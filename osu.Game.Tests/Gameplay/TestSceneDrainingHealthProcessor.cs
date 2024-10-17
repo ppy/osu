@@ -6,6 +6,7 @@
 using System.Threading;
 using NUnit.Framework;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Framework.Testing;
 using osu.Framework.Timing;
@@ -13,8 +14,10 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Tests.Visual;
 
@@ -168,7 +171,7 @@ namespace osu.Game.Tests.Gameplay
             var beatmap = createBeatmap(0, 1000);
             createProcessor(beatmap);
 
-            AddStep("setup fail conditions", () => processor.FailConditions += ((_, result) => result.Type == HitResult.Miss));
+            AddStep("setup fail conditions", () => processor.Mods.Value = new[] { new OsuModSuddenDeath() });
 
             AddStep("apply perfect hit result", () => processor.ApplyResult(new JudgementResult(beatmap.HitObjects[0], new Judgement()) { Type = HitResult.Perfect }));
             AddAssert("not failed", () => !processor.HasFailed);
@@ -185,8 +188,11 @@ namespace osu.Game.Tests.Gameplay
 
             AddStep("setup multiple fail conditions", () =>
             {
-                processor.FailConditions += ((_, result) => result.Type == HitResult.Miss);
-                processor.FailConditions += ((_, result) => result.Type == HitResult.Meh);
+                processor.Mods.Value = new Mod[]
+                {
+                    new OsuModSuddenDeath(),
+                    new ModFailOnResult(HitResult.Meh),
+                };
             });
 
             AddStep("apply perfect hit result", () => processor.ApplyResult(new JudgementResult(beatmap.HitObjects[0], new Judgement()) { Type = HitResult.Perfect }));
@@ -194,6 +200,28 @@ namespace osu.Game.Tests.Gameplay
 
             AddStep($"apply {resultApplied.ToString().ToLowerInvariant()} hit result",
                 () => processor.ApplyResult(new JudgementResult(beatmap.HitObjects[0], new Judgement()) { Type = resultApplied }));
+            AddAssert("failed", () => processor.HasFailed);
+        }
+
+        [Test]
+        public void TestMultipleOverlappingFailConditions([Values] bool secondModHasRestart)
+        {
+            var beatmap = createBeatmap(0, 1000);
+            createProcessor(beatmap);
+
+            AddStep("setup multiple fail conditions", () =>
+            {
+                processor.Mods.Value = new Mod[]
+                {
+                    new OsuModSuddenDeath { Restart = { Value = !secondModHasRestart } },
+                    new ModFailOnResult(HitResult.Miss) { Restart = { Value = secondModHasRestart } },
+                };
+            });
+
+            AddStep("apply perfect hit result", () => processor.ApplyResult(new JudgementResult(beatmap.HitObjects[0], new Judgement()) { Type = HitResult.Perfect }));
+            AddAssert("not failed", () => !processor.HasFailed);
+
+            AddStep("apply miss hit result", () => processor.ApplyResult(new JudgementResult(beatmap.HitObjects[0], new Judgement()) { Type = HitResult.Miss }));
             AddAssert("failed", () => processor.HasFailed);
         }
 
@@ -388,6 +416,23 @@ namespace osu.Game.Tests.Gameplay
 
                 AddNested(new JudgeableHitObject());
             }
+        }
+
+        private class ModFailOnResult : ModForceFail
+        {
+            public override string Name => "";
+            public override LocalisableString Description => "";
+            public override double ScoreMultiplier => 1.0;
+            public override string Acronym => "";
+
+            private readonly HitResult type;
+
+            public ModFailOnResult(HitResult type)
+            {
+                this.type = type;
+            }
+
+            public override bool ShouldFail(JudgementResult result) => result.Type == type;
         }
     }
 }

@@ -15,7 +15,7 @@ using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public class ModAccuracyChallenge : ModFailCondition, IApplicableToScoreProcessor
+    public class ModAccuracyChallenge : ModForceFail, IApplicableToScoreProcessor
     {
         public override string Name => "Accuracy Challenge";
 
@@ -48,33 +48,35 @@ namespace osu.Game.Rulesets.Mods
         [SettingSource("Accuracy mode", "The mode of accuracy that will trigger failure.")]
         public Bindable<AccuracyMode> AccuracyJudgeMode { get; } = new Bindable<AccuracyMode>();
 
-        private readonly Bindable<double> currentAccuracy = new Bindable<double>();
+        private ScoreProcessor? scoreProcessor;
 
         public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
         {
-            switch (AccuracyJudgeMode.Value)
-            {
-                case AccuracyMode.Standard:
-                    currentAccuracy.BindTo(scoreProcessor.Accuracy);
-                    break;
-
-                case AccuracyMode.MaximumAchievable:
-                    currentAccuracy.BindTo(scoreProcessor.MaximumAccuracy);
-                    break;
-            }
-
-            currentAccuracy.BindValueChanged(s =>
-            {
-                if (s.NewValue < MinimumAccuracy.Value)
-                {
-                    TriggerFailure();
-                }
-            });
+            this.scoreProcessor = scoreProcessor;
         }
 
         public ScoreRank AdjustRank(ScoreRank rank, double accuracy) => rank;
 
-        protected override bool FailCondition(HealthProcessor healthProcessor, JudgementResult result) => false;
+        public override bool ShouldFail(JudgementResult result)
+        {
+            if (scoreProcessor == null)
+                return false;
+
+            double accuracy;
+
+            switch (AccuracyJudgeMode.Value)
+            {
+                case AccuracyMode.MaximumAchievable:
+                    accuracy = scoreProcessor.MaximumAccuracy.Value;
+                    break;
+
+                default:
+                    accuracy = scoreProcessor.Accuracy.Value;
+                    break;
+            }
+
+            return accuracy < MinimumAccuracy.Value;
+        }
 
         public enum AccuracyMode
         {
