@@ -10,6 +10,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
         CursorExpand,
         CursorRotate,
         HitCircleOverlayAboveNumber,
+        EditorBlueprintRadius,
 
         // ReSharper disable once IdentifierTypo
         HitCircleOverlayAboveNumer, // Some old skins will have this typo
