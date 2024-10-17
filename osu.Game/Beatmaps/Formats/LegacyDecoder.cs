@@ -168,6 +168,7 @@ namespace osu.Game.Beatmaps.Formats
             Events,
             TimingPoints,
             Colours,
+            CustomSoundBanks,
             HitObjects,
             Variables,
             Fonts,
