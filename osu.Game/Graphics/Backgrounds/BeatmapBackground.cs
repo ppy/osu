@@ -3,7 +3,6 @@
 
 #nullable disable
 
-
 using System.Runtime.InteropServices;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -131,7 +130,7 @@ namespace osu.Game.Graphics.Backgrounds
             }
 
             public DimmableBufferedContainer(RenderBufferFormat[] formats = null, bool pixelSnapping = false, bool cachedFrameBuffer = false)
-            : base(formats, pixelSnapping, cachedFrameBuffer)
+                : base(formats, pixelSnapping, cachedFrameBuffer)
             {
                 DimColour = Color4.Black;
                 DimLevel = 0.0f;
@@ -150,7 +149,7 @@ namespace osu.Game.Graphics.Backgrounds
                 public new DimmableBufferedContainer Source => (DimmableBufferedContainer)base.Source;
 
                 public DimmableBufferedContainerDrawNode(DimmableBufferedContainer source, BufferedContainerDrawNodeSharedData sharedData)
-                : base(source, sharedData)
+                    : base(source, sharedData)
                 {
                 }
 
@@ -224,7 +223,6 @@ namespace osu.Game.Graphics.Backgrounds
             }
 
             public BeatmapBackgroundSprite()
-            : base()
             {
                 DimColour = Color4.Black;
                 DimLevel = 0.0f;

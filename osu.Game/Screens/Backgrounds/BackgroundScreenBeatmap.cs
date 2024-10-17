@@ -229,7 +229,7 @@ namespace osu.Game.Screens.Backgrounds
             {
                 get
                 {
-                    if (IgnoreUserSettings.Value || ShowStoryboard.Value && StoryboardReplacesBackground.Value)
+                    if (IgnoreUserSettings.Value || (ShowStoryboard.Value && StoryboardReplacesBackground.Value))
                         return Color4.Black;
 
                     return OsuColour.Gray((float)userDimColour.Value);

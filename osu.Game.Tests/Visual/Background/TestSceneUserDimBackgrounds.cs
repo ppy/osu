@@ -370,31 +370,31 @@ namespace osu.Game.Tests.Visual.Background
 
             public bool IsBackgroundDimmed()
             {
-                Color4 ParentDrawColour = background.ParentDrawColour;
-                Color4 TargetColour = new Color4(
-                    ParentDrawColour.R * (1f - background.CurrentDim),
-                    ParentDrawColour.G * (1f - background.CurrentDim),
-                    ParentDrawColour.B * (1f - background.CurrentDim),
-                    ParentDrawColour.A
+                Color4 parentDrawColour = background.ParentDrawColour;
+                Color4 targetColour = new Color4(
+                    parentDrawColour.R * (1f - background.CurrentDim),
+                    parentDrawColour.G * (1f - background.CurrentDim),
+                    parentDrawColour.B * (1f - background.CurrentDim),
+                    parentDrawColour.A
                 );
 
-                return background.CurrentColour == TargetColour;
+                return background.CurrentColour == targetColour;
             }
 
             public bool IsBackgroundUndimmed() => background.CurrentColour == background.ParentDrawColour && background.CurrentColourOffset == Color4.Black;
 
             public bool IsBackgroundColourOffset()
             {
-                Color4 CurrentDimColour = background.CurrentDimColour;
-                Color4 ParentDrawColour = background.ParentDrawColour;
-                Color4 TargetColourOffset = new Color4(
-                    ParentDrawColour.R * CurrentDimColour.R * background.CurrentDim,
-                    ParentDrawColour.G * CurrentDimColour.G * background.CurrentDim,
-                    ParentDrawColour.B * CurrentDimColour.B * background.CurrentDim,
+                Color4 currentDimColour = background.CurrentDimColour;
+                Color4 parentDrawColour = background.ParentDrawColour;
+                Color4 targetColourOffset = new Color4(
+                    parentDrawColour.R * currentDimColour.R * background.CurrentDim,
+                    parentDrawColour.G * currentDimColour.G * background.CurrentDim,
+                    parentDrawColour.B * currentDimColour.B * background.CurrentDim,
                     1
                 );
 
-                return background.CurrentColourOffset == TargetColourOffset;
+                return background.CurrentColourOffset == targetColourOffset;
             }
 
             public bool IsUserBlurApplied() => Precision.AlmostEquals(background.CurrentBlur, new Vector2((float)BlurLevel.Value * BackgroundScreenBeatmap.USER_BLUR_FACTOR), 0.1f);
@@ -568,14 +568,14 @@ namespace osu.Game.Tests.Visual.Background
             {
                 get
                 {
-                    Color4 DrawColour = DrawColourInfo.Colour;
-                    float DimLevel = ColouredDimmable.DimLevel;
+                    Color4 drawColour = DrawColourInfo.Colour;
+                    float dimLevel = ColouredDimmable.DimLevel;
 
                     return new Color4(
-                        DrawColour.R * (1 - DimLevel),
-                        DrawColour.G * (1 - DimLevel),
-                        DrawColour.B * (1 - DimLevel),
-                        DrawColour.A
+                        drawColour.R * (1 - dimLevel),
+                        drawColour.G * (1 - dimLevel),
+                        drawColour.B * (1 - dimLevel),
+                        drawColour.A
                     );
                 }
             }
@@ -584,15 +584,15 @@ namespace osu.Game.Tests.Visual.Background
             {
                 get
                 {
-                    Color4 DrawColour = DrawColourInfo.Colour;
-                    Color4 DimColour = ColouredDimmable.DimColour;
-                    float DimLevel = ColouredDimmable.DimLevel;
+                    Color4 drawColour = DrawColourInfo.Colour;
+                    Color4 dimColour = ColouredDimmable.DimColour;
+                    float dimLevel = ColouredDimmable.DimLevel;
 
                     return new Color4(
-                        DrawColour.R * DimColour.R * DimLevel,
-                        DrawColour.G * DimColour.G * DimLevel,
-                        DrawColour.B * DimColour.B * DimLevel,
-                        DrawColour.A
+                        drawColour.R * dimColour.R * dimLevel,
+                        drawColour.G * dimColour.G * dimLevel,
+                        drawColour.B * dimColour.B * dimLevel,
+                        drawColour.A
                     );
                 }
             }
@@ -601,12 +601,12 @@ namespace osu.Game.Tests.Visual.Background
 
             public bool IsSpriteDimmed => ColouredDimmableSprite.DimLevel != 0.0f;
 
-            public bool IsBufferedContainerDimmed => ColouredDimmableBufferedContainer != null ? ColouredDimmableBufferedContainer.DimLevel != 0.0f : false;
+            public bool IsBufferedContainerDimmed => ColouredDimmableBufferedContainer != null && ColouredDimmableBufferedContainer.DimLevel != 0.0f;
 
             public bool IsBufferedContainerNull => ColouredDimmableBufferedContainer == null;
 
             public TestBeatmapBackground(WorkingBeatmap beatmap)
-            : base(beatmap)
+                : base(beatmap)
             {
             }
 
