@@ -592,7 +592,7 @@ namespace osu.Game.Overlays.Mods
 
                     //matchingMod ensures that if an exact mod acronym is typed, it will be selected when Select is pressed (as opposed to being prioritized in arbitrary column order)
                     ModState? firstMod = columnFlow.Columns.OfType<ModColumn>().FirstOrDefault(m => m.IsPresent)?.AvailableMods.FirstOrDefault(x => x.Visible);
-                    ModState? matchingMod = columnFlow.Columns.OfType<ModColumn>().SelectMany(m => m.AvailableMods).FirstOrDefault(x => x.Mod.Acronym.Equals(SearchTerm, StringComparison.OrdinalIgnoreCase));
+                    ModState? matchingMod = columnFlow.Columns.OfType<ModColumn>().SelectMany(m => m.AvailableMods).FirstOrDefault(x => x.Mod.Acronym.Equals(SearchTerm, StringComparison.OrdinalIgnoreCase) | x.Mod.Name.Equals(SearchTerm, StringComparison.OrdinalIgnoreCase));
 
                     if (matchingMod is not null)
                     {
