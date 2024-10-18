@@ -92,7 +92,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             HitWindows hitWindows = new OsuHitWindows();
             hitWindows.SetDifficulty(beatmap.Difficulty.OverallDifficulty);
 
-            double hitWindowGreat = hitWindows.WindowFor(HitResult.Great) / clockRate;
+            double hitWindowGreat = hitWindows.WindowFor(HitResult.Great);
+
+            // Floor hitwindow for stable scores
+            if (mods.OfType<OsuModClassic>().Any(m => m.NoSliderHeadAccuracy.Value))
+                hitWindowGreat = Math.Floor(hitWindowGreat);
+
+            hitWindowGreat /= clockRate;
 
             OsuDifficultyAttributes attributes = new OsuDifficultyAttributes
             {
