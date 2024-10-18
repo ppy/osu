@@ -111,7 +111,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                         BlurContainer = new BackdropBlurContainer
                         {
                             RelativeSizeAxes = Axes.Both,
-                            BlurSigma = new Vector2(10f),
+                            BlurSigma = new Vector2(4f),
                             MaskCutoff = 0.25f,
                             EffectBufferScale = new Vector2(0.5f),
                             Child = Body = new SkinnableDrawable(new OsuSkinComponentLookup(OsuSkinComponents.SliderBody), _ => new DefaultSliderBody(), confineMode: ConfineMode.NoScaling)
