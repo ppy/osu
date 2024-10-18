@@ -55,7 +55,7 @@ namespace osu.Game.Skinning.Components
 
             Attribute.BindValueChanged(_ => updateText());
             Template.BindValueChanged(_ => updateText());
-            beatmap.BindValueChanged(b => updateText());
+            beatmap.BindValueChanged(_ => updateText());
 
             updateText();
         }
