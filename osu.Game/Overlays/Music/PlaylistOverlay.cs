@@ -26,7 +26,7 @@ namespace osu.Game.Overlays.Music
         private const float transition_duration = 600;
         public const float PLAYLIST_HEIGHT = 510;
 
-        private readonly BindableList<Live<BeatmapSetInfo>> beatmapSets = new BindableList<Live<BeatmapSetInfo>>();
+        public readonly BindableList<Live<BeatmapSetInfo>> BeatmapSets = new BindableList<Live<BeatmapSetInfo>>();
 
         private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
 
@@ -39,7 +39,7 @@ namespace osu.Game.Overlays.Music
         private IDisposable beatmapSubscription;
 
         private FilterControl filter;
-        private Playlist list;
+        public Playlist List;
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, Bindable<WorkingBeatmap> beatmap)
@@ -66,7 +66,7 @@ namespace osu.Game.Overlays.Music
                             Colour = colours.Gray3,
                             RelativeSizeAxes = Axes.Both,
                         },
-                        list = new Playlist
+                        List = new Playlist
                         {
                             RelativeSizeAxes = Axes.Both,
                             Padding = new MarginPadding { Top = 95, Bottom = 10, Right = 10 },
@@ -76,7 +76,7 @@ namespace osu.Game.Overlays.Music
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            FilterChanged = criteria => list.Filter(criteria),
+                            FilterChanged = criteria => List.Filter(criteria),
                             Padding = new MarginPadding(10),
                         },
                     },
@@ -85,7 +85,7 @@ namespace osu.Game.Overlays.Music
 
             filter.Search.OnCommit += (_, _) =>
             {
-                list.FirstVisibleSet?.PerformRead(set =>
+                List.FirstVisibleSet?.PerformRead(set =>
                 {
                     BeatmapInfo toSelect = set.Beatmaps.FirstOrDefault();
 
@@ -104,25 +104,25 @@ namespace osu.Game.Overlays.Music
 
             beatmapSubscription = realm.RegisterForNotifications(r => r.All<BeatmapSetInfo>().Where(s => !s.DeletePending && !s.Protected), beatmapsChanged);
 
-            list.Items.BindTo(beatmapSets);
-            beatmap.BindValueChanged(working => list.SelectedSet.Value = working.NewValue.BeatmapSetInfo.ToLive(realm), true);
+            List.Items.BindTo(BeatmapSets);
+            beatmap.BindValueChanged(working => List.SelectedSet.Value = working.NewValue.BeatmapSetInfo.ToLive(realm), true);
         }
 
         private void beatmapsChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet changes)
         {
             if (changes == null)
             {
-                beatmapSets.Clear();
+                BeatmapSets.Clear();
                 // must use AddRange to avoid RearrangeableList sort overhead per add op.
-                beatmapSets.AddRange(sender.Select(b => b.ToLive(realm)));
+                BeatmapSets.AddRange(sender.Select(b => b.ToLive(realm)));
                 return;
             }
 
             foreach (int i in changes.InsertedIndices)
-                beatmapSets.Insert(i, sender[i].ToLive(realm));
+                BeatmapSets.Insert(i, sender[i].ToLive(realm));
 
             foreach (int i in changes.DeletedIndices.OrderDescending())
-                beatmapSets.RemoveAt(i);
+                BeatmapSets.RemoveAt(i);
         }
 
         protected override void PopIn()
