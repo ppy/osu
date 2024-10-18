@@ -50,7 +50,7 @@ namespace osu.Game.Overlays.Music
         }
 
         public Live<BeatmapSetInfo>? FirstVisibleSet => Items.FirstOrDefault(i => ((PlaylistItem)ItemMap[i]).MatchingFilter);
-        public IEnumerable<Live<BeatmapSetInfo>>? AllVisibleSets => Items.Where(i => ((PlaylistItem)ItemMap[i]).MatchingFilter);
+        public IEnumerable<Live<BeatmapSetInfo>> AllVisibleSets => Items.Where(i => ((PlaylistItem)ItemMap[i]).MatchingFilter);
 
         protected override OsuRearrangeableListItem<Live<BeatmapSetInfo>> CreateOsuDrawable(Live<BeatmapSetInfo> item) =>
             new PlaylistItem(item)
