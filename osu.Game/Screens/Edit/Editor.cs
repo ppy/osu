@@ -1100,6 +1100,7 @@ namespace osu.Game.Screens.Edit
         {
             // Gives margin to seek back after last control point
             double seekMargin = 0;
+            
             if (clock.IsRunning) 
             {
                 IAdjustableClock adjustableClock = clock;
