@@ -48,7 +48,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep(@"Reset all", delegate
             {
                 healthProcessor.Health.Value = 1;
-                healthProcessor.Failed += () => false; // health won't be updated if the processor gets into a "fail" state.
+                healthProcessor.Failed += _ => false; // health won't be updated if the processor gets into a "fail" state.
 
                 Children = new Drawable[]
                 {

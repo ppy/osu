@@ -11,7 +11,7 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModSuddenDeath : ModFailCondition
+    public abstract class ModSuddenDeath : ModForceFail
     {
         public override string Name => "Sudden Death";
         public override string Acronym => "SD";
@@ -23,8 +23,9 @@ namespace osu.Game.Rulesets.Mods
 
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(ModPerfect)).ToArray();
 
-        protected override bool FailCondition(HealthProcessor healthProcessor, JudgementResult result)
-            => result.Type.AffectsCombo()
-               && !result.IsHit;
+        public override bool ShouldFail(JudgementResult result)
+        {
+            return result.Type.AffectsCombo() && !result.IsHit;
+        }
     }
 }

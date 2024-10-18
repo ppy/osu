@@ -8,11 +8,11 @@ using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Tests.Visual
 {
-    public abstract partial class ModFailConditionTestScene : ModTestScene
+    public abstract partial class ModForceFailTestScene : ModTestScene
     {
-        private readonly ModFailCondition mod;
+        private readonly ModForceFail mod;
 
-        protected ModFailConditionTestScene(ModFailCondition mod)
+        protected ModForceFailTestScene(ModForceFail mod)
         {
             this.mod = mod;
         }
@@ -40,12 +40,12 @@ namespace osu.Game.Tests.Visual
 
             protected override bool CheckModsAllowFailure() => true;
 
-            public bool CheckFailed(bool failed)
+            public bool CheckFailed(bool shouldHaveFailed)
             {
-                if (!failed)
+                if (!shouldHaveFailed)
                     return ScoreProcessor.HasCompleted.Value && !HealthProcessor.HasFailed;
 
-                return HealthProcessor.HasFailed;
+                return HealthProcessor.HasFailed || ScoreProcessor.HasFailed;
             }
         }
 
