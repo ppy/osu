@@ -12,23 +12,28 @@ namespace osu.Game.Localisation.SkinComponents
         /// <summary>
         /// "Attribute"
         /// </summary>
-        public static LocalisableString Attribute => new TranslatableString(getKey(@"attribute"), "Attribute");
+        public static LocalisableString Attribute => new TranslatableString(getKey(@"attribute"), @"Attribute");
 
         /// <summary>
         /// "The attribute to be displayed."
         /// </summary>
-        public static LocalisableString AttributeDescription => new TranslatableString(getKey(@"attribute_description"), "The attribute to be displayed.");
+        public static LocalisableString AttributeDescription => new TranslatableString(getKey(@"attribute_description"), @"The attribute to be displayed.");
 
         /// <summary>
         /// "Template"
         /// </summary>
-        public static LocalisableString Template => new TranslatableString(getKey(@"template"), "Template");
+        public static LocalisableString Template => new TranslatableString(getKey(@"template"), @"Template");
 
         /// <summary>
         /// "Supports {{Label}} and {{Value}}, but also including arbitrary attributes like {{StarRating}} (see attribute list for supported values)."
         /// </summary>
         public static LocalisableString TemplateDescription => new TranslatableString(getKey(@"template_description"), @"Supports {{Label}} and {{Value}}, but also including arbitrary attributes like {{StarRating}} (see attribute list for supported values).");
 
-        private static string getKey(string key) => $"{prefix}:{key}";
+        /// <summary>
+        /// "Max PP"
+        /// </summary>
+        public static LocalisableString MaxPP => new TranslatableString(getKey(@"max_pp"), @"Max PP");
+
+        private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
