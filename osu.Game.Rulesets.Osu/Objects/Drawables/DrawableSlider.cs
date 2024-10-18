@@ -12,6 +12,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Layout;
+using osu.Framework.Utils;
 using osu.Game.Audio;
 using osu.Game.Graphics.Containers;
 using osu.Game.Rulesets.Judgements;
@@ -22,6 +23,7 @@ using osu.Game.Rulesets.Osu.Skinning.Default;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -111,7 +113,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                         BlurContainer = new BackdropBlurContainer
                         {
                             RelativeSizeAxes = Axes.Both,
-                            BlurSigma = new Vector2(4f),
+                            BlurSigma = new Vector2(5f),
                             MaskCutoff = 0.25f,
                             EffectBufferScale = new Vector2(0.5f),
                             Child = Body = new SkinnableDrawable(new OsuSkinComponentLookup(OsuSkinComponents.SliderBody), _ => new DefaultSliderBody(), confineMode: ConfineMode.NoScaling)
@@ -144,6 +146,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             {
                 foreach (var drawableHitObject in NestedHitObjects)
                     drawableHitObject.AccentColour.Value = colour.NewValue;
+                BlurContainer.EffectColour = Interpolation.ValueAt(0.5, colour.NewValue, Color4.White, 0, 1);
             }, true);
         }
 
