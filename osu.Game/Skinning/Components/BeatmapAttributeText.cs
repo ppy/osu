@@ -76,8 +76,13 @@ namespace osu.Game.Skinning.Components
 
             foreach (var type in Enum.GetValues<BeatmapAttribute>())
             {
-                numberedTemplate = numberedTemplate.Replace($"{{{{{type}}}}}", $"{{{values.Count}}}");
-                values.Add(getValueString(type));
+                string replaced = numberedTemplate.Replace($@"{{{{{type}}}}}", $@"{{{values.Count}}}");
+
+                if (numberedTemplate != replaced)
+                {
+                    numberedTemplate = replaced;
+                    values.Add(getValueString(type));
+                }
             }
 
             text.Text = LocalisableString.Format(numberedTemplate, values.ToArray());
