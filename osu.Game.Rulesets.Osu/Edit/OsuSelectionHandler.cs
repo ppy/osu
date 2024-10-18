@@ -115,8 +115,9 @@ namespace osu.Game.Rulesets.Osu.Edit
 
                 if (h is Slider slider)
                 {
-                    slider.Path.Reverse(out Vector2 offset, changeHandler);
-                    new PositionChange(slider, slider.Position + offset).Submit(changeHandler);
+                    var reverse = new ReverseSliderPathChange(slider.Path);
+                    reverse.Submit(changeHandler);
+                    new PositionChange(slider, slider.Position + reverse.PositionalOffset).Submit(changeHandler);
                 }
             }
 
@@ -273,7 +274,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                         new RemovePathControlPointChange(mergedHitObject.Path.ControlPoints, mergedHitObject.Path.ControlPoints.Count - 1).Submit(changeHandler);
                     }
 
-                    mergedHitObject.Path.ControlPoints.SubmitAddRange(hasPath.Path.ControlPoints.Select(o => new PathControlPoint(o.Position + offset, o.Type)), changeHandler);
+                    new AddRangePathControlPointChange(mergedHitObject.Path.ControlPoints, hasPath.Path.ControlPoints.Select(o => new PathControlPoint(o.Position + offset, o.Type))).Submit(changeHandler);
                     lastCircle = false;
                 }
                 else

@@ -175,7 +175,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             // Snap the slider's length to the current beat divisor
             // to calculate the final resulting duration / bounding box before the final checks.
-            slider.SnapTo(snapProvider, changeHandler);
+            new SnapToChange<Slider>(slider, snapProvider).Submit(changeHandler);
 
             new PositionChange(slider, GeometryUtils.GetScaledPosition(scale, origin, originalInfo.Position, axisRotation)).Submit(changeHandler);
 
@@ -194,7 +194,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             new PositionChange(slider, originalInfo.Position).Submit(changeHandler);
 
             // Snap the slider's length again to undo the potentially-invalid length applied by the previous snap.
-            slider.SnapTo(snapProvider, changeHandler);
+            new SnapToChange<Slider>(slider, snapProvider).Submit(changeHandler);
         }
 
         private (bool X, bool Y) isQuadInBounds(Quad quad)

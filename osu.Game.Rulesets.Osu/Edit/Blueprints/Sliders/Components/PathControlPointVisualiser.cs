@@ -380,7 +380,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             EnsureValidPathTypes();
 
             if (hitObject.Path.Distance < originalDistance)
-                hitObject.SnapTo(distanceSnapProvider, changeHandler);
+                new SnapToChange<T>(hitObject, distanceSnapProvider).Submit(changeHandler);
             else
                 new ExpectedDistanceChange(hitObject.Path, originalDistance).Submit(changeHandler);
 
@@ -454,7 +454,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             }
 
             // Snap the path to the current beat divisor before checking length validity.
-            hitObject.SnapTo(distanceSnapProvider, changeHandler);
+            new SnapToChange<T>(hitObject, distanceSnapProvider).Submit(changeHandler);
 
             if (!hitObject.Path.HasValidLength)
             {
@@ -464,7 +464,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                 new PositionChange(hitObject, oldPosition).Submit(changeHandler);
                 new StartTimeChange(hitObject, oldStartTime).Submit(changeHandler);
                 // Snap the path length again to undo the invalid length.
-                hitObject.SnapTo(distanceSnapProvider, changeHandler);
+                new SnapToChange<T>(hitObject, distanceSnapProvider).Submit(changeHandler);
                 return;
             }
 

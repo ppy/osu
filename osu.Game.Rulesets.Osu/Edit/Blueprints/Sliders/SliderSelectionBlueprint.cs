@@ -303,7 +303,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
                 if (Precision.AlmostBigger(segmentEnds[segmentIndex], 1, 1E-3))
                 {
-                    sliderPath.ControlPoints.SubmitRemoveRange(i + 1, sliderPath.ControlPoints.Count - i - 1, changeHandler);
+                    new RemoveRangePathControlPointChange(sliderPath.ControlPoints, i + 1, sliderPath.ControlPoints.Count - i - 1).Submit(changeHandler);
                     new PathControlPointTypeChange(sliderPath.ControlPoints[^1], null).Submit(changeHandler);
                     break;
                 }
@@ -443,7 +443,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
             ControlPointVisualiser?.EnsureValidPathTypes();
 
-            HitObject.SnapTo(distanceSnapProvider, changeHandler);
+            new SnapToChange<Slider>(HitObject, distanceSnapProvider).Submit(changeHandler);
 
             return pathControlPoint;
         }
@@ -467,7 +467,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             ControlPointVisualiser?.EnsureValidPathTypes();
 
             // Snap the slider to the current beat divisor before checking length validity.
-            HitObject.SnapTo(distanceSnapProvider, changeHandler);
+            new SnapToChange<Slider>(HitObject, distanceSnapProvider).Submit(changeHandler);
 
             // If there are 0 or 1 remaining control points, or the slider has an invalid length, it is in a degenerate form and should be deleted
             if (controlPoints.Count <= 1 || !HitObject.Path.HasValidLength)
@@ -512,7 +512,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
                 // Extract the split portion and remove from the original slider.
                 var splitControlPoints = controlPoints.Take(index + 1).ToList();
-                HitObject.Path.ControlPoints.SubmitRemoveRange(0, index, changeHandler);
+                new RemoveRangePathControlPointChange(HitObject.Path.ControlPoints, 0, index).Submit(changeHandler);
 
                 var newSlider = new Slider
                 {
