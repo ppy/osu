@@ -50,6 +50,8 @@ namespace osu.Game.Screens.Play
                 Anchor = Anchor.TopCentre,
                 Origin = Anchor.TopCentre,
             });
+
+            AddReplayAnalysisSettings();
         }
 
         protected override void LoadComplete()
