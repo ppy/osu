@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Transforms;
@@ -32,10 +33,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         protected override Container<Drawable> Content => zoomedContent;
 
         /// <summary>
-        /// The current zoom level of <see cref="ZoomableScrollContainer"/>.
+        /// The current (final) zoom level of <see cref="ZoomableScrollContainer"/>.
         /// It may differ from <see cref="Zoom"/> during transitions.
         /// </summary>
-        public float CurrentZoom { get; private set; } = 1;
+        public BindableFloat CurrentZoom { get; private set; } = new BindableFloat(1);
 
         private bool isZoomSetUp;
 
@@ -98,7 +99,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             minZoom = minimum;
             maxZoom = maximum;
 
-            CurrentZoom = zoomTarget = initial;
+            CurrentZoom.Value = zoomTarget = initial;
             zoomedContentWidthCache.Invalidate();
 
             isZoomSetUp = true;
@@ -124,7 +125,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             if (IsLoaded)
                 setZoomTarget(newZoom, ToSpaceOfOtherDrawable(new Vector2(DrawWidth / 2, 0), zoomedContent).X);
             else
-                CurrentZoom = zoomTarget = newZoom;
+                CurrentZoom.Value = zoomTarget = newZoom;
         }
 
         protected override void UpdateAfterChildren()
@@ -154,7 +155,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private void updateZoomedContentWidth()
         {
-            zoomedContent.Width = DrawWidth * CurrentZoom;
+            zoomedContent.Width = DrawWidth * CurrentZoom.Value;
             zoomedContentWidthCache.Validate();
         }
 
@@ -238,7 +239,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 float expectedWidth = d.DrawWidth * newZoom;
                 float targetOffset = expectedWidth * (focusPoint / contentSize) - focusOffset;
 
-                d.CurrentZoom = newZoom;
+                d.CurrentZoom.Value = newZoom;
                 d.updateZoomedContentWidth();
 
                 // Temporarily here to make sure ScrollTo gets the correct DrawSize for scrollable area.
@@ -247,7 +248,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 d.ScrollTo(targetOffset, false);
             }
 
-            protected override void ReadIntoStartValue(ZoomableScrollContainer d) => StartValue = d.CurrentZoom;
+            protected override void ReadIntoStartValue(ZoomableScrollContainer d) => StartValue = d.CurrentZoom.Value;
         }
     }
 }
