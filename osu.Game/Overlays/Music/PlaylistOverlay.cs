@@ -26,7 +26,7 @@ namespace osu.Game.Overlays.Music
         private const float transition_duration = 600;
         public const float PLAYLIST_HEIGHT = 510;
 
-        public readonly BindableList<Live<BeatmapSetInfo>> BeatmapSets = new BindableList<Live<BeatmapSetInfo>>();
+        private readonly BindableList<Live<BeatmapSetInfo>> beatmapSets = new BindableList<Live<BeatmapSetInfo>>();
 
         private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
 
@@ -104,7 +104,7 @@ namespace osu.Game.Overlays.Music
 
             beatmapSubscription = realm.RegisterForNotifications(r => r.All<BeatmapSetInfo>().Where(s => !s.DeletePending && !s.Protected), beatmapsChanged);
 
-            List.Items.BindTo(BeatmapSets);
+            List.Items.BindTo(beatmapSets);
             beatmap.BindValueChanged(working => List.SelectedSet.Value = working.NewValue.BeatmapSetInfo.ToLive(realm), true);
         }
 
@@ -112,17 +112,17 @@ namespace osu.Game.Overlays.Music
         {
             if (changes == null)
             {
-                BeatmapSets.Clear();
+                beatmapSets.Clear();
                 // must use AddRange to avoid RearrangeableList sort overhead per add op.
-                BeatmapSets.AddRange(sender.Select(b => b.ToLive(realm)));
+                beatmapSets.AddRange(sender.Select(b => b.ToLive(realm)));
                 return;
             }
 
             foreach (int i in changes.InsertedIndices)
-                BeatmapSets.Insert(i, sender[i].ToLive(realm));
+                beatmapSets.Insert(i, sender[i].ToLive(realm));
 
             foreach (int i in changes.DeletedIndices.OrderDescending())
-                BeatmapSets.RemoveAt(i);
+                beatmapSets.RemoveAt(i);
         }
 
         protected override void PopIn()
