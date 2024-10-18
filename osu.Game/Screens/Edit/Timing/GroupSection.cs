@@ -110,7 +110,16 @@ namespace osu.Game.Screens.Edit.Timing
             Beatmap.ControlPointInfo.RemoveGroup(SelectedGroup.Value);
 
             foreach (var cp in currentGroupItems)
+            {
+                // Only adjust hit object offsets if the group contains a timing control point
+                if (Beatmap.AdjustNotesOnOffsetBPMChange.Value && cp is TimingControlPoint tp)
+                {
+                    TimingSectionAdjustments.AdjustHitObjectOffset(Beatmap, tp, time - SelectedGroup.Value.Time);
+                    Beatmap.UpdateAllHitObjects();
+                }
+
                 Beatmap.ControlPointInfo.Add(time, cp);
+            }
 
             // the control point might not necessarily exist yet, if currentGroupItems was empty.
             SelectedGroup.Value = Beatmap.ControlPointInfo.GroupAt(time, true);
