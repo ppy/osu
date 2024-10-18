@@ -21,7 +21,7 @@ namespace osu.Game.Screens.Edit.Changes
 
     public static class IRevertibleChangeExtension
     {
-        public static void Submit(this IRevertibleChange change, NewBeatmapEditorChangeHandler? changeHandler, bool commitImmediately = false)
+        public static void Apply(this IRevertibleChange change, NewBeatmapEditorChangeHandler? changeHandler, bool commitImmediately = false)
         {
             if (changeHandler != null)
                 changeHandler.Submit(change, commitImmediately);

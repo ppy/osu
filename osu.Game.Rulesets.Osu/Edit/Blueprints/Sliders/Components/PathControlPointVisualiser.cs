@@ -115,7 +115,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                 return;
 
             if (segment.Count > 3)
-                new PathControlPointTypeChange(first, PathType.BEZIER).Submit(changeHandler);
+                new PathControlPointTypeChange(first, PathType.BEZIER).Apply(changeHandler);
 
             if (segment.Count != 3)
                 return;
@@ -123,7 +123,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             ReadOnlySpan<Vector2> points = segment.Select(p => p.Position).ToArray();
             RectangleF boundingBox = PathApproximator.CircularArcBoundingBox(points);
             if (boundingBox.Width >= 640 || boundingBox.Height >= 480)
-                new PathControlPointTypeChange(first, PathType.BEZIER).Submit(changeHandler);
+                new PathControlPointTypeChange(first, PathType.BEZIER).Apply(changeHandler);
         }
 
         /// <summary>
@@ -370,19 +370,19 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                     int thirdPointIndex = indexInSegment + 2;
 
                     if (pointsInSegment.Count > thirdPointIndex + 1)
-                        new PathControlPointTypeChange(pointsInSegment[thirdPointIndex], pointsInSegment[0].Type).Submit(changeHandler);
+                        new PathControlPointTypeChange(pointsInSegment[thirdPointIndex], pointsInSegment[0].Type).Apply(changeHandler);
                 }
 
-                new ExpectedDistanceChange(hitObject.Path, null).Submit(changeHandler);
-                new PathControlPointTypeChange(p.ControlPoint, type).Submit(changeHandler);
+                new ExpectedDistanceChange(hitObject.Path, null).Apply(changeHandler);
+                new PathControlPointTypeChange(p.ControlPoint, type).Apply(changeHandler);
             }
 
             EnsureValidPathTypes();
 
             if (hitObject.Path.Distance < originalDistance)
-                new SnapToChange<T>(hitObject, distanceSnapProvider).Submit(changeHandler);
+                new SnapToChange<T>(hitObject, distanceSnapProvider).Apply(changeHandler);
             else
-                new ExpectedDistanceChange(hitObject.Path, originalDistance).Submit(changeHandler);
+                new ExpectedDistanceChange(hitObject.Path, originalDistance).Apply(changeHandler);
 
             changeHandler?.EndChange();
         }
@@ -425,8 +425,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
                 Vector2 movementDelta = Parent!.ToLocalSpace(result?.ScreenSpacePosition ?? newHeadPosition) - hitObject.Position;
 
-                new PositionChange(hitObject, hitObject.Position + movementDelta).Submit(changeHandler);
-                new StartTimeChange(hitObject, result?.Time ?? hitObject.StartTime).Submit(changeHandler);
+                new PositionChange(hitObject, hitObject.Position + movementDelta).Apply(changeHandler);
+                new StartTimeChange(hitObject, result?.Time ?? hitObject.StartTime).Apply(changeHandler);
 
                 for (int i = 1; i < hitObject.Path.ControlPoints.Count; i++)
                 {
@@ -436,7 +436,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                     // All other selected control points (if any) will move together with the head point
                     // (and so they will not move at all, relative to each other).
                     if (!selectedControlPoints.Contains(controlPoint))
-                        new PathControlPointPositionChange(controlPoint, controlPoint.Position - movementDelta).Submit(changeHandler);
+                        new PathControlPointPositionChange(controlPoint, controlPoint.Position - movementDelta).Apply(changeHandler);
                 }
             }
             else
@@ -449,28 +449,28 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                 {
                     PathControlPoint controlPoint = controlPoints[i];
                     if (selectedControlPoints.Contains(controlPoint))
-                        new PathControlPointPositionChange(controlPoint, dragStartPositions[i] + movementDelta).Submit(changeHandler);
+                        new PathControlPointPositionChange(controlPoint, dragStartPositions[i] + movementDelta).Apply(changeHandler);
                 }
             }
 
             // Snap the path to the current beat divisor before checking length validity.
-            new SnapToChange<T>(hitObject, distanceSnapProvider).Submit(changeHandler);
+            new SnapToChange<T>(hitObject, distanceSnapProvider).Apply(changeHandler);
 
             if (!hitObject.Path.HasValidLength)
             {
                 for (int i = 0; i < hitObject.Path.ControlPoints.Count; i++)
-                    new PathControlPointPositionChange(hitObject.Path.ControlPoints[i], oldControlPoints[i]).Submit(changeHandler);
+                    new PathControlPointPositionChange(hitObject.Path.ControlPoints[i], oldControlPoints[i]).Apply(changeHandler);
 
-                new PositionChange(hitObject, oldPosition).Submit(changeHandler);
-                new StartTimeChange(hitObject, oldStartTime).Submit(changeHandler);
+                new PositionChange(hitObject, oldPosition).Apply(changeHandler);
+                new StartTimeChange(hitObject, oldStartTime).Apply(changeHandler);
                 // Snap the path length again to undo the invalid length.
-                new SnapToChange<T>(hitObject, distanceSnapProvider).Submit(changeHandler);
+                new SnapToChange<T>(hitObject, distanceSnapProvider).Apply(changeHandler);
                 return;
             }
 
             // Maintain the path types in case they got defaulted to bezier at some point during the drag.
             for (int i = 0; i < hitObject.Path.ControlPoints.Count; i++)
-                new PathControlPointTypeChange(hitObject.Path.ControlPoints[i], dragPathTypes[i]).Submit(changeHandler);
+                new PathControlPointTypeChange(hitObject.Path.ControlPoints[i], dragPathTypes[i]).Apply(changeHandler);
 
             EnsureValidPathTypes();
         }

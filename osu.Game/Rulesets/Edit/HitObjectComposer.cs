@@ -499,14 +499,14 @@ namespace osu.Game.Rulesets.Edit
 
             if (commit)
             {
-                new AddHitObjectChange(EditorBeatmap, hitObject).Submit(changeHandler);
+                new AddHitObjectChange(EditorBeatmap, hitObject).Apply(changeHandler);
 
                 if (autoSeekOnPlacement.Value && EditorClock.CurrentTime < hitObject.StartTime)
                     EditorClock.SeekSmoothlyTo(hitObject.StartTime);
             }
         }
 
-        public void Delete(HitObject hitObject) => new RemoveHitObjectChange(EditorBeatmap, hitObject).Submit(changeHandler);
+        public void Delete(HitObject hitObject) => new RemoveHitObjectChange(EditorBeatmap, hitObject).Apply(changeHandler);
 
         #endregion
 

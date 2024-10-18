@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Objects
             where THitObject : HitObject, IHasPath
         {
             double newDistance = snapProvider?.FindSnappedDistance(hitObject, (float)hitObject.Path.CalculatedDistance, DistanceSnapTarget.Start) ?? hitObject.Path.CalculatedDistance;
-            new ExpectedDistanceChange(hitObject.Path, newDistance).Submit(changeHandler);
+            new ExpectedDistanceChange(hitObject.Path, newDistance).Apply(changeHandler);
         }
 
         /// <summary>
@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Objects
 
             // Inherited points after a linear point, as well as the first control point if it inherited,
             // should be treated as linear points, so their types are temporarily changed to linear.
-            inheritedLinearPoints.ForEach(p => new PathControlPointTypeChange(p, PathType.LINEAR).Submit(changeHandler));
+            inheritedLinearPoints.ForEach(p => new PathControlPointTypeChange(p, PathType.LINEAR).Apply(changeHandler));
 
             double[] segmentEnds = sliderPath.GetSegmentEnds().ToArray();
 
@@ -51,11 +51,11 @@ namespace osu.Game.Rulesets.Objects
                     segmentEnds = segmentEnds[..^1];
                 }
 
-                new RemovePathControlPointChange(controlPoints, controlPoints.Count - 1).Submit(changeHandler);
+                new RemovePathControlPointChange(controlPoints, controlPoints.Count - 1).Apply(changeHandler);
             }
 
             // Restore original control point types.
-            inheritedLinearPoints.ForEach(p => new PathControlPointTypeChange(p, null).Submit(changeHandler));
+            inheritedLinearPoints.ForEach(p => new PathControlPointTypeChange(p, null).Apply(changeHandler));
 
             // Recalculate middle perfect curve control points at the end of the slider path.
             if (controlPoints.Count >= 3 && controlPoints[^3].Type == PathType.PERFECT_CURVE && controlPoints[^2].Type == null && segmentEnds.Any())
@@ -66,7 +66,7 @@ namespace osu.Game.Rulesets.Objects
                 var circleArcPath = new List<Vector2>();
                 sliderPath.GetPathToProgress(circleArcPath, lastSegmentStart / lastSegmentEnd, 1);
 
-                new PathControlPointPositionChange(controlPoints[^2], circleArcPath[circleArcPath.Count / 2]).Submit(changeHandler);
+                new PathControlPointPositionChange(controlPoints[^2], circleArcPath[circleArcPath.Count / 2]).Apply(changeHandler);
             }
 
             sliderPath.reverseControlPoints(out positionalOffset, changeHandler);
@@ -101,7 +101,7 @@ namespace osu.Game.Rulesets.Objects
                 else if (p.Type != null)
                     (p.Type, lastType) = (lastType, p.Type);
 
-                new InsertPathControlPointChange(sliderPath.ControlPoints, 0, p).Submit(changeHandler);
+                new InsertPathControlPointChange(sliderPath.ControlPoints, 0, p).Apply(changeHandler);
             }
         }
 
@@ -111,7 +111,7 @@ namespace osu.Game.Rulesets.Objects
         public static void SubmitRemoveRange(this BindableList<PathControlPoint> controlPoints, int startIndex, int count, NewBeatmapEditorChangeHandler? changeHandler)
         {
             for (int i = 0; i < count; i++)
-                new RemovePathControlPointChange(controlPoints, startIndex).Submit(changeHandler);
+                new RemovePathControlPointChange(controlPoints, startIndex).Apply(changeHandler);
         }
 
         /// <summary>
@@ -120,7 +120,7 @@ namespace osu.Game.Rulesets.Objects
         public static void SubmitAddRange(this BindableList<PathControlPoint> controlPoints, IEnumerable<PathControlPoint> points, NewBeatmapEditorChangeHandler? changeHandler)
         {
             foreach (var point in points)
-                new InsertPathControlPointChange(controlPoints, controlPoints.Count, point).Submit(changeHandler);
+                new InsertPathControlPointChange(controlPoints, controlPoints.Count, point).Apply(changeHandler);
         }
     }
 }

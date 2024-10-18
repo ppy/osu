@@ -280,9 +280,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             if (Precision.AlmostEquals(proposedDistance, HitObject.Path.Distance) && Precision.AlmostEquals(proposedVelocity, HitObject.SliderVelocityMultiplier))
                 return;
 
-            new SliderVelocityMultiplierChange(HitObject, proposedVelocity).Submit(changeHandler);
-            new ExpectedDistanceChange(HitObject.Path, proposedDistance).Submit(changeHandler);
-            new QueueUpdateHitObject(editorBeatmap, HitObject).Submit(changeHandler);
+            new SliderVelocityMultiplierChange(HitObject, proposedVelocity).Apply(changeHandler);
+            new ExpectedDistanceChange(HitObject.Path, proposedDistance).Apply(changeHandler);
+            new QueueUpdateHitObject(editorBeatmap, HitObject).Apply(changeHandler);
         }
 
         /// <summary>
@@ -303,8 +303,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
                 if (Precision.AlmostBigger(segmentEnds[segmentIndex], 1, 1E-3))
                 {
-                    new RemoveRangePathControlPointChange(sliderPath.ControlPoints, i + 1, sliderPath.ControlPoints.Count - i - 1).Submit(changeHandler);
-                    new PathControlPointTypeChange(sliderPath.ControlPoints[^1], null).Submit(changeHandler);
+                    new RemoveRangePathControlPointChange(sliderPath.ControlPoints, i + 1, sliderPath.ControlPoints.Count - i - 1).Apply(changeHandler);
+                    new PathControlPointTypeChange(sliderPath.ControlPoints[^1], null).Apply(changeHandler);
                     break;
                 }
 
@@ -439,11 +439,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             var pathControlPoint = new PathControlPoint { Position = position };
 
             // Move the control points from the insertion index onwards to make room for the insertion
-            new InsertPathControlPointChange(HitObject.Path.ControlPoints, insertionIndex, pathControlPoint).Submit(changeHandler);
+            new InsertPathControlPointChange(HitObject.Path.ControlPoints, insertionIndex, pathControlPoint).Apply(changeHandler);
 
             ControlPointVisualiser?.EnsureValidPathTypes();
 
-            new SnapToChange<Slider>(HitObject, distanceSnapProvider).Submit(changeHandler);
+            new SnapToChange<Slider>(HitObject, distanceSnapProvider).Apply(changeHandler);
 
             return pathControlPoint;
         }
@@ -459,15 +459,15 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 // The first control point in the slider must have a type, so take it from the previous "first" one
                 // Todo: Should be handled within SliderPath itself
                 if (c == controlPoints[0] && controlPoints.Count > 1 && controlPoints[1].Type == null)
-                    new PathControlPointTypeChange(controlPoints[1], controlPoints[0].Type).Submit(changeHandler);
+                    new PathControlPointTypeChange(controlPoints[1], controlPoints[0].Type).Apply(changeHandler);
 
-                new RemovePathControlPointChange(HitObject.Path.ControlPoints, c).Submit(changeHandler);
+                new RemovePathControlPointChange(HitObject.Path.ControlPoints, c).Apply(changeHandler);
             }
 
             ControlPointVisualiser?.EnsureValidPathTypes();
 
             // Snap the slider to the current beat divisor before checking length validity.
-            new SnapToChange<Slider>(HitObject, distanceSnapProvider).Submit(changeHandler);
+            new SnapToChange<Slider>(HitObject, distanceSnapProvider).Apply(changeHandler);
 
             // If there are 0 or 1 remaining control points, or the slider has an invalid length, it is in a degenerate form and should be deleted
             if (controlPoints.Count <= 1 || !HitObject.Path.HasValidLength)
@@ -480,9 +480,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             // So the slider needs to be offset by this amount instead, and all control points offset backwards such that the path is re-positioned at (0, 0)
             Vector2 first = controlPoints[0].Position;
             foreach (var c in controlPoints)
-                new PathControlPointPositionChange(c, c.Position - first).Submit(changeHandler);
+                new PathControlPointPositionChange(c, c.Position - first).Apply(changeHandler);
 
-            new PositionChange(HitObject, HitObject.Position + first).Submit(changeHandler);
+            new PositionChange(HitObject, HitObject.Position + first).Apply(changeHandler);
         }
 
         private void splitControlPoints(List<PathControlPoint> controlPointsToSplitAt)
@@ -512,7 +512,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
                 // Extract the split portion and remove from the original slider.
                 var splitControlPoints = controlPoints.Take(index + 1).ToList();
-                new RemoveRangePathControlPointChange(HitObject.Path.ControlPoints, 0, index).Submit(changeHandler);
+                new RemoveRangePathControlPointChange(HitObject.Path.ControlPoints, 0, index).Apply(changeHandler);
 
                 var newSlider = new Slider
                 {
@@ -526,18 +526,18 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 };
 
                 // Increase the start time of the slider before adding the new slider so the new slider is immediately inserted at the correct index and internal state remains valid.
-                new StartTimeChange(HitObject, HitObject.StartTime + split_gap).Submit(changeHandler);
+                new StartTimeChange(HitObject, HitObject.StartTime + split_gap).Apply(changeHandler);
 
-                new AddHitObjectChange(editorBeatmap, newSlider).Submit(changeHandler);
+                new AddHitObjectChange(editorBeatmap, newSlider).Apply(changeHandler);
 
-                new NewComboChange(HitObject, false).Submit(changeHandler);
-                new ExpectedDistanceChange(HitObject.Path, HitObject.Path.ExpectedDistance.Value - newSlider.Path.CalculatedDistance).Submit(changeHandler);
-                new StartTimeChange(HitObject, HitObject.StartTime + newSlider.SpanDuration).Submit(changeHandler);
+                new NewComboChange(HitObject, false).Apply(changeHandler);
+                new ExpectedDistanceChange(HitObject.Path, HitObject.Path.ExpectedDistance.Value - newSlider.Path.CalculatedDistance).Apply(changeHandler);
+                new StartTimeChange(HitObject, HitObject.StartTime + newSlider.SpanDuration).Apply(changeHandler);
 
                 // In case the remainder of the slider has no length left over, give it length anyways so we don't get a 0 length slider.
                 if (HitObject.Path.ExpectedDistance.Value <= Precision.DOUBLE_EPSILON)
                 {
-                    new ExpectedDistanceChange(HitObject.Path, null).Submit(changeHandler);
+                    new ExpectedDistanceChange(HitObject.Path, null).Apply(changeHandler);
                 }
             }
 
@@ -545,9 +545,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             // As a final step, we must reset its control points to have an origin of (0,0).
             Vector2 first = controlPoints[0].Position;
             foreach (var c in controlPoints)
-                new PathControlPointPositionChange(c, c.Position - first).Submit(changeHandler);
+                new PathControlPointPositionChange(c, c.Position - first).Apply(changeHandler);
 
-            new PositionChange(HitObject, HitObject.Position + first).Submit(changeHandler);
+            new PositionChange(HitObject, HitObject.Position + first).Apply(changeHandler);
         }
 
         private void convertToStream()
@@ -581,13 +581,13 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                     Position = position,
                     NewCombo = i == 0 && HitObject.NewCombo,
                     Samples = HitObject.HeadCircle.Samples.Select(s => s.With()).ToList()
-                }).Submit(changeHandler);
+                }).Apply(changeHandler);
 
                 i += 1;
                 time = HitObject.StartTime + i * streamSpacing;
             }
 
-            new RemoveHitObjectChange(editorBeatmap, HitObject).Submit(changeHandler);
+            new RemoveHitObjectChange(editorBeatmap, HitObject).Apply(changeHandler);
 
             changeHandler?.EndChange();
         }
