@@ -15,6 +15,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Screens.Edit.Changes;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
@@ -25,6 +26,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         [Resolved]
         protected EditorBeatmap Beatmap { get; private set; }
+
+        [Resolved(canBeNull: true)]
+        private NewBeatmapEditorChangeHandler changeHandler { get; set; }
 
         protected readonly HitObjectComposer Composer;
 
@@ -88,8 +92,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 {
                     Beatmap.PerformOnSelection(obj =>
                     {
-                        obj.StartTime += offset;
-                        Beatmap.Update(obj);
+                        new StartTimeChange(obj, obj.StartTime + offset).Apply(changeHandler);
+                        new QueueUpdateHitObject(Beatmap, obj).Apply(changeHandler);
                     });
                 }
             }
@@ -120,7 +124,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             // handle positional change etc.
             foreach (var blueprint in SelectionBlueprints)
-                Beatmap.Update(blueprint.Item);
+                new QueueUpdateHitObject(Beatmap, blueprint.Item).Apply(changeHandler);
         }
 
         protected override bool OnDoubleClick(DoubleClickEvent e)

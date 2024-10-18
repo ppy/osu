@@ -10,6 +10,7 @@ using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
+using osu.Game.Screens.Edit.Changes;
 using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
 using Direction = osu.Framework.Graphics.Direction;
@@ -95,9 +96,10 @@ namespace osu.Game.Rulesets.Catch.Edit
 
                 if (h is JuiceStream juiceStream)
                 {
-                    juiceStream.Path.Reverse(out Vector2 positionalOffset);
-                    juiceStream.OriginalX += positionalOffset.X;
-                    juiceStream.LegacyConvertedY += positionalOffset.Y;
+                    var reverse = new ReverseSliderPathChange(juiceStream.Path);
+                    reverse.Apply();
+                    juiceStream.OriginalX += reverse.PositionalOffset.X;
+                    juiceStream.LegacyConvertedY += reverse.PositionalOffset.Y;
                     EditorBeatmap.Update(juiceStream);
                 }
             }
