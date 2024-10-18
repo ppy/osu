@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
         [BackgroundDependencyLoader]
         private void load()
         {
-            AccentColour = ColourInfo.GradientVertical(
+            ArgonAccentColour = ColourInfo.GradientVertical(
                 new Color4(241, 0, 0, 255),
                 new Color4(167, 0, 0, 255)
             );
