@@ -590,18 +590,16 @@ namespace osu.Game.Overlays.Mods
                         return true;
                     }
 
-                    //matchingMod ensures that if an exact mod acronym is typed, it will be selected when Select is pressed (as opposed to being prioritized in arbitrary column order)
-                    ModState? firstMod = columnFlow.Columns.OfType<ModColumn>().FirstOrDefault(m => m.IsPresent)?.AvailableMods.FirstOrDefault(x => x.Visible);
-                    ModState? matchingMod = columnFlow.Columns.OfType<ModColumn>().SelectMany(m => m.AvailableMods).FirstOrDefault(x => x.Mod.Acronym.Equals(SearchTerm, StringComparison.OrdinalIgnoreCase) | x.Mod.Name.Equals(SearchTerm, StringComparison.OrdinalIgnoreCase));
+                    IEnumerable<ModState> visibleMods = columnFlow.Columns.OfType<ModColumn>().Where(c => c.IsPresent).SelectMany(c => c.AvailableMods.Where(m => m.Visible));
+
+                    // Search for an exact acronym or name match, or otherwise default to the first visible mod.
+                    ModState? matchingMod =
+                        visibleMods.FirstOrDefault(m => m.Mod.Acronym.Equals(SearchTerm, StringComparison.OrdinalIgnoreCase) || m.Mod.Name.Equals(SearchTerm, StringComparison.OrdinalIgnoreCase))
+                        ?? visibleMods.FirstOrDefault();
 
                     if (matchingMod is not null)
                     {
                         matchingMod.Active.Value = !matchingMod.Active.Value;
-                        SearchTextBox.SelectAll();
-                    }
-                    else if (firstMod is not null)
-                    {
-                        firstMod.Active.Value = !firstMod.Active.Value;
                         SearchTextBox.SelectAll();
                     }
 
