@@ -127,7 +127,7 @@ namespace osu.Game.Skinning.Components
                     return BeatmapsetsStrings.ShowStatsBpm;
 
                 default:
-                    throw new ArgumentOutOfRangeException();
+                    throw new ArgumentOutOfRangeException(nameof(attribute), attribute, $@"Unrecognised {nameof(BeatmapAttribute)}");
             }
         }
 
@@ -175,7 +175,7 @@ namespace osu.Game.Skinning.Components
                     return beatmap.Value.BeatmapInfo.StarRating.ToLocalisableString(@"F2");
 
                 default:
-                    throw new ArgumentOutOfRangeException();
+                    throw new ArgumentOutOfRangeException(nameof(attribute), attribute, $@"Unrecognised {nameof(BeatmapAttribute)}");
             }
         }
 
