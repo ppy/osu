@@ -30,7 +30,7 @@ namespace osu.Game.Screens.Play.HUD
         [SettingSource(typeof(SongProgressStrings), nameof(SongProgressStrings.ShowTime), nameof(SongProgressStrings.ShowTimeDescription))]
         public Bindable<bool> ShowTime { get; } = new BindableBool(true);
 
-        [SettingSource("Use relative size")]
+        [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.UseRelativeSize))]
         public BindableBool UseRelativeSize { get; } = new BindableBool(true);
 
         [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.Colour), nameof(SkinnableComponentStrings.ColourDescription))]
