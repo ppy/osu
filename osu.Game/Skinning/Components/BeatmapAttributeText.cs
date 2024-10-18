@@ -122,8 +122,13 @@ namespace osu.Game.Skinning.Components
 
             foreach (var type in Enum.GetValues<BeatmapAttribute>())
             {
-                numberedTemplate = numberedTemplate.Replace($"{{{{{type}}}}}", $"{{{values.Count}}}");
-                values.Add(getValueString(type));
+                string replaced = numberedTemplate.Replace($@"{{{{{type}}}}}", $@"{{{values.Count}}}");
+
+                if (numberedTemplate != replaced)
+                {
+                    numberedTemplate = replaced;
+                    values.Add(getValueString(type));
+                }
             }
 
             text.Text = LocalisableString.Format(numberedTemplate, values.ToArray());
@@ -173,7 +178,7 @@ namespace osu.Game.Skinning.Components
                     return BeatmapsetsStrings.ShowStatsBpm;
 
                 default:
-                    throw new ArgumentOutOfRangeException();
+                    return string.Empty;
             }
         }
 
@@ -221,7 +226,7 @@ namespace osu.Game.Skinning.Components
                     return (starDifficulty?.Stars ?? 0).ToLocalisableString(@"F2");
 
                 default:
-                    throw new ArgumentOutOfRangeException();
+                    return string.Empty;
             }
 
             BeatmapDifficulty computeDifficulty()
