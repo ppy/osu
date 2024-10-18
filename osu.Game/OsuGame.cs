@@ -994,7 +994,11 @@ namespace osu.Game
                             Children = new Drawable[]
                             {
                                 backReceptor = new ScreenFooter.BackReceptor(),
-                                ScreenStack = new OsuScreenStack { RelativeSizeAxes = Axes.Both },
+                                new RefCountedBackbufferProvider
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Child = ScreenStack = new OsuScreenStack { RelativeSizeAxes = Axes.Both }
+                                },
                                 BackButton = new BackButton(backReceptor)
                                 {
                                     Anchor = Anchor.BottomLeft,

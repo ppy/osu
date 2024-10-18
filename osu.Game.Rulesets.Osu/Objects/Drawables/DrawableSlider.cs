@@ -37,6 +37,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         [Cached]
         public DrawableSliderBall Ball { get; private set; }
 
+        public BackdropBlurContainer BlurContainer { get; private set; }
+
         public SkinnableDrawable Body { get; private set; }
 
         private ShakeContainer shakeContainer;
@@ -106,7 +108,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     RelativeSizeAxes = Axes.Both,
                     Children = new[]
                     {
-                        Body = new SkinnableDrawable(new OsuSkinComponentLookup(OsuSkinComponents.SliderBody), _ => new DefaultSliderBody(), confineMode: ConfineMode.NoScaling),
+                        BlurContainer = new BackdropBlurContainer
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            BlurSigma = new Vector2(10f),
+                            MaskCutoff = 0.25f,
+                            EffectBufferScale = new Vector2(0.5f),
+                            Child = Body = new SkinnableDrawable(new OsuSkinComponentLookup(OsuSkinComponents.SliderBody), _ => new DefaultSliderBody(), confineMode: ConfineMode.NoScaling)
+                        },
                         // proxied here so that the tail is drawn under repeats/ticks - legacy skins rely on this
                         tailContainer.CreateProxy(),
                         tickContainer = new Container<DrawableSliderTick> { RelativeSizeAxes = Axes.Both },
@@ -282,6 +291,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
                 relativeAnchorPositionLayout.Validate();
             }
+
+            BlurContainer.MaskCutoff = Body.Alpha * 0.25f;
         }
 
         public override void OnKilled()
@@ -337,7 +348,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.UpdateInitialTransforms();
 
-            Body.FadeInFromZero(HitObject.TimeFadeIn);
+            // The backdrop blur opacity should fade in quicker, but the overall alpha should fade in linearly.
+            // By using OutQuad easing on both the blur container & the child, we end up getting a linear fade in.
+            BlurContainer.FadeInFromZero(HitObject.TimeFadeIn, Easing.OutQuad);
+            Body.FadeInFromZero(HitObject.TimeFadeIn, Easing.OutQuad);
         }
 
         protected override void UpdateStartTimeStateTransforms()
@@ -358,7 +372,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             {
                 case ArmedState.Hit:
                     if (HeadCircle.IsHit && SliderBody?.SnakingOut.Value == true)
-                        Body.FadeOut(40); // short fade to allow for any body colour to smoothly disappear.
+                        BlurContainer.FadeOut(40); // short fade to allow for any body colour to smoothly disappear.
                     break;
             }
 
