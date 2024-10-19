@@ -78,9 +78,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         {
             base.LoadComplete();
 
-            samplesVisible.BindValueChanged(visible => this.FadeTo(visible.NewValue ? 1 : 0, 200, Easing.OutQuint));
-            this.FadeTo(samplesVisible.Value ? 1 : 0);
-
             if (timelineBlueprintContainer != null)
                 contracted.BindTo(timelineBlueprintContainer.SamplePointContracted);
 
@@ -99,6 +96,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     LabelContainer.CornerRadius = 8;
                 }
             }, true);
+
+            samplesVisible.BindValueChanged(visible => this.FadeTo(visible.NewValue ? 1 : 0, 200, Easing.OutQuint), true);
+            FinishTransforms();
         }
 
         protected override void Dispose(bool isDisposing)
