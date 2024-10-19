@@ -15,7 +15,6 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
-using osu.Framework.Layout;
 using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
@@ -38,8 +37,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private bool hitObjectDragged;
 
-        private readonly LayoutValue samplePointContractedStateCache = new LayoutValue(Invalidation.DrawSize);
-
         /// <remarks>
         /// Positional input must be received outside the container's bounds,
         /// in order to handle timeline blueprints which are stacked offscreen.
@@ -54,8 +51,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             Origin = Anchor.Centre;
 
             Height = 0.6f;
-
-            AddLayout(samplePointContractedStateCache);
         }
 
         [BackgroundDependencyLoader]
@@ -123,10 +118,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 Composer.Playfield.FutureLifetimeExtension = timeline.VisibleRange / 2;
             }
 
-            updateSamplePointContractedState();
-
             base.Update();
 
+            updateSamplePointContractedState();
             updateStacking();
         }
 
@@ -134,8 +128,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private void updateSamplePointContractedState()
         {
-            if (samplePointContractedStateCache.IsValid)
-                return;
+            // because only blueprints of objects which are alive (via pooling) are displayed in the timeline, it's feasible to do this every-update.
 
             const double minimum_gap = 28;
 
@@ -157,7 +150,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             double smallestAbsoluteGap = ((TimelineSelectionBlueprintContainer)SelectionBlueprints).ContentRelativeToAbsoluteFactor.X * smallestTimeGap;
             SamplePointContracted.Value = smallestAbsoluteGap < minimum_gap;
-            samplePointContractedStateCache.Validate();
         }
 
         private readonly Stack<HitObject> currentConcurrentObjects = new Stack<HitObject>();
