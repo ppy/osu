@@ -228,7 +228,7 @@ namespace osu.Game.Overlays
         /// <param name="playlist">A playlist to navigate through. Otherwise use the current or list of all beatmap sets.</param>
         public void PreviousTrack(Action<PreviousTrackResult>? onSuccess = null, bool allowProtectedTracks = false, IEnumerable<Live<BeatmapSetInfo>>? playlist = null) => Schedule(() =>
         {
-            if (playlist != null && currentPlaylist != playlist)
+            if (playlist != null && !EqualityComparer<IEnumerable<Live<BeatmapSetInfo>>?>.Default.Equals(playlist, currentPlaylist))
                 currentPlaylist = playlist;
             PreviousTrackResult res = prev(allowProtectedTracks, currentPlaylist);
             if (res != PreviousTrackResult.None)
@@ -284,7 +284,7 @@ namespace osu.Game.Overlays
         /// <param name="playlist">A playlist to navigate through. Otherwise use the current or list of all beatmap sets.</param>
         public void NextTrack(Action? onSuccess = null, bool allowProtectedTracks = false, IEnumerable<Live<BeatmapSetInfo>>? playlist = null) => Schedule(() =>
         {
-            if (playlist != null && currentPlaylist != playlist)
+            if (playlist != null && !EqualityComparer<IEnumerable<Live<BeatmapSetInfo>>?>.Default.Equals(playlist, currentPlaylist))
                 currentPlaylist = playlist;
             bool res = next(allowProtectedTracks, currentPlaylist);
             if (res)
@@ -361,8 +361,8 @@ namespace osu.Game.Overlays
             else
             {
                 playableSet = (playlist ?? getBeatmapSets()).SkipWhile(i => !i.Value.Equals(current?.BeatmapSetInfo))
-                                              .Where(i => !i.Value.Protected || allowProtectedTracks)
-                                              .ElementAtOrDefault(1)
+                                                            .Where(i => !i.Value.Protected || allowProtectedTracks)
+                                                            .ElementAtOrDefault(1)
                               ?? (playlist ?? getBeatmapSets()).FirstOrDefault(i => !i.Value.Protected || allowProtectedTracks);
             }
 
