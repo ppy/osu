@@ -66,6 +66,25 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 effectiveMissCount = Math.Min(effectiveMissCount + countOk * okMultiplier + countMeh * mehMultiplier, totalHits);
             }
 
+            OsuPerformanceAttributes performanceAttributes = calculatePerformanceAttributes(score, osuAttributes);
+
+            double savedEffectiveMissCount = effectiveMissCount;
+
+            effectiveMissCount = 0;
+            countMiss = 0;
+            scoreMaxCombo = osuAttributes.MaxCombo;
+
+            double balanceAdjustingMultiplier = calculateBalancerAdjustingMultiplier(score, osuAttributes);
+            multiplier *= balanceAdjustingMultiplier;
+
+            performanceAttributes.Total *= multiplier;
+
+            return performanceAttributes;
+        }
+
+        // Internal function
+        private OsuPerformanceAttributes calculatePerformanceAttributes(ScoreInfo score, OsuDifficultyAttributes osuAttributes)
+        {
             double power = OsuDifficultyCalculator.SUM_POWER;
 
             double aimValue = computeAimValue(score, osuAttributes);
@@ -98,16 +117,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // Add cognition value without LP-sum cuz otherwise it makes balancing harder
             double totalValue =
                 (Math.Pow(Math.Pow(mechanicalValue, power) + Math.Pow(accuracyValue, power), 1.0 / power)
-                + cognitionValue) * multiplier;
-
-            double savedEffectiveMissCount = effectiveMissCount;
-
-            effectiveMissCount = 0;
-            countMiss = 0;
-            scoreMaxCombo = osuAttributes.MaxCombo;
-
-            double balanceAdjustingMultiplier = calculateBalancerAdjustingMultiplier(score, osuAttributes);
-            totalValue *= balanceAdjustingMultiplier;
+                + cognitionValue);
 
             // Fancy stuff for better visual display of FL pp
 
@@ -395,40 +405,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double calculateBalancerAdjustingMultiplier(ScoreInfo score, OsuDifficultyAttributes osuAttributes)
         {
-            double multiplier = PERFORMANCE_BASE_MULTIPLIER;
-            double power = OsuDifficultyCalculator.SUM_POWER;
-
-            double aimValue = computeAimValue(score, osuAttributes);
-            double speedValue = computeSpeedValue(score, osuAttributes);
-            double mechanicalValue = Math.Pow(Math.Pow(aimValue, power) + Math.Pow(speedValue, power), 1.0 / power);
-
-            // Cognition
-
-            double lowARValue = computeReadingLowARValue(score, osuAttributes);
-            double highARValue = computeReadingHighARValue(score, osuAttributes);
-
-            double readingARValue = Math.Pow(Math.Pow(lowARValue, power) + Math.Pow(highARValue, power), 1.0 / power);
-
-            double flashlightValue = computeFlashlightValue(score, osuAttributes);
-
-            double readingHDValue = 0;
-            if (score.Mods.Any(h => h is OsuModHidden))
-                readingHDValue = computeReadingHiddenValue(score, osuAttributes);
-
-            // Reduce AR reading bonus if FL is present
-            double flPower = OsuDifficultyCalculator.FL_SUM_POWER;
-            double flashlightARValue = score.Mods.Any(h => h is OsuModFlashlight) ?
-                Math.Pow(Math.Pow(flashlightValue, flPower) + Math.Pow(readingARValue, flPower), 1.0 / flPower) : readingARValue;
-
-            double cognitionValue = flashlightARValue + readingHDValue;
-            cognitionValue = AdjustCognitionPerformance(cognitionValue, mechanicalValue, flashlightValue);
-
-            double accuracyValue = computeAccuracyValue(score, osuAttributes);
-
-            // Add cognition value without LP-sum cuz otherwise it makes balancing harder
-            double totalValue =
-                (Math.Pow(Math.Pow(mechanicalValue, power) + Math.Pow(accuracyValue, power), 1.0 / power)
-                + cognitionValue) * multiplier;
+            double totalValue = calculatePerformanceAttributes(score, osuAttributes).Total * PERFORMANCE_BASE_MULTIPLIER;
 
             if (totalValue < 600)
                 return 1;

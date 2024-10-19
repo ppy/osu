@@ -130,8 +130,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private HighARAimComponent aimComponent;
         private HighARSpeedComponent speedComponent;
 
-        private readonly List<double> difficulties = new List<double>();
-
         private int objectsCount = 0;
         private double objectsPreemptSum = 0;
 
@@ -150,8 +148,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             double mergedDifficulty = Math.Pow(
                 Math.Pow(aimComponent.CurrentSectionPeak, power) +
                 Math.Pow(speedComponent.CurrentSectionPeak, power), 1.0 / power);
-
-            difficulties.Add(mergedDifficulty);
+            mergedDifficulty *= skill_multiplier;
 
             if (current.Index == 0)
                 CurrentSectionEnd = Math.Ceiling(current.StartTime / SectionLength) * SectionLength;
@@ -216,8 +213,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             {
             }
 
-            protected new double SkillMultiplier => base.SkillMultiplier;
-
             protected override double StrainValueAt(DifficultyHitObject current)
             {
                 CurrentStrain *= StrainDecay(current.DeltaTime);
@@ -237,8 +232,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 : base(mods)
             {
             }
-
-            protected new double SkillMultiplier => base.SkillMultiplier;
 
             protected override double StrainValueAt(DifficultyHitObject current)
             {
