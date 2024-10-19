@@ -19,7 +19,7 @@ namespace osu.Game.Screens.Edit.Changes
         void Revert();
     }
 
-    public static class IRevertibleChangeExtension
+    public static class RevertibleChangeExtension
     {
         public static void Apply(this IRevertibleChange change, NewBeatmapEditorChangeHandler? changeHandler, bool commitImmediately = false)
         {
