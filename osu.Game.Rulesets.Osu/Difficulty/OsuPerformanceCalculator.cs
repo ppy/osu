@@ -52,8 +52,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             else
             {
                 countSliderEndsDropped = osuAttributes.SliderCount - score.Statistics.GetValueOrDefault(HitResult.SliderTailHit);
-                // Note: HitResult.LargeTickMiss is not stored within the API or in score dumps. Do not use it!
-                countLargeTickMiss = score.MaximumStatistics.GetValueOrDefault(HitResult.LargeTickHit) - score.Statistics.GetValueOrDefault(HitResult.LargeTickHit);
+                countLargeTickMiss = score.Statistics.GetValueOrDefault(HitResult.LargeTickMiss);
                 effectiveMissCount = countMiss;
             }
 
