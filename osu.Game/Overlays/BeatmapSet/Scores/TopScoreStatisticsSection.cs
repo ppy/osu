@@ -9,6 +9,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
@@ -96,10 +97,17 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuColour colours)
         {
             if (score != null)
+            {
                 totalScoreColumn.Current = scoreManager.GetBindableTotalScoreString(score);
+
+                if (score.Accuracy == 1.0) accuracyColumn.TextColour = colours.GreenLight;
+#pragma warning disable CS0618
+                if (score.MaxCombo == score.BeatmapInfo!.MaxCombo) maxComboColumn.TextColour = colours.GreenLight;
+#pragma warning restore CS0618
+            }
         }
 
         private ScoreInfo score;
@@ -226,6 +234,10 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             public LocalisableString Text
             {
                 set => text.Text = value;
+            }
+            public ColourInfo TextColour
+            {
+                set => text.Colour = value;
             }
 
             public Drawable Drawable
