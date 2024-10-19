@@ -144,7 +144,13 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 if (hitObject is IHasRepeats hasRepeats)
                     smallestTimeGap = Math.Min(smallestTimeGap, hasRepeats.Duration / hasRepeats.SpanCount() / 2);
 
-                smallestTimeGap = Math.Min(smallestTimeGap, lastTime - hitObject.GetEndTime());
+                double gap = lastTime - hitObject.GetEndTime();
+
+                // If the gap is less than 1ms, we can assume that the objects are stacked on top of each other
+                // Contracting doesn't make sense in this case
+                if (gap > 1 && gap < smallestTimeGap)
+                    smallestTimeGap = gap;
+
                 lastTime = hitObject.StartTime;
             }
 
