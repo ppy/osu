@@ -22,6 +22,7 @@ using osu.Game.Input.Bindings;
 using osuTK;
 using osuTK.Graphics;
 using osu.Game.Localisation;
+using osuTK.Input;
 
 namespace osu.Game.Screens.Play
 {
@@ -255,13 +256,36 @@ namespace osu.Game.Screens.Play
 
         private partial class Button : DialogButton
         {
+            private bool isHovered;
+
             // required to ensure keyboard navigation always starts from an extremity (unless the cursor is moved)
-            protected override bool OnHover(HoverEvent e) => true;
+            protected override bool OnHover(HoverEvent e)
+            {
+                isHovered = true;
+                return base.OnHover(e);
+            }
+
+            protected override void OnHoverLost(HoverLostEvent e)
+            {
+                isHovered = false;
+                base.OnHoverLost(e);
+            }
 
             protected override bool OnMouseMove(MouseMoveEvent e)
             {
                 State = SelectionState.Selected;
                 return base.OnMouseMove(e);
+            }
+
+            protected override bool OnKeyDown(KeyDownEvent e)
+            {
+                if (isHovered && (e.Key == Key.Z || e.Key == Key.X))
+                {
+                    TriggerClick();
+                    return true;
+                }
+
+                return base.OnKeyDown(e);
             }
         }
 
