@@ -118,7 +118,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     public class ReadingHighAR : GraphSkill
     {
         public const double MECHANICAL_PP_POWER = 0.6;
-        private const double skill_multiplier = 9.3;
+        private const double skill_multiplier = 41.2;
         private const double component_default_value_multiplier = 280;
         public ReadingHighAR(Mod[] mods)
             : base(mods)
@@ -173,8 +173,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         public override double DifficultyValue()
         {
             // Simulating summing to get the most correct value possible
-            double aimValue = Math.Sqrt(aimComponent.DifficultyValue()) * OsuDifficultyCalculator.DIFFICULTY_MULTIPLIER;
-            double speedValue = Math.Sqrt(speedComponent.DifficultyValue()) * OsuDifficultyCalculator.DIFFICULTY_MULTIPLIER;
+            double aimValue = Math.Sqrt(aimComponent.DifficultyValue() * skill_multiplier) * OsuDifficultyCalculator.DIFFICULTY_MULTIPLIER;
+            double speedValue = Math.Sqrt(speedComponent.DifficultyValue() * skill_multiplier) * OsuDifficultyCalculator.DIFFICULTY_MULTIPLIER;
 
             double aimPerformance = DifficultyToPerformance(aimValue);
             double speedPerformance = DifficultyToPerformance(speedValue);
@@ -201,7 +201,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             double adjustedDifficulty = performanceToDifficulty(totalPerformance);
             double difficultyValue = Math.Pow(adjustedDifficulty / OsuDifficultyCalculator.DIFFICULTY_MULTIPLIER, 2.0);
 
-            Difficulty = skill_multiplier * Math.Pow(difficultyValue, MECHANICAL_PP_POWER);
+            Difficulty = Math.Pow(difficultyValue, MECHANICAL_PP_POWER);
 
             // Sqrt value to make difficulty depend less on mechanical difficulty
             return Difficulty;
