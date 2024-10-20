@@ -45,6 +45,9 @@ namespace osu.Game.Graphics.Backgrounds
             set => ColouredDimmable.DimLevel = dimLevel = value;
         }
 
+        /// <summary>
+        /// A drawable that currently handles dimming.
+        /// </summary>
         protected IColouredDimmable ColouredDimmable => ColouredDimmableBufferedContainer != null ? ColouredDimmableBufferedContainer : ColouredDimmableSprite;
 
         public BeatmapBackground(WorkingBeatmap beatmap, string fallbackTextureName = @"Backgrounds/bg1")

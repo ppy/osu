@@ -16,7 +16,7 @@ using osuTK;
 namespace osu.Game.Graphics.Backgrounds
 {
     /// <summary>
-    /// A background which offers blurring via a <see cref="bufferedContainer"/> on demand.
+    /// A background which offers blurring via a <see cref="BufferedContainer"/> on demand.
     /// </summary>
     public partial class Background : CompositeDrawable, IEquatable<Background>
     {
