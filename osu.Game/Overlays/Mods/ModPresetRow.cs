@@ -33,18 +33,20 @@ namespace osu.Game.Overlays.Mods
                     Spacing = new Vector2(7),
                     Children = new Drawable[]
                     {
-                        new IconButton
-                        {
-                            Icon = FontAwesome.Solid.TimesCircle,
-                            Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreLeft,
-                            Enabled = { Value = !(rootSet == null || rootSet.Count <= 1) },
-                            Action = () => Scheduler.AddOnce(() =>
+                        rootSet != null
+                            ? new IconButton
                             {
-                                this.FadeOut(200, Easing.OutQuint).Then().Expire();
-                                rootSet?.Remove(mod);
-                            })
-                        },
+                                Icon = FontAwesome.Solid.TimesCircle,
+                                Anchor = Anchor.CentreLeft,
+                                Origin = Anchor.CentreLeft,
+                                Enabled = { Value = rootSet.Count > 1 },
+                                Action = () => Scheduler.AddOnce(() =>
+                                {
+                                    this.FadeOut(200, Easing.OutQuint).Then().Expire();
+                                    rootSet?.Remove(mod);
+                                })
+                            }
+                            : new Container(),
                         new ModSwitchTiny(mod)
                         {
                             Active = { Value = true },
