@@ -40,10 +40,11 @@ namespace osu.Game.Overlays.Mods
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
                                 Enabled = { Value = rootSet.Count > 1 },
+                                TooltipText = "Remove this mod",
                                 Action = () => Scheduler.AddOnce(() =>
                                 {
                                     this.FadeOut(200, Easing.OutQuint).Then().Expire();
-                                    rootSet?.Remove(mod);
+                                    rootSet.Remove(mod);
                                 })
                             }
                             : new Container(),
