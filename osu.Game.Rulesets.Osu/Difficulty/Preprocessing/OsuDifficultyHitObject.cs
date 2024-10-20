@@ -342,7 +342,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             var visibleObjects = new List<OsuDifficultyHitObject>();
 
-            for (int i = 0; i < current.Count; i++)
+            for (int i = 0; i < current.Index; i++)
             {
                 OsuDifficultyHitObject hitObject = (OsuDifficultyHitObject)current.Previous(i);
 
@@ -421,20 +421,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             double similarity3_2 = getGeneralSimilarity(prevObj0, prevObj3);
             double similarity3_3 = getGeneralSimilarity(prevObj1, prevObj4);
 
-            double similarity3_max = Math.Max(Math.Max(similarity3_1, similarity3_2), similarity3_3);
             double similarity3_total = similarity3_1 * similarity3_2 * similarity3_3;
-
-            double similarity3 = Math.Max(Math.Pow(similarity3_max, 3) * 0.5, similarity3_total);
 
             // 4-4 repeat
             double similarity4_1 = getGeneralSimilarity(this, prevObj3);
             double similarity4_2 = getGeneralSimilarity(prevObj0, prevObj4);
             double similarity4_3 = getGeneralSimilarity(prevObj1, prevObj5);
 
-            double similarity4_max = Math.Pow(Math.Max(Math.Max(similarity4_1, similarity4_2), similarity4_3), 2);
             double similarity4_total = similarity4_1 * similarity4_2 * similarity4_3;
-
-            double similarity4 = Math.Max(Math.Pow(similarity4_max, 3) * 0.5, similarity4_total);
 
             // Bandaid to fix Rubik's Cube +EZ
             double wideness = 0;

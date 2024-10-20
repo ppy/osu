@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
-using osu.Game.Rulesets.Osu.Difficulty.Skills;
 using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
@@ -17,6 +16,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         private const double reading_window_size = 3000;
 
         private const double overlap_multiplier = 1;
+
+        private const double slider_body_length_multiplier = 1.3;
 
         public static double EvaluateDensityOf(DifficultyHitObject current, bool applyDistanceNerf = true, bool applySliderbodyDensity = true, double angleNerfMultiplier = 1.0)
         {
@@ -39,7 +40,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double loopDifficulty = currObj.OpacityAt(loopObj.BaseObject.StartTime, false);
 
                 // Small distances means objects may be cheesed, so it doesn't matter whether they are arranged confusingly.
-                if (applyDistanceNerf) loopDifficulty *= (logistic((loopObj.MinimumJumpDistance - 80) / 10) + 0.2) / 1.2;
+                if (applyDistanceNerf) loopDifficulty *= (logistic((loopObj.LazyJumpDistance - 80) / 10) + 0.2) / 1.2;
 
                 // Additional buff for long sliderbodies. OVERBUFFED ON PURPOSE
                 if (applySliderbodyDensity && loopObj.BaseObject is Slider slider)
@@ -59,7 +60,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     if (i > 0) maxBuff += 1;
                     if (i < readingObjects.Count - 1) maxBuff += 1;
 
-                    loopDifficulty *= 1 + 1.5 * Math.Min(sliderBodyBuff, maxBuff);
+                    loopDifficulty *= 1 + slider_body_length_multiplier * Math.Min(sliderBodyBuff, maxBuff);
                 }
 
                 // Reduce density bonus for this object if they're too apart in time
@@ -85,6 +86,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 density += loopDifficulty;
 
                 // Angles nerf
+                // Why it's /2 + 0.5?
+                // Because there was a bug initially that made angle predictability to be from 0.5 to 1
+                // And removing this bug caused balance to be destroyed
                 double angleNerf = (loopObj.AnglePredictability / 2) + 0.5;
 
                 densityAnglesNerf += angleNerf * loopDifficulty * angleNerfMultiplier;
@@ -189,71 +193,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         // Returns value from 0 to 1, where 0 is very predictable and 1 is very unpredictable
         public static double EvaluateInpredictabilityOf(DifficultyHitObject current)
         {
-            // make the sum equal to 1
-            const double velocity_change_part = 0.8;
-            const double angle_change_part = 0.1;
-            const double rhythm_change_part = 0.1;
-
             if (current.BaseObject is Spinner || current.Index == 0 || current.Previous(0).BaseObject is Spinner)
                 return 0;
 
             var osuCurrObj = (OsuDifficultyHitObject)current;
             var osuLastObj = (OsuDifficultyHitObject)current.Previous(0);
 
-            // Rhythm difference punishment for velocity and angle bonuses
-            double rhythmSimilarity = 1 - getRhythmDifference(osuCurrObj.StrainTime, osuLastObj.StrainTime);
-
-            // Make differentiation going from 1/4 to 1/2 and bigger difference
-            // To 1/3 to 1/2 and smaller difference
-            rhythmSimilarity = Math.Clamp(rhythmSimilarity, 0.5, 0.75);
-            rhythmSimilarity = 4 * (rhythmSimilarity - 0.5);
-
-            double velocityChangeBonus = getVelocityChangeFactor(osuCurrObj, osuLastObj) * rhythmSimilarity;
-
-            double currVelocity = osuCurrObj.LazyJumpDistance / osuCurrObj.StrainTime;
-            double prevVelocity = osuLastObj.LazyJumpDistance / osuLastObj.StrainTime;
-
-            double angleChangeBonus = 0;
-
-            if (osuCurrObj.Angle != null && osuLastObj.Angle != null && currVelocity > 0 && prevVelocity > 0)
-            {
-                angleChangeBonus = 1 - osuCurrObj.AnglePredictability;
-                angleChangeBonus *= Math.Min(currVelocity, prevVelocity) / Math.Max(currVelocity, prevVelocity); // Prevent cheesing
-            }
-
-            angleChangeBonus *= rhythmSimilarity;
-
-            // This bonus only awards rhythm changes if they're not filled with sliderends
-            double rhythmChangeBonus = 0;
-
-            if (current.Index > 1)
-            {
-                var osuLastLastObj = (OsuDifficultyHitObject)current.Previous(1);
-
-                double currDelta = osuCurrObj.StrainTime;
-                double lastDelta = osuLastObj.StrainTime;
-
-                if (osuLastObj.BaseObject is Slider sliderCurr)
-                {
-                    currDelta -= sliderCurr.Duration / osuCurrObj.ClockRate;
-                    currDelta = Math.Max(0, currDelta);
-                }
-
-                if (osuLastLastObj.BaseObject is Slider sliderLast)
-                {
-                    lastDelta -= sliderLast.Duration / osuLastObj.ClockRate;
-                    lastDelta = Math.Max(0, lastDelta);
-                }
-
-                rhythmChangeBonus = getRhythmDifference(currDelta, lastDelta);
-            }
-
-            double result = velocity_change_part * velocityChangeBonus + angle_change_part * angleChangeBonus + rhythm_change_part * rhythmChangeBonus;
-            return result;
-        }
-
-        private static double getVelocityChangeFactor(OsuDifficultyHitObject osuCurrObj, OsuDifficultyHitObject osuLastObj)
-        {
             double currVelocity = osuCurrObj.LazyJumpDistance / osuCurrObj.StrainTime;
             double prevVelocity = osuLastObj.LazyJumpDistance / osuLastObj.StrainTime;
 
@@ -271,12 +216,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 velocityChangeFactor /= 0.4;
             }
 
-            return velocityChangeFactor;
+            // Rhythm difference punishment for velocity and angle bonuses
+            double rhythmSimilarity = 1 - getRhythmDifference(osuCurrObj.StrainTime, osuLastObj.StrainTime);
+
+            // Make differentiation going from 1/4 to 1/2 and bigger difference
+            // To 1/3 to 1/2 and smaller difference
+            rhythmSimilarity = Math.Clamp(rhythmSimilarity, 0.5, 0.75);
+            rhythmSimilarity = 4 * (rhythmSimilarity - 0.5);
+
+            return velocityChangeFactor * rhythmSimilarity;
         }
 
         private static double getTimeNerfFactor(double deltaTime) => Math.Clamp(2 - deltaTime / (reading_window_size / 2), 0, 1);
         private static double getRhythmDifference(double t1, double t2) => 1 - Math.Min(t1, t2) / Math.Max(t1, t2);
-        private static double logistic(double x) => 1 / (1 + Math.Exp(-x));
+        private static double logistic(double x) => 1.0 / (1 + Math.Exp(-x));
 
         // Finds the overlapness of the last object for which StartTime lower than target
         private static double boundBinarySearch(List<OsuDifficultyHitObject.ReadingObject> arr, double target)
@@ -315,59 +268,44 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             double densityFactor = Math.Pow(density / 6.2, 1.5);
 
-            double invisibilityFactor;
+            // High AR curve
+            double invisibilityFactor = Math.Pow(preempt * 2.4 - 0.2, 5);
 
-            // AR11+DT and faster = 0 HD pp unless density is big
-            if (preempt < 0.2) invisibilityFactor = 0;
+            // Mid and Low AR curves
+            invisibilityFactor = Math.Min(invisibilityFactor, Math.Max(preempt, preempt * 3 - 2.4));
 
-            // Else accelerating growth until around ART0, then linear, and starting from AR5 is 3 times faster again to buff AR0 +HD
-            else invisibilityFactor = Math.Min(Math.Pow(preempt * 2.4 - 0.2, 5), Math.Max(preempt, preempt * 3 - 2.4));
+            // On 250ms invisibility factor will be 0
+            invisibilityFactor *= invLerp(preempt, 0.25, 0.3);
 
-
-            double hdDifficulty = invisibilityFactor + densityFactor;
-
-            // Scale by inpredictability slightly
-            hdDifficulty *= 0.96 + 0.1 * ReadingEvaluator.EvaluateInpredictabilityOf(current); // Max multiplier is 1.1
-
-            return hdDifficulty;
+            return invisibilityFactor + densityFactor;
         }
+
+        private static double invLerp(double value, double min, double max) => Math.Clamp((value - min) / (max - min), 0, 1);
     }
 
     public static class ReadingHighAREvaluator
     {
+        // https://www.desmos.com/calculator/mtlyw84ncw
         public static double EvaluateDifficultyOf(DifficultyHitObject current, bool applyAdjust = false)
         {
             var currObj = (OsuDifficultyHitObject)current;
 
-            double result = GetDifficulty(currObj.Preempt);
+            // Get preempt in seconds
+            double preempt = currObj.Preempt / 1000;
+
+            // This function is matching live high AR bonus
+            double value = 0.63 * Math.Pow(Math.Max(8 - 20 * preempt, 0), 2.0 / 3);
+
+            // Use different curve for preempt < 375ms
+            value = Math.Max(value, Math.Exp(9.075 - 80.0 * Math.Max(preempt, 0.375) / 3));
 
             if (applyAdjust)
             {
                 double inpredictability = ReadingEvaluator.EvaluateInpredictabilityOf(current);
-
-                // follow lines make high AR easier, so apply nerf if object isn't new combo
-                inpredictability *= 1 + 0.1 * (800 - currObj.FollowLineTime) / 800;
-
-                result *= 0.98 + 0.6 * inpredictability;
+                value *= 0.98 + 0.6 * inpredictability;
             }
 
-            return result;
-        }
-
-        // High AR curve (this curve is without Math.Pow(value, 2))
-        // https://www.desmos.com/calculator/xuuwd77cbq
-        public static double GetDifficulty(double preempt)
-        {
-            // Get preempt in seconds
-            preempt /= 1000;
-            double value;
-
-            if (preempt < 0.375) // We have stop in the point of AR10.5, the value here = 0.396875, derivative = -10.5833, 
-                value = 0.63 * Math.Pow(8 - 20 * preempt, 2.0 / 3); // This function is matching live high AR bonus
-            else
-                value = Math.Exp(9.07583 - 80.0 * preempt / 3);
-
-            return Math.Pow(value, 1.0 / ReadingHighAR.MECHANICAL_PP_POWER);
+            return value;
         }
     }
 }

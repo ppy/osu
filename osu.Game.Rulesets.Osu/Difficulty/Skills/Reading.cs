@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
     public class ReadingLowAR : GraphSkill
     {
-        private double skillMultiplier => 1.23;
+        private double skillMultiplier => 1.22;
         private double aimComponentMultiplier => 0.4;
 
         public ReadingLowAR(Mod[] mods)
@@ -94,7 +94,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             : base(mods, false)
         {
         }
-        protected new double SkillMultiplier => 7.632;
+        protected new double SkillMultiplier => 7.3;
 
         protected override double StrainValueAt(DifficultyHitObject current)
         {
@@ -131,7 +131,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private HighARSpeedComponent speedComponent;
 
         private int objectsCount = 0;
-        private double objectsPreemptSum = 0;
 
         public override void Process(DifficultyHitObject current)
         {
@@ -141,7 +140,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             if (current.BaseObject is not Spinner)
             {
                 objectsCount++;
-                objectsPreemptSum += ((OsuDifficultyHitObject)current).Preempt;
             }
 
             double power = OsuDifficultyCalculator.SUM_POWER;
@@ -164,8 +162,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         }
 
         // Coefs for curve similar to difficulty to performance curve
-        private static double power => 3.0369;
-        private static double multiplier => 3.69656;
+        private static double power => 3;
+        private static double multiplier => 3.7;
 
         public static double DifficultyToPerformance(double difficulty) => Math.Pow(difficulty, power) * multiplier;
         private static double performanceToDifficulty(double performance) => Math.Pow(performance / multiplier, 1.0 / power);
@@ -185,18 +183,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             // Length bonus is in SR to not inflate Star Rating of short AR11 maps
             double lengthBonus = OsuPerformanceCalculator.CalculateDefaultLengthBonus(objectsCount);
             lengthBonus = Math.Pow(lengthBonus, 0.5 / MECHANICAL_PP_POWER);
-
-            // Get average preempt of objects
-            double averagePreempt = objectsPreemptSum / objectsCount / 1000;
-
-            // Increase length bonus for long maps with very high AR
-            // https://www.desmos.com/calculator/wz9wckqgzu
-            double lengthBonusPower = 1 + 0.75 * Math.Pow(0.1, Math.Pow(2.3 * averagePreempt, 8));
-
-            // Be sure that increasing AR won't decrease pp
-            if (lengthBonus < 1) lengthBonusPower = 2;
-
-            totalPerformance *= Math.Pow(lengthBonus, lengthBonusPower);
+            totalPerformance *= lengthBonus;
 
             double adjustedDifficulty = performanceToDifficulty(totalPerformance);
             double difficultyValue = Math.Pow(adjustedDifficulty / OsuDifficultyCalculator.DIFFICULTY_MULTIPLIER, 2.0);
@@ -217,12 +204,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             {
                 CurrentStrain *= StrainDecay(current.DeltaTime);
 
+                double highARDifficulty = Math.Pow(ReadingHighAREvaluator.EvaluateDifficultyOf(current, true), 1.0 / MECHANICAL_PP_POWER);
                 double aimDifficulty = AimEvaluator.EvaluateDifficultyOf(current, true) * SkillMultiplier;
-                aimDifficulty *= ReadingHighAREvaluator.EvaluateDifficultyOf(current, true);
 
+                aimDifficulty *= highARDifficulty;
                 CurrentStrain += aimDifficulty;
 
-                return CurrentStrain + component_default_value_multiplier * ReadingHighAREvaluator.EvaluateDifficultyOf(current, true);
+                return CurrentStrain + component_default_value_multiplier * highARDifficulty;
             }
         }
 
@@ -239,13 +227,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
                 CurrentStrain *= StrainDecay(currObj.StrainTime);
 
+                double highARDifficulty = Math.Pow(ReadingHighAREvaluator.EvaluateDifficultyOf(current, false), 1.0 / MECHANICAL_PP_POWER);
                 double speedDifficulty = SpeedEvaluator.EvaluateDifficultyOf(current) * SkillMultiplier;
-                speedDifficulty *= ReadingHighAREvaluator.EvaluateDifficultyOf(current);
+
+                speedDifficulty *= highARDifficulty;
                 CurrentStrain += speedDifficulty;
 
                 CurrentRhythm = currObj.RhythmDifficulty;
                 double totalStrain = CurrentStrain * CurrentRhythm;
-                return totalStrain + component_default_value_multiplier * ReadingHighAREvaluator.EvaluateDifficultyOf(current);
+                return totalStrain + component_default_value_multiplier * highARDifficulty;
             }
         }
     }
