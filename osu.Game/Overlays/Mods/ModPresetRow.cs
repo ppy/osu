@@ -12,6 +12,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Mods
 {
@@ -43,8 +44,13 @@ namespace osu.Game.Overlays.Mods
                                 TooltipText = "Remove this mod",
                                 Action = () => Scheduler.AddOnce(() =>
                                 {
-                                    this.FadeOut(200, Easing.OutQuint).Then().Expire();
-                                    rootSet.Remove(mod);
+                                    if (rootSet.Count <= 1)
+                                        this.FlashColour(Color4.Red, 300);
+                                    else
+                                    {
+                                        this.FadeOut(200, Easing.OutQuint).Then().Expire();
+                                        rootSet.Remove(mod);
+                                    }
                                 })
                             }
                             : new Container(),
