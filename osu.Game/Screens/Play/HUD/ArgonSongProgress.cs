@@ -30,6 +30,9 @@ namespace osu.Game.Screens.Play.HUD
         [SettingSource(typeof(SongProgressStrings), nameof(SongProgressStrings.ShowTime), nameof(SongProgressStrings.ShowTimeDescription))]
         public Bindable<bool> ShowTime { get; } = new BindableBool(true);
 
+        [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.UseRelativeSize))]
+        public BindableBool UseRelativeSize { get; } = new BindableBool(true);
+
         [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.Colour), nameof(SkinnableComponentStrings.ColourDescription))]
         public BindableColour4 AccentColour { get; } = new BindableColour4(Colour4.White);
 
@@ -99,6 +102,11 @@ namespace osu.Game.Screens.Play.HUD
             ShowGraph.BindValueChanged(_ => updateGraphVisibility(), true);
             ShowTime.BindValueChanged(_ => info.FadeTo(ShowTime.Value ? 1 : 0, 200, Easing.In), true);
             AccentColour.BindValueChanged(_ => Colour = AccentColour.Value, true);
+
+            // see comment in ArgonHealthDisplay.cs regarding RelativeSizeAxes
+            float previousWidth = Width;
+            UseRelativeSize.BindValueChanged(v => RelativeSizeAxes = v.NewValue ? Axes.X : Axes.None, true);
+            Width = previousWidth;
         }
 
         protected override void UpdateObjects(IEnumerable<HitObject> objects)

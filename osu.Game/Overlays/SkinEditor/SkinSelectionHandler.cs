@@ -13,6 +13,7 @@ using osu.Game.Extensions;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit.Compose.Components;
+using osu.Game.Localisation;
 using osu.Game.Skinning;
 using osu.Game.Utils;
 using osuTK;
@@ -101,19 +102,19 @@ namespace osu.Game.Overlays.SkinEditor
 
         protected override IEnumerable<MenuItem> GetContextMenuItemsForSelection(IEnumerable<SelectionBlueprint<ISerialisableDrawable>> selection)
         {
-            var closestItem = new TernaryStateRadioMenuItem("Closest", MenuItemType.Standard, _ => applyClosestAnchors())
+            var closestItem = new TernaryStateRadioMenuItem(SkinEditorStrings.Closest, MenuItemType.Standard, _ => applyClosestAnchors())
             {
                 State = { Value = GetStateFromSelection(selection, c => !c.Item.UsesFixedAnchor) }
             };
 
-            yield return new OsuMenuItem("Anchor")
+            yield return new OsuMenuItem(SkinEditorStrings.Anchor)
             {
                 Items = createAnchorItems((d, a) => d.UsesFixedAnchor && ((Drawable)d).Anchor == a, applyFixedAnchors)
                         .Prepend(closestItem)
                         .ToArray()
             };
 
-            yield return originMenu = new OsuMenuItem("Origin");
+            yield return originMenu = new OsuMenuItem(SkinEditorStrings.Origin);
 
             closestItem.State.BindValueChanged(s =>
             {
@@ -125,19 +126,19 @@ namespace osu.Game.Overlays.SkinEditor
 
             yield return new OsuMenuItemSpacer();
 
-            yield return new OsuMenuItem("Reset position", MenuItemType.Standard, () =>
+            yield return new OsuMenuItem(SkinEditorStrings.ResetPosition, MenuItemType.Standard, () =>
             {
                 foreach (var blueprint in SelectedBlueprints)
                     ((Drawable)blueprint.Item).Position = Vector2.Zero;
             });
 
-            yield return new OsuMenuItem("Reset rotation", MenuItemType.Standard, () =>
+            yield return new OsuMenuItem(SkinEditorStrings.ResetRotation, MenuItemType.Standard, () =>
             {
                 foreach (var blueprint in SelectedBlueprints)
                     ((Drawable)blueprint.Item).Rotation = 0;
             });
 
-            yield return new OsuMenuItem("Reset scale", MenuItemType.Standard, () =>
+            yield return new OsuMenuItem(SkinEditorStrings.ResetScale, MenuItemType.Standard, () =>
             {
                 foreach (var blueprint in SelectedBlueprints)
                 {
@@ -153,9 +154,9 @@ namespace osu.Game.Overlays.SkinEditor
 
             yield return new OsuMenuItemSpacer();
 
-            yield return new OsuMenuItem("Bring to front", MenuItemType.Standard, () => skinEditor.BringSelectionToFront());
+            yield return new OsuMenuItem(SkinEditorStrings.BringToFront, MenuItemType.Standard, () => skinEditor.BringSelectionToFront());
 
-            yield return new OsuMenuItem("Send to back", MenuItemType.Standard, () => skinEditor.SendSelectionToBack());
+            yield return new OsuMenuItem(SkinEditorStrings.SendToBack, MenuItemType.Standard, () => skinEditor.SendSelectionToBack());
 
             yield return new OsuMenuItemSpacer();
 
