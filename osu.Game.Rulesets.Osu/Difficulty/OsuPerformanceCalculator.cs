@@ -26,12 +26,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private int countMiss;
 
         /// <summary>
-        /// Missed slider ticks that includes missed reverse arrows
+        /// Missed slider ticks that includes missed reverse arrows. Will only be correct on non-classic scores
         /// </summary>
         private int countSliderTickMiss;
 
         /// <summary>
-        /// Amount of missed slider tails that don't break combo
+        /// Amount of missed slider tails that don't break combo. Will only be correct on non-classic scores
         /// </summary>
         private int countSliderEndsDropped;
 
@@ -57,33 +57,33 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             countOk = score.Statistics.GetValueOrDefault(HitResult.Ok);
             countMeh = score.Statistics.GetValueOrDefault(HitResult.Meh);
             countMiss = score.Statistics.GetValueOrDefault(HitResult.Miss);
+            countSliderEndsDropped = osuAttributes.SliderCount - score.Statistics.GetValueOrDefault(HitResult.SliderTailHit);
+            countSliderTickMiss = score.Statistics.GetValueOrDefault(HitResult.LargeTickMiss);
 
             if (osuAttributes.SliderCount > 0)
             {
-                // Consider that full combo is maximum combo minus dropped sliders since missed tails don't contribute to score combo but also don't break it
-                // In classic scores we can't know the amount of dropped sliders so we use 10% of all sliders on the map
-                double droppedSliderTailsAmount = usingClassicSliderAccuracy
-                    ? 0.1 * osuAttributes.SliderCount
-                    : countSliderEndsDropped;
+                if (usingClassicSliderAccuracy)
+                {
+                    // Consider that full combo is maximum combo minus dropped slider tails since they don't contribute to combo but also don't break it
+                    // In classic scores we can't know the amount of dropped sliders so we estimate to 10% of all sliders on the map
+                    double fullComboThreshold = attributes.MaxCombo - 0.1 * osuAttributes.SliderCount;
 
-                double fullComboThreshold = attributes.MaxCombo - droppedSliderTailsAmount;
+                    if (scoreMaxCombo < fullComboThreshold)
+                        effectiveMissCount = fullComboThreshold / Math.Max(1.0, scoreMaxCombo);
 
-                if (scoreMaxCombo < fullComboThreshold)
-                    effectiveMissCount = fullComboThreshold / Math.Max(1.0, scoreMaxCombo);
-            }
+                    // In classic scores there can't be more misses than a sum of all non-perfect judgements
+                    effectiveMissCount = Math.Min(effectiveMissCount, totalImperfectHits);
+                }
+                else
+                {
+                    double fullComboThreshold = attributes.MaxCombo - countSliderEndsDropped;
 
-            if (!usingClassicSliderAccuracy)
-            {
-                countSliderEndsDropped = osuAttributes.SliderCount - score.Statistics.GetValueOrDefault(HitResult.SliderTailHit);
-                countSliderTickMiss = score.Statistics.GetValueOrDefault(HitResult.LargeTickMiss);
+                    if (scoreMaxCombo < fullComboThreshold)
+                        effectiveMissCount = fullComboThreshold / Math.Max(1.0, scoreMaxCombo);
 
-                // Combine regular misses with tick misses since tick misses break combo as well
-                effectiveMissCount = Math.Min(effectiveMissCount, countSliderTickMiss + countMiss);
-            }
-            else
-            {
-                // In classic scores there can't be more misses than a sum of all non-perfect judgements
-                effectiveMissCount = Math.Min(effectiveMissCount, totalImperfectHits);
+                    // Combine regular misses with tick misses since tick misses break combo as well
+                    effectiveMissCount = Math.Min(effectiveMissCount, countSliderTickMiss + countMiss);
+                }
             }
 
             effectiveMissCount = Math.Max(countMiss, effectiveMissCount);
