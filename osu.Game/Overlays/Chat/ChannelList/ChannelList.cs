@@ -9,10 +9,12 @@ using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays.Chat.Listing;
 using osu.Game.Resources.Localisation.Web;
@@ -39,6 +41,7 @@ namespace osu.Game.Overlays.Chat.ChannelList
         private ChannelGroup publicChannelGroup = null!;
         private ChannelGroup privateChannelGroup = null!;
         private ChannelListItem selector = null!;
+        private TextBox searchTextBox = null!;
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
@@ -65,10 +68,38 @@ namespace osu.Game.Overlays.Chat.ChannelList
                             announceChannelGroup = new ChannelGroup(ChatStrings.ChannelsListTitleANNOUNCE.ToUpper()),
                             publicChannelGroup = new ChannelGroup(ChatStrings.ChannelsListTitlePUBLIC.ToUpper()),
                             selector = new ChannelListItem(ChannelListingChannel),
+                            new FillFlowContainer
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                Padding = new MarginPadding { Horizontal = 18, Top = 8 },
+                                Direction = FillDirection.Vertical,
+                                Children = new Drawable[]
+                                {
+                                    new OsuSpriteText
+                                    {
+                                        Text = "SEARCH",
+                                        Margin = new MarginPadding { Bottom = 5 },
+                                        Font = OsuFont.Torus.With(size: 12, weight: FontWeight.SemiBold),
+                                    },
+                                    searchTextBox = new OsuTextBox
+                                    {
+                                        Height = 28,
+                                        RelativeSizeAxes = Axes.X,
+                                        PlaceholderText = "Search by name...",
+                                        FontSize = 14,
+                                    }
+                                }
+                            },
                             privateChannelGroup = new ChannelGroup(ChatStrings.ChannelsListTitlePM.ToUpper()),
                         },
                     },
                 },
+            };
+
+            searchTextBox.OnUpdate += (newText) =>
+            {
+                privateChannelGroup.FilterChannels(searchTextBox.Text);
             };
 
             selector.OnRequestSelect += chan => OnRequestSelect?.Invoke(chan);
@@ -166,6 +197,23 @@ namespace osu.Game.Overlays.Chat.ChannelList
                         AutoSizeAxes = Axes.Y,
                     },
                 };
+            }
+
+            public void FilterChannels(string searchTerm)
+            {
+                foreach (var item in ItemFlow.Children)
+                {
+                    if (string.IsNullOrEmpty(searchTerm))
+                    {
+                        item.Show();
+                        continue;
+                    }
+
+                    if (item.Channel.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
+                        item.Show();
+                    else
+                        item.Hide();
+                }
             }
         }
     }
