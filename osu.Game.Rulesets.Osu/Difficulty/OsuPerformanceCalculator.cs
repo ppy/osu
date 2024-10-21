@@ -271,7 +271,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             }
 
             // Clamp miss count to maximum amount of possible breaks
-            comboBasedMissCount = Math.Min(comboBasedMissCount, countOk + countMeh + countMiss + countLargeTickMiss);
+            comboBasedMissCount = usingClassicSliderAccuracy ? Math.Min(comboBasedMissCount, countOk + countMeh + countMiss) : Math.Min(comboBasedMissCount, countLargeTickMiss + countMiss);
 
             return Math.Max(countMiss, comboBasedMissCount);
         }
