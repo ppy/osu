@@ -7,6 +7,7 @@ using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Skinning.Default;
 using osu.Game.Skinning;
 using osu.Game.Utils;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Legacy
@@ -23,6 +24,16 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
         private partial class LegacyDrawableSliderPath : DrawableSliderPath
         {
+            public LegacyDrawableSliderPath()
+            {
+                BlurSigma = new Vector2(8f);
+
+                BackdropTintStrength = 0.5f;
+
+                // To prevent shadows from contributing to the background blur effect
+                MaskCutoff = 0.25f;
+            }
+
             protected override Color4 ColourAt(float position)
             {
                 // https://github.com/peppy/osu-stable-reference/blob/3ea48705eb67172c430371dcfc8a16a002ed0d3d/osu!/Graphics/Renderers/MmSliderRendererGL.cs#L99
