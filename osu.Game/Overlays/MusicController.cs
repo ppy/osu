@@ -60,7 +60,7 @@ namespace osu.Game.Overlays
         [Resolved]
         private IBindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
 
-        public BindableList<Live<BeatmapSetInfo>> Playlist { get; private set; } = null!;
+        public readonly BindableList<Live<BeatmapSetInfo>> Playlist = new BindableList<Live<BeatmapSetInfo>>();
 
         public DrawableTrack CurrentTrack { get; private set; } = new DrawableTrack(new TrackVirtual(1000));
 
@@ -92,7 +92,7 @@ namespace osu.Game.Overlays
         {
             base.LoadComplete();
 
-            Playlist = new BindableList<Live<BeatmapSetInfo>>(getBeatmapSets());
+            Playlist.AddRange(getBeatmapSets());
 
             beatmap.BindValueChanged(b =>
             {
@@ -356,8 +356,8 @@ namespace osu.Game.Overlays
             else
             {
                 playableSet = Playlist.SkipWhile(i => !i.Value.Equals(current?.BeatmapSetInfo))
-                                                            .Where(i => !i.Value.Protected || allowProtectedTracks)
-                                                            .ElementAtOrDefault(1)
+                                      .Where(i => !i.Value.Protected || allowProtectedTracks)
+                                      .ElementAtOrDefault(1)
                               ?? Playlist.FirstOrDefault(i => !i.Value.Protected || allowProtectedTracks);
             }
 

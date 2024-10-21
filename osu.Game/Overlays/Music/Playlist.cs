@@ -53,16 +53,15 @@ namespace osu.Game.Overlays.Music
             currentCriteria = criteria;
 
             if (currentCriteria == criteria)
+                updateMusicControllerPlaylist();
+
+            items.FilterCompleted += () => Scheduler.AddOnce(updateMusicControllerPlaylist);
+
+            void updateMusicControllerPlaylist()
             {
                 musicController.Playlist.Clear();
                 musicController.Playlist.AddRange(AllVisibleSets);
             }
-
-            items.FilterCompleted += () =>
-            {
-                musicController.Playlist.Clear();
-                musicController.Playlist.AddRange(AllVisibleSets);
-            };
         }
 
         public Live<BeatmapSetInfo>? FirstVisibleSet => Items.FirstOrDefault(i => ((PlaylistItem)ItemMap[i]).MatchingFilter);
