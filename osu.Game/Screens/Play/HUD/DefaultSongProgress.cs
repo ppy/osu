@@ -37,6 +37,9 @@ namespace osu.Game.Screens.Play.HUD
         [SettingSource(typeof(SongProgressStrings), nameof(SongProgressStrings.ShowTime), nameof(SongProgressStrings.ShowTimeDescription))]
         public Bindable<bool> ShowTime { get; } = new BindableBool(true);
 
+        [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.UseRelativeSize))]
+        public BindableBool UseRelativeSize { get; } = new BindableBool(true);
+
         [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.Colour), nameof(SkinnableComponentStrings.ColourDescription))]
         public BindableColour4 AccentColour { get; } = new BindableColour4(Colour4.White);
 
@@ -83,6 +86,11 @@ namespace osu.Game.Screens.Play.HUD
         private void load(OsuColour colours)
         {
             graph.FillColour = bar.FillColour = colours.BlueLighter;
+
+            // see comment in ArgonHealthDisplay.cs regarding RelativeSizeAxes
+            float previousWidth = Width;
+            UseRelativeSize.BindValueChanged(v => RelativeSizeAxes = v.NewValue ? Axes.X : Axes.None, true);
+            Width = previousWidth;
         }
 
         protected override void LoadComplete()
