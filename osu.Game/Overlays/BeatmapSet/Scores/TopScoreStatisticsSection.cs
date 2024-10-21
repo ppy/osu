@@ -236,7 +236,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 set => text.Text = value;
             }
 
-            public ColourInfo TextColour
+            public Colour4 TextColour
             {
                 set => text.Colour = value;
             }
