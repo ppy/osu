@@ -46,14 +46,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             countOk = score.Statistics.GetValueOrDefault(HitResult.Ok);
             countMeh = score.Statistics.GetValueOrDefault(HitResult.Meh);
             countMiss = score.Statistics.GetValueOrDefault(HitResult.Miss);
+            effectiveMissCount = calculateEffectiveMissCount(osuAttributes);
 
-            if (usingClassicSliderAccuracy)
-                effectiveMissCount = calculateEffectiveMissCount(osuAttributes);
-            else
+            if (!usingClassicSliderAccuracy)
             {
                 countSliderEndsDropped = osuAttributes.SliderCount - score.Statistics.GetValueOrDefault(HitResult.SliderTailHit);
                 countLargeTickMiss = score.Statistics.GetValueOrDefault(HitResult.LargeTickMiss);
-                effectiveMissCount = calculateEffectiveMissCount(osuAttributes);
             }
 
             double multiplier = PERFORMANCE_BASE_MULTIPLIER;
@@ -134,7 +132,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             if (attributes.SliderCount > 0)
             {
-                double estimateSliderEndsDropped = usingClassicSliderAccuracy ? Math.Clamp(Math.Min(countOk + countMeh + countMiss, attributes.MaxCombo - scoreMaxCombo), 0, estimateDifficultSliders) : Math.Min(countSliderEndsDropped + countLargeTickMiss, estimateDifficultSliders);
+                double estimateSliderEndsDropped = usingClassicSliderAccuracy
+                    ? Math.Clamp(Math.Min(countOk + countMeh + countMiss, attributes.MaxCombo - scoreMaxCombo), 0, estimateDifficultSliders)
+                    : Math.Min(countSliderEndsDropped + countLargeTickMiss, estimateDifficultSliders);
+
                 double sliderNerfFactor = (1 - attributes.SliderFactor) * Math.Pow(1 - estimateSliderEndsDropped / estimateDifficultSliders, 3) + attributes.SliderFactor;
                 aimValue *= sliderNerfFactor;
             }
@@ -259,39 +260,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double calculateEffectiveMissCount(OsuDifficultyAttributes attributes)
         {
-            if (usingClassicSliderAccuracy)
+            double comboBasedMissCount = 0.0;
+
+            if (attributes.SliderCount > 0)
             {
                 // Guess the number of misses + slider breaks from combo
-                double comboBasedMissCount = 0.0;
-
-                if (attributes.SliderCount > 0)
-                {
-                    double fullComboThreshold = attributes.MaxCombo - 0.1 * attributes.SliderCount;
-                    if (scoreMaxCombo < fullComboThreshold)
-                        comboBasedMissCount = fullComboThreshold / Math.Max(1.0, scoreMaxCombo);
-                }
-
-                // Clamp miss count to maximum amount of possible breaks
-                comboBasedMissCount = Math.Min(comboBasedMissCount, countOk + countMeh + countMiss);
-
-                return Math.Max(countMiss, comboBasedMissCount);
+                double fullComboThreshold = usingClassicSliderAccuracy ? attributes.MaxCombo - 0.1 * attributes.SliderCount : attributes.MaxCombo - countSliderEndsDropped;
+                if (scoreMaxCombo < fullComboThreshold)
+                    comboBasedMissCount = fullComboThreshold / Math.Max(1.0, scoreMaxCombo);
             }
-            else
-            {
-                // Cap LargeTickMisses to avoid buzz sliders giving high miss counts
-                // Uses very similar formula to calculateEffectiveMissCount(), but utilizes osu!lazer's extra data
-                double comboBasedMissCount = 0.0;
 
-                if (attributes.SliderCount > 0)
-                {
-                    comboBasedMissCount = (attributes.MaxCombo - countSliderEndsDropped) / Math.Max(1.0, scoreMaxCombo);
-                }
+            // Clamp miss count to maximum amount of possible breaks
+            comboBasedMissCount = Math.Min(comboBasedMissCount, countOk + countMeh + countMiss + countLargeTickMiss);
 
-                // Clamp miss count to maximum amount of possible breaks
-                comboBasedMissCount = Math.Min(comboBasedMissCount, countOk + countMeh + countMiss + countLargeTickMiss);
-
-                return Math.Max(countMiss, comboBasedMissCount);
-            }
+            return Math.Max(countMiss, comboBasedMissCount);
         }
 
         // Miss penalty assumes that a player will miss on the hardest parts of a map,
