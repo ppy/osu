@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             {
                 countSliderEndsDropped = osuAttributes.SliderCount - score.Statistics.GetValueOrDefault(HitResult.SliderTailHit);
                 countLargeTickMiss = score.Statistics.GetValueOrDefault(HitResult.LargeTickMiss);
-                effectiveMissCount = countMiss;
+                effectiveMissCount = calculateEffectiveLazerMissCount(osuAttributes);
             }
 
             double multiplier = PERFORMANCE_BASE_MULTIPLIER;
@@ -271,6 +271,22 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             // Clamp miss count to maximum amount of possible breaks
             comboBasedMissCount = Math.Min(comboBasedMissCount, countOk + countMeh + countMiss);
+
+            return Math.Max(countMiss, comboBasedMissCount);
+        }
+        private double calculateEffectiveLazerMissCount(OsuDifficultyAttributes attributes)
+        {
+            // Cap LargeTickMisses to avoid buzz sliders giving high miss counts
+            // Uses very similar formula to calculateEffectiveMissCount(), but utilizes osu!lazer's extra data
+            double comboBasedMissCount = 0.0;
+
+            if (attributes.SliderCount > 0)
+            {
+                comboBasedMissCount = (attributes.MaxCombo - countSliderEndsDropped) / Math.Max(1.0, scoreMaxCombo);
+            }
+
+            // Clamp miss count to maximum amount of possible breaks
+            comboBasedMissCount = Math.Min(comboBasedMissCount, countOk + countMeh + countMiss + countLargeTickMiss);
 
             return Math.Max(countMiss, comboBasedMissCount);
         }
