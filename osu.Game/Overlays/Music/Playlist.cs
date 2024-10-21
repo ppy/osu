@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -21,6 +22,9 @@ namespace osu.Game.Overlays.Music
         public readonly Bindable<Live<BeatmapSetInfo>> SelectedSet = new Bindable<Live<BeatmapSetInfo>>();
 
         private FilterCriteria currentCriteria = new FilterCriteria();
+
+        [Resolved]
+        private MusicController musicController { get; set; } = null!;
 
         public new MarginPadding Padding
         {
@@ -47,6 +51,18 @@ namespace osu.Game.Overlays.Music
 
             items.SearchTerm = criteria.SearchText;
             currentCriteria = criteria;
+
+            if (currentCriteria == criteria)
+            {
+                musicController.Playlist.Clear();
+                musicController.Playlist.AddRange(AllVisibleSets);
+            }
+
+            items.FilterCompleted += () =>
+            {
+                musicController.Playlist.Clear();
+                musicController.Playlist.AddRange(AllVisibleSets);
+            };
         }
 
         public Live<BeatmapSetInfo>? FirstVisibleSet => Items.FirstOrDefault(i => ((PlaylistItem)ItemMap[i]).MatchingFilter);

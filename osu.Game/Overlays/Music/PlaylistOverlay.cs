@@ -39,7 +39,7 @@ namespace osu.Game.Overlays.Music
         private IDisposable beatmapSubscription;
 
         private FilterControl filter;
-        public Playlist List;
+        private Playlist list;
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, Bindable<WorkingBeatmap> beatmap)
@@ -66,7 +66,7 @@ namespace osu.Game.Overlays.Music
                             Colour = colours.Gray3,
                             RelativeSizeAxes = Axes.Both,
                         },
-                        List = new Playlist
+                        list = new Playlist
                         {
                             RelativeSizeAxes = Axes.Both,
                             Padding = new MarginPadding { Top = 95, Bottom = 10, Right = 10 },
@@ -76,7 +76,7 @@ namespace osu.Game.Overlays.Music
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            FilterChanged = criteria => List.Filter(criteria),
+                            FilterChanged = criteria => list.Filter(criteria),
                             Padding = new MarginPadding(10),
                         },
                     },
@@ -85,7 +85,7 @@ namespace osu.Game.Overlays.Music
 
             filter.Search.OnCommit += (_, _) =>
             {
-                List.FirstVisibleSet?.PerformRead(set =>
+                list.FirstVisibleSet?.PerformRead(set =>
                 {
                     BeatmapInfo toSelect = set.Beatmaps.FirstOrDefault();
 
@@ -104,8 +104,8 @@ namespace osu.Game.Overlays.Music
 
             beatmapSubscription = realm.RegisterForNotifications(r => r.All<BeatmapSetInfo>().Where(s => !s.DeletePending && !s.Protected), beatmapsChanged);
 
-            List.Items.BindTo(beatmapSets);
-            beatmap.BindValueChanged(working => List.SelectedSet.Value = working.NewValue.BeatmapSetInfo.ToLive(realm), true);
+            list.Items.BindTo(beatmapSets);
+            beatmap.BindValueChanged(working => list.SelectedSet.Value = working.NewValue.BeatmapSetInfo.ToLive(realm), true);
         }
 
         private void beatmapsChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet changes)

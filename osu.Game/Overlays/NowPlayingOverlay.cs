@@ -145,7 +145,7 @@ namespace osu.Game.Overlays
                                                 {
                                                     Anchor = Anchor.Centre,
                                                     Origin = Anchor.Centre,
-                                                    Action = () => musicController.PreviousTrack(playlist: playlist?.List.AllVisibleSets),
+                                                    Action = () => musicController.PreviousTrack(),
                                                     Icon = FontAwesome.Solid.StepBackward,
                                                 },
                                                 playButton = new MusicIconButton
@@ -161,7 +161,7 @@ namespace osu.Game.Overlays
                                                 {
                                                     Anchor = Anchor.Centre,
                                                     Origin = Anchor.Centre,
-                                                    Action = () => musicController.NextTrack(playlist: playlist?.List.AllVisibleSets),
+                                                    Action = () => musicController.NextTrack(),
                                                     Icon = FontAwesome.Solid.StepForward,
                                                 },
                                             }

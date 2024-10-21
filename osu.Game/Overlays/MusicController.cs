@@ -60,6 +60,8 @@ namespace osu.Game.Overlays
         [Resolved]
         private IBindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
 
+        public BindableList<Live<BeatmapSetInfo>> Playlist { get; private set; } = null!;
+
         public DrawableTrack CurrentTrack { get; private set; } = new DrawableTrack(new TrackVirtual(1000));
 
         [Resolved]
@@ -89,6 +91,8 @@ namespace osu.Game.Overlays
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            Playlist = new BindableList<Live<BeatmapSetInfo>>(getBeatmapSets());
 
             beatmap.BindValueChanged(b =>
             {
@@ -121,8 +125,6 @@ namespace osu.Game.Overlays
         public bool TrackLoaded => CurrentTrack.TrackLoaded;
 
         private ScheduledDelegate? seekDelegate;
-
-        private IEnumerable<Live<BeatmapSetInfo>>? currentPlaylist;
 
         public void SeekTo(double position)
         {
@@ -225,12 +227,9 @@ namespace osu.Game.Overlays
         /// </summary>
         /// <param name="onSuccess">Invoked when the operation has been performed successfully.</param>
         /// <param name="allowProtectedTracks">Whether to include <see cref="BeatmapSetInfo.Protected"/> beatmap sets when navigating.</param>
-        /// <param name="playlist">A playlist to navigate through. Otherwise use the current or list of all beatmap sets.</param>
-        public void PreviousTrack(Action<PreviousTrackResult>? onSuccess = null, bool allowProtectedTracks = false, IEnumerable<Live<BeatmapSetInfo>>? playlist = null) => Schedule(() =>
+        public void PreviousTrack(Action<PreviousTrackResult>? onSuccess = null, bool allowProtectedTracks = false) => Schedule(() =>
         {
-            if (playlist != null && !EqualityComparer<IEnumerable<Live<BeatmapSetInfo>>?>.Default.Equals(playlist, currentPlaylist))
-                currentPlaylist = playlist;
-            PreviousTrackResult res = prev(allowProtectedTracks, currentPlaylist);
+            PreviousTrackResult res = prev(allowProtectedTracks);
             if (res != PreviousTrackResult.None)
                 onSuccess?.Invoke(res);
         });
@@ -239,9 +238,8 @@ namespace osu.Game.Overlays
         /// Play the previous track or restart the current track if it's current time below <see cref="restart_cutoff_point"/>.
         /// </summary>
         /// <param name="allowProtectedTracks">Whether to include <see cref="BeatmapSetInfo.Protected"/> beatmap sets when navigating.</param>
-        /// <param name="playlist">A playlist to navigate through. Otherwise use the current or list of all beatmap sets.</param>
         /// <returns>The <see cref="PreviousTrackResult"/> that indicate the decided action.</returns>
-        private PreviousTrackResult prev(bool allowProtectedTracks, IEnumerable<Live<BeatmapSetInfo>>? playlist = null)
+        private PreviousTrackResult prev(bool allowProtectedTracks)
         {
             if (beatmap.Disabled || !AllowTrackControl.Value)
                 return PreviousTrackResult.None;
@@ -259,11 +257,11 @@ namespace osu.Game.Overlays
             Live<BeatmapSetInfo>? playableSet;
 
             if (Shuffle.Value)
-                playableSet = getNextRandom(-1, allowProtectedTracks, playlist);
+                playableSet = getNextRandom(-1, allowProtectedTracks);
             else
             {
-                playableSet = (playlist ?? getBeatmapSets()).TakeWhile(i => !i.Value.Equals(current?.BeatmapSetInfo)).LastOrDefault(s => !s.Value.Protected || allowProtectedTracks)
-                              ?? (playlist ?? getBeatmapSets()).LastOrDefault(s => !s.Value.Protected || allowProtectedTracks);
+                playableSet = Playlist.TakeWhile(i => !i.Value.Equals(current?.BeatmapSetInfo)).LastOrDefault(s => !s.Value.Protected || allowProtectedTracks)
+                              ?? Playlist.LastOrDefault(s => !s.Value.Protected || allowProtectedTracks);
             }
 
             if (playableSet != null)
@@ -281,12 +279,9 @@ namespace osu.Game.Overlays
         /// </summary>
         /// <param name="onSuccess">Invoked when the operation has been performed successfully.</param>
         /// <param name="allowProtectedTracks">Whether to include <see cref="BeatmapSetInfo.Protected"/> beatmap sets when navigating.</param>
-        /// <param name="playlist">A playlist to navigate through. Otherwise use the current or list of all beatmap sets.</param>
-        public void NextTrack(Action? onSuccess = null, bool allowProtectedTracks = false, IEnumerable<Live<BeatmapSetInfo>>? playlist = null) => Schedule(() =>
+        public void NextTrack(Action? onSuccess = null, bool allowProtectedTracks = false) => Schedule(() =>
         {
-            if (playlist != null && !EqualityComparer<IEnumerable<Live<BeatmapSetInfo>>?>.Default.Equals(playlist, currentPlaylist))
-                currentPlaylist = playlist;
-            bool res = next(allowProtectedTracks, currentPlaylist);
+            bool res = next(allowProtectedTracks);
             if (res)
                 onSuccess?.Invoke();
         });
@@ -347,7 +342,7 @@ namespace osu.Game.Overlays
             Scheduler.AddDelayed(() => duckOperation.Dispose(), delayUntilRestore);
         }
 
-        private bool next(bool allowProtectedTracks, IEnumerable<Live<BeatmapSetInfo>>? playlist = null)
+        private bool next(bool allowProtectedTracks)
         {
             if (beatmap.Disabled || !AllowTrackControl.Value)
                 return false;
@@ -357,13 +352,13 @@ namespace osu.Game.Overlays
             Live<BeatmapSetInfo>? playableSet;
 
             if (Shuffle.Value)
-                playableSet = getNextRandom(1, allowProtectedTracks, playlist);
+                playableSet = getNextRandom(1, allowProtectedTracks);
             else
             {
-                playableSet = (playlist ?? getBeatmapSets()).SkipWhile(i => !i.Value.Equals(current?.BeatmapSetInfo))
+                playableSet = Playlist.SkipWhile(i => !i.Value.Equals(current?.BeatmapSetInfo))
                                                             .Where(i => !i.Value.Protected || allowProtectedTracks)
                                                             .ElementAtOrDefault(1)
-                              ?? (playlist ?? getBeatmapSets()).FirstOrDefault(i => !i.Value.Protected || allowProtectedTracks);
+                              ?? Playlist.FirstOrDefault(i => !i.Value.Protected || allowProtectedTracks);
             }
 
             var playableBeatmap = playableSet?.Value.Beatmaps.FirstOrDefault();
@@ -378,13 +373,13 @@ namespace osu.Game.Overlays
             return false;
         }
 
-        private Live<BeatmapSetInfo>? getNextRandom(int direction, bool allowProtectedTracks, IEnumerable<Live<BeatmapSetInfo>>? playlist = null)
+        private Live<BeatmapSetInfo>? getNextRandom(int direction, bool allowProtectedTracks)
         {
             try
             {
                 Live<BeatmapSetInfo> result;
 
-                var possibleSets = (playlist ?? getBeatmapSets()).Where(s => !s.Value.Protected || allowProtectedTracks).ToList();
+                var possibleSets = Playlist.Where(s => !s.Value.Protected || allowProtectedTracks).ToList();
 
                 if (possibleSets.Count == 0)
                     return null;
