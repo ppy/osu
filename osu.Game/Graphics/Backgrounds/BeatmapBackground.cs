@@ -13,8 +13,6 @@ using osu.Framework.Graphics.Shaders.Types;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps;
-using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Graphics.Backgrounds
 {
@@ -31,11 +29,11 @@ namespace osu.Game.Graphics.Backgrounds
 
         protected DimmableBufferedContainer ColouredDimmableBufferedContainer { get; private set; }
 
-        private Color4 dimColour;
+        private Colour4 dimColour;
 
         private float dimLevel;
 
-        public Color4 DimColour
+        public Colour4 DimColour
         {
             get => dimColour;
             set => ColouredDimmable.DimColour = dimColour = value;
@@ -54,7 +52,7 @@ namespace osu.Game.Graphics.Backgrounds
             Beatmap = beatmap;
             this.fallbackTextureName = fallbackTextureName;
 
-            DimColour = Color4.Black;
+            DimColour = Colour4.Black;
             DimLevel = 0.0f;
         }
 
@@ -74,7 +72,7 @@ namespace osu.Game.Graphics.Backgrounds
 
         protected override BufferedContainer CreateBufferedContainer()
         {
-            ColouredDimmableSprite.DimColour = Color4.Black;
+            ColouredDimmableSprite.DimColour = Colour4.Black;
             ColouredDimmableSprite.DimLevel = 0.0f;
 
             return ColouredDimmableBufferedContainer = new DimmableBufferedContainer(cachedFrameBuffer: true)
@@ -98,18 +96,18 @@ namespace osu.Game.Graphics.Backgrounds
 
         public interface IColouredDimmable : IDrawable
         {
-            Color4 DimColour { get; set; }
+            Colour4 DimColour { get; set; }
 
             float DimLevel { get; set; }
         }
 
         public partial class DimmableBufferedContainer : BufferedContainer, IColouredDimmable
         {
-            private Color4 dimColour;
+            private Colour4 dimColour;
 
             private float dimLevel;
 
-            public Color4 DimColour
+            public Colour4 DimColour
             {
                 get => dimColour;
                 set
@@ -132,7 +130,7 @@ namespace osu.Game.Graphics.Backgrounds
             public DimmableBufferedContainer(RenderBufferFormat[] formats = null, bool pixelSnapping = false, bool cachedFrameBuffer = false)
                 : base(formats, pixelSnapping, cachedFrameBuffer)
             {
-                DimColour = Color4.Black;
+                DimColour = Colour4.Black;
                 DimLevel = 0.0f;
             }
 
@@ -153,7 +151,7 @@ namespace osu.Game.Graphics.Backgrounds
                 {
                 }
 
-                private Color4 dimColour;
+                private Colour4 dimColour;
 
                 private float dimLevel;
 
@@ -173,7 +171,13 @@ namespace osu.Game.Graphics.Backgrounds
 
                     beatmapBackgroundParametersBuffer.Data = beatmapBackgroundParametersBuffer.Data with
                     {
-                        DimColour = new Vector4(dimColour.R, dimColour.G, dimColour.B, dimColour.A),
+                        DimColour = new UniformVector4
+                        {
+                            X = dimColour.R,
+                            Y = dimColour.G,
+                            Z = dimColour.B,
+                            W = dimColour.A
+                        },
                         DimLevel = dimLevel,
                     };
 
@@ -198,11 +202,11 @@ namespace osu.Game.Graphics.Backgrounds
 
         public partial class BeatmapBackgroundSprite : Sprite, IColouredDimmable
         {
-            private Color4 dimColour;
+            private Colour4 dimColour;
 
             private float dimLevel;
 
-            public Color4 DimColour
+            public Colour4 DimColour
             {
                 get => dimColour;
                 set
@@ -224,7 +228,7 @@ namespace osu.Game.Graphics.Backgrounds
 
             public BeatmapBackgroundSprite()
             {
-                DimColour = Color4.Black;
+                DimColour = Colour4.Black;
                 DimLevel = 0.0f;
             }
 
@@ -245,7 +249,7 @@ namespace osu.Game.Graphics.Backgrounds
                 {
                 }
 
-                private Color4 dimColour;
+                private Colour4 dimColour;
 
                 private float dimLevel;
 
@@ -265,7 +269,13 @@ namespace osu.Game.Graphics.Backgrounds
 
                     beatmapBackgroundParametersBuffer.Data = beatmapBackgroundParametersBuffer.Data with
                     {
-                        DimColour = new Vector4(dimColour.R, dimColour.G, dimColour.B, dimColour.A),
+                        DimColour = new UniformVector4
+                        {
+                            X = dimColour.R,
+                            Y = dimColour.G,
+                            Z = dimColour.B,
+                            W = dimColour.A
+                        },
                         DimLevel = dimLevel,
                     };
 

@@ -19,7 +19,6 @@ using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Database;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -34,7 +33,6 @@ using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Select;
 using osu.Game.Tests.Resources;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.Background
 {
@@ -302,7 +300,7 @@ namespace osu.Game.Tests.Visual.Background
             {
                 Size = new Vector2(500, 50),
                 Alpha = 1,
-                Colour = Color4.White,
+                Colour = Colour4.White,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Text = "THIS IS A STORYBOARD",
@@ -366,12 +364,12 @@ namespace osu.Game.Tests.Visual.Background
                 config.BindWith(OsuSetting.DimColour, DimColour);
             }
 
-            public bool IsBackgroundBlack() => background.CurrentColour == OsuColour.Gray(0) && background.CurrentColourOffset == OsuColour.Gray(0);
+            public bool IsBackgroundBlack() => background.CurrentColour == Colour4.Black && background.CurrentColourOffset == Colour4.Black;
 
             public bool IsBackgroundDimmed()
             {
-                Color4 parentDrawColour = background.ParentDrawColour;
-                Color4 targetColour = new Color4(
+                Colour4 parentDrawColour = background.ParentDrawColour;
+                Colour4 targetColour = new Colour4(
                     parentDrawColour.R * (1f - background.CurrentDim),
                     parentDrawColour.G * (1f - background.CurrentDim),
                     parentDrawColour.B * (1f - background.CurrentDim),
@@ -381,13 +379,13 @@ namespace osu.Game.Tests.Visual.Background
                 return background.CurrentColour == targetColour;
             }
 
-            public bool IsBackgroundUndimmed() => background.CurrentColour == background.ParentDrawColour && background.CurrentColourOffset == Color4.Black;
+            public bool IsBackgroundUndimmed() => background.CurrentColour == background.ParentDrawColour && background.CurrentColourOffset == Colour4.Black;
 
             public bool IsBackgroundColourOffset()
             {
-                Color4 currentDimColour = background.CurrentDimColour;
-                Color4 parentDrawColour = background.ParentDrawColour;
-                Color4 targetColourOffset = new Color4(
+                Colour4 currentDimColour = background.CurrentDimColour;
+                Colour4 parentDrawColour = background.ParentDrawColour;
+                Colour4 targetColourOffset = new Colour4(
                     parentDrawColour.R * currentDimColour.R * background.CurrentDim,
                     parentDrawColour.G * currentDimColour.G * background.CurrentDim,
                     parentDrawColour.B * currentDimColour.B * background.CurrentDim,
@@ -500,11 +498,11 @@ namespace osu.Game.Tests.Visual.Background
 
             protected override BeatmapBackground CreateBeatmapBackground(WorkingBeatmap beatmap) => beatmapBackground = new TestBeatmapBackground(beatmap);
 
-            public Color4 CurrentColour => beatmapBackground.CurrentColour;
+            public Colour4 CurrentColour => beatmapBackground.CurrentColour;
 
-            public Color4 CurrentColourOffset => beatmapBackground.CurrentColourOffset;
+            public Colour4 CurrentColourOffset => beatmapBackground.CurrentColourOffset;
 
-            public Color4 ContentDrawColour => beatmapBackground.ContentDrawColour;
+            public Colour4 ContentDrawColour => beatmapBackground.ContentDrawColour;
 
             public bool IsSpriteDimmed => beatmapBackground.IsSpriteDimmed;
 
@@ -512,13 +510,13 @@ namespace osu.Game.Tests.Visual.Background
 
             public bool IsBufferedContainerNull => beatmapBackground.IsBufferedContainerNull;
 
-            public Color4 ParentDrawColour => DrawColourInfo.Colour;
+            public Colour4 ParentDrawColour => DrawColourInfo.Colour;
 
             public float CurrentAlpha => dimmable.CurrentAlpha;
 
             public float CurrentDim => dimmable.DimLevel;
 
-            public Color4 CurrentDimColour => dimmable.DimColour;
+            public Colour4 CurrentDimColour => dimmable.DimColour;
 
             public Vector2 CurrentBlur => Background?.BlurSigma ?? Vector2.Zero;
 
@@ -538,7 +536,7 @@ namespace osu.Game.Tests.Visual.Background
 
             public new float DimLevel => base.DimLevel;
 
-            public new Color4 DimColour => base.DimColour;
+            public new Colour4 DimColour => base.DimColour;
         }
 
         private partial class TestBeatmapBackground : BeatmapBackground
@@ -561,17 +559,17 @@ namespace osu.Game.Tests.Visual.Background
             // CurrentColourOffset can be used to track how much colour was added as an offset.
             //
             // Two separate variables are needed because just one Colour variable would be ambiguous, for example:
-            // if Colour == Color4.White, that could mean either that
+            // if Colour == Colour4.White, that could mean either that
             // DimLevel == 0.0, or
-            // DimLevel == 1.0 and DimColour == Color4.White.
-            public Color4 CurrentColour
+            // DimLevel == 1.0 and DimColour == Colour4.White.
+            public Colour4 CurrentColour
             {
                 get
                 {
-                    Color4 drawColour = DrawColourInfo.Colour;
+                    Colour4 drawColour = DrawColourInfo.Colour;
                     float dimLevel = ColouredDimmable.DimLevel;
 
-                    return new Color4(
+                    return new Colour4(
                         drawColour.R * (1 - dimLevel),
                         drawColour.G * (1 - dimLevel),
                         drawColour.B * (1 - dimLevel),
@@ -580,15 +578,15 @@ namespace osu.Game.Tests.Visual.Background
                 }
             }
 
-            public Color4 CurrentColourOffset
+            public Colour4 CurrentColourOffset
             {
                 get
                 {
-                    Color4 drawColour = DrawColourInfo.Colour;
-                    Color4 dimColour = ColouredDimmable.DimColour;
+                    Colour4 drawColour = DrawColourInfo.Colour;
+                    Colour4 dimColour = ColouredDimmable.DimColour;
                     float dimLevel = ColouredDimmable.DimLevel;
 
-                    return new Color4(
+                    return new Colour4(
                         drawColour.R * dimColour.R * dimLevel,
                         drawColour.G * dimColour.G * dimLevel,
                         drawColour.B * dimColour.B * dimLevel,
@@ -597,7 +595,7 @@ namespace osu.Game.Tests.Visual.Background
                 }
             }
 
-            public Color4 ContentDrawColour => ColouredDimmable.DrawColourInfo.Colour;
+            public Colour4 ContentDrawColour => ColouredDimmable.DrawColourInfo.Colour;
 
             public bool IsSpriteDimmed => ColouredDimmableSprite.DimLevel != 0.0f;
 
