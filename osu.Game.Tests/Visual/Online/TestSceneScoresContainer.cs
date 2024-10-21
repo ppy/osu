@@ -147,6 +147,18 @@ namespace osu.Game.Tests.Visual.Online
             AddUntilStep("wait for scores displayed", () => scoresContainer.ChildrenOfType<ScoreTableRowBackground>().Any());
             AddAssert("best score displayed", () => scoresContainer.ChildrenOfType<DrawableTopScore>().Count() == 2);
 
+            AddStep("Load scores with personal best FC", () =>
+            {
+                var allScores = createScores();
+                allScores.UserScore = createUserBest();
+                allScores.UserScore.Score.Accuracy = 1;
+                scoresContainer.Beatmap.Value.MaxCombo = allScores.UserScore.Score.MaxCombo = 1337;
+                scoresContainer.Scores = allScores;
+            });
+
+            AddUntilStep("wait for scores displayed", () => scoresContainer.ChildrenOfType<ScoreTableRowBackground>().Any());
+            AddAssert("best score displayed", () => scoresContainer.ChildrenOfType<DrawableTopScore>().Count() == 2);
+
             AddStep("Load scores with personal best (null position)", () =>
             {
                 var allScores = createScores();
