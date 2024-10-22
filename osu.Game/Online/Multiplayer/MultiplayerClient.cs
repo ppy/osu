@@ -15,6 +15,7 @@ using osu.Framework.Graphics;
 using osu.Game.Database;
 using osu.Game.Localisation;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer.Countdown;
 using osu.Game.Online.Rooms;
@@ -188,7 +189,7 @@ namespace osu.Game.Online.Multiplayer
 
                 // Populate users.
                 Debug.Assert(joinedRoom.Users != null);
-                await Task.WhenAll(joinedRoom.Users.Select(PopulateUser)).ConfigureAwait(false);
+                await PopulateUsers(joinedRoom.Users).ConfigureAwait(false);
 
                 // Update the stored room (must be done on update thread for thread-safety).
                 await runOnUpdateThreadAsync(() =>
@@ -416,7 +417,7 @@ namespace osu.Game.Online.Multiplayer
 
         async Task IMultiplayerClient.UserJoined(MultiplayerRoomUser user)
         {
-            await PopulateUser(user).ConfigureAwait(false);
+            await PopulateUsers([user]).ConfigureAwait(false);
 
             Scheduler.Add(() =>
             {
@@ -803,10 +804,26 @@ namespace osu.Game.Online.Multiplayer
         }
 
         /// <summary>
-        /// Populates the <see cref="APIUser"/> for a given <see cref="MultiplayerRoomUser"/>.
+        /// Populates the <see cref="APIUser"/> for a given collection of <see cref="MultiplayerRoomUser"/>s.
         /// </summary>
-        /// <param name="multiplayerUser">The <see cref="MultiplayerRoomUser"/> to populate.</param>
-        protected async Task PopulateUser(MultiplayerRoomUser multiplayerUser) => multiplayerUser.User ??= await userLookupCache.GetUserAsync(multiplayerUser.UserID).ConfigureAwait(false);
+        /// <param name="multiplayerUsers">The <see cref="MultiplayerRoomUser"/>s to populate.</param>
+        protected async Task PopulateUsers(IEnumerable<MultiplayerRoomUser> multiplayerUsers)
+        {
+            var request = new GetUsersRequest(multiplayerUsers.Select(u => u.UserID).Distinct().ToArray());
+
+            await API.PerformAsync(request).ConfigureAwait(false);
+
+            if (request.Response == null)
+                return;
+
+            Dictionary<int, APIUser> users = request.Response.Users.ToDictionary(user => user.Id);
+
+            foreach (var multiplayerUser in multiplayerUsers)
+            {
+                if (users.TryGetValue(multiplayerUser.UserID, out var user))
+                    multiplayerUser.User = user;
+            }
+        }
 
         /// <summary>
         /// Updates the local room settings with the given <see cref="MultiplayerRoomSettings"/>.
