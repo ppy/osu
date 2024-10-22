@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
+using osu.Framework.Testing;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -71,11 +72,9 @@ namespace osu.Game.Overlays.Chat.ChannelList
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
                                 Padding = new MarginPadding { Horizontal = 10, Top = 8 },
-                                Child = searchTextBox = new BasicSearchTextBox
+                                Child = searchTextBox = new ChannelSearchTextBox
                                 {
                                     RelativeSizeAxes = Axes.X,
-                                    Scale = new Vector2(0.8f),
-                                    Width = 1 / 0.8f,
                                 }
                             },
                             announceChannelGroup = new ChannelGroup(ChatStrings.ChannelsListTitleANNOUNCE.ToUpper()),
@@ -88,6 +87,17 @@ namespace osu.Game.Overlays.Chat.ChannelList
             };
 
             searchTextBox.Current.BindValueChanged(_ => groupFlow.SearchTerm = searchTextBox.Current.Value, true);
+            searchTextBox.OnCommit += (_, _) =>
+            {
+                if (string.IsNullOrEmpty(searchTextBox.Current.Value))
+                    return;
+
+                var firstMatchingItem = this.ChildrenOfType<ChannelListItem>().FirstOrDefault(item => item.MatchingFilter);
+                if (firstMatchingItem == null)
+                    return;
+
+                OnRequestSelect?.Invoke(firstMatchingItem.Channel);
+            };
 
             selector.OnRequestSelect += chan => OnRequestSelect?.Invoke(chan);
         }
@@ -184,6 +194,18 @@ namespace osu.Game.Overlays.Chat.ChannelList
                         AutoSizeAxes = Axes.Y,
                     },
                 };
+            }
+        }
+
+        private partial class ChannelSearchTextBox : BasicSearchTextBox
+        {
+            protected override bool AllowCommit => true;
+
+            public ChannelSearchTextBox()
+            {
+                const float scale_factor = 0.8f;
+                Scale = new Vector2(scale_factor);
+                Width = 1 / scale_factor;
             }
         }
     }
