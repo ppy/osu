@@ -4,7 +4,6 @@
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
@@ -67,8 +66,9 @@ namespace osu.Game.Overlays.Mods
                     Content.EdgeEffect = new EdgeEffectParameters
                     {
                         Type = EdgeEffectType.Glow,
-                        Colour = AccentColour.Opacity(0.5f),
-                        Radius = 10,
+                        Colour = AccentColour,
+                        Hollow = true,
+                        Radius = 2,
                     };
                 }
                 else
