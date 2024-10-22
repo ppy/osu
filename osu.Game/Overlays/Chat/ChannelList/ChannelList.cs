@@ -37,7 +37,7 @@ namespace osu.Game.Overlays.Chat.ChannelList
         private readonly Dictionary<Channel, ChannelListItem> channelMap = new Dictionary<Channel, ChannelListItem>();
 
         private OsuScrollContainer scroll = null!;
-        private FillFlowContainer groupFlow = null!;
+        private SearchContainer groupFlow = null!;
         private ChannelGroup announceChannelGroup = null!;
         private ChannelGroup publicChannelGroup = null!;
         private ChannelGroup privateChannelGroup = null!;
@@ -59,7 +59,7 @@ namespace osu.Game.Overlays.Chat.ChannelList
                     RelativeSizeAxes = Axes.Both,
                     ScrollbarAnchor = Anchor.TopRight,
                     ScrollDistance = 35f,
-                    Child = groupFlow = new FillFlowContainer
+                    Child = groupFlow = new SearchContainer
                     {
                         Direction = FillDirection.Vertical,
                         RelativeSizeAxes = Axes.X,
@@ -87,10 +87,7 @@ namespace osu.Game.Overlays.Chat.ChannelList
                 },
             };
 
-            searchTextBox.OnUpdate += (newText) =>
-            {
-                privateChannelGroup.FilterChannels(searchTextBox.Text);
-            };
+            searchTextBox.Current.BindValueChanged(_ => groupFlow.SearchTerm = searchTextBox.Current.Value, true);
 
             selector.OnRequestSelect += chan => OnRequestSelect?.Invoke(chan);
         }
@@ -187,23 +184,6 @@ namespace osu.Game.Overlays.Chat.ChannelList
                         AutoSizeAxes = Axes.Y,
                     },
                 };
-            }
-
-            public void FilterChannels(string searchTerm)
-            {
-                foreach (var item in ItemFlow.Children)
-                {
-                    if (string.IsNullOrEmpty(searchTerm))
-                    {
-                        item.Show();
-                        continue;
-                    }
-
-                    if (item.Channel.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
-                        item.Show();
-                    else
-                        item.Hide();
-                }
             }
         }
     }
