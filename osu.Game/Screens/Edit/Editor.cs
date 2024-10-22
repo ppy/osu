@@ -1098,17 +1098,12 @@ namespace osu.Game.Screens.Edit
 
         private void seekControlPoint(int direction)
         {
-            // Gives margin to seek back after last control point
-            double seekMargin = 0;
-            
-            if (clock.IsRunning) 
-            {
-                IAdjustableClock adjustableClock = clock;
-                seekMargin = 450 * adjustableClock.Rate;
-            }
+            // In the case of a backwards seek while playing, it can be hard to jump before a timing point.
+            // Adding some lenience here makes it more user-friendly.
+            double seekLenience = clock.IsRunning ? 1000 * ((IAdjustableClock)clock).Rate : 0;
 
-            var found = direction < 1
-                ? editorBeatmap.ControlPointInfo.AllControlPoints.LastOrDefault(p => p.Time < clock.CurrentTime - seekMargin)
+            ControlPoint found = direction < 1
+                ? editorBeatmap.ControlPointInfo.AllControlPoints.LastOrDefault(p => p.Time < clock.CurrentTime - seekLenience)
                 : editorBeatmap.ControlPointInfo.AllControlPoints.FirstOrDefault(p => p.Time > clock.CurrentTime);
 
             if (found != null)
