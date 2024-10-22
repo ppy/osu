@@ -18,6 +18,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays.Chat.Listing;
 using osu.Game.Resources.Localisation.Web;
+using osuTK;
 
 namespace osu.Game.Overlays.Chat.ChannelList
 {
@@ -65,32 +66,21 @@ namespace osu.Game.Overlays.Chat.ChannelList
                         AutoSizeAxes = Axes.Y,
                         Children = new Drawable[]
                         {
-                            announceChannelGroup = new ChannelGroup(ChatStrings.ChannelsListTitleANNOUNCE.ToUpper()),
-                            publicChannelGroup = new ChannelGroup(ChatStrings.ChannelsListTitlePUBLIC.ToUpper()),
-                            selector = new ChannelListItem(ChannelListingChannel),
-                            new FillFlowContainer
+                            new Container
                             {
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
-                                Padding = new MarginPadding { Horizontal = 18, Top = 8 },
-                                Direction = FillDirection.Vertical,
-                                Children = new Drawable[]
+                                Padding = new MarginPadding { Horizontal = 10, Top = 8 },
+                                Child = searchTextBox = new BasicSearchTextBox
                                 {
-                                    new OsuSpriteText
-                                    {
-                                        Text = "SEARCH",
-                                        Margin = new MarginPadding { Bottom = 5 },
-                                        Font = OsuFont.Torus.With(size: 12, weight: FontWeight.SemiBold),
-                                    },
-                                    searchTextBox = new OsuTextBox
-                                    {
-                                        Height = 28,
-                                        RelativeSizeAxes = Axes.X,
-                                        PlaceholderText = "Search by name...",
-                                        FontSize = 14,
-                                    }
+                                    RelativeSizeAxes = Axes.X,
+                                    Scale = new Vector2(0.8f),
+                                    Width = 1 / 0.8f,
                                 }
                             },
+                            announceChannelGroup = new ChannelGroup(ChatStrings.ChannelsListTitleANNOUNCE.ToUpper()),
+                            publicChannelGroup = new ChannelGroup(ChatStrings.ChannelsListTitlePUBLIC.ToUpper()),
+                            selector = new ChannelListItem(ChannelListingChannel),
                             privateChannelGroup = new ChannelGroup(ChatStrings.ChannelsListTitlePM.ToUpper()),
                         },
                     },
