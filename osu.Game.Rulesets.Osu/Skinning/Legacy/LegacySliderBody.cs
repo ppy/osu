@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         {
             public LegacyDrawableSliderPath()
             {
-                BlurSigma = new Vector2(8f);
+                BlurSigma = new Vector2(16f);
 
                 BackdropTintStrength = 0.5f;
 

@@ -337,10 +337,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.UpdateInitialTransforms();
 
-            // The backdrop blur opacity should fade in quicker, but the overall alpha should fade in linearly.
-            // By using OutQuad easing on both the blur container & the child, we end up getting a linear fade in.
-            Body.FadeInFromZero(HitObject.TimeFadeIn, Easing.OutQuad);
-            Body.FadeInFromZero(HitObject.TimeFadeIn, Easing.OutQuad);
+            Body.FadeInFromZero(HitObject.TimeFadeIn);
         }
 
         protected override void UpdateStartTimeStateTransforms()

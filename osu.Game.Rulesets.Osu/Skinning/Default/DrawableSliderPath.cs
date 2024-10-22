@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics.Lines;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Default
@@ -13,6 +14,11 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
 
         private const float border_max_size = 8f;
         private const float border_min_size = 0f;
+
+        protected DrawableSliderPath()
+        {
+            EffectBufferScale = new Vector2(0.25f);
+        }
 
         private Color4 borderColour = Color4.White;
 
