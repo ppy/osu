@@ -810,19 +810,19 @@ namespace osu.Game.Online.Multiplayer
         protected async Task PopulateUsers(IEnumerable<MultiplayerRoomUser> multiplayerUsers)
         {
             var request = new GetUsersRequest(multiplayerUsers.Select(u => u.UserID).Distinct().ToArray());
-            await API.PerformAsync(request).ContinueWith(t =>
+
+            await API.PerformAsync(request).ConfigureAwait(false);
+
+            if (request.Response == null)
+                return;
+
+            Dictionary<int, APIUser> users = request.Response.Users.ToDictionary(user => user.Id);
+
+            foreach (var multiplayerUser in multiplayerUsers)
             {
-                if (request.Response == null)
-                    return;
-
-                var users = request.Response.Users.ToDictionary(user => user.Id);
-
-                foreach (var multiplayerUser in multiplayerUsers)
-                {
-                    if (users.TryGetValue(multiplayerUser.UserID, out var user))
-                        multiplayerUser.User = user;
-                }
-            }).ConfigureAwait(false);
+                if (users.TryGetValue(multiplayerUser.UserID, out var user))
+                    multiplayerUser.User = user;
+            }
         }
 
         /// <summary>
