@@ -10,10 +10,11 @@ using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
-using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Replays;
+using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Users;
 
@@ -28,6 +29,10 @@ namespace osu.Game.Screens.Edit.GameplayTest
 
         [Resolved]
         private MusicController musicController { get; set; } = null!;
+
+        private double previousAutoTime;
+
+        private List<ReplayFrame> fullFrames = new List<ReplayFrame>();
 
         public EditorPlayer(Editor editor)
             : base(new PlayerConfiguration { ShowResults = false })
@@ -174,9 +179,6 @@ namespace osu.Game.Screens.Edit.GameplayTest
         {
         }
 
-        private double previousAutoTime;
-        private List<ReplayFrame> allAutoFrames = new List<ReplayFrame>();
-
         private void toggleAutoplay()
         {
             if (DrawableRuleset.ReplayScore == null)
@@ -185,17 +187,16 @@ namespace osu.Game.Screens.Edit.GameplayTest
                 if (autoplay == null)
                     return;
 
-                // stores time when autoplay starts
+                // Stores time when autoplay starts
                 previousAutoTime = GameplayClockContainer.CurrentTime;
 
                 var score = autoplay.CreateScoreFromReplayData(GameplayState.Beatmap, new[] { autoplay });
-                allAutoFrames = score.Replay.Frames;
+                fullFrames = score.Replay.Frames;
 
                 DrawableRuleset.SetReplayScore(score);
 
-                // sanity check
-                if (DrawableRuleset.ReplayScore != null)
-                    DrawableRuleset.ReplayScore.Replay.Frames.RemoveAll(f => f.Time < GameplayClockContainer.CurrentTime);
+                // Remove past frames to prevent replay frame handler from seeking back to start in an attempt to play back the entirety of the replay.
+                DrawableRuleset.ReplayScore?.Replay.Frames.RemoveAll(f => f.Time < GameplayClockContainer.CurrentTime);
                 // Without this schedule, the `GlobalCursorDisplay.Update()` machinery will fade the gameplay cursor out, but we still want it to show.
                 Schedule(() => DrawableRuleset.Cursor?.Show());
             }
@@ -205,22 +206,17 @@ namespace osu.Game.Screens.Edit.GameplayTest
 
         protected override void Update()
         {
-            // updates if there's a replay (autoplay)
             if (DrawableRuleset.ReplayScore != null)
             {
-                // compare currentTime with previousTime
                 if (GameplayClockContainer.CurrentTime < previousAutoTime)
                 {
-                    var drawnFrames = DrawableRuleset.ReplayScore;
-
-                    // find the frames from the original replay data that should be present based on the current time
-                    var missingFrames = allAutoFrames.Where(f => f.Time >= GameplayClockContainer.CurrentTime && f.Time <= previousAutoTime).ToList();
+                    // This inserts the missing frames that were removed when starting the autoplay
                     previousAutoTime = GameplayClockContainer.CurrentTime;
 
-                    // add the missing frames back
-                    drawnFrames.Replay.Frames.AddRange(missingFrames);
+                    var score = new Score { Replay = { Frames = fullFrames } };
 
-                    DrawableRuleset.SetReplayScore(drawnFrames);
+                    DrawableRuleset.SetReplayScore(score);
+                    DrawableRuleset.ReplayScore?.Replay.Frames.RemoveAll(f => f.Time < GameplayClockContainer.CurrentTime);
                 }
             }
         }
