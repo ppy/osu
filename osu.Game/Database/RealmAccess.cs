@@ -93,8 +93,9 @@ namespace osu.Game.Database
         /// 40   2023-12-21    Add ScoreInfo.Version to keep track of which build scores were set on.
         /// 41   2024-04-17    Add ScoreInfo.TotalScoreWithoutMods for future mod multiplier rebalances.
         /// 42   2024-08-07    Update mania key bindings to reflect changes to ManiaAction
+        /// 43   2024-10-14    Reset keybind for toggling FPS display to avoid conflict with "convert to stream" in the editor, if not already changed by user.
         /// </summary>
-        private const int schema_version = 42;
+        private const int schema_version = 43;
 
         /// <summary>
         /// Lock object which is held during <see cref="BlockAllOperations"/> sections, blocking realm retrieval during blocking periods.
@@ -375,10 +376,6 @@ namespace osu.Game.Database
                     {
                         foreach (var beatmap in beatmapSet.Beatmaps)
                         {
-                            // Cascade delete related scores, else they will have a null beatmap against the model's spec.
-                            foreach (var score in beatmap.Scores)
-                                realm.Remove(score);
-
                             realm.Remove(beatmap.Metadata);
                             realm.Remove(beatmap);
                         }
@@ -568,7 +565,7 @@ namespace osu.Game.Database
             lock (notificationsResetMap)
             {
                 // Store an action which is used when blocking to ensure consumers don't use results of a stale changeset firing.
-                notificationsResetMap.Add(action, () => callback(new EmptyRealmSet<T>(), null));
+                notificationsResetMap.Add(action, () => callback(new RealmResetEmptySet<T>(), null));
             }
 
             return RegisterCustomSubscription(action);
@@ -1192,6 +1189,21 @@ namespace osu.Game.Database
                     }
 
                     break;
+
+                case 43:
+                {
+                    // Clear default bindings for "Toggle FPS Display",
+                    // as it conflicts with "Convert to Stream" in the editor.
+                    // Only apply change if set to the conflicting bind
+                    // i.e. has been manually rebound by the user.
+                    var keyBindings = migration.NewRealm.All<RealmKeyBinding>();
+
+                    var toggleFpsBind = keyBindings.FirstOrDefault(bind => bind.ActionInt == (int)GlobalAction.ToggleFPSDisplay);
+                    if (toggleFpsBind != null && toggleFpsBind.KeyCombination.Keys.SequenceEqual(new[] { InputKey.Shift, InputKey.Control, InputKey.F }))
+                        migration.NewRealm.Remove(toggleFpsBind);
+
+                    break;
+                }
             }
 
             Logger.Log($"Migration completed in {stopwatch.ElapsedMilliseconds}ms");
