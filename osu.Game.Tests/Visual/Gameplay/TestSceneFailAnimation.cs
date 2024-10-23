@@ -51,7 +51,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                HealthProcessor.FailConditions += (_, _) => true;
+                HealthProcessor.Mods.Value = new[] { Ruleset.Value.CreateInstance().CreateMod<ModSuddenDeath>()! };
             }
 
             private double lastFrequency = double.MaxValue;
