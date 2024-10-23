@@ -49,12 +49,9 @@ namespace osu.Game.Rulesets.Osu.Edit
                 {
                     angleInput = new SliderWithTextBoxInput<float>("Angle (degrees):")
                     {
-                        Current = new BindableNumber<float>
-                        {
-                            MinValue = -360,
-                            MaxValue = 360,
-                            Precision = 1
-                        },
+                        SliderPrecision = 1,
+                        SliderMinValue = -360,
+                        SliderMaxValue = 360,
                         Instantaneous = true
                     },
                     rotationOrigin = new EditorRadioButtonCollection
@@ -90,7 +87,14 @@ namespace osu.Game.Rulesets.Osu.Edit
                 angleInput.TakeFocus();
                 angleInput.SelectAll();
             });
-            angleInput.Current.BindValueChanged(angle => rotationInfo.Value = rotationInfo.Value with { Degrees = angle.NewValue });
+            angleInput.Current.BindValueChanged(angle =>
+            {
+                float normalizedAngle = angle.NewValue < -360 || angle.NewValue > 360
+                    ? ((((angle.NewValue + 360) % 720) + 720) % 720) - 360
+                    : angle.NewValue;
+                rotationInfo.Value = rotationInfo.Value with { Degrees = normalizedAngle };
+                angleInput.Current.Value = normalizedAngle;
+            });
             rotationOrigin.Items.First().Select();
 
             rotationHandler.CanRotateAroundSelectionOrigin.BindValueChanged(e =>
