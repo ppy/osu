@@ -252,7 +252,7 @@ namespace osu.Game.Screens.Play
                 PlayfieldSkinLayer.Position = ToLocalSpace(playfieldScreenSpaceDrawQuad.TopLeft);
                 PlayfieldSkinLayer.Width = (ToLocalSpace(playfieldScreenSpaceDrawQuad.TopRight) - ToLocalSpace(playfieldScreenSpaceDrawQuad.TopLeft)).Length;
                 PlayfieldSkinLayer.Height = (ToLocalSpace(playfieldScreenSpaceDrawQuad.BottomLeft) - ToLocalSpace(playfieldScreenSpaceDrawQuad.TopLeft)).Length;
-                PlayfieldSkinLayer.Rotation = drawableRuleset.Playfield.Rotation;
+                PlayfieldSkinLayer.Rotation = drawableRuleset.PlayfieldAdjustmentContainer.Rotation;
             }
 
             float? lowestTopScreenSpaceLeft = null;
