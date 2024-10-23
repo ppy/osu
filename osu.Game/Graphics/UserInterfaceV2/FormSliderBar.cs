@@ -382,11 +382,30 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 base.OnHoverLost(e);
             }
 
+            protected override void OnFocus(FocusEvent e)
+            {
+                updateState();
+                base.OnFocus(e);
+            }
+
+            protected override void OnFocusLost(FocusLostEvent e)
+            {
+                updateState();
+                base.OnFocusLost(e);
+            }
+
             private void updateState()
             {
+                int glow = 0;
+
+                if (IsHovered || IsDragged)
+                    glow++;
+                if (HasFocus)
+                    glow++;
+
                 rightBox.Colour = colourProvider.Background6;
-                leftBox.Colour = IsHovered || IsDragged ? colourProvider.Highlight1.Opacity(0.5f) : colourProvider.Dark2;
-                nub.Colour = IsHovered || IsDragged ? colourProvider.Highlight1 : colourProvider.Light4;
+                leftBox.Colour = glow >= 2 ? colourProvider.Highlight1.Opacity(0.5f) : glow >= 1 ? colourProvider.Colour2.Opacity(0.5f) : colourProvider.Dark2;
+                nub.Colour = glow >= 2 ? colourProvider.Highlight1 : glow >= 1 ? colourProvider.Colour2 : colourProvider.Light4;
             }
 
             protected override void UpdateValue(float value)

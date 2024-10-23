@@ -97,13 +97,13 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool OnHover(HoverEvent e)
         {
-            Nub.Glowing = true;
+            Nub.Glow = 1;
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            Nub.Glowing = false;
+            Nub.Glow = 0;
             base.OnHoverLost(e);
         }
 

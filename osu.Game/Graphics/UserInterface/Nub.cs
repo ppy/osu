@@ -77,30 +77,40 @@ namespace osu.Game.Graphics.UserInterface
             Current.BindValueChanged(onCurrentValueChanged, true);
         }
 
-        private bool glowing;
+        private int glow;
 
-        public bool Glowing
+        public int Glow
         {
-            get => glowing;
+            get => glow;
             set
             {
-                glowing = value;
-
-                if (value)
+                if (value > 0)
                 {
-                    main.FadeColour(GlowingAccentColour.Lighten(0.5f), 40, Easing.OutQuint)
-                        .Then()
-                        .FadeColour(GlowingAccentColour, 800, Easing.OutQuint);
+                    float extraGlow = (value - 1) * 0.10f;
 
-                    main.FadeEdgeEffectTo(Color4.White.Opacity(0.1f), 40, Easing.OutQuint)
-                        .Then()
-                        .FadeEdgeEffectTo(GlowColour.Opacity(0.1f), 800, Easing.OutQuint);
+                    if (value > glow)
+                    {
+                        main.FadeColour(GlowingAccentColour.Lighten(0.5f), 40, Easing.OutQuint)
+                            .Then()
+                            .FadeColour(GlowingAccentColour.Lighten(extraGlow), 800, Easing.OutQuint);
+
+                        main.FadeEdgeEffectTo(Color4.White.Opacity(0.1f), 40, Easing.OutQuint)
+                            .Then()
+                            .FadeEdgeEffectTo(GlowColour.Lighten(extraGlow).Opacity(0.1f), 800, Easing.OutQuint);
+                    }
+                    else
+                    {
+                        main.FadeColour(GlowingAccentColour.Lighten(extraGlow), 800, Easing.OutQuint);
+                        main.FadeEdgeEffectTo(GlowColour.Lighten(extraGlow).Opacity(0.1f), 800, Easing.OutQuint);
+                    }
                 }
                 else
                 {
                     main.FadeEdgeEffectTo(GlowColour.Opacity(0), 800, Easing.OutQuint);
                     main.FadeColour(AccentColour, 800, Easing.OutQuint);
                 }
+
+                glow = value;
             }
         }
 
@@ -126,7 +136,7 @@ namespace osu.Game.Graphics.UserInterface
             set
             {
                 accentColour = value;
-                if (!Glowing)
+                if (Glow == 0)
                     main.Colour = value;
             }
         }
@@ -139,7 +149,7 @@ namespace osu.Game.Graphics.UserInterface
             set
             {
                 glowingAccentColour = value;
-                if (Glowing)
+                if (Glow > 0)
                     main.Colour = value;
             }
         }
@@ -154,7 +164,7 @@ namespace osu.Game.Graphics.UserInterface
                 glowColour = value;
 
                 var effect = main.EdgeEffect;
-                effect.Colour = Glowing ? value : value.Opacity(0);
+                effect.Colour = Glow > 0 ? value : value.Opacity(0);
                 main.EdgeEffect = effect;
             }
         }

@@ -156,9 +156,31 @@ namespace osu.Game.Graphics.UserInterface
             base.OnDragEnd(e);
         }
 
+        protected override void OnFocus(FocusEvent e)
+        {
+            updateGlow();
+            base.OnFocus(e);
+        }
+
+        protected override void OnFocusLost(FocusLostEvent e)
+        {
+            updateGlow();
+            base.OnFocusLost(e);
+        }
+
         private void updateGlow()
         {
-            Nub.Glowing = !Current.Disabled && (IsHovered || IsDragged);
+            int glow = 0;
+
+            if (!Current.Disabled)
+            {
+                if (IsHovered || IsDragged)
+                    glow++;
+                if (HasFocus)
+                    glow++;
+            }
+
+            Nub.Glow = glow;
         }
 
         protected override void UpdateAfterChildren()
