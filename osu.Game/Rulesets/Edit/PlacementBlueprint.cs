@@ -72,6 +72,11 @@ namespace osu.Game.Rulesets.Edit
         }
 
         /// <summary>
+        /// Determines which objects to snap to for the snap result in <see cref="UpdateTimeAndPosition"/>.
+        /// </summary>
+        public virtual SnapType SnapType => SnapType.All;
+
+        /// <summary>
         /// Updates the time and position of this <see cref="PlacementBlueprint"/> based on the provided snap information.
         /// </summary>
         /// <param name="result">The snap result information.</param>

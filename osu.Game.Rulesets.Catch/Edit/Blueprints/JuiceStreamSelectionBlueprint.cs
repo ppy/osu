@@ -8,6 +8,7 @@ using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Catch.Edit.Blueprints.Components;
@@ -172,7 +173,10 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
             yield return new OsuMenuItem("Add vertex", MenuItemType.Standard, () =>
             {
                 editablePath.AddVertex(rightMouseDownPosition);
-            });
+            })
+            {
+                Hotkey = new Hotkey(new KeyCombination(InputKey.Control, InputKey.MouseLeft))
+            };
         }
 
         protected override void Dispose(bool isDisposing)

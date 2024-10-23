@@ -150,13 +150,25 @@ namespace osu.Game.Screens.Edit.Compose.Components
             switch (e.Key)
             {
                 case Key.G:
-                    return CanReverse && reverseButton?.TriggerClick() == true;
+                    if (!CanReverse || reverseButton == null)
+                        return false;
+
+                    reverseButton.TriggerAction();
+                    return true;
 
                 case Key.Comma:
-                    return canRotate.Value && rotateCounterClockwiseButton?.TriggerClick() == true;
+                    if (!canRotate.Value || rotateCounterClockwiseButton == null)
+                        return false;
+
+                    rotateCounterClockwiseButton.TriggerAction();
+                    return true;
 
                 case Key.Period:
-                    return canRotate.Value && rotateClockwiseButton?.TriggerClick() == true;
+                    if (!canRotate.Value || rotateClockwiseButton == null)
+                        return false;
+
+                    rotateClockwiseButton.TriggerAction();
+                    return true;
             }
 
             return base.OnKeyDown(e);
@@ -285,7 +297,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 Action = action
             };
 
-            button.OperationStarted += freezeButtonPosition;
+            button.Clicked += freezeButtonPosition;
             button.HoverLost += unfreezeButtonPosition;
 
             button.OperationStarted += operationStarted;
