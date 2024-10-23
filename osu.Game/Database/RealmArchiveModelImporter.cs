@@ -105,13 +105,24 @@ namespace osu.Game.Database
             }
 
             notification.Progress = 0;
-            notification.Text = $"{HumanisedModelName.Humanize(LetterCasing.Title)} import is initialising...";
 
             int current = 0;
 
             var imported = new List<Live<TModel>>();
 
             parameters.Batch |= tasks.Length >= minimum_items_considered_batch_import;
+
+            // A paused state could obviously be entered mid-import (during the `Task.WhenAll` below),
+            // but in order to keep things simple let's focus on the most common scenario.
+            notification.Text = $"{HumanisedModelName.Humanize(LetterCasing.Title)} import is paused due to gameplay...";
+
+            try
+            {
+                pauseIfNecessary(parameters, notification.CancellationToken);
+            }
+            catch { }
+
+            notification.Text = $"{HumanisedModelName.Humanize(LetterCasing.Title)} import is initialising...";
 
             await Task.WhenAll(tasks.Select(async task =>
             {
