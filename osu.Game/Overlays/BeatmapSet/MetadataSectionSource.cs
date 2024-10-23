@@ -17,9 +17,9 @@ namespace osu.Game.Overlays.BeatmapSet
         protected override void AddMetadata(string metadata, LinkFlowContainer loaded)
         {
             if (SearchAction != null)
-                loaded.AddLink(metadata, () => SearchAction(metadata));
+                loaded.AddLink(metadata, () => SearchAction($@"source=""""{metadata}"""""));
             else
-                loaded.AddLink(metadata, LinkAction.SearchBeatmapSet, metadata);
+                loaded.AddLink(metadata, LinkAction.SearchBeatmapSet, $@"source=""""{metadata}""""");
         }
     }
 }
