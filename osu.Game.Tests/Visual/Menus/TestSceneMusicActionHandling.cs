@@ -100,6 +100,8 @@ namespace osu.Game.Tests.Visual.Menus
                     beatmap.Length = 60_000;
             }));
 
+            AddAssert("empty playlist", () => Game.MusicController.Playlist.Count > 0);
+
             AddStep("bind to track change", () =>
             {
                 trackChangeQueue = new Queue<(IWorkingBeatmap, TrackChangeDirection)>();
@@ -142,6 +144,8 @@ namespace osu.Game.Tests.Visual.Menus
                     beatmap.Length = 60_000;
             }));
 
+            AddAssert("empty playlist", () => Game.MusicController.Playlist.Count > 0);
+
             AddStep("bind to track change", () =>
             {
                 trackChangeQueue = new Queue<(IWorkingBeatmap, TrackChangeDirection)>();
@@ -176,6 +180,8 @@ namespace osu.Game.Tests.Visual.Menus
                 foreach (var beatmap in r.All<BeatmapInfo>().Where(b => b.Length == 0))
                     beatmap.Length = 60_000;
             }));
+
+            AddAssert("empty playlist", () => Game.MusicController.Playlist.Count > 0);
 
             AddStep("bind to track change", () =>
             {
