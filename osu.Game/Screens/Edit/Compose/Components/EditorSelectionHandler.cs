@@ -65,6 +65,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
         public readonly Dictionary<string, Bindable<TernaryState>> SelectionAdditionBankStates = new Dictionary<string, Bindable<TernaryState>>();
 
         /// <summary>
+        /// Whether there is no selection and the auto <see cref="SelectionBankStates"/> can be used.
+        /// </summary>
+        public readonly Bindable<bool> AutoSelectionBankEnabled = new Bindable<bool>();
+
+        /// <summary>
         /// Whether the selection contains any addition samples and the <see cref="SelectionAdditionBankStates"/> can be used.
         /// </summary>
         public readonly Bindable<bool> SelectionAdditionBanksEnabled = new Bindable<bool>();
@@ -253,6 +258,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void resetTernaryStates()
         {
+            AutoSelectionBankEnabled.Value = true;
             SelectionBankStates[HIT_BANK_AUTO].Value = TernaryState.True;
             SelectionAdditionBankStates[HIT_BANK_AUTO].Value = TernaryState.True;
         }
@@ -263,6 +269,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected virtual void UpdateTernaryStates()
         {
             SelectionNewComboState.Value = GetStateFromSelection(SelectedItems.OfType<IHasComboInformation>(), h => h.NewCombo);
+            AutoSelectionBankEnabled.Value = SelectedItems.Count == 0;
 
             var samplesInSelection = SelectedItems.SelectMany(enumerateAllSamples).ToArray();
 

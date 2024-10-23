@@ -68,7 +68,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
             SampleBankTernaryStates = createSampleBankTernaryButtons(SelectionHandler.SelectionBankStates).ToArray();
             SampleAdditionBankTernaryStates = createSampleBankTernaryButtons(SelectionHandler.SelectionAdditionBankStates).ToArray();
 
-            SelectionHandler.SelectionAdditionBanksEnabled.BindValueChanged(_ => updateTernaryButtonTooltips());
+            SelectionHandler.AutoSelectionBankEnabled.BindValueChanged(_ => updateAutoBankTernaryButtonTooltip(), true);
+            SelectionHandler.SelectionAdditionBanksEnabled.BindValueChanged(_ => updateAdditionBankTernaryButtonTooltips(), true);
 
             AddInternal(new DrawableRulesetDependenciesProvidingContainer(Composer.Ruleset)
             {
@@ -290,7 +291,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
             return null;
         }
 
-        private void updateTernaryButtonTooltips()
+        private void updateAutoBankTernaryButtonTooltip()
+        {
+            var autoBankButton = SampleBankTernaryStates.Single(t => t.Bindable == SelectionHandler.SelectionBankStates[EditorSelectionHandler.HIT_BANK_AUTO]);
+            autoBankButton.Tooltip = !SelectionHandler.AutoSelectionBankEnabled.Value ? "Auto normal bank can only be used during hit object placement" : string.Empty;
+        }
+
+        private void updateAdditionBankTernaryButtonTooltips()
         {
             foreach (var ternaryButton in SampleAdditionBankTernaryStates)
                 ternaryButton.Tooltip = !SelectionHandler.SelectionAdditionBanksEnabled.Value ? "Add an addition sample first to be able to set a bank" : string.Empty;
