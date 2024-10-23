@@ -91,6 +91,9 @@ namespace osu.Game.Rulesets.Edit
         private Bindable<bool> autoSeekOnPlacement;
         private readonly Bindable<bool> composerFocusMode = new Bindable<bool>();
 
+        [CanBeNull]
+        private RadioButton lastTool;
+
         protected DrawableRuleset<TObject> DrawableRuleset { get; private set; }
 
         protected HitObjectComposer(Ruleset ruleset)
@@ -254,8 +257,7 @@ namespace osu.Game.Rulesets.Edit
                 },
             };
 
-            toolboxCollection.Items = CompositionTools
-                                      .Prepend(new SelectTool())
+            toolboxCollection.Items = (CompositionTools.Prepend(new SelectTool()))
                                       .Select(t => new HitObjectCompositionToolButton(t, () => toolSelected(t)))
                                       .ToList();
 
@@ -272,7 +274,7 @@ namespace osu.Game.Rulesets.Edit
 
             sampleBankTogglesCollection.AddRange(BlueprintContainer.SampleBankTernaryStates.Zip(BlueprintContainer.SampleAdditionBankTernaryStates).Select(b => new SampleBankTernaryButton(b.First, b.Second)));
 
-            setSelectTool();
+            SetSelectTool();
 
             EditorBeatmap.SelectedHitObjects.CollectionChanged += selectionChanged;
         }
@@ -297,7 +299,7 @@ namespace osu.Game.Rulesets.Edit
             {
                 // it's important this is performed before the similar code in EditorRadioButton disables the button.
                 if (!timing.NewValue)
-                    setSelectTool();
+                    SetSelectTool();
             });
 
             EditorBeatmap.HasTiming.BindValueChanged(hasTiming =>
@@ -404,7 +406,7 @@ namespace osu.Game.Rulesets.Edit
             if (e.ControlPressed || e.SuperPressed)
                 return false;
 
-            if (checkLeftToggleFromKey(e.Key, out int leftIndex))
+            if (checkToolboxMappingFromKey(e.Key, out int leftIndex))
             {
                 var item = toolboxCollection.Items.ElementAtOrDefault(leftIndex);
 
@@ -416,7 +418,7 @@ namespace osu.Game.Rulesets.Edit
                 }
             }
 
-            if (checkRightToggleFromKey(e.Key, out int rightIndex))
+            if (checkToggleMappingFromKey(e.Key, out int rightIndex))
             {
                 if (e.ShiftPressed || e.AltPressed)
                 {
@@ -444,7 +446,7 @@ namespace osu.Game.Rulesets.Edit
             return base.OnKeyDown(e);
         }
 
-        private bool checkLeftToggleFromKey(Key key, out int index)
+        private bool checkToolboxMappingFromKey(Key key, out int index)
         {
             if (key < Key.Number1 || key > Key.Number9)
             {
@@ -456,7 +458,7 @@ namespace osu.Game.Rulesets.Edit
             return true;
         }
 
-        private bool checkRightToggleFromKey(Key key, out int index)
+        private bool checkToggleMappingFromKey(Key key, out int index)
         {
             switch (key)
             {
@@ -513,14 +515,18 @@ namespace osu.Game.Rulesets.Edit
             if (EditorBeatmap.SelectedHitObjects.Any())
             {
                 // ensure in selection mode if a selection is made.
-                setSelectTool();
+                SetSelectTool();
             }
         }
 
-        private void setSelectTool() => toolboxCollection.Items.First().Select();
+        public void SetSelectTool() => toolboxCollection.Items.First().Select();
+
+        public void SetLastTool() => (lastTool ?? toolboxCollection.Items.First()).Select();
 
         private void toolSelected(CompositionTool tool)
         {
+            lastTool = toolboxCollection.Items.OfType<HitObjectCompositionToolButton>().FirstOrDefault(i => i.Tool == BlueprintContainer.CurrentTool);
+
             BlueprintContainer.CurrentTool = tool;
 
             if (!(tool is SelectTool))
