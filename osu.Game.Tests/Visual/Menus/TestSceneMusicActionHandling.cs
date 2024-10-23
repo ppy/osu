@@ -48,6 +48,8 @@ namespace osu.Game.Tests.Visual.Menus
                 });
             });
 
+            AddAssert("empty playlist", () => Game.MusicController.Playlist.Count > 0);
+
             AddStep("bind to track change", () =>
             {
                 trackChangeQueue = new Queue<(IWorkingBeatmap, TrackChangeDirection)>();

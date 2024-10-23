@@ -20,6 +20,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Rulesets.Mods;
+using Realms;
 
 namespace osu.Game.Overlays
 {
@@ -61,11 +62,14 @@ namespace osu.Game.Overlays
         private IBindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
 
         public readonly BindableList<Live<BeatmapSetInfo>> Playlist = new BindableList<Live<BeatmapSetInfo>>();
+        public readonly BindableBool PlaylistHookedByOverlay = new BindableBool(false);
 
         public DrawableTrack CurrentTrack { get; private set; } = new DrawableTrack(new TrackVirtual(1000));
 
         [Resolved]
         private RealmAccess realm { get; set; } = null!;
+
+        private IDisposable? beatmapSubscription;
 
         private BindableNumber<double> sampleVolume = null!;
 
@@ -92,14 +96,41 @@ namespace osu.Game.Overlays
         {
             base.LoadComplete();
 
-            Playlist.AddRange(getBeatmapSets());
+            beatmapSubscription = realm.RegisterForNotifications(r => r.All<BeatmapSetInfo>().Where(s => !s.DeletePending && !s.Protected), beatmapsChanged);
 
+            PlaylistHookedByOverlay.ValueChanged += b =>
+            {
+                if (!b.NewValue)
+                {
+                    Playlist.Clear();
+                    Playlist.AddRange(getBeatmapSets());
+                }
+            };
             beatmap.BindValueChanged(b =>
             {
                 if (b.NewValue != null)
                     changeBeatmap(b.NewValue);
             }, true);
             mods.BindValueChanged(_ => ResetTrackAdjustments(), true);
+        }
+
+        private void beatmapsChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet? changes)
+        {
+            if (PlaylistHookedByOverlay.Value) return;
+
+            if (changes == null)
+            {
+                Playlist.Clear();
+                // must use AddRange to avoid RearrangeableList sort overhead per add op.
+                Playlist.AddRange(sender.Select(b => b.ToLive(realm)));
+                return;
+            }
+
+            foreach (int i in changes.InsertedIndices)
+                Playlist.Insert(i, sender[i].ToLive(realm));
+
+            foreach (int i in changes.DeletedIndices.OrderDescending())
+                Playlist.RemoveAt(i);
         }
 
         /// <summary>
@@ -601,6 +632,12 @@ namespace osu.Game.Overlays
                 foreach (var mod in mods.Value.OfType<IApplicableToTrack>())
                     mod.ApplyToTrack(modTrackAdjustments);
             }
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            beatmapSubscription?.Dispose();
         }
     }
 
