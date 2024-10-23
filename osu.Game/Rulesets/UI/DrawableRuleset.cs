@@ -65,8 +65,6 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         public override Playfield Playfield => playfield.Value;
 
-        private PlayfieldAdjustmentContainer playfieldAdjustmentContainer;
-
         public override PlayfieldAdjustmentContainer PlayfieldAdjustmentContainer => playfieldAdjustmentContainer;
 
         public override Container Overlays { get; } = new Container { RelativeSizeAxes = Axes.Both };
@@ -78,6 +76,8 @@ namespace osu.Game.Rulesets.UI
         public override Container FrameStableComponents { get; } = new Container { RelativeSizeAxes = Axes.Both };
 
         public override IFrameStableClock FrameStableClock => frameStabilityContainer;
+
+        private readonly PlayfieldAdjustmentContainer playfieldAdjustmentContainer;
 
         private bool allowBackwardsSeeks;
 
@@ -144,6 +144,7 @@ namespace osu.Game.Rulesets.UI
             RelativeSizeAxes = Axes.Both;
 
             KeyBindingInputManager = CreateInputManager();
+            playfieldAdjustmentContainer = CreatePlayfieldAdjustmentContainer();
             playfield = new Lazy<Playfield>(() => CreatePlayfield().With(p =>
             {
                 p.NewResult += (_, r) => NewResult?.Invoke(r);
@@ -195,8 +196,7 @@ namespace osu.Game.Rulesets.UI
                     audioContainer.WithChild(KeyBindingInputManager
                         .WithChildren(new Drawable[]
                         {
-                            playfieldAdjustmentContainer = CreatePlayfieldAdjustmentContainer()
-                                .WithChild(Playfield),
+                            playfieldAdjustmentContainer.WithChild(Playfield),
                             Overlays
                         })),
                 }
