@@ -65,7 +65,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private void load()
         {
             MainTernaryStates = CreateTernaryButtons().ToArray();
-            SampleBankTernaryStates = createSampleBankTernaryButtons().ToArray();
+            SampleBankTernaryStates = createSampleBankTernaryButtons(SelectionHandler.SelectionBankStates).ToArray();
+            SampleAdditionBankTernaryStates = createSampleBankTernaryButtons(SelectionHandler.SelectionAdditionBankStates).ToArray();
 
             AddInternal(new DrawableRulesetDependenciesProvidingContainer(Composer.Ruleset)
             {
@@ -90,6 +91,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 kvp.Value.BindValueChanged(_ => updatePlacementSamples());
 
             foreach (var kvp in SelectionHandler.SelectionBankStates)
+                kvp.Value.BindValueChanged(_ => updatePlacementSamples());
+
+            foreach (var kvp in SelectionHandler.SelectionAdditionBankStates)
                 kvp.Value.BindValueChanged(_ => updatePlacementSamples());
         }
 
@@ -179,6 +183,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             foreach (var kvp in SelectionHandler.SelectionBankStates)
                 bankChanged(kvp.Key, kvp.Value.Value);
+
+            foreach (var kvp in SelectionHandler.SelectionAdditionBankStates)
+                additionBankChanged(kvp.Key, kvp.Value.Value);
         }
 
         private void sampleChanged(string sampleName, TernaryState state)
@@ -210,7 +217,17 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (bankName == EditorSelectionHandler.HIT_BANK_AUTO)
                 CurrentHitObjectPlacement.AutomaticBankAssignment = state == TernaryState.True;
             else if (state == TernaryState.True)
-                CurrentHitObjectPlacement.HitObject.Samples = CurrentHitObjectPlacement.HitObject.Samples.Select(s => s.With(newBank: bankName)).ToList();
+                CurrentHitObjectPlacement.HitObject.Samples = CurrentHitObjectPlacement.HitObject.Samples.Select(s => s.Name == HitSampleInfo.HIT_NORMAL ? s.With(newBank: bankName) : s).ToList();
+        }
+
+        private void additionBankChanged(string bankName, TernaryState state)
+        {
+            if (CurrentHitObjectPlacement == null) return;
+
+            if (bankName == EditorSelectionHandler.HIT_BANK_AUTO)
+                CurrentHitObjectPlacement.AutomaticAdditionBankAssignment = state == TernaryState.True;
+            else if (state == TernaryState.True)
+                CurrentHitObjectPlacement.HitObject.Samples = CurrentHitObjectPlacement.HitObject.Samples.Select(s => s.Name != HitSampleInfo.HIT_NORMAL ? s.With(newBank: bankName) : s).ToList();
         }
 
         public readonly Bindable<TernaryState> NewCombo = new Bindable<TernaryState> { Description = "New Combo" };
@@ -221,6 +238,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
         public TernaryButton[] MainTernaryStates { get; private set; }
 
         public TernaryButton[] SampleBankTernaryStates { get; private set; }
+
+        public TernaryButton[] SampleAdditionBankTernaryStates { get; private set; }
 
         /// <summary>
         /// Create all ternary states required to be displayed to the user.
@@ -234,36 +253,21 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 yield return new TernaryButton(kvp.Value, kvp.Key.Replace("hit", string.Empty).Titleize(), () => GetIconForSample(kvp.Key));
         }
 
-        private IEnumerable<TernaryButton> createSampleBankTernaryButtons()
+        private IEnumerable<TernaryButton> createSampleBankTernaryButtons(Dictionary<string, Bindable<TernaryState>> sampleBankStates)
         {
-            foreach (var kvp in SelectionHandler.SelectionBankStates)
+            foreach (var kvp in sampleBankStates)
                 yield return new TernaryButton(kvp.Value, kvp.Key.Titleize(), () => getIconForBank(kvp.Key));
         }
 
         private Drawable getIconForBank(string sampleName)
         {
-            return new Container
+            return new OsuSpriteText
             {
-                Size = new Vector2(30, 20),
-                Children = new Drawable[]
-                {
-                    new SpriteIcon
-                    {
-                        Size = new Vector2(8),
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
-                        Icon = FontAwesome.Solid.VolumeOff
-                    },
-                    new OsuSpriteText
-                    {
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
-                        X = 10,
-                        Y = -1,
-                        Font = OsuFont.Default.With(weight: FontWeight.Bold, size: 20),
-                        Text = $"{char.ToUpperInvariant(sampleName.First())}"
-                    }
-                }
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Y = -1,
+                Font = OsuFont.Default.With(weight: FontWeight.Bold, size: 20),
+                Text = $"{char.ToUpperInvariant(sampleName.First())}"
             };
         }
 
@@ -295,9 +299,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
             ensurePlacementCreated();
         }
 
-        private void updatePlacementPosition()
+        private void updatePlacementTimeAndPosition()
         {
-            var snapResult = Composer.FindSnappedPositionAndTime(InputManager.CurrentState.Mouse.Position);
+            var snapResult = Composer.FindSnappedPositionAndTime(InputManager.CurrentState.Mouse.Position, CurrentPlacement.SnapType);
 
             // if no time was found from positional snapping, we should still quantize to the beat.
             snapResult.Time ??= Beatmap.SnapTime(EditorClock.CurrentTime, null);
@@ -329,8 +333,18 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (Composer.CursorInPlacementArea)
                 ensurePlacementCreated();
 
+            // updates the placement with the latest editor clock time.
             if (CurrentPlacement != null)
-                updatePlacementPosition();
+                updatePlacementTimeAndPosition();
+        }
+
+        protected override bool OnMouseMove(MouseMoveEvent e)
+        {
+            // updates the placement with the latest mouse position.
+            if (CurrentPlacement != null)
+                updatePlacementTimeAndPosition();
+
+            return base.OnMouseMove(e);
         }
 
         protected sealed override SelectionBlueprint<HitObject> CreateBlueprintFor(HitObject item)
@@ -367,7 +381,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 placementBlueprintContainer.Child = CurrentPlacement = blueprint;
 
                 // Fixes a 1-frame position discrepancy due to the first mouse move event happening in the next frame
-                updatePlacementPosition();
+                updatePlacementTimeAndPosition();
 
                 updatePlacementSamples();
 
