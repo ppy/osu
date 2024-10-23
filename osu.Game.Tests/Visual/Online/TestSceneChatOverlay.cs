@@ -648,6 +648,34 @@ namespace osu.Game.Tests.Visual.Online
             AddUntilStep("Info message displayed", () => channelManager.CurrentChannel.Value.Messages.Last(), () => Is.InstanceOf(typeof(InfoMessage)));
         }
 
+        [Test]
+        public void TestFiltering()
+        {
+            AddStep("Show overlay", () => chatOverlay.Show());
+            joinTestChannel(1);
+            joinTestChannel(3);
+            joinTestChannel(5);
+            joinChannel(new Channel(new APIUser { Id = 2001, Username = "alice" }));
+            joinChannel(new Channel(new APIUser { Id = 2002, Username = "bob" }));
+            joinChannel(new Channel(new APIUser { Id = 2003, Username = "charley the plant" }));
+
+            AddStep("filter to \"c\"", () => chatOverlay.ChildrenOfType<SearchTextBox>().Single().Text = "c");
+            AddUntilStep("bob filtered out", () => chatOverlay.ChildrenOfType<ChannelListItem>().Count(i => i.Alpha > 0), () => Is.EqualTo(5));
+
+            AddStep("filter to \"channel\"", () => chatOverlay.ChildrenOfType<SearchTextBox>().Single().Text = "channel");
+            AddUntilStep("only public channels left", () => chatOverlay.ChildrenOfType<ChannelListItem>().Count(i => i.Alpha > 0), () => Is.EqualTo(3));
+
+            AddStep("commit textbox", () =>
+            {
+                chatOverlay.ChildrenOfType<SearchTextBox>().Single().TakeFocus();
+                Schedule(() => InputManager.PressKey(Key.Enter));
+            });
+            AddUntilStep("#channel-2 active", () => channelManager.CurrentChannel.Value.Name, () => Is.EqualTo("#channel-2"));
+
+            AddStep("filter to \"channel-3\"", () => chatOverlay.ChildrenOfType<SearchTextBox>().Single().Text = "channel-3");
+            AddUntilStep("no channels left", () => chatOverlay.ChildrenOfType<ChannelListItem>().Count(i => i.Alpha > 0), () => Is.EqualTo(0));
+        }
+
         private void joinTestChannel(int i)
         {
             AddStep($"Join test channel {i}", () => channelManager.JoinChannel(testChannels[i]));
