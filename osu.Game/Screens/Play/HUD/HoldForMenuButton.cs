@@ -299,7 +299,7 @@ namespace osu.Game.Screens.Play.HUD
                 {
                     case GlobalAction.Back:
                         if (!pendingAnimation)
-                            BeginConfirm();
+                            Confirm();
                         return true;
 
                     case GlobalAction.PauseGameplay:
@@ -307,7 +307,7 @@ namespace osu.Game.Screens.Play.HUD
                         if (ReplayLoaded.Value) return false;
 
                         if (!pendingAnimation)
-                            BeginConfirm();
+                            Confirm();
                         return true;
                 }
 

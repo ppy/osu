@@ -267,23 +267,26 @@ namespace osu.Game.Tests.Editing
         [Test]
         public void TestUseCurrentSnap()
         {
+            ExpandableButton getCurrentSnapButton() => composer.ChildrenOfType<EditorToolboxGroup>().Single(g => g.Name == "snapping")
+                                                               .ChildrenOfType<ExpandableButton>().Single();
+
             AddStep("add objects to beatmap", () =>
             {
                 editorBeatmap.Add(new HitCircle { StartTime = 1000 });
                 editorBeatmap.Add(new HitCircle { Position = new Vector2(100), StartTime = 2000 });
             });
 
-            AddStep("hover use current snap button", () => InputManager.MoveMouseTo(composer.ChildrenOfType<ExpandableButton>().Single()));
-            AddUntilStep("use current snap expanded", () => composer.ChildrenOfType<ExpandableButton>().Single().Expanded.Value, () => Is.True);
+            AddStep("hover use current snap button", () => InputManager.MoveMouseTo(getCurrentSnapButton()));
+            AddUntilStep("use current snap expanded", () => getCurrentSnapButton().Expanded.Value, () => Is.True);
 
             AddStep("seek before first object", () => EditorClock.Seek(0));
-            AddUntilStep("use current snap not available", () => composer.ChildrenOfType<ExpandableButton>().Single().Enabled.Value, () => Is.False);
+            AddUntilStep("use current snap not available", () => getCurrentSnapButton().Enabled.Value, () => Is.False);
 
             AddStep("seek to between objects", () => EditorClock.Seek(1500));
-            AddUntilStep("use current snap available", () => composer.ChildrenOfType<ExpandableButton>().Single().Enabled.Value, () => Is.True);
+            AddUntilStep("use current snap available", () => getCurrentSnapButton().Enabled.Value, () => Is.True);
 
             AddStep("seek after last object", () => EditorClock.Seek(2500));
-            AddUntilStep("use current snap not available", () => composer.ChildrenOfType<ExpandableButton>().Single().Enabled.Value, () => Is.False);
+            AddUntilStep("use current snap not available", () => getCurrentSnapButton().Enabled.Value, () => Is.False);
         }
 
         private void assertSnapDistance(float expectedDistance, HitObject? referenceObject, bool includeSliderVelocity)
