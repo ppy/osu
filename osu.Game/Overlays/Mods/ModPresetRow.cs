@@ -1,20 +1,24 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Mods
 {
     public partial class ModPresetRow : FillFlowContainer
     {
-        public ModPresetRow(Mod mod)
+        public ModPresetRow(Mod mod, HashSet<Mod>? rootSet = null)
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -30,6 +34,26 @@ namespace osu.Game.Overlays.Mods
                     Spacing = new Vector2(7),
                     Children = new Drawable[]
                     {
+                        rootSet != null
+                            ? new IconButton
+                            {
+                                Icon = FontAwesome.Solid.TimesCircle,
+                                Anchor = Anchor.CentreLeft,
+                                Origin = Anchor.CentreLeft,
+                                Enabled = { Value = rootSet.Count > 1 },
+                                TooltipText = "Remove this mod",
+                                Action = () => Scheduler.AddOnce(() =>
+                                {
+                                    if (rootSet.Count <= 1)
+                                        this.FlashColour(Color4.Red, 300);
+                                    else
+                                    {
+                                        this.FadeOut(200, Easing.OutQuint).Then().Expire();
+                                        rootSet.Remove(mod);
+                                    }
+                                })
+                            }
+                            : new Container(),
                         new ModSwitchTiny(mod)
                         {
                             Active = { Value = true },
@@ -41,8 +65,8 @@ namespace osu.Game.Overlays.Mods
                         {
                             Text = mod.Name,
                             Font = OsuFont.Default.With(size: 16, weight: FontWeight.SemiBold),
-                            Origin = Anchor.CentreLeft,
                             Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
                             Margin = new MarginPadding { Bottom = 2 }
                         }
                     }
