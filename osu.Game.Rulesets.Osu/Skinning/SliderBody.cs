@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Lines;
+using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Skinning.Default;
 using osuTK;
 using osuTK.Graphics;
@@ -119,6 +120,13 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
             protected override Color4 ColourAt(float position)
             {
+                const float actual_to_visual_radius = OsuHitObject.OBJECT_RADIUS / OsuHitObject.VISUAL_OBJECT_RADIUS;
+
+                position = 1 - (1 - position) * actual_to_visual_radius;
+
+                if (position < 0.0)
+                    return Color4.Transparent;
+
                 if (CalculatedBorderPortion != 0f && position <= CalculatedBorderPortion)
                     return BorderColour;
 
