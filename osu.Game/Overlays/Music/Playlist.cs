@@ -59,7 +59,6 @@ namespace osu.Game.Overlays.Music
 
             void updateMusicControllerPlaylist() => Scheduler.AddOnce(() =>
             {
-                musicController.PlaylistHookedByOverlay.Value = true;
                 musicController.Playlist.Clear();
                 musicController.Playlist.AddRange(AllVisibleSets);
             });
@@ -67,12 +66,6 @@ namespace osu.Game.Overlays.Music
 
         public Live<BeatmapSetInfo>? FirstVisibleSet => Items.FirstOrDefault(i => ((PlaylistItem)ItemMap[i]).MatchingFilter);
         public IEnumerable<Live<BeatmapSetInfo>> AllVisibleSets => Items.Where(i => ((PlaylistItem)ItemMap[i]).MatchingFilter);
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-            musicController.PlaylistHookedByOverlay.Value = false;
-        }
 
         protected override OsuRearrangeableListItem<Live<BeatmapSetInfo>> CreateOsuDrawable(Live<BeatmapSetInfo> item) =>
             new PlaylistItem(item)
