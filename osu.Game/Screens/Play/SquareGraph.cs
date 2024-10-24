@@ -43,9 +43,9 @@ namespace osu.Game.Screens.Play
 
         private float[] calculatedValues = Array.Empty<float>(); // values but adjusted to fit the amount of columns
 
-        private int[] values;
+        private float[] values;
 
-        public int[] Values
+        public float[] Values
         {
             get => values;
             set
@@ -168,13 +168,13 @@ namespace osu.Game.Screens.Play
                 return;
             }
 
-            int max = values.Max();
+            float max = values.Max();
 
             float step = values.Length / (float)ColumnCount;
 
             for (float i = 0; i < values.Length; i += step)
             {
-                newValues.Add((float)values[(int)i] / max);
+                newValues.Add(values[(int)i] / max);
             }
 
             calculatedValues = newValues.ToArray();

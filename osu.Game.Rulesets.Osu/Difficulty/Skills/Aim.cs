@@ -38,5 +38,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             return currentStrain;
         }
+
+        public override bool IsRelevant => withSliders;
     }
 }

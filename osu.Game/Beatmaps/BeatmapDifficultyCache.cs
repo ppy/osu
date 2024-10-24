@@ -156,6 +156,14 @@ namespace osu.Game.Beatmaps
                 updateScheduler);
         }
 
+        public Task<List<double[]>> GetSectionDifficultiesAsync(IWorkingBeatmap beatmap, Ruleset ruleset, Mod[] mods, CancellationToken cancellationToken = default)
+        {
+            return Task.Factory.StartNew(() => ruleset.CreateDifficultyCalculator(beatmap).CalculateSectionDifficulties(mods, cancellationToken).ToList(),
+                cancellationToken,
+                TaskCreationOptions.HideScheduler | TaskCreationOptions.RunContinuationsAsynchronously,
+                updateScheduler);
+        }
+
         /// <summary>
         /// Updates all tracked <see cref="BindableStarDifficulty"/> using the current ruleset and mods.
         /// </summary>
