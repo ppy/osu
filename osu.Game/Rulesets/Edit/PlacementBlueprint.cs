@@ -129,15 +129,8 @@ namespace osu.Game.Rulesets.Edit
             }
         }
 
-        protected override void PopIn()
-        {
-            this.FadeIn(200, Easing.OutQuint);
-        }
-
-        protected override void PopOut()
-        {
-            this.FadeOut(200, Easing.OutQuint);
-        }
+        protected override void PopIn() => this.FadeIn();
+        protected override void PopOut() => this.FadeOut();
 
         public enum PlacementState
         {
