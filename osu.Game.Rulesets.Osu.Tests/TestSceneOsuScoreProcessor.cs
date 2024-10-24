@@ -39,6 +39,12 @@ namespace osu.Game.Rulesets.Osu.Tests
             Assert.That(scoreProcessor.Rank.Value, Is.EqualTo(ScoreRank.X));
             Assert.That(scoreProcessor.MinimumRank.Value, Is.EqualTo(ScoreRank.A));
             Assert.That(scoreProcessor.MaximumRank.Value, Is.EqualTo(ScoreRank.X));
+
+            scoreProcessor.ApplyResult(new JudgementResult(beatmap.HitObjects[999], beatmap.HitObjects[999].Judgement) { Type = HitResult.Great });
+
+            Assert.That(scoreProcessor.Rank.Value, Is.EqualTo(ScoreRank.X));
+            Assert.That(scoreProcessor.MinimumRank.Value, Is.EqualTo(ScoreRank.X));
+            Assert.That(scoreProcessor.MaximumRank.Value, Is.EqualTo(ScoreRank.X));
         }
 
         [Test]
@@ -58,6 +64,12 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             Assert.That(scoreProcessor.Rank.Value, Is.EqualTo(ScoreRank.XH));
             Assert.That(scoreProcessor.MinimumRank.Value, Is.EqualTo(ScoreRank.A));
+            Assert.That(scoreProcessor.MaximumRank.Value, Is.EqualTo(ScoreRank.XH));
+
+            scoreProcessor.ApplyResult(new JudgementResult(beatmap.HitObjects[999], beatmap.HitObjects[999].Judgement) { Type = HitResult.Great });
+
+            Assert.That(scoreProcessor.Rank.Value, Is.EqualTo(ScoreRank.XH));
+            Assert.That(scoreProcessor.MinimumRank.Value, Is.EqualTo(ScoreRank.XH));
             Assert.That(scoreProcessor.MaximumRank.Value, Is.EqualTo(ScoreRank.XH));
         }
 
