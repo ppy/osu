@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Difficulty
         /// </summary>
         protected IBeatmap Beatmap { get; private set; }
 
-        private Mod[] playableMods;
+        public Mod[] PlayableMods { get; private set; }
         private double clockRate;
 
         private readonly IRulesetInfo ruleset;
@@ -65,10 +65,10 @@ namespace osu.Game.Rulesets.Difficulty
             cancellationToken.ThrowIfCancellationRequested();
             preProcess(mods, cancellationToken);
 
-            var skills = CreateSkills(Beatmap, playableMods, clockRate);
+            var skills = CreateSkills(Beatmap, PlayableMods, clockRate);
 
             if (!Beatmap.HitObjects.Any())
-                return CreateDifficultyAttributes(Beatmap, playableMods, skills, clockRate);
+                return CreateDifficultyAttributes(Beatmap, PlayableMods, skills, clockRate);
 
             foreach (var hitObject in getDifficultyHitObjects())
             {
@@ -79,7 +79,7 @@ namespace osu.Game.Rulesets.Difficulty
                 }
             }
 
-            return CreateDifficultyAttributes(Beatmap, playableMods, skills, clockRate);
+            return CreateDifficultyAttributes(Beatmap, PlayableMods, skills, clockRate);
         }
 
         /// <summary>
@@ -106,7 +106,7 @@ namespace osu.Game.Rulesets.Difficulty
             if (!Beatmap.HitObjects.Any())
                 return attribs;
 
-            var skills = CreateSkills(Beatmap, playableMods, clockRate);
+            var skills = CreateSkills(Beatmap, PlayableMods, clockRate);
             var progressiveBeatmap = new ProgressiveCalculationBeatmap(Beatmap);
             var difficultyObjects = getDifficultyHitObjects().ToArray();
 
@@ -127,7 +127,7 @@ namespace osu.Game.Rulesets.Difficulty
                     currentIndex++;
                 }
 
-                attribs.Add(new TimedDifficultyAttributes(obj.GetEndTime(), CreateDifficultyAttributes(progressiveBeatmap, playableMods, skills, clockRate)));
+                attribs.Add(new TimedDifficultyAttributes(obj.GetEndTime(), CreateDifficultyAttributes(progressiveBeatmap, PlayableMods, skills, clockRate)));
             }
 
             return attribs;
@@ -159,7 +159,7 @@ namespace osu.Game.Rulesets.Difficulty
         /// <summary>
         /// Retrieves the <see cref="DifficultyHitObject"/>s to calculate against.
         /// </summary>
-        private IEnumerable<DifficultyHitObject> getDifficultyHitObjects() => SortObjects(CreateDifficultyHitObjects(Beatmap, clockRate));
+        private IEnumerable<DifficultyHitObject> getDifficultyHitObjects() => SortObjects(CreateDifficultyHitObjects(Beatmap, PlayableMods, clockRate));
 
         /// <summary>
         /// Performs required tasks before every calculation.
@@ -168,16 +168,16 @@ namespace osu.Game.Rulesets.Difficulty
         /// <param name="cancellationToken">The cancellation token.</param>
         private void preProcess([NotNull] IEnumerable<Mod> mods, CancellationToken cancellationToken = default)
         {
-            playableMods = mods.Select(m => m.DeepClone()).ToArray();
+            PlayableMods = mods.Select(m => m.DeepClone()).ToArray();
 
             // Only pass through the cancellation token if it's non-default.
             // This allows for the default timeout to be applied for playable beatmap construction.
             Beatmap = cancellationToken == default
-                ? beatmap.GetPlayableBeatmap(ruleset, playableMods)
-                : beatmap.GetPlayableBeatmap(ruleset, playableMods, cancellationToken);
+                ? beatmap.GetPlayableBeatmap(ruleset, PlayableMods)
+                : beatmap.GetPlayableBeatmap(ruleset, PlayableMods, cancellationToken);
 
             var track = new TrackVirtual(10000);
-            playableMods.OfType<IApplicableToTrack>().ForEach(m => m.ApplyToTrack(track));
+            PlayableMods.OfType<IApplicableToTrack>().ForEach(m => m.ApplyToTrack(track));
             clockRate = track.Rate;
         }
 
@@ -276,9 +276,10 @@ namespace osu.Game.Rulesets.Difficulty
         /// Enumerates <see cref="DifficultyHitObject"/>s to be processed from <see cref="HitObject"/>s in the <see cref="IBeatmap"/>.
         /// </summary>
         /// <param name="beatmap">The <see cref="IBeatmap"/> providing the <see cref="HitObject"/>s to enumerate.</param>
+        /// <param name="mods"></param>
         /// <param name="clockRate">The rate at which the gameplay clock is run at.</param>
         /// <returns>The enumerated <see cref="DifficultyHitObject"/>s.</returns>
-        protected abstract IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate);
+        protected abstract IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, Mod[] mods, double clockRate);
 
         /// <summary>
         /// Creates the <see cref="Skill"/>s to calculate the difficulty of an <see cref="IBeatmap"/>.
