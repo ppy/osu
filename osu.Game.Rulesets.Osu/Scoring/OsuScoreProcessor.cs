@@ -17,14 +17,21 @@ namespace osu.Game.Rulesets.Osu.Scoring
         }
 
         public override ScoreRank RankFromScore(double accuracy, IReadOnlyDictionary<HitResult, int> results)
-        {
-            ScoreRank rank = base.RankFromScore(accuracy, results);
+            => adjustRank(base.RankFromScore(accuracy, results), results.GetValueOrDefault(HitResult.Miss));
 
+        protected override ScoreRank MinimumRankFromScore(double accuracy, IReadOnlyDictionary<HitResult, int> results)
+            // this will be wrong when the remaining judgements do not affect accuracy and the player did not miss before,
+            // but it's a bit of a tiny detail to fix. we'll at least show an S/SS rank when the user completes the beatmap
+            // (especially when the beatmap has an outro storyboard).
+            => adjustRank(base.RankFromScore(accuracy, results), JudgedHits == MaxHits ? results.GetValueOrDefault(HitResult.Miss) : int.MaxValue);
+
+        private ScoreRank adjustRank(ScoreRank rank, int misses)
+        {
             switch (rank)
             {
                 case ScoreRank.S:
                 case ScoreRank.X:
-                    if (results.GetValueOrDefault(HitResult.Miss) > 0)
+                    if (misses > 0)
                         rank = ScoreRank.A;
                     break;
             }
