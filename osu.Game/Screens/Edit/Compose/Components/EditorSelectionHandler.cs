@@ -259,6 +259,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private void resetTernaryStates()
         {
             AutoSelectionBankEnabled.Value = true;
+            SelectionAdditionBanksEnabled.Value = true;
             SelectionBankStates[HIT_BANK_AUTO].Value = TernaryState.True;
             SelectionAdditionBankStates[HIT_BANK_AUTO].Value = TernaryState.True;
         }
