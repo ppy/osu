@@ -85,7 +85,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         private PopoverContainer popoverContainer;
         private LoadingLayer loadingLayer;
         private RoomsContainer roomsContainer;
-        private SearchTextBox searchTextBox;
+        private ShearedFilterTextBox searchTextBox;
         private Dropdown<RoomStatusFilter> statusDropdown;
 
         [BackgroundDependencyLoader(true)]
@@ -135,7 +135,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                         {
                             RelativeSizeAxes = Axes.X,
                             Height = Header.HEIGHT,
-                            Child = searchTextBox = new BasicSearchTextBox
+                            Child = searchTextBox = new ShearedFilterTextBox
                             {
                                 Anchor = Anchor.CentreRight,
                                 Origin = Anchor.CentreRight,
@@ -196,10 +196,17 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             if (ongoingOperationTracker != null)
             {
                 operationInProgress.BindTo(ongoingOperationTracker.InProgress);
-                operationInProgress.BindValueChanged(_ => updateLoadingLayer());
+                operationInProgress.BindValueChanged(_ => updateLoadingState());
             }
 
-            ListingPollingComponent.InitialRoomsReceived.BindValueChanged(_ => updateLoadingLayer(), true);
+            ListingPollingComponent.InitialRoomsReceived.BindValueChanged(_ => updateLoadingState(), true);
+
+            roomsContainer.VisibleRoomCount.BindValueChanged(_ =>
+            {
+                if (operationInProgress.Value || !ListingPollingComponent.InitialRoomsReceived.Value) return;
+
+                updateFilterText();
+            }, true);
 
             updateFilter();
         }
@@ -382,12 +389,24 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             this.Push(CreateRoomSubScreen(room));
         }
 
-        private void updateLoadingLayer()
+        private void updateLoadingState()
         {
             if (operationInProgress.Value || !ListingPollingComponent.InitialRoomsReceived.Value)
+            {
                 loadingLayer.Show();
+                searchTextBox.FilterText = "loading...";
+            }
             else
+            {
                 loadingLayer.Hide();
+                updateFilterText();
+            }
+        }
+
+        private void updateFilterText()
+        {
+            int visibleRoomCount = roomsContainer.VisibleRoomCount.Value;
+            searchTextBox.FilterText = visibleRoomCount != 1 ? $"{visibleRoomCount:#,0} matches" : $"{visibleRoomCount:#,0} match";
         }
 
         private void updatePollingRate(bool isCurrentScreen)
