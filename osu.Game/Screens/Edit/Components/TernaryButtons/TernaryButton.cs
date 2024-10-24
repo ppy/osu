@@ -12,7 +12,7 @@ namespace osu.Game.Screens.Edit.Components.TernaryButtons
     {
         public readonly Bindable<TernaryState> Bindable;
 
-        public readonly Bindable<bool> Enabled = new Bindable<bool>();
+        public readonly Bindable<bool> Enabled = new Bindable<bool>(true);
 
         public readonly string Description;
 
