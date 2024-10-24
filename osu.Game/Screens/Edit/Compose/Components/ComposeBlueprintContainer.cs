@@ -68,6 +68,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
             SampleBankTernaryStates = createSampleBankTernaryButtons(SelectionHandler.SelectionBankStates).ToArray();
             SampleAdditionBankTernaryStates = createSampleBankTernaryButtons(SelectionHandler.SelectionAdditionBankStates).ToArray();
 
+            SelectionHandler.AutoSelectionBankEnabled.BindValueChanged(_ => updateAutoBankTernaryButtonTooltip(), true);
+            SelectionHandler.SelectionAdditionBanksEnabled.BindValueChanged(_ => updateAdditionBankTernaryButtonTooltips(), true);
+
             AddInternal(new DrawableRulesetDependenciesProvidingContainer(Composer.Ruleset)
             {
                 Child = placementBlueprintContainer
@@ -286,6 +289,26 @@ namespace osu.Game.Screens.Edit.Compose.Components
             }
 
             return null;
+        }
+
+        private void updateAutoBankTernaryButtonTooltip()
+        {
+            bool enabled = SelectionHandler.AutoSelectionBankEnabled.Value;
+
+            var autoBankButton = SampleBankTernaryStates.Single(t => t.Bindable == SelectionHandler.SelectionBankStates[EditorSelectionHandler.HIT_BANK_AUTO]);
+            autoBankButton.Enabled.Value = enabled;
+            autoBankButton.Tooltip = !enabled ? "Auto normal bank can only be used during hit object placement" : string.Empty;
+        }
+
+        private void updateAdditionBankTernaryButtonTooltips()
+        {
+            bool enabled = SelectionHandler.SelectionAdditionBanksEnabled.Value;
+
+            foreach (var ternaryButton in SampleAdditionBankTernaryStates)
+            {
+                ternaryButton.Enabled.Value = enabled;
+                ternaryButton.Tooltip = !enabled ? "Add an addition sample first to be able to set a bank" : string.Empty;
+            }
         }
 
         #region Placement
