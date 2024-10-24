@@ -395,8 +395,6 @@ namespace osu.Game.Rulesets.Scoring
             TotalScore.Value = (long)Math.Round(TotalScoreWithoutMods.Value * scoreMultiplier);
         }
 
-        private readonly Dictionary<HitResult, int> minimumAccuracyResultCounts = new Dictionary<HitResult, int>();
-
         private void updateRank()
         {
             // Once failed, we shouldn't update the rank anymore.
@@ -405,13 +403,7 @@ namespace osu.Game.Rulesets.Scoring
 
             ScoreRank newRank = RankFromScore(Accuracy.Value, ScoreResultCounts);
             ScoreRank newMaxRank = RankFromScore(MaximumAccuracy.Value, ScoreResultCounts);
-
-            // this arbitrarily only fills HitResult.Miss because it's the only hit result that can affect the state of RankFromScore in the main rulesets (see OsuScoreProcessor).
-            // eventually (whenever it's needed), other miss result types should be correctly filled and this dictionary should be updated regularly next to ScoreResultCounts,
-            // but this is sufficient for now.
-            minimumAccuracyResultCounts[HitResult.Miss] = MaxHits - JudgedHits + ScoreResultCounts.GetValueOrDefault(HitResult.Miss);
-
-            ScoreRank newMinRank = RankFromScore(MinimumAccuracy.Value, minimumAccuracyResultCounts);
+            ScoreRank newMinRank = MinimumRankFromScore(MinimumAccuracy.Value, ScoreResultCounts);
 
             foreach (var mod in Mods.Value.OfType<IApplicableToScoreProcessor>())
             {
@@ -571,6 +563,15 @@ namespace osu.Game.Rulesets.Scoring
 
             return ScoreRank.D;
         }
+
+        /// <summary>
+        /// A special version of <see cref="RankFromScore"/> specific for computing the <see cref="MinimumRank"/> field.
+        /// </summary>
+        /// <remarks>
+        /// This calls <see cref="RankFromScore"/> by default, but if the underlying method uses <paramref name="results"/>
+        /// then this method should be overriden to ensure the returned rank is correct in the context of "minimum achievable rank".
+        /// </remarks>
+        protected virtual ScoreRank MinimumRankFromScore(double accuracy, IReadOnlyDictionary<HitResult, int> results) => RankFromScore(accuracy, results);
 
         /// <summary>
         /// Given a <see cref="ScoreRank"/>, return the cutoff accuracy (0..1).
