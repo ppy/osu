@@ -1,88 +1,102 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
-using osu.Game.Rulesets.Catch.UI;
+using osu.Game.Rulesets.Catch.Skinning.Legacy;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play;
-using osu.Game.Tests.Visual;
-using osuTK;
+using osu.Game.Skinning;
+using osu.Game.Tests.Gameplay;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Tests
 {
     public partial class TestSceneComboCounter : CatchSkinnableTestScene
     {
-        private ScoreProcessor scoreProcessor = null!;
+        private readonly GameplayState gameplayState = TestGameplayState.Create(new CatchRuleset());
 
-        private Color4 judgedObjectColour = Color4.White;
+        [Cached(typeof(ScoreProcessor))]
+        private ScoreProcessor scoreProcessor;
 
-        private readonly Bindable<bool> showHud = new Bindable<bool>(true);
+        private Color4? judgedObjectColour;
+
+        public TestSceneComboCounter()
+        {
+            scoreProcessor = gameplayState.ScoreProcessor;
+        }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            Dependencies.CacheAs<Player>(new TestPlayer
-            {
-                ShowingOverlayComponents = { BindTarget = showHud },
-            });
+            scoreProcessor.NewJudgement += result => gameplayState.ApplyResult(result);
+
+            Dependencies.CacheAs(gameplayState);
         }
 
         [SetUp]
         public void SetUp() => Schedule(() =>
         {
-            scoreProcessor = new ScoreProcessor(new CatchRuleset());
-
-            showHud.Value = true;
-
-            SetContents(_ => new CatchComboDisplay
+            SetContents(skin =>
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Scale = new Vector2(2.5f),
+                if (skin is LegacySkin)
+                {
+                    return new LegacyCatchComboCounter
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                    };
+                }
+
+                return Empty();
             });
         });
 
         [Test]
         public void TestCatchComboCounter()
         {
-            AddRepeatStep("perform hit", () => performJudgement(HitResult.Great), 20);
-            AddStep("perform miss", () => performJudgement(HitResult.Miss));
-
-            AddStep("randomize judged object colour", () =>
+            AddRepeatStep("perform hit", () =>
             {
-                judgedObjectColour = new Color4(
-                    RNG.NextSingle(1f),
-                    RNG.NextSingle(1f),
-                    RNG.NextSingle(1f),
-                    1f
-                );
-            });
+                if (judgedObjectColour == null || RNG.NextDouble() > 0.8)
+                {
+                    judgedObjectColour = new Color4(
+                        RNG.NextSingle(1f),
+                        RNG.NextSingle(1f),
+                        RNG.NextSingle(1f),
+                        1f
+                    );
+                }
 
-            AddStep("set hud to never show", () => showHud.Value = false);
-            AddRepeatStep("perform hit", () => performJudgement(HitResult.Great), 5);
+                performJudgement(HitResult.Great);
+            }, 20);
 
-            AddStep("set hud to show", () => showHud.Value = true);
-            AddRepeatStep("perform hit", () => performJudgement(HitResult.Great), 5);
+            AddStep("perform miss", () => performJudgement(HitResult.Miss));
         }
 
         private void performJudgement(HitResult type, Judgement? judgement = null)
         {
-            var judgedObject = new DrawableFruit(new Fruit()) { AccentColour = { Value = judgedObjectColour } };
+            var judgedObject = new DrawableFruit(new ColourfulFruit(judgedObjectColour!.Value));
 
             var result = new JudgementResult(judgedObject.HitObject, judgement ?? new Judgement()) { Type = type };
             scoreProcessor.ApplyResult(result);
+        }
 
-            foreach (var counter in CreatedDrawables.Cast<CatchComboDisplay>())
-                counter.OnNewResult(judgedObject, result);
+        private class ColourfulFruit : Fruit, IHasComboInformation
+        {
+            private readonly Color4 colour;
+
+            public ColourfulFruit(Color4 colour)
+            {
+                this.colour = colour;
+            }
+
+            Color4 IHasComboInformation.GetComboColour(ISkin skin) => colour;
         }
     }
 }
