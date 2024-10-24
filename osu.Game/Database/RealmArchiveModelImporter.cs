@@ -112,26 +112,20 @@ namespace osu.Game.Database
 
             parameters.Batch |= tasks.Length >= minimum_items_considered_batch_import;
 
-            // A paused state could obviously be entered mid-import (during the `Task.WhenAll` below),
-            // but in order to keep things simple let's focus on the most common scenario.
-            notification.Text = $"{HumanisedModelName.Humanize(LetterCasing.Title)} import is paused due to gameplay...";
-
-            try
-            {
-                pauseIfNecessary(parameters, notification.CancellationToken);
-            }
-            catch { }
-
             notification.Text = $"{HumanisedModelName.Humanize(LetterCasing.Title)} import is initialising...";
+            notification.State = ProgressNotificationState.Active;
 
-            await Task.WhenAll(tasks.Select(async task =>
+            await pauseIfNecessaryAsync(parameters, notification, notification.CancellationToken).ConfigureAwait(false);
+
+            await Parallel.ForEachAsync(tasks, notification.CancellationToken, async (task, cancellation) =>
             {
-                if (notification.CancellationToken.IsCancellationRequested)
-                    return;
+                cancellation.ThrowIfCancellationRequested();
 
                 try
                 {
-                    var model = await Import(task, parameters, notification.CancellationToken).ConfigureAwait(false);
+                    await pauseIfNecessaryAsync(parameters, notification, cancellation).ConfigureAwait(false);
+
+                    var model = await Import(task, parameters, cancellation).ConfigureAwait(false);
 
                     lock (imported)
                     {
@@ -150,7 +144,7 @@ namespace osu.Game.Database
                 {
                     Logger.Error(e, $@"Could not import ({task})", LoggingTarget.Database);
                 }
-            })).ConfigureAwait(false);
+            }).ConfigureAwait(false);
 
             if (imported.Count == 0)
             {
@@ -297,8 +291,6 @@ namespace osu.Game.Database
         /// <param name="cancellationToken">An optional cancellation token.</param>
         public virtual Live<TModel>? ImportModel(TModel item, ArchiveReader? archive = null, ImportParameters parameters = default, CancellationToken cancellationToken = default) => Realm.Run(realm =>
         {
-            pauseIfNecessary(parameters, cancellationToken);
-
             TModel? existing;
 
             if (parameters.Batch && archive != null)
@@ -586,21 +578,29 @@ namespace osu.Game.Database
         /// <returns>Whether to perform deletion.</returns>
         protected virtual bool ShouldDeleteArchive(string path) => false;
 
-        private void pauseIfNecessary(ImportParameters importParameters, CancellationToken cancellationToken)
+        private async Task pauseIfNecessaryAsync(ImportParameters importParameters, ProgressNotification notification, CancellationToken cancellationToken)
         {
             if (!PauseImports || importParameters.ImportImmediately)
                 return;
 
             Logger.Log($@"{GetType().Name} is being paused.");
 
+            // A paused state could obviously be entered mid-import (during the `Task.WhenAll` below),
+            // but in order to keep things simple let's focus on the most common scenario.
+            notification.Text = $"{HumanisedModelName.Humanize(LetterCasing.Title)} import is paused due to gameplay...";
+            notification.State = ProgressNotificationState.Queued;
+
             while (PauseImports)
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                Thread.Sleep(500);
+                await Task.Delay(500, cancellationToken).ConfigureAwait(false);
             }
 
             cancellationToken.ThrowIfCancellationRequested();
             Logger.Log($@"{GetType().Name} is being resumed.");
+
+            notification.Text = $"{HumanisedModelName.Humanize(LetterCasing.Title)} import is resuming...";
+            notification.State = ProgressNotificationState.Active;
         }
 
         private IEnumerable<string> getIDs(IEnumerable<INamedFile> files)
