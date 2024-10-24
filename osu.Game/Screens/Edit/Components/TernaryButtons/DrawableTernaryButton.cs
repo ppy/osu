@@ -60,6 +60,7 @@ namespace osu.Game.Screens.Edit.Components.TernaryButtons
             base.LoadComplete();
 
             Button.Bindable.BindValueChanged(_ => updateSelectionState(), true);
+            Button.Enabled.BindTo(Enabled);
 
             Action = onAction;
         }
