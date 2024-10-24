@@ -38,6 +38,8 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
         protected bool FirstObject { get; private set; } = true;
 
+        public List<string> AvailableSampleBanks = ["none", "normal", "soft", "drum"];
+
         protected ConvertHitObjectParser(double offset, int formatVersion)
         {
             Offset = offset;
@@ -192,23 +194,15 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
             string[] split = str.Split(':');
 
-            var bank = (LegacySampleBank)Parsing.ParseInt(split[0]);
-            if (!Enum.IsDefined(bank))
-                bank = LegacySampleBank.Normal;
+            string bank = (Parsing.ParseInt(split[0]) > AvailableSampleBanks.Count - 1) ? "normal" : AvailableSampleBanks[Parsing.ParseInt(split[0])];
+            string addBank = (Parsing.ParseInt(split[1]) > AvailableSampleBanks.Count - 1) ? "normal" : AvailableSampleBanks[Parsing.ParseInt(split[1])];
 
-            var addBank = (LegacySampleBank)Parsing.ParseInt(split[1]);
-            if (!Enum.IsDefined(addBank))
-                addBank = LegacySampleBank.Normal;
+            if (bank == @"none") { bank = null; }
 
-            string stringBank = bank.ToString().ToLowerInvariant();
-            if (stringBank == @"none")
-                stringBank = null;
-            string stringAddBank = addBank.ToString().ToLowerInvariant();
-            if (stringAddBank == @"none")
-                stringAddBank = null;
+            if (addBank == @"none") { addBank = null; }
 
-            bankInfo.BankForNormal = stringBank;
-            bankInfo.BankForAdditions = string.IsNullOrEmpty(stringAddBank) ? stringBank : stringAddBank;
+            bankInfo.BankForNormal = bank;
+            bankInfo.BankForAdditions = string.IsNullOrEmpty(addBank) ? bank : addBank;
 
             if (banksOnly) return;
 
