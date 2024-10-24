@@ -3,9 +3,11 @@
 
 #nullable disable
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input.Events;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit;
@@ -19,11 +21,15 @@ namespace osu.Game.Tests.Visual
     public abstract partial class PlacementBlueprintTestScene : OsuManualInputManagerTestScene, IPlacementHandler
     {
         protected readonly Container HitObjectContainer;
-        protected PlacementBlueprint CurrentBlueprint { get; private set; }
+        protected HitObjectPlacementBlueprint CurrentBlueprint { get; private set; }
 
         protected PlacementBlueprintTestScene()
         {
             base.Content.Add(HitObjectContainer = CreateHitObjectContainer().With(c => c.Clock = new FramedClock(new StopwatchClock())));
+            base.Content.Add(new MouseMovementInterceptor
+            {
+                MouseMoved = updatePlacementTimeAndPosition,
+            });
         }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
@@ -83,18 +89,19 @@ namespace osu.Game.Tests.Visual
         protected override void Update()
         {
             base.Update();
-
-            CurrentBlueprint.UpdateTimeAndPosition(SnapForBlueprint(CurrentBlueprint));
+            updatePlacementTimeAndPosition();
         }
 
-        protected virtual SnapResult SnapForBlueprint(PlacementBlueprint blueprint) =>
+        private void updatePlacementTimeAndPosition() => CurrentBlueprint.UpdateTimeAndPosition(SnapForBlueprint(CurrentBlueprint));
+
+        protected virtual SnapResult SnapForBlueprint(HitObjectPlacementBlueprint blueprint) =>
             new SnapResult(InputManager.CurrentState.Mouse.Position, null);
 
         public override void Add(Drawable drawable)
         {
             base.Add(drawable);
 
-            if (drawable is PlacementBlueprint blueprint)
+            if (drawable is HitObjectPlacementBlueprint blueprint)
             {
                 blueprint.Show();
                 blueprint.UpdateTimeAndPosition(SnapForBlueprint(blueprint));
@@ -106,6 +113,23 @@ namespace osu.Game.Tests.Visual
         protected virtual Container CreateHitObjectContainer() => new Container { RelativeSizeAxes = Axes.Both };
 
         protected abstract DrawableHitObject CreateHitObject(HitObject hitObject);
-        protected abstract PlacementBlueprint CreateBlueprint();
+        protected abstract HitObjectPlacementBlueprint CreateBlueprint();
+
+        private partial class MouseMovementInterceptor : Drawable
+        {
+            public Action MouseMoved;
+
+            public MouseMovementInterceptor()
+            {
+                RelativeSizeAxes = Axes.Both;
+                Depth = float.MinValue;
+            }
+
+            protected override bool OnMouseMove(MouseMoveEvent e)
+            {
+                MouseMoved?.Invoke();
+                return base.OnMouseMove(e);
+            }
+        }
     }
 }

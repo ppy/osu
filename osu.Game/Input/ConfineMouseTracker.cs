@@ -15,7 +15,7 @@ namespace osu.Game.Input
 {
     /// <summary>
     /// Connects <see cref="OsuSetting.ConfineMouseMode"/> with <see cref="FrameworkSetting.ConfineMouseMode"/>.
-    /// If <see cref="OsuGame.LocalUserPlaying"/> is true, we should also confine the mouse cursor if it has been
+    /// If <see cref="ILocalUserPlayInfo.PlayingState"/> is playing, we should also confine the mouse cursor if it has been
     /// requested with <see cref="OsuConfineMouseMode.DuringGameplay"/>.
     /// </summary>
     public partial class ConfineMouseTracker : Component
@@ -25,7 +25,7 @@ namespace osu.Game.Input
         private Bindable<bool> frameworkMinimiseOnFocusLossInFullscreen;
 
         private Bindable<OsuConfineMouseMode> osuConfineMode;
-        private IBindable<bool> localUserPlaying;
+        private IBindable<LocalUserPlayingState> localUserPlaying;
 
         [BackgroundDependencyLoader]
         private void load(ILocalUserPlayInfo localUserInfo, FrameworkConfigManager frameworkConfigManager, OsuConfigManager osuConfigManager)
@@ -37,7 +37,7 @@ namespace osu.Game.Input
             frameworkMinimiseOnFocusLossInFullscreen.BindValueChanged(_ => updateConfineMode());
 
             osuConfineMode = osuConfigManager.GetBindable<OsuConfineMouseMode>(OsuSetting.ConfineMouseMode);
-            localUserPlaying = localUserInfo.IsPlaying.GetBoundCopy();
+            localUserPlaying = localUserInfo.PlayingState.GetBoundCopy();
 
             osuConfineMode.ValueChanged += _ => updateConfineMode();
             localUserPlaying.BindValueChanged(_ => updateConfineMode(), true);
@@ -63,7 +63,7 @@ namespace osu.Game.Input
                     break;
 
                 case OsuConfineMouseMode.DuringGameplay:
-                    frameworkConfineMode.Value = localUserPlaying.Value ? ConfineMouseMode.Always : ConfineMouseMode.Never;
+                    frameworkConfineMode.Value = localUserPlaying.Value == LocalUserPlayingState.Playing ? ConfineMouseMode.Always : ConfineMouseMode.Never;
                     break;
 
                 case OsuConfineMouseMode.Always:

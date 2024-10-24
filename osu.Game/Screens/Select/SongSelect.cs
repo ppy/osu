@@ -127,6 +127,8 @@ namespace osu.Game.Screens.Select
         private Sample sampleChangeDifficulty = null!;
         private Sample sampleChangeBeatmap = null!;
 
+        private bool pendingFilterApplication;
+
         private Container carouselContainer = null!;
 
         protected BeatmapDetailArea BeatmapDetails { get; private set; } = null!;
@@ -328,7 +330,20 @@ namespace osu.Game.Screens.Select
                 GetRecommendedBeatmap = s => recommender?.GetRecommendedBeatmap(s),
             }, c => carouselContainer.Child = c);
 
-            FilterControl.FilterChanged = Carousel.Filter;
+            FilterControl.FilterChanged = criteria =>
+            {
+                // If a filter operation is applied when we're in a state that doesn't allow selection,
+                // we might end up in an unexpected state. This is because currently carousel panels are in charge
+                // of updating the global selection (which is very hard to deal with).
+                //
+                // For now let's just avoid filtering when selection isn't allowed locally.
+                // This should be nuked from existence when we get around to fixing the complexity of song select <-> beatmap carousel.
+                // The debounce part of BeatmapCarousel's filtering should probably also be removed and handled locally.
+                if (Carousel.AllowSelection)
+                    Carousel.Filter(criteria);
+                else
+                    pendingFilterApplication = true;
+            };
 
             if (ShowSongSelectFooter)
             {
@@ -595,11 +610,6 @@ namespace osu.Game.Screens.Select
                 beatmapInfoPrevious = beatmap;
             }
 
-            // we can't run this in the debounced run due to the selected mods bindable not being debounced,
-            // since mods could be updated to the new ruleset instances while the decoupled bindable is held behind,
-            // therefore resulting in performing difficulty calculation with invalid states.
-            advancedStats.Ruleset.Value = ruleset;
-
             void run()
             {
                 // clear pending task immediately to track any potential nested debounce operation.
@@ -700,6 +710,12 @@ namespace osu.Game.Screens.Select
             ModSelect.SelectedMods.BindTo(selectedMods);
 
             Carousel.AllowSelection = true;
+
+            if (pendingFilterApplication)
+            {
+                Carousel.Filter(FilterControl.CreateCriteria());
+                pendingFilterApplication = false;
+            }
 
             BeatmapDetails.Refresh();
 
@@ -857,6 +873,8 @@ namespace osu.Game.Screens.Select
             ModSelect.Beatmap.Value = beatmap;
 
             advancedStats.BeatmapInfo = beatmap.BeatmapInfo;
+            advancedStats.Mods.Value = selectedMods.Value;
+            advancedStats.Ruleset.Value = Ruleset.Value;
 
             bool beatmapSelected = beatmap is not DummyWorkingBeatmap;
 
@@ -968,6 +986,12 @@ namespace osu.Game.Screens.Select
             decoupledRuleset.DisabledChanged += r => Ruleset.Disabled = r;
 
             Beatmap.BindValueChanged(updateCarouselSelection);
+
+            selectedMods.BindValueChanged(_ =>
+            {
+                if (decoupledRuleset.Value.Equals(rulesetNoDebounce))
+                    advancedStats.Mods.Value = selectedMods.Value;
+            }, true);
 
             boundLocalBindables = true;
         }
