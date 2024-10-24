@@ -92,7 +92,7 @@ namespace osu.Game.Rulesets.Mania.Edit
             base.Update();
 
             if (screenWithTimeline?.TimelineArea.Timeline != null)
-                drawableRuleset.TimelineTimeRange = EditorClock.TrackLength / screenWithTimeline.TimelineArea.Timeline.CurrentZoom / 2;
+                drawableRuleset.TimelineTimeRange = EditorClock.TrackLength / screenWithTimeline.TimelineArea.Timeline.CurrentZoom.Value / 2;
         }
     }
 }
