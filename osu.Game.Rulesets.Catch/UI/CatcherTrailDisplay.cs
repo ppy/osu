@@ -64,7 +64,12 @@ namespace osu.Game.Rulesets.Catch.UI
         {
             applyScaleChange(scale, dashTrails);
             applyScaleChange(scale, hyperDashTrails);
-            applyScaleChange(scale, hyperDashAfterImages);
+
+            foreach (var afterImage in hyperDashAfterImages)
+            {
+                afterImage.Hide();
+                afterImage.Expire();
+            }
         }
 
         private void applyScaleChange(Vector2 scale, Container<CatcherTrail> trails)
