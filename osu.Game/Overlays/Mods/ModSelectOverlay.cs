@@ -237,12 +237,15 @@ namespace osu.Game.Overlays.Mods
                 ActiveMods.Value = ComputeActiveMods();
             }, true);
 
-            customisationPanel.Expanded.BindValueChanged(_ => updateCustomisationVisualState(), true);
+            customisationPanel.ExpandedState.BindValueChanged(_ => updateCustomisationVisualState(), true);
 
             SearchTextBox.Current.BindValueChanged(query =>
             {
                 foreach (var column in columnFlow.Columns)
                     column.SearchTerm = query.NewValue;
+
+                if (SearchTextBox.HasFocus)
+                    preselectMod();
             }, true);
 
             // Start scrolling from the end, to give the user a sense that
@@ -252,6 +255,26 @@ namespace osu.Game.Overlays.Mods
                 columnScroll.ScrollToEnd(false);
                 columnScroll.ScrollTo(0);
             });
+        }
+
+        private void preselectMod()
+        {
+            var visibleMods = columnFlow.Columns.OfType<ModColumn>().Where(c => c.IsPresent).SelectMany(c => c.AvailableMods.Where(m => m.Visible));
+
+            // Search for an exact acronym or name match, or otherwise default to the first visible mod.
+            ModState? matchingMod =
+                visibleMods.FirstOrDefault(m => m.Mod.Acronym.Equals(SearchTerm, StringComparison.OrdinalIgnoreCase) || m.Mod.Name.Equals(SearchTerm, StringComparison.OrdinalIgnoreCase))
+                ?? visibleMods.FirstOrDefault();
+            var preselectedMod = matchingMod;
+
+            foreach (var mod in AllAvailableMods)
+                mod.Preselected.Value = mod == preselectedMod && SearchTextBox.Current.Value.Length > 0;
+        }
+
+        private void clearPreselection()
+        {
+            foreach (var mod in AllAvailableMods)
+                mod.Preselected.Value = false;
         }
 
         public new ModSelectFooterContent? DisplayedFooterContent => base.DisplayedFooterContent as ModSelectFooterContent;
@@ -368,22 +391,22 @@ namespace osu.Game.Overlays.Mods
                 customisationPanel.Enabled.Value = true;
 
                 if (anyModPendingConfiguration)
-                    customisationPanel.Expanded.Value = true;
+                    customisationPanel.ExpandedState.Value = ModCustomisationPanel.ModCustomisationPanelState.ExpandedByMod;
             }
             else
             {
-                customisationPanel.Expanded.Value = false;
+                customisationPanel.ExpandedState.Value = ModCustomisationPanel.ModCustomisationPanelState.Collapsed;
                 customisationPanel.Enabled.Value = false;
             }
         }
 
         private void updateCustomisationVisualState()
         {
-            if (customisationPanel.Expanded.Value)
+            if (customisationPanel.ExpandedState.Value != ModCustomisationPanel.ModCustomisationPanelState.Collapsed)
             {
                 columnScroll.FadeColour(OsuColour.Gray(0.5f), 400, Easing.OutQuint);
                 SearchTextBox.FadeColour(OsuColour.Gray(0.5f), 400, Easing.OutQuint);
-                SearchTextBox.KillFocus();
+                setTextBoxFocus(false);
             }
             else
             {
@@ -544,7 +567,7 @@ namespace osu.Game.Overlays.Mods
                     nonFilteredColumnCount += 1;
             }
 
-            customisationPanel.Expanded.Value = false;
+            customisationPanel.ExpandedState.Value = ModCustomisationPanel.ModCustomisationPanelState.Collapsed;
         }
 
         #endregion
@@ -571,7 +594,7 @@ namespace osu.Game.Overlays.Mods
                 // wherein activating the binding will both change the contents of the search text box and deselect all mods.
                 case GlobalAction.DeselectAllMods:
                 {
-                    if (!SearchTextBox.HasFocus && !customisationPanel.Expanded.Value)
+                    if (!SearchTextBox.HasFocus && customisationPanel.ExpandedState.Value == ModCustomisationPanel.ModCustomisationPanelState.Collapsed)
                     {
                         DisplayedFooterContent?.DeselectAllModsButton?.TriggerClick();
                         return true;
@@ -590,11 +613,11 @@ namespace osu.Game.Overlays.Mods
                         return true;
                     }
 
-                    ModState? firstMod = columnFlow.Columns.OfType<ModColumn>().FirstOrDefault(m => m.IsPresent)?.AvailableMods.FirstOrDefault(x => x.Visible);
+                    var matchingMod = AllAvailableMods.SingleOrDefault(m => m.Preselected.Value);
 
-                    if (firstMod is not null)
+                    if (matchingMod is not null)
                     {
-                        firstMod.Active.Value = !firstMod.Active.Value;
+                        matchingMod.Active.Value = !matchingMod.Active.Value;
                         SearchTextBox.SelectAll();
                     }
 
@@ -637,7 +660,7 @@ namespace osu.Game.Overlays.Mods
             if (e.Repeat || e.Key != Key.Tab)
                 return false;
 
-            if (customisationPanel.Expanded.Value)
+            if (customisationPanel.ExpandedState.Value != ModCustomisationPanel.ModCustomisationPanelState.Collapsed)
                 return true;
 
             // TODO: should probably eventually support typical platform search shortcuts (`Ctrl-F`, `/`)
@@ -648,9 +671,15 @@ namespace osu.Game.Overlays.Mods
         private void setTextBoxFocus(bool focus)
         {
             if (focus)
+            {
                 SearchTextBox.TakeFocus();
+                preselectMod();
+            }
             else
+            {
                 SearchTextBox.KillFocus();
+                clearPreselection();
+            }
         }
 
         #endregion
@@ -668,6 +697,8 @@ namespace osu.Game.Overlays.Mods
         [Cached]
         internal partial class ColumnScrollContainer : OsuScrollContainer<ColumnFlowContainer>
         {
+            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
+
             public ColumnScrollContainer()
                 : base(Direction.Horizontal)
             {

@@ -260,6 +260,44 @@ namespace osu.Game.Tests.Database
         }
 
         [Test]
+        public void TestNoChangesAfterDelete()
+        {
+            RunTestWithRealmAsync(async (realm, storage) =>
+            {
+                var importer = new BeatmapImporter(storage, realm);
+                using var rulesets = new RealmRulesetStore(realm, storage);
+
+                using var __ = getBeatmapArchive(out string pathOriginal);
+                using var _ = getBeatmapArchive(out string pathOriginalSecond);
+
+                var importBeforeUpdate = await importer.Import(new ImportTask(pathOriginal));
+
+                importBeforeUpdate!.PerformWrite(s => s.DeletePending = true);
+
+                var dateBefore = importBeforeUpdate.Value.DateAdded;
+
+                Assert.That(importBeforeUpdate, Is.Not.Null);
+                Debug.Assert(importBeforeUpdate != null);
+
+                var importAfterUpdate = await importer.ImportAsUpdate(new ProgressNotification(), new ImportTask(pathOriginalSecond), importBeforeUpdate.Value);
+
+                realm.Run(r => r.Refresh());
+
+                Assert.That(importAfterUpdate, Is.Not.Null);
+                Debug.Assert(importAfterUpdate != null);
+
+                checkCount<BeatmapSetInfo>(realm, 1);
+                checkCount<BeatmapInfo>(realm, count_beatmaps);
+                checkCount<BeatmapMetadata>(realm, count_beatmaps);
+
+                Assert.That(importBeforeUpdate.Value.Beatmaps.First().OnlineID, Is.GreaterThan(-1));
+                Assert.That(importBeforeUpdate.Value.DateAdded, Is.EqualTo(dateBefore));
+                Assert.That(importAfterUpdate.Value.DateAdded, Is.EqualTo(dateBefore));
+                Assert.That(importBeforeUpdate.ID, Is.EqualTo(importAfterUpdate.ID));
+            });
+        }
+
+        [Test]
         public void TestNoChanges()
         {
             RunTestWithRealmAsync(async (realm, storage) =>
@@ -272,21 +310,25 @@ namespace osu.Game.Tests.Database
 
                 var importBeforeUpdate = await importer.Import(new ImportTask(pathOriginal));
 
+                var dateBefore = importBeforeUpdate!.Value.DateAdded;
+
                 Assert.That(importBeforeUpdate, Is.Not.Null);
                 Debug.Assert(importBeforeUpdate != null);
 
                 var importAfterUpdate = await importer.ImportAsUpdate(new ProgressNotification(), new ImportTask(pathOriginalSecond), importBeforeUpdate.Value);
 
+                realm.Run(r => r.Refresh());
+
                 Assert.That(importAfterUpdate, Is.Not.Null);
                 Debug.Assert(importAfterUpdate != null);
-
-                realm.Run(r => r.Refresh());
 
                 checkCount<BeatmapSetInfo>(realm, 1);
                 checkCount<BeatmapInfo>(realm, count_beatmaps);
                 checkCount<BeatmapMetadata>(realm, count_beatmaps);
 
                 Assert.That(importBeforeUpdate.Value.Beatmaps.First().OnlineID, Is.GreaterThan(-1));
+                Assert.That(importBeforeUpdate.Value.DateAdded, Is.EqualTo(dateBefore));
+                Assert.That(importAfterUpdate.Value.DateAdded, Is.EqualTo(dateBefore));
                 Assert.That(importBeforeUpdate.ID, Is.EqualTo(importAfterUpdate.ID));
             });
         }

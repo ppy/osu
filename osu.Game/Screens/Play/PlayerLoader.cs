@@ -455,7 +455,19 @@ namespace osu.Game.Screens.Play
             MetadataInfo.Loading = true;
 
             content.FadeInFromZero(500, Easing.OutQuint);
-            content.ScaleTo(1, 650, Easing.OutQuint).Then().Schedule(prepareNewPlayer);
+
+            if (quickRestart)
+            {
+                prepareNewPlayer();
+                content.ScaleTo(1, 650, Easing.OutQuint);
+            }
+            else
+            {
+                content
+                    .ScaleTo(1, 650, Easing.OutQuint)
+                    .Then()
+                    .Schedule(prepareNewPlayer);
+            }
 
             using (BeginDelayedSequence(delayBeforeSideDisplays))
             {
@@ -573,6 +585,9 @@ namespace osu.Game.Screens.Play
                 // if the player never got pushed, we should explicitly dispose it.
                 DisposalTask = LoadTask?.ContinueWith(_ => CurrentPlayer?.Dispose());
             }
+
+            highPerformanceSession?.Dispose();
+            highPerformanceSession = null;
         }
 
         #endregion

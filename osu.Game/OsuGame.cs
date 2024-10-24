@@ -54,6 +54,7 @@ using osu.Game.Overlays.BeatmapListing;
 using osu.Game.Overlays.Mods;
 using osu.Game.Overlays.Music;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Overlays.OSD;
 using osu.Game.Overlays.SkinEditor;
 using osu.Game.Overlays.Toolbar;
 using osu.Game.Overlays.Volume;
@@ -63,6 +64,7 @@ using osu.Game.Screens;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Footer;
 using osu.Game.Screens.Menu;
+using osu.Game.Screens.OnlinePlay.DailyChallenge;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
@@ -141,6 +143,8 @@ namespace osu.Game
 
         private Container overlayOffsetContainer;
 
+        private OnScreenDisplay onScreenDisplay;
+
         [Resolved]
         private FrameworkConfigManager frameworkConfig { get; set; }
 
@@ -171,14 +175,9 @@ namespace osu.Game
         /// </summary>
         public readonly IBindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>();
 
-        /// <summary>
-        /// Whether the local user is currently interacting with the game in a way that should not be interrupted.
-        /// </summary>
-        /// <remarks>
-        /// This is exclusively managed by <see cref="Player"/>. If other components are mutating this state, a more
-        /// resilient method should be used to ensure correct state.
-        /// </remarks>
-        public Bindable<bool> LocalUserPlaying = new BindableBool();
+        IBindable<LocalUserPlayingState> ILocalUserPlayInfo.PlayingState => playingState;
+
+        private readonly Bindable<LocalUserPlayingState> playingState = new Bindable<LocalUserPlayingState>();
 
         protected OsuScreenStack ScreenStack;
 
@@ -298,7 +297,7 @@ namespace osu.Game
         protected override UserInputManager CreateUserInputManager()
         {
             var userInputManager = base.CreateUserInputManager();
-            (userInputManager as OsuUserInputManager)?.LocalUserPlaying.BindTo(LocalUserPlaying);
+            (userInputManager as OsuUserInputManager)?.PlayingState.BindTo(playingState);
             return userInputManager;
         }
 
@@ -387,11 +386,11 @@ namespace osu.Game
             // Transfer any runtime changes back to configuration file.
             SkinManager.CurrentSkinInfo.ValueChanged += skin => configSkin.Value = skin.NewValue.ID.ToString();
 
-            LocalUserPlaying.BindValueChanged(p =>
+            playingState.BindValueChanged(p =>
             {
-                BeatmapManager.PauseImports = p.NewValue;
-                SkinManager.PauseImports = p.NewValue;
-                ScoreManager.PauseImports = p.NewValue;
+                BeatmapManager.PauseImports = p.NewValue != LocalUserPlayingState.NotPlaying;
+                SkinManager.PauseImports = p.NewValue != LocalUserPlayingState.NotPlaying;
+                ScoreManager.PauseImports = p.NewValue != LocalUserPlayingState.NotPlaying;
             }, true);
 
             IsActive.BindValueChanged(active => updateActiveState(active.NewValue), true);
@@ -441,10 +440,11 @@ namespace osu.Game
                     break;
 
                 case LinkAction.SearchBeatmapSet:
-                    if (link.Argument is RomanisableString romanisable)
-                        SearchBeatmapSet(romanisable.GetPreferred(Localisation.CurrentParameters.Value.PreferOriginalScript));
+                    if (link.Argument is LocalisableString localisable)
+                        SearchBeatmapSet(Localisation.GetLocalisedString(localisable));
                     else
                         SearchBeatmapSet(argString);
+
                     break;
 
                 case LinkAction.FilterBeatmapSetGenre:
@@ -494,6 +494,12 @@ namespace osu.Game
                 default:
                     throw new NotImplementedException($"This {nameof(LinkAction)} ({link.Action.ToString()}) is missing an associated action.");
             }
+        });
+
+        public void CopyUrlToClipboard(string url) => waitForReady(() => onScreenDisplay, _ =>
+        {
+            dependencies.Get<Clipboard>().SetText(url);
+            onScreenDisplay.Display(new CopyUrlToast());
         });
 
         public void OpenUrlExternally(string url, bool forceBypassExternalUrlWarning = false) => waitForReady(() => externalLinkOpener, _ =>
@@ -641,10 +647,10 @@ namespace osu.Game
             Live<BeatmapSetInfo> databasedSet = null;
 
             if (beatmap.OnlineID > 0)
-                databasedSet = BeatmapManager.QueryBeatmapSet(s => s.OnlineID == beatmap.OnlineID);
+                databasedSet = BeatmapManager.QueryBeatmapSet(s => s.OnlineID == beatmap.OnlineID && !s.DeletePending);
 
             if (beatmap is BeatmapSetInfo localBeatmap)
-                databasedSet ??= BeatmapManager.QueryBeatmapSet(s => s.Hash == localBeatmap.Hash);
+                databasedSet ??= BeatmapManager.QueryBeatmapSet(s => s.Hash == localBeatmap.Hash && !s.DeletePending);
 
             if (databasedSet == null)
             {
@@ -749,23 +755,36 @@ namespace osu.Game
                 return;
             }
 
-            // This should be able to be performed from song select, but that is disabled for now
+            // This should be able to be performed from song select always, but that is disabled for now
             // due to the weird decoupled ruleset logic (which can cause a crash in certain filter scenarios).
             //
             // As a special case, if the beatmap and ruleset already match, allow immediately displaying the score from song select.
             // This is guaranteed to not crash, and feels better from a user's perspective (ie. if they are clicking a score in the
             // song select leaderboard).
+            // Similar exemptions are made here for daily challenge where it is guaranteed that beatmap and ruleset match.
+            // `OnlinePlayScreen` is excluded because when resuming back to it,
+            // `RoomSubScreen` changes the global beatmap to the next playlist item on resume,
+            // which may not match the score, and thus crash.
             IEnumerable<Type> validScreens =
                 Beatmap.Value.BeatmapInfo.Equals(databasedBeatmap) && Ruleset.Value.Equals(databasedScore.ScoreInfo.Ruleset)
-                    ? new[] { typeof(SongSelect) }
+                    ? new[] { typeof(SongSelect), typeof(DailyChallenge) }
                     : Array.Empty<Type>();
 
             PerformFromScreen(screen =>
             {
                 Logger.Log($"{nameof(PresentScore)} updating beatmap ({databasedBeatmap}) and ruleset ({databasedScore.ScoreInfo.Ruleset}) to match score");
 
-                Ruleset.Value = databasedScore.ScoreInfo.Ruleset;
-                Beatmap.Value = BeatmapManager.GetWorkingBeatmap(databasedBeatmap);
+                // some screens (mostly online) disable the ruleset/beatmap bindable.
+                // attempting to set the ruleset/beatmap in that state will crash.
+                // however, the `validScreens` pre-check above should ensure that we actually never come from one of those screens
+                // while simultaneously having mismatched ruleset/beatmap.
+                // therefore this is just a safety against touching the possibly-disabled bindables if we don't actually have to touch them.
+                // if it ever fails, then this probably *should* crash anyhow (so that we can fix it).
+                if (!Ruleset.Value.Equals(databasedScore.ScoreInfo.Ruleset))
+                    Ruleset.Value = databasedScore.ScoreInfo.Ruleset;
+
+                if (!Beatmap.Value.BeatmapInfo.Equals(databasedBeatmap))
+                    Beatmap.Value = BeatmapManager.GetWorkingBeatmap(databasedBeatmap);
 
                 switch (presentType)
                 {
@@ -1064,7 +1083,7 @@ namespace osu.Game
 
             loadComponentSingleFile(volume = new VolumeOverlay(), leftFloatingOverlayContent.Add, true);
 
-            var onScreenDisplay = new OnScreenDisplay();
+            onScreenDisplay = new OnScreenDisplay();
 
             onScreenDisplay.BeginTracking(this, frameworkConfig);
             onScreenDisplay.BeginTracking(this, LocalConfig);
@@ -1118,6 +1137,7 @@ namespace osu.Game
             loadComponentSingleFile(new MedalOverlay(), topMostOverlayContent.Add);
 
             loadComponentSingleFile(new BackgroundDataStoreProcessor(), Add);
+            loadComponentSingleFile(new DetachedBeatmapStore(), Add, true);
 
             Add(difficultyRecommender);
             Add(externalLinkOpener = new ExternalLinkOpener());
@@ -1528,6 +1548,16 @@ namespace osu.Game
                 scope.SetTag(@"screen", newScreen?.GetType().ReadableName() ?? @"none");
             });
 
+            switch (current)
+            {
+                case Player player:
+                    player.PlayingState.UnbindFrom(playingState);
+
+                    // reset for sanity.
+                    playingState.Value = LocalUserPlayingState.NotPlaying;
+                    break;
+            }
+
             switch (newScreen)
             {
                 case IntroScreen intro:
@@ -1540,13 +1570,14 @@ namespace osu.Game
                     versionManager?.Show();
                     break;
 
+                case Player player:
+                    player.PlayingState.BindTo(playingState);
+                    break;
+
                 default:
                     versionManager?.Hide();
                     break;
             }
-
-            // reset on screen change for sanity.
-            LocalUserPlaying.Value = false;
 
             if (current is IOsuScreen currentOsuScreen)
             {
@@ -1596,7 +1627,5 @@ namespace osu.Game
             if (newScreen == null)
                 Exit();
         }
-
-        IBindable<bool> ILocalUserPlayInfo.IsPlaying => LocalUserPlaying;
     }
 }

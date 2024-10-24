@@ -96,14 +96,14 @@ namespace osu.Game.Overlays
         {
             Debug.Assert(user != null);
 
-            if (user.OnlineID == Header.User.Value?.User.Id && ruleset?.MatchesOnlineID(Header.User.Value?.Ruleset) == true)
+            bool sameUser = user.OnlineID == Header.User.Value?.User.Id;
+            if (sameUser && ruleset?.MatchesOnlineID(Header.User.Value?.Ruleset) == true)
                 return;
 
             if (sectionsContainer != null)
                 sectionsContainer.ExpandableHeader = null;
 
             userReq?.Cancel();
-            Clear();
             lastSection = null;
 
             sections = !user.IsBot
@@ -119,20 +119,69 @@ namespace osu.Game.Overlays
                 }
                 : Array.Empty<ProfileSection>();
 
-            tabs = new ProfileSectionTabControl
-            {
-                RelativeSizeAxes = Axes.X,
-                Anchor = Anchor.TopCentre,
-                Origin = Anchor.TopCentre,
-            };
+            if (!sameUser)
+                changeOverlayColours(OverlayColourScheme.Pink.GetHue());
 
-            Add(new OsuContextMenuContainer
+            recreateBaseContent();
+
+            if (API.State.Value != APIState.Offline)
+            {
+                userReq = user.OnlineID > 1 ? new GetUserRequest(user.OnlineID, ruleset) : new GetUserRequest(user.Username, ruleset);
+                userReq.Success += u => userLoadComplete(u, ruleset);
+
+                API.Queue(userReq);
+                loadingLayer.Show();
+            }
+        }
+
+        private void userLoadComplete(APIUser loadedUser, IRulesetInfo? userRuleset)
+        {
+            Debug.Assert(sections != null && sectionsContainer != null && tabs != null);
+
+            // reuse header and content if same colour scheme, otherwise recreate both.
+            int profileHue = loadedUser.ProfileHue ?? OverlayColourScheme.Pink.GetHue();
+
+            if (changeOverlayColours(profileHue))
+                recreateBaseContent();
+
+            var actualRuleset = rulesets.GetRuleset(userRuleset?.ShortName ?? loadedUser.PlayMode).AsNonNull();
+
+            var userProfile = new UserProfileData(loadedUser, actualRuleset);
+            Header.User.Value = userProfile;
+
+            if (loadedUser.ProfileOrder != null)
+            {
+                foreach (string id in loadedUser.ProfileOrder)
+                {
+                    var sec = sections.FirstOrDefault(s => s.Identifier == id);
+
+                    if (sec != null)
+                    {
+                        sec.User.Value = userProfile;
+
+                        sectionsContainer.Add(sec);
+                        tabs.AddItem(sec);
+                    }
+                }
+            }
+
+            loadingLayer.Hide();
+        }
+
+        private void recreateBaseContent()
+        {
+            Child = new OsuContextMenuContainer
             {
                 RelativeSizeAxes = Axes.Both,
                 Child = sectionsContainer = new ProfileSectionsContainer
                 {
                     ExpandableHeader = Header,
-                    FixedHeader = tabs,
+                    FixedHeader = tabs = new ProfileSectionTabControl
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopCentre,
+                    },
                     HeaderBackground = new Box
                     {
                         // this is only visible as the ProfileTabControl background
@@ -140,7 +189,7 @@ namespace osu.Game.Overlays
                         RelativeSizeAxes = Axes.Both
                     },
                 }
-            });
+            };
 
             sectionsContainer.SelectedSection.ValueChanged += section =>
             {
@@ -167,45 +216,18 @@ namespace osu.Game.Overlays
                     sectionsContainer.ScrollTo(lastSection);
                 }
             };
-
-            sectionsContainer.ScrollToTop();
-
-            if (API.State.Value != APIState.Offline)
-            {
-                userReq = user.OnlineID > 1 ? new GetUserRequest(user.OnlineID, ruleset) : new GetUserRequest(user.Username, ruleset);
-                userReq.Success += u => userLoadComplete(u, ruleset);
-
-                API.Queue(userReq);
-                loadingLayer.Show();
-            }
         }
 
-        private void userLoadComplete(APIUser loadedUser, IRulesetInfo? userRuleset)
+        private bool changeOverlayColours(int hue)
         {
-            Debug.Assert(sections != null && sectionsContainer != null && tabs != null);
+            if (hue == ColourProvider.Hue)
+                return false;
 
-            var actualRuleset = rulesets.GetRuleset(userRuleset?.ShortName ?? loadedUser.PlayMode).AsNonNull();
+            ColourProvider.ChangeColourScheme(hue);
 
-            var userProfile = new UserProfileData(loadedUser, actualRuleset);
-            Header.User.Value = userProfile;
-
-            if (loadedUser.ProfileOrder != null)
-            {
-                foreach (string id in loadedUser.ProfileOrder)
-                {
-                    var sec = sections.FirstOrDefault(s => s.Identifier == id);
-
-                    if (sec != null)
-                    {
-                        sec.User.Value = userProfile;
-
-                        sectionsContainer.Add(sec);
-                        tabs.AddItem(sec);
-                    }
-                }
-            }
-
-            loadingLayer.Hide();
+            RecreateHeader();
+            UpdateColours();
+            return true;
         }
 
         private partial class ProfileSectionTabControl : OsuTabControl<ProfileSection>
