@@ -32,6 +32,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         [Resolved(CanBeNull = true)]
         private Timeline timeline { get; set; }
 
+        [Resolved(CanBeNull = true)]
+        private EditorClock editorClock { get; set; }
+
         private Bindable<HitObject> placement;
         private SelectionBlueprint<HitObject> placementBlueprint;
 
@@ -128,9 +131,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private void updateSamplePointContractedState()
         {
-            // because only blueprints of objects which are alive (via pooling) are displayed in the timeline, it's feasible to do this every-update.
-
             const double minimum_gap = 28;
+
+            if (timeline == null || editorClock == null)
+                return;
 
             // Find the smallest time gap between any two sample point pieces
             double smallestTimeGap = double.PositiveInfinity;
@@ -140,6 +144,14 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             foreach (var selectionBlueprint in SelectionBlueprints)
             {
                 var hitObject = selectionBlueprint.Item;
+
+                // Only check the hit objects which are visible in the timeline
+                // SelectionBlueprints can contain hit objects which are not visible in the timeline due to selection keeping them alive
+                if (hitObject.StartTime > editorClock.CurrentTime + timeline.VisibleRange / 2)
+                    continue;
+
+                if (hitObject.GetEndTime() < editorClock.CurrentTime - timeline.VisibleRange / 2)
+                    break;
 
                 if (hitObject is IHasRepeats hasRepeats)
                     smallestTimeGap = Math.Min(smallestTimeGap, hasRepeats.Duration / hasRepeats.SpanCount() / 2);
