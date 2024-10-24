@@ -71,7 +71,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
         private Box background = null!;
         private Box flashLayer = null!;
         private FormTextBox.InnerTextBox textBox = null!;
-        private Slider slider = null!;
+        private InnerSlider slider = null!;
         private FormFieldCaption caption = null!;
         private IFocusManager focusManager = null!;
 
@@ -135,7 +135,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                             },
                             TabbableContentContainer = tabbableContentContainer,
                         },
-                        slider = new Slider
+                        slider = new InnerSlider
                         {
                             Anchor = Anchor.CentreRight,
                             Origin = Anchor.CentreRight,
@@ -163,6 +163,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             textBox.Current.BindValueChanged(textChanged);
 
             slider.IsDragging.BindValueChanged(_ => updateState());
+            slider.Focused.BindValueChanged(_ => updateState());
 
             current.ValueChanged += e => currentNumberInstantaneous.Value = e.NewValue;
             current.MinValueChanged += v => currentNumberInstantaneous.MinValue = v;
@@ -259,16 +260,18 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         private void updateState()
         {
+            bool childHasFocus = slider.Focused.Value || textBox.Focused.Value;
+
             textBox.Alpha = 1;
 
             background.Colour = currentNumberInstantaneous.Disabled ? colourProvider.Background4 : colourProvider.Background5;
             caption.Colour = currentNumberInstantaneous.Disabled ? colourProvider.Foreground1 : colourProvider.Content2;
             textBox.Colour = currentNumberInstantaneous.Disabled ? colourProvider.Foreground1 : colourProvider.Content1;
 
-            BorderThickness = IsHovered || textBox.Focused.Value || slider.IsDragging.Value ? 2 : 0;
-            BorderColour = textBox.Focused.Value ? colourProvider.Highlight1 : colourProvider.Light4;
+            BorderThickness = childHasFocus || IsHovered || slider.IsDragging.Value ? 2 : 0;
+            BorderColour = childHasFocus ? colourProvider.Highlight1 : colourProvider.Light4;
 
-            if (textBox.Focused.Value)
+            if (childHasFocus)
                 background.Colour = ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Dark3);
             else if (IsHovered || slider.IsDragging.Value)
                 background.Colour = ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Dark4);
@@ -283,8 +286,10 @@ namespace osu.Game.Graphics.UserInterfaceV2
             textBox.Text = slider.GetDisplayableValue(currentNumberInstantaneous.Value).ToString();
         }
 
-        private partial class Slider : OsuSliderBar<T>
+        private partial class InnerSlider : OsuSliderBar<T>
         {
+            public BindableBool Focused { get; } = new BindableBool();
+
             public BindableBool IsDragging { get; set; } = new BindableBool();
             public Action? OnCommit { get; set; }
 
@@ -344,7 +349,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-
                 updateState();
             }
 
@@ -382,11 +386,25 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 base.OnHoverLost(e);
             }
 
+            protected override void OnFocus(FocusEvent e)
+            {
+                updateState();
+                Focused.Value = true;
+                base.OnFocus(e);
+            }
+
+            protected override void OnFocusLost(FocusLostEvent e)
+            {
+                updateState();
+                Focused.Value = false;
+                base.OnFocusLost(e);
+            }
+
             private void updateState()
             {
                 rightBox.Colour = colourProvider.Background6;
-                leftBox.Colour = IsHovered || IsDragged ? colourProvider.Highlight1.Opacity(0.5f) : colourProvider.Dark2;
-                nub.Colour = IsHovered || IsDragged ? colourProvider.Highlight1 : colourProvider.Light4;
+                leftBox.Colour = HasFocus || IsHovered || IsDragged ? colourProvider.Highlight1.Opacity(0.5f) : colourProvider.Dark2;
+                nub.Colour = HasFocus || IsHovered || IsDragged ? colourProvider.Highlight1 : colourProvider.Light4;
             }
 
             protected override void UpdateValue(float value)
