@@ -63,6 +63,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                         {
                             LabelText = "Show specific team",
                             Current = currentTeam,
+                            ShowsDefaultIndicator = false,
                         }
                     }
                 }
