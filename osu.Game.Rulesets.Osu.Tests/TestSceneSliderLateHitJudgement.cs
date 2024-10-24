@@ -52,7 +52,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             performTest(new List<ReplayFrame>
             {
-                new OsuReplayFrame(time_slider_start + 100, slider_start_position, OsuAction.LeftButton),
+                new OsuReplayFrame(time_slider_start + 99.5, slider_start_position, OsuAction.LeftButton),
                 new OsuReplayFrame(time_slider_end + 100, slider_end_position, OsuAction.LeftButton),
             });
 
@@ -70,7 +70,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             performTest(new List<ReplayFrame>
             {
-                new OsuReplayFrame(time_slider_start + 100, slider_start_position, OsuAction.LeftButton),
+                new OsuReplayFrame(time_slider_start + 99.5, slider_start_position, OsuAction.LeftButton),
                 new OsuReplayFrame(time_slider_end + 100, slider_end_position, OsuAction.LeftButton),
             }, s =>
             {
@@ -91,7 +91,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             performTest(new List<ReplayFrame>
             {
-                new OsuReplayFrame(time_slider_start + 150, slider_start_position, OsuAction.LeftButton),
+                new OsuReplayFrame(time_slider_start + 149.5, slider_start_position, OsuAction.LeftButton),
                 new OsuReplayFrame(time_slider_end + 150, slider_end_position, OsuAction.LeftButton),
             }, s =>
             {
@@ -116,7 +116,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             performTest(new List<ReplayFrame>
             {
-                new OsuReplayFrame(time_slider_start + 150, slider_start_position, OsuAction.LeftButton),
+                new OsuReplayFrame(time_slider_start + 149.5, slider_start_position, OsuAction.LeftButton),
                 new OsuReplayFrame(time_slider_end + 150, slider_end_position, OsuAction.LeftButton),
             }, s =>
             {
@@ -140,7 +140,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             performTest(new List<ReplayFrame>
             {
-                new OsuReplayFrame(time_slider_start + 151, slider_start_position, OsuAction.LeftButton),
+                new OsuReplayFrame(time_slider_start + 150, slider_start_position, OsuAction.LeftButton),
                 new OsuReplayFrame(time_slider_end + 151, slider_end_position, OsuAction.LeftButton),
             }, s =>
             {
@@ -165,7 +165,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             performTest(new List<ReplayFrame>
             {
-                new OsuReplayFrame(time_slider_start + 150, slider_start_position, OsuAction.LeftButton),
+                new OsuReplayFrame(time_slider_start + 149.5, slider_start_position, OsuAction.LeftButton),
                 new OsuReplayFrame(time_slider_end + 150, slider_start_position, OsuAction.LeftButton),
             }, s =>
             {
@@ -195,7 +195,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             performTest(new List<ReplayFrame>
             {
-                new OsuReplayFrame(time_slider_start + 150, slider_start_position, OsuAction.LeftButton),
+                new OsuReplayFrame(time_slider_start + 149.5, slider_start_position, OsuAction.LeftButton),
                 new OsuReplayFrame(time_slider_end + 150, slider_start_position, OsuAction.LeftButton),
             }, s =>
             {
@@ -224,7 +224,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             performTest(new List<ReplayFrame>
             {
-                new OsuReplayFrame(time_slider_start + 150, slider_start_position, OsuAction.LeftButton),
+                new OsuReplayFrame(time_slider_start + 149.5, slider_start_position, OsuAction.LeftButton),
                 new OsuReplayFrame(time_slider_end + 150, slider_start_position, OsuAction.LeftButton),
             }, s =>
             {
@@ -259,7 +259,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             performTest(new List<ReplayFrame>
             {
-                new OsuReplayFrame(time_slider_start + 150, slider_start_position, OsuAction.LeftButton),
+                new OsuReplayFrame(time_slider_start + 149.5, slider_start_position, OsuAction.LeftButton),
                 new OsuReplayFrame(time_slider_end + 150, slider_start_position, OsuAction.LeftButton),
             }, s =>
             {
@@ -289,7 +289,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             performTest(new List<ReplayFrame>
             {
-                new OsuReplayFrame(time_slider_start + 150, slider_start_position, OsuAction.LeftButton),
+                new OsuReplayFrame(time_slider_start + 149.5, slider_start_position, OsuAction.LeftButton),
                 new OsuReplayFrame(time_slider_end + 150, slider_start_position, OsuAction.LeftButton),
             }, s =>
             {
@@ -320,7 +320,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             performTest(new List<ReplayFrame>
             {
-                new OsuReplayFrame(time_slider_start + 150, slider_start_position - new Vector2(20), OsuAction.LeftButton),
+                new OsuReplayFrame(time_slider_start + 149.5, slider_start_position - new Vector2(20), OsuAction.LeftButton),
                 new OsuReplayFrame(time_slider_end + 150, slider_start_position - new Vector2(20), OsuAction.LeftButton),
             }, s =>
             {
