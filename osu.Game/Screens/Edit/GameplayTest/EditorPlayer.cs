@@ -13,6 +13,8 @@ using osu.Game.Overlays;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Replays;
+using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Users;
 
@@ -27,6 +29,10 @@ namespace osu.Game.Screens.Edit.GameplayTest
 
         [Resolved]
         private MusicController musicController { get; set; } = null!;
+
+        private double previousAutoTime;
+
+        private List<ReplayFrame> fullFrames = new List<ReplayFrame>();
 
         public EditorPlayer(Editor editor)
             : base(new PlayerConfiguration { ShowResults = false })
@@ -181,17 +187,38 @@ namespace osu.Game.Screens.Edit.GameplayTest
                 if (autoplay == null)
                     return;
 
-                var score = autoplay.CreateScoreFromReplayData(GameplayState.Beatmap, [autoplay]);
+                // Stores time when autoplay starts
+                previousAutoTime = GameplayClockContainer.CurrentTime;
 
-                // remove past frames to prevent replay frame handler from seeking back to start in an attempt to play back the entirety of the replay.
-                score.Replay.Frames.RemoveAll(f => f.Time <= GameplayClockContainer.CurrentTime);
+                var score = autoplay.CreateScoreFromReplayData(GameplayState.Beatmap, new[] { autoplay });
+                fullFrames = score.Replay.Frames;
 
                 DrawableRuleset.SetReplayScore(score);
+
+                // Remove past frames to prevent replay frame handler from seeking back to start in an attempt to play back the entirety of the replay.
+                DrawableRuleset.ReplayScore?.Replay.Frames.RemoveAll(f => f.Time < GameplayClockContainer.CurrentTime);
                 // Without this schedule, the `GlobalCursorDisplay.Update()` machinery will fade the gameplay cursor out, but we still want it to show.
                 Schedule(() => DrawableRuleset.Cursor?.Show());
             }
             else
                 DrawableRuleset.SetReplayScore(null);
+        }
+
+        protected override void Update()
+        {
+            if (DrawableRuleset.ReplayScore != null)
+            {
+                if (GameplayClockContainer.CurrentTime < previousAutoTime)
+                {
+                    // This inserts the missing frames that were removed when starting the autoplay
+                    previousAutoTime = GameplayClockContainer.CurrentTime;
+
+                    var score = new Score { Replay = { Frames = fullFrames } };
+
+                    DrawableRuleset.SetReplayScore(score);
+                    DrawableRuleset.ReplayScore?.Replay.Frames.RemoveAll(f => f.Time < GameplayClockContainer.CurrentTime);
+                }
+            }
         }
 
         private void toggleQuickPause()
