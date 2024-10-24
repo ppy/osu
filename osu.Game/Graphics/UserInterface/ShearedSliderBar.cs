@@ -70,7 +70,6 @@ namespace osu.Game.Graphics.UserInterface
                     CornerRadius = 5,
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
-                    Padding = new MarginPadding { Horizontal = 2 },
                     Child = new Container
                     {
                         RelativeSizeAxes = Axes.Both,
@@ -192,8 +191,8 @@ namespace osu.Game.Graphics.UserInterface
         protected override void UpdateAfterChildren()
         {
             base.UpdateAfterChildren();
-            LeftBox.Scale = new Vector2(Math.Clamp(RangePadding + Nub.DrawPosition.X - Nub.DrawWidth / 2.15f, 0, Math.Max(0, DrawWidth)), 1);
-            RightBox.Scale = new Vector2(Math.Clamp(DrawWidth - Nub.DrawPosition.X - RangePadding - Nub.DrawWidth / 2.15f, 0, Math.Max(0, DrawWidth)), 1);
+            LeftBox.Scale = new Vector2(Math.Clamp(RangePadding + Nub.DrawPosition.X - Nub.DrawWidth / 2.3f, 0, Math.Max(0, DrawWidth)), 1);
+            RightBox.Scale = new Vector2(Math.Clamp(DrawWidth - Nub.DrawPosition.X - RangePadding - Nub.DrawWidth / 2.3f, 0, Math.Max(0, DrawWidth)), 1);
         }
 
         protected override void UpdateValue(float value)
