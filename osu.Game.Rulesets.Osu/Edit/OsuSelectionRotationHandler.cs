@@ -9,8 +9,10 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Osu.Edit.Changes;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit;
+using osu.Game.Screens.Edit.Changes;
 using osu.Game.Screens.Edit.Compose.Components;
 using osu.Game.Utils;
 using osuTK;
@@ -20,7 +22,7 @@ namespace osu.Game.Rulesets.Osu.Edit
     public partial class OsuSelectionRotationHandler : SelectionRotationHandler
     {
         [Resolved]
-        private IEditorChangeHandler? changeHandler { get; set; }
+        private NewBeatmapEditorChangeHandler? changeHandler { get; set; }
 
         private BindableList<HitObject> selectedItems { get; } = new BindableList<HitObject>();
 
@@ -78,14 +80,17 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             foreach (var ho in objectsInRotation)
             {
-                ho.Position = GeometryUtils.RotatePointAroundOrigin(originalPositions[ho], actualOrigin, rotation);
+                new PositionChange(ho, GeometryUtils.RotatePointAroundOrigin(originalPositions[ho], actualOrigin, rotation)).Apply(changeHandler);
 
                 if (ho is IHasPath withPath)
                 {
                     var originalPath = originalPathControlPointPositions[withPath];
 
                     for (int i = 0; i < withPath.Path.ControlPoints.Count; ++i)
-                        withPath.Path.ControlPoints[i].Position = GeometryUtils.RotatePointAroundOrigin(originalPath[i], Vector2.Zero, rotation);
+                    {
+                        new PathControlPointPositionChange(withPath.Path.ControlPoints[i],
+                            GeometryUtils.RotatePointAroundOrigin(originalPath[i], Vector2.Zero, rotation)).Apply(changeHandler);
+                    }
                 }
             }
         }
