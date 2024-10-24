@@ -85,7 +85,7 @@ namespace osu.Game.Screens.Edit.Compose
                     // We want to display this below hitobjects to better expose placement objects visually.
                     // It needs to be above the blueprint container to handle drags on breaks though.
                     breakDisplay.CreateProxy(),
-                    new TimelineBlueprintContainer(composer),
+                    ruleset.CreateTimelineBlueprintContainer(composer),
                     breakDisplay
                 }
             });
