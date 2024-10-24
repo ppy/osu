@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
-            Size = OsuHitObject.OBJECT_DIMENSIONS;
+            Size = OsuHitObject.VISUAL_OBJECT_DIMENSIONS;
 
             InternalChild = new SpriteIcon
             {
