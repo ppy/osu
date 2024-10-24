@@ -9,6 +9,7 @@ using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Mania.Scoring
 {
@@ -56,6 +57,24 @@ namespace osu.Game.Rulesets.Mania.Scoring
             }
 
             return GetBaseScoreForResult(result);
+        }
+
+        public override ScoreRank RankFromScore(double accuracy, IReadOnlyDictionary<HitResult, int> results)
+        {
+            ScoreRank rank = base.RankFromScore(accuracy, results);
+
+            if (rank != ScoreRank.S)
+                return rank;
+
+            // SS is expected as long as all hitobjects have been hit with either a GREAT or PERFECT result.
+
+            bool anyImperfect =
+                results.GetValueOrDefault(HitResult.Good) > 0
+                || results.GetValueOrDefault(HitResult.Ok) > 0
+                || results.GetValueOrDefault(HitResult.Meh) > 0
+                || results.GetValueOrDefault(HitResult.Miss) > 0;
+
+            return anyImperfect ? rank : ScoreRank.X;
         }
 
         private class JudgementOrderComparer : IComparer<HitObject>
