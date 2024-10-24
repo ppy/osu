@@ -70,10 +70,12 @@ namespace osu.Game.Screens.Backgrounds
             dimmable.DimWhenUserSettingsIgnored.BindTo(DimWhenUserSettingsIgnored);
         }
 
+        protected virtual BeatmapBackground CreateBeatmapBackground(WorkingBeatmap beatmap) => new BeatmapBackground(beatmap);
+
         [BackgroundDependencyLoader]
         private void load()
         {
-            var background = new BeatmapBackground(beatmap);
+            var background = CreateBeatmapBackground(beatmap);
             LoadComponent(background);
             switchBackground(background);
         }
@@ -96,7 +98,7 @@ namespace osu.Game.Screens.Backgrounds
                         return;
 
                     cancellationSource?.Cancel();
-                    LoadComponentAsync(new BeatmapBackground(beatmap), switchBackground, (cancellationSource = new CancellationTokenSource()).Token);
+                    LoadComponentAsync(CreateBeatmapBackground(beatmap), switchBackground, (cancellationSource = new CancellationTokenSource()).Token);
                 });
             }
         }
@@ -109,7 +111,7 @@ namespace osu.Game.Screens.Backgrounds
             Schedule(() =>
             {
                 cancellationSource?.Cancel();
-                LoadComponentAsync(new BeatmapBackground(beatmap), switchBackground, (cancellationSource = new CancellationTokenSource()).Token);
+                LoadComponentAsync(CreateBeatmapBackground(beatmap), switchBackground, (cancellationSource = new CancellationTokenSource()).Token);
             });
         }
 
@@ -126,7 +128,7 @@ namespace osu.Game.Screens.Backgrounds
             }
 
             b.Depth = newDepth;
-            dimmable.Background = Background = b;
+            Background = dimmable.BeatmapBackground = b;
         }
 
         public override bool Equals(BackgroundScreen other)
@@ -148,7 +150,9 @@ namespace osu.Game.Screens.Backgrounds
 
             public readonly Bindable<bool> StoryboardReplacesBackground = new Bindable<bool>();
 
-            public Background Background
+            public Background Background => background;
+
+            public BeatmapBackground BeatmapBackground
             {
                 get => background;
                 set
@@ -156,13 +160,17 @@ namespace osu.Game.Screens.Backgrounds
                     background?.Expire();
 
                     base.Add(background = value);
+
+                    background.DimLevel = DimLevel;
+                    background.DimColour = DimColour;
                     background.BlurTo(blurTarget, 0, Easing.OutQuint);
                 }
             }
 
             private Bindable<double> userBlurLevel { get; set; }
+            private Bindable<double> userDimColour { get; set; }
 
-            private Background background;
+            private BeatmapBackground background;
 
             public override void Add(Drawable drawable)
             {
@@ -185,6 +193,7 @@ namespace osu.Game.Screens.Backgrounds
             private void load(OsuConfigManager config)
             {
                 userBlurLevel = config.GetBindable<double>(OsuSetting.BlurLevel);
+                userDimColour = config.GetBindable<double>(OsuSetting.DimColour);
             }
 
             protected override void LoadComplete()
@@ -192,8 +201,15 @@ namespace osu.Game.Screens.Backgrounds
                 base.LoadComplete();
 
                 userBlurLevel.ValueChanged += _ => UpdateVisuals();
+                userDimColour.ValueChanged += _ => UpdateVisuals();
                 BlurAmount.ValueChanged += _ => UpdateVisuals();
                 StoryboardReplacesBackground.ValueChanged += _ => UpdateVisuals();
+
+                if (background != null)
+                {
+                    background.DimLevel = DimLevel;
+                    background.DimColour = DimColour;
+                }
             }
 
             protected override float DimLevel
@@ -207,9 +223,25 @@ namespace osu.Game.Screens.Backgrounds
                 }
             }
 
+            protected virtual Colour4 DimColour
+            {
+                get
+                {
+                    if (IgnoreUserSettings.Value || (ShowStoryboard.Value && StoryboardReplacesBackground.Value))
+                        return Colour4.Black;
+
+                    return new Colour4((float)userDimColour.Value, (float)userDimColour.Value, (float)userDimColour.Value, 1.0f);
+                }
+            }
+
             protected override void UpdateVisuals()
             {
-                base.UpdateVisuals();
+                ContentDisplayed = ShowDimContent;
+
+                Content.FadeTo(ContentDisplayed ? 1 : 0, BACKGROUND_FADE_DURATION, Easing.OutQuint);
+                background?.TransformTo(nameof(BeatmapBackground.DimLevel), DimLevel, BACKGROUND_FADE_DURATION, Easing.OutQuint);
+
+                background?.TransformTo(nameof(BeatmapBackground.DimColour), DimColour, BACKGROUND_FADE_DURATION, Easing.OutQuint);
 
                 Background?.BlurTo(blurTarget, BACKGROUND_FADE_DURATION, Easing.OutQuint);
             }
