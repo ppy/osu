@@ -66,6 +66,9 @@ namespace osu.Game.Screens.Edit.Components.TernaryButtons
 
         private void onAction()
         {
+            if (!Button.Enabled.Value)
+                return;
+
             Button.Toggle();
         }
 
