@@ -59,20 +59,20 @@ namespace osu.Game.Tests.Visual
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
             ResetPlacement();
         }
 
-        public void BeginPlacement(HitObject hitObject)
+        public void ShowPlacement(HitObject hitObject)
         {
         }
 
-        public void EndPlacement(HitObject hitObject, bool commit)
+        public void HidePlacement()
         {
-            if (commit)
-                AddHitObject(CreateHitObject(hitObject));
+        }
 
-            ResetPlacement();
+        public void CommitPlacement(HitObject hitObject)
+        {
+            AddHitObject(CreateHitObject(hitObject));
         }
 
         protected void ResetPlacement()
@@ -89,6 +89,10 @@ namespace osu.Game.Tests.Visual
         protected override void Update()
         {
             base.Update();
+
+            if (CurrentBlueprint.PlacementActive == PlacementBlueprint.PlacementState.Finished)
+                ResetPlacement();
+
             updatePlacementTimeAndPosition();
         }
 

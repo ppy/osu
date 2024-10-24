@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -63,18 +64,26 @@ namespace osu.Game.Rulesets.Edit
             startTimeBindable.BindValueChanged(_ => ApplyDefaultsToHitObject(), true);
         }
 
+        private bool placementBegun;
+
         protected override void BeginPlacement(bool commitStart = false)
         {
             base.BeginPlacement(commitStart);
 
-            placementHandler.BeginPlacement(HitObject);
+            if (State.Value == Visibility.Visible)
+                placementHandler.ShowPlacement(HitObject);
+
+            placementBegun = true;
         }
 
         public override void EndPlacement(bool commit)
         {
             base.EndPlacement(commit);
 
-            placementHandler.EndPlacement(HitObject, IsValidForPlacement && commit);
+            if (IsValidForPlacement && commit)
+                placementHandler.CommitPlacement(HitObject);
+            else
+                placementHandler.HidePlacement();
         }
 
         /// <summary>
@@ -127,5 +136,19 @@ namespace osu.Game.Rulesets.Edit
         /// refreshing <see cref="Objects.HitObject.NestedHitObjects"/> and parameters for the <see cref="HitObject"/>.
         /// </summary>
         protected void ApplyDefaultsToHitObject() => HitObject.ApplyDefaults(beatmap.ControlPointInfo, beatmap.Difficulty);
+
+        protected override void PopIn()
+        {
+            base.PopIn();
+
+            if (placementBegun)
+                placementHandler.ShowPlacement(HitObject);
+        }
+
+        protected override void PopOut()
+        {
+            base.PopOut();
+            placementHandler.HidePlacement();
+        }
     }
 }
