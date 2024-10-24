@@ -22,10 +22,5 @@ namespace osu.Game.Rulesets.Catch.Edit
 
             // TODO: disable hit lighting as well
         }
-
-        public void ApplyCircleSizeToCatcher(IBeatmapDifficultyInfo difficulty)
-        {
-            Catcher.SetScaleAndCatchWidth(difficulty);
-        }
     }
 }
