@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
         }
 
-        protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
+        protected override DifficultyAttributes CreateDifficultyAttributes(IDifficultyCalculatorBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
         {
             if (beatmap.HitObjects.Count == 0)
                 return new OsuDifficultyAttributes { Mods = mods };
@@ -85,9 +85,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double preempt = IBeatmapDifficultyInfo.DifficultyRange(beatmap.Difficulty.ApproachRate, 1800, 1200, 450) / clockRate;
             double drainRate = beatmap.Difficulty.DrainRate;
 
-            int hitCirclesCount = beatmap.HitObjects.Count(h => h is HitCircle);
-            int sliderCount = beatmap.HitObjects.Count(h => h is Slider);
-            int spinnerCount = beatmap.HitObjects.Count(h => h is Spinner);
+            int hitCirclesCount = beatmap.GetHitObjectCountOf(typeof(HitCircle));
+            int sliderCount = beatmap.GetHitObjectCountOf(typeof(Slider));
+            int spinnerCount = beatmap.GetHitObjectCountOf(typeof(Spinner));
 
             HitWindows hitWindows = new OsuHitWindows();
             hitWindows.SetDifficulty(beatmap.Difficulty.OverallDifficulty);
@@ -117,7 +117,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return attributes;
         }
 
-        protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
+        protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IDifficultyCalculatorBeatmap beatmap, double clockRate)
         {
             List<DifficultyHitObject> objects = new List<DifficultyHitObject>();
 
@@ -132,7 +132,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return objects;
         }
 
-        protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods, double clockRate)
+        protected override Skill[] CreateSkills(IDifficultyCalculatorBeatmap beatmap, Mod[] mods, double clockRate)
         {
             var skills = new List<Skill>
             {
