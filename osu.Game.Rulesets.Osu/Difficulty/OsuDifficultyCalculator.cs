@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (mods.Any(h => h is OsuModFlashlight))
                 flashlightRating = Math.Sqrt(skills[3].DifficultyValue()) * difficulty_multiplier;
 
-            double sliderFactor = aimRating > 0 ? aimRatingNoSliders / aimRating : 1;
+            double sliderFactor = aimRating > 0 ? Math.Min(aimRating, aimRatingNoSliders) / aimRating : 1;
 
             double aimDifficultyStrainCount = ((OsuStrainSkill)skills[0]).CountDifficultStrains();
             double speedDifficultyStrainCount = ((OsuStrainSkill)skills[2]).CountDifficultStrains();
