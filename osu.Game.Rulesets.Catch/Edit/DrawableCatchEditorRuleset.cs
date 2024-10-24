@@ -49,7 +49,14 @@ namespace osu.Game.Rulesets.Catch.Edit
                 editorBeatmap.BeatmapReprocessed -= onBeatmapReprocessed;
         }
 
-        private void onBeatmapReprocessed() => (Playfield as CatchEditorPlayfield)?.ApplyCircleSizeToCatcher(editorBeatmap.Difficulty);
+        private void onBeatmapReprocessed()
+        {
+            if (Playfield is CatchEditorPlayfield catchPlayfield)
+            {
+                catchPlayfield.Catcher.ApplyDifficulty(editorBeatmap.Difficulty);
+                catchPlayfield.CatcherArea.CatcherTrails.UpdateCatcherTrailsScale(catchPlayfield.Catcher.BodyScale);
+            }
+        }
 
         protected override Playfield CreatePlayfield() => new CatchEditorPlayfield(Beatmap.Difficulty);
 

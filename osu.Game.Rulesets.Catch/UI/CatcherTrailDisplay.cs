@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Pooling;
 using osu.Game.Rulesets.Catch.Skinning;
 using osu.Game.Rulesets.Objects.Pooling;
 using osu.Game.Skinning;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.UI
@@ -53,6 +54,25 @@ namespace osu.Game.Rulesets.Catch.UI
                 hyperDashTrails = new Container<CatcherTrail> { RelativeSizeAxes = Axes.Both, Colour = Catcher.DEFAULT_HYPER_DASH_COLOUR },
                 hyperDashAfterImages = new Container<CatcherTrail> { RelativeSizeAxes = Axes.Both, Colour = Catcher.DEFAULT_HYPER_DASH_COLOUR },
             };
+        }
+
+        /// <summary>
+        /// Update the scale of all trails.
+        /// </summary>
+        /// <param name="scale">The new body scale of the Catcher</param>
+        public void UpdateCatcherTrailsScale(Vector2 scale)
+        {
+            applyScaleChange(scale, dashTrails);
+            applyScaleChange(scale, hyperDashTrails);
+            applyScaleChange(scale, hyperDashAfterImages);
+        }
+
+        private void applyScaleChange(Vector2 scale, Container<CatcherTrail> trails)
+        {
+            foreach (var trail in trails)
+            {
+                trail.Scale = scale;
+            }
         }
 
         protected override void LoadComplete()
