@@ -5,11 +5,14 @@ using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.UI;
@@ -70,6 +73,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                             Value = 1,
                             Default = 1,
                         },
+                        KeyboardStep = 0.01f,
                         Instantaneous = true
                     },
                     scaleOrigin = new EditorRadioButtonCollection
@@ -281,6 +285,17 @@ namespace osu.Game.Rulesets.Osu.Edit
             base.PopOut();
 
             if (IsLoaded) scaleHandler.Commit();
+        }
+
+        public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+        {
+            if (e.Action == GlobalAction.Select && !e.Repeat)
+            {
+                this.HidePopover();
+                return true;
+            }
+
+            return base.OnPressed(e);
         }
     }
 
