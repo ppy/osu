@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
@@ -10,7 +9,6 @@ using osu.Framework.Graphics;
 using osu.Game.Extensions;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Spectator;
 using osu.Game.Scoring;
 using osu.Game.Users;
@@ -34,8 +32,6 @@ namespace osu.Game.Online
 
         private readonly Dictionary<long, ScoreInfo> watchedScores = new Dictionary<long, ScoreInfo>();
 
-        private Dictionary<string, UserStatistics>? latestStatistics;
-
         public UserStatisticsWatcher(LocalUserStatisticsProvider? statisticsProvider = null)
         {
             this.statisticsProvider = statisticsProvider;
@@ -44,8 +40,6 @@ namespace osu.Game.Online
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
-            api.LocalUser.BindValueChanged(user => onUserChanged(user.NewValue), true);
             spectatorClient.OnUserScoreProcessed += userScoreProcessed;
         }
 
@@ -67,35 +61,6 @@ namespace osu.Game.Online
             });
         }
 
-        private void onUserChanged(APIUser? localUser) => Schedule(() =>
-        {
-            latestStatistics = null;
-
-            if (localUser == null || localUser.OnlineID <= 1)
-                return;
-
-            var userRequest = new GetUsersRequest(new[] { localUser.OnlineID });
-            userRequest.Success += initialiseUserStatistics;
-            api.Queue(userRequest);
-        });
-
-        private void initialiseUserStatistics(GetUsersResponse response) => Schedule(() =>
-        {
-            var user = response.Users.SingleOrDefault();
-
-            // possible if the user is restricted or similar.
-            if (user == null)
-                return;
-
-            latestStatistics = new Dictionary<string, UserStatistics>();
-
-            if (user.RulesetsStatistics != null)
-            {
-                foreach (var rulesetStats in user.RulesetsStatistics)
-                    latestStatistics.Add(rulesetStats.Key, rulesetStats.Value);
-            }
-        });
-
         private void userScoreProcessed(int userId, long scoreId)
         {
             if (userId != api.LocalUser.Value?.OnlineID)
@@ -116,18 +81,14 @@ namespace osu.Game.Online
 
         private void dispatchStatisticsUpdate(ScoreInfo scoreInfo, UserStatistics updatedStatistics)
         {
-            string rulesetName = scoreInfo.Ruleset.ShortName;
-
-            statisticsProvider?.UpdateStatistics(updatedStatistics, scoreInfo.Ruleset);
-
-            if (latestStatistics == null)
+            if (statisticsProvider == null)
                 return;
 
-            latestStatistics.TryGetValue(rulesetName, out UserStatistics? latestRulesetStatistics);
-            latestRulesetStatistics ??= new UserStatistics();
+            var latestRulesetStatistics = statisticsProvider.GetStatisticsFor(scoreInfo.Ruleset);
+            statisticsProvider.UpdateStatistics(updatedStatistics, scoreInfo.Ruleset);
 
-            latestUpdate.Value = new UserStatisticsUpdate(scoreInfo, latestRulesetStatistics, updatedStatistics);
-            latestStatistics[rulesetName] = updatedStatistics;
+            if (latestRulesetStatistics != null)
+                latestUpdate.Value = new UserStatisticsUpdate(scoreInfo, latestRulesetStatistics, updatedStatistics);
         }
 
         protected override void Dispose(bool isDisposing)

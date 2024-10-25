@@ -33,6 +33,13 @@ namespace osu.Game.Online
 
         private readonly Dictionary<string, UserStatistics> allStatistics = new Dictionary<string, UserStatistics>();
 
+        /// <summary>
+        /// Returns the <see cref="UserStatistics"/> currently available for the given ruleset.
+        /// This may return null if the requested statistics has not been fetched yet.
+        /// </summary>
+        /// <param name="ruleset">The ruleset to return the corresponding <see cref="UserStatistics"/> for.</param>
+        internal UserStatistics? GetStatisticsFor(RulesetInfo ruleset) => allStatistics.GetValueOrDefault(ruleset.ShortName);
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
