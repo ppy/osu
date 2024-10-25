@@ -15,6 +15,7 @@ using osu.Framework.Threading;
 using osu.Game;
 using osu.Game.Configuration;
 using osu.Game.Extensions;
+using osu.Game.Online;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
@@ -48,6 +49,9 @@ namespace osu.Desktop
         private MultiplayerClient multiplayerClient { get; set; } = null!;
 
         [Resolved]
+        private LocalUserStatisticsProvider statisticsProvider { get; set; } = null!;
+
+        [Resolved]
         private OsuConfigManager config { get; set; } = null!;
 
         private readonly IBindable<UserStatus?> status = new Bindable<UserStatus?>();
@@ -65,6 +69,7 @@ namespace osu.Desktop
         };
 
         private IBindable<APIUser>? user;
+        private IBindable<UserStatistics?>? localStatistics;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -117,6 +122,10 @@ namespace osu.Desktop
             status.BindValueChanged(_ => schedulePresenceUpdate());
             activity.BindValueChanged(_ => schedulePresenceUpdate());
             privacyMode.BindValueChanged(_ => schedulePresenceUpdate());
+
+            localStatistics = statisticsProvider.Statistics.GetBoundCopy();
+            localStatistics.BindValueChanged(_ => schedulePresenceUpdate());
+
             multiplayerClient.RoomUpdated += onRoomUpdated;
         }
 
@@ -158,7 +167,7 @@ namespace osu.Desktop
 
         private void updatePresence(bool hideIdentifiableInformation)
         {
-            if (user == null)
+            if (user == null || localStatistics == null)
                 return;
 
             // user activity
@@ -228,12 +237,7 @@ namespace osu.Desktop
             if (privacyMode.Value == DiscordRichPresenceMode.Limited)
                 presence.Assets.LargeImageText = string.Empty;
             else
-            {
-                if (user.Value.RulesetsStatistics != null && user.Value.RulesetsStatistics.TryGetValue(ruleset.Value.ShortName, out UserStatistics? statistics))
-                    presence.Assets.LargeImageText = $"{user.Value.Username}" + (statistics.GlobalRank > 0 ? $" (rank #{statistics.GlobalRank:N0})" : string.Empty);
-                else
-                    presence.Assets.LargeImageText = $"{user.Value.Username}" + (user.Value.Statistics?.GlobalRank > 0 ? $" (rank #{user.Value.Statistics.GlobalRank:N0})" : string.Empty);
-            }
+                presence.Assets.LargeImageText = $"{user.Value.Username}" + (localStatistics.Value?.GlobalRank > 0 ? $" (rank #{localStatistics.Value?.GlobalRank:N0})" : string.Empty);
 
             // small image
             presence.Assets.SmallImageKey = ruleset.Value.IsLegacyRuleset() ? $"mode_{ruleset.Value.OnlineID}" : "mode_custom";
