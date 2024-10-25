@@ -142,6 +142,14 @@ namespace osu.Game.Rulesets.Scoring
             }
         }
 
+        protected override bool CheckDefaultFailCondition(JudgementResult result)
+        {
+            if (result.Judgement.MaxResult.IsBonus() || result.Type == HitResult.IgnoreHit)
+                return false;
+
+            return base.CheckDefaultFailCondition(result);
+        }
+
         protected override void Reset(bool storeResults)
         {
             base.Reset(storeResults);

@@ -128,6 +128,7 @@ namespace osu.Game.Overlays.FirstRunSetup
             if (available)
             {
                 copyInformation.Text = FirstRunOverlayImportFromStableScreenStrings.DataMigrationNoExtraSpace;
+                copyInformation.AddText(@" "); // just to ensure correct spacing
                 copyInformation.AddLink(FirstRunOverlayImportFromStableScreenStrings.LearnAboutHardLinks, LinkAction.OpenWiki, @"Client/Release_stream/Lazer/File_storage#via-hard-links");
             }
             else if (!RuntimeInfo.IsDesktop)
@@ -313,6 +314,7 @@ namespace osu.Game.Overlays.FirstRunSetup
             private partial class DirectoryChooserPopover : OsuPopover
             {
                 public DirectoryChooserPopover(Bindable<DirectoryInfo?> currentDirectory)
+                    : base(false)
                 {
                     Child = new Container
                     {
@@ -323,6 +325,13 @@ namespace osu.Game.Overlays.FirstRunSetup
                             CurrentPath = { BindTarget = currentDirectory }
                         },
                     };
+                }
+
+                [BackgroundDependencyLoader]
+                private void load(OverlayColourProvider colourProvider)
+                {
+                    Body.BorderColour = colourProvider.Highlight1;
+                    Body.BorderThickness = 2;
                 }
             }
         }

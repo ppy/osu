@@ -1,12 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
@@ -16,7 +14,10 @@ using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
 using osu.Framework.Threading;
+using osu.Framework.Utils;
+using osu.Game.Audio.Effects;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Rulesets.Mods;
 
@@ -28,7 +29,7 @@ namespace osu.Game.Overlays
     public partial class MusicController : CompositeDrawable
     {
         [Resolved]
-        private BeatmapManager beatmaps { get; set; }
+        private BeatmapManager beatmaps { get; set; } = null!;
 
         /// <summary>
         /// Point in time after which the current track will be restarted on triggering a "previous track" action.
@@ -45,29 +46,55 @@ namespace osu.Game.Overlays
         /// </summary>
         public readonly BindableBool AllowTrackControl = new BindableBool(true);
 
+        public readonly BindableBool Shuffle = new BindableBool(true);
+
         /// <summary>
         /// Fired when the global <see cref="WorkingBeatmap"/> has changed.
         /// Includes direction information for display purposes.
         /// </summary>
-        public event Action<WorkingBeatmap, TrackChangeDirection> TrackChanged;
+        public event Action<WorkingBeatmap, TrackChangeDirection>? TrackChanged;
 
         [Resolved]
-        private IBindable<WorkingBeatmap> beatmap { get; set; }
+        private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
 
         [Resolved]
-        private IBindable<IReadOnlyList<Mod>> mods { get; set; }
+        private IBindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
 
-        [NotNull]
         public DrawableTrack CurrentTrack { get; private set; } = new DrawableTrack(new TrackVirtual(1000));
 
         [Resolved]
-        private RealmAccess realm { get; set; }
+        private RealmAccess realm { get; set; } = null!;
+
+        private BindableNumber<double> sampleVolume = null!;
+
+        private readonly BindableDouble audioDuckVolume = new BindableDouble(1);
+
+        private AudioFilter audioDuckFilter = null!;
+
+        private readonly Bindable<RandomSelectAlgorithm> randomSelectAlgorithm = new Bindable<RandomSelectAlgorithm>();
+        private readonly List<Live<BeatmapSetInfo>> previousRandomSets = new List<Live<BeatmapSetInfo>>();
+        private int randomHistoryDirection;
+        private int lastRandomTrackDirection;
+
+        [BackgroundDependencyLoader]
+        private void load(AudioManager audio, OsuConfigManager configManager)
+        {
+            AddInternal(audioDuckFilter = new AudioFilter(audio.TrackMixer));
+            audio.Tracks.AddAdjustment(AdjustableProperty.Volume, audioDuckVolume);
+            sampleVolume = audio.VolumeSample.GetBoundCopy();
+
+            configManager.BindWith(OsuSetting.RandomSelectAlgorithm, randomSelectAlgorithm);
+        }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            beatmap.BindValueChanged(b => changeBeatmap(b.NewValue), true);
+            beatmap.BindValueChanged(b =>
+            {
+                if (b.NewValue != null)
+                    changeBeatmap(b.NewValue);
+            }, true);
             mods.BindValueChanged(_ => ResetTrackAdjustments(), true);
         }
 
@@ -76,6 +103,9 @@ namespace osu.Game.Overlays
         /// </summary>
         public void ReloadCurrentTrack()
         {
+            if (current == null)
+                return;
+
             changeTrack();
             TrackChanged?.Invoke(current, TrackChangeDirection.None);
         }
@@ -90,14 +120,14 @@ namespace osu.Game.Overlays
         /// </summary>
         public bool TrackLoaded => CurrentTrack.TrackLoaded;
 
-        private ScheduledDelegate seekDelegate;
+        private ScheduledDelegate? seekDelegate;
 
         public void SeekTo(double position)
         {
             seekDelegate?.Cancel();
             seekDelegate = Schedule(() =>
             {
-                if (beatmap.Disabled || !AllowTrackControl.Value)
+                if (!AllowTrackControl.Value)
                     return;
 
                 CurrentTrack.Seek(position);
@@ -118,7 +148,7 @@ namespace osu.Game.Overlays
                     return;
 
                 Logger.Log($"{nameof(MusicController)} skipping next track to {nameof(EnsurePlayingSomething)}");
-                NextTrack();
+                NextTrack(allowProtectedTracks: true);
             }
             else if (!IsPlaying)
             {
@@ -192,9 +222,10 @@ namespace osu.Game.Overlays
         /// Play the previous track or restart the current track if it's current time below <see cref="restart_cutoff_point"/>.
         /// </summary>
         /// <param name="onSuccess">Invoked when the operation has been performed successfully.</param>
-        public void PreviousTrack(Action<PreviousTrackResult> onSuccess = null) => Schedule(() =>
+        /// <param name="allowProtectedTracks">Whether to include <see cref="BeatmapSetInfo.Protected"/> beatmap sets when navigating.</param>
+        public void PreviousTrack(Action<PreviousTrackResult>? onSuccess = null, bool allowProtectedTracks = false) => Schedule(() =>
         {
-            PreviousTrackResult res = prev();
+            PreviousTrackResult res = prev(allowProtectedTracks);
             if (res != PreviousTrackResult.None)
                 onSuccess?.Invoke(res);
         });
@@ -202,8 +233,9 @@ namespace osu.Game.Overlays
         /// <summary>
         /// Play the previous track or restart the current track if it's current time below <see cref="restart_cutoff_point"/>.
         /// </summary>
+        /// <param name="allowProtectedTracks">Whether to include <see cref="BeatmapSetInfo.Protected"/> beatmap sets when navigating.</param>
         /// <returns>The <see cref="PreviousTrackResult"/> that indicate the decided action.</returns>
-        private PreviousTrackResult prev()
+        private PreviousTrackResult prev(bool allowProtectedTracks)
         {
             if (beatmap.Disabled || !AllowTrackControl.Value)
                 return PreviousTrackResult.None;
@@ -218,12 +250,19 @@ namespace osu.Game.Overlays
 
             queuedDirection = TrackChangeDirection.Prev;
 
-            var playableSet = getBeatmapSets().AsEnumerable().TakeWhile(i => !i.Equals(current.BeatmapSetInfo)).LastOrDefault()
-                              ?? getBeatmapSets().LastOrDefault();
+            Live<BeatmapSetInfo>? playableSet;
+
+            if (Shuffle.Value)
+                playableSet = getNextRandom(-1, allowProtectedTracks);
+            else
+            {
+                playableSet = getBeatmapSets().TakeWhile(i => !i.Value.Equals(current?.BeatmapSetInfo)).LastOrDefault(s => !s.Value.Protected || allowProtectedTracks)
+                              ?? getBeatmapSets().LastOrDefault(s => !s.Value.Protected || allowProtectedTracks);
+            }
 
             if (playableSet != null)
             {
-                changeBeatmap(beatmaps.GetWorkingBeatmap(playableSet.Beatmaps.First()));
+                changeBeatmap(beatmaps.GetWorkingBeatmap(playableSet.Value.Beatmaps.First()));
                 restartTrack();
                 return PreviousTrackResult.Previous;
             }
@@ -235,25 +274,91 @@ namespace osu.Game.Overlays
         /// Play the next random or playlist track.
         /// </summary>
         /// <param name="onSuccess">Invoked when the operation has been performed successfully.</param>
+        /// <param name="allowProtectedTracks">Whether to include <see cref="BeatmapSetInfo.Protected"/> beatmap sets when navigating.</param>
         /// <returns>A <see cref="ScheduledDelegate"/> of the operation.</returns>
-        public void NextTrack(Action onSuccess = null) => Schedule(() =>
+        public void NextTrack(Action? onSuccess = null, bool allowProtectedTracks = false) => Schedule(() =>
         {
-            bool res = next();
+            bool res = next(allowProtectedTracks);
             if (res)
                 onSuccess?.Invoke();
         });
 
-        private bool next()
+        private readonly List<DuckParameters> duckOperations = new List<DuckParameters>();
+
+        /// <summary>
+        /// Applies ducking, attenuating the volume and/or low-pass cutoff of the currently playing track to make headroom for effects (or just to apply an effect).
+        /// </summary>
+        /// <returns>A <see cref="IDisposable"/> which will restore the duck operation when disposed.</returns>
+        public IDisposable Duck(DuckParameters? parameters = null)
+        {
+            // Don't duck if samples have no volume, it sounds weird.
+            if (sampleVolume.Value == 0)
+                return new InvokeOnDisposal(() => { });
+
+            parameters ??= new DuckParameters();
+
+            duckOperations.Add(parameters);
+
+            DuckParameters volumeOperation = duckOperations.MinBy(p => p.DuckVolumeTo)!;
+            DuckParameters lowPassOperation = duckOperations.MinBy(p => p.DuckCutoffTo)!;
+
+            audioDuckFilter.CutoffTo(lowPassOperation.DuckCutoffTo, lowPassOperation.DuckDuration, lowPassOperation.DuckEasing);
+            this.TransformBindableTo(audioDuckVolume, volumeOperation.DuckVolumeTo, volumeOperation.DuckDuration, volumeOperation.DuckEasing);
+
+            return new InvokeOnDisposal(restoreDucking);
+
+            void restoreDucking() => Schedule(() =>
+            {
+                if (!duckOperations.Remove(parameters))
+                    return;
+
+                DuckParameters? restoreVolumeOperation = duckOperations.MinBy(p => p.DuckVolumeTo);
+                DuckParameters? restoreLowPassOperation = duckOperations.MinBy(p => p.DuckCutoffTo);
+
+                // If another duck operation is in the list, restore ducking to its level, else reset back to defaults.
+                audioDuckFilter.CutoffTo(restoreLowPassOperation?.DuckCutoffTo ?? AudioFilter.MAX_LOWPASS_CUTOFF, parameters.RestoreDuration, parameters.RestoreEasing);
+                this.TransformBindableTo(audioDuckVolume, restoreVolumeOperation?.DuckVolumeTo ?? 1, parameters.RestoreDuration, parameters.RestoreEasing);
+            });
+        }
+
+        /// <summary>
+        /// A convenience method that ducks the currently playing track, then after a delay, restores automatically.
+        /// </summary>
+        /// <param name="delayUntilRestore">A delay in milliseconds which defines how long to delay restoration after ducking completes.</param>
+        /// <param name="parameters">Parameters defining the ducking operation.</param>
+        public void DuckMomentarily(double delayUntilRestore, DuckParameters? parameters = null)
+        {
+            // Don't duck if samples have no volume, it sounds weird.
+            if (sampleVolume.Value == 0)
+                return;
+
+            parameters ??= new DuckParameters();
+
+            IDisposable duckOperation = Duck(parameters);
+
+            Scheduler.AddDelayed(() => duckOperation.Dispose(), delayUntilRestore);
+        }
+
+        private bool next(bool allowProtectedTracks)
         {
             if (beatmap.Disabled || !AllowTrackControl.Value)
                 return false;
 
             queuedDirection = TrackChangeDirection.Next;
 
-            var playableSet = getBeatmapSets().AsEnumerable().SkipWhile(i => !i.Equals(current.BeatmapSetInfo)).ElementAtOrDefault(1)
-                              ?? getBeatmapSets().FirstOrDefault();
+            Live<BeatmapSetInfo>? playableSet;
 
-            var playableBeatmap = playableSet?.Beatmaps.FirstOrDefault();
+            if (Shuffle.Value)
+                playableSet = getNextRandom(1, allowProtectedTracks);
+            else
+            {
+                playableSet = getBeatmapSets().SkipWhile(i => !i.Value.Equals(current?.BeatmapSetInfo))
+                                              .Where(i => !i.Value.Protected || allowProtectedTracks)
+                                              .ElementAtOrDefault(1)
+                              ?? getBeatmapSets().FirstOrDefault(i => !i.Value.Protected || allowProtectedTracks);
+            }
+
+            var playableBeatmap = playableSet?.Value.Beatmaps.FirstOrDefault();
 
             if (playableBeatmap != null)
             {
@@ -265,6 +370,84 @@ namespace osu.Game.Overlays
             return false;
         }
 
+        private Live<BeatmapSetInfo>? getNextRandom(int direction, bool allowProtectedTracks)
+        {
+            try
+            {
+                Live<BeatmapSetInfo> result;
+
+                var possibleSets = getBeatmapSets().Where(s => !s.Value.Protected || allowProtectedTracks).ToList();
+
+                if (possibleSets.Count == 0)
+                    return null;
+
+                // if there is only one possible set left, play it, even if it is the same as the current track.
+                // looping is preferable over playing nothing.
+                if (possibleSets.Count == 1)
+                    return possibleSets.Single();
+
+                // now that we actually know there is a choice, do not allow the current track to be played again.
+                possibleSets.RemoveAll(s => s.Value.Equals(current?.BeatmapSetInfo));
+
+                // condition below checks if the signs of `randomHistoryDirection` and `direction` are opposite and not zero.
+                // if that is the case, it means that the user had previously chosen next track `randomHistoryDirection` times and wants to go back,
+                // or that the user had previously chosen previous track `randomHistoryDirection` times and wants to go forward.
+                // in both cases, it means that we have a history of previous random selections that we can rewind.
+                if (randomHistoryDirection * direction < 0)
+                {
+                    Debug.Assert(Math.Abs(randomHistoryDirection) == previousRandomSets.Count);
+
+                    // if the user has been shuffling backwards and now going forwards (or vice versa),
+                    // the topmost item from history needs to be discarded because it's the *current* track.
+                    if (direction * lastRandomTrackDirection < 0)
+                    {
+                        previousRandomSets.RemoveAt(previousRandomSets.Count - 1);
+                        randomHistoryDirection += direction;
+                    }
+
+                    if (previousRandomSets.Count > 0)
+                    {
+                        result = previousRandomSets[^1];
+                        previousRandomSets.RemoveAt(previousRandomSets.Count - 1);
+                        return result;
+                    }
+                }
+
+                // if the early-return above didn't cover it, it means that we have no history to fall back on
+                // and need to actually choose something random.
+                switch (randomSelectAlgorithm.Value)
+                {
+                    case RandomSelectAlgorithm.Random:
+                        result = possibleSets[RNG.Next(possibleSets.Count)];
+                        break;
+
+                    case RandomSelectAlgorithm.RandomPermutation:
+                        var notYetPlayedSets = possibleSets.Except(previousRandomSets).ToList();
+
+                        if (notYetPlayedSets.Count == 0)
+                        {
+                            notYetPlayedSets = possibleSets;
+                            previousRandomSets.Clear();
+                            randomHistoryDirection = 0;
+                        }
+
+                        result = notYetPlayedSets[RNG.Next(notYetPlayedSets.Count)];
+                        break;
+
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(randomSelectAlgorithm), randomSelectAlgorithm.Value, "Unsupported random select algorithm");
+                }
+
+                previousRandomSets.Add(result);
+                return result;
+            }
+            finally
+            {
+                randomHistoryDirection += direction;
+                lastRandomTrackDirection = direction;
+            }
+        }
+
         private void restartTrack()
         {
             // if not scheduled, the previously track will be stopped one frame later (see ScheduleAfterChildren logic in GameBase).
@@ -272,11 +455,13 @@ namespace osu.Game.Overlays
             Schedule(() => CurrentTrack.RestartAsync());
         }
 
-        private WorkingBeatmap current;
+        private WorkingBeatmap? current;
 
         private TrackChangeDirection? queuedDirection;
 
-        private IQueryable<BeatmapSetInfo> getBeatmapSets() => realm.Realm.All<BeatmapSetInfo>().Where(s => !s.DeletePending);
+        private IEnumerable<Live<BeatmapSetInfo>> getBeatmapSets() => realm.Realm.All<BeatmapSetInfo>().Where(s => !s.DeletePending)
+                                                                           .AsEnumerable()
+                                                                           .Select(s => new RealmLive<BeatmapSetInfo>(s, realm));
 
         private void changeBeatmap(WorkingBeatmap newWorking)
         {
@@ -289,7 +474,7 @@ namespace osu.Game.Overlays
 
             TrackChangeDirection direction = TrackChangeDirection.None;
 
-            bool audioEquals = newWorking?.BeatmapInfo?.AudioEquals(current?.BeatmapInfo) == true;
+            bool audioEquals = newWorking.BeatmapInfo?.AudioEquals(current?.BeatmapInfo) == true;
 
             if (current != null)
             {
@@ -303,8 +488,8 @@ namespace osu.Game.Overlays
                 else
                 {
                     // figure out the best direction based on order in playlist.
-                    int last = getBeatmapSets().AsEnumerable().TakeWhile(b => !b.Equals(current.BeatmapSetInfo)).Count();
-                    int next = newWorking == null ? -1 : getBeatmapSets().AsEnumerable().TakeWhile(b => !b.Equals(newWorking.BeatmapSetInfo)).Count();
+                    int last = getBeatmapSets().TakeWhile(b => !b.Value.Equals(current.BeatmapSetInfo)).Count();
+                    int next = getBeatmapSets().TakeWhile(b => !b.Value.Equals(newWorking.BeatmapSetInfo)).Count();
 
                     direction = last > next ? TrackChangeDirection.Prev : TrackChangeDirection.Next;
                 }
@@ -361,7 +546,7 @@ namespace osu.Game.Overlays
         {
             // Important to keep this in its own method to avoid inadvertently capturing unnecessary variables in the callback.
             // Can lead to leaks.
-            var queuedTrack = new DrawableTrack(current.LoadTrack());
+            var queuedTrack = new DrawableTrack(current!.LoadTrack());
             queuedTrack.Completed += onTrackCompleted;
             return queuedTrack;
         }
@@ -369,7 +554,7 @@ namespace osu.Game.Overlays
         private void onTrackCompleted()
         {
             if (!CurrentTrack.Looping && !beatmap.Disabled && AllowTrackControl.Value)
-                NextTrack();
+                NextTrack(allowProtectedTracks: true);
         }
 
         private bool applyModTrackAdjustments;
@@ -390,7 +575,7 @@ namespace osu.Game.Overlays
             }
         }
 
-        private AudioAdjustments modTrackAdjustments;
+        private AudioAdjustments? modTrackAdjustments;
 
         /// <summary>
         /// Resets the adjustments currently applied on <see cref="CurrentTrack"/> and applies the mod adjustments if <see cref="ApplyModTrackAdjustments"/> is <c>true</c>.
@@ -414,6 +599,45 @@ namespace osu.Game.Overlays
                     mod.ApplyToTrack(modTrackAdjustments);
             }
         }
+    }
+
+    public class DuckParameters
+    {
+        /// <summary>
+        /// The duration of the ducking transition in milliseconds.
+        /// Defaults to 100 ms.
+        /// </summary>
+        public double DuckDuration = 100;
+
+        /// <summary>
+        /// The final volume which should be reached during ducking, when 0 is silent and 1 is original volume.
+        /// Defaults to 25%.
+        /// </summary>
+        public double DuckVolumeTo = 0.25;
+
+        /// <summary>
+        /// The low-pass cutoff frequency which should be reached during ducking. If not required, set to <see cref="AudioFilter.MAX_LOWPASS_CUTOFF"/>.
+        /// Defaults to 300 Hz.
+        /// </summary>
+        public int DuckCutoffTo = 300;
+
+        /// <summary>
+        /// The easing curve to be applied during ducking.
+        /// Defaults to <see cref="Easing.Out"/>.
+        /// </summary>
+        public Easing DuckEasing = Easing.Out;
+
+        /// <summary>
+        /// The duration of the restoration transition in milliseconds.
+        /// Defaults to 500 ms.
+        /// </summary>
+        public double RestoreDuration = 500;
+
+        /// <summary>
+        /// The easing curve to be applied during restoration.
+        /// Defaults to <see cref="Easing.In"/>.
+        /// </summary>
+        public Easing RestoreEasing = Easing.In;
     }
 
     public enum TrackChangeDirection

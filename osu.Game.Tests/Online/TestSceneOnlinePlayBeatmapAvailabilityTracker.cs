@@ -257,7 +257,7 @@ namespace osu.Game.Tests.Online
             {
             }
 
-            protected override string Target => null;
+            protected override string Target => string.Empty;
         }
     }
 }

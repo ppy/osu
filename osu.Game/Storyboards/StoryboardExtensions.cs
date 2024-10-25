@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osuTK;
 
@@ -22,18 +21,18 @@ namespace osu.Game.Storyboards
             // Either flip horizontally or negative X scale, but not both.
             if (flipH ^ (vectorScale.X < 0))
             {
-                if (origin.HasFlagFast(Anchor.x0))
+                if (origin.HasFlag(Anchor.x0))
                     origin = Anchor.x2 | (origin & (Anchor.y0 | Anchor.y1 | Anchor.y2));
-                else if (origin.HasFlagFast(Anchor.x2))
+                else if (origin.HasFlag(Anchor.x2))
                     origin = Anchor.x0 | (origin & (Anchor.y0 | Anchor.y1 | Anchor.y2));
             }
 
             // Either flip vertically or negative Y scale, but not both.
             if (flipV ^ (vectorScale.Y < 0))
             {
-                if (origin.HasFlagFast(Anchor.y0))
+                if (origin.HasFlag(Anchor.y0))
                     origin = Anchor.y2 | (origin & (Anchor.x0 | Anchor.x1 | Anchor.x2));
-                else if (origin.HasFlagFast(Anchor.y2))
+                else if (origin.HasFlag(Anchor.y2))
                     origin = Anchor.y0 | (origin & (Anchor.x0 | Anchor.x1 | Anchor.x2));
             }
 

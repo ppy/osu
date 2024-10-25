@@ -10,7 +10,7 @@ using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Edit
 {
-    public class HitCircleCompositionTool : HitObjectCompositionTool
+    public class HitCircleCompositionTool : CompositionTool
     {
         public HitCircleCompositionTool()
             : base(nameof(HitCircle))
@@ -19,6 +19,6 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         public override Drawable CreateIcon() => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Circles);
 
-        public override PlacementBlueprint CreatePlacementBlueprint() => new HitCirclePlacementBlueprint();
+        public override HitObjectPlacementBlueprint CreatePlacementBlueprint() => new HitCirclePlacementBlueprint();
     }
 }

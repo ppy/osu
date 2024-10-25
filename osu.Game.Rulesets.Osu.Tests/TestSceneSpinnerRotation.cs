@@ -134,7 +134,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
                 // multipled by 2 to nullify the score multiplier. (autoplay mod selected)
                 long totalScore = scoreProcessor.TotalScore.Value * 2;
-                return totalScore == (int)(drawableSpinner.Result.TotalRotation / 360) * scoreProcessor.GetBaseScoreForResult(new SpinnerTick().CreateJudgement().MaxResult);
+                return totalScore == (int)(drawableSpinner.Result.TotalRotation / 360) * scoreProcessor.GetBaseScoreForResult(new SpinnerTick().Judgement.MaxResult);
             });
 
             addSeekStep(0);

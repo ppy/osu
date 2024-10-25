@@ -1,11 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using osu.Framework.Allocation;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
@@ -14,6 +13,7 @@ using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
+using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
 
@@ -21,14 +21,17 @@ namespace osu.Game.Rulesets.Mania.Edit
 {
     public partial class ManiaHitObjectComposer : ScrollingHitObjectComposer<ManiaHitObject>
     {
-        private DrawableManiaEditorRuleset drawableRuleset;
+        private DrawableManiaEditorRuleset drawableRuleset = null!;
+
+        [Resolved]
+        private EditorScreenWithTimeline? screenWithTimeline { get; set; }
 
         public ManiaHitObjectComposer(Ruleset ruleset)
             : base(ruleset)
         {
         }
 
-        public new ManiaPlayfield Playfield => ((ManiaPlayfield)drawableRuleset.Playfield);
+        public new ManiaPlayfield Playfield => drawableRuleset.Playfield;
 
         public IScrollingInfo ScrollingInfo => drawableRuleset.ScrollingInfo;
 
@@ -43,7 +46,7 @@ namespace osu.Game.Rulesets.Mania.Edit
 
         protected override BeatSnapGrid CreateBeatSnapGrid() => new ManiaBeatSnapGrid();
 
-        protected override IReadOnlyList<HitObjectCompositionTool> CompositionTools => new HitObjectCompositionTool[]
+        protected override IReadOnlyList<CompositionTool> CompositionTools => new CompositionTool[]
         {
             new NoteCompositionTool(),
             new HoldNoteCompositionTool()
@@ -72,7 +75,7 @@ namespace osu.Game.Rulesets.Mania.Edit
                 if (!double.TryParse(split[0], out double time) || !int.TryParse(split[1], out int column))
                     continue;
 
-                ManiaHitObject current = remainingHitObjects.FirstOrDefault(h => h.StartTime == time && h.Column == column);
+                ManiaHitObject? current = remainingHitObjects.FirstOrDefault(h => h.StartTime == time && h.Column == column);
 
                 if (current == null)
                     continue;
@@ -82,6 +85,14 @@ namespace osu.Game.Rulesets.Mania.Edit
                 if (i < objectDescriptions.Length - 1)
                     remainingHitObjects = remainingHitObjects.Where(h => h != current && h.StartTime >= current.StartTime).ToList();
             }
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (screenWithTimeline?.TimelineArea.Timeline != null)
+                drawableRuleset.TimelineTimeRange = EditorClock.TrackLength / screenWithTimeline.TimelineArea.Timeline.CurrentZoom / 2;
         }
     }
 }

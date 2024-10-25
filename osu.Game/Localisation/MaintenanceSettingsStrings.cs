@@ -35,11 +35,6 @@ namespace osu.Game.Localisation
         public static LocalisableString ProhibitedInteractDuringMigration => new TranslatableString(getKey(@"prohibited_interact_during_migration"), @"Please avoid interacting with the game!");
 
         /// <summary>
-        /// "Some files couldn't be cleaned up during migration. Clicking this notification will open the folder so you can manually clean things up."
-        /// </summary>
-        public static LocalisableString FailedCleanupNotification => new TranslatableString(getKey(@"failed_cleanup_notification"), @"Some files couldn't be cleaned up during migration. Clicking this notification will open the folder so you can manually clean things up.");
-
-        /// <summary>
         /// "Please select a new location"
         /// </summary>
         public static LocalisableString SelectNewLocation => new TranslatableString(getKey(@"select_new_location"), @"Please select a new location");
@@ -63,6 +58,11 @@ namespace osu.Game.Localisation
         /// "Delete ALL beatmap videos"
         /// </summary>
         public static LocalisableString DeleteAllBeatmapVideos => new TranslatableString(getKey(@"delete_all_beatmap_videos"), @"Delete ALL beatmap videos");
+
+        /// <summary>
+        /// "Reset ALL beatmap offsets"
+        /// </summary>
+        public static LocalisableString ResetAllOffsets => new TranslatableString(getKey(@"reset_all_offsets"), @"Reset ALL beatmap offsets");
 
         /// <summary>
         /// "Delete ALL scores"
@@ -105,14 +105,29 @@ namespace osu.Game.Localisation
         public static LocalisableString DeletedAllCollections => new TranslatableString(getKey(@"deleted_all_collections"), @"Deleted all collections!");
 
         /// <summary>
+        /// "No collections found to delete!"
+        /// </summary>
+        public static LocalisableString NoCollectionsFoundToDelete => new TranslatableString(getKey(@"no_collections_found_to_delete"), @"No collections found to delete!");
+
+        /// <summary>
         /// "Deleted all mod presets!"
         /// </summary>
         public static LocalisableString DeletedAllModPresets => new TranslatableString(getKey(@"deleted_all_mod_presets"), @"Deleted all mod presets!");
 
         /// <summary>
+        /// "No mod presets found to delete!"
+        /// </summary>
+        public static LocalisableString NoModPresetsFoundToDelete => new TranslatableString(getKey(@"no_mod_presets_found_to_delete"), @"No mod presets found to delete!");
+
+        /// <summary>
         /// "Restored all deleted mod presets!"
         /// </summary>
         public static LocalisableString RestoredAllDeletedModPresets => new TranslatableString(getKey(@"restored_all_deleted_mod_presets"), @"Restored all deleted mod presets!");
+
+        /// <summary>
+        /// "No mod presets found to restore!"
+        /// </summary>
+        public static LocalisableString NoModPresetsFoundToRestore => new TranslatableString(getKey(@"no_mod_presets_found_to_restore"), @"No mod presets found to restore!");
 
         /// <summary>
         /// "Please select your osu!stable install location"

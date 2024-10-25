@@ -2,11 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Runtime.Versioning;
+using System.Threading.Tasks;
 using Microsoft.Win32;
+using osu.Desktop.Performance;
 using osu.Desktop.Security;
 using osu.Framework.Platform;
 using osu.Game;
@@ -15,11 +16,12 @@ using osu.Framework;
 using osu.Framework.Logging;
 using osu.Game.Updater;
 using osu.Desktop.Windows;
+using osu.Framework.Allocation;
 using osu.Game.IO;
 using osu.Game.IPC;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Performance;
 using osu.Game.Utils;
-using SDL2;
 
 namespace osu.Desktop
 {
@@ -27,6 +29,9 @@ namespace osu.Desktop
     {
         private OsuSchemeLinkIPCChannel? osuSchemeLinkIPCChannel;
         private ArchiveImportIPCChannel? archiveImportIPCChannel;
+
+        [Cached(typeof(IHighPerformanceSessionManager))]
+        private readonly HighPerformanceSessionManager highPerformanceSessionManager = new HighPerformanceSessionManager();
 
         public OsuGameDesktop(string[]? args = null)
             : base(args)
@@ -86,46 +91,24 @@ namespace osu.Desktop
         [SupportedOSPlatform("windows")]
         private string? getStableInstallPathFromRegistry()
         {
-            using (RegistryKey? key = Registry.ClassesRoot.OpenSubKey("osu"))
-                return key?.OpenSubKey(@"shell\open\command")?.GetValue(string.Empty)?.ToString()?.Split('"')[1].Replace("osu!.exe", "");
+            using (RegistryKey? key = Registry.ClassesRoot.OpenSubKey("osu!"))
+                return key?.OpenSubKey(WindowsAssociationManager.SHELL_OPEN_COMMAND)?.GetValue(string.Empty)?.ToString()?.Split('"')[1].Replace("osu!.exe", "");
         }
+
+        public static bool IsPackageManaged => !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("OSU_EXTERNAL_UPDATE_PROVIDER"));
 
         protected override UpdateManager CreateUpdateManager()
         {
-            string? packageManaged = Environment.GetEnvironmentVariable("OSU_EXTERNAL_UPDATE_PROVIDER");
-
-            if (!string.IsNullOrEmpty(packageManaged))
+            if (IsPackageManaged)
                 return new NoActionUpdateManager();
 
-            switch (RuntimeInfo.OS)
-            {
-                case RuntimeInfo.Platform.Windows:
-                    Debug.Assert(OperatingSystem.IsWindows());
-
-                    return new SquirrelUpdateManager();
-
-                default:
-                    return new SimpleUpdateManager();
-            }
+            return new VelopackUpdateManager();
         }
 
         public override bool RestartAppWhenExited()
         {
-            switch (RuntimeInfo.OS)
-            {
-                case RuntimeInfo.Platform.Windows:
-                    Debug.Assert(OperatingSystem.IsWindows());
-
-                    // Of note, this is an async method in squirrel that adds an arbitrary delay before returning
-                    // likely to ensure the external process is in a good state.
-                    //
-                    // We're not waiting on that here, but the outro playing before the actual exit should be enough
-                    // to cover this.
-                    Squirrel.UpdateManager.RestartAppWhenExited().FireAndForget();
-                    return true;
-            }
-
-            return base.RestartAppWhenExited();
+            Task.Run(() => Velopack.UpdateExe.Start()).FireAndForget();
+            return true;
         }
 
         protected override void LoadComplete()
@@ -155,31 +138,13 @@ namespace osu.Desktop
             host.Window.Title = Name;
         }
 
-        protected override BatteryInfo CreateBatteryInfo() => new SDL2BatteryInfo();
+        protected override BatteryInfo CreateBatteryInfo() => FrameworkEnvironment.UseSDL3 ? new SDL3BatteryInfo() : new SDL2BatteryInfo();
 
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
             osuSchemeLinkIPCChannel?.Dispose();
             archiveImportIPCChannel?.Dispose();
-        }
-
-        private class SDL2BatteryInfo : BatteryInfo
-        {
-            public override double? ChargeLevel
-            {
-                get
-                {
-                    SDL.SDL_GetPowerInfo(out _, out int percentage);
-
-                    if (percentage == -1)
-                        return null;
-
-                    return percentage / 100.0;
-                }
-            }
-
-            public override bool OnBattery => SDL.SDL_GetPowerInfo(out _, out _) == SDL.SDL_PowerState.SDL_POWERSTATE_ON_BATTERY;
         }
     }
 }

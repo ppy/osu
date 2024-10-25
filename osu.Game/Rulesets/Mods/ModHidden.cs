@@ -16,11 +16,11 @@ namespace osu.Game.Rulesets.Mods
         public override ModType Type => ModType.DifficultyIncrease;
         public override bool Ranked => UsesDefaultConfiguration;
 
-        public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
+        public virtual void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
         {
         }
 
-        public ScoreRank AdjustRank(ScoreRank rank, double accuracy)
+        public virtual ScoreRank AdjustRank(ScoreRank rank, double accuracy)
         {
             switch (rank)
             {

@@ -7,6 +7,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -201,7 +202,10 @@ namespace osu.Game.Skinning
                         source.SourceChanged -= TriggerSourceChanged;
                 }
 
-                skinSources = sources.Select(skin => (skin, new DisableableSkinSource(skin, this))).ToArray();
+                skinSources = sources
+                              // Shouldn't be required after NRT is applied to all calling sources.
+                              .Where(skin => skin.IsNotNull())
+                              .Select(skin => (skin, new DisableableSkinSource(skin, this))).ToArray();
 
                 foreach (var skin in skinSources)
                 {

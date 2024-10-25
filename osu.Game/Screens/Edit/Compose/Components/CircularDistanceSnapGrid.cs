@@ -59,7 +59,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             // Picture the scenario where the user has just placed an object on a 1/2 snap, then changes to
             // 1/3 snap and expects to be able to place the next object on a valid 1/3 snap, regardless of the
             // fact that the 1/2 snap reference object is not valid for 1/3 snapping.
-            float offset = SnapProvider.FindSnappedDistance(ReferenceObject, 0);
+            float offset = SnapProvider.FindSnappedDistance(ReferenceObject, 0, DistanceSnapTarget.End);
 
             for (int i = 0; i < requiredCircles; i++)
             {
@@ -104,7 +104,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 ? SnapProvider.DurationToDistance(ReferenceObject, editorClock.CurrentTime - ReferenceObject.GetEndTime())
                 // When interacting with the resolved snap provider, the distance spacing multiplier should first be removed
                 // to allow for snapping at a non-multiplied ratio.
-                : SnapProvider.FindSnappedDistance(ReferenceObject, travelLength / distanceSpacingMultiplier);
+                : SnapProvider.FindSnappedDistance(ReferenceObject, travelLength / distanceSpacingMultiplier, DistanceSnapTarget.End);
 
             double snappedTime = StartTime + SnapProvider.DistanceToDuration(ReferenceObject, snappedDistance);
 
@@ -140,7 +140,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
                 Colour = this.baseColour = baseColour;
 
-                Current.Value = 1;
+                Progress = 1;
             }
 
             protected override void Update()

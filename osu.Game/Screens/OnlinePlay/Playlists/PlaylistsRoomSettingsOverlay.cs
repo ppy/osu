@@ -24,6 +24,7 @@ using osu.Game.Overlays;
 using osu.Game.Screens.OnlinePlay.Match.Components;
 using osuTK;
 using osu.Game.Localisation;
+using osu.Game.Rulesets;
 
 namespace osu.Game.Screens.OnlinePlay.Playlists
 {
@@ -77,6 +78,9 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
             [Resolved]
             private IAPIProvider api { get; set; } = null!;
+
+            [Resolved]
+            private RulesetStore rulesets { get; set; } = null!;
 
             private IBindable<APIUser> localUser = null!;
 
@@ -366,7 +370,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             public void SelectBeatmap() => editPlaylistButton.TriggerClick();
 
             private void onPlaylistChanged(object? sender, NotifyCollectionChangedEventArgs e) =>
-                playlistLength.Text = $"Length: {Playlist.GetTotalDuration()}";
+                playlistLength.Text = $"Length: {Playlist.GetTotalDuration(rulesets)}";
 
             private bool hasValidSettings => RoomID.Value == null && NameField.Text.Length > 0 && Playlist.Count > 0
                                              && hasValidDuration;

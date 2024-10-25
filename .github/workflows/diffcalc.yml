@@ -104,25 +104,48 @@ env:
   EXECUTION_ID: execution-${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}
 
 jobs:
+  master-environment:
+    name: Save master environment
+    runs-on: ubuntu-latest
+    outputs:
+      HEAD: ${{ steps.get-head.outputs.HEAD }}
+    steps:
+      - name: Checkout osu
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          sparse-checkout: |
+            README.md
+
+      - name: Get HEAD ref
+        id: get-head
+        run: |
+          ref=$(git log -1 --format='%H')
+          echo "HEAD=https://github.com/${{ github.repository }}/commit/${ref}" >> "${GITHUB_OUTPUT}"
+
   check-permissions:
     name: Check permissions
     runs-on: ubuntu-latest
     if: ${{ github.event_name == 'workflow_dispatch' || contains(github.event.comment.body, '!diffcalc') }}
     steps:
       - name: Check permissions
-        if: ${{ github.event_name != 'workflow_dispatch' }}
-        uses: actions-cool/check-user-permission@a0668c9aec87f3875fc56170b6452a453e9dd819 # v2.2.0
-        with:
-          require: 'write'
+        run: |
+          ALLOWED_USERS=(smoogipoo peppy bdach frenzibyte)
+          for i in "${ALLOWED_USERS[@]}"; do
+              if [[ "${{ github.actor }}" == "$i" ]]; then
+                  exit 0
+              fi
+          done
+          exit 1
 
   create-comment:
     name: Create PR comment
-    needs: check-permissions
+    needs: [ master-environment, check-permissions ]
     runs-on: ubuntu-latest
     if: ${{ github.event_name == 'issue_comment' && github.event.issue.pull_request }}
     steps:
       - name: Create comment
-        uses: thollander/actions-comment-pull-request@363c6f6eae92cc5c3a66e95ba016fc771bb38943 # v2.4.2
+        uses: thollander/actions-comment-pull-request@fabd468d3a1a0b97feee5f6b9e499eab0dd903f6 # v2.5.0
         with:
           comment_tag: ${{ env.EXECUTION_ID }}
           message: |
@@ -140,7 +163,7 @@ jobs:
       GOOGLE_CREDS_FILE: ${{ steps.set-outputs.outputs.GOOGLE_CREDS_FILE }}
     steps:
       - name: Checkout diffcalc-sheet-generator
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: ${{ env.EXECUTION_ID }}
           repository: 'smoogipoo/diffcalc-sheet-generator'
@@ -154,7 +177,7 @@ jobs:
 
   environment:
     name: Setup environment
-    needs: directory
+    needs: [ master-environment, directory ]
     runs-on: self-hosted
     env:
       VARS_JSON: ${{ toJSON(vars) }}
@@ -177,6 +200,10 @@ jobs:
                 sed -i "s;^${optNoPrefix}=.*$;${optNoPrefix}=${val};" "${{ needs.directory.outputs.GENERATOR_ENV }}"
               fi
           done
+
+      - name: Add master environment
+        run: |
+          sed -i "s;^OSU_A=.*$;OSU_A=${{ needs.master-environment.outputs.HEAD }};" "${{ needs.directory.outputs.GENERATOR_ENV }}"
 
       - name: Add pull-request environment
         if: ${{ github.event_name == 'issue_comment' && github.event.issue.pull_request }}
@@ -246,22 +273,23 @@ jobs:
 
           echo "TARGET_DIR=${{ needs.directory.outputs.GENERATOR_DIR }}/sql/${ruleset}" >> "${GITHUB_OUTPUT}"
           echo "DATA_NAME=${performance_data_name}" >> "${GITHUB_OUTPUT}"
+          echo "DATA_PKG=${performance_data_name}.tar.bz2" >> "${GITHUB_OUTPUT}"
 
       - name: Restore cache
         id: restore-cache
-        uses: maxnowack/local-cache@038cc090b52e4f205fbc468bf5b0756df6f68775 # v1
+        uses: maxnowack/local-cache@720e69c948191660a90aa1cf6a42fc4d2dacdf30 # v2
         with:
-          path: ${{ steps.query.outputs.DATA_NAME }}.tar.bz2
+          path: ${{ steps.query.outputs.DATA_PKG }}
           key: ${{ steps.query.outputs.DATA_NAME }}
 
       - name: Download
         if: steps.restore-cache.outputs.cache-hit != 'true'
         run: |
-          wget -q -nc "https://data.ppy.sh/${{ steps.query.outputs.DATA_NAME }}.tar.bz2"
+          wget -q -O "${{ steps.query.outputs.DATA_PKG }}" "https://data.ppy.sh/${{ steps.query.outputs.DATA_PKG }}"
 
       - name: Extract
         run: |
-          tar -I lbzip2 -xf "${{ steps.query.outputs.DATA_NAME }}.tar.bz2"
+          tar -I lbzip2 -xf "${{ steps.query.outputs.DATA_PKG }}"
           rm -r "${{ steps.query.outputs.TARGET_DIR }}"
           mv "${{ steps.query.outputs.DATA_NAME }}" "${{ steps.query.outputs.TARGET_DIR }}"
 
@@ -277,22 +305,23 @@ jobs:
 
           echo "TARGET_DIR=${{ needs.directory.outputs.GENERATOR_DIR }}/beatmaps" >> "${GITHUB_OUTPUT}"
           echo "DATA_NAME=${beatmaps_data_name}" >> "${GITHUB_OUTPUT}"
+          echo "DATA_PKG=${beatmaps_data_name}.tar.bz2" >> "${GITHUB_OUTPUT}"
 
       - name: Restore cache
         id: restore-cache
-        uses: maxnowack/local-cache@038cc090b52e4f205fbc468bf5b0756df6f68775 # v1
+        uses: maxnowack/local-cache@720e69c948191660a90aa1cf6a42fc4d2dacdf30 # v2
         with:
-          path: ${{ steps.query.outputs.DATA_NAME }}.tar.bz2
+          path: ${{ steps.query.outputs.DATA_PKG }}
           key: ${{ steps.query.outputs.DATA_NAME }}
 
       - name: Download
         if: steps.restore-cache.outputs.cache-hit != 'true'
         run: |
-          wget -q -nc "https://data.ppy.sh/${{ steps.query.outputs.DATA_NAME }}.tar.bz2"
+          wget -q -O "${{ steps.query.outputs.DATA_PKG }}" "https://data.ppy.sh/${{ steps.query.outputs.DATA_PKG }}"
 
       - name: Extract
         run: |
-          tar -I lbzip2 -xf "${{ steps.query.outputs.DATA_NAME }}.tar.bz2"
+          tar -I lbzip2 -xf "${{ steps.query.outputs.DATA_PKG }}"
           rm -r "${{ steps.query.outputs.TARGET_DIR }}"
           mv "${{ steps.query.outputs.DATA_NAME }}" "${{ steps.query.outputs.TARGET_DIR }}"
 
@@ -312,9 +341,12 @@ jobs:
           sed -i 's/^GH_TOKEN=.*$/GH_TOKEN=${{ github.token }}/' "${{ needs.directory.outputs.GENERATOR_ENV }}"
 
           cd "${{ needs.directory.outputs.GENERATOR_DIR }}"
-          docker-compose up --build generator
 
-          link=$(docker-compose logs generator -n 10 | grep 'http' | sed -E 's/^.*(http.*)$/\1/')
+          docker compose up --build --detach
+          docker compose logs --follow &
+          docker compose wait generator
+
+          link=$(docker compose logs --tail 10 generator | grep 'http' | sed -E 's/^.*(http.*)$/\1/')
           target=$(cat "${{ needs.directory.outputs.GENERATOR_ENV }}" | grep -E '^OSU_B=' | cut -d '=' -f2-)
 
           echo "TARGET=${target}" >> "${GITHUB_OUTPUT}"
@@ -324,7 +356,7 @@ jobs:
         if: ${{ always() }}
         run: |
           cd "${{ needs.directory.outputs.GENERATOR_DIR }}"
-          docker-compose down -v
+          docker compose down --volumes
 
   output-cli:
     name: Output info
@@ -354,28 +386,26 @@ jobs:
     steps:
       - name: Update comment on success
         if: ${{ needs.generator.result == 'success' }}
-        uses: thollander/actions-comment-pull-request@363c6f6eae92cc5c3a66e95ba016fc771bb38943 # v2.4.2
+        uses: thollander/actions-comment-pull-request@fabd468d3a1a0b97feee5f6b9e499eab0dd903f6 # v2.5.0
         with:
           comment_tag: ${{ env.EXECUTION_ID }}
-          mode: upsert
-          create_if_not_exists: false
+          mode: recreate
           message: |
             Target: ${{ needs.generator.outputs.TARGET }}
             Spreadsheet: ${{ needs.generator.outputs.SPREADSHEET_LINK }}
 
       - name: Update comment on failure
         if: ${{ needs.generator.result == 'failure' }}
-        uses: thollander/actions-comment-pull-request@363c6f6eae92cc5c3a66e95ba016fc771bb38943 # v2.4.2
+        uses: thollander/actions-comment-pull-request@fabd468d3a1a0b97feee5f6b9e499eab0dd903f6 # v2.5.0
         with:
           comment_tag: ${{ env.EXECUTION_ID }}
-          mode: upsert
-          create_if_not_exists: false
+          mode: recreate
           message: |
             Difficulty calculation failed: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
       - name: Update comment on cancellation
         if: ${{ needs.generator.result == 'cancelled' }}
-        uses: thollander/actions-comment-pull-request@363c6f6eae92cc5c3a66e95ba016fc771bb38943 # v2.4.2
+        uses: thollander/actions-comment-pull-request@fabd468d3a1a0b97feee5f6b9e499eab0dd903f6 # v2.5.0
         with:
           comment_tag: ${{ env.EXECUTION_ID }}
           mode: delete

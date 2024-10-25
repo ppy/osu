@@ -14,7 +14,7 @@ namespace osu.Game.Overlays.Chat
 {
     public partial class DaySeparator : Container
     {
-        protected virtual float TextSize => 15;
+        protected virtual float TextSize => 13;
 
         protected virtual float LineHeight => 2;
 
@@ -75,7 +75,7 @@ namespace osu.Game.Overlays.Chat
                                         Height = LineHeight,
                                         Colour = colourProvider?.Background5 ?? Colour4.White,
                                     },
-                                    Drawable.Empty(),
+                                    Empty(),
                                     new OsuSpriteText
                                     {
                                         Anchor = Anchor.CentreRight,
@@ -87,7 +87,7 @@ namespace osu.Game.Overlays.Chat
                                 }
                             },
                         },
-                        Drawable.Empty(),
+                        Empty(),
                         new Circle
                         {
                             Anchor = Anchor.Centre,

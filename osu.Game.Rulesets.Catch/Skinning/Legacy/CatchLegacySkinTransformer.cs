@@ -4,8 +4,8 @@
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Game.Skinning;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Skinning.Legacy
@@ -28,76 +28,94 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 
         public override Drawable? GetDrawableComponent(ISkinComponentLookup lookup)
         {
-            if (lookup is SkinComponentsContainerLookup containerLookup)
+            switch (lookup)
             {
-                switch (containerLookup.Target)
-                {
-                    case SkinComponentsContainerLookup.TargetArea.MainHUDComponents:
-                        var components = base.GetDrawableComponent(lookup) as Container;
+                case GlobalSkinnableContainerLookup containerLookup:
+                    // Only handle per ruleset defaults here.
+                    if (containerLookup.Ruleset == null)
+                        return base.GetDrawableComponent(lookup);
 
-                        if (providesComboCounter && components != null)
-                        {
-                            // catch may provide its own combo counter; hide the default.
-                            // todo: this should be done in an elegant way per ruleset, defining which HUD skin components should be displayed.
-                            foreach (var legacyComboCounter in components.OfType<LegacyComboCounter>())
-                                legacyComboCounter.HiddenByRulesetImplementation = false;
-                        }
-
-                        return components;
-                }
-            }
-
-            if (lookup is CatchSkinComponentLookup catchSkinComponent)
-            {
-                switch (catchSkinComponent.Component)
-                {
-                    case CatchSkinComponents.Fruit:
-                        if (hasPear)
-                            return new LegacyFruitPiece();
-
+                    // we don't have enough assets to display these components (this is especially the case on a "beatmap" skin).
+                    if (!IsProvidingLegacyResources)
                         return null;
 
-                    case CatchSkinComponents.Banana:
-                        if (GetTexture("fruit-bananas") != null)
-                            return new LegacyBananaPiece();
+                    // Our own ruleset components default.
+                    switch (containerLookup.Lookup)
+                    {
+                        case GlobalSkinnableContainers.MainHUDComponents:
+                            // todo: remove CatchSkinComponents.CatchComboCounter and refactor LegacyCatchComboCounter to be added here instead.
+                            return new DefaultSkinComponentsContainer(container =>
+                            {
+                                var keyCounter = container.OfType<LegacyKeyCounterDisplay>().FirstOrDefault();
 
-                        return null;
+                                if (keyCounter != null)
+                                {
+                                    // set the anchor to top right so that it won't squash to the return button to the top
+                                    keyCounter.Anchor = Anchor.CentreRight;
+                                    keyCounter.Origin = Anchor.TopRight;
+                                    keyCounter.Position = new Vector2(0, -40) * 1.6f;
+                                }
+                            })
+                            {
+                                Children = new Drawable[]
+                                {
+                                    new LegacyKeyCounterDisplay(),
+                                }
+                            };
+                    }
 
-                    case CatchSkinComponents.Droplet:
-                        if (GetTexture("fruit-drop") != null)
-                            return new LegacyDropletPiece();
+                    return null;
 
-                        return null;
+                case CatchSkinComponentLookup catchSkinComponent:
+                    switch (catchSkinComponent.Component)
+                    {
+                        case CatchSkinComponents.Fruit:
+                            if (hasPear)
+                                return new LegacyFruitPiece();
 
-                    case CatchSkinComponents.Catcher:
-                        decimal version = GetConfig<SkinConfiguration.LegacySetting, decimal>(SkinConfiguration.LegacySetting.Version)?.Value ?? 1;
+                            return null;
 
-                        if (version < 2.3m)
-                        {
-                            if (hasOldStyleCatcherSprite())
-                                return new LegacyCatcherOld();
-                        }
+                        case CatchSkinComponents.Banana:
+                            if (GetTexture("fruit-bananas") != null)
+                                return new LegacyBananaPiece();
 
-                        if (hasNewStyleCatcherSprite())
-                            return new LegacyCatcherNew();
+                            return null;
 
-                        return null;
+                        case CatchSkinComponents.Droplet:
+                            if (GetTexture("fruit-drop") != null)
+                                return new LegacyDropletPiece();
 
-                    case CatchSkinComponents.CatchComboCounter:
-                        if (providesComboCounter)
-                            return new LegacyCatchComboCounter();
+                            return null;
 
-                        return null;
+                        case CatchSkinComponents.Catcher:
+                            decimal version = GetConfig<SkinConfiguration.LegacySetting, decimal>(SkinConfiguration.LegacySetting.Version)?.Value ?? 1;
 
-                    case CatchSkinComponents.HitExplosion:
-                        if (hasOldStyleCatcherSprite() || hasNewStyleCatcherSprite())
-                            return new LegacyHitExplosion();
+                            if (version < 2.3m)
+                            {
+                                if (hasOldStyleCatcherSprite())
+                                    return new LegacyCatcherOld();
+                            }
 
-                        return null;
+                            if (hasNewStyleCatcherSprite())
+                                return new LegacyCatcherNew();
 
-                    default:
-                        throw new UnsupportedSkinComponentException(lookup);
-                }
+                            return null;
+
+                        case CatchSkinComponents.CatchComboCounter:
+                            if (providesComboCounter)
+                                return new LegacyCatchComboCounter();
+
+                            return null;
+
+                        case CatchSkinComponents.HitExplosion:
+                            if (hasOldStyleCatcherSprite() || hasNewStyleCatcherSprite())
+                                return new LegacyHitExplosion();
+
+                            return null;
+
+                        default:
+                            throw new UnsupportedSkinComponentException(lookup);
+                    }
             }
 
             return base.GetDrawableComponent(lookup);
@@ -122,19 +140,6 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 
                     result.Value = LegacyColourCompatibility.DisallowZeroAlpha(result.Value);
                     return (IBindable<TValue>)result;
-
-                case CatchSkinConfiguration config:
-                    switch (config)
-                    {
-                        case CatchSkinConfiguration.FlipCatcherPlate:
-                            // Don't flip catcher plate contents if the catcher is provided by this legacy skin.
-                            if (GetDrawableComponent(new CatchSkinComponentLookup(CatchSkinComponents.Catcher)) != null)
-                                return (IBindable<TValue>)new Bindable<bool>();
-
-                            break;
-                    }
-
-                    break;
             }
 
             return base.GetConfig<TLookup, TValue>(lookup);
