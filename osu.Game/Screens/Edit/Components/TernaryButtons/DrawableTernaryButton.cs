@@ -4,8 +4,10 @@
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
@@ -14,7 +16,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Components.TernaryButtons
 {
-    public partial class DrawableTernaryButton : OsuButton
+    public partial class DrawableTernaryButton : OsuButton, IHasTooltip
     {
         private Color4 defaultBackgroundColour;
         private Color4 defaultIconColour;
@@ -58,12 +60,16 @@ namespace osu.Game.Screens.Edit.Components.TernaryButtons
             base.LoadComplete();
 
             Button.Bindable.BindValueChanged(_ => updateSelectionState(), true);
+            Button.Enabled.BindTo(Enabled);
 
             Action = onAction;
         }
 
         private void onAction()
         {
+            if (!Button.Enabled.Value)
+                return;
+
             Button.Toggle();
         }
 
@@ -98,5 +104,7 @@ namespace osu.Game.Screens.Edit.Components.TernaryButtons
             Anchor = Anchor.CentreLeft,
             X = 40f
         };
+
+        public LocalisableString TooltipText => Button.Tooltip;
     }
 }

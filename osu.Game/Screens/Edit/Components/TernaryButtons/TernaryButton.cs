@@ -12,12 +12,16 @@ namespace osu.Game.Screens.Edit.Components.TernaryButtons
     {
         public readonly Bindable<TernaryState> Bindable;
 
+        public readonly Bindable<bool> Enabled = new Bindable<bool>(true);
+
         public readonly string Description;
 
         /// <summary>
         /// A function which creates a drawable icon to represent this item. If null, a sane default should be used.
         /// </summary>
         public readonly Func<Drawable>? CreateIcon;
+
+        public string Tooltip { get; set; } = string.Empty;
 
         public TernaryButton(Bindable<TernaryState> bindable, string description, Func<Drawable>? createIcon = null)
         {
