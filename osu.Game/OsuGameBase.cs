@@ -212,8 +212,8 @@ namespace osu.Game
         protected MultiplayerClient MultiplayerClient { get; private set; }
 
         private MetadataClient metadataClient;
-        private SoloStatisticsWatcher soloStatisticsWatcher;
-        private LocalUserStatisticsProvider localUserStatisticsProvider;
+
+        protected LocalUserStatisticsProvider LocalUserStatisticsProvider { get; private set; }
 
         private RealmAccess realm;
 
@@ -330,9 +330,7 @@ namespace osu.Game
             dependencies.CacheAs(SpectatorClient = new OnlineSpectatorClient(endpoints));
             dependencies.CacheAs(MultiplayerClient = new OnlineMultiplayerClient(endpoints));
             dependencies.CacheAs(metadataClient = new OnlineMetadataClient(endpoints));
-
-            dependencies.CacheAs(localUserStatisticsProvider = new LocalUserStatisticsProvider());
-            dependencies.CacheAs(soloStatisticsWatcher = new SoloStatisticsWatcher(localUserStatisticsProvider));
+            dependencies.CacheAs(LocalUserStatisticsProvider = new LocalUserStatisticsProvider());
 
             base.Content.Add(new BeatmapOnlineChangeIngest(beatmapUpdater, realm, metadataClient));
 
@@ -375,8 +373,7 @@ namespace osu.Game
             base.Content.Add(SpectatorClient);
             base.Content.Add(MultiplayerClient);
             base.Content.Add(metadataClient);
-            base.Content.Add(localUserStatisticsProvider);
-            base.Content.Add(soloStatisticsWatcher);
+            base.Content.Add(LocalUserStatisticsProvider);
 
             base.Content.Add(rulesetConfigCache);
 

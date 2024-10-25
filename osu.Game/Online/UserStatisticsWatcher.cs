@@ -36,7 +36,7 @@ namespace osu.Game.Online
 
         private Dictionary<string, UserStatistics>? latestStatistics;
 
-        public SoloStatisticsWatcher(LocalUserStatisticsProvider? statisticsProvider = null)
+        public UserStatisticsWatcher(LocalUserStatisticsProvider? statisticsProvider = null)
         {
             this.statisticsProvider = statisticsProvider;
         }
@@ -118,7 +118,7 @@ namespace osu.Game.Online
         {
             string rulesetName = scoreInfo.Ruleset.ShortName;
 
-            statisticsProvider?.UpdateStatistics(updatedStatistics, callback.Score.Ruleset);
+            statisticsProvider?.UpdateStatistics(updatedStatistics, scoreInfo.Ruleset);
 
             if (latestStatistics == null)
                 return;
