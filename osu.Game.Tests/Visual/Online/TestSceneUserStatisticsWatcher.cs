@@ -25,6 +25,7 @@ namespace osu.Game.Tests.Visual.Online
     {
         protected override bool UseOnlineAPI => false;
 
+        private LocalUserStatisticsProvider statisticsProvider = null!;
         private UserStatisticsWatcher watcher = null!;
 
         [Resolved]
@@ -109,7 +110,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 Clear();
                 Add(statisticsProvider = new LocalUserStatisticsProvider());
-                Add(watcher = new SoloStatisticsWatcher(statisticsProvider));
+                Add(watcher = new UserStatisticsWatcher(statisticsProvider));
             });
         }
 
