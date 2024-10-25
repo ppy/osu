@@ -45,19 +45,22 @@ namespace osu.Game.Users
         }
 
         [Resolved]
-        private LocalUserStatisticsProvider statisticsProvider { get; set; } = null!;
+        private LocalUserStatisticsProvider? statisticsProvider { get; set; }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            statistics.BindTo(statisticsProvider.Statistics);
-            statistics.BindValueChanged(stats =>
+            if (statisticsProvider != null)
             {
-                loadingLayer.State.Value = stats.NewValue == null ? Visibility.Visible : Visibility.Hidden;
-                globalRankDisplay.Content = stats.NewValue?.GlobalRank?.ToLocalisableString("\\##,##0") ?? "-";
-                countryRankDisplay.Content = stats.NewValue?.CountryRank?.ToLocalisableString("\\##,##0") ?? "-";
-            }, true);
+                statistics.BindTo(statisticsProvider.Statistics);
+                statistics.BindValueChanged(stats =>
+                {
+                    loadingLayer.State.Value = stats.NewValue == null ? Visibility.Visible : Visibility.Hidden;
+                    globalRankDisplay.Content = stats.NewValue?.GlobalRank?.ToLocalisableString("\\##,##0") ?? "-";
+                    countryRankDisplay.Content = stats.NewValue?.CountryRank?.ToLocalisableString("\\##,##0") ?? "-";
+                }, true);
+            }
         }
 
         protected override Drawable CreateLayout()
