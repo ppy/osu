@@ -98,7 +98,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             const float vertical_offset = 13;
 
-            InternalChildren = new Drawable[]
+            InternalChildren = new[]
             {
                 label = new OsuSpriteText
                 {
