@@ -16,6 +16,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
 
         private SettingsButton deleteBeatmapsButton = null!;
         private SettingsButton deleteBeatmapVideosButton = null!;
+        private SettingsButton resetOffsetsButton = null!;
         private SettingsButton restoreButton = null!;
         private SettingsButton undeleteButton = null!;
 
@@ -31,7 +32,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                     {
                         deleteBeatmapsButton.Enabled.Value = false;
                         Task.Run(() => beatmaps.Delete()).ContinueWith(_ => Schedule(() => deleteBeatmapsButton.Enabled.Value = true));
-                    }));
+                    }, DeleteConfirmationContentStrings.Beatmaps));
                 }
             });
 
@@ -40,13 +41,27 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                 Text = MaintenanceSettingsStrings.DeleteAllBeatmapVideos,
                 Action = () =>
                 {
-                    dialogOverlay?.Push(new MassVideoDeleteConfirmationDialog(() =>
+                    dialogOverlay?.Push(new MassDeleteConfirmationDialog(() =>
                     {
                         deleteBeatmapVideosButton.Enabled.Value = false;
                         Task.Run(beatmaps.DeleteAllVideos).ContinueWith(_ => Schedule(() => deleteBeatmapVideosButton.Enabled.Value = true));
-                    }));
+                    }, DeleteConfirmationContentStrings.BeatmapVideos));
                 }
             });
+
+            Add(resetOffsetsButton = new DangerousSettingsButton
+            {
+                Text = MaintenanceSettingsStrings.ResetAllOffsets,
+                Action = () =>
+                {
+                    dialogOverlay?.Push(new MassDeleteConfirmationDialog(() =>
+                    {
+                        resetOffsetsButton.Enabled.Value = false;
+                        Task.Run(beatmaps.ResetAllOffsets).ContinueWith(_ => Schedule(() => resetOffsetsButton.Enabled.Value = true));
+                    }, DeleteConfirmationContentStrings.Offsets));
+                }
+            });
+
             AddRange(new Drawable[]
             {
                 restoreButton = new SettingsButton

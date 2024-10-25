@@ -31,4 +31,22 @@
     <PackageReference Include="DeepEqual" Version="2.0.0" />
     <PackageReference Include="Moq" Version="4.17.2" />
   </ItemGroup>
+  <!-- osu.Framework.Android depends on https://www.nuget.org/packages/Xamarin.AndroidX.Window,
+       which - via a chain of transitive dependencies - also includes https://www.nuget.org/packages/Xamarin.Jetbrains.Annotations,
+       which causes compile failures such as:
+
+         The type 'NotNullAttribute' exists in both 'JetBrains.Annotations, Version=4242.42.42.42, Culture=neutral, PublicKeyToken=1010a0d8d6380325'
+         and 'Xamarin.Jetbrains.Annotations, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null' [D:\a\osu\osu\osu.Game.Tests.Android\osu.Game.Tests.Android.csproj]
+
+       We cannot easily change the source files, because of how this project works
+       (all source files are basically symlinked from the desktop test project,
+       so changing anything there just for the sake of mobile would be strange).
+       Thus, apply the following "interesting" workaround as borrowed from https://stackoverflow.com/a/65127159 instead. -->
+  <Target Name="AddPackageAliases" BeforeTargets="FindReferenceAssembliesForReferences;ResolveReferences">
+    <ItemGroup>
+      <ReferencePath Condition="%(Filename) == 'Xamarin.Jetbrains.Annotations'">
+        <Aliases>XamarinJetbrainsAnnotations</Aliases>
+      </ReferencePath>
+    </ItemGroup>
+  </Target>
 </Project>

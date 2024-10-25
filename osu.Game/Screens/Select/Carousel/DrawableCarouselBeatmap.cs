@@ -25,9 +25,11 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 using osuTK;
 using osuTK.Graphics;
 
@@ -74,6 +76,15 @@ namespace osu.Game.Screens.Select.Carousel
 
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; } = null!;
+
+        [Resolved]
+        private IBindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
+
+        [Resolved]
+        private IAPIProvider api { get; set; } = null!;
+
+        [Resolved]
+        private OsuGame? game { get; set; }
 
         private IBindable<StarDifficulty?> starDifficultyBindable = null!;
         private CancellationTokenSource? starDifficultyCancellationSource;
@@ -122,7 +133,7 @@ namespace osu.Game.Screens.Select.Carousel
                     {
                         difficultyIcon = new DifficultyIcon(beatmapInfo)
                         {
-                            ShowTooltip = false,
+                            TooltipType = DifficultyIconTooltipType.None,
                             Scale = new Vector2(1.8f),
                         },
                         new FillFlowContainer
@@ -185,6 +196,7 @@ namespace osu.Game.Screens.Select.Carousel
             base.LoadComplete();
 
             ruleset.BindValueChanged(_ => updateKeyCount());
+            mods.BindValueChanged(_ => updateKeyCount());
         }
 
         protected override void Selected()
@@ -255,7 +267,7 @@ namespace osu.Game.Screens.Select.Carousel
                 ILegacyRuleset legacyRuleset = (ILegacyRuleset)ruleset.Value.CreateInstance();
 
                 keyCountText.Alpha = 1;
-                keyCountText.Text = $"[{legacyRuleset.GetKeyCount(beatmapInfo)}K]";
+                keyCountText.Text = $"[{legacyRuleset.GetKeyCount(beatmapInfo, mods.Value)}K]";
             }
             else
                 keyCountText.Alpha = 0;
@@ -282,6 +294,9 @@ namespace osu.Game.Screens.Select.Carousel
                     collectionItems.Add(new OsuMenuItem("Manage...", MenuItemType.Standard, manageCollectionsDialog.Show));
 
                 items.Add(new OsuMenuItem("Collections") { Items = collectionItems });
+
+                if (beatmapInfo.GetOnlineURL(api, ruleset.Value) is string url)
+                    items.Add(new OsuMenuItem("Copy link", MenuItemType.Standard, () => game?.CopyUrlToClipboard(url)));
 
                 if (hideRequested != null)
                     items.Add(new OsuMenuItem(CommonStrings.ButtonsHide.ToSentence(), MenuItemType.Destructive, () => hideRequested(beatmapInfo)));

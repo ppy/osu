@@ -4,7 +4,9 @@
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Events;
 using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -19,6 +21,19 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override TextContainer CreateTextContainer() => new ToggleTextContainer(Item);
 
+        protected override bool OnMouseDown(MouseDownEvent e)
+        {
+            // Right mouse button is a special case where we allow actioning without dismissing the menu.
+            // This is achieved by not calling `Clicked` (as done by the base implementation in OnClick).
+            if (IsActionable && e.Button == MouseButton.Right)
+            {
+                Item.Action.Value?.Invoke();
+                return true;
+            }
+
+            return false;
+        }
+
         private partial class ToggleTextContainer : TextContainer
         {
             private readonly StatefulMenuItem menuItem;
@@ -31,12 +46,11 @@ namespace osu.Game.Graphics.UserInterface
 
                 state = menuItem.State.GetBoundCopy();
 
-                Add(stateIcon = new SpriteIcon
+                CheckboxContainer.Add(stateIcon = new SpriteIcon
                 {
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreLeft,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
                     Size = new Vector2(10),
-                    Margin = new MarginPadding { Horizontal = MARGIN_HORIZONTAL },
                     AlwaysPresent = true,
                 });
             }
@@ -45,14 +59,6 @@ namespace osu.Game.Graphics.UserInterface
             {
                 base.LoadComplete();
                 state.BindValueChanged(updateState, true);
-            }
-
-            protected override void Update()
-            {
-                base.Update();
-
-                // Todo: This is bad. This can maybe be done better with a refactor of DrawableOsuMenuItem.
-                stateIcon.X = BoldText.DrawWidth + 10;
             }
 
             private void updateState(ValueChangedEvent<object> state)

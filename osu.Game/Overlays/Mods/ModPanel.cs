@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mods;
@@ -36,7 +37,7 @@ namespace osu.Game.Overlays.Mods
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Active = { BindTarget = Active },
-                Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0),
+                Shear = new Vector2(-OsuGame.SHEAR, 0),
                 Scale = new Vector2(HEIGHT / ModSwitchSmall.DEFAULT_SIZE)
             };
         }
@@ -58,6 +59,21 @@ namespace osu.Game.Overlays.Mods
 
             modState.ValidForSelection.BindValueChanged(_ => updateFilterState());
             modState.MatchingTextFilter.BindValueChanged(_ => updateFilterState(), true);
+            modState.Preselected.BindValueChanged(b =>
+            {
+                if (b.NewValue)
+                {
+                    Content.EdgeEffect = new EdgeEffectParameters
+                    {
+                        Type = EdgeEffectType.Glow,
+                        Colour = AccentColour,
+                        Hollow = true,
+                        Radius = 2,
+                    };
+                }
+                else
+                    Content.EdgeEffect = default;
+            }, true);
         }
 
         protected override void Select()
@@ -77,11 +93,11 @@ namespace osu.Game.Overlays.Mods
         /// <seealso cref="ModState.Visible"/>
         public bool Visible => modState.Visible;
 
-        public override IEnumerable<LocalisableString> FilterTerms => new[]
+        public override IEnumerable<LocalisableString> FilterTerms => new LocalisableString[]
         {
             Mod.Name,
+            Mod.Name.Replace(" ", string.Empty),
             Mod.Acronym,
-            Mod.Description
         };
 
         public override bool MatchingFilter

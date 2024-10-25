@@ -34,6 +34,19 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"previous_usernames")]
         public string[] PreviousUsernames;
 
+        [JsonProperty(@"rank_highest")]
+        [CanBeNull]
+        public UserRankHighest RankHighest;
+
+        public class UserRankHighest
+        {
+            [JsonProperty(@"rank")]
+            public int Rank;
+
+            [JsonProperty(@"updated_at")]
+            public DateTimeOffset UpdatedAt;
+        }
+
         [JsonProperty(@"country_code")]
         private string countryCodeString;
 
@@ -188,6 +201,9 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"playmode")]
         public string PlayMode;
 
+        [JsonProperty(@"profile_hue")]
+        public int? ProfileHue;
+
         [JsonProperty(@"profile_order")]
         public string[] ProfileOrder;
 
@@ -245,7 +261,7 @@ namespace osu.Game.Online.API.Requests.Responses
         public APIUserHistoryCount[] ReplaysWatchedCounts;
 
         /// <summary>
-        /// All user statistics per ruleset's short name (in the case of a <see cref="GetUsersRequest"/> response).
+        /// All user statistics per ruleset's short name (in the case of a <see cref="GetUsersRequest"/> or <see cref="GetMeRequest"/> response).
         /// Otherwise empty. Can be altered for testing purposes.
         /// </summary>
         // todo: this should likely be moved to a separate UserCompact class at some point.
@@ -255,6 +271,9 @@ namespace osu.Game.Online.API.Requests.Responses
 
         [JsonProperty("groups")]
         public APIUserGroup[] Groups;
+
+        [JsonProperty("daily_challenge_user_stats")]
+        public APIUserDailyChallengeStatistics DailyChallengeStatistics = new APIUserDailyChallengeStatistics();
 
         public override string ToString() => Username;
 

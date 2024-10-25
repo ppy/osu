@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Buffers;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -111,11 +112,6 @@ namespace osu.Game.Rulesets.Catch.UI
         public Direction VisualDirection { get; set; } = Direction.Right;
 
         public Vector2 BodyScale => Scale * body.Scale;
-
-        /// <summary>
-        /// Whether the contents of the catcher plate should be visually flipped when the catcher direction is changed.
-        /// </summary>
-        private bool flipCatcherPlate;
 
         /// <summary>
         /// Width of the area that can be used to attempt catches during gameplay.
@@ -339,8 +335,6 @@ namespace osu.Game.Rulesets.Catch.UI
                 skin.GetConfig<CatchSkinColour, Color4>(CatchSkinColour.HyperDash)?.Value ??
                 DEFAULT_HYPER_DASH_COLOUR;
 
-            flipCatcherPlate = skin.GetConfig<CatchSkinConfiguration, bool>(CatchSkinConfiguration.FlipCatcherPlate)?.Value ?? true;
-
             runHyperDashStateTransition(HyperDashing);
         }
 
@@ -352,8 +346,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
             body.Scale = scaleFromDirection;
             // Inverse of catcher scale is applied here, as catcher gets scaled by circle size and so do the incoming fruit.
-            caughtObjectContainer.Scale = (1 / Scale.X) * (flipCatcherPlate ? scaleFromDirection : Vector2.One);
-            hitExplosionContainer.Scale = flipCatcherPlate ? scaleFromDirection : Vector2.One;
+            caughtObjectContainer.Scale = new Vector2(1 / Scale.X);
 
             // Correct overshooting.
             if ((hyperDashDirection > 0 && hyperDashTargetPosition < X) ||
@@ -370,7 +363,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
             if (caughtObject == null) return;
 
-            caughtObject.CopyStateFrom(drawableObject);
+            caughtObject.RestoreState(drawableObject.SaveState());
             caughtObject.Anchor = Anchor.TopCentre;
             caughtObject.Position = position;
             caughtObject.Scale *= caught_fruit_scale_adjust;
@@ -419,41 +412,50 @@ namespace osu.Game.Rulesets.Catch.UI
             }
         }
 
-        private CaughtObject getDroppedObject(CaughtObject caughtObject)
+        private CaughtObject getDroppedObject(CatchObjectState state)
         {
-            var droppedObject = getCaughtObject(caughtObject.HitObject);
+            var droppedObject = getCaughtObject(state.HitObject);
             Debug.Assert(droppedObject != null);
 
-            droppedObject.CopyStateFrom(caughtObject);
+            droppedObject.RestoreState(state);
             droppedObject.Anchor = Anchor.TopLeft;
-            droppedObject.Position = caughtObjectContainer.ToSpaceOfOtherDrawable(caughtObject.DrawPosition, droppedObjectTarget);
+            droppedObject.Position = caughtObjectContainer.ToSpaceOfOtherDrawable(state.DisplayPosition, droppedObjectTarget);
 
             return droppedObject;
         }
 
         private void clearPlate(DroppedObjectAnimation animation)
         {
-            var caughtObjects = caughtObjectContainer.Children.ToArray();
+            int caughtCount = caughtObjectContainer.Children.Count;
+            CatchObjectState[] states = ArrayPool<CatchObjectState>.Shared.Rent(caughtCount);
 
-            caughtObjectContainer.Clear(false);
+            try
+            {
+                for (int i = 0; i < caughtCount; i++)
+                    states[i] = caughtObjectContainer.Children[i].SaveState();
 
-            // Use the already returned PoolableDrawables for new objects
-            var droppedObjects = caughtObjects.Select(getDroppedObject).ToArray();
+                caughtObjectContainer.Clear(false);
 
-            droppedObjectTarget.AddRange(droppedObjects);
-
-            foreach (var droppedObject in droppedObjects)
-                applyDropAnimation(droppedObject, animation);
+                for (int i = 0; i < caughtCount; i++)
+                {
+                    CaughtObject obj = getDroppedObject(states[i]);
+                    droppedObjectTarget.Add(obj);
+                    applyDropAnimation(obj, animation);
+                }
+            }
+            finally
+            {
+                ArrayPool<CatchObjectState>.Shared.Return(states);
+            }
         }
 
         private void removeFromPlate(CaughtObject caughtObject, DroppedObjectAnimation animation)
         {
+            CatchObjectState state = caughtObject.SaveState();
             caughtObjectContainer.Remove(caughtObject, false);
 
-            var droppedObject = getDroppedObject(caughtObject);
-
+            var droppedObject = getDroppedObject(state);
             droppedObjectTarget.Add(droppedObject);
-
             applyDropAnimation(droppedObject, animation);
         }
 

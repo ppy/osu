@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -27,6 +28,7 @@ using osu.Game.Configuration;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
 using osu.Game.Overlays.Mods;
+using osu.Game.Utils;
 
 namespace osu.Game.Screens.Select.Details
 {
@@ -34,14 +36,6 @@ namespace osu.Game.Screens.Select.Details
     {
         [Resolved]
         private BeatmapDifficultyCache difficultyCache { get; set; }
-
-        [Resolved]
-        private IBindable<IReadOnlyList<Mod>> mods { get; set; }
-
-        [Resolved]
-        private OsuGameBase game { get; set; }
-
-        private IBindable<RulesetInfo> gameRuleset;
 
         protected readonly StatisticRow FirstValue, HpDrain, Accuracy, ApproachRate;
         private readonly StatisticRow starDifficulty;
@@ -63,6 +57,23 @@ namespace osu.Game.Screens.Select.Details
                 updateStatistics();
             }
         }
+
+        /// <summary>
+        /// Ruleset to be used for certain elements of display.
+        /// When set, this will override the set <see cref="Beatmap"/>'s own ruleset.
+        /// </summary>
+        /// <remarks>
+        /// No checks are done as to whether the ruleset specified is valid for the currently <see cref="BeatmapInfo"/>.
+        /// </remarks>
+        public Bindable<RulesetInfo> Ruleset { get; } = new Bindable<RulesetInfo>();
+
+        /// <summary>
+        /// Mods to be used for certain elements of display.
+        /// </summary>
+        /// <remarks>
+        /// No checks are done as to whether the mods specified are valid for the current <see cref="Ruleset"/>.
+        /// </remarks>
+        public Bindable<IReadOnlyList<Mod>> Mods { get; } = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
         public AdvancedStats(int columns = 1)
         {
@@ -137,14 +148,8 @@ namespace osu.Game.Screens.Select.Details
         {
             base.LoadComplete();
 
-            // the cached ruleset bindable might be a decoupled bindable provided by SongSelect,
-            // which we can't rely on in combination with the game-wide selected mods list,
-            // since mods could be updated to the new ruleset instances while the decoupled bindable is held behind,
-            // therefore resulting in performing difficulty calculation with invalid states.
-            gameRuleset = game.Ruleset.GetBoundCopy();
-            gameRuleset.BindValueChanged(_ => updateStatistics());
-
-            mods.BindValueChanged(modsChanged, true);
+            Ruleset.BindValueChanged(_ => updateStatistics());
+            Mods.BindValueChanged(modsChanged, true);
         }
 
         private ModSettingChangeTracker modSettingChangeTracker;
@@ -169,44 +174,39 @@ namespace osu.Game.Screens.Select.Details
             IBeatmapDifficultyInfo baseDifficulty = BeatmapInfo?.Difficulty;
             BeatmapDifficulty adjustedDifficulty = null;
 
-            IRulesetInfo ruleset = gameRuleset?.Value ?? beatmapInfo.Ruleset;
-
             if (baseDifficulty != null)
             {
                 BeatmapDifficulty originalDifficulty = new BeatmapDifficulty(baseDifficulty);
 
-                foreach (var mod in mods.Value.OfType<IApplicableToDifficulty>())
+                foreach (var mod in Mods.Value.OfType<IApplicableToDifficulty>())
                     mod.ApplyToDifficulty(originalDifficulty);
 
                 adjustedDifficulty = originalDifficulty;
 
-                if (gameRuleset != null)
+                if (Ruleset.Value != null)
                 {
-                    double rate = 1;
-                    foreach (var mod in mods.Value.OfType<IApplicableToRate>())
-                        rate = mod.ApplyToRate(0, rate);
+                    double rate = ModUtils.CalculateRateWithMods(Mods.Value);
 
-                    adjustedDifficulty = ruleset.CreateInstance().GetRateAdjustedDisplayDifficulty(originalDifficulty, rate);
+                    adjustedDifficulty = Ruleset.Value.CreateInstance().GetRateAdjustedDisplayDifficulty(originalDifficulty, rate);
 
                     TooltipContent = new AdjustedAttributesTooltip.Data(originalDifficulty, adjustedDifficulty);
                 }
             }
 
-            switch (ruleset.OnlineID)
+            switch (Ruleset.Value?.OnlineID)
             {
                 case 3:
                     // Account for mania differences locally for now.
                     // Eventually this should be handled in a more modular way, allowing rulesets to return arbitrary difficulty attributes.
-                    ILegacyRuleset legacyRuleset = (ILegacyRuleset)ruleset.CreateInstance();
+                    ILegacyRuleset legacyRuleset = (ILegacyRuleset)Ruleset.Value.CreateInstance();
 
                     // For the time being, the key count is static no matter what, because:
                     // a) The method doesn't have knowledge of the active keymods. Doing so may require considerations for filtering.
                     // b) Using the difficulty adjustment mod to adjust OD doesn't have an effect on conversion.
-                    int keyCount = baseDifficulty == null ? 0 : legacyRuleset.GetKeyCount(BeatmapInfo);
+                    int keyCount = baseDifficulty == null ? 0 : legacyRuleset.GetKeyCount(BeatmapInfo, Mods.Value);
 
                     FirstValue.Title = BeatmapsetsStrings.ShowStatsCsMania;
                     FirstValue.Value = (keyCount, keyCount);
-
                     break;
 
                 default:
@@ -240,8 +240,8 @@ namespace osu.Game.Screens.Select.Details
 
             starDifficultyCancellationSource = new CancellationTokenSource();
 
-            var normalStarDifficultyTask = difficultyCache.GetDifficultyAsync(BeatmapInfo, gameRuleset.Value, null, starDifficultyCancellationSource.Token);
-            var moddedStarDifficultyTask = difficultyCache.GetDifficultyAsync(BeatmapInfo, gameRuleset.Value, mods.Value, starDifficultyCancellationSource.Token);
+            var normalStarDifficultyTask = difficultyCache.GetDifficultyAsync(BeatmapInfo, Ruleset.Value, null, starDifficultyCancellationSource.Token);
+            var moddedStarDifficultyTask = difficultyCache.GetDifficultyAsync(BeatmapInfo, Ruleset.Value, Mods.Value, starDifficultyCancellationSource.Token);
 
             Task.WhenAll(normalStarDifficultyTask, moddedStarDifficultyTask).ContinueWith(_ => Schedule(() =>
             {

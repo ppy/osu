@@ -40,6 +40,12 @@ namespace osu.Game.Online.API
         string AccessToken { get; }
 
         /// <summary>
+        /// Used as an identifier of a single local lazer session.
+        /// Sent across the wire for the purposes of concurrency control to spectator server.
+        /// </summary>
+        Guid SessionIdentifier { get; }
+
+        /// <summary>
         /// Returns whether the local user is logged in.
         /// </summary>
         bool IsLoggedIn { get; }
@@ -56,7 +62,7 @@ namespace osu.Game.Online.API
         string APIEndpointUrl { get; }
 
         /// <summary>
-        /// The root URL of of the website, excluding the trailing slash.
+        /// The root URL of the website, excluding the trailing slash.
         /// </summary>
         string WebsiteRootUrl { get; }
 

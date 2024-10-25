@@ -121,7 +121,11 @@ namespace osu.Game.Screens.Edit
 
             scheduledDifficultySwitch = Schedule(() =>
             {
-                Beatmap.Value = nextBeatmap.Invoke();
+                var workingBeatmap = nextBeatmap.Invoke();
+
+                Ruleset.Value = workingBeatmap.BeatmapInfo.Ruleset;
+                Beatmap.Value = workingBeatmap;
+
                 state = editorState;
 
                 // This screen is a weird exception to the rule that nothing after song select changes the global beatmap.

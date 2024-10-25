@@ -13,6 +13,7 @@ using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.UI.Scrolling;
+using osu.Game.Screens.Edit;
 using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
@@ -41,6 +42,9 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
 
         [Resolved]
         private IBeatSnapProvider? beatSnapProvider { get; set; }
+
+        [Resolved]
+        protected EditorBeatmap? EditorBeatmap { get; private set; }
 
         protected EditablePath(Func<float, double> positionToTime)
         {
@@ -103,15 +107,23 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
             //
             // The value is clamped here by the bindable min and max values.
             // In case the required velocity is too large, the path is not preserved.
+            double previousVelocity = svBindable.Value;
             svBindable.Value = Math.Ceiling(requiredVelocity / svToVelocityFactor);
 
-            path.ConvertToSliderPath(hitObject.Path, hitObject.LegacyConvertedY, hitObject.Velocity);
+            // adjust velocity locally, so that once the SV change is applied by applying defaults
+            // (triggered by `EditorBeatmap.Update()` call at end of method),
+            // it results in the outcome desired by the user.
+            double relativeChange = svBindable.Value / previousVelocity;
+            double localVelocity = hitObject.Velocity * relativeChange;
+            path.ConvertToSliderPath(hitObject.Path, hitObject.LegacyConvertedY, localVelocity);
 
             if (beatSnapProvider == null) return;
 
             double endTime = hitObject.StartTime + path.Duration;
             double snappedEndTime = beatSnapProvider.SnapTime(endTime, hitObject.StartTime);
-            hitObject.Path.ExpectedDistance.Value = (snappedEndTime - hitObject.StartTime) * hitObject.Velocity;
+            hitObject.Path.ExpectedDistance.Value = (snappedEndTime - hitObject.StartTime) * localVelocity;
+
+            EditorBeatmap?.Update(hitObject);
         }
 
         public Vector2 ToRelativePosition(Vector2 screenSpacePosition)
