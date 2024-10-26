@@ -325,7 +325,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     case PlacementBlueprint.PlacementState.Waiting:
                         if (!Composer.CursorInPlacementArea)
                             CurrentPlacement.Hide();
-                        else if (Composer.CursorInPlacementArea)
+                        else
                             CurrentPlacement.Show();
 
                         break;
