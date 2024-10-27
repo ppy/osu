@@ -14,31 +14,24 @@ using osu.Game.Users;
 namespace osu.Game.Online
 {
     /// <summary>
-    /// A component that is responsible for providing the latest statistics of the logged-in user for the game-wide selected ruleset.
+    /// A component that keeps track of the latest statistics for the local user.
     /// </summary>
     public partial class LocalUserStatisticsProvider : Component
     {
-        /// <summary>
-        /// The statistics of the logged-in user for the game-wide selected ruleset.
-        /// </summary>
-        public IBindable<UserStatistics?> Statistics => statistics;
-
-        private readonly Bindable<UserStatistics?> statistics = new Bindable<UserStatistics?>();
-
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; } = null!;
 
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
 
-        private readonly Dictionary<string, UserStatistics> allStatistics = new Dictionary<string, UserStatistics>();
-
         /// <summary>
-        /// Returns the <see cref="UserStatistics"/> currently available for the given ruleset.
-        /// This may return null if the requested statistics has not been fetched yet.
+        /// The statistics of the local user for the game-wide selected ruleset.
         /// </summary>
-        /// <param name="ruleset">The ruleset to return the corresponding <see cref="UserStatistics"/> for.</param>
-        internal UserStatistics? GetStatisticsFor(RulesetInfo ruleset) => allStatistics.GetValueOrDefault(ruleset.ShortName);
+        public IBindable<UserStatistics?> Statistics => statistics;
+
+        private readonly Bindable<UserStatistics?> statistics = new Bindable<UserStatistics?>();
+
+        private readonly Dictionary<string, UserStatistics> allStatistics = new Dictionary<string, UserStatistics>();
 
         protected override void LoadComplete()
         {
@@ -89,6 +82,13 @@ namespace osu.Game.Online
             currentRequest.Success += u => statistics.Value = allStatistics[ruleset.ShortName] = u.Statistics;
             api.Queue(currentRequest);
         }
+
+        /// <summary>
+        /// Returns the <see cref="UserStatistics"/> currently available for the given ruleset.
+        /// This may return null if the requested statistics has not been fetched yet.
+        /// </summary>
+        /// <param name="ruleset">The ruleset to return the corresponding <see cref="UserStatistics"/> for.</param>
+        internal UserStatistics? GetStatisticsFor(RulesetInfo ruleset) => allStatistics.GetValueOrDefault(ruleset.ShortName);
 
         internal void UpdateStatistics(UserStatistics statistics, RulesetInfo statisticsRuleset)
         {
