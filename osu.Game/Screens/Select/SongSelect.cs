@@ -963,7 +963,7 @@ namespace osu.Game.Screens.Select
 
             if (FilterControl.CurrentTextSearch.Value == string.Empty)
             {
-                FilterControl.InformationalText = $"{carouselCountDisplayed} beatmaps loaded";
+                FilterControl.InformationalText = $"{carouselCountDisplayed} beatmaps available";
             }
             else
             {
