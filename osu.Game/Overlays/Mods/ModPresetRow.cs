@@ -9,6 +9,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
 using osuTK;
@@ -18,7 +19,7 @@ namespace osu.Game.Overlays.Mods
 {
     public partial class ModPresetRow : FillFlowContainer
     {
-        public ModPresetRow(Mod mod, HashSet<Mod>? rootSet = null)
+        public ModPresetRow(Mod mod, HashSet<Mod>? rootSet = null, ModRowMode mode = ModRowMode.None)
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -34,24 +35,25 @@ namespace osu.Game.Overlays.Mods
                     Spacing = new Vector2(7),
                     Children = new Drawable[]
                     {
-                        rootSet != null
+                        rootSet != null && mode != ModRowMode.None
                             ? new IconButton
                             {
-                                Icon = FontAwesome.Solid.TimesCircle,
+                                Icon = mode == ModRowMode.Remove ? FontAwesome.Solid.TimesCircle : FontAwesome.Solid.PlusCircle,
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
-                                Enabled = { Value = rootSet.Count > 1 },
-                                TooltipText = "Remove this mod",
-                                Action = () => Scheduler.AddOnce(() =>
-                                {
-                                    if (rootSet.Count <= 1)
-                                        this.FlashColour(Color4.Red, 300);
-                                    else
+                                TooltipText = mode == ModRowMode.Remove ? ModSelectOverlayStrings.RemoveThisMod : ModSelectOverlayStrings.AddThisMod,
+                                Action = mode == ModRowMode.Remove
+                                    ? () => Scheduler.AddOnce(() =>
                                     {
-                                        this.FadeOut(200, Easing.OutQuint).Then().Expire();
-                                        rootSet.Remove(mod);
-                                    }
-                                })
+                                        if (rootSet.Count <= 1)
+                                            this.FlashColour(Color4.Red, 300);
+                                        else
+                                        {
+                                            this.FadeOut(200, Easing.OutQuint).Then().Expire();
+                                            rootSet.Remove(mod);
+                                        }
+                                    })
+                                    : () => Scheduler.AddOnce(() => rootSet.Add(mod))
                             }
                             : new Container(),
                         new ModSwitchTiny(mod)
@@ -84,5 +86,12 @@ namespace osu.Game.Overlays.Mods
                 });
             }
         }
+    }
+
+    public enum ModRowMode
+    {
+        None,
+        Remove,
+        Add
     }
 }

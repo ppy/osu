@@ -46,6 +46,16 @@ namespace osu.Game.Localisation
         public static LocalisableString UseCurrentMods => new TranslatableString(getKey(@"use_current_mods"), @"Use current mods");
 
         /// <summary>
+        /// "Remove this mod"
+        /// </summary>
+        public static LocalisableString RemoveThisMod => new TranslatableString(getKey(@"remove_this_mod"), @"Remove this mod");
+
+        /// <summary>
+        /// "Add this mod"
+        /// </summary>
+        public static LocalisableString AddThisMod => new TranslatableString(getKey(@"add_this_mod"), @"Add this mod");
+
+        /// <summary>
         /// "tab to search..."
         /// </summary>
         public static LocalisableString TabToSearch => new TranslatableString(getKey(@"tab_to_search"), @"tab to search...");
