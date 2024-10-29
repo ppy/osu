@@ -2,9 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -75,15 +77,25 @@ namespace osu.Game.Overlays.Mods
                 }
             };
 
-            if (!string.IsNullOrEmpty(mod.SettingDescription))
+            if (mode == ModRowMode.None)
             {
-                AddInternal(new OsuTextFlowContainer
+                if (!string.IsNullOrEmpty(mod.SettingDescription))
                 {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Padding = new MarginPadding { Left = 14 },
-                    Text = mod.SettingDescription
-                });
+                    AddInternal(new OsuTextFlowContainer
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Padding = new MarginPadding { Left = 14 },
+                        Text = mod.SettingDescription
+                    });
+                }
+            }
+            else
+            {
+                var settings = mod.CreateSettingsControls().ToList();
+
+                if (settings.Count > 0)
+                    AddRange(settings);
             }
         }
     }
