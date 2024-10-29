@@ -10,6 +10,8 @@ using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Framework.Input.States;
@@ -292,6 +294,36 @@ namespace osu.Game.Tests.Visual.Background
             AddUntilStep("Sprite is not dimmed", () => !songSelect.IsSpriteDimmed());
         }
 
+        /// <summary>
+        /// Check if BufferedContainer redraws the framebuffer on dim changes.
+        /// </summary>
+        [Test]
+        public void TestNoBufferRedrawOnDimChange()
+        {
+            performFullSetup();
+
+            AddUntilStep("Screen is dimmed, blur applied and dim colour adjusted", () => songSelect.IsBackgroundDimmed() && songSelect.IsUserBlurApplied() && songSelect.IsBackgroundColourOffset());
+            AddUntilStep("BufferedContainer is initialized", () => !songSelect.IsBufferedContainerNull());
+
+            AddStep("Start tracking redraws", () => songSelect.RequiredRedraw = false);
+
+            AddStep("Undim the screen", () =>
+            {
+                songSelect.DimLevel.Value = 0.0;
+                songSelect.DimColour.Value = 0.0;
+            });
+            AddUntilStep("Screen is undimmed and blur applied", () => songSelect.IsBackgroundUndimmed() && songSelect.IsUserBlurApplied());
+            AddUntilStep("Redraw wasn't required", () => !songSelect.RequiredRedraw);
+
+            AddStep("Dim the screen", () =>
+            {
+                songSelect.DimLevel.Value = 0.7;
+                songSelect.DimColour.Value = 0.5;
+            });
+            AddUntilStep("Screen is dimmed, blur applied and dim colour adjusted", () => songSelect.IsBackgroundDimmed() && songSelect.IsUserBlurApplied() && songSelect.IsBackgroundColourOffset());
+            AddUntilStep("Redraw wasn't required", () => !songSelect.RequiredRedraw);
+        }
+
         private void createFakeStoryboard() => AddStep("Create storyboard", () =>
         {
             player.StoryboardEnabled.Value = false;
@@ -416,6 +448,12 @@ namespace osu.Game.Tests.Visual.Background
             public bool IsBufferedContainerDimmed() => background.IsBufferedContainerDimmed;
 
             public bool IsBufferedContainerNull() => background.IsBufferedContainerNull;
+
+            public bool RequiredRedraw
+            {
+                get => background.RequiredRedraw;
+                set => background.RequiredRedraw = value;
+            }
         }
 
         private partial class FadeAccessibleResults : ResultsScreen
@@ -520,6 +558,12 @@ namespace osu.Game.Tests.Visual.Background
 
             public Vector2 CurrentBlur => Background?.BlurSigma ?? Vector2.Zero;
 
+            public bool RequiredRedraw
+            {
+                get => beatmapBackground.RequiredRedraw;
+                set => beatmapBackground.RequiredRedraw = value;
+            }
+
             private TestDimmableBackground dimmable;
 
             private TestBeatmapBackground beatmapBackground;
@@ -603,6 +647,14 @@ namespace osu.Game.Tests.Visual.Background
 
             public bool IsBufferedContainerNull => ColouredDimmableBufferedContainer == null;
 
+            public bool RequiredRedraw
+            {
+                get => dimmableBufferedContainer.RequiredRedraw;
+                set => dimmableBufferedContainer.RequiredRedraw = value;
+            }
+
+            private TestDimmableBufferedContainer dimmableBufferedContainer;
+
             public TestBeatmapBackground(WorkingBeatmap beatmap)
                 : base(beatmap)
             {
@@ -613,6 +665,45 @@ namespace osu.Game.Tests.Visual.Background
                 if (AllowBlur)
                 {
                     base.BlurTo(newBlurSigma, duration, easing);
+                }
+            }
+
+            protected override BufferedContainer CreateBufferedContainer()
+            {
+                ColouredDimmableSprite.DimColour = Colour4.Black;
+                ColouredDimmableSprite.DimLevel = 0.0f;
+
+                return ColouredDimmableBufferedContainer = dimmableBufferedContainer = new TestDimmableBufferedContainer(cachedFrameBuffer: true)
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    RedrawOnScale = false,
+                    Child = Sprite,
+                    DimColour = DimColour,
+                    DimLevel = DimLevel
+                };
+            }
+        }
+
+        private partial class TestDimmableBufferedContainer : BeatmapBackground.DimmableBufferedContainer
+        {
+            // Ideally this one would be tracked inside of the DrawNode and set to true
+            // when framebuffer is redrawn, but DrawNode's are a bit broken in the
+            // headless testing mode, so an indirect check is used (see RequiresChildrenUpdate).
+            public bool RequiredRedraw;
+
+            public TestDimmableBufferedContainer(RenderBufferFormat[] formats = null, bool pixelSnapping = false, bool cachedFrameBuffer = false)
+                : base(formats, pixelSnapping, cachedFrameBuffer)
+            {
+            }
+
+            protected override bool RequiresChildrenUpdate
+            {
+                get
+                {
+                    // A bit hacky, but at least it doesn't require exposing BufferedContainer.updateVersion
+                    bool requiresChildrenUpdate = base.RequiresChildrenUpdate;
+                    RequiredRedraw |= requiresChildrenUpdate;
+                    return requiresChildrenUpdate;
                 }
             }
         }

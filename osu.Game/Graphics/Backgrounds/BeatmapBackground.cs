@@ -27,7 +27,7 @@ namespace osu.Game.Graphics.Backgrounds
 
         protected BeatmapBackgroundSprite ColouredDimmableSprite { get; private set; }
 
-        protected DimmableBufferedContainer ColouredDimmableBufferedContainer { get; private set; }
+        protected DimmableBufferedContainer ColouredDimmableBufferedContainer;
 
         private Colour4 dimColour;
 
