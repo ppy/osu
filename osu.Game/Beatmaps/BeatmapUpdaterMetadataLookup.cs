@@ -85,11 +85,11 @@ namespace osu.Game.Beatmaps
 
         private bool shouldDiscardLookupResult(OnlineBeatmapMetadata result, BeatmapInfo beatmapInfo)
         {
-            if (beatmapInfo.OnlineID > 0 && result.BeatmapID != beatmapInfo.OnlineID)
-            {
-                Logger.Log($"Discarding metadata lookup result due to mismatching online ID (expected: {beatmapInfo.OnlineID} actual: {result.BeatmapID})", LoggingTarget.Database);
-                return true;
-            }
+            // previously this used to check whether the `OnlineID` of the looked-up beatmap matches the local `OnlineID`.
+            // unfortunately it appears that historically stable mappers would apply crude hacks to fix unspecified "issues" with submission
+            // which would amount to reusing online IDs of other beatmaps.
+            // this means that the online ID in the `.osu` file is not reliable, and this cannot be fixed server-side
+            // because updating the maps retroactively would break stable (by losing all of users' local scores).
 
             if (beatmapInfo.OnlineID == -1 && result.MD5Hash != beatmapInfo.MD5Hash)
             {
