@@ -95,7 +95,11 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             if (estimatedUnstableRate == null)
                 return 0;
 
-            return difficultyValue * Math.Pow(SpecialFunctions.Erf(400 / (Math.Sqrt(2) * estimatedUnstableRate.Value)), 2.0);
+            // Scale accuracy more harshly on nearly-completely mono speed maps.
+            double accScalingExponent = 2 + attributes.MonoStaminaFactor;
+            double accScalingShift = 300 - 100 * attributes.MonoStaminaFactor;
+
+            return difficultyValue * Math.Pow(SpecialFunctions.Erf(accScalingShift / (Math.Sqrt(2) * estimatedUnstableRate.Value)), accScalingExponent);
         }
 
         private double computeAccuracyValue(ScoreInfo score, TaikoDifficultyAttributes attributes, bool isConvert)
