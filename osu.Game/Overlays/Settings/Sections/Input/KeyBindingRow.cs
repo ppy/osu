@@ -495,6 +495,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             RealmKeyBinding? existingBinding = keyBinding.KeyCombination.Equals(new KeyCombination(InputKey.None))
                 ? null
                 : bindings.FirstOrDefault(other => other.ID != keyBinding.ID && other.KeyCombination.Equals(keyBinding.KeyCombination) && (!restoringBinding || other.ActionInt != keyBinding.ActionInt));
+
             if (existingBinding == null)
             {
                 realm.Write(r => r.Find<RealmKeyBinding>(keyBinding.ID)!.KeyCombinationString = keyBinding.KeyCombination.ToString());
