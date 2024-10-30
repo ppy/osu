@@ -45,7 +45,8 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
             new HitCircleCompositionTool(),
             new SliderCompositionTool(),
-            new SpinnerCompositionTool()
+            new SpinnerCompositionTool(),
+            new GridFromPointsTool()
         };
 
         private readonly Bindable<TernaryState> rectangularGridSnapToggle = new Bindable<TernaryState>();
@@ -79,13 +80,12 @@ namespace osu.Game.Rulesets.Osu.Edit
             // Give a bit of breathing room around the playfield content.
             PlayfieldContentContainer.Padding = new MarginPadding(10);
 
-            LayerBelowRuleset.AddRange(new Drawable[]
-            {
+            LayerBelowRuleset.Add(
                 distanceSnapGridContainer = new Container
                 {
                     RelativeSizeAxes = Axes.Both
                 }
-            });
+            );
 
             selectedHitObjects = EditorBeatmap.SelectedHitObjects.GetBoundCopy();
             selectedHitObjects.CollectionChanged += (_, _) => updateDistanceSnapGrid();
