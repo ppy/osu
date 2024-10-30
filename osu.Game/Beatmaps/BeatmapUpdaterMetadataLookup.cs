@@ -43,10 +43,15 @@ namespace osu.Game.Beatmaps
 
             foreach (var beatmapInfo in beatmapSet.Beatmaps)
             {
-                // note that it is KEY that the lookup here only uses MD5 inside
-                // (see implementations of underlying `IOnlineBeatmapMetadataSource`s).
-                // anything else like online ID or filename can be manipulated, thus being inherently unreliable,
-                // thus being unusable here for any purpose.
+                // note that these lookups DO NOT ACTUALLY FULLY GUARANTEE that the beatmap is what it claims it is,
+                // i.e. the correctness of this lookup should be treated as APPROXIMATE AT WORST.
+                // this is because the beatmap filename is used as a fallback in some scenarios where the MD5 of the beatmap may mismatch.
+                // this is considered to be an acceptable casualty so that things can continue to work as expected for users in some rare scenarios
+                // (stale beatmap files in beatmap packs, beatmap mirror desyncs).
+                // however, all this means that other places such as score submission ARE EXPECTED TO VERIFY THE MD5 OF THE BEATMAP AGAINST THE ONLINE ONE EXPLICITLY AGAIN.
+                //
+                // additionally note that the online ID stored to the map is EXPLICITLY NOT USED because some users in a silly attempt to "fix" things for themselves on stable
+                // would reuse online IDs of already submitted beatmaps, which means that information is pretty much expected to be bogus in a nonzero number of beatmapsets.
                 if (!tryLookup(beatmapInfo, preferOnlineFetch, out var res))
                     continue;
 

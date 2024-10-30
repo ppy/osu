@@ -10,20 +10,20 @@ namespace osu.Game.Online.API.Requests
 {
     public class GetBeatmapRequest : APIRequest<APIBeatmap>
     {
-        public readonly int OnlineID = -1;
+        public readonly int OnlineID;
         public readonly string? MD5Hash;
         public readonly string? Filename;
 
         public GetBeatmapRequest(IBeatmapInfo beatmapInfo)
+            : this(onlineId: beatmapInfo.OnlineID, md5Hash: beatmapInfo.MD5Hash, filename: (beatmapInfo as BeatmapInfo)?.Path)
         {
-            OnlineID = beatmapInfo.OnlineID;
-            MD5Hash = beatmapInfo.MD5Hash;
-            Filename = (beatmapInfo as BeatmapInfo)?.Path ?? string.Empty;
         }
 
-        public GetBeatmapRequest(string md5Hash)
+        public GetBeatmapRequest(int onlineId = -1, string? md5Hash = null, string? filename = null)
         {
+            OnlineID = onlineId;
             MD5Hash = md5Hash;
+            Filename = filename;
         }
 
         protected override WebRequest CreateWebRequest()
