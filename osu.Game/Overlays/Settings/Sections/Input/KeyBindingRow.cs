@@ -222,7 +222,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 var button = buttons[i++];
                 button.UpdateKeyCombination(d);
 
-                tryPersistKeyBinding(button.KeyBinding.Value, advanceToNextBinding: false);
+                tryPersistKeyBinding(button.KeyBinding.Value, advanceToNextBinding: false, restoringBinding: true);
             }
 
             isDefault.Value = true;
@@ -489,13 +489,12 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             base.OnFocusLost(e);
         }
 
-        private void tryPersistKeyBinding(RealmKeyBinding keyBinding, bool advanceToNextBinding)
+        private void tryPersistKeyBinding(RealmKeyBinding keyBinding, bool advanceToNextBinding, bool restoringBinding = false)
         {
             List<RealmKeyBinding> bindings = GetAllSectionBindings();
             RealmKeyBinding? existingBinding = keyBinding.KeyCombination.Equals(new KeyCombination(InputKey.None))
                 ? null
-                : bindings.FirstOrDefault(other => other.ID != keyBinding.ID && other.KeyCombination.Equals(keyBinding.KeyCombination));
-
+                : bindings.FirstOrDefault(other => other.ID != keyBinding.ID && other.KeyCombination.Equals(keyBinding.KeyCombination) && (!restoringBinding || other.ActionInt != keyBinding.ActionInt));
             if (existingBinding == null)
             {
                 realm.Write(r => r.Find<RealmKeyBinding>(keyBinding.ID)!.KeyCombinationString = keyBinding.KeyCombination.ToString());
