@@ -241,8 +241,8 @@ namespace osu.Game.Tests.Beatmaps
 
             metadataLookup.Update(beatmapSet, preferOnlineFetch);
 
-            Assert.That(beatmap.Status, Is.EqualTo(BeatmapOnlineStatus.None));
-            Assert.That(beatmap.OnlineID, Is.EqualTo(-1));
+            Assert.That(beatmap.Status, Is.EqualTo(BeatmapOnlineStatus.Ranked));
+            Assert.That(beatmap.OnlineID, Is.EqualTo(654321));
         }
 
         [Test]
