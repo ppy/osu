@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Online.API;
 
@@ -44,10 +43,14 @@ namespace osu.Game.Beatmaps
 
             foreach (var beatmapInfo in beatmapSet.Beatmaps)
             {
+                // note that it is KEY that the lookup here only uses MD5 inside
+                // (see implementations of underlying `IOnlineBeatmapMetadataSource`s).
+                // anything else like online ID or filename can be manipulated, thus being inherently unreliable,
+                // thus being unusable here for any purpose.
                 if (!tryLookup(beatmapInfo, preferOnlineFetch, out var res))
                     continue;
 
-                if (res == null || shouldDiscardLookupResult(res, beatmapInfo))
+                if (res == null)
                 {
                     beatmapInfo.ResetOnlineInfo();
                     lookupResults.Add(null); // mark lookup failure
@@ -81,23 +84,6 @@ namespace osu.Game.Beatmaps
                 beatmapSet.DateRanked = representative.DateRanked;
                 beatmapSet.DateSubmitted = representative.DateSubmitted;
             }
-        }
-
-        private bool shouldDiscardLookupResult(OnlineBeatmapMetadata result, BeatmapInfo beatmapInfo)
-        {
-            // previously this used to check whether the `OnlineID` of the looked-up beatmap matches the local `OnlineID`.
-            // unfortunately it appears that historically stable mappers would apply crude hacks to fix unspecified "issues" with submission
-            // which would amount to reusing online IDs of other beatmaps.
-            // this means that the online ID in the `.osu` file is not reliable, and this cannot be fixed server-side
-            // because updating the maps retroactively would break stable (by losing all of users' local scores).
-
-            if (beatmapInfo.OnlineID == -1 && result.MD5Hash != beatmapInfo.MD5Hash)
-            {
-                Logger.Log($"Discarding metadata lookup result due to mismatching hash (expected: {beatmapInfo.MD5Hash} actual: {result.MD5Hash})", LoggingTarget.Database);
-                return true;
-            }
-
-            return false;
         }
 
         /// <summary>
