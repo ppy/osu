@@ -314,14 +314,14 @@ namespace osu.Game.Skinning
                     // For users with existing skin configuration on the ruleset-specific HUD layer, we need to manually add the combo counter because otherwise the user will not see any counter on their screen.
                     resources?.RealmAccess.Run(r =>
                     {
-                        var ruleset = r.Find<RulesetInfo>("fruits");
+                        var ruleset = r.Find<RulesetInfo>(@"fruits");
 
                         if (target != GlobalSkinnableContainers.MainHUDComponents
                             || !layout.TryGetDrawableInfo(ruleset, out var catchHUDComponents)
                             || resources == null)
                             return;
 
-                        Type newCatchComboCounter = SerialisedDrawableInfo.GetAllAvailableDrawables(ruleset).Single(t => t.IsAssignableTo(typeof(LegacyComboCounter)));
+                        Type newCatchComboCounter = SerialisedDrawableInfo.GetAllAvailableDrawables(ruleset).Single(t => t.Name == @"LegacyCatchComboCounter");
 
                         var serialisedComponent = new SerialisedDrawableInfo((Drawable)Activator.CreateInstance(newCatchComboCounter)!)
                         {

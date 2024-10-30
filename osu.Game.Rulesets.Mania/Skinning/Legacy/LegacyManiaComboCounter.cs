@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
         /// <summary>
         /// Value shown at the current moment.
         /// </summary>
-        public virtual int DisplayedCount
+        public int DisplayedCount
         {
             get => displayedCount;
             private set

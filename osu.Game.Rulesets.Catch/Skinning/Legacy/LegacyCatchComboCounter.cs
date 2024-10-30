@@ -1,10 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Globalization;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Threading;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Types;
@@ -15,11 +16,42 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 {
-    /// <summary>
-    /// A combo counter implementation that visually behaves almost similar to stable's osu!catch combo counter.
-    /// </summary>
-    public partial class LegacyCatchComboCounter : LegacyComboCounter
+    public partial class LegacyCatchComboCounter : CompositeDrawable, ISerialisableDrawable
     {
+        public bool UsesFixedAnchor { get; set; }
+
+        public Bindable<int> Current { get; } = new BindableInt { MinValue = 0 };
+
+        /// <summary>
+        /// Value shown at the current moment.
+        /// </summary>
+        public int DisplayedCount
+        {
+            get => displayedCount;
+            private set
+            {
+                if (displayedCount.Equals(value))
+                    return;
+
+                displayedCountText.Text = formatCount(value);
+                counterContainer.Size = displayedCountText.Size;
+
+                displayedCount = value;
+            }
+        }
+
+        private int displayedCount;
+
+        private int previousValue;
+
+        private const double main_duration = 300;
+        private const double pop_out_duration = 400;
+        private const double rolling_duration = 20;
+
+        private Container counterContainer = null!;
+        private LegacySpriteText popOutCountText = null!;
+        private LegacySpriteText displayedCountText = null!;
+
         [Resolved]
         private GameplayState gameplayState { get; set; } = null!;
 
@@ -33,16 +65,51 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 
         public LegacyCatchComboCounter()
         {
-            PopOutCountText.Origin = PopOutCountText.Anchor = Anchor.Centre;
-            DisplayedCountText.Origin = DisplayedCountText.Anchor = Anchor.Centre;
-
-            Content.ChangeChildDepth(PopOutCountText, float.MinValue);
+            // This is required since we control the anchor/origin to move appropriately with the catcher.
             UsesFixedAnchor = true;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(ScoreProcessor scoreProcessor)
+        {
+            AutoSizeAxes = Axes.Both;
+
+            InternalChildren = new[]
+            {
+                counterContainer = new Container
+                {
+                    AlwaysPresent = true,
+                    Children = new[]
+                    {
+                        displayedCountText = new LegacySpriteText(LegacyFont.Combo)
+                        {
+                            Alpha = 0,
+                            AlwaysPresent = true,
+                            BypassAutoSizeAxes = Axes.Both,
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                        },
+                        popOutCountText = new LegacySpriteText(LegacyFont.Combo)
+                        {
+                            Alpha = 0,
+                            Blending = BlendingParameters.Additive,
+                            BypassAutoSizeAxes = Axes.Both,
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                        },
+                    }
+                }
+            };
+
+            Current.BindTo(scoreProcessor.Combo);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            displayedCountText.Text = formatCount(Current.Value);
+            counterContainer.Size = displayedCountText.Size;
 
             lastJudgementResult = gameplayState.LastJudgementResult.GetBoundCopy();
             lastJudgementResult.BindValueChanged(result =>
@@ -54,9 +121,10 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
                     return;
 
                 if (result.NewValue?.HitObject is IHasComboInformation catchObject)
-                    PopOutCountText.Colour = catchObject.GetComboColour(skin);
+                    popOutCountText.Colour = catchObject.GetComboColour(skin);
             });
 
+            Current.BindValueChanged(combo => updateCount(combo.NewValue == 0), true);
             FinishTransforms(true);
         }
 
@@ -75,58 +143,73 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
             Origin = (Origin & ~(Anchor.x0 | Anchor.x2)) | Anchor.x1;
         }
 
-        private ScheduledDelegate? scheduledPopOut;
-
-        protected override void OnCountIncrement()
+        private void updateCount(bool rolling)
         {
-            const double main_duration = 300;
-            const double pop_out_duration = 400;
+            int prev = previousValue;
+            previousValue = Current.Value;
 
-            scheduledPopOut?.Cancel();
-            scheduledPopOut = null;
+            if (!IsLoaded)
+                return;
 
-            DisplayedCountText.ScaleTo(2)
+            if (!rolling)
+            {
+                FinishTransforms(false, nameof(DisplayedCount));
+
+                if (prev + 1 == Current.Value)
+                    onCountIncrement();
+                else
+                    onCountChange();
+            }
+            else
+                onCountRolling();
+        }
+
+        private void onCountIncrement()
+        {
+            displayedCountText.ScaleTo(2)
                               .ScaleTo(1, main_duration, Easing.Out);
 
-            DisplayedCountText.FadeInFromZero()
+            displayedCountText.FadeInFromZero()
                               .Then()
                               .Delay(1000)
                               .FadeOut(main_duration);
 
-            PopOutCountText.Text = FormatCount(Current.Value);
+            popOutCountText.Text = formatCount(Current.Value);
 
-            PopOutCountText.ScaleTo(2)
+            popOutCountText.ScaleTo(2)
                            .ScaleTo(2.4f, pop_out_duration, Easing.Out);
 
-            PopOutCountText.FadeTo(0.7f)
+            popOutCountText.FadeTo(0.7f)
                            .FadeOut(pop_out_duration);
 
-            this.Delay(pop_out_duration - 140).Schedule(() =>
-            {
-                base.OnCountIncrement();
-            }, out scheduledPopOut);
+            this.Delay(pop_out_duration - 140).TransformTo(nameof(DisplayedCount), Current.Value);
         }
 
-        protected override void OnCountRolling()
+        private void onCountRolling()
         {
-            base.OnCountRolling();
+            popOutCountText.FadeOut(100);
+            displayedCountText.FadeOut(100);
 
-            scheduledPopOut?.Cancel();
-            scheduledPopOut = null;
+            this.TransformTo(nameof(DisplayedCount), Current.Value, getProportionalDuration(DisplayedCount, Current.Value));
+        }
 
+        private void onCountChange()
+        {
             if (Current.Value == 0)
             {
-                PopOutCountText.FadeOut(100);
-                DisplayedCountText.FadeOut(100);
+                popOutCountText.FadeOut();
+                displayedCountText.FadeOut();
             }
+
+            this.TransformTo(nameof(DisplayedCount), Current.Value);
         }
 
-        protected override void OnCountChange()
+        private double getProportionalDuration(int currentValue, int newValue)
         {
-            base.OnCountChange();
-
-            scheduledPopOut?.Cancel();
-            scheduledPopOut = null;
+            double difference = currentValue > newValue ? currentValue - newValue : newValue - currentValue;
+            return difference * rolling_duration;
         }
+
+        private string formatCount(int count) => count.ToString(CultureInfo.InvariantCulture);
     }
 }
