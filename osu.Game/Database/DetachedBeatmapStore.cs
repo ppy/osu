@@ -44,7 +44,7 @@ namespace osu.Game.Database
         {
             if (changes == null)
             {
-                if (detachedBeatmapSets.Count > 0 && sender.Count == 0)
+                if (sender is RealmResetEmptySet<BeatmapSetInfo>)
                 {
                     // Usually we'd reset stuff here, but doing so triggers a silly flow which ends up deadlocking realm.
                     // Additionally, user should not be at song select when realm is blocking all operations in the first place.

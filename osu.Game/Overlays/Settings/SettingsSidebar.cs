@@ -66,7 +66,7 @@ namespace osu.Game.Overlays.Settings
             [BackgroundDependencyLoader]
             private void load()
             {
-                Size = new Vector2(SettingsSidebar.EXPANDED_WIDTH);
+                Size = new Vector2(EXPANDED_WIDTH);
 
                 Padding = new MarginPadding(40);
 
