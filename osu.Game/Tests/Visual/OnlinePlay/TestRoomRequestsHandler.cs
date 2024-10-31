@@ -188,7 +188,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
 
                 case GetBeatmapRequest getBeatmapRequest:
                 {
-                    getBeatmapRequest.TriggerSuccess(createResponseBeatmaps(getBeatmapRequest.BeatmapInfo.OnlineID).Single());
+                    getBeatmapRequest.TriggerSuccess(createResponseBeatmaps(getBeatmapRequest.OnlineID).Single());
                     return true;
                 }
 
@@ -212,6 +212,22 @@ namespace osu.Game.Tests.Visual.OnlinePlay
                     }
 
                     getBeatmapSetRequest.TriggerSuccess(OsuTestScene.CreateAPIBeatmapSet(baseBeatmap));
+                    return true;
+                }
+
+                case GetUsersRequest getUsersRequest:
+                {
+                    getUsersRequest.TriggerSuccess(new GetUsersResponse
+                    {
+                        Users = getUsersRequest.UserIds.Select(id => id == TestUserLookupCache.UNRESOLVED_USER_ID
+                                                   ? null
+                                                   : new APIUser
+                                                   {
+                                                       Id = id,
+                                                       Username = $"User {id}"
+                                                   })
+                                               .Where(u => u != null).ToList(),
+                    });
                     return true;
                 }
             }
