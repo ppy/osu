@@ -21,7 +21,7 @@ namespace osu.Game.Overlays.Mods
 {
     public partial class ModPresetRow : FillFlowContainer
     {
-        public ModPresetRow(Mod mod, HashSet<Mod>? rootSet = null, ModRowMode mode = ModRowMode.None)
+        public ModPresetRow(Mod mod, HashSet<Mod>? rootSet = null, ModRowMode mode = ModRowMode.None, HashSet<Mod>? saveSet = null)
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -55,7 +55,19 @@ namespace osu.Game.Overlays.Mods
                                             rootSet.Remove(mod);
                                         }
                                     })
-                                    : () => Scheduler.AddOnce(() => rootSet.Add(mod))
+                                    : () => Scheduler.AddOnce(() =>
+                                    {
+                                        if (saveSet != null)
+                                        {
+                                            if (mod.IncompatibleMods.Any(c => saveSet.Any(c.IsInstanceOfType)))
+                                                this.FlashColour(Color4.Red, 300);
+                                            else
+                                            {
+                                                this.FadeOut(200, Easing.OutQuint).Then().Expire();
+                                                saveSet.Add(mod);
+                                            }
+                                        }
+                                    })
                             }
                             : new Container(),
                         new ModSwitchTiny(mod)

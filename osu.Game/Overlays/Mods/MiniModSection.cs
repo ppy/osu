@@ -20,14 +20,13 @@ namespace osu.Game.Overlays.Mods
 
         private readonly IReadOnlyList<ModState> availableMods = Array.Empty<ModState>();
         private readonly HashSet<Mod>? rootSet;
+        private readonly HashSet<Mod>? saveSet;
 
-        private OsuSpriteText sectionHeader = null!;
-        private FillFlowContainer modFlowContainer = null!;
-
-        public MiniModSection(ModType modType, HashSet<Mod>? rootSet)
+        public MiniModSection(ModType modType, HashSet<Mod>? rootSet, HashSet<Mod>? saveSet)
         {
             ModType = modType;
             this.rootSet = rootSet;
+            this.saveSet = saveSet;
         }
 
         [BackgroundDependencyLoader]
@@ -35,35 +34,35 @@ namespace osu.Game.Overlays.Mods
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
-            InternalChild = new FillFlowContainer
+
+            if (rootSet != null && rootSet.Count(m => m.Type == ModType) != 0)
             {
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
-                Children = new Drawable[]
+                InternalChild = new FillFlowContainer
                 {
-                    sectionHeader = new OsuSpriteText
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Children = new Drawable[]
                     {
-                        RelativeSizeAxes = Axes.X,
-                        Text = ModType.Humanize(LetterCasing.Title),
-                        Colour = colours.ForModType(ModType),
-                        Font = OsuFont.TorusAlternate.With(size: 16, weight: FontWeight.SemiBold),
-                    },
-                    modFlowContainer = new FillFlowContainer
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        Margin = new MarginPadding
+                        new OsuSpriteText
                         {
-                            Left = 5,
+                            RelativeSizeAxes = Axes.X,
+                            Text = ModType.Humanize(LetterCasing.Title),
+                            Colour = colours.ForModType(ModType),
+                            Font = OsuFont.TorusAlternate.With(size: 16, weight: FontWeight.SemiBold),
+                        },
+                        new FillFlowContainer
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Margin = new MarginPadding
+                            {
+                                Left = 5,
+                            },
+                            ChildrenEnumerable = rootSet.Where(m => m.Type == ModType)
+                                                        .Select(m => new ModPresetRow(m, rootSet, ModRowMode.Add, saveSet))
                         }
                     }
-                }
-            };
-
-            if (rootSet != null)
-            {
-                modFlowContainer.ChildrenEnumerable = rootSet.Where(m => m.Type == ModType)
-                                                             .Select(m => new ModPresetRow(m, rootSet, ModRowMode.Add));
+                };
             }
         }
 
