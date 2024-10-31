@@ -116,6 +116,8 @@ namespace osu.Game.Overlays.Mods
         private Container aboveColumnsContent = null!;
         private ModCustomisationPanel customisationPanel = null!;
 
+        private ModPresetColumn presetColumn = null!;
+
         protected virtual SelectAllModsButton? SelectAllModsButton => null;
 
         private Sample? columnAppearSample;
@@ -295,7 +297,7 @@ namespace osu.Game.Overlays.Mods
         {
             if (ShowPresets)
             {
-                yield return new ColumnDimContainer(new ModPresetColumn
+                yield return new ColumnDimContainer(presetColumn = new ModPresetColumn
                 {
                     Margin = new MarginPadding { Right = 10 }
                 });
@@ -340,6 +342,8 @@ namespace osu.Game.Overlays.Mods
 
             foreach (var column in columnFlow.Columns.OfType<ModColumn>())
                 column.AvailableMods = AvailableMods.Value.GetValueOrDefault(column.ModType, Array.Empty<ModState>());
+
+            presetColumn.AllAvailableMods = AllAvailableMods.Select(mod => mod.Mod).ToList();
         }
 
         private void filterMods()

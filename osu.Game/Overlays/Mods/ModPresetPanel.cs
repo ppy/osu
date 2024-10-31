@@ -30,14 +30,18 @@ namespace osu.Game.Overlays.Mods
         [Resolved]
         private Bindable<IReadOnlyList<Mod>> selectedMods { get; set; } = null!;
 
+        public IReadOnlyList<Mod>? AvailableMods;
+
         private ModSettingChangeTracker? settingChangeTracker;
 
-        public ModPresetPanel(Live<ModPreset> preset)
+        public ModPresetPanel(Live<ModPreset> preset, IReadOnlyList<Mod>? availableMods = null)
         {
             Preset = preset;
 
             Title = preset.Value.Name;
             Description = preset.Value.Description;
+
+            AvailableMods = availableMods;
         }
 
         [BackgroundDependencyLoader]
@@ -128,6 +132,6 @@ namespace osu.Game.Overlays.Mods
             settingChangeTracker?.Dispose();
         }
 
-        public Popover GetPopover() => new EditPresetPopover(Preset);
+        public Popover GetPopover() => new EditPresetPopover(Preset, AvailableMods);
     }
 }

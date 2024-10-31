@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -25,6 +26,8 @@ namespace osu.Game.Overlays.Mods
 
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; } = null!;
+
+        public IReadOnlyList<Mod>? AllAvailableMods;
 
         private const float contracted_width = WIDTH - 120;
 
@@ -79,7 +82,7 @@ namespace osu.Game.Overlays.Mods
                 return;
             }
 
-            latestLoadTask = LoadComponentsAsync(presets.Select(p => new ModPresetPanel(p.ToLive(realm))
+            latestLoadTask = LoadComponentsAsync(presets.Select(p => new ModPresetPanel(p.ToLive(realm), AllAvailableMods)
             {
                 Shear = Vector2.Zero
             }), loaded =>

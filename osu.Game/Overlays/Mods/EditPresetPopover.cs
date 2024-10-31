@@ -27,11 +27,14 @@ namespace osu.Game.Overlays.Mods
         private LabelledTextBox descriptionTextBox = null!;
         private ShearedButton useCurrentModsButton = null!;
         private ShearedButton saveButton = null!;
-        private FillFlowContainer scrollContent = null!;
+        private FillFlowContainer currentModContent = null!;
+        private FillFlowContainer availableModContent = null!;
 
         private readonly Live<ModPreset> preset;
 
-        private HashSet<Mod> saveableMods;
+        private readonly IReadOnlyList<Mod>? availableMods;
+
+        private readonly Bindable<HashSet<Mod>> saveableMods;
 
         [Resolved]
         private Bindable<IReadOnlyList<Mod>> selectedMods { get; set; } = null!;
@@ -42,10 +45,14 @@ namespace osu.Game.Overlays.Mods
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
-        public EditPresetPopover(Live<ModPreset> preset)
+        public EditPresetPopover(Live<ModPreset> preset, IReadOnlyList<Mod>? mods)
         {
             this.preset = preset;
-            saveableMods = preset.PerformRead(p => p.Mods).ToHashSet();
+            availableMods = mods;
+            saveableMods = new Bindable<HashSet<Mod>>
+            {
+                Value = preset.PerformRead(p => p.Mods).ToHashSet()
+            };
         }
 
         [BackgroundDependencyLoader]
@@ -53,39 +60,88 @@ namespace osu.Game.Overlays.Mods
         {
             Child = new FillFlowContainer
             {
-                Width = 300,
+                Width = 600,
                 AutoSizeAxes = Axes.Y,
-                Spacing = new Vector2(7),
                 Direction = FillDirection.Vertical,
+                Spacing = new Vector2(7),
                 Children = new Drawable[]
                 {
-                    nameTextBox = new LabelledTextBox
-                    {
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.TopCentre,
-                        Label = CommonStrings.Name,
-                        TabbableContentContainer = this,
-                        Current = { Value = preset.PerformRead(p => p.Name) },
-                    },
-                    descriptionTextBox = new LabelledTextBox
-                    {
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.TopCentre,
-                        Label = CommonStrings.Description,
-                        TabbableContentContainer = this,
-                        Current = { Value = preset.PerformRead(p => p.Description) },
-                    },
-                    new OsuScrollContainer
+                    new GridContainer
                     {
                         RelativeSizeAxes = Axes.X,
-                        Height = 100,
-                        Padding = new MarginPadding(7),
-                        Child = scrollContent = new FillFlowContainer
+                        Height = 40,
+                        ColumnDimensions = new Dimension[]
                         {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Padding = new MarginPadding(7),
-                            Spacing = new Vector2(7),
+                            new Dimension(GridSizeMode.Relative, 0.5f),
+                            new Dimension(GridSizeMode.Relative, 0.5f),
+                        },
+                        Content = new[]
+                        {
+                            new Drawable[]
+                            {
+                                nameTextBox = new LabelledTextBox
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    Anchor = Anchor.TopCentre,
+                                    Origin = Anchor.TopCentre,
+                                    Label = CommonStrings.Name,
+                                    TabbableContentContainer = this,
+                                    Current = { Value = preset.PerformRead(p => p.Name) },
+                                },
+                                descriptionTextBox = new LabelledTextBox
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    Anchor = Anchor.TopCentre,
+                                    Origin = Anchor.TopCentre,
+                                    Label = CommonStrings.Description,
+                                    TabbableContentContainer = this,
+                                    Current = { Value = preset.PerformRead(p => p.Description) },
+                                }
+                            }
+                        }
+                    },
+                    new GridContainer
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Height = 250,
+                        ColumnDimensions = new Dimension[]
+                        {
+                            new Dimension(GridSizeMode.Relative, 0.5f),
+                            new Dimension(GridSizeMode.Relative, 0.5f)
+                        },
+                        Content = new[]
+                        {
+                            new Drawable[]
+                            {
+                                new OsuScrollContainer
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    Height = 250,
+                                    Padding = new MarginPadding(7),
+                                    Masking = true,
+                                    Child = currentModContent = new FillFlowContainer
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        AutoSizeAxes = Axes.Y,
+                                        Padding = new MarginPadding(7),
+                                        Spacing = new Vector2(7),
+                                    }
+                                },
+                                new OsuScrollContainer
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    Height = 250,
+                                    Padding = new MarginPadding(7),
+                                    Masking = true,
+                                    Child = availableModContent = new FillFlowContainer
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        AutoSizeAxes = Axes.Y,
+                                        Padding = new MarginPadding(7),
+                                        Spacing = new Vector2(7),
+                                    }
+                                }
+                            }
                         }
                     },
                     new FillFlowContainer
@@ -126,6 +182,7 @@ namespace osu.Game.Overlays.Mods
             Body.BorderColour = colours.Orange1;
 
             selectedMods.BindValueChanged(_ => updateState(), true);
+            saveableMods.BindValueChanged(_ => updateState(), true);
             nameTextBox.Current.BindValueChanged(s =>
             {
                 saveButton.Enabled.Value = !string.IsNullOrWhiteSpace(s.NewValue);
@@ -153,13 +210,22 @@ namespace osu.Game.Overlays.Mods
 
         private void useCurrentMods()
         {
-            saveableMods = selectedMods.Value.Where(mod => mod.Type != ModType.System).ToHashSet();
+            saveableMods.Value = selectedMods.Value.Where(mod => mod.Type != ModType.System).ToHashSet();
             updateState();
         }
 
         private void updateState()
         {
-            scrollContent.ChildrenEnumerable = saveableMods.AsOrdered().Select(mod => new ModPresetRow(mod, saveableMods));
+            currentModContent.ChildrenEnumerable = saveableMods.Value.AsOrdered().Select(mod => new ModPresetRow(mod, saveableMods.Value, ModRowMode.Remove));
+            availableModContent.Children = new Drawable[]
+            {
+                new MiniModSection(ModType.DifficultyReduction, availableMods?.Where(mod => mod.Type == ModType.DifficultyReduction && !saveableMods.Value.Contains(mod)).ToHashSet()),
+                new MiniModSection(ModType.DifficultyIncrease, availableMods?.Where(mod => mod.Type == ModType.DifficultyIncrease && !saveableMods.Value.Contains(mod)).ToHashSet()),
+                new MiniModSection(ModType.Automation, availableMods?.Where(mod => mod.Type == ModType.Automation && !saveableMods.Value.Contains(mod)).ToHashSet()),
+                new MiniModSection(ModType.Conversion, availableMods?.Where(mod => mod.Type == ModType.Conversion && !saveableMods.Value.Contains(mod)).ToHashSet()),
+                new MiniModSection(ModType.Fun, availableMods?.Where(mod => mod.Type == ModType.Fun && !saveableMods.Value.Contains(mod)).ToHashSet()),
+            };
+
             useCurrentModsButton.Enabled.Value = checkSelectedModsDiffersFromSaved();
         }
 
@@ -168,7 +234,7 @@ namespace osu.Game.Overlays.Mods
             if (!selectedMods.Value.Any())
                 return false;
 
-            return !saveableMods.SetEquals(selectedMods.Value.Where(mod => mod.Type != ModType.System));
+            return !saveableMods.Value.SetEquals(selectedMods.Value.Where(mod => mod.Type != ModType.System));
         }
 
         private void save()
@@ -177,7 +243,7 @@ namespace osu.Game.Overlays.Mods
             {
                 s.Name = nameTextBox.Current.Value;
                 s.Description = descriptionTextBox.Current.Value;
-                s.Mods = saveableMods;
+                s.Mods = saveableMods.Value;
             });
 
             this.HidePopover();
