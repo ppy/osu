@@ -344,8 +344,8 @@ namespace osu.Game.Rulesets.Edit
                 PlayfieldContentContainer.Anchor = Anchor.CentreLeft;
                 PlayfieldContentContainer.Origin = Anchor.CentreLeft;
 
-                PlayfieldContentContainer.Width = Math.Max(1024, DrawWidth) - (TOOLBOX_CONTRACTED_SIZE_LEFT + TOOLBOX_CONTRACTED_SIZE_RIGHT);
-                PlayfieldContentContainer.X = TOOLBOX_CONTRACTED_SIZE_LEFT;
+                PlayfieldContentContainer.Width = Math.Max(1024, DrawWidth);
+                PlayfieldContentContainer.X = LeftToolbox.DrawWidth;
             }
 
             composerFocusMode.Value = PlayfieldContentContainer.Contains(InputManager.CurrentState.Mouse.Position)
