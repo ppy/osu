@@ -25,6 +25,19 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private int countMeh;
         private int countMiss;
 
+        /// <summary>
+        /// Missed slider ticks that includes missed reverse arrows. Will only be correct on non-classic scores
+        /// </summary>
+        private int countSliderTickMiss;
+
+        /// <summary>
+        /// Amount of missed slider tails that don't break combo. Will only be correct on non-classic scores
+        /// </summary>
+        private int countSliderEndsDropped;
+
+        /// <summary>
+        /// Estimated total amount of combo breaks
+        /// </summary>
         private double effectiveMissCount;
 
         public OsuPerformanceCalculator()
@@ -44,7 +57,36 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             countOk = score.Statistics.GetValueOrDefault(HitResult.Ok);
             countMeh = score.Statistics.GetValueOrDefault(HitResult.Meh);
             countMiss = score.Statistics.GetValueOrDefault(HitResult.Miss);
-            effectiveMissCount = calculateEffectiveMissCount(osuAttributes);
+            countSliderEndsDropped = osuAttributes.SliderCount - score.Statistics.GetValueOrDefault(HitResult.SliderTailHit);
+            countSliderTickMiss = score.Statistics.GetValueOrDefault(HitResult.LargeTickMiss);
+
+            if (osuAttributes.SliderCount > 0)
+            {
+                if (usingClassicSliderAccuracy)
+                {
+                    // Consider that full combo is maximum combo minus dropped slider tails since they don't contribute to combo but also don't break it
+                    // In classic scores we can't know the amount of dropped sliders so we estimate to 10% of all sliders on the map
+                    double fullComboThreshold = attributes.MaxCombo - 0.1 * osuAttributes.SliderCount;
+
+                    if (scoreMaxCombo < fullComboThreshold)
+                        effectiveMissCount = fullComboThreshold / Math.Max(1.0, scoreMaxCombo);
+
+                    // In classic scores there can't be more misses than a sum of all non-perfect judgements
+                    effectiveMissCount = Math.Min(effectiveMissCount, totalImperfectHits);
+                }
+                else
+                {
+                    double fullComboThreshold = attributes.MaxCombo - countSliderEndsDropped;
+
+                    if (scoreMaxCombo < fullComboThreshold)
+                        effectiveMissCount = fullComboThreshold / Math.Max(1.0, scoreMaxCombo);
+
+                    // Combine regular misses with tick misses since tick misses break combo as well
+                    effectiveMissCount = Math.Min(effectiveMissCount, countSliderTickMiss + countMiss);
+                }
+            }
+
+            effectiveMissCount = Math.Max(countMiss, effectiveMissCount);
 
             double multiplier = PERFORMANCE_BASE_MULTIPLIER;
 
@@ -163,8 +205,22 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             if (attributes.SliderCount > 0)
             {
-                double estimateSliderEndsDropped = Math.Clamp(Math.Min(countOk + countMeh + countMiss, attributes.MaxCombo - scoreMaxCombo), 0, estimateDifficultSliders);
-                double sliderNerfFactor = (1 - attributes.SliderFactor) * Math.Pow(1 - estimateSliderEndsDropped / estimateDifficultSliders, 3) + attributes.SliderFactor;
+                double estimateImproperlyFollowedDifficultSliders;
+
+                if (usingClassicSliderAccuracy)
+                {
+                    // When the score is considered classic (regardless if it was made on old client or not) we consider all missing combo to be dropped difficult sliders
+                    int maximumPossibleDroppedSliders = totalImperfectHits;
+                    estimateImproperlyFollowedDifficultSliders = Math.Clamp(Math.Min(maximumPossibleDroppedSliders, attributes.MaxCombo - scoreMaxCombo), 0, estimateDifficultSliders);
+                }
+                else
+                {
+                    // We add tick misses here since they too mean that the player didn't follow the slider properly
+                    // We however aren't adding misses here because missing slider heads has a harsh penalty by itself and doesn't mean that the rest of the slider wasn't followed properly
+                    estimateImproperlyFollowedDifficultSliders = Math.Min(countSliderEndsDropped + countSliderTickMiss, estimateDifficultSliders);
+                }
+
+                double sliderNerfFactor = (1 - attributes.SliderFactor) * Math.Pow(1 - estimateImproperlyFollowedDifficultSliders / estimateDifficultSliders, 3) + attributes.SliderFactor;
                 aimValue *= sliderNerfFactor;
             }
 
@@ -385,24 +441,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return hiddenValue;
         }
 
-        private double calculateEffectiveMissCount(OsuDifficultyAttributes attributes)
-        {
-            // Guess the number of misses + slider breaks from combo
-            double comboBasedMissCount = 0.0;
-
-            if (attributes.SliderCount > 0)
-            {
-                double fullComboThreshold = attributes.MaxCombo - 0.1 * attributes.SliderCount;
-                if (scoreMaxCombo < fullComboThreshold)
-                    comboBasedMissCount = fullComboThreshold / Math.Max(1.0, scoreMaxCombo);
-            }
-
-            // Clamp miss count to maximum amount of possible breaks
-            comboBasedMissCount = Math.Min(comboBasedMissCount, countOk + countMeh + countMiss);
-
-            return Math.Max(countMiss, comboBasedMissCount);
-        }
-
         private double calculateBalancerAdjustingMultiplier(ScoreInfo score, OsuDifficultyAttributes osuAttributes)
         {
             double totalValue = calculatePerformanceAttributes(score, osuAttributes).Total * PERFORMANCE_BASE_MULTIPLIER;
@@ -442,5 +480,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private static double logistic(double x) => 1 / (1 + Math.Exp(-x));
 
         private int totalHits => countGreat + countOk + countMeh + countMiss;
+        private int totalImperfectHits => countOk + countMeh + countMiss;
     }
 }
