@@ -47,11 +47,11 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
             double multiplier = 1.13;
 
-            if (score.Mods.Any(m => m is ModHidden))
+            if (score.Mods.Any(m => m is ModHidden) && !isConvert)
                 multiplier *= 1.075;
 
             if (score.Mods.Any(m => m is ModEasy))
-                multiplier *= 0.975;
+                multiplier *= 0.950;
 
             double difficultyValue = computeDifficultyValue(score, taikoAttributes, isConvert);
             double accuracyValue = computeAccuracyValue(score, taikoAttributes, isConvert);
@@ -81,16 +81,16 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             difficultyValue *= Math.Pow(0.986, effectiveMissCount);
 
             if (score.Mods.Any(m => m is ModEasy))
-                difficultyValue *= 0.985;
+                difficultyValue *= 0.90;
 
-            if (score.Mods.Any(m => m is ModHidden) && !isConvert)
+            if (score.Mods.Any(m => m is ModHidden))
                 difficultyValue *= 1.025;
 
             if (score.Mods.Any(m => m is ModHardRock))
                 difficultyValue *= 1.10;
 
             if (score.Mods.Any(m => m is ModFlashlight<TaikoHitObject>))
-                difficultyValue *= 1.050 * lengthBonus;
+                difficultyValue *= Math.Max(1, 1.050 - Math.Min(attributes.MonoStaminaFactor / 50, 1) * lengthBonus);
 
             if (estimatedUnstableRate == null)
                 return 0;
