@@ -9,6 +9,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Scoring;
+using osu.Game.Utils;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty
 {
@@ -18,7 +19,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         private int countOk;
         private int countMeh;
         private int countMiss;
-        private double accuracy;
+        private double? estimatedUnstableRate;
 
         private double effectiveMissCount;
 
@@ -35,7 +36,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             countOk = score.Statistics.GetValueOrDefault(HitResult.Ok);
             countMeh = score.Statistics.GetValueOrDefault(HitResult.Meh);
             countMiss = score.Statistics.GetValueOrDefault(HitResult.Miss);
-            accuracy = customAccuracy;
+            estimatedUnstableRate = computeDeviationUpperBound(taikoAttributes) * 10;
 
             // The effectiveMissCount is calculated by gaining a ratio for totalSuccessfulHits and increasing the miss penalty for shorter object counts lower than 1000.
             if (totalSuccessfulHits > 0)
@@ -65,6 +66,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 Difficulty = difficultyValue,
                 Accuracy = accuracyValue,
                 EffectiveMissCount = effectiveMissCount,
+                EstimatedUnstableRate = estimatedUnstableRate,
                 Total = totalValue
             };
         }
@@ -85,35 +87,94 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 difficultyValue *= 1.025;
 
             if (score.Mods.Any(m => m is ModHardRock))
-                difficultyValue *= 1.050;
+                difficultyValue *= 1.10;
 
             if (score.Mods.Any(m => m is ModFlashlight<TaikoHitObject>))
                 difficultyValue *= 1.050 * lengthBonus;
 
-            return difficultyValue * Math.Pow(accuracy, 2.0);
+            if (estimatedUnstableRate == null)
+                return 0;
+
+            return difficultyValue * Math.Pow(SpecialFunctions.Erf(400 / (Math.Sqrt(2) * estimatedUnstableRate.Value)), 2.0);
         }
 
         private double computeAccuracyValue(ScoreInfo score, TaikoDifficultyAttributes attributes, bool isConvert)
         {
-            if (attributes.GreatHitWindow <= 0)
+            if (attributes.GreatHitWindow <= 0 || estimatedUnstableRate == null)
                 return 0;
 
-            double accuracyValue = Math.Pow(60.0 / attributes.GreatHitWindow, 1.1) * Math.Pow(accuracy, 8.0) * Math.Pow(attributes.StarRating, 0.4) * 27.0;
+            double accuracyValue = Math.Pow(70 / estimatedUnstableRate.Value, 1.1) * Math.Pow(attributes.StarRating, 0.4) * 100.0;
 
             double lengthBonus = Math.Min(1.15, Math.Pow(totalHits / 1500.0, 0.3));
-            accuracyValue *= lengthBonus;
 
             // Slight HDFL Bonus for accuracy. A clamp is used to prevent against negative values.
             if (score.Mods.Any(m => m is ModFlashlight<TaikoHitObject>) && score.Mods.Any(m => m is ModHidden) && !isConvert)
-                accuracyValue *= Math.Max(1.0, 1.1 * lengthBonus);
+                accuracyValue *= Math.Max(1.0, 1.05 * lengthBonus);
 
             return accuracyValue;
+        }
+
+        /// <summary>
+        /// Computes an upper bound on the player's tap deviation based on the OD, number of circles and sliders,
+        /// and the hit judgements, assuming the player's mean hit error is 0. The estimation is consistent in that
+        /// two SS scores on the same map with the same settings will always return the same deviation.
+        /// </summary>
+        private double? computeDeviationUpperBound(TaikoDifficultyAttributes attributes)
+        {
+            if (totalSuccessfulHits == 0 || attributes.GreatHitWindow <= 0)
+                return null;
+
+            double h300 = attributes.GreatHitWindow;
+            double h100 = attributes.OkHitWindow;
+
+            const double z = 2.32634787404; // 99% critical value for the normal distribution (one-tailed).
+
+            // The upper bound on deviation, calculated with the ratio of 300s to objects, and the great hit window.
+            double? calcDeviationGreatWindow()
+            {
+                if (countGreat == 0) return null;
+
+                double n = totalHits;
+
+                // Proportion of greats hit.
+                double p = countGreat / n;
+
+                // We can be 99% confident that p is at least this value.
+                double pLowerBound = (n * p + z * z / 2) / (n + z * z) - z / (n + z * z) * Math.Sqrt(n * p * (1 - p) + z * z / 4);
+
+                // We can be 99% confident that the deviation is not higher than:
+                return h300 / (Math.Sqrt(2) * SpecialFunctions.ErfInv(pLowerBound));
+            }
+
+            // The upper bound on deviation, calculated with the ratio of 300s + 100s to objects, and the good hit window.
+            // This will return a lower value than the first method when the number of 100s is high, but the miss count is low.
+            double? calcDeviationGoodWindow()
+            {
+                if (totalSuccessfulHits == 0) return null;
+
+                double n = totalHits;
+
+                // Proportion of greats + goods hit.
+                double p = totalSuccessfulHits / n;
+
+                // We can be 99% confident that p is at least this value.
+                double pLowerBound = (n * p + z * z / 2) / (n + z * z) - z / (n + z * z) * Math.Sqrt(n * p * (1 - p) + z * z / 4);
+
+                // We can be 99% confident that the deviation is not higher than:
+                return h100 / (Math.Sqrt(2) * SpecialFunctions.ErfInv(pLowerBound));
+            }
+
+            double? deviationGreatWindow = calcDeviationGreatWindow();
+            double? deviationGoodWindow = calcDeviationGoodWindow();
+
+            if (deviationGreatWindow is null)
+                return deviationGoodWindow;
+
+            return Math.Min(deviationGreatWindow.Value, deviationGoodWindow!.Value);
         }
 
         private int totalHits => countGreat + countOk + countMeh + countMiss;
 
         private int totalSuccessfulHits => countGreat + countOk + countMeh;
-
-        private double customAccuracy => totalHits > 0 ? (countGreat * 300 + countOk * 150) / (totalHits * 300.0) : 0;
     }
 }
