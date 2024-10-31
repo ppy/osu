@@ -175,7 +175,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                     estimateImproperlyFollowedDifficultSliders = Math.Min(countSliderEndsDropped + countSliderTickMiss, estimateDifficultSliders);
                 }
 
-                double sliderNerfFactor = (1 - attributes.SliderFactor) * (1 - estimateSliderEndsDropped / estimateDifficultSliders) + attributes.SliderFactor;
+                double sliderNerfFactor = (1 - attributes.SliderFactor) * (1 - estimateImproperlyFollowedDifficultSliders / estimateDifficultSliders) + attributes.SliderFactor;
                 aimValue *= Math.Pow(sliderNerfFactor, 3);
             }
 
