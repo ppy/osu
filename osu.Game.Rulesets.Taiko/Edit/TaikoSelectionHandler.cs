@@ -6,6 +6,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Bindings;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
@@ -86,10 +87,22 @@ namespace osu.Game.Rulesets.Taiko.Edit
         protected override IEnumerable<MenuItem> GetContextMenuItemsForSelection(IEnumerable<SelectionBlueprint<HitObject>> selection)
         {
             if (selection.All(s => s.Item is Hit))
-                yield return new TernaryStateToggleMenuItem("Rim") { State = { BindTarget = selectionRimState } };
+            {
+                yield return new TernaryStateToggleMenuItem("Rim")
+                {
+                    State = { BindTarget = selectionRimState },
+                    Hotkey = new Hotkey(new KeyCombination(InputKey.W), new KeyCombination(InputKey.R)),
+                };
+            }
 
             if (selection.All(s => s.Item is TaikoHitObject))
-                yield return new TernaryStateToggleMenuItem("Strong") { State = { BindTarget = selectionStrongState } };
+            {
+                yield return new TernaryStateToggleMenuItem("Strong")
+                {
+                    State = { BindTarget = selectionStrongState },
+                    Hotkey = new Hotkey(new KeyCombination(InputKey.E)),
+                };
+            }
 
             foreach (var item in base.GetContextMenuItemsForSelection(selection))
                 yield return item;
