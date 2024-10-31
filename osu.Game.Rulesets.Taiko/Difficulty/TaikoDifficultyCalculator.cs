@@ -80,12 +80,12 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             Colour colour = (Colour)skills.First(x => x is Colour);
             Rhythm rhythm = (Rhythm)skills.First(x => x is Rhythm);
             Stamina stamina = (Stamina)skills.First(x => x is Stamina);
-            Stamina staminaMonos = (Stamina)skills.Last(x => x is Stamina);
+            Stamina singleColourStamina = (Stamina)skills.Last(x => x is Stamina);
 
             double colourRating = colour.DifficultyValue() * colour_skill_multiplier;
             double rhythmRating = rhythm.DifficultyValue() * rhythm_skill_multiplier;
             double staminaRating = stamina.DifficultyValue() * stamina_skill_multiplier;
-            double monoStaminaRating = staminaMonos.DifficultyValue() * stamina_skill_multiplier;
+            double monoStaminaRating = singleColourStamina.DifficultyValue() * stamina_skill_multiplier;
 
             double monoStaminaFactor = Math.Pow(monoStaminaRating / staminaRating, 5);
 
