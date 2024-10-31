@@ -180,11 +180,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             double sumPower = OsuDifficultyCalculator.SUM_POWER;
             double totalPerformance = Math.Pow(Math.Pow(aimPerformance, sumPower) + Math.Pow(speedPerformance, sumPower), 1.0 / sumPower);
 
-            // Length bonus is in SR to not inflate Star Rating of short AR11 maps
-            double lengthBonus = OsuPerformanceCalculator.CalculateDefaultLengthBonus(objectsCount);
-            lengthBonus = Math.Pow(lengthBonus, 0.5 / MECHANICAL_PP_POWER);
-            totalPerformance *= lengthBonus;
-
             double adjustedDifficulty = performanceToDifficulty(totalPerformance);
             double difficultyValue = Math.Pow(adjustedDifficulty / OsuDifficultyCalculator.DIFFICULTY_MULTIPLIER, 2.0);
 

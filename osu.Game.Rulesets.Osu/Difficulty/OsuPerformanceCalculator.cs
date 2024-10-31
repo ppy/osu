@@ -417,7 +417,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 speedPartValue *= Math.Pow(0.99, countMeh < totalHits / 500.0 ? 0 : countMeh - totalHits / 500.0);
             }
 
-            return aimPartValue + speedPartValue;
+            double lengthBonus = Math.Pow(CalculateDefaultLengthBonus(totalHits), 0.5);
+
+            return (aimPartValue + speedPartValue) * lengthBonus;
         }
 
         private double computeReadingHiddenValue(ScoreInfo score, OsuDifficultyAttributes attributes)

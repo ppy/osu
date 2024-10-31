@@ -52,18 +52,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double sliderFactor = aimRating > 0 ? aimRatingNoSliders / aimRating : 1;
 
             double hiddenDifficultyStrainCount = 0;
-            double baseReadingHiddenPerformance = 0.0;
+            double readingHiddenPerformance = 0.0;
             if (mods.Any(h => h is OsuModHidden))
             {
                 hiddenRating = Math.Sqrt(skills[6].DifficultyValue()) * DIFFICULTY_MULTIPLIER;
-                baseReadingHiddenPerformance = ReadingHidden.DifficultyToPerformance(hiddenRating);
+                readingHiddenPerformance = ReadingHidden.DifficultyToPerformance(hiddenRating);
                 hiddenDifficultyStrainCount = skills.OfType<ReadingHidden>().First().CountDifficultStrains();
-            }
-
-            double baseFlashlightPerformance = 0.0;
-            if (mods.Any(h => h is OsuModFlashlight))
-            {
-                baseFlashlightPerformance = Flashlight.DifficultyToPerformance(flashlightRating);
             }
 
             double aimDifficultyStrainCount = skills[0].CountDifficultStrains();
@@ -89,15 +83,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 flashlightRating *= 0.7;
             }
 
-            double baseAimPerformance = OsuStrainSkill.DifficultyToPerformance(aimRating);
-            double baseSpeedPerformance = OsuStrainSkill.DifficultyToPerformance(speedRating);
+            double aimPerformance = OsuStrainSkill.DifficultyToPerformance(aimRating);
+            double speedPerformance = OsuStrainSkill.DifficultyToPerformance(speedRating);
 
             // Cognition
-            double baseReadingLowARPerformance = ReadingLowAR.DifficultyToPerformance(readingLowARRating);
-            double baseReadingHighARPerformance = OsuStrainSkill.DifficultyToPerformance(readingHighARRating);
-            double baseReadingARPerformance = Math.Pow(Math.Pow(baseReadingLowARPerformance, SUM_POWER) + Math.Pow(baseReadingHighARPerformance, SUM_POWER), 1.0 / SUM_POWER);
+            double readingLowARPerformance = ReadingLowAR.DifficultyToPerformance(readingLowARRating);
+            double readingHighARPerformance = OsuStrainSkill.DifficultyToPerformance(readingHighARRating);
+            double readingARPerformance = Math.Pow(Math.Pow(readingLowARPerformance, SUM_POWER) + Math.Pow(readingHighARPerformance, SUM_POWER), 1.0 / SUM_POWER);
 
-            double baseFlashlightARPerformance = Math.Pow(Math.Pow(baseFlashlightPerformance, FL_SUM_POWER) + Math.Pow(baseReadingARPerformance, FL_SUM_POWER), 1.0 / FL_SUM_POWER);
+            double potentialFlashlightPerformance = Flashlight.DifficultyToPerformance(flashlightRating);
+            double flashlightPerformance = mods.Any(h => h is OsuModFlashlight) ? potentialFlashlightPerformance : 0;
+
+            double baseFlashlightARPerformance = Math.Pow(Math.Pow(flashlightPerformance, FL_SUM_POWER) + Math.Pow(readingARPerformance, FL_SUM_POWER), 1.0 / FL_SUM_POWER);
 
             double preempt = IBeatmapDifficultyInfo.DifficultyRange(beatmap.Difficulty.ApproachRate, 1800, 1200, 450) / clockRate;
 
@@ -107,12 +104,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             int sliderCount = beatmap.HitObjects.Count(h => h is Slider);
             int spinnerCount = beatmap.HitObjects.Count(h => h is Spinner);
 
-            double cognitionPerformance = baseFlashlightARPerformance + baseReadingHiddenPerformance;
-            double mechanicalPerformance = Math.Pow(Math.Pow(baseAimPerformance, SUM_POWER) + Math.Pow(baseSpeedPerformance, SUM_POWER), 1.0 / SUM_POWER);
+            double cognitionPerformance = baseFlashlightARPerformance + readingHiddenPerformance;
+            double mechanicalPerformance = Math.Pow(Math.Pow(aimPerformance, SUM_POWER) + Math.Pow(speedPerformance, SUM_POWER), 1.0 / SUM_POWER);
 
             // Limit cognition by full memorisation difficulty, what is assumed to be mechanicalPerformance + flashlightPerformance
-            double perfectFlashlightPerformance = Flashlight.DifficultyToPerformance(flashlightRating);
-            cognitionPerformance = OsuPerformanceCalculator.AdjustCognitionPerformance(cognitionPerformance, mechanicalPerformance, perfectFlashlightPerformance);
+            cognitionPerformance = OsuPerformanceCalculator.AdjustCognitionPerformance(cognitionPerformance, mechanicalPerformance, potentialFlashlightPerformance);
 
             double basePerformance = mechanicalPerformance + cognitionPerformance;
 
