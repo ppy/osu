@@ -716,7 +716,7 @@ namespace osu.Game.Tests.Database
                 {
                     foreach (var entry in zip.Entries.ToArray())
                     {
-                        if (entry.Key.EndsWith(".osu", StringComparison.InvariantCulture))
+                        if (entry.Key!.EndsWith(".osu", StringComparison.InvariantCulture))
                             zip.RemoveEntry(entry);
                     }
 

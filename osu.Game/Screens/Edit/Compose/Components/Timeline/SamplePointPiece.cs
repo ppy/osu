@@ -107,7 +107,11 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         public static string? GetAdditionBankValue(IEnumerable<HitSampleInfo> samples)
         {
-            return samples.FirstOrDefault(o => o.Name != HitSampleInfo.HIT_NORMAL)?.Bank;
+            var firstAddition = samples.FirstOrDefault(o => o.Name != HitSampleInfo.HIT_NORMAL);
+            if (firstAddition == null)
+                return null;
+
+            return firstAddition.EditorAutoBank ? EditorSelectionHandler.HIT_BANK_AUTO : firstAddition.Bank;
         }
 
         public static int GetVolumeValue(ICollection<HitSampleInfo> samples)
@@ -320,7 +324,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 {
                     for (int i = 0; i < relevantSamples.Count; i++)
                     {
-                        if (relevantSamples[i].Name != HitSampleInfo.HIT_NORMAL) continue;
+                        if (relevantSamples[i].Name != HitSampleInfo.HIT_NORMAL && !relevantSamples[i].EditorAutoBank) continue;
 
                         relevantSamples[i] = relevantSamples[i].With(newBank: newBank);
                     }
@@ -331,11 +335,20 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             {
                 updateAllRelevantSamples((_, relevantSamples) =>
                 {
+                    string normalBank = relevantSamples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL)?.Bank ?? HitSampleInfo.BANK_SOFT;
+
                     for (int i = 0; i < relevantSamples.Count; i++)
                     {
-                        if (relevantSamples[i].Name == HitSampleInfo.HIT_NORMAL) continue;
+                        if (relevantSamples[i].Name == HitSampleInfo.HIT_NORMAL)
+                            continue;
 
-                        relevantSamples[i] = relevantSamples[i].With(newBank: newBank);
+                        // Addition samples with bank set to auto should inherit the bank of the normal sample
+                        if (newBank == EditorSelectionHandler.HIT_BANK_AUTO)
+                        {
+                            relevantSamples[i] = relevantSamples[i].With(newBank: normalBank, newEditorAutoBank: true);
+                        }
+                        else
+                            relevantSamples[i] = relevantSamples[i].With(newBank: newBank, newEditorAutoBank: false);
                     }
                 });
             }
@@ -383,7 +396,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     selectionSampleStates[sampleName] = bindable;
                 }
 
-                banks.AddRange(HitSampleInfo.AllBanks);
+                banks.AddRange(HitSampleInfo.AllBanks.Prepend(EditorSelectionHandler.HIT_BANK_AUTO));
             }
 
             private void updateTernaryStates()
@@ -438,24 +451,31 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             protected override bool OnKeyDown(KeyDownEvent e)
             {
-                if (e.ControlPressed || e.AltPressed || e.SuperPressed || !checkRightToggleFromKey(e.Key, out int rightIndex))
+                if (e.ControlPressed || e.SuperPressed || !checkRightToggleFromKey(e.Key, out int rightIndex))
                     return base.OnKeyDown(e);
 
-                if (e.ShiftPressed)
+                if (e.ShiftPressed || e.AltPressed)
                 {
                     string? newBank = banks.ElementAtOrDefault(rightIndex);
 
                     if (string.IsNullOrEmpty(newBank))
                         return true;
 
-                    setBank(newBank);
-                    updatePrimaryBankState();
-                    setAdditionBank(newBank);
-                    updateAdditionBankState();
+                    if (e.ShiftPressed && newBank != EditorSelectionHandler.HIT_BANK_AUTO)
+                    {
+                        setBank(newBank);
+                        updatePrimaryBankState();
+                    }
+
+                    if (e.AltPressed)
+                    {
+                        setAdditionBank(newBank);
+                        updateAdditionBankState();
+                    }
                 }
                 else
                 {
-                    var item = togglesCollection.ElementAtOrDefault(rightIndex);
+                    var item = togglesCollection.ElementAtOrDefault(rightIndex - 1);
 
                     if (item is not DrawableTernaryButton button) return base.OnKeyDown(e);
 
@@ -469,16 +489,20 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             {
                 switch (key)
                 {
-                    case Key.W:
+                    case Key.Q:
                         index = 0;
                         break;
 
-                    case Key.E:
+                    case Key.W:
                         index = 1;
                         break;
 
-                    case Key.R:
+                    case Key.E:
                         index = 2;
+                        break;
+
+                    case Key.R:
+                        index = 3;
                         break;
 
                     default:
