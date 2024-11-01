@@ -376,10 +376,6 @@ namespace osu.Game.Database
                     {
                         foreach (var beatmap in beatmapSet.Beatmaps)
                         {
-                            // Cascade delete related scores, else they will have a null beatmap against the model's spec.
-                            foreach (var score in beatmap.Scores)
-                                realm.Remove(score);
-
                             realm.Remove(beatmap.Metadata);
                             realm.Remove(beatmap);
                         }

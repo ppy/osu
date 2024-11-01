@@ -45,7 +45,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         public void Setup() => Schedule(() =>
         {
             SelectedMods.SetDefault();
-            Ruleset.SetDefault();
+            Ruleset.Value = new OsuRuleset().RulesetInfo;
             Beatmap.Value = CreateWorkingBeatmap(new TestBeatmap(new OsuRuleset().RulesetInfo)
             {
                 BeatmapInfo =

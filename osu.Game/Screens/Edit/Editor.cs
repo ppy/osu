@@ -215,6 +215,7 @@ namespace osu.Game.Screens.Edit
         private Bindable<bool> editorLimitedDistanceSnap;
         private Bindable<bool> editorTimelineShowTimingChanges;
         private Bindable<bool> editorTimelineShowTicks;
+        private Bindable<bool> editorContractSidebars;
 
         /// <summary>
         /// This controls the opacity of components like the timelines, sidebars, etc.
@@ -323,6 +324,7 @@ namespace osu.Game.Screens.Edit
             editorLimitedDistanceSnap = config.GetBindable<bool>(OsuSetting.EditorLimitedDistanceSnap);
             editorTimelineShowTimingChanges = config.GetBindable<bool>(OsuSetting.EditorTimelineShowTimingChanges);
             editorTimelineShowTicks = config.GetBindable<bool>(OsuSetting.EditorTimelineShowTicks);
+            editorContractSidebars = config.GetBindable<bool>(OsuSetting.EditorContractSidebars);
 
             AddInternal(new OsuContextMenuContainer
             {
@@ -402,7 +404,11 @@ namespace osu.Game.Screens.Edit
                                             new ToggleMenuItem(EditorStrings.LimitedDistanceSnap)
                                             {
                                                 State = { BindTarget = editorLimitedDistanceSnap },
-                                            }
+                                            },
+                                            new ToggleMenuItem(EditorStrings.ContractSidebars)
+                                            {
+                                                State = { BindTarget = editorContractSidebars }
+                                            },
                                         }
                                     },
                                     new MenuItem(EditorStrings.Timing)
@@ -1098,8 +1104,12 @@ namespace osu.Game.Screens.Edit
 
         private void seekControlPoint(int direction)
         {
-            var found = direction < 1
-                ? editorBeatmap.ControlPointInfo.AllControlPoints.LastOrDefault(p => p.Time < clock.CurrentTime)
+            // In the case of a backwards seek while playing, it can be hard to jump before a timing point.
+            // Adding some lenience here makes it more user-friendly.
+            double seekLenience = clock.IsRunning ? 1000 * ((IAdjustableClock)clock).Rate : 0;
+
+            ControlPoint found = direction < 1
+                ? editorBeatmap.ControlPointInfo.AllControlPoints.LastOrDefault(p => p.Time < clock.CurrentTime - seekLenience)
                 : editorBeatmap.ControlPointInfo.AllControlPoints.FirstOrDefault(p => p.Time > clock.CurrentTime);
 
             if (found != null)

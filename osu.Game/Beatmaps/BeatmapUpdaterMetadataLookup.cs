@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Online.API;
 
@@ -44,10 +43,19 @@ namespace osu.Game.Beatmaps
 
             foreach (var beatmapInfo in beatmapSet.Beatmaps)
             {
+                // note that these lookups DO NOT ACTUALLY FULLY GUARANTEE that the beatmap is what it claims it is,
+                // i.e. the correctness of this lookup should be treated as APPROXIMATE AT WORST.
+                // this is because the beatmap filename is used as a fallback in some scenarios where the MD5 of the beatmap may mismatch.
+                // this is considered to be an acceptable casualty so that things can continue to work as expected for users in some rare scenarios
+                // (stale beatmap files in beatmap packs, beatmap mirror desyncs).
+                // however, all this means that other places such as score submission ARE EXPECTED TO VERIFY THE MD5 OF THE BEATMAP AGAINST THE ONLINE ONE EXPLICITLY AGAIN.
+                //
+                // additionally note that the online ID stored to the map is EXPLICITLY NOT USED because some users in a silly attempt to "fix" things for themselves on stable
+                // would reuse online IDs of already submitted beatmaps, which means that information is pretty much expected to be bogus in a nonzero number of beatmapsets.
                 if (!tryLookup(beatmapInfo, preferOnlineFetch, out var res))
                     continue;
 
-                if (res == null || shouldDiscardLookupResult(res, beatmapInfo))
+                if (res == null)
                 {
                     beatmapInfo.ResetOnlineInfo();
                     lookupResults.Add(null); // mark lookup failure
@@ -81,23 +89,6 @@ namespace osu.Game.Beatmaps
                 beatmapSet.DateRanked = representative.DateRanked;
                 beatmapSet.DateSubmitted = representative.DateSubmitted;
             }
-        }
-
-        private bool shouldDiscardLookupResult(OnlineBeatmapMetadata result, BeatmapInfo beatmapInfo)
-        {
-            if (beatmapInfo.OnlineID > 0 && result.BeatmapID != beatmapInfo.OnlineID)
-            {
-                Logger.Log($"Discarding metadata lookup result due to mismatching online ID (expected: {beatmapInfo.OnlineID} actual: {result.BeatmapID})", LoggingTarget.Database);
-                return true;
-            }
-
-            if (beatmapInfo.OnlineID == -1 && result.MD5Hash != beatmapInfo.MD5Hash)
-            {
-                Logger.Log($"Discarding metadata lookup result due to mismatching hash (expected: {beatmapInfo.MD5Hash} actual: {result.MD5Hash})", LoggingTarget.Database);
-                return true;
-            }
-
-            return false;
         }
 
         /// <summary>
