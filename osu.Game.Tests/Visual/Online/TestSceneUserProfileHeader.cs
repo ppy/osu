@@ -3,17 +3,24 @@
 
 using System;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Profile;
+using osu.Game.Overlays.Profile.Header.Components;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Users;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -21,6 +28,10 @@ namespace osu.Game.Tests.Visual.Online
     {
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Green);
+
+        private DummyAPIAccess dummyAPI => (DummyAPIAccess)API;
+
+        private readonly ManualResetEventSlim requestLock = new ManualResetEventSlim();
 
         [Resolved]
         private OsuConfigManager configManager { get; set; } = null!;
@@ -399,6 +410,75 @@ namespace osu.Game.Tests.Visual.Online
                     }
                 }
             }, new OsuRuleset().RulesetInfo));
+        }
+
+        [Test]
+        public void TestAddFriend()
+        {
+            AddStep("clear friend list", () => dummyAPI.Friends.Clear());
+            AddStep("Show non-friend user", () => header.User.Value = new UserProfileData(TestSceneUserProfileOverlay.TEST_USER, new OsuRuleset().RulesetInfo));
+            AddStep("Setup request", () =>
+            {
+                requestLock.Reset();
+
+                dummyAPI.HandleRequest += request =>
+                {
+                    if (request is not FriendAddRequest req)
+                        return false;
+
+                    if (req.TargetId != 1)
+                        return false;
+
+                    var apiRelation = CreateAPIRelationFromAPIUser(TestSceneUserProfileOverlay.TEST_USER);
+
+                    Task.Run(() =>
+                    {
+                        requestLock.Wait(3000);
+                        req.TriggerSuccess(apiRelation);
+                    });
+
+                    dummyAPI.Friends.Add(apiRelation);
+                    return true;
+                };
+            });
+            AddStep("Click followers button", () => this.ChildrenOfType<FollowersButton>().First().TriggerClick());
+            AddStep("Complete request", () => requestLock.Set());
+            AddUntilStep("Friend added", () => API.Friends.Any(f => f.TargetID == TestSceneUserProfileOverlay.TEST_USER.OnlineID));
+        }
+
+        [Test]
+        public void TestAddFriendNonMutual()
+        {
+            AddStep("clear friend list", () => dummyAPI.Friends.Clear());
+            AddStep("Show non-friend user", () => header.User.Value = new UserProfileData(TestSceneUserProfileOverlay.TEST_USER, new OsuRuleset().RulesetInfo));
+            AddStep("Setup request", () =>
+            {
+                requestLock.Reset();
+
+                dummyAPI.HandleRequest += request =>
+                {
+                    if (request is not FriendAddRequest req)
+                        return false;
+
+                    if (req.TargetId != 1)
+                        return false;
+
+                    var apiRelation = CreateAPIRelationFromAPIUser(TestSceneUserProfileOverlay.TEST_USER);
+                    apiRelation.Mutual = false;
+
+                    Task.Run(() =>
+                    {
+                        requestLock.Wait(3000);
+                        req.TriggerSuccess(apiRelation);
+                    });
+
+                    dummyAPI.Friends.Add(apiRelation);
+                    return true;
+                };
+            });
+            AddStep("Click followers button", () => this.ChildrenOfType<FollowersButton>().First().TriggerClick());
+            AddStep("Complete request", () => requestLock.Set());
+            AddUntilStep("Friend added", () => API.Friends.Any(f => f.TargetID == TestSceneUserProfileOverlay.TEST_USER.OnlineID));
         }
     }
 }

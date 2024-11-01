@@ -37,7 +37,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
         [BackgroundDependencyLoader]
-        private void load(IAPIProvider api, INotificationOverlay notifications)
+        private void load(IAPIProvider api, INotificationOverlay? notifications)
         {
             localUser.BindTo(api.LocalUser);
 
