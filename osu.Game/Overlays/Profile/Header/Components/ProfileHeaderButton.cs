@@ -4,9 +4,11 @@
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {
@@ -14,6 +16,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
     {
         private readonly Box background;
         private readonly Container content;
+        private readonly LoadingLayer loading;
 
         protected override Container<Drawable> Content => content;
 
@@ -40,9 +43,25 @@ namespace osu.Game.Overlays.Profile.Header.Components
                         AutoSizeAxes = Axes.X,
                         RelativeSizeAxes = Axes.Y,
                         Padding = new MarginPadding { Horizontal = 10 },
-                    }
+                    },
+                    loading = new LoadingLayer(true, false)
                 }
             });
+        }
+
+        protected void SetBackGroundColour(ColourInfo colorInfo, double duration = 0)
+        {
+            background.FadeColour(colorInfo, duration);
+        }
+
+        protected void ShowLodingLayer()
+        {
+            loading.Show();
+        }
+
+        protected void HideLodingLayer()
+        {
+            loading.Hide();
         }
 
         [BackgroundDependencyLoader]
