@@ -220,15 +220,15 @@ namespace osu.Game.Overlays.Mods
             availableModContent.Children = new Drawable[]
             {
                 new MiniModSection(ModType.DifficultyReduction,
-                    availableMods?.Where(mod => mod.Type == ModType.DifficultyReduction && !saveableMods.Value.Contains(mod)).ToHashSet(), saveableMods.Value),
+                    availableMods?.Where(mod => !saveableMods.Value.Contains(mod)).ToHashSet(), saveableMods.Value),
                 new MiniModSection(ModType.DifficultyIncrease,
-                    availableMods?.Where(mod => mod.Type == ModType.DifficultyIncrease && !saveableMods.Value.Contains(mod)).ToHashSet(), saveableMods.Value),
+                    availableMods?.Where(mod => !saveableMods.Value.Contains(mod)).ToHashSet(), saveableMods.Value),
                 new MiniModSection(ModType.Automation,
-                    availableMods?.Where(mod => mod.Type == ModType.Automation && !saveableMods.Value.Contains(mod)).ToHashSet(), saveableMods.Value),
+                    availableMods?.Where(mod => !saveableMods.Value.Contains(mod)).ToHashSet(), saveableMods.Value),
                 new MiniModSection(ModType.Conversion,
-                    availableMods?.Where(mod => mod.Type == ModType.Conversion && !saveableMods.Value.Contains(mod)).ToHashSet(), saveableMods.Value),
+                    availableMods?.Where(mod => !saveableMods.Value.Contains(mod)).ToHashSet(), saveableMods.Value),
                 new MiniModSection(ModType.Fun,
-                    availableMods?.Where(mod => mod.Type == ModType.Fun && !saveableMods.Value.Contains(mod)).ToHashSet(), saveableMods.Value),
+                    availableMods?.Where(mod => !saveableMods.Value.Contains(mod)).ToHashSet(), saveableMods.Value),
             };
 
             useCurrentModsButton.Enabled.Value = checkSelectedModsDiffersFromSaved();
