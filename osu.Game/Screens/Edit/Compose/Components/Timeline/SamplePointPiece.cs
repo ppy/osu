@@ -44,8 +44,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         [Resolved]
         private TimelineBlueprintContainer? timelineBlueprintContainer { get; set; }
 
-        private Bindable<bool> samplesVisible = null!;
-
         public SamplePointPiece(HitObject hitObject)
         {
             HitObject = hitObject;
@@ -68,8 +66,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             if (editor != null)
                 editor.ShowSampleEditPopoverRequested += onShowSampleEditPopoverRequested;
-
-            samplesVisible = config.GetBindable<bool>(OsuSetting.EditorTimelineShowSamples);
         }
 
         private readonly Bindable<bool> contracted = new Bindable<bool>();
@@ -97,7 +93,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 }
             }, true);
 
-            samplesVisible.BindValueChanged(visible => this.FadeTo(visible.NewValue ? 1 : 0, 200, Easing.OutQuint), true);
             FinishTransforms();
         }
 
