@@ -257,6 +257,8 @@ namespace osu.Game.Skinning.Components
             difficultyCancellationSource?.Cancel();
             difficultyCancellationSource?.Dispose();
             difficultyCancellationSource = null;
+
+            modSettingTracker?.Dispose();
         }
     }
 
