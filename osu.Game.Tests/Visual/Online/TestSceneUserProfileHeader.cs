@@ -431,7 +431,13 @@ namespace osu.Game.Tests.Visual.Online
                     if (req.TargetId != nonFriend.OnlineID)
                         return false;
 
-                    var apiRelation = CreateAPIRelationFromAPIUser(nonFriend);
+                    var apiRelation = new APIRelation
+                    {
+                        TargetID = nonFriend.OnlineID,
+                        Mutual = true,
+                        RelationType = RelationType.Friend,
+                        TargetUser = nonFriend
+                    };
 
                     Task.Run(() =>
                     {
@@ -465,8 +471,13 @@ namespace osu.Game.Tests.Visual.Online
                     if (req.TargetId != nonFriend.OnlineID)
                         return false;
 
-                    var apiRelation = CreateAPIRelationFromAPIUser(nonFriend);
-                    apiRelation.Mutual = false;
+                    var apiRelation = new APIRelation
+                    {
+                        TargetID = nonFriend.OnlineID,
+                        Mutual = false,
+                        RelationType = RelationType.Friend,
+                        TargetUser = nonFriend
+                    };
 
                     Task.Run(() =>
                     {

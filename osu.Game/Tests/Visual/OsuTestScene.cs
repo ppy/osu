@@ -317,15 +317,6 @@ namespace osu.Game.Tests.Visual
             return result;
         }
 
-        public static APIRelation CreateAPIRelationFromAPIUser(APIUser user) =>
-            new APIRelation
-            {
-                Mutual = true,
-                RelationType = RelationType.Friend,
-                TargetID = user.OnlineID,
-                TargetUser = user
-            };
-
         protected WorkingBeatmap CreateWorkingBeatmap(RulesetInfo ruleset) =>
             CreateWorkingBeatmap(CreateBeatmap(ruleset));
 
