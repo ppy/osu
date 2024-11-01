@@ -36,9 +36,6 @@ namespace osu.Game.Overlays.Music
         [Resolved]
         private RealmAccess realm { get; set; }
 
-        [Resolved]
-        private MusicController musicController { get; set; }
-
         private IDisposable beatmapSubscription;
 
         private FilterControl filter;
