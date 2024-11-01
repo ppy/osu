@@ -32,7 +32,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
     {
         protected DragBox DragBox { get; private set; }
 
-        public Container<SelectionBlueprint<T>> SelectionBlueprints { get; private set; }
+        public SelectionBlueprintContainer SelectionBlueprints { get; private set; }
+
+        public partial class SelectionBlueprintContainer : Container<SelectionBlueprint<T>>
+        {
+            public new virtual void ChangeChildDepth(SelectionBlueprint<T> child, float newDepth) => base.ChangeChildDepth(child, newDepth);
+        }
 
         public SelectionHandler<T> SelectionHandler { get; private set; }
 
@@ -95,7 +100,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             });
         }
 
-        protected virtual Container<SelectionBlueprint<T>> CreateSelectionBlueprintContainer() => new Container<SelectionBlueprint<T>> { RelativeSizeAxes = Axes.Both };
+        protected virtual SelectionBlueprintContainer CreateSelectionBlueprintContainer() => new SelectionBlueprintContainer { RelativeSizeAxes = Axes.Both };
 
         /// <summary>
         /// Creates a <see cref="Components.SelectionHandler{T}"/> which outlines items and handles movement of selections.

@@ -322,6 +322,11 @@ namespace osu.Game.Screens.Select
         {
             try
             {
+                // To handle the beatmap update flow, attempt to track selection changes across delete-insert transactions.
+                // When an update occurs, the previous beatmap set is either soft or hard deleted.
+                // Check if the current selection was potentially deleted by re-querying its validity.
+                bool selectedSetMarkedDeleted = SelectedBeatmapSet != null && fetchFromID(SelectedBeatmapSet.ID)?.DeletePending != false;
+
                 foreach (var set in setsRequiringRemoval) removeBeatmapSet(set.ID);
 
                 foreach (var set in setsRequiringUpdate) updateBeatmapSet(set);
@@ -330,11 +335,6 @@ namespace osu.Game.Screens.Select
                 {
                     // If SelectedBeatmapInfo is non-null, the set should also be non-null.
                     Debug.Assert(SelectedBeatmapSet != null);
-
-                    // To handle the beatmap update flow, attempt to track selection changes across delete-insert transactions.
-                    // When an update occurs, the previous beatmap set is either soft or hard deleted.
-                    // Check if the current selection was potentially deleted by re-querying its validity.
-                    bool selectedSetMarkedDeleted = fetchFromID(SelectedBeatmapSet.ID)?.DeletePending != false;
 
                     if (selectedSetMarkedDeleted && setsRequiringUpdate.Any())
                     {
