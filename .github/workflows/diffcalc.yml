@@ -346,7 +346,7 @@ jobs:
           docker compose logs --follow &
           docker compose wait generator
 
-          link=$(docker compose logs generator --tail 10 | grep 'http' | sed -E 's/^.*(http.*)$/\1/')
+          link=$(docker compose logs --tail 10 generator | grep 'http' | sed -E 's/^.*(http.*)$/\1/')
           target=$(cat "${{ needs.directory.outputs.GENERATOR_ENV }}" | grep -E '^OSU_B=' | cut -d '=' -f2-)
 
           echo "TARGET=${target}" >> "${GITHUB_OUTPUT}"
