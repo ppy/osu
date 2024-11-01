@@ -6,11 +6,11 @@ using osu.Framework.IO.Network;
 
 namespace osu.Game.Online.API.Requests
 {
-    public class FriendDeleteRequest : APIRequest
+    public class DeleteFriendRequest : APIRequest
     {
         public readonly int TargetId;
 
-        public FriendDeleteRequest(int targetId)
+        public DeleteFriendRequest(int targetId)
         {
             TargetId = targetId;
         }
