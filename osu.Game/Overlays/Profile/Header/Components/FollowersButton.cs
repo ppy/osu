@@ -25,7 +25,26 @@ namespace osu.Game.Overlays.Profile.Header.Components
         // the number of friends obtained is stored and modified locally.
         private int followerCount;
 
-        public override LocalisableString TooltipText => FriendsStrings.ButtonsDisabled;
+        public override LocalisableString TooltipText
+        {
+            get
+            {
+                switch (status.Value)
+                {
+                    case FriendStatus.Self:
+                        return FriendsStrings.ButtonsDisabled;
+
+                    case FriendStatus.None:
+                        return FriendsStrings.ButtonsAdd;
+
+                    case FriendStatus.NotMutual:
+                    case FriendStatus.Mutual:
+                        return FriendsStrings.ButtonsRemove;
+                }
+
+                return FriendsStrings.TitleCompact;
+            }
+        }
 
         protected override IconUsage Icon => FontAwesome.Solid.User;
 
