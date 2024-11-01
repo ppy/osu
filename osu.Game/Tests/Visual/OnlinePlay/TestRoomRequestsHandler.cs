@@ -188,7 +188,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
 
                 case GetBeatmapRequest getBeatmapRequest:
                 {
-                    getBeatmapRequest.TriggerSuccess(createResponseBeatmaps(getBeatmapRequest.BeatmapInfo.OnlineID).Single());
+                    getBeatmapRequest.TriggerSuccess(createResponseBeatmaps(getBeatmapRequest.OnlineID).Single());
                     return true;
                 }
 
