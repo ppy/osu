@@ -229,7 +229,7 @@ namespace osu.Game.Skinning.Components
                     return (starDifficulty?.Stars ?? 0).ToLocalisableString(@"F2");
 
                 case BeatmapAttribute.MaxPP:
-                    return (starDifficulty?.PerformanceAttributes?.Total ?? 0).ToLocalisableString(@"F2");
+                    return Math.Round(starDifficulty?.PerformanceAttributes?.Total ?? 0, MidpointRounding.AwayFromZero).ToLocalisableString();
 
                 default:
                     return string.Empty;
