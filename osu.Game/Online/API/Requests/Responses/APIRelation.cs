@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace osu.Game.Online.API.Requests.Responses
 {
@@ -20,6 +21,7 @@ namespace osu.Game.Online.API.Requests.Responses
         public APIUser? TargetUser { get; set; }
     }
 
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum RelationType
     {
         Friend,
