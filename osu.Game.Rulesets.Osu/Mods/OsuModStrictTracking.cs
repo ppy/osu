@@ -120,6 +120,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                                 Position = Position + Path.PositionAt(e.PathProgress),
                                 StackHeight = StackHeight,
                                 Scale = Scale,
+                                PathProgress = e.PathProgress,
                             });
                             break;
 
@@ -150,6 +151,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                                 Position = Position + Path.PositionAt(e.PathProgress),
                                 StackHeight = StackHeight,
                                 Scale = Scale,
+                                PathProgress = e.PathProgress,
                             });
                             break;
                     }

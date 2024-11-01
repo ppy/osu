@@ -11,6 +11,7 @@ using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
 using osu.Game.Audio;
@@ -177,6 +178,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         {
             base.OnDeselected();
 
+            if (placementControlPoint != null)
+                endControlPointPlacement();
+
             updateVisualDefinition();
             BodyPiece.RecyclePath();
         }
@@ -269,7 +273,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             {
                 double minDistance = distanceSnapProvider?.GetBeatSnapDistanceAt(HitObject, false) * oldVelocityMultiplier ?? 1;
                 // Add a small amount to the proposed distance to make it easier to snap to the full length of the slider.
-                proposedDistance = distanceSnapProvider?.FindSnappedDistance(HitObject, (float)proposedDistance + 1) ?? proposedDistance;
+                proposedDistance = distanceSnapProvider?.FindSnappedDistance(HitObject, (float)proposedDistance + 1, DistanceSnapTarget.Start) ?? proposedDistance;
                 proposedDistance = MathHelper.Clamp(proposedDistance, minDistance, HitObject.Path.CalculatedDistance);
             }
 
@@ -376,13 +380,16 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         protected override void OnMouseUp(MouseUpEvent e)
         {
             if (placementControlPoint != null)
-            {
-                if (IsDragged)
-                    ControlPointVisualiser?.DragEnded();
+                endControlPointPlacement();
+        }
 
-                placementControlPoint = null;
-                changeHandler?.EndChange();
-            }
+        private void endControlPointPlacement()
+        {
+            if (IsDragged)
+                ControlPointVisualiser?.DragEnded();
+
+            placementControlPoint = null;
+            changeHandler?.EndChange();
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)
@@ -593,8 +600,14 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 changeHandler?.BeginChange();
                 addControlPoint(lastRightClickPosition);
                 changeHandler?.EndChange();
-            }),
-            new OsuMenuItem("Convert to stream", MenuItemType.Destructive, convertToStream),
+            })
+            {
+                Hotkey = new Hotkey(new KeyCombination(InputKey.Control, InputKey.MouseLeft))
+            },
+            new OsuMenuItem("Convert to stream", MenuItemType.Destructive, convertToStream)
+            {
+                Hotkey = new Hotkey(new KeyCombination(InputKey.Control, InputKey.Shift, InputKey.F))
+            },
         };
 
         // Always refer to the drawable object's slider body so subsequent movement deltas are calculated with updated positions.

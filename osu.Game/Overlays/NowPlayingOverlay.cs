@@ -47,6 +47,7 @@ namespace osu.Game.Overlays
         private IconButton prevButton = null!;
         private IconButton playButton = null!;
         private IconButton nextButton = null!;
+        private MusicIconButton shuffleButton = null!;
         private IconButton playlistButton = null!;
 
         private ScrollingTextContainer title = null!, artist = null!;
@@ -69,6 +70,7 @@ namespace osu.Game.Overlays
         private OsuColour colours { get; set; } = null!;
 
         private Bindable<bool> allowTrackControl = null!;
+        private readonly BindableBool shuffle = new BindableBool(true);
 
         public NowPlayingOverlay()
         {
@@ -164,6 +166,14 @@ namespace osu.Game.Overlays
                                                 },
                                             }
                                         },
+                                        shuffleButton = new MusicIconButton
+                                        {
+                                            Anchor = Anchor.CentreLeft,
+                                            Origin = Anchor.Centre,
+                                            Position = new Vector2(bottom_black_area_height / 2, 0),
+                                            Action = shuffle.Toggle,
+                                            Icon = FontAwesome.Solid.Random,
+                                        },
                                         playlistButton = new MusicIconButton
                                         {
                                             Origin = Anchor.Centre,
@@ -226,6 +236,9 @@ namespace osu.Game.Overlays
 
             allowTrackControl = musicController.AllowTrackControl.GetBoundCopy();
             allowTrackControl.BindValueChanged(_ => Scheduler.AddOnce(updateEnabledStates), true);
+
+            shuffle.BindTo(musicController.Shuffle);
+            shuffle.BindValueChanged(s => shuffleButton.FadeColour(s.NewValue ? colours.Yellow : Color4.White, 200, Easing.OutQuint), true);
 
             musicController.TrackChanged += trackChanged;
             trackChanged(beatmap.Value);

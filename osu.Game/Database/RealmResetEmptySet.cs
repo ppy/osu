@@ -12,7 +12,13 @@ using Realms.Schema;
 
 namespace osu.Game.Database
 {
-    public class EmptyRealmSet<T> : IRealmCollection<T>
+    /// <summary>
+    /// This can arrive in <see cref="RealmAccess.RegisterForNotifications{T}"/> callbacks to imply that realm access has been reset.
+    /// </summary>
+    /// <remarks>
+    /// Usually implies that the original database may return soon and the callback can usually be silently ignored.
+    ///</remarks>
+    public class RealmResetEmptySet<T> : IRealmCollection<T>
     {
         private IList<T> emptySet => Array.Empty<T>();
 

@@ -18,6 +18,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Graphics;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Edit.Tools;
@@ -89,6 +90,9 @@ namespace osu.Game.Rulesets.Edit
         private IBindable<bool> hasTiming;
         private Bindable<bool> autoSeekOnPlacement;
         private readonly Bindable<bool> composerFocusMode = new Bindable<bool>();
+
+        [CanBeNull]
+        private RadioButton lastTool;
 
         protected DrawableRuleset<TObject> DrawableRuleset { get; private set; }
 
@@ -175,16 +179,56 @@ namespace osu.Game.Rulesets.Edit
                                         Spacing = new Vector2(0, 5),
                                     },
                                 },
-                                new EditorToolboxGroup("bank (Shift-Q~R)")
+                                new EditorToolboxGroup("bank (Shift/Alt-Q~R)")
                                 {
-                                    Child = sampleBankTogglesCollection = new FillFlowContainer
+                                    Child = new FillFlowContainer
                                     {
                                         RelativeSizeAxes = Axes.X,
                                         AutoSizeAxes = Axes.Y,
                                         Direction = FillDirection.Vertical,
                                         Spacing = new Vector2(0, 5),
-                                    },
-                                }
+                                        Children = new Drawable[]
+                                        {
+                                            new Container
+                                            {
+                                                RelativeSizeAxes = Axes.X,
+                                                AutoSizeAxes = Axes.Y,
+                                                Children = new Drawable[]
+                                                {
+                                                    new ExpandableSpriteText
+                                                    {
+                                                        Text = "Normal",
+                                                        AlwaysPresent = true,
+                                                        AllowMultiline = false,
+                                                        RelativePositionAxes = Axes.X,
+                                                        X = 0.25f,
+                                                        Origin = Anchor.TopCentre,
+                                                        Anchor = Anchor.TopLeft,
+                                                        Font = OsuFont.GetFont(weight: FontWeight.Regular, size: 17),
+                                                    },
+                                                    new ExpandableSpriteText
+                                                    {
+                                                        Text = "Addition",
+                                                        AlwaysPresent = true,
+                                                        AllowMultiline = false,
+                                                        RelativePositionAxes = Axes.X,
+                                                        X = 0.75f,
+                                                        Origin = Anchor.TopCentre,
+                                                        Anchor = Anchor.TopLeft,
+                                                        Font = OsuFont.GetFont(weight: FontWeight.Regular, size: 17),
+                                                    },
+                                                }
+                                            },
+                                            sampleBankTogglesCollection = new FillFlowContainer
+                                            {
+                                                RelativeSizeAxes = Axes.X,
+                                                AutoSizeAxes = Axes.Y,
+                                                Direction = FillDirection.Vertical,
+                                                Spacing = new Vector2(0, 5),
+                                            },
+                                        }
+                                    }
+                                },
                             }
                         },
                     }
@@ -213,8 +257,7 @@ namespace osu.Game.Rulesets.Edit
                 },
             };
 
-            toolboxCollection.Items = CompositionTools
-                                      .Prepend(new SelectTool())
+            toolboxCollection.Items = (CompositionTools.Prepend(new SelectTool()))
                                       .Select(t => new HitObjectCompositionToolButton(t, () => toolSelected(t)))
                                       .ToList();
 
@@ -229,9 +272,9 @@ namespace osu.Game.Rulesets.Edit
             TernaryStates = CreateTernaryButtons().ToArray();
             togglesCollection.AddRange(TernaryStates.Select(b => new DrawableTernaryButton(b)));
 
-            sampleBankTogglesCollection.AddRange(BlueprintContainer.SampleBankTernaryStates.Select(b => new DrawableTernaryButton(b)));
+            sampleBankTogglesCollection.AddRange(BlueprintContainer.SampleBankTernaryStates.Zip(BlueprintContainer.SampleAdditionBankTernaryStates).Select(b => new SampleBankTernaryButton(b.First, b.Second)));
 
-            setSelectTool();
+            SetSelectTool();
 
             EditorBeatmap.SelectedHitObjects.CollectionChanged += selectionChanged;
         }
@@ -256,7 +299,7 @@ namespace osu.Game.Rulesets.Edit
             {
                 // it's important this is performed before the similar code in EditorRadioButton disables the button.
                 if (!timing.NewValue)
-                    setSelectTool();
+                    SetSelectTool();
             });
 
             EditorBeatmap.HasTiming.BindValueChanged(hasTiming =>
@@ -301,8 +344,8 @@ namespace osu.Game.Rulesets.Edit
                 PlayfieldContentContainer.Anchor = Anchor.CentreLeft;
                 PlayfieldContentContainer.Origin = Anchor.CentreLeft;
 
-                PlayfieldContentContainer.Width = Math.Max(1024, DrawWidth) - (TOOLBOX_CONTRACTED_SIZE_LEFT + TOOLBOX_CONTRACTED_SIZE_RIGHT);
-                PlayfieldContentContainer.X = TOOLBOX_CONTRACTED_SIZE_LEFT;
+                PlayfieldContentContainer.Width = Math.Max(1024, DrawWidth);
+                PlayfieldContentContainer.X = LeftToolbox.DrawWidth;
             }
 
             composerFocusMode.Value = PlayfieldContentContainer.Contains(InputManager.CurrentState.Mouse.Position)
@@ -323,7 +366,7 @@ namespace osu.Game.Rulesets.Edit
         /// <remarks>
         /// A "select" tool is automatically added as the first tool.
         /// </remarks>
-        protected abstract IReadOnlyList<HitObjectCompositionTool> CompositionTools { get; }
+        protected abstract IReadOnlyList<CompositionTool> CompositionTools { get; }
 
         /// <summary>
         /// A collection of states which will be displayed to the user in the toolbox.
@@ -360,10 +403,10 @@ namespace osu.Game.Rulesets.Edit
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
-            if (e.ControlPressed || e.AltPressed || e.SuperPressed)
+            if (e.ControlPressed || e.SuperPressed)
                 return false;
 
-            if (checkLeftToggleFromKey(e.Key, out int leftIndex))
+            if (checkToolboxMappingFromKey(e.Key, out int leftIndex))
             {
                 var item = toolboxCollection.Items.ElementAtOrDefault(leftIndex);
 
@@ -375,23 +418,35 @@ namespace osu.Game.Rulesets.Edit
                 }
             }
 
-            if (checkRightToggleFromKey(e.Key, out int rightIndex))
+            if (checkToggleMappingFromKey(e.Key, out int rightIndex))
             {
-                var item = e.ShiftPressed
-                    ? sampleBankTogglesCollection.ElementAtOrDefault(rightIndex)
-                    : togglesCollection.ElementAtOrDefault(rightIndex);
-
-                if (item is DrawableTernaryButton button)
+                if (e.ShiftPressed || e.AltPressed)
                 {
-                    button.Button.Toggle();
-                    return true;
+                    if (sampleBankTogglesCollection.ElementAtOrDefault(rightIndex) is SampleBankTernaryButton sampleBankTernaryButton)
+                    {
+                        if (e.ShiftPressed)
+                            sampleBankTernaryButton.NormalButton.Toggle();
+
+                        if (e.AltPressed)
+                            sampleBankTernaryButton.AdditionsButton.Toggle();
+
+                        return true;
+                    }
+                }
+                else
+                {
+                    if (togglesCollection.ElementAtOrDefault(rightIndex) is DrawableTernaryButton button)
+                    {
+                        button.Button.Toggle();
+                        return true;
+                    }
                 }
             }
 
             return base.OnKeyDown(e);
         }
 
-        private bool checkLeftToggleFromKey(Key key, out int index)
+        private bool checkToolboxMappingFromKey(Key key, out int index)
         {
             if (key < Key.Number1 || key > Key.Number9)
             {
@@ -403,7 +458,7 @@ namespace osu.Game.Rulesets.Edit
             return true;
         }
 
-        private bool checkRightToggleFromKey(Key key, out int index)
+        private bool checkToggleMappingFromKey(Key key, out int index)
         {
             switch (key)
             {
@@ -460,14 +515,18 @@ namespace osu.Game.Rulesets.Edit
             if (EditorBeatmap.SelectedHitObjects.Any())
             {
                 // ensure in selection mode if a selection is made.
-                setSelectTool();
+                SetSelectTool();
             }
         }
 
-        private void setSelectTool() => toolboxCollection.Items.First().Select();
+        public void SetSelectTool() => toolboxCollection.Items.First().Select();
 
-        private void toolSelected(HitObjectCompositionTool tool)
+        public void SetLastTool() => (lastTool ?? toolboxCollection.Items.First()).Select();
+
+        private void toolSelected(CompositionTool tool)
         {
+            lastTool = toolboxCollection.Items.OfType<HitObjectCompositionToolButton>().FirstOrDefault(i => i.Tool == BlueprintContainer.CurrentTool);
+
             BlueprintContainer.CurrentTool = tool;
 
             if (!(tool is SelectTool))
