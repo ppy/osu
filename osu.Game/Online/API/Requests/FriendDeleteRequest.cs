@@ -8,11 +8,11 @@ namespace osu.Game.Online.API.Requests
 {
     public class FriendDeleteRequest : APIRequest
     {
-        private readonly int targetId;
+        public readonly int TargetId;
 
         public FriendDeleteRequest(int targetId)
         {
-            this.targetId = targetId;
+            TargetId = targetId;
         }
 
         protected override WebRequest CreateWebRequest()
@@ -22,6 +22,6 @@ namespace osu.Game.Online.API.Requests
             return req;
         }
 
-        protected override string Target => $@"friends/{targetId}";
+        protected override string Target => $@"friends/{TargetId}";
     }
 }

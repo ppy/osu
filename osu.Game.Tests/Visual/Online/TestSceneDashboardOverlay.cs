@@ -30,7 +30,7 @@ namespace osu.Game.Tests.Visual.Online
                 if (supportLevel > 3)
                     supportLevel = 0;
 
-                ((DummyAPIAccess)API).Friends.Add(new APIUser
+                ((DummyAPIAccess)API).Friends.Add(CreateAPIRelationFromAPIUser(new APIUser
                 {
                     Username = @"peppy",
                     Id = 2,
@@ -38,7 +38,7 @@ namespace osu.Game.Tests.Visual.Online
                     CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
                     IsSupporter = supportLevel > 0,
                     SupportLevel = supportLevel
-                });
+                }));
             }
         }
 

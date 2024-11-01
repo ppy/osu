@@ -9,11 +9,11 @@ namespace osu.Game.Online.API.Requests
 {
     public class FriendAddRequest : APIRequest<APIRelation>
     {
-        private readonly int targetId;
+        public readonly int TargetId;
 
         public FriendAddRequest(int targetId)
         {
-            this.targetId = targetId;
+            TargetId = targetId;
         }
 
         protected override WebRequest CreateWebRequest()
@@ -21,7 +21,7 @@ namespace osu.Game.Online.API.Requests
             var req = base.CreateWebRequest();
 
             req.Method = HttpMethod.Post;
-            req.AddParameter("target", targetId.ToString(), RequestParameterType.Query);
+            req.AddParameter("target", TargetId.ToString(), RequestParameterType.Query);
 
             return req;
         }
