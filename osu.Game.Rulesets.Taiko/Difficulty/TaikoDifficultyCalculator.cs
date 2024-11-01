@@ -86,8 +86,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             double rhythmRating = rhythm.DifficultyValue() * rhythm_skill_multiplier;
             double staminaRating = stamina.DifficultyValue() * stamina_skill_multiplier;
             double monoStaminaRating = singleColourStamina.DifficultyValue() * stamina_skill_multiplier;
-
-            double monoStaminaFactor = Math.Pow(monoStaminaRating / staminaRating, 5);
+            double monoStaminaFactor = staminaRating == 0 ? 1 : Math.Pow(monoStaminaRating / staminaRating, 5);
 
             double combinedRating = combinedDifficultyValue(rhythm, colour, stamina);
             double starRating = rescale(combinedRating * 1.4);
