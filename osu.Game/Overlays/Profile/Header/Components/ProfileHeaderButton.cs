@@ -49,17 +49,17 @@ namespace osu.Game.Overlays.Profile.Header.Components
             });
         }
 
-        protected void SetBackGroundColour(ColourInfo colorInfo, double duration = 0)
+        protected void SetBackgroundColour(ColourInfo colorInfo, double duration = 0)
         {
             background.FadeColour(colorInfo, duration);
         }
 
-        protected void ShowLodingLayer()
+        protected void ShowLoadingLayer()
         {
             loading.Show();
         }
 
-        protected void HideLodingLayer()
+        protected void HideLoadingLayer()
         {
             loading.Hide();
         }

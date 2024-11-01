@@ -68,7 +68,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 if (status.Value == FriendStatus.Self)
                     return;
 
-                ShowLodingLayer();
+                ShowLoadingLayer();
 
                 APIRequest req = status.Value == FriendStatus.None ? new FriendAddRequest(User.Value.User.OnlineID) : new FriendDeleteRequest(User.Value.User.OnlineID);
 
@@ -77,7 +77,8 @@ namespace osu.Game.Overlays.Profile.Header.Components
                     followerCount += status.Value == FriendStatus.None ? 1 : -1;
 
                     api.UpdateLocalFriends();
-                    HideLodingLayer();
+                    updateStatus();
+                    HideLoadingLayer();
                 };
 
                 req.Failure += e =>
@@ -88,7 +89,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                         Icon = FontAwesome.Solid.Times,
                     });
 
-                    HideLodingLayer();
+                    HideLoadingLayer();
                 };
 
                 api.Queue(req);
@@ -164,19 +165,19 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 case FriendStatus.None:
                     IdleColour = colourProvider.Background6;
                     HoverColour = colourProvider.Background5;
-                    SetBackGroundColour(colourProvider.Background6, 200);
+                    SetBackgroundColour(colourProvider.Background6, 200);
                     break;
 
                 case FriendStatus.NotMutual:
                     IdleColour = colour.Green;
                     HoverColour = colour.Green.Lighten(0.1f);
-                    SetBackGroundColour(colour.Green, 200);
+                    SetBackgroundColour(colour.Green, 200);
                     break;
 
                 case FriendStatus.Mutual:
                     IdleColour = colour.Pink;
                     HoverColour = colour.Pink1.Lighten(0.1f);
-                    SetBackGroundColour(colour.Pink, 200);
+                    SetBackgroundColour(colour.Pink, 200);
                     break;
             }
         }
