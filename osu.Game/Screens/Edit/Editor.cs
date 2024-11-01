@@ -215,7 +215,6 @@ namespace osu.Game.Screens.Edit
         private Bindable<bool> editorLimitedDistanceSnap;
         private Bindable<bool> editorTimelineShowTimingChanges;
         private Bindable<bool> editorTimelineShowTicks;
-        private Bindable<bool> editorTimelineShowSamples;
 
         /// <summary>
         /// This controls the opacity of components like the timelines, sidebars, etc.
@@ -324,7 +323,6 @@ namespace osu.Game.Screens.Edit
             editorLimitedDistanceSnap = config.GetBindable<bool>(OsuSetting.EditorLimitedDistanceSnap);
             editorTimelineShowTimingChanges = config.GetBindable<bool>(OsuSetting.EditorTimelineShowTimingChanges);
             editorTimelineShowTicks = config.GetBindable<bool>(OsuSetting.EditorTimelineShowTicks);
-            editorTimelineShowSamples = config.GetBindable<bool>(OsuSetting.EditorTimelineShowSamples);
 
             AddInternal(new OsuContextMenuContainer
             {
@@ -390,10 +388,6 @@ namespace osu.Game.Screens.Edit
                                                     {
                                                         State = { BindTarget = editorTimelineShowTicks }
                                                     },
-                                                    new ToggleMenuItem(EditorStrings.TimelineShowSamples)
-                                                    {
-                                                        State = { BindTarget = editorTimelineShowSamples }
-                                                    }
                                                 ]
                                             },
                                             new BackgroundDimMenuItem(editorBackgroundDim),

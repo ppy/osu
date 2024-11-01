@@ -205,7 +205,6 @@ namespace osu.Game.Configuration
 
             SetDefault(OsuSetting.EditorTimelineShowTimingChanges, true);
             SetDefault(OsuSetting.EditorTimelineShowTicks, true);
-            SetDefault(OsuSetting.EditorTimelineShowSamples, true);
 
             SetDefault(OsuSetting.AlwaysShowHoldForMenuButton, false);
         }
@@ -433,6 +432,5 @@ namespace osu.Game.Configuration
         EditorTimelineShowTimingChanges,
         EditorTimelineShowTicks,
         AlwaysShowHoldForMenuButton,
-        EditorTimelineShowSamples
     }
 }
