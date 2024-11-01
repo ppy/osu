@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Mania.Edit
 
         protected override BeatSnapGrid CreateBeatSnapGrid() => new ManiaBeatSnapGrid();
 
-        protected override IReadOnlyList<HitObjectCompositionTool> CompositionTools => new HitObjectCompositionTool[]
+        protected override IReadOnlyList<CompositionTool> CompositionTools => new CompositionTool[]
         {
             new NoteCompositionTool(),
             new HoldNoteCompositionTool()

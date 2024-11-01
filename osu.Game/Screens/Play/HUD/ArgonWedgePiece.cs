@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Configuration;
+using osu.Game.Localisation.SkinComponents;
 using osu.Game.Skinning;
 using osuTK;
 
@@ -20,6 +21,9 @@ namespace osu.Game.Screens.Play.HUD
 
         [SettingSource("Inverted shear")]
         public BindableBool InvertShear { get; } = new BindableBool();
+
+        [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.Colour), nameof(SkinnableComponentStrings.ColourDescription))]
+        public BindableColour4 AccentColour { get; } = new BindableColour4(Color4Extensions.FromHex("#66CCFF"));
 
         public ArgonWedgePiece()
         {
@@ -37,7 +41,6 @@ namespace osu.Game.Screens.Play.HUD
             InternalChild = new Box
             {
                 RelativeSizeAxes = Axes.Both,
-                Colour = ColourInfo.GradientVertical(Color4Extensions.FromHex("#66CCFF").Opacity(0.0f), Color4Extensions.FromHex("#66CCFF").Opacity(0.25f)),
             };
         }
 
@@ -46,6 +49,7 @@ namespace osu.Game.Screens.Play.HUD
             base.LoadComplete();
 
             InvertShear.BindValueChanged(v => Shear = new Vector2(0.8f, 0f) * (v.NewValue ? -1 : 1), true);
+            AccentColour.BindValueChanged(c => InternalChild.Colour = ColourInfo.GradientVertical(AccentColour.Value.Opacity(0.0f), AccentColour.Value.Opacity(0.25f)), true);
         }
     }
 }
