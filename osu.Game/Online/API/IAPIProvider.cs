@@ -22,7 +22,7 @@ namespace osu.Game.Online.API
         /// <summary>
         /// The user's friends.
         /// </summary>
-        IBindableList<APIUser> Friends { get; }
+        IBindableList<APIRelation> Friends { get; }
 
         /// <summary>
         /// The current user's activity.
@@ -133,6 +133,11 @@ namespace osu.Game.Online.API
         /// Sets Statistics bindable.
         /// </summary>
         void UpdateStatistics(UserStatistics newStatistics);
+
+        /// <summary>
+        /// Update the friends status of the current user.
+        /// </summary>
+        void UpdateLocalFriends();
 
         /// <summary>
         /// Schedule a callback to run on the update thread.
