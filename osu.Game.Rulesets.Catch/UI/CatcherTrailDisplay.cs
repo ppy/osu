@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
@@ -62,21 +63,16 @@ namespace osu.Game.Rulesets.Catch.UI
         /// <param name="scale">The new body scale of the Catcher</param>
         public void UpdateCatcherTrailsScale(Vector2 scale)
         {
-            applyScaleChange(scale, dashTrails);
-            applyScaleChange(scale, hyperDashTrails);
+            var oldEntries = Entries.ToList();
 
-            foreach (var afterImage in hyperDashAfterImages)
-            {
-                afterImage.Hide();
-                afterImage.Expire();
-            }
-        }
+            Clear();
 
-        private void applyScaleChange(Vector2 scale, Container<CatcherTrail> trails)
-        {
-            foreach (var trail in trails)
+            foreach (var oldEntry in oldEntries)
             {
-                trail.Scale = scale;
+                // use magnitude of the new scale while preserving the sign of the old one in the X direction.
+                // the end effect is preserving the direction in which the trail sprites face, which is important.
+                var targetScale = new Vector2(Math.Abs(scale.X) * Math.Sign(oldEntry.Scale.X), Math.Abs(scale.Y));
+                Add(new CatcherTrailEntry(oldEntry.LifetimeStart, oldEntry.CatcherState, oldEntry.Position, targetScale, oldEntry.Animation));
             }
         }
 
