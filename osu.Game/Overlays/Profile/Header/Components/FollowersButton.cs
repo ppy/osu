@@ -89,7 +89,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
 
                 ShowLoadingLayer();
 
-                APIRequest req = status.Value == FriendStatus.None ? new FriendAddRequest(User.Value.User.OnlineID) : new FriendDeleteRequest(User.Value.User.OnlineID);
+                APIRequest req = status.Value == FriendStatus.None ? new AddFriendRequest(User.Value.User.OnlineID) : new FriendDeleteRequest(User.Value.User.OnlineID);
 
                 req.Success += () =>
                 {

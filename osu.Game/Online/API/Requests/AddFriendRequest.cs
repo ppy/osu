@@ -7,11 +7,11 @@ using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Online.API.Requests
 {
-    public class FriendAddRequest : APIRequest<APIRelation>
+    public class AddFriendRequest : APIRequest<APIRelation>
     {
         public readonly int TargetId;
 
-        public FriendAddRequest(int targetId)
+        public AddFriendRequest(int targetId)
         {
             TargetId = targetId;
         }

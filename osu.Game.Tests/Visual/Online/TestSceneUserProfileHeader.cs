@@ -425,7 +425,7 @@ namespace osu.Game.Tests.Visual.Online
 
                 dummyAPI.HandleRequest = request =>
                 {
-                    if (request is not FriendAddRequest req)
+                    if (request is not AddFriendRequest req)
                         return false;
 
                     if (req.TargetId != nonFriend.OnlineID)
@@ -459,7 +459,7 @@ namespace osu.Game.Tests.Visual.Online
 
                 dummyAPI.HandleRequest = request =>
                 {
-                    if (request is not FriendAddRequest req)
+                    if (request is not AddFriendRequest req)
                         return false;
 
                     if (req.TargetId != nonFriend.OnlineID)
