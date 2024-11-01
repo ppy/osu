@@ -203,22 +203,29 @@ namespace osu.Game.Overlays
                     }
                 },
             };
-
-            LoadComponentAsync(playlist = new PlaylistOverlay
-            {
-                RelativeSizeAxes = Axes.Both,
-            }, _ =>
-            {
-                playlistContainer.Add(playlist);
-
-                playlist.State.BindValueChanged(s => playlistButton.FadeColour(s.NewValue == Visibility.Visible ? colours.Yellow : Color4.White, 200, Easing.OutQuint), true);
-            });
         }
 
         private void togglePlaylist()
         {
+            if (playlist == null)
+            {
+                LoadComponentAsync(playlist = new PlaylistOverlay
+                {
+                    RelativeSizeAxes = Axes.Both,
+                }, _ =>
+                {
+                    playlistContainer.Add(playlist);
+
+                    playlist.State.BindValueChanged(s => playlistButton.FadeColour(s.NewValue == Visibility.Visible ? colours.Yellow : Color4.White, 200, Easing.OutQuint), true);
+
+                    togglePlaylist();
+                });
+
+                return;
+            }
+
             if (!beatmap.Disabled)
-                playlist?.ToggleVisibility();
+                playlist.ToggleVisibility();
         }
 
         protected override void LoadComplete()

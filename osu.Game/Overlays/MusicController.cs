@@ -258,8 +258,8 @@ namespace osu.Game.Overlays
                 playableSet = getNextRandom(-1, allowProtectedTracks);
             else
             {
-                playableSet = Playlist.TakeWhile(i => !i.Value.Equals(current?.BeatmapSetInfo)).LastOrDefault(s => !s.Value.Protected || allowProtectedTracks)
-                              ?? Playlist.LastOrDefault(s => !s.Value.Protected || allowProtectedTracks);
+                playableSet = getBeatmapSets().TakeWhile(i => !i.Value.Equals(current?.BeatmapSetInfo)).LastOrDefault(s => !s.Value.Protected || allowProtectedTracks)
+                              ?? getBeatmapSets().LastOrDefault(s => !s.Value.Protected || allowProtectedTracks);
             }
 
             if (playableSet != null)
@@ -353,10 +353,10 @@ namespace osu.Game.Overlays
                 playableSet = getNextRandom(1, allowProtectedTracks);
             else
             {
-                playableSet = Playlist.SkipWhile(i => !i.Value.Equals(current?.BeatmapSetInfo))
+                playableSet = getBeatmapSets().SkipWhile(i => !i.Value.Equals(current?.BeatmapSetInfo))
                                       .Where(i => !i.Value.Protected || allowProtectedTracks)
                                       .ElementAtOrDefault(1)
-                              ?? Playlist.FirstOrDefault(i => !i.Value.Protected || allowProtectedTracks);
+                              ?? getBeatmapSets().FirstOrDefault(i => !i.Value.Protected || allowProtectedTracks);
             }
 
             var playableBeatmap = playableSet?.Value.Beatmaps.FirstOrDefault();
@@ -377,7 +377,7 @@ namespace osu.Game.Overlays
             {
                 Live<BeatmapSetInfo> result;
 
-                var possibleSets = Playlist.Where(s => !s.Value.Protected || allowProtectedTracks).ToList();
+                var possibleSets = getBeatmapSets().Where(s => !s.Value.Protected || allowProtectedTracks).ToList();
 
                 if (possibleSets.Count == 0)
                     return null;
@@ -460,9 +460,10 @@ namespace osu.Game.Overlays
 
         private TrackChangeDirection? queuedDirection;
 
-        private IEnumerable<Live<BeatmapSetInfo>> getBeatmapSets() => realm.Realm.All<BeatmapSetInfo>().Where(s => !s.DeletePending)
-                                                                           .AsEnumerable()
-                                                                           .Select(s => new RealmLive<BeatmapSetInfo>(s, realm));
+        private IEnumerable<Live<BeatmapSetInfo>> getBeatmapSets() => Playlist.IsDefault ? realm.Realm.All<BeatmapSetInfo>().Where(s => !s.DeletePending)
+                                                                                                      .AsEnumerable()
+                                                                                                      .Select(s => new RealmLive<BeatmapSetInfo>(s, realm))
+                                                                                         : Playlist.Where(s => !s.Value.DeletePending);
 
         private void changeBeatmap(WorkingBeatmap newWorking)
         {
