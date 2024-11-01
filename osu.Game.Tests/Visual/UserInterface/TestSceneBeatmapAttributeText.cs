@@ -164,16 +164,16 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             AddStep("set test ruleset", () => Ruleset.Value = new TestRuleset().RulesetInfo);
             AddStep("set max pp attribute", () => text.Attribute.Value = BeatmapAttribute.MaxPP);
-            AddAssert("check max pp is 0", getText, () => Is.EqualTo("Max PP: 0.00"));
+            AddAssert("check max pp is 0", getText, () => Is.EqualTo("Max PP: 0"));
 
             // Adding mod
             TestMod mod = null!;
             AddStep("add mod with pp 1", () => SelectedMods.Value = new[] { mod = new TestMod { Performance = { Value = 1 } } });
-            AddUntilStep("check max pp is 1", getText, () => Is.EqualTo("Max PP: 1.00"));
+            AddUntilStep("check max pp is 1", getText, () => Is.EqualTo("Max PP: 1"));
 
             // Changing mod setting
             AddStep("change mod pp to 2", () => mod.Performance.Value = 2);
-            AddUntilStep("check max pp is 2", getText, () => Is.EqualTo("Max PP: 2.00"));
+            AddUntilStep("check max pp is 2", getText, () => Is.EqualTo("Max PP: 2"));
         }
 
         private string getText() => text.ChildrenOfType<SpriteText>().Single().Text.ToString();
