@@ -7,7 +7,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Game.Configuration;
@@ -20,7 +19,6 @@ using osu.Game.Overlays.Profile;
 using osu.Game.Overlays.Profile.Header.Components;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Users;
-using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -412,73 +410,79 @@ namespace osu.Game.Tests.Visual.Online
             }, new OsuRuleset().RulesetInfo));
         }
 
+        private APIUser nonFriend => new APIUser
+        {
+            Id = 727,
+            Username = "Whatever",
+        };
+
         [Test]
         public void TestAddFriend()
         {
-            AddStep("clear friend list", () => dummyAPI.Friends.Clear());
-            AddStep("Show non-friend user", () => header.User.Value = new UserProfileData(TestSceneUserProfileOverlay.TEST_USER, new OsuRuleset().RulesetInfo));
             AddStep("Setup request", () =>
             {
                 requestLock.Reset();
 
-                dummyAPI.HandleRequest += request =>
+                dummyAPI.HandleRequest = request =>
                 {
                     if (request is not FriendAddRequest req)
                         return false;
 
-                    if (req.TargetId != 1)
+                    if (req.TargetId != nonFriend.OnlineID)
                         return false;
 
-                    var apiRelation = CreateAPIRelationFromAPIUser(TestSceneUserProfileOverlay.TEST_USER);
+                    var apiRelation = CreateAPIRelationFromAPIUser(nonFriend);
 
                     Task.Run(() =>
                     {
                         requestLock.Wait(3000);
+                        dummyAPI.Friends.Add(apiRelation);
                         req.TriggerSuccess(apiRelation);
                     });
 
-                    dummyAPI.Friends.Add(apiRelation);
                     return true;
                 };
             });
+            AddStep("clear friend list", () => dummyAPI.Friends.Clear());
+            AddStep("Show non-friend user", () => header.User.Value = new UserProfileData(nonFriend, new OsuRuleset().RulesetInfo));
             AddStep("Click followers button", () => this.ChildrenOfType<FollowersButton>().First().TriggerClick());
             AddStep("Complete request", () => requestLock.Set());
-            AddUntilStep("Friend added", () => API.Friends.Any(f => f.TargetID == TestSceneUserProfileOverlay.TEST_USER.OnlineID));
+            AddUntilStep("Friend added", () => API.Friends.Any(f => f.TargetID == nonFriend.OnlineID));
         }
 
         [Test]
         public void TestAddFriendNonMutual()
         {
-            AddStep("clear friend list", () => dummyAPI.Friends.Clear());
-            AddStep("Show non-friend user", () => header.User.Value = new UserProfileData(TestSceneUserProfileOverlay.TEST_USER, new OsuRuleset().RulesetInfo));
             AddStep("Setup request", () =>
             {
                 requestLock.Reset();
 
-                dummyAPI.HandleRequest += request =>
+                dummyAPI.HandleRequest = request =>
                 {
                     if (request is not FriendAddRequest req)
                         return false;
 
-                    if (req.TargetId != 1)
+                    if (req.TargetId != nonFriend.OnlineID)
                         return false;
 
-                    var apiRelation = CreateAPIRelationFromAPIUser(TestSceneUserProfileOverlay.TEST_USER);
+                    var apiRelation = CreateAPIRelationFromAPIUser(nonFriend);
                     apiRelation.Mutual = false;
 
                     Task.Run(() =>
                     {
                         requestLock.Wait(3000);
+                        dummyAPI.Friends.Add(apiRelation);
                         req.TriggerSuccess(apiRelation);
                     });
 
-                    dummyAPI.Friends.Add(apiRelation);
                     return true;
                 };
             });
+            AddStep("clear friend list", () => dummyAPI.Friends.Clear());
+            AddStep("Show non-friend user", () => header.User.Value = new UserProfileData(nonFriend, new OsuRuleset().RulesetInfo));
             AddStep("Click followers button", () => this.ChildrenOfType<FollowersButton>().First().TriggerClick());
             AddStep("Complete request", () => requestLock.Set());
-            AddUntilStep("Friend added", () => API.Friends.Any(f => f.TargetID == TestSceneUserProfileOverlay.TEST_USER.OnlineID));
+            AddUntilStep("Friend added", () => API.Friends.Any(f => f.TargetID == nonFriend.OnlineID));
         }
     }
 }
