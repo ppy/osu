@@ -44,7 +44,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
         private Container itemsPlaceholder;
         private LoadingLayer loading;
 
-        private readonly IBindableList<APIUser> apiFriends = new BindableList<APIUser>();
+        private readonly IBindableList<APIRelation> apiFriends = new BindableList<APIRelation>();
 
         public FriendDisplay()
         {
@@ -145,7 +145,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
             controlBackground.Colour = colourProvider.Background5;
 
             apiFriends.BindTo(api.Friends);
-            apiFriends.BindCollectionChanged((_, _) => Schedule(() => Users = apiFriends.ToList()), true);
+            apiFriends.BindCollectionChanged((_, _) => Schedule(() => Users = apiFriends.Select(f => f.TargetUser).ToList()), true);
         }
 
         protected override void LoadComplete()
