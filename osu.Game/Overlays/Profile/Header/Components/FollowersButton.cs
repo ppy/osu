@@ -21,6 +21,10 @@ namespace osu.Game.Overlays.Profile.Header.Components
     {
         public readonly Bindable<UserProfileData?> User = new Bindable<UserProfileData?>();
 
+        // Because it is impossible to update the number of friends after the operation,
+        // the number of friends obtained is stored and modified locally.
+        private int followerCount;
+
         public override LocalisableString TooltipText => FriendsStrings.ButtonsDisabled;
 
         protected override IconUsage Icon => FontAwesome.Solid.User;
@@ -47,7 +51,11 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 updateColor();
             });
 
-            User.BindValueChanged(_ => updateStatus(), true);
+            User.BindValueChanged(u =>
+            {
+                followerCount = u.NewValue?.User.FollowerCount ?? 0;
+                updateStatus();
+            }, true);
 
             apiFriends.BindTo(api.Friends);
             apiFriends.BindCollectionChanged((_, _) => Schedule(updateStatus));
@@ -66,6 +74,8 @@ namespace osu.Game.Overlays.Profile.Header.Components
 
                 req.Success += () =>
                 {
+                    followerCount += status.Value == FriendStatus.None ? 1 : -1;
+
                     api.UpdateLocalFriends();
                     HideLodingLayer();
                 };
@@ -104,7 +114,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
 
         private void updateStatus()
         {
-            SetValue(User.Value?.User.FollowerCount ?? 0);
+            SetValue(followerCount);
 
             if (localUser.Value.OnlineID == User.Value?.User.OnlineID)
             {
