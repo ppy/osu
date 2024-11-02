@@ -2,9 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Evaluators;
+using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
@@ -34,9 +36,22 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         {
             currentStrain *= strainDecay(current.DeltaTime);
             currentStrain += AimEvaluator.EvaluateDifficultyOf(current, withSliders) * skillMultiplier;
-            ObjectStrains.Add(currentStrain);
+            ObjectStrains.Add((currentStrain, current.BaseObject.GetType()));
 
             return currentStrain;
+        }
+
+        public double GetDifficultSliders()
+        {
+            double[] sliderStrains = ObjectStrains.Where(x => x.ObjectType == typeof(Slider)).Select(x => x.Strain).OrderDescending().ToArray();
+            if (sliderStrains.Length == 0)
+                return 0;
+
+            double maxSliderStrain = sliderStrains.Max();
+            if (maxSliderStrain == 0)
+                return 0;
+
+            return sliderStrains.Sum(strain => 1.0 / (1.0 + Math.Exp(-(strain / maxSliderStrain * 12.0 - 6.0))));
         }
     }
 }

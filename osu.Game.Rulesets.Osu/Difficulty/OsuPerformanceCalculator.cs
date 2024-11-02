@@ -163,7 +163,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             }
 
             // We assume 15% of sliders in a map are difficult since there's no way to tell from the performance calculator.
-            double estimateDifficultSliders = attributes.SliderCount * 0.15;
+            double estimateDifficultSliders = attributes.AimDifficultSliders;
 
             if (attributes.SliderCount > 0)
             {
