@@ -10,10 +10,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 {
     public static class AimEvaluator
     {
-        private const double wide_angle_multiplier = 1.5;
-        private const double acute_angle_multiplier = 1.95;
-        private const double slider_multiplier = 1.35;
-        private const double velocity_change_multiplier = 0.75;
+        private const double wide_angle_multiplier = 1.575;
+        private const double acute_angle_multiplier = 1.9;
+        private const double angle_deviation_multiplier = 1;
+        private const double slider_multiplier = 1.42;
+        private const double velocity_change_multiplier = 1.725;
 
         /// <summary>
         /// Evaluates the difficulty of aiming the current object, based on:
@@ -60,6 +61,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double acuteAngleBonus = 0;
             double sliderBonus = 0;
             double velocityChangeBonus = 0;
+            double angleDeviationBonus = 0;
 
             double aimStrain = currVelocity; // Start strain with regular velocity.
 
@@ -70,12 +72,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     double currAngle = osuCurrObj.Angle.Value;
                     double lastAngle = osuLastObj.Angle.Value;
                     double lastLastAngle = osuLastLastObj.Angle.Value;
+                    double angleMean = (currAngle + lastAngle + lastLastAngle) / 3
 
                     // Rewarding angles, take the smaller velocity as base.
                     double angleBonus = Math.Min(currVelocity, prevVelocity);
 
                     wideAngleBonus = calcWideAngleBonus(currAngle);
                     acuteAngleBonus = calcAcuteAngleBonus(currAngle);
+
+                    // New angle deviation bonuses from proposed tech rework
+                    angleDeviationBonus = calcAngleDeviationBonus(currAngle, lastAngle, lastLastAngle, angleMean));
 
                     if (osuCurrObj.StrainTime > 100) // Only buff deltaTime exceeding 300 bpm 1/2.
                         acuteAngleBonus = 0;
@@ -91,6 +97,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     wideAngleBonus *= angleBonus * (1 - Math.Min(wideAngleBonus, Math.Pow(calcWideAngleBonus(lastAngle), 3)));
                     // Penalize acute angles if they're repeated, reducing the penalty as the lastLastAngle gets more obtuse.
                     acuteAngleBonus *= 0.5 + 0.5 * (1 - Math.Min(acuteAngleBonus, Math.Pow(calcAcuteAngleBonus(lastLastAngle), 3)));
+                    // Angle Deviation bonuses mainly buffs Tech maps, so the bonus will also be affected by the TravelDistance (Smaller -> better cuz tech) and deltaTime (Starts at 180bpm 1/2s, caps at 33ms).
+                    angleDeviationBonus *= Math.Pow(Math.min(167 / Math.Max(33, osuCurrObj.StrainTime), 1), 2) - 1 * (180 - osuCurrObj.LazyJumpDistance / 180)
                 }
             }
 
@@ -119,7 +127,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             }
 
             // Add in acute angle bonus or wide angle bonus + velocity change bonus, whichever is larger.
-            aimStrain += Math.Max(acuteAngleBonus * acute_angle_multiplier, wideAngleBonus * wide_angle_multiplier + velocityChangeBonus * velocity_change_multiplier);
+            aimStrain += Math.Max(acuteAngleBonus * acute_angle_multiplier, wideAngleBonus * wide_angle_multiplier + velocityChangeBonus * velocity_change_multiplier) * (angleDeviationBonus * angle_deviation_multiplier);
 
             // Add in additional slider velocity bonus.
             if (withSliderTravelDistance)
@@ -131,5 +139,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         private static double calcWideAngleBonus(double angle) => Math.Pow(Math.Sin(3.0 / 4 * (Math.Min(5.0 / 6 * Math.PI, Math.Max(Math.PI / 6, angle)) - Math.PI / 6)), 2);
 
         private static double calcAcuteAngleBonus(double angle) => 1 - calcWideAngleBonus(angle);
+
+        private static double calcAngleDeviationBonus(double angle1, double angle2, double angle3, double meanAngle) => Math.pow(Math.Sqrt((Math.Pow(angle1 - meanAngle, 2) + Math.Pow(angle2 - meanAngle, 2) + Math.Pow(angle3 - meanAngle, 2)) / 3) / 20, 1.57)
     }
 }
