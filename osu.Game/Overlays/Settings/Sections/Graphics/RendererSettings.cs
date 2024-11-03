@@ -3,6 +3,7 @@
 
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Configuration;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
@@ -21,11 +22,20 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
         private bool automaticRendererInUse;
 
+        private Bindable<FrameSync> configFrameSync = null!;
+        private SettingsEnumDropdown<FrameSync> frameSyncDropdown = null!;
+
+        private IBindable<bool> allowConfiguringFrameLimiter = null!;
+
         [BackgroundDependencyLoader]
         private void load(FrameworkConfigManager config, OsuConfigManager osuConfig, IDialogOverlay? dialogOverlay, OsuGame? game, GameHost host)
         {
             var renderer = config.GetBindable<RendererType>(FrameworkSetting.Renderer);
             automaticRendererInUse = renderer.Value == RendererType.Automatic;
+
+            configFrameSync = config.GetBindable<FrameSync>(FrameworkSetting.FrameSync);
+
+            allowConfiguringFrameLimiter = host.AllowConfiguringFrameSync.GetBoundCopy();
 
             Children = new Drawable[]
             {
@@ -40,10 +50,10 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     Keywords = new[] { @"compatibility", @"directx" },
                 },
                 // TODO: this needs to be a custom dropdown at some point
-                new SettingsEnumDropdown<FrameSync>
+                frameSyncDropdown = new SettingsEnumDropdown<FrameSync>
                 {
                     LabelText = GraphicsSettingsStrings.FrameLimiter,
-                    Current = config.GetBindable<FrameSync>(FrameworkSetting.FrameSync),
+                    Current = configFrameSync.GetUnboundCopy(),
                     Keywords = new[] { @"fps" },
                 },
                 new SettingsEnumDropdown<ExecutionMode>
@@ -79,6 +89,28 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     }));
                 }
             });
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            allowConfiguringFrameLimiter.BindValueChanged(v =>
+            {
+                frameSyncDropdown.Current.Disabled = !v.NewValue;
+                frameSyncDropdown.TooltipText = v.NewValue ? string.Empty : RendererSettingsStrings.FrameLimitersUnavailableTooltip;
+            }, true);
+
+            configFrameSync.BindValueChanged(val =>
+            {
+                bool disabled = frameSyncDropdown.Current.Disabled;
+
+                frameSyncDropdown.Current.Disabled = false;
+                frameSyncDropdown.Current.Value = val.NewValue;
+                frameSyncDropdown.Current.Disabled = disabled;
+            }, true);
+
+            frameSyncDropdown.Current.BindValueChanged(val => configFrameSync.Value = val.NewValue);
         }
 
         private partial class RendererSettingsDropdown : SettingsEnumDropdown<RendererType>
