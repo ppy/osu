@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         private readonly OsuGridToolboxGroup gridToolbox;
 
-        private readonly Bindable<PreciseRotationInfo> rotationInfo = new Bindable<PreciseRotationInfo>(new PreciseRotationInfo(0, RotationOrigin.GridCentre));
+        private readonly Bindable<PreciseRotationInfo> rotationInfo = new Bindable<PreciseRotationInfo>(new PreciseRotationInfo(0, EditorOrigin.GridCentre));
 
         private SliderWithTextBoxInput<float> angleInput = null!;
         private EditorRadioButtonCollection rotationOrigin = null!;
@@ -67,13 +67,13 @@ namespace osu.Game.Rulesets.Osu.Edit
                         Items = new[]
                         {
                             new RadioButton("Grid centre",
-                                () => rotationInfo.Value = rotationInfo.Value with { Origin = RotationOrigin.GridCentre },
+                                () => rotationInfo.Value = rotationInfo.Value with { Origin = EditorOrigin.GridCentre },
                                 () => new SpriteIcon { Icon = FontAwesome.Regular.PlusSquare }),
                             new RadioButton("Playfield centre",
-                                () => rotationInfo.Value = rotationInfo.Value with { Origin = RotationOrigin.PlayfieldCentre },
+                                () => rotationInfo.Value = rotationInfo.Value with { Origin = EditorOrigin.PlayfieldCentre },
                                 () => new SpriteIcon { Icon = FontAwesome.Regular.Square }),
                             selectionCentreButton = new RadioButton("Selection centre",
-                                () => rotationInfo.Value = rotationInfo.Value with { Origin = RotationOrigin.SelectionCentre },
+                                () => rotationInfo.Value = rotationInfo.Value with { Origin = EditorOrigin.SelectionCentre },
                                 () => new SpriteIcon { Icon = FontAwesome.Solid.VectorSquare })
                         }
                     }
@@ -111,9 +111,9 @@ namespace osu.Game.Rulesets.Osu.Edit
         private Vector2? getOriginPosition(PreciseRotationInfo rotation) =>
             rotation.Origin switch
             {
-                RotationOrigin.GridCentre => gridToolbox.StartPosition.Value,
-                RotationOrigin.PlayfieldCentre => OsuPlayfield.BASE_SIZE / 2,
-                RotationOrigin.SelectionCentre => null,
+                EditorOrigin.GridCentre => gridToolbox.StartPosition.Value,
+                EditorOrigin.PlayfieldCentre => OsuPlayfield.BASE_SIZE / 2,
+                EditorOrigin.SelectionCentre => null,
                 _ => throw new ArgumentOutOfRangeException(nameof(rotation))
             };
 
@@ -143,12 +143,5 @@ namespace osu.Game.Rulesets.Osu.Edit
         }
     }
 
-    public enum RotationOrigin
-    {
-        GridCentre,
-        PlayfieldCentre,
-        SelectionCentre
-    }
-
-    public record PreciseRotationInfo(float Degrees, RotationOrigin Origin);
+    public record PreciseRotationInfo(float Degrees, EditorOrigin Origin);
 }
