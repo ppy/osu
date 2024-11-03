@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Logging;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Screens.Edit.Changes;
 
 namespace osu.Game.Screens.Edit
@@ -134,6 +135,9 @@ namespace osu.Game.Screens.Edit
             foreach (var change in transaction.UndoChanges.Reverse())
                 change.Revert();
 
+            foreach (var hitObject in transaction.HitObjectUpdates)
+                editorBeatmap.Update(hitObject);
+
             editorBeatmap.EndChange();
             isRestoring = false;
         }
@@ -145,6 +149,9 @@ namespace osu.Game.Screens.Edit
 
             foreach (var change in transaction.UndoChanges)
                 change.Apply();
+
+            foreach (var hitObject in transaction.HitObjectUpdates)
+                editorBeatmap.Update(hitObject);
 
             editorBeatmap.EndChange();
             isRestoring = false;
@@ -161,6 +168,11 @@ namespace osu.Game.Screens.Edit
             currentTransaction.Add(change);
         }
 
+        public void RecordUpdate(HitObject hitObject)
+        {
+            currentTransaction.RecordUpdate(hitObject);
+        }
+
         private readonly struct Transaction
         {
             public Transaction()
@@ -170,15 +182,24 @@ namespace osu.Game.Screens.Edit
 
             private readonly List<IRevertibleChange> undoChanges;
 
+            private readonly HashSet<HitObject> hitObjectUpdates = new HashSet<HitObject>();
+
             /// <summary>
             /// The changes to undo the given transaction.
             /// Stored in reverse order of original changes to match execution order when undoing.
             /// </summary>
             public IReadOnlyList<IRevertibleChange> UndoChanges => undoChanges;
 
+            public IReadOnlySet<HitObject> HitObjectUpdates => hitObjectUpdates;
+
             public void Add(IRevertibleChange change)
             {
                 undoChanges.Add(change);
+            }
+
+            public void RecordUpdate(HitObject hitObject)
+            {
+                hitObjectUpdates.Add(hitObject);
             }
         }
     }

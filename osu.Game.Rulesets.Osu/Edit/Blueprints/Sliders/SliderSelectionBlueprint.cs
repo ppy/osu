@@ -282,7 +282,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
             new SliderVelocityMultiplierChange(HitObject, proposedVelocity).Apply(changeHandler);
             new ExpectedDistanceChange(HitObject.Path, proposedDistance).Apply(changeHandler);
-            new QueueUpdateHitObject(editorBeatmap, HitObject).Apply(changeHandler);
+            editorBeatmap?.Update(HitObject);
+            changeHandler?.RecordUpdate(HitObject);
         }
 
         /// <summary>
