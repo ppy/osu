@@ -165,11 +165,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddUntilStep("wait for room join", () => RoomJoined);
 
-            AddStep("join other user (ready)", () =>
-            {
-                MultiplayerClient.AddUser(new APIUser { Id = PLAYER_1_ID });
-                MultiplayerClient.ChangeUserState(PLAYER_1_ID, MultiplayerUserState.Ready);
-            });
+            AddStep("join other user", void () => MultiplayerClient.AddUser(new APIUser { Id = PLAYER_1_ID }));
+            AddUntilStep("wait for user populated", () => MultiplayerClient.ClientRoom!.Users.Single(u => u.UserID == PLAYER_1_ID).User, () => Is.Not.Null);
+            AddStep("other user ready", () => MultiplayerClient.ChangeUserState(PLAYER_1_ID, MultiplayerUserState.Ready));
 
             ClickButtonWhenEnabled<MultiplayerSpectateButton>();
 

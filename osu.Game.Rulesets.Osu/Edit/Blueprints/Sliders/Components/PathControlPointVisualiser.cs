@@ -335,6 +335,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             base.Dispose(isDisposing);
             foreach (var p in Pieces)
                 p.ControlPoint.Changed -= controlPointChanged;
+
+            if (draggedControlPointIndex >= 0)
+                DragEnded();
         }
 
         private void selectionRequested(PathControlPointPiece<T> piece, MouseButtonEvent e)
@@ -391,7 +394,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
         private Vector2[] dragStartPositions;
         private PathType?[] dragPathTypes;
-        private int draggedControlPointIndex;
+        private int draggedControlPointIndex = -1;
         private HashSet<PathControlPoint> selectedControlPoints;
 
         private List<MenuItem> curveTypeItems;
@@ -475,7 +478,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             EnsureValidPathTypes();
         }
 
-        public void DragEnded() => changeHandler?.EndChange();
+        public void DragEnded()
+        {
+            changeHandler?.EndChange();
+            draggedControlPointIndex = -1;
+        }
 
         #endregion
 
