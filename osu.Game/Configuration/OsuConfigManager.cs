@@ -195,7 +195,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.EditorLimitedDistanceSnap, false);
             SetDefault(OsuSetting.EditorShowSpeedChanges, false);
             SetDefault(OsuSetting.EditorScaleOrigin, EditorOrigin.GridCentre);
-            SetDefault(OsuSetting.EditorRotateOrigin, EditorOrigin.GridCentre);
+            SetDefault(OsuSetting.EditorRotationOrigin, EditorOrigin.GridCentre);
 
             SetDefault(OsuSetting.HideCountryFlags, false);
 
@@ -438,6 +438,7 @@ namespace osu.Game.Configuration
         EditorTimelineShowTicks,
         AlwaysShowHoldForMenuButton,
         EditorContractSidebars,
-        EditorScaleOrigin
+        EditorScaleOrigin,
+        EditorRotationOrigin
     }
 }
