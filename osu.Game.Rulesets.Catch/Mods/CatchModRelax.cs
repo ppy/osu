@@ -29,10 +29,7 @@ namespace osu.Game.Rulesets.Catch.Mods
         public void ApplyToPlayer(Player player)
         {
             if (!drawableRuleset.HasReplayLoaded.Value)
-            {
-                var catchPlayfield = (CatchPlayfield)drawableRuleset.Playfield;
-                catchPlayfield.CatcherArea.Add(new MouseInputHelper(catchPlayfield.CatcherArea));
-            }
+                drawableRuleset.Playfield.CatcherArea.Add(new MouseInputHelper(drawableRuleset.Playfield.CatcherArea));
         }
 
         private partial class MouseInputHelper : Drawable, IKeyBindingHandler<CatchAction>, IRequireHighFrequencyMousePosition

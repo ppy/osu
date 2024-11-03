@@ -97,9 +97,9 @@ namespace osu.Game.Rulesets.Catch.Tests
             AddAssert("catcher state is idle", () => catcherState == CatcherAnimationState.Idle);
         }
 
-        private bool playfieldIsEmpty => !((CatchPlayfield)drawableRuleset.Playfield).AllHitObjects.Any(h => h.IsAlive);
+        private bool playfieldIsEmpty => !drawableRuleset.Playfield.AllHitObjects.Any(h => h.IsAlive);
 
-        private CatcherAnimationState catcherState => ((CatchPlayfield)drawableRuleset.Playfield).Catcher.CurrentState;
+        private CatcherAnimationState catcherState => drawableRuleset.Playfield.Catcher.CurrentState;
 
         private void spawnFruits(bool hit = false)
         {

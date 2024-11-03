@@ -4,9 +4,9 @@
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Rulesets.Catch.Objects;
+using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
-using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Mods
 {
@@ -20,7 +20,12 @@ namespace osu.Game.Rulesets.Catch.Mods
 
         public void ApplyToDrawableRuleset(DrawableRuleset<CatchHitObject> drawableRuleset)
         {
-            drawableRuleset.PlayfieldAdjustmentContainer.Scale = new Vector2(1, -1);
+            // todo: usually mods are not supposed to invent new code inside the ruleset implementation,
+            // but it's required in this case because we need to flip the position of the catch combo counter,
+            // and the only way to achieve that is by having a signal that LegacyCatchComboCounter can use to act accordingly.
+            // this will be gone once ruleset-specific skinnable containers are supported.
+            var drawableCatchRuleset = (DrawableCatchRuleset)drawableRuleset;
+            drawableCatchRuleset.Flipped = true;
         }
     }
 }

@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Globalization;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -132,15 +133,32 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
         {
             base.Update();
 
-            if (drawableRuleset != null)
-            {
-                var catcher = ((CatchPlayfield)drawableRuleset.Playfield).Catcher;
-                X = Parent!.ToLocalSpace(catcher.ScreenSpaceDrawQuad.Centre).X;
-            }
+            if (drawableRuleset == null)
+                return;
+
+            var drawableCatchRuleset = (DrawableCatchRuleset)drawableRuleset;
+            var catcher = drawableCatchRuleset.Playfield.Catcher;
+
+            Anchor targetAnchor = Anchor;
+            Anchor targetOrigin = Origin;
 
             // These are required in order for the combo to follow the catcher in a sane way.
-            Anchor = (Anchor & ~(Anchor.x1 | Anchor.x2)) | Anchor.x0;
-            Origin = (Origin & ~(Anchor.x0 | Anchor.x2)) | Anchor.x1;
+            targetAnchor = (targetAnchor & ~(Anchor.x1 | Anchor.x2)) | Anchor.x0;
+            targetOrigin = (targetOrigin & ~(Anchor.x0 | Anchor.x2)) | Anchor.x1;
+
+            // if the anchor isn't a vertical center, set top or bottom anchor based on whether "floating furits" mod is active.
+            // this hack is borrowed from mania combo counter implementations.
+            // todo: this should be rewritten immediately once ruleset-specific skinnable containers are supported.
+            // since right now all skinnable containers source from GlobalSkinnableContainers
+            if (!Anchor.HasFlag(Anchor.y1))
+            {
+                targetAnchor = (targetAnchor & ~(Anchor.y0 | Anchor.y2)) | (drawableCatchRuleset.Flipped ? Anchor.TopLeft : Anchor.BottomLeft);
+                Y = Math.Abs(Y) * (drawableCatchRuleset.Flipped ? 1 : -1);
+            }
+
+            Anchor = targetAnchor;
+            Origin = targetOrigin;
+            X = Parent!.ToLocalSpace(catcher.ScreenSpaceDrawQuad.Centre).X;
         }
 
         private void updateCount(bool rolling)

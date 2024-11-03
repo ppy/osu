@@ -9,6 +9,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Input.Handlers;
 using osu.Game.Replays;
+using osu.Game.Rulesets.Catch.Mods;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Replays;
 using osu.Game.Rulesets.Mods;
@@ -24,6 +25,24 @@ namespace osu.Game.Rulesets.Catch.UI
     public partial class DrawableCatchRuleset : DrawableScrollingRuleset<CatchHitObject>
     {
         protected override bool UserScrollSpeedAdjustment => false;
+
+        private bool flipped;
+
+        /// <summary>
+        /// Flips the ruleset upside down for <see cref="CatchModFloatingFruits"/> to work.
+        /// </summary>
+        // todo: this is not ideal implementation of the mod, see comment inside mod or LegacyCatchComboCounter for more info.
+        public bool Flipped
+        {
+            get => flipped;
+            set
+            {
+                flipped = value;
+                PlayfieldAdjustmentContainer.Scale = new Vector2(1, value ? -1 : 1);
+            }
+        }
+
+        public new CatchPlayfield Playfield => (CatchPlayfield)base.Playfield;
 
         public DrawableCatchRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod>? mods = null)
             : base(ruleset, beatmap, mods)
@@ -45,7 +64,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
         protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new CatchFramedReplayInputHandler(replay);
 
-        protected override ReplayRecorder CreateReplayRecorder(Score score) => new CatchReplayRecorder(score, (CatchPlayfield)Playfield);
+        protected override ReplayRecorder CreateReplayRecorder(Score score) => new CatchReplayRecorder(score, Playfield);
 
         protected override Playfield CreatePlayfield() => new CatchPlayfield(Beatmap.Difficulty);
 
