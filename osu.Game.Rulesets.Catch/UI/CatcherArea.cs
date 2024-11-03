@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
         private readonly Container<Catcher> catcherContainer;
 
-        private readonly CatcherTrailDisplay catcherTrails;
+        public readonly CatcherTrailDisplay CatcherTrails;
 
         private Catcher catcher = null!;
 
@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Catch.UI
             Children = new Drawable[]
             {
                 catcherContainer = new Container<Catcher> { RelativeSizeAxes = Axes.Both },
-                catcherTrails = new CatcherTrailDisplay(),
+                CatcherTrails = new CatcherTrailDisplay(),
             };
         }
 
@@ -97,7 +97,7 @@ namespace osu.Game.Rulesets.Catch.UI
             {
                 const double trail_generation_interval = 16;
 
-                if (Time.Current - catcherTrails.LastDashTrailTime >= trail_generation_interval)
+                if (Time.Current - CatcherTrails.LastDashTrailTime >= trail_generation_interval)
                     displayCatcherTrail(Catcher.HyperDashing ? CatcherTrailAnimation.HyperDashing : CatcherTrailAnimation.Dashing);
             }
 
@@ -155,6 +155,6 @@ namespace osu.Game.Rulesets.Catch.UI
             }
         }
 
-        private void displayCatcherTrail(CatcherTrailAnimation animation) => catcherTrails.Add(new CatcherTrailEntry(Time.Current, Catcher.CurrentState, Catcher.X, Catcher.BodyScale, animation));
+        private void displayCatcherTrail(CatcherTrailAnimation animation) => CatcherTrails.Add(new CatcherTrailEntry(Time.Current, Catcher.CurrentState, Catcher.X, Catcher.BodyScale, animation));
     }
 }
