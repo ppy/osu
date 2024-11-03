@@ -67,7 +67,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                     {
                         Current = scaleInputBindable = new BindableNumber<float>
                         {
-                            MinValue = 0.5f,
+                            MinValue = 0.05f,
                             MaxValue = 2,
                             Precision = 0.001f,
                             Value = 1,
