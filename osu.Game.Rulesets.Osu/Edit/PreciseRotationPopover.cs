@@ -10,6 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
+using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Osu.UI;
@@ -30,7 +31,11 @@ namespace osu.Game.Rulesets.Osu.Edit
         private SliderWithTextBoxInput<float> angleInput = null!;
         private EditorRadioButtonCollection rotationOrigin = null!;
 
+        private RadioButton gridCentreButton = null!;
+        private RadioButton playfieldCentreButton = null!;
         private RadioButton selectionCentreButton = null!;
+
+        private Bindable<EditorOrigin> configRotationOrigin = null!;
 
         public PreciseRotationPopover(SelectionRotationHandler rotationHandler, OsuGridToolboxGroup gridToolbox)
         {
@@ -41,8 +46,10 @@ namespace osu.Game.Rulesets.Osu.Edit
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuConfigManager config)
         {
+            configRotationOrigin = config.GetBindable<EditorOrigin>(OsuSetting.EditorRotationOrigin);
+
             Child = new FillFlowContainer
             {
                 Width = 220,
@@ -66,10 +73,10 @@ namespace osu.Game.Rulesets.Osu.Edit
                         RelativeSizeAxes = Axes.X,
                         Items = new[]
                         {
-                            new RadioButton("Grid centre",
+                            gridCentreButton = new RadioButton("Grid centre",
                                 () => rotationInfo.Value = rotationInfo.Value with { Origin = EditorOrigin.GridCentre },
                                 () => new SpriteIcon { Icon = FontAwesome.Regular.PlusSquare }),
-                            new RadioButton("Playfield centre",
+                            playfieldCentreButton = new RadioButton("Playfield centre",
                                 () => rotationInfo.Value = rotationInfo.Value with { Origin = EditorOrigin.PlayfieldCentre },
                                 () => new SpriteIcon { Icon = FontAwesome.Regular.Square }),
                             selectionCentreButton = new RadioButton("Selection centre",
@@ -95,7 +102,57 @@ namespace osu.Game.Rulesets.Osu.Edit
                 angleInput.SelectAll();
             });
             angleInput.Current.BindValueChanged(angle => rotationInfo.Value = rotationInfo.Value with { Degrees = angle.NewValue });
-            rotationOrigin.Items.First().Select();
+
+            bool didSelect = false;
+
+            configRotationOrigin.BindValueChanged(val =>
+            {
+                switch (configRotationOrigin.Value)
+                {
+                    case EditorOrigin.GridCentre:
+                        if (!gridCentreButton.Selected.Disabled)
+                        {
+                            gridCentreButton.Select();
+                            didSelect = true;
+                        }
+
+                        break;
+
+                    case EditorOrigin.PlayfieldCentre:
+                        if (!playfieldCentreButton.Selected.Disabled)
+                        {
+                            playfieldCentreButton.Select();
+                            didSelect = true;
+                        }
+
+                        break;
+
+                    case EditorOrigin.SelectionCentre:
+                        if (!selectionCentreButton.Selected.Disabled)
+                        {
+                            selectionCentreButton.Select();
+                            didSelect = true;
+                        }
+
+                        break;
+                }
+            }, true);
+
+            if (!didSelect)
+                rotationOrigin.Items.First(b => !b.Selected.Disabled).Select();
+
+            gridCentreButton.Selected.BindValueChanged(b =>
+            {
+                if (b.NewValue) configRotationOrigin.Value = EditorOrigin.GridCentre;
+            });
+            playfieldCentreButton.Selected.BindValueChanged(b =>
+            {
+                if (b.NewValue) configRotationOrigin.Value = EditorOrigin.PlayfieldCentre;
+            });
+            selectionCentreButton.Selected.BindValueChanged(b =>
+            {
+                if (b.NewValue) configRotationOrigin.Value = EditorOrigin.SelectionCentre;
+            });
 
             rotationHandler.CanRotateAroundSelectionOrigin.BindValueChanged(e =>
             {
