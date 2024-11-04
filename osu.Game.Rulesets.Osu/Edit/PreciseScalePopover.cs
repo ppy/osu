@@ -208,7 +208,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             if (!scaleHandler.OriginalSurroundingQuad.HasValue)
                 return;
 
-            const float min_scale = 0.5f;
+            const float min_scale = 0.05f;
             const float max_scale = 10;
 
             var scale = scaleHandler.ClampScaleToPlayfieldBounds(new Vector2(max_scale), getOriginPosition(scaleInfo.Value), getAdjustAxis(scaleInfo.Value), getRotation(scaleInfo.Value));
