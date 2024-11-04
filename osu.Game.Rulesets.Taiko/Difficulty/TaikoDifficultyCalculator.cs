@@ -38,7 +38,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             {
                 new Rhythm(mods),
                 new Colour(mods),
-                new Stamina(mods)
+                new Stamina(mods, false),
+                new Stamina(mods, true)
             };
         }
 
@@ -79,10 +80,13 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             Colour colour = (Colour)skills.First(x => x is Colour);
             Rhythm rhythm = (Rhythm)skills.First(x => x is Rhythm);
             Stamina stamina = (Stamina)skills.First(x => x is Stamina);
+            Stamina singleColourStamina = (Stamina)skills.Last(x => x is Stamina);
 
             double colourRating = colour.DifficultyValue() * colour_skill_multiplier;
             double rhythmRating = rhythm.DifficultyValue() * rhythm_skill_multiplier;
             double staminaRating = stamina.DifficultyValue() * stamina_skill_multiplier;
+            double monoStaminaRating = singleColourStamina.DifficultyValue() * stamina_skill_multiplier;
+            double monoStaminaFactor = staminaRating == 0 ? 1 : Math.Pow(monoStaminaRating / staminaRating, 5);
 
             double combinedRating = combinedDifficultyValue(rhythm, colour, stamina);
             double starRating = rescale(combinedRating * 1.4);
@@ -95,6 +99,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 StarRating = starRating,
                 Mods = mods,
                 StaminaDifficulty = staminaRating,
+                MonoStaminaFactor = monoStaminaFactor,
                 RhythmDifficulty = rhythmRating,
                 ColourDifficulty = colourRating,
                 PeakDifficulty = combinedRating,
