@@ -7,6 +7,7 @@ using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
@@ -63,6 +64,7 @@ namespace osu.Game.Overlays.Login
                         },
                         username = new OsuTextBox
                         {
+                            InputProperties = new TextInputProperties(TextInputType.Username, false),
                             PlaceholderText = UsersStrings.LoginUsername.ToLower(),
                             RelativeSizeAxes = Axes.X,
                             Text = api.ProvidedUsername,
