@@ -80,8 +80,9 @@ namespace osu.Game.Rulesets.Osu.Mods
                             using (circle.ApproachCircle.BeginAbsoluteSequence(fadeStartTime))
                             {
                                 circle.ApproachCircle.ClearTransforms(targetMember: nameof(circle.ApproachCircle.Scale));
+                                circle.ApproachCircle.Scale = new(3);
                                 circle.ApproachCircle.ScaleTo(2, hitObject.TimePreempt).Then().Expire();
-                                circle.ApproachCircle.FadeOut(fadeDuration);
+                                circle.ApproachCircle.FadeOut(hitObject.TimePreempt);
                             }
                         else
                             circle.ApproachCircle.Hide();
