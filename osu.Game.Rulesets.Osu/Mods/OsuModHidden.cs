@@ -77,7 +77,8 @@ namespace osu.Game.Rulesets.Osu.Mods
                 {
                     using (circle.BeginAbsoluteSequence(hitObject.StartTime - hitObject.TimePreempt))
                         if (StillShowApproachCircles.Value)
-                            circle.ApproachCircle.FadeOut(fadeDuration);
+                            using (circle.ApproachCircle.BeginAbsoluteSequence(fadeStartTime))
+                                circle.ApproachCircle.FadeOut(fadeDuration);
                         else
                             circle.ApproachCircle.Hide();
                 }
