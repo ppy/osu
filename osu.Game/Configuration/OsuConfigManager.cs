@@ -17,6 +17,7 @@ using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods.Input;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Screens.Edit.Compose.Components;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
@@ -193,6 +194,8 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.EditorAutoSeekOnPlacement, true);
             SetDefault(OsuSetting.EditorLimitedDistanceSnap, false);
             SetDefault(OsuSetting.EditorShowSpeedChanges, false);
+            SetDefault(OsuSetting.EditorScaleOrigin, EditorOrigin.GridCentre);
+            SetDefault(OsuSetting.EditorRotationOrigin, EditorOrigin.GridCentre);
 
             SetDefault(OsuSetting.HideCountryFlags, false);
 
@@ -434,6 +437,8 @@ namespace osu.Game.Configuration
         EditorTimelineShowTimingChanges,
         EditorTimelineShowTicks,
         AlwaysShowHoldForMenuButton,
-        EditorContractSidebars
+        EditorContractSidebars,
+        EditorScaleOrigin,
+        EditorRotationOrigin
     }
 }
