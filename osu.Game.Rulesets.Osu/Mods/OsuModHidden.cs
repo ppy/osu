@@ -81,8 +81,8 @@ namespace osu.Game.Rulesets.Osu.Mods
                             {
                                 circle.ApproachCircle.ClearTransforms(targetMember: nameof(circle.ApproachCircle.Scale));
                                 circle.ApproachCircle.Scale = new(3);
-                                circle.ApproachCircle.ScaleTo(2, hitObject.TimePreempt).Then().Expire();
-                                circle.ApproachCircle.FadeOut(hitObject.TimePreempt);
+                                circle.ApproachCircle.ScaleTo(2, fadeDuration).Then().Expire();
+                                circle.ApproachCircle.FadeOut(fadeDuration);
                             }
                         else
                             circle.ApproachCircle.Hide();
