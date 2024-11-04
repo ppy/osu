@@ -4,16 +4,16 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
-using osu.Framework.Graphics;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics;
 using osu.Framework.Localisation;
-using osu.Game.Configuration;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Skinning;
 
 namespace osu.Game.Rulesets.Osu.Mods
@@ -22,6 +22,9 @@ namespace osu.Game.Rulesets.Osu.Mods
     {
         [SettingSource("Only fade approach circles", "The main object body will not fade when enabled.")]
         public Bindable<bool> OnlyFadeApproachCircles { get; } = new BindableBool();
+
+        [SettingSource("Still show approach circles", "The approach circle will fade and not be completely hidden")]
+        public Bindable<bool> StillShowApproachCircles { get; } = new BindableBool();
 
         public override LocalisableString Description => @"Play with no approach circles and fading circles/sliders.";
         public override double ScoreMultiplier => UsesDefaultConfiguration ? 1.06 : 1;
@@ -73,7 +76,10 @@ namespace osu.Game.Rulesets.Osu.Mods
                 if (drawableObject is DrawableHitCircle circle)
                 {
                     using (circle.BeginAbsoluteSequence(hitObject.StartTime - hitObject.TimePreempt))
-                        circle.ApproachCircle.Hide();
+                        if (StillShowApproachCircles.Value)
+                            circle.ApproachCircle.FadeOut(fadeDuration);
+                        else
+                            circle.ApproachCircle.Hide();
                 }
                 else if (drawableObject is DrawableSpinner spinner)
                 {

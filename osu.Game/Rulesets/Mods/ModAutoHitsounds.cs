@@ -40,6 +40,14 @@ namespace osu.Game.Rulesets.Mods
             Precision = 0.01,
         };
 
+        [SettingSource("Hitsounds offset", "The offset of the hitsounds", SettingControlType = typeof(MultiplierSettingsSlider))]
+        public BindableNumber<double> HitsoundsOffset { get; } = new BindableDouble(0)
+        {
+            MinValue = -500,
+            MaxValue = 500,
+            Precision = 1,
+        };
+
         public void ApplyToDrawableHitObject(DrawableHitObject drawable)
         {
             drawable.PlaySamplesOnHit = false;
@@ -59,9 +67,9 @@ namespace osu.Game.Rulesets.Mods
 
         public void UpdateObject(Playfield playfield, DrawableHitObject hitObject)
         {
+            double start = hitObject.HitObject.StartTime + HitsoundsOffset.Value;
             double currentTime = AutoHitsounds.ClockContainer.CurrentTime + AutoHitsounds.ClockContainer.GetUserOffset();
-            if (hitObject.HitObject.StartTime > currentTime - AutoHitsounds.ClockContainer.ElapsedFrameTime &&
-               hitObject.HitObject.StartTime <= currentTime)
+            if (start > currentTime - AutoHitsounds.ClockContainer.ElapsedFrameTime && start <= currentTime)
                 hitObject.PlaySamples();
 
             foreach (var nestedHitObject in hitObject.NestedHitObjects)
