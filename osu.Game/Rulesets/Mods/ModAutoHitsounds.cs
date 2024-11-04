@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Mods
             Precision = 0.01,
         };
 
-        [SettingSource("Hitsounds offset", "The offset of the hitsounds", SettingControlType = typeof(MultiplierSettingsSlider))]
+        [SettingSource("Hitsounds offset", "The offset of the hitsounds", SettingControlType = typeof(IntegerSettingsSlider))]
         public BindableNumber<double> HitsoundsOffset { get; } = new BindableDouble(0)
         {
             MinValue = -500,
