@@ -28,6 +28,8 @@ namespace osu.Game.Rulesets.Edit
             new CheckTooShortAudioFiles(),
             new CheckAudioInVideo(),
             new CheckDelayedHitsounds(),
+            new CheckSongFormat(),
+            new CheckHitsoundsFormat(),
 
             // Files
             new CheckZeroByteFiles(),
@@ -44,6 +46,9 @@ namespace osu.Game.Rulesets.Edit
 
             // Events
             new CheckBreaks(),
+
+            // Metadata
+            new CheckTitleMarkers(),
         };
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)

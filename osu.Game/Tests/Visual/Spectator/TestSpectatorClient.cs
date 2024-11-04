@@ -13,6 +13,8 @@ using osu.Game.Online.API;
 using osu.Game.Online.Spectator;
 using osu.Game.Replays.Legacy;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
@@ -99,12 +101,23 @@ namespace osu.Game.Tests.Visual.Spectator
         /// <param name="userId">The user to send frames for.</param>
         /// <param name="count">The total number of frames to send.</param>
         /// <param name="startTime">The time to start gameplay frames from.</param>
-        public void SendFramesFromUser(int userId, int count, double startTime = 0)
+        /// <param name="initialResultCount">Add a number of misses to frame header data for testing purposes.</param>
+        public void SendFramesFromUser(int userId, int count, double startTime = 0, int initialResultCount = 0)
         {
             var frames = new List<LegacyReplayFrame>();
 
             int currentFrameIndex = userNextFrameDictionary[userId];
             int lastFrameIndex = currentFrameIndex + count - 1;
+
+            var scoreProcessor = new ScoreProcessor(rulesetStore.GetRuleset(0)!.CreateInstance());
+
+            for (int i = 0; i < initialResultCount; i++)
+            {
+                scoreProcessor.ApplyResult(new JudgementResult(new HitObject(), new Judgement())
+                {
+                    Type = HitResult.Miss,
+                });
+            }
 
             for (; currentFrameIndex <= lastFrameIndex; currentFrameIndex++)
             {
@@ -130,7 +143,16 @@ namespace osu.Game.Tests.Visual.Spectator
                     Combo = currentFrameIndex,
                     TotalScore = (long)(currentFrameIndex * 123478 * RNG.NextDouble(0.99, 1.01)),
                     Accuracy = RNG.NextDouble(0.98, 1),
-                }, new ScoreProcessor(rulesetStore.GetRuleset(0)!.CreateInstance()), frames.ToArray());
+                    Statistics = scoreProcessor.Statistics.ToDictionary(),
+                }, scoreProcessor, frames.ToArray());
+
+                if (initialResultCount > 0)
+                {
+                    foreach (var f in frames)
+                        f.Header = bundle.Header;
+                }
+
+                scoreProcessor.ResetFromReplayFrame(frames.Last());
                 ((ISpectatorClient)this).UserSentFrames(userId, bundle);
 
                 frames.Clear();

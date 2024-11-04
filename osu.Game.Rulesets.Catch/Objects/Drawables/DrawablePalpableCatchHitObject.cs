@@ -37,6 +37,8 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         /// </summary>
         protected readonly Container ScalingContainer;
 
+        public Vector2 DisplayPosition => DrawPosition;
+
         public Vector2 DisplaySize => ScalingContainer.Size * ScalingContainer.Scale;
 
         public float DisplayRotation => ScalingContainer.Rotation;
@@ -95,5 +97,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 
             base.OnFree();
         }
+
+        public void RestoreState(CatchObjectState state) => throw new NotSupportedException("Cannot restore state into a drawable catch hitobject.");
     }
 }

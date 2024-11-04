@@ -6,7 +6,6 @@ using System.Text;
 using DiscordRPC;
 using DiscordRPC.Message;
 using Newtonsoft.Json;
-using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
@@ -80,13 +79,19 @@ namespace osu.Desktop
             client.OnReady += onReady;
             client.OnError += (_, e) => Logger.Log($"An error occurred with Discord RPC Client: {e.Message} ({e.Code})", LoggingTarget.Network, LogLevel.Error);
 
-            // A URI scheme is required to support game invitations, as well as informing Discord of the game executable path to support launching the game when a user clicks on join/spectate.
-            // The library doesn't properly support URI registration when ran from an app bundle on macOS.
-            if (!RuntimeInfo.IsApple)
+            try
             {
                 client.RegisterUriScheme();
                 client.Subscribe(EventType.Join);
                 client.OnJoin += onJoin;
+            }
+            catch (Exception ex)
+            {
+                // This is known to fail in at least the following sandboxed environments:
+                // - macOS (when packaged as an app bundle)
+                // - flatpak (see: https://github.com/flathub/sh.ppy.osu/issues/170)
+                // There is currently no better way to do this offered by Discord, so the best we can do is simply ignore it for now.
+                Logger.Log($"Failed to register Discord URI scheme: {ex}");
             }
 
             client.Initialize();
@@ -159,8 +164,8 @@ namespace osu.Desktop
             // user activity
             if (activity.Value != null)
             {
-                presence.State = truncate(activity.Value.GetStatus(hideIdentifiableInformation));
-                presence.Details = truncate(activity.Value.GetDetails(hideIdentifiableInformation) ?? string.Empty);
+                presence.State = clampLength(activity.Value.GetStatus(hideIdentifiableInformation));
+                presence.Details = clampLength(activity.Value.GetDetails(hideIdentifiableInformation) ?? string.Empty);
 
                 if (getBeatmapID(activity.Value) is int beatmapId && beatmapId > 0)
                 {
@@ -205,7 +210,9 @@ namespace osu.Desktop
                     Password = room.Settings.Password,
                 };
 
-                presence.Secrets.JoinSecret = JsonConvert.SerializeObject(roomSecret);
+                if (client.HasRegisteredUriScheme)
+                    presence.Secrets.JoinSecret = JsonConvert.SerializeObject(roomSecret);
+
                 // discord cannot handle both secrets and buttons at the same time, so we need to choose something.
                 // the multiplayer room seems more important.
                 presence.Buttons = null;
@@ -264,8 +271,21 @@ namespace osu.Desktop
 
         private static readonly int ellipsis_length = Encoding.UTF8.GetByteCount(new[] { '…' });
 
-        private static string truncate(string str)
+        private static string clampLength(string str)
         {
+            // Empty strings are fine to discord even though single-character strings are not. Make it make sense.
+            if (string.IsNullOrEmpty(str))
+                return str;
+
+            // As above, discord decides that *non-empty* strings shorter than 2 characters cannot possibly be valid input, because... reasons?
+            // And yes, that is two *characters*, or *codepoints*, not *bytes* as further down below (as determined by empirical testing).
+            // Also, spaces don't count. Because reasons, clearly.
+            // That all seems very questionable, and isn't even documented anywhere. So to *make it* accept such valid input,
+            // just tack on enough of U+200B ZERO WIDTH SPACEs at the end. After making sure to trim whitespace.
+            string trimmed = str.Trim();
+            if (trimmed.Length < 2)
+                return trimmed.PadRight(2, '\u200B');
+
             if (Encoding.UTF8.GetByteCount(str) <= 128)
                 return str;
 

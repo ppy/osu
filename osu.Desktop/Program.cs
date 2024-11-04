@@ -13,8 +13,8 @@ using osu.Framework.Platform;
 using osu.Game;
 using osu.Game.IPC;
 using osu.Game.Tournament;
-using SDL2;
-using Squirrel;
+using SDL;
+using Velopack;
 
 namespace osu.Desktop
 {
@@ -31,19 +31,11 @@ namespace osu.Desktop
         [STAThread]
         public static void Main(string[] args)
         {
-            /*
-             * WARNING: DO NOT PLACE **ANY** CODE ABOVE THE FOLLOWING BLOCK!
-             *
-             * Logic handling Squirrel MUST run before EVERYTHING if you do not want to break it.
-             * To be more precise: Squirrel is internally using a rather... crude method to determine whether it is running under NUnit,
-             * namely by checking loaded assemblies:
-             * https://github.com/clowd/Clowd.Squirrel/blob/24427217482deeeb9f2cacac555525edfc7bd9ac/src/Squirrel/SimpleSplat/PlatformModeDetector.cs#L17-L32
-             *
-             * If it finds ANY assembly from the ones listed above - REGARDLESS of the reason why it is loaded -
-             * the app will then do completely broken things like:
-             * - not creating system shortcuts (as the logic is if'd out if "running tests")
-             * - not exiting after the install / first-update / uninstall hooks are ran (as the `Environment.Exit()` calls are if'd out if "running tests")
-             */
+            // IMPORTANT DON'T IGNORE: For general sanity, velopack's setup needs to run before anything else.
+            // This has bitten us in the rear before (bricked updater), and although the underlying issue from
+            // last time has been fixed, let's not tempt fate.
+            setupVelopack();
+
             if (OperatingSystem.IsWindows())
             {
                 var windowsVersion = Environment.OSVersion.Version;
@@ -52,19 +44,20 @@ namespace osu.Desktop
                 // See https://www.mongodb.com/docs/realm/sdk/dotnet/compatibility/
                 if (windowsVersion.Major < 6 || (windowsVersion.Major == 6 && windowsVersion.Minor <= 2))
                 {
-                    // If users running in compatibility mode becomes more of a common thing, we may want to provide better guidance or even consider
-                    // disabling it ourselves.
-                    // We could also better detect compatibility mode if required:
-                    // https://stackoverflow.com/questions/10744651/how-i-can-detect-if-my-application-is-running-under-compatibility-mode#comment58183249_10744730
-                    SDL.SDL_ShowSimpleMessageBox(SDL.SDL_MessageBoxFlags.SDL_MESSAGEBOX_ERROR,
-                        "Your operating system is too old to run osu!",
-                        "This version of osu! requires at least Windows 8.1 to run.\n"
-                        + "Please upgrade your operating system or consider using an older version of osu!.\n\n"
-                        + "If you are running a newer version of windows, please check you don't have \"Compatibility mode\" turned on for osu!", IntPtr.Zero);
-                    return;
+                    unsafe
+                    {
+                        // If users running in compatibility mode becomes more of a common thing, we may want to provide better guidance or even consider
+                        // disabling it ourselves.
+                        // We could also better detect compatibility mode if required:
+                        // https://stackoverflow.com/questions/10744651/how-i-can-detect-if-my-application-is-running-under-compatibility-mode#comment58183249_10744730
+                        SDL3.SDL_ShowSimpleMessageBox(SDL_MessageBoxFlags.SDL_MESSAGEBOX_ERROR,
+                            "Your operating system is too old to run osu!"u8,
+                            "This version of osu! requires at least Windows 8.1 to run.\n"u8
+                            + "Please upgrade your operating system or consider using an older version of osu!.\n\n"u8
+                            + "If you are running a newer version of windows, please check you don't have \"Compatibility mode\" turned on for osu!"u8, null);
+                        return;
+                    }
                 }
-
-                setupSquirrel();
             }
 
             // NVIDIA profiles are based on the executable name of a process.
@@ -104,7 +97,13 @@ namespace osu.Desktop
                 }
             }
 
-            using (DesktopGameHost host = Host.GetSuitableDesktopHost(gameName, new HostOptions { IPCPort = !tournamentClient ? OsuGame.IPC_PORT : null }))
+            var hostOptions = new HostOptions
+            {
+                IPCPort = !tournamentClient ? OsuGame.IPC_PORT : null,
+                FriendlyGameName = OsuGameBase.GAME_NAME,
+            };
+
+            using (DesktopGameHost host = Host.GetSuitableDesktopHost(gameName, hostOptions))
             {
                 if (!host.IsPrimaryInstance)
                 {
@@ -168,32 +167,28 @@ namespace osu.Desktop
             return false;
         }
 
-        [SupportedOSPlatform("windows")]
-        private static void setupSquirrel()
+        private static void setupVelopack()
         {
-            SquirrelAwareApp.HandleEvents(onInitialInstall: (_, tools) =>
+            if (OsuGameDesktop.IsPackageManaged)
             {
-                tools.CreateShortcutForThisExe();
-                tools.CreateUninstallerRegistryEntry();
-                WindowsAssociationManager.InstallAssociations();
-            }, onAppUpdate: (_, tools) =>
-            {
-                tools.CreateUninstallerRegistryEntry();
-                WindowsAssociationManager.UpdateAssociations();
-            }, onAppUninstall: (_, tools) =>
-            {
-                tools.RemoveShortcutForThisExe();
-                tools.RemoveUninstallerRegistryEntry();
-                WindowsAssociationManager.UninstallAssociations();
-            }, onEveryRun: (_, _, _) =>
-            {
-                // While setting the `ProcessAppUserModelId` fixes duplicate icons/shortcuts on the taskbar, it currently
-                // causes the right-click context menu to function incorrectly.
-                //
-                // This may turn out to be non-required after an alternative solution is implemented.
-                // see https://github.com/clowd/Clowd.Squirrel/issues/24
-                // tools.SetProcessAppUserModelId();
-            });
+                Logger.Log("Updates are being managed by an external provider. Skipping Velopack setup.");
+                return;
+            }
+
+            var app = VelopackApp.Build();
+
+            if (OperatingSystem.IsWindows())
+                configureWindows(app);
+
+            app.Run();
+        }
+
+        [SupportedOSPlatform("windows")]
+        private static void configureWindows(VelopackApp app)
+        {
+            app.WithFirstRun(_ => WindowsAssociationManager.InstallAssociations());
+            app.WithAfterUpdateFastCallback(_ => WindowsAssociationManager.UpdateAssociations());
+            app.WithBeforeUninstallFastCallback(_ => WindowsAssociationManager.UninstallAssociations());
         }
     }
 }
