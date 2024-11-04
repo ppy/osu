@@ -5,6 +5,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
@@ -14,6 +15,7 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Resources.Localisation.Web;
+using SharpCompress;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {
@@ -186,21 +188,20 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 case FriendStatus.None:
                     IdleColour = colourProvider.Background6;
                     HoverColour = colourProvider.Background5;
-                    SetBackgroundColour(colourProvider.Background6, 200);
                     break;
 
                 case FriendStatus.NotMutual:
                     IdleColour = colour.Green.Opacity(0.7f);
-                    HoverColour = IdleColour.Lighten(0.05f);
-                    SetBackgroundColour(IdleColour, 200);
+                    HoverColour = IdleColour.Lighten(0.1f);
                     break;
 
                 case FriendStatus.Mutual:
                     IdleColour = colour.Pink.Opacity(0.7f);
-                    HoverColour = IdleColour.Lighten(0.05f);
-                    SetBackgroundColour(colour.Pink.Opacity(0.7f), 200);
+                    HoverColour = IdleColour.Lighten(0.1f);
                     break;
             }
+
+            EffectTargets.ForEach(d => d.FadeColour(IsHovered ? HoverColour : IdleColour, FADE_DURATION, Easing.OutQuint));
         }
 
         private enum FriendStatus

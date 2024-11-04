@@ -4,7 +4,6 @@
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Containers;
@@ -47,11 +46,6 @@ namespace osu.Game.Overlays.Profile.Header.Components
                     loading = new LoadingLayer(true, false)
                 }
             });
-        }
-
-        protected void SetBackgroundColour(ColourInfo colorInfo, double duration = 0)
-        {
-            background.FadeColour(colorInfo, duration);
         }
 
         protected void ShowLoadingLayer()
