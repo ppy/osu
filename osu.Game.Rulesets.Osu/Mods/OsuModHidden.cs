@@ -77,11 +77,12 @@ namespace osu.Game.Rulesets.Osu.Mods
                 {
                     using (circle.BeginAbsoluteSequence(hitObject.StartTime - hitObject.TimePreempt))
                         if (StillShowApproachCircles.Value)
+                        {
+                            circle.ApproachCircle.ClearTransforms(targetMember: nameof(circle.ApproachCircle.Scale));
+                            circle.ApproachCircle.ScaleTo(2, hitObject.TimePreempt).Then().Expire();
                             using (circle.ApproachCircle.BeginAbsoluteSequence(fadeStartTime))
-                            {
-                                circle.ApproachCircle.ScaleTo(2, fadeDuration).Then().Expire();
                                 circle.ApproachCircle.FadeOut(fadeDuration);
-                            }
+                        }
                         else
                             circle.ApproachCircle.Hide();
                 }
