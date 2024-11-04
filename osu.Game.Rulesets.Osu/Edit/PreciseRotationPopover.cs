@@ -103,6 +103,11 @@ namespace osu.Game.Rulesets.Osu.Edit
             });
             angleInput.Current.BindValueChanged(angle => rotationInfo.Value = rotationInfo.Value with { Degrees = angle.NewValue });
 
+            rotationHandler.CanRotateAroundSelectionOrigin.BindValueChanged(e =>
+            {
+                selectionCentreButton.Selected.Disabled = !e.NewValue;
+            }, true);
+
             bool didSelect = false;
 
             configRotationOrigin.BindValueChanged(val =>
@@ -153,11 +158,6 @@ namespace osu.Game.Rulesets.Osu.Edit
             {
                 if (b.NewValue) configRotationOrigin.Value = EditorOrigin.SelectionCentre;
             });
-
-            rotationHandler.CanRotateAroundSelectionOrigin.BindValueChanged(e =>
-            {
-                selectionCentreButton.Selected.Disabled = !e.NewValue;
-            }, true);
 
             rotationInfo.BindValueChanged(rotation =>
             {
