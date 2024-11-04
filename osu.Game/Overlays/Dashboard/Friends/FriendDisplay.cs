@@ -39,7 +39,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
         private CancellationTokenSource cancellationToken;
 
         [CanBeNull]
-        private SearchContainer currentContent = null;
+        private SearchContainer currentContent;
 
         private FriendOnlineStreamControl onlineStreamControl;
         private Box background;
