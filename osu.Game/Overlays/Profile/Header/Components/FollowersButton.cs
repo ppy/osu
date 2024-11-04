@@ -178,6 +178,8 @@ namespace osu.Game.Overlays.Profile.Header.Components
 
         private void updateColor()
         {
+            // https://github.com/ppy/osu-web/blob/0a5367a4a68a6cdf450eb483251b3cf03b3ac7d2/resources/css/bem/user-action-button.less
+
             switch (status.Value)
             {
                 case FriendStatus.Self:
@@ -188,15 +190,15 @@ namespace osu.Game.Overlays.Profile.Header.Components
                     break;
 
                 case FriendStatus.NotMutual:
-                    IdleColour = colour.Green;
-                    HoverColour = colour.Green.Lighten(0.1f);
-                    SetBackgroundColour(colour.Green, 200);
+                    IdleColour = colour.Green.Opacity(0.7f);
+                    HoverColour = IdleColour.Lighten(0.05f);
+                    SetBackgroundColour(IdleColour, 200);
                     break;
 
                 case FriendStatus.Mutual:
-                    IdleColour = colour.Pink;
-                    HoverColour = colour.Pink1.Lighten(0.1f);
-                    SetBackgroundColour(colour.Pink, 200);
+                    IdleColour = colour.Pink.Opacity(0.7f);
+                    HoverColour = IdleColour.Lighten(0.05f);
+                    SetBackgroundColour(colour.Pink.Opacity(0.7f), 200);
                     break;
             }
         }
