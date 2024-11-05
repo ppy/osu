@@ -98,7 +98,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                     if (req is AddFriendRequest addedRequest)
                     {
                         SetValue(++followerCount);
-                        status.Value = addedRequest.Response?.Mutual == true ? FriendStatus.Mutual : FriendStatus.NotMutual;
+                        status.Value = addedRequest.Response?.UserRelation.Mutual == true ? FriendStatus.Mutual : FriendStatus.NotMutual;
                     }
                     else
                     {

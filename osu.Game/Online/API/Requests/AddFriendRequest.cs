@@ -3,11 +3,10 @@
 
 using System.Net.Http;
 using osu.Framework.IO.Network;
-using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Online.API.Requests
 {
-    public class AddFriendRequest : APIRequest<APIRelation>
+    public class AddFriendRequest : APIRequest<AddFriendResponse>
     {
         public readonly int TargetId;
 

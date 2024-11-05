@@ -443,7 +443,10 @@ namespace osu.Game.Tests.Visual.Online
                     {
                         requestLock.Wait(3000);
                         dummyAPI.Friends.Add(apiRelation);
-                        req.TriggerSuccess(apiRelation);
+                        req.TriggerSuccess(new AddFriendResponse
+                        {
+                            UserRelation = apiRelation
+                        });
                     });
 
                     return true;
@@ -483,7 +486,10 @@ namespace osu.Game.Tests.Visual.Online
                     {
                         requestLock.Wait(3000);
                         dummyAPI.Friends.Add(apiRelation);
-                        req.TriggerSuccess(apiRelation);
+                        req.TriggerSuccess(new AddFriendResponse
+                        {
+                            UserRelation = apiRelation
+                        });
                     });
 
                     return true;
