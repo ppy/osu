@@ -5,7 +5,9 @@ using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Database;
@@ -17,13 +19,19 @@ using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 {
-    public partial class MultiplayerSpectateButton : MultiplayerRoomComposite
+    public partial class MultiplayerSpectateButton : CompositeDrawable
     {
         [Resolved]
         private OngoingOperationTracker ongoingOperationTracker { get; set; } = null!;
 
         [Resolved]
         private OsuColour colours { get; set; } = null!;
+
+        [Resolved]
+        private MultiplayerClient client { get; set; } = null!;
+
+        [Resolved]
+        private IBindable<PlaylistItem?> currentItem { get; set; } = null!;
 
         private IBindable<bool> operationInProgress = null!;
 
@@ -44,7 +52,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         {
             var clickOperation = ongoingOperationTracker.BeginOperation();
 
-            Client.ToggleSpectate().ContinueWith(_ => endOperation());
+            client.ToggleSpectate().ContinueWith(_ => endOperation());
 
             void endOperation() => clickOperation?.Dispose();
         }
@@ -63,19 +71,16 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         {
             base.LoadComplete();
 
-            CurrentPlaylistItem.BindValueChanged(_ => Scheduler.AddOnce(checkForAutomaticDownload), true);
-        }
-
-        protected override void OnRoomUpdated()
-        {
-            base.OnRoomUpdated();
-
+            currentItem.BindValueChanged(_ => Scheduler.AddOnce(checkForAutomaticDownload), true);
+            client.RoomUpdated += onRoomUpdated;
             updateState();
         }
 
+        private void onRoomUpdated() => Scheduler.AddOnce(updateState);
+
         private void updateState()
         {
-            switch (Client.LocalUser?.State)
+            switch (client.LocalUser?.State)
             {
                 default:
                     button.Text = "Spectate";
@@ -88,8 +93,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                     break;
             }
 
-            button.Enabled.Value = Client.Room != null
-                                   && Client.Room.State != MultiplayerRoomState.Closed
+            button.Enabled.Value = client.Room != null
+                                   && client.Room.State != MultiplayerRoomState.Closed
                                    && !operationInProgress.Value;
 
             Scheduler.AddOnce(checkForAutomaticDownload);
@@ -112,11 +117,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
         private void checkForAutomaticDownload()
         {
-            PlaylistItem? currentItem = CurrentPlaylistItem.Value;
+            PlaylistItem? item = currentItem.Value;
 
             downloadCheckCancellation?.Cancel();
 
-            if (currentItem == null)
+            if (item == null)
                 return;
 
             if (!automaticallyDownload.Value)
@@ -128,13 +133,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             //
             // Rather than over-complicating this flow, let's only auto-download when spectating for the time being.
             // A potential path forward would be to have a local auto-download checkbox above the playlist item list area.
-            if (Client.LocalUser?.State != MultiplayerUserState.Spectating)
+            if (client.LocalUser?.State != MultiplayerUserState.Spectating)
                 return;
 
             // In a perfect world we'd use BeatmapAvailability, but there's no event-driven flow for when a selection changes.
             // ie. if selection changes from "not downloaded" to another "not downloaded" we wouldn't get a value changed raised.
             beatmapLookupCache
-                .GetBeatmapAsync(currentItem.Beatmap.OnlineID, (downloadCheckCancellation = new CancellationTokenSource()).Token)
+                .GetBeatmapAsync(item.Beatmap.OnlineID, (downloadCheckCancellation = new CancellationTokenSource()).Token)
                 .ContinueWith(resolved => Schedule(() =>
                 {
                     var beatmapSet = resolved.GetResultSafely()?.BeatmapSet;
@@ -150,5 +155,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         }
 
         #endregion
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (client.IsNotNull())
+                client.RoomUpdated -= onRoomUpdated;
+        }
     }
 }
