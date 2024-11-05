@@ -9,10 +9,19 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 {
     public partial class NoteSelectionBlueprint : ManiaSelectionBlueprint<Note>
     {
+        private readonly EditNotePiece notePiece;
+
         public NoteSelectionBlueprint(Note note)
             : base(note)
         {
-            AddInternal(new EditNotePiece { RelativeSizeAxes = Axes.X });
+            AddInternal(notePiece = new EditNotePiece { RelativeSizeAxes = Axes.X });
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            notePiece.Height = DrawableObject.DrawHeight;
         }
     }
 }

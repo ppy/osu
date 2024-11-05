@@ -10,6 +10,7 @@ using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.Edit.Blueprints.Components;
 using osu.Game.Rulesets.Mania.Objects;
+using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Screens.Edit;
 using osuTK;
 
@@ -31,6 +32,8 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 
         private EditHoldNoteEndPiece head = null!;
         private EditHoldNoteEndPiece tail = null!;
+
+        protected new DrawableHoldNote DrawableObject => (DrawableHoldNote)base.DrawableObject;
 
         public HoldNoteSelectionBlueprint(HoldNote hold)
             : base(hold)
@@ -99,7 +102,9 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
         {
             base.Update();
 
+            head.Height = DrawableObject.Head.DrawHeight;
             head.Y = HitObjectContainer.PositionAtTime(HitObject.Head.StartTime, HitObject.StartTime);
+            tail.Height = DrawableObject.Tail.DrawHeight;
             tail.Y = HitObjectContainer.PositionAtTime(HitObject.Tail.StartTime, HitObject.StartTime);
             Height = HitObjectContainer.LengthAtTime(HitObject.StartTime, HitObject.EndTime) + tail.DrawHeight;
         }
