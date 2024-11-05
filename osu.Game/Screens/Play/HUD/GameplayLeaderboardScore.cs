@@ -316,7 +316,7 @@ namespace osu.Game.Screens.Play.HUD
 
             HasQuit.BindValueChanged(_ => updateState());
 
-            isFriend = User != null && api.Friends.Any(u => User.OnlineID == u.Id);
+            isFriend = User != null && api.Friends.Any(u => User.OnlineID == u.TargetID);
         }
 
         protected override void LoadComplete()
