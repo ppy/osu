@@ -95,10 +95,12 @@ namespace osu.Game.Overlays.Profile.Header.Components
 
                 req.Success += () =>
                 {
-                    followerCount += status.Value == FriendStatus.None ? 1 : -1;
+                    bool becameFriend = status.Value == FriendStatus.None;
+
+                    SetValue(followerCount += becameFriend ? 1 : -1);
+                    status.Value = becameFriend ? FriendStatus.NotMutual : FriendStatus.None;
 
                     api.UpdateLocalFriends();
-                    updateStatus();
                     HideLoadingLayer();
                 };
 
