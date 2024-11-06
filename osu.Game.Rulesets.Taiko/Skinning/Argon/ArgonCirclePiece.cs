@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Objects;
@@ -14,7 +15,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Taiko.Skinning.Argon
 {
-    public abstract partial class ArgonCirclePiece : BeatSyncedContainer
+    public abstract partial class ArgonCirclePiece : BeatSyncedContainer, IHasAccentColour
     {
         public const float ICON_SIZE = 20 / 70f;
 
@@ -22,21 +23,27 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
 
         private const float kiai_flash_opacity = 0.15f;
 
-        private ColourInfo accentColour;
+        private ColourInfo argonAccentColour;
 
         /// <summary>
         /// The colour of the inner circle and outer glows.
         /// </summary>
-        public ColourInfo AccentColour
+        public ColourInfo ArgonAccentColour
         {
-            get => accentColour;
+            get => argonAccentColour;
             set
             {
-                accentColour = value;
+                argonAccentColour = value;
 
-                ring.Colour = AccentColour.MultiplyAlpha(0.5f);
-                ring2.Colour = AccentColour;
+                ring.Colour = ArgonAccentColour.MultiplyAlpha(0.5f);
+                ring2.Colour = ArgonAccentColour;
             }
+        }
+
+        public Color4 AccentColour
+        {
+            get => ArgonAccentColour.AverageColour;
+            set => ArgonAccentColour = value;
         }
 
         [Resolved]
