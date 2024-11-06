@@ -140,6 +140,11 @@ namespace osu.Game.Localisation
         public static LocalisableString TimelineShowTimingChanges => new TranslatableString(getKey(@"timeline_show_timing_changes"), @"Show timing changes");
 
         /// <summary>
+        /// "Show breaks"
+        /// </summary>
+        public static LocalisableString TimelineShowBreaks => new TranslatableString(getKey(@"timeline_show_breaks"), @"Show breaks");
+
+        /// <summary>
         /// "Show ticks"
         /// </summary>
         public static LocalisableString TimelineShowTicks => new TranslatableString(getKey(@"timeline_show_ticks"), @"Show ticks");
