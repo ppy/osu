@@ -115,6 +115,11 @@ namespace osu.Game.Localisation
         public static LocalisableString LimitedDistanceSnap => new TranslatableString(getKey(@"limited_distance_snap_grid"), @"Limit distance snap placement to current time");
 
         /// <summary>
+        /// "Contract sidebars when not hovered"
+        /// </summary>
+        public static LocalisableString ContractSidebars => new TranslatableString(getKey(@"contract_sidebars"), @"Contract sidebars when not hovered");
+
+        /// <summary>
         /// "Must be in edit mode to handle editor links"
         /// </summary>
         public static LocalisableString MustBeInEditorToHandleLinks => new TranslatableString(getKey(@"must_be_in_editor_to_handle_links"), @"Must be in edit mode to handle editor links");
@@ -133,6 +138,11 @@ namespace osu.Game.Localisation
         /// "Show timing changes"
         /// </summary>
         public static LocalisableString TimelineShowTimingChanges => new TranslatableString(getKey(@"timeline_show_timing_changes"), @"Show timing changes");
+
+        /// <summary>
+        /// "Show breaks"
+        /// </summary>
+        public static LocalisableString TimelineShowBreaks => new TranslatableString(getKey(@"timeline_show_breaks"), @"Show breaks");
 
         /// <summary>
         /// "Show ticks"
