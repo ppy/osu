@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -17,6 +16,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints.Components
         public EditNotePiece()
         {
             Masking = true;
+            CornerRadius = 5;
             BorderThickness = 9; // organoleptically chosen to look good enough for all default skins
             BorderColour = Color4.White;
             Height = DefaultNotePiece.NOTE_HEIGHT;
@@ -33,18 +33,6 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints.Components
         private void load(OsuColour colours)
         {
             Colour = colours.Yellow;
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-
-            // from anecdotal experience, there are generally two types of user skins:
-            // one type uses rectangles for notes, and the other uses circles / squarish sprites (various stepmania-likes).
-            // this is a crude heuristic that attempts to choose the best of both worlds based on aspect ratio alone.
-            float aspectRatio = DrawWidth / DrawHeight;
-            bool isSquarish = aspectRatio > 4f / 5 && aspectRatio < 5f / 4;
-            CornerRadius = isSquarish ? Math.Min(DrawWidth, DrawHeight) / 2 : 5;
         }
     }
 }
