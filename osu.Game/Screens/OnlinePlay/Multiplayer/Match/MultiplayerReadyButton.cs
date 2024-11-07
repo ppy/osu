@@ -149,16 +149,19 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             {
                 switch (localUser?.State)
                 {
-                    default:
-                        Text = "Ready";
-                        break;
-
                     case MultiplayerUserState.Spectating:
                     case MultiplayerUserState.Ready:
-                        Text = room.Host?.Equals(localUser) == true
+                        Text = multiplayerClient.IsHost
                             ? $"Start match {countText}"
                             : $"Waiting for host... {countText}";
+                        break;
 
+                    default:
+                        // Show the abort button for the host as long as gameplay is in progress.
+                        if (multiplayerClient.IsHost && room.State != MultiplayerRoomState.Open)
+                            Text = "Abort the match";
+                        else
+                            Text = "Ready";
                         break;
                 }
             }
@@ -193,12 +196,16 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             switch (localUser?.State)
             {
                 default:
-                    setGreen();
+                    // Show the abort button for the host as long as gameplay is in progress.
+                    if (multiplayerClient.IsHost && room.State != MultiplayerRoomState.Open)
+                        setRed();
+                    else
+                        setGreen();
                     break;
 
                 case MultiplayerUserState.Spectating:
                 case MultiplayerUserState.Ready:
-                    if (room?.Host?.Equals(localUser) == true && !room.ActiveCountdowns.Any(c => c is MatchStartCountdown))
+                    if (multiplayerClient.IsHost && !room.ActiveCountdowns.Any(c => c is MatchStartCountdown))
                         setGreen();
                     else
                         setYellow();
@@ -206,15 +213,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                     break;
             }
 
-            void setYellow()
-            {
-                BackgroundColour = colours.YellowDark;
-            }
+            void setYellow() => BackgroundColour = colours.YellowDark;
 
-            void setGreen()
-            {
-                BackgroundColour = colours.Green;
-            }
+            void setGreen() => BackgroundColour = colours.Green;
+
+            void setRed() => BackgroundColour = colours.Red;
         }
 
         protected override void Dispose(bool isDisposing)

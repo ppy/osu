@@ -14,6 +14,7 @@ using osu.Game.Extensions;
 using osu.Game.IO;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Play.HUD.HitErrorMeters;
+using osu.Game.Skinning.Triangles;
 using osuTK;
 using osuTK.Graphics;
 
@@ -63,19 +64,16 @@ namespace osu.Game.Skinning
             // Temporary until default skin has a valid hit lighting.
             if ((lookup as SkinnableSprite.SpriteComponentLookup)?.LookupName == @"lighting") return Drawable.Empty();
 
-            if (base.GetDrawableComponent(lookup) is Drawable c)
-                return c;
-
             switch (lookup)
             {
-                case SkinComponentsContainerLookup containerLookup:
+                case GlobalSkinnableContainerLookup containerLookup:
                     // Only handle global level defaults for now.
                     if (containerLookup.Ruleset != null)
                         return null;
 
-                    switch (containerLookup.Target)
+                    switch (containerLookup.Lookup)
                     {
-                        case SkinComponentsContainerLookup.TargetArea.SongSelect:
+                        case GlobalSkinnableContainers.SongSelect:
                             var songSelectComponents = new DefaultSkinComponentsContainer(_ =>
                             {
                                 // do stuff when we need to.
@@ -83,7 +81,7 @@ namespace osu.Game.Skinning
 
                             return songSelectComponents;
 
-                        case SkinComponentsContainerLookup.TargetArea.MainHUDComponents:
+                        case GlobalSkinnableContainers.MainHUDComponents:
                             var skinnableTargetWrapper = new DefaultSkinComponentsContainer(container =>
                             {
                                 var score = container.OfType<DefaultScoreCounter>().FirstOrDefault();
@@ -167,7 +165,7 @@ namespace osu.Game.Skinning
                                     new DefaultKeyCounterDisplay(),
                                     new BarHitErrorMeter(),
                                     new BarHitErrorMeter(),
-                                    new PerformancePointsCounter()
+                                    new TrianglesPerformancePointsCounter()
                                 }
                             };
 
@@ -177,7 +175,7 @@ namespace osu.Game.Skinning
                     return null;
             }
 
-            return null;
+            return base.GetDrawableComponent(lookup);
         }
 
         public override IBindable<TValue>? GetConfig<TLookup, TValue>(TLookup lookup)
@@ -190,19 +188,24 @@ namespace osu.Game.Skinning
                     switch (global)
                     {
                         case GlobalSkinColours.ComboColours:
+                        {
+                            LogLookupDebug(this, lookup, LookupDebugType.Hit);
                             return SkinUtils.As<TValue>(new Bindable<IReadOnlyList<Color4>?>(Configuration.ComboColours));
+                        }
                     }
 
                     break;
 
                 case SkinComboColourLookup comboColour:
+                    LogLookupDebug(this, lookup, LookupDebugType.Hit);
                     return SkinUtils.As<TValue>(new Bindable<Color4>(getComboColour(Configuration, comboColour.ColourIndex)));
             }
 
+            LogLookupDebug(this, lookup, LookupDebugType.Miss);
             return null;
         }
 
         private static Color4 getComboColour(IHasComboColours source, int colourIndex)
-            => source.ComboColours[colourIndex % source.ComboColours.Count];
+            => source.ComboColours![colourIndex % source.ComboColours.Count];
     }
 }

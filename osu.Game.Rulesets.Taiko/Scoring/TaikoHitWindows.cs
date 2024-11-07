@@ -7,7 +7,7 @@ namespace osu.Game.Rulesets.Taiko.Scoring
 {
     public class TaikoHitWindows : HitWindows
     {
-        private static readonly DifficultyRange[] taiko_ranges =
+        internal static readonly DifficultyRange[] TAIKO_RANGES =
         {
             new DifficultyRange(HitResult.Great, 50, 35, 20),
             new DifficultyRange(HitResult.Ok, 120, 80, 50),
@@ -27,6 +27,6 @@ namespace osu.Game.Rulesets.Taiko.Scoring
             return false;
         }
 
-        protected override DifficultyRange[] GetRanges() => taiko_ranges;
+        protected override DifficultyRange[] GetRanges() => TAIKO_RANGES;
     }
 }

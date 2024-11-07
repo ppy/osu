@@ -24,20 +24,16 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 {
     public class ManiaDifficultyCalculator : DifficultyCalculator
     {
-        private const double star_scaling_factor = 0.018;
+        private const double difficulty_multiplier = 0.018;
 
         private readonly bool isForCurrentRuleset;
         private readonly double originalOverallDifficulty;
 
-        public override int Version => 20220902;
-
-        private readonly IWorkingBeatmap workingBeatmap;
+        public override int Version => 20241007;
 
         public ManiaDifficultyCalculator(IRulesetInfo ruleset, IWorkingBeatmap beatmap)
             : base(ruleset, beatmap)
         {
-            workingBeatmap = beatmap;
-
             isForCurrentRuleset = beatmap.BeatmapInfo.Ruleset.MatchesOnlineID(ruleset);
             originalOverallDifficulty = beatmap.BeatmapInfo.Difficulty.OverallDifficulty;
         }
@@ -52,22 +48,13 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
             ManiaDifficultyAttributes attributes = new ManiaDifficultyAttributes
             {
-                StarRating = skills[0].DifficultyValue() * star_scaling_factor,
+                StarRating = skills[0].DifficultyValue() * difficulty_multiplier,
                 Mods = mods,
                 // In osu-stable mania, rate-adjustment mods don't affect the hit window.
                 // This is done the way it is to introduce fractional differences in order to match osu-stable for the time being.
                 GreatHitWindow = Math.Ceiling((int)(getHitWindow300(mods) * clockRate) / clockRate),
                 MaxCombo = beatmap.HitObjects.Sum(maxComboForObject),
             };
-
-            if (ComputeLegacyScoringValues)
-            {
-                ManiaLegacyScoreSimulator sv1Simulator = new ManiaLegacyScoreSimulator();
-                sv1Simulator.Simulate(workingBeatmap, beatmap, mods);
-                attributes.LegacyAccuracyScore = sv1Simulator.AccuracyScore;
-                attributes.LegacyComboScore = sv1Simulator.ComboScore;
-                attributes.LegacyBonusScoreRatio = sv1Simulator.BonusScoreRatio;
-            }
 
             return attributes;
         }

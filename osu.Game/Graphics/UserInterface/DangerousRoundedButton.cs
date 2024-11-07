@@ -11,7 +11,7 @@ namespace osu.Game.Graphics.UserInterface
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            BackgroundColour = colours.PinkDark;
+            BackgroundColour = colours.DangerousButtonColour;
         }
     }
 }

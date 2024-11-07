@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -14,53 +15,54 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
 {
     public partial class ArgonBarLine : CompositeDrawable
     {
-        private Container majorEdgeContainer = null!;
-
         private Bindable<bool> major = null!;
+
+        private Box mainLine = null!;
+        private Drawable topAnchor = null!;
+        private Drawable bottomAnchor = null!;
 
         [BackgroundDependencyLoader]
         private void load(DrawableHitObject drawableHitObject)
         {
             RelativeSizeAxes = Axes.Both;
 
-            const float line_offset = 8;
-            var majorPieceSize = new Vector2(6, 20);
+            // Avoid flickering due to no anti-aliasing of boxes by default.
+            var edgeSmoothness = new Vector2(0.3f);
 
-            InternalChildren = new Drawable[]
+            AddInternal(mainLine = new Box
             {
-                line = new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    EdgeSmoothness = new Vector2(0.5f, 0),
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                },
-                majorEdgeContainer = new Container
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    RelativeSizeAxes = Axes.Both,
-                    Children = new[]
-                    {
-                        new Circle
-                        {
-                            Name = "Top line",
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.BottomCentre,
-                            Size = majorPieceSize,
-                            Y = -line_offset,
-                        },
-                        new Circle
-                        {
-                            Name = "Bottom line",
-                            Anchor = Anchor.BottomCentre,
-                            Origin = Anchor.TopCentre,
-                            Size = majorPieceSize,
-                            Y = line_offset,
-                        },
-                    }
-                }
-            };
+                Name = "Bar line",
+                EdgeSmoothness = edgeSmoothness,
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                RelativeSizeAxes = Axes.Both,
+            });
+
+            const float major_extension = 10;
+
+            AddInternal(topAnchor = new Box
+            {
+                Name = "Top anchor",
+                EdgeSmoothness = edgeSmoothness,
+                Blending = BlendingParameters.Additive,
+                Anchor = Anchor.TopCentre,
+                Origin = Anchor.BottomCentre,
+                Height = major_extension,
+                RelativeSizeAxes = Axes.X,
+                Colour = ColourInfo.GradientVertical(Colour4.Transparent, Colour4.White),
+            });
+
+            AddInternal(bottomAnchor = new Box
+            {
+                Name = "Bottom anchor",
+                EdgeSmoothness = edgeSmoothness,
+                Blending = BlendingParameters.Additive,
+                Anchor = Anchor.BottomCentre,
+                Origin = Anchor.TopCentre,
+                Height = major_extension,
+                RelativeSizeAxes = Axes.X,
+                Colour = ColourInfo.GradientVertical(Colour4.White, Colour4.Transparent),
+            });
 
             major = ((DrawableBarLine)drawableHitObject).Major.GetBoundCopy();
         }
@@ -71,13 +73,10 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
             major.BindValueChanged(updateMajor, true);
         }
 
-        private Box line = null!;
-
         private void updateMajor(ValueChangedEvent<bool> major)
         {
-            line.Alpha = major.NewValue ? 1f : 0.5f;
-            line.Width = major.NewValue ? 1 : 0.5f;
-            majorEdgeContainer.Alpha = major.NewValue ? 1 : 0;
+            mainLine.Alpha = major.NewValue ? 1f : 0.5f;
+            topAnchor.Alpha = bottomAnchor.Alpha = major.NewValue ? mainLine.Alpha * 0.3f : 0;
         }
     }
 }

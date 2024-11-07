@@ -5,10 +5,12 @@ using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Utils;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Localisation.HUD;
+using osu.Game.Localisation.SkinComponents;
 using osu.Game.Rulesets.Objects;
 using osuTK;
 
@@ -27,9 +29,19 @@ namespace osu.Game.Screens.Play.HUD
         private readonly DefaultSongProgressBar bar;
         private readonly DefaultSongProgressGraph graph;
         private readonly SongProgressInfo info;
+        private readonly Container content;
 
         [SettingSource(typeof(SongProgressStrings), nameof(SongProgressStrings.ShowGraph), nameof(SongProgressStrings.ShowGraphDescription))]
         public Bindable<bool> ShowGraph { get; } = new BindableBool(true);
+
+        [SettingSource(typeof(SongProgressStrings), nameof(SongProgressStrings.ShowTime), nameof(SongProgressStrings.ShowTimeDescription))]
+        public Bindable<bool> ShowTime { get; } = new BindableBool(true);
+
+        [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.UseRelativeSize))]
+        public BindableBool UseRelativeSize { get; } = new BindableBool(true);
+
+        [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.Colour), nameof(SkinnableComponentStrings.ColourDescription))]
+        public BindableColour4 AccentColour { get; } = new BindableColour4(Colour4.White);
 
         [Resolved]
         private Player? player { get; set; }
@@ -37,31 +49,36 @@ namespace osu.Game.Screens.Play.HUD
         public DefaultSongProgress()
         {
             RelativeSizeAxes = Axes.X;
+            AutoSizeAxes = Axes.Y;
             Anchor = Anchor.BottomRight;
             Origin = Anchor.BottomRight;
 
-            Children = new Drawable[]
+            Child = content = new Container
             {
-                info = new SongProgressInfo
+                RelativeSizeAxes = Axes.X,
+                Children = new Drawable[]
                 {
-                    Origin = Anchor.BottomLeft,
-                    Anchor = Anchor.BottomLeft,
-                    RelativeSizeAxes = Axes.X,
-                },
-                graph = new DefaultSongProgressGraph
-                {
-                    RelativeSizeAxes = Axes.X,
-                    Origin = Anchor.BottomLeft,
-                    Anchor = Anchor.BottomLeft,
-                    Height = graph_height,
-                    Margin = new MarginPadding { Bottom = bottom_bar_height },
-                },
-                bar = new DefaultSongProgressBar(bottom_bar_height, graph_height, handle_size)
-                {
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
-                    OnSeek = time => player?.Seek(time),
-                },
+                    info = new SongProgressInfo
+                    {
+                        Origin = Anchor.BottomLeft,
+                        Anchor = Anchor.BottomLeft,
+                        RelativeSizeAxes = Axes.X,
+                    },
+                    graph = new DefaultSongProgressGraph
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Origin = Anchor.BottomLeft,
+                        Anchor = Anchor.BottomLeft,
+                        Height = graph_height,
+                        Margin = new MarginPadding { Bottom = bottom_bar_height },
+                    },
+                    bar = new DefaultSongProgressBar(bottom_bar_height, graph_height, handle_size)
+                    {
+                        Anchor = Anchor.BottomLeft,
+                        Origin = Anchor.BottomLeft,
+                        OnSeek = time => player?.Seek(time),
+                    },
+                }
             };
         }
 
@@ -69,12 +86,19 @@ namespace osu.Game.Screens.Play.HUD
         private void load(OsuColour colours)
         {
             graph.FillColour = bar.FillColour = colours.BlueLighter;
+
+            // see comment in ArgonHealthDisplay.cs regarding RelativeSizeAxes
+            float previousWidth = Width;
+            UseRelativeSize.BindValueChanged(v => RelativeSizeAxes = v.NewValue ? Axes.X : Axes.None, true);
+            Width = previousWidth;
         }
 
         protected override void LoadComplete()
         {
             Interactive.BindValueChanged(_ => updateBarVisibility(), true);
             ShowGraph.BindValueChanged(_ => updateGraphVisibility(), true);
+            ShowTime.BindValueChanged(_ => updateTimeVisibility(), true);
+            AccentColour.BindValueChanged(_ => Colour = AccentColour.Value, true);
 
             base.LoadComplete();
         }
@@ -91,12 +115,7 @@ namespace osu.Game.Screens.Play.HUD
 
         protected override void UpdateProgress(double progress, bool isIntro)
         {
-            bar.CurrentTime = GameplayClock.CurrentTime;
-
-            if (isIntro)
-                graph.Progress = 0;
-            else
-                graph.Progress = (int)(graph.ColumnCount * progress);
+            graph.Progress = isIntro ? 0 : (int)(graph.ColumnCount * progress);
         }
 
         protected override void Update()
@@ -107,7 +126,7 @@ namespace osu.Game.Screens.Play.HUD
             float newHeight = bottom_bar_height + graph_height + handle_size.Y + info.Height - graph.Y;
 
             if (!Precision.AlmostEquals(Height, newHeight, 5f))
-                Height = newHeight;
+                content.Height = newHeight;
         }
 
         private void updateBarVisibility()
@@ -123,6 +142,13 @@ namespace osu.Game.Screens.Play.HUD
 
             bar.ResizeHeightTo(ShowGraph.Value ? barHeight + graph_height : barHeight, transition_duration, Easing.In);
             graph.FadeTo(ShowGraph.Value ? 1 : 0, transition_duration, Easing.In);
+
+            updateInfoMargin();
+        }
+
+        private void updateTimeVisibility()
+        {
+            info.FadeTo(ShowTime.Value ? 1 : 0, transition_duration, Easing.In);
 
             updateInfoMargin();
         }

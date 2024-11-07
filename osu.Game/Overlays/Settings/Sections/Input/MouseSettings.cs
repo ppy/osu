@@ -28,6 +28,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         private Bindable<double> localSensitivity;
 
         private Bindable<WindowMode> windowMode;
+        private Bindable<bool> minimiseOnFocusLoss;
         private SettingsEnumDropdown<OsuConfineMouseMode> confineMouseModeSetting;
         private Bindable<bool> relativeMode;
 
@@ -47,6 +48,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
             relativeMode = mouseHandler.UseRelativeMode.GetBoundCopy();
             windowMode = config.GetBindable<WindowMode>(FrameworkSetting.WindowMode);
+            minimiseOnFocusLoss = config.GetBindable<bool>(FrameworkSetting.MinimiseOnFocusLossInFullscreen);
 
             Children = new Drawable[]
             {
@@ -75,7 +77,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = MouseSettingsStrings.DisableMouseButtons,
+                    LabelText = MouseSettingsStrings.DisableClicksDuringGameplay,
                     Current = osuConfig.GetBindable<bool>(OsuSetting.MouseDisableButtons)
                 },
             };
@@ -98,32 +100,43 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
             localSensitivity.BindValueChanged(val => handlerSensitivity.Value = val.NewValue);
 
-            windowMode.BindValueChanged(mode =>
-            {
-                bool isFullscreen = mode.NewValue == WindowMode.Fullscreen;
-
-                if (isFullscreen)
-                {
-                    confineMouseModeSetting.Current.Disabled = true;
-                    confineMouseModeSetting.TooltipText = MouseSettingsStrings.NotApplicableFullscreen;
-                }
-                else
-                {
-                    confineMouseModeSetting.Current.Disabled = false;
-                    confineMouseModeSetting.TooltipText = string.Empty;
-                }
-            }, true);
+            windowMode.BindValueChanged(_ => updateConfineMouseModeSettingVisibility());
+            minimiseOnFocusLoss.BindValueChanged(_ => updateConfineMouseModeSettingVisibility(), true);
 
             highPrecisionMouse.Current.BindValueChanged(highPrecision =>
             {
-                if (RuntimeInfo.OS != RuntimeInfo.Platform.Windows)
+                switch (RuntimeInfo.OS)
                 {
-                    if (highPrecision.NewValue)
-                        highPrecisionMouse.SetNoticeText(MouseSettingsStrings.HighPrecisionPlatformWarning, true);
-                    else
-                        highPrecisionMouse.ClearNoticeText();
+                    case RuntimeInfo.Platform.Linux:
+                    case RuntimeInfo.Platform.macOS:
+                    case RuntimeInfo.Platform.iOS:
+                        if (highPrecision.NewValue)
+                            highPrecisionMouse.SetNoticeText(MouseSettingsStrings.HighPrecisionPlatformWarning, true);
+                        else
+                            highPrecisionMouse.ClearNoticeText();
+
+                        break;
                 }
             }, true);
+        }
+
+        /// <summary>
+        /// Updates disabled state and tooltip of <see cref="confineMouseModeSetting"/> to match when <see cref="ConfineMouseTracker"/> is overriding the confine mode.
+        /// </summary>
+        private void updateConfineMouseModeSettingVisibility()
+        {
+            bool confineModeOverriden = windowMode.Value == WindowMode.Fullscreen && minimiseOnFocusLoss.Value;
+
+            if (confineModeOverriden)
+            {
+                confineMouseModeSetting.Current.Disabled = true;
+                confineMouseModeSetting.TooltipText = MouseSettingsStrings.NotApplicableFullscreen;
+            }
+            else
+            {
+                confineMouseModeSetting.Current.Disabled = false;
+                confineMouseModeSetting.TooltipText = string.Empty;
+            }
         }
 
         public partial class SensitivitySetting : SettingsSlider<double, SensitivitySlider>

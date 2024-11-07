@@ -13,20 +13,24 @@ namespace osu.Game.Rulesets.Osu.Tests
     [TestFixture]
     public class OsuDifficultyCalculatorTest : DifficultyCalculatorTest
     {
-        protected override string ResourceAssembly => "osu.Game.Rulesets.Osu";
+        protected override string ResourceAssembly => "osu.Game.Rulesets.Osu.Tests";
 
-        [TestCase(6.7115569159190587d, 206, "diffcalc-test")]
-        [TestCase(1.4391311903612753d, 45, "zero-length-sliders")]
+        [TestCase(6.7171144000821119d, 239, "diffcalc-test")]
+        [TestCase(1.4485749025771304d, 54, "zero-length-sliders")]
+        [TestCase(0.42630400627180914d, 4, "very-fast-slider")]
+        [TestCase(0.14143808967817237d, 2, "nan-slider")]
         public void Test(double expectedStarRating, int expectedMaxCombo, string name)
             => base.Test(expectedStarRating, expectedMaxCombo, name);
 
-        [TestCase(8.9757300665532966d, 206, "diffcalc-test")]
-        [TestCase(1.7437232654020756d, 45, "zero-length-sliders")]
+        [TestCase(8.9825709931204205d, 239, "diffcalc-test")]
+        [TestCase(1.7550169162648608d, 54, "zero-length-sliders")]
+        [TestCase(0.55231632896800109d, 4, "very-fast-slider")]
         public void TestClockRateAdjusted(double expectedStarRating, int expectedMaxCombo, string name)
             => Test(expectedStarRating, expectedMaxCombo, name, new OsuModDoubleTime());
 
-        [TestCase(6.7115569159190587d, 239, "diffcalc-test")]
-        [TestCase(1.4391311903612753d, 54, "zero-length-sliders")]
+        [TestCase(6.7171144000821119d, 239, "diffcalc-test")]
+        [TestCase(1.4485749025771304d, 54, "zero-length-sliders")]
+        [TestCase(0.42630400627180914d, 4, "very-fast-slider")]
         public void TestClassicMod(double expectedStarRating, int expectedMaxCombo, string name)
             => Test(expectedStarRating, expectedMaxCombo, name, new OsuModClassic());
 

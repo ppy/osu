@@ -12,6 +12,9 @@ namespace osu.Game.Rulesets.Objects.Types
     /// </summary>
     public interface IHasComboInformation : IHasCombo
     {
+        /// <summary>
+        /// Bindable exposure of <see cref="IndexInCurrentCombo"/>.
+        /// </summary>
         Bindable<int> IndexInCurrentComboBindable { get; }
 
         /// <summary>
@@ -19,13 +22,21 @@ namespace osu.Game.Rulesets.Objects.Types
         /// </summary>
         int IndexInCurrentCombo { get; set; }
 
+        /// <summary>
+        /// Bindable exposure of <see cref="ComboIndex"/>.
+        /// </summary>
         Bindable<int> ComboIndexBindable { get; }
 
         /// <summary>
         /// The index of this combo in relation to the beatmap.
+        ///
+        /// In other words, this is incremented by 1 each time a <see cref="NewCombo"/> is reached.
         /// </summary>
         int ComboIndex { get; set; }
 
+        /// <summary>
+        /// Bindable exposure of <see cref="ComboIndexWithOffsets"/>.
+        /// </summary>
         Bindable<int> ComboIndexWithOffsetsBindable { get; }
 
         /// <summary>
@@ -39,6 +50,9 @@ namespace osu.Game.Rulesets.Objects.Types
         /// </summary>
         new bool NewCombo { get; set; }
 
+        /// <summary>
+        /// Bindable exposure of <see cref="LastInCombo"/>.
+        /// </summary>
         Bindable<bool> LastInComboBindable { get; }
 
         /// <summary>

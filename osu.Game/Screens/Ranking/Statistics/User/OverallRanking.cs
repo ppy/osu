@@ -6,8 +6,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Online.Solo;
-using osuTK;
+using osu.Game.Online;
 
 namespace osu.Game.Screens.Ranking.Statistics.User
 {
@@ -15,10 +14,10 @@ namespace osu.Game.Screens.Ranking.Statistics.User
     {
         private const float transition_duration = 300;
 
-        public Bindable<SoloStatisticsUpdate?> StatisticsUpdate { get; } = new Bindable<SoloStatisticsUpdate?>();
+        public Bindable<UserStatisticsUpdate?> StatisticsUpdate { get; } = new Bindable<UserStatisticsUpdate?>();
 
         private LoadingLayer loadingLayer = null!;
-        private FillFlowContainer content = null!;
+        private GridContainer content = null!;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -33,21 +32,47 @@ namespace osu.Game.Screens.Ranking.Statistics.User
                 {
                     RelativeSizeAxes = Axes.Both,
                 },
-                content = new FillFlowContainer
+                content = new GridContainer
                 {
                     AlwaysPresent = true,
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Direction = FillDirection.Vertical,
-                    Spacing = new Vector2(10),
-                    Children = new Drawable[]
+                    ColumnDimensions = new[]
                     {
-                        new GlobalRankChangeRow { StatisticsUpdate = { BindTarget = StatisticsUpdate } },
-                        new AccuracyChangeRow { StatisticsUpdate = { BindTarget = StatisticsUpdate } },
-                        new MaximumComboChangeRow { StatisticsUpdate = { BindTarget = StatisticsUpdate } },
-                        new RankedScoreChangeRow { StatisticsUpdate = { BindTarget = StatisticsUpdate } },
-                        new TotalScoreChangeRow { StatisticsUpdate = { BindTarget = StatisticsUpdate } },
-                        new PerformancePointsChangeRow { StatisticsUpdate = { BindTarget = StatisticsUpdate } }
+                        new Dimension(),
+                        new Dimension(GridSizeMode.Absolute, 30),
+                        new Dimension(),
+                    },
+                    RowDimensions = new[]
+                    {
+                        new Dimension(GridSizeMode.AutoSize),
+                        new Dimension(GridSizeMode.Absolute, 10),
+                        new Dimension(GridSizeMode.AutoSize),
+                        new Dimension(GridSizeMode.Absolute, 10),
+                        new Dimension(GridSizeMode.AutoSize),
+                    },
+                    Content = new[]
+                    {
+                        new Drawable[]
+                        {
+                            new GlobalRankChangeRow { StatisticsUpdate = { BindTarget = StatisticsUpdate } },
+                            new SimpleStatisticTable.Spacer(),
+                            new PerformancePointsChangeRow { StatisticsUpdate = { BindTarget = StatisticsUpdate } },
+                        },
+                        new Drawable[] { },
+                        new Drawable[]
+                        {
+                            new MaximumComboChangeRow { StatisticsUpdate = { BindTarget = StatisticsUpdate } },
+                            new SimpleStatisticTable.Spacer(),
+                            new AccuracyChangeRow { StatisticsUpdate = { BindTarget = StatisticsUpdate } },
+                        },
+                        new Drawable[] { },
+                        new Drawable[]
+                        {
+                            new RankedScoreChangeRow { StatisticsUpdate = { BindTarget = StatisticsUpdate } },
+                            new SimpleStatisticTable.Spacer(),
+                            new TotalScoreChangeRow { StatisticsUpdate = { BindTarget = StatisticsUpdate } },
+                        }
                     }
                 }
             };
@@ -61,7 +86,7 @@ namespace osu.Game.Screens.Ranking.Statistics.User
             FinishTransforms(true);
         }
 
-        private void onUpdateReceived(ValueChangedEvent<SoloStatisticsUpdate?> update)
+        private void onUpdateReceived(ValueChangedEvent<UserStatisticsUpdate?> update)
         {
             if (update.NewValue == null)
             {

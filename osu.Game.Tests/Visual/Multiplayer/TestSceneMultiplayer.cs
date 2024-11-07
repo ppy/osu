@@ -19,6 +19,7 @@ using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Database;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
@@ -29,6 +30,9 @@ using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
+using osu.Game.Rulesets.Taiko;
+using osu.Game.Scoring;
+using osu.Game.Screens.OnlinePlay;
 using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Lounge;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
@@ -62,9 +66,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
         {
+            DetachedBeatmapStore detachedBeatmapStore;
+
             Dependencies.Cache(new RealmRulesetStore(Realm));
             Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, Realm, API, audio, Resources, host, Beatmap.Default));
+            Dependencies.Cache(detachedBeatmapStore = new DetachedBeatmapStore());
             Dependencies.Cache(Realm);
+
+            Add(detachedBeatmapStore);
         }
 
         public override void SetUpSteps()
@@ -136,8 +145,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private void addRandomPlayer()
         {
-            int randomUser = RNG.Next(200000, 500000);
-            multiplayerClient.AddUser(new APIUser { Id = randomUser, Username = $"user {randomUser}" });
+            int id = TestResources.GetNextTestID();
+            multiplayerClient.AddUser(new APIUser { Id = id, Username = $"user {id}" });
         }
 
         private void removeLastUser()
@@ -641,7 +650,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 }
             });
 
-            AddStep("open mod overlay", () => this.ChildrenOfType<RoomSubScreen.UserModSelectButton>().Single().TriggerClick());
+            AddStep("open mod overlay", () => this.ChildrenOfType<UserModSelectButton>().Single().TriggerClick());
 
             AddStep("invoke on back button", () => multiplayerComponents.OnBackButton());
 
@@ -690,10 +699,19 @@ namespace osu.Game.Tests.Visual.Multiplayer
             }
 
             AddUntilStep("wait for results", () => multiplayerComponents.CurrentScreen is ResultsScreen);
+
+            AddAssert("check is fail", () =>
+            {
+                var scoreInfo = ((ResultsScreen)multiplayerComponents.CurrentScreen).Score;
+
+                return scoreInfo?.Passed == false && scoreInfo.Rank == ScoreRank.F;
+            });
         }
 
         [Test]
-        [FlakyTest] // See above
+        [Ignore("Failing too often, needs revisiting in some future.")]
+        // This test is failing even after 10 retries (see https://github.com/ppy/osu/actions/runs/6700910613/job/18208272419)
+        // Something is stopping the ready button from changing states, over multiple runs.
         public void TestGameplayExitFlow()
         {
             Bindable<double>? holdDelay = null;
@@ -997,6 +1015,43 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 AddUntilStep("wait for gameplay to start", () => multiplayerClient.ClientRoom?.State == MultiplayerRoomState.Playing);
                 AddUntilStep("wait for local user to enter spectator", () => multiplayerComponents.CurrentScreen is MultiSpectatorScreen);
             }
+        }
+
+        [Test]
+        public void TestGameplayStartsWhileInSongSelectWithDifferentRuleset()
+        {
+            createRoom(() => new Room
+            {
+                Name = { Value = "Test Room" },
+                QueueMode = { Value = QueueMode.AllPlayers },
+                Playlist =
+                {
+                    new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
+                    {
+                        RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
+                        AllowedMods = new[] { new APIMod { Acronym = "HD" } },
+                    },
+                    new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 1)).BeatmapInfo)
+                    {
+                        RulesetID = new TaikoRuleset().RulesetInfo.OnlineID,
+                        AllowedMods = new[] { new APIMod { Acronym = "HD" } },
+                    },
+                }
+            });
+
+            AddStep("select hidden", () => multiplayerClient.ChangeUserMods(new[] { new APIMod { Acronym = "HD" } }));
+            AddStep("make user ready", () => multiplayerClient.ChangeState(MultiplayerUserState.Ready));
+            AddStep("press edit on second item", () => this.ChildrenOfType<DrawableRoomPlaylistItem>().Single(i => i.Item.RulesetID == 1)
+                                                           .ChildrenOfType<DrawableRoomPlaylistItem.PlaylistEditButton>().Single().TriggerClick());
+
+            AddUntilStep("wait for song select", () => InputManager.ChildrenOfType<MultiplayerMatchSongSelect>().FirstOrDefault()?.BeatmapSetsLoaded == true);
+            AddAssert("ruleset is taiko", () => Ruleset.Value.OnlineID == 1);
+
+            AddStep("start match", () => multiplayerClient.StartMatch().WaitSafely());
+
+            AddUntilStep("wait for loading", () => multiplayerClient.ClientRoom?.State == MultiplayerRoomState.WaitingForLoad);
+            AddUntilStep("wait for gameplay to start", () => multiplayerClient.ClientRoom?.State == MultiplayerRoomState.Playing);
+            AddAssert("hidden is selected", () => SelectedMods.Value, () => Has.One.TypeOf(typeof(OsuModHidden)));
         }
 
         private void enterGameplay()

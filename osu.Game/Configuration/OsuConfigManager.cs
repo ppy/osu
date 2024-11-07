@@ -17,9 +17,12 @@ using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods.Input;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Screens.Edit.Compose.Components;
+using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
 using osu.Game.Skinning;
+using osu.Game.Users;
 
 namespace osu.Game.Configuration
 {
@@ -37,7 +40,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.Ruleset, string.Empty);
             SetDefault(OsuSetting.Skin, SkinInfo.ARGON_SKIN.ToString());
 
-            SetDefault(OsuSetting.BeatmapDetailTab, PlayBeatmapDetailArea.TabType.Details);
+            SetDefault(OsuSetting.BeatmapDetailTab, PlayBeatmapDetailArea.TabType.Local);
             SetDefault(OsuSetting.BeatmapDetailModsFilter, false);
 
             SetDefault(OsuSetting.ShowConvertedBeatmaps, true);
@@ -49,6 +52,7 @@ namespace osu.Game.Configuration
 
             SetDefault(OsuSetting.RandomSelectAlgorithm, RandomSelectAlgorithm.RandomPermutation);
             SetDefault(OsuSetting.ModSelectHotkeyStyle, ModSelectHotkeyStyle.Sequential);
+            SetDefault(OsuSetting.ModSelectTextSearchStartsActive, true);
 
             SetDefault(OsuSetting.ChatDisplayHeight, ChatOverlay.DEFAULT_HEIGHT, 0.2f, 1f);
 
@@ -64,16 +68,23 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.Username, string.Empty);
             SetDefault(OsuSetting.Token, string.Empty);
 
-            SetDefault(OsuSetting.AutomaticallyDownloadWhenSpectating, false);
+            SetDefault(OsuSetting.AutomaticallyDownloadMissingBeatmaps, true);
 
-            SetDefault(OsuSetting.SavePassword, false).ValueChanged += enabled =>
+            SetDefault(OsuSetting.SavePassword, true).ValueChanged += enabled =>
             {
-                if (enabled.NewValue) SetValue(OsuSetting.SaveUsername, true);
+                if (enabled.NewValue)
+                    SetValue(OsuSetting.SaveUsername, true);
+                else
+                    GetBindable<string>(OsuSetting.Token).SetDefault();
             };
 
             SetDefault(OsuSetting.SaveUsername, true).ValueChanged += enabled =>
             {
-                if (!enabled.NewValue) SetValue(OsuSetting.SavePassword, false);
+                if (!enabled.NewValue)
+                {
+                    GetBindable<string>(OsuSetting.Username).SetDefault();
+                    SetValue(OsuSetting.SavePassword, false);
+                }
             };
 
             SetDefault(OsuSetting.ExternalLinkWarning, true);
@@ -89,6 +100,7 @@ namespace osu.Game.Configuration
 
             SetDefault(OsuSetting.MenuVoice, true);
             SetDefault(OsuSetting.MenuMusic, true);
+            SetDefault(OsuSetting.MenuTips, true);
 
             SetDefault(OsuSetting.AudioOffset, 0, -500.0, 500.0, 1);
 
@@ -101,6 +113,8 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.MouseDisableButtons, false);
             SetDefault(OsuSetting.MouseDisableWheel, false);
             SetDefault(OsuSetting.ConfineMouseMode, OsuConfineMouseMode.DuringGameplay);
+
+            SetDefault(OsuSetting.TouchDisableGameplayTaps, false);
 
             // Graphics
             SetDefault(OsuSetting.ShowFpsDisplay, false);
@@ -130,6 +144,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.FadePlayfieldWhenHealthLow, true);
             SetDefault(OsuSetting.KeyOverlay, false);
             SetDefault(OsuSetting.ReplaySettingsOverlay, true);
+            SetDefault(OsuSetting.ReplayPlaybackControlsExpanded, true);
             SetDefault(OsuSetting.GameplayLeaderboard, true);
             SetDefault(OsuSetting.AlwaysPlayFirstComboBreak, true);
 
@@ -178,10 +193,26 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.EditorShowHitMarkers, true);
             SetDefault(OsuSetting.EditorAutoSeekOnPlacement, true);
             SetDefault(OsuSetting.EditorLimitedDistanceSnap, false);
+            SetDefault(OsuSetting.EditorShowSpeedChanges, false);
+            SetDefault(OsuSetting.EditorScaleOrigin, EditorOrigin.GridCentre);
+            SetDefault(OsuSetting.EditorRotationOrigin, EditorOrigin.GridCentre);
+
+            SetDefault(OsuSetting.HideCountryFlags, false);
+
+            SetDefault(OsuSetting.MultiplayerRoomFilter, RoomPermissionsFilter.All);
 
             SetDefault(OsuSetting.LastProcessedMetadataId, -1);
 
             SetDefault(OsuSetting.ComboColourNormalisationAmount, 0.2f, 0f, 1f, 0.01f);
+            SetDefault<UserStatus?>(OsuSetting.UserOnlineStatus, null);
+
+            SetDefault(OsuSetting.EditorTimelineShowTimingChanges, true);
+            SetDefault(OsuSetting.EditorTimelineShowBreaks, true);
+            SetDefault(OsuSetting.EditorTimelineShowTicks, true);
+
+            SetDefault(OsuSetting.EditorContractSidebars, false);
+
+            SetDefault(OsuSetting.AlwaysShowHoldForMenuButton, false);
         }
 
         protected override bool CheckLookupContainsPrivateInformation(OsuSetting lookup)
@@ -236,6 +267,12 @@ namespace osu.Game.Configuration
                     name: GlobalActionKeyBindingStrings.ToggleGameplayMouseButtons,
                     value: disabledState ? CommonStrings.Disabled.ToLower() : CommonStrings.Enabled.ToLower(),
                     shortcut: LookupKeyBindings(GlobalAction.ToggleGameplayMouseButtons))
+                ),
+                new TrackedSetting<bool>(OsuSetting.GameplayLeaderboard, state => new SettingDescription(
+                    rawValue: state,
+                    name: GlobalActionKeyBindingStrings.ToggleInGameLeaderboard,
+                    value: state ? CommonStrings.Enabled.ToLower() : CommonStrings.Disabled.ToLower(),
+                    shortcut: LookupKeyBindings(GlobalAction.ToggleInGameLeaderboard))
                 ),
                 new TrackedSetting<HUDVisibilityMode>(OsuSetting.HUDVisibilityMode, visibilityMode => new SettingDescription(
                     rawValue: visibilityMode,
@@ -311,6 +348,10 @@ namespace osu.Game.Configuration
 
         ShowHealthDisplayWhenCantFail,
         FadePlayfieldWhenHealthLow,
+
+        /// <summary>
+        /// Disables mouse buttons clicks during gameplay.
+        /// </summary>
         MouseDisableButtons,
         MouseDisableWheel,
         ConfineMouseMode,
@@ -324,6 +365,7 @@ namespace osu.Game.Configuration
         VolumeInactive,
         MenuMusic,
         MenuVoice,
+        MenuTips,
         CursorRotation,
         MenuParallax,
         Prefer24HourTime,
@@ -377,13 +419,28 @@ namespace osu.Game.Configuration
         EditorShowHitMarkers,
         EditorAutoSeekOnPlacement,
         DiscordRichPresence,
-        AutomaticallyDownloadWhenSpectating,
+
         ShowOnlineExplicitContent,
         LastProcessedMetadataId,
         SafeAreaConsiderations,
         ComboColourNormalisationAmount,
         ProfileCoverExpanded,
         EditorLimitedDistanceSnap,
-        ReplaySettingsOverlay
+        ReplaySettingsOverlay,
+        ReplayPlaybackControlsExpanded,
+        AutomaticallyDownloadMissingBeatmaps,
+        EditorShowSpeedChanges,
+        TouchDisableGameplayTaps,
+        ModSelectTextSearchStartsActive,
+        UserOnlineStatus,
+        MultiplayerRoomFilter,
+        HideCountryFlags,
+        EditorTimelineShowTimingChanges,
+        EditorTimelineShowTicks,
+        AlwaysShowHoldForMenuButton,
+        EditorContractSidebars,
+        EditorScaleOrigin,
+        EditorRotationOrigin,
+        EditorTimelineShowBreaks,
     }
 }

@@ -69,6 +69,17 @@ namespace osu.Game.Screens.Edit.Compose.Components
             allDragHandles.Add(handle);
         }
 
+        public void FlipScaleHandles(Direction direction)
+        {
+            foreach (var handle in scaleHandles)
+            {
+                if (direction == Direction.Horizontal && !handle.Anchor.HasFlag(Anchor.x1))
+                    handle.Anchor ^= Anchor.x0 | Anchor.x2;
+                if (direction == Direction.Vertical && !handle.Anchor.HasFlag(Anchor.y1))
+                    handle.Anchor ^= Anchor.y0 | Anchor.y2;
+            }
+        }
+
         private SelectionBoxRotationHandle displayedRotationHandle;
         private SelectionBoxDragHandle activeHandle;
 

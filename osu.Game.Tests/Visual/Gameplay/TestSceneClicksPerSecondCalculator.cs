@@ -125,6 +125,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             public IEnumerable<double> NonGameplayAdjustments => throw new NotImplementedException();
             public IBindable<bool> IsPaused => throw new NotImplementedException();
+            public bool IsRewinding => false;
         }
     }
 }

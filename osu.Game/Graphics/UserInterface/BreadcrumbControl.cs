@@ -10,6 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Graphics.UserInterface
@@ -33,7 +34,7 @@ namespace osu.Game.Graphics.UserInterface
 
             Current.ValueChanged += index =>
             {
-                foreach (var t in TabContainer.Children.OfType<BreadcrumbTabItem>())
+                foreach (var t in TabContainer.OfType<BreadcrumbTabItem>())
                 {
                     int tIndex = TabContainer.IndexOf(t);
                     int tabIndex = TabContainer.IndexOf(TabMap[index.NewValue]);
@@ -48,6 +49,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             protected virtual float ChevronSize => 10;
 
+            [CanBeNull]
             public event Action<Visibility> StateChanged;
 
             public readonly SpriteIcon Chevron;

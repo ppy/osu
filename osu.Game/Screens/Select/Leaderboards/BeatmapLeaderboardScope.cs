@@ -12,11 +12,11 @@ namespace osu.Game.Screens.Select.Leaderboards
         [Description("Local Ranking")]
         Local,
 
-        [LocalisableDescription(typeof(BeatmapsetsStrings), nameof(BeatmapsetsStrings.ShowScoreboardCountry))]
-        Country,
-
         [LocalisableDescription(typeof(BeatmapsetsStrings), nameof(BeatmapsetsStrings.ShowScoreboardGlobal))]
         Global,
+
+        [LocalisableDescription(typeof(BeatmapsetsStrings), nameof(BeatmapsetsStrings.ShowScoreboardCountry))]
+        Country,
 
         [LocalisableDescription(typeof(BeatmapsetsStrings), nameof(BeatmapsetsStrings.ShowScoreboardFriend))]
         Friend,

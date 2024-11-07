@@ -12,6 +12,7 @@ using JetBrains.Annotations;
 using Newtonsoft.Json;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.ListExtensions;
+using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Lists;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
@@ -38,6 +39,8 @@ namespace osu.Game.Rulesets.Objects
         /// <summary>
         /// Invoked after <see cref="ApplyDefaults"/> has completed on this <see cref="HitObject"/>.
         /// </summary>
+        // TODO: This has no implicit unbind flow. Currently, if a Playfield manages HitObjects it will leave a bound event on this and cause the
+        // playfield to remain in memory.
         public event Action<HitObject> DefaultsApplied;
 
         public readonly Bindable<double> StartTimeBindable = new BindableDouble();
@@ -75,12 +78,6 @@ namespace osu.Game.Rulesets.Objects
         /// This is used only to preload these samples ahead of time.
         /// </summary>
         public virtual IList<HitSampleInfo> AuxiliarySamples => ImmutableList<HitSampleInfo>.Empty;
-
-        /// <summary>
-        /// Legacy BPM multiplier that introduces floating-point errors for rulesets that depend on it.
-        /// DO NOT USE THIS UNLESS 100% SURE.
-        /// </summary>
-        public double? LegacyBpmMultiplier { get; set; }
 
         /// <summary>
         /// Whether this <see cref="HitObject"/> is in Kiai time.
@@ -167,8 +164,19 @@ namespace osu.Game.Rulesets.Objects
         protected void AddNested(HitObject hitObject) => nestedHitObjects.Add(hitObject);
 
         /// <summary>
-        /// Creates the <see cref="Judgement"/> that represents the scoring information for this <see cref="HitObject"/>.
+        /// The <see cref="Judgement"/> that represents the scoring information for this <see cref="HitObject"/>.
         /// </summary>
+        [JsonIgnore]
+        public Judgement Judgement => judgement ??= CreateJudgement();
+
+        private Judgement judgement;
+
+        /// <summary>
+        /// Should be overridden to create a <see cref="Judgement"/> that represents the scoring information for this <see cref="HitObject"/>.
+        /// </summary>
+        /// <remarks>
+        /// For read access, use <see cref="Judgement"/> to avoid unnecessary allocations.
+        /// </remarks>
         [NotNull]
         public virtual Judgement CreateJudgement() => new Judgement();
 
@@ -216,11 +224,21 @@ namespace osu.Game.Rulesets.Objects
         /// <returns>A populated <see cref="HitSampleInfo"/>.</returns>
         public HitSampleInfo CreateHitSampleInfo(string sampleName = HitSampleInfo.HIT_NORMAL)
         {
-            if (Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL) is HitSampleInfo existingSample)
-                return existingSample.With(newName: sampleName);
+            // As per stable, all non-normal "addition" samples should use the same bank.
+            if (sampleName != HitSampleInfo.HIT_NORMAL)
+            {
+                if (Samples.FirstOrDefault(s => s.Name != HitSampleInfo.HIT_NORMAL) is HitSampleInfo existingAddition)
+                    return existingAddition.With(newName: sampleName);
+            }
+
+            // Fall back to using the normal sample bank otherwise.
+            if (Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL) is HitSampleInfo existingNormal)
+                return existingNormal.With(newName: sampleName, newEditorAutoBank: true);
 
             return new HitSampleInfo(sampleName);
         }
+
+        public override string ToString() => $"{GetType().ReadableName()} @ {StartTime}";
     }
 
     public static class HitObjectExtensions

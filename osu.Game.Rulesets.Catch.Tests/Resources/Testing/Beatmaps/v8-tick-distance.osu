@@ -1,0 +1,19 @@
+osu file format v7
+
+[General]
+StackLeniency: 0.7
+Mode: 0
+
+[Difficulty]
+HPDrainRate:5
+CircleSize:4
+OverallDifficulty:8
+SliderMultiplier:1
+SliderTickRate:1
+
+[TimingPoints]
+336,342.857142857143,4,1,0,100,1,0
+81588,-200,4,2,0,100,0,0
+
+[HitObjects]
+384,72,81593,2,12,B|464:72,1,75,4|4

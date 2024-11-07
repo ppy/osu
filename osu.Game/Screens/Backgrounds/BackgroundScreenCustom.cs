@@ -15,7 +15,7 @@ namespace osu.Game.Screens.Backgrounds
             AddInternal(new Background(textureName));
         }
 
-        public override bool Equals(BackgroundScreen other)
+        public override bool Equals(BackgroundScreen? other)
         {
             if (other is BackgroundScreenCustom backgroundScreenCustom)
                 return base.Equals(other) && textureName == backgroundScreenCustom.textureName;

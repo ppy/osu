@@ -2,7 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -22,8 +24,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private const float button_padding = 5;
 
-        public Func<float, bool>? OnRotation;
-        public Func<Vector2, Anchor, bool>? OnScale;
+        [Resolved]
+        private SelectionRotationHandler? rotationHandler { get; set; }
+
+        [Resolved]
+        private SelectionScaleHandler? scaleHandler { get; set; }
+
         public Func<Direction, bool, bool>? OnFlip;
         public Func<bool>? OnReverse;
 
@@ -51,56 +57,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
             }
         }
 
-        private bool canRotate;
+        private readonly IBindable<bool> canRotate = new BindableBool();
 
-        /// <summary>
-        /// Whether rotation support should be enabled.
-        /// </summary>
-        public bool CanRotate
-        {
-            get => canRotate;
-            set
-            {
-                if (canRotate == value) return;
+        private readonly IBindable<bool> canScaleX = new BindableBool();
 
-                canRotate = value;
-                recreate();
-            }
-        }
+        private readonly IBindable<bool> canScaleY = new BindableBool();
 
-        private bool canScaleX;
-
-        /// <summary>
-        /// Whether horizontal scaling support should be enabled.
-        /// </summary>
-        public bool CanScaleX
-        {
-            get => canScaleX;
-            set
-            {
-                if (canScaleX == value) return;
-
-                canScaleX = value;
-                recreate();
-            }
-        }
-
-        private bool canScaleY;
-
-        /// <summary>
-        /// Whether vertical scaling support should be enabled.
-        /// </summary>
-        public bool CanScaleY
-        {
-            get => canScaleY;
-            set
-            {
-                if (canScaleY == value) return;
-
-                canScaleY = value;
-                recreate();
-            }
-        }
+        private readonly IBindable<bool> canScaleDiagonally = new BindableBool();
 
         private bool canFlipX;
 
@@ -161,7 +124,23 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private OsuColour colours { get; set; } = null!;
 
         [BackgroundDependencyLoader]
-        private void load() => recreate();
+        private void load()
+        {
+            if (rotationHandler != null)
+                canRotate.BindTo(rotationHandler.CanRotateAroundSelectionOrigin);
+
+            if (scaleHandler != null)
+            {
+                canScaleX.BindTo(scaleHandler.CanScaleX);
+                canScaleY.BindTo(scaleHandler.CanScaleY);
+                canScaleDiagonally.BindTo(scaleHandler.CanScaleDiagonally);
+            }
+
+            canRotate.BindValueChanged(_ => recreate());
+            canScaleX.BindValueChanged(_ => recreate());
+            canScaleY.BindValueChanged(_ => recreate());
+            canScaleDiagonally.BindValueChanged(_ => recreate(), true);
+        }
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
@@ -171,13 +150,25 @@ namespace osu.Game.Screens.Edit.Compose.Components
             switch (e.Key)
             {
                 case Key.G:
-                    return CanReverse && reverseButton?.TriggerClick() == true;
+                    if (!CanReverse || reverseButton == null)
+                        return false;
+
+                    reverseButton.TriggerAction();
+                    return true;
 
                 case Key.Comma:
-                    return CanRotate && rotateCounterClockwiseButton?.TriggerClick() == true;
+                    if (!canRotate.Value || rotateCounterClockwiseButton == null)
+                        return false;
+
+                    rotateCounterClockwiseButton.TriggerAction();
+                    return true;
 
                 case Key.Period:
-                    return CanRotate && rotateClockwiseButton?.TriggerClick() == true;
+                    if (!canRotate.Value || rotateClockwiseButton == null)
+                        return false;
+
+                    rotateClockwiseButton.TriggerAction();
+                    return true;
             }
 
             return base.OnKeyDown(e);
@@ -249,19 +240,19 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 }
             };
 
-            if (CanScaleX) addXScaleComponents();
-            if (CanScaleX && CanScaleY) addFullScaleComponents();
-            if (CanScaleY) addYScaleComponents();
+            if (canScaleX.Value) addXScaleComponents();
+            if (canScaleDiagonally.Value) addFullScaleComponents();
+            if (canScaleY.Value) addYScaleComponents();
             if (CanFlipX) addXFlipComponents();
             if (CanFlipY) addYFlipComponents();
-            if (CanRotate) addRotationComponents();
+            if (canRotate.Value) addRotationComponents();
             if (CanReverse) reverseButton = addButton(FontAwesome.Solid.Backward, "Reverse pattern (Ctrl-G)", () => OnReverse?.Invoke());
         }
 
         private void addRotationComponents()
         {
-            rotateCounterClockwiseButton = addButton(FontAwesome.Solid.Undo, "Rotate 90 degrees counter-clockwise (Ctrl-<)", () => OnRotation?.Invoke(-90));
-            rotateClockwiseButton = addButton(FontAwesome.Solid.Redo, "Rotate 90 degrees clockwise (Ctrl->)", () => OnRotation?.Invoke(90));
+            rotateCounterClockwiseButton = addButton(FontAwesome.Solid.Undo, "Rotate 90 degrees counter-clockwise (Ctrl-<)", () => rotationHandler?.Rotate(-90));
+            rotateClockwiseButton = addButton(FontAwesome.Solid.Redo, "Rotate 90 degrees clockwise (Ctrl->)", () => rotationHandler?.Rotate(90));
 
             addRotateHandle(Anchor.TopLeft);
             addRotateHandle(Anchor.TopRight);
@@ -306,11 +297,34 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 Action = action
             };
 
+            button.Clicked += freezeButtonPosition;
+            button.HoverLost += unfreezeButtonPosition;
+
             button.OperationStarted += operationStarted;
             button.OperationEnded += operationEnded;
+
             buttons.Add(button);
 
             return button;
+        }
+
+        /// <remarks>
+        /// This method should be called when a selection needs to be flipped
+        /// because of an ongoing scale handle drag that would otherwise cause width or height to go negative.
+        /// </remarks>
+        public void PerformFlipFromScaleHandles(Axes axes)
+        {
+            if (axes.HasFlag(Axes.X))
+            {
+                dragHandles.FlipScaleHandles(Direction.Horizontal);
+                OnFlip?.Invoke(Direction.Horizontal, false);
+            }
+
+            if (axes.HasFlag(Axes.Y))
+            {
+                dragHandles.FlipScaleHandles(Direction.Vertical);
+                OnFlip?.Invoke(Direction.Vertical, false);
+            }
         }
 
         private void addScaleHandle(Anchor anchor)
@@ -318,7 +332,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
             var handle = new SelectionBoxScaleHandle
             {
                 Anchor = anchor,
-                HandleScale = (delta, a) => OnScale?.Invoke(delta, a)
             };
 
             handle.OperationStarted += operationStarted;
@@ -331,7 +344,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
             var handle = new SelectionBoxRotationHandle
             {
                 Anchor = anchor,
-                HandleRotate = angle => OnRotation?.Invoke(angle)
             };
 
             handle.OperationStarted += operationStarted;
@@ -362,15 +374,41 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 OperationStarted?.Invoke();
         }
 
-        private void ensureButtonsOnScreen()
+        private Vector2? frozenButtonsPosition;
+
+        private void freezeButtonPosition()
         {
-            buttons.Position = Vector2.Zero;
+            frozenButtonsPosition = buttons.ScreenSpaceDrawQuad.TopLeft;
+        }
+
+        private void unfreezeButtonPosition()
+        {
+            if (frozenButtonsPosition != null)
+            {
+                frozenButtonsPosition = null;
+                ensureButtonsOnScreen(true);
+            }
+        }
+
+        private void ensureButtonsOnScreen(bool animated = false)
+        {
+            if (frozenButtonsPosition != null)
+            {
+                buttons.Anchor = Anchor.TopLeft;
+                buttons.Origin = Anchor.TopLeft;
+
+                buttons.Position = ToLocalSpace(frozenButtonsPosition.Value) - new Vector2(button_padding);
+                return;
+            }
+
+            if (!animated && buttons.Transforms.Any())
+                return;
 
             var thisQuad = ScreenSpaceDrawQuad;
 
             // Shrink the parent quad to give a bit of padding so the buttons don't stick *right* on the border.
             // AABBFloat assumes no rotation. one would hope the whole editor is not being rotated.
-            var parentQuad = Parent.ScreenSpaceDrawQuad.AABBFloat.Shrink(ToLocalSpace(thisQuad.TopLeft + new Vector2(button_padding * 2)));
+            var parentQuad = Parent!.ScreenSpaceDrawQuad.AABBFloat.Shrink(ToLocalSpace(thisQuad.TopLeft + new Vector2(button_padding * 2)));
 
             float topExcess = thisQuad.TopLeft.Y - parentQuad.TopLeft.Y;
             float bottomExcess = parentQuad.BottomLeft.Y - thisQuad.BottomLeft.Y;
@@ -379,24 +417,51 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             float minHeight = buttons.ScreenSpaceDrawQuad.Height;
 
+            Anchor targetAnchor;
+            Anchor targetOrigin;
+            Vector2 targetPosition = Vector2.Zero;
+
             if (topExcess < minHeight && bottomExcess < minHeight)
             {
-                buttons.Anchor = Anchor.BottomCentre;
-                buttons.Origin = Anchor.BottomCentre;
-                buttons.Y = Math.Min(0, ToLocalSpace(Parent.ScreenSpaceDrawQuad.BottomLeft).Y - DrawHeight);
+                targetAnchor = Anchor.BottomCentre;
+                targetOrigin = Anchor.BottomCentre;
+                targetPosition.Y = Math.Min(0, ToLocalSpace(Parent!.ScreenSpaceDrawQuad.BottomLeft).Y - DrawHeight);
             }
             else if (topExcess > bottomExcess)
             {
-                buttons.Anchor = Anchor.TopCentre;
-                buttons.Origin = Anchor.BottomCentre;
+                targetAnchor = Anchor.TopCentre;
+                targetOrigin = Anchor.BottomCentre;
             }
             else
             {
-                buttons.Anchor = Anchor.BottomCentre;
-                buttons.Origin = Anchor.TopCentre;
+                targetAnchor = Anchor.BottomCentre;
+                targetOrigin = Anchor.TopCentre;
             }
 
-            buttons.X += ToLocalSpace(thisQuad.TopLeft - new Vector2(Math.Min(0, leftExcess)) + new Vector2(Math.Min(0, rightExcess))).X;
+            targetPosition.X += ToLocalSpace(thisQuad.TopLeft - new Vector2(Math.Min(0, leftExcess)) + new Vector2(Math.Min(0, rightExcess))).X;
+
+            if (animated)
+            {
+                var originalPosition = ToLocalSpace(buttons.ScreenSpaceDrawQuad.TopLeft);
+
+                buttons.Origin = targetOrigin;
+                buttons.Anchor = targetAnchor;
+                buttons.Position = targetPosition;
+
+                var newPosition = ToLocalSpace(buttons.ScreenSpaceDrawQuad.TopLeft);
+
+                var delta = newPosition - originalPosition;
+
+                buttons.Position -= delta;
+
+                buttons.MoveTo(targetPosition, 300, Easing.OutQuint);
+            }
+            else
+            {
+                buttons.Anchor = targetAnchor;
+                buttons.Origin = targetOrigin;
+                buttons.Position = targetPosition;
+            }
         }
     }
 }

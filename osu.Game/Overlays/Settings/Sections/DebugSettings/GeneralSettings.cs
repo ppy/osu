@@ -15,7 +15,7 @@ namespace osu.Game.Overlays.Settings.Sections.DebugSettings
 {
     public partial class GeneralSettings : SettingsSubsection
     {
-        protected override LocalisableString Header => DebugSettingsStrings.GeneralHeader;
+        protected override LocalisableString Header => CommonStrings.General;
 
         [BackgroundDependencyLoader]
         private void load(FrameworkDebugConfigManager config, FrameworkConfigManager frameworkConfig, IPerformFromScreenRunner? performer)
@@ -39,7 +39,7 @@ namespace osu.Game.Overlays.Settings.Sections.DebugSettings
                 },
                 new SettingsButton
                 {
-                    Text = @"Run latency certifier",
+                    Text = DebugSettingsStrings.RunLatencyCertifier,
                     Action = () => performer?.PerformFromScreen(menu => menu.Push(new LatencyCertifierScreen()))
                 }
             };

@@ -62,7 +62,7 @@ namespace osu.Game.Beatmaps
         }
 
         [UsedImplicitly]
-        private BeatmapInfo()
+        protected BeatmapInfo()
         {
         }
 
@@ -119,6 +119,10 @@ namespace osu.Game.Beatmaps
 
         [JsonIgnore]
         public bool Hidden { get; set; }
+
+        public int EndTimeObjectCount { get; set; } = -1;
+
+        public int TotalObjectCount { get; set; } = -1;
 
         /// <summary>
         /// Reset any fetched online linking information (and history).

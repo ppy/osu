@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -22,7 +23,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public partial class OsuDropdown<T> : Dropdown<T>
+    public partial class OsuDropdown<T> : Dropdown<T>, IKeyBindingHandler<GlobalAction>
     {
         private const float corner_radius = 5;
 
@@ -30,9 +31,29 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override DropdownMenu CreateMenu() => new OsuDropdownMenu();
 
+        public OsuDropdown()
+        {
+            if (Header is OsuDropdownHeader osuHeader)
+                osuHeader.Dropdown = this;
+        }
+
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+        {
+            if (e.Repeat) return false;
+
+            if (e.Action == GlobalAction.Back)
+                return Back();
+
+            return false;
+        }
+
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
+        {
+        }
+
         #region OsuDropdownMenu
 
-        protected partial class OsuDropdownMenu : DropdownMenu, IKeyBindingHandler<GlobalAction>
+        protected partial class OsuDropdownMenu : DropdownMenu
         {
             public override bool HandleNonPositionalInput => State == MenuState.Open;
 
@@ -54,7 +75,7 @@ namespace osu.Game.Graphics.UserInterface
             [BackgroundDependencyLoader(true)]
             private void load(OverlayColourProvider? colourProvider, OsuColour colours, AudioManager audio)
             {
-                BackgroundColour = colourProvider?.Background5 ?? Color4.Black.Opacity(0.5f);
+                BackgroundColour = colourProvider?.Background5 ?? Color4.Black;
                 HoverColour = colourProvider?.Light4 ?? colours.PinkDarker;
                 SelectionColour = colourProvider?.Background3 ?? colours.PinkDarker.Opacity(0.5f);
 
@@ -172,6 +193,8 @@ namespace osu.Game.Graphics.UserInterface
                     : base(item)
                 {
                     Foreground.Padding = new MarginPadding(2);
+                    Foreground.AutoSizeAxes = Axes.Y;
+                    Foreground.RelativeSizeAxes = Axes.X;
 
                     Masking = true;
                     CornerRadius = corner_radius;
@@ -233,11 +256,12 @@ namespace osu.Game.Graphics.UserInterface
                                 Origin = Anchor.CentreLeft,
                                 Anchor = Anchor.CentreLeft,
                             },
-                            Label = new OsuSpriteText
+                            Label = new TruncatingSpriteText
                             {
-                                X = 15,
+                                Padding = new MarginPadding { Left = 15 },
                                 Origin = Anchor.CentreLeft,
                                 Anchor = Anchor.CentreLeft,
+                                RelativeSizeAxes = Axes.X,
                             },
                         };
                     }
@@ -276,23 +300,6 @@ namespace osu.Game.Graphics.UserInterface
             }
 
             #endregion
-
-            public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
-            {
-                if (e.Repeat) return false;
-
-                if (e.Action == GlobalAction.Back)
-                {
-                    State = MenuState.Closed;
-                    return true;
-                }
-
-                return false;
-            }
-
-            public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
-            {
-            }
         }
 
         #endregion
@@ -307,7 +314,9 @@ namespace osu.Game.Graphics.UserInterface
                 set => Text.Text = value;
             }
 
-            protected readonly SpriteIcon Icon;
+            protected readonly SpriteIcon Chevron;
+
+            public OsuDropdown<T>? Dropdown { get; set; }
 
             public OsuDropdownHeader()
             {
@@ -341,7 +350,7 @@ namespace osu.Game.Graphics.UserInterface
                                 Origin = Anchor.CentreLeft,
                                 RelativeSizeAxes = Axes.X,
                             },
-                            Icon = new SpriteIcon
+                            Chevron = new SpriteIcon
                             {
                                 Icon = FontAwesome.Solid.ChevronDown,
                                 Anchor = Anchor.CentreRight,
@@ -355,11 +364,94 @@ namespace osu.Game.Graphics.UserInterface
                 AddInternal(new HoverClickSounds());
             }
 
-            [BackgroundDependencyLoader(true)]
-            private void load(OverlayColourProvider? colourProvider, OsuColour colours)
+            [Resolved]
+            private OverlayColourProvider? colourProvider { get; set; }
+
+            [Resolved]
+            private OsuColour colours { get; set; } = null!;
+
+            protected override void LoadComplete()
             {
-                BackgroundColour = colourProvider?.Background5 ?? Color4.Black.Opacity(0.5f);
-                BackgroundColourHover = colourProvider?.Light4 ?? colours.PinkDarker;
+                base.LoadComplete();
+
+                if (Dropdown != null)
+                    Dropdown.Menu.StateChanged += _ => updateChevron();
+
+                SearchBar.State.ValueChanged += _ => updateColour();
+                Enabled.BindValueChanged(_ => updateColour());
+                updateColour();
+            }
+
+            protected override bool OnHover(HoverEvent e)
+            {
+                updateColour();
+                return false;
+            }
+
+            protected override void OnHoverLost(HoverLostEvent e)
+            {
+                updateColour();
+            }
+
+            private void updateColour()
+            {
+                bool hovered = Enabled.Value && IsHovered;
+                var hoveredColour = colourProvider?.Light4 ?? colours.PinkDarker;
+                var unhoveredColour = colourProvider?.Background5 ?? Color4.Black;
+
+                Colour = Color4.White;
+                Alpha = Enabled.Value ? 1 : 0.3f;
+
+                if (SearchBar.State.Value == Visibility.Visible)
+                {
+                    Chevron.Colour = hovered ? hoveredColour.Lighten(0.5f) : Colour4.White;
+                    Background.Colour = unhoveredColour;
+                }
+                else
+                {
+                    Chevron.Colour = Color4.White;
+                    Background.Colour = hovered ? hoveredColour : unhoveredColour;
+                }
+            }
+
+            private void updateChevron()
+            {
+                Debug.Assert(Dropdown != null);
+                bool open = Dropdown.Menu.State == MenuState.Open;
+                Chevron.ScaleTo(open ? new Vector2(1f, -1f) : Vector2.One, 300, Easing.OutQuint);
+            }
+
+            protected override DropdownSearchBar CreateSearchBar() => new OsuDropdownSearchBar
+            {
+                Padding = new MarginPadding { Right = 26 },
+            };
+
+            private partial class OsuDropdownSearchBar : DropdownSearchBar
+            {
+                protected override void PopIn() => this.FadeIn();
+
+                protected override void PopOut() => this.FadeOut();
+
+                protected override TextBox CreateTextBox() => new DropdownSearchTextBox
+                {
+                    FontSize = OsuFont.Default.Size,
+                };
+
+                private partial class DropdownSearchTextBox : OsuTextBox
+                {
+                    [BackgroundDependencyLoader]
+                    private void load(OverlayColourProvider? colourProvider)
+                    {
+                        BackgroundUnfocused = colourProvider?.Background5 ?? new Color4(10, 10, 10, 255);
+                        BackgroundFocused = colourProvider?.Background5 ?? new Color4(10, 10, 10, 255);
+                    }
+
+                    protected override void OnFocus(FocusEvent e)
+                    {
+                        base.OnFocus(e);
+                        BorderThickness = 0;
+                    }
+                }
             }
         }
     }

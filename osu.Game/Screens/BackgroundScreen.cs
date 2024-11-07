@@ -13,16 +13,16 @@ namespace osu.Game.Screens
 {
     public abstract partial class BackgroundScreen : Screen, IEquatable<BackgroundScreen>
     {
-        protected const float TRANSITION_LENGTH = 500;
-        private const float x_movement_amount = 50;
+        public const float TRANSITION_LENGTH = 500;
 
-        private readonly bool animateOnEnter;
+        private const float x_movement_amount = 50;
 
         public override bool IsPresent => base.IsPresent || Scheduler.HasPendingTasks;
 
-        protected BackgroundScreen(bool animateOnEnter = true)
+        public bool AnimateEntry { get; set; } = true;
+
+        protected BackgroundScreen()
         {
-            this.animateOnEnter = animateOnEnter;
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
         }
@@ -52,12 +52,11 @@ namespace osu.Game.Screens
 
         public override void OnEntering(ScreenTransitionEvent e)
         {
-            if (animateOnEnter)
+            if (AnimateEntry)
             {
                 this.FadeOut();
-                this.MoveToX(x_movement_amount);
-
                 this.FadeIn(TRANSITION_LENGTH, Easing.InOutQuart);
+                this.MoveToX(x_movement_amount);
                 this.MoveToX(0, TRANSITION_LENGTH, Easing.InOutQuart);
             }
 

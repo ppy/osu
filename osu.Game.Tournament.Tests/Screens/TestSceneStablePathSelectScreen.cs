@@ -5,7 +5,7 @@ using osu.Game.Tournament.Screens.Setup;
 
 namespace osu.Game.Tournament.Tests.Screens
 {
-    public partial class TestSceneStablePathSelectScreen : TournamentTestScene
+    public partial class TestSceneStablePathSelectScreen : TournamentScreenTestScene
     {
         public TestSceneStablePathSelectScreen()
         {

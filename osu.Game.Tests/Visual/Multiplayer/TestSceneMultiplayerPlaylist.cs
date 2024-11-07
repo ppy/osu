@@ -1,13 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Platform;
@@ -29,10 +28,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public partial class TestSceneMultiplayerPlaylist : MultiplayerTestScene
     {
-        private MultiplayerPlaylist list;
-        private BeatmapManager beatmaps;
-        private BeatmapSetInfo importedSet;
-        private BeatmapInfo importedBeatmap;
+        [Cached(typeof(IBindable<PlaylistItem>))]
+        private readonly Bindable<PlaylistItem> currentItem = new Bindable<PlaylistItem>();
+
+        private MultiplayerPlaylist list = null!;
+        private BeatmapManager beatmaps = null!;
+        private BeatmapSetInfo importedSet = null!;
+        private BeatmapInfo importedBeatmap = null!;
 
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
@@ -198,7 +200,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             addItemStep();
             addItemStep();
 
-            DrawableRoomPlaylistItem[] drawableItems = null;
+            DrawableRoomPlaylistItem[] drawableItems = null!;
             AddStep("get drawable items", () => drawableItems = this.ChildrenOfType<DrawableRoomPlaylistItem>().ToArray());
 
             // Add 1 item for another user.

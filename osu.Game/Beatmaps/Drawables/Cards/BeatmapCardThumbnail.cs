@@ -3,15 +3,14 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps.Drawables.Cards.Buttons;
-using osu.Game.Graphics;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Framework.Graphics.UserInterface;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Beatmaps.Drawables.Cards
 {
@@ -25,7 +24,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             set => foreground.Padding = value;
         }
 
-        private readonly UpdateableOnlineBeatmapSetCover cover;
+        private readonly Box background;
         private readonly Container foreground;
         private readonly PlayButton playButton;
         private readonly CircularProgress progress;
@@ -33,14 +32,21 @@ namespace osu.Game.Beatmaps.Drawables.Cards
 
         protected override Container<Drawable> Content => content;
 
-        public BeatmapCardThumbnail(APIBeatmapSet beatmapSetInfo)
+        [Resolved]
+        private OverlayColourProvider colourProvider { get; set; } = null!;
+
+        public BeatmapCardThumbnail(IBeatmapSetInfo beatmapSetInfo, IBeatmapSetOnlineInfo onlineInfo)
         {
             InternalChildren = new Drawable[]
             {
-                cover = new UpdateableOnlineBeatmapSetCover(BeatmapSetCoverType.List)
+                new UpdateableOnlineBeatmapSetCover(BeatmapSetCoverType.List)
                 {
                     RelativeSizeAxes = Axes.Both,
-                    OnlineInfo = beatmapSetInfo
+                    OnlineInfo = onlineInfo
+                },
+                background = new Box
+                {
+                    RelativeSizeAxes = Axes.Both
                 },
                 foreground = new Container
                 {
@@ -55,7 +61,6 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Size = new Vector2(50),
                             InnerRadius = 0.2f
                         },
                         content = new Container
@@ -68,7 +73,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
         }
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
+        private void load()
         {
             progress.Colour = colourProvider.Highlight1;
         }
@@ -79,9 +84,15 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             Dimmed.BindValueChanged(_ => updateState());
 
             playButton.Playing.BindValueChanged(_ => updateState(), true);
-            ((IBindable<double>)progress.Current).BindTo(playButton.Progress);
-
             FinishTransforms(true);
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            progress.Progress = playButton.Progress.Value;
+            progress.Size = new Vector2(50 * playButton.DrawWidth / (BeatmapCardNormal.HEIGHT - BeatmapCard.CORNER_RADIUS));
         }
 
         private void updateState()
@@ -89,7 +100,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             bool shouldDim = Dimmed.Value || playButton.Playing.Value;
 
             playButton.FadeTo(shouldDim ? 1 : 0, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
-            cover.FadeColour(shouldDim ? OsuColour.Gray(0.2f) : Color4.White, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
+            background.FadeColour(colourProvider.Background6.Opacity(shouldDim ? 0.6f : 0f), BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
         }
     }
 }

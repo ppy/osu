@@ -9,7 +9,6 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
-using osu.Framework.Extensions.EnumExtensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -23,8 +22,9 @@ using osuTK.Graphics;
 using osu.Framework.Localisation;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Resources.Localisation.Web;
-using osu.Game.Scoring.Drawables;
+using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
 {
@@ -57,9 +57,11 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         }
 
         /// <summary>
-        /// The statistics that appear in the table, in order of appearance.
+        /// The names of the statistics that appear in the table. If multiple HitResults have the same
+        /// DisplayName (for example, "slider end" is the name for both <see cref="HitResult.SliderTailHit"/> and <see cref="HitResult.SmallTickHit"/>
+        /// in osu!) the name will only be listed once.
         /// </summary>
-        private readonly List<(HitResult result, LocalisableString displayName)> statisticResultTypes = new List<(HitResult, LocalisableString)>();
+        private readonly List<LocalisableString> statisticResultNames = new List<LocalisableString>();
 
         private bool showPerformancePoints;
 
@@ -71,7 +73,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 return;
 
             showPerformancePoints = showPerformanceColumn;
-            statisticResultTypes.Clear();
+            statisticResultNames.Clear();
 
             for (int i = 0; i < scores.Count; i++)
                 backgroundFlow.Add(new ScoreTableRowBackground(i, scores[i], row_height));
@@ -104,20 +106,18 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
             var ruleset = scores.First().Ruleset.CreateInstance();
 
-            foreach (var result in EnumExtensions.GetValuesInOrder<HitResult>())
+            foreach (var resultGroup in ruleset.GetHitResults().GroupBy(r => r.displayName))
             {
-                if (!allScoreStatistics.Contains(result))
+                if (!resultGroup.Any(r => allScoreStatistics.Contains(r.result)))
                     continue;
 
                 // for the time being ignore bonus result types.
                 // this is not being sent from the API and will be empty in all cases.
-                if (result.IsBonus())
+                if (resultGroup.All(r => r.result.IsBonus()))
                     continue;
 
-                var displayName = ruleset.GetDisplayNameForHitResult(result);
-
-                columns.Add(new TableColumn(displayName, Anchor.CentreLeft, new Dimension(minSize: 35, maxSize: 60)));
-                statisticResultTypes.Add((result, displayName));
+                columns.Add(new TableColumn(resultGroup.Key, Anchor.CentreLeft, new Dimension(minSize: 35, maxSize: 60)));
+                statisticResultNames.Add(resultGroup.Key);
             }
 
             if (showPerformancePoints)
@@ -159,7 +159,6 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 new UpdateableFlag(score.User.CountryCode)
                 {
                     Size = new Vector2(19, 14),
-                    ShowPlaceholderOnUnknown = false,
                 },
                 username,
 #pragma warning disable 618
@@ -167,22 +166,49 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 #pragma warning restore 618
             };
 
-            var availableStatistics = score.GetStatisticsForDisplay().ToDictionary(tuple => tuple.Result);
+            var availableStatistics = score.GetStatisticsForDisplay().ToLookup(tuple => tuple.DisplayName);
 
-            foreach (var result in statisticResultTypes)
+            foreach (var columnName in statisticResultNames)
             {
-                if (!availableStatistics.TryGetValue(result.result, out var stat))
-                    stat = new HitResultDisplayStatistic(result.result, 0, null, result.displayName);
+                int count = 0;
+                int? maxCount = null;
 
-                content.Add(new StatisticText(stat.Count, stat.MaxCount, @"N0") { Colour = stat.Count == 0 ? Color4.Gray : Color4.White });
+                if (availableStatistics.Contains(columnName))
+                {
+                    maxCount = 0;
+
+                    foreach (var s in availableStatistics[columnName])
+                    {
+                        count += s.Count;
+                        maxCount += s.MaxCount;
+                    }
+                }
+
+                content.Add(new StatisticText(count, maxCount, @"N0") { Colour = count == 0 ? Color4.Gray : Color4.White });
             }
 
             if (showPerformancePoints)
             {
-                if (score.PP != null)
-                    content.Add(new StatisticText(score.PP, format: @"N0"));
+                if (!score.Ranked)
+                {
+                    content.Add(new SpriteTextWithTooltip
+                    {
+                        Text = "-",
+                        Font = OsuFont.GetFont(size: text_size),
+                        TooltipText = ScoresStrings.StatusNoPp
+                    });
+                }
+                else if (score.PP == null)
+                {
+                    content.Add(new SpriteIconWithTooltip
+                    {
+                        Icon = FontAwesome.Solid.Sync,
+                        Size = new Vector2(text_size),
+                        TooltipText = ScoresStrings.StatusProcessing,
+                    });
+                }
                 else
-                    content.Add(new UnprocessedPerformancePointsPlaceholder { Size = new Vector2(text_size) });
+                    content.Add(new StatisticText(score.PP, format: @"N0"));
             }
 
             content.Add(new ScoreboardTime(score.Date, text_size)
@@ -195,7 +221,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 Direction = FillDirection.Horizontal,
                 AutoSizeAxes = Axes.Both,
                 Spacing = new Vector2(1),
-                ChildrenEnumerable = score.Mods.Select(m => new ModIcon(m)
+                ChildrenEnumerable = score.Mods.AsOrdered().Select(m => new ModIcon(m)
                 {
                     AutoSizeAxes = Axes.Both,
                     Scale = new Vector2(0.3f)

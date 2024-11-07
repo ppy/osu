@@ -34,22 +34,51 @@ namespace osu.Game.Rulesets.Mods
             set => CurrentNumber.Precision = value;
         }
 
+        private float minValue;
+
         public float MinValue
         {
-            set => CurrentNumber.MinValue = value;
+            get => minValue;
+            set
+            {
+                if (value == minValue)
+                    return;
+
+                minValue = value;
+                updateExtents();
+            }
         }
 
-        private float maxValue;
+        private float maxValue = 10; // matches default max value of `CurrentNumber`
 
         public float MaxValue
         {
+            get => maxValue;
             set
             {
                 if (value == maxValue)
                     return;
 
                 maxValue = value;
-                updateMaxValue();
+                updateExtents();
+            }
+        }
+
+        private float? extendedMinValue;
+
+        /// <summary>
+        /// The minimum value to be used when extended limits are applied.
+        /// </summary>
+        public float? ExtendedMinValue
+        {
+            get => extendedMinValue;
+            set
+            {
+                if (value == extendedMinValue)
+                    return;
+
+                extendedMinValue = value;
+                updateExtents();
             }
         }
 
@@ -60,13 +89,14 @@ namespace osu.Game.Rulesets.Mods
         /// </summary>
         public float? ExtendedMaxValue
         {
+            get => extendedMaxValue;
             set
             {
                 if (value == extendedMaxValue)
                     return;
 
                 extendedMaxValue = value;
-                updateMaxValue();
+                updateExtents();
             }
         }
 
@@ -78,7 +108,7 @@ namespace osu.Game.Rulesets.Mods
         public DifficultyBindable(float? defaultValue = null)
             : base(defaultValue)
         {
-            ExtendedLimits.BindValueChanged(_ => updateMaxValue());
+            ExtendedLimits.BindValueChanged(_ => updateExtents());
         }
 
         public override float? Value
@@ -88,14 +118,20 @@ namespace osu.Game.Rulesets.Mods
             {
                 // Ensure that in the case serialisation runs in the wrong order (and limit extensions aren't applied yet) the deserialised value is still propagated.
                 if (value != null)
-                    CurrentNumber.MaxValue = MathF.Max(CurrentNumber.MaxValue, value.Value);
+                {
+                    CurrentNumber.MinValue = Math.Clamp(MathF.Min(CurrentNumber.MinValue, value.Value), ExtendedMinValue ?? MinValue, MinValue);
+                    CurrentNumber.MaxValue = Math.Clamp(MathF.Max(CurrentNumber.MaxValue, value.Value), MaxValue, ExtendedMaxValue ?? MaxValue);
 
-                base.Value = value;
+                    base.Value = Math.Clamp(value.Value, CurrentNumber.MinValue, CurrentNumber.MaxValue);
+                }
+                else
+                    base.Value = value;
             }
         }
 
-        private void updateMaxValue()
+        private void updateExtents()
         {
+            CurrentNumber.MinValue = ExtendedLimits.Value && extendedMinValue != null ? extendedMinValue.Value : minValue;
             CurrentNumber.MaxValue = ExtendedLimits.Value && extendedMaxValue != null ? extendedMaxValue.Value : maxValue;
         }
 
@@ -111,6 +147,8 @@ namespace osu.Game.Rulesets.Mods
             // the following max value copies are only safe as long as these values are effectively constants.
             otherDifficultyBindable.MaxValue = maxValue;
             otherDifficultyBindable.ExtendedMaxValue = extendedMaxValue;
+            otherDifficultyBindable.MinValue = minValue;
+            otherDifficultyBindable.ExtendedMinValue = extendedMinValue;
         }
 
         public override void BindTo(Bindable<float?> them)

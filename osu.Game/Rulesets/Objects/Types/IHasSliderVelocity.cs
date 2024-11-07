@@ -13,8 +13,8 @@ namespace osu.Game.Rulesets.Objects.Types
         /// <summary>
         /// The slider velocity multiplier.
         /// </summary>
-        double SliderVelocity { get; set; }
+        double SliderVelocityMultiplier { get; set; }
 
-        BindableNumber<double> SliderVelocityBindable { get; }
+        BindableNumber<double> SliderVelocityMultiplierBindable { get; }
     }
 }

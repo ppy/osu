@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using JetBrains.Annotations;
 using osu.Framework;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -190,6 +191,7 @@ namespace osu.Game.Screens.Play
             private const float padding = 2;
             public const float WIDTH = cube_size + padding;
 
+            [CanBeNull]
             public event Action<ColumnState> StateChanged;
 
             private readonly List<Box> drawableRows = new List<Box>();

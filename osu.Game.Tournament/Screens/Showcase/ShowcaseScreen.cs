@@ -42,7 +42,7 @@ namespace osu.Game.Tournament.Screens.Showcase
             });
         }
 
-        protected override void CurrentMatchChanged(ValueChangedEvent<TournamentMatch> match)
+        protected override void CurrentMatchChanged(ValueChangedEvent<TournamentMatch?> match)
         {
             // showcase screen doesn't care about a match being selected.
             // base call intentionally omitted to not show match warning.

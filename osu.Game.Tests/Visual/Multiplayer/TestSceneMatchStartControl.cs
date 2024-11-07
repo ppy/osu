@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Linq;
 using Moq;
@@ -36,14 +34,17 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private readonly Bindable<BeatmapAvailability> beatmapAvailability = new Bindable<BeatmapAvailability>();
         private readonly Bindable<Room> room = new Bindable<Room>();
 
-        private MultiplayerRoom multiplayerRoom;
-        private MultiplayerRoomUser localUser;
-        private OngoingOperationTracker ongoingOperationTracker;
+        private MultiplayerRoom multiplayerRoom = null!;
+        private MultiplayerRoomUser localUser = null!;
+        private OngoingOperationTracker ongoingOperationTracker = null!;
 
-        private PopoverContainer content;
-        private MatchStartControl control;
+        private PopoverContainer content = null!;
+        private MatchStartControl control = null!;
 
         private OsuButton readyButton => control.ChildrenOfType<OsuButton>().Single();
+
+        [Cached(typeof(IBindable<PlaylistItem>))]
+        private readonly Bindable<PlaylistItem> currentItem = new Bindable<PlaylistItem>();
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
             new CachedModelDependencyContainer<Room>(base.CreateChildDependencies(parent)) { Model = { BindTarget = room } };
@@ -112,15 +113,15 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                 beatmapAvailability.Value = BeatmapAvailability.LocallyAvailable();
 
-                var playlistItem = new PlaylistItem(Beatmap.Value.BeatmapInfo)
+                currentItem.Value = new PlaylistItem(Beatmap.Value.BeatmapInfo)
                 {
                     RulesetID = Beatmap.Value.BeatmapInfo.Ruleset.OnlineID
                 };
 
                 room.Value = new Room
                 {
-                    Playlist = { playlistItem },
-                    CurrentPlaylistItem = { Value = playlistItem }
+                    Playlist = { currentItem.Value },
+                    CurrentPlaylistItem = { BindTarget = currentItem }
                 };
 
                 localUser = new MultiplayerRoomUser(API.LocalUser.Value.Id) { User = API.LocalUser.Value };
@@ -129,7 +130,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 {
                     Playlist =
                     {
-                        TestMultiplayerClient.CreateMultiplayerPlaylistItem(playlistItem),
+                        TestMultiplayerClient.CreateMultiplayerPlaylistItem(currentItem.Value),
                     },
                     Users = { localUser },
                     Host = localUser,
@@ -376,6 +377,41 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 if (nextUnready != null)
                     changeUserState(nextUnready.UserID, MultiplayerUserState.Ready);
             }, users);
+        }
+
+        [Test]
+        public void TestAbortMatch()
+        {
+            AddStep("setup client", () =>
+            {
+                multiplayerClient.Setup(m => m.StartMatch())
+                                 .Callback(() =>
+                                 {
+                                     multiplayerClient.Raise(m => m.LoadRequested -= null);
+                                     multiplayerClient.Object.Room!.State = MultiplayerRoomState.WaitingForLoad;
+
+                                     // The local user state doesn't really matter, so let's do the same as the base implementation for these tests.
+                                     changeUserState(localUser.UserID, MultiplayerUserState.Idle);
+                                 });
+
+                multiplayerClient.Setup(m => m.AbortMatch())
+                                 .Callback(() =>
+                                 {
+                                     multiplayerClient.Object.Room!.State = MultiplayerRoomState.Open;
+                                     raiseRoomUpdated();
+                                 });
+            });
+
+            // Ready
+            ClickButtonWhenEnabled<MultiplayerReadyButton>();
+
+            // Start match
+            ClickButtonWhenEnabled<MultiplayerReadyButton>();
+            AddUntilStep("countdown button disabled", () => !this.ChildrenOfType<MultiplayerCountdownButton>().Single().Enabled.Value);
+
+            // Abort
+            ClickButtonWhenEnabled<MultiplayerReadyButton>();
+            AddStep("check abort request received", () => multiplayerClient.Verify(m => m.AbortMatch(), Times.Once));
         }
 
         private void verifyGameplayStartFlow()

@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -28,19 +26,20 @@ namespace osu.Game.Screens.Ranking.Statistics
     {
         public const float SIDE_PADDING = 30;
 
-        public readonly Bindable<ScoreInfo> Score = new Bindable<ScoreInfo>();
+        public readonly Bindable<ScoreInfo?> Score = new Bindable<ScoreInfo?>();
 
         protected override bool StartHidden => true;
 
         [Resolved]
-        private BeatmapManager beatmapManager { get; set; }
+        private BeatmapManager beatmapManager { get; set; } = null!;
 
         private readonly Container content;
         private readonly LoadingSpinner spinner;
 
         private bool wasOpened;
-        private Sample popInSample;
-        private Sample popOutSample;
+        private Sample? popInSample;
+        private Sample? popOutSample;
+        private CancellationTokenSource? loadCancellation;
 
         public StatisticsPanel()
         {
@@ -71,9 +70,7 @@ namespace osu.Game.Screens.Ranking.Statistics
             popOutSample = audio.Samples.Get(@"Results/statistics-panel-pop-out");
         }
 
-        private CancellationTokenSource loadCancellation;
-
-        private void populateStatistics(ValueChangedEvent<ScoreInfo> score)
+        private void populateStatistics(ValueChangedEvent<ScoreInfo?> score)
         {
             loadCancellation?.Cancel();
             loadCancellation = null;
@@ -124,20 +121,23 @@ namespace osu.Game.Screens.Ranking.Statistics
                 }
                 else
                 {
-                    FillFlowContainer rows;
+                    FillFlowContainer flow;
                     container = new OsuScrollContainer(Direction.Vertical)
                     {
                         RelativeSizeAxes = Axes.Both,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
+                        Masking = false,
+                        ScrollbarOverlapsContent = false,
                         Alpha = 0,
                         Children = new[]
                         {
-                            rows = new FillFlowContainer
+                            flow = new FillFlowContainer
                             {
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
-                                Spacing = new Vector2(30, 15)
+                                Spacing = new Vector2(30, 15),
+                                Direction = FillDirection.Full,
                             }
                         }
                     };
@@ -146,35 +146,22 @@ namespace osu.Game.Screens.Ranking.Statistics
 
                     foreach (var item in statisticItems)
                     {
-                        var columnContent = new List<Drawable>();
-
                         if (!hitEventsAvailable && item.RequiresHitEvents)
                         {
                             anyRequiredHitEvents = true;
                             continue;
                         }
 
-                        columnContent.Add(new StatisticContainer(item)
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                        });
-
-                        rows.Add(new GridContainer
+                        flow.Add(new StatisticItemContainer(item)
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Content = new[] { columnContent.ToArray() },
-                            ColumnDimensions = new[] { new Dimension() },
-                            RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) }
                         });
                     }
 
                     if (anyRequiredHitEvents)
                     {
-                        rows.Add(new FillFlowContainer
+                        flow.Add(new FillFlowContainer
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
@@ -197,7 +184,7 @@ namespace osu.Game.Screens.Ranking.Statistics
 
                 LoadComponentAsync(container, d =>
                 {
-                    if (!Score.Value.Equals(newScore))
+                    if (Score.Value?.Equals(newScore) != true)
                         return;
 
                     spinner.Hide();
@@ -223,7 +210,7 @@ namespace osu.Game.Screens.Ranking.Statistics
 
         protected override void PopIn()
         {
-            this.FadeIn(150, Easing.OutQuint);
+            this.FadeIn(350, Easing.OutQuint);
 
             popInSample?.Play();
             wasOpened = true;
@@ -231,7 +218,7 @@ namespace osu.Game.Screens.Ranking.Statistics
 
         protected override void PopOut()
         {
-            this.FadeOut(150, Easing.OutQuint);
+            this.FadeOut(250, Easing.OutQuint);
 
             if (wasOpened)
                 popOutSample?.Play();

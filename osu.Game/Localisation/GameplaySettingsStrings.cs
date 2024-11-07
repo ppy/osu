@@ -20,11 +20,6 @@ namespace osu.Game.Localisation
         public static LocalisableString BeatmapHeader => new TranslatableString(getKey(@"beatmap_header"), @"Beatmap");
 
         /// <summary>
-        /// "General"
-        /// </summary>
-        public static LocalisableString GeneralHeader => new TranslatableString(getKey(@"general_header"), @"General");
-
-        /// <summary>
         /// "Audio"
         /// </summary>
         public static LocalisableString AudioHeader => new TranslatableString(getKey(@"audio"), @"Audio");
@@ -88,6 +83,11 @@ namespace osu.Game.Localisation
         /// "Always show gameplay leaderboard"
         /// </summary>
         public static LocalisableString AlwaysShowGameplayLeaderboard => new TranslatableString(getKey(@"gameplay_leaderboard"), @"Always show gameplay leaderboard");
+
+        /// <summary>
+        /// "Always show hold for menu button"
+        /// </summary>
+        public static LocalisableString AlwaysShowHoldForMenuButton => new TranslatableString(getKey(@"always_show_hold_for_menu_button"), @"Always show hold for menu button");
 
         /// <summary>
         /// "Always play first combo break sound"

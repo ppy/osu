@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 
         public override Drawable? GetDrawableComponent(ISkinComponentLookup lookup)
         {
-            if (lookup is GameplaySkinComponentLookup<HitResult>)
+            if (lookup is SkinComponentLookup<HitResult>)
             {
                 // if a taiko skin is providing explosion sprites, hide the judgements completely
                 if (hasExplosion.Value)
@@ -50,6 +50,9 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                         if (hasBarLeft)
                             return new LegacyInputDrum();
 
+                        return null;
+
+                    case TaikoSkinComponents.DrumSamplePlayer:
                         return null;
 
                     case TaikoSkinComponents.CentreHit:

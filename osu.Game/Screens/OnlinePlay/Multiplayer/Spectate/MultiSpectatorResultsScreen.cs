@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using osu.Game.Online.API;
@@ -18,8 +16,15 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         {
         }
 
-        protected override APIRequest FetchScores(Action<IEnumerable<ScoreInfo>> scoresCallback) => null;
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
 
-        protected override APIRequest FetchNextPage(int direction, Action<IEnumerable<ScoreInfo>> scoresCallback) => null;
+            Scheduler.AddDelayed(() => StatisticsPanel.ToggleVisibility(), 1000);
+        }
+
+        protected override APIRequest? FetchScores(Action<IEnumerable<ScoreInfo>> scoresCallback) => null;
+
+        protected override APIRequest? FetchNextPage(int direction, Action<IEnumerable<ScoreInfo>> scoresCallback) => null;
     }
 }

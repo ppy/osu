@@ -25,14 +25,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Cached(typeof(ILocalUserPlayInfo))]
         private ILocalUserPlayInfo localUserInfo;
 
-        private readonly Bindable<bool> localUserPlaying = new Bindable<bool>();
+        private readonly Bindable<LocalUserPlayingState> playingState = new Bindable<LocalUserPlayingState>();
 
         private TextBox textBox => chatDisplay.ChildrenOfType<TextBox>().First();
 
         public TestSceneGameplayChatDisplay()
         {
             var mockLocalUserInfo = new Mock<ILocalUserPlayInfo>();
-            mockLocalUserInfo.SetupGet(i => i.IsPlaying).Returns(localUserPlaying);
+            mockLocalUserInfo.SetupGet(i => i.PlayingState).Returns(playingState);
 
             localUserInfo = mockLocalUserInfo.Object;
         }
@@ -84,12 +84,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
-        public void TestFocusOnTabKeyWhenExpanded()
+        public void TestFocusOnEnterKeyWhenExpanded()
         {
             setLocalUserPlaying(true);
 
             assertChatFocused(false);
-            AddStep("press tab", () => InputManager.Key(Key.Tab));
+            AddStep("press enter", () => InputManager.Key(Key.Enter));
             assertChatFocused(true);
         }
 
@@ -99,19 +99,19 @@ namespace osu.Game.Tests.Visual.Multiplayer
             setLocalUserPlaying(true);
 
             assertChatFocused(false);
-            AddStep("press tab", () => InputManager.Key(Key.Tab));
+            AddStep("press enter", () => InputManager.Key(Key.Enter));
             assertChatFocused(true);
             AddStep("press escape", () => InputManager.Key(Key.Escape));
             assertChatFocused(false);
         }
 
         [Test]
-        public void TestFocusOnTabKeyWhenNotExpanded()
+        public void TestFocusOnEnterKeyWhenNotExpanded()
         {
             AddStep("set not expanded", () => chatDisplay.Expanded.Value = false);
             AddUntilStep("is not visible", () => !chatDisplay.IsPresent);
 
-            AddStep("press tab", () => InputManager.Key(Key.Tab));
+            AddStep("press enter", () => InputManager.Key(Key.Enter));
             assertChatFocused(true);
             AddUntilStep("is visible", () => chatDisplay.IsPresent);
 
@@ -120,25 +120,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("is not visible", () => !chatDisplay.IsPresent);
         }
 
-        [Test]
-        public void TestFocusToggleViaAction()
-        {
-            AddStep("set not expanded", () => chatDisplay.Expanded.Value = false);
-            AddUntilStep("is not visible", () => !chatDisplay.IsPresent);
-
-            AddStep("press tab", () => InputManager.Key(Key.Tab));
-            assertChatFocused(true);
-            AddUntilStep("is visible", () => chatDisplay.IsPresent);
-
-            AddStep("press tab", () => InputManager.Key(Key.Tab));
-            assertChatFocused(false);
-            AddUntilStep("is not visible", () => !chatDisplay.IsPresent);
-        }
-
         private void assertChatFocused(bool isFocused) =>
             AddAssert($"chat {(isFocused ? "focused" : "not focused")}", () => textBox.HasFocus == isFocused);
 
         private void setLocalUserPlaying(bool playing) =>
-            AddStep($"local user {(playing ? "playing" : "not playing")}", () => localUserPlaying.Value = playing);
+            AddStep($"local user {(playing ? "playing" : "not playing")}", () => playingState.Value = playing ? LocalUserPlayingState.Playing : LocalUserPlayingState.NotPlaying);
     }
 }

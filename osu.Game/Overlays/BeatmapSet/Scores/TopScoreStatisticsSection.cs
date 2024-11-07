@@ -22,7 +22,6 @@ using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
-using osu.Game.Scoring.Drawables;
 using osuTK;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
@@ -97,10 +96,17 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuColour colours)
         {
             if (score != null)
+            {
                 totalScoreColumn.Current = scoreManager.GetBindableTotalScoreString(score);
+
+                if (score.Accuracy == 1.0) accuracyColumn.TextColour = colours.GreenLight;
+#pragma warning disable CS0618
+                if (score.MaxCombo == score.BeatmapInfo!.MaxCombo) maxComboColumn.TextColour = colours.GreenLight;
+#pragma warning restore CS0618
+            }
         }
 
         private ScoreInfo score;
@@ -125,10 +131,26 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
                 ppColumn.Alpha = value.BeatmapInfo!.Status.GrantsPerformancePoints() ? 1 : 0;
 
-                if (value.PP is double pp)
-                    ppColumn.Text = pp.ToLocalisableString(@"N0");
+                if (!value.Ranked)
+                {
+                    ppColumn.Drawable = new SpriteTextWithTooltip
+                    {
+                        Text = "-",
+                        Font = smallFont,
+                        TooltipText = ScoresStrings.StatusNoPp
+                    };
+                }
+                else if (value.PP is not double pp)
+                {
+                    ppColumn.Drawable = new SpriteIconWithTooltip
+                    {
+                        Icon = FontAwesome.Solid.Sync,
+                        Size = new Vector2(smallFont.Size),
+                        TooltipText = ScoresStrings.StatusProcessing,
+                    };
+                }
                 else
-                    ppColumn.Drawable = new UnprocessedPerformancePointsPlaceholder { Size = new Vector2(smallFont.Size) };
+                    ppColumn.Text = pp.ToLocalisableString(@"N0");
 
                 statisticsColumns.ChildrenEnumerable = value.GetStatisticsForDisplay().Select(createStatisticsColumn);
                 modsColumn.Mods = value.Mods;
@@ -213,6 +235,11 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 set => text.Text = value;
             }
 
+            public Colour4 TextColour
+            {
+                set => text.Colour = value;
+            }
+
             public Drawable Drawable
             {
                 set
@@ -275,7 +302,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 set
                 {
                     modsContainer.Clear();
-                    modsContainer.Children = value.Select(mod => new ModIcon(mod)
+                    modsContainer.Children = value.AsOrdered().Select(mod => new ModIcon(mod)
                     {
                         AutoSizeAxes = Axes.Both,
                         Scale = new Vector2(0.25f),

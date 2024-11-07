@@ -45,11 +45,16 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
         {
+            DetachedBeatmapStore detachedBeatmapStore;
+
             Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
             Dependencies.Cache(manager = new BeatmapManager(LocalStorage, Realm, null, audio, Resources, host, Beatmap.Default));
+            Dependencies.Cache(detachedBeatmapStore = new DetachedBeatmapStore());
             Dependencies.Cache(Realm);
 
             importedBeatmapSet = manager.Import(TestResources.CreateTestBeatmapSetInfo(8, rulesets.AvailableRulesets.ToArray()));
+
+            Add(detachedBeatmapStore);
         }
 
         public override void SetUpSteps()
@@ -65,6 +70,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("create song select", () => LoadScreen(songSelect = new TestMultiplayerMatchSongSelect(SelectedRoom.Value)));
             AddUntilStep("wait for present", () => songSelect.IsCurrentScreen() && songSelect.BeatmapSetsLoaded);
+        }
+
+        [Test]
+        public void TestSelectFreeMods()
+        {
+            AddStep("set some freemods", () => songSelect.FreeMods.Value = new OsuRuleset().GetModsFor(ModType.Fun).ToArray());
+            AddStep("set all freemods", () => songSelect.FreeMods.Value = new OsuRuleset().CreateAllMods().ToArray());
+            AddStep("set no freemods", () => songSelect.FreeMods.Value = Array.Empty<Mod>());
         }
 
         [Test]

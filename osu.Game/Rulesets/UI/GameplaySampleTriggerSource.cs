@@ -7,6 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Audio;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Skinning;
@@ -34,14 +35,22 @@ namespace osu.Game.Rulesets.UI
         [Resolved]
         private IGameplayClock? gameplayClock { get; set; }
 
+        protected readonly AudioContainer AudioContainer;
+
         public GameplaySampleTriggerSource(HitObjectContainer hitObjectContainer)
         {
             this.hitObjectContainer = hitObjectContainer;
 
-            InternalChild = hitSounds = new Container<SkinnableSound>
+            InternalChild = AudioContainer = new AudioContainer
             {
-                Name = "concurrent sample pool",
-                ChildrenEnumerable = Enumerable.Range(0, max_concurrent_hitsounds).Select(_ => new PausableSkinnableSound())
+                Child = hitSounds = new Container<SkinnableSound>
+                {
+                    Name = "concurrent sample pool",
+                    ChildrenEnumerable = Enumerable.Range(0, max_concurrent_hitsounds).Select(_ => new PausableSkinnableSound
+                    {
+                        MinimumSampleVolume = DrawableHitObject.MINIMUM_SAMPLE_VOLUME
+                    })
+                }
             };
         }
 
@@ -64,10 +73,29 @@ namespace osu.Game.Rulesets.UI
 
         protected virtual void PlaySamples(ISampleInfo[] samples) => Schedule(() =>
         {
-            var hitSound = getNextSample();
-            hitSound.Samples = samples;
+            var hitSound = GetNextSample();
+            ApplySampleInfo(hitSound, samples);
             hitSound.Play();
         });
+
+        protected virtual void ApplySampleInfo(SkinnableSound hitSound, ISampleInfo[] samples)
+        {
+            hitSound.Samples = samples;
+        }
+
+        public void StopAllPlayback() => Schedule(() =>
+        {
+            foreach (var sound in hitSounds)
+                sound.Stop();
+        });
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (gameplayClock?.IsRewinding == true)
+                mostValidObject = null;
+        }
 
         protected HitObject? GetMostValidObject()
         {
@@ -77,7 +105,7 @@ namespace osu.Game.Rulesets.UI
                 // If required, we can make this lookup more efficient by adding support to get next-future-entry in LifetimeEntryManager.
                 var candidate =
                     // Use alive entries first as an optimisation.
-                    hitObjectContainer.AliveEntries.Select(tuple => tuple.Entry).Where(e => !isAlreadyHit(e)).MinBy(e => e.HitObject.StartTime)
+                    hitObjectContainer.AliveEntries.Keys.Where(e => !isAlreadyHit(e)).MinBy(e => e.HitObject.StartTime)
                     ?? hitObjectContainer.Entries.Where(e => !isAlreadyHit(e)).MinBy(e => e.HitObject.StartTime);
 
                 // In the case there are no non-judged objects, the last hit object should be used instead.
@@ -110,7 +138,7 @@ namespace osu.Game.Rulesets.UI
             return getAllNested(mostValidObject.HitObject).OrderBy(h => h.GetEndTime()).SkipWhile(h => h.GetEndTime() <= getReferenceTime()).FirstOrDefault() ?? mostValidObject.HitObject;
         }
 
-        private bool isAlreadyHit(HitObjectLifetimeEntry h) => h.Result?.HasResult == true;
+        private bool isAlreadyHit(HitObjectLifetimeEntry h) => h.AllJudged;
         private bool isCloseEnoughToCurrentTime(HitObject h) => getReferenceTime() >= h.StartTime - h.HitWindows.WindowFor(HitResult.Miss) * 2;
 
         private double getReferenceTime() => gameplayClock?.CurrentTime ?? Clock.CurrentTime;
@@ -126,7 +154,7 @@ namespace osu.Game.Rulesets.UI
             }
         }
 
-        private SkinnableSound getNextSample()
+        protected SkinnableSound GetNextSample()
         {
             SkinnableSound hitSound = hitSounds[nextHitSoundIndex];
 

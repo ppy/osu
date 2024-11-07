@@ -20,6 +20,8 @@ namespace osu.Game.Overlays
 
         private const float transition_time = 400;
 
+        protected override double PopInOutSampleBalance => OsuGameBase.SFX_STEREO_STRENGTH * 0.75f;
+
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
 
@@ -76,7 +78,7 @@ namespace osu.Game.Overlays
             this.FadeIn(transition_time, Easing.OutQuint);
             FadeEdgeEffectTo(WaveContainer.SHADOW_OPACITY, WaveContainer.APPEAR_DURATION, Easing.Out);
 
-            ScheduleAfterChildren(() => GetContainingInputManager().ChangeFocus(panel));
+            ScheduleAfterChildren(() => GetContainingFocusManager()!.ChangeFocus(panel));
         }
 
         protected override void PopOut()

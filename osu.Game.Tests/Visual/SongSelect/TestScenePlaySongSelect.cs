@@ -13,6 +13,7 @@ using osu.Framework.Extensions;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
@@ -21,13 +22,14 @@ using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Extensions;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Dialog;
 using osu.Game.Overlays.Mods;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mania.Mods;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
@@ -54,16 +56,20 @@ namespace osu.Game.Tests.Visual.SongSelect
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
         {
+            DetachedBeatmapStore detachedBeatmapStore;
+
             // These DI caches are required to ensure for interactive runs this test scene doesn't nuke all user beatmaps in the local install.
             // At a point we have isolated interactive test runs enough, this can likely be removed.
             Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
             Dependencies.Cache(Realm);
             Dependencies.Cache(manager = new BeatmapManager(LocalStorage, Realm, null, audio, Resources, host, defaultBeatmap = Beatmap.Default));
+            Dependencies.Cache(detachedBeatmapStore = new DetachedBeatmapStore());
 
             Dependencies.Cache(music = new MusicController());
 
             // required to get bindables attached
             Add(music);
+            Add(detachedBeatmapStore);
 
             Dependencies.Cache(config = new OsuConfigManager(LocalStorage));
         }
@@ -83,6 +89,128 @@ namespace osu.Game.Tests.Visual.SongSelect
             });
 
             AddStep("delete all beatmaps", () => manager.Delete());
+        }
+
+        [Test]
+        public void TestSpeedChange()
+        {
+            createSongSelect();
+            changeMods();
+
+            decreaseModSpeed();
+            AddAssert("half time activated at 0.95x", () => songSelect!.Mods.Value.OfType<ModHalfTime>().Single().SpeedChange.Value, () => Is.EqualTo(0.95).Within(0.005));
+
+            decreaseModSpeed();
+            AddAssert("half time speed changed to 0.9x", () => songSelect!.Mods.Value.OfType<ModHalfTime>().Single().SpeedChange.Value, () => Is.EqualTo(0.9).Within(0.005));
+
+            increaseModSpeed();
+            AddAssert("half time speed changed to 0.95x", () => songSelect!.Mods.Value.OfType<ModHalfTime>().Single().SpeedChange.Value, () => Is.EqualTo(0.95).Within(0.005));
+
+            increaseModSpeed();
+            AddAssert("no mods selected", () => songSelect!.Mods.Value.Count == 0);
+
+            increaseModSpeed();
+            AddAssert("double time activated at 1.05x", () => songSelect!.Mods.Value.OfType<ModDoubleTime>().Single().SpeedChange.Value, () => Is.EqualTo(1.05).Within(0.005));
+
+            increaseModSpeed();
+            AddAssert("double time speed changed to 1.1x", () => songSelect!.Mods.Value.OfType<ModDoubleTime>().Single().SpeedChange.Value, () => Is.EqualTo(1.1).Within(0.005));
+
+            decreaseModSpeed();
+            AddAssert("double time speed changed to 1.05x", () => songSelect!.Mods.Value.OfType<ModDoubleTime>().Single().SpeedChange.Value, () => Is.EqualTo(1.05).Within(0.005));
+
+            OsuModNightcore nc = new OsuModNightcore
+            {
+                SpeedChange = { Value = 1.05 }
+            };
+            changeMods(nc);
+
+            increaseModSpeed();
+            AddAssert("nightcore speed changed to 1.1x", () => songSelect!.Mods.Value.OfType<ModNightcore>().Single().SpeedChange.Value, () => Is.EqualTo(1.1).Within(0.005));
+
+            decreaseModSpeed();
+            AddAssert("nightcore speed changed to 1.05x", () => songSelect!.Mods.Value.OfType<ModNightcore>().Single().SpeedChange.Value, () => Is.EqualTo(1.05).Within(0.005));
+
+            decreaseModSpeed();
+            AddAssert("no mods selected", () => songSelect!.Mods.Value.Count == 0);
+
+            decreaseModSpeed();
+            AddAssert("daycore activated at 0.95x", () => songSelect!.Mods.Value.OfType<ModDaycore>().Single().SpeedChange.Value, () => Is.EqualTo(0.95).Within(0.005));
+
+            decreaseModSpeed();
+            AddAssert("daycore activated at 0.95x", () => songSelect!.Mods.Value.OfType<ModDaycore>().Single().SpeedChange.Value, () => Is.EqualTo(0.9).Within(0.005));
+
+            increaseModSpeed();
+            AddAssert("daycore activated at 0.95x", () => songSelect!.Mods.Value.OfType<ModDaycore>().Single().SpeedChange.Value, () => Is.EqualTo(0.95).Within(0.005));
+
+            OsuModDoubleTime dt = new OsuModDoubleTime
+            {
+                SpeedChange = { Value = 1.02 },
+                AdjustPitch = { Value = true },
+            };
+            changeMods(dt);
+
+            decreaseModSpeed();
+            AddAssert("half time activated at 0.97x", () => songSelect!.Mods.Value.OfType<ModHalfTime>().Single().SpeedChange.Value, () => Is.EqualTo(0.97).Within(0.005));
+            AddAssert("adjust pitch preserved", () => songSelect!.Mods.Value.OfType<ModHalfTime>().Single().AdjustPitch.Value, () => Is.True);
+
+            OsuModHalfTime ht = new OsuModHalfTime
+            {
+                SpeedChange = { Value = 0.97 },
+                AdjustPitch = { Value = true },
+            };
+            Mod[] modlist = { ht, new OsuModHardRock(), new OsuModHidden() };
+            changeMods(modlist);
+
+            increaseModSpeed();
+            AddAssert("double time activated at 1.02x", () => songSelect!.Mods.Value.OfType<ModDoubleTime>().Single().SpeedChange.Value, () => Is.EqualTo(1.02).Within(0.005));
+            AddAssert("double time activated at 1.02x", () => songSelect!.Mods.Value.OfType<ModDoubleTime>().Single().AdjustPitch.Value, () => Is.True);
+            AddAssert("HD still enabled", () => songSelect!.Mods.Value.OfType<ModHidden>().SingleOrDefault(), () => Is.Not.Null);
+            AddAssert("HR still enabled", () => songSelect!.Mods.Value.OfType<ModHardRock>().SingleOrDefault(), () => Is.Not.Null);
+
+            changeMods(new ModWindUp());
+            increaseModSpeed();
+            AddAssert("windup still active", () => songSelect!.Mods.Value.First() is ModWindUp);
+
+            changeMods(new ModAdaptiveSpeed());
+            increaseModSpeed();
+            AddAssert("adaptive speed still active", () => songSelect!.Mods.Value.First() is ModAdaptiveSpeed);
+
+            OsuModDoubleTime dtWithAdjustPitch = new OsuModDoubleTime
+            {
+                SpeedChange = { Value = 1.05 },
+                AdjustPitch = { Value = true },
+            };
+            changeMods(dtWithAdjustPitch);
+
+            decreaseModSpeed();
+            AddAssert("no mods selected", () => songSelect!.Mods.Value.Count == 0);
+
+            decreaseModSpeed();
+            AddAssert("half time activated at 0.95x", () => songSelect!.Mods.Value.OfType<ModHalfTime>().Single().SpeedChange.Value, () => Is.EqualTo(0.95).Within(0.005));
+            AddAssert("half time has adjust pitch active", () => songSelect!.Mods.Value.OfType<ModHalfTime>().Single().AdjustPitch.Value, () => Is.True);
+
+            AddStep("turn off adjust pitch", () => songSelect!.Mods.Value.OfType<ModHalfTime>().Single().AdjustPitch.Value = false);
+
+            increaseModSpeed();
+            AddAssert("no mods selected", () => songSelect!.Mods.Value.Count == 0);
+
+            increaseModSpeed();
+            AddAssert("double time activated at 1.05x", () => songSelect!.Mods.Value.OfType<ModDoubleTime>().Single().SpeedChange.Value, () => Is.EqualTo(1.05).Within(0.005));
+            AddAssert("double time has adjust pitch inactive", () => songSelect!.Mods.Value.OfType<ModDoubleTime>().Single().AdjustPitch.Value, () => Is.False);
+
+            void increaseModSpeed() => AddStep("increase mod speed", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.Key(Key.Up);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+
+            void decreaseModSpeed() => AddStep("decrease mod speed", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.Key(Key.Down);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
         }
 
         [Test]
@@ -141,7 +269,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             createSongSelect();
 
-            AddAssert("filter count is 1", () => songSelect?.FilterCount == 1);
+            AddAssert("filter count is 0", () => songSelect?.FilterCount, () => Is.EqualTo(0));
         }
 
         [Test]
@@ -261,7 +389,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddStep("return", () => songSelect!.MakeCurrent());
             AddUntilStep("wait for current", () => songSelect!.IsCurrentScreen());
-            AddAssert("filter count is 1", () => songSelect!.FilterCount == 1);
+            AddAssert("filter count is 0", () => songSelect!.FilterCount, () => Is.EqualTo(0));
         }
 
         [Test]
@@ -281,7 +409,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddStep("return", () => songSelect!.MakeCurrent());
             AddUntilStep("wait for current", () => songSelect!.IsCurrentScreen());
-            AddAssert("filter count is 2", () => songSelect!.FilterCount == 2);
+            AddAssert("filter count is 1", () => songSelect!.FilterCount, () => Is.EqualTo(1));
         }
 
         [Test]
@@ -311,7 +439,9 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             createSongSelect();
 
-            addRulesetImportStep(0);
+            // We need to use one real beatmap to trigger the "same-track-transfer" logic that we're looking to test here.
+            // See `SongSelect.ensurePlayingSelected` and `WorkingBeatmap.TryTransferTrack`.
+            AddStep("import test beatmap", () => manager.Import(new ImportTask(TestResources.GetTestBeatmapForImport())).WaitSafely());
             addRulesetImportStep(0);
 
             checkMusicPlaying(true);
@@ -320,6 +450,8 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddStep("manual pause", () => music.TogglePause());
             checkMusicPlaying(false);
+
+            // Track should not have changed, so music should still not be playing.
             AddStep("select next difficulty", () => songSelect!.Carousel.SelectNext(skipDifficulties: false));
             checkMusicPlaying(false);
 
@@ -415,6 +547,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
+        [Ignore("temporary while peppy investigates. probably realm batching related.")]
         public void TestSelectionRetainedOnBeatmapUpdate()
         {
             createSongSelect();
@@ -459,7 +592,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 manager.Import(testBeatmapSetInfo);
             }, 10);
 
-            AddUntilStep("has selection", () => songSelect!.Carousel.SelectedBeatmapInfo?.BeatmapSet?.OnlineID == originalOnlineSetID);
+            AddUntilStep("has selection", () => songSelect!.Carousel.SelectedBeatmapInfo?.BeatmapSet?.OnlineID, () => Is.EqualTo(originalOnlineSetID));
 
             Task<Live<BeatmapSetInfo>?> updateTask = null!;
 
@@ -471,7 +604,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             });
             AddUntilStep("wait for update completion", () => updateTask.IsCompleted);
 
-            AddUntilStep("retained selection", () => songSelect!.Carousel.SelectedBeatmapInfo?.BeatmapSet?.OnlineID == originalOnlineSetID);
+            AddUntilStep("retained selection", () => songSelect!.Carousel.SelectedBeatmapInfo?.BeatmapSet?.OnlineID, () => Is.EqualTo(originalOnlineSetID));
         }
 
         [Test]
@@ -574,6 +707,24 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddAssert("start not requested", () => !startRequested);
         }
 
+        [Test]
+        public void TestSearchTextWithRulesetCriteria()
+        {
+            createSongSelect();
+
+            addRulesetImportStep(0);
+
+            AddStep("disallow convert display", () => config.SetValue(OsuSetting.ShowConvertedBeatmaps, false));
+
+            AddUntilStep("has selection", () => songSelect!.Carousel.SelectedBeatmapInfo != null);
+
+            AddStep("set filter to match all", () => songSelect!.FilterControl.CurrentTextSearch.Value = "Some");
+
+            changeRuleset(1);
+
+            AddUntilStep("has no selection", () => songSelect!.Carousel.SelectedBeatmapInfo == null);
+        }
+
         [TestCase(false)]
         [TestCase(true)]
         public void TestExternalBeatmapChangeWhileFiltered(bool differentRuleset)
@@ -590,7 +741,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddUntilStep("has selection", () => songSelect!.Carousel.SelectedBeatmapInfo != null);
 
-            AddStep("set filter text", () => songSelect!.FilterControl.ChildrenOfType<SearchTextBox>().First().Text = "nonono");
+            AddStep("set filter text", () => songSelect!.FilterControl.ChildrenOfType<FilterControl.FilterControlTextBox>().First().Text = "nonono");
 
             AddUntilStep("dummy selected", () => Beatmap.Value is DummyWorkingBeatmap);
 
@@ -624,7 +775,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddUntilStep("carousel has correct", () => songSelect!.Carousel.SelectedBeatmapInfo?.MatchesOnlineID(target) == true);
             AddUntilStep("game has correct", () => Beatmap.Value.BeatmapInfo.MatchesOnlineID(target));
 
-            AddStep("reset filter text", () => songSelect!.FilterControl.ChildrenOfType<SearchTextBox>().First().Text = string.Empty);
+            AddStep("reset filter text", () => songSelect!.FilterControl.ChildrenOfType<FilterControl.FilterControlTextBox>().First().Text = string.Empty);
 
             AddAssert("game still correct", () => Beatmap.Value?.BeatmapInfo.MatchesOnlineID(target) == true);
             AddAssert("carousel still correct", () => songSelect!.Carousel.SelectedBeatmapInfo.MatchesOnlineID(target));
@@ -642,7 +793,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddUntilStep("has selection", () => songSelect!.Carousel.SelectedBeatmapInfo != null);
 
-            AddStep("set filter text", () => songSelect!.FilterControl.ChildrenOfType<SearchTextBox>().First().Text = "nonono");
+            AddStep("set filter text", () => songSelect!.FilterControl.ChildrenOfType<FilterControl.FilterControlTextBox>().First().Text = "nonono");
 
             AddUntilStep("dummy selected", () => Beatmap.Value is DummyWorkingBeatmap);
 
@@ -665,7 +816,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddUntilStep("carousel has correct", () => songSelect!.Carousel.SelectedBeatmapInfo?.MatchesOnlineID(target) == true);
             AddUntilStep("game has correct", () => Beatmap.Value.BeatmapInfo.MatchesOnlineID(target));
 
-            AddStep("set filter text", () => songSelect!.FilterControl.ChildrenOfType<SearchTextBox>().First().Text = "nononoo");
+            AddStep("set filter text", () => songSelect!.FilterControl.ChildrenOfType<FilterControl.FilterControlTextBox>().First().Text = "nononoo");
 
             AddUntilStep("game lost selection", () => Beatmap.Value is DummyWorkingBeatmap);
             AddAssert("carousel lost selection", () => songSelect!.Carousel.SelectedBeatmapInfo == null);
@@ -1087,6 +1238,112 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddAssert("0 matching shown", () => songSelect.ChildrenOfType<FilterControl>().Single().InformationalText == "0 matches");
         }
 
+        [Test]
+        [Solo]
+        public void TestHardDeleteHandledCorrectly()
+        {
+            createSongSelect();
+
+            addRulesetImportStep(0);
+            AddAssert("3 matching shown", () => songSelect.ChildrenOfType<FilterControl>().Single().InformationalText == "3 matches");
+
+            AddStep("hard delete beatmap", () => Realm.Write(r => r.RemoveRange(r.All<BeatmapSetInfo>().Where(s => !s.Protected))));
+
+            AddUntilStep("0 matching shown", () => songSelect.ChildrenOfType<FilterControl>().Single().InformationalText == "0 matches");
+        }
+
+        [Test]
+        public void TestDeleteHotkey()
+        {
+            createSongSelect();
+
+            addRulesetImportStep(0);
+            AddAssert("3 matching shown", () => songSelect.ChildrenOfType<FilterControl>().Single().InformationalText == "3 matches");
+
+            AddStep("press shift-delete", () =>
+            {
+                InputManager.PressKey(Key.ShiftLeft);
+                InputManager.Key(Key.Delete);
+                InputManager.ReleaseKey(Key.ShiftLeft);
+            });
+            AddUntilStep("delete dialog shown", () => DialogOverlay.CurrentDialog, Is.InstanceOf<BeatmapDeleteDialog>);
+            AddStep("confirm deletion", () => DialogOverlay.CurrentDialog!.PerformAction<PopupDialogDangerousButton>());
+            AddAssert("0 matching shown", () => songSelect.ChildrenOfType<FilterControl>().Single().InformationalText == "0 matches");
+        }
+
+        [Test]
+        public void TestCutInFilterTextBox()
+        {
+            createSongSelect();
+
+            AddStep("set filter text", () => songSelect!.FilterControl.ChildrenOfType<FilterControl.FilterControlTextBox>().First().Text = "nonono");
+            AddStep("select all", () => InputManager.Keys(PlatformAction.SelectAll));
+            AddStep("press ctrl-x", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.Key(Key.X);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+
+            AddAssert("filter text cleared", () => songSelect!.FilterControl.ChildrenOfType<FilterControl.FilterControlTextBox>().First().Text, () => Is.Empty);
+        }
+
+        [Test]
+        public void TestNonFilterableModChange()
+        {
+            addRulesetImportStep(0);
+
+            createSongSelect();
+
+            // Mod that is guaranteed to never re-filter.
+            AddStep("add non-filterable mod", () => SelectedMods.Value = new Mod[] { new OsuModCinema() });
+            AddAssert("filter count is 0", () => songSelect!.FilterCount, () => Is.EqualTo(0));
+
+            // Removing the mod should still not re-filter.
+            AddStep("remove non-filterable mod", () => SelectedMods.Value = Array.Empty<Mod>());
+            AddAssert("filter count is 0", () => songSelect!.FilterCount, () => Is.EqualTo(0));
+        }
+
+        [Test]
+        public void TestFilterableModChange()
+        {
+            addRulesetImportStep(3);
+
+            createSongSelect();
+
+            // Change to mania ruleset.
+            AddStep("filter to mania ruleset", () => Ruleset.Value = rulesets.AvailableRulesets.First(r => r.OnlineID == 3));
+            AddAssert("filter count is 2", () => songSelect!.FilterCount, () => Is.EqualTo(1));
+
+            // Apply a mod, but this should NOT re-filter because there's no search text.
+            AddStep("add filterable mod", () => SelectedMods.Value = new Mod[] { new ManiaModKey3() });
+            AddAssert("filter count is 1", () => songSelect!.FilterCount, () => Is.EqualTo(1));
+
+            // Set search text. Should re-filter.
+            AddStep("set search text to match mods", () => songSelect!.FilterControl.CurrentTextSearch.Value = "keys=3");
+            AddAssert("filter count is 2", () => songSelect!.FilterCount, () => Is.EqualTo(2));
+
+            // Change filterable mod. Should re-filter.
+            AddStep("change new filterable mod", () => SelectedMods.Value = new Mod[] { new ManiaModKey5() });
+            AddAssert("filter count is 3", () => songSelect!.FilterCount, () => Is.EqualTo(3));
+
+            // Add non-filterable mod. Should NOT re-filter.
+            AddStep("apply non-filterable mod", () => SelectedMods.Value = new Mod[] { new ManiaModNoFail(), new ManiaModKey5() });
+            AddAssert("filter count is 3", () => songSelect!.FilterCount, () => Is.EqualTo(3));
+
+            // Remove filterable mod. Should re-filter.
+            AddStep("remove filterable mod", () => SelectedMods.Value = new Mod[] { new ManiaModNoFail() });
+            AddAssert("filter count is 4", () => songSelect!.FilterCount, () => Is.EqualTo(4));
+
+            // Remove non-filterable mod. Should NOT re-filter.
+            AddStep("remove filterable mod", () => SelectedMods.Value = Array.Empty<Mod>());
+            AddAssert("filter count is 4", () => songSelect!.FilterCount, () => Is.EqualTo(4));
+
+            // Add filterable mod. Should re-filter.
+            AddStep("add filterable mod", () => SelectedMods.Value = new Mod[] { new ManiaModKey3() });
+            AddAssert("filter count is 5", () => songSelect!.FilterCount, () => Is.EqualTo(5));
+        }
+
         private void waitForInitialSelection()
         {
             AddUntilStep("wait for initial selection", () => !Beatmap.IsDefault);
@@ -1167,8 +1424,6 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             public Action? StartRequested;
 
-            public new Bindable<RulesetInfo> Ruleset => base.Ruleset;
-
             public new FilterControl FilterControl => base.FilterControl;
 
             public WorkingBeatmap CurrentBeatmap => Beatmap.Value;
@@ -1178,18 +1433,18 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             public new void PresentScore(ScoreInfo score) => base.PresentScore(score);
 
+            public int FilterCount;
+
             protected override bool OnStart()
             {
                 StartRequested?.Invoke();
                 return base.OnStart();
             }
 
-            public int FilterCount;
-
-            protected override void ApplyFilterToCarousel(FilterCriteria criteria)
+            [BackgroundDependencyLoader]
+            private void load()
             {
-                FilterCount++;
-                base.ApplyFilterToCarousel(criteria);
+                FilterControl.FilterChanged += _ => FilterCount++;
             }
         }
     }

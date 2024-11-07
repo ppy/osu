@@ -27,6 +27,11 @@ namespace osu.Game.Overlays.Notifications
 
         public Func<bool>? CancelRequested { get; set; }
 
+        /// <summary>
+        /// Whether the operation represented by the <see cref="ProgressNotification"/> is still ongoing.
+        /// </summary>
+        public bool Ongoing => State != ProgressNotificationState.Completed && State != ProgressNotificationState.Cancelled;
+
         protected override bool AllowFlingDismiss => false;
 
         public override string PopOutSampleName => State is ProgressNotificationState.Cancelled ? base.PopOutSampleName : "";
@@ -49,7 +54,7 @@ namespace osu.Game.Overlays.Notifications
             set
             {
                 text = value;
-                Schedule(() => textDrawable.Text = text);
+                Scheduler.AddOnce(t => textDrawable.Text = t, text);
             }
         }
 
