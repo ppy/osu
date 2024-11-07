@@ -200,7 +200,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         protected override TestOsuGame CreateTestGame() => new NoBeatmapUpdateGame(LocalStorage, API);
 
-        private class NoBeatmapUpdateGame : TestOsuGame
+        private partial class NoBeatmapUpdateGame : TestOsuGame
         {
             public NoBeatmapUpdateGame(Storage storage, IAPIProvider api, string[] args = null)
                 : base(storage, api, args)
