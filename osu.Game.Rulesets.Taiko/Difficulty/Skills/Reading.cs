@@ -12,10 +12,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         protected override double SkillMultiplier => 1.0;
         protected override double StrainDecayBase => 0.4;
 
-        public static double HighSvBonus;
-        public static double ObjectDensity;
-
         private double currentStrain;
+
+        public static double ObjectDensity;
 
         private const double high_sv_multiplier = 1.0;
 
@@ -40,32 +39,49 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         {
             TaikoDifficultyHitObject hitObject = (TaikoDifficultyHitObject)current;
 
-            // Variables for high SV influence.
-            const double high_sv_upper = 640; // The upper BPM threshold where high SV influence starts to fade.
-            const double high_sv_lower = 480; // The lower BPM threshold where high SV influence becomes significant.
+            // Calculate High SV and Low SV Object Density,
+            double sliderVelocityBonus = calculateHighVelocityBonus(hitObject.EffectiveBPM);
+            ObjectDensity = calculateObjectDensity(current.DeltaTime);
 
-            // Center and range for the high SV sigmoid curve, making the impact gradual within this range.
-            const double high_sv_center = (high_sv_upper + high_sv_lower) / 2;
-            const double high_sv_range = high_sv_upper - high_sv_lower;
-
-            // Variables for low SV influence.
-            const double low_sv_delta_time_center = 200; // The delta time around which low SV influence centers.
-            const double low_sv_delta_time_range = 300; // The range for the transition around the delta time.
-
-            // Center range for low SV adjustment based on hit object density.
-            const double low_sv_max_center = 150; // Upper bound for low SV adjustment.
-            const double low_sv_min_center = 50; // Lower bound for low SV adjustment.
-
-            // Calculate the adjusted center for low SV influence based on object density.
-            ObjectDensity = low_sv_max_center - (low_sv_max_center - low_sv_min_center)
-                * sigmoid(current.DeltaTime, low_sv_delta_time_center, low_sv_delta_time_range);
-
-            // Calculate bonuses based on high and low SV impact.
-            HighSvBonus = sigmoid(hitObject.EffectiveBPM, high_sv_center, high_sv_range);
-
-            return high_sv_multiplier * HighSvBonus; // No bonuses to lowSV within starRating.
+            return high_sv_multiplier * sliderVelocityBonus;
         }
 
+        /// <summary>
+        /// Calculates the influence of higher slider velocities on beatmap difficulty.
+        /// The bonus is determined based on the EffectiveBPM, shifting within a defined range
+        /// between the upper and lower boundaries to reflect how increased slider velocity impacts difficulty.
+        /// </summary>
+        private double calculateHighVelocityBonus(double effectiveBPM)
+        {
+            const double velocity_max = 640;
+            const double velocity_min = 480;
+
+            const double center = (velocity_max + velocity_min) / 2;
+            const double range = velocity_max - velocity_min;
+
+            return sigmoid(effectiveBPM, center, range);
+        }
+
+        private double calculateObjectDensity(double deltaTime)
+        {
+            // The maximum and minimum center value for density.
+            const double density_max = 150;
+            const double density_min = 50;
+
+            // The midpoint of the range for the sigmoid function, where the transition is most significant.
+            const double center = 200;
+            const double range = 300;
+
+            // Adjusts the penalty for low SV based on object density.
+            return density_max - (density_max - density_min) *
+                sigmoid(deltaTime, center, range);
+        }
+
+        /// <summary>
+        /// Calculates a smooth transition using a sigmoid function.
+        /// <param name="center">The midpoint of the curve where the output transitions most rapidly.</param>
+        /// <param name="range">Determines how steep or gradual the curve is around the center.</param>
+        /// </summary>
         private double sigmoid(double value, double center, double range)
         {
             range /= 10;
