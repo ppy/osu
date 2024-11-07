@@ -3,22 +3,28 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mania.Skinning.Default;
-using osuTK.Graphics;
+using osu.Game.Rulesets.Mania.UI;
+using osu.Game.Rulesets.UI.Scrolling;
+using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Edit.Blueprints.Components
 {
     public partial class EditNotePiece : CompositeDrawable
     {
+        [Resolved]
+        private Column? column { get; set; }
+
         public EditNotePiece()
         {
             Masking = true;
             CornerRadius = 5;
-            BorderThickness = 9; // organoleptically chosen to look good enough for all default skins
-            BorderColour = Color4.White;
+            BorderThickness = 6;
+            BorderColour = ColourInfo.GradientVertical(Colour4.White.Opacity(0.5f), Colour4.White);
             Height = DefaultNotePiece.NOTE_HEIGHT;
 
             InternalChild = new Box
@@ -33,6 +39,14 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints.Components
         private void load(OsuColour colours)
         {
             Colour = colours.Yellow;
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (column != null)
+                Scale = new Vector2(1, column.ScrollingInfo.Direction.Value == ScrollingDirection.Down ? 1 : -1);
         }
     }
 }
