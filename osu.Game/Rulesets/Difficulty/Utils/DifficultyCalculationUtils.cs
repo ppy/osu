@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Difficulty.Utils
         /// <param name="multiplier">Growth rate of the function</param>
         /// <param name="midpointOffset">How much the function midpoint is offset from zero <paramref name="x"/></param>
         /// <returns>The output of logistic function of <paramref name="x"/></returns>
-        public static double Logistic(double x, double maxValue = 1, double multiplier = 1, double midpointOffset = 0) => maxValue / (1 + Math.Exp(multiplier * (midpointOffset - x)));
+        public static double Logistic(double x, double midpointOffset, double multiplier, double maxValue = 1) => maxValue / (1 + Math.Exp(multiplier * (midpointOffset - x)));
 
         /// <summary>
         /// Calculates a S-shaped logistic function (https://en.wikipedia.org/wiki/Logistic_function)
