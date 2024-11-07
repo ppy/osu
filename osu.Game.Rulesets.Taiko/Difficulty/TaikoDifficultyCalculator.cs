@@ -86,17 +86,13 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             Stamina stamina = (Stamina)skills.First(x => x is Stamina);
             Reading reading = (Reading)skills.First(x => x is Reading);
             Stamina singleColourStamina = (Stamina)skills.Last(x => x is Stamina);
-
-            // Reading related
-            double objectDensity = Reading.ObjectDensity;
-            double highSvBonus = Reading.HighSvBonus;
-
             double colourRating = colour.DifficultyValue() * colour_skill_multiplier;
             double rhythmRating = rhythm.DifficultyValue() * rhythm_skill_multiplier;
             double readingRating = reading.DifficultyValue() * reading_skill_multiplier;
             double staminaRating = stamina.DifficultyValue() * stamina_skill_multiplier;
             double monoStaminaRating = singleColourStamina.DifficultyValue() * stamina_skill_multiplier;
             double monoStaminaFactor = staminaRating == 0 ? 1 : Math.Pow(monoStaminaRating / staminaRating, 5);
+            double objectDensity = Reading.ObjectDensity;
 
             double combinedRating = combinedDifficultyValue(rhythm, colour, stamina, reading);
             double starRating = rescale(combinedRating * 1.4);
