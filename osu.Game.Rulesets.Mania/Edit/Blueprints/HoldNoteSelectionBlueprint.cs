@@ -34,7 +34,6 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 
         private EditHoldNoteEndPiece head = null!;
         private EditHoldNoteEndPiece tail = null!;
-        private Container body = null!;
 
         protected new DrawableHoldNote DrawableObject => (DrawableHoldNote)base.DrawableObject;
 
@@ -89,7 +88,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
                     },
                     DragEnded = () => changeHandler?.EndChange(),
                 },
-                body = new Container
+                new Container
                 {
                     RelativeSizeAxes = Axes.Both,
                     Masking = true,
