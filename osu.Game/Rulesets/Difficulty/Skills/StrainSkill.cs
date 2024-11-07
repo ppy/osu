@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         private double currentSectionEnd;
 
         private readonly List<double> strainPeaks = new List<double>();
-        protected List<double> ObjectStrains = new List<double>(); // Store individual strains
+        protected readonly List<double> ObjectStrains = new List<double>(); // Store individual strains
 
         protected StrainSkill(Mod[] mods)
             : base(mods)
@@ -68,7 +68,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// Calculates the number of strains weighted against the top strain.
         /// The result is scaled by clock rate as it affects the total number of strains.
         /// </summary>
-        public double CountDifficultStrains()
+        public virtual double CountDifficultStrains()
         {
             if (ObjectStrains.Count == 0)
                 return 0.0;
