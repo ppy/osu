@@ -19,6 +19,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// A distance by which all distances should be scaled in order to assume a uniform circle size.
         /// </summary>
         public const int NORMALISED_RADIUS = 50; // Change radius to 50 to make 100 the diameter. Easier for mental maths.
+
         public const int NORMALISED_DIAMETER = NORMALISED_RADIUS * 2;
 
         public const int MIN_DELTA_TIME = 25;
