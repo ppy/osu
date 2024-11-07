@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
@@ -11,6 +12,7 @@ using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.Edit.Blueprints.Components;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
+using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Screens.Edit;
 using osuTK;
 
@@ -32,6 +34,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 
         private EditHoldNoteEndPiece head = null!;
         private EditHoldNoteEndPiece tail = null!;
+        private Container body = null!;
 
         protected new DrawableHoldNote DrawableObject => (DrawableHoldNote)base.DrawableObject;
 
@@ -48,6 +51,8 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
                 head = new EditHoldNoteEndPiece
                 {
                     RelativeSizeAxes = Axes.X,
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomCentre,
                     DragStarted = () => changeHandler?.BeginChange(),
                     Dragging = pos =>
                     {
@@ -67,6 +72,8 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
                 tail = new EditHoldNoteEndPiece
                 {
                     RelativeSizeAxes = Axes.X,
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomCentre,
                     DragStarted = () => changeHandler?.BeginChange(),
                     Dragging = pos =>
                     {
@@ -82,10 +89,12 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
                     },
                     DragEnded = () => changeHandler?.EndChange(),
                 },
-                new Container
+                body = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
                     Masking = true,
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomCentre,
                     BorderThickness = 1,
                     BorderColour = colours.Yellow,
                     Child = new Box
@@ -107,6 +116,16 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
             tail.Height = DrawableObject.Tail.DrawHeight;
             tail.Y = HitObjectContainer.PositionAtTime(HitObject.Tail.StartTime, HitObject.StartTime);
             Height = HitObjectContainer.LengthAtTime(HitObject.StartTime, HitObject.EndTime) + tail.DrawHeight;
+        }
+
+        protected override void OnDirectionChanged(ValueChangedEvent<ScrollingDirection> direction)
+        {
+            Origin = direction.NewValue == ScrollingDirection.Down ? Anchor.BottomCentre : Anchor.TopCentre;
+
+            foreach (var child in InternalChildren)
+                child.Anchor = Origin;
+
+            head.Scale = tail.Scale = new Vector2(1, direction.NewValue == ScrollingDirection.Down ? 1 : -1);
         }
 
         public override Quad SelectionQuad => ScreenSpaceDrawQuad;
