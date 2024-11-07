@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// <summary>
         /// Strain values are multiplied by this number for the given skill. Used to balance the value of different skills between each other.
         /// </summary>
-        public virtual double SkillMultiplier => 1;
+        protected virtual double SkillMultiplier => 1;
 
         /// <summary>
         /// The weight by which each strain value decays when summing strains.

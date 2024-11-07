@@ -16,7 +16,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     /// </summary>
     public class Flashlight : StrainSkill
     {
-        public override double SkillMultiplier => 0.05512;
+        protected override double SkillMultiplier => 0.05512;
+
         private readonly bool hasHiddenMod;
 
         public Flashlight(Mod[] mods)
