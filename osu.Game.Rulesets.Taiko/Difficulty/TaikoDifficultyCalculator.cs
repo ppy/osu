@@ -38,6 +38,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             {
                 new Rhythm(mods),
                 new Colour(mods),
+                new Reading(mods),
                 new Stamina(mods, false),
                 new Stamina(mods, true)
             };
@@ -57,6 +58,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             List<TaikoDifficultyHitObject> centreObjects = new List<TaikoDifficultyHitObject>();
             List<TaikoDifficultyHitObject> rimObjects = new List<TaikoDifficultyHitObject>();
             List<TaikoDifficultyHitObject> noteObjects = new List<TaikoDifficultyHitObject>();
+            EffectiveBPMLoader bpmLoader = new EffectiveBPMLoader(beatmap, noteObjects);
 
             for (int i = 2; i < beatmap.HitObjects.Count; i++)
             {
@@ -68,6 +70,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             }
 
             TaikoColourDifficultyPreprocessor.ProcessAndAssign(difficultyHitObjects);
+            bpmLoader.LoadEffectiveBPM();
 
             return difficultyHitObjects;
         }
@@ -80,10 +83,12 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             Colour colour = (Colour)skills.First(x => x is Colour);
             Rhythm rhythm = (Rhythm)skills.First(x => x is Rhythm);
             Stamina stamina = (Stamina)skills.First(x => x is Stamina);
+            Reading reading = (Reading)skills.First(x => x is Reading);
             Stamina singleColourStamina = (Stamina)skills.Last(x => x is Stamina);
 
             double colourRating = colour.DifficultyValue() * colour_skill_multiplier;
             double rhythmRating = rhythm.DifficultyValue() * rhythm_skill_multiplier;
+            double readingRating = reading.DifficultyValue();
             double staminaRating = stamina.DifficultyValue() * stamina_skill_multiplier;
             double monoStaminaRating = singleColourStamina.DifficultyValue() * stamina_skill_multiplier;
             double monoStaminaFactor = staminaRating == 0 ? 1 : Math.Pow(monoStaminaRating / staminaRating, 5);
@@ -110,6 +115,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 StaminaDifficulty = staminaRating,
                 MonoStaminaFactor = monoStaminaFactor,
                 RhythmDifficulty = rhythmRating,
+                ReadingDifficulty = readingRating,
                 ColourDifficulty = colourRating,
                 PeakDifficulty = combinedRating,
                 GreatHitWindow = hitWindows.WindowFor(HitResult.Great) / clockRate,
