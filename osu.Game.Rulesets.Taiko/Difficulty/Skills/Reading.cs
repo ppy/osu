@@ -39,7 +39,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         {
             TaikoDifficultyHitObject hitObject = (TaikoDifficultyHitObject)current;
 
-            // Calculate High SV and Low SV Object Density,
             double sliderVelocityBonus = calculateHighVelocityBonus(hitObject.EffectiveBPM);
             ObjectDensity = calculateObjectDensity(current.DeltaTime);
 
@@ -53,6 +52,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         /// </summary>
         private double calculateHighVelocityBonus(double effectiveBPM)
         {
+            // The maximum and minimum center value for the impact of EffectiveBPM.
             const double velocity_max = 640;
             const double velocity_min = 480;
 
