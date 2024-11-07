@@ -45,6 +45,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         public override double DifficultyValue() => GetCurrentStrainPeaks().Sum();
 
-        public static double DifficultyToPerformance(double difficulty) => 25 * Math.Pow(difficulty, 2);
+        public static double DifficultyToPerformance(double difficulty) => 28.727 * Math.Pow(difficulty, 2);
     }
 }
