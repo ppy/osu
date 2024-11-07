@@ -2,8 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
@@ -11,6 +11,7 @@ using osu.Game.Rulesets.Mania.Skinning.Default;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.Edit.Blueprints.Components
 {
@@ -23,15 +24,31 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints.Components
         {
             Masking = true;
             CornerRadius = 5;
-            BorderThickness = 6;
-            BorderColour = ColourInfo.GradientVertical(Colour4.White.Opacity(0.5f), Colour4.White);
             Height = DefaultNotePiece.NOTE_HEIGHT;
 
-            InternalChild = new Box
+            InternalChildren = new Drawable[]
             {
-                RelativeSizeAxes = Axes.Both,
-                Alpha = 0,
-                AlwaysPresent = true,
+                new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Masking = true,
+                    CornerRadius = 5,
+                    BorderThickness = 5,
+                    BorderColour = Color4.White.Opacity(0.7f),
+                    Child = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Alpha = 0,
+                        AlwaysPresent = true,
+                    },
+                },
+                new Box
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Height = 10,
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomCentre,
+                },
             };
         }
 
