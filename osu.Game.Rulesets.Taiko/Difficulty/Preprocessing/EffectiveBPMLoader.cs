@@ -1,7 +1,7 @@
+using System;
 using System.Collections.Generic;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
 {
@@ -11,7 +11,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
         private readonly IList<TaikoDifficultyHitObject> noteObjects;
         private readonly IReadOnlyList<TimingControlPoint?> controlPoints;
         private readonly double beatmapGlobalSv;
-        private double sliderVelocity = 1.0;
 
         public EffectiveBPMLoader(IBeatmap beatmap, List<TaikoDifficultyHitObject> noteObjects)
         {
@@ -21,16 +20,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
             this.noteObjects = noteObjects;
         }
 
-        public void ScrollSpeed(ControlPointInfo controlPointInfo, HitObject hitObject)
-        {
-            // Find the active EffectControlPoint at the start time of the hit object.
-            EffectControlPoint activeEffectControlPoint = controlPointInfo.EffectPointAt(hitObject.StartTime);
-
-            // Use the ScrollSpeed from the activeEffectControlPoint.
-            sliderVelocity = activeEffectControlPoint?.ScrollSpeed ?? 1.0; // Fallback to 1.0 if null
-        }
-
-        public void LoadEffectiveBPM()
+        public void LoadEffectiveBPM(ControlPointInfo controlPointInfo)
         {
             using IEnumerator<TimingControlPoint?> controlPointEnumerator = controlPoints.GetEnumerator();
             controlPointEnumerator.MoveNext();
@@ -48,9 +38,18 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
                     nextControlPoint = controlPointEnumerator.MoveNext() ? controlPointEnumerator.Current : null;
                 }
 
+                // Find the active EffectControlPoint at the start time of the hit object.
+                EffectControlPoint activeEffectControlPoint = controlPointInfo.EffectPointAt(currentNoteObject.StartTime);
+
+                // Use the ScrollSpeed from the activeEffectControlPoint.
+                double currentSliderVelocity = activeEffectControlPoint?.ScrollSpeed ?? 1.0; // Fallback to 1.0 if null
+
+                // Print out the slider velocity for debugging.
+                Console.WriteLine($"Slider velocity for hit object at time {currentNoteObject.StartTime}: {currentSliderVelocity}");
+
                 if (currentControlPoint != null)
                 {
-                    currentNoteObject.EffectiveBPM = currentControlPoint.BPM * beatmapGlobalSv * sliderVelocity;
+                    currentNoteObject.EffectiveBPM = currentControlPoint.BPM * beatmapGlobalSv * currentSliderVelocity;
                 }
             }
         }
