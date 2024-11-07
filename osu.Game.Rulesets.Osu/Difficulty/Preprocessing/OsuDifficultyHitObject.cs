@@ -343,15 +343,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
         private int getObjectCombo(HitObject hitObject)
         {
-            if (hitObject is Slider slider)
-            {
-                if (slider.NestedHitObjects[1] is SliderRepeat)
-                    return slider.RepeatCount + 2;
-                else
-                    return slider.NestedHitObjects.Count;
-            }
+            int combo = 0;
 
-            return 1;
+            addCombo(hitObject, ref combo);
+
+            return combo;
+
+            static void addCombo(HitObject hitObject, ref int combo)
+            {
+                if (hitObject.Judgement.MaxResult.AffectsCombo())
+                    combo++;
+
+                foreach (var nested in hitObject.NestedHitObjects)
+                    addCombo(nested, ref combo);
+            }
         }
     }
 }
