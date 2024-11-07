@@ -25,6 +25,11 @@ namespace osu.Game.Beatmaps
         /// <param name="lookupScope">The preferred scope to use for metadata lookup.</param>
         void Process(BeatmapSetInfo beatmapSet, MetadataLookupScope lookupScope = MetadataLookupScope.LocalCacheFirst);
 
+        /// <summary>
+        /// Runs a subset of processing focused on updating any cached beatmap object counts.
+        /// </summary>
+        /// <param name="beatmapInfo">The managed beatmap to update. A transaction will be opened to apply changes.</param>
+        /// <param name="lookupScope">The preferred scope to use for metadata lookup.</param>
         void ProcessObjectCounts(BeatmapInfo beatmapInfo, MetadataLookupScope lookupScope = MetadataLookupScope.LocalCacheFirst);
     }
 }
