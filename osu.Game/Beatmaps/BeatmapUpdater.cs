@@ -41,50 +41,56 @@ namespace osu.Game.Beatmaps
                 updateScheduler);
         }
 
-        public void Process(BeatmapSetInfo beatmapSet, MetadataLookupScope lookupScope = MetadataLookupScope.LocalCacheFirst) => beatmapSet.Realm!.Write(_ =>
+        public void Process(BeatmapSetInfo beatmapSet, MetadataLookupScope lookupScope = MetadataLookupScope.LocalCacheFirst)
         {
-            // Before we use below, we want to invalidate.
-            workingBeatmapCache.Invalidate(beatmapSet);
-
-            if (lookupScope != MetadataLookupScope.None)
-                metadataLookup.Update(beatmapSet, lookupScope == MetadataLookupScope.OnlineFirst);
-
-            foreach (var beatmap in beatmapSet.Beatmaps)
+            beatmapSet.Realm!.Write(_ =>
             {
-                difficultyCache.Invalidate(beatmap);
+                // Before we use below, we want to invalidate.
+                workingBeatmapCache.Invalidate(beatmapSet);
 
-                var working = workingBeatmapCache.GetWorkingBeatmap(beatmap);
-                var ruleset = working.BeatmapInfo.Ruleset.CreateInstance();
+                if (lookupScope != MetadataLookupScope.None)
+                    metadataLookup.Update(beatmapSet, lookupScope == MetadataLookupScope.OnlineFirst);
 
-                Debug.Assert(ruleset != null);
+                foreach (var beatmap in beatmapSet.Beatmaps)
+                {
+                    difficultyCache.Invalidate(beatmap);
 
-                var calculator = ruleset.CreateDifficultyCalculator(working);
+                    var working = workingBeatmapCache.GetWorkingBeatmap(beatmap);
+                    var ruleset = working.BeatmapInfo.Ruleset.CreateInstance();
 
-                beatmap.StarRating = calculator.Calculate().StarRating;
-                beatmap.Length = working.Beatmap.CalculatePlayableLength();
-                beatmap.BPM = 60000 / working.Beatmap.GetMostCommonBeatLength();
-                beatmap.EndTimeObjectCount = working.Beatmap.HitObjects.Count(h => h is IHasDuration);
-                beatmap.TotalObjectCount = working.Beatmap.HitObjects.Count;
-            }
+                    Debug.Assert(ruleset != null);
 
-            // And invalidate again afterwards as re-fetching the most up-to-date database metadata will be required.
-            workingBeatmapCache.Invalidate(beatmapSet);
-        });
+                    var calculator = ruleset.CreateDifficultyCalculator(working);
 
-        public void ProcessObjectCounts(BeatmapInfo beatmapInfo, MetadataLookupScope lookupScope = MetadataLookupScope.LocalCacheFirst) => beatmapInfo.Realm!.Write(_ =>
+                    beatmap.StarRating = calculator.Calculate().StarRating;
+                    beatmap.Length = working.Beatmap.CalculatePlayableLength();
+                    beatmap.BPM = 60000 / working.Beatmap.GetMostCommonBeatLength();
+                    beatmap.EndTimeObjectCount = working.Beatmap.HitObjects.Count(h => h is IHasDuration);
+                    beatmap.TotalObjectCount = working.Beatmap.HitObjects.Count;
+                }
+
+                // And invalidate again afterwards as re-fetching the most up-to-date database metadata will be required.
+                workingBeatmapCache.Invalidate(beatmapSet);
+            });
+        }
+
+        public void ProcessObjectCounts(BeatmapInfo beatmapInfo, MetadataLookupScope lookupScope = MetadataLookupScope.LocalCacheFirst)
         {
-            // Before we use below, we want to invalidate.
-            workingBeatmapCache.Invalidate(beatmapInfo);
+            beatmapInfo.Realm!.Write(_ =>
+            {
+                // Before we use below, we want to invalidate.
+                workingBeatmapCache.Invalidate(beatmapInfo);
 
-            var working = workingBeatmapCache.GetWorkingBeatmap(beatmapInfo);
-            var beatmap = working.Beatmap;
+                var working = workingBeatmapCache.GetWorkingBeatmap(beatmapInfo);
+                var beatmap = working.Beatmap;
 
-            beatmapInfo.EndTimeObjectCount = beatmap.HitObjects.Count(h => h is IHasDuration);
-            beatmapInfo.TotalObjectCount = beatmap.HitObjects.Count;
+                beatmapInfo.EndTimeObjectCount = beatmap.HitObjects.Count(h => h is IHasDuration);
+                beatmapInfo.TotalObjectCount = beatmap.HitObjects.Count;
 
-            // And invalidate again afterwards as re-fetching the most up-to-date database metadata will be required.
-            workingBeatmapCache.Invalidate(beatmapInfo);
-        });
+                // And invalidate again afterwards as re-fetching the most up-to-date database metadata will be required.
+                workingBeatmapCache.Invalidate(beatmapInfo);
+            });
+        }
 
         #region Implementation of IDisposable
 
