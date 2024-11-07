@@ -90,7 +90,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             // Reading related
             double objectDensity = Reading.ObjectDensity;
             double highSvBonus = Reading.HighSvBonus;
-            double lowSvBonus = Reading.LowSvBonus;
 
             double colourRating = colour.DifficultyValue() * colour_skill_multiplier;
             double rhythmRating = rhythm.DifficultyValue() * rhythm_skill_multiplier;
@@ -124,11 +123,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 ReadingDifficulty = readingRating,
                 ColourDifficulty = colourRating,
                 PeakDifficulty = combinedRating,
-                // Reading Related
                 ObjectDensity = objectDensity,
-                HighSVBonus = highSvBonus,
-                LowSVBonus = lowSvBonus,
-                // Accuracy Related
                 GreatHitWindow = hitWindows.WindowFor(HitResult.Great) / clockRate,
                 OkHitWindow = hitWindows.WindowFor(HitResult.Ok) / clockRate,
                 MaxCombo = beatmap.GetMaxCombo(),

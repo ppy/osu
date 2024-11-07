@@ -64,14 +64,11 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         [JsonProperty("ok_hit_window")]
         public double OkHitWindow { get; set; }
 
+        /// <summary>
+        /// The calculated object density for a beatmap. Scaled based on the time between consecutive objects.
+        /// </summary>
         [JsonProperty("hit_object_density")]
         public double ObjectDensity { get; set; }
-
-        [JsonProperty("high_sv_bonus")]
-        public double HighSVBonus { get; set; }
-
-        [JsonProperty("low_sv_bonus")]
-        public double LowSVBonus { get; set; }
 
         public override IEnumerable<(int attributeId, object value)> ToDatabaseAttributes()
         {
