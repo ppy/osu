@@ -103,7 +103,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 starRating *= 0.925;
                 // For maps with low colour variance and high stamina requirement, multiple inputs are more likely to be abused.
                 if (colourRating < 2 && staminaRating > 8)
-                    starRating *= 0.80;
+                    starRating *= 0.90;
             }
 
             HitWindows hitWindows = new TaikoHitWindows();
