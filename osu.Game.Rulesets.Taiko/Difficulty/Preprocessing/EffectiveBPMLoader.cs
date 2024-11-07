@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
             this.noteObjects = noteObjects;
         }
 
-        public void LoadEffectiveBPM(ControlPointInfo controlPointInfo)
+        public void LoadEffectiveBPM(ControlPointInfo controlPointInfo, double clockRate)
         {
             using IEnumerator<TimingControlPoint?> controlPointEnumerator = controlPoints.GetEnumerator();
             controlPointEnumerator.MoveNext();
@@ -40,8 +40,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
                 // Find the active EffectControlPoint at the start time of the hit object.
                 EffectControlPoint activeEffectControlPoint = controlPointInfo.EffectPointAt(currentNoteObject.StartTime);
 
-                // Use the ScrollSpeed from the activeEffectControlPoint.
-                double currentSliderVelocity = activeEffectControlPoint?.ScrollSpeed ?? 1.0; // Fallback to 1.0 if null
+                double currentSliderVelocity = (activeEffectControlPoint?.ScrollSpeed ?? 1.0) * clockRate;
 
                 if (currentControlPoint != null)
                 {
