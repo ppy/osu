@@ -29,12 +29,12 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         protected override double StrainValueOf(DifficultyHitObject current)
         {
             currentStrain *= StrainDecayBase;
-            currentStrain += readingBonus(current) * SkillMultiplier;
+            currentStrain += reading(current) * SkillMultiplier;
 
             return currentStrain;
         }
 
-        private double readingBonus(DifficultyHitObject current)
+        private double reading(DifficultyHitObject current)
         {
             TaikoDifficultyHitObject hitObject = (TaikoDifficultyHitObject)current;
 
