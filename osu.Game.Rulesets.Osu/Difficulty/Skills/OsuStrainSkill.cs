@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             foreach (double strain in strains.OrderDescending())
             {
                 Difficulty += strain * weight;
-                weight *= SumDecay;
+                weight *= SumDecayWeight;
             }
 
             return Difficulty;

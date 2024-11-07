@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// <summary>
         /// The weight by which each strain value decays when summing strains.
         /// </summary>
-        protected virtual double SumDecay => 0.9;
+        protected virtual double SumDecayWeight => 0.9;
 
         /// <summary>
         /// The length of each strain section.
@@ -140,7 +140,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             foreach (double strain in peaks.OrderDescending())
             {
                 difficulty += strain * weight;
-                weight *= SumDecay;
+                weight *= SumDecayWeight;
             }
 
             return difficulty;
