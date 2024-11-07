@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using osu.Game.Beatmaps;
@@ -79,6 +80,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             yield return (ATTRIB_ID_GREAT_HIT_WINDOW, GreatHitWindow);
             yield return (ATTRIB_ID_OK_HIT_WINDOW, OkHitWindow);
             yield return (ATTRIB_ID_MONO_STAMINA_FACTOR, MonoStaminaFactor);
+            yield return (ATTRIB_ID_OBJECT_DENSITY, ObjectDensity);
         }
 
         public override void FromDatabaseAttributes(IReadOnlyDictionary<int, double> values, IBeatmapOnlineInfo onlineInfo)
@@ -89,6 +91,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             GreatHitWindow = values[ATTRIB_ID_GREAT_HIT_WINDOW];
             OkHitWindow = values[ATTRIB_ID_OK_HIT_WINDOW];
             MonoStaminaFactor = values[ATTRIB_ID_MONO_STAMINA_FACTOR];
+            ObjectDensity = values[ATTRIB_ID_OBJECT_DENSITY];
         }
     }
 }
