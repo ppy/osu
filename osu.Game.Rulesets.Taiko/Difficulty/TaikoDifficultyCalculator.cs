@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         private const double rhythm_skill_multiplier = 0.2 * difficulty_multiplier;
         private const double colour_skill_multiplier = 0.375 * difficulty_multiplier;
         private const double stamina_skill_multiplier = 0.375 * difficulty_multiplier;
-        private const double reading_skill_multiplier = 0.0395 * difficulty_multiplier;
+        private double readingSkillMultiplier = 0.1185 * difficulty_multiplier;
 
         public override int Version => 20241007;
 
@@ -89,12 +89,12 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
             double colourRating = colour.DifficultyValue() * colour_skill_multiplier;
             double rhythmRating = rhythm.DifficultyValue() * rhythm_skill_multiplier;
-            double readingRating = reading.DifficultyValue() * reading_skill_multiplier;
+            double readingRating = reading.DifficultyValue() * readingSkillMultiplier;
             double staminaRating = stamina.DifficultyValue() * stamina_skill_multiplier;
             double monoStaminaRating = singleColourStamina.DifficultyValue() * stamina_skill_multiplier;
             double monoStaminaFactor = staminaRating == 0 ? 1 : Math.Pow(monoStaminaRating / staminaRating, 5);
 
-            double combinedRating = combinedDifficultyValue(rhythm, colour, stamina);
+            double combinedRating = combinedDifficultyValue(rhythm, colour, stamina, reading);
             double starRating = rescale(combinedRating * 1.4);
 
             // TODO: This is temporary measure as we don't detect abuse of multiple-input playstyles of converts within the current system.
@@ -145,22 +145,24 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         /// For each section, the peak strains of all separate skills are combined into a single peak strain for the section.
         /// The resulting partial rating of the beatmap is a weighted sum of the combined peaks (higher peaks are weighted more).
         /// </remarks>
-        private double combinedDifficultyValue(Rhythm rhythm, Colour colour, Stamina stamina)
+        private double combinedDifficultyValue(Rhythm rhythm, Colour colour, Stamina stamina, Reading reading)
         {
             List<double> peaks = new List<double>();
 
             var colourPeaks = colour.GetCurrentStrainPeaks().ToList();
             var rhythmPeaks = rhythm.GetCurrentStrainPeaks().ToList();
             var staminaPeaks = stamina.GetCurrentStrainPeaks().ToList();
+            var readingPeaks = reading.GetCurrentStrainPeaks().ToList();
 
             for (int i = 0; i < colourPeaks.Count; i++)
             {
                 double colourPeak = colourPeaks[i] * colour_skill_multiplier;
                 double rhythmPeak = rhythmPeaks[i] * rhythm_skill_multiplier;
                 double staminaPeak = staminaPeaks[i] * stamina_skill_multiplier;
+                double readingPeak = readingPeaks[i] * readingSkillMultiplier;
 
                 double peak = norm(1.5, colourPeak, staminaPeak);
-                peak = norm(2, peak, rhythmPeak);
+                peak = norm(2, peak, rhythmPeak, readingPeak);
 
                 // Sections with 0 strain are excluded to avoid worst-case time complexity of the following sort (e.g. /b/2351871).
                 // These sections will not contribute to the difficulty.
