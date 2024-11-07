@@ -68,7 +68,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             const double density_max = 150;
             const double density_min = 50;
 
-            // The midpoint of the range for the sigmoid function, where the transition is most significant.
             const double center = 200;
             const double range = 300;
 
