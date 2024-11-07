@@ -4,6 +4,7 @@
 using System;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osuTK;
 
@@ -30,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         /// <item><description>and whether the hidden mod is enabled.</description></item>
         /// </list>
         /// </summary>
-        public static double EvaluateDifficultyOf(DifficultyHitObject current, bool hidden)
+        public static double EvaluateDifficultyOf(DifficultyHitObject current, bool hidden, OsuModFlashlight osuModFlashlight)
         {
             if (current.BaseObject is Spinner)
                 return 0;
@@ -59,7 +60,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 if (!(currentObj.BaseObject is Spinner))
                 {
                     double pixelDistance = (osuHitObject.StackedPosition - currentHitObject.StackedEndPosition).Length;
-                    double flashlightRadius = getComboScaleFor(currentObj.CurrentMaxCombo);
+                    double flashlightRadius = getSize(currentObj.CurrentMaxCombo, osuModFlashlight);
                     double objectOpacity = osuCurrent.OpacityAt(currentHitObject.StartTime, hidden);
 
                     // Consider the jump from the lazy end position for sliders.
@@ -131,15 +132,24 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             return result;
         }
 
-        private static double getComboScaleFor(int combo)
+        private static float getSize(int combo, OsuModFlashlight osuModFlashlight)
         {
-            // Taken from ModFlashlight.
-            if (combo >= 200)
-                return 125.0;
-            if (combo >= 100)
-                return 162.5;
+            float size = osuModFlashlight.DefaultFlashlightSize * osuModFlashlight.SizeMultiplier.Value;
 
-            return 200.0;
+            if (osuModFlashlight.ComboBasedSize.Value)
+                size *= getComboScaleFor(combo);
+
+            return size;
+        }
+
+        private static float getComboScaleFor(int combo)
+        {
+            if (combo >= 200)
+                return 0.625f;
+            if (combo >= 100)
+                return 0.8125f;
+
+            return 1.0f;
         }
     }
 }
