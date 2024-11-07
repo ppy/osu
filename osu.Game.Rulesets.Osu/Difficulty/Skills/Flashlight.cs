@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
@@ -15,7 +16,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     /// </summary>
     public class Flashlight : StrainSkill
     {
-        public override double SkillMultiplier => 0.052;
+        public override double SkillMultiplier => 0.05512;
         private readonly bool hasHiddenMod;
 
         public Flashlight(Mod[] mods)
@@ -26,6 +27,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         protected override double StrainValueOf(DifficultyHitObject current) => FlashlightEvaluator.EvaluateDifficultyOf(current, hasHiddenMod);
 
-        public override double DifficultyValue() => GetCurrentStrainPeaks().Sum() * OsuStrainSkill.DEFAULT_DIFFICULTY_MULTIPLIER;
+        public override double DifficultyValue() => GetCurrentStrainPeaks().Sum();
+
+        public static double DifficultyToPerformance(double difficulty) => 25 * Math.Pow(difficulty, 2);
     }
 }

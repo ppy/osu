@@ -19,12 +19,12 @@ namespace osu.Game.Rulesets.Mania.Edit.Setup
     {
         public override LocalisableString Title => EditorSetupStrings.DifficultyHeader;
 
-        private LabelledSliderBar<float> keyCountSlider { get; set; } = null!;
-        private LabelledSwitchButton specialStyle { get; set; } = null!;
-        private LabelledSliderBar<float> healthDrainSlider { get; set; } = null!;
-        private LabelledSliderBar<float> overallDifficultySlider { get; set; } = null!;
-        private LabelledSliderBar<double> baseVelocitySlider { get; set; } = null!;
-        private LabelledSliderBar<double> tickRateSlider { get; set; } = null!;
+        private FormSliderBar<float> keyCountSlider { get; set; } = null!;
+        private FormCheckBox specialStyle { get; set; } = null!;
+        private FormSliderBar<float> healthDrainSlider { get; set; } = null!;
+        private FormSliderBar<float> overallDifficultySlider { get; set; } = null!;
+        private FormSliderBar<double> baseVelocitySlider { get; set; } = null!;
+        private FormSliderBar<double> tickRateSlider { get; set; } = null!;
 
         [Resolved]
         private Editor? editor { get; set; }
@@ -37,77 +37,81 @@ namespace osu.Game.Rulesets.Mania.Edit.Setup
         {
             Children = new Drawable[]
             {
-                keyCountSlider = new LabelledSliderBar<float>
+                keyCountSlider = new FormSliderBar<float>
                 {
-                    Label = BeatmapsetsStrings.ShowStatsCsMania,
-                    FixedLabelWidth = LABEL_WIDTH,
-                    Description = "The number of columns in the beatmap",
+                    Caption = BeatmapsetsStrings.ShowStatsCsMania,
+                    HintText = "The number of columns in the beatmap",
                     Current = new BindableFloat(Beatmap.Difficulty.CircleSize)
                     {
                         Default = BeatmapDifficulty.DEFAULT_DIFFICULTY,
                         MinValue = 0,
                         MaxValue = 10,
                         Precision = 1,
-                    }
+                    },
+                    TransferValueOnCommit = true,
+                    TabbableContentContainer = this,
                 },
-                specialStyle = new LabelledSwitchButton
+                specialStyle = new FormCheckBox
                 {
-                    Label = "Use special (N+1) style",
-                    FixedLabelWidth = LABEL_WIDTH,
-                    Description = "Changes one column to act as a classic \"scratch\" or \"special\" column, which can be moved around by the user's skin (to the left/right/centre). Generally used in 6K (5+1) or 8K (7+1) configurations.",
+                    Caption = "Use special (N+1) style",
+                    HintText = "Changes one column to act as a classic \"scratch\" or \"special\" column, which can be moved around by the user's skin (to the left/right/centre). Generally used in 6K (5+1) or 8K (7+1) configurations.",
                     Current = { Value = Beatmap.BeatmapInfo.SpecialStyle }
                 },
-                healthDrainSlider = new LabelledSliderBar<float>
+                healthDrainSlider = new FormSliderBar<float>
                 {
-                    Label = BeatmapsetsStrings.ShowStatsDrain,
-                    FixedLabelWidth = LABEL_WIDTH,
-                    Description = EditorSetupStrings.DrainRateDescription,
+                    Caption = BeatmapsetsStrings.ShowStatsDrain,
+                    HintText = EditorSetupStrings.DrainRateDescription,
                     Current = new BindableFloat(Beatmap.Difficulty.DrainRate)
                     {
                         Default = BeatmapDifficulty.DEFAULT_DIFFICULTY,
                         MinValue = 0,
                         MaxValue = 10,
                         Precision = 0.1f,
-                    }
+                    },
+                    TransferValueOnCommit = true,
+                    TabbableContentContainer = this,
                 },
-                overallDifficultySlider = new LabelledSliderBar<float>
+                overallDifficultySlider = new FormSliderBar<float>
                 {
-                    Label = BeatmapsetsStrings.ShowStatsAccuracy,
-                    FixedLabelWidth = LABEL_WIDTH,
-                    Description = EditorSetupStrings.OverallDifficultyDescription,
+                    Caption = BeatmapsetsStrings.ShowStatsAccuracy,
+                    HintText = EditorSetupStrings.OverallDifficultyDescription,
                     Current = new BindableFloat(Beatmap.Difficulty.OverallDifficulty)
                     {
                         Default = BeatmapDifficulty.DEFAULT_DIFFICULTY,
                         MinValue = 0,
                         MaxValue = 10,
                         Precision = 0.1f,
-                    }
+                    },
+                    TransferValueOnCommit = true,
+                    TabbableContentContainer = this,
                 },
-                baseVelocitySlider = new LabelledSliderBar<double>
+                baseVelocitySlider = new FormSliderBar<double>
                 {
-                    Label = EditorSetupStrings.BaseVelocity,
-                    FixedLabelWidth = LABEL_WIDTH,
-                    Description = EditorSetupStrings.BaseVelocityDescription,
+                    Caption = EditorSetupStrings.BaseVelocity,
+                    HintText = EditorSetupStrings.BaseVelocityDescription,
                     Current = new BindableDouble(Beatmap.Difficulty.SliderMultiplier)
                     {
                         Default = 1.4,
                         MinValue = 0.4,
                         MaxValue = 3.6,
                         Precision = 0.01f,
-                    }
+                    },
+                    TransferValueOnCommit = true,
+                    TabbableContentContainer = this,
                 },
-                tickRateSlider = new LabelledSliderBar<double>
+                tickRateSlider = new FormSliderBar<double>
                 {
-                    Label = EditorSetupStrings.TickRate,
-                    FixedLabelWidth = LABEL_WIDTH,
-                    Description = EditorSetupStrings.TickRateDescription,
+                    Caption = EditorSetupStrings.TickRate,
+                    HintText = EditorSetupStrings.TickRateDescription,
                     Current = new BindableDouble(Beatmap.Difficulty.SliderTickRate)
                     {
                         Default = 1,
                         MinValue = 1,
                         MaxValue = 4,
                         Precision = 1,
-                    }
+                    },
+                    TransferValueOnCommit = true,
+                    TabbableContentContainer = this,
                 },
             };
 

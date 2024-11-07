@@ -195,6 +195,7 @@ namespace osu.Game.Database
 
                 Directory.CreateDirectory(Path.GetDirectoryName(destinationPath)!);
 
+                // Consider using hard links here to make this instant.
                 using (var inStream = Files.Storage.GetStream(sourcePath))
                 using (var outStream = File.Create(destinationPath))
                     await inStream.CopyToAsync(outStream).ConfigureAwait(false);
@@ -527,7 +528,7 @@ namespace osu.Game.Database
         /// <param name="model">The new model proposed for import.</param>
         /// <param name="realm">The current realm context.</param>
         /// <returns>An existing model which matches the criteria to skip importing, else null.</returns>
-        protected TModel? CheckForExisting(TModel model, Realm realm) => string.IsNullOrEmpty(model.Hash) ? null : realm.All<TModel>().FirstOrDefault(b => b.Hash == model.Hash);
+        protected TModel? CheckForExisting(TModel model, Realm realm) => string.IsNullOrEmpty(model.Hash) ? null : realm.All<TModel>().OrderBy(b => b.DeletePending).FirstOrDefault(b => b.Hash == model.Hash);
 
         /// <summary>
         /// Whether import can be skipped after finding an existing import early in the process.

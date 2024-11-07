@@ -57,7 +57,7 @@ namespace osu.Game.Online.API
         private string password;
 
         public IBindable<APIUser> LocalUser => localUser;
-        public IBindableList<APIUser> Friends => friends;
+        public IBindableList<APIRelation> Friends => friends;
         public IBindable<UserActivity> Activity => activity;
         public IBindable<UserStatistics> Statistics => statistics;
 
@@ -67,7 +67,7 @@ namespace osu.Game.Online.API
 
         private Bindable<APIUser> localUser { get; } = new Bindable<APIUser>(createGuestUser());
 
-        private BindableList<APIUser> friends { get; } = new BindableList<APIUser>();
+        private BindableList<APIRelation> friends { get; } = new BindableList<APIRelation>();
 
         private Bindable<UserActivity> activity { get; } = new Bindable<UserActivity>();
 
@@ -159,7 +159,7 @@ namespace osu.Game.Online.API
 
         private void onTokenChanged(ValueChangedEvent<OAuthToken> e) => config.SetValue(OsuSetting.Token, config.Get<bool>(OsuSetting.SavePassword) ? authentication.TokenString : string.Empty);
 
-        internal new void Schedule(Action action) => base.Schedule(action);
+        void IAPIProvider.Schedule(Action action) => base.Schedule(action);
 
         public string AccessToken => authentication.RequestAccessToken();
 
@@ -360,19 +360,7 @@ namespace osu.Game.Online.API
                 }
             }
 
-            var friendsReq = new GetFriendsRequest();
-            friendsReq.Failure += _ => state.Value = APIState.Failing;
-            friendsReq.Success += res =>
-            {
-                friends.Clear();
-                friends.AddRange(res);
-            };
-
-            if (!handleRequest(friendsReq))
-            {
-                state.Value = APIState.Failing;
-                return;
-            }
+            UpdateLocalFriends();
 
             // The Success callback event is fired on the main thread, so we should wait for that to run before proceeding.
             // Without this, we will end up circulating this Connecting loop multiple times and queueing up many web requests
@@ -385,7 +373,8 @@ namespace osu.Game.Online.API
         {
             try
             {
-                request.Perform(this);
+                request.AttachAPI(this);
+                request.Perform();
             }
             catch (Exception e)
             {
@@ -483,7 +472,8 @@ namespace osu.Game.Online.API
         {
             try
             {
-                req.Perform(this);
+                req.AttachAPI(this);
+                req.Perform();
 
                 if (req.CompletionState != APIRequestCompletionState.Completed)
                     return false;
@@ -568,6 +558,8 @@ namespace osu.Game.Online.API
         {
             lock (queue)
             {
+                request.AttachAPI(this);
+
                 if (state.Value == APIState.Offline)
                 {
                     request.Fail(new WebException(@"User not logged in"));
@@ -618,6 +610,22 @@ namespace osu.Game.Online.API
 
             if (IsLoggedIn)
                 localUser.Value.Statistics = newStatistics;
+        }
+
+        public void UpdateLocalFriends()
+        {
+            if (!IsLoggedIn)
+                return;
+
+            var friendsReq = new GetFriendsRequest();
+            friendsReq.Failure += _ => state.Value = APIState.Failing;
+            friendsReq.Success += res =>
+            {
+                friends.Clear();
+                friends.AddRange(res);
+            };
+
+            Queue(friendsReq);
         }
 
         private static APIUser createGuestUser() => new GuestUser();
