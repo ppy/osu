@@ -22,7 +22,7 @@ namespace osu.Game.Online.API
         /// <summary>
         /// The user's friends.
         /// </summary>
-        IBindableList<APIUser> Friends { get; }
+        IBindableList<APIRelation> Friends { get; }
 
         /// <summary>
         /// The current user's activity.
@@ -45,6 +45,12 @@ namespace osu.Game.Online.API
         string AccessToken { get; }
 
         /// <summary>
+        /// Used as an identifier of a single local lazer session.
+        /// Sent across the wire for the purposes of concurrency control to spectator server.
+        /// </summary>
+        Guid SessionIdentifier { get; }
+
+        /// <summary>
         /// Returns whether the local user is logged in.
         /// </summary>
         bool IsLoggedIn { get; }
@@ -61,7 +67,7 @@ namespace osu.Game.Online.API
         string APIEndpointUrl { get; }
 
         /// <summary>
-        /// The root URL of of the website, excluding the trailing slash.
+        /// The root URL of the website, excluding the trailing slash.
         /// </summary>
         string WebsiteRootUrl { get; }
 
@@ -127,6 +133,16 @@ namespace osu.Game.Online.API
         /// Sets Statistics bindable.
         /// </summary>
         void UpdateStatistics(UserStatistics newStatistics);
+
+        /// <summary>
+        /// Update the friends status of the current user.
+        /// </summary>
+        void UpdateLocalFriends();
+
+        /// <summary>
+        /// Schedule a callback to run on the update thread.
+        /// </summary>
+        internal void Schedule(Action action);
 
         /// <summary>
         /// Constructs a new <see cref="IHubClientConnector"/>. May be null if not supported.

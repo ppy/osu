@@ -39,7 +39,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             var storyboard = new Storyboard();
             var sprite = new StoryboardSprite("unknown", Anchor.TopLeft, Vector2.Zero);
-            sprite.TimelineGroup.Alpha.Add(Easing.None, startTime, 0, 0, 1);
+            sprite.Commands.AddAlpha(Easing.None, startTime, 0, 0, 1);
             storyboard.GetLayer("Background").Add(sprite);
             return storyboard;
         }

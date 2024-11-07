@@ -51,14 +51,15 @@ namespace osu.Game.Tournament.Screens.Editors
 
             AddInternal(rightClickMessage = new WarningBox("Right click to place and link matches"));
 
-            ScrollContent.Add(grid = new RectangularPositionSnapGrid(Vector2.Zero)
+            ScrollContent.Add(grid = new RectangularPositionSnapGrid
             {
-                Spacing = new Vector2(GRID_SPACING),
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 BypassAutoSizeAxes = Axes.Both,
                 Depth = float.MaxValue
             });
+
+            grid.Spacing.Value = new Vector2(GRID_SPACING);
 
             LadderInfo.Matches.CollectionChanged += (_, _) => updateMessage();
             updateMessage();
