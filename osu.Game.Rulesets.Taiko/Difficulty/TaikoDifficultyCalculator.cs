@@ -70,7 +70,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             }
 
             TaikoColourDifficultyPreprocessor.ProcessAndAssign(difficultyHitObjects);
-            bpmLoader.LoadEffectiveBPM();
+            bpmLoader.LoadEffectiveBPM(beatmap.ControlPointInfo);
 
             return difficultyHitObjects;
         }
