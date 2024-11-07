@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         private const double rhythm_skill_multiplier = 0.2 * difficulty_multiplier;
         private const double colour_skill_multiplier = 0.375 * difficulty_multiplier;
         private const double stamina_skill_multiplier = 0.375 * difficulty_multiplier;
-        private double readingSkillMultiplier = 0.1185 * difficulty_multiplier;
+        private const double reading_skill_multiplier = 0.1385 * difficulty_multiplier;
 
         public override int Version => 20241007;
 
@@ -87,9 +87,14 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             Reading reading = (Reading)skills.First(x => x is Reading);
             Stamina singleColourStamina = (Stamina)skills.Last(x => x is Stamina);
 
+            // Reading related
+            double objectDensity = Reading.ObjectDensity;
+            double highSvBonus = Reading.HighSvBonus;
+            double lowSvBonus = Reading.LowSvBonus;
+
             double colourRating = colour.DifficultyValue() * colour_skill_multiplier;
             double rhythmRating = rhythm.DifficultyValue() * rhythm_skill_multiplier;
-            double readingRating = reading.DifficultyValue() * readingSkillMultiplier;
+            double readingRating = reading.DifficultyValue() * reading_skill_multiplier;
             double staminaRating = stamina.DifficultyValue() * stamina_skill_multiplier;
             double monoStaminaRating = singleColourStamina.DifficultyValue() * stamina_skill_multiplier;
             double monoStaminaFactor = staminaRating == 0 ? 1 : Math.Pow(monoStaminaRating / staminaRating, 5);
@@ -119,6 +124,11 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 ReadingDifficulty = readingRating,
                 ColourDifficulty = colourRating,
                 PeakDifficulty = combinedRating,
+                // Reading Related
+                ObjectDensity = objectDensity,
+                HighSVBonus = highSvBonus,
+                LowSVBonus = lowSvBonus,
+                // Accuracy Related
                 GreatHitWindow = hitWindows.WindowFor(HitResult.Great) / clockRate,
                 OkHitWindow = hitWindows.WindowFor(HitResult.Ok) / clockRate,
                 MaxCombo = beatmap.GetMaxCombo(),
@@ -159,7 +169,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 double colourPeak = colourPeaks[i] * colour_skill_multiplier;
                 double rhythmPeak = rhythmPeaks[i] * rhythm_skill_multiplier;
                 double staminaPeak = staminaPeaks[i] * stamina_skill_multiplier;
-                double readingPeak = readingPeaks[i] * readingSkillMultiplier;
+                double readingPeak = readingPeaks[i] * reading_skill_multiplier;
 
                 double peak = norm(1.5, colourPeak, staminaPeak);
                 peak = norm(2, peak, rhythmPeak, readingPeak);
