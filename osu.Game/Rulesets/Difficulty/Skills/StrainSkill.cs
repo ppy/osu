@@ -18,23 +18,23 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// <summary>
         /// Strain values are multiplied by this number for the given skill. Used to balance the value of different skills between each other.
         /// </summary>
-        protected virtual double SkillMultiplier => 1;
-
-        /// <summary>
-        /// The weight by which each strain value decays when summing strains.
-        /// </summary>
-        protected virtual double SumDecayWeight => 0.9;
-
-        /// <summary>
-        /// The length of each strain section.
-        /// </summary>
-        protected virtual int SectionLength => 400;
+        protected abstract double SkillMultiplier { get; }
 
         /// <summary>
         /// Determines how quickly strain decays for the given skill.
         /// For example a value of 0.15 indicates that strain decays to 15% of its original value in one second.
         /// </summary>
-        protected virtual double StrainDecayBase => 0.15;
+        protected abstract double StrainDecayBase { get; }
+
+        /// <summary>
+        /// The weight by which each strain value decays when summing strains.
+        /// </summary>
+        protected abstract double SumDecayWeight { get; }
+
+        /// <summary>
+        /// The length of each strain section.
+        /// </summary>
+        protected virtual int SectionLength => 400;
 
         /// <summary>
         /// The current strain level.

@@ -14,6 +14,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
     public class Colour : StrainSkill
     {
         protected override double SkillMultiplier => 0.12;
+        protected override double SumDecayWeight => 0.9;
 
         // This is set to decay slower than other skills, due to the fact that only the first note of each encoding class
         //  having any difficulty values, and we want to allow colour difficulty to be able to build up even on

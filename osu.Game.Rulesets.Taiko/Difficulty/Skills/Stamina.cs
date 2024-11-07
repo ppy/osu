@@ -17,6 +17,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
     {
         protected override double SkillMultiplier => 1.1;
         protected override double StrainDecayBase => 0.4;
+        protected override double SumDecayWeight => 0.9;
 
         private readonly bool singleColourStamina;
 
