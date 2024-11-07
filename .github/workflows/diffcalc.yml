@@ -107,6 +107,7 @@ jobs:
   master-environment:
     name: Save master environment
     runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'workflow_dispatch' || contains(github.event.comment.body, '!diffcalc') }}
     outputs:
       HEAD: ${{ steps.get-head.outputs.HEAD }}
     steps:
