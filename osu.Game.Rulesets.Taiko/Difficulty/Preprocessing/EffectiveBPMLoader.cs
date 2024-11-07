@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -43,9 +42,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
 
                 // Use the ScrollSpeed from the activeEffectControlPoint.
                 double currentSliderVelocity = activeEffectControlPoint?.ScrollSpeed ?? 1.0; // Fallback to 1.0 if null
-
-                // Print out the slider velocity for debugging.
-                Console.WriteLine($"Slider velocity for hit object at time {currentNoteObject.StartTime}: {currentSliderVelocity}");
 
                 if (currentControlPoint != null)
                 {

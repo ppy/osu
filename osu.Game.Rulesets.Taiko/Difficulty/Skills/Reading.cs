@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         private double currentStrain;
 
         private const double high_sv_multiplier = 1;
-        private const double low_sv_multiplier = 1;
+        private const double low_sv_multiplier = 0.25;
 
         /// <summary>
         /// Creates a <see cref="Rhythm"/> skill.
@@ -38,36 +38,38 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         {
             TaikoDifficultyHitObject hitObject = (TaikoDifficultyHitObject)current;
 
-            // High SV Variables
-            const double high_sv_upper_bound = 640;
-            const double high_sv_lower_bound = 480;
+            // Variables for high SV influence.
+            const double high_sv_upper = 640; // The upper BPM threshold where high SV influence starts to fade.
+            const double high_sv_lower = 480; // The lower BPM threshold where high SV influence becomes significant.
 
-            const double high_sv_center = (high_sv_upper_bound + high_sv_lower_bound) / 2;
-            const double high_sv_width = high_sv_upper_bound - high_sv_lower_bound;
+            // Center and range for the high SV sigmoid curve, making the impact gradual within this range.
+            const double high_sv_center = (high_sv_upper + high_sv_lower) / 2;
+            const double high_sv_range = high_sv_upper - high_sv_lower;
 
-            // Low SV Variables
-            const double low_sv_delta_time_center = 200;
-            const double low_sv_delta_time_width = 300;
+            // Variables for low SV influence.
+            const double low_sv_delta_time_center = 200; // The delta time around which low SV influence centers.
+            const double low_sv_delta_time_range = 300; // The range for the transition around the delta time.
 
-            // Maximum center for low sv (for high density)
-            const double low_sv_center_upper_bound = 200;
+            // Center range for low SV adjustment based on hit object density.
+            const double low_sv_max_center = 200; // Upper bound for low SV adjustment.
+            const double low_sv_min_center = 100; // Lower bound for low SV adjustment.
+            const double low_sv_range = 100; // Reduced range to make the impact more abrupt at very low SVs.
 
-            // Minimum center for low sv (for low density)
-            const double low_sv_center_lower_bound = 100;
-            const double low_sv_width = 160;
+            // Calculate the adjusted center for low SV influence based on object density.
+            double objectDensity = low_sv_max_center - (low_sv_max_center - low_sv_min_center)
+                * sigmoid(current.DeltaTime, low_sv_delta_time_center, low_sv_delta_time_range);
 
-            // Calculate low sv center, considering density
-            double lowSvCenter = low_sv_center_upper_bound - (low_sv_center_upper_bound - low_sv_center_lower_bound) * this.sigmoid(current.DeltaTime, low_sv_delta_time_center, low_sv_delta_time_width);
-            double highSvBonus = sigmoid(hitObject.EffectiveBPM, high_sv_center, high_sv_width);
-            double lowSvBonus = 1 - sigmoid(hitObject.EffectiveBPM, lowSvCenter, low_sv_width);
+            // Calculate bonuses based on high and low SV impact.
+            double highSvBonus = sigmoid(hitObject.EffectiveBPM, high_sv_center, high_sv_range);
+            double lowSvBonus = 1 - sigmoid(hitObject.EffectiveBPM, objectDensity, low_sv_range);
 
             return high_sv_multiplier * highSvBonus + low_sv_multiplier * lowSvBonus;
         }
 
-        private double sigmoid(double value, double center, double width)
+        private double sigmoid(double value, double center, double range)
         {
-            width /= 10;
-            return 1 / (1 + Math.Exp(-(value - center) / width));
+            range /= 10;
+            return 1 / (1 + Math.Exp(-(value - center) / range));
         }
     }
 }
