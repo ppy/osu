@@ -22,6 +22,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
         /// </summary>
         private readonly IReadOnlyList<TaikoDifficultyHitObject>? monoDifficultyHitObjects;
 
+        /// Effective BPM of the object, required for reading difficulty calculation
+        public double EffectiveBPM;
+
         /// <summary>
         /// The index of this <see cref="TaikoDifficultyHitObject"/> in <see cref="monoDifficultyHitObjects"/>.
         /// </summary>
@@ -41,6 +44,11 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
         /// The rhythm required to hit this hit object.
         /// </summary>
         public readonly TaikoDifficultyHitObjectRhythm Rhythm;
+
+        /// <summary>
+        /// The reading required to hit this hit object.
+        /// </summary>
+        public readonly TaikoDifficultyHitObject Reading;
 
         /// <summary>
         /// Colour data for this hit object. This is used by colour evaluator to calculate colour difficulty, but can be used
