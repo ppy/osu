@@ -13,7 +13,8 @@ namespace osu.Game.Tests.Visual.Metadata
 {
     public partial class TestMetadataClient : MetadataClient
     {
-        public override IBindable<bool> IsConnected => new BindableBool(true);
+        public override IBindable<bool> IsConnected => isConnected;
+        private readonly BindableBool isConnected = new BindableBool(true);
 
         public override IBindable<bool> IsWatchingUserPresence => isWatchingUserPresence;
         private readonly BindableBool isWatchingUserPresence = new BindableBool();
@@ -21,7 +22,7 @@ namespace osu.Game.Tests.Visual.Metadata
         public override IBindableDictionary<int, UserPresence> UserStates => userStates;
         private readonly BindableDictionary<int, UserPresence> userStates = new BindableDictionary<int, UserPresence>();
 
-        public override IBindable<DailyChallengeInfo?> DailyChallengeInfo => dailyChallengeInfo;
+        public override Bindable<DailyChallengeInfo?> DailyChallengeInfo => dailyChallengeInfo;
         private readonly Bindable<DailyChallengeInfo?> dailyChallengeInfo = new Bindable<DailyChallengeInfo?>();
 
         [Resolved]
@@ -85,6 +86,29 @@ namespace osu.Game.Tests.Visual.Metadata
         {
             dailyChallengeInfo.Value = info;
             return Task.CompletedTask;
+        }
+
+        public override Task<MultiplayerPlaylistItemStats[]> BeginWatchingMultiplayerRoom(long id)
+        {
+            var stats = new MultiplayerPlaylistItemStats[MultiplayerPlaylistItemStats.TOTAL_SCORE_DISTRIBUTION_BINS];
+
+            for (int i = 0; i < stats.Length; i++)
+                stats[i] = new MultiplayerPlaylistItemStats { PlaylistItemID = i };
+
+            return Task.FromResult(stats);
+        }
+
+        public override Task EndWatchingMultiplayerRoom(long id) => Task.CompletedTask;
+
+        public void Disconnect()
+        {
+            isConnected.Value = false;
+            dailyChallengeInfo.Value = null;
+        }
+
+        public void Reconnect()
+        {
+            isConnected.Value = true;
         }
     }
 }

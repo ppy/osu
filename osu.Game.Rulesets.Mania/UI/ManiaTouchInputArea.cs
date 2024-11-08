@@ -99,12 +99,6 @@ namespace osu.Game.Rulesets.Mania.UI
             return false;
         }
 
-        protected override bool OnMouseDown(MouseDownEvent e)
-        {
-            Show();
-            return true;
-        }
-
         protected override bool OnTouchDown(TouchDownEvent e)
         {
             Show();
@@ -172,17 +166,6 @@ namespace osu.Game.Rulesets.Mania.UI
                 updateButton(false);
             }
 
-            protected override bool OnMouseDown(MouseDownEvent e)
-            {
-                updateButton(true);
-                return false; // handled by parent container to show overlay.
-            }
-
-            protected override void OnMouseUp(MouseUpEvent e)
-            {
-                updateButton(false);
-            }
-
             private void updateButton(bool press)
             {
                 if (press == isPressed)
@@ -192,12 +175,12 @@ namespace osu.Game.Rulesets.Mania.UI
 
                 if (press)
                 {
-                    inputManager?.KeyBindingContainer?.TriggerPressed(Action.Value);
+                    inputManager?.KeyBindingContainer.TriggerPressed(Action.Value);
                     highlightOverlay.FadeTo(0.1f, 80, Easing.OutQuint);
                 }
                 else
                 {
-                    inputManager?.KeyBindingContainer?.TriggerReleased(Action.Value);
+                    inputManager?.KeyBindingContainer.TriggerReleased(Action.Value);
                     highlightOverlay.FadeTo(0, 400, Easing.OutQuint);
                 }
             }
