@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             TaikoDifficultyHitObject hitObject = (TaikoDifficultyHitObject)current;
 
             double sliderVelocityBonus = calculateHighVelocityBonus(hitObject.EffectiveBPM);
-            ObjectDensity = calculateObjectDensity(current.DeltaTime);
+            ObjectDensity = calculateObjectDensity(current.DeltaTime, hitObject.EffectiveBPM);
 
             return high_sv_multiplier * sliderVelocityBonus;
         }
@@ -62,7 +62,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             return sigmoid(effectiveBPM, center, range);
         }
 
-        private double calculateObjectDensity(double deltaTime)
+        private double calculateObjectDensity(double deltaTime, double effectiveBPM)
         {
             // The maximum and minimum center value for density.
             const double density_max = 150;
@@ -73,11 +73,12 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 
             // Adjusts the penalty for low SV based on object density.
             return density_max - (density_max - density_min) *
-                sigmoid(deltaTime, center, range);
+                sigmoid(effectiveBPM - (deltaTime / 2), center, range);
         }
 
         /// <summary>
         /// Calculates a smooth transition using a sigmoid function.
+        /// <param name="value">The input value</param>
         /// <param name="center">The midpoint of the curve where the output transitions most rapidly.</param>
         /// <param name="range">Determines how steep or gradual the curve is around the center.</param>
         /// </summary>

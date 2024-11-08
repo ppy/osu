@@ -46,11 +46,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
         public readonly TaikoDifficultyHitObjectRhythm Rhythm;
 
         /// <summary>
-        /// The reading required to hit this hit object.
-        /// </summary>
-        public readonly TaikoDifficultyHitObject Reading;
-
-        /// <summary>
         /// Colour data for this hit object. This is used by colour evaluator to calculate colour difficulty, but can be used
         /// by other skills in the future.
         /// </summary>
