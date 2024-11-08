@@ -1,3 +1,6 @@
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
 using System.Collections.Generic;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -20,7 +23,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
         }
 
         /// <summary>
-        /// Calculates and sets the effective BPM for each note object, considering clock rate and scroll speed.
+        /// Calculates and sets the effective BPM and slider velocity for each note object, considering clock rate and scroll speed.
         /// </summary>
         public void LoadEffectiveBPM(ControlPointInfo controlPointInfo, double clockRate)
         {
@@ -32,7 +35,12 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
             foreach (var currentNoteObject in noteObjects)
             {
                 currentControlPoint = getNextControlPoint(currentNoteObject, currentControlPoint, ref nextControlPoint, controlPointEnumerator);
-                setEffectiveBPMForObject(controlPointInfo, currentNoteObject, currentControlPoint, clockRate);
+
+                // Calculate and set slider velocity for the current note object.
+                double currentSliderVelocity = calculateSliderVelocity(controlPointInfo, currentNoteObject.StartTime, clockRate);
+                currentNoteObject.CurrentSliderVelocity = currentSliderVelocity;
+
+                setEffectiveBPMForObject(currentNoteObject, currentControlPoint, currentSliderVelocity);
             }
         }
 
@@ -51,16 +59,22 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
         }
 
         /// <summary>
-        /// Calculates and sets the effective BPM for the given note object based on the current control point and clock rate.
+        /// Calculates the slider velocity based on control point info and clock rate.
         /// </summary>
-        private void setEffectiveBPMForObject(ControlPointInfo controlPointInfo, TaikoDifficultyHitObject currentNoteObject, TimingControlPoint? currentControlPoint, double clockRate)
+        private double calculateSliderVelocity(ControlPointInfo controlPointInfo, double startTime, double clockRate)
+        {
+            var activeEffectControlPoint = controlPointInfo.EffectPointAt(startTime);
+            return globalSliderVelocity * (activeEffectControlPoint?.ScrollSpeed ?? 1.0) * clockRate;
+        }
+
+        /// <summary>
+        /// Sets the effective BPM for the given note object.
+        /// </summary>
+        private void setEffectiveBPMForObject(TaikoDifficultyHitObject currentNoteObject, TimingControlPoint? currentControlPoint, double currentSliderVelocity)
         {
             if (currentControlPoint != null)
             {
-                var activeEffectControlPoint = controlPointInfo.EffectPointAt(currentNoteObject.StartTime);
-                double currentSliderVelocity = (activeEffectControlPoint?.ScrollSpeed ?? 1.0) * clockRate;
-
-                currentNoteObject.EffectiveBPM = currentControlPoint.BPM * globalSliderVelocity * currentSliderVelocity;
+                currentNoteObject.EffectiveBPM = currentControlPoint.BPM * currentSliderVelocity;
             }
         }
     }

@@ -5,6 +5,8 @@ using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Taiko.Objects;
+
 namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 {
     public class Reading : StrainDecaySkill
@@ -14,7 +16,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 
         private double currentStrain;
 
-        public static double ObjectDensity;
+        public double ObjectDensity;
 
         private const double high_sv_multiplier = 1.0;
 
@@ -37,10 +39,16 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 
         private double reading(DifficultyHitObject current)
         {
-            TaikoDifficultyHitObject hitObject = (TaikoDifficultyHitObject)current;
+            TaikoDifficultyHitObject noteObject = (TaikoDifficultyHitObject)current;
 
-            double sliderVelocityBonus = calculateHighVelocityBonus(hitObject.EffectiveBPM);
-            ObjectDensity = calculateObjectDensity(current.DeltaTime, hitObject.EffectiveBPM);
+            if (noteObject.BaseObject is Swell || noteObject.BaseObject is DrumRoll)
+            {
+                return 1;
+            }
+
+            // Only return a difficulty value when the Object isn't a Spinner or a Slider.
+            double sliderVelocityBonus = calculateHighVelocityBonus(noteObject.EffectiveBPM);
+            ObjectDensity = calculateObjectDensity(noteObject.DeltaTime, noteObject.EffectiveBPM, noteObject.CurrentSliderVelocity);
 
             return high_sv_multiplier * sliderVelocityBonus;
         }
@@ -62,18 +70,18 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             return sigmoid(effectiveBPM, center, range);
         }
 
-        private double calculateObjectDensity(double deltaTime, double effectiveBPM)
+        private double calculateObjectDensity(double deltaTime, double effectiveBPM, double currentSliderVelocity)
         {
             // The maximum and minimum center value for density.
-            const double density_max = 150;
+            const double density_max = 300;
             const double density_min = 50;
 
             const double center = 200;
-            const double range = 300;
+            const double range = 2000;
 
             // Adjusts the penalty for low SV based on object density.
             return density_max - (density_max - density_min) *
-                sigmoid(effectiveBPM - (deltaTime / 2), center, range);
+                sigmoid(deltaTime * currentSliderVelocity, center, range);
         }
 
         /// <summary>

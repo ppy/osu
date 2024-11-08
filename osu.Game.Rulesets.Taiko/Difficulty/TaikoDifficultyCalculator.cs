@@ -92,7 +92,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             double staminaRating = stamina.DifficultyValue() * stamina_skill_multiplier;
             double monoStaminaRating = singleColourStamina.DifficultyValue() * stamina_skill_multiplier;
             double monoStaminaFactor = staminaRating == 0 ? 1 : Math.Pow(monoStaminaRating / staminaRating, 5);
-            double objectDensity = Reading.ObjectDensity;
+            double objectDensity = reading.ObjectDensity;
 
             double combinedRating = combinedDifficultyValue(rhythm, colour, stamina, reading);
             double starRating = rescale(combinedRating * 1.4);
