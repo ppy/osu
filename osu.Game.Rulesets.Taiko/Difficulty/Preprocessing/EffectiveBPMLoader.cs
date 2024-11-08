@@ -9,14 +9,12 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
 {
     public class EffectiveBPMLoader
     {
-        private readonly IBeatmap beatmap;
         private readonly IList<TaikoDifficultyHitObject> noteObjects;
         private readonly IReadOnlyList<TimingControlPoint?> timingControlPoints;
         private readonly double globalSliderVelocity;
 
         public EffectiveBPMLoader(IBeatmap beatmap, List<TaikoDifficultyHitObject> noteObjects)
         {
-            this.beatmap = beatmap;
             this.noteObjects = noteObjects;
             timingControlPoints = beatmap.ControlPointInfo.TimingPoints;
             globalSliderVelocity = beatmap.Difficulty.SliderMultiplier;
@@ -64,7 +62,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
         private double calculateSliderVelocity(ControlPointInfo controlPointInfo, double startTime, double clockRate)
         {
             var activeEffectControlPoint = controlPointInfo.EffectPointAt(startTime);
-            return globalSliderVelocity * (activeEffectControlPoint?.ScrollSpeed ?? 1.0) * clockRate;
+            return globalSliderVelocity * (activeEffectControlPoint.ScrollSpeed) * clockRate;
         }
 
         /// <summary>
