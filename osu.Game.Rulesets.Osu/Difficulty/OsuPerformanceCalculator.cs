@@ -58,6 +58,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             countMiss = score.Statistics.GetValueOrDefault(HitResult.Miss);
             countSliderEndsDropped = osuAttributes.SliderCount - score.Statistics.GetValueOrDefault(HitResult.SliderTailHit);
             countSliderTickMiss = score.Statistics.GetValueOrDefault(HitResult.LargeTickMiss);
+            effectiveMissCount = countMiss;
 
             accuracy = calculateAccuracy(countGreat, countOk, countMeh, countMiss, totalHits);
 
@@ -88,6 +89,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             }
 
             effectiveMissCount = Math.Max(countMiss, effectiveMissCount);
+            effectiveMissCount = Math.Min(totalHits, effectiveMissCount);
 
             double multiplier = PERFORMANCE_BASE_MULTIPLIER;
 
