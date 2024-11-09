@@ -1,4 +1,4 @@
-name: "🔒Run diffcalc runner"
+name: "🔒diffcalc (do not use)"
 
 on:
   workflow_call:
