@@ -167,7 +167,9 @@ namespace osu.Desktop
                 presence.State = clampLength(activity.Value.GetStatus(hideIdentifiableInformation));
                 presence.Details = clampLength(activity.Value.GetDetails(hideIdentifiableInformation) ?? string.Empty);
 
-                if (getBeatmapID(activity.Value) is int beatmapId && beatmapId > 0)
+                if (getBeatmapID(activity.Value) is int beatmapId
+                    && beatmapId > 0
+                    && !(activity.Value is UserActivity.EditingBeatmap && hideIdentifiableInformation))
                 {
                     presence.Buttons = new[]
                     {
