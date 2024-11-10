@@ -88,7 +88,7 @@ jobs:
       # Attempt to upload results even if test fails.
       # https://docs.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions#always
       - name: Upload Test Results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: ${{ always() }}
         with:
           name: osu-test-results-${{matrix.os.prettyname}}-${{matrix.threadingMode}}
