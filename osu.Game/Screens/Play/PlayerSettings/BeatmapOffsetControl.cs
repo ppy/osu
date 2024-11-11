@@ -60,6 +60,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
         [Resolved]
         private IGameplayClock? gameplayClock { get; set; }
 
+        private double? unstableRate;
         private double lastPlayAverage;
         private double lastPlayBeatmapOffset;
         private HitEventTimingDistributionGraph? lastPlayGraph;
@@ -209,6 +210,19 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 });
 
                 return;
+            }
+
+            unstableRate = hitEvents.CalculateUnstableRate();
+            const double unstablerate_threshold = 100;
+
+            if (hitEvents.Count > 10 && unstableRate != null)
+            {
+                Current.Value = unstableRate switch
+                {
+                    > unstablerate_threshold => lastPlayBeatmapOffset - (Math.Exp((double)(-0.0075 * (unstableRate - unstablerate_threshold))) * lastPlayAverage),
+                    < unstablerate_threshold => lastPlayBeatmapOffset - lastPlayAverage,
+                    _ => Current.Value
+                };
             }
 
             lastPlayAverage = average;
