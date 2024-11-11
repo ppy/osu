@@ -202,7 +202,7 @@ namespace osu.Game.Online.Multiplayer
                     Debug.Assert(joinedRoom.Playlist.Count > 0);
 
                     APIRoom.Playlist.Clear();
-                    APIRoom.Playlist.AddRange(joinedRoom.Playlist.Select(createPlaylistItem));
+                    APIRoom.Playlist.AddRange(joinedRoom.Playlist.Select(item => new PlaylistItem(item)));
                     APIRoom.CurrentPlaylistItem.Value = APIRoom.Playlist.Single(item => item.ID == joinedRoom.Settings.PlaylistItemId);
 
                     // The server will null out the end date upon the host joining the room, but the null value is never communicated to the client.
@@ -734,7 +734,7 @@ namespace osu.Game.Online.Multiplayer
                 Debug.Assert(APIRoom != null);
 
                 Room.Playlist.Add(item);
-                APIRoom.Playlist.Add(createPlaylistItem(item));
+                APIRoom.Playlist.Add(new PlaylistItem(item));
 
                 ItemAdded?.Invoke(item);
                 RoomUpdated?.Invoke();
@@ -780,7 +780,7 @@ namespace osu.Game.Online.Multiplayer
                     int existingIndex = APIRoom.Playlist.IndexOf(APIRoom.Playlist.Single(existing => existing.ID == item.ID));
 
                     APIRoom.Playlist.RemoveAt(existingIndex);
-                    APIRoom.Playlist.Insert(existingIndex, createPlaylistItem(item));
+                    APIRoom.Playlist.Insert(existingIndex, new PlaylistItem(item));
                 }
                 catch (Exception ex)
                 {
@@ -852,18 +852,6 @@ namespace osu.Game.Online.Multiplayer
 
             RoomUpdated?.Invoke();
         }
-
-        private PlaylistItem createPlaylistItem(MultiplayerPlaylistItem item) => new PlaylistItem(new APIBeatmap { OnlineID = item.BeatmapID, StarRating = item.StarRating })
-        {
-            ID = item.ID,
-            OwnerID = item.OwnerID,
-            RulesetID = item.RulesetID,
-            Expired = item.Expired,
-            PlaylistOrder = item.PlaylistOrder,
-            PlayedAt = item.PlayedAt,
-            RequiredMods = item.RequiredMods.ToArray(),
-            AllowedMods = item.AllowedMods.ToArray()
-        };
 
         /// <summary>
         /// For the provided user ID, update whether the user is included in <see cref="CurrentMatchPlayingUserIds"/>.
