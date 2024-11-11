@@ -422,10 +422,6 @@ namespace osu.Game.Screens.Edit
                                         Items = new MenuItem[]
                                         {
                                             new EditorMenuItem(EditorStrings.SetPreviewPointToCurrent, MenuItemType.Standard, SetPreviewPointToCurrentTime),
-                                            new ToggleMenuItem(EditorStrings.AdjustExistingObjectsOnTimingChanges)
-                                            {
-                                                State = { BindTarget = config.GetBindable<bool>(OsuSetting.EditorAdjustExistingObjectsOnTimingChanges) },
-                                            }
                                         }
                                     }
                                 }
