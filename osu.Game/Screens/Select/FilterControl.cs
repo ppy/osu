@@ -97,8 +97,8 @@ namespace osu.Game.Screens.Select
             {
                 new Box
                 {
-                    Colour = Color4.Black,
-                    Alpha = 0.8f,
+                    Colour = OsuColour.Gray(0.05f),
+                    Alpha = 0.96f,
                     Width = 2,
                     RelativeSizeAxes = Axes.Both,
                 },
