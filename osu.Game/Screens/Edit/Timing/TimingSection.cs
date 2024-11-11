@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Edit.Timing
 {
@@ -25,6 +26,12 @@ namespace osu.Game.Screens.Edit.Timing
         {
             Flow.AddRange(new Drawable[]
             {
+                new LabelledSwitchButton
+                {
+                    Label = EditorStrings.AdjustExistingObjectsOnTimingChanges,
+                    FixedLabelWidth = 220,
+                    Current = configManager.GetBindable<bool>(OsuSetting.EditorAdjustExistingObjectsOnTimingChanges),
+                },
                 new TapTimingControl(),
                 bpmTextEntry = new BPMTextBox(),
                 timeSignature = new LabelledTimeSignature
