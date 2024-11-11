@@ -213,13 +213,15 @@ namespace osu.Game.Screens.Play.PlayerSettings
             }
 
             unstableRate = hitEvents.CalculateUnstableRate();
-            const double unstablerate_threshold = 100;
+            const double unstablerate_threshold = 90; // threshold under which offset is applied immediately or the calculation is used
 
             if (hitEvents.Count > 10 && unstableRate != null)
             {
                 Current.Value = unstableRate switch
                 {
-                    > unstablerate_threshold => lastPlayBeatmapOffset - (Math.Exp((double)(-0.0075 * (unstableRate - unstablerate_threshold))) * lastPlayAverage),
+                    //makes calculated offsets which were achieved with low UR have higher impact then offsets calculated with high UR
+                    > unstablerate_threshold => lastPlayBeatmapOffset - (Math.Exp((double)(-0.014 * (unstableRate - unstablerate_threshold))) * lastPlayAverage),
+                    //case is smaller than the threshold and offset is applied
                     < unstablerate_threshold => lastPlayBeatmapOffset - lastPlayAverage,
                     _ => Current.Value
                 };
