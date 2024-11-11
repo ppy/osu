@@ -140,7 +140,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         private void addRooms(IEnumerable<Room> rooms)
         {
             foreach (var room in rooms)
-                roomFlow.Add(new DrawableLoungeRoom(room) { SelectedRoom = { BindTarget = SelectedRoom } });
+                roomFlow.Add(new DrawableLoungeRoom(room) { SelectedRoom = SelectedRoom });
 
             applyFilterCriteria(Filter?.Value);
         }

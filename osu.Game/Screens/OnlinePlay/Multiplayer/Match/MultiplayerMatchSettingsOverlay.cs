@@ -28,14 +28,20 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 {
     public partial class MultiplayerMatchSettingsOverlay : RoomSettingsOverlay
     {
-        private MatchSettings settings = null!;
+        public required Bindable<PlaylistItem?> SelectedItem
+        {
+            get => selectedItem;
+            set => selectedItem.Current = value;
+        }
 
         protected override OsuButton SubmitButton => settings.ApplyButton;
+        protected override bool IsLoading => ongoingOperationTracker.InProgress.Value;
 
         [Resolved]
         private OngoingOperationTracker ongoingOperationTracker { get; set; } = null!;
 
-        protected override bool IsLoading => ongoingOperationTracker.InProgress.Value;
+        private readonly BindableWithCurrent<PlaylistItem?> selectedItem = new BindableWithCurrent<PlaylistItem?>();
+        private MatchSettings settings = null!;
 
         public MultiplayerMatchSettingsOverlay(Room room)
             : base(room)
@@ -48,7 +54,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         {
             RelativeSizeAxes = Axes.Both,
             RelativePositionAxes = Axes.Y,
-            SettingsApplied = Hide
+            SettingsApplied = Hide,
+            SelectedItem = { BindTarget = SelectedItem }
         };
 
         protected partial class MatchSettings : OnlinePlayComposite
@@ -57,6 +64,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
             public override bool IsPresent => base.IsPresent || Scheduler.HasPendingTasks;
 
+            public readonly Bindable<PlaylistItem?> SelectedItem = new Bindable<PlaylistItem?>();
             public Action? SettingsApplied;
 
             public OsuTextBox NameField = null!;
@@ -66,7 +74,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             public OsuTextBox PasswordTextBox = null!;
             public OsuCheckbox AutoSkipCheckbox = null!;
             public RoundedButton ApplyButton = null!;
-
             public OsuSpriteText ErrorText = null!;
 
             private OsuEnumDropdown<StartMode> startModeDropdown = null!;
@@ -367,7 +374,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 base.LoadComplete();
 
                 drawablePlaylist.Items.BindTo(Playlist);
-                drawablePlaylist.SelectedItem.BindTo(CurrentPlaylistItem);
+                drawablePlaylist.SelectedItem.BindTo(SelectedItem);
             }
 
             protected override void Update()
@@ -448,7 +455,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 if (text.StartsWith(not_found_prefix, StringComparison.Ordinal))
                 {
                     ErrorText.Text = "The selected beatmap is not available online.";
-                    CurrentPlaylistItem.Value.MarkInvalid();
+                    SelectedItem.Value?.MarkInvalid();
                 }
                 else
                 {

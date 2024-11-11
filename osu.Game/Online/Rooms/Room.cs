@@ -1,10 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Newtonsoft.Json;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -16,8 +17,25 @@ using osu.Game.Online.Rooms.RoomStatuses;
 namespace osu.Game.Online.Rooms
 {
     [JsonObject(MemberSerialization.OptIn)]
-    public partial class Room : IDependencyInjectionCandidate
+    public partial class Room : IDependencyInjectionCandidate, INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        [JsonProperty("current_playlist_item")]
+        private PlaylistItem? currentPlaylistItem;
+
+        /// <summary>
+        /// Represents the current item selected within the room.
+        /// </summary>
+        /// <remarks>
+        /// Only valid for room listing requests (i.e. in the lounge screen), and may not be valid while inside the room.
+        /// </remarks>
+        public PlaylistItem? CurrentPlaylistItem
+        {
+            get => currentPlaylistItem;
+            set => SetField(ref currentPlaylistItem, value);
+        }
+
         [Cached]
         [JsonProperty("id")]
         public readonly Bindable<long?> RoomID = new Bindable<long?>();
@@ -28,7 +46,7 @@ namespace osu.Game.Online.Rooms
 
         [Cached]
         [JsonProperty("host")]
-        public readonly Bindable<APIUser> Host = new Bindable<APIUser>();
+        public readonly Bindable<APIUser?> Host = new Bindable<APIUser?>();
 
         [Cached]
         [JsonProperty("playlist")]
@@ -37,10 +55,6 @@ namespace osu.Game.Online.Rooms
         [Cached]
         [JsonProperty("channel_id")]
         public readonly Bindable<int> ChannelId = new Bindable<int>();
-
-        [JsonProperty("current_playlist_item")]
-        [Cached]
-        public readonly Bindable<PlaylistItem> CurrentPlaylistItem = new Bindable<PlaylistItem>();
 
         [JsonProperty("playlist_item_stats")]
         [Cached]
@@ -126,7 +140,7 @@ namespace osu.Game.Online.Rooms
 
         [Cached(Name = nameof(Password))]
         [JsonProperty("password")]
-        public readonly Bindable<string> Password = new Bindable<string>();
+        public readonly Bindable<string?> Password = new Bindable<string?>();
 
         [Cached]
         public readonly Bindable<TimeSpan?> Duration = new Bindable<TimeSpan?>();
@@ -203,7 +217,7 @@ namespace osu.Game.Online.Rooms
             AutoStartDuration.Value = other.AutoStartDuration.Value;
             DifficultyRange.Value = other.DifficultyRange.Value;
             PlaylistItemStats.Value = other.PlaylistItemStats.Value;
-            CurrentPlaylistItem.Value = other.CurrentPlaylistItem.Value;
+            CurrentPlaylistItem = other.CurrentPlaylistItem;
             AutoSkip.Value = other.AutoSkip.Value;
 
             other.RemoveExpiredPlaylistItems();
@@ -240,7 +254,7 @@ namespace osu.Game.Online.Rooms
             public int CountTotal;
 
             [JsonProperty("ruleset_ids")]
-            public int[] RulesetIDs;
+            public int[] RulesetIDs = [];
         }
 
         [JsonObject(MemberSerialization.OptIn)]
@@ -251,6 +265,19 @@ namespace osu.Game.Online.Rooms
 
             [JsonProperty("max")]
             public double Max;
+        }
+
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null!)
+            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
+        protected bool SetField<T>(ref T field, T value, [CallerMemberName] string propertyName = null!)
+        {
+            if (EqualityComparer<T>.Default.Equals(field, value))
+                return false;
+
+            field = value;
+            OnPropertyChanged(propertyName);
+            return true;
         }
     }
 }

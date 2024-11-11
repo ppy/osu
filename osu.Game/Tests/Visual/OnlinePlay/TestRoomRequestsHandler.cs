@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -296,10 +294,11 @@ namespace osu.Game.Tests.Visual.OnlinePlay
             Debug.Assert(result != null);
 
             // Playlist item IDs and beatmaps aren't serialised.
-            if (source.CurrentPlaylistItem.Value != null)
+            if (source.CurrentPlaylistItem != null)
             {
-                result.CurrentPlaylistItem.Value = result.CurrentPlaylistItem.Value.With(new Optional<IBeatmapInfo>(source.CurrentPlaylistItem.Value.Beatmap));
-                result.CurrentPlaylistItem.Value.ID = source.CurrentPlaylistItem.Value.ID;
+                Debug.Assert(result.CurrentPlaylistItem != null);
+                result.CurrentPlaylistItem = result.CurrentPlaylistItem.With(new Optional<IBeatmapInfo>(source.CurrentPlaylistItem.Beatmap));
+                result.CurrentPlaylistItem.ID = source.CurrentPlaylistItem.ID;
             }
 
             for (int i = 0; i < source.Playlist.Count; i++)

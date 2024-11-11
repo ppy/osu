@@ -41,6 +41,31 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("create rooms", () =>
             {
+                PlaylistItem item1 = new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo)
+                {
+                    BeatmapInfo = { StarRating = 2.5 }
+                }.BeatmapInfo);
+
+                PlaylistItem item2 = new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo)
+                {
+                    BeatmapInfo = { StarRating = 4.5 }
+                }.BeatmapInfo);
+
+                PlaylistItem item3 = new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo)
+                {
+                    BeatmapInfo =
+                    {
+                        StarRating = 2.5,
+                        Metadata =
+                        {
+                            Artist = "very very very very very very very very very long artist",
+                            ArtistUnicode = "very very very very very very very very very long artist",
+                            Title = "very very very very very very very very very very very long title",
+                            TitleUnicode = "very very very very very very very very very very very long title",
+                        }
+                    }
+                }.BeatmapInfo);
+
                 Child = rooms = new FillFlowContainer
                 {
                     Anchor = Anchor.Centre,
@@ -56,16 +81,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                             Status = { Value = new RoomStatusOpen() },
                             EndDate = { Value = DateTimeOffset.Now.AddDays(1) },
                             Type = { Value = MatchType.HeadToHead },
-                            Playlist =
-                            {
-                                new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo)
-                                {
-                                    BeatmapInfo =
-                                    {
-                                        StarRating = 2.5
-                                    }
-                                }.BeatmapInfo)
-                            }
+                            Playlist = { item1 },
+                            CurrentPlaylistItem = item1
                         }),
                         createLoungeRoom(new Room
                         {
@@ -74,46 +91,16 @@ namespace osu.Game.Tests.Visual.Multiplayer
                             HasPassword = { Value = true },
                             EndDate = { Value = DateTimeOffset.Now.AddDays(1) },
                             Type = { Value = MatchType.HeadToHead },
-                            Playlist =
-                            {
-                                new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo)
-                                {
-                                    BeatmapInfo =
-                                    {
-                                        StarRating = 2.5,
-                                        Metadata =
-                                        {
-                                            Artist = "very very very very very very very very very long artist",
-                                            ArtistUnicode = "very very very very very very very very very long artist",
-                                            Title = "very very very very very very very very very very very long title",
-                                            TitleUnicode = "very very very very very very very very very very very long title",
-                                        }
-                                    }
-                                }.BeatmapInfo)
-                            }
+                            Playlist = { item3 },
+                            CurrentPlaylistItem = item3
                         }),
                         createLoungeRoom(new Room
                         {
                             Name = { Value = "Playlist room with multiple beatmaps" },
                             Status = { Value = new RoomStatusPlaying() },
                             EndDate = { Value = DateTimeOffset.Now.AddDays(1) },
-                            Playlist =
-                            {
-                                new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo)
-                                {
-                                    BeatmapInfo =
-                                    {
-                                        StarRating = 2.5
-                                    }
-                                }.BeatmapInfo),
-                                new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo)
-                                {
-                                    BeatmapInfo =
-                                    {
-                                        StarRating = 4.5
-                                    }
-                                }.BeatmapInfo)
-                            }
+                            Playlist = { item1, item2 },
+                            CurrentPlaylistItem = item1
                         }),
                         createLoungeRoom(new Room
                         {
@@ -181,20 +168,29 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     {
                         Name = { Value = "A host-only room" },
                         QueueMode = { Value = QueueMode.HostOnly },
-                        Type = { Value = MatchType.HeadToHead }
-                    }),
+                        Type = { Value = MatchType.HeadToHead },
+                    })
+                    {
+                        SelectedItem = new Bindable<PlaylistItem>()
+                    },
                     new DrawableMatchRoom(new Room
                     {
                         Name = { Value = "An all-players, team-versus room" },
                         QueueMode = { Value = QueueMode.AllPlayers },
                         Type = { Value = MatchType.TeamVersus }
-                    }),
+                    })
+                    {
+                        SelectedItem = new Bindable<PlaylistItem>()
+                    },
                     new DrawableMatchRoom(new Room
                     {
                         Name = { Value = "A round-robin room" },
                         QueueMode = { Value = QueueMode.AllPlayersRoundRobin },
                         Type = { Value = MatchType.HeadToHead }
-                    }),
+                    })
+                    {
+                        SelectedItem = new Bindable<PlaylistItem>()
+                    },
                 }
             });
         }
@@ -215,7 +211,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             return new DrawableLoungeRoom(room)
             {
                 MatchingFilter = true,
-                SelectedRoom = { BindTarget = selectedRoom }
+                SelectedRoom = selectedRoom
             };
         }
     }

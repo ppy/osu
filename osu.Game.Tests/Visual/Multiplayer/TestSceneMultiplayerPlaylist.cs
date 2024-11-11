@@ -28,9 +28,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public partial class TestSceneMultiplayerPlaylist : MultiplayerTestScene
     {
-        [Cached(typeof(IBindable<PlaylistItem>))]
-        private readonly Bindable<PlaylistItem> currentItem = new Bindable<PlaylistItem>();
-
         private MultiplayerPlaylist list = null!;
         private BeatmapManager beatmaps = null!;
         private BeatmapSetInfo importedSet = null!;
@@ -56,7 +53,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.Both,
-                    Size = new Vector2(0.4f, 0.8f)
+                    Size = new Vector2(0.4f, 0.8f),
+                    SelectedItem = new Bindable<PlaylistItem?>()
                 };
             });
 
