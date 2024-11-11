@@ -15,6 +15,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -60,6 +61,8 @@ namespace osu.Game.Screens.Play.PlayerSettings
         [Resolved]
         private IGameplayClock? gameplayClock { get; set; }
 
+        private double? unstableRate;
+        private Bindable<bool> autoAudioOffset = null!;
         private double lastPlayAverage;
         private double lastPlayBeatmapOffset;
         private HitEventTimingDistributionGraph? lastPlayGraph;
@@ -169,6 +172,12 @@ namespace osu.Game.Screens.Play.PlayerSettings
             }
         }
 
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
+        {
+            autoAudioOffset = config.GetBindable<bool>(OsuSetting.AutoAudioOffset);
+        }
+
         private void scoreChanged(ValueChangedEvent<ScoreInfo?> score)
         {
             referenceScoreContainer.Clear();
@@ -209,6 +218,24 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 });
 
                 return;
+            }
+
+            unstableRate = hitEvents.CalculateUnstableRate();
+            const double unstablerate_threshold = 90; // threshold under which offset is applied immediately or the calculation is used.
+
+            if (autoAudioOffset.Value) //enter case if global setting is checked.
+            {
+                if (hitEvents.Count > 10) //make sure that UR and hit error average are available.
+                {
+                    Current.Value = unstableRate switch
+                    {
+                        // calculated offsets which were achieved with low UR have higher impact than offsets calculated with high UR.
+                        >= unstablerate_threshold => lastPlayBeatmapOffset - (Math.Exp((double)(-0.0116 * (unstableRate - unstablerate_threshold))) * average),
+                        // UR is smaller than the threshold and offset is applied.
+                        < unstablerate_threshold => lastPlayBeatmapOffset - average,
+                        _ => Current.Value
+                    };
+                }
             }
 
             lastPlayAverage = average;
