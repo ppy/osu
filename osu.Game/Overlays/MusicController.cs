@@ -460,15 +460,7 @@ namespace osu.Game.Overlays
 
         private TrackChangeDirection? queuedDirection;
 
-        private IEnumerable<Live<BeatmapSetInfo>> getBeatmapSets()
-        {
-            return Playlist.IsDefault
-                ? realm.Realm.All<BeatmapSetInfo>()
-                       .Where(s => !s.DeletePending)
-                       .AsEnumerable()
-                       .Select(s => new RealmLive<BeatmapSetInfo>(s, realm))
-                : Playlist.Where(s => !s.Value.DeletePending);
-        }
+        private IEnumerable<Live<BeatmapSetInfo>> getBeatmapSets() => Playlist.Where(s => !s.Value.DeletePending);
 
         private void changeBeatmap(WorkingBeatmap newWorking)
         {
