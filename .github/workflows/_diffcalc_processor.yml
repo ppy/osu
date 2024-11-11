@@ -251,4 +251,4 @@ jobs:
     steps:
       - name: Cleanup
         run: |
-          rm -rf "${{ needs.directory.outputs.GENERATOR_DIR }}"
+          rm -rf "${{ env.GENERATOR_DIR }}"
