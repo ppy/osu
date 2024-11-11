@@ -230,7 +230,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                     Current.Value = unstableRate switch
                     {
                         //makes calculated offsets which were achieved with low UR have higher impact then offsets calculated with high UR
-                        > unstablerate_threshold => lastPlayBeatmapOffset - (Math.Exp((double)(-0.0116 * (unstableRate - unstablerate_threshold))) * average),
+                        >= unstablerate_threshold => lastPlayBeatmapOffset - (Math.Exp((double)(-0.0116 * (unstableRate - unstablerate_threshold))) * average),
                         //case is smaller than the threshold and offset is applied
                         < unstablerate_threshold => lastPlayBeatmapOffset - average,
                         _ => Current.Value
