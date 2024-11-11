@@ -180,7 +180,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 {
                     // We add tick misses here since they too mean that the player didn't follow the slider properly
                     // We however aren't adding misses here because missing slider heads has a harsh penalty by itself and doesn't mean that the rest of the slider wasn't followed properly
-                    estimateImproperlyFollowedDifficultSliders = Math.Min(countSliderEndsDropped + countSliderTickMiss, estimateDifficultSliders);
+                    estimateImproperlyFollowedDifficultSliders = Math.Clamp(countSliderEndsDropped + countSliderTickMiss, 0, estimateDifficultSliders);
                 }
 
                 double sliderNerfFactor = (1 - attributes.SliderFactor) * Math.Pow(1 - estimateImproperlyFollowedDifficultSliders / estimateDifficultSliders, 3) + attributes.SliderFactor;
