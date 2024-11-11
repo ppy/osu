@@ -12,6 +12,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Screens.Select
@@ -82,14 +83,15 @@ namespace osu.Game.Screens.Select
                 {
                     RelativeSizeAxes = Axes.Both,
                     Size = Vector2.One,
-                    Colour = Color4.Black.Opacity(0.5f),
+                    Colour = OsuColour.Gray(0.1f),
+                    Alpha = 0.96f,
                 },
                 modeLight = new Box
                 {
                     RelativeSizeAxes = Axes.X,
                     Height = 3,
                     Position = new Vector2(0, -3),
-                    Colour = Color4.Black,
+                    Colour = OsuColour.Gray(0.1f),
                 },
                 new FillFlowContainer
                 {
