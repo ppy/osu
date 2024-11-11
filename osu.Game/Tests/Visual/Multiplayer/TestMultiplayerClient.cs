@@ -232,7 +232,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 {
                     Name = ServerAPIRoom.Name.Value,
                     MatchType = ServerAPIRoom.Type.Value,
-                    Password = password,
+                    Password = password ?? string.Empty,
                     QueueMode = ServerAPIRoom.QueueMode.Value,
                     AutoStartDuration = ServerAPIRoom.AutoStartDuration.Value
                 },

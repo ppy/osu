@@ -35,7 +35,6 @@ namespace osu.Game.Screens.OnlinePlay.Match
     [Cached(typeof(IPreviewTrackOwner))]
     public abstract partial class RoomSubScreen : OnlinePlaySubScreen, IPreviewTrackOwner
     {
-        [Cached(typeof(IBindable<PlaylistItem>))]
         public readonly Bindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();
 
         public override bool? ApplyModTrackAdjustments => true;
@@ -164,7 +163,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
                                                     new DrawableMatchRoom(Room, allowEdit)
                                                     {
                                                         OnEdit = () => settingsOverlay.Show(),
-                                                        SelectedItem = { BindTarget = SelectedItem }
+                                                        SelectedItem = SelectedItem
                                                     }
                                                 },
                                                 null,

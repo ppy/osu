@@ -21,6 +21,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 {
     public partial class MultiplayerSpectateButton : CompositeDrawable
     {
+        public required Bindable<PlaylistItem?> SelectedItem
+        {
+            get => selectedItem;
+            set => selectedItem.Current = value;
+        }
+
         [Resolved]
         private OngoingOperationTracker ongoingOperationTracker { get; set; } = null!;
 
@@ -30,12 +36,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         [Resolved]
         private MultiplayerClient client { get; set; } = null!;
 
-        [Resolved]
-        private IBindable<PlaylistItem?> currentItem { get; set; } = null!;
+        private readonly BindableWithCurrent<PlaylistItem?> selectedItem = new BindableWithCurrent<PlaylistItem?>();
+        private readonly RoundedButton button;
 
         private IBindable<bool> operationInProgress = null!;
-
-        private readonly RoundedButton button;
 
         public MultiplayerSpectateButton()
         {
@@ -71,7 +75,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         {
             base.LoadComplete();
 
-            currentItem.BindValueChanged(_ => Scheduler.AddOnce(checkForAutomaticDownload), true);
+            SelectedItem.BindValueChanged(_ => Scheduler.AddOnce(checkForAutomaticDownload), true);
             client.RoomUpdated += onRoomUpdated;
             updateState();
         }
@@ -117,7 +121,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
         private void checkForAutomaticDownload()
         {
-            PlaylistItem? item = currentItem.Value;
+            PlaylistItem? item = SelectedItem.Value;
 
             downloadCheckCancellation?.Cancel();
 

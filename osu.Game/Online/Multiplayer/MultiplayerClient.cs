@@ -203,7 +203,7 @@ namespace osu.Game.Online.Multiplayer
 
                     APIRoom.Playlist.Clear();
                     APIRoom.Playlist.AddRange(joinedRoom.Playlist.Select(item => new PlaylistItem(item)));
-                    APIRoom.CurrentPlaylistItem.Value = APIRoom.Playlist.Single(item => item.ID == joinedRoom.Settings.PlaylistItemId);
+                    APIRoom.CurrentPlaylistItem = APIRoom.Playlist.Single(item => item.ID == joinedRoom.Settings.PlaylistItemId);
 
                     // The server will null out the end date upon the host joining the room, but the null value is never communicated to the client.
                     APIRoom.EndDate.Value = null;
@@ -847,7 +847,7 @@ namespace osu.Game.Online.Multiplayer
             APIRoom.Type.Value = Room.Settings.MatchType;
             APIRoom.QueueMode.Value = Room.Settings.QueueMode;
             APIRoom.AutoStartDuration.Value = Room.Settings.AutoStartDuration;
-            APIRoom.CurrentPlaylistItem.Value = APIRoom.Playlist.Single(item => item.ID == settings.PlaylistItemId);
+            APIRoom.CurrentPlaylistItem = APIRoom.Playlist.Single(item => item.ID == settings.PlaylistItemId);
             APIRoom.AutoSkip.Value = Room.Settings.AutoSkip;
 
             RoomUpdated?.Invoke();

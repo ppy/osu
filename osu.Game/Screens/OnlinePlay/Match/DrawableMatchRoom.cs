@@ -1,10 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -21,25 +18,22 @@ namespace osu.Game.Screens.OnlinePlay.Match
 {
     public partial class DrawableMatchRoom : DrawableRoom
     {
-        public readonly IBindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();
-        public Action OnEdit;
+        public Action? OnEdit;
 
         [Resolved]
-        private IAPIProvider api { get; set; }
+        private IAPIProvider api { get; set; } = null!;
 
-        private readonly IBindable<APIUser> host = new Bindable<APIUser>();
+        private readonly BindableWithCurrent<PlaylistItem?> current = new BindableWithCurrent<PlaylistItem?>();
+        private readonly IBindable<APIUser?> host = new Bindable<APIUser?>();
         private readonly bool allowEdit;
-
-        [CanBeNull]
-        private Drawable editButton;
-
-        private BackgroundSprite background;
+        private Drawable? editButton;
 
         public DrawableMatchRoom(Room room, bool allowEdit = true)
             : base(room)
         {
             this.allowEdit = allowEdit;
 
+            base.SelectedItem.BindTo(SelectedItem);
             host.BindTo(room.Host);
         }
 
@@ -58,21 +52,23 @@ namespace osu.Game.Screens.OnlinePlay.Match
             }
         }
 
+        public new required Bindable<PlaylistItem?> SelectedItem
+        {
+            get => current;
+            set => current.Current = value;
+        }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
             if (editButton != null)
                 host.BindValueChanged(h => editButton.Alpha = h.NewValue?.Equals(api.LocalUser.Value) == true ? 1 : 0, true);
-
-            SelectedItem.BindValueChanged(item => background.Beatmap.Value = item.NewValue?.Beatmap, true);
         }
 
-        protected override Drawable CreateBackground() => background = new BackgroundSprite();
-
-        private partial class BackgroundSprite : UpdateableBeatmapBackgroundSprite
+        protected override UpdateableBeatmapBackgroundSprite CreateBackground() => base.CreateBackground().With(d =>
         {
-            protected override double LoadDelay => 0;
-        }
+            d.BackgroundLoadDelay = 0;
+        });
     }
 }
