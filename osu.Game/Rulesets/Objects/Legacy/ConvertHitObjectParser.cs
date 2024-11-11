@@ -156,7 +156,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
             {
                 double duration = Math.Max(0, Parsing.ParseDouble(split[5]) + offset - startTime);
 
-                result = createSpinner(new Vector2(512, 384) / 2, combo, comboOffset, duration);
+                result = createSpinner(new Vector2(512, 384) / 2, combo, duration);
 
                 if (split.Length > 6)
                     readCustomSampleBanks(split[6], bankInfo);
@@ -174,7 +174,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                     readCustomSampleBanks(string.Join(':', ss.Skip(1)), bankInfo);
                 }
 
-                result = createHold(pos, combo, comboOffset, endTime + offset - startTime);
+                result = createHold(pos, endTime + offset - startTime);
             }
 
             if (result == null)
@@ -489,10 +489,9 @@ namespace osu.Game.Rulesets.Objects.Legacy
         /// </summary>
         /// <param name="position">The position of the hit object.</param>
         /// <param name="newCombo">Whether the hit object creates a new combo.</param>
-        /// <param name="comboOffset">When starting a new combo, the offset of the new combo relative to the current one.</param>
         /// <param name="duration">The spinner duration.</param>
         /// <returns>The hit object.</returns>
-        private ConvertHitObject createSpinner(Vector2 position, bool newCombo, int comboOffset, double duration)
+        private ConvertHitObject createSpinner(Vector2 position, bool newCombo, double duration)
         {
             return lastObject = new ConvertSpinner
             {
@@ -507,10 +506,8 @@ namespace osu.Game.Rulesets.Objects.Legacy
         /// Creates a legacy Hold-type hit object.
         /// </summary>
         /// <param name="position">The position of the hit object.</param>
-        /// <param name="newCombo">Whether the hit object creates a new combo.</param>
-        /// <param name="comboOffset">When starting a new combo, the offset of the new combo relative to the current one.</param>
         /// <param name="duration">The hold duration.</param>
-        private ConvertHitObject createHold(Vector2 position, bool newCombo, int comboOffset, double duration)
+        private ConvertHitObject createHold(Vector2 position, double duration)
         {
             return lastObject = new ConvertHold
             {
