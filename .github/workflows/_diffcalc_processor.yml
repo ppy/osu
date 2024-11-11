@@ -84,7 +84,7 @@ jobs:
           PR_TEXT: ${{ inputs.pr-text }}
         run: |
           # Add comment environment
-          echo "${PR_TEXT}" | sed -r 's/\r$//' | grep -E '^\w+=' | while read -r line; do
+          echo "${PR_TEXT}" | sed -r 's/\r$//' | { grep -E '^\w+=' || true; } | while read -r line; do
               opt=$(echo "${line}" | cut -d '=' -f1)
               sed -i "s;^${opt}=.*$;${line};" "${{ env.GENERATOR_ENV }}"
           done
