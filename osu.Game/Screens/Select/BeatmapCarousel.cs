@@ -222,12 +222,6 @@ namespace osu.Game.Screens.Select
             InternalChild = new Container
             {
                 RelativeSizeAxes = Axes.Both,
-                Padding = new MarginPadding
-                {
-                    // Avoid clash between scrollbar and osu! logo.
-                    Top = 10,
-                    Bottom = 100,
-                },
                 Children = new Drawable[]
                 {
                     setPool,
@@ -1270,6 +1264,38 @@ namespace osu.Game.Screens.Select
                     return false;
 
                 return base.OnDragStart(e);
+            }
+
+            protected override ScrollbarContainer CreateScrollbar(Direction direction)
+            {
+                return new PaddedScrollbar();
+            }
+
+            protected partial class PaddedScrollbar : OsuScrollbar
+            {
+                public PaddedScrollbar()
+                    : base(Direction.Vertical)
+                {
+                }
+            }
+
+            private const float top_padding = 10;
+            private const float bottom_padding = 80;
+
+            protected override float ToScrollbarPosition(float scrollPosition)
+            {
+                if (Precision.AlmostEquals(0, ScrollableExtent))
+                    return 0;
+
+                return top_padding + (ScrollbarMovementExtent - bottom_padding) * (scrollPosition / ScrollableExtent);
+            }
+
+            protected override float FromScrollbarPosition(float scrollbarPosition)
+            {
+                if (Precision.AlmostEquals(0, ScrollbarMovementExtent))
+                    return 0;
+
+                return ScrollableExtent * ((scrollbarPosition - top_padding) / (ScrollbarMovementExtent - bottom_padding));
             }
         }
 
