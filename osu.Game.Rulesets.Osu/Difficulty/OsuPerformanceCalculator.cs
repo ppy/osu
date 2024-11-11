@@ -305,23 +305,22 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double calculateReadingModBonus(ScoreInfo score, OsuDifficultyAttributes attributes)
         {
-            double AR = attributes.ApproachRate;
             bool isFullyHidden = score.Mods.OfType<OsuModHidden>().Any(m => !m.OnlyFadeApproachCircles.Value);
 
-            if (AR >= 7)
+            if (attributes.ApproachRate >= 7)
             {
                 // Normal curve for AR > 7, rewarding lower AR
-                return 0.04 * (12.0 - AR);
+                return 0.04 * (12.0 - attributes.ApproachRate);
             }
-            else if (AR >= 2)
+            else if (attributes.ApproachRate >= 2)
             {
                 // For fully hidden notes - add additional reward for extra low AR
-                return 0.2 + (isFullyHidden ? 0.06 : 0.04) * (7.0 - AR);
+                return 0.2 + (isFullyHidden ? 0.06 : 0.04) * (7.0 - attributes.ApproachRate);
             }
             else
             {
                 // Max bonus is 0.7 for fully hidden and 0.55 for half-hidden or traceable
-                return (isFullyHidden ? 0.5 : 0.4) + (isFullyHidden ? 0.2 : 0.15) * (1 - Math.Pow(1.5, AR - 2));
+                return (isFullyHidden ? 0.5 : 0.4) + (isFullyHidden ? 0.2 : 0.15) * (1 - Math.Pow(1.5, attributes.ApproachRate - 2));
             }
         }
 
