@@ -120,11 +120,11 @@ namespace osu.Game.Tests.Beatmaps.Formats
         private void compareBeatmaps((IBeatmap beatmap, TestLegacySkin skin) expected, (IBeatmap beatmap, TestLegacySkin skin) actual)
         {
             // Check all control points that are still considered to be at a global level.
-            Assert.That(expected.beatmap.ControlPointInfo.TimingPoints.Serialize(), Is.EqualTo(actual.beatmap.ControlPointInfo.TimingPoints.Serialize()));
-            Assert.That(expected.beatmap.ControlPointInfo.EffectPoints.Serialize(), Is.EqualTo(actual.beatmap.ControlPointInfo.EffectPoints.Serialize()));
+            Assert.That(actual.beatmap.ControlPointInfo.TimingPoints.Serialize(), Is.EqualTo(expected.beatmap.ControlPointInfo.TimingPoints.Serialize()));
+            Assert.That(actual.beatmap.ControlPointInfo.EffectPoints.Serialize(), Is.EqualTo(expected.beatmap.ControlPointInfo.EffectPoints.Serialize()));
 
             // Check all hitobjects.
-            Assert.That(expected.beatmap.HitObjects.Serialize(), Is.EqualTo(actual.beatmap.HitObjects.Serialize()));
+            Assert.That(actual.beatmap.HitObjects.Serialize(), Is.EqualTo(expected.beatmap.HitObjects.Serialize()));
 
             // Check skin.
             Assert.IsTrue(areComboColoursEqual(expected.skin.Configuration, actual.skin.Configuration));

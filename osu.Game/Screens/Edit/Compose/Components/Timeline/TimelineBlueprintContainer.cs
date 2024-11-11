@@ -91,7 +91,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             }
         }
 
-        protected override Container<SelectionBlueprint<HitObject>> CreateSelectionBlueprintContainer() => new TimelineSelectionBlueprintContainer { RelativeSizeAxes = Axes.Both };
+        protected override SelectionBlueprintContainer CreateSelectionBlueprintContainer() => new TimelineSelectionBlueprintContainer { RelativeSizeAxes = Axes.Both };
 
         protected override bool OnDragStart(DragStartEvent e)
         {
@@ -173,7 +173,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         protected sealed override DragBox CreateDragBox() => new TimelineDragBox();
 
-        protected override void UpdateSelectionFromDragBox()
+        protected override void UpdateSelectionFromDragBox(HashSet<HitObject> selectionBeforeDrag)
         {
             Composer.BlueprintContainer.CommitIfPlacementActive();
 
@@ -191,6 +191,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             bool shouldBeSelected(HitObject hitObject)
             {
+                if (selectionBeforeDrag.Contains(hitObject))
+                    return true;
+
                 double midTime = (hitObject.StartTime + hitObject.GetEndTime()) / 2;
                 return minTime <= midTime && midTime <= maxTime;
             }
@@ -284,13 +287,26 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             }
         }
 
-        protected partial class TimelineSelectionBlueprintContainer : Container<SelectionBlueprint<HitObject>>
+        protected partial class TimelineSelectionBlueprintContainer : SelectionBlueprintContainer
         {
-            protected override Container<SelectionBlueprint<HitObject>> Content { get; }
+            protected override HitObjectOrderedSelectionContainer Content { get; }
 
             public TimelineSelectionBlueprintContainer()
             {
                 AddInternal(new TimelinePart<SelectionBlueprint<HitObject>>(Content = new HitObjectOrderedSelectionContainer { RelativeSizeAxes = Axes.Both }) { RelativeSizeAxes = Axes.Both });
+            }
+
+            public override void ChangeChildDepth(SelectionBlueprint<HitObject> child, float newDepth)
+            {
+                // timeline blueprint container also contains a blueprint for current placement, if present
+                // (see `placementChanged()` callback above).
+                // because the current placement hitobject is generally going to be mutated during the placement,
+                // it is possible for `Content`'s children to become unsorted when the user moves the placement around,
+                // which can culminate in a critical failure when attempting to binary-search children here
+                // using `HitObjectOrderedSelectionContainer`'s custom comparer.
+                // thus, always force a re-sort of objects before attempting to change child depth to avoid this scenario.
+                Content.Sort();
+                base.ChangeChildDepth(child, newDepth);
             }
         }
     }
