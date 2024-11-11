@@ -12,6 +12,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Graphics;
@@ -123,6 +124,7 @@ namespace osu.Game.Overlays.Music
                 {
                     musicController.Playlist.Clear();
                     musicController.Playlist.AddRange(sender.Select(b => b.ToLive(realm)));
+                    Logger.Log("Playlist items: " + musicController.Playlist.Count);
                 }
                 return;
             }
@@ -131,14 +133,20 @@ namespace osu.Game.Overlays.Music
             {
                 beatmapSets.Insert(i, sender[i].ToLive(realm));
                 if (!list.IsLoaded)
+                {
                     musicController.Playlist.Insert(i, sender[i].ToLive(realm));
+                    Logger.Log("Playlist items: " + musicController.Playlist.Count);
+                }
             }
 
             foreach (int i in changes.DeletedIndices.OrderDescending())
             {
                 beatmapSets.RemoveAt(i);
                 if (!list.IsLoaded)
+                {
                     musicController.Playlist.RemoveAt(i);
+                    Logger.Log("Playlist items: " + musicController.Playlist.Count);
+                }
             }
         }
 
