@@ -197,6 +197,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.EditorShowSpeedChanges, false);
             SetDefault(OsuSetting.EditorScaleOrigin, EditorOrigin.GridCentre);
             SetDefault(OsuSetting.EditorRotationOrigin, EditorOrigin.GridCentre);
+            SetDefault(OsuSetting.EditorAdjustExistingObjectsOnTimingChanges, true);
 
             SetDefault(OsuSetting.HideCountryFlags, false);
 
@@ -444,5 +445,6 @@ namespace osu.Game.Configuration
         EditorScaleOrigin,
         EditorRotationOrigin,
         EditorTimelineShowBreaks,
+        EditorAdjustExistingObjectsOnTimingChanges,
     }
 }
