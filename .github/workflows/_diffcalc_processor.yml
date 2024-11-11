@@ -32,6 +32,10 @@ env:
   GENERATOR_DIR: ${{ github.workspace }}/${{ inputs.id }}
   GENERATOR_ENV: ${{ github.workspace }}/${{ inputs.id }}/.env
 
+defaults:
+  run:
+    shell: bash -euo pipefail {0}
+
 jobs:
   environment:
     name: Setup environment

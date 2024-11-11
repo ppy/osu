@@ -103,6 +103,10 @@ permissions:
 env:
   EXECUTION_ID: execution-${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}
 
+defaults:
+  run:
+    shell: bash -euo pipefail {0}
+
 jobs:
   check-permissions:
     name: Check permissions
