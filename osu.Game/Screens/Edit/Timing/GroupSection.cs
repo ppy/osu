@@ -7,6 +7,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osuTK;
@@ -24,6 +25,9 @@ namespace osu.Game.Screens.Edit.Timing
 
         [Resolved]
         protected EditorBeatmap Beatmap { get; private set; } = null!;
+
+        [Resolved]
+        private OsuConfigManager configManager { get; set; } = null!;
 
         [Resolved]
         private EditorClock clock { get; set; } = null!;
@@ -112,7 +116,7 @@ namespace osu.Game.Screens.Edit.Timing
             foreach (var cp in currentGroupItems)
             {
                 // Only adjust hit object offsets if the group contains a timing control point
-                if (Beatmap.AdjustNotesOnOffsetBPMChange.Value && cp is TimingControlPoint tp)
+                if (cp is TimingControlPoint tp && configManager.Get<bool>(OsuSetting.EditorAdjustExistingObjectsOnTimingChanges))
                 {
                     TimingSectionAdjustments.AdjustHitObjectOffset(Beatmap, tp, time - SelectedGroup.Value.Time);
                     Beatmap.UpdateAllHitObjects();
