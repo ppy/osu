@@ -67,7 +67,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Adjust a beatmaps offset after every play"
         /// </summary>
-        public static LocalisableString AutoAdjustBeatmapOffset => new TranslatableString(getKey(@"auto_adjust_offset"), @"Adjust a beatmaps offset after every play");
+        public static LocalisableString AutoAdjustBeatmapOffset => new TranslatableString(getKey(@"auto_adjust_beatmap_offset"), @"Adjust a beatmaps offset after every play");
 
         /// <summary>
         /// "Play a few beatmaps to receive a suggested offset!"
