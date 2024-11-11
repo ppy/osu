@@ -65,7 +65,7 @@ namespace osu.Game.Localisation
         public static LocalisableString AudioOffset => new TranslatableString(getKey(@"audio_offset"), @"Audio offset");
 
         /// <summary>
-        /// "Automnatically adjust the offset each time a map is played/restarted"
+        /// "Automatically adjust offset after each play"
         /// </summary>
         public static LocalisableString AutoAudioOffset => new TranslatableString(getKey(@"auto_audio_offset"), @"Automatically adjust offset after each play");
 
