@@ -172,10 +172,12 @@ namespace osu.Game.Screens.Play.PlayerSettings
             }
         }
 
+        [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
             autoAudioOffset = config.GetBindable<bool>(OsuSetting.AutoAudioOffset);
         }
+
         private void scoreChanged(ValueChangedEvent<ScoreInfo?> score)
         {
             referenceScoreContainer.Clear();
