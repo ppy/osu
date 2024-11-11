@@ -133,7 +133,7 @@ jobs:
       head-sha: https://github.com/${{ github.repository }}/commit/${{ github.event.pull_request.head.sha || github.sha }}
       pr-url: ${{ github.event.issue.pull_request.html_url || '' }}
       pr-text: ${{ github.event.comment.body || '' }}
-      dispatch-inputs: ${{ toJSON(inputs) }}
+      dispatch-inputs: ${{ (github.event.type == 'workflow_dispatch' && toJSON(inputs)) || '' }}
     secrets:
       DIFFCALC_GOOGLE_CREDENTIALS: ${{ secrets.DIFFCALC_GOOGLE_CREDENTIALS }}
 
