@@ -1280,14 +1280,14 @@ namespace osu.Game.Screens.Select
             }
 
             private const float top_padding = 10;
-            private const float bottom_padding = 80;
+            private const float bottom_padding = 70;
 
             protected override float ToScrollbarPosition(float scrollPosition)
             {
                 if (Precision.AlmostEquals(0, ScrollableExtent))
                     return 0;
 
-                return top_padding + (ScrollbarMovementExtent - bottom_padding) * (scrollPosition / ScrollableExtent);
+                return top_padding + (ScrollbarMovementExtent - (top_padding + bottom_padding)) * (scrollPosition / ScrollableExtent);
             }
 
             protected override float FromScrollbarPosition(float scrollbarPosition)
@@ -1295,7 +1295,7 @@ namespace osu.Game.Screens.Select
                 if (Precision.AlmostEquals(0, ScrollbarMovementExtent))
                     return 0;
 
-                return ScrollableExtent * ((scrollbarPosition - top_padding) / (ScrollbarMovementExtent - bottom_padding));
+                return ScrollableExtent * ((scrollbarPosition - top_padding) / (ScrollbarMovementExtent - (top_padding + bottom_padding)));
             }
         }
 
