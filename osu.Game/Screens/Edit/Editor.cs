@@ -214,7 +214,9 @@ namespace osu.Game.Screens.Edit
         private Bindable<bool> editorAutoSeekOnPlacement;
         private Bindable<bool> editorLimitedDistanceSnap;
         private Bindable<bool> editorTimelineShowTimingChanges;
+        private Bindable<bool> editorTimelineShowBreaks;
         private Bindable<bool> editorTimelineShowTicks;
+        private Bindable<bool> editorContractSidebars;
 
         /// <summary>
         /// This controls the opacity of components like the timelines, sidebars, etc.
@@ -322,7 +324,9 @@ namespace osu.Game.Screens.Edit
             editorAutoSeekOnPlacement = config.GetBindable<bool>(OsuSetting.EditorAutoSeekOnPlacement);
             editorLimitedDistanceSnap = config.GetBindable<bool>(OsuSetting.EditorLimitedDistanceSnap);
             editorTimelineShowTimingChanges = config.GetBindable<bool>(OsuSetting.EditorTimelineShowTimingChanges);
+            editorTimelineShowBreaks = config.GetBindable<bool>(OsuSetting.EditorTimelineShowBreaks);
             editorTimelineShowTicks = config.GetBindable<bool>(OsuSetting.EditorTimelineShowTicks);
+            editorContractSidebars = config.GetBindable<bool>(OsuSetting.EditorContractSidebars);
 
             AddInternal(new OsuContextMenuContainer
             {
@@ -388,6 +392,10 @@ namespace osu.Game.Screens.Edit
                                                     {
                                                         State = { BindTarget = editorTimelineShowTicks }
                                                     },
+                                                    new ToggleMenuItem(EditorStrings.TimelineShowBreaks)
+                                                    {
+                                                        State = { BindTarget = editorTimelineShowBreaks }
+                                                    },
                                                 ]
                                             },
                                             new BackgroundDimMenuItem(editorBackgroundDim),
@@ -402,14 +410,18 @@ namespace osu.Game.Screens.Edit
                                             new ToggleMenuItem(EditorStrings.LimitedDistanceSnap)
                                             {
                                                 State = { BindTarget = editorLimitedDistanceSnap },
-                                            }
+                                            },
+                                            new ToggleMenuItem(EditorStrings.ContractSidebars)
+                                            {
+                                                State = { BindTarget = editorContractSidebars }
+                                            },
                                         }
                                     },
                                     new MenuItem(EditorStrings.Timing)
                                     {
                                         Items = new MenuItem[]
                                         {
-                                            new EditorMenuItem(EditorStrings.SetPreviewPointToCurrent, MenuItemType.Standard, SetPreviewPointToCurrentTime)
+                                            new EditorMenuItem(EditorStrings.SetPreviewPointToCurrent, MenuItemType.Standard, SetPreviewPointToCurrentTime),
                                         }
                                     }
                                 }
@@ -1098,8 +1110,12 @@ namespace osu.Game.Screens.Edit
 
         private void seekControlPoint(int direction)
         {
-            var found = direction < 1
-                ? editorBeatmap.ControlPointInfo.AllControlPoints.LastOrDefault(p => p.Time < clock.CurrentTime)
+            // In the case of a backwards seek while playing, it can be hard to jump before a timing point.
+            // Adding some lenience here makes it more user-friendly.
+            double seekLenience = clock.IsRunning ? 1000 * ((IAdjustableClock)clock).Rate : 0;
+
+            ControlPoint found = direction < 1
+                ? editorBeatmap.ControlPointInfo.AllControlPoints.LastOrDefault(p => p.Time < clock.CurrentTime - seekLenience)
                 : editorBeatmap.ControlPointInfo.AllControlPoints.FirstOrDefault(p => p.Time > clock.CurrentTime);
 
             if (found != null)
