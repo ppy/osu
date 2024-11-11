@@ -1,0 +1,228 @@
+name: "🔒diffcalc (do not use)"
+
+on:
+  workflow_call:
+    inputs:
+      id:
+        type: string
+      head-sha:
+        type: string
+      pr-url:
+        type: string
+      pr-text:
+        type: string
+      dispatch-inputs:
+        type: string
+    outputs:
+      target:
+        description: The comparison target.
+        value: ${{ jobs.generator.outputs.target }}
+      sheet:
+        description: The comparison spreadsheet.
+        value: ${{ jobs.generator.outputs.sheet }}
+    secrets:
+      DIFFCALC_GOOGLE_CREDENTIALS:
+        required: true
+
+env:
+  GENERATOR_DIR: ${{ github.workspace }}/${{ inputs.id }}
+  GENERATOR_ENV: ${{ github.workspace }}/${{ inputs.id }}/.env
+
+defaults:
+  run:
+    shell: bash -euo pipefail {0}
+
+jobs:
+  generator:
+    name: Run
+    runs-on: self-hosted
+    timeout-minutes: 720
+
+    outputs:
+      target: ${{ steps.run.outputs.target }}
+      sheet: ${{ steps.run.outputs.sheet }}
+
+    steps:
+      - name: Checkout diffcalc-sheet-generator
+        uses: actions/checkout@v4
+        with:
+          path: ${{ inputs.id }}
+          repository: 'smoogipoo/diffcalc-sheet-generator'
+
+      - name: Add base environment
+        env:
+          GOOGLE_CREDS_FILE: ${{ github.workspace }}/${{ inputs.id }}/google-credentials.json
+          VARS_JSON: ${{ (vars != null && toJSON(vars)) || '' }}
+        run: |
+          # Required by diffcalc-sheet-generator
+          cp '${{ env.GENERATOR_DIR }}/.env.sample' "${{ env.GENERATOR_ENV }}"
+
+          # Add Google credentials
+          echo '${{ secrets.DIFFCALC_GOOGLE_CREDENTIALS }}' | base64 -d > "${{ env.GOOGLE_CREDS_FILE }}"
+
+          # Add repository variables
+          echo "${VARS_JSON}" | jq -c '. | to_entries | .[]' | while read -r line; do
+              opt=$(jq -r '.key' <<< ${line})
+              val=$(jq -r '.value' <<< ${line})
+
+              if [[ "${opt}" =~ ^DIFFCALC_ ]]; then
+                optNoPrefix=$(echo "${opt}" | cut -d '_' -f2-)
+                sed -i "s;^${optNoPrefix}=.*$;${optNoPrefix}=${val};" "${{ env.GENERATOR_ENV }}"
+              fi
+          done
+
+      - name: Add HEAD environment
+        run: |
+          sed -i "s;^OSU_A=.*$;OSU_A=${{ inputs.head-sha }};" "${{ env.GENERATOR_ENV }}"
+
+      - name: Add pull-request environment
+        if: ${{ inputs.pr-url != '' }}
+        run: |
+          sed -i "s;^OSU_B=.*$;OSU_B=${{ inputs.pr-url }};" "${{ env.GENERATOR_ENV }}"
+
+      - name: Add comment environment
+        if: ${{ inputs.pr-text != '' }}
+        env:
+          PR_TEXT: ${{ inputs.pr-text }}
+        run: |
+          # Add comment environment
+          echo "${PR_TEXT}" | sed -r 's/\r$//' | { grep -E '^\w+=' || true; } | while read -r line; do
+              opt=$(echo "${line}" | cut -d '=' -f1)
+              sed -i "s;^${opt}=.*$;${line};" "${{ env.GENERATOR_ENV }}"
+          done
+
+      - name: Add dispatch environment
+        if: ${{ inputs.dispatch-inputs != '' }}
+        env:
+          DISPATCH_INPUTS_JSON: ${{ inputs.dispatch-inputs }}
+        run: |
+          function get_input() {
+            echo "${DISPATCH_INPUTS_JSON}" | jq -r ".\"$1\""
+          }
+
+          osu_a=$(get_input 'osu-a')
+          osu_b=$(get_input 'osu-b')
+          ruleset=$(get_input 'ruleset')
+          generators=$(get_input 'generators')
+          difficulty_calculator_a=$(get_input 'difficulty-calculator-a')
+          difficulty_calculator_b=$(get_input 'difficulty-calculator-b')
+          score_processor_a=$(get_input 'score-processor-a')
+          score_processor_b=$(get_input 'score-processor-b')
+          converts=$(get_input 'converts')
+          ranked_only=$(get_input 'ranked-only')
+
+          sed -i "s;^OSU_B=.*$;OSU_B=${osu_b};" "${{ env.GENERATOR_ENV }}"
+          sed -i "s/^RULESET=.*$/RULESET=${ruleset}/" "${{ env.GENERATOR_ENV }}"
+          sed -i "s/^GENERATORS=.*$/GENERATORS=${generators}/" "${{ env.GENERATOR_ENV }}"
+
+          if [[ "${osu_a}" != 'latest' ]]; then
+              sed -i "s;^OSU_A=.*$;OSU_A=${osu_a};" "${{ env.GENERATOR_ENV }}"
+          fi
+
+          if [[ "${difficulty_calculator_a}" != 'latest' ]]; then
+              sed -i "s;^DIFFICULTY_CALCULATOR_A=.*$;DIFFICULTY_CALCULATOR_A=${difficulty_calculator_a};" "${{ env.GENERATOR_ENV }}"
+          fi
+
+          if [[ "${difficulty_calculator_b}" != 'latest' ]]; then
+              sed -i "s;^DIFFICULTY_CALCULATOR_B=.*$;DIFFICULTY_CALCULATOR_B=${difficulty_calculator_b};" "${{ env.GENERATOR_ENV }}"
+          fi
+
+          if [[ "${score_processor_a}" != 'latest' ]]; then
+              sed -i "s;^SCORE_PROCESSOR_A=.*$;SCORE_PROCESSOR_A=${score_processor_a};" "${{ env.GENERATOR_ENV }}"
+          fi
+
+          if [[ "${score_processor_b}" != 'latest' ]]; then
+              sed -i "s;^SCORE_PROCESSOR_B=.*$;SCORE_PROCESSOR_B=${score_processor_b};" "${{ env.GENERATOR_ENV }}"
+          fi
+
+          if [[ "${converts}" == 'true' ]]; then
+              sed -i 's/^NO_CONVERTS=.*$/NO_CONVERTS=0/' "${{ env.GENERATOR_ENV }}"
+          else
+              sed -i 's/^NO_CONVERTS=.*$/NO_CONVERTS=1/' "${{ env.GENERATOR_ENV }}"
+          fi
+
+          if [[ "${ranked_only}" == 'true' ]]; then
+              sed -i 's/^RANKED_ONLY=.*$/RANKED_ONLY=1/' "${{ env.GENERATOR_ENV }}"
+          else
+              sed -i 's/^RANKED_ONLY=.*$/RANKED_ONLY=0/' "${{ env.GENERATOR_ENV }}"
+          fi
+
+      - name: Query latest scores
+        id: query-scores
+        run: |
+          ruleset=$(cat ${{ env.GENERATOR_ENV }} | grep -E '^RULESET=' | cut -d '=' -f2-)
+          performance_data_name=$(curl -s "https://data.ppy.sh/" | grep "performance_${ruleset}_top_1000\b" | tail -1 | awk -F "'" '{print $2}' | sed 's/\.tar\.bz2//g')
+
+          echo "TARGET_DIR=${{ env.GENERATOR_DIR }}/sql/${ruleset}" >> "${GITHUB_OUTPUT}"
+          echo "DATA_NAME=${performance_data_name}" >> "${GITHUB_OUTPUT}"
+          echo "DATA_PKG=${performance_data_name}.tar.bz2" >> "${GITHUB_OUTPUT}"
+
+      - name: Restore score cache
+        id: restore-score-cache
+        uses: maxnowack/local-cache@720e69c948191660a90aa1cf6a42fc4d2dacdf30 # v2
+        with:
+          path: ${{ steps.query-scores.outputs.DATA_PKG }}
+          key: ${{ steps.query-scores.outputs.DATA_NAME }}
+
+      - name: Download scores
+        if: steps.restore-score-cache.outputs.cache-hit != 'true'
+        run: |
+          wget -q -O "${{ steps.query-scores.outputs.DATA_PKG }}" "https://data.ppy.sh/${{ steps.query-scores.outputs.DATA_PKG }}"
+
+      - name: Extract scores
+        run: |
+          tar -I lbzip2 -xf "${{ steps.query-scores.outputs.DATA_PKG }}"
+          rm -r "${{ steps.query-scores.outputs.TARGET_DIR }}"
+          mv "${{ steps.query-scores.outputs.DATA_NAME }}" "${{ steps.query-scores.outputs.TARGET_DIR }}"
+
+      - name: Query latest beatmaps
+        id: query-beatmaps
+        run: |
+          beatmaps_data_name=$(curl -s "https://data.ppy.sh/" | grep "osu_files" | tail -1 | awk -F "'" '{print $2}' | sed 's/\.tar\.bz2//g')
+
+          echo "TARGET_DIR=${{ env.GENERATOR_DIR }}/beatmaps" >> "${GITHUB_OUTPUT}"
+          echo "DATA_NAME=${beatmaps_data_name}" >> "${GITHUB_OUTPUT}"
+          echo "DATA_PKG=${beatmaps_data_name}.tar.bz2" >> "${GITHUB_OUTPUT}"
+
+      - name: Restore beatmap cache
+        id: restore-beatmap-cache
+        uses: maxnowack/local-cache@720e69c948191660a90aa1cf6a42fc4d2dacdf30 # v2
+        with:
+          path: ${{ steps.query-beatmaps.outputs.DATA_PKG }}
+          key: ${{ steps.query-beatmaps.outputs.DATA_NAME }}
+
+      - name: Download beatmap
+        if: steps.restore-beatmap-cache.outputs.cache-hit != 'true'
+        run: |
+          wget -q -O "${{ steps.query-beatmaps.outputs.DATA_PKG }}" "https://data.ppy.sh/${{ steps.query-beatmaps.outputs.DATA_PKG }}"
+
+      - name: Extract beatmap
+        run: |
+          tar -I lbzip2 -xf "${{ steps.query-beatmaps.outputs.DATA_PKG }}"
+          rm -r "${{ steps.query-beatmaps.outputs.TARGET_DIR }}"
+          mv "${{ steps.query-beatmaps.outputs.DATA_NAME }}" "${{ steps.query-beatmaps.outputs.TARGET_DIR }}"
+
+      - name: Run
+        id: run
+        run: |
+          # Add the GitHub token. This needs to be done here because it's unique per-job.
+          sed -i 's/^GH_TOKEN=.*$/GH_TOKEN=${{ github.token }}/' "${{ env.GENERATOR_ENV }}"
+
+          cd "${{ env.GENERATOR_DIR }}"
+
+          docker compose up --build --detach
+          docker compose logs --follow &
+          docker compose wait generator
+
+          link=$(docker compose logs --tail 10 generator | grep 'http' | sed -E 's/^.*(http.*)$/\1/')
+          target=$(cat "${{ env.GENERATOR_ENV }}" | grep -E '^OSU_B=' | cut -d '=' -f2-)
+
+          echo "target=${target}" >> "${GITHUB_OUTPUT}"
+          echo "sheet=${link}" >> "${GITHUB_OUTPUT}"
+
+      - name: Shutdown
+        if: ${{ always() }}
+        run: |
+          cd "${{ env.GENERATOR_DIR }}"
+          docker compose down --volumes
+          rm -rf "${{ env.GENERATOR_DIR }}"

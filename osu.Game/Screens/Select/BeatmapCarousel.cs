@@ -216,7 +216,7 @@ namespace osu.Game.Screens.Select
 
         private int visibleSetsCount;
 
-        public BeatmapCarousel(FilterCriteria initialCriterial)
+        public BeatmapCarousel(FilterCriteria initialCriteria)
         {
             root = new CarouselRoot(this);
             InternalChild = new Container
@@ -239,7 +239,7 @@ namespace osu.Game.Screens.Select
                 }
             };
 
-            activeCriteria = initialCriterial;
+            activeCriteria = initialCriteria;
         }
 
         [BackgroundDependencyLoader]

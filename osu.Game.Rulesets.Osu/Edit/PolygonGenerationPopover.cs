@@ -53,6 +53,8 @@ namespace osu.Game.Rulesets.Osu.Edit
         [BackgroundDependencyLoader]
         private void load()
         {
+            AllowableAnchors = new[] { Anchor.CentreLeft, Anchor.CentreRight };
+
             Child = new FillFlowContainer
             {
                 Width = 220,
