@@ -15,6 +15,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -61,6 +62,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
         private IGameplayClock? gameplayClock { get; set; }
 
         private double? unstableRate;
+        private Bindable<bool> autoAudioOffset = null!;
         private double lastPlayAverage;
         private double lastPlayBeatmapOffset;
         private HitEventTimingDistributionGraph? lastPlayGraph;
@@ -170,6 +172,10 @@ namespace osu.Game.Screens.Play.PlayerSettings
             }
         }
 
+        private void load(OsuConfigManager config)
+        {
+            autoAudioOffset = config.GetBindable<bool>(OsuSetting.AutoAudioOffset);
+        }
         private void scoreChanged(ValueChangedEvent<ScoreInfo?> score)
         {
             referenceScoreContainer.Clear();
@@ -215,16 +221,19 @@ namespace osu.Game.Screens.Play.PlayerSettings
             unstableRate = hitEvents.CalculateUnstableRate();
             const double unstablerate_threshold = 90; // threshold under which offset is applied immediately or the calculation is used
 
-            if (hitEvents.Count > 10 && unstableRate != null)
+            if (autoAudioOffset.Value)
             {
-                Current.Value = unstableRate switch
+                if (hitEvents.Count > 10)
                 {
-                    //makes calculated offsets which were achieved with low UR have higher impact then offsets calculated with high UR
-                    > unstablerate_threshold => lastPlayBeatmapOffset - (Math.Exp((double)(-0.0116 * (unstableRate - unstablerate_threshold))) * lastPlayAverage),
-                    //case is smaller than the threshold and offset is applied
-                    < unstablerate_threshold => lastPlayBeatmapOffset - lastPlayAverage,
-                    _ => Current.Value
-                };
+                    Current.Value = unstableRate switch
+                    {
+                        //makes calculated offsets which were achieved with low UR have higher impact then offsets calculated with high UR
+                        > unstablerate_threshold => lastPlayBeatmapOffset - (Math.Exp((double)(-0.0116 * (unstableRate - unstablerate_threshold))) * average),
+                        //case is smaller than the threshold and offset is applied
+                        < unstablerate_threshold => lastPlayBeatmapOffset - average,
+                        _ => Current.Value
+                    };
+                }
             }
 
             lastPlayAverage = average;

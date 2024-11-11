@@ -26,6 +26,11 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                 {
                     Current = config.GetBindable<double>(OsuSetting.AudioOffset),
                 },
+                new SettingsCheckbox
+                {
+                    LabelText = AudioSettingsStrings.AutoAudioOffset,
+                    Current = config.GetBindable<bool>(OsuSetting.AutoAudioOffset)
+                },
             };
         }
     }
