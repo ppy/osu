@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterfaceV2;
 
 namespace osu.Game.Screens.Edit.Timing
@@ -15,6 +16,9 @@ namespace osu.Game.Screens.Edit.Timing
         private LabelledTimeSignature timeSignature = null!;
         private LabelledSwitchButton omitBarLine = null!;
         private BPMTextBox bpmTextEntry = null!;
+
+        [Resolved]
+        private OsuConfigManager configManager { get; set; } = null!;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -46,7 +50,7 @@ namespace osu.Game.Screens.Edit.Timing
 
             bpmTextEntry.OnCommit = (oldBeatLength, _) =>
             {
-                if (!Beatmap.AdjustNotesOnOffsetBPMChange.Value || ControlPoint.Value == null)
+                if (!configManager.Get<bool>(OsuSetting.EditorAdjustExistingObjectsOnTimingChanges) || ControlPoint.Value == null)
                     return;
 
                 Beatmap.BeginChange();

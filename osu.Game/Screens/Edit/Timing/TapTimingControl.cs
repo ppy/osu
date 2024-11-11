@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
@@ -25,6 +26,9 @@ namespace osu.Game.Screens.Edit.Timing
 
         [Resolved]
         private EditorBeatmap beatmap { get; set; } = null!;
+
+        [Resolved]
+        private OsuConfigManager configManager { get; set; } = null!;
 
         [Resolved]
         private Bindable<ControlPointGroup> selectedGroup { get; set; } = null!;
@@ -209,7 +213,7 @@ namespace osu.Game.Screens.Edit.Timing
 
             foreach (var cp in currentGroupItems)
             {
-                if (beatmap.AdjustNotesOnOffsetBPMChange.Value && cp is TimingControlPoint tp)
+                if (cp is TimingControlPoint tp)
                 {
                     TimingSectionAdjustments.AdjustHitObjectOffset(beatmap, tp, adjust);
                     beatmap.UpdateAllHitObjects();
@@ -236,7 +240,7 @@ namespace osu.Game.Screens.Edit.Timing
             double oldBeatLength = timing.BeatLength;
             timing.BeatLength = 60000 / (timing.BPM + adjust);
 
-            if (beatmap.AdjustNotesOnOffsetBPMChange.Value)
+            if (configManager.Get<bool>(OsuSetting.EditorAdjustExistingObjectsOnTimingChanges))
             {
                 beatmap.BeginChange();
                 TimingSectionAdjustments.SetHitObjectBPM(beatmap, timing, oldBeatLength);

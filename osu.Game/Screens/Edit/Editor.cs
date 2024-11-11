@@ -422,9 +422,9 @@ namespace osu.Game.Screens.Edit
                                         Items = new MenuItem[]
                                         {
                                             new EditorMenuItem(EditorStrings.SetPreviewPointToCurrent, MenuItemType.Standard, SetPreviewPointToCurrentTime),
-                                            new ToggleMenuItem(EditorStrings.AdjustNotesOnOffsetBPMChange)
+                                            new ToggleMenuItem(EditorStrings.AdjustExistingObjectsOnTimingChanges)
                                             {
-                                                State = { BindTarget = editorBeatmap.AdjustNotesOnOffsetBPMChange },
+                                                State = { BindTarget = config.GetBindable<bool>(OsuSetting.EditorAdjustExistingObjectsOnTimingChanges) },
                                             }
                                         }
                                     }
