@@ -24,10 +24,6 @@ on:
       DIFFCALC_GOOGLE_CREDENTIALS:
         required: true
 
-concurrency:
-  group: ${{ github.workflow }}
-  cancel-in-progress: false
-
 env:
   GENERATOR_DIR: ${{ github.workspace }}/${{ inputs.id }}
   GENERATOR_ENV: ${{ github.workspace }}/${{ inputs.id }}/.env
@@ -37,9 +33,15 @@ defaults:
     shell: bash -euo pipefail {0}
 
 jobs:
-  environment:
+  generator:
     name: Setup environment
     runs-on: self-hosted
+    timeout-minutes: 720
+
+    outputs:
+      target: ${{ steps.run.outputs.target }}
+      sheet: ${{ steps.run.outputs.sheet }}
+
     steps:
       - name: Checkout diffcalc-sheet-generator
         uses: actions/checkout@v4
@@ -145,13 +147,8 @@ jobs:
               sed -i 's/^RANKED_ONLY=.*$/RANKED_ONLY=0/' "${{ env.GENERATOR_ENV }}"
           fi
 
-  scores:
-    name: Setup scores
-    needs: environment
-    runs-on: self-hosted
-    steps:
-      - name: Query latest data
-        id: query
+      - name: Query latest scores
+        id: query-scores
         run: |
           ruleset=$(cat ${{ env.GENERATOR_ENV }} | grep -E '^RULESET=' | cut -d '=' -f2-)
           performance_data_name=$(curl -s "https://data.ppy.sh/" | grep "performance_${ruleset}_top_1000\b" | tail -1 | awk -F "'" '{print $2}' | sed 's/\.tar\.bz2//g')
@@ -160,31 +157,26 @@ jobs:
           echo "DATA_NAME=${performance_data_name}" >> "${GITHUB_OUTPUT}"
           echo "DATA_PKG=${performance_data_name}.tar.bz2" >> "${GITHUB_OUTPUT}"
 
-      - name: Restore cache
-        id: restore-cache
+      - name: Restore score cache
+        id: restore-score-cache
         uses: maxnowack/local-cache@720e69c948191660a90aa1cf6a42fc4d2dacdf30 # v2
         with:
-          path: ${{ steps.query.outputs.DATA_PKG }}
-          key: ${{ steps.query.outputs.DATA_NAME }}
+          path: ${{ steps.query-scores.outputs.DATA_PKG }}
+          key: ${{ steps.query-scores.outputs.DATA_NAME }}
 
-      - name: Download
-        if: steps.restore-cache.outputs.cache-hit != 'true'
+      - name: Download scores
+        if: steps.restore-score-cache.outputs.cache-hit != 'true'
         run: |
-          wget -q -O "${{ steps.query.outputs.DATA_PKG }}" "https://data.ppy.sh/${{ steps.query.outputs.DATA_PKG }}"
+          wget -q -O "${{ steps.query-scores.outputs.DATA_PKG }}" "https://data.ppy.sh/${{ steps.query-scores.outputs.DATA_PKG }}"
 
-      - name: Extract
+      - name: Extract scores
         run: |
-          tar -I lbzip2 -xf "${{ steps.query.outputs.DATA_PKG }}"
-          rm -r "${{ steps.query.outputs.TARGET_DIR }}"
-          mv "${{ steps.query.outputs.DATA_NAME }}" "${{ steps.query.outputs.TARGET_DIR }}"
+          tar -I lbzip2 -xf "${{ steps.query-scores.outputs.DATA_PKG }}"
+          rm -r "${{ steps.query-scores.outputs.TARGET_DIR }}"
+          mv "${{ steps.query-scores.outputs.DATA_NAME }}" "${{ steps.query-scores.outputs.TARGET_DIR }}"
 
-  beatmaps:
-    name: Setup beatmaps
-    needs: environment
-    runs-on: self-hosted
-    steps:
-      - name: Query latest data
-        id: query
+      - name: Query latest beatmaps
+        id: query-beatmaps
         run: |
           beatmaps_data_name=$(curl -s "https://data.ppy.sh/" | grep "osu_files" | tail -1 | awk -F "'" '{print $2}' | sed 's/\.tar\.bz2//g')
 
@@ -192,33 +184,24 @@ jobs:
           echo "DATA_NAME=${beatmaps_data_name}" >> "${GITHUB_OUTPUT}"
           echo "DATA_PKG=${beatmaps_data_name}.tar.bz2" >> "${GITHUB_OUTPUT}"
 
-      - name: Restore cache
-        id: restore-cache
+      - name: Restore beatmap cache
+        id: restore-beatmap-cache
         uses: maxnowack/local-cache@720e69c948191660a90aa1cf6a42fc4d2dacdf30 # v2
         with:
-          path: ${{ steps.query.outputs.DATA_PKG }}
-          key: ${{ steps.query.outputs.DATA_NAME }}
+          path: ${{ steps.query-beatmaps.outputs.DATA_PKG }}
+          key: ${{ steps.query-beatmaps.outputs.DATA_NAME }}
 
-      - name: Download
-        if: steps.restore-cache.outputs.cache-hit != 'true'
+      - name: Download beatmap
+        if: steps.restore-beatmap-cache.outputs.cache-hit != 'true'
         run: |
-          wget -q -O "${{ steps.query.outputs.DATA_PKG }}" "https://data.ppy.sh/${{ steps.query.outputs.DATA_PKG }}"
+          wget -q -O "${{ steps.query-beatmaps.outputs.DATA_PKG }}" "https://data.ppy.sh/${{ steps.query-beatmaps.outputs.DATA_PKG }}"
 
-      - name: Extract
+      - name: Extract beatmap
         run: |
-          tar -I lbzip2 -xf "${{ steps.query.outputs.DATA_PKG }}"
-          rm -r "${{ steps.query.outputs.TARGET_DIR }}"
-          mv "${{ steps.query.outputs.DATA_NAME }}" "${{ steps.query.outputs.TARGET_DIR }}"
+          tar -I lbzip2 -xf "${{ steps.query-beatmaps.outputs.DATA_PKG }}"
+          rm -r "${{ steps.query-beatmaps.outputs.TARGET_DIR }}"
+          mv "${{ steps.query-beatmaps.outputs.DATA_NAME }}" "${{ steps.query-beatmaps.outputs.TARGET_DIR }}"
 
-  generator:
-    name: Run generator
-    needs: [ environment, scores, beatmaps ]
-    runs-on: self-hosted
-    timeout-minutes: 720
-    outputs:
-      target: ${{ steps.run.outputs.target }}
-      sheet: ${{ steps.run.outputs.sheet }}
-    steps:
       - name: Run
         id: run
         run: |
@@ -242,13 +225,4 @@ jobs:
         run: |
           cd "${{ env.GENERATOR_DIR }}"
           docker compose down --volumes
-
-  cleanup:
-    name: Cleanup
-    needs: [ environment, scores, beatmaps, generator ]
-    runs-on: self-hosted
-    if: ${{ always() }}
-    steps:
-      - name: Cleanup
-        run: |
           rm -rf "${{ env.GENERATOR_DIR }}"
