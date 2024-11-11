@@ -34,7 +34,7 @@ defaults:
 
 jobs:
   generator:
-    name: Setup environment
+    name: Run
     runs-on: self-hosted
     timeout-minutes: 720
 
