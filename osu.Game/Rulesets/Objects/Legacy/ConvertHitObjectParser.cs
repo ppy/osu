@@ -71,7 +71,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
             var soundType = (LegacyHitSoundType)Parsing.ParseInt(split[4]);
             var bankInfo = new SampleBankInfo();
 
-            HitObject? result = null;
+            ConvertHitObject? result = null;
 
             if (type.HasFlag(LegacyHitObjectType.Circle))
             {
@@ -181,6 +181,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 throw new InvalidDataException($"Unknown hit object type: {split[3]}");
 
             result.StartTime = startTime;
+            result.LegacyType = type;
 
             if (result.Samples.Count == 0)
                 result.Samples = convertSoundType(soundType, bankInfo);
@@ -448,7 +449,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
         /// <param name="newCombo">Whether the hit object creates a new combo.</param>
         /// <param name="comboOffset">When starting a new combo, the offset of the new combo relative to the current one.</param>
         /// <returns>The hit object.</returns>
-        private HitObject createHitCircle(Vector2 position, bool newCombo, int comboOffset)
+        private ConvertHitObject createHitCircle(Vector2 position, bool newCombo, int comboOffset)
         {
             return lastObject = new ConvertHitCircle
             {
@@ -469,8 +470,8 @@ namespace osu.Game.Rulesets.Objects.Legacy
         /// <param name="repeatCount">The slider repeat count.</param>
         /// <param name="nodeSamples">The samples to be played when the slider nodes are hit. This includes the head and tail of the slider.</param>
         /// <returns>The hit object.</returns>
-        private HitObject createSlider(Vector2 position, bool newCombo, int comboOffset, PathControlPoint[] controlPoints, double? length, int repeatCount,
-                                       IList<IList<HitSampleInfo>> nodeSamples)
+        private ConvertHitObject createSlider(Vector2 position, bool newCombo, int comboOffset, PathControlPoint[] controlPoints, double? length, int repeatCount,
+                                              IList<IList<HitSampleInfo>> nodeSamples)
         {
             return lastObject = new ConvertSlider
             {
@@ -491,7 +492,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
         /// <param name="comboOffset">When starting a new combo, the offset of the new combo relative to the current one.</param>
         /// <param name="duration">The spinner duration.</param>
         /// <returns>The hit object.</returns>
-        private HitObject createSpinner(Vector2 position, bool newCombo, int comboOffset, double duration)
+        private ConvertHitObject createSpinner(Vector2 position, bool newCombo, int comboOffset, double duration)
         {
             return lastObject = new ConvertSpinner
             {
@@ -509,7 +510,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
         /// <param name="newCombo">Whether the hit object creates a new combo.</param>
         /// <param name="comboOffset">When starting a new combo, the offset of the new combo relative to the current one.</param>
         /// <param name="duration">The hold duration.</param>
-        private HitObject createHold(Vector2 position, bool newCombo, int comboOffset, double duration)
+        private ConvertHitObject createHold(Vector2 position, bool newCombo, int comboOffset, double duration)
         {
             return lastObject = new ConvertHold
             {
