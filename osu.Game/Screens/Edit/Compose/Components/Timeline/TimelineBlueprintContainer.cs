@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -25,7 +26,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
-    internal partial class TimelineBlueprintContainer : EditorBlueprintContainer
+    public partial class TimelineBlueprintContainer : EditorBlueprintContainer
     {
         [Resolved(CanBeNull = true)]
         private Timeline timeline { get; set; }
@@ -163,13 +164,13 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         protected override SelectionHandler<HitObject> CreateSelectionHandler() => new TimelineSelectionHandler();
 
-        protected override SelectionBlueprint<HitObject> CreateBlueprintFor(HitObject item)
+        protected sealed override SelectionBlueprint<HitObject> CreateBlueprintFor(HitObject item)
         {
-            return new TimelineHitObjectBlueprint(item)
-            {
-                OnDragHandled = e => hitObjectDragged = e != null,
-            };
+            return CreateTimelineBlueprintFor(item)?.With(b => b.OnDragHandled = e => hitObjectDragged = e != null);
         }
+
+        [CanBeNull]
+        public virtual TimelineHitObjectBlueprint CreateTimelineBlueprintFor(HitObject hitObject) => new TimelineHitObjectBlueprint(hitObject);
 
         protected sealed override DragBox CreateDragBox() => new TimelineDragBox();
 
