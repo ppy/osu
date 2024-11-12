@@ -16,6 +16,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using osu.Framework.Platform;
 using osu.Game.Configuration;
 using osu.Game.Extensions;
 using osu.Game.Graphics;
@@ -23,6 +24,7 @@ using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays;
@@ -81,6 +83,12 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
 
         [Resolved]
         private ScoreManager scoreManager { get; set; } = null!;
+
+        [Resolved]
+        private Clipboard? clipboard { get; set; }
+
+        [Resolved]
+        private IAPIProvider api { get; set; } = null!;
 
         private Container content = null!;
         private Box background = null!;
@@ -768,6 +776,9 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
 
                 if (score.Mods.Length > 0)
                     items.Add(new OsuMenuItem("Use these mods", MenuItemType.Highlighted, () => SelectedMods.Value = score.Mods.Where(m => IsValidMod.Invoke(m)).ToArray()));
+
+                if (score.OnlineID > 0)
+                    items.Add(new OsuMenuItem(CommonStrings.CopyLink, MenuItemType.Standard, () => clipboard?.SetText($@"{api.WebsiteRootUrl}/scores/{score.OnlineID}")));
 
                 if (score.Files.Count <= 0) return items.ToArray();
 

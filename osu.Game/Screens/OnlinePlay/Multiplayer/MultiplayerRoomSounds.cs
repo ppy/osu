@@ -1,23 +1,26 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
-using osu.Framework.Bindables;
-using osu.Game.Online.API.Requests.Responses;
+using osu.Framework.Extensions.ObjectExtensions;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Online.Multiplayer;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
-    public partial class MultiplayerRoomSounds : MultiplayerRoomComposite
+    public partial class MultiplayerRoomSounds : CompositeDrawable
     {
-        private Sample hostChangedSample;
-        private Sample userJoinedSample;
-        private Sample userLeftSample;
-        private Sample userKickedSample;
+        [Resolved]
+        private MultiplayerClient client { get; set; } = null!;
+
+        private Sample? hostChangedSample;
+        private Sample? userJoinedSample;
+        private Sample? userLeftSample;
+        private Sample? userKickedSample;
+        private MultiplayerRoomUser? host;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
@@ -32,36 +35,47 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         {
             base.LoadComplete();
 
-            Host.BindValueChanged(hostChanged);
+            client.RoomUpdated += onRoomUpdated;
+            client.UserJoined += onUserJoined;
+            client.UserLeft += onUserLeft;
+            client.UserKicked += onUserKicked;
+            updateState();
         }
 
-        protected override void UserJoined(MultiplayerRoomUser user)
+        private void onRoomUpdated() => Scheduler.AddOnce(updateState);
+
+        private void updateState()
         {
-            base.UserJoined(user);
+            if (EqualityComparer<MultiplayerRoomUser>.Default.Equals(host, client.Room?.Host))
+                return;
 
-            Scheduler.AddOnce(() => userJoinedSample?.Play());
-        }
-
-        protected override void UserLeft(MultiplayerRoomUser user)
-        {
-            base.UserLeft(user);
-
-            Scheduler.AddOnce(() => userLeftSample?.Play());
-        }
-
-        protected override void UserKicked(MultiplayerRoomUser user)
-        {
-            base.UserKicked(user);
-
-            Scheduler.AddOnce(() => userKickedSample?.Play());
-        }
-
-        private void hostChanged(ValueChangedEvent<APIUser> value)
-        {
             // only play sound when the host changes from an already-existing host.
-            if (value.OldValue == null) return;
+            if (host != null)
+                Scheduler.AddOnce(() => hostChangedSample?.Play());
 
-            Scheduler.AddOnce(() => hostChangedSample?.Play());
+            host = client.Room?.Host;
+        }
+
+        private void onUserJoined(MultiplayerRoomUser user)
+            => Scheduler.AddOnce(() => userJoinedSample?.Play());
+
+        private void onUserLeft(MultiplayerRoomUser user)
+            => Scheduler.AddOnce(() => userLeftSample?.Play());
+
+        private void onUserKicked(MultiplayerRoomUser user)
+            => Scheduler.AddOnce(() => userKickedSample?.Play());
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (client.IsNotNull())
+            {
+                client.RoomUpdated -= onRoomUpdated;
+                client.UserJoined -= onUserJoined;
+                client.UserLeft -= onUserLeft;
+                client.UserKicked -= onUserKicked;
+            }
         }
     }
 }
