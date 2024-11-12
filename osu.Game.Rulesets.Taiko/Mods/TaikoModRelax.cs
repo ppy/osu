@@ -14,7 +14,8 @@ namespace osu.Game.Rulesets.Taiko.Mods
     {
         public override LocalisableString Description => @"No need to remember which key is correct anymore!";
 
-        public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(TaikoModSingleTap) }).ToArray();
+        public override Type[] IncompatibleMods =>
+            base.IncompatibleMods.Concat(new[] { typeof(TaikoModSingleTap), typeof(TaikoModRandom), typeof(TaikoModSwap) }).ToArray();
 
         public void ApplyToDrawableHitObject(DrawableHitObject drawable)
         {
