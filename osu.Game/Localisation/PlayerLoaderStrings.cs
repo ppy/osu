@@ -26,10 +26,10 @@ namespace osu.Game.Localisation
 
         /// <summary>
         /// "No performance points will be awarded.
-        /// Leaderboards may be reset by the beatmap creator."
+        /// Leaderboards may be reset."
         /// </summary>
         public static LocalisableString LovedBeatmapDisclaimerContent => new TranslatableString(getKey(@"loved_beatmap_disclaimer_content"), @"No performance points will be awarded.
-Leaderboards may be reset by the beatmap creator.");
+Leaderboards may be reset.");
 
         /// <summary>
         /// "This beatmap is qualified"
