@@ -20,10 +20,16 @@ namespace osu.Game.Screens.OnlinePlay.Match
     {
         public Action? OnEdit;
 
+        public new required Bindable<PlaylistItem?> SelectedItem
+        {
+            get => selectedItem;
+            set => selectedItem.Current = value;
+        }
+
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
 
-        private readonly BindableWithCurrent<PlaylistItem?> current = new BindableWithCurrent<PlaylistItem?>();
+        private readonly BindableWithCurrent<PlaylistItem?> selectedItem = new BindableWithCurrent<PlaylistItem?>();
         private readonly IBindable<APIUser?> host = new Bindable<APIUser?>();
         private readonly bool allowEdit;
         private Drawable? editButton;
@@ -50,12 +56,6 @@ namespace osu.Game.Screens.OnlinePlay.Match
                     Action = () => OnEdit?.Invoke()
                 });
             }
-        }
-
-        public new required Bindable<PlaylistItem?> SelectedItem
-        {
-            get => current;
-            set => current.Current = value;
         }
 
         protected override void LoadComplete()
