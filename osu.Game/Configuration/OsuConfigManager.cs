@@ -196,6 +196,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.EditorShowSpeedChanges, false);
             SetDefault(OsuSetting.EditorScaleOrigin, EditorOrigin.GridCentre);
             SetDefault(OsuSetting.EditorRotationOrigin, EditorOrigin.GridCentre);
+            SetDefault(OsuSetting.EditorAdjustExistingObjectsOnTimingChanges, true);
 
             SetDefault(OsuSetting.HideCountryFlags, false);
 
@@ -207,6 +208,7 @@ namespace osu.Game.Configuration
             SetDefault<UserStatus?>(OsuSetting.UserOnlineStatus, null);
 
             SetDefault(OsuSetting.EditorTimelineShowTimingChanges, true);
+            SetDefault(OsuSetting.EditorTimelineShowBreaks, true);
             SetDefault(OsuSetting.EditorTimelineShowTicks, true);
 
             SetDefault(OsuSetting.EditorContractSidebars, false);
@@ -439,6 +441,8 @@ namespace osu.Game.Configuration
         AlwaysShowHoldForMenuButton,
         EditorContractSidebars,
         EditorScaleOrigin,
-        EditorRotationOrigin
+        EditorRotationOrigin,
+        EditorTimelineShowBreaks,
+        EditorAdjustExistingObjectsOnTimingChanges,
     }
 }
