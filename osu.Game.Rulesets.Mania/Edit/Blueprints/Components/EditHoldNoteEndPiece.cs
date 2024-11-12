@@ -27,9 +27,6 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints.Components
         {
             Height = DefaultNotePiece.NOTE_HEIGHT;
 
-            CornerRadius = 5;
-            Masking = true;
-
             InternalChild = new EditNotePiece
             {
                 RelativeSizeAxes = Axes.Both,

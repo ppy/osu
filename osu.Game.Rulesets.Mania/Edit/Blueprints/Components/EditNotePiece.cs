@@ -2,12 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
-using osu.Game.Rulesets.Mania.Skinning.Default;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osuTK;
@@ -17,24 +15,21 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints.Components
 {
     public partial class EditNotePiece : CompositeDrawable
     {
+        private readonly Container border;
+        private readonly Box box;
+
         [Resolved]
         private Column? column { get; set; }
 
         public EditNotePiece()
         {
-            Masking = true;
-            CornerRadius = 5;
-            Height = DefaultNotePiece.NOTE_HEIGHT;
-
             InternalChildren = new Drawable[]
             {
-                new Container
+                border = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
                     Masking = true,
-                    CornerRadius = 5,
-                    BorderThickness = 5,
-                    BorderColour = Color4.White.Opacity(0.7f),
+                    BorderThickness = 3,
                     Child = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
@@ -42,10 +37,10 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints.Components
                         AlwaysPresent = true,
                     },
                 },
-                new Box
+                box = new Box
                 {
                     RelativeSizeAxes = Axes.X,
-                    Height = 10,
+                    Height = 3,
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
                 },
@@ -55,7 +50,8 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints.Components
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            Colour = colours.Yellow;
+            border.BorderColour = colours.YellowDark;
+            box.Colour = colours.YellowLight;
         }
 
         protected override void Update()

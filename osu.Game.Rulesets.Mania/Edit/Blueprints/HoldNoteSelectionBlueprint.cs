@@ -47,6 +47,12 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
         {
             InternalChildren = new Drawable[]
             {
+                new EditBodyPiece
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomCentre,
+                },
                 head = new EditHoldNoteEndPiece
                 {
                     RelativeSizeAxes = Axes.X,
@@ -88,21 +94,6 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
                     },
                     DragEnded = () => changeHandler?.EndChange(),
                 },
-                new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Masking = true,
-                    Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre,
-                    BorderThickness = 1,
-                    BorderColour = colours.Yellow,
-                    Child = new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Alpha = 0,
-                        AlwaysPresent = true,
-                    }
-                }
             };
         }
 
