@@ -206,7 +206,7 @@ namespace osu.Game.Online.Multiplayer
                     APIRoom.CurrentPlaylistItem = APIRoom.Playlist.Single(item => item.ID == joinedRoom.Settings.PlaylistItemId);
 
                     // The server will null out the end date upon the host joining the room, but the null value is never communicated to the client.
-                    APIRoom.EndDate.Value = null;
+                    APIRoom.EndDate = null;
 
                     Debug.Assert(LocalUser != null);
                     addUserToAPIRoom(LocalUser);

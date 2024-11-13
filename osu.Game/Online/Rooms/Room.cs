@@ -87,6 +87,39 @@ namespace osu.Game.Online.Rooms
         }
 
         /// <summary>
+        /// The duration for which the room will be open. Will be <c>null</c> after the room is created.
+        /// </summary>
+        /// <remarks>
+        /// To check the room end time, use <see cref="EndDate"/>.
+        /// </remarks>
+        public TimeSpan? Duration
+        {
+            get => duration == null ? null : TimeSpan.FromMinutes(duration.Value);
+            set => SetField(ref duration, value == null ? null : (int)value.Value.TotalMinutes);
+        }
+
+        /// <summary>
+        /// The date at which the room was opened. Will be <c>null</c> while the room has not yet been created.
+        /// </summary>
+        public DateTimeOffset? StartDate
+        {
+            get => startDate;
+            set => SetField(ref startDate, value);
+        }
+
+        /// <summary>
+        /// The date at which the room will be closed.
+        /// </summary>
+        /// <remarks>
+        /// To set the room duration, use <see cref="Duration"/>.
+        /// </remarks>
+        public DateTimeOffset? EndDate
+        {
+            get => endDate;
+            set => SetField(ref endDate, value);
+        }
+
+        /// <summary>
         /// The maximum number of users allowed in the room.
         /// </summary>
         public int? MaxParticipants
@@ -189,6 +222,15 @@ namespace osu.Game.Online.Rooms
         [JsonConverter(typeof(SnakeCaseStringEnumConverter))]
         private RoomCategory category;
 
+        [JsonProperty("duration")]
+        private int? duration;
+
+        [JsonProperty("starts_at")]
+        private DateTimeOffset? startDate;
+
+        [JsonProperty("ends_at")]
+        private DateTimeOffset? endDate;
+
         // Not yet serialised (not implemented).
         private int? maxParticipants;
 
@@ -245,36 +287,6 @@ namespace osu.Game.Online.Rooms
         [JsonProperty("recent_participants")]
         public readonly BindableList<APIUser> RecentParticipants = new BindableList<APIUser>();
 
-        #region Properties only used for room creation request
-
-        [Cached]
-        public readonly Bindable<TimeSpan?> Duration = new Bindable<TimeSpan?>();
-
-        [JsonProperty("duration")]
-        private int? duration
-        {
-            get => (int?)Duration.Value?.TotalMinutes;
-            set
-            {
-                if (value == null)
-                    Duration.Value = null;
-                else
-                    Duration.Value = TimeSpan.FromMinutes(value.Value);
-            }
-        }
-
-        #endregion
-
-        // Only supports retrieval for now
-        [Cached]
-        [JsonProperty("starts_at")]
-        public readonly Bindable<DateTimeOffset?> StartDate = new Bindable<DateTimeOffset?>();
-
-        // Only supports retrieval for now
-        [Cached]
-        [JsonProperty("ends_at")]
-        public readonly Bindable<DateTimeOffset?> EndDate = new Bindable<DateTimeOffset?>();
-
         // Todo: Find a better way to do this (https://github.com/ppy/osu-framework/issues/1930)
         [JsonProperty("max_attempts", DefaultValueHandling = DefaultValueHandling.Ignore)]
         private int? maxAttempts
@@ -307,7 +319,7 @@ namespace osu.Game.Online.Rooms
             Type = other.Type;
             MaxParticipants = other.MaxParticipants;
             ParticipantCount = other.ParticipantCount;
-            EndDate.Value = other.EndDate.Value;
+            EndDate = other.EndDate;
             UserScore.Value = other.UserScore.Value;
             QueueMode = other.QueueMode;
             AutoStartDuration = other.AutoStartDuration;

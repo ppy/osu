@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
@@ -32,14 +31,5 @@ namespace osu.Game.Screens.OnlinePlay
 
         [Resolved(typeof(Room))]
         public Bindable<PlaylistAggregateScore> UserScore { get; private set; } = null!;
-
-        [Resolved(typeof(Room))]
-        protected Bindable<DateTimeOffset?> StartDate { get; private set; } = null!;
-
-        [Resolved(typeof(Room))]
-        protected Bindable<DateTimeOffset?> EndDate { get; private set; } = null!;
-
-        [Resolved(typeof(Room))]
-        protected Bindable<TimeSpan?> Duration { get; private set; } = null!;
     }
 }

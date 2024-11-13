@@ -34,7 +34,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             TextFlow.Colour = Colour4.Black;
             Pill.Background.Alpha = 1;
 
-            EndDate.BindValueChanged(_ => updateDisplay());
             room.PropertyChanged += onRoomPropertyChanged;
             updateDisplay();
 
@@ -43,8 +42,13 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
         private void onRoomPropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(Room.Status))
-                updateDisplay();
+            switch (e.PropertyName)
+            {
+                case nameof(Room.Status):
+                case nameof(Room.EndDate):
+                    updateDisplay();
+                    break;
+            }
         }
 
         private void updateDisplay()

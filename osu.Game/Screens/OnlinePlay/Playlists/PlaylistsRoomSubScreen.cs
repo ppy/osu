@@ -234,7 +234,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             }
         };
 
-        protected override Drawable CreateFooter() => new PlaylistsRoomFooter
+        protected override Drawable CreateFooter() => new PlaylistsRoomFooter(Room)
         {
             OnStart = StartPlay
         };

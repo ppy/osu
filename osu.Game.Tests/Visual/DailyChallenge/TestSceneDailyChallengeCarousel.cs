@@ -98,7 +98,7 @@ namespace osu.Game.Tests.Visual.DailyChallenge
                                 Origin = Anchor.Centre,
                                 Children = new Drawable[]
                                 {
-                                    new DailyChallengeTimeRemainingRing(),
+                                    new DailyChallengeTimeRemainingRing(room.Value),
                                     breakdown = new DailyChallengeScoreBreakdown(),
                                 }
                             }
@@ -125,8 +125,8 @@ namespace osu.Game.Tests.Visual.DailyChallenge
             AddSliderStep("update time remaining", 0f, 1f, 0f, progress =>
             {
                 var startedTimeAgo = TimeSpan.FromHours(24) * progress;
-                room.Value.StartDate.Value = DateTimeOffset.Now - startedTimeAgo;
-                room.Value.EndDate.Value = room.Value.StartDate.Value.Value.AddDays(1);
+                room.Value.StartDate = DateTimeOffset.Now - startedTimeAgo;
+                room.Value.EndDate = room.Value.StartDate.Value.AddDays(1);
             });
             AddStep("add normal score", () =>
             {

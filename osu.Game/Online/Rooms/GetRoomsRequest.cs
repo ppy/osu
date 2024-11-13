@@ -44,7 +44,7 @@ namespace osu.Game.Online.Rooms
                 // API doesn't populate status so let's do it here.
                 foreach (var room in Response)
                 {
-                    if (room.EndDate.Value != null && DateTimeOffset.Now >= room.EndDate.Value)
+                    if (room.EndDate != null && DateTimeOffset.Now >= room.EndDate)
                         room.Status = new RoomStatusEnded();
                     else if (room.HasPassword)
                         room.Status = new RoomStatusOpenPrivate();

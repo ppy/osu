@@ -78,8 +78,8 @@ namespace osu.Game.Tests.Visual.DailyChallenge
                             AllowedMods = [new APIMod(new OsuModDoubleTime())]
                         }
                     },
-                    StartDate = { Value = DateTimeOffset.Now },
-                    EndDate = { Value = DateTimeOffset.Now.AddHours(24) },
+                    StartDate = DateTimeOffset.Now,
+                    EndDate = DateTimeOffset.Now.AddHours(24),
                     Category = RoomCategory.DailyChallenge
                 }));
             });
