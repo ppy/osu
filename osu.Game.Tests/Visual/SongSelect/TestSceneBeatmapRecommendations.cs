@@ -10,9 +10,12 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Game.Extensions;
+using osu.Game.Online.API;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Mania;
@@ -191,8 +194,39 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             AddStep("present beatmap", () => Game.PresentBeatmap(getImport()));
 
-            AddUntilStep("wait for song select", () => Game.ScreenStack.CurrentScreen is Screens.Select.SongSelect);
+            AddUntilStep("wait for song select", () => Game.ScreenStack.CurrentScreen is Screens.Select.SongSelect select && select.BeatmapSetsLoaded);
             AddUntilStep("recommended beatmap displayed", () => Game.Beatmap.Value.BeatmapInfo.MatchesOnlineID(getImport().Beatmaps[expectedDiff - 1]));
+        }
+
+        protected override TestOsuGame CreateTestGame() => new NoBeatmapUpdateGame(LocalStorage, API);
+
+        private partial class NoBeatmapUpdateGame : TestOsuGame
+        {
+            public NoBeatmapUpdateGame(Storage storage, IAPIProvider api, string[] args = null)
+                : base(storage, api, args)
+            {
+            }
+
+            protected override IBeatmapUpdater CreateBeatmapUpdater() => new TestBeatmapUpdater();
+
+            private class TestBeatmapUpdater : IBeatmapUpdater
+            {
+                public void Queue(Live<BeatmapSetInfo> beatmapSet, MetadataLookupScope lookupScope = MetadataLookupScope.LocalCacheFirst)
+                {
+                }
+
+                public void Process(BeatmapSetInfo beatmapSet, MetadataLookupScope lookupScope = MetadataLookupScope.LocalCacheFirst)
+                {
+                }
+
+                public void ProcessObjectCounts(BeatmapInfo beatmapInfo, MetadataLookupScope lookupScope = MetadataLookupScope.LocalCacheFirst)
+                {
+                }
+
+                public void Dispose()
+                {
+                }
+            }
         }
     }
 }
