@@ -18,9 +18,6 @@ namespace osu.Game.Screens.OnlinePlay
         protected BindableList<PlaylistItem> Playlist { get; private set; } = null!;
 
         [Resolved(typeof(Room))]
-        protected Bindable<Room.RoomDifficultyRange> DifficultyRange { get; private set; } = null!;
-
-        [Resolved(typeof(Room))]
         protected BindableList<APIUser> RecentParticipants { get; private set; } = null!;
 
         [Resolved(typeof(Room))]

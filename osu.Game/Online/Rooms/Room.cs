@@ -165,6 +165,15 @@ namespace osu.Game.Online.Rooms
         }
 
         /// <summary>
+        /// Describes the range of difficulty of the room.
+        /// </summary>
+        public RoomDifficultyRange? DifficultyRange
+        {
+            get => difficultyRange;
+            set => SetField(ref difficultyRange, value);
+        }
+
+        /// <summary>
         /// The playlist queueing mode. Only valid for multiplayer rooms.
         /// </summary>
         public QueueMode QueueMode
@@ -270,6 +279,9 @@ namespace osu.Game.Online.Rooms
         [JsonProperty("playlist_item_stats")]
         private RoomPlaylistItemStats? playlistItemStats;
 
+        [JsonProperty("difficulty_range")]
+        private RoomDifficultyRange? difficultyRange;
+
         [JsonConverter(typeof(SnakeCaseStringEnumConverter))]
         [JsonProperty("type")]
         private MatchType type;
@@ -299,10 +311,6 @@ namespace osu.Game.Online.Rooms
         [Cached]
         [JsonProperty("playlist")]
         public readonly BindableList<PlaylistItem> Playlist = new BindableList<PlaylistItem>();
-
-        [JsonProperty("difficulty_range")]
-        [Cached]
-        public readonly Bindable<RoomDifficultyRange> DifficultyRange = new Bindable<RoomDifficultyRange>();
 
         [Cached]
         [JsonProperty("current_user_score")]
@@ -340,7 +348,7 @@ namespace osu.Game.Online.Rooms
             UserScore.Value = other.UserScore.Value;
             QueueMode = other.QueueMode;
             AutoStartDuration = other.AutoStartDuration;
-            DifficultyRange.Value = other.DifficultyRange.Value;
+            DifficultyRange = other.DifficultyRange;
             PlaylistItemStats = other.PlaylistItemStats;
             CurrentPlaylistItem = other.CurrentPlaylistItem;
             AutoSkip = other.AutoSkip;

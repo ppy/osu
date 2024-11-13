@@ -20,7 +20,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 SelectedRoom.Value = new Room();
 
-                Child = new StarRatingRangeDisplay
+                Child = new StarRatingRangeDisplay(SelectedRoom.Value)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre
