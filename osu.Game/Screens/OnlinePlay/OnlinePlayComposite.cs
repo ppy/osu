@@ -41,8 +41,5 @@ namespace osu.Game.Screens.OnlinePlay
 
         [Resolved(typeof(Room))]
         protected Bindable<TimeSpan?> Duration { get; private set; } = null!;
-
-        [Resolved(typeof(Room))]
-        protected Bindable<TimeSpan> AutoStartDuration { get; private set; } = null!;
     }
 }

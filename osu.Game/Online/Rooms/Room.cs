@@ -132,6 +132,15 @@ namespace osu.Game.Online.Rooms
         }
 
         /// <summary>
+        /// The amount of time before the match is automatically started. Only valid for multiplayer rooms.
+        /// </summary>
+        public TimeSpan AutoStartDuration
+        {
+            get => TimeSpan.FromSeconds(autoStartDuration);
+            set => SetField(ref autoStartDuration, (ushort)value.TotalSeconds);
+        }
+
+        /// <summary>
         /// Represents the current item selected within the room.
         /// </summary>
         /// <remarks>
@@ -197,6 +206,9 @@ namespace osu.Game.Online.Rooms
         [JsonProperty("auto_skip")]
         private bool autoSkip;
 
+        [JsonProperty("auto_start_duration")]
+        private ushort autoStartDuration;
+
         [JsonProperty("current_playlist_item")]
         private PlaylistItem? currentPlaylistItem;
 
@@ -224,16 +236,6 @@ namespace osu.Game.Online.Rooms
 
         [Cached]
         public readonly Bindable<int?> MaxAttempts = new Bindable<int?>();
-
-        [Cached]
-        public readonly Bindable<TimeSpan> AutoStartDuration = new Bindable<TimeSpan>();
-
-        [JsonProperty("auto_start_duration")]
-        private ushort autoStartDuration
-        {
-            get => (ushort)AutoStartDuration.Value.TotalSeconds;
-            set => AutoStartDuration.Value = TimeSpan.FromSeconds(value);
-        }
 
         [Cached]
         [JsonProperty("current_user_score")]
@@ -308,7 +310,7 @@ namespace osu.Game.Online.Rooms
             EndDate.Value = other.EndDate.Value;
             UserScore.Value = other.UserScore.Value;
             QueueMode = other.QueueMode;
-            AutoStartDuration.Value = other.AutoStartDuration.Value;
+            AutoStartDuration = other.AutoStartDuration;
             DifficultyRange.Value = other.DifficultyRange.Value;
             PlaylistItemStats.Value = other.PlaylistItemStats.Value;
             CurrentPlaylistItem = other.CurrentPlaylistItem;

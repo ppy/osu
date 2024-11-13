@@ -350,7 +350,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 };
 
                 TypePicker.Current.BindValueChanged(type => typeLabel.Text = type.NewValue.GetLocalisableDescription(), true);
-                AutoStartDuration.BindValueChanged(duration => startModeDropdown.Current.Value = (StartMode)(int)duration.NewValue.TotalSeconds, true);
 
                 operationInProgress.BindTo(ongoingOperationTracker.InProgress);
                 operationInProgress.BindValueChanged(v =>
@@ -377,6 +376,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 updateRoomPassword();
                 updateRoomAutoSkip();
                 updateRoomMaxParticipants();
+                updateRoomAutoStartDuration();
             }
 
             private void onRoomPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -406,6 +406,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                     case nameof(Room.MaxParticipants):
                         updateRoomMaxParticipants();
                         break;
+
+                    case nameof(Room.AutoStartDuration):
+                        updateRoomAutoStartDuration();
+                        break;
                 }
             }
 
@@ -427,6 +431,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             private void updateRoomMaxParticipants()
                 => MaxParticipantsField.Text = room.MaxParticipants?.ToString();
 
+            private void updateRoomAutoStartDuration()
+                => typeLabel.Text = room.AutoStartDuration.GetLocalisableDescription();
+
             protected override void Update()
             {
                 base.Update();
@@ -445,8 +452,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 Debug.Assert(applyingSettingsOperation == null);
                 applyingSettingsOperation = ongoingOperationTracker.BeginOperation();
 
-                TimeSpan autoStartDuration = TimeSpan.FromSeconds((int)startModeDropdown.Current.Value);
-
                 // If the client is already in a room, update via the client.
                 // Otherwise, update the room directly in preparation for it to be submitted to the API on match creation.
                 if (client.Room != null)
@@ -456,7 +461,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                               password: PasswordTextBox.Text,
                               matchType: TypePicker.Current.Value,
                               queueMode: QueueModeDropdown.Current.Value,
-                              autoStartDuration: autoStartDuration,
+                              autoStartDuration: TimeSpan.FromSeconds((int)startModeDropdown.Current.Value),
                               autoSkip: AutoSkipCheckbox.Current.Value)
                           .ContinueWith(t => Schedule(() =>
                           {
@@ -472,7 +477,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                     room.Type = TypePicker.Current.Value;
                     room.Password = PasswordTextBox.Current.Value;
                     room.QueueMode = QueueModeDropdown.Current.Value;
-                    room.AutoStartDuration.Value = autoStartDuration;
+                    room.AutoStartDuration = TimeSpan.FromSeconds((int)startModeDropdown.Current.Value);
                     room.AutoSkip = AutoSkipCheckbox.Current.Value;
 
                     if (int.TryParse(MaxParticipantsField.Text, out int max))
