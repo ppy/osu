@@ -146,7 +146,7 @@ namespace osu.Game.Beatmaps.Drawables
             approachRate.Text = @" AR: " + adjustedDifficulty.ApproachRate.ToString(@"0.##");
             overallDifficulty.Text = @" OD: " + adjustedDifficulty.OverallDifficulty.ToString(@"0.##");
 
-            length.Text = "Length: " + TimeSpan.FromMilliseconds(displayedContent.BeatmapInfo.Length / rate).ToString(@"mm\:ss");
+            length.Text = "Length: " + TimeSpan.FromMilliseconds(displayedContent.BeatmapInfo.Length / rate).ToString(@"hh\:mm\:ss");
             bpm.Text = " BPM: " + Math.Round(bpmAdjusted, 0);
         }
 
