@@ -344,8 +344,8 @@ namespace osu.Game.Rulesets.Edit
                 PlayfieldContentContainer.Anchor = Anchor.CentreLeft;
                 PlayfieldContentContainer.Origin = Anchor.CentreLeft;
 
-                PlayfieldContentContainer.Width = Math.Max(1024, DrawWidth) - (TOOLBOX_CONTRACTED_SIZE_LEFT + TOOLBOX_CONTRACTED_SIZE_RIGHT);
-                PlayfieldContentContainer.X = TOOLBOX_CONTRACTED_SIZE_LEFT;
+                PlayfieldContentContainer.Width = Math.Max(1024, DrawWidth);
+                PlayfieldContentContainer.X = LeftToolbox.DrawWidth;
             }
 
             composerFocusMode.Value = PlayfieldContentContainer.Contains(InputManager.CurrentState.Mouse.Position)
@@ -537,22 +537,23 @@ namespace osu.Game.Rulesets.Edit
 
         #region IPlacementHandler
 
-        public void BeginPlacement(HitObject hitObject)
+        public void ShowPlacement(HitObject hitObject)
         {
             EditorBeatmap.PlacementObject.Value = hitObject;
         }
 
-        public void EndPlacement(HitObject hitObject, bool commit)
+        public void HidePlacement()
         {
             EditorBeatmap.PlacementObject.Value = null;
+        }
 
-            if (commit)
-            {
-                EditorBeatmap.Add(hitObject);
+        public void CommitPlacement(HitObject hitObject)
+        {
+            EditorBeatmap.PlacementObject.Value = null;
+            EditorBeatmap.Add(hitObject);
 
-                if (autoSeekOnPlacement.Value && EditorClock.CurrentTime < hitObject.StartTime)
-                    EditorClock.SeekSmoothlyTo(hitObject.StartTime);
-            }
+            if (autoSeekOnPlacement.Value && EditorClock.CurrentTime < hitObject.StartTime)
+                EditorClock.SeekSmoothlyTo(hitObject.StartTime);
         }
 
         public void Delete(HitObject hitObject) => EditorBeatmap.Remove(hitObject);
