@@ -45,11 +45,11 @@ namespace osu.Game.Online.Rooms
                 foreach (var room in Response)
                 {
                     if (room.EndDate.Value != null && DateTimeOffset.Now >= room.EndDate.Value)
-                        room.Status.Value = new RoomStatusEnded();
+                        room.Status = new RoomStatusEnded();
                     else if (room.HasPassword.Value)
-                        room.Status.Value = new RoomStatusOpenPrivate();
+                        room.Status = new RoomStatusOpenPrivate();
                     else
-                        room.Status.Value = new RoomStatusOpen();
+                        room.Status = new RoomStatusOpen();
                 }
             }
         }
