@@ -181,6 +181,8 @@ namespace osu.Game.Skinning
 
         public void RemoveAllAdjustments(AdjustableProperty type) => sampleContainer.RemoveAllAdjustments(type);
 
+        public void RemoveAdjustmentsFromAllProperties() => sampleContainer.RemoveAdjustmentsFromAllProperties();
+
         public IBindable<double> AggregateVolume => sampleContainer.AggregateVolume;
 
         public IBindable<double> AggregateBalance => sampleContainer.AggregateBalance;

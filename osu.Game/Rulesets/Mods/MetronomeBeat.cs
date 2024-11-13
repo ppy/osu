@@ -86,6 +86,11 @@ namespace osu.Game.Rulesets.Mods
             sample.RemoveAllAdjustments(type);
         }
 
+        public void RemoveAdjustmentsFromAllProperties()
+        {
+            sample.RemoveAdjustmentsFromAllProperties();
+        }
+
         #endregion
     }
 }

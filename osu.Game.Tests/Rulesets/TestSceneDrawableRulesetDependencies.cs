@@ -144,6 +144,8 @@ namespace osu.Game.Tests.Rulesets
 
             public void RemoveAllAdjustments(AdjustableProperty type) => throw new NotImplementedException();
 
+            public void RemoveAdjustmentsFromAllProperties() => throw new NotImplementedException();
+
             public IBindable<double> AggregateVolume => throw new NotImplementedException();
             public IBindable<double> AggregateBalance => throw new NotImplementedException();
             public IBindable<double> AggregateFrequency => throw new NotImplementedException();

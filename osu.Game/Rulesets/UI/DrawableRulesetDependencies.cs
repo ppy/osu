@@ -137,6 +137,8 @@ namespace osu.Game.Rulesets.UI
 
             public void RemoveAllAdjustments(AdjustableProperty type) => throw new NotSupportedException();
 
+            public void RemoveAdjustmentsFromAllProperties() => throw new NotSupportedException();
+
             public void BindAdjustments(IAggregateAudioAdjustment component) => throw new NotImplementedException();
 
             public void UnbindAdjustments(IAggregateAudioAdjustment component) => throw new NotImplementedException();

@@ -194,6 +194,8 @@ namespace osu.Game.Skinning
 
         public void RemoveAllAdjustments(AdjustableProperty type) => samplesContainer.RemoveAllAdjustments(type);
 
+        public void RemoveAdjustmentsFromAllProperties() => samplesContainer.RemoveAdjustmentsFromAllProperties();
+
         /// <summary>
         /// Whether any samples are currently playing.
         /// </summary>

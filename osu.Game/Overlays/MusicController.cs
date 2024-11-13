@@ -585,11 +585,7 @@ namespace osu.Game.Overlays
         /// </remarks>
         public void ResetTrackAdjustments()
         {
-            // todo: we probably want a helper method rather than this.
-            CurrentTrack.RemoveAllAdjustments(AdjustableProperty.Balance);
-            CurrentTrack.RemoveAllAdjustments(AdjustableProperty.Frequency);
-            CurrentTrack.RemoveAllAdjustments(AdjustableProperty.Tempo);
-            CurrentTrack.RemoveAllAdjustments(AdjustableProperty.Volume);
+            CurrentTrack.RemoveAdjustmentsFromAllProperties();
 
             if (applyModTrackAdjustments)
             {
