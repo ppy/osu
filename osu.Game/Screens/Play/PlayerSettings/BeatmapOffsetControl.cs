@@ -45,7 +45,6 @@ namespace osu.Game.Screens.Play.PlayerSettings
         };
 
         private readonly FillFlowContainer referenceScoreContainer;
-        private readonly PlayerCheckbox autoAdjustOffsetToggle;
 
         [Resolved]
         private RealmAccess realm { get; set; } = null!;
@@ -87,7 +86,6 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 Spacing = new Vector2(10),
                 Children = new Drawable[]
                 {
-                    autoAdjustOffsetToggle = new PlayerCheckbox { LabelText = AudioSettingsStrings.AutoAdjustBeatmapOffset },
                     new OffsetSliderBar
                     {
                         KeyboardStep = 5,
@@ -178,7 +176,6 @@ namespace osu.Game.Screens.Play.PlayerSettings
         private void load(OsuConfigManager config)
         {
             autoAdjustBeatmapOffset = config.GetBindable<bool>(OsuSetting.AutoAdjustBeatmapOffset);
-            autoAdjustOffsetToggle.Current = config.GetBindable<bool>(OsuSetting.AutoAdjustBeatmapOffset);
         }
 
         private void scoreChanged(ValueChangedEvent<ScoreInfo?> score)
