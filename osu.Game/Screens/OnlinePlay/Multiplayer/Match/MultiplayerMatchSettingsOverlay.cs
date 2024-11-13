@@ -352,7 +352,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 TypePicker.Current.BindValueChanged(type => typeLabel.Text = type.NewValue.GetLocalisableDescription(), true);
                 MaxParticipants.BindValueChanged(count => MaxParticipantsField.Text = count.NewValue?.ToString(), true);
                 AutoStartDuration.BindValueChanged(duration => startModeDropdown.Current.Value = (StartMode)(int)duration.NewValue.TotalSeconds, true);
-                AutoSkip.BindValueChanged(autoSkip => AutoSkipCheckbox.Current.Value = autoSkip.NewValue, true);
 
                 operationInProgress.BindTo(ongoingOperationTracker.InProgress);
                 operationInProgress.BindValueChanged(v =>
@@ -377,6 +376,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 updateRoomType();
                 updateRoomQueueMode();
                 updateRoomPassword();
+                updateRoomAutoSkip();
             }
 
             private void onRoomPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -398,6 +398,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                     case nameof(Room.Password):
                         updateRoomPassword();
                         break;
+
+                    case nameof(Room.AutoSkip):
+                        updateRoomAutoSkip();
+                        break;
                 }
             }
 
@@ -412,6 +416,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
             private void updateRoomPassword()
                 => PasswordTextBox.Text = room.Password ?? string.Empty;
+
+            private void updateRoomAutoSkip()
+                => AutoSkipCheckbox.Current.Value = room.AutoSkip;
 
             protected override void Update()
             {
@@ -459,7 +466,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                     room.Password = PasswordTextBox.Current.Value;
                     room.QueueMode = QueueModeDropdown.Current.Value;
                     room.AutoStartDuration.Value = autoStartDuration;
-                    room.AutoSkip.Value = AutoSkipCheckbox.Current.Value;
+                    room.AutoSkip = AutoSkipCheckbox.Current.Value;
 
                     if (int.TryParse(MaxParticipantsField.Text, out int max))
                         room.MaxParticipants.Value = max;
