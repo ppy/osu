@@ -17,9 +17,6 @@ namespace osu.Game.Screens.OnlinePlay
     public partial class OnlinePlayComposite : CompositeDrawable
     {
         [Resolved(typeof(Room))]
-        protected Bindable<APIUser> Host { get; private set; } = null!;
-
-        [Resolved(typeof(Room))]
         protected Bindable<RoomStatus> Status { get; private set; } = null!;
 
         [Resolved(typeof(Room))]

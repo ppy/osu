@@ -61,8 +61,8 @@ namespace osu.Game.Tests.Visual.Playlists
             setupAndCreateRoom(room =>
             {
                 room.Name = "my awesome room";
-                room.Host.Value = API.LocalUser.Value;
-                room.RecentParticipants.Add(room.Host.Value);
+                room.Host = API.LocalUser.Value;
+                room.RecentParticipants.Add(room.Host);
                 room.EndDate.Value = DateTimeOffset.Now.AddMinutes(5);
                 room.Playlist.Add(new PlaylistItem(importedBeatmap.Beatmaps.First())
                 {
@@ -85,8 +85,8 @@ namespace osu.Game.Tests.Visual.Playlists
             {
                 room.Name = "my awesome room";
                 room.MaxAttempts.Value = 5;
-                room.Host.Value = API.LocalUser.Value;
-                room.RecentParticipants.Add(room.Host.Value);
+                room.Host = API.LocalUser.Value;
+                room.RecentParticipants.Add(room.Host);
                 room.EndDate.Value = DateTimeOffset.Now.AddMinutes(5);
                 room.Playlist.Add(new PlaylistItem(importedBeatmap.Beatmaps.First())
                 {
@@ -103,7 +103,7 @@ namespace osu.Game.Tests.Visual.Playlists
             setupAndCreateRoom(room =>
             {
                 room.Name = "my awesome room";
-                room.Host.Value = API.LocalUser.Value;
+                room.Host = API.LocalUser.Value;
                 room.Playlist.Add(new PlaylistItem(importedBeatmap.Beatmaps.First())
                 {
                     RulesetID = new OsuRuleset().RulesetInfo.OnlineID
@@ -151,7 +151,7 @@ namespace osu.Game.Tests.Visual.Playlists
             setupAndCreateRoom(room =>
             {
                 room.Name = "my awesome room";
-                room.Host.Value = API.LocalUser.Value;
+                room.Host = API.LocalUser.Value;
                 room.Playlist.Add(new PlaylistItem(new BeatmapInfo
                 {
                     MD5Hash = realHash,

@@ -528,7 +528,7 @@ namespace osu.Game.Online.Multiplayer
                 var user = Room.Users.FirstOrDefault(u => u.UserID == userId);
 
                 Room.Host = user;
-                APIRoom.Host.Value = user?.User;
+                APIRoom.Host = user?.User;
 
                 RoomUpdated?.Invoke();
             }, false);
