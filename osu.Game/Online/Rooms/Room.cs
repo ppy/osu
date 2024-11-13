@@ -21,9 +21,6 @@ namespace osu.Game.Online.Rooms
     {
         public event PropertyChangedEventHandler? PropertyChanged;
 
-        [JsonProperty("current_playlist_item")]
-        private PlaylistItem? currentPlaylistItem;
-
         /// <summary>
         /// Represents the current item selected within the room.
         /// </summary>
@@ -35,6 +32,9 @@ namespace osu.Game.Online.Rooms
             get => currentPlaylistItem;
             set => SetField(ref currentPlaylistItem, value);
         }
+
+        [JsonProperty("current_playlist_item")]
+        private PlaylistItem? currentPlaylistItem;
 
         [Cached]
         [JsonProperty("id")]
