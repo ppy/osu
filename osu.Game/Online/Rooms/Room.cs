@@ -87,6 +87,15 @@ namespace osu.Game.Online.Rooms
             set => SetField(ref status, value);
         }
 
+        /// <summary>
+        /// Describes which players are able to join the room.
+        /// </summary>
+        public RoomAvailability Availability
+        {
+            get => availability;
+            set => SetField(ref availability, value);
+        }
+
         [JsonProperty("id")]
         private long? roomId;
 
@@ -110,6 +119,9 @@ namespace osu.Game.Online.Rooms
         // Not serialised (see: GetRoomsRequest).
         private RoomStatus status = new RoomStatusOpen();
 
+        // Not yet serialised (not implemented).
+        private RoomAvailability availability;
+
         [Cached]
         [JsonProperty("playlist")]
         public readonly BindableList<PlaylistItem> Playlist = new BindableList<PlaylistItem>();
@@ -128,9 +140,6 @@ namespace osu.Game.Online.Rooms
 
         [Cached]
         public readonly Bindable<int?> MaxAttempts = new Bindable<int?>();
-
-        [Cached]
-        public readonly Bindable<RoomAvailability> Availability = new Bindable<RoomAvailability>();
 
         [Cached]
         public readonly Bindable<QueueMode> QueueMode = new Bindable<QueueMode>();
@@ -241,7 +250,7 @@ namespace osu.Game.Online.Rooms
 
             ChannelId.Value = other.ChannelId.Value;
             Status = other.Status;
-            Availability.Value = other.Availability.Value;
+            Availability = other.Availability;
             HasPassword.Value = other.HasPassword.Value;
             Type = other.Type;
             MaxParticipants.Value = other.MaxParticipants.Value;
