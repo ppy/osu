@@ -183,7 +183,17 @@ namespace osu.Game.Beatmaps.Formats
             if (scrollSpeedEncodedAsSliderVelocity)
             {
                 foreach (var point in legacyControlPoints.EffectPoints)
-                    legacyControlPoints.Add(point.Time, new DifficultyControlPoint { SliderVelocity = point.ScrollSpeed });
+                {
+                    legacyControlPoints.Add(point.Time, new DifficultyControlPoint
+                    {
+                        SliderVelocityBindable =
+                        {
+                            MinValue = point.ScrollSpeedBindable.MinValue,
+                            MaxValue = point.ScrollSpeedBindable.MaxValue,
+                            Value = point.ScrollSpeedBindable.Value,
+                        }
+                    });
+                }
             }
 
             LegacyControlPointProperties lastControlPointProperties = new LegacyControlPointProperties();
