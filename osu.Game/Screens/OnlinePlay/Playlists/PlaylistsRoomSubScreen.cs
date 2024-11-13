@@ -60,16 +60,24 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             base.LoadComplete();
 
             isIdle.BindValueChanged(_ => updatePollingRate(), true);
-            Room.MaxAttempts.BindValueChanged(_ => progressSection.Alpha = Room.MaxAttempts.Value != null ? 1 : 0, true);
 
             Room.PropertyChanged += onRoomPropertyChanged;
             updateSetupState();
+            updateRoomMaxAttempts();
         }
 
         private void onRoomPropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(Room.RoomID))
-                updateSetupState();
+            switch (e.PropertyName)
+            {
+                case nameof(Room.RoomID):
+                    updateSetupState();
+                    break;
+
+                case nameof(Room.MaxAttempts):
+                    updateRoomMaxAttempts();
+                    break;
+            }
         }
 
         private void updateSetupState()
@@ -81,6 +89,9 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                 Schedule(() => SelectedItem.Value = Room.Playlist.FirstOrDefault());
             }
         }
+
+        private void updateRoomMaxAttempts()
+            => progressSection.Alpha = Room.MaxAttempts != null ? 1 : 0;
 
         protected override Drawable CreateMainContent() => new Container
         {
@@ -193,7 +204,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                             Children = new Drawable[]
                                             {
                                                 new OverlinedHeader("Progress"),
-                                                new RoomLocalUserInfo(),
+                                                new RoomLocalUserInfo(Room),
                                             }
                                         },
                                     },

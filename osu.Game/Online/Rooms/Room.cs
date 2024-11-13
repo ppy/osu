@@ -147,6 +147,15 @@ namespace osu.Game.Online.Rooms
         }
 
         /// <summary>
+        /// The maximum number of attempts on the playlist. Only valid for playlist rooms.
+        /// </summary>
+        public int? MaxAttempts
+        {
+            get => maxAttempts;
+            set => SetField(ref maxAttempts, value);
+        }
+
+        /// <summary>
         /// The playlist queueing mode. Only valid for multiplayer rooms.
         /// </summary>
         public QueueMode QueueMode
@@ -237,6 +246,9 @@ namespace osu.Game.Online.Rooms
         [JsonProperty("participant_count")]
         private int participantCount;
 
+        [JsonProperty("max_attempts", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        private int? maxAttempts;
+
         [JsonConverter(typeof(SnakeCaseStringEnumConverter))]
         [JsonProperty("type")]
         private MatchType type;
@@ -277,23 +289,12 @@ namespace osu.Game.Online.Rooms
         public readonly Bindable<RoomDifficultyRange> DifficultyRange = new Bindable<RoomDifficultyRange>();
 
         [Cached]
-        public readonly Bindable<int?> MaxAttempts = new Bindable<int?>();
-
-        [Cached]
         [JsonProperty("current_user_score")]
         public readonly Bindable<PlaylistAggregateScore> UserScore = new Bindable<PlaylistAggregateScore>();
 
         [Cached]
         [JsonProperty("recent_participants")]
         public readonly BindableList<APIUser> RecentParticipants = new BindableList<APIUser>();
-
-        // Todo: Find a better way to do this (https://github.com/ppy/osu-framework/issues/1930)
-        [JsonProperty("max_attempts", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private int? maxAttempts
-        {
-            get => MaxAttempts.Value;
-            set => MaxAttempts.Value = value;
-        }
 
         /// <summary>
         /// Copies values from another <see cref="Room"/> into this one.

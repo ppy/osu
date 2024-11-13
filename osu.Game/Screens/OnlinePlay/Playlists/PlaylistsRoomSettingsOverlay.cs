@@ -316,8 +316,6 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                     loadingLayer = new LoadingLayer(true)
                 };
 
-                MaxAttempts.BindValueChanged(count => MaxAttemptsField.Text = count.NewValue?.ToString(), true);
-
                 DurationField.Current.BindValueChanged(duration =>
                 {
                     if (hasValidDuration)
@@ -346,6 +344,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                 updateRoomAvailability();
                 updateRoomMaxParticipants();
                 updateRoomDuration();
+                updateRoomMaxAttempts();
             }
 
             private void onRoomPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -367,6 +366,10 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                     case nameof(Room.Duration):
                         updateRoomDuration();
                         break;
+
+                    case nameof(Room.MaxAttempts):
+                        updateRoomMaxAttempts();
+                        break;
                 }
             }
 
@@ -381,6 +384,9 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
             private void updateRoomDuration()
                 => DurationField.Current.Value = room.Duration ?? TimeSpan.FromMinutes(30);
+
+            private void updateRoomMaxAttempts()
+                => MaxAttemptsField.Text = room.MaxAttempts?.ToString();
 
             private void populateDurations(ValueChangedEvent<APIUser> user)
             {
@@ -431,13 +437,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
                 room.Name = NameField.Text;
                 room.Availability = AvailabilityPicker.Current.Value;
-                room.MaxParticipants = int.TryParse(MaxParticipantsField.Text, out int max) ? max : null;
-
-                if (int.TryParse(MaxAttemptsField.Text, out max))
-                    MaxAttempts.Value = max;
-                else
-                    MaxAttempts.Value = null;
-
+                room.MaxParticipants = int.TryParse(MaxParticipantsField.Text, out int maxParticipants) ? maxParticipants : null;
+                room.MaxAttempts = int.TryParse(MaxAttemptsField.Text, out int maxAttempts) ? maxAttempts : null;
                 room.Duration = DurationField.Current.Value;
 
                 loadingLayer.Show();
