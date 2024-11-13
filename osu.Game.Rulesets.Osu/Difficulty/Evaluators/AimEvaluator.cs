@@ -69,7 +69,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             double wideAngleBonus = 0;
             double acuteAngleBonus = 0;
-            double sliderBonus = 0;
             double velocityChangeBonus = 0;
 
             double aimStrain = currVelocity; // Start strain with regular velocity.
