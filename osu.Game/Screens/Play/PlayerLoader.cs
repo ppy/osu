@@ -224,7 +224,7 @@ namespace osu.Game.Screens.Play
                         }
                     },
                 },
-                idleTracker = new IdleTracker(750),
+                idleTracker = new IdleTracker(1500),
                 sampleRestart = new SkinnableSound(new SampleInfo(@"Gameplay/restart", @"pause-retry-click"))
             };
 
