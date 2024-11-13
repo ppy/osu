@@ -156,6 +156,15 @@ namespace osu.Game.Online.Rooms
         }
 
         /// <summary>
+        /// Describes the items in the playlist.
+        /// </summary>
+        public RoomPlaylistItemStats? PlaylistItemStats
+        {
+            get => playlistItemStats;
+            set => SetField(ref playlistItemStats, value);
+        }
+
+        /// <summary>
         /// The playlist queueing mode. Only valid for multiplayer rooms.
         /// </summary>
         public QueueMode QueueMode
@@ -258,6 +267,9 @@ namespace osu.Game.Online.Rooms
         [JsonProperty("max_attempts", DefaultValueHandling = DefaultValueHandling.Ignore)]
         private int? maxAttempts;
 
+        [JsonProperty("playlist_item_stats")]
+        private RoomPlaylistItemStats? playlistItemStats;
+
         [JsonConverter(typeof(SnakeCaseStringEnumConverter))]
         [JsonProperty("type")]
         private MatchType type;
@@ -287,10 +299,6 @@ namespace osu.Game.Online.Rooms
         [Cached]
         [JsonProperty("playlist")]
         public readonly BindableList<PlaylistItem> Playlist = new BindableList<PlaylistItem>();
-
-        [JsonProperty("playlist_item_stats")]
-        [Cached]
-        public readonly Bindable<RoomPlaylistItemStats> PlaylistItemStats = new Bindable<RoomPlaylistItemStats>();
 
         [JsonProperty("difficulty_range")]
         [Cached]
@@ -333,7 +341,7 @@ namespace osu.Game.Online.Rooms
             QueueMode = other.QueueMode;
             AutoStartDuration = other.AutoStartDuration;
             DifficultyRange.Value = other.DifficultyRange.Value;
-            PlaylistItemStats.Value = other.PlaylistItemStats.Value;
+            PlaylistItemStats = other.PlaylistItemStats;
             CurrentPlaylistItem = other.CurrentPlaylistItem;
             AutoSkip = other.AutoSkip;
 

@@ -43,7 +43,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
 
                 if (ruleset != null)
                 {
-                    room.PlaylistItemStats.Value = new Room.RoomPlaylistItemStats
+                    room.PlaylistItemStats = new Room.RoomPlaylistItemStats
                     {
                         RulesetIDs = new[] { ruleset.OnlineID },
                     };

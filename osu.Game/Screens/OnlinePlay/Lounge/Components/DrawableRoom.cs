@@ -355,7 +355,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
             pills.AddRange(new Drawable[]
             {
-                new PlaylistCountPill
+                new PlaylistCountPill(Room)
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
