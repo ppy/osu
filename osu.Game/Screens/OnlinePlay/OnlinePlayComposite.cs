@@ -28,12 +28,6 @@ namespace osu.Game.Screens.OnlinePlay
         protected BindableList<APIUser> RecentParticipants { get; private set; } = null!;
 
         [Resolved(typeof(Room))]
-        protected Bindable<int> ParticipantCount { get; private set; } = null!;
-
-        [Resolved(typeof(Room))]
-        protected Bindable<int?> MaxParticipants { get; private set; } = null!;
-
-        [Resolved(typeof(Room))]
         protected Bindable<int?> MaxAttempts { get; private set; } = null!;
 
         [Resolved(typeof(Room))]

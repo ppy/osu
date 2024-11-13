@@ -166,14 +166,11 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             base.LoadComplete();
 
             RecentParticipants.BindCollectionChanged(onParticipantsChanged, true);
-            ParticipantCount.BindValueChanged(_ =>
-            {
-                updateHiddenUsers();
-                totalCount.Text = ParticipantCount.Value.ToString();
-            }, true);
 
             room.PropertyChanged += onRoomPropertyChanged;
+
             updateRoomHost();
+            updateRoomParticipantCount();
         }
 
         private int numberOfCircles = 4;
@@ -257,7 +254,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         {
             int hiddenCount = 0;
             if (RecentParticipants.Count > NumberOfCircles)
-                hiddenCount = ParticipantCount.Value - NumberOfCircles + 1;
+                hiddenCount = room.ParticipantCount - NumberOfCircles + 1;
 
             hiddenUsers.Count = hiddenCount;
 
@@ -272,8 +269,16 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
         private void onRoomPropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(Room.Host))
-                updateRoomHost();
+            switch (e.PropertyName)
+            {
+                case nameof(Room.Host):
+                    updateRoomHost();
+                    break;
+
+                case nameof(Room.ParticipantCount):
+                    updateRoomParticipantCount();
+                    break;
+            }
         }
 
         private void updateRoomHost()
@@ -286,6 +291,12 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 hostText.AddText("hosted by ");
                 hostText.AddUserLink(room.Host);
             }
+        }
+
+        private void updateRoomParticipantCount()
+        {
+            updateHiddenUsers();
+            totalCount.Text = room.ParticipantCount.ToString();
         }
 
         protected override void Dispose(bool isDisposing)

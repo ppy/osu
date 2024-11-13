@@ -350,7 +350,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 };
 
                 TypePicker.Current.BindValueChanged(type => typeLabel.Text = type.NewValue.GetLocalisableDescription(), true);
-                MaxParticipants.BindValueChanged(count => MaxParticipantsField.Text = count.NewValue?.ToString(), true);
                 AutoStartDuration.BindValueChanged(duration => startModeDropdown.Current.Value = (StartMode)(int)duration.NewValue.TotalSeconds, true);
 
                 operationInProgress.BindTo(ongoingOperationTracker.InProgress);
@@ -377,6 +376,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 updateRoomQueueMode();
                 updateRoomPassword();
                 updateRoomAutoSkip();
+                updateRoomMaxParticipants();
             }
 
             private void onRoomPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -402,6 +402,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                     case nameof(Room.AutoSkip):
                         updateRoomAutoSkip();
                         break;
+
+                    case nameof(Room.MaxParticipants):
+                        updateRoomMaxParticipants();
+                        break;
                 }
             }
 
@@ -419,6 +423,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
             private void updateRoomAutoSkip()
                 => AutoSkipCheckbox.Current.Value = room.AutoSkip;
+
+            private void updateRoomMaxParticipants()
+                => MaxParticipantsField.Text = room.MaxParticipants?.ToString();
 
             protected override void Update()
             {
@@ -469,9 +476,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                     room.AutoSkip = AutoSkipCheckbox.Current.Value;
 
                     if (int.TryParse(MaxParticipantsField.Text, out int max))
-                        room.MaxParticipants.Value = max;
+                        room.MaxParticipants = max;
                     else
-                        room.MaxParticipants.Value = null;
+                        room.MaxParticipants = null;
 
                     manager.CreateRoom(room, onSuccess, onError);
                 }

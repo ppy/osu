@@ -143,13 +143,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 Id = id,
                 Username = $"User {id}"
             });
-            SelectedRoom.Value.ParticipantCount.Value++;
+            SelectedRoom.Value.ParticipantCount++;
         }
 
         private void removeUserAt(int index)
         {
             SelectedRoom.Value.RecentParticipants.RemoveAt(index);
-            SelectedRoom.Value.ParticipantCount.Value--;
+            SelectedRoom.Value.ParticipantCount--;
         }
     }
 }
