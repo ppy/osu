@@ -165,7 +165,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     new DrawableMatchRoom(new Room
                     {
                         Name = "A host-only room",
-                        QueueMode = { Value = QueueMode.HostOnly },
+                        QueueMode = QueueMode.HostOnly,
                         Type = MatchType.HeadToHead,
                     })
                     {
@@ -174,7 +174,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     new DrawableMatchRoom(new Room
                     {
                         Name = "An all-players, team-versus room",
-                        QueueMode = { Value = QueueMode.AllPlayers },
+                        QueueMode = QueueMode.AllPlayers,
                         Type = MatchType.TeamVersus
                     })
                     {
@@ -183,7 +183,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     new DrawableMatchRoom(new Room
                     {
                         Name = "A round-robin room",
-                        QueueMode = { Value = QueueMode.AllPlayersRoundRobin },
+                        QueueMode = QueueMode.AllPlayersRoundRobin,
                         Type = MatchType.HeadToHead
                     })
                     {

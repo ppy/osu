@@ -358,7 +358,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             Activity.Value = new UserActivity.InLobby(Room);
         }
 
-        private bool localUserCanAddItem => client.IsHost || Room.QueueMode.Value != QueueMode.HostOnly;
+        private bool localUserCanAddItem => client.IsHost || Room.QueueMode != QueueMode.HostOnly;
 
         private void updateCurrentItem()
         {

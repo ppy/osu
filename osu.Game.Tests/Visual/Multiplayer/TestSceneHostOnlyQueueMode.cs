@@ -46,7 +46,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 QueueMode = QueueMode.AllPlayers
             }).WaitSafely());
 
-            AddUntilStep("api room updated", () => MultiplayerClient.ClientAPIRoom?.QueueMode.Value == QueueMode.AllPlayers);
+            AddUntilStep("api room updated", () => MultiplayerClient.ClientAPIRoom?.QueueMode == QueueMode.AllPlayers);
         }
 
         [Test]

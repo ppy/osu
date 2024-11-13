@@ -341,7 +341,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 pills.AddRange(new OnlinePlayComposite[]
                 {
                     new MatchTypePill(Room),
-                    new QueueModePill(),
+                    new QueueModePill(Room),
                 });
             }
 

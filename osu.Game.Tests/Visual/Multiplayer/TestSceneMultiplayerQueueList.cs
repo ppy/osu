@@ -69,7 +69,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public void TestDeleteButtonAlwaysVisibleForHost()
         {
             AddStep("set all players queue mode", () => MultiplayerClient.ChangeSettings(new MultiplayerRoomSettings { QueueMode = QueueMode.AllPlayers }).WaitSafely());
-            AddUntilStep("wait for queue mode change", () => MultiplayerClient.ClientAPIRoom?.QueueMode.Value == QueueMode.AllPlayers);
+            AddUntilStep("wait for queue mode change", () => MultiplayerClient.ClientAPIRoom?.QueueMode == QueueMode.AllPlayers);
 
             addPlaylistItem(() => API.LocalUser.Value.OnlineID);
             assertDeleteButtonVisibility(1, true);
@@ -81,7 +81,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public void TestDeleteButtonOnlyVisibleForItemOwnerIfNotHost()
         {
             AddStep("set all players queue mode", () => MultiplayerClient.ChangeSettings(new MultiplayerRoomSettings { QueueMode = QueueMode.AllPlayers }).WaitSafely());
-            AddUntilStep("wait for queue mode change", () => MultiplayerClient.ClientAPIRoom?.QueueMode.Value == QueueMode.AllPlayers);
+            AddUntilStep("wait for queue mode change", () => MultiplayerClient.ClientAPIRoom?.QueueMode == QueueMode.AllPlayers);
 
             AddStep("join other user", () => MultiplayerClient.AddUser(new APIUser { Id = 1234 }));
             AddStep("set other user as host", () => MultiplayerClient.TransferHost(1234));
@@ -100,7 +100,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public void TestSingleItemDoesNotHaveDeleteButton()
         {
             AddStep("set all players queue mode", () => MultiplayerClient.ChangeSettings(new MultiplayerRoomSettings { QueueMode = QueueMode.AllPlayers }).WaitSafely());
-            AddUntilStep("wait for queue mode change", () => MultiplayerClient.ClientAPIRoom?.QueueMode.Value == QueueMode.AllPlayers);
+            AddUntilStep("wait for queue mode change", () => MultiplayerClient.ClientAPIRoom?.QueueMode == QueueMode.AllPlayers);
 
             assertDeleteButtonVisibility(0, false);
         }
@@ -109,7 +109,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public void TestCurrentItemHasDeleteButtonIfNotSingle()
         {
             AddStep("set all players queue mode", () => MultiplayerClient.ChangeSettings(new MultiplayerRoomSettings { QueueMode = QueueMode.AllPlayers }).WaitSafely());
-            AddUntilStep("wait for queue mode change", () => MultiplayerClient.ClientAPIRoom?.QueueMode.Value == QueueMode.AllPlayers);
+            AddUntilStep("wait for queue mode change", () => MultiplayerClient.ClientAPIRoom?.QueueMode == QueueMode.AllPlayers);
 
             addPlaylistItem(() => API.LocalUser.Value.OnlineID);
 
