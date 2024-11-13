@@ -74,7 +74,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("open room", () => multiplayerComponents.ChildrenOfType<LoungeSubScreen>().Single().Open(new Room
             {
                 Name = "Test Room",
-                QueueMode = { Value = Mode },
+                QueueMode = Mode,
                 Playlist =
                 {
                     new PlaylistItem(InitialBeatmap)
@@ -96,7 +96,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestCreatedWithCorrectMode()
         {
-            AddUntilStep("room created with correct mode", () => MultiplayerClient.ClientAPIRoom?.QueueMode.Value == Mode);
+            AddUntilStep("room created with correct mode", () => MultiplayerClient.ClientAPIRoom?.QueueMode == Mode);
         }
 
         protected void RunGameplay()

@@ -67,6 +67,15 @@ namespace osu.Game.Online.Rooms
         }
 
         /// <summary>
+        /// The playlist queueing mode. Only valid for multiplayer rooms.
+        /// </summary>
+        public QueueMode QueueMode
+        {
+            get => queueMode;
+            set => SetField(ref queueMode, value);
+        }
+
+        /// <summary>
         /// Represents the current item selected within the room.
         /// </summary>
         /// <remarks>
@@ -96,6 +105,7 @@ namespace osu.Game.Online.Rooms
             set => SetField(ref availability, value);
         }
 
+
         [JsonProperty("id")]
         private long? roomId;
 
@@ -112,6 +122,10 @@ namespace osu.Game.Online.Rooms
         [JsonConverter(typeof(SnakeCaseStringEnumConverter))]
         [JsonProperty("type")]
         private MatchType type;
+
+        [JsonConverter(typeof(SnakeCaseStringEnumConverter))]
+        [JsonProperty("queue_mode")]
+        private QueueMode queueMode;
 
         [JsonProperty("current_playlist_item")]
         private PlaylistItem? currentPlaylistItem;
@@ -140,17 +154,6 @@ namespace osu.Game.Online.Rooms
 
         [Cached]
         public readonly Bindable<int?> MaxAttempts = new Bindable<int?>();
-
-        [Cached]
-        public readonly Bindable<QueueMode> QueueMode = new Bindable<QueueMode>();
-
-        [JsonConverter(typeof(SnakeCaseStringEnumConverter))]
-        [JsonProperty("queue_mode")]
-        private QueueMode queueMode
-        {
-            get => QueueMode.Value;
-            set => QueueMode.Value = value;
-        }
 
         [Cached]
         public readonly Bindable<TimeSpan> AutoStartDuration = new Bindable<TimeSpan>();
@@ -257,7 +260,7 @@ namespace osu.Game.Online.Rooms
             ParticipantCount.Value = other.ParticipantCount.Value;
             EndDate.Value = other.EndDate.Value;
             UserScore.Value = other.UserScore.Value;
-            QueueMode.Value = other.QueueMode.Value;
+            QueueMode = other.QueueMode;
             AutoStartDuration.Value = other.AutoStartDuration.Value;
             DifficultyRange.Value = other.DifficultyRange.Value;
             PlaylistItemStats.Value = other.PlaylistItemStats.Value;

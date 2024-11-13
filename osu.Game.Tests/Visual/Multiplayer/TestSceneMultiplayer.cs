@@ -792,7 +792,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 roomManager.AddServerSideRoom(new Room
                 {
                     Name = "Test Room",
-                    QueueMode = { Value = QueueMode.AllPlayers },
+                    QueueMode = QueueMode.AllPlayers,
                     Playlist =
                     {
                         new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
@@ -837,7 +837,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             createRoom(() => new Room
             {
                 Name = "Test Room",
-                QueueMode = { Value = QueueMode.AllPlayers },
+                QueueMode = QueueMode.AllPlayers,
                 Playlist =
                 {
                     new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
@@ -873,7 +873,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             createRoom(() => new Room
             {
                 Name = "Test Room",
-                QueueMode = { Value = QueueMode.AllPlayers },
+                QueueMode = QueueMode.AllPlayers,
                 Playlist =
                 {
                     new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
@@ -912,7 +912,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             createRoom(() => new Room
             {
                 Name = "Test Room",
-                QueueMode = { Value = QueueMode.AllPlayers },
+                QueueMode = QueueMode.AllPlayers,
                 Playlist =
                 {
                     new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
@@ -943,7 +943,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             createRoom(() => new Room
             {
                 Name = "Test Room",
-                QueueMode = { Value = QueueMode.AllPlayers },
+                QueueMode = QueueMode.AllPlayers,
                 Playlist =
                 {
                     new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
@@ -1023,7 +1023,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             createRoom(() => new Room
             {
                 Name = "Test Room",
-                QueueMode = { Value = QueueMode.AllPlayers },
+                QueueMode = QueueMode.AllPlayers,
                 Playlist =
                 {
                     new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)

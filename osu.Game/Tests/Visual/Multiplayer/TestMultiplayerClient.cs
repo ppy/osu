@@ -233,7 +233,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     Name = ServerAPIRoom.Name,
                     MatchType = ServerAPIRoom.Type,
                     Password = password ?? string.Empty,
-                    QueueMode = ServerAPIRoom.QueueMode.Value,
+                    QueueMode = ServerAPIRoom.QueueMode,
                     AutoStartDuration = ServerAPIRoom.AutoStartDuration.Value
                 },
                 Playlist = ServerAPIRoom.Playlist.Select(CreateMultiplayerPlaylistItem).ToList(),
