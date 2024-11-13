@@ -84,7 +84,7 @@ namespace osu.Game.Tests.Visual.Playlists
             setupAndCreateRoom(room =>
             {
                 room.Name = "my awesome room";
-                room.MaxAttempts.Value = 5;
+                room.MaxAttempts = 5;
                 room.Host = API.LocalUser.Value;
                 room.RecentParticipants.Add(room.Host);
                 room.EndDate = DateTimeOffset.Now.AddMinutes(5);

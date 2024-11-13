@@ -15,9 +15,6 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 {
     public partial class PlaylistsReadyButton : ReadyButton
     {
-        [Resolved(typeof(Room), nameof(Room.MaxAttempts))]
-        private Bindable<int?> maxAttempts { get; set; } = null!;
-
         [Resolved(typeof(Room), nameof(Room.UserScore))]
         private Bindable<PlaylistAggregateScore> userScore { get; set; } = null!;
 
@@ -46,10 +43,10 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
             userScore.BindValueChanged(aggregate =>
             {
-                if (maxAttempts.Value == null)
+                if (room.MaxAttempts == null)
                     return;
 
-                int remaining = maxAttempts.Value.Value - aggregate.NewValue.PlaylistItemAttempts.Sum(a => a.Attempts);
+                int remaining = room.MaxAttempts.Value - aggregate.NewValue.PlaylistItemAttempts.Sum(a => a.Attempts);
 
                 hasRemainingAttempts = remaining > 0;
             });
