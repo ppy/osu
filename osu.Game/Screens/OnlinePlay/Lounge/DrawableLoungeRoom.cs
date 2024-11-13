@@ -185,7 +185,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                 return true;
             }
 
-            if (Room.HasPassword.Value)
+            if (Room.HasPassword)
             {
                 this.ShowPopover();
                 return true;

@@ -19,7 +19,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         private MultiplayerClient multiplayerClient { get; set; } = null!;
 
         public override void CreateRoom(Room room, Action<Room>? onSuccess = null, Action<string>? onError = null)
-            => base.CreateRoom(room, r => joinMultiplayerRoom(r, r.Password.Value, onSuccess, onError), onError);
+            => base.CreateRoom(room, r => joinMultiplayerRoom(r, r.Password, onSuccess, onError), onError);
 
         public override void JoinRoom(Room room, string? password = null, Action<Room>? onSuccess = null, Action<string>? onError = null)
         {

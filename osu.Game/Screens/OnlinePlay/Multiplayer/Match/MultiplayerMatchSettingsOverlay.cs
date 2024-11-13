@@ -351,7 +351,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
                 TypePicker.Current.BindValueChanged(type => typeLabel.Text = type.NewValue.GetLocalisableDescription(), true);
                 MaxParticipants.BindValueChanged(count => MaxParticipantsField.Text = count.NewValue?.ToString(), true);
-                Password.BindValueChanged(password => PasswordTextBox.Text = password.NewValue ?? string.Empty, true);
                 AutoStartDuration.BindValueChanged(duration => startModeDropdown.Current.Value = (StartMode)(int)duration.NewValue.TotalSeconds, true);
                 AutoSkip.BindValueChanged(autoSkip => AutoSkipCheckbox.Current.Value = autoSkip.NewValue, true);
 
@@ -377,6 +376,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 updateRoomName();
                 updateRoomType();
                 updateRoomQueueMode();
+                updateRoomPassword();
             }
 
             private void onRoomPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -394,6 +394,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                     case nameof(Room.QueueMode):
                         updateRoomQueueMode();
                         break;
+
+                    case nameof(Room.Password):
+                        updateRoomPassword();
+                        break;
                 }
             }
 
@@ -405,6 +409,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
             private void updateRoomQueueMode()
                 => QueueModeDropdown.Current.Value = room.QueueMode;
+
+            private void updateRoomPassword()
+                => PasswordTextBox.Text = room.Password ?? string.Empty;
 
             protected override void Update()
             {
@@ -449,7 +456,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 {
                     room.Name = NameField.Text;
                     room.Type = TypePicker.Current.Value;
-                    room.Password.Value = PasswordTextBox.Current.Value;
+                    room.Password = PasswordTextBox.Current.Value;
                     room.QueueMode = QueueModeDropdown.Current.Value;
                     room.AutoStartDuration.Value = autoStartDuration;
                     room.AutoSkip.Value = AutoSkipCheckbox.Current.Value;

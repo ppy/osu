@@ -24,7 +24,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
     {
         private readonly Room room = new Room
         {
-            HasPassword = { Value = true }
+            Password = "*"
         };
 
         [Cached]

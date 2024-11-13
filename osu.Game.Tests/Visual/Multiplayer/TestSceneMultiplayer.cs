@@ -318,7 +318,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             createRoom(() => new Room
             {
                 Name = "Test Room",
-                Password = { Value = "password" },
+                Password = "password",
                 Playlist =
                 {
                     new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
@@ -328,7 +328,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 }
             });
 
-            AddUntilStep("room has password", () => multiplayerClient.ClientAPIRoom?.Password.Value == "password");
+            AddUntilStep("room has password", () => multiplayerClient.ClientAPIRoom?.Password == "password");
         }
 
         [Test]
@@ -339,7 +339,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 roomManager.AddServerSideRoom(new Room
                 {
                     Name = "Test Room",
-                    Password = { Value = "password" },
+                    Password = "password",
                     Playlist =
                     {
                         new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
@@ -371,7 +371,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             createRoom(() => new Room
             {
                 Name = "Test Room",
-                Password = { Value = "password" },
+                Password = "password",
                 Playlist =
                 {
                     new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
@@ -382,7 +382,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
 
             AddStep("change password", () => multiplayerClient.ChangeSettings(password: "password2"));
-            AddUntilStep("local password changed", () => multiplayerClient.ClientAPIRoom?.Password.Value == "password2");
+            AddUntilStep("local password changed", () => multiplayerClient.ClientAPIRoom?.Password == "password2");
         }
 
         [Test]

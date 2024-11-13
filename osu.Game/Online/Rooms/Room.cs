@@ -40,6 +40,35 @@ namespace osu.Game.Online.Rooms
         }
 
         /// <summary>
+        /// Sets the room password. Will be <c>null</c> after the room is created.
+        /// </summary>
+        /// <remarks>
+        /// To check if the room has a password, use <see cref="HasPassword"/>.
+        /// </remarks>
+        public string? Password
+        {
+            get => password;
+            set
+            {
+                SetField(ref password, value);
+                HasPassword = !string.IsNullOrEmpty(value);
+            }
+        }
+
+        /// <summary>
+        /// Whether the room has a password.
+        /// </summary>
+        /// <remarks>
+        /// To set a password, use <see cref="Password"/>.
+        /// </remarks>
+        [JsonProperty("has_password")]
+        public bool HasPassword
+        {
+            get => hasPassword;
+            private set => SetField(ref hasPassword, value);
+        }
+
+        /// <summary>
         /// The room host. Will be <c>null</c> while the room has not yet been created.
         /// </summary>
         public APIUser? Host
@@ -112,6 +141,12 @@ namespace osu.Game.Online.Rooms
         [JsonProperty("name")]
         private string name = string.Empty;
 
+        [JsonProperty("password")]
+        private string? password;
+
+        // Not serialised (internal use only).
+        private bool hasPassword;
+
         [JsonProperty("host")]
         private APIUser? host;
 
@@ -172,9 +207,6 @@ namespace osu.Game.Online.Rooms
         [JsonProperty("current_user_score")]
         public readonly Bindable<PlaylistAggregateScore> UserScore = new Bindable<PlaylistAggregateScore>();
 
-        [JsonProperty("has_password")]
-        public readonly Bindable<bool> HasPassword = new Bindable<bool>();
-
         [Cached]
         [JsonProperty("recent_participants")]
         public readonly BindableList<APIUser> RecentParticipants = new BindableList<APIUser>();
@@ -184,10 +216,6 @@ namespace osu.Game.Online.Rooms
         public readonly Bindable<int> ParticipantCount = new Bindable<int>();
 
         #region Properties only used for room creation request
-
-        [Cached(Name = nameof(Password))]
-        [JsonProperty("password")]
-        public readonly Bindable<string?> Password = new Bindable<string?>();
 
         [Cached]
         public readonly Bindable<TimeSpan?> Duration = new Bindable<TimeSpan?>();
@@ -229,11 +257,6 @@ namespace osu.Game.Online.Rooms
         [JsonProperty("auto_skip")]
         public readonly Bindable<bool> AutoSkip = new Bindable<bool>();
 
-        public Room()
-        {
-            Password.BindValueChanged(p => HasPassword.Value = !string.IsNullOrEmpty(p.NewValue));
-        }
-
         /// <summary>
         /// Copies values from another <see cref="Room"/> into this one.
         /// </summary>
@@ -254,7 +277,7 @@ namespace osu.Game.Online.Rooms
             ChannelId.Value = other.ChannelId.Value;
             Status = other.Status;
             Availability = other.Availability;
-            HasPassword.Value = other.HasPassword.Value;
+            HasPassword = other.HasPassword;
             Type = other.Type;
             MaxParticipants.Value = other.MaxParticipants.Value;
             ParticipantCount.Value = other.ParticipantCount.Value;

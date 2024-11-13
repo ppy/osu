@@ -216,7 +216,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             ServerAPIRoom = roomManager.ServerSideRooms.Single(r => r.RoomID == roomId);
 
-            if (password != ServerAPIRoom.Password.Value)
+            if (password != ServerAPIRoom.Password)
                 throw new InvalidOperationException("Invalid password.");
 
             lastPlaylistItemId = ServerAPIRoom.Playlist.Max(item => item.ID);

@@ -39,7 +39,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
                 };
 
                 if (withPassword)
-                    room.Password.Value = @"password";
+                    room.Password = @"password";
 
                 if (ruleset != null)
                 {
