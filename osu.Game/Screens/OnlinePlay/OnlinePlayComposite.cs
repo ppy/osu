@@ -19,8 +19,5 @@ namespace osu.Game.Screens.OnlinePlay
 
         [Resolved(typeof(Room))]
         protected BindableList<APIUser> RecentParticipants { get; private set; } = null!;
-
-        [Resolved(typeof(Room))]
-        public Bindable<PlaylistAggregateScore> UserScore { get; private set; } = null!;
     }
 }
