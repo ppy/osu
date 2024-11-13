@@ -1,11 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -22,6 +20,7 @@ using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Users;
 using osuTK;
+using Container = osu.Framework.Graphics.Containers.Container;
 
 namespace osu.Game.Screens.OnlinePlay.Playlists
 {
@@ -33,20 +32,22 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
         private readonly IBindable<bool> isIdle = new BindableBool();
 
-        private MatchLeaderboard leaderboard;
-        private SelectionPollingComponent selectionPollingComponent;
+        [Resolved(CanBeNull = true)]
+        private IdleTracker? idleTracker { get; set; }
 
-        private FillFlowContainer progressSection;
+        private MatchLeaderboard leaderboard = null!;
+        private SelectionPollingComponent selectionPollingComponent = null!;
+        private FillFlowContainer progressSection = null!;
 
         public PlaylistsRoomSubScreen(Room room)
             : base(room, false) // Editing is temporarily not allowed.
         {
-            Title = room.RoomID.Value == null ? "New playlist" : room.Name.Value;
+            Title = room.RoomID == null ? "New playlist" : room.Name.Value;
             Activity.Value = new UserActivity.InLobby(room);
         }
 
-        [BackgroundDependencyLoader(true)]
-        private void load([CanBeNull] IdleTracker idleTracker)
+        [BackgroundDependencyLoader]
+        private void load()
         {
             if (idleTracker != null)
                 isIdle.BindTo(idleTracker.IsIdle);
@@ -59,17 +60,26 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             base.LoadComplete();
 
             isIdle.BindValueChanged(_ => updatePollingRate(), true);
-            RoomId.BindValueChanged(id =>
-            {
-                if (id.NewValue != null)
-                {
-                    // Set the first playlist item.
-                    // This is scheduled since updating the room and playlist may happen in an arbitrary order (via Room.CopyFrom()).
-                    Schedule(() => SelectedItem.Value = Room.Playlist.FirstOrDefault());
-                }
-            }, true);
-
             Room.MaxAttempts.BindValueChanged(_ => progressSection.Alpha = Room.MaxAttempts.Value != null ? 1 : 0, true);
+
+            Room.PropertyChanged += onRoomPropertyChanged;
+            updateSetupState();
+        }
+
+        private void onRoomPropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(Room.RoomID))
+                updateSetupState();
+        }
+
+        private void updateSetupState()
+        {
+            if (Room.RoomID != null)
+            {
+                // Set the first playlist item.
+                // This is scheduled since updating the room and playlist may happen in an arbitrary order (via Room.CopyFrom()).
+                Schedule(() => SelectedItem.Value = Room.Playlist.FirstOrDefault());
+            }
         }
 
         protected override Drawable CreateMainContent() => new Container
@@ -92,7 +102,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                     },
                     Content = new[]
                     {
-                        new Drawable[]
+                        new Drawable?[]
                         {
                             // Playlist items column
                             new GridContainer
@@ -113,8 +123,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                             AllowShowingResults = true,
                                             RequestResults = item =>
                                             {
-                                                Debug.Assert(RoomId.Value != null);
-                                                ParentScreen?.Push(new PlaylistItemUserResultsScreen(null, RoomId.Value.Value, item));
+                                                Debug.Assert(Room.RoomID != null);
+                                                ParentScreen?.Push(new PlaylistItemUserResultsScreen(null, Room.RoomID.Value, item));
                                             }
                                         }
                                     },
@@ -248,5 +258,11 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         {
             Exited = () => leaderboard.RefetchScores()
         });
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            Room.PropertyChanged -= onRoomPropertyChanged;
+        }
     }
 }

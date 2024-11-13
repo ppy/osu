@@ -22,6 +22,15 @@ namespace osu.Game.Online.Rooms
         public event PropertyChangedEventHandler? PropertyChanged;
 
         /// <summary>
+        /// The online room ID. Will be <c>null</c> while the room has not yet been created.
+        /// </summary>
+        public long? RoomID
+        {
+            get => roomId;
+            set => SetField(ref roomId, value);
+        }
+
+        /// <summary>
         /// Represents the current item selected within the room.
         /// </summary>
         /// <remarks>
@@ -33,12 +42,11 @@ namespace osu.Game.Online.Rooms
             set => SetField(ref currentPlaylistItem, value);
         }
 
+        [JsonProperty("id")]
+        private long? roomId;
+
         [JsonProperty("current_playlist_item")]
         private PlaylistItem? currentPlaylistItem;
-
-        [Cached]
-        [JsonProperty("id")]
-        public readonly Bindable<long?> RoomID = new Bindable<long?>();
 
         [Cached]
         [JsonProperty("name")]
@@ -196,7 +204,7 @@ namespace osu.Game.Online.Rooms
         /// <param name="other">The <see cref="Room"/> to copy values from.</param>
         public void CopyFrom(Room other)
         {
-            RoomID.Value = other.RoomID.Value;
+            RoomID = other.RoomID;
             Name.Value = other.Name.Value;
 
             Category.Value = other.Category.Value;

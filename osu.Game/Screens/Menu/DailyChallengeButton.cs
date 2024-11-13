@@ -155,9 +155,9 @@ namespace osu.Game.Screens.Menu
                     Room = room;
                     cover.OnlineInfo = TooltipContent = room.Playlist.FirstOrDefault()?.Beatmap.BeatmapSet as APIBeatmapSet;
 
-                    if (room.StartDate.Value != null && room.RoomID.Value != lastDailyChallengeRoomID)
+                    if (room.StartDate.Value != null && room.RoomID != lastDailyChallengeRoomID)
                     {
-                        lastDailyChallengeRoomID = room.RoomID.Value;
+                        lastDailyChallengeRoomID = room.RoomID;
 
                         // new challenge is live, reset intro played static.
                         statics.SetValue(Static.DailyChallengeIntroPlayed, false);

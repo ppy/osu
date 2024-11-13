@@ -353,7 +353,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 RoomName.BindValueChanged(name => NameField.Text = name.NewValue, true);
                 Type.BindValueChanged(type => TypePicker.Current.Value = type.NewValue, true);
                 MaxParticipants.BindValueChanged(count => MaxParticipantsField.Text = count.NewValue?.ToString(), true);
-                RoomID.BindValueChanged(roomId => playlistContainer.Alpha = roomId.NewValue == null ? 1 : 0, true);
                 Password.BindValueChanged(password => PasswordTextBox.Text = password.NewValue ?? string.Empty, true);
                 QueueMode.BindValueChanged(mode => QueueModeDropdown.Current.Value = mode.NewValue, true);
                 AutoStartDuration.BindValueChanged(duration => startModeDropdown.Current.Value = (StartMode)(int)duration.NewValue.TotalSeconds, true);
@@ -382,6 +381,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 base.Update();
 
                 ApplyButton.Enabled.Value = Playlist.Count > 0 && NameField.Text.Length > 0 && !operationInProgress.Value;
+                playlistContainer.Alpha = room.RoomID == null ? 1 : 0;
             }
 
             private void apply()

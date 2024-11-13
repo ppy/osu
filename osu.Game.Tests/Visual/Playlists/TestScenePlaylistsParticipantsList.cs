@@ -19,7 +19,7 @@ namespace osu.Game.Tests.Visual.Playlists
 
             AddStep("create list", () =>
             {
-                SelectedRoom.Value = new Room { RoomID = { Value = 7 } };
+                SelectedRoom.Value = new Room { RoomID = 7 };
 
                 for (int i = 0; i < 50; i++)
                 {

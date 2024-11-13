@@ -36,7 +36,7 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
 
         private void updateChannel()
         {
-            if (room.RoomID.Value == null || channelId.Value == 0)
+            if (room.RoomID == null || channelId.Value == 0)
                 return;
 
             Channel.Value = channelManager?.JoinChannel(new Channel { Id = channelId.Value, Type = ChannelType.Multiplayer, Name = $"#lazermp_{room.RoomID.Value}" });

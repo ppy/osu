@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
@@ -29,6 +30,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.OnlinePlay.Match.Components;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
+using Container = osu.Framework.Graphics.Containers.Container;
 
 namespace osu.Game.Screens.OnlinePlay.Match
 {
@@ -59,8 +61,6 @@ namespace osu.Game.Screens.OnlinePlay.Match
         /// </summary>
         protected readonly Bindable<IReadOnlyList<Mod>> UserMods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
-        protected readonly IBindable<long?> RoomId = new Bindable<long?>();
-
         [Resolved(CanBeNull = true)]
         private IOverlayManager overlayManager { get; set; }
 
@@ -81,6 +81,9 @@ namespace osu.Game.Screens.OnlinePlay.Match
 
         [Resolved]
         private PreviewTrackManager previewTrackManager { get; set; } = null!;
+
+        [Resolved(canBeNull: true)]
+        private IDialogOverlay dialogOverlay { get; set; }
 
         [Cached]
         private readonly OnlinePlayBeatmapAvailabilityTracker beatmapAvailabilityTracker = new OnlinePlayBeatmapAvailabilityTracker();
@@ -109,8 +112,6 @@ namespace osu.Game.Screens.OnlinePlay.Match
             this.allowEdit = allowEdit;
 
             Padding = new MarginPadding { Top = Header.HEIGHT };
-
-            RoomId.BindTo(room.RoomID);
         }
 
         [BackgroundDependencyLoader]
@@ -252,22 +253,6 @@ namespace osu.Game.Screens.OnlinePlay.Match
         {
             base.LoadComplete();
 
-            RoomId.BindValueChanged(id =>
-            {
-                if (id.NewValue == null)
-                {
-                    // A new room is being created.
-                    // The main content should be hidden until the settings overlay is hidden, signaling the room is ready to be displayed.
-                    mainContent.Hide();
-                    settingsOverlay.Show();
-                }
-                else
-                {
-                    mainContent.Show();
-                    settingsOverlay.Hide();
-                }
-            }, true);
-
             SelectedItem.BindValueChanged(_ => Scheduler.AddOnce(selectedItemChanged));
             UserMods.BindValueChanged(_ => Scheduler.AddOnce(UpdateMods));
 
@@ -275,6 +260,31 @@ namespace osu.Game.Screens.OnlinePlay.Match
             beatmapAvailabilityTracker.Availability.BindValueChanged(_ => updateWorkingBeatmap());
 
             userModsSelectOverlayRegistration = overlayManager?.RegisterBlockingOverlay(UserModsSelectOverlay);
+
+            Room.PropertyChanged += onRoomPropertyChanged;
+            updateSetupState();
+        }
+
+        private void onRoomPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(Room.RoomID))
+                updateSetupState();
+        }
+
+        private void updateSetupState()
+        {
+            if (Room.RoomID == null)
+            {
+                // A new room is being created.
+                // The main content should be hidden until the settings overlay is hidden, signaling the room is ready to be displayed.
+                mainContent.Hide();
+                settingsOverlay.Show();
+            }
+            else
+            {
+                mainContent.Show();
+                settingsOverlay.Hide();
+            }
         }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
@@ -285,14 +295,11 @@ namespace osu.Game.Screens.OnlinePlay.Match
             };
         }
 
-        [Resolved(canBeNull: true)]
-        private IDialogOverlay dialogOverlay { get; set; }
-
         protected virtual bool IsConnected => api.State.Value == APIState.Online;
 
         public override bool OnBackButton()
         {
-            if (Room.RoomID.Value == null)
+            if (Room.RoomID == null)
             {
                 if (!ensureExitConfirmed())
                     return true;
@@ -365,7 +372,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
             if (!IsConnected)
                 return true;
 
-            bool hasUnsavedChanges = Room.RoomID.Value == null && Room.Playlist.Count > 0;
+            bool hasUnsavedChanges = Room.RoomID == null && Room.Playlist.Count > 0;
 
             if (dialogOverlay == null || !hasUnsavedChanges)
                 return true;
@@ -538,6 +545,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
             base.Dispose(isDisposing);
 
             userModsSelectOverlayRegistration?.Dispose();
+            Room.PropertyChanged -= onRoomPropertyChanged;
         }
     }
 }

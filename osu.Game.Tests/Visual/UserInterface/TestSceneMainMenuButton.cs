@@ -53,7 +53,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                         beatmap.OnlineID = 1001;
                         getRoomRequest.TriggerSuccess(new Room
                         {
-                            RoomID = { Value = 1234 },
+                            RoomID = 1234,
                             Playlist =
                             {
                                 new PlaylistItem(beatmap)
@@ -131,7 +131,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                         beatmap.OnlineID = 1001;
                         getRoomRequest.TriggerSuccess(new Room
                         {
-                            RoomID = { Value = 1234 },
+                            RoomID = 1234,
                             Playlist =
                             {
                                 new PlaylistItem(beatmap)

@@ -214,7 +214,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             roomId = clone(roomId);
             password = clone(password);
 
-            ServerAPIRoom = roomManager.ServerSideRooms.Single(r => r.RoomID.Value == roomId);
+            ServerAPIRoom = roomManager.ServerSideRooms.Single(r => r.RoomID == roomId);
 
             if (password != ServerAPIRoom.Password.Value)
                 throw new InvalidOperationException("Invalid password.");

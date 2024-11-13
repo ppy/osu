@@ -39,7 +39,7 @@ namespace osu.Game.Tests.Visual.DailyChallenge
         {
             var room = new Room
             {
-                RoomID = { Value = 1234 },
+                RoomID = 1234,
                 Name = { Value = "Daily Challenge: June 4, 2024" },
                 Playlist =
                 {
@@ -62,7 +62,7 @@ namespace osu.Game.Tests.Visual.DailyChallenge
         {
             var room = new Room
             {
-                RoomID = { Value = 1234 },
+                RoomID = 1234,
                 Name = { Value = "Daily Challenge: June 4, 2024" },
                 Playlist =
                 {
@@ -91,7 +91,7 @@ namespace osu.Game.Tests.Visual.DailyChallenge
         {
             var room = new Room
             {
-                RoomID = { Value = 1234 },
+                RoomID = 1234,
                 Name = { Value = "Daily Challenge: June 4, 2024" },
                 Playlist =
                 {
