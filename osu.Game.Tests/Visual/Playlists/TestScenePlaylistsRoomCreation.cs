@@ -63,7 +63,7 @@ namespace osu.Game.Tests.Visual.Playlists
                 room.Name = "my awesome room";
                 room.Host = API.LocalUser.Value;
                 room.RecentParticipants.Add(room.Host);
-                room.EndDate.Value = DateTimeOffset.Now.AddMinutes(5);
+                room.EndDate = DateTimeOffset.Now.AddMinutes(5);
                 room.Playlist.Add(new PlaylistItem(importedBeatmap.Beatmaps.First())
                 {
                     RulesetID = new OsuRuleset().RulesetInfo.OnlineID
@@ -87,7 +87,7 @@ namespace osu.Game.Tests.Visual.Playlists
                 room.MaxAttempts.Value = 5;
                 room.Host = API.LocalUser.Value;
                 room.RecentParticipants.Add(room.Host);
-                room.EndDate.Value = DateTimeOffset.Now.AddMinutes(5);
+                room.EndDate = DateTimeOffset.Now.AddMinutes(5);
                 room.Playlist.Add(new PlaylistItem(importedBeatmap.Beatmaps.First())
                 {
                     RulesetID = new OsuRuleset().RulesetInfo.OnlineID

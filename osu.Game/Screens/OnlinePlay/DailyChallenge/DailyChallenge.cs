@@ -228,7 +228,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                                                                         Origin = Anchor.Centre,
                                                                         Children = new Drawable[]
                                                                         {
-                                                                            new DailyChallengeTimeRemainingRing(),
+                                                                            new DailyChallengeTimeRemainingRing(room),
                                                                             breakdown = new DailyChallengeScoreBreakdown(),
                                                                             totals = new DailyChallengeTotalsDisplay(),
                                                                         }
@@ -301,7 +301,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                                                 Spacing = new Vector2(10),
                                                 Children = new Drawable[]
                                                 {
-                                                    new PlaylistsReadyButton
+                                                    new PlaylistsReadyButton(room)
                                                     {
                                                         Anchor = Anchor.Centre,
                                                         Origin = Anchor.Centre,

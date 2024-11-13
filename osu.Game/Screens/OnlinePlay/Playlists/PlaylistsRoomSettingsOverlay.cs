@@ -317,7 +317,6 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                 };
 
                 MaxAttempts.BindValueChanged(count => MaxAttemptsField.Text = count.NewValue?.ToString(), true);
-                Duration.BindValueChanged(duration => DurationField.Current.Value = duration.NewValue ?? TimeSpan.FromMinutes(30), true);
 
                 DurationField.Current.BindValueChanged(duration =>
                 {
@@ -346,6 +345,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                 updateRoomName();
                 updateRoomAvailability();
                 updateRoomMaxParticipants();
+                updateRoomDuration();
             }
 
             private void onRoomPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -363,6 +363,10 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                     case nameof(Room.MaxParticipants):
                         updateRoomMaxParticipants();
                         break;
+
+                    case nameof(Room.Duration):
+                        updateRoomDuration();
+                        break;
                 }
             }
 
@@ -374,6 +378,9 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
             private void updateRoomMaxParticipants()
                 => MaxParticipantsField.Text = room.MaxParticipants?.ToString();
+
+            private void updateRoomDuration()
+                => DurationField.Current.Value = room.Duration ?? TimeSpan.FromMinutes(30);
 
             private void populateDurations(ValueChangedEvent<APIUser> user)
             {
@@ -431,7 +438,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                 else
                     MaxAttempts.Value = null;
 
-                Duration.Value = DurationField.Current.Value;
+                room.Duration = DurationField.Current.Value;
 
                 loadingLayer.Show();
                 manager?.CreateRoom(room, onSuccess, onError);

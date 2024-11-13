@@ -49,7 +49,7 @@ namespace osu.Game.Tests.Visual.DailyChallenge
                         AllowedMods = [new APIMod(new OsuModDoubleTime())]
                     }
                 },
-                EndDate = { Value = DateTimeOffset.Now.AddHours(12) },
+                EndDate = DateTimeOffset.Now.AddHours(12),
                 Category = RoomCategory.DailyChallenge
             };
 
@@ -72,7 +72,7 @@ namespace osu.Game.Tests.Visual.DailyChallenge
                         AllowedMods = [new APIMod(new OsuModDoubleTime())]
                     }
                 },
-                EndDate = { Value = DateTimeOffset.Now.AddHours(12) },
+                EndDate = DateTimeOffset.Now.AddHours(12),
                 Category = RoomCategory.DailyChallenge
             };
 
@@ -101,7 +101,7 @@ namespace osu.Game.Tests.Visual.DailyChallenge
                         AllowedMods = [new APIMod(new OsuModDoubleTime())]
                     }
                 },
-                EndDate = { Value = DateTimeOffset.Now.AddHours(12) },
+                EndDate = DateTimeOffset.Now.AddHours(12),
                 Category = RoomCategory.DailyChallenge
             };
 

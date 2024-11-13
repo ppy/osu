@@ -77,7 +77,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         {
                             Name = "Multiplayer room",
                             Status = new RoomStatusOpen(),
-                            EndDate = { Value = DateTimeOffset.Now.AddDays(1) },
+                            EndDate = DateTimeOffset.Now.AddDays(1),
                             Type = MatchType.HeadToHead,
                             Playlist = { item1 },
                             CurrentPlaylistItem = item1
@@ -87,7 +87,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                             Name = "Private room",
                             Status = new RoomStatusOpenPrivate(),
                             Password = "*",
-                            EndDate = { Value = DateTimeOffset.Now.AddDays(1) },
+                            EndDate = DateTimeOffset.Now.AddDays(1),
                             Type = MatchType.HeadToHead,
                             Playlist = { item3 },
                             CurrentPlaylistItem = item3
@@ -96,7 +96,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         {
                             Name = "Playlist room with multiple beatmaps",
                             Status = new RoomStatusPlaying(),
-                            EndDate = { Value = DateTimeOffset.Now.AddDays(1) },
+                            EndDate = DateTimeOffset.Now.AddDays(1),
                             Playlist = { item1, item2 },
                             CurrentPlaylistItem = item1
                         }),
@@ -104,7 +104,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         {
                             Name = "Finished room",
                             Status = new RoomStatusEnded(),
-                            EndDate = { Value = DateTimeOffset.Now },
+                            EndDate = DateTimeOffset.Now,
                         }),
                         createLoungeRoom(new Room
                         {

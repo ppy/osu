@@ -341,8 +341,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                 r.RoomID = null;
 
                 // Null out dates because end date is not supported client-side and the settings overlay will populate a duration.
-                r.EndDate.Value = null;
-                r.Duration.Value = null;
+                r.EndDate = null;
+                r.Duration = null;
 
                 Open(r);
 

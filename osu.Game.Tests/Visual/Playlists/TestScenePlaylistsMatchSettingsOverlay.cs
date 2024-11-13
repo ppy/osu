@@ -84,7 +84,7 @@ namespace osu.Game.Tests.Visual.Playlists
 
             AddStep("create room", () => settings.ApplyButton.Action.Invoke());
             AddAssert("has correct name", () => createdRoom.Name == expected_name);
-            AddAssert("has correct duration", () => createdRoom.Duration.Value == expectedDuration);
+            AddAssert("has correct duration", () => createdRoom.Duration == expectedDuration);
         }
 
         [Test]
