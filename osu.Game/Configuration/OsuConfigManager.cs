@@ -220,6 +220,8 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.EditorContractSidebars, false);
 
             SetDefault(OsuSetting.AlwaysShowHoldForMenuButton, false);
+
+            SetDefault(OsuSetting.BroadcastGameState, false);
             SetDefault(OsuSetting.AlwaysRequireHoldingForPause, false);
             SetDefault(OsuSetting.EditorShowStoryboard, true);
 
@@ -473,6 +475,7 @@ namespace osu.Game.Configuration
         /// Cached state of whether local user is a supporter.
         /// Used to allow early checks (ie for startup samples) to be in the correct state, even if the API authentication process has not completed.
         /// </summary>
-        WasSupporter
+        WasSupporter,
+        BroadcastGameState,
     }
 }

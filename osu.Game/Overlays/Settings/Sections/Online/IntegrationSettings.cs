@@ -25,7 +25,7 @@ namespace osu.Game.Overlays.Settings.Sections.Online
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "Broadcast game state",
+                    LabelText = OnlineSettingsStrings.BroadcastGameState,
                     Current = config.GetBindable<bool>(OsuSetting.BroadcastGameState),
                 }
             };

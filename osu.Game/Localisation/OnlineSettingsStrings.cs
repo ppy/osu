@@ -94,6 +94,11 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString HideCountryFlags => new TranslatableString(getKey(@"hide_country_flags"), @"Hide country flags");
 
+        /// <summary>
+        /// "Broadcast game state"
+        /// </summary>
+        public static LocalisableString BroadcastGameState => new TranslatableString(getKey(@"broadcast_game_state"), @"Broadcast game state");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
