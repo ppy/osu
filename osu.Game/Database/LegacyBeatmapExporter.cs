@@ -59,7 +59,25 @@ namespace osu.Game.Database
             };
 
             // Convert beatmap elements to be compatible with legacy format
-            // So we truncate time and position values to integers, and convert paths with multiple segments to bezier curves
+            // So we truncate time and position values to integers, and convert paths with multiple segments to Bézier curves
+
+            // We must first truncate all timing points and move all objects in the timing section with it to ensure everything stays snapped
+            for (int i = 0; i < playableBeatmap.ControlPointInfo.TimingPoints.Count; i++)
+            {
+                var timingPoint = playableBeatmap.ControlPointInfo.TimingPoints[i];
+                double offset = Math.Floor(timingPoint.Time) - timingPoint.Time;
+                double nextTimingPointTime = i + 1 < playableBeatmap.ControlPointInfo.TimingPoints.Count
+                    ? playableBeatmap.ControlPointInfo.TimingPoints[i + 1].Time
+                    : double.PositiveInfinity;
+
+                // Offset all control points in the timing section (including the current one)
+                foreach (var controlPoint in playableBeatmap.ControlPointInfo.AllControlPoints.Where(o => o.Time >= timingPoint.Time && o.Time < nextTimingPointTime))
+                    controlPoint.Time += offset;
+
+                // Offset all hit objects in the timing section
+                foreach (var hitObject in playableBeatmap.HitObjects.Where(o => o.StartTime >= timingPoint.Time && o.StartTime < nextTimingPointTime))
+                    hitObject.StartTime += offset;
+            }
 
             foreach (var controlPoint in playableBeatmap.ControlPointInfo.AllControlPoints)
                 controlPoint.Time = Math.Floor(controlPoint.Time);
