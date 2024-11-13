@@ -68,6 +68,9 @@ namespace osu.Game.Rulesets.Edit
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; }
 
+        [Resolved(canBeNull: true)]
+        private NewBeatmapEditorChangeHandler changeHandler { get; set; }
+
         public override ComposeBlueprintContainer BlueprintContainer => blueprintContainer;
         private ComposeBlueprintContainer blueprintContainer;
 
@@ -273,7 +276,8 @@ namespace osu.Game.Rulesets.Edit
             TernaryStates = CreateTernaryButtons().ToArray();
             togglesCollection.AddRange(TernaryStates.Select(b => new DrawableTernaryButton(b)));
 
-            sampleBankTogglesCollection.AddRange(BlueprintContainer.SampleBankTernaryStates.Zip(BlueprintContainer.SampleAdditionBankTernaryStates).Select(b => new SampleBankTernaryButton(b.First, b.Second)));
+            sampleBankTogglesCollection.AddRange(BlueprintContainer.SampleBankTernaryStates.Zip(BlueprintContainer.SampleAdditionBankTernaryStates)
+                                                                   .Select(b => new SampleBankTernaryButton(b.First, b.Second)));
 
             SetSelectTool();
 
@@ -538,25 +542,23 @@ namespace osu.Game.Rulesets.Edit
 
         #region IPlacementHandler
 
-        public void BeginPlacement(HitObject hitObject)
+        public void ShowPlacement(HitObject hitObject)
         {
             EditorBeatmap.PlacementObject.Value = hitObject;
         }
 
-        [Resolved(canBeNull: true)]
-        private NewBeatmapEditorChangeHandler changeHandler { get; set; }
-
-        public void EndPlacement(HitObject hitObject, bool commit)
+        public void HidePlacement()
         {
             EditorBeatmap.PlacementObject.Value = null;
+        }
 
-            if (commit)
-            {
-                new AddHitObjectChange(EditorBeatmap, hitObject).Apply(changeHandler);
+        public void CommitPlacement(HitObject hitObject)
+        {
+            EditorBeatmap.PlacementObject.Value = null;
+            new AddHitObjectChange(EditorBeatmap, hitObject).Apply(changeHandler);
 
-                if (autoSeekOnPlacement.Value && EditorClock.CurrentTime < hitObject.StartTime)
-                    EditorClock.SeekSmoothlyTo(hitObject.StartTime);
-            }
+            if (autoSeekOnPlacement.Value && EditorClock.CurrentTime < hitObject.StartTime)
+                EditorClock.SeekSmoothlyTo(hitObject.StartTime);
         }
 
         public void Delete(HitObject hitObject) => new RemoveHitObjectChange(EditorBeatmap, hitObject).Apply(changeHandler);
