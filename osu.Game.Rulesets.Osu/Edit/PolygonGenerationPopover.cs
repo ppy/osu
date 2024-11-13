@@ -58,6 +58,8 @@ namespace osu.Game.Rulesets.Osu.Edit
             var selectionHandler = (EditorSelectionHandler)composer.BlueprintContainer.SelectionHandler;
             newComboState = selectionHandler.SelectionNewComboState.GetBoundCopy();
 
+            AllowableAnchors = new[] { Anchor.CentreLeft, Anchor.CentreRight };
+
             Child = new FillFlowContainer
             {
                 Width = 220,

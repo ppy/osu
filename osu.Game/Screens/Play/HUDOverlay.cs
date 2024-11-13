@@ -252,7 +252,7 @@ namespace osu.Game.Screens.Play
                 PlayfieldSkinLayer.Position = ToLocalSpace(playfieldScreenSpaceDrawQuad.TopLeft);
                 PlayfieldSkinLayer.Width = (ToLocalSpace(playfieldScreenSpaceDrawQuad.TopRight) - ToLocalSpace(playfieldScreenSpaceDrawQuad.TopLeft)).Length;
                 PlayfieldSkinLayer.Height = (ToLocalSpace(playfieldScreenSpaceDrawQuad.BottomLeft) - ToLocalSpace(playfieldScreenSpaceDrawQuad.TopLeft)).Length;
-                PlayfieldSkinLayer.Rotation = drawableRuleset.Playfield.Rotation;
+                PlayfieldSkinLayer.Rotation = drawableRuleset.PlayfieldAdjustmentContainer.Rotation;
             }
 
             float? lowestTopScreenSpaceLeft = null;
@@ -300,7 +300,9 @@ namespace osu.Game.Screens.Play
                     if (element is LegacyHealthDisplay)
                         return;
 
-                    float bottom = drawable.ScreenSpaceDrawQuad.BottomRight.Y;
+                    // AABB is used here because the drawable can be flipped/rotated arbitrarily,
+                    // so the "bottom right" corner of the raw SSDQ might not necessarily be where one expects it to be.
+                    float bottom = drawable.ScreenSpaceDrawQuad.AABBFloat.BottomRight.Y;
 
                     bool isRelativeX = drawable.RelativeSizeAxes == Axes.X;
 
@@ -319,7 +321,7 @@ namespace osu.Game.Screens.Play
                 // and align bottom-right components with the top-edge of the highest bottom-anchored hud element.
                 else if (drawable.Anchor.HasFlag(Anchor.BottomRight) || (drawable.Anchor.HasFlag(Anchor.y2) && drawable.RelativeSizeAxes == Axes.X))
                 {
-                    var topLeft = element.ScreenSpaceDrawQuad.TopLeft;
+                    var topLeft = element.ScreenSpaceDrawQuad.AABBFloat.TopLeft;
                     if (highestBottomScreenSpace == null || topLeft.Y < highestBottomScreenSpace.Value.Y)
                         highestBottomScreenSpace = topLeft;
                 }
