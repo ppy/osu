@@ -121,7 +121,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
         public bool FilteringActive { get; set; }
 
-        public IEnumerable<LocalisableString> FilterTerms => new LocalisableString[] { Room.Name.Value };
+        public IEnumerable<LocalisableString> FilterTerms => new LocalisableString[] { Room.Name };
 
         private bool matchingFilter = true;
 

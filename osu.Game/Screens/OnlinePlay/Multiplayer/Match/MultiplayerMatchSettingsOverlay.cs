@@ -350,7 +350,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 };
 
                 TypePicker.Current.BindValueChanged(type => typeLabel.Text = type.NewValue.GetLocalisableDescription(), true);
-                RoomName.BindValueChanged(name => NameField.Text = name.NewValue, true);
                 Type.BindValueChanged(type => TypePicker.Current.Value = type.NewValue, true);
                 MaxParticipants.BindValueChanged(count => MaxParticipantsField.Text = count.NewValue?.ToString(), true);
                 Password.BindValueChanged(password => PasswordTextBox.Text = password.NewValue ?? string.Empty, true);
@@ -374,7 +373,20 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
                 drawablePlaylist.Items.BindTo(Playlist);
                 drawablePlaylist.SelectedItem.BindTo(SelectedItem);
+
+                room.PropertyChanged += onRoomPropertyChanged;
+
+                updateRoomName();
             }
+
+            private void onRoomPropertyChanged(object? sender, PropertyChangedEventArgs e)
+            {
+                if (e.PropertyName == nameof(Room.Name))
+                    updateRoomName();
+            }
+
+            private void updateRoomName()
+                => NameField.Text = room.Name;
 
             protected override void Update()
             {
@@ -417,7 +429,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 }
                 else
                 {
-                    room.Name.Value = NameField.Text;
+                    room.Name = NameField.Text;
                     room.Type.Value = TypePicker.Current.Value;
                     room.Password.Value = PasswordTextBox.Current.Value;
                     room.QueueMode.Value = QueueModeDropdown.Current.Value;
@@ -467,6 +479,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 applyingSettingsOperation.Dispose();
                 applyingSettingsOperation = null;
             });
+
+            protected override void Dispose(bool isDisposing)
+            {
+                base.Dispose(isDisposing);
+                room.PropertyChanged -= onRoomPropertyChanged;
+            }
         }
 
         public partial class CreateOrUpdateButton : RoundedButton

@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
 using Humanizer;
 using Humanizer.Localisation;
@@ -25,6 +26,7 @@ using osu.Game.Screens.OnlinePlay.Match.Components;
 using osuTK;
 using osu.Game.Localisation;
 using osu.Game.Rulesets;
+using Container = osu.Framework.Graphics.Containers.Container;
 
 namespace osu.Game.Screens.OnlinePlay.Playlists
 {
@@ -142,7 +144,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                             {
                                                                 RelativeSizeAxes = Axes.X,
                                                                 TabbableContentContainer = this,
-                                                                LengthLimit = 100
+                                                                LengthLimit = 100,
+                                                                Text = room.Name
                                                             },
                                                         },
                                                         new Section("Duration")
@@ -313,7 +316,6 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                     loadingLayer = new LoadingLayer(true)
                 };
 
-                RoomName.BindValueChanged(name => NameField.Text = name.NewValue, true);
                 Availability.BindValueChanged(availability => AvailabilityPicker.Current.Value = availability.NewValue, true);
                 MaxParticipants.BindValueChanged(count => MaxParticipantsField.Text = count.NewValue?.ToString(), true);
                 MaxAttempts.BindValueChanged(count => MaxAttemptsField.Text = count.NewValue?.ToString(), true);
@@ -336,6 +338,24 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                 playlist.Items.BindTo(Playlist);
                 Playlist.BindCollectionChanged(onPlaylistChanged, true);
             }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                room.PropertyChanged += onRoomPropertyChanged;
+
+                updateRoomName();
+            }
+
+            private void onRoomPropertyChanged(object? sender, PropertyChangedEventArgs e)
+            {
+                if (e.PropertyName == nameof(Room.Name))
+                    updateRoomName();
+            }
+
+            private void updateRoomName()
+                => NameField.Text = room.Name;
 
             private void populateDurations(ValueChangedEvent<APIUser> user)
             {
@@ -384,7 +404,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
                 hideError();
 
-                RoomName.Value = NameField.Text;
+                room.Name = NameField.Text;
                 Availability.Value = AvailabilityPicker.Current.Value;
 
                 if (int.TryParse(MaxParticipantsField.Text, out int max))
@@ -435,6 +455,12 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
                 ErrorText.FadeIn(50);
                 loadingLayer.Hide();
+            }
+
+            protected override void Dispose(bool isDisposing)
+            {
+                base.Dispose(isDisposing);
+                room.PropertyChanged -= onRoomPropertyChanged;
             }
         }
 

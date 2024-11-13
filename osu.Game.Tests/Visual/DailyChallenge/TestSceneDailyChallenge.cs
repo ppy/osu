@@ -40,7 +40,7 @@ namespace osu.Game.Tests.Visual.DailyChallenge
             var room = new Room
             {
                 RoomID = 1234,
-                Name = { Value = "Daily Challenge: June 4, 2024" },
+                Name = "Daily Challenge: June 4, 2024",
                 Playlist =
                 {
                     new PlaylistItem(TestResources.CreateTestBeatmapSetInfo().Beatmaps.First())
@@ -63,7 +63,7 @@ namespace osu.Game.Tests.Visual.DailyChallenge
             var room = new Room
             {
                 RoomID = 1234,
-                Name = { Value = "Daily Challenge: June 4, 2024" },
+                Name = "Daily Challenge: June 4, 2024",
                 Playlist =
                 {
                     new PlaylistItem(TestResources.CreateTestBeatmapSetInfo().Beatmaps.First())
@@ -92,7 +92,7 @@ namespace osu.Game.Tests.Visual.DailyChallenge
             var room = new Room
             {
                 RoomID = 1234,
-                Name = { Value = "Daily Challenge: June 4, 2024" },
+                Name = "Daily Challenge: June 4, 2024",
                 Playlist =
                 {
                     new PlaylistItem(TestResources.CreateTestBeatmapSetInfo().Beatmaps.First())

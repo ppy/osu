@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Linq;
 using NUnit.Framework;
@@ -29,10 +27,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public partial class TestSceneTeamVersus : ScreenTestScene
     {
-        private BeatmapManager beatmaps;
-        private BeatmapSetInfo importedSet;
+        private BeatmapManager beatmaps = null!;
+        private BeatmapSetInfo importedSet = null!;
 
-        private TestMultiplayerComponents multiplayerComponents;
+        private TestMultiplayerComponents multiplayerComponents = null!;
 
         private TestMultiplayerClient multiplayerClient => multiplayerComponents.MultiplayerClient;
 
@@ -64,7 +62,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             createRoom(() => new Room
             {
-                Name = { Value = "Test Room" },
+                Name = "Test Room",
                 Type = { Value = MatchType.TeamVersus },
                 Playlist =
                 {
@@ -84,7 +82,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             createRoom(() => new Room
             {
-                Name = { Value = "Test Room" },
+                Name = "Test Room",
                 Type = { Value = MatchType.TeamVersus },
                 Playlist =
                 {
@@ -121,7 +119,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             createRoom(() => new Room
             {
-                Name = { Value = "Test Room" },
+                Name = "Test Room",
                 Type = { Value = MatchType.HeadToHead },
                 Playlist =
                 {
@@ -147,7 +145,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             createRoom(() => new Room
             {
-                Name = { Value = "Test Room" },
+                Name = "Test Room",
                 Playlist =
                 {
                     new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)

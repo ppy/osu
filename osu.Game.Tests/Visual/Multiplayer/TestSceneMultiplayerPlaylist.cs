@@ -164,7 +164,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 RoomManager.CreateRoom(new Room
                 {
-                    Name = { Value = "test name" },
+                    Name = "test name",
                     Playlist =
                     {
                         new PlaylistItem(new TestBeatmap(Ruleset.Value).BeatmapInfo)

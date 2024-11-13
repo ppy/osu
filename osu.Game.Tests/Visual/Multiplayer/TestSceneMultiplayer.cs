@@ -103,7 +103,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             createRoom(() => new Room
             {
-                Name = { Value = "Test Room" },
+                Name = "Test Room",
                 Playlist =
                 {
                     new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
@@ -238,7 +238,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             createRoom(() => new Room
             {
-                Name = { Value = "Test Room" },
+                Name = "Test Room",
                 Playlist =
                 {
                     new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
@@ -259,7 +259,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 roomManager.AddServerSideRoom(new Room
                 {
-                    Name = { Value = "Test Room" },
+                    Name = "Test Room",
                     Playlist =
                     {
                         new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
@@ -288,7 +288,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 roomManager.AddServerSideRoom(new Room
                 {
-                    Name = { Value = "Test Room" },
+                    Name = "Test Room",
                     Playlist =
                     {
                         new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
@@ -317,7 +317,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             createRoom(() => new Room
             {
-                Name = { Value = "Test Room" },
+                Name = "Test Room",
                 Password = { Value = "password" },
                 Playlist =
                 {
@@ -338,7 +338,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 roomManager.AddServerSideRoom(new Room
                 {
-                    Name = { Value = "Test Room" },
+                    Name = "Test Room",
                     Password = { Value = "password" },
                     Playlist =
                     {
@@ -370,7 +370,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             createRoom(() => new Room
             {
-                Name = { Value = "Test Room" },
+                Name = "Test Room",
                 Password = { Value = "password" },
                 Playlist =
                 {
@@ -401,7 +401,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             createRoom(() => new Room
             {
-                Name = { Value = "Test Room" },
+                Name = "Test Room",
                 Playlist =
                 {
                     new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
@@ -430,7 +430,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 };
                 return new Room
                 {
-                    Name = { Value = "Test Room" },
+                    Name = "Test Room",
                     Playlist = { item }
                 };
             });
@@ -471,7 +471,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 };
                 return new Room
                 {
-                    Name = { Value = "Test Room" },
+                    Name = "Test Room",
                     Playlist = { item }
                 };
             });
@@ -512,7 +512,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 };
                 return new Room
                 {
-                    Name = { Value = "Test Room" },
+                    Name = "Test Room",
                     Playlist = { item }
                 };
             });
@@ -548,7 +548,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             createRoom(() => new Room
             {
-                Name = { Value = "Test Room" },
+                Name = "Test Room",
                 Playlist =
                 {
                     new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
@@ -581,7 +581,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             createRoom(() => new Room
             {
-                Name = { Value = "Test Room" },
+                Name = "Test Room",
                 Playlist =
                 {
                     new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
@@ -620,7 +620,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             createRoom(() => new Room
             {
-                Name = { Value = "Test Room" },
+                Name = "Test Room",
                 Playlist =
                 {
                     new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
@@ -639,7 +639,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             createRoom(() => new Room
             {
-                Name = { Value = "Test Room" },
+                Name = "Test Room",
                 Playlist =
                 {
                     new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
@@ -679,7 +679,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             createRoom(() => new Room
             {
-                Name = { Value = "Test Room" },
+                Name = "Test Room",
                 Playlist =
                 {
                     new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
@@ -724,7 +724,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             createRoom(() => new Room
             {
-                Name = { Value = "Test Room" },
+                Name = "Test Room",
                 Playlist =
                 {
                     new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
@@ -754,7 +754,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             createRoom(() => new Room
             {
-                Name = { Value = "Test Room" },
+                Name = "Test Room",
                 Playlist =
                 {
                     new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
@@ -791,7 +791,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 roomManager.AddServerSideRoom(new Room
                 {
-                    Name = { Value = "Test Room" },
+                    Name = "Test Room",
                     QueueMode = { Value = QueueMode.AllPlayers },
                     Playlist =
                     {
@@ -810,7 +810,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("disable polling", () => this.ChildrenOfType<ListingPollingComponent>().Single().TimeBetweenPolls.Value = 0);
             AddStep("change server-side settings", () =>
             {
-                roomManager.ServerSideRooms[0].Name.Value = "New name";
+                roomManager.ServerSideRooms[0].Name = "New name";
                 roomManager.ServerSideRooms[0].Playlist.Add(new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
                 {
                     ID = 2,
@@ -825,7 +825,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddAssert("local room has correct settings", () =>
             {
                 var localRoom = this.ChildrenOfType<MultiplayerMatchSubScreen>().Single().Room;
-                return localRoom.Name.Value == roomManager.ServerSideRooms[0].Name.Value
+                return localRoom.Name == roomManager.ServerSideRooms[0].Name
                        && localRoom.Playlist.SequenceEqual(roomManager.ServerSideRooms[0].Playlist);
             });
         }
@@ -836,7 +836,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             createRoom(() => new Room
             {
-                Name = { Value = "Test Room" },
+                Name = "Test Room",
                 QueueMode = { Value = QueueMode.AllPlayers },
                 Playlist =
                 {
@@ -872,7 +872,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             createRoom(() => new Room
             {
-                Name = { Value = "Test Room" },
+                Name = "Test Room",
                 QueueMode = { Value = QueueMode.AllPlayers },
                 Playlist =
                 {
@@ -911,7 +911,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             createRoom(() => new Room
             {
-                Name = { Value = "Test Room" },
+                Name = "Test Room",
                 QueueMode = { Value = QueueMode.AllPlayers },
                 Playlist =
                 {
@@ -942,7 +942,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             createRoom(() => new Room
             {
-                Name = { Value = "Test Room" },
+                Name = "Test Room",
                 QueueMode = { Value = QueueMode.AllPlayers },
                 Playlist =
                 {
@@ -976,7 +976,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             createRoom(() => new Room
             {
-                Name = { Value = "Test Room" },
+                Name = "Test Room",
                 Playlist =
                 {
                     new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
@@ -1022,7 +1022,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             createRoom(() => new Room
             {
-                Name = { Value = "Test Room" },
+                Name = "Test Room",
                 QueueMode = { Value = QueueMode.AllPlayers },
                 Playlist =
                 {
