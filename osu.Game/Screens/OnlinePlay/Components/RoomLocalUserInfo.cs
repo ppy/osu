@@ -47,16 +47,19 @@ namespace osu.Game.Screens.OnlinePlay.Components
         {
             base.LoadComplete();
 
-            UserScore.BindValueChanged(_ => updateAttempts());
-
             room.PropertyChanged += onRoomPropertyChanged;
             updateAttempts();
         }
 
         private void onRoomPropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(Room.MaxAttempts))
-                updateAttempts();
+            switch (e.PropertyName)
+            {
+                case nameof(Room.UserScore):
+                case nameof(Room.MaxAttempts):
+                    updateAttempts();
+                    break;
+            }
         }
 
         private void updateAttempts()
@@ -65,9 +68,9 @@ namespace osu.Game.Screens.OnlinePlay.Components
             {
                 attemptDisplay.Text = $"Maximum attempts: {room.MaxAttempts:N0}";
 
-                if (UserScore.Value != null)
+                if (room.UserScore != null)
                 {
-                    int remaining = room.MaxAttempts.Value - UserScore.Value.PlaylistItemAttempts.Sum(a => a.Attempts);
+                    int remaining = room.MaxAttempts.Value - room.UserScore.PlaylistItemAttempts.Sum(a => a.Attempts);
                     attemptDisplay.Text += $" ({remaining} remaining)";
 
                     if (remaining == 0)

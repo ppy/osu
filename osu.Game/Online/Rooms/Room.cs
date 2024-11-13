@@ -201,6 +201,15 @@ namespace osu.Game.Online.Rooms
         }
 
         /// <summary>
+        /// Provides some extra scoring statistics for the local user in the room.
+        /// </summary>
+        public PlaylistAggregateScore? UserScore
+        {
+            get => userScore;
+            set => SetField(ref userScore, value);
+        }
+
+        /// <summary>
         /// Represents the current item selected within the room.
         /// </summary>
         /// <remarks>
@@ -296,6 +305,9 @@ namespace osu.Game.Online.Rooms
         [JsonProperty("auto_start_duration")]
         private ushort autoStartDuration;
 
+        [JsonProperty("current_user_score")]
+        private PlaylistAggregateScore? userScore;
+
         [JsonProperty("current_playlist_item")]
         private PlaylistItem? currentPlaylistItem;
 
@@ -311,10 +323,6 @@ namespace osu.Game.Online.Rooms
         [Cached]
         [JsonProperty("playlist")]
         public readonly BindableList<PlaylistItem> Playlist = new BindableList<PlaylistItem>();
-
-        [Cached]
-        [JsonProperty("current_user_score")]
-        public readonly Bindable<PlaylistAggregateScore> UserScore = new Bindable<PlaylistAggregateScore>();
 
         [Cached]
         [JsonProperty("recent_participants")]
@@ -345,7 +353,7 @@ namespace osu.Game.Online.Rooms
             MaxParticipants = other.MaxParticipants;
             ParticipantCount = other.ParticipantCount;
             EndDate = other.EndDate;
-            UserScore.Value = other.UserScore.Value;
+            UserScore = other.UserScore;
             QueueMode = other.QueueMode;
             AutoStartDuration = other.AutoStartDuration;
             DifficultyRange = other.DifficultyRange;
