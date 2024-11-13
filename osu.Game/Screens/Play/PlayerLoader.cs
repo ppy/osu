@@ -51,6 +51,8 @@ namespace osu.Game.Screens.Play
 
         public override bool? AllowGlobalTrackControl => false;
 
+        public override float BackgroundParallaxAmount => quickRestart ? 0 : 1;
+
         // Here because IsHovered will not update unless we do so.
         public override bool HandlePositionalInput => true;
 
@@ -387,7 +389,7 @@ namespace osu.Game.Screens.Play
 
             // We need to perform this check here rather than in OnHover as any number of children of VisualSettings
             // may also be handling the hover events.
-            if (inputManager.HoveredDrawables.Contains(VisualSettings))
+            if (inputManager.HoveredDrawables.Contains(VisualSettings) || quickRestart)
             {
                 // Preview user-defined background dim and blur when hovered on the visual settings panel.
                 ApplyToBackground(b =>
@@ -458,8 +460,9 @@ namespace osu.Game.Screens.Play
 
             if (quickRestart)
             {
-                prepareNewPlayer();
-                content.ScaleTo(1, 650, Easing.OutQuint);
+                // A slight delay is added here to avoid an awkward stutter during the initial animation.
+                Scheduler.AddDelayed(prepareNewPlayer, 100);
+                content.ScaleTo(1);
             }
             else
             {
@@ -467,15 +470,15 @@ namespace osu.Game.Screens.Play
                     .ScaleTo(1, 650, Easing.OutQuint)
                     .Then()
                     .Schedule(prepareNewPlayer);
-            }
 
-            using (BeginDelayedSequence(delayBeforeSideDisplays))
-            {
-                settingsScroll.FadeInFromZero(500, Easing.Out)
-                              .MoveToX(0, 500, Easing.OutQuint);
+                using (BeginDelayedSequence(delayBeforeSideDisplays))
+                {
+                    settingsScroll.FadeInFromZero(500, Easing.Out)
+                                  .MoveToX(0, 500, Easing.OutQuint);
 
-                disclaimers.FadeInFromZero(500, Easing.Out)
-                           .MoveToX(0, 500, Easing.OutQuint);
+                    disclaimers.FadeInFromZero(500, Easing.Out)
+                               .MoveToX(0, 500, Easing.OutQuint);
+                }
             }
 
             AddRangeInternal(new[]
@@ -565,7 +568,7 @@ namespace osu.Game.Screens.Play
                     else
                         this.Exit();
                 });
-            }, 500);
+            }, quickRestart ? 0 : 500);
         }
 
         private void cancelLoad()
