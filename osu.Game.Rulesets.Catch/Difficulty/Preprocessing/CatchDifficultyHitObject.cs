@@ -20,15 +20,12 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing
 
         public readonly float NormalizedPosition;
         public readonly float NormalizedPositionLast0;
-        public readonly float? NormalizedPositionLast1 = null;
+        public readonly float? NormalizedPositionLast1;
 
         /// <summary>
         /// Milliseconds elapsed since the start time of the previous <see cref="CatchDifficultyHitObject"/>, with a minimum of 40ms.
         /// </summary>
         public readonly double StrainTime;
-
-        private PalpableCatchHitObject lastObj0;
-        private PalpableCatchHitObject? lastObj1;
 
         public CatchDifficultyHitObject(HitObject hitObject, HitObject lastObject0, HitObject? lastObject1, double clockRate, float halfCatcherWidth, List<DifficultyHitObject> objects, int index)
             : base(hitObject, lastObject0, clockRate, objects, index)
@@ -36,8 +33,8 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing
             // We will scale everything by this factor, so we can assume a uniform CircleSize among beatmaps.
             float scalingFactor = normalized_hitobject_radius / halfCatcherWidth;
 
-            lastObj0 = (PalpableCatchHitObject)lastObject0;
-            lastObj1 = (PalpableCatchHitObject?)lastObject1;
+            var lastObj0 = (PalpableCatchHitObject)lastObject0;
+            var lastObj1 = (PalpableCatchHitObject?)lastObject1;
 
             NormalizedPosition = BaseObject.EffectiveX * scalingFactor;
             NormalizedPositionLast0 = lastObj0.EffectiveX * scalingFactor;
