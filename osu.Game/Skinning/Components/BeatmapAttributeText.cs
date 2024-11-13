@@ -3,6 +3,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -18,6 +20,9 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Localisation;
 using osu.Game.Localisation.SkinComponents;
 using osu.Game.Resources.Localisation.Web;
+using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Utils;
 
 namespace osu.Game.Skinning.Components
 {
@@ -33,7 +38,20 @@ namespace osu.Game.Skinning.Components
         [Resolved]
         private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
 
+        [Resolved]
+        private IBindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
+
+        [Resolved]
+        private IBindable<RulesetInfo> ruleset { get; set; } = null!;
+
+        [Resolved]
+        private BeatmapDifficultyCache difficultyCache { get; set; } = null!;
+
         private readonly OsuSpriteText text;
+        private IBindable<StarDifficulty?>? difficultyBindable;
+        private CancellationTokenSource? difficultyCancellationSource;
+        private ModSettingChangeTracker? modSettingTracker;
+        private StarDifficulty? starDifficulty;
 
         public BeatmapAttributeText()
         {
@@ -55,7 +73,35 @@ namespace osu.Game.Skinning.Components
 
             Attribute.BindValueChanged(_ => updateText());
             Template.BindValueChanged(_ => updateText());
-            beatmap.BindValueChanged(_ => updateText());
+
+            beatmap.BindValueChanged(b =>
+            {
+                difficultyCancellationSource?.Cancel();
+                difficultyCancellationSource = new CancellationTokenSource();
+
+                difficultyBindable?.UnbindAll();
+                difficultyBindable = difficultyCache.GetBindableDifficulty(b.NewValue.BeatmapInfo, difficultyCancellationSource.Token);
+                difficultyBindable.BindValueChanged(d =>
+                {
+                    starDifficulty = d.NewValue;
+                    updateText();
+                });
+
+                updateText();
+            }, true);
+
+            mods.BindValueChanged(m =>
+            {
+                modSettingTracker?.Dispose();
+                modSettingTracker = new ModSettingChangeTracker(m.NewValue)
+                {
+                    SettingChanged = _ => updateText()
+                };
+
+                updateText();
+            }, true);
+
+            ruleset.BindValueChanged(_ => updateText());
 
             updateText();
         }
@@ -156,37 +202,64 @@ namespace osu.Game.Skinning.Components
                     return beatmap.Value.BeatmapInfo.Metadata.Source;
 
                 case BeatmapAttribute.Length:
-                    return TimeSpan.FromMilliseconds(beatmap.Value.BeatmapInfo.Length).ToFormattedDuration();
+                    return Math.Round(beatmap.Value.BeatmapInfo.Length / ModUtils.CalculateRateWithMods(mods.Value)).ToFormattedDuration();
 
                 case BeatmapAttribute.RankedStatus:
                     return beatmap.Value.BeatmapInfo.Status.GetLocalisableDescription();
 
                 case BeatmapAttribute.BPM:
-                    return beatmap.Value.BeatmapInfo.BPM.ToLocalisableString(@"F2");
+                    return FormatUtils.RoundBPM(beatmap.Value.BeatmapInfo.BPM, ModUtils.CalculateRateWithMods(mods.Value)).ToLocalisableString(@"F2");
 
                 case BeatmapAttribute.CircleSize:
-                    return ((double)beatmap.Value.BeatmapInfo.Difficulty.CircleSize).ToLocalisableString(@"F2");
+                    return computeDifficulty().CircleSize.ToLocalisableString(@"F2");
 
                 case BeatmapAttribute.HPDrain:
-                    return ((double)beatmap.Value.BeatmapInfo.Difficulty.DrainRate).ToLocalisableString(@"F2");
+                    return computeDifficulty().DrainRate.ToLocalisableString(@"F2");
 
                 case BeatmapAttribute.Accuracy:
-                    return ((double)beatmap.Value.BeatmapInfo.Difficulty.OverallDifficulty).ToLocalisableString(@"F2");
+                    return computeDifficulty().OverallDifficulty.ToLocalisableString(@"F2");
 
                 case BeatmapAttribute.ApproachRate:
-                    return ((double)beatmap.Value.BeatmapInfo.Difficulty.ApproachRate).ToLocalisableString(@"F2");
+                    return computeDifficulty().ApproachRate.ToLocalisableString(@"F2");
 
                 case BeatmapAttribute.StarRating:
-                    return beatmap.Value.BeatmapInfo.StarRating.ToLocalisableString(@"F2");
+                    return (starDifficulty?.Stars ?? 0).ToLocalisableString(@"F2");
 
                 default:
                     return string.Empty;
+            }
+
+            BeatmapDifficulty computeDifficulty()
+            {
+                BeatmapDifficulty difficulty = new BeatmapDifficulty(beatmap.Value.BeatmapInfo.Difficulty);
+
+                foreach (var mod in mods.Value.OfType<IApplicableToDifficulty>())
+                    mod.ApplyToDifficulty(difficulty);
+
+                if (ruleset.Value is RulesetInfo rulesetInfo)
+                {
+                    double rate = ModUtils.CalculateRateWithMods(mods.Value);
+                    difficulty = rulesetInfo.CreateInstance().GetRateAdjustedDisplayDifficulty(difficulty, rate);
+                }
+
+                return difficulty;
             }
         }
 
         protected override void SetFont(FontUsage font) => text.Font = font.With(size: 40);
 
         protected override void SetTextColour(Colour4 textColour) => text.Colour = textColour;
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            difficultyCancellationSource?.Cancel();
+            difficultyCancellationSource?.Dispose();
+            difficultyCancellationSource = null;
+
+            modSettingTracker?.Dispose();
+        }
     }
 
     // WARNING: DO NOT ADD ANY VALUES TO THIS ENUM ANYWHERE ELSE THAN AT THE END.
