@@ -47,9 +47,6 @@ namespace osu.Game.Screens.OnlinePlay
         protected Bindable<DateTimeOffset?> EndDate { get; private set; } = null!;
 
         [Resolved(typeof(Room))]
-        protected Bindable<RoomAvailability> Availability { get; private set; } = null!;
-
-        [Resolved(typeof(Room))]
         public Bindable<string> Password { get; private set; } = null!;
 
         [Resolved(typeof(Room))]

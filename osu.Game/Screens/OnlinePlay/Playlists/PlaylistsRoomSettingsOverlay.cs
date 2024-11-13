@@ -316,7 +316,6 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                     loadingLayer = new LoadingLayer(true)
                 };
 
-                Availability.BindValueChanged(availability => AvailabilityPicker.Current.Value = availability.NewValue, true);
                 MaxParticipants.BindValueChanged(count => MaxParticipantsField.Text = count.NewValue?.ToString(), true);
                 MaxAttempts.BindValueChanged(count => MaxAttemptsField.Text = count.NewValue?.ToString(), true);
                 Duration.BindValueChanged(duration => DurationField.Current.Value = duration.NewValue ?? TimeSpan.FromMinutes(30), true);
@@ -346,16 +345,28 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                 room.PropertyChanged += onRoomPropertyChanged;
 
                 updateRoomName();
+                updateRoomAvailability();
             }
 
             private void onRoomPropertyChanged(object? sender, PropertyChangedEventArgs e)
             {
-                if (e.PropertyName == nameof(Room.Name))
-                    updateRoomName();
+                switch (e.PropertyName)
+                {
+                    case nameof(Room.Name):
+                        updateRoomName();
+                        break;
+
+                    case nameof(Room.Availability):
+                        updateRoomAvailability();
+                        break;
+                }
             }
 
             private void updateRoomName()
                 => NameField.Text = room.Name;
+
+            private void updateRoomAvailability()
+                => AvailabilityPicker.Current.Value = room.Availability;
 
             private void populateDurations(ValueChangedEvent<APIUser> user)
             {
@@ -405,7 +416,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                 hideError();
 
                 room.Name = NameField.Text;
-                Availability.Value = AvailabilityPicker.Current.Value;
+                room.Availability = AvailabilityPicker.Current.Value;
 
                 if (int.TryParse(MaxParticipantsField.Text, out int max))
                     MaxParticipants.Value = max;
