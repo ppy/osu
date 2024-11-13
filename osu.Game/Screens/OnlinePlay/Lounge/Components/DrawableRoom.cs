@@ -360,7 +360,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
                 },
-                new StarRatingRangeDisplay
+                new StarRatingRangeDisplay(Room)
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
