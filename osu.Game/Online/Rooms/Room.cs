@@ -105,6 +105,15 @@ namespace osu.Game.Online.Rooms
         }
 
         /// <summary>
+        /// Whether to automatically skip map intros. Only valid for multiplayer rooms.
+        /// </summary>
+        public bool AutoSkip
+        {
+            get => autoSkip;
+            set => SetField(ref autoSkip, value);
+        }
+
+        /// <summary>
         /// Represents the current item selected within the room.
         /// </summary>
         /// <remarks>
@@ -134,7 +143,6 @@ namespace osu.Game.Online.Rooms
             set => SetField(ref availability, value);
         }
 
-
         [JsonProperty("id")]
         private long? roomId;
 
@@ -161,6 +169,9 @@ namespace osu.Game.Online.Rooms
         [JsonConverter(typeof(SnakeCaseStringEnumConverter))]
         [JsonProperty("queue_mode")]
         private QueueMode queueMode;
+
+        [JsonProperty("auto_skip")]
+        private bool autoSkip;
 
         [JsonProperty("current_playlist_item")]
         private PlaylistItem? currentPlaylistItem;
@@ -253,10 +264,6 @@ namespace osu.Game.Online.Rooms
             set => MaxAttempts.Value = value;
         }
 
-        [Cached]
-        [JsonProperty("auto_skip")]
-        public readonly Bindable<bool> AutoSkip = new Bindable<bool>();
-
         /// <summary>
         /// Copies values from another <see cref="Room"/> into this one.
         /// </summary>
@@ -288,7 +295,7 @@ namespace osu.Game.Online.Rooms
             DifficultyRange.Value = other.DifficultyRange.Value;
             PlaylistItemStats.Value = other.PlaylistItemStats.Value;
             CurrentPlaylistItem = other.CurrentPlaylistItem;
-            AutoSkip.Value = other.AutoSkip.Value;
+            AutoSkip = other.AutoSkip;
 
             other.RemoveExpiredPlaylistItems();
 

@@ -848,7 +848,7 @@ namespace osu.Game.Online.Multiplayer
             APIRoom.QueueMode = Room.Settings.QueueMode;
             APIRoom.AutoStartDuration.Value = Room.Settings.AutoStartDuration;
             APIRoom.CurrentPlaylistItem = APIRoom.Playlist.Single(item => item.ID == settings.PlaylistItemId);
-            APIRoom.AutoSkip.Value = Room.Settings.AutoSkip;
+            APIRoom.AutoSkip = Room.Settings.AutoSkip;
 
             RoomUpdated?.Invoke();
         }
