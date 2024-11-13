@@ -201,7 +201,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                     {
                                         new OverlinedHeader("Leaderboard")
                                     },
-                                    new Drawable[] { leaderboard = new MatchLeaderboard { RelativeSizeAxes = Axes.Both }, },
+                                    new Drawable[] { leaderboard = new MatchLeaderboard(Room) { RelativeSizeAxes = Axes.Both }, },
                                 },
                                 RowDimensions = new[]
                                 {

@@ -63,7 +63,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 SelectedRoom.Value = new Room { RoomID = 3 };
 
-                Child = new MatchLeaderboard
+                Child = new MatchLeaderboard(SelectedRoom.Value)
                 {
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
