@@ -195,6 +195,15 @@ namespace osu.Game.Online.Rooms
         }
 
         /// <summary>
+        /// The chat channel id for the room. Will be <c>0</c> while the room has not yet been created.
+        /// </summary>
+        public int ChannelId
+        {
+            get => channelId;
+            private set => SetField(ref channelId, value);
+        }
+
+        /// <summary>
         /// The current room status.
         /// </summary>
         public RoomStatus Status
@@ -266,6 +275,9 @@ namespace osu.Game.Online.Rooms
         [JsonProperty("current_playlist_item")]
         private PlaylistItem? currentPlaylistItem;
 
+        [JsonProperty("channel_id")]
+        private int channelId;
+
         // Not serialised (see: GetRoomsRequest).
         private RoomStatus status = new RoomStatusOpen();
 
@@ -275,10 +287,6 @@ namespace osu.Game.Online.Rooms
         [Cached]
         [JsonProperty("playlist")]
         public readonly BindableList<PlaylistItem> Playlist = new BindableList<PlaylistItem>();
-
-        [Cached]
-        [JsonProperty("channel_id")]
-        public readonly Bindable<int> ChannelId = new Bindable<int>();
 
         [JsonProperty("playlist_item_stats")]
         [Cached]
@@ -313,7 +321,7 @@ namespace osu.Game.Online.Rooms
             if (other.Host != null && Host?.Id != other.Host.Id)
                 Host = other.Host;
 
-            ChannelId.Value = other.ChannelId.Value;
+            ChannelId = other.ChannelId;
             Status = other.Status;
             Availability = other.Availability;
             HasPassword = other.HasPassword;
