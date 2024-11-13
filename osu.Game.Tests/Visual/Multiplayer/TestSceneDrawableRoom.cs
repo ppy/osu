@@ -195,7 +195,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private DrawableRoom createLoungeRoom(Room room)
         {
-            room.Host.Value ??= new APIUser { Username = "peppy", Id = 2 };
+            room.Host ??= new APIUser { Username = "peppy", Id = 2 };
 
             if (room.RecentParticipants.Count == 0)
             {

@@ -42,7 +42,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
 
         public virtual void CreateRoom(Room room, Action<Room>? onSuccess = null, Action<string>? onError = null)
         {
-            room.Host.Value = api.LocalUser.Value;
+            room.Host = api.LocalUser.Value;
 
             var req = new CreateRoomRequest(room);
 

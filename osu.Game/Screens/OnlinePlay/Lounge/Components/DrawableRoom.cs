@@ -224,7 +224,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                                 Children = new Drawable[]
                                                 {
                                                     ButtonsContainer,
-                                                    drawableRoomParticipantsList = new DrawableRoomParticipantsList
+                                                    drawableRoomParticipantsList = new DrawableRoomParticipantsList(Room)
                                                     {
                                                         Anchor = Anchor.CentreRight,
                                                         Origin = Anchor.CentreRight,

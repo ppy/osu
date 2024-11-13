@@ -39,6 +39,12 @@ namespace osu.Game.Online.Rooms
             set => SetField(ref name, value);
         }
 
+        public APIUser? Host
+        {
+            get => host;
+            set => SetField(ref host, value);
+        }
+
         /// <summary>
         /// Represents the current item selected within the room.
         /// </summary>
@@ -57,12 +63,11 @@ namespace osu.Game.Online.Rooms
         [JsonProperty("name")]
         private string name = string.Empty;
 
+        [JsonProperty("host")]
+        private APIUser? host;
+
         [JsonProperty("current_playlist_item")]
         private PlaylistItem? currentPlaylistItem;
-
-        [Cached]
-        [JsonProperty("host")]
-        public readonly Bindable<APIUser?> Host = new Bindable<APIUser?>();
 
         [Cached]
         [JsonProperty("playlist")]
@@ -217,8 +222,8 @@ namespace osu.Game.Online.Rooms
 
             Category.Value = other.Category.Value;
 
-            if (other.Host.Value != null && Host.Value?.Id != other.Host.Value.Id)
-                Host.Value = other.Host.Value;
+            if (other.Host != null && Host?.Id != other.Host.Id)
+                Host = other.Host;
 
             ChannelId.Value = other.ChannelId.Value;
             Status.Value = other.Status.Value;

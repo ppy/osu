@@ -262,12 +262,12 @@ namespace osu.Game.Tests.Visual.OnlinePlay
         public void AddServerSideRoom(Room room, APIUser host)
         {
             room.RoomID ??= currentRoomId++;
-            room.Host.Value = host;
+            room.Host = host;
 
             for (int i = 0; i < room.Playlist.Count; i++)
             {
                 room.Playlist[i].ID = currentPlaylistItemId++;
-                room.Playlist[i].OwnerID = room.Host.Value.OnlineID;
+                room.Playlist[i].OwnerID = room.Host.OnlineID;
             }
 
             serverSideRooms.Add(room);

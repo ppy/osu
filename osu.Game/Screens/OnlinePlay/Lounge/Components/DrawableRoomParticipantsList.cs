@@ -1,13 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -16,31 +14,33 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Users.Drawables;
 using osuTK;
+using Container = osu.Framework.Graphics.Containers.Container;
 
 namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 {
     public partial class DrawableRoomParticipantsList : OnlinePlayComposite
     {
         public const float SHEAR_WIDTH = 12f;
-
         private const float avatar_size = 36;
-
         private const float height = 60f;
-
         private static readonly Vector2 shear = new Vector2(SHEAR_WIDTH / height, 0);
 
-        private FillFlowContainer<CircularAvatar> avatarFlow;
+        private readonly Room room;
 
-        private CircularAvatar hostAvatar;
-        private LinkFlowContainer hostText;
-        private HiddenUserCount hiddenUsers;
-        private OsuSpriteText totalCount;
+        private FillFlowContainer<CircularAvatar> avatarFlow = null!;
+        private CircularAvatar hostAvatar = null!;
+        private LinkFlowContainer hostText = null!;
+        private HiddenUserCount hiddenUsers = null!;
+        private OsuSpriteText totalCount = null!;
 
-        public DrawableRoomParticipantsList()
+        public DrawableRoomParticipantsList(Room room)
         {
+            this.room = room;
+
             AutoSizeAxes = Axes.X;
             Height = height;
         }
@@ -172,7 +172,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 totalCount.Text = ParticipantCount.Value.ToString();
             }, true);
 
-            Host.BindValueChanged(onHostChanged, true);
+            room.PropertyChanged += onRoomPropertyChanged;
+            updateRoomHost();
         }
 
         private int numberOfCircles = 4;
@@ -199,7 +200,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             }
         }
 
-        private void onParticipantsChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void onParticipantsChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             switch (e.Action)
             {
@@ -269,21 +270,33 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             }
         }
 
-        private void onHostChanged(ValueChangedEvent<APIUser> host)
+        private void onRoomPropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
-            hostAvatar.User = host.NewValue;
+            if (e.PropertyName == nameof(Room.Host))
+                updateRoomHost();
+        }
+
+        private void updateRoomHost()
+        {
+            hostAvatar.User = room.Host;
             hostText.Clear();
 
-            if (host.NewValue != null)
+            if (room.Host != null)
             {
                 hostText.AddText("hosted by ");
-                hostText.AddUserLink(host.NewValue);
+                hostText.AddUserLink(room.Host);
             }
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            room.PropertyChanged -= onRoomPropertyChanged;
         }
 
         private partial class CircularAvatar : CompositeDrawable
         {
-            public APIUser User
+            public APIUser? User
             {
                 get => avatar.User;
                 set => avatar.User = value;

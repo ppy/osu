@@ -33,7 +33,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
                 {
                     RoomID = -currentRoomId,
                     Name = $@"Room {currentRoomId}",
-                    Host = { Value = new APIUser { Username = @"Host" } },
+                    Host = new APIUser { Username = @"Host" },
                     EndDate = { Value = DateTimeOffset.Now + TimeSpan.FromSeconds(10) },
                     Category = { Value = withSpotlightRooms && i % 2 == 0 ? RoomCategory.Spotlight : RoomCategory.Normal },
                 };

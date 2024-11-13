@@ -26,17 +26,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 SelectedRoom.Value = new Room
                 {
                     Name = "test room",
-                    Host =
+                    Host = new APIUser
                     {
-                        Value = new APIUser
-                        {
-                            Id = 2,
-                            Username = "peppy",
-                        }
+                        Id = 2,
+                        Username = "peppy",
                     }
                 };
 
-                Child = list = new DrawableRoomParticipantsList
+                Child = list = new DrawableRoomParticipantsList(SelectedRoom.Value)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
