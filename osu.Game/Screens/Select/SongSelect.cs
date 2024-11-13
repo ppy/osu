@@ -711,12 +711,6 @@ namespace osu.Game.Screens.Select
 
             Carousel.AllowSelection = true;
 
-            if (pendingFilterApplication)
-            {
-                Carousel.Filter(FilterControl.CreateCriteria());
-                pendingFilterApplication = false;
-            }
-
             BeatmapDetails.Refresh();
 
             beginLooping();
@@ -747,6 +741,17 @@ namespace osu.Game.Screens.Select
             wedgeBackground.ScaleTo(1, 500, Easing.OutQuint);
 
             FilterControl.Activate();
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (Carousel.AllowSelection && pendingFilterApplication)
+            {
+                Carousel.Filter(FilterControl.CreateCriteria());
+                pendingFilterApplication = false;
+            }
         }
 
         public override void OnSuspending(ScreenTransitionEvent e)
