@@ -189,7 +189,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                                                         RelativeSizeAxes = Axes.X,
                                                                         Font = OsuFont.GetFont(size: 28)
                                                                     },
-                                                                    new RoomStatusText
+                                                                    new RoomStatusText(Room)
                                                                     {
                                                                         SelectedItem = { BindTarget = SelectedItem }
                                                                     }
@@ -259,17 +259,12 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
                 wrapper.FadeInFromZero(200);
 
-                roomType.BindTo(Room.Type);
-                roomType.BindValueChanged(t =>
-                {
-                    endDateInfo.Alpha = t.NewValue == MatchType.Playlists ? 1 : 0;
-                }, true);
-
                 hasPassword.BindTo(Room.HasPassword);
                 hasPassword.BindValueChanged(v => passwordIcon.Alpha = v.NewValue ? 1 : 0, true);
 
                 updateRoomName();
                 updateRoomCategory();
+                updateRoomType();
             };
 
             SelectedItem.BindValueChanged(item => background.Beatmap.Value = item.NewValue?.Beatmap, true);
@@ -286,6 +281,10 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 case nameof(Room.Category):
                     updateRoomCategory();
                     break;
+
+                case nameof(Room.Type):
+                    updateRoomType();
+                    break;
             }
         }
 
@@ -301,6 +300,12 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 specialCategoryPill?.Show();
             else
                 specialCategoryPill?.Hide();
+        }
+
+        private void updateRoomType()
+        {
+            if (endDateInfo != null)
+                endDateInfo.Alpha = Room.Type == MatchType.Playlists ? 1 : 0;
         }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
@@ -331,11 +336,11 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         {
             var pills = new List<Drawable>();
 
-            if (Room.Type.Value != MatchType.Playlists)
+            if (Room.Type != MatchType.Playlists)
             {
                 pills.AddRange(new OnlinePlayComposite[]
                 {
-                    new MatchTypePill(),
+                    new MatchTypePill(Room),
                     new QueueModePill(),
                 });
             }
@@ -374,11 +379,13 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             [Resolved]
             private BeatmapLookupCache beatmapLookupCache { get; set; } = null!;
 
+            private readonly Room room;
             private SpriteText statusText = null!;
             private LinkFlowContainer beatmapText = null!;
 
-            public RoomStatusText()
+            public RoomStatusText(Room room)
             {
+                this.room = room;
                 RelativeSizeAxes = Axes.X;
                 AutoSizeAxes = Axes.Y;
             }
@@ -437,7 +444,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 beatmapLookupCancellation?.Cancel();
                 beatmapText.Clear();
 
-                if (Type.Value == MatchType.Playlists)
+                if (room.Type == MatchType.Playlists)
                 {
                     statusText.Text = "Ready to play";
                     return;

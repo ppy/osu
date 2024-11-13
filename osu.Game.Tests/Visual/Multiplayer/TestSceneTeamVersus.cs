@@ -63,7 +63,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             createRoom(() => new Room
             {
                 Name = "Test Room",
-                Type = { Value = MatchType.TeamVersus },
+                Type = MatchType.TeamVersus,
                 Playlist =
                 {
                     new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
@@ -83,7 +83,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             createRoom(() => new Room
             {
                 Name = "Test Room",
-                Type = { Value = MatchType.TeamVersus },
+                Type = MatchType.TeamVersus,
                 Playlist =
                 {
                     new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
@@ -120,7 +120,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             createRoom(() => new Room
             {
                 Name = "Test Room",
-                Type = { Value = MatchType.HeadToHead },
+                Type = MatchType.HeadToHead,
                 Playlist =
                 {
                     new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
@@ -130,14 +130,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 }
             });
 
-            AddUntilStep("match type head to head", () => multiplayerClient.ClientAPIRoom?.Type.Value == MatchType.HeadToHead);
+            AddUntilStep("match type head to head", () => multiplayerClient.ClientAPIRoom?.Type == MatchType.HeadToHead);
 
             AddStep("change match type", () => multiplayerClient.ChangeSettings(new MultiplayerRoomSettings
             {
                 MatchType = MatchType.TeamVersus
             }).WaitSafely());
 
-            AddUntilStep("api room updated to team versus", () => multiplayerClient.ClientAPIRoom?.Type.Value == MatchType.TeamVersus);
+            AddUntilStep("api room updated to team versus", () => multiplayerClient.ClientAPIRoom?.Type == MatchType.TeamVersus);
         }
 
         [Test]
