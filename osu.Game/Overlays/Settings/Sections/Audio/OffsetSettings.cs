@@ -30,7 +30,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                 new AudioOffsetAdjustControl
                 {
                     Current = config.GetBindable<double>(OsuSetting.AudioOffset),
-                }
+                },
             };
         }
     }
