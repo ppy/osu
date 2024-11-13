@@ -846,7 +846,7 @@ namespace osu.Game.Online.Multiplayer
             APIRoom.Status = string.IsNullOrEmpty(Room.Settings.Password) ? new RoomStatusOpen() : new RoomStatusOpenPrivate();
             APIRoom.Type = Room.Settings.MatchType;
             APIRoom.QueueMode = Room.Settings.QueueMode;
-            APIRoom.AutoStartDuration.Value = Room.Settings.AutoStartDuration;
+            APIRoom.AutoStartDuration = Room.Settings.AutoStartDuration;
             APIRoom.CurrentPlaylistItem = APIRoom.Playlist.Single(item => item.ID == settings.PlaylistItemId);
             APIRoom.AutoSkip = Room.Settings.AutoSkip;
 
