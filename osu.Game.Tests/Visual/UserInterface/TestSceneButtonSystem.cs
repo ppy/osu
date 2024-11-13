@@ -110,7 +110,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                         break;
 
                     case Key.Q:
-                        buttons.OnExit = action;
+                        buttons.OnExit = _ => action();
                         break;
 
                     case Key.O:
