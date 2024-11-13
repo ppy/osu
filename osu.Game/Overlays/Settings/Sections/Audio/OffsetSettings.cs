@@ -22,15 +22,15 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
         {
             Children = new Drawable[]
             {
-                new AudioOffsetAdjustControl
-                {
-                    Current = config.GetBindable<double>(OsuSetting.AudioOffset),
-                },
                 new SettingsCheckbox
                 {
                     LabelText = AudioSettingsStrings.AutoAdjustBeatmapOffset,
                     Current = config.GetBindable<bool>(OsuSetting.AutoAdjustBeatmapOffset)
                 },
+                new AudioOffsetAdjustControl
+                {
+                    Current = config.GetBindable<double>(OsuSetting.AudioOffset),
+                }
             };
         }
     }
