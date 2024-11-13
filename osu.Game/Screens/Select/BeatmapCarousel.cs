@@ -216,18 +216,12 @@ namespace osu.Game.Screens.Select
 
         private int visibleSetsCount;
 
-        public BeatmapCarousel(FilterCriteria initialCriterial)
+        public BeatmapCarousel(FilterCriteria initialCriteria)
         {
             root = new CarouselRoot(this);
             InternalChild = new Container
             {
                 RelativeSizeAxes = Axes.Both,
-                Padding = new MarginPadding
-                {
-                    // Avoid clash between scrollbar and osu! logo.
-                    Top = 10,
-                    Bottom = 100,
-                },
                 Children = new Drawable[]
                 {
                     setPool,
@@ -239,7 +233,7 @@ namespace osu.Game.Screens.Select
                 }
             };
 
-            activeCriteria = initialCriterial;
+            activeCriteria = initialCriteria;
         }
 
         [BackgroundDependencyLoader]
@@ -322,6 +316,11 @@ namespace osu.Game.Screens.Select
         {
             try
             {
+                // To handle the beatmap update flow, attempt to track selection changes across delete-insert transactions.
+                // When an update occurs, the previous beatmap set is either soft or hard deleted.
+                // Check if the current selection was potentially deleted by re-querying its validity.
+                bool selectedSetMarkedDeleted = SelectedBeatmapSet != null && fetchFromID(SelectedBeatmapSet.ID)?.DeletePending != false;
+
                 foreach (var set in setsRequiringRemoval) removeBeatmapSet(set.ID);
 
                 foreach (var set in setsRequiringUpdate) updateBeatmapSet(set);
@@ -330,11 +329,6 @@ namespace osu.Game.Screens.Select
                 {
                     // If SelectedBeatmapInfo is non-null, the set should also be non-null.
                     Debug.Assert(SelectedBeatmapSet != null);
-
-                    // To handle the beatmap update flow, attempt to track selection changes across delete-insert transactions.
-                    // When an update occurs, the previous beatmap set is either soft or hard deleted.
-                    // Check if the current selection was potentially deleted by re-querying its validity.
-                    bool selectedSetMarkedDeleted = fetchFromID(SelectedBeatmapSet.ID)?.DeletePending != false;
 
                     if (selectedSetMarkedDeleted && setsRequiringUpdate.Any())
                     {
@@ -1116,11 +1110,6 @@ namespace osu.Game.Screens.Select
             // adjusting the item's overall X position can cause it to become masked away when
             // child items (difficulties) are still visible.
             item.Header.X = offsetX(dist, visibleHalfHeight) - (parent?.X ?? 0);
-
-            // We are applying a multiplicative alpha (which is internally done by nesting an
-            // additional container and setting that container's alpha) such that we can
-            // layer alpha transformations on top.
-            item.SetMultiplicativeAlpha(Math.Clamp(1.75f - 1.5f * dist, 0, 1));
         }
 
         private enum PendingScrollOperation
@@ -1270,6 +1259,38 @@ namespace osu.Game.Screens.Select
                     return false;
 
                 return base.OnDragStart(e);
+            }
+
+            protected override ScrollbarContainer CreateScrollbar(Direction direction)
+            {
+                return new PaddedScrollbar();
+            }
+
+            protected partial class PaddedScrollbar : OsuScrollbar
+            {
+                public PaddedScrollbar()
+                    : base(Direction.Vertical)
+                {
+                }
+            }
+
+            private const float top_padding = 10;
+            private const float bottom_padding = 70;
+
+            protected override float ToScrollbarPosition(float scrollPosition)
+            {
+                if (Precision.AlmostEquals(0, ScrollableExtent))
+                    return 0;
+
+                return top_padding + (ScrollbarMovementExtent - (top_padding + bottom_padding)) * (scrollPosition / ScrollableExtent);
+            }
+
+            protected override float FromScrollbarPosition(float scrollbarPosition)
+            {
+                if (Precision.AlmostEquals(0, ScrollbarMovementExtent))
+                    return 0;
+
+                return ScrollableExtent * ((scrollbarPosition - top_padding) / (ScrollbarMovementExtent - (top_padding + bottom_padding)));
             }
         }
 
