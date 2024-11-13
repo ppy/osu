@@ -20,9 +20,6 @@ namespace osu.Game.Screens.OnlinePlay
         protected Bindable<RoomStatus> Status { get; private set; } = null!;
 
         [Resolved(typeof(Room))]
-        protected Bindable<MatchType> Type { get; private set; } = null!;
-
-        [Resolved(typeof(Room))]
         protected Bindable<Room.RoomPlaylistItemStats> PlaylistItemStats { get; private set; } = null!;
 
         [Resolved(typeof(Room))]

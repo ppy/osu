@@ -350,7 +350,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 };
 
                 TypePicker.Current.BindValueChanged(type => typeLabel.Text = type.NewValue.GetLocalisableDescription(), true);
-                Type.BindValueChanged(type => TypePicker.Current.Value = type.NewValue, true);
                 MaxParticipants.BindValueChanged(count => MaxParticipantsField.Text = count.NewValue?.ToString(), true);
                 Password.BindValueChanged(password => PasswordTextBox.Text = password.NewValue ?? string.Empty, true);
                 QueueMode.BindValueChanged(mode => QueueModeDropdown.Current.Value = mode.NewValue, true);
@@ -377,16 +376,28 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 room.PropertyChanged += onRoomPropertyChanged;
 
                 updateRoomName();
+                updateRoomType();
             }
 
             private void onRoomPropertyChanged(object? sender, PropertyChangedEventArgs e)
             {
-                if (e.PropertyName == nameof(Room.Name))
-                    updateRoomName();
+                switch (e.PropertyName)
+                {
+                    case nameof(Room.Name):
+                        updateRoomName();
+                        break;
+
+                    case nameof(Room.Type):
+                        updateRoomName();
+                        break;
+                }
             }
 
             private void updateRoomName()
                 => NameField.Text = room.Name;
+
+            private void updateRoomType()
+                => TypePicker.Current.Value = room.Type;
 
             protected override void Update()
             {
@@ -430,7 +441,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 else
                 {
                     room.Name = NameField.Text;
-                    room.Type.Value = TypePicker.Current.Value;
+                    room.Type = TypePicker.Current.Value;
                     room.Password.Value = PasswordTextBox.Current.Value;
                     room.QueueMode.Value = QueueModeDropdown.Current.Value;
                     room.AutoStartDuration.Value = autoStartDuration;

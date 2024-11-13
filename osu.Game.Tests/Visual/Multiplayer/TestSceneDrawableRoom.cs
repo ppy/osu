@@ -78,7 +78,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                             Name = "Multiplayer room",
                             Status = { Value = new RoomStatusOpen() },
                             EndDate = { Value = DateTimeOffset.Now.AddDays(1) },
-                            Type = { Value = MatchType.HeadToHead },
+                            Type = MatchType.HeadToHead,
                             Playlist = { item1 },
                             CurrentPlaylistItem = item1
                         }),
@@ -88,7 +88,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                             Status = { Value = new RoomStatusOpenPrivate() },
                             HasPassword = { Value = true },
                             EndDate = { Value = DateTimeOffset.Now.AddDays(1) },
-                            Type = { Value = MatchType.HeadToHead },
+                            Type = MatchType.HeadToHead,
                             Playlist = { item3 },
                             CurrentPlaylistItem = item3
                         }),
@@ -137,7 +137,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 Name = "Room with password",
                 Status = { Value = new RoomStatusOpen() },
-                Type = { Value = MatchType.HeadToHead },
+                Type = MatchType.HeadToHead,
             }));
 
             AddUntilStep("wait for panel load", () => drawableRoom.ChildrenOfType<DrawableRoomParticipantsList>().Any());
@@ -166,7 +166,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     {
                         Name = "A host-only room",
                         QueueMode = { Value = QueueMode.HostOnly },
-                        Type = { Value = MatchType.HeadToHead },
+                        Type = MatchType.HeadToHead,
                     })
                     {
                         SelectedItem = new Bindable<PlaylistItem?>()
@@ -175,7 +175,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     {
                         Name = "An all-players, team-versus room",
                         QueueMode = { Value = QueueMode.AllPlayers },
-                        Type = { Value = MatchType.TeamVersus }
+                        Type = MatchType.TeamVersus
                     })
                     {
                         SelectedItem = new Bindable<PlaylistItem?>()
@@ -184,7 +184,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     {
                         Name = "A round-robin room",
                         QueueMode = { Value = QueueMode.AllPlayersRoundRobin },
-                        Type = { Value = MatchType.HeadToHead }
+                        Type = MatchType.HeadToHead
                     })
                     {
                         SelectedItem = new Bindable<PlaylistItem?>()

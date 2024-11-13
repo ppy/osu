@@ -58,6 +58,15 @@ namespace osu.Game.Online.Rooms
         }
 
         /// <summary>
+        /// The match type.
+        /// </summary>
+        public MatchType Type
+        {
+            get => type;
+            set => SetField(ref type, value);
+        }
+
+        /// <summary>
         /// Represents the current item selected within the room.
         /// </summary>
         /// <remarks>
@@ -81,6 +90,10 @@ namespace osu.Game.Online.Rooms
         [JsonProperty("category")]
         [JsonConverter(typeof(SnakeCaseStringEnumConverter))]
         private RoomCategory category;
+
+        [JsonConverter(typeof(SnakeCaseStringEnumConverter))]
+        [JsonProperty("type")]
+        private MatchType type;
 
         [JsonProperty("current_playlist_item")]
         private PlaylistItem? currentPlaylistItem;
@@ -109,18 +122,6 @@ namespace osu.Game.Online.Rooms
 
         [Cached]
         public readonly Bindable<RoomAvailability> Availability = new Bindable<RoomAvailability>();
-
-        [Cached]
-        public readonly Bindable<MatchType> Type = new Bindable<MatchType>();
-
-        // Todo: osu-framework bug (https://github.com/ppy/osu-framework/issues/4106)
-        [JsonConverter(typeof(SnakeCaseStringEnumConverter))]
-        [JsonProperty("type")]
-        private MatchType type
-        {
-            get => Type.Value;
-            set => Type.Value = value;
-        }
 
         [Cached]
         public readonly Bindable<QueueMode> QueueMode = new Bindable<QueueMode>();
@@ -233,7 +234,7 @@ namespace osu.Game.Online.Rooms
             Status.Value = other.Status.Value;
             Availability.Value = other.Availability.Value;
             HasPassword.Value = other.HasPassword.Value;
-            Type.Value = other.Type.Value;
+            Type = other.Type;
             MaxParticipants.Value = other.MaxParticipants.Value;
             ParticipantCount.Value = other.ParticipantCount.Value;
             EndDate.Value = other.EndDate.Value;
