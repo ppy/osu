@@ -39,10 +39,22 @@ namespace osu.Game.Online.Rooms
             set => SetField(ref name, value);
         }
 
+        /// <summary>
+        /// The room host. Will be <c>null</c> while the room has not yet been created.
+        /// </summary>
         public APIUser? Host
         {
             get => host;
             set => SetField(ref host, value);
+        }
+
+        /// <summary>
+        /// The room category.
+        /// </summary>
+        public RoomCategory Category
+        {
+            get => category;
+            set => SetField(ref category, value);
         }
 
         /// <summary>
@@ -66,6 +78,10 @@ namespace osu.Game.Online.Rooms
         [JsonProperty("host")]
         private APIUser? host;
 
+        [JsonProperty("category")]
+        [JsonConverter(typeof(SnakeCaseStringEnumConverter))]
+        private RoomCategory category;
+
         [JsonProperty("current_playlist_item")]
         private PlaylistItem? currentPlaylistItem;
 
@@ -84,18 +100,6 @@ namespace osu.Game.Online.Rooms
         [JsonProperty("difficulty_range")]
         [Cached]
         public readonly Bindable<RoomDifficultyRange> DifficultyRange = new Bindable<RoomDifficultyRange>();
-
-        [Cached]
-        public readonly Bindable<RoomCategory> Category = new Bindable<RoomCategory>();
-
-        // Todo: osu-framework bug (https://github.com/ppy/osu-framework/issues/4106)
-        [JsonProperty("category")]
-        [JsonConverter(typeof(SnakeCaseStringEnumConverter))]
-        private RoomCategory category
-        {
-            get => Category.Value;
-            set => Category.Value = value;
-        }
 
         [Cached]
         public readonly Bindable<int?> MaxAttempts = new Bindable<int?>();
@@ -220,7 +224,7 @@ namespace osu.Game.Online.Rooms
             RoomID = other.RoomID;
             Name = other.Name;
 
-            Category.Value = other.Category.Value;
+            Category = other.Category;
 
             if (other.Host != null && Host?.Id != other.Host.Id)
                 Host = other.Host;

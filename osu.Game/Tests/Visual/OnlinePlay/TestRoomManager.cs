@@ -35,7 +35,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
                     Name = $@"Room {currentRoomId}",
                     Host = new APIUser { Username = @"Host" },
                     EndDate = { Value = DateTimeOffset.Now + TimeSpan.FromSeconds(10) },
-                    Category = { Value = withSpotlightRooms && i % 2 == 0 ? RoomCategory.Spotlight : RoomCategory.Normal },
+                    Category = withSpotlightRooms && i % 2 == 0 ? RoomCategory.Spotlight : RoomCategory.Normal,
                 };
 
                 if (withPassword)

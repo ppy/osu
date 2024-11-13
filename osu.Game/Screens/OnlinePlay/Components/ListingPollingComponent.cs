@@ -51,7 +51,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
 
             req.Success += result =>
             {
-                result = result.Where(r => r.Category.Value != RoomCategory.DailyChallenge).ToList();
+                result = result.Where(r => r.Category != RoomCategory.DailyChallenge).ToList();
 
                 foreach (var existing in RoomManager.Rooms.ToArray())
                 {

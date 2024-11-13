@@ -55,20 +55,20 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddAssert("has 5 rooms", () => container.Rooms.Count == 5);
 
             AddAssert("all spotlights at top", () => container.Rooms
-                                                              .SkipWhile(r => r.Room.Category.Value == RoomCategory.Spotlight)
-                                                              .All(r => r.Room.Category.Value == RoomCategory.Normal));
+                                                              .SkipWhile(r => r.Room.Category == RoomCategory.Spotlight)
+                                                              .All(r => r.Room.Category == RoomCategory.Normal));
 
             AddStep("remove first room", () => RoomManager.RemoveRoom(RoomManager.Rooms.First(r => r.RoomID == 0)));
             AddAssert("has 4 rooms", () => container.Rooms.Count == 4);
             AddAssert("first room removed", () => container.Rooms.All(r => r.Room.RoomID != 0));
 
             AddStep("select first room", () => container.Rooms.First().TriggerClick());
-            AddAssert("first spotlight selected", () => checkRoomSelected(RoomManager.Rooms.First(r => r.Category.Value == RoomCategory.Spotlight)));
+            AddAssert("first spotlight selected", () => checkRoomSelected(RoomManager.Rooms.First(r => r.Category == RoomCategory.Spotlight)));
 
             AddStep("remove last room", () => RoomManager.RemoveRoom(RoomManager.Rooms.MinBy(r => r.RoomID)));
-            AddAssert("first spotlight still selected", () => checkRoomSelected(RoomManager.Rooms.First(r => r.Category.Value == RoomCategory.Spotlight)));
+            AddAssert("first spotlight still selected", () => checkRoomSelected(RoomManager.Rooms.First(r => r.Category == RoomCategory.Spotlight)));
 
-            AddStep("remove spotlight room", () => RoomManager.RemoveRoom(RoomManager.Rooms.Single(r => r.Category.Value == RoomCategory.Spotlight)));
+            AddStep("remove spotlight room", () => RoomManager.RemoveRoom(RoomManager.Rooms.Single(r => r.Category == RoomCategory.Spotlight)));
             AddAssert("selection vacated", () => checkRoomSelected(null));
         }
 

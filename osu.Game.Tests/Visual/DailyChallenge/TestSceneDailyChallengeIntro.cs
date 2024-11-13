@@ -80,7 +80,7 @@ namespace osu.Game.Tests.Visual.DailyChallenge
                     },
                     StartDate = { Value = DateTimeOffset.Now },
                     EndDate = { Value = DateTimeOffset.Now.AddHours(24) },
-                    Category = { Value = RoomCategory.DailyChallenge }
+                    Category = RoomCategory.DailyChallenge
                 }));
             });
             AddStep("signal client", () => metadataClient.DailyChallengeUpdated(new DailyChallengeInfo { RoomID = roomId }));

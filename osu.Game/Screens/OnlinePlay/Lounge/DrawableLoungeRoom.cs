@@ -66,7 +66,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
             AddRangeInternal(new Drawable[]
             {
-                new StatusColouredContainer(transition_duration)
+                new StatusColouredContainer(Room, transition_duration)
                 {
                     RelativeSizeAxes = Axes.Both,
                     Child = selectionBox = new Container
