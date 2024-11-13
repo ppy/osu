@@ -2,20 +2,18 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Diagnostics;
 using osu.Framework.Bindables;
 using osu.Framework.Localisation;
-using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Osu.UI;
-using osu.Game.Rulesets.UI;
+using osu.Framework.Utils;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu.UI.Cursor;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
-using osu.Game.Rulesets.Osu.UI.Cursor;
-using osu.Framework.Utils;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
@@ -32,10 +30,11 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         protected readonly BindableNumber<int> CurrentCombo = new BindableInt();
         protected readonly IBindable<bool> IsBreakTime = new Bindable<bool>();
-        protected float ComboBasedSize;
+
+        private float currentSize;
 
         [SettingSource(
-            "Max Size at Combo",
+            "Max size at combo",
             "The combo count at which the cursor reaches its maximum size",
             SettingControlType = typeof(SettingsSlider<int, RoundedSliderBar<int>>)
         )]
@@ -46,11 +45,11 @@ namespace osu.Game.Rulesets.Osu.Mods
         };
 
         [SettingSource(
-            "Final Size Multiplier",
+            "Final size multiplier",
             "The multiplier applied to cursor size when combo reaches maximum",
             SettingControlType = typeof(SettingsSlider<float, RoundedSliderBar<float>>)
         )]
-        public BindableFloat MaxMulti { get; } = new BindableFloat(10f)
+        public BindableFloat MaxCursorSize { get; } = new BindableFloat(10f)
         {
             MinValue = 5f,
             MaxValue = 15f,
@@ -69,27 +68,18 @@ namespace osu.Game.Rulesets.Osu.Mods
             CurrentCombo.BindTo(scoreProcessor.Combo);
             CurrentCombo.BindValueChanged(combo =>
             {
-                ComboBasedSize = Math.Clamp(MaxMulti.Value * ((float)combo.NewValue / MaxSizeComboCount.Value), MIN_SIZE, MaxMulti.Value);
+                currentSize = Math.Clamp(MaxCursorSize.Value * ((float)combo.NewValue / MaxSizeComboCount.Value), MIN_SIZE, MaxCursorSize.Value);
             }, true);
         }
 
         public void Update(Playfield playfield)
         {
-            bool beBaseSize = IsBreakTime.Value;
-            OsuPlayfield osuPlayfield = (OsuPlayfield)playfield;
-            Debug.Assert(osuPlayfield.Cursor != null);
+            OsuCursor cursor = (OsuCursor)(playfield.Cursor!.ActiveCursor);
 
-            OsuCursor realCursor = (OsuCursor)osuPlayfield.Cursor.ActiveCursor;
-            float currentCombSize = (float)Interpolation.Lerp(realCursor.CursorScale.Value, ComboBasedSize, Math.Clamp(osuPlayfield.Time.Elapsed / TRANSITION_DURATION, 0, 1));
-
-            if (beBaseSize)
-            {
-                realCursor.UpdateSize(1);
-            }
+            if (IsBreakTime.Value)
+                cursor.ModScaleAdjust.Value = 1;
             else
-            {
-                realCursor.UpdateSize(currentCombSize);
-            }
+                cursor.ModScaleAdjust.Value = (float)Interpolation.Lerp(cursor.ModScaleAdjust.Value, currentSize, Math.Clamp(cursor.Time.Elapsed / TRANSITION_DURATION, 0, 1));
         }
     }
 }
