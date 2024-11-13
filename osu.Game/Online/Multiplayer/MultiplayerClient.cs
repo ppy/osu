@@ -492,7 +492,7 @@ namespace osu.Game.Online.Multiplayer
                 Id = user.UserID,
                 Username = "[Unresolved]"
             });
-            APIRoom.ParticipantCount.Value++;
+            APIRoom.ParticipantCount++;
         }
 
         private Task handleUserLeft(MultiplayerRoomUser user, Action<MultiplayerRoomUser>? callback)
@@ -507,7 +507,7 @@ namespace osu.Game.Online.Multiplayer
 
                 Debug.Assert(APIRoom != null);
                 APIRoom.RecentParticipants.RemoveAll(u => u.Id == user.UserID);
-                APIRoom.ParticipantCount.Value--;
+                APIRoom.ParticipantCount--;
 
                 callback?.Invoke(user);
                 RoomUpdated?.Invoke();

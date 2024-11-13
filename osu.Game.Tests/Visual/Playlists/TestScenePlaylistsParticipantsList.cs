@@ -38,7 +38,7 @@ namespace osu.Game.Tests.Visual.Playlists
         {
             AddStep("create component", () =>
             {
-                Child = new ParticipantsDisplay(Direction.Horizontal)
+                Child = new ParticipantsDisplay(SelectedRoom.Value, Direction.Horizontal)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -52,7 +52,7 @@ namespace osu.Game.Tests.Visual.Playlists
         {
             AddStep("create component", () =>
             {
-                Child = new ParticipantsDisplay(Direction.Vertical)
+                Child = new ParticipantsDisplay(SelectedRoom.Value, Direction.Vertical)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,

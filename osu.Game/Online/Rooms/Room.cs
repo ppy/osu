@@ -87,6 +87,24 @@ namespace osu.Game.Online.Rooms
         }
 
         /// <summary>
+        /// The maximum number of users allowed in the room.
+        /// </summary>
+        public int? MaxParticipants
+        {
+            get => maxParticipants;
+            set => SetField(ref maxParticipants, value);
+        }
+
+        /// <summary>
+        /// The current number of users in the room.
+        /// </summary>
+        public int ParticipantCount
+        {
+            get => participantCount;
+            set => SetField(ref participantCount, value);
+        }
+
+        /// <summary>
         /// The match type.
         /// </summary>
         public MatchType Type
@@ -162,6 +180,12 @@ namespace osu.Game.Online.Rooms
         [JsonConverter(typeof(SnakeCaseStringEnumConverter))]
         private RoomCategory category;
 
+        // Not yet serialised (not implemented).
+        private int? maxParticipants;
+
+        [JsonProperty("participant_count")]
+        private int participantCount;
+
         [JsonConverter(typeof(SnakeCaseStringEnumConverter))]
         [JsonProperty("type")]
         private MatchType type;
@@ -212,19 +236,12 @@ namespace osu.Game.Online.Rooms
         }
 
         [Cached]
-        public readonly Bindable<int?> MaxParticipants = new Bindable<int?>();
-
-        [Cached]
         [JsonProperty("current_user_score")]
         public readonly Bindable<PlaylistAggregateScore> UserScore = new Bindable<PlaylistAggregateScore>();
 
         [Cached]
         [JsonProperty("recent_participants")]
         public readonly BindableList<APIUser> RecentParticipants = new BindableList<APIUser>();
-
-        [Cached]
-        [JsonProperty("participant_count")]
-        public readonly Bindable<int> ParticipantCount = new Bindable<int>();
 
         #region Properties only used for room creation request
 
@@ -286,8 +303,8 @@ namespace osu.Game.Online.Rooms
             Availability = other.Availability;
             HasPassword = other.HasPassword;
             Type = other.Type;
-            MaxParticipants.Value = other.MaxParticipants.Value;
-            ParticipantCount.Value = other.ParticipantCount.Value;
+            MaxParticipants = other.MaxParticipants;
+            ParticipantCount = other.ParticipantCount;
             EndDate.Value = other.EndDate.Value;
             UserScore.Value = other.UserScore.Value;
             QueueMode = other.QueueMode;
