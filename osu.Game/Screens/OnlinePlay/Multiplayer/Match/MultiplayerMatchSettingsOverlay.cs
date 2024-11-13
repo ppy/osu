@@ -323,7 +323,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                             Padding = new MarginPadding { Horizontal = OsuScreen.HORIZONTAL_OVERFLOW_PADDING },
                                             Children = new Drawable[]
                                             {
-                                                ApplyButton = new CreateOrUpdateButton
+                                                ApplyButton = new CreateOrUpdateButton(room)
                                                 {
                                                     Anchor = Anchor.BottomCentre,
                                                     Origin = Anchor.BottomCentre,
@@ -471,19 +471,24 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
         public partial class CreateOrUpdateButton : RoundedButton
         {
-            [Resolved(typeof(Room), nameof(Room.RoomID))]
-            private Bindable<long?> roomId { get; set; } = null!;
+            private readonly Room room;
 
-            protected override void LoadComplete()
+            public CreateOrUpdateButton(Room room)
             {
-                base.LoadComplete();
-                roomId.BindValueChanged(id => Text = id.NewValue == null ? "Create" : "Update", true);
+                this.room = room;
             }
 
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
                 BackgroundColour = colours.YellowDark;
+            }
+
+            protected override void Update()
+            {
+                base.Update();
+
+                Text = room.RoomID == null ? "Create" : "Update";
             }
         }
 
