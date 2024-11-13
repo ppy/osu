@@ -76,7 +76,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         createLoungeRoom(new Room
                         {
                             Name = "Multiplayer room",
-                            Status = { Value = new RoomStatusOpen() },
+                            Status = new RoomStatusOpen(),
                             EndDate = { Value = DateTimeOffset.Now.AddDays(1) },
                             Type = MatchType.HeadToHead,
                             Playlist = { item1 },
@@ -85,7 +85,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         createLoungeRoom(new Room
                         {
                             Name = "Private room",
-                            Status = { Value = new RoomStatusOpenPrivate() },
+                            Status = new RoomStatusOpenPrivate(),
                             HasPassword = { Value = true },
                             EndDate = { Value = DateTimeOffset.Now.AddDays(1) },
                             Type = MatchType.HeadToHead,
@@ -95,7 +95,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         createLoungeRoom(new Room
                         {
                             Name = "Playlist room with multiple beatmaps",
-                            Status = { Value = new RoomStatusPlaying() },
+                            Status = new RoomStatusPlaying(),
                             EndDate = { Value = DateTimeOffset.Now.AddDays(1) },
                             Playlist = { item1, item2 },
                             CurrentPlaylistItem = item1
@@ -103,19 +103,19 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         createLoungeRoom(new Room
                         {
                             Name = "Finished room",
-                            Status = { Value = new RoomStatusEnded() },
+                            Status = new RoomStatusEnded(),
                             EndDate = { Value = DateTimeOffset.Now },
                         }),
                         createLoungeRoom(new Room
                         {
                             Name = "Spotlight room",
-                            Status = { Value = new RoomStatusOpen() },
+                            Status = new RoomStatusOpen(),
                             Category = RoomCategory.Spotlight,
                         }),
                         createLoungeRoom(new Room
                         {
                             Name = "Featured artist room",
-                            Status = { Value = new RoomStatusOpen() },
+                            Status = new RoomStatusOpen(),
                             Category = RoomCategory.FeaturedArtist,
                         }),
                     }
@@ -136,7 +136,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("create room", () => Child = drawableRoom = createLoungeRoom(room = new Room
             {
                 Name = "Room with password",
-                Status = { Value = new RoomStatusOpen() },
+                Status = new RoomStatusOpen(),
                 Type = MatchType.HeadToHead,
             }));
 

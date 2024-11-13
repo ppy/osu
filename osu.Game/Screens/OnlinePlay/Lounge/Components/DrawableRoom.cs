@@ -159,7 +159,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                                                 Spacing = new Vector2(5),
                                                                 Children = new Drawable[]
                                                                 {
-                                                                    new RoomStatusPill
+                                                                    new RoomStatusPill(Room)
                                                                     {
                                                                         Anchor = Anchor.CentreLeft,
                                                                         Origin = Anchor.CentreLeft
