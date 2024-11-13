@@ -10,7 +10,7 @@ using osu.Game.IO.Serialization;
 namespace osu.Game.Online.Broadcasts
 {
     [JsonObject(MemberSerialization.OptIn)]
-    public abstract class GameStateBroadcaster : Component
+    public abstract partial class GameStateBroadcaster : Component
     {
         [JsonProperty]
         public abstract string Type { get; }
@@ -18,18 +18,21 @@ namespace osu.Game.Online.Broadcasts
         public abstract void Broadcast();
     }
 
-    public abstract class GameStateBroadcaster<T> : GameStateBroadcaster
+    public abstract partial class GameStateBroadcaster<T> : GameStateBroadcaster
     {
         [JsonProperty]
-        public abstract T Message { get; }
+        public abstract T? Message { get; }
 
         [Resolved]
-        private IGameStateBroadcastServer server { get; set; }
+        private IGameStateBroadcastServer server { get; set; } = null!;
 
         public sealed override void Broadcast()
         {
             if (!IsLoaded)
                 throw new InvalidOperationException(@"Broadcaster must be loaded before any broadcasts may be sent.");
+
+            if (Message == null)
+                return;
 
             Scheduler.AddOnce(() => server.Broadcast(this.Serialize()));
         }

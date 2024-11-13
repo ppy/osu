@@ -7,12 +7,12 @@ using osu.Game.Rulesets;
 
 namespace osu.Game.Online.Broadcasts
 {
-    public class RulesetStateBroadcaster : GameStateBroadcaster<RulesetInfo>
+    public partial class RulesetStateBroadcaster : GameStateBroadcaster<RulesetInfo>
     {
         public override string Type => @"Ruleset";
-        public override RulesetInfo Message => ruleset?.Value;
+        public override RulesetInfo Message => ruleset.Value;
 
-        private IBindable<RulesetInfo> ruleset;
+        private IBindable<RulesetInfo> ruleset = null!;
 
         [BackgroundDependencyLoader]
         private void load(IBindable<RulesetInfo> ruleset)

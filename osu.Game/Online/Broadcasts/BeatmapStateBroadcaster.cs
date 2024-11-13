@@ -7,11 +7,12 @@ using osu.Game.Beatmaps;
 
 namespace osu.Game.Online.Broadcasts
 {
-    public class BeatmapStateBroadcaster : GameStateBroadcaster<BeatmapInfo>
+    public partial class BeatmapStateBroadcaster : GameStateBroadcaster<BeatmapInfo>
     {
         public override string Type => @"Beatmap";
-        public override BeatmapInfo Message => beatmap?.Value.BeatmapInfo;
-        private IBindable<WorkingBeatmap> beatmap;
+        public override BeatmapInfo Message => beatmap.Value.BeatmapInfo;
+
+        private IBindable<WorkingBeatmap> beatmap = null!;
 
         [BackgroundDependencyLoader]
         private void load(IBindable<WorkingBeatmap> beatmap)
