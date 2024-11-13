@@ -523,7 +523,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("restart completed", () => getCurrentPlayer() != null && getCurrentPlayer() != previousPlayer);
             AddStep("release quick retry key", () => InputManager.ReleaseKey(Key.Tilde));
 
-            AddUntilStep("wait for player", () => getCurrentPlayer()?.LoadState == LoadState.Ready);
+            AddUntilStep("wait for player", () => getCurrentPlayer()?.LoadState >= LoadState.Ready);
 
             AddUntilStep("time reached zero", () => getCurrentPlayer()?.GameplayClockContainer.CurrentTime > 0);
             AddUntilStep("skip button not visible", () => !checkSkipButtonVisible());
