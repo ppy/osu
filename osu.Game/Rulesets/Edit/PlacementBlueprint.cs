@@ -7,7 +7,6 @@ using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Objects;
-using osuTK;
 using osuTK.Input;
 
 namespace osu.Game.Rulesets.Edit
@@ -15,7 +14,7 @@ namespace osu.Game.Rulesets.Edit
     /// <summary>
     /// A blueprint which governs the placement of something.
     /// </summary>
-    public abstract partial class PlacementBlueprint : CompositeDrawable, IKeyBindingHandler<GlobalAction>
+    public abstract partial class PlacementBlueprint : VisibilityContainer, IKeyBindingHandler<GlobalAction>
     {
         /// <summary>
         /// Whether the <see cref="HitObject"/> is currently mid-placement, but has not necessarily finished being placed.
@@ -31,12 +30,17 @@ namespace osu.Game.Rulesets.Edit
         /// </remarks>
         protected virtual bool IsValidForPlacement => true;
 
+        // the blueprint should still be considered for input even if it is hidden,
+        // especially when such input is the reason for making the blueprint become visible.
+        public override bool PropagatePositionalInputSubTree => true;
+        public override bool PropagateNonPositionalInputSubTree => true;
+
         protected PlacementBlueprint()
         {
             RelativeSizeAxes = Axes.Both;
 
-            // This is required to allow the blueprint's position to be updated via OnMouseMove/Handle
-            // on the same frame it is made visible via a PlacementState change.
+            // the blueprint should still be considered for input even if it is hidden,
+            // especially when such input is the reason for making the blueprint become visible.
             AlwaysPresent = true;
         }
 
@@ -104,8 +108,6 @@ namespace osu.Game.Rulesets.Edit
         {
         }
 
-        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
-
         protected override bool Handle(UIEvent e)
         {
             base.Handle(e);
@@ -126,6 +128,9 @@ namespace osu.Game.Rulesets.Edit
                     return false;
             }
         }
+
+        protected override void PopIn() => this.FadeIn();
+        protected override void PopOut() => this.FadeOut();
 
         public enum PlacementState
         {
