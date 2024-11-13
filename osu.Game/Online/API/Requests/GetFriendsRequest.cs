@@ -6,7 +6,7 @@ using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Online.API.Requests
 {
-    public class GetFriendsRequest : APIRequest<List<APIUser>>
+    public class GetFriendsRequest : APIRequest<List<APIRelation>>
     {
         protected override string Target => @"friends";
     }
