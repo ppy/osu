@@ -48,8 +48,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double sliderFactor = aimRating > 0 ? Math.Min(aimRating, aimRatingNoSliders) / aimRating : 1;
 
-            double aimDifficultyStrainCount = ((OsuStrainSkill)skills[0]).CountDifficultStrains();
-            double speedDifficultyStrainCount = ((OsuStrainSkill)skills[2]).CountDifficultStrains();
+            double aimDifficultyStrainCount = ((OsuStrainSkill)skills[0]).CountTopWeightedStrains();
+            double speedDifficultyStrainCount = ((OsuStrainSkill)skills[2]).CountTopWeightedStrains();
 
             if (mods.Any(m => m is OsuModTouchDevice))
             {
