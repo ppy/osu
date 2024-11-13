@@ -227,17 +227,20 @@ namespace osu.Game.Screens.Play.PlayerSettings
 
             if (autoAdjustBeatmapOffset.Value) //Enters this case if global setting is checked in Menu.
             {
-                if (hitEvents.Count >= 10) //Make sure that UR and hit error average are available.
+                if (hitEvents.Count >= 30) //Make sure that there is a minimum baseline of hits to make evaluation.
                 {
-                    Current.Value = unstableRate switch
+                    if (unstableRate >= unstablerate_threshold)
                     {
-                        >= unstablerate_threshold => lastPlayBeatmapOffset - (average * Math.Exp((double)(exponential_factor * (unstableRate - unstablerate_threshold)))),
+                        Current.Value = lastPlayBeatmapOffset - (average * Math.Exp((double)(exponential_factor * (unstableRate - unstablerate_threshold))));
                         // A visual explanation of what is calculated here can be found in discussion #30521
                         // A calculated offset which is achieved with low UR has higher impact than offset calculated with high UR.
                         // "average" will be scaled by a value between 1.0 and 0.0
-                        < unstablerate_threshold => lastPlayBeatmapOffset - average,
-                        _ => Current.Value
-                    };
+                    }
+
+                    if (unstableRate < unstablerate_threshold)
+                    {
+                        Current.Value = lastPlayBeatmapOffset - average;
+                    }
                 }
             }
 
