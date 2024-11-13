@@ -26,7 +26,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// </summary>
         protected virtual double ReducedStrainBaseline => 0.75;
 
-        protected List<double> ObjectStrains = new List<double>();
         protected double Difficulty;
 
         protected OsuStrainSkill(Mod[] mods)
@@ -61,27 +60,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             }
 
             return Difficulty;
-        }
-
-        /// <summary>
-        /// Returns the number of strains weighted against the top strain.
-        /// The result is scaled by clock rate as it affects the total number of strains.
-        /// </summary>
-        public double CountDifficultStrains()
-        {
-            if (Difficulty == 0)
-                return 0.0;
-
-            double consistentTopStrain = Difficulty / 10; // What would the top strain be if all strain values were identical
-            // Use a weighted sum of all strains. Constants are arbitrary and give nice values
-            return ObjectStrains.Sum(s => 1.1 / (1 + Math.Exp(-10 * (s / consistentTopStrain - 0.88))));
-        }
-
-        protected override double StrainValueAt(DifficultyHitObject current)
-        {
-            double strain = base.StrainValueAt(current);
-            ObjectStrains.Add(strain);
-            return strain;
         }
 
         public static double DifficultyToPerformance(double difficulty) => Math.Pow(5.0 * Math.Max(1.0, difficulty / 0.0675) - 4.0, 3.0) / 100000.0;
