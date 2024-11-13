@@ -86,7 +86,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         {
                             Name = "Private room",
                             Status = new RoomStatusOpenPrivate(),
-                            HasPassword = { Value = true },
+                            Password = "*",
                             EndDate = { Value = DateTimeOffset.Now.AddDays(1) },
                             Type = MatchType.HeadToHead,
                             Playlist = { item3 },
@@ -144,10 +144,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddAssert("password icon hidden", () => Precision.AlmostEquals(0, drawableRoom.ChildrenOfType<DrawableRoom.PasswordProtectedIcon>().Single().Alpha));
 
-            AddStep("set password", () => room.Password.Value = "password");
+            AddStep("set password", () => room.Password = "password");
             AddAssert("password icon visible", () => Precision.AlmostEquals(1, drawableRoom.ChildrenOfType<DrawableRoom.PasswordProtectedIcon>().Single().Alpha));
 
-            AddStep("unset password", () => room.Password.Value = string.Empty);
+            AddStep("unset password", () => room.Password = string.Empty);
             AddAssert("password icon hidden", () => Precision.AlmostEquals(0, drawableRoom.ChildrenOfType<DrawableRoom.PasswordProtectedIcon>().Single().Alpha));
         }
 

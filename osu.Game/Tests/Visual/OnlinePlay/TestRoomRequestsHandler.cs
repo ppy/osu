@@ -51,8 +51,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
                     var apiRoom = cloneRoom(createRoomRequest.Room);
 
                     // Passwords are explicitly not copied between rooms.
-                    apiRoom.HasPassword.Value = !string.IsNullOrEmpty(createRoomRequest.Room.Password.Value);
-                    apiRoom.Password.Value = createRoomRequest.Room.Password.Value;
+                    apiRoom.Password = createRoomRequest.Room.Password;
 
                     AddServerSideRoom(apiRoom, localUser);
 
@@ -66,7 +65,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
                 {
                     var room = ServerSideRooms.Single(r => r.RoomID == joinRoomRequest.Room.RoomID);
 
-                    if (joinRoomRequest.Password != room.Password.Value)
+                    if (joinRoomRequest.Password != room.Password)
                     {
                         joinRoomRequest.TriggerFailure(new InvalidOperationException("Invalid password."));
                         return true;
@@ -278,9 +277,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
             var responseRoom = cloneRoom(room);
 
             // Password is hidden from the response, and is only propagated via HasPassword.
-            bool hadPassword = responseRoom.HasPassword.Value;
-            responseRoom.Password.Value = null;
-            responseRoom.HasPassword.Value = hadPassword;
+            responseRoom.Password = responseRoom.HasPassword ? Guid.NewGuid().ToString() : null;
 
             if (!withParticipants)
                 responseRoom.RecentParticipants.Clear();

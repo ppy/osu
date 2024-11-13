@@ -184,7 +184,7 @@ namespace osu.Game.Online.Multiplayer
                 Debug.Assert(room.RoomID != null);
 
                 // Join the server-side room.
-                var joinedRoom = await JoinRoom(room.RoomID.Value, password ?? room.Password.Value).ConfigureAwait(false);
+                var joinedRoom = await JoinRoom(room.RoomID.Value, password ?? room.Password).ConfigureAwait(false);
                 Debug.Assert(joinedRoom != null);
 
                 // Populate users.
@@ -397,7 +397,7 @@ namespace osu.Game.Online.Multiplayer
                 switch (state)
                 {
                     case MultiplayerRoomState.Open:
-                        APIRoom.Status = APIRoom.HasPassword.Value ? new RoomStatusOpenPrivate() : new RoomStatusOpen();
+                        APIRoom.Status = APIRoom.HasPassword ? new RoomStatusOpenPrivate() : new RoomStatusOpen();
                         break;
 
                     case MultiplayerRoomState.Playing:
@@ -842,7 +842,7 @@ namespace osu.Game.Online.Multiplayer
             // Update a few properties of the room instantaneously.
             Room.Settings = settings;
             APIRoom.Name = Room.Settings.Name;
-            APIRoom.Password.Value = Room.Settings.Password;
+            APIRoom.Password = Room.Settings.Password;
             APIRoom.Status = string.IsNullOrEmpty(Room.Settings.Password) ? new RoomStatusOpen() : new RoomStatusOpenPrivate();
             APIRoom.Type = Room.Settings.MatchType;
             APIRoom.QueueMode = Room.Settings.QueueMode;

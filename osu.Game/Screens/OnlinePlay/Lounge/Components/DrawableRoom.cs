@@ -259,12 +259,10 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
                 wrapper.FadeInFromZero(200);
 
-                hasPassword.BindTo(Room.HasPassword);
-                hasPassword.BindValueChanged(v => passwordIcon.Alpha = v.NewValue ? 1 : 0, true);
-
                 updateRoomName();
                 updateRoomCategory();
                 updateRoomType();
+                updateRoomHasPassword();
             };
 
             SelectedItem.BindValueChanged(item => background.Beatmap.Value = item.NewValue?.Beatmap, true);
@@ -284,6 +282,10 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
                 case nameof(Room.Type):
                     updateRoomType();
+                    break;
+
+                case nameof(Room.HasPassword):
+                    updateRoomHasPassword();
                     break;
             }
         }
@@ -306,6 +308,12 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         {
             if (endDateInfo != null)
                 endDateInfo.Alpha = Room.Type == MatchType.Playlists ? 1 : 0;
+        }
+
+        private void updateRoomHasPassword()
+        {
+            if (passwordIcon != null)
+                passwordIcon.Alpha = Room.HasPassword ? 1 : 0;
         }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)

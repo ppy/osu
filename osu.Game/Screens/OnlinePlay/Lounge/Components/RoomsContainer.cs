@@ -101,10 +101,10 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                         return true;
 
                     case RoomPermissionsFilter.Public:
-                        return !room.Room.HasPassword.Value;
+                        return !room.Room.HasPassword;
 
                     case RoomPermissionsFilter.Private:
-                        return room.Room.HasPassword.Value;
+                        return room.Room.HasPassword;
 
                     default:
                         throw new ArgumentOutOfRangeException(nameof(accessType), accessType, $"Unsupported {nameof(RoomPermissionsFilter)} in filter");
