@@ -50,7 +50,7 @@ namespace osu.Game.Tests.Visual.DailyChallenge
                     }
                 },
                 EndDate = { Value = DateTimeOffset.Now.AddHours(12) },
-                Category = { Value = RoomCategory.DailyChallenge }
+                Category = RoomCategory.DailyChallenge
             };
 
             AddStep("add room", () => API.Perform(new CreateRoomRequest(room)));
@@ -73,7 +73,7 @@ namespace osu.Game.Tests.Visual.DailyChallenge
                     }
                 },
                 EndDate = { Value = DateTimeOffset.Now.AddHours(12) },
-                Category = { Value = RoomCategory.DailyChallenge }
+                Category = RoomCategory.DailyChallenge
             };
 
             AddStep("add room", () => API.Perform(new CreateRoomRequest(room)));
@@ -102,7 +102,7 @@ namespace osu.Game.Tests.Visual.DailyChallenge
                     }
                 },
                 EndDate = { Value = DateTimeOffset.Now.AddHours(12) },
-                Category = { Value = RoomCategory.DailyChallenge }
+                Category = RoomCategory.DailyChallenge
             };
 
             AddStep("add room", () => API.Perform(new CreateRoomRequest(room)));

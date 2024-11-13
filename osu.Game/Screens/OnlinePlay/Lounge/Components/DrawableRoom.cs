@@ -164,7 +164,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                                                         Anchor = Anchor.CentreLeft,
                                                                         Origin = Anchor.CentreLeft
                                                                     },
-                                                                    specialCategoryPill = new RoomSpecialCategoryPill
+                                                                    specialCategoryPill = new RoomSpecialCategoryPill(Room)
                                                                     {
                                                                         Anchor = Anchor.CentreLeft,
                                                                         Origin = Anchor.CentreLeft
@@ -259,15 +259,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
                 wrapper.FadeInFromZero(200);
 
-                roomCategory.BindTo(Room.Category);
-                roomCategory.BindValueChanged(c =>
-                {
-                    if (c.NewValue > RoomCategory.Normal)
-                        specialCategoryPill.Show();
-                    else
-                        specialCategoryPill.Hide();
-                }, true);
-
                 roomType.BindTo(Room.Type);
                 roomType.BindValueChanged(t =>
                 {
@@ -278,6 +269,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 hasPassword.BindValueChanged(v => passwordIcon.Alpha = v.NewValue ? 1 : 0, true);
 
                 updateRoomName();
+                updateRoomCategory();
             };
 
             SelectedItem.BindValueChanged(item => background.Beatmap.Value = item.NewValue?.Beatmap, true);
@@ -285,14 +277,30 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
         private void onRoomPropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(Room.Name))
-                updateRoomName();
+            switch (e.PropertyName)
+            {
+                case nameof(Room.Name):
+                    updateRoomName();
+                    break;
+
+                case nameof(Room.Category):
+                    updateRoomCategory();
+                    break;
+            }
         }
 
         private void updateRoomName()
         {
             if (roomName != null)
                 roomName.Text = Room.Name;
+        }
+
+        private void updateRoomCategory()
+        {
+            if (Room.Category > RoomCategory.Normal)
+                specialCategoryPill?.Show();
+            else
+                specialCategoryPill?.Hide();
         }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)

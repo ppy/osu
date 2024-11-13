@@ -32,9 +32,6 @@ namespace osu.Game.Screens.OnlinePlay
         protected Bindable<Room.RoomDifficultyRange> DifficultyRange { get; private set; } = null!;
 
         [Resolved(typeof(Room))]
-        protected Bindable<RoomCategory> Category { get; private set; } = null!;
-
-        [Resolved(typeof(Room))]
         protected BindableList<APIUser> RecentParticipants { get; private set; } = null!;
 
         [Resolved(typeof(Room))]

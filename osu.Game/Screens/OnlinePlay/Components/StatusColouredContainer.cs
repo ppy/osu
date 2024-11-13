@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -17,13 +15,13 @@ namespace osu.Game.Screens.OnlinePlay.Components
         private readonly double transitionDuration;
 
         [Resolved(typeof(Room), nameof(Room.Status))]
-        private Bindable<RoomStatus> status { get; set; }
+        private Bindable<RoomStatus> status { get; set; } = null!;
 
-        [Resolved(typeof(Room), nameof(Room.Category))]
-        private Bindable<RoomCategory> category { get; set; }
+        private readonly Room room;
 
-        public StatusColouredContainer(double transitionDuration = 100)
+        public StatusColouredContainer(Room room, double transitionDuration = 100)
         {
+            this.room = room;
             this.transitionDuration = transitionDuration;
         }
 
@@ -32,7 +30,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
         {
             status.BindValueChanged(s =>
             {
-                this.FadeColour(colours.ForRoomCategory(category.Value) ?? s.NewValue.GetAppropriateColour(colours), transitionDuration);
+                this.FadeColour(colours.ForRoomCategory(room.Category) ?? s.NewValue.GetAppropriateColour(colours), transitionDuration);
             }, true);
         }
     }

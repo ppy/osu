@@ -110,13 +110,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         {
                             Name = "Spotlight room",
                             Status = { Value = new RoomStatusOpen() },
-                            Category = { Value = RoomCategory.Spotlight },
+                            Category = RoomCategory.Spotlight,
                         }),
                         createLoungeRoom(new Room
                         {
                             Name = "Featured artist room",
                             Status = { Value = new RoomStatusOpen() },
-                            Category = { Value = RoomCategory.FeaturedArtist },
+                            Category = RoomCategory.FeaturedArtist,
                         }),
                     }
                 };
