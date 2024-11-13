@@ -12,11 +12,11 @@ using osu.Game.Online.Broadcasts;
 namespace osu.Desktop.WebSockets
 {
     [Cached(typeof(IGameStateBroadcastServer))]
-    public class GameStateBroadcastServer : WebSocketServer, IGameStateBroadcastServer
+    public partial class GameStateBroadcastServer : WebSocketServer, IGameStateBroadcastServer
     {
         public override string Endpoint => @"state";
 
-        private Bindable<bool> enabled;
+        private Bindable<bool> enabled = null!;
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
@@ -31,11 +31,11 @@ namespace osu.Desktop.WebSockets
 
             if (e.NewValue)
             {
-                Task.Run(() => Start()).ContinueWith(t => enabled.Disabled = false);
+                Task.Run(Start).ContinueWith(t => enabled.Disabled = false);
             }
             else
             {
-                Task.Run(() => Close()).ContinueWith(t => enabled.Disabled = false);
+                Task.Run(Stop).ContinueWith(t => enabled.Disabled = false);
             }
         }
 
@@ -46,7 +46,7 @@ namespace osu.Desktop.WebSockets
             => AddRangeInternal(broadcasters);
 
         public void Remove(GameStateBroadcaster broadcaster)
-            => RemoveInternal(broadcaster);
+            => RemoveInternal(broadcaster, true);
 
         protected override void OnConnectionReady(WebSocketConnection connection)
         {
