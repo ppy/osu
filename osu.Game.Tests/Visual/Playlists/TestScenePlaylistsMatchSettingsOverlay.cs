@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using NUnit.Framework;
 using osu.Framework.Bindables;
@@ -22,7 +20,7 @@ namespace osu.Game.Tests.Visual.Playlists
     {
         protected new TestRoomManager RoomManager => (TestRoomManager)base.RoomManager;
 
-        private TestRoomSettings settings;
+        private TestRoomSettings settings = null!;
 
         protected override OnlinePlayTestSceneDependencies CreateOnlinePlayDependencies() => new TestDependencies();
 
@@ -47,19 +45,19 @@ namespace osu.Game.Tests.Visual.Playlists
         {
             AddStep("clear name and beatmap", () =>
             {
-                SelectedRoom.Value.Name.Value = "";
+                SelectedRoom.Value.Name = "";
                 SelectedRoom.Value.Playlist.Clear();
             });
 
             AddAssert("button disabled", () => !settings.ApplyButton.Enabled.Value);
 
-            AddStep("set name", () => SelectedRoom.Value.Name.Value = "Room name");
+            AddStep("set name", () => SelectedRoom.Value.Name = "Room name");
             AddAssert("button disabled", () => !settings.ApplyButton.Enabled.Value);
 
             AddStep("set beatmap", () => SelectedRoom.Value.Playlist.Add(new PlaylistItem(CreateBeatmap(Ruleset.Value).BeatmapInfo)));
             AddAssert("button enabled", () => settings.ApplyButton.Enabled.Value);
 
-            AddStep("clear name", () => SelectedRoom.Value.Name.Value = "");
+            AddStep("clear name", () => SelectedRoom.Value.Name = "");
             AddAssert("button disabled", () => !settings.ApplyButton.Enabled.Value);
         }
 
@@ -69,7 +67,7 @@ namespace osu.Game.Tests.Visual.Playlists
             const string expected_name = "expected name";
             TimeSpan expectedDuration = TimeSpan.FromMinutes(15);
 
-            Room createdRoom = null;
+            Room createdRoom = null!;
 
             AddStep("setup", () =>
             {
@@ -85,7 +83,7 @@ namespace osu.Game.Tests.Visual.Playlists
             });
 
             AddStep("create room", () => settings.ApplyButton.Action.Invoke());
-            AddAssert("has correct name", () => createdRoom.Name.Value == expected_name);
+            AddAssert("has correct name", () => createdRoom.Name == expected_name);
             AddAssert("has correct duration", () => createdRoom.Duration.Value == expectedDuration);
         }
 
@@ -94,13 +92,13 @@ namespace osu.Game.Tests.Visual.Playlists
         {
             const string not_found_prefix = "beatmaps not found:";
 
-            string errorMessage = null;
+            string errorMessage = null!;
 
             AddStep("setup", () =>
             {
                 var beatmap = CreateBeatmap(Ruleset.Value).BeatmapInfo;
 
-                SelectedRoom.Value.Name.Value = "Test Room";
+                SelectedRoom.Value.Name = "Test Room";
                 SelectedRoom.Value.Playlist.Add(new PlaylistItem(beatmap));
 
                 errorMessage = $"{not_found_prefix} {beatmap.OnlineID}";
@@ -127,7 +125,7 @@ namespace osu.Game.Tests.Visual.Playlists
 
             AddStep("setup", () =>
             {
-                SelectedRoom.Value.Name.Value = "Test Room";
+                SelectedRoom.Value.Name = "Test Room";
                 SelectedRoom.Value.Playlist.Add(new PlaylistItem(CreateBeatmap(Ruleset.Value).BeatmapInfo));
 
                 RoomManager.CreateRequested = _ => failText;
@@ -169,7 +167,7 @@ namespace osu.Game.Tests.Visual.Playlists
 
         protected class TestRoomManager : IRoomManager
         {
-            public Func<Room, string> CreateRequested;
+            public Func<Room, string>? CreateRequested;
 
             public event Action RoomsUpdated
             {
@@ -187,7 +185,7 @@ namespace osu.Game.Tests.Visual.Playlists
 
             public void ClearRooms() => throw new NotImplementedException();
 
-            public void CreateRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null)
+            public void CreateRoom(Room room, Action<Room>? onSuccess = null, Action<string>? onError = null)
             {
                 if (CreateRequested == null)
                     return;
@@ -200,7 +198,7 @@ namespace osu.Game.Tests.Visual.Playlists
                     onSuccess?.Invoke(room);
             }
 
-            public void JoinRoom(Room room, string password, Action<Room> onSuccess = null, Action<string> onError = null) => throw new NotImplementedException();
+            public void JoinRoom(Room room, string? password, Action<Room>? onSuccess = null, Action<string>? onError = null) => throw new NotImplementedException();
 
             public void PartRoom() => throw new NotImplementedException();
         }

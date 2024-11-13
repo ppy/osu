@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Threading;
 using osu.Framework.Allocation;
@@ -26,6 +27,7 @@ using osu.Game.Overlays;
 using osu.Game.Screens.OnlinePlay.Components;
 using osuTK;
 using osuTK.Graphics;
+using Container = osu.Framework.Graphics.Containers.Container;
 
 namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 {
@@ -47,6 +49,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         private RoomSpecialCategoryPill? specialCategoryPill;
         private PasswordProtectedIcon? passwordIcon;
         private EndDateInfo? endDateInfo;
+        private SpriteText? roomName;
         private UpdateableBeatmapBackgroundSprite background = null!;
         private DelayedLoadWrapper wrapper = null!;
 
@@ -181,11 +184,10 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                                                 Direction = FillDirection.Vertical,
                                                                 Children = new Drawable[]
                                                                 {
-                                                                    new TruncatingSpriteText
+                                                                    roomName = new TruncatingSpriteText
                                                                     {
                                                                         RelativeSizeAxes = Axes.X,
-                                                                        Font = OsuFont.GetFont(size: 28),
-                                                                        Current = { BindTarget = Room.Name }
+                                                                        Font = OsuFont.GetFont(size: 28)
                                                                     },
                                                                     new RoomStatusText
                                                                     {
@@ -247,6 +249,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         {
             base.LoadComplete();
 
+            Room.PropertyChanged += onRoomPropertyChanged;
+
             wrapper.DelayedLoadComplete += _ =>
             {
                 Debug.Assert(specialCategoryPill != null);
@@ -272,9 +276,23 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
                 hasPassword.BindTo(Room.HasPassword);
                 hasPassword.BindValueChanged(v => passwordIcon.Alpha = v.NewValue ? 1 : 0, true);
+
+                updateRoomName();
             };
 
             SelectedItem.BindValueChanged(item => background.Beatmap.Value = item.NewValue?.Beatmap, true);
+        }
+
+        private void onRoomPropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(Room.Name))
+                updateRoomName();
+        }
+
+        private void updateRoomName()
+        {
+            if (roomName != null)
+                roomName.Text = Room.Name;
         }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
@@ -330,6 +348,12 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             });
 
             return pills;
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            Room.PropertyChanged -= onRoomPropertyChanged;
         }
 
         private partial class RoomStatusText : OnlinePlayComposite

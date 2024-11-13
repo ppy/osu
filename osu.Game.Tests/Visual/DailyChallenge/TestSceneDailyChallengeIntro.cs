@@ -69,7 +69,7 @@ namespace osu.Game.Tests.Visual.DailyChallenge
                 API.Perform(new CreateRoomRequest(room = new Room
                 {
                     RoomID = roomId,
-                    Name = { Value = "Daily Challenge: June 4, 2024" },
+                    Name = "Daily Challenge: June 4, 2024",
                     Playlist =
                     {
                         new PlaylistItem(CreateAPIBeatmap(new OsuRuleset().RulesetInfo))

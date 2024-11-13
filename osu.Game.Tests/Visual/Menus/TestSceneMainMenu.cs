@@ -43,7 +43,7 @@ namespace osu.Game.Tests.Visual.Menus
                         getRoomRequest.TriggerSuccess(new Room
                         {
                             RoomID = 1234,
-                            Name = { Value = "Aug 8, 2024" },
+                            Name = "Aug 8, 2024",
                             Playlist =
                             {
                                 new PlaylistItem(beatmap)

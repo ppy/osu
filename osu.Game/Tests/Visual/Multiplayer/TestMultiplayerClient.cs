@@ -230,7 +230,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 Settings =
                 {
-                    Name = ServerAPIRoom.Name.Value,
+                    Name = ServerAPIRoom.Name,
                     MatchType = ServerAPIRoom.Type.Value,
                     Password = password ?? string.Empty,
                     QueueMode = ServerAPIRoom.QueueMode.Value,

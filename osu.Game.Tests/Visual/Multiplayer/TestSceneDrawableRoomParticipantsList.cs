@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
@@ -17,7 +15,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public partial class TestSceneDrawableRoomParticipantsList : OnlinePlayTestScene
     {
-        private DrawableRoomParticipantsList list;
+        private DrawableRoomParticipantsList list = null!;
 
         public override void SetUpSteps()
         {
@@ -27,7 +25,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 SelectedRoom.Value = new Room
                 {
-                    Name = { Value = "test room" },
+                    Name = "test room",
                     Host =
                     {
                         Value = new APIUser

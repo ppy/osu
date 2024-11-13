@@ -122,7 +122,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
             }
             catch (Exception ex)
             {
-                Logger.Error(ex, $"Failed to update room: {room.Name.Value}.");
+                Logger.Error(ex, $"Failed to update room: {room.Name}.");
 
                 ignoredRooms.Add(room.RoomID.Value);
                 rooms.Remove(room);

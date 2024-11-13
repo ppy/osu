@@ -459,7 +459,7 @@ namespace osu.Game.Online.Multiplayer
             if (apiUser == null || apiRoom == null) return;
 
             PostNotification?.Invoke(
-                new UserAvatarNotification(apiUser, NotificationsStrings.InvitedYouToTheMultiplayer(apiUser.Username, apiRoom.Name.Value))
+                new UserAvatarNotification(apiUser, NotificationsStrings.InvitedYouToTheMultiplayer(apiUser.Username, apiRoom.Name))
                 {
                     Activated = () =>
                     {
@@ -841,7 +841,7 @@ namespace osu.Game.Online.Multiplayer
 
             // Update a few properties of the room instantaneously.
             Room.Settings = settings;
-            APIRoom.Name.Value = Room.Settings.Name;
+            APIRoom.Name = Room.Settings.Name;
             APIRoom.Password.Value = Room.Settings.Password;
             APIRoom.Status.Value = string.IsNullOrEmpty(Room.Settings.Password) ? new RoomStatusOpen() : new RoomStatusOpenPrivate();
             APIRoom.Type.Value = Room.Settings.MatchType;

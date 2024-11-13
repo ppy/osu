@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Linq;
 using NUnit.Framework;
@@ -32,12 +30,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Cached]
         protected readonly OverlayColourProvider ColourProvider = new OverlayColourProvider(OverlayColourScheme.Plum);
 
-        private readonly Bindable<Room> selectedRoom = new Bindable<Room>();
+        private readonly Bindable<Room?> selectedRoom = new Bindable<Room?>();
 
         [Test]
         public void TestMultipleStatuses()
         {
-            FillFlowContainer rooms = null;
+            FillFlowContainer rooms = null!;
 
             AddStep("create rooms", () =>
             {
@@ -77,7 +75,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     {
                         createLoungeRoom(new Room
                         {
-                            Name = { Value = "Multiplayer room" },
+                            Name = "Multiplayer room",
                             Status = { Value = new RoomStatusOpen() },
                             EndDate = { Value = DateTimeOffset.Now.AddDays(1) },
                             Type = { Value = MatchType.HeadToHead },
@@ -86,7 +84,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         }),
                         createLoungeRoom(new Room
                         {
-                            Name = { Value = "Private room" },
+                            Name = "Private room",
                             Status = { Value = new RoomStatusOpenPrivate() },
                             HasPassword = { Value = true },
                             EndDate = { Value = DateTimeOffset.Now.AddDays(1) },
@@ -96,7 +94,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         }),
                         createLoungeRoom(new Room
                         {
-                            Name = { Value = "Playlist room with multiple beatmaps" },
+                            Name = "Playlist room with multiple beatmaps",
                             Status = { Value = new RoomStatusPlaying() },
                             EndDate = { Value = DateTimeOffset.Now.AddDays(1) },
                             Playlist = { item1, item2 },
@@ -104,19 +102,19 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         }),
                         createLoungeRoom(new Room
                         {
-                            Name = { Value = "Finished room" },
+                            Name = "Finished room",
                             Status = { Value = new RoomStatusEnded() },
                             EndDate = { Value = DateTimeOffset.Now },
                         }),
                         createLoungeRoom(new Room
                         {
-                            Name = { Value = "Spotlight room" },
+                            Name = "Spotlight room",
                             Status = { Value = new RoomStatusOpen() },
                             Category = { Value = RoomCategory.Spotlight },
                         }),
                         createLoungeRoom(new Room
                         {
-                            Name = { Value = "Featured artist room" },
+                            Name = "Featured artist room",
                             Status = { Value = new RoomStatusOpen() },
                             Category = { Value = RoomCategory.FeaturedArtist },
                         }),
@@ -132,12 +130,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestEnableAndDisablePassword()
         {
-            DrawableRoom drawableRoom = null;
-            Room room = null;
+            DrawableRoom drawableRoom = null!;
+            Room room = null!;
 
             AddStep("create room", () => Child = drawableRoom = createLoungeRoom(room = new Room
             {
-                Name = { Value = "Room with password" },
+                Name = "Room with password",
                 Status = { Value = new RoomStatusOpen() },
                 Type = { Value = MatchType.HeadToHead },
             }));
@@ -166,30 +164,30 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 {
                     new DrawableMatchRoom(new Room
                     {
-                        Name = { Value = "A host-only room" },
+                        Name = "A host-only room",
                         QueueMode = { Value = QueueMode.HostOnly },
                         Type = { Value = MatchType.HeadToHead },
                     })
                     {
-                        SelectedItem = new Bindable<PlaylistItem>()
+                        SelectedItem = new Bindable<PlaylistItem?>()
                     },
                     new DrawableMatchRoom(new Room
                     {
-                        Name = { Value = "An all-players, team-versus room" },
+                        Name = "An all-players, team-versus room",
                         QueueMode = { Value = QueueMode.AllPlayers },
                         Type = { Value = MatchType.TeamVersus }
                     })
                     {
-                        SelectedItem = new Bindable<PlaylistItem>()
+                        SelectedItem = new Bindable<PlaylistItem?>()
                     },
                     new DrawableMatchRoom(new Room
                     {
-                        Name = { Value = "A round-robin room" },
+                        Name = "A round-robin room",
                         QueueMode = { Value = QueueMode.AllPlayersRoundRobin },
                         Type = { Value = MatchType.HeadToHead }
                     })
                     {
-                        SelectedItem = new Bindable<PlaylistItem>()
+                        SelectedItem = new Bindable<PlaylistItem?>()
                     },
                 }
             });

@@ -31,6 +31,15 @@ namespace osu.Game.Online.Rooms
         }
 
         /// <summary>
+        /// The room name.
+        /// </summary>
+        public string Name
+        {
+            get => name;
+            set => SetField(ref name, value);
+        }
+
+        /// <summary>
         /// Represents the current item selected within the room.
         /// </summary>
         /// <remarks>
@@ -45,12 +54,11 @@ namespace osu.Game.Online.Rooms
         [JsonProperty("id")]
         private long? roomId;
 
+        [JsonProperty("name")]
+        private string name = string.Empty;
+
         [JsonProperty("current_playlist_item")]
         private PlaylistItem? currentPlaylistItem;
-
-        [Cached]
-        [JsonProperty("name")]
-        public readonly Bindable<string> Name = new Bindable<string>();
 
         [Cached]
         [JsonProperty("host")]
@@ -205,7 +213,7 @@ namespace osu.Game.Online.Rooms
         public void CopyFrom(Room other)
         {
             RoomID = other.RoomID;
-            Name.Value = other.Name.Value;
+            Name = other.Name;
 
             Category.Value = other.Category.Value;
 

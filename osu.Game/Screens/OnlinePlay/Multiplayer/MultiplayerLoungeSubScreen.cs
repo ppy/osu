@@ -73,7 +73,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         protected override Room CreateNewRoom() => new Room
         {
-            Name = { Value = $"{api.LocalUser}'s awesome room" },
+            Name = $"{api.LocalUser}'s awesome room",
             Type = { Value = MatchType.HeadToHead },
         };
 

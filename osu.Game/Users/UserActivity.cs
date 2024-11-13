@@ -249,7 +249,7 @@ namespace osu.Game.Users
             public InLobby(Room room)
             {
                 RoomID = room.RoomID ?? -1;
-                RoomName = room.Name.Value;
+                RoomName = room.Name;
             }
 
             [SerializationConstructor]
