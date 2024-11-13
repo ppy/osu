@@ -181,10 +181,10 @@ namespace osu.Game.Online.Multiplayer
 
             await joinOrLeaveTaskChain.Add(async () =>
             {
-                Debug.Assert(room.RoomID.Value != null);
+                Debug.Assert(room.RoomID != null);
 
                 // Join the server-side room.
-                var joinedRoom = await JoinRoom(room.RoomID.Value.Value, password ?? room.Password.Value).ConfigureAwait(false);
+                var joinedRoom = await JoinRoom(room.RoomID.Value, password ?? room.Password.Value).ConfigureAwait(false);
                 Debug.Assert(joinedRoom != null);
 
                 // Populate users.

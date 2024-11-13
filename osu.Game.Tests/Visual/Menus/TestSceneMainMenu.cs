@@ -42,7 +42,7 @@ namespace osu.Game.Tests.Visual.Menus
                         beatmap.OnlineID = 1001;
                         getRoomRequest.TriggerSuccess(new Room
                         {
-                            RoomID = { Value = 1234 },
+                            RoomID = 1234,
                             Name = { Value = "Aug 8, 2024" },
                             Playlist =
                             {

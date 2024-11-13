@@ -54,7 +54,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         public MultiplayerMatchSubScreen(Room room)
             : base(room)
         {
-            Title = room.RoomID.Value == null ? "New room" : room.Name.Value;
+            Title = room.RoomID == null ? "New room" : room.Name.Value;
             Activity.Value = new UserActivity.InLobby(room);
         }
 

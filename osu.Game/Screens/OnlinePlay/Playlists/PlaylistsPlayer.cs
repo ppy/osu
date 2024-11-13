@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Diagnostics;
 using System.Linq;
@@ -21,11 +19,11 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 {
     public partial class PlaylistsPlayer : RoomSubmittingPlayer
     {
-        public Action Exited;
+        public Action? Exited;
 
         protected override UserActivity InitialActivity => new UserActivity.InPlaylistGame(Beatmap.Value.BeatmapInfo, Ruleset.Value);
 
-        public PlaylistsPlayer(Room room, PlaylistItem playlistItem, PlayerConfiguration configuration = null)
+        public PlaylistsPlayer(Room room, PlaylistItem playlistItem, PlayerConfiguration? configuration = null)
             : base(room, playlistItem, configuration)
         {
         }
@@ -57,8 +55,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
         protected override ResultsScreen CreateResults(ScoreInfo score)
         {
-            Debug.Assert(Room.RoomID.Value != null);
-            return new PlaylistItemUserResultsScreen(score, Room.RoomID.Value.Value, PlaylistItem)
+            Debug.Assert(Room.RoomID != null);
+            return new PlaylistItemUserResultsScreen(score, Room.RoomID.Value, PlaylistItem)
             {
                 AllowRetry = true,
                 ShowUserStatistics = true,

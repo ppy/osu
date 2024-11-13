@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Threading.Tasks;
 using osu.Game.Online.Rooms;
 
@@ -20,21 +18,21 @@ namespace osu.Game.Screens.OnlinePlay.Components
             this.room = room;
         }
 
-        private GetRoomRequest lastPollRequest;
+        private GetRoomRequest? lastPollRequest;
 
         protected override Task Poll()
         {
             if (!API.IsLoggedIn)
                 return base.Poll();
 
-            if (room.RoomID.Value == null)
+            if (room.RoomID == null)
                 return base.Poll();
 
             var tcs = new TaskCompletionSource<bool>();
 
             lastPollRequest?.Cancel();
 
-            var req = new GetRoomRequest(room.RoomID.Value.Value);
+            var req = new GetRoomRequest(room.RoomID.Value);
 
             req.Success += result =>
             {

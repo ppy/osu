@@ -64,7 +64,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
 
                 case JoinRoomRequest joinRoomRequest:
                 {
-                    var room = ServerSideRooms.Single(r => r.RoomID.Value == joinRoomRequest.Room.RoomID.Value);
+                    var room = ServerSideRooms.Single(r => r.RoomID == joinRoomRequest.Room.RoomID);
 
                     if (joinRoomRequest.Password != room.Password.Value)
                     {
@@ -162,7 +162,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
                     return true;
 
                 case GetRoomRequest getRoomRequest:
-                    getRoomRequest.TriggerSuccess(createResponseRoom(ServerSideRooms.Single(r => r.RoomID.Value == getRoomRequest.RoomId), true));
+                    getRoomRequest.TriggerSuccess(createResponseRoom(ServerSideRooms.Single(r => r.RoomID == getRoomRequest.RoomId), true));
                     return true;
 
                 case CreateRoomScoreRequest createRoomScoreRequest:
@@ -261,7 +261,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
         /// <param name="host">The room host.</param>
         public void AddServerSideRoom(Room room, APIUser host)
         {
-            room.RoomID.Value ??= currentRoomId++;
+            room.RoomID ??= currentRoomId++;
             room.Host.Value = host;
 
             for (int i = 0; i < room.Playlist.Count; i++)
