@@ -1,9 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Specialized;
+using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -165,12 +164,11 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         {
             base.LoadComplete();
 
-            RecentParticipants.BindCollectionChanged(onParticipantsChanged, true);
-
             room.PropertyChanged += onRoomPropertyChanged;
 
             updateRoomHost();
             updateRoomParticipantCount();
+            updateRoomParticipants();
         }
 
         private int numberOfCircles = 4;
@@ -190,43 +188,38 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
                 // Reinitialising the list looks janky, but this is unlikely to be used in a setting where it's visible.
                 clearUsers();
-                foreach (var u in RecentParticipants)
+                foreach (var u in room.RecentParticipants)
                     addUser(u);
 
                 updateHiddenUsers();
             }
         }
 
-        private void onParticipantsChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        private void updateRoomParticipants()
         {
-            switch (e.Action)
+            HashSet<APIUser> newUsers = room.RecentParticipants.ToHashSet();
+
+            avatarFlow.RemoveAll(a =>
             {
-                case NotifyCollectionChangedAction.Add:
-                    Debug.Assert(e.NewItems != null);
+                // Avatar with no user. Really shouldn't ever be the case but asserting it correctly is difficult.
+                if (a.User == null)
+                    return false;
 
-                    foreach (var added in e.NewItems.OfType<APIUser>())
-                        addUser(added);
-                    break;
+                // User was previously and still is a participant. Keep them around but remove them from the new set.
+                // This will be useful when we add all remaining users (now just the new participants) to the flow.
+                if (newUsers.Contains(a.User))
+                {
+                    newUsers.Remove(a.User);
+                    return false;
+                }
 
-                case NotifyCollectionChangedAction.Remove:
-                    Debug.Assert(e.OldItems != null);
+                // User is no longer a participant. Remove them from the flow.
+                return true;
+            }, true);
 
-                    foreach (var removed in e.OldItems.OfType<APIUser>())
-                        removeUser(removed);
-                    break;
-
-                case NotifyCollectionChangedAction.Reset:
-                    clearUsers();
-                    break;
-
-                case NotifyCollectionChangedAction.Replace:
-                case NotifyCollectionChangedAction.Move:
-                    // Easiest is to just reinitialise the whole list. These are unlikely to ever be use cases.
-                    clearUsers();
-                    foreach (var u in RecentParticipants)
-                        addUser(u);
-                    break;
-            }
+            // Add all remaining users to the flow.
+            foreach (var u in newUsers)
+                addUser(u);
 
             updateHiddenUsers();
         }
@@ -239,11 +232,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 avatarFlow.Add(new CircularAvatar { User = user });
         }
 
-        private void removeUser(APIUser user)
-        {
-            avatarFlow.RemoveAll(a => a.User == user, true);
-        }
-
         private void clearUsers()
         {
             avatarFlow.Clear();
@@ -253,7 +241,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         private void updateHiddenUsers()
         {
             int hiddenCount = 0;
-            if (RecentParticipants.Count > NumberOfCircles)
+            if (room.RecentParticipants.Count > NumberOfCircles)
                 hiddenCount = room.ParticipantCount - NumberOfCircles + 1;
 
             hiddenUsers.Count = hiddenCount;
@@ -262,7 +250,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 avatarFlow.Remove(avatarFlow.Last(), true);
             else if (displayedCircles < NumberOfCircles)
             {
-                var nextUser = RecentParticipants.FirstOrDefault(u => avatarFlow.All(a => a.User != u));
+                var nextUser = room.RecentParticipants.FirstOrDefault(u => avatarFlow.All(a => a.User != u));
                 if (nextUser != null) addUser(nextUser);
             }
         }
@@ -277,6 +265,10 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
                 case nameof(Room.ParticipantCount):
                     updateRoomParticipantCount();
+                    break;
+
+                case nameof(Room.RecentParticipants):
+                    updateRoomParticipants();
                     break;
             }
         }

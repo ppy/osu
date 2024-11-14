@@ -138,17 +138,17 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private void addUser(int id)
         {
-            SelectedRoom.Value.RecentParticipants.Add(new APIUser
+            SelectedRoom.Value.RecentParticipants = SelectedRoom.Value.RecentParticipants.Append(new APIUser
             {
                 Id = id,
                 Username = $"User {id}"
-            });
+            }).ToArray();
             SelectedRoom.Value.ParticipantCount++;
         }
 
         private void removeUserAt(int index)
         {
-            SelectedRoom.Value.RecentParticipants.RemoveAt(index);
+            SelectedRoom.Value.RecentParticipants = SelectedRoom.Value.RecentParticipants.Where(u => !u.Equals(SelectedRoom.Value.RecentParticipants[index])).ToArray();
             SelectedRoom.Value.ParticipantCount--;
         }
     }

@@ -199,11 +199,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             if (room.RecentParticipants.Count == 0)
             {
-                room.RecentParticipants.AddRange(Enumerable.Range(0, 20).Select(i => new APIUser
+                room.RecentParticipants = Enumerable.Range(0, 20).Select(i => new APIUser
                 {
                     Id = i,
                     Username = $"User {i}"
-                }));
+                }).ToArray();
             }
 
             return new DrawableLoungeRoom(room)

@@ -4,7 +4,6 @@
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
 
 namespace osu.Game.Screens.OnlinePlay
@@ -16,8 +15,5 @@ namespace osu.Game.Screens.OnlinePlay
     {
         [Resolved(typeof(Room))]
         protected BindableList<PlaylistItem> Playlist { get; private set; } = null!;
-
-        [Resolved(typeof(Room))]
-        protected BindableList<APIUser> RecentParticipants { get; private set; } = null!;
     }
 }

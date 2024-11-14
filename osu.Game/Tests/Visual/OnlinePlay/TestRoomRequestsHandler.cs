@@ -280,7 +280,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
             responseRoom.Password = responseRoom.HasPassword ? Guid.NewGuid().ToString() : null;
 
             if (!withParticipants)
-                responseRoom.RecentParticipants.Clear();
+                responseRoom.RecentParticipants = [];
 
             return responseRoom;
         }
