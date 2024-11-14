@@ -594,7 +594,7 @@ namespace osu.Game.Screens.Play
         /// This method will show the pause or fail dialog before performing an exit.
         /// If a dialog is not yet displayed, the exit will be blocked and the relevant dialog will display instead.
         /// </remarks>
-        /// <returns></returns>
+        /// <returns>Whether this call resulted in a final exit.</returns>
         protected bool PerformExitWithConfirmation()
         {
             bool pauseOrFailDialogVisible =
