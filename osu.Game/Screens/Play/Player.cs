@@ -719,9 +719,14 @@ namespace osu.Game.Screens.Play
             // stopping here is to ensure music doesn't become audible after exiting back to PlayerLoader.
             musicController.Stop();
 
-            RestartRequested?.Invoke(quickRestart);
+            if (RestartRequested != null)
+            {
+                skipExitTransition = quickRestart;
+                RestartRequested?.Invoke(quickRestart);
+                return true;
+            }
 
-            return PerformExit(skipTransition: quickRestart);
+            return PerformExit(quickRestart);
         }
 
         /// <summary>
