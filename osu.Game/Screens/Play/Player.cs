@@ -83,6 +83,11 @@ namespace osu.Game.Screens.Play
         /// </summary>
         protected virtual bool PauseOnFocusLost => true;
 
+        /// <summary>
+        /// Whether to show the fail overlay (with buttons to retry / exit) on failing.
+        /// </summary>
+        protected virtual bool ShowFailOverlay => true;
+
         public Action<bool> RestartRequested;
 
         private bool isRestarting;
@@ -990,6 +995,9 @@ namespace osu.Game.Screens.Play
         /// </summary>
         private void onFailComplete()
         {
+            if (!ShowFailOverlay)
+                return;
+
             GameplayClockContainer.Stop();
 
             FailOverlay.Retries = RestartCount;
