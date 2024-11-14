@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -29,7 +30,11 @@ namespace osu.Game.Collections
 
         private IDisposable? realmSubscription;
 
-        protected override FillFlowContainer<RearrangeableListItem<Live<BeatmapCollection>>> CreateListFillFlowContainer() => new Flow
+        private Flow flow = null!;
+
+        public IEnumerable<Drawable> OrderedItems => flow.FlowingChildren;
+
+        protected override FillFlowContainer<RearrangeableListItem<Live<BeatmapCollection>>> CreateListFillFlowContainer() => flow = new Flow
         {
             DragActive = { BindTarget = DragActive }
         };
