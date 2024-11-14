@@ -86,6 +86,7 @@ namespace osu.Game.Screens.Play
         public Action<bool> RestartRequested;
 
         private bool isRestarting;
+        private bool noExitTransition;
 
         private Bindable<bool> mouseWheelDisabled;
 
@@ -297,10 +298,7 @@ namespace osu.Game.Screens.Play
                     {
                         if (!this.IsCurrentScreen()) return;
 
-                        if (PerformExit(false))
-                            // The hotkey overlay dims the screen.
-                            // If the operation succeeds, we want to make sure we stay dimmed to keep continuity.
-                            fadeOut(true);
+                        PerformExit(false, true);
                     },
                 },
             });
@@ -318,10 +316,7 @@ namespace osu.Game.Screens.Play
                         {
                             if (!this.IsCurrentScreen()) return;
 
-                            if (Restart(true))
-                                // The hotkey overlay dims the screen.
-                                // If the operation succeeds, we want to make sure we stay dimmed to keep continuity.
-                                fadeOut(true);
+                            Restart(true);
                         },
                     },
                 });
@@ -600,8 +595,9 @@ namespace osu.Game.Screens.Play
         /// Whether the pause or fail dialog should be shown before performing an exit.
         /// If <see langword="true"/> and a dialog is not yet displayed, the exit will be blocked and the relevant dialog will display instead.
         /// </param>
+        /// <param name="withoutTransition">Whether the exit should perform without a transition, because the screen had faded to black already.</param>
         /// <returns>Whether this call resulted in a final exit.</returns>
-        protected bool PerformExit(bool showDialogFirst)
+        protected bool PerformExit(bool showDialogFirst, bool withoutTransition = false)
         {
             bool pauseOrFailDialogVisible =
                 PauseOverlay.State.Value == Visibility.Visible || FailOverlay.State.Value == Visibility.Visible;
@@ -639,6 +635,8 @@ namespace osu.Game.Screens.Play
             // Screen may not be current if a restart has been performed.
             if (this.IsCurrentScreen())
             {
+                noExitTransition = withoutTransition;
+
                 // The actual exit is performed if
                 // - the pause / fail dialog was not requested
                 // - the pause / fail dialog was requested but is already displayed (user showing intention to exit).
@@ -709,7 +707,7 @@ namespace osu.Game.Screens.Play
 
             RestartRequested?.Invoke(quickRestart);
 
-            return PerformExit(false);
+            return PerformExit(false, quickRestart);
         }
 
         /// <summary>
@@ -1254,10 +1252,10 @@ namespace osu.Game.Screens.Play
             ShowUserStatistics = true,
         };
 
-        private void fadeOut(bool instant = false)
+        private void fadeOut()
         {
-            float fadeOutDuration = instant ? 0 : 250;
-            this.FadeOut(fadeOutDuration);
+            if (!noExitTransition)
+                this.FadeOut(250);
 
             if (this.IsCurrentScreen())
             {
