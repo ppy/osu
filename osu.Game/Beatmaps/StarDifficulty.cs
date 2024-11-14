@@ -1,9 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
-using JetBrains.Annotations;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Difficulty;
 
@@ -25,20 +22,18 @@ namespace osu.Game.Beatmaps
         /// The difficulty attributes computed for the given beatmap.
         /// Might not be available if the star difficulty is associated with a beatmap that's not locally available.
         /// </summary>
-        [CanBeNull]
-        public readonly DifficultyAttributes DifficultyAttributes;
+        public readonly DifficultyAttributes? DifficultyAttributes;
 
         /// <summary>
         /// The performance attributes computed for a perfect score on the given beatmap.
         /// Might not be available if the star difficulty is associated with a beatmap that's not locally available.
         /// </summary>
-        [CanBeNull]
-        public readonly PerformanceAttributes PerformanceAttributes;
+        public readonly PerformanceAttributes? PerformanceAttributes;
 
         /// <summary>
         /// Creates a <see cref="StarDifficulty"/> structure.
         /// </summary>
-        public StarDifficulty([NotNull] DifficultyAttributes difficulty, [NotNull] PerformanceAttributes performance)
+        public StarDifficulty(DifficultyAttributes difficulty, PerformanceAttributes performance)
         {
             Stars = double.IsFinite(difficulty.StarRating) ? difficulty.StarRating : 0;
             MaxCombo = difficulty.MaxCombo;
@@ -55,7 +50,6 @@ namespace osu.Game.Beatmaps
         {
             Stars = double.IsFinite(starDifficulty) ? starDifficulty : 0;
             MaxCombo = maxCombo;
-            DifficultyAttributes = null;
         }
 
         public DifficultyRating DifficultyRating => GetDifficultyRating(Stars);
