@@ -30,7 +30,6 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         }
 
         protected List<double> ObjectStrains = new List<double>();
-        protected double Difficulty;
 
         /// <summary>
         /// Process a <see cref="DifficultyHitObject"/>.
@@ -44,15 +43,15 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         public abstract double DifficultyValue();
 
         /// <summary>
-        /// Returns the number of strains weighted against the top strain.
+        /// Calculates the number of strains weighted against the top strain.
         /// The result is scaled by clock rate as it affects the total number of strains.
         /// </summary>
-        public double CountDifficultStrains()
+        public virtual double CountTopWeightedStrains()
         {
-            if (Difficulty == 0)
+            if (ObjectStrains.Count == 0)
                 return 0.0;
 
-            double consistentTopStrain = Difficulty / 10; // What would the top strain be if all strain values were identical
+            double consistentTopStrain = DifficultyValue() / 10; // What would the top strain be if all strain values were identical
             // Use a weighted sum of all strains. Constants are arbitrary and give nice values
             return ObjectStrains.Sum(s => 1.1 / (1 + Math.Exp(-10 * (s / consistentTopStrain - 0.88))));
         }
