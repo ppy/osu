@@ -2,9 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Runtime.InteropServices;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Rendering;
+using osu.Framework.Graphics.Shaders;
+using osu.Framework.Graphics.Shaders.Types;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Utils;
@@ -92,7 +96,7 @@ namespace osu.Game.Storyboards.Drawables
         }
 
         [BackgroundDependencyLoader]
-        private void load(Storyboard storyboard)
+        private void load(Storyboard storyboard, ShaderManager shaders)
         {
             if (storyboard.UseSkinSprites)
             {
@@ -103,6 +107,8 @@ namespace osu.Game.Storyboards.Drawables
                 Texture = textureStore.Get(Sprite.Path, WrapMode.ClampToEdge, WrapMode.ClampToEdge);
 
             Sprite.ApplyTransforms(this);
+
+            TextureShader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, "BeatmapBackground");
         }
 
         private void skinSourceChanged()
@@ -121,6 +127,65 @@ namespace osu.Game.Storyboards.Drawables
 
             if (skin.IsNotNull())
                 skin.SourceChanged -= skinSourceChanged;
+        }
+
+        protected override DrawNode CreateDrawNode() => new DrawableStoryboardSpriteDrawNode(this);
+
+        public class DrawableStoryboardSpriteDrawNode : SpriteDrawNode
+        {
+            public new DrawableStoryboardSprite Source => (DrawableStoryboardSprite)base.Source;
+
+            public DrawableStoryboardSpriteDrawNode(DrawableStoryboardSprite source)
+                : base(source)
+            {
+            }
+
+            private Colour4 dimColour = Colour4.Red;
+
+            private float dimLevel = 1.0f;
+
+            public override void ApplyState()
+            {
+                base.ApplyState();
+
+                // dimColour = Source.DimColour;
+                // dimLevel = Source.DimLevel;
+            }
+
+            private IUniformBuffer<BeatmapBackgroundParameters> beatmapBackgroundParametersBuffer = null!;
+
+            protected override void BindUniformResources(IShader shader, IRenderer renderer)
+            {
+                beatmapBackgroundParametersBuffer ??= renderer.CreateUniformBuffer<BeatmapBackgroundParameters>();
+
+                beatmapBackgroundParametersBuffer.Data = beatmapBackgroundParametersBuffer.Data with
+                {
+                    DimColour = new UniformVector4
+                    {
+                        X = dimColour.R,
+                        Y = dimColour.G,
+                        Z = dimColour.B,
+                        W = dimColour.A
+                    },
+                    DimLevel = dimLevel,
+                };
+
+                shader.BindUniformBlock("m_BeatmapBackgroundParameters", beatmapBackgroundParametersBuffer);
+            }
+
+            protected override void Dispose(bool isDisposing)
+            {
+                base.Dispose(isDisposing);
+                beatmapBackgroundParametersBuffer?.Dispose();
+            }
+
+            [StructLayout(LayoutKind.Sequential, Pack = 1)]
+            private record struct BeatmapBackgroundParameters
+            {
+                public UniformVector4 DimColour;
+                public UniformFloat DimLevel;
+                private readonly UniformPadding12 pad1;
+            }
         }
     }
 }
