@@ -114,7 +114,7 @@ namespace osu.Game.Collections
 
             private void onCommit(TextBox sender, bool newText)
             {
-                if (collection.IsManaged && newText)
+                if (collection.IsManaged && collection.Value.Name != TextBox.Current.Value)
                     collection.PerformWrite(c => c.Name = TextBox.Current.Value);
             }
         }

@@ -162,8 +162,10 @@ namespace osu.Game.Collections
 
                 TextBox.OnCommit += (sender, newText) =>
                 {
-                    if (newText && !string.IsNullOrEmpty(TextBox.Current.Value))
-                        realm.Write(r => r.Add(new BeatmapCollection(TextBox.Current.Value)));
+                    if (string.IsNullOrEmpty(TextBox.Text))
+                        return;
+
+                    realm.Write(r => r.Add(new BeatmapCollection(TextBox.Text)));
                     TextBox.Text = string.Empty;
                 };
             }
