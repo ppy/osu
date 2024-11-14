@@ -265,6 +265,7 @@ namespace osu.Game.Tests.Visual.Collections
         }
 
         [Test]
+        [Solo]
         public void TestCollectionRenamedExternal()
         {
             BeatmapCollection first = null!;
@@ -341,6 +342,6 @@ namespace osu.Game.Tests.Visual.Collections
             => AddUntilStep($"{count} collections shown", () => dialog.ChildrenOfType<DrawableCollectionListItem>().Count() == count + 1); // +1 for placeholder
 
         private void assertCollectionName(int index, string name)
-            => AddUntilStep($"item {index + 1} has correct name", () => dialog.ChildrenOfType<DrawableCollectionListItem>().ElementAt(index).ChildrenOfType<TextBox>().First().Text == name);
+            => AddUntilStep($"item {index + 1} has correct name", () => dialog.ChildrenOfType<DrawableCollectionList>().Single().OrderedItems.ElementAt(index).ChildrenOfType<TextBox>().First().Text == name);
     }
 }
