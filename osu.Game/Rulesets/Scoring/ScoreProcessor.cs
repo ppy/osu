@@ -120,6 +120,11 @@ namespace osu.Game.Rulesets.Scoring
         public long MaximumTotalScore { get; private set; }
 
         /// <summary>
+        /// The maximum achievable combo.
+        /// </summary>
+        public int MaximumCombo { get; private set; }
+
+        /// <summary>
         /// The maximum sum of accuracy-affecting judgements at the current point in time.
         /// </summary>
         /// <remarks>
@@ -423,6 +428,7 @@ namespace osu.Game.Rulesets.Scoring
                 MaximumResultCounts.AddRange(ScoreResultCounts);
 
                 MaximumTotalScore = TotalScore.Value;
+                MaximumCombo = HighestCombo.Value;
             }
 
             ScoreResultCounts.Clear();
