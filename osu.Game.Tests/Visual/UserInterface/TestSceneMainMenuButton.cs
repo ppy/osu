@@ -30,7 +30,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         public void TestStandardButton()
         {
             AddStep("add button", () => Child = new MainMenuButton(
-                ButtonSystemStrings.Solo, @"button-default-select", OsuIcon.Player, new Color4(102, 68, 204, 255), _ => { }, 0, Key.P)
+                ButtonSystemStrings.Solo, @"button-default-select", OsuIcon.Player, new Color4(102, 68, 204, 255), (_, _) => { }, 0, Key.P)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -87,7 +87,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                         Origin = Anchor.Centre,
                         AutoSizeAxes = Axes.Both,
                         CachedDependencies = [(typeof(INotificationOverlay), notificationOverlay)],
-                        Child = new DailyChallengeButton(@"button-default-select", new Color4(102, 68, 204, 255), _ => { }, 0, Key.D)
+                        Child = new DailyChallengeButton(@"button-default-select", new Color4(102, 68, 204, 255), (_, _) => { }, 0, Key.D)
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
@@ -161,7 +161,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                         Origin = Anchor.Centre,
                         AutoSizeAxes = Axes.Both,
                         CachedDependencies = [(typeof(INotificationOverlay), notificationOverlay)],
-                        Child = new DailyChallengeButton(@"button-default-select", new Color4(102, 68, 204, 255), _ => { }, 0, Key.D)
+                        Child = new DailyChallengeButton(@"button-default-select", new Color4(102, 68, 204, 255), (_, _) => { }, 0, Key.D)
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,

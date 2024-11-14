@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Database;
 using osu.Game.IO;
 using osu.Game.Localisation;
 using osu.Game.Overlays;
@@ -15,6 +16,9 @@ namespace osu.Game.Screens.Menu
     {
         [Resolved]
         private IDialogOverlay dialogOverlay { get; set; } = null!;
+
+        [Resolved]
+        private RealmAccess realmAccess { get; set; } = null!;
 
         public StorageErrorDialog(OsuStorage storage, OsuStorageError error)
         {
@@ -35,7 +39,15 @@ namespace osu.Game.Screens.Menu
                             Text = StorageErrorDialogStrings.TryAgain,
                             Action = () =>
                             {
-                                if (!storage.TryChangeToCustomStorage(out var nextError))
+                                bool success;
+                                OsuStorageError nextError;
+
+                                // blocking all operations has a side effect of closing & reopening the realm db,
+                                // which is desirable here since the restoration of the old storage - if it succeeds - means the realm db has moved.
+                                using (realmAccess.BlockAllOperations(@"restoration of previously unavailable storage"))
+                                    success = storage.TryChangeToCustomStorage(out nextError);
+
+                                if (!success)
                                     dialogOverlay.Push(new StorageErrorDialog(storage, nextError));
                             }
                         },
