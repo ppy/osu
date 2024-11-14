@@ -4,12 +4,15 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
+using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
+using osu.Framework.Graphics.Textures;
 using osu.Framework.Lists;
 using osu.Framework.Logging;
 using osu.Framework.Threading;
@@ -18,7 +21,11 @@ using osu.Game.Database;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
+using osu.Game.Scoring;
+using osu.Game.Skinning;
+using osu.Game.Storyboards;
 
 namespace osu.Game.Beatmaps
 {
@@ -237,10 +244,37 @@ namespace osu.Game.Beatmaps
                 var ruleset = rulesetInfo.CreateInstance();
                 Debug.Assert(ruleset != null);
 
-                var calculator = ruleset.CreateDifficultyCalculator(beatmapManager.GetWorkingBeatmap(key.BeatmapInfo));
-                var attributes = calculator.Calculate(key.OrderedMods, cancellationToken);
+                PlayableCachedWorkingBeatmap workingBeatmap = new PlayableCachedWorkingBeatmap(beatmapManager.GetWorkingBeatmap(key.BeatmapInfo));
+                IBeatmap playableBeatmap = workingBeatmap.GetPlayableBeatmap(ruleset.RulesetInfo, key.OrderedMods, cancellationToken);
 
-                return new StarDifficulty(attributes);
+                var difficulty = ruleset.CreateDifficultyCalculator(workingBeatmap).Calculate(key.OrderedMods, cancellationToken);
+                cancellationToken.ThrowIfCancellationRequested();
+
+                var performanceCalculator = ruleset.CreatePerformanceCalculator();
+                if (performanceCalculator == null)
+                    return new StarDifficulty(difficulty, new PerformanceAttributes());
+
+                ScoreProcessor scoreProcessor = ruleset.CreateScoreProcessor();
+                scoreProcessor.Mods.Value = key.OrderedMods;
+                scoreProcessor.ApplyBeatmap(playableBeatmap);
+                cancellationToken.ThrowIfCancellationRequested();
+
+                ScoreInfo perfectScore = new ScoreInfo(key.BeatmapInfo, ruleset.RulesetInfo)
+                {
+                    Passed = true,
+                    Accuracy = 1,
+                    Mods = key.OrderedMods,
+                    MaxCombo = scoreProcessor.MaximumCombo,
+                    Combo = scoreProcessor.MaximumCombo,
+                    TotalScore = scoreProcessor.MaximumTotalScore,
+                    Statistics = scoreProcessor.MaximumStatistics,
+                    MaximumStatistics = scoreProcessor.MaximumStatistics
+                };
+
+                var performance = performanceCalculator.Calculate(perfectScore, difficulty);
+                cancellationToken.ThrowIfCancellationRequested();
+
+                return new StarDifficulty(difficulty, performance);
             }
             catch (OperationCanceledException)
             {
@@ -276,7 +310,6 @@ namespace osu.Game.Beatmaps
         {
             public readonly BeatmapInfo BeatmapInfo;
             public readonly RulesetInfo Ruleset;
-
             public readonly Mod[] OrderedMods;
 
             public DifficultyCacheLookup(BeatmapInfo beatmapInfo, RulesetInfo? ruleset, IEnumerable<Mod>? mods)
@@ -316,6 +349,43 @@ namespace osu.Game.Beatmaps
                 BeatmapInfo = beatmapInfo;
                 CancellationToken = cancellationToken;
             }
+        }
+
+        /// <summary>
+        /// A working beatmap that caches its playable representation.
+        /// This is intended as single-use for when it is guaranteed that the playable beatmap can be reused.
+        /// </summary>
+        private class PlayableCachedWorkingBeatmap : IWorkingBeatmap
+        {
+            private readonly IWorkingBeatmap working;
+            private IBeatmap? playable;
+
+            public PlayableCachedWorkingBeatmap(IWorkingBeatmap working)
+            {
+                this.working = working;
+            }
+
+            public IBeatmap GetPlayableBeatmap(IRulesetInfo ruleset, IReadOnlyList<Mod> mods)
+                => playable ??= working.GetPlayableBeatmap(ruleset, mods);
+
+            public IBeatmap GetPlayableBeatmap(IRulesetInfo ruleset, IReadOnlyList<Mod> mods, CancellationToken cancellationToken)
+                => playable ??= working.GetPlayableBeatmap(ruleset, mods, cancellationToken);
+
+            IBeatmapInfo IWorkingBeatmap.BeatmapInfo => working.BeatmapInfo;
+            bool IWorkingBeatmap.BeatmapLoaded => working.BeatmapLoaded;
+            bool IWorkingBeatmap.TrackLoaded => working.TrackLoaded;
+            IBeatmap IWorkingBeatmap.Beatmap => working.Beatmap;
+            Texture IWorkingBeatmap.GetBackground() => working.GetBackground();
+            Texture IWorkingBeatmap.GetPanelBackground() => working.GetPanelBackground();
+            Waveform IWorkingBeatmap.Waveform => working.Waveform;
+            Storyboard IWorkingBeatmap.Storyboard => working.Storyboard;
+            ISkin IWorkingBeatmap.Skin => working.Skin;
+            Track IWorkingBeatmap.Track => working.Track;
+            Track IWorkingBeatmap.LoadTrack() => working.LoadTrack();
+            Stream IWorkingBeatmap.GetStream(string storagePath) => working.GetStream(storagePath);
+            void IWorkingBeatmap.BeginAsyncLoad() => working.BeginAsyncLoad();
+            void IWorkingBeatmap.CancelAsyncLoad() => working.CancelAsyncLoad();
+            void IWorkingBeatmap.PrepareTrackForPreview(bool looping, double offsetFromPreviewPoint) => working.PrepareTrackForPreview(looping, offsetFromPreviewPoint);
         }
     }
 }
