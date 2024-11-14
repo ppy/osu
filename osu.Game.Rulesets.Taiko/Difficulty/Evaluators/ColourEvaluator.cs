@@ -3,6 +3,7 @@
 
 using System;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour;
 using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour.Data;
@@ -12,25 +13,11 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
     public class ColourEvaluator
     {
         /// <summary>
-        /// A sigmoid function. It gives a value between (middle - height/2) and (middle + height/2).
-        /// </summary>
-        /// <param name="val">The input value.</param>
-        /// <param name="center">The center of the sigmoid, where the largest gradient occurs and value is equal to middle.</param>
-        /// <param name="width">The radius of the sigmoid, outside of which values are near the minimum/maximum.</param>
-        /// <param name="middle">The middle of the sigmoid output.</param>
-        /// <param name="height">The height of the sigmoid output. This will be equal to max value - min value.</param>
-        private static double sigmoid(double val, double center, double width, double middle, double height)
-        {
-            double sigmoid = Math.Tanh(Math.E * -(val - center) / width);
-            return sigmoid * (height / 2) + middle;
-        }
-
-        /// <summary>
         /// Evaluate the difficulty of the first note of a <see cref="MonoStreak"/>.
         /// </summary>
         public static double EvaluateDifficultyOf(MonoStreak monoStreak)
         {
-            return sigmoid(monoStreak.Index, 2, 2, 0.5, 1) * EvaluateDifficultyOf(monoStreak.Parent) * 0.5;
+            return DifficultyCalculationUtils.Logistic(exponent: Math.E * monoStreak.Index - 2 * Math.E) * EvaluateDifficultyOf(monoStreak.Parent) * 0.5;
         }
 
         /// <summary>
@@ -38,7 +25,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
         /// </summary>
         public static double EvaluateDifficultyOf(AlternatingMonoPattern alternatingMonoPattern)
         {
-            return sigmoid(alternatingMonoPattern.Index, 2, 2, 0.5, 1) * EvaluateDifficultyOf(alternatingMonoPattern.Parent);
+            return DifficultyCalculationUtils.Logistic(exponent: Math.E * alternatingMonoPattern.Index - 2 * Math.E) * EvaluateDifficultyOf(alternatingMonoPattern.Parent);
         }
 
         /// <summary>
@@ -46,7 +33,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
         /// </summary>
         public static double EvaluateDifficultyOf(RepeatingHitPatterns repeatingHitPattern)
         {
-            return 2 * (1 - sigmoid(repeatingHitPattern.RepetitionInterval, 2, 2, 0.5, 1));
+            return 2 * (1 - DifficultyCalculationUtils.Logistic(exponent: Math.E * repeatingHitPattern.RepetitionInterval - 2 * Math.E));
         }
 
         public static double EvaluateDifficultyOf(DifficultyHitObject hitObject)
