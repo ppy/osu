@@ -151,7 +151,7 @@ namespace osu.Game.Collections
             }
         }
 
-        private class NewCollectionEntryItem : DrawableCollectionListItem
+        private partial class NewCollectionEntryItem : DrawableCollectionListItem
         {
             [Resolved]
             private RealmAccess realm { get; set; } = null!;
