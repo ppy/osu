@@ -312,7 +312,7 @@ namespace osu.Game.Screens.Play
         {
             base.OnSuspending(e);
 
-            quickRestartBlackLayer?.FadeOut(500, Easing.OutQuint);
+            quickRestartBlackLayer?.FadeOut(500, Easing.OutQuint).Expire();
             quickRestartBlackLayer = null;
 
             BackgroundBrightnessReduction = false;
