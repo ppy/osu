@@ -147,9 +147,7 @@ namespace osu.Game.Beatmaps.Drawables
             overallDifficulty.Text = @" OD: " + adjustedDifficulty.OverallDifficulty.ToString(@"0.##");
 
             TimeSpan lengthTimeSpan = TimeSpan.FromMilliseconds(displayedContent.BeatmapInfo.Length / rate);
-            length.Text = "Length: " + (lengthTimeSpan.Hours > 0
-                                        ? lengthTimeSpan.ToString(@"hh\:mm\:ss")
-                                        : lengthTimeSpan.ToString(@"mm\:ss"));
+            length.Text = "Length: " + (lengthTimeSpan.TotalHours >= 1 ? lengthTimeSpan.ToString(@"hh\:mm\:ss") : lengthTimeSpan.ToString(@"mm\:ss"));
             bpm.Text = " BPM: " + Math.Round(bpmAdjusted, 0);
         }
 
