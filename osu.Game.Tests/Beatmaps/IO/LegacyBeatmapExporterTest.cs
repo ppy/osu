@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.IO;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -30,9 +29,9 @@ namespace osu.Game.Tests.Beatmaps.IO
 
             // Ensure importer encoding is correct
             AddStep("import beatmap", () => beatmap = importBeatmapFromArchives(@"decimal-timing-beatmap.olz"));
-            AddAssert("timing point has decimal offset", () => Math.Abs(beatmap.Beatmap.ControlPointInfo.TimingPoints[0].Time - 284.725) < 0.001);
-            AddAssert("kiai has decimal offset", () => Math.Abs(beatmap.Beatmap.ControlPointInfo.EffectPoints[0].Time - 28520.019) < 0.001);
-            AddAssert("hit object has decimal offset", () => Math.Abs(beatmap.Beatmap.HitObjects[0].StartTime - 28520.019) < 0.001);
+            AddAssert("timing point has decimal offset", () => beatmap.Beatmap.ControlPointInfo.TimingPoints[0].Time, () => Is.EqualTo(284.725).Within(0.001));
+            AddAssert("kiai has decimal offset", () => beatmap.Beatmap.ControlPointInfo.EffectPoints[0].Time, () => Is.EqualTo(28520.019).Within(0.001));
+            AddAssert("hit object has decimal offset", () => beatmap.Beatmap.HitObjects[0].StartTime, () => Is.EqualTo(28520.019).Within(0.001));
 
             // Ensure exporter legacy conversion is correct
             AddStep("export", () =>
@@ -44,9 +43,9 @@ namespace osu.Game.Tests.Beatmaps.IO
             });
 
             AddStep("import beatmap again", () => beatmap = importBeatmapFromStream(outStream));
-            AddAssert("timing point has truncated offset", () => Math.Abs(beatmap.Beatmap.ControlPointInfo.TimingPoints[0].Time - 284) < 0.001);
-            AddAssert("kiai is snapped", () => Math.Abs(beatmap.Beatmap.ControlPointInfo.EffectPoints[0].Time - 28519) < 0.001);
-            AddAssert("hit object is snapped", () => Math.Abs(beatmap.Beatmap.HitObjects[0].StartTime - 28519) < 0.001);
+            AddAssert("timing point has truncated offset", () => beatmap.Beatmap.ControlPointInfo.TimingPoints[0].Time, () => Is.EqualTo(284).Within(0.001));
+            AddAssert("kiai is snapped", () => beatmap.Beatmap.ControlPointInfo.EffectPoints[0].Time, () => Is.EqualTo(28519).Within(0.001));
+            AddAssert("hit object is snapped", () => beatmap.Beatmap.HitObjects[0].StartTime, () => Is.EqualTo(28519).Within(0.001));
         }
 
         private IWorkingBeatmap importBeatmapFromStream(Stream stream)
