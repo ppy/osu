@@ -3,11 +3,14 @@
 
 using osu.Game.Rulesets.Objects.Types;
 
-namespace osu.Game.Rulesets.Objects.Legacy.Taiko
+namespace osu.Game.Rulesets.Objects.Legacy
 {
     /// <summary>
-    /// Legacy osu!taiko Spinner-type, used for parsing Beatmaps.
+    /// Legacy "Spinner" hit object type.
     /// </summary>
+    /// <remarks>
+    /// Only used for parsing beatmaps and not gameplay.
+    /// </remarks>
     internal sealed class ConvertSpinner : ConvertHitObject, IHasDuration
     {
         public double Duration { get; set; }
