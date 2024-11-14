@@ -140,9 +140,32 @@ namespace osu.Game.Collections
                 var previous = PlaceholderItem;
 
                 placeholderContainer.Clear(false);
-                placeholderContainer.Add(PlaceholderItem = new DrawableCollectionListItem(new BeatmapCollection().ToLiveUnmanaged(), false));
+                placeholderContainer.Add(PlaceholderItem = new NewCollectionEntryItem());
 
                 return previous;
+            }
+        }
+
+        private class NewCollectionEntryItem : DrawableCollectionListItem
+        {
+            [Resolved]
+            private RealmAccess realm { get; set; } = null!;
+
+            public NewCollectionEntryItem()
+                : base(new BeatmapCollection().ToLiveUnmanaged(), false)
+            {
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                TextBox.OnCommit += (sender, newText) =>
+                {
+                    if (newText && !string.IsNullOrEmpty(TextBox.Current.Value))
+                        realm.Write(r => r.Add(new BeatmapCollection(TextBox.Current.Value)));
+                    TextBox.Text = string.Empty;
+                };
             }
         }
 
