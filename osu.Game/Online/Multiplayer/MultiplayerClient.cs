@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
@@ -201,8 +200,7 @@ namespace osu.Game.Online.Multiplayer
 
                     Debug.Assert(joinedRoom.Playlist.Count > 0);
 
-                    APIRoom.Playlist.Clear();
-                    APIRoom.Playlist.AddRange(joinedRoom.Playlist.Select(item => new PlaylistItem(item)));
+                    APIRoom.Playlist = joinedRoom.Playlist.Select(item => new PlaylistItem(item)).ToArray();
                     APIRoom.CurrentPlaylistItem = APIRoom.Playlist.Single(item => item.ID == joinedRoom.Settings.PlaylistItemId);
 
                     // The server will null out the end date upon the host joining the room, but the null value is never communicated to the client.
@@ -734,7 +732,7 @@ namespace osu.Game.Online.Multiplayer
                 Debug.Assert(APIRoom != null);
 
                 Room.Playlist.Add(item);
-                APIRoom.Playlist.Add(new PlaylistItem(item));
+                APIRoom.Playlist = APIRoom.Playlist.Append(new PlaylistItem(item)).ToArray();
 
                 ItemAdded?.Invoke(item);
                 RoomUpdated?.Invoke();
@@ -753,7 +751,7 @@ namespace osu.Game.Online.Multiplayer
                 Debug.Assert(APIRoom != null);
 
                 Room.Playlist.Remove(Room.Playlist.Single(existing => existing.ID == playlistItemId));
-                APIRoom.Playlist.RemoveAll(existing => existing.ID == playlistItemId);
+                APIRoom.Playlist = APIRoom.Playlist.Where(i => i.ID != playlistItemId).ToArray();
 
                 Debug.Assert(Room.Playlist.Count > 0);
 
@@ -771,30 +769,10 @@ namespace osu.Game.Online.Multiplayer
                 if (Room == null)
                     return;
 
-                try
-                {
-                    Debug.Assert(APIRoom != null);
+                Debug.Assert(APIRoom != null);
 
-                    Room.Playlist[Room.Playlist.IndexOf(Room.Playlist.Single(existing => existing.ID == item.ID))] = item;
-
-                    int existingIndex = APIRoom.Playlist.IndexOf(APIRoom.Playlist.Single(existing => existing.ID == item.ID));
-
-                    APIRoom.Playlist.RemoveAt(existingIndex);
-                    APIRoom.Playlist.Insert(existingIndex, new PlaylistItem(item));
-                }
-                catch (Exception ex)
-                {
-                    // Temporary code to attempt to figure out long-term failing tests.
-                    StringBuilder exceptionText = new StringBuilder();
-
-                    exceptionText.AppendLine("MultiplayerClient test failure investigation");
-                    exceptionText.AppendLine($"Exception                : {ex.ToString()}");
-                    exceptionText.AppendLine($"Lookup                   : {item.ID}");
-                    exceptionText.AppendLine($"Items in Room.Playlist   : {string.Join(',', Room.Playlist.Select(i => i.ID))}");
-                    exceptionText.AppendLine($"Items in APIRoom.Playlist: {string.Join(',', APIRoom!.Playlist.Select(i => i.ID))}");
-
-                    throw new AggregateException(exceptionText.ToString());
-                }
+                Room.Playlist[Room.Playlist.IndexOf(Room.Playlist.Single(existing => existing.ID == item.ID))] = item;
+                APIRoom.Playlist = APIRoom.Playlist.Select((pi, i) => pi.ID == item.ID ? new PlaylistItem(item) : APIRoom.Playlist[i]).ToArray();
 
                 ItemChanged?.Invoke(item);
                 RoomUpdated?.Invoke();

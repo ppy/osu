@@ -38,12 +38,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 Name = "test name",
                 Type = MatchType.HeadToHead,
                 Playlist =
-                {
+                [
                     new PlaylistItem(new TestBeatmap(Ruleset.Value).BeatmapInfo)
                     {
                         RulesetID = Ruleset.Value.OnlineID
                     }
-                }
+                ]
             };
         }
 

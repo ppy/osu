@@ -119,7 +119,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                 room.Value = new Room
                 {
-                    Playlist = { item },
+                    Playlist = [item],
                     CurrentPlaylistItem = item
                 };
 

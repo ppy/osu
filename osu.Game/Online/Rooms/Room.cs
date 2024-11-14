@@ -8,7 +8,6 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using Newtonsoft.Json;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Game.IO.Serialization.Converters;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
@@ -165,6 +164,15 @@ namespace osu.Game.Online.Rooms
         }
 
         /// <summary>
+        /// The room playlist.
+        /// </summary>
+        public IReadOnlyList<PlaylistItem> Playlist
+        {
+            get => playlist;
+            set => SetList(ref playlist, value);
+        }
+
+        /// <summary>
         /// Describes the items in the playlist.
         /// </summary>
         public RoomPlaylistItemStats? PlaylistItemStats
@@ -297,6 +305,9 @@ namespace osu.Game.Online.Rooms
         [JsonProperty("max_attempts", DefaultValueHandling = DefaultValueHandling.Ignore)]
         private int? maxAttempts;
 
+        [JsonProperty("playlist")]
+        private IReadOnlyList<PlaylistItem> playlist = [];
+
         [JsonProperty("playlist_item_stats")]
         private RoomPlaylistItemStats? playlistItemStats;
 
@@ -331,10 +342,6 @@ namespace osu.Game.Online.Rooms
 
         // Not yet serialised (not implemented).
         private RoomAvailability availability;
-
-        [Cached]
-        [JsonProperty("playlist")]
-        public readonly BindableList<PlaylistItem> Playlist = new BindableList<PlaylistItem>();
 
         /// <summary>
         /// Copies values from another <see cref="Room"/> into this one.
@@ -371,12 +378,7 @@ namespace osu.Game.Online.Rooms
 
             other.RemoveExpiredPlaylistItems();
 
-            if (!Playlist.SequenceEqual(other.Playlist))
-            {
-                Playlist.Clear();
-                Playlist.AddRange(other.Playlist);
-            }
-
+            Playlist = other.Playlist;
             RecentParticipants = other.RecentParticipants;
         }
 
@@ -386,7 +388,7 @@ namespace osu.Game.Online.Rooms
             // and display only the non-expired playlist items while the room is still active. In order to achieve this, all expired items are removed from the source Room.
             // More refactoring is required before this can be done locally instead - DrawableRoomPlaylist is currently directly bound to the playlist to display items in the room.
             if (Status is not RoomStatusEnded)
-                Playlist.RemoveAll(i => i.Expired);
+                Playlist = Playlist.Where(i => !i.Expired).ToArray();
         }
 
         [JsonObject(MemberSerialization.OptIn)]

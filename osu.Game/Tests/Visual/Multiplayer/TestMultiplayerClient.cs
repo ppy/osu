@@ -447,7 +447,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             item.PlaylistOrder = existingItem.PlaylistOrder;
 
             ServerRoom.Playlist[ServerRoom.Playlist.IndexOf(existingItem)] = item;
-            ServerAPIRoom.Playlist[ServerAPIRoom.Playlist.IndexOf(ServerAPIRoom.Playlist.Single(i => i.ID == item.ID))] = new PlaylistItem(item);
+            ServerAPIRoom.Playlist = ServerAPIRoom.Playlist.Select((pi, i) => pi.ID == item.ID ? new PlaylistItem(item) : ServerAPIRoom.Playlist[i]).ToArray();
 
             await ((IMultiplayerClient)this).PlaylistItemChanged(clone(item)).ConfigureAwait(false);
         }
@@ -474,7 +474,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 throw new InvalidOperationException("Attempted to remove an item which has already been played.");
 
             ServerRoom.Playlist.Remove(item);
-            ServerAPIRoom.Playlist.RemoveAll(i => i.ID == item.ID);
+            ServerAPIRoom.Playlist = ServerAPIRoom.Playlist.Where(i => i.ID != item.ID).ToArray();
             await ((IMultiplayerClient)this).PlaylistItemRemoved(clone(playlistItemId)).ConfigureAwait(false);
 
             await updateCurrentItem(ServerRoom).ConfigureAwait(false);
@@ -569,7 +569,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             item.ID = ++lastPlaylistItemId;
 
             ServerRoom.Playlist.Add(item);
-            ServerAPIRoom.Playlist.Add(new PlaylistItem(item));
+            ServerAPIRoom.Playlist = ServerAPIRoom.Playlist.Append(new PlaylistItem(item)).ToArray();
             await ((IMultiplayerClient)this).PlaylistItemAdded(clone(item)).ConfigureAwait(false);
 
             await updatePlaylistOrder(ServerRoom).ConfigureAwait(false);

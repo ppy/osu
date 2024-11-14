@@ -26,24 +26,27 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         {
             base.LoadComplete();
 
-            Playlist.BindCollectionChanged((_, _) => updateCount());
-
             room.PropertyChanged += onRoomPropertyChanged;
             updateCount();
         }
 
         private void onRoomPropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(Room.PlaylistItemStats))
-                updateCount();
+            switch (e.PropertyName)
+            {
+                case nameof(Room.Playlist):
+                case nameof(Room.PlaylistItemStats):
+                    updateCount();
+                    break;
+            }
         }
 
         private void updateCount()
         {
-            int activeItems = Playlist.Count > 0 || room.PlaylistItemStats == null
+            int activeItems = room.Playlist.Count > 0 || room.PlaylistItemStats == null
                 // For now, use the playlist as the source of truth if it has any items.
                 // This allows the count to display correctly on the room screen (after joining a room).
-                ? Playlist.Count(i => !i.Expired)
+                ? room.Playlist.Count(i => !i.Expired)
                 : room.PlaylistItemStats.CountActive;
 
             TextFlow.Clear();

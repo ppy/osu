@@ -4,6 +4,7 @@
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
@@ -277,7 +278,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                                         drawablePlaylist = new DrawableRoomPlaylist
                                                         {
                                                             RelativeSizeAxes = Axes.X,
-                                                            Height = DrawableRoomPlaylistItem.HEIGHT
+                                                            Height = DrawableRoomPlaylistItem.HEIGHT,
+                                                            SelectedItem = { BindTarget = SelectedItem }
                                                         },
                                                         selectBeatmapButton = new RoundedButton
                                                         {
@@ -365,9 +367,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             {
                 base.LoadComplete();
 
-                drawablePlaylist.Items.BindTo(Playlist);
-                drawablePlaylist.SelectedItem.BindTo(SelectedItem);
-
                 room.PropertyChanged += onRoomPropertyChanged;
 
                 updateRoomName();
@@ -377,6 +376,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 updateRoomAutoSkip();
                 updateRoomMaxParticipants();
                 updateRoomAutoStartDuration();
+                updateRoomPlaylist();
+
+                drawablePlaylist.Items.BindCollectionChanged((_, __) => room.Playlist = drawablePlaylist.Items.ToArray());
             }
 
             private void onRoomPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -410,6 +412,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                     case nameof(Room.AutoStartDuration):
                         updateRoomAutoStartDuration();
                         break;
+
+                    case nameof(Room.Playlist):
+                        updateRoomPlaylist();
+                        break;
                 }
             }
 
@@ -434,11 +440,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             private void updateRoomAutoStartDuration()
                 => typeLabel.Text = room.AutoStartDuration.GetLocalisableDescription();
 
+            private void updateRoomPlaylist()
+                => drawablePlaylist.Items.ReplaceRange(0, drawablePlaylist.Items.Count, room.Playlist);
+
             protected override void Update()
             {
                 base.Update();
 
-                ApplyButton.Enabled.Value = Playlist.Count > 0 && NameField.Text.Length > 0 && !operationInProgress.Value;
+                ApplyButton.Enabled.Value = room.Playlist.Count > 0 && NameField.Text.Length > 0 && !operationInProgress.Value;
                 playlistContainer.Alpha = room.RoomID == null ? 1 : 0;
             }
 

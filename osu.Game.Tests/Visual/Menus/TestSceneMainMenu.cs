@@ -45,9 +45,9 @@ namespace osu.Game.Tests.Visual.Menus
                             RoomID = 1234,
                             Name = "Aug 8, 2024",
                             Playlist =
-                            {
+                            [
                                 new PlaylistItem(beatmap)
-                            },
+                            ],
                             StartDate = DateTimeOffset.Now.AddMinutes(-30),
                             EndDate = DateTimeOffset.Now.AddSeconds(60)
                         });

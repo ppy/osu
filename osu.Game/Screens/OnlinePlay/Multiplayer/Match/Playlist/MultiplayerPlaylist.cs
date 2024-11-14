@@ -33,11 +33,17 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
         [Resolved]
         private MultiplayerClient client { get; set; } = null!;
 
+        private readonly Room room;
         private readonly BindableWithCurrent<PlaylistItem?> selectedItem = new BindableWithCurrent<PlaylistItem?>();
         private MultiplayerPlaylistTabControl playlistTabControl = null!;
         private MultiplayerQueueList queueList = null!;
         private MultiplayerHistoryList historyList = null!;
         private bool firstPopulation = true;
+
+        public MultiplayerPlaylist(Room room)
+        {
+            this.room = room;
+        }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -59,7 +65,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
                     Masking = true,
                     Children = new Drawable[]
                     {
-                        queueList = new MultiplayerQueueList
+                        queueList = new MultiplayerQueueList(room)
                         {
                             RelativeSizeAxes = Axes.Both,
                             SelectedItem = { BindTarget = selectedItem },

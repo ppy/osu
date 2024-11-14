@@ -329,9 +329,6 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
                 localUser = api.LocalUser.GetBoundCopy();
                 localUser.BindValueChanged(populateDurations, true);
-
-                playlist.Items.BindTo(Playlist);
-                Playlist.BindCollectionChanged(onPlaylistChanged, true);
             }
 
             protected override void LoadComplete()
@@ -345,6 +342,9 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                 updateRoomMaxParticipants();
                 updateRoomDuration();
                 updateRoomMaxAttempts();
+                updateRoomPlaylist();
+
+                playlist.Items.BindCollectionChanged((_, __) => room.Playlist = playlist.Items.ToArray());
             }
 
             private void onRoomPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -370,6 +370,10 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                     case nameof(Room.MaxAttempts):
                         updateRoomMaxAttempts();
                         break;
+
+                    case nameof(Room.Playlist):
+                        updateRoomPlaylist();
+                        break;
                 }
             }
 
@@ -387,6 +391,9 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
             private void updateRoomMaxAttempts()
                 => MaxAttemptsField.Text = room.MaxAttempts?.ToString();
+
+            private void updateRoomPlaylist()
+                => playlist.Items.ReplaceRange(0, playlist.Items.Count, room.Playlist);
 
             private void populateDurations(ValueChangedEvent<APIUser> user)
             {
@@ -421,9 +428,9 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             public void SelectBeatmap() => editPlaylistButton.TriggerClick();
 
             private void onPlaylistChanged(object? sender, NotifyCollectionChangedEventArgs e) =>
-                playlistLength.Text = $"Length: {Playlist.GetTotalDuration(rulesets)}";
+                playlistLength.Text = $"Length: {room.Playlist.GetTotalDuration(rulesets)}";
 
-            private bool hasValidSettings => room.RoomID == null && NameField.Text.Length > 0 && Playlist.Count > 0
+            private bool hasValidSettings => room.RoomID == null && NameField.Text.Length > 0 && room.Playlist.Count > 0
                                              && hasValidDuration;
 
             private bool hasValidDuration => DurationField.Current.Value <= TimeSpan.FromDays(14) || localUser.Value.IsSupporter;
@@ -464,7 +471,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                               .Select(int.Parse)
                                               .ToArray();
 
-                    foreach (var item in Playlist)
+                    foreach (var item in room.Playlist)
                     {
                         if (invalidBeatmapIDs.Contains(item.Beatmap.OnlineID))
                             item.MarkInvalid();
