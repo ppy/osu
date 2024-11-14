@@ -45,7 +45,11 @@ namespace osu.Game.Rulesets.Difficulty.Skills
                 CurrentSectionEnd += SectionLength;
             }
 
-            CurrentSectionPeak = Math.Max(StrainValueAt(current), CurrentSectionPeak);
+            double strain = StrainValueAt(current);
+            CurrentSectionPeak = Math.Max(strain, CurrentSectionPeak);
+
+            // Store the strain value for the object
+            ObjectStrains.Add(strain);
         }
 
         /// <summary>

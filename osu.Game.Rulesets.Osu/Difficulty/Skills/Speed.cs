@@ -40,8 +40,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             CurrentRhythm = currODHO.RhythmDifficulty;
             double totalStrain = CurrentStrain * CurrentRhythm;
 
-            ObjectStrains.Add(totalStrain);
-
             return totalStrain;
         }
 

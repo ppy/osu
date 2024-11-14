@@ -57,12 +57,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             {
                 hiddenRating = Math.Sqrt(skills[6].DifficultyValue()) * DIFFICULTY_MULTIPLIER;
                 readingHiddenPerformance = ReadingHidden.DifficultyToPerformance(hiddenRating);
-                hiddenDifficultyStrainCount = skills.OfType<ReadingHidden>().First().CountDifficultStrains();
+                hiddenDifficultyStrainCount = skills.OfType<ReadingHidden>().First().CountTopWeightedStrains();
             }
 
-            double aimDifficultyStrainCount = skills[0].CountDifficultStrains();
-            double speedDifficultyStrainCount = skills.OfType<Speed>().First().CountDifficultStrains();
-            double lowArDifficultyStrainCount = skills.OfType<ReadingLowAR>().First().CountDifficultStrains();
+            double aimDifficultyStrainCount = skills[0].CountTopWeightedStrains();
+            double speedDifficultyStrainCount = skills.OfType<Speed>().First().CountTopWeightedStrains();
+            double lowArDifficultyStrainCount = skills.OfType<ReadingLowAR>().First().CountTopWeightedStrains();
 
             if (mods.Any(m => m is OsuModTouchDevice))
             {
