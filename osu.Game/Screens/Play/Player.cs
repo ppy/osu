@@ -298,7 +298,7 @@ namespace osu.Game.Screens.Play
                     {
                         if (!this.IsCurrentScreen()) return;
 
-                        PerformExit(true);
+                        PerformExit(skipTransition: true);
                     },
                 },
             });
@@ -721,7 +721,7 @@ namespace osu.Game.Screens.Play
 
             RestartRequested?.Invoke(quickRestart);
 
-            return PerformExit(quickRestart);
+            return PerformExit(skipTransition: quickRestart);
         }
 
         /// <summary>
