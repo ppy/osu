@@ -32,7 +32,8 @@ namespace osu.Game.Rulesets.Osu.Mods
             typeof(ModAutoplay),
             typeof(OsuModMagnetised),
             typeof(OsuModRepel),
-            typeof(ModTouchDevice)
+            typeof(ModTouchDevice),
+            typeof(OsuModBloom)
         };
 
         private OsuInputManager inputManager = null!;

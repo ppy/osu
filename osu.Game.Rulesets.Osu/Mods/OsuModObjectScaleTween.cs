@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         protected virtual float EndScale => 1;
 
-        public override Type[] IncompatibleMods => new[] { typeof(IRequiresApproachCircles), typeof(OsuModSpinIn), typeof(OsuModObjectScaleTween), typeof(OsuModDepth) };
+        public override Type[] IncompatibleMods => new[] { typeof(IRequiresApproachCircles), typeof(OsuModSpinIn), typeof(OsuModObjectScaleTween), typeof(OsuModDepth), typeof(OsuModBloom) };
 
         protected override void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state)
         {

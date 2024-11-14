@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override double ScoreMultiplier => 1;
         protected const float MIN_SIZE = 1;
         protected const float TRANSITION_DURATION = 100;
-        public override Type[] IncompatibleMods => new[] { typeof(OsuModFlashlight), typeof(OsuModNoScope), typeof(OsuModObjectScaleTween), typeof(OsuModTouchDevice), typeof(OsuModAutopilot) };
+        public override Type[] IncompatibleMods => new[] { typeof(OsuModFlashlight), typeof(OsuModNoScope), typeof(OsuModObjectScaleTween), typeof(ModTouchDevice), typeof(OsuModAutopilot) };
 
         protected readonly BindableNumber<int> CurrentCombo = new BindableInt();
         protected readonly IBindable<bool> IsBreakTime = new Bindable<bool>();
