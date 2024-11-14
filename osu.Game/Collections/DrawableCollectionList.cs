@@ -43,8 +43,25 @@ namespace osu.Game.Collections
 
         private void collectionsChanged(IRealmCollection<BeatmapCollection> collections, ChangeSet? changes)
         {
-            Items.Clear();
-            Items.AddRange(collections.AsEnumerable().Select(c => c.ToLive(realm)));
+            if (changes == null)
+            {
+                Items.AddRange(collections.AsEnumerable().Select(c => c.ToLive(realm)));
+                return;
+            }
+
+            foreach (int i in changes.DeletedIndices.OrderDescending())
+                Items.RemoveAt(i);
+
+            foreach (int i in changes.InsertedIndices)
+                Items.Insert(i, collections[i].ToLive(realm));
+
+            foreach (int i in changes.NewModifiedIndices)
+            {
+                var updatedItem = collections[i];
+
+                Items.RemoveAt(i);
+                Items.Insert(i, updatedItem.ToLive(realm));
+            }
         }
 
         protected override OsuRearrangeableListItem<Live<BeatmapCollection>> CreateOsuDrawable(Live<BeatmapCollection> item)
