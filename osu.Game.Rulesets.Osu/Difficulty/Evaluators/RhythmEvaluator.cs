@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
 
@@ -120,7 +121,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                                 islandCount.Count++;
 
                             // repeated island (ex: triplet -> triplet)
-                            double power = logistic(island.Delta, 2.75, 0.24, 14);
+                            double power = DifficultyCalculationUtils.Logistic(island.Delta, maxValue: 2.75, multiplier: 0.24, midpointOffset: 58.33);
                             effectiveRatio *= Math.Min(3.0 / islandCount.Count, Math.Pow(1.0 / islandCount.Count, power));
 
                             islandCounts[countIndex] = (islandCount.Island, islandCount.Count);
@@ -171,8 +172,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             return Math.Sqrt(4 + rhythmComplexitySum * rhythm_overall_multiplier) / 2.0; // produces multiplier that can be applied to strain. range [1, infinity) (not really though)
         }
-
-        private static double logistic(double x, double maxValue, double multiplier, double offset) => (maxValue / (1 + Math.Pow(Math.E, offset - (multiplier * x))));
 
         private class Island : IEquatable<Island>
         {
