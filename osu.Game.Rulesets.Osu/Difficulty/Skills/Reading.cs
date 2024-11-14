@@ -72,16 +72,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             values = values.OrderByDescending(d => d).ToList();
 
-            Difficulty = 0;
+            double difficulty = 0;
 
             // Difficulty is the weighted sum of the highest strains from every section.
             // We're sorting from highest to lowest strain.
             for (int i = 0; i < values.Count; i++)
             {
-                Difficulty += values[i] / (i + 1);
+                difficulty += values[i] / (i + 1);
             }
 
-            return Difficulty;
+            return difficulty;
         }
         public static double DifficultyToPerformance(double difficulty) => Math.Max(
             Math.Max(Math.Pow(difficulty, 1.5) * 20, Math.Pow(difficulty, 2) * 17.0),
@@ -181,12 +181,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             double totalPerformance = Math.Pow(Math.Pow(aimPerformance, sumPower) + Math.Pow(speedPerformance, sumPower), 1.0 / sumPower);
 
             double adjustedDifficulty = performanceToDifficulty(totalPerformance);
-            double difficultyValue = Math.Pow(adjustedDifficulty / OsuDifficultyCalculator.DIFFICULTY_MULTIPLIER, 2.0);
+            double rawDifficultyValue = Math.Pow(adjustedDifficulty / OsuDifficultyCalculator.DIFFICULTY_MULTIPLIER, 2.0);
 
-            Difficulty = Math.Pow(difficultyValue, MECHANICAL_PP_POWER);
+            double difficulty = Math.Pow(rawDifficultyValue, MECHANICAL_PP_POWER);
 
             // Sqrt value to make difficulty depend less on mechanical difficulty
-            return Difficulty;
+            return difficulty;
         }
         public class HighARAimComponent : Aim
         {

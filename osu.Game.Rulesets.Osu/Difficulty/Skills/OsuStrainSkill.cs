@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         public override double DifficultyValue()
         {
-            Difficulty = 0;
+            double difficulty = 0;
             double weight = 1;
 
             // Sections with 0 strain are excluded to avoid worst-case time complexity of the following sort (e.g. /b/2351871).
@@ -54,11 +54,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             // We're sorting from highest to lowest strain.
             foreach (double strain in strains.OrderDescending())
             {
-                Difficulty += strain * weight;
+                difficulty += strain * weight;
                 weight *= DecayWeight;
             }
 
-            return Difficulty;
+            return difficulty;
         }
 
         /// <summary>
