@@ -290,19 +290,17 @@ namespace osu.Game.Tests.Visual.OnlinePlay
             var result = JsonConvert.DeserializeObject<Room>(JsonConvert.SerializeObject(source));
             Debug.Assert(result != null);
 
-            // Playlist item IDs and beatmaps aren't serialised.
-            if (source.CurrentPlaylistItem != null)
-            {
-                Debug.Assert(result.CurrentPlaylistItem != null);
-                result.CurrentPlaylistItem = result.CurrentPlaylistItem.With(new Optional<IBeatmapInfo>(source.CurrentPlaylistItem.Beatmap));
-                result.CurrentPlaylistItem.ID = source.CurrentPlaylistItem.ID;
-            }
+            // When serialising, only beatmap IDs are sent to the server.
+            // When deserialising, full beatmaps and IDs are expected to arrive.
 
-            for (int i = 0; i < source.Playlist.Count; i++)
-            {
-                result.Playlist[i] = result.Playlist[i].With(new Optional<IBeatmapInfo>(source.Playlist[i].Beatmap));
-                result.Playlist[i].ID = source.Playlist[i].ID;
-            }
+            PlaylistItem? finalCurrentItem = result.CurrentPlaylistItem?.With(id: source.CurrentPlaylistItem!.ID, beatmap: new Optional<IBeatmapInfo>(source.CurrentPlaylistItem.Beatmap));
+            PlaylistItem[] finalPlaylist = result.Playlist.Select((pi, i) => pi.With(id: source.Playlist[i].ID, beatmap: new Optional<IBeatmapInfo>(source.Playlist[i].Beatmap))).ToArray();
+
+            // When setting the properties, we do a clear-then-add, otherwise equality comparers (that only compare by ID) pass early and members don't get replaced.
+            result.CurrentPlaylistItem = null;
+            result.CurrentPlaylistItem = finalCurrentItem;
+            result.Playlist = [];
+            result.Playlist = finalPlaylist;
 
             return result;
         }

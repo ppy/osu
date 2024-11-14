@@ -38,6 +38,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         private MatchLeaderboard leaderboard = null!;
         private SelectionPollingComponent selectionPollingComponent = null!;
         private FillFlowContainer progressSection = null!;
+        private DrawableRoomPlaylist drawablePlaylist = null!;
 
         public PlaylistsRoomSubScreen(Room room)
             : base(room, false) // Editing is temporarily not allowed.
@@ -77,6 +78,10 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                 case nameof(Room.MaxAttempts):
                     updateRoomMaxAttempts();
                     break;
+
+                case nameof(Room.Playlist):
+                    updateRoomPlaylist();
+                    break;
             }
         }
 
@@ -92,6 +97,9 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
         private void updateRoomMaxAttempts()
             => progressSection.Alpha = Room.MaxAttempts != null ? 1 : 0;
+
+        private void updateRoomPlaylist()
+            => drawablePlaylist.Items.ReplaceRange(0, drawablePlaylist.Items.Count, Room.Playlist);
 
         protected override Drawable CreateMainContent() => new Container
         {
@@ -122,13 +130,12 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                 Padding = new MarginPadding { Right = 5 },
                                 Content = new[]
                                 {
-                                    new Drawable[] { new OverlinedPlaylistHeader(), },
+                                    new Drawable[] { new OverlinedPlaylistHeader(Room), },
                                     new Drawable[]
                                     {
-                                        new DrawableRoomPlaylist
+                                        drawablePlaylist = new DrawableRoomPlaylist
                                         {
                                             RelativeSizeAxes = Axes.Both,
-                                            Items = { BindTarget = Room.Playlist },
                                             SelectedItem = { BindTarget = SelectedItem },
                                             AllowSelection = true,
                                             AllowShowingResults = true,

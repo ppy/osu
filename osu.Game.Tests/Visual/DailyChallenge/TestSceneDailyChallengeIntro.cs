@@ -71,13 +71,13 @@ namespace osu.Game.Tests.Visual.DailyChallenge
                     RoomID = roomId,
                     Name = "Daily Challenge: June 4, 2024",
                     Playlist =
-                    {
+                    [
                         new PlaylistItem(CreateAPIBeatmap(new OsuRuleset().RulesetInfo))
                         {
                             RequiredMods = [new APIMod(new OsuModTraceable())],
                             AllowedMods = [new APIMod(new OsuModDoubleTime())]
                         }
-                    },
+                    ],
                     StartDate = DateTimeOffset.Now,
                     EndDate = DateTimeOffset.Now.AddHours(24),
                     Category = RoomCategory.DailyChallenge

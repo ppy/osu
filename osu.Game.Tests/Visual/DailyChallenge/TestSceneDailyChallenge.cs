@@ -42,13 +42,13 @@ namespace osu.Game.Tests.Visual.DailyChallenge
                 RoomID = 1234,
                 Name = "Daily Challenge: June 4, 2024",
                 Playlist =
-                {
+                [
                     new PlaylistItem(TestResources.CreateTestBeatmapSetInfo().Beatmaps.First())
                     {
                         RequiredMods = [new APIMod(new OsuModTraceable())],
                         AllowedMods = [new APIMod(new OsuModDoubleTime())]
                     }
-                },
+                ],
                 EndDate = DateTimeOffset.Now.AddHours(12),
                 Category = RoomCategory.DailyChallenge
             };
@@ -65,13 +65,13 @@ namespace osu.Game.Tests.Visual.DailyChallenge
                 RoomID = 1234,
                 Name = "Daily Challenge: June 4, 2024",
                 Playlist =
-                {
+                [
                     new PlaylistItem(TestResources.CreateTestBeatmapSetInfo().Beatmaps.First())
                     {
                         RequiredMods = [new APIMod(new OsuModTraceable())],
                         AllowedMods = [new APIMod(new OsuModDoubleTime())]
                     }
-                },
+                ],
                 EndDate = DateTimeOffset.Now.AddHours(12),
                 Category = RoomCategory.DailyChallenge
             };
@@ -94,13 +94,13 @@ namespace osu.Game.Tests.Visual.DailyChallenge
                 RoomID = 1234,
                 Name = "Daily Challenge: June 4, 2024",
                 Playlist =
-                {
+                [
                     new PlaylistItem(TestResources.CreateTestBeatmapSetInfo().Beatmaps.First())
                     {
                         RequiredMods = [new APIMod(new OsuModTraceable())],
                         AllowedMods = [new APIMod(new OsuModDoubleTime())]
                     }
-                },
+                ],
                 EndDate = DateTimeOffset.Now.AddHours(12),
                 Category = RoomCategory.DailyChallenge
             };

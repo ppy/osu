@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Linq;
 using NUnit.Framework;
@@ -27,10 +25,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public partial class TestSceneMultiplayerQueueList : MultiplayerTestScene
     {
-        private MultiplayerQueueList playlist;
-        private BeatmapManager beatmaps;
-        private BeatmapSetInfo importedSet;
-        private BeatmapInfo importedBeatmap;
+        private MultiplayerQueueList playlist = null!;
+        private BeatmapManager beatmaps = null!;
+        private BeatmapSetInfo importedSet = null!;
+        private BeatmapInfo importedBeatmap = null!;
 
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
@@ -46,12 +44,17 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("create playlist", () =>
             {
-                Child = playlist = new MultiplayerQueueList
+                Child = playlist = new MultiplayerQueueList(SelectedRoom.Value)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Size = new Vector2(500, 300),
-                    Items = { BindTarget = MultiplayerClient.ClientAPIRoom!.Playlist }
+                };
+
+                MultiplayerClient.ClientAPIRoom!.PropertyChanged += (_, e) =>
+                {
+                    if (e.PropertyName == nameof(Room.Playlist))
+                        playlist.Items.ReplaceRange(0, playlist.Items.Count, MultiplayerClient.ClientAPIRoom.Playlist);
                 };
             });
 

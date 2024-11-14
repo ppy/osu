@@ -55,9 +55,9 @@ namespace osu.Game.Tests.Visual.UserInterface
                         {
                             RoomID = 1234,
                             Playlist =
-                            {
+                            [
                                 new PlaylistItem(beatmap)
-                            },
+                            ],
                             StartDate = DateTimeOffset.Now.AddMinutes(-5),
                             EndDate = DateTimeOffset.Now.AddSeconds(30)
                         });
@@ -133,9 +133,9 @@ namespace osu.Game.Tests.Visual.UserInterface
                         {
                             RoomID = 1234,
                             Playlist =
-                            {
+                            [
                                 new PlaylistItem(beatmap)
-                            },
+                            ],
                             StartDate = DateTimeOffset.Now.AddMinutes(-50),
                             EndDate = DateTimeOffset.Now.AddSeconds(30)
                         });

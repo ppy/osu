@@ -12,45 +12,34 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 {
     public partial class PlaylistsSongSelect : OnlinePlaySongSelect
     {
+        private readonly Room room;
+
         public PlaylistsSongSelect(Room room)
             : base(room)
         {
+            this.room = room;
         }
 
-        protected override BeatmapDetailArea CreateBeatmapDetailArea() => new MatchBeatmapDetailArea
+        protected override BeatmapDetailArea CreateBeatmapDetailArea() => new MatchBeatmapDetailArea(room)
         {
-            CreateNewItem = createNewItem
+            CreateNewItem = () => room.Playlist = room.Playlist.Append(createNewItem()).ToArray()
         };
 
         protected override bool SelectItem(PlaylistItem item)
         {
-            switch (Playlist.Count)
-            {
-                case 0:
-                    createNewItem();
-                    break;
-
-                case 1:
-                    Playlist.Clear();
-                    createNewItem();
-                    break;
-            }
+            if (room.Playlist.Count <= 1)
+                room.Playlist = [createNewItem()];
 
             this.Exit();
             return true;
         }
 
-        private void createNewItem()
+        private PlaylistItem createNewItem() => new PlaylistItem(Beatmap.Value.BeatmapInfo)
         {
-            PlaylistItem item = new PlaylistItem(Beatmap.Value.BeatmapInfo)
-            {
-                ID = Playlist.Count == 0 ? 0 : Playlist.Max(p => p.ID) + 1,
-                RulesetID = Ruleset.Value.OnlineID,
-                RequiredMods = Mods.Value.Select(m => new APIMod(m)).ToArray(),
-                AllowedMods = FreeMods.Value.Select(m => new APIMod(m)).ToArray()
-            };
-
-            Playlist.Add(item);
-        }
+            ID = room.Playlist.Count == 0 ? 0 : room.Playlist.Max(p => p.ID) + 1,
+            RulesetID = Ruleset.Value.OnlineID,
+            RequiredMods = Mods.Value.Select(m => new APIMod(m)).ToArray(),
+            AllowedMods = FreeMods.Value.Select(m => new APIMod(m)).ToArray()
+        };
     }
 }

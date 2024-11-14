@@ -33,11 +33,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("set playlist", () =>
             {
-                SelectedRoom.Value.Playlist.AddRange(new[]
-                {
+                SelectedRoom.Value.Playlist =
+                [
                     new PlaylistItem(new BeatmapInfo { StarRating = min }),
                     new PlaylistItem(new BeatmapInfo { StarRating = max }),
-                });
+                ];
             });
         }
     }

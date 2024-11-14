@@ -48,7 +48,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("create list", () =>
             {
-                Child = list = new MultiplayerPlaylist
+                Child = list = new MultiplayerPlaylist(SelectedRoom.Value)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -166,7 +166,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 {
                     Name = "test name",
                     Playlist =
-                    {
+                    [
                         new PlaylistItem(new TestBeatmap(Ruleset.Value).BeatmapInfo)
                         {
                             RulesetID = Ruleset.Value.OnlineID
@@ -176,7 +176,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                             RulesetID = Ruleset.Value.OnlineID,
                             Expired = true
                         }
-                    }
+                    ]
                 });
             });
 

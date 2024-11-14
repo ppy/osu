@@ -48,10 +48,13 @@ namespace osu.Game.Tests.Visual.OnlinePlay
                         RulesetIDs = new[] { ruleset.OnlineID },
                     };
 
-                    room.Playlist.Add(new PlaylistItem(new BeatmapInfo { Metadata = new BeatmapMetadata() })
-                    {
-                        RulesetID = ruleset.OnlineID,
-                    });
+                    room.Playlist =
+                    [
+                        new PlaylistItem(new BeatmapInfo { Metadata = new BeatmapMetadata() })
+                        {
+                            RulesetID = ruleset.OnlineID,
+                        }
+                    ];
                 }
 
                 CreateRoom(room);

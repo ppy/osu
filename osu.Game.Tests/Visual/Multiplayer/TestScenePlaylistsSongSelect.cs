@@ -99,12 +99,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("create new item", () => songSelect.BeatmapDetails.CreateNewItem());
             AddStep("create new item", () => songSelect.BeatmapDetails.CreateNewItem());
-            AddStep("rearrange", () =>
-            {
-                var item = SelectedRoom.Value.Playlist[0];
-                SelectedRoom.Value.Playlist.RemoveAt(0);
-                SelectedRoom.Value.Playlist.Add(item);
-            });
+            AddStep("rearrange", () => SelectedRoom.Value.Playlist = SelectedRoom.Value.Playlist.Skip(1).Append(SelectedRoom.Value.Playlist[0]).ToArray());
 
             AddStep("create new item", () => songSelect.BeatmapDetails.CreateNewItem());
             AddAssert("new item has id 2", () => SelectedRoom.Value.Playlist.Last().ID == 2);

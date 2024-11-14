@@ -76,12 +76,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 Name = "Test Room",
                 QueueMode = Mode,
                 Playlist =
-                {
+                [
                     new PlaylistItem(InitialBeatmap)
                     {
                         RulesetID = new OsuRuleset().RulesetInfo.OnlineID
                     }
-                }
+                ]
             }));
 
             AddUntilStep("wait for room open", () => this.ChildrenOfType<MultiplayerMatchSubScreen>().FirstOrDefault()?.IsLoaded == true);
