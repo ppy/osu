@@ -205,7 +205,9 @@ namespace osu.Game.Tests.Visual.Collections
 
             AddStep("click first delete button", () =>
             {
-                InputManager.MoveMouseTo(dialog.ChildrenOfType<DrawableCollectionListItem.DeleteButton>().First(), new Vector2(5, 0));
+                InputManager.MoveMouseTo(dialog
+                                         .ChildrenOfType<DrawableCollectionListItem>().Single(i => i.Model.Value.Name == "1")
+                                         .ChildrenOfType<DrawableCollectionListItem.DeleteButton>().Single(), new Vector2(5, 0));
                 InputManager.Click(MouseButton.Left);
             });
 
@@ -213,9 +215,11 @@ namespace osu.Game.Tests.Visual.Collections
             assertCollectionCount(1);
             assertCollectionName(0, "2");
 
-            AddStep("click first delete button", () =>
+            AddStep("click second delete button", () =>
             {
-                InputManager.MoveMouseTo(dialog.ChildrenOfType<DrawableCollectionListItem.DeleteButton>().First(), new Vector2(5, 0));
+                InputManager.MoveMouseTo(dialog
+                                         .ChildrenOfType<DrawableCollectionListItem>().Single(i => i.Model.Value.Name == "2")
+                                         .ChildrenOfType<DrawableCollectionListItem.DeleteButton>().Single(), new Vector2(5, 0));
                 InputManager.Click(MouseButton.Left);
             });
 
@@ -310,7 +314,7 @@ namespace osu.Game.Tests.Visual.Collections
 
             AddStep("focus first collection", () =>
             {
-                InputManager.MoveMouseTo(firstItem = dialog.ChildrenOfType<DrawableCollectionListItem>().First());
+                InputManager.MoveMouseTo(firstItem = dialog.ChildrenOfType<DrawableCollectionListItem>().Single(i => i.Model.Value.Name == "1"));
                 InputManager.Click(MouseButton.Left);
             });
 
