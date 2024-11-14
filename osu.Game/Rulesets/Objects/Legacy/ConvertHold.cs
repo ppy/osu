@@ -3,17 +3,18 @@
 
 using osu.Game.Rulesets.Objects.Types;
 
-namespace osu.Game.Rulesets.Objects.Legacy.Mania
+namespace osu.Game.Rulesets.Objects.Legacy
 {
     /// <summary>
-    /// Legacy osu!mania Spinner-type, used for parsing Beatmaps.
+    /// Legacy "Hold" hit object type. Generally only valid in the mania ruleset.
     /// </summary>
-    internal sealed class ConvertSpinner : ConvertHitObject, IHasDuration, IHasXPosition
+    /// <remarks>
+    /// Only used for parsing beatmaps and not gameplay.
+    /// </remarks>
+    internal sealed class ConvertHold : ConvertHitObject, IHasDuration
     {
         public double Duration { get; set; }
 
         public double EndTime => StartTime + Duration;
-
-        public float X { get; set; }
     }
 }
