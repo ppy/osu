@@ -23,7 +23,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
 
             AddInternal(scroll = new OsuScrollContainer(direction)
             {
-                Child = list = new ParticipantsList()
+                Child = list = new ParticipantsList(room)
             });
 
             switch (direction)

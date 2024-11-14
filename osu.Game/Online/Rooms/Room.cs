@@ -138,6 +138,15 @@ namespace osu.Game.Online.Rooms
         }
 
         /// <summary>
+        /// The set of most recent participants in the room.
+        /// </summary>
+        public IReadOnlyList<APIUser> RecentParticipants
+        {
+            get => recentParticipants;
+            set => SetList(ref recentParticipants, value);
+        }
+
+        /// <summary>
         /// The match type.
         /// </summary>
         public MatchType Type
@@ -282,6 +291,9 @@ namespace osu.Game.Online.Rooms
         [JsonProperty("participant_count")]
         private int participantCount;
 
+        [JsonProperty("recent_participants")]
+        private IReadOnlyList<APIUser> recentParticipants = [];
+
         [JsonProperty("max_attempts", DefaultValueHandling = DefaultValueHandling.Ignore)]
         private int? maxAttempts;
 
@@ -324,10 +336,6 @@ namespace osu.Game.Online.Rooms
         [JsonProperty("playlist")]
         public readonly BindableList<PlaylistItem> Playlist = new BindableList<PlaylistItem>();
 
-        [Cached]
-        [JsonProperty("recent_participants")]
-        public readonly BindableList<APIUser> RecentParticipants = new BindableList<APIUser>();
-
         /// <summary>
         /// Copies values from another <see cref="Room"/> into this one.
         /// </summary>
@@ -369,11 +377,7 @@ namespace osu.Game.Online.Rooms
                 Playlist.AddRange(other.Playlist);
             }
 
-            if (!RecentParticipants.SequenceEqual(other.RecentParticipants))
-            {
-                RecentParticipants.Clear();
-                RecentParticipants.AddRange(other.RecentParticipants);
-            }
+            RecentParticipants = other.RecentParticipants;
         }
 
         public void RemoveExpiredPlaylistItems()
@@ -410,6 +414,16 @@ namespace osu.Game.Online.Rooms
 
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null!)
             => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
+        protected bool SetList<T>(ref IReadOnlyList<T> list, IReadOnlyList<T> value, [CallerMemberName] string propertyName = null!)
+        {
+            if (list.SequenceEqual(value))
+                return false;
+
+            list = value;
+            OnPropertyChanged(propertyName);
+            return true;
+        }
 
         protected bool SetField<T>(ref T field, T value, [CallerMemberName] string propertyName = null!)
         {

@@ -487,11 +487,11 @@ namespace osu.Game.Online.Multiplayer
         {
             Debug.Assert(APIRoom != null);
 
-            APIRoom.RecentParticipants.Add(user.User ?? new APIUser
+            APIRoom.RecentParticipants = APIRoom.RecentParticipants.Append(user.User ?? new APIUser
             {
                 Id = user.UserID,
                 Username = "[Unresolved]"
-            });
+            }).ToArray();
             APIRoom.ParticipantCount++;
         }
 
@@ -506,7 +506,7 @@ namespace osu.Game.Online.Multiplayer
                 PlayingUserIds.Remove(user.UserID);
 
                 Debug.Assert(APIRoom != null);
-                APIRoom.RecentParticipants.RemoveAll(u => u.Id == user.UserID);
+                APIRoom.RecentParticipants = APIRoom.RecentParticipants.Where(u => u.Id != user.UserID).ToArray();
                 APIRoom.ParticipantCount--;
 
                 callback?.Invoke(user);
