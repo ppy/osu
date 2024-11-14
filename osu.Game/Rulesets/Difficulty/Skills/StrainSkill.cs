@@ -70,10 +70,11 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// </summary>
         public virtual double CountTopWeightedStrains()
         {
-            if (ObjectStrains.Count == 0)
+            double consistentTopStrain = DifficultyValue() / 10; // What would the top strain be if all strain values were identical
+
+            if (ObjectStrains.Count == 0 || consistentTopStrain == 0)
                 return 0.0;
 
-            double consistentTopStrain = DifficultyValue() / 10; // What would the top strain be if all strain values were identical
             // Use a weighted sum of all strains. Constants are arbitrary and give nice values
             return ObjectStrains.Sum(s => 1.1 / (1 + Math.Exp(-10 * (s / consistentTopStrain - 0.88))));
         }
