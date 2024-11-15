@@ -30,6 +30,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
         [Resolved]
         private IPositionSnapProvider? positionSnapProvider { get; set; }
 
+        private EditBodyPiece body = null!;
         private EditHoldNoteEndPiece head = null!;
         private EditHoldNoteEndPiece tail = null!;
 
@@ -45,7 +46,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
         {
             InternalChildren = new Drawable[]
             {
-                new EditBodyPiece
+                body = new EditBodyPiece
                 {
                     RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.BottomCentre,
@@ -113,7 +114,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
             foreach (var child in InternalChildren)
                 child.Anchor = Origin;
 
-            head.Scale = tail.Scale = new Vector2(1, direction.NewValue == ScrollingDirection.Down ? 1 : -1);
+            head.Scale = tail.Scale = body.Scale = new Vector2(1, direction.NewValue == ScrollingDirection.Down ? 1 : -1);
         }
 
         public override Quad SelectionQuad => ScreenSpaceDrawQuad;
