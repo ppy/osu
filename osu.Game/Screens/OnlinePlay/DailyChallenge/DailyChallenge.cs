@@ -119,14 +119,6 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             Padding = new MarginPadding { Horizontal = -HORIZONTAL_OVERFLOW_PADDING };
         }
 
-        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
-        {
-            return new CachedModelDependencyContainer<Room>(base.CreateChildDependencies(parent))
-            {
-                Model = { Value = room }
-            };
-        }
-
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {

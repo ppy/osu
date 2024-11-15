@@ -316,14 +316,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 passwordIcon.Alpha = Room.HasPassword ? 1 : 0;
         }
 
-        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
-        {
-            return new CachedModelDependencyContainer<Room>(base.CreateChildDependencies(parent))
-            {
-                Model = { Value = Room }
-            };
-        }
-
         private int numberOfAvatars = 7;
 
         public int NumberOfAvatars

@@ -287,14 +287,6 @@ namespace osu.Game.Screens.OnlinePlay.Match
             }
         }
 
-        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
-        {
-            return new CachedModelDependencyContainer<Room>(base.CreateChildDependencies(parent))
-            {
-                Model = { Value = Room }
-            };
-        }
-
         protected virtual bool IsConnected => api.State.Value == APIState.Online;
 
         public override bool OnBackButton()

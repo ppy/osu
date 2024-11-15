@@ -18,11 +18,6 @@ namespace osu.Game.Tests.Visual.DailyChallenge
     {
         private readonly Bindable<Room> room = new Bindable<Room>(new Room());
 
-        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) => new CachedModelDependencyContainer<Room>(base.CreateChildDependencies(parent))
-        {
-            Model = { BindTarget = room }
-        };
-
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Plum);
 
