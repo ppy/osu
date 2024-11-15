@@ -269,14 +269,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
         private void updateScreenModeWarning()
         {
             if (RuntimeInfo.OS == RuntimeInfo.Platform.macOS)
-            {
-                if (windowModeDropdown.Current.Value == WindowMode.Fullscreen)
-                    windowModeDropdown.SetNoticeText(LayoutSettingsStrings.FullscreenMacOSNote, true);
-                else
-                    windowModeDropdown.ClearNoticeText();
-
                 return;
-            }
 
             if (windowModeDropdown.Current.Value != WindowMode.Fullscreen)
             {
