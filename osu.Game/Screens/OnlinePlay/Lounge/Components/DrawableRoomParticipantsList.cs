@@ -21,7 +21,7 @@ using Container = osu.Framework.Graphics.Containers.Container;
 
 namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 {
-    public partial class DrawableRoomParticipantsList : OnlinePlayComposite
+    public partial class DrawableRoomParticipantsList : CompositeDrawable
     {
         public const float SHEAR_WIDTH = 12f;
         private const float avatar_size = 36;

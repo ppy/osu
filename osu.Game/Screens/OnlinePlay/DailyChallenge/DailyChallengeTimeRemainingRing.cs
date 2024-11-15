@@ -17,7 +17,7 @@ using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 {
-    public partial class DailyChallengeTimeRemainingRing : OnlinePlayComposite
+    public partial class DailyChallengeTimeRemainingRing : CompositeDrawable
     {
         private readonly Room room;
 

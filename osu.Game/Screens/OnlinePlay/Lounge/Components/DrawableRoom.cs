@@ -346,7 +346,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
             if (Room.Type != MatchType.Playlists)
             {
-                pills.AddRange(new OnlinePlayComposite[]
+                pills.AddRange(new Drawable[]
                 {
                     new MatchTypePill(Room),
                     new QueueModePill(Room),
@@ -377,7 +377,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             Room.PropertyChanged -= onRoomPropertyChanged;
         }
 
-        private partial class RoomStatusText : OnlinePlayComposite
+        private partial class RoomStatusText : CompositeDrawable
         {
             public readonly IBindable<PlaylistItem?> SelectedItem = new Bindable<PlaylistItem?>();
 

@@ -47,14 +47,14 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
         protected override void SelectBeatmap() => settings.SelectBeatmap();
 
-        protected override OnlinePlayComposite CreateSettings(Room room) => settings = new MatchSettings(room)
+        protected override Drawable CreateSettings(Room room) => settings = new MatchSettings(room)
         {
             RelativeSizeAxes = Axes.Both,
             RelativePositionAxes = Axes.Y,
             EditPlaylist = () => EditPlaylist?.Invoke()
         };
 
-        protected partial class MatchSettings : OnlinePlayComposite
+        protected partial class MatchSettings : CompositeDrawable
         {
             private const float disabled_alpha = 0.2f;
 
