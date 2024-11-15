@@ -5,7 +5,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
-using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.Edit.Blueprints.Components;
 using osu.Game.Rulesets.Mania.Objects;
@@ -18,9 +17,6 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 {
     public partial class HoldNoteSelectionBlueprint : ManiaSelectionBlueprint<HoldNote>
     {
-        [Resolved]
-        private OsuColour colours { get; set; } = null!;
-
         [Resolved]
         private IEditorChangeHandler? changeHandler { get; set; }
 
