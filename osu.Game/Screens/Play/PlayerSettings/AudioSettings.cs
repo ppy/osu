@@ -25,7 +25,6 @@ namespace osu.Game.Screens.Play.PlayerSettings
             Children = new Drawable[]
             {
                 beatmapHitsoundsToggle = new PlayerCheckbox { LabelText = SkinSettingsStrings.BeatmapHitsounds },
-                autoAdjustOffsetToggle = new PlayerCheckbox { LabelText = AudioSettingsStrings.AutoAdjustBeatmapOffset },
                 new BeatmapOffsetControl
                 {
                     ReferenceScore = { BindTarget = referenceScore },
@@ -37,7 +36,6 @@ namespace osu.Game.Screens.Play.PlayerSettings
         private void load(OsuConfigManager config, SessionStatics statics)
         {
             beatmapHitsoundsToggle.Current = config.GetBindable<bool>(OsuSetting.BeatmapHitsounds);
-            autoAdjustOffsetToggle.Current = config.GetBindable<bool>(OsuSetting.AutoAdjustBeatmapOffset);
             statics.BindWith(Static.LastLocalUserScore, referenceScore);
         }
     }
