@@ -6,9 +6,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Backgrounds;
-using osu.Game.Rulesets.Mania.Skinning.Default;
-using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.Edit.Blueprints.Components
 {
