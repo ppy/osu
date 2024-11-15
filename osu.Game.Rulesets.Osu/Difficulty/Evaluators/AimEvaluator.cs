@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         private const double wide_angle_multiplier = 1.575;
         private const double acute_angle_multiplier = 1.9;
         private const double angle_deviation_multiplier = 1;
-        private const double slider_multiplier = 1.42;
+        private const double slider_multiplier = 1.5;
         private const double velocity_change_multiplier = 1.725;
 
         /// <summary>
@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double travelVelocity = osuLastObj.TravelDistance / osuLastObj.TravelTime; // calculate the slider velocity from slider head to slider end.
                 double movementVelocity = osuCurrObj.MinimumJumpDistance / osuCurrObj.MinimumJumpTime; // calculate the movement velocity from slider end to current object
 
-                currVelocity = Math.Max(currVelocity, movementVelocity + travelVelocity); // take the larger total combined velocity.
+                currVelocity = Math.Max(currVelocity, movementVelocity + travelVelocity, 1920); // take the larger total combined velocity, capped at 3x diagonal crossmap/s (640) to differentiate techs and oshama.
             }
 
             // As above, do the same for the previous hitobject.
@@ -54,7 +54,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double travelVelocity = osuLastLastObj.TravelDistance / osuLastLastObj.TravelTime;
                 double movementVelocity = osuLastObj.MinimumJumpDistance / osuLastObj.MinimumJumpTime;
 
-                prevVelocity = Math.Max(prevVelocity, movementVelocity + travelVelocity);
+                prevVelocity = Math.Max(prevVelocity, movementVelocity + travelVelocity, 1920);
             }
 
             double wideAngleBonus = 0;
@@ -112,7 +112,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double distRatio = Math.Pow(Math.Sin(Math.PI / 2 * Math.Abs(prevVelocity - currVelocity) / Math.Max(prevVelocity, currVelocity)), 2);
 
                 // Reward for % distance up to 125 / strainTime for overlaps where velocity is still changing.
-                double overlapVelocityBuff = Math.Min(125 / Math.Min(osuCurrObj.StrainTime, osuLastObj.StrainTime), Math.Abs(prevVelocity - currVelocity));
+                double overlapVelocityBuff = Math.Pow(Math.Min(125 / Math.Min(osuCurrObj.StrainTime, osuLastObj.StrainTime), Math.Abs(prevVelocity - currVelocity)), 2) / 125;
 
                 velocityChangeBonus = overlapVelocityBuff * distRatio;
 
@@ -129,9 +129,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             // Add in acute angle bonus or wide angle bonus + velocity change bonus, whichever is larger, (multiplied by the angle deviation bonus).
             aimStrain += Math.Max(acuteAngleBonus * acute_angle_multiplier, wideAngleBonus * wide_angle_multiplier + velocityChangeBonus * velocity_change_multiplier) * (angleDeviationBonus * angle_deviation_multiplier);
 
-            // Add in additional slider velocity bonus.
+            // Add in additional slider velocity bonus. (Tech rework bumps the power of the sliderBonus so that fast sliders buffs more.)
             if (withSliderTravelDistance)
-                aimStrain += sliderBonus * slider_multiplier;
+                aimStrain += Math.Pow(sliderBonus, 1.7) * slider_multiplier / 512;
 
             return aimStrain;
         }
