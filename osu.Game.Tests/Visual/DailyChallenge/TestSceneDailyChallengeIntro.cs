@@ -38,7 +38,7 @@ namespace osu.Game.Tests.Visual.DailyChallenge
             Add(metadataClient);
 
             // add button to observe for daily challenge changes and perform its logic.
-            Add(new DailyChallengeButton(@"button-default-select", new Color4(102, 68, 204, 255), _ => { }, 0, Key.D));
+            Add(new DailyChallengeButton(@"button-default-select", new Color4(102, 68, 204, 255), (_, _) => { }, 0, Key.D));
         }
 
         [Test]
