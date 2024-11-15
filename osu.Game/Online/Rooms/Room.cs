@@ -7,7 +7,6 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Newtonsoft.Json;
-using osu.Framework.Allocation;
 using osu.Game.IO.Serialization.Converters;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
@@ -16,7 +15,7 @@ using osu.Game.Online.Rooms.RoomStatuses;
 namespace osu.Game.Online.Rooms
 {
     [JsonObject(MemberSerialization.OptIn)]
-    public partial class Room : IDependencyInjectionCandidate, INotifyPropertyChanged
+    public partial class Room : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler? PropertyChanged;
 
