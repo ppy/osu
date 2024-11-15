@@ -43,9 +43,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private OsuButton readyButton => control.ChildrenOfType<OsuButton>().Single();
 
-        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
-            new CachedModelDependencyContainer<Room>(base.CreateChildDependencies(parent)) { Model = { BindTarget = room } };
-
         [BackgroundDependencyLoader]
         private void load()
         {
