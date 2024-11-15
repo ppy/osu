@@ -46,8 +46,6 @@ namespace osu.Game.Overlays.Music
         {
             this.beatmap.BindTo(beatmap);
 
-            beatmapSubscription = realm.RegisterForNotifications(r => r.All<BeatmapSetInfo>().Where(s => !s.DeletePending && !s.Protected), beatmapsChanged);
-
             Children = new Drawable[]
             {
                 new Container
@@ -104,6 +102,8 @@ namespace osu.Game.Overlays.Music
         {
             base.LoadComplete();
 
+            beatmapSubscription = realm.RegisterForNotifications(r => r.All<BeatmapSetInfo>().Where(s => !s.DeletePending && !s.Protected), beatmapsChanged);
+
             list.Items.BindTo(beatmapSets);
             beatmap.BindValueChanged(working => list.SelectedSet.Value = working.NewValue.BeatmapSetInfo.ToLive(realm), true);
         }
@@ -119,14 +119,10 @@ namespace osu.Game.Overlays.Music
             }
 
             foreach (int i in changes.InsertedIndices)
-            {
                 beatmapSets.Insert(i, sender[i].ToLive(realm));
-            }
 
             foreach (int i in changes.DeletedIndices.OrderDescending())
-            {
                 beatmapSets.RemoveAt(i);
-            }
         }
 
         protected override void PopIn()
