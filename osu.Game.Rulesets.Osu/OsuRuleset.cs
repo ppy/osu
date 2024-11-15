@@ -214,7 +214,8 @@ namespace osu.Game.Rulesets.Osu
                         new OsuModFreezeFrame(),
                         new OsuModBubbles(),
                         new OsuModSynesthesia(),
-                        new OsuModDepth()
+                        new OsuModDepth(),
+                        new OsuModBloom()
                     };
 
                 case ModType.System:
