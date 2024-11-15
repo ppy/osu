@@ -7,13 +7,13 @@ using osu.Game.Beatmaps.ControlPoints;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
 {
-    public class EffectiveBPMLoader
+    public class EffectiveBPMPreprocessor
     {
         private readonly IList<TaikoDifficultyHitObject> noteObjects;
         private readonly IReadOnlyList<TimingControlPoint?> timingControlPoints;
         private readonly double globalSliderVelocity;
 
-        public EffectiveBPMLoader(IBeatmap beatmap, List<TaikoDifficultyHitObject> noteObjects)
+        public EffectiveBPMPreprocessor(IBeatmap beatmap, List<TaikoDifficultyHitObject> noteObjects)
         {
             this.noteObjects = noteObjects;
             timingControlPoints = beatmap.ControlPointInfo.TimingPoints;
@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
                 double currentSliderVelocity = calculateSliderVelocity(controlPointInfo, currentNoteObject.StartTime, clockRate);
                 currentNoteObject.CurrentSliderVelocity = currentSliderVelocity;
 
-                setEffectiveBPMForObject(currentNoteObject, currentControlPoint, currentSliderVelocity);
+                calculateEffectiveBPM(currentNoteObject, currentControlPoint, currentSliderVelocity);
             }
         }
 
@@ -68,7 +68,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
         /// <summary>
         /// Sets the effective BPM for the given note object.
         /// </summary>
-        private void setEffectiveBPMForObject(TaikoDifficultyHitObject currentNoteObject, TimingControlPoint? currentControlPoint, double currentSliderVelocity)
+        private void calculateEffectiveBPM(TaikoDifficultyHitObject currentNoteObject, TimingControlPoint? currentControlPoint, double currentSliderVelocity)
         {
             if (currentControlPoint != null)
             {

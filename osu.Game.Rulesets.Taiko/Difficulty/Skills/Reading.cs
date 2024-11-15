@@ -22,9 +22,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         private const double high_sv_multiplier = 1.0;
 
         /// <summary>
-        /// Creates a <see cref="Rhythm"/> skill.
+        /// Creates a <see cref="Reading"/> skill.
         /// </summary>
-        /// <param name="mods">Mods for use in skill calculations.</param>
         public Reading(Mod[] mods)
             : base(mods)
         {
@@ -49,7 +48,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 
             // Only return a difficulty value when the Object isn't a Spinner or a Slider.
             double sliderVelocityBonus = calculateHighVelocityBonus(noteObject.EffectiveBPM);
-            ObjectDensity = calculateObjectDensity(noteObject.DeltaTime, noteObject.EffectiveBPM, noteObject.CurrentSliderVelocity);
+            ObjectDensity = calculateObjectDensity(noteObject.DeltaTime, noteObject.CurrentSliderVelocity);
 
             return high_sv_multiplier * sliderVelocityBonus;
         }
@@ -71,7 +70,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             return sigmoid(effectiveBPM, center, range);
         }
 
-        private double calculateObjectDensity(double deltaTime, double effectiveBPM, double currentSliderVelocity)
+        private double calculateObjectDensity(double deltaTime, double currentSliderVelocity)
         {
             // The maximum and minimum center value for density.
             const double density_max = 300;
