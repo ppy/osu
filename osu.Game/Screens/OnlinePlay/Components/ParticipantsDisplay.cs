@@ -4,12 +4,13 @@
 using System.ComponentModel;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.Rooms;
 
 namespace osu.Game.Screens.OnlinePlay.Components
 {
-    public partial class ParticipantsDisplay : OnlinePlayComposite
+    public partial class ParticipantsDisplay : CompositeDrawable
     {
         public readonly Bindable<string> Details = new Bindable<string>();
 

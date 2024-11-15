@@ -18,7 +18,7 @@ using Container = osu.Framework.Graphics.Containers.Container;
 
 namespace osu.Game.Screens.OnlinePlay.Components
 {
-    public partial class StarRatingRangeDisplay : OnlinePlayComposite
+    public partial class StarRatingRangeDisplay : CompositeDrawable
     {
         private readonly Room room;
 

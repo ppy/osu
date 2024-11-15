@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -13,7 +14,7 @@ using osu.Game.Online.Rooms;
 
 namespace osu.Game.Screens.OnlinePlay.Components
 {
-    public partial class BeatmapTitle : OnlinePlayComposite
+    public partial class BeatmapTitle : CompositeDrawable
     {
         private readonly Room room;
         private readonly LinkFlowContainer textFlow;

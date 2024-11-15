@@ -5,12 +5,13 @@ using System;
 using System.ComponentModel;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Online.Rooms;
 
 namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 {
-    public partial class EndDateInfo : OnlinePlayComposite
+    public partial class EndDateInfo : CompositeDrawable
     {
         private readonly Room room;
 

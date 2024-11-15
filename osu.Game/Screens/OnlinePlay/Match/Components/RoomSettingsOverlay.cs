@@ -21,7 +21,7 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
         protected const float TRANSITION_DURATION = 350;
         protected const float FIELD_PADDING = 25;
 
-        protected OnlinePlayComposite Settings { get; set; } = null!;
+        protected Drawable Settings { get; set; } = null!;
 
         protected override bool BlockScrollInput => false;
 
@@ -48,7 +48,7 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
 
         protected abstract void SelectBeatmap();
 
-        protected abstract OnlinePlayComposite CreateSettings(Room room);
+        protected abstract Drawable CreateSettings(Room room);
 
         protected override void PopIn()
         {

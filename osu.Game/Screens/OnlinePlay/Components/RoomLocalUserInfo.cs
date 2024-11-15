@@ -12,7 +12,7 @@ using osu.Game.Online.Rooms;
 
 namespace osu.Game.Screens.OnlinePlay.Components
 {
-    public partial class RoomLocalUserInfo : OnlinePlayComposite
+    public partial class RoomLocalUserInfo : CompositeDrawable
     {
         private readonly Room room;
         private OsuSpriteText attemptDisplay = null!;
