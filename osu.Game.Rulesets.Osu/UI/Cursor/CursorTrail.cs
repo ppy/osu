@@ -14,6 +14,7 @@ using osu.Framework.Graphics.Rendering.Vertices;
 using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Shaders.Types;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Graphics.Visualisation;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Framework.Timing;
@@ -23,6 +24,7 @@ using osuTK.Graphics.ES30;
 
 namespace osu.Game.Rulesets.Osu.UI.Cursor
 {
+    [DrawVisualiserHidden]
     public partial class CursorTrail : Drawable, IRequireHighFrequencyMousePosition
     {
         private const int max_sprites = 2048;

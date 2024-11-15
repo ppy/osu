@@ -195,7 +195,10 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 },
             };
 
-            if (hitEvents.Count < 10)
+            // affecting unstable rate here is used as a substitute of determining if a hit event represents a *timed* hit event,
+            // i.e. an user input that the user had to *time to the track*,
+            // i.e. one that it *makes sense to use* when doing anything with timing and offsets.
+            if (hitEvents.Count(HitEventExtensions.AffectsUnstableRate) < 10)
             {
                 referenceScoreContainer.AddRange(new Drawable[]
                 {

@@ -158,7 +158,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             if (!string.IsNullOrEmpty(message))
                 Logger.Log(message, LoggingTarget.Runtime, LogLevel.Important);
 
-            Schedule(() => PerformExit(false));
+            Schedule(() => PerformExit());
         }
 
         private void onGameplayStarted() => Scheduler.Add(() =>

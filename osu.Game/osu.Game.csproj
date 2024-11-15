@@ -20,7 +20,7 @@
   <ItemGroup Label="Package References">
     <PackageReference Include="AutoMapper" Version="13.0.1" />
     <PackageReference Include="DiffPlex" Version="1.7.2" />
-    <PackageReference Include="HtmlAgilityPack" Version="1.11.67" />
+    <PackageReference Include="HtmlAgilityPack" Version="1.11.70" />
     <PackageReference Include="Humanizer" Version="2.14.1" />
     <PackageReference Include="MessagePack" Version="2.5.187" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="8.0.10" />
@@ -35,9 +35,9 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Realm" Version="11.5.0" />
-    <PackageReference Include="ppy.osu.Framework" Version="2024.1025.0" />
+    <PackageReference Include="ppy.osu.Framework" Version="2024.1112.0" />
     <PackageReference Include="ppy.osu.Game.Resources" Version="2024.1106.0" />
-    <PackageReference Include="Sentry" Version="4.12.1" />
+    <PackageReference Include="Sentry" Version="4.13.0" />
     <!-- Held back due to 0.34.0 failing AOT compilation on ZstdSharp.dll dependency. -->
     <PackageReference Include="SharpCompress" Version="0.38.0" />
     <PackageReference Include="NUnit" Version="3.14.0" />
