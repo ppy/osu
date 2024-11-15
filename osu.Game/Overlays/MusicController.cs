@@ -97,7 +97,7 @@ namespace osu.Game.Overlays
 
             Playlist.AddRange(realm.Realm.All<BeatmapSetInfo>().Where(x => !x.DeletePending).AsEnumerable().Select(x => x.ToLive(realm)));
 
-            beatmapSubscription = realm.RegisterForNotifications(r => r.All<BeatmapSetInfo>().Where(s => !s.DeletePending && !s.Protected), beatmapsChanged);
+            beatmapSubscription = realm.RegisterForNotifications(r => r.All<BeatmapSetInfo>().Where(s => !s.DeletePending), beatmapsChanged);
 
             beatmap.BindValueChanged(b =>
             {
@@ -109,8 +109,8 @@ namespace osu.Game.Overlays
 
         private void beatmapsChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet? changes)
         {
-            Playlist.RemoveAll(x => !x.Value.Protected);
-            Playlist.AddRange(sender.Select(b => b.ToLive(realm)));
+            Playlist.Clear();
+            Playlist.AddRange(sender.Select(x => x.ToLive(realm)));
         }
 
         protected override void Dispose(bool isDisposing)
