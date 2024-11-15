@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double travelVelocity = osuLastObj.TravelDistance / osuLastObj.TravelTime; // calculate the slider velocity from slider head to slider end.
                 double movementVelocity = osuCurrObj.MinimumJumpDistance / osuCurrObj.MinimumJumpTime; // calculate the movement velocity from slider end to current object
 
-                currVelocity = Math.Max(currVelocity, movementVelocity + travelVelocity, 1920); // take the larger total combined velocity, capped at 3x diagonal crossmap/s (640) to differentiate techs and oshama.
+                currVelocity = Math.Max(currVelocity, movementVelocity + travelVelocity, 1.92); // take the larger total combined velocity, capped at 3x diagonal crossmap/s (0.64/ms) to differentiate techs and oshama.
             }
 
             // As above, do the same for the previous hitobject.
@@ -54,7 +54,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double travelVelocity = osuLastLastObj.TravelDistance / osuLastLastObj.TravelTime;
                 double movementVelocity = osuLastObj.MinimumJumpDistance / osuLastObj.MinimumJumpTime;
 
-                prevVelocity = Math.Max(prevVelocity, movementVelocity + travelVelocity, 1920);
+                prevVelocity = Math.Max(prevVelocity, movementVelocity + travelVelocity, 1.92);
             }
 
             double wideAngleBonus = 0;
@@ -123,7 +123,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             if (osuLastObj.BaseObject is Slider)
             {
                 // Reward sliders based on velocity.
-                sliderBonus = osuLastObj.TravelDistance / osuLastObj.TravelTime;
+                sliderBonus = Math.Max(osuLastObj.TravelDistance / osuLastObj.TravelTime, 1.92);
             }
 
             // Add in acute angle bonus or wide angle bonus + velocity change bonus, whichever is larger, (multiplied by the angle deviation bonus).
@@ -131,7 +131,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             // Add in additional slider velocity bonus. (Tech rework bumps the power of the sliderBonus so that fast sliders buffs more.)
             if (withSliderTravelDistance)
-                aimStrain += Math.Pow(sliderBonus, 1.7) * slider_multiplier / 512;
+                aimStrain += Math.Pow(sliderBonus * 2.25, 1.7) * slider_multiplier / 2;
 
             return aimStrain;
         }
