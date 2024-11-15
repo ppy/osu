@@ -20,6 +20,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Rulesets.Mods;
+using Realms;
 
 namespace osu.Game.Overlays
 {
@@ -73,6 +74,8 @@ namespace osu.Game.Overlays
 
         private AudioFilter audioDuckFilter = null!;
 
+        private IDisposable? beatmapSubscription;
+
         private readonly Bindable<RandomSelectAlgorithm> randomSelectAlgorithm = new Bindable<RandomSelectAlgorithm>();
         private readonly List<Live<BeatmapSetInfo>> previousRandomSets = new List<Live<BeatmapSetInfo>>();
         private int randomHistoryDirection;
@@ -92,12 +95,29 @@ namespace osu.Game.Overlays
         {
             base.LoadComplete();
 
+            Playlist.AddRange(realm.Realm.All<BeatmapSetInfo>().Where(x => !x.DeletePending).AsEnumerable().Select(x => x.ToLive(realm)));
+
+            beatmapSubscription = realm.RegisterForNotifications(r => r.All<BeatmapSetInfo>().Where(s => !s.DeletePending && !s.Protected), beatmapsChanged);
+
             beatmap.BindValueChanged(b =>
             {
                 if (b.NewValue != null)
                     changeBeatmap(b.NewValue);
             }, true);
             mods.BindValueChanged(_ => ResetTrackAdjustments(), true);
+        }
+
+        private void beatmapsChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet? changes)
+        {
+            Playlist.RemoveAll(x => !x.Value.Protected);
+            Playlist.AddRange(sender.Select(b => b.ToLive(realm)));
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            beatmapSubscription?.Dispose();
         }
 
         /// <summary>

@@ -59,7 +59,7 @@ namespace osu.Game.Overlays.Music
 
             void updateMusicControllerPlaylist() => Scheduler.AddOnce(() =>
             {
-                musicController.Playlist.Clear();
+                musicController.Playlist.RemoveAll(x => !x.Value.Protected);
                 musicController.Playlist.AddRange(AllVisibleSets);
             });
         }
