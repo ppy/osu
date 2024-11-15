@@ -10,13 +10,11 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
     public class EffectiveBPMPreprocessor
     {
         private readonly IList<TaikoDifficultyHitObject> noteObjects;
-        private readonly IReadOnlyList<TimingControlPoint?> timingControlPoints;
         private readonly double globalSliderVelocity;
 
         public EffectiveBPMPreprocessor(IBeatmap beatmap, List<TaikoDifficultyHitObject> noteObjects)
         {
             this.noteObjects = noteObjects;
-            timingControlPoints = beatmap.ControlPointInfo.TimingPoints;
             globalSliderVelocity = beatmap.Difficulty.SliderMultiplier;
         }
 
@@ -25,35 +23,17 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
         /// </summary>
         public void LoadEffectiveBPM(ControlPointInfo controlPointInfo, double clockRate)
         {
-            using var controlPointEnumerator = timingControlPoints.GetEnumerator();
-            controlPointEnumerator.MoveNext();
-            var currentControlPoint = controlPointEnumerator.Current;
-            var nextControlPoint = controlPointEnumerator.MoveNext() ? controlPointEnumerator.Current : null;
-
             foreach (var currentNoteObject in noteObjects)
             {
-                currentControlPoint = getNextControlPoint(currentNoteObject, currentControlPoint, ref nextControlPoint, controlPointEnumerator);
+                // Retrieve the timing point at the note's start time
+                TimingControlPoint currentControlPoint = controlPointInfo.TimingPointAt(currentNoteObject.StartTime);
 
-                // Calculate and set slider velocity for the current note object.
+                // Calculate the slider velocity at the note's start time.
                 double currentSliderVelocity = calculateSliderVelocity(controlPointInfo, currentNoteObject.StartTime, clockRate);
                 currentNoteObject.CurrentSliderVelocity = currentSliderVelocity;
 
-                calculateEffectiveBPM(currentNoteObject, currentControlPoint, currentSliderVelocity);
+                currentNoteObject.EffectiveBPM = currentControlPoint.BPM * currentSliderVelocity;
             }
-        }
-
-        /// <summary>
-        /// Advances to the next timing control point if the current note's start time exceeds the current control point's time.
-        /// </summary>
-        private TimingControlPoint? getNextControlPoint(TaikoDifficultyHitObject currentNoteObject, TimingControlPoint? currentControlPoint, ref TimingControlPoint? nextControlPoint, IEnumerator<TimingControlPoint?> controlPointEnumerator)
-        {
-            if (nextControlPoint != null && currentNoteObject.StartTime > nextControlPoint.Time)
-            {
-                currentControlPoint = nextControlPoint;
-                nextControlPoint = controlPointEnumerator.MoveNext() ? controlPointEnumerator.Current : null;
-            }
-
-            return currentControlPoint;
         }
 
         /// <summary>
@@ -63,17 +43,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
         {
             var activeEffectControlPoint = controlPointInfo.EffectPointAt(startTime);
             return globalSliderVelocity * (activeEffectControlPoint.ScrollSpeed) * clockRate;
-        }
-
-        /// <summary>
-        /// Sets the effective BPM for the given note object.
-        /// </summary>
-        private void calculateEffectiveBPM(TaikoDifficultyHitObject currentNoteObject, TimingControlPoint? currentControlPoint, double currentSliderVelocity)
-        {
-            if (currentControlPoint != null)
-            {
-                currentNoteObject.EffectiveBPM = currentControlPoint.BPM * currentSliderVelocity;
-            }
         }
     }
 }
