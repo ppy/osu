@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Logging;
-using osu.Framework.Platform;
 using osu.Game;
 using osu.Game.Configuration;
 using osu.Game.Overlays;
@@ -20,7 +19,7 @@ namespace osu.Desktop.Updater
 {
     public partial class VelopackUpdateManager : Game.Updater.UpdateManager
     {
-        private UpdateManager updateManager;
+        private UpdateManager updateManager = null!;
         private INotificationOverlay notificationOverlay = null!;
 
         [Resolved]
@@ -31,9 +30,6 @@ namespace osu.Desktop.Updater
 
         [Resolved]
         private OsuConfigManager osuConfigManager { get; set; } = null!;
-
-        [Resolved]
-        private Storage storage { get; set; } = null!;
 
         private bool isInGameplay => localUserInfo?.PlayingState.Value != LocalUserPlayingState.NotPlaying;
 
