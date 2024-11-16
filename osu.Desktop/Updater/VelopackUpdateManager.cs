@@ -4,8 +4,11 @@
 using System;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Logging;
+using osu.Framework.Platform;
 using osu.Game;
+using osu.Game.Configuration;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Screens.Play;
@@ -16,7 +19,7 @@ namespace osu.Desktop.Updater
 {
     public partial class VelopackUpdateManager : Game.Updater.UpdateManager
     {
-        private readonly UpdateManager updateManager;
+        private UpdateManager updateManager;
         private INotificationOverlay notificationOverlay = null!;
 
         [Resolved]
@@ -25,22 +28,45 @@ namespace osu.Desktop.Updater
         [Resolved]
         private ILocalUserPlayInfo? localUserInfo { get; set; }
 
+        [Resolved]
+        private OsuConfigManager osuConfigManager { get; set; } = null!;
+
+        [Resolved]
+        private Storage storage { get; set; } = null!;
+
         private bool isInGameplay => localUserInfo?.PlayingState.Value != LocalUserPlayingState.NotPlaying;
 
         private UpdateInfo? pendingUpdate;
 
-        public VelopackUpdateManager()
-        {
-            updateManager = new UpdateManager(new GithubSource(@"https://github.com/ppy/osu", null, false), new UpdateOptions
-            {
-                AllowVersionDowngrade = true,
-            });
-        }
+        private Bindable<ReleaseStream> releaseStream => osuConfigManager.GetBindable<ReleaseStream>(OsuSetting.ReleaseStream);
 
         [BackgroundDependencyLoader]
         private void load(INotificationOverlay notifications)
         {
             notificationOverlay = notifications;
+
+            UpdateOptions options = new UpdateOptions
+            {
+                AllowVersionDowngrade = true,
+            };
+
+            string platform = Environment.OSVersion.Platform switch
+            {
+                PlatformID.Win32NT => "win",
+                PlatformID.Unix => "linux",
+                PlatformID.MacOSX => "osx",
+                _ => throw new PlatformNotSupportedException(),
+            };
+
+            if (releaseStream.Value == ReleaseStream.Photon)
+            {
+                options.ExplicitChannel = $"{platform}-photon";
+                Logger.Log("Using photon channel");
+            }
+            else if (releaseStream.Value == ReleaseStream.Lazer)
+                options.ExplicitChannel = platform;
+
+            updateManager = new UpdateManager(new GithubSource(@"https://github.com/ppy/osu", null, false), options);
         }
 
         protected override async Task<bool> PerformUpdateCheck() => await checkForUpdateAsync().ConfigureAwait(false);
