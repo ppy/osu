@@ -7,8 +7,14 @@ using osu.Game.Rulesets.Difficulty;
 
 namespace osu.Game.Rulesets.Mania.Difficulty
 {
-    public class ManiaPerformanceAttributes : PerformanceAttributes
+    public interface IManiaPerformanceAttributes
     {
+        public double Difficulty { get; set; }
+    }
+
+    public class ManiaPerformanceAttributes : PerformanceAttributes, IManiaPerformanceAttributes
+    {
+        /// <inheritdoc/>
         [JsonProperty("difficulty")]
         public double Difficulty { get; set; }
 

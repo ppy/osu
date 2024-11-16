@@ -8,7 +8,7 @@ using osu.Game.Rulesets.Difficulty;
 
 namespace osu.Game.Rulesets.Mania.Difficulty
 {
-    public class ManiaDifficultyAttributes : DifficultyAttributes
+    public interface IManiaDifficultyAttributes
     {
         /// <summary>
         /// The hit window for a GREAT hit inclusive of rate-adjusting mods (DT/HT/etc).
@@ -16,6 +16,12 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         /// <remarks>
         /// Rate-adjusting mods do not affect the hit window at all in osu-stable.
         /// </remarks>
+        public double GreatHitWindow { get; set; }
+    }
+
+    public class ManiaDifficultyAttributes : DifficultyAttributes, IManiaDifficultyAttributes
+    {
+        /// <inheritdoc/>
         [JsonProperty("great_hit_window")]
         public double GreatHitWindow { get; set; }
 

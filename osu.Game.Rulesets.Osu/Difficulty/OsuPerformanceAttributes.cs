@@ -7,20 +7,38 @@ using osu.Game.Rulesets.Difficulty;
 
 namespace osu.Game.Rulesets.Osu.Difficulty
 {
-    public class OsuPerformanceAttributes : PerformanceAttributes
+    public interface IOsuPerformanceAttributes
     {
+        public double Aim { get; set; }
+
+        public double Speed { get; set; }
+
+        public double Accuracy { get; set; }
+
+        public double Flashlight { get; set; }
+
+        public double EffectiveMissCount { get; set; }
+    }
+
+    public class OsuPerformanceAttributes : PerformanceAttributes, IOsuPerformanceAttributes
+    {
+        /// <inheritdoc/>
         [JsonProperty("aim")]
         public double Aim { get; set; }
 
+        /// <inheritdoc/>
         [JsonProperty("speed")]
         public double Speed { get; set; }
 
+        /// <inheritdoc/>
         [JsonProperty("accuracy")]
         public double Accuracy { get; set; }
 
+        /// <inheritdoc/>
         [JsonProperty("flashlight")]
         public double Flashlight { get; set; }
 
+        /// <inheritdoc/>
         [JsonProperty("effective_miss_count")]
         public double EffectiveMissCount { get; set; }
 
