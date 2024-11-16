@@ -331,6 +331,9 @@ namespace osu.Game.Screens.Play
             cancelLoad();
             ContentOut();
 
+            quickRestartBlackLayer?.FadeOut(100, Easing.OutQuint).Expire();
+            quickRestartBlackLayer = null;
+
             // Ensure the screen doesn't expire until all the outwards fade operations have completed.
             this.Delay(CONTENT_OUT_DURATION).FadeOut();
 
