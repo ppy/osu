@@ -64,6 +64,7 @@ namespace osu.Desktop.Updater
             if (releaseStream.Value == ReleaseStream.Photon)
             {
                 options.ExplicitChannel = $"{platform}-photon";
+                // TODO: The logging here is not correct. It should be reading from `VelopackLocator.GetDefault(null).Channel` instead. Should also probably be moved to a more appropriate location.
                 Logger.Log("Using photon channel");
             }
             else if (releaseStream.Value == ReleaseStream.Lazer)
