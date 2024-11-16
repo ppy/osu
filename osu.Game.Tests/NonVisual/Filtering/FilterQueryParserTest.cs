@@ -509,6 +509,8 @@ namespace osu.Game.Tests.NonVisual.Filtering
             FilterQueryParser.ApplyQueries(filterCriteria, query);
             Assert.AreEqual("find me songs with  please", filterCriteria.SearchText.Trim());
             Assert.AreEqual(5, filterCriteria.SearchTerms.Length);
+            Assert.AreEqual("unit tests", filterCriteria.Source.SearchTerm);
+            Assert.That(filterCriteria.Source.MatchMode, Is.EqualTo(FilterCriteria.MatchMode.IsolatedPhrase));
         }
 
         private class CustomFilterCriteria : IRulesetFilterCriteria
