@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
         }
 
-        protected override IPerformanceAttributes CreatePerformanceAttributes(ScoreInfo score, DifficultyAttributes attributes)
+        protected override IPerformanceAttributes CreatePerformanceAttributes(ScoreInfo score, IDifficultyAttributes attributes)
         {
             var osuAttributes = (OsuDifficultyAttributes)attributes;
 

@@ -8,7 +8,7 @@ using System;
 namespace osu.Game.Rulesets.Difficulty
 {
     /// <summary>
-    /// Wraps a <see cref="DifficultyAttributes"/> object and adds a time value for which the attribute is valid.
+    /// Wraps a <see cref="IDifficultyAttributes"/> object and adds a time value for which the attribute is valid.
     /// Output by DifficultyCalculator.CalculateTimed methods.
     /// </summary>
     public class TimedDifficultyAttributes : IComparable<TimedDifficultyAttributes>
@@ -21,14 +21,14 @@ namespace osu.Game.Rulesets.Difficulty
         /// <summary>
         /// The attributes.
         /// </summary>
-        public readonly DifficultyAttributes Attributes;
+        public readonly IDifficultyAttributes Attributes;
 
         /// <summary>
         /// Creates new <see cref="TimedDifficultyAttributes"/>.
         /// </summary>
         /// <param name="time">The non-clock-adjusted time value at which the attributes take effect.</param>
         /// <param name="attributes">The attributes.</param>
-        public TimedDifficultyAttributes(double time, DifficultyAttributes attributes)
+        public TimedDifficultyAttributes(double time, IDifficultyAttributes attributes)
         {
             Time = time;
             Attributes = attributes;

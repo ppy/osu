@@ -172,7 +172,7 @@ namespace osu.Game.Tests.NonVisual
             {
             }
 
-            protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
+            protected override IDifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
                 => new TestDifficultyAttributes { Objects = beatmap.HitObjects.ToArray() };
 
             protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
@@ -208,7 +208,7 @@ namespace osu.Game.Tests.NonVisual
             }
         }
 
-        private class TestDifficultyAttributes : DifficultyAttributes
+        private class TestDifficultyAttributes : IDifficultyAttributes
         {
             public HitObject[] Objects = Array.Empty<HitObject>();
         }

@@ -26,13 +26,13 @@ namespace osu.Game.Beatmaps
         /// Might not be available if the star difficulty is associated with a beatmap that's not locally available.
         /// </summary>
         [CanBeNull]
-        public readonly DifficultyAttributes Attributes;
+        public readonly IDifficultyAttributes Attributes;
 
         /// <summary>
-        /// Creates a <see cref="StarDifficulty"/> structure based on <see cref="DifficultyAttributes"/> computed
+        /// Creates a <see cref="StarDifficulty"/> structure based on <see cref="IDifficultyAttributes"/> computed
         /// by a <see cref="DifficultyCalculator"/>.
         /// </summary>
-        public StarDifficulty([NotNull] DifficultyAttributes attributes)
+        public StarDifficulty([NotNull] IDifficultyAttributes attributes)
         {
             Stars = double.IsFinite(attributes.StarRating) ? attributes.StarRating : 0;
             MaxCombo = attributes.MaxCombo;
@@ -42,7 +42,7 @@ namespace osu.Game.Beatmaps
 
         /// <summary>
         /// Creates a <see cref="StarDifficulty"/> structure with a pre-populated star difficulty and max combo
-        /// in scenarios where computing <see cref="DifficultyAttributes"/> is not feasible (i.e. when working with online sources).
+        /// in scenarios where computing <see cref="IDifficultyAttributes"/> is not feasible (i.e. when working with online sources).
         /// </summary>
         public StarDifficulty(double starDifficulty, int maxCombo)
         {

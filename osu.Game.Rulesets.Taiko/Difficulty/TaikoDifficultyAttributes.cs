@@ -1,15 +1,29 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
+using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty
 {
-    public class TaikoDifficultyAttributes : DifficultyAttributes
+    public struct TaikoDifficultyAttributes : IDifficultyAttributes
     {
+        public TaikoDifficultyAttributes() { }
+
+        /// <inheritdoc/>
+        public Mod[] Mods { get; set; } = Array.Empty<Mod>();
+
+        /// <inheritdoc/>
+        public double StarRating { get; set; }
+
+        /// <inheritdoc/>
+        [JsonProperty("max_combo", Order = -2)]
+        public int MaxCombo { get; set; }
+
         /// <summary>
         /// The difficulty corresponding to the stamina skill.
         /// </summary>
@@ -52,23 +66,20 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         [JsonProperty("ok_hit_window")]
         public double OkHitWindow { get; set; }
 
-        public override IEnumerable<(int attributeId, object value)> ToDatabaseAttributes()
+        public IEnumerable<(int attributeId, object value)> ToDatabaseAttributes()
         {
-            foreach (var v in base.ToDatabaseAttributes())
-                yield return v;
-
-            yield return (ATTRIB_ID_DIFFICULTY, StarRating);
-            yield return (ATTRIB_ID_GREAT_HIT_WINDOW, GreatHitWindow);
-            yield return (ATTRIB_ID_OK_HIT_WINDOW, OkHitWindow);
+            yield return (IDifficultyAttributes.ATTRIB_ID_MAX_COMBO, MaxCombo);
+            yield return (IDifficultyAttributes.ATTRIB_ID_DIFFICULTY, StarRating);
+            yield return (IDifficultyAttributes.ATTRIB_ID_GREAT_HIT_WINDOW, GreatHitWindow);
+            yield return (IDifficultyAttributes.ATTRIB_ID_OK_HIT_WINDOW, OkHitWindow);
         }
 
-        public override void FromDatabaseAttributes(IReadOnlyDictionary<int, double> values, IBeatmapOnlineInfo onlineInfo)
+        public void FromDatabaseAttributes(IReadOnlyDictionary<int, double> values, IBeatmapOnlineInfo onlineInfo)
         {
-            base.FromDatabaseAttributes(values, onlineInfo);
-
-            StarRating = values[ATTRIB_ID_DIFFICULTY];
-            GreatHitWindow = values[ATTRIB_ID_GREAT_HIT_WINDOW];
-            OkHitWindow = values[ATTRIB_ID_OK_HIT_WINDOW];
+            MaxCombo = (int)values[IDifficultyAttributes.ATTRIB_ID_MAX_COMBO];
+            StarRating = values[IDifficultyAttributes.ATTRIB_ID_DIFFICULTY];
+            GreatHitWindow = values[IDifficultyAttributes.ATTRIB_ID_GREAT_HIT_WINDOW];
+            OkHitWindow = values[IDifficultyAttributes.ATTRIB_ID_OK_HIT_WINDOW];
         }
     }
 }

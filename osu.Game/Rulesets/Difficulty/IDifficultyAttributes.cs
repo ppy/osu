@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using osu.Game.Beatmaps;
@@ -13,7 +12,7 @@ namespace osu.Game.Rulesets.Difficulty
     /// Describes the difficulty of a beatmap, as output by a <see cref="DifficultyCalculator"/>.
     /// </summary>
     [JsonObject(MemberSerialization.OptIn)]
-    public class DifficultyAttributes
+    public interface IDifficultyAttributes
     {
         protected const int ATTRIB_ID_AIM = 1;
         protected const int ATTRIB_ID_SPEED = 3;
@@ -33,7 +32,7 @@ namespace osu.Game.Rulesets.Difficulty
         /// <summary>
         /// The mods which were applied to the beatmap.
         /// </summary>
-        public Mod[] Mods { get; set; } = Array.Empty<Mod>();
+        public Mod[] Mods { get; set; }
 
         /// <summary>
         /// The combined star rating of all skills.
@@ -48,42 +47,18 @@ namespace osu.Game.Rulesets.Difficulty
         public int MaxCombo { get; set; }
 
         /// <summary>
-        /// Creates new <see cref="DifficultyAttributes"/>.
-        /// </summary>
-        public DifficultyAttributes()
-        {
-        }
-
-        /// <summary>
-        /// Creates new <see cref="DifficultyAttributes"/>.
-        /// </summary>
-        /// <param name="mods">The mods which were applied to the beatmap.</param>
-        /// <param name="starRating">The combined star rating of all skills.</param>
-        public DifficultyAttributes(Mod[] mods, double starRating)
-        {
-            Mods = mods;
-            StarRating = starRating;
-        }
-
-        /// <summary>
-        /// Converts this <see cref="DifficultyAttributes"/> to osu-web compatible database attribute mappings.
+        /// Converts this <see cref="IDifficultyAttributes"/> to osu-web compatible database attribute mappings.
         /// </summary>
         /// <remarks>
         /// See: osu_difficulty_attribs table.
         /// </remarks>
-        public virtual IEnumerable<(int attributeId, object value)> ToDatabaseAttributes()
-        {
-            yield return (ATTRIB_ID_MAX_COMBO, MaxCombo);
-        }
+        public IEnumerable<(int attributeId, object value)> ToDatabaseAttributes();
 
         /// <summary>
-        /// Reads osu-web database attribute mappings into this <see cref="DifficultyAttributes"/> object.
+        /// Reads osu-web database attribute mappings into this <see cref="IDifficultyAttributes"/> object.
         /// </summary>
         /// <param name="values">The attribute mappings.</param>
         /// <param name="onlineInfo">The <see cref="IBeatmapOnlineInfo"/> where more information about the beatmap may be extracted from (such as AR/CS/OD/etc).</param>
-        public virtual void FromDatabaseAttributes(IReadOnlyDictionary<int, double> values, IBeatmapOnlineInfo onlineInfo)
-        {
-            MaxCombo = (int)values[ATTRIB_ID_MAX_COMBO];
-        }
+        public void FromDatabaseAttributes(IReadOnlyDictionary<int, double> values, IBeatmapOnlineInfo onlineInfo);
     }
 }
