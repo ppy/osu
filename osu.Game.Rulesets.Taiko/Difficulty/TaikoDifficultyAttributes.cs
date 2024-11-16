@@ -16,6 +16,12 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         public double StaminaDifficulty { get; set; }
 
         /// <summary>
+        /// The ratio of stamina difficulty from mono-color (single colour) streams to total stamina difficulty.
+        /// </summary>
+        [JsonProperty("mono_stamina_factor")]
+        public double MonoStaminaFactor { get; set; }
+
+        /// <summary>
         /// The difficulty corresponding to the rhythm skill.
         /// </summary>
         public double RhythmDifficulty { get; set; }
@@ -81,6 +87,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             yield return (ATTRIB_ID_DIFFICULTY, StarRating);
             yield return (ATTRIB_ID_GREAT_HIT_WINDOW, GreatHitWindow);
             yield return (ATTRIB_ID_OK_HIT_WINDOW, OkHitWindow);
+            yield return (ATTRIB_ID_MONO_STAMINA_FACTOR, MonoStaminaFactor);
         }
 
         public override void FromDatabaseAttributes(IReadOnlyDictionary<int, double> values, IBeatmapOnlineInfo onlineInfo)
@@ -90,6 +97,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             StarRating = values[ATTRIB_ID_DIFFICULTY];
             GreatHitWindow = values[ATTRIB_ID_GREAT_HIT_WINDOW];
             OkHitWindow = values[ATTRIB_ID_OK_HIT_WINDOW];
+            MonoStaminaFactor = values[ATTRIB_ID_MONO_STAMINA_FACTOR];
         }
     }
 }
