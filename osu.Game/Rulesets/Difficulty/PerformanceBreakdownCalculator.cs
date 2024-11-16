@@ -41,18 +41,18 @@ namespace osu.Game.Rulesets.Difficulty
 
             cancellationToken.ThrowIfCancellationRequested();
 
-            PerformanceAttributes[] performanceArray = await Task.WhenAll(
+            IPerformanceAttributes[] performanceArray = await Task.WhenAll(
                 // compute actual performance
                 performanceCalculator.CalculateAsync(score, attributes.Value.Attributes, cancellationToken),
                 // compute performance for perfect play
                 getPerfectPerformance(score, cancellationToken)
             ).ConfigureAwait(false);
 
-            return new PerformanceBreakdown(performanceArray[0] ?? new PerformanceAttributes(), performanceArray[1] ?? new PerformanceAttributes());
+            return new PerformanceBreakdown(performanceArray[0] ?? new EmptyPerformanceAttributes(), performanceArray[1] ?? new EmptyPerformanceAttributes());
         }
 
         [ItemCanBeNull]
-        private Task<PerformanceAttributes> getPerfectPerformance(ScoreInfo score, CancellationToken cancellationToken = default)
+        private Task<IPerformanceAttributes> getPerfectPerformance(ScoreInfo score, CancellationToken cancellationToken = default)
         {
             return Task.Run(async () =>
             {
@@ -116,6 +116,13 @@ namespace osu.Game.Rulesets.Difficulty
                 yield return nested.Judgement.MaxResult;
 
             yield return hitObject.Judgement.MaxResult;
+        }
+
+        public class EmptyPerformanceAttributes : IPerformanceAttributes
+        {
+            public double Total { get; set; } = 0;
+
+            public IEnumerable<PerformanceDisplayAttribute> GetAttributesForDisplay() => [];
         }
     }
 }

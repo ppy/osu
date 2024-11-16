@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 
 namespace osu.Game.Rulesets.Difficulty
 {
-    public class PerformanceAttributes
+    public interface IPerformanceAttributes
     {
         /// <summary>
         /// Calculated score performance points.
@@ -19,9 +19,6 @@ namespace osu.Game.Rulesets.Difficulty
         /// Some attributes may be omitted if they are not meant for display.
         /// </summary>
         /// <returns></returns>
-        public virtual IEnumerable<PerformanceDisplayAttribute> GetAttributesForDisplay()
-        {
-            yield return new PerformanceDisplayAttribute(nameof(Total), "Achieved PP", Total);
-        }
+        public IEnumerable<PerformanceDisplayAttribute> GetAttributesForDisplay();
     }
 }
