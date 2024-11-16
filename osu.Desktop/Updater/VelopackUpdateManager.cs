@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -50,11 +51,13 @@ namespace osu.Desktop.Updater
                 AllowVersionDowngrade = true,
             };
 
+            string arch = RuntimeInformation.OSArchitecture.ToString().ToLowerInvariant();
+
             string platform = Environment.OSVersion.Platform switch
             {
                 PlatformID.Win32NT => "win",
-                PlatformID.Unix => "linux",
-                PlatformID.MacOSX => "osx",
+                PlatformID.Unix => "linux-" + arch,
+                PlatformID.MacOSX => "osx-" + arch,
                 _ => throw new PlatformNotSupportedException(),
             };
 
