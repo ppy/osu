@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
             // Snap conversions for rhythms
             var snapConversions = new Dictionary<int, int>()
             {
-                { 8, 4 },  // 1/8 snap to 1/4 snap
+                { 8, 4 }, // 1/8 snap to 1/4 snap
                 { 6, 4 }, // 1/6 snap to 1/4 snap
                 { 3, 2 }, // 1/3 snap to 1/2 snap
             };
@@ -126,7 +126,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
                 3 => EnableOneThird.Value,
                 6 => EnableOneSixth.Value,
                 8 => EnableOneEighth.Value,
-                _ => false
+                _ => false,
             };
         }
     }
