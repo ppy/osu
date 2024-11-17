@@ -55,4 +55,26 @@ namespace osu.Game.Rulesets.Difficulty
         /// <param name="onlineInfo">The <see cref="IBeatmapOnlineInfo"/> where more information about the beatmap may be extracted from (such as AR/CS/OD/etc).</param>
         public void FromDatabaseAttributes(IReadOnlyDictionary<int, double> values, IBeatmapOnlineInfo onlineInfo);
     }
+
+    /// <summary>
+    /// Represents a full, minimal implementation of <see cref="IDifficultyAttributes"/>.
+    /// </summary>
+    public class EmptyDifficultyAttributes : IDifficultyAttributes
+    {
+        public double StarRating { get; set; }
+
+        public int MaxCombo { get; set; }
+
+        public IEnumerable<(int attributeId, object value)> ToDatabaseAttributes()
+        {
+            yield return (IDifficultyAttributes.ATTRIB_ID_MAX_COMBO, MaxCombo);
+            yield return (IDifficultyAttributes.ATTRIB_ID_AIM, StarRating);
+        }
+
+        public void FromDatabaseAttributes(IReadOnlyDictionary<int, double> values, IBeatmapOnlineInfo onlineInfo)
+        {
+            MaxCombo = (int)values[IDifficultyAttributes.ATTRIB_ID_MAX_COMBO];
+            StarRating = values[IDifficultyAttributes.ATTRIB_ID_AIM];
+        }
+    }
 }

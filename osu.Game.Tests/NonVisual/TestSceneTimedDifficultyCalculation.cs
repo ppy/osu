@@ -208,7 +208,7 @@ namespace osu.Game.Tests.NonVisual
             }
         }
 
-        private class TestDifficultyAttributes : IDifficultyAttributes
+        private class TestDifficultyAttributes : EmptyDifficultyAttributes
         {
             public HitObject[] Objects = Array.Empty<HitObject>();
         }
