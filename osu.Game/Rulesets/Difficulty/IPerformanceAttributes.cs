@@ -21,4 +21,17 @@ namespace osu.Game.Rulesets.Difficulty
         /// <returns></returns>
         public IEnumerable<PerformanceDisplayAttribute> GetAttributesForDisplay();
     }
+
+    /// <summary>
+    /// Represents a full, minimal implementation of <see cref="IPerformanceAttributes"/>.
+    /// </summary>
+    public class EmptyPerformanceAttributes : IPerformanceAttributes
+    {
+        public double Total { get; set; }
+
+        public IEnumerable<PerformanceDisplayAttribute> GetAttributesForDisplay()
+        {
+            yield return new PerformanceDisplayAttribute(nameof(Total), "Achieved PP", Total);
+        }
+    }
 }
