@@ -24,13 +24,13 @@ namespace osu.Game.Rulesets.Taiko.Mods
         public override ModType Type => ModType.DifficultyReduction;
 
         [SettingSource("One-third conversion", "Converts 1/3 snap to 1/2 snap.")]
-        public Bindable<bool> EnableOneThird { get; } = new BindableBool(false);
+        public Bindable<bool> OneThirdConversion { get; } = new BindableBool(false);
 
         [SettingSource("One-sixth conversion", "Converts 1/6 snap to 1/4 snap.")]
-        public Bindable<bool> EnableOneSixth { get; } = new BindableBool(true);
+        public Bindable<bool> OneSixthConversion { get; } = new BindableBool(true);
 
         [SettingSource("One-eighth conversion", "Converts 1/8 snap to 1/4 snap.")]
-        public Bindable<bool> EnableOneEighth { get; } = new BindableBool(false);
+        public Bindable<bool> OneEighthConversion { get; } = new BindableBool(false);
 
         public void ApplyToBeatmap(IBeatmap beatmap)
         {
@@ -123,9 +123,9 @@ namespace osu.Game.Rulesets.Taiko.Mods
         {
             return snap switch
             {
-                3 => EnableOneThird.Value,
-                6 => EnableOneSixth.Value,
-                8 => EnableOneEighth.Value,
+                3 => OneThirdConversion.Value,
+                6 => OneSixthConversion.Value,
+                8 => OneEighthConversion.Value,
                 _ => false,
             };
         }
