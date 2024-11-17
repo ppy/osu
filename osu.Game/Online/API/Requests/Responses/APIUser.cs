@@ -223,12 +223,14 @@ namespace osu.Game.Online.API.Requests.Responses
 
         /// <summary>
         /// User statistics for the requested ruleset (in the case of a <see cref="GetUserRequest"/> or <see cref="GetFriendsRequest"/> response).
-        /// Otherwise empty.
         /// </summary>
+        /// <remarks>
+        /// This returns null when accessed from <see cref="IAPIProvider.LocalUser"/>. Use <see cref="LocalUserStatisticsProvider"/> instead.
+        /// </remarks>
         [JsonProperty(@"statistics")]
         public UserStatistics Statistics
         {
-            get => statistics ??= new UserStatistics();
+            get => statistics;
             set
             {
                 if (statistics != null)
@@ -242,7 +244,11 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"rank_history")]
         private APIRankHistory rankHistory
         {
-            set => Statistics.RankHistory = value;
+            set
+            {
+                statistics ??= new UserStatistics();
+                statistics.RankHistory = value;
+            }
         }
 
         [JsonProperty(@"active_tournament_banners")]

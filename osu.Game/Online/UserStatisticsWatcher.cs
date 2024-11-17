@@ -8,10 +8,8 @@ using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Game.Extensions;
 using osu.Game.Online.API;
-using osu.Game.Online.API.Requests;
 using osu.Game.Online.Spectator;
 using osu.Game.Scoring;
-using osu.Game.Users;
 
 namespace osu.Game.Online
 {
@@ -20,9 +18,12 @@ namespace osu.Game.Online
     /// </summary>
     public partial class UserStatisticsWatcher : Component
     {
-        private readonly LocalUserStatisticsProvider? statisticsProvider;
-        public IBindable<UserStatisticsUpdate?> LatestUpdate => latestUpdate;
-        private readonly Bindable<UserStatisticsUpdate?> latestUpdate = new Bindable<UserStatisticsUpdate?>();
+        private readonly LocalUserStatisticsProvider statisticsProvider;
+
+        public IBindable<ScoreBasedUserStatisticsUpdate?> LatestUpdate => latestUpdate;
+        private readonly Bindable<ScoreBasedUserStatisticsUpdate?> latestUpdate = new Bindable<ScoreBasedUserStatisticsUpdate?>();
+
+        private ScoreInfo? scorePendingUpdate;
 
         [Resolved]
         private SpectatorClient spectatorClient { get; set; } = null!;
@@ -32,7 +33,7 @@ namespace osu.Game.Online
 
         private readonly Dictionary<long, ScoreInfo> watchedScores = new Dictionary<long, ScoreInfo>();
 
-        public UserStatisticsWatcher(LocalUserStatisticsProvider? statisticsProvider = null)
+        public UserStatisticsWatcher(LocalUserStatisticsProvider statisticsProvider)
         {
             this.statisticsProvider = statisticsProvider;
         }
@@ -40,7 +41,9 @@ namespace osu.Game.Online
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
             spectatorClient.OnUserScoreProcessed += userScoreProcessed;
+            statisticsProvider.StatisticsUpdate.ValueChanged += onStatisticsUpdated;
         }
 
         /// <summary>
@@ -69,27 +72,20 @@ namespace osu.Game.Online
             if (!watchedScores.Remove(scoreId, out var scoreInfo))
                 return;
 
-            requestStatisticsUpdate(userId, scoreInfo);
+            scorePendingUpdate = scoreInfo;
+            statisticsProvider.RefetchStatistics(scoreInfo.Ruleset);
         }
 
-        private void requestStatisticsUpdate(int userId, ScoreInfo scoreInfo)
+        private void onStatisticsUpdated(ValueChangedEvent<UserStatisticsUpdate> update) => Schedule(() =>
         {
-            var request = new GetUserRequest(userId, scoreInfo.Ruleset);
-            request.Success += user => Schedule(() => dispatchStatisticsUpdate(scoreInfo, user.Statistics));
-            api.Queue(request);
-        }
-
-        private void dispatchStatisticsUpdate(ScoreInfo scoreInfo, UserStatistics updatedStatistics)
-        {
-            if (statisticsProvider == null)
+            if (scorePendingUpdate == null || !update.NewValue.Ruleset.Equals(scorePendingUpdate.Ruleset))
                 return;
 
-            var latestRulesetStatistics = statisticsProvider.GetStatisticsFor(scoreInfo.Ruleset);
-            statisticsProvider.UpdateStatistics(updatedStatistics, scoreInfo.Ruleset);
+            if (update.NewValue.OldStatistics != null)
+                latestUpdate.Value = new ScoreBasedUserStatisticsUpdate(scorePendingUpdate, update.NewValue.OldStatistics, update.NewValue.NewStatistics);
 
-            if (latestRulesetStatistics != null)
-                latestUpdate.Value = new UserStatisticsUpdate(scoreInfo, latestRulesetStatistics, updatedStatistics);
-        }
+            scorePendingUpdate = null;
+        });
 
         protected override void Dispose(bool isDisposing)
         {
