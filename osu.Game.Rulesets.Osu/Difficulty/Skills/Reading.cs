@@ -118,7 +118,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     public class ReadingHighAR : GraphSkill
     {
         public const double MECHANICAL_PP_POWER = 0.6;
-        private const double skill_multiplier = 41.2;
+        private const double skill_multiplier = 9.31;
         private const double component_default_value_multiplier = 280;
         public ReadingHighAR(Mod[] mods)
             : base(mods)
@@ -130,23 +130,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private HighARAimComponent aimComponent;
         private HighARSpeedComponent speedComponent;
 
-        private int objectsCount = 0;
-
         public override void Process(DifficultyHitObject current)
         {
             aimComponent.Process(current);
             speedComponent.Process(current);
-
-            if (current.BaseObject is not Spinner)
-            {
-                objectsCount++;
-            }
-
-            double power = OsuDifficultyCalculator.SUM_POWER;
-            double mergedDifficulty = Math.Pow(
-                Math.Pow(aimComponent.CurrentSectionPeak, power) +
-                Math.Pow(speedComponent.CurrentSectionPeak, power), 1.0 / power);
-            mergedDifficulty *= skill_multiplier;
 
             if (current.Index == 0)
                 CurrentSectionEnd = Math.Ceiling(current.StartTime / SectionLength) * SectionLength;
@@ -158,7 +145,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 CurrentSectionEnd += SectionLength;
             }
 
-            CurrentSectionPeak = Math.Max(mergedDifficulty, CurrentSectionPeak);
+            double visualDifficultyValue = scaleDifficulty(aimComponent.CurrentSectionPeak, speedComponent.CurrentSectionPeak);
+            CurrentSectionPeak = Math.Max(visualDifficultyValue, CurrentSectionPeak);
         }
 
         // Coefs for curve similar to difficulty to performance curve
@@ -168,11 +156,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         public static double DifficultyToPerformance(double difficulty) => Math.Pow(difficulty, power) * multiplier;
         private static double performanceToDifficulty(double performance) => Math.Pow(performance / multiplier, 1.0 / power);
 
-        public override double DifficultyValue()
+        private static double scaleDifficulty(double aimPart, double speedPart)
         {
             // Simulating summing to get the most correct value possible
-            double aimValue = Math.Sqrt(aimComponent.DifficultyValue() * skill_multiplier) * OsuDifficultyCalculator.DIFFICULTY_MULTIPLIER;
-            double speedValue = Math.Sqrt(speedComponent.DifficultyValue() * skill_multiplier) * OsuDifficultyCalculator.DIFFICULTY_MULTIPLIER;
+            double aimValue = Math.Sqrt(aimPart * skill_multiplier) * OsuDifficultyCalculator.DIFFICULTY_MULTIPLIER;
+            double speedValue = Math.Sqrt(speedPart * skill_multiplier) * OsuDifficultyCalculator.DIFFICULTY_MULTIPLIER;
 
             double aimPerformance = DifficultyToPerformance(aimValue);
             double speedPerformance = DifficultyToPerformance(speedValue);
@@ -180,14 +168,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             double sumPower = OsuDifficultyCalculator.SUM_POWER;
             double totalPerformance = Math.Pow(Math.Pow(aimPerformance, sumPower) + Math.Pow(speedPerformance, sumPower), 1.0 / sumPower);
 
-            double adjustedDifficulty = performanceToDifficulty(totalPerformance);
-            double rawDifficultyValue = Math.Pow(adjustedDifficulty / OsuDifficultyCalculator.DIFFICULTY_MULTIPLIER, 2.0);
+            double newSkillValue = performanceToDifficulty(totalPerformance);
+            double difficultyValue = Math.Pow(newSkillValue / OsuDifficultyCalculator.DIFFICULTY_MULTIPLIER, 2.0);
 
-            double difficulty = Math.Pow(rawDifficultyValue, MECHANICAL_PP_POWER);
+            difficultyValue = Math.Pow(difficultyValue / skill_multiplier, MECHANICAL_PP_POWER);
 
-            // Sqrt value to make difficulty depend less on mechanical difficulty
-            return difficulty;
+            return difficultyValue;
         }
+
+        public override double DifficultyValue() => skill_multiplier * scaleDifficulty(aimComponent.DifficultyValue(), speedComponent.DifficultyValue());
         public class HighARAimComponent : Aim
         {
             public HighARAimComponent(Mod[] mods)
