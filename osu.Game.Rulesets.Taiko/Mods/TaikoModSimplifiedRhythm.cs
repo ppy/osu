@@ -36,17 +36,16 @@ namespace osu.Game.Rulesets.Taiko.Mods
         {
             var taikoBeatmap = (TaikoBeatmap)beatmap;
             var controlPointInfo = taikoBeatmap.ControlPointInfo;
-            List<Hit> toRemove = [];
+            List<Hit> toRemove = new List<Hit>();
 
             // Snap conversions for rhythms
-            var snapConversions = new Dictionary<int, int>()
+            var snapConversions = new Dictionary<int, int>
             {
                 { 8, 4 }, // 1/8 snap to 1/4 snap
                 { 6, 4 }, // 1/6 snap to 1/4 snap
                 { 3, 2 }, // 1/3 snap to 1/2 snap
             };
 
-            double beatLength = controlPointInfo.TimingPointAt(0).BeatLength;
             int patternStartIndex = 0;
             bool inPattern = false;
 
@@ -63,6 +62,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
                     double snapValue = i < hits.Count - 1
                         ? getSnapBetweenNotes(controlPointInfo, hits[i], hits[i + 1])
                         : 1; // No next note, default to a safe 1/1 snap
+
                     if (snapValue == snapConversion.Key)
                     {
                         if (!inPattern)
@@ -71,6 +71,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
                         }
                         inPattern = true;
                     }
+
                     // check if end of pattern or if we're on the last note
                     if ((inPattern && snapValue != snapConversion.Key) || i == hits.Count)
                     {
@@ -95,7 +96,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
                                 // 1/6 and 1/3: Adjust the second note and remove the third
                                 if (currentHitPosition % 3 == 1)
                                 {
-                                    hits[j].StartTime = hits[j - 1].StartTime + controlPointInfo.TimingPointAt(hits[j].StartTime).BeatLength / Convert.ToDouble(snapConversion.Value);
+                                    hits[j].StartTime = hits[j - 1].StartTime + (controlPointInfo.TimingPointAt(hits[j].StartTime).BeatLength / Convert.ToDouble(snapConversion.Value));
                                 }
                                 else if (currentHitPosition % 3 == 2)
                                 {
