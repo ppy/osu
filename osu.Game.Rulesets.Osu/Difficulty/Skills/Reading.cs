@@ -10,11 +10,10 @@ using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Evaluators;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
-using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
-    public class ReadingLowAR : GraphSkill
+    public class ReadingLowAR : StrainSkill
     {
         private double skillMultiplier => 1.22;
         private double aimComponentMultiplier => 0.4;
@@ -86,6 +85,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         public static double DifficultyToPerformance(double difficulty) => Math.Max(
             Math.Max(Math.Pow(difficulty, 1.5) * 20, Math.Pow(difficulty, 2) * 17.0),
             Math.Max(Math.Pow(difficulty, 3) * 10.5, Math.Pow(difficulty, 4) * 6.00));
+
+        protected override double StrainValueAt(DifficultyHitObject current)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override double CalculateInitialStrain(double time, DifficultyHitObject current)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     public class ReadingHidden : Aim
@@ -115,7 +124,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             Math.Max(difficulty * 16, Math.Pow(difficulty, 2) * 10), Math.Pow(difficulty, 3) * 4);
     }
 
-    public class ReadingHighAR : GraphSkill
+    public class ReadingHighAR : StrainSkill
     {
         public const double MECHANICAL_PP_POWER = 0.6;
         private const double skill_multiplier = 9.31;
@@ -177,6 +186,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         }
 
         public override double DifficultyValue() => skill_multiplier * scaleDifficulty(aimComponent.DifficultyValue(), speedComponent.DifficultyValue());
+
+        protected override double StrainValueAt(DifficultyHitObject current)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override double CalculateInitialStrain(double time, DifficultyHitObject current)
+        {
+            throw new NotImplementedException();
+        }
+
         public class HighARAimComponent : Aim
         {
             public HighARAimComponent(Mod[] mods)
