@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Evaluators;
@@ -22,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private readonly bool withSliders;
 
         protected double CurrentStrain;
-        protected double SkillMultiplier => 25.18; // WARNING - INCREASED FROM 24.963 FOR BALANCING
+        protected double SkillMultiplier => 25.5; // WARNING - INCREASED FROM 24.963 FOR BALANCING
 
         protected override double CalculateInitialStrain(double time, DifficultyHitObject current) => CurrentStrain * StrainDecay(time - current.Previous(0).StartTime);
 
