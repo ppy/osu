@@ -6,7 +6,7 @@ using System;
 namespace osu.Game.Beatmaps.Legacy
 {
     [Flags]
-    internal enum LegacyHitObjectType
+    public enum LegacyHitObjectType
     {
         Circle = 1,
         Slider = 1 << 1,

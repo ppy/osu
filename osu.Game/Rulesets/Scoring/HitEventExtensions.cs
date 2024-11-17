@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Scoring
 
             foreach (var e in hitEvents)
             {
-                if (!affectsUnstableRate(e))
+                if (!AffectsUnstableRate(e))
                     continue;
 
                 count++;
@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.Scoring
         /// </returns>
         public static double? CalculateAverageHitError(this IEnumerable<HitEvent> hitEvents)
         {
-            double[] timeOffsets = hitEvents.Where(affectsUnstableRate).Select(ev => ev.TimeOffset).ToArray();
+            double[] timeOffsets = hitEvents.Where(AffectsUnstableRate).Select(ev => ev.TimeOffset).ToArray();
 
             if (timeOffsets.Length == 0)
                 return null;
@@ -65,6 +65,6 @@ namespace osu.Game.Rulesets.Scoring
             return timeOffsets.Average();
         }
 
-        private static bool affectsUnstableRate(HitEvent e) => !(e.HitObject.HitWindows is HitWindows.EmptyHitWindows) && e.Result.IsHit();
+        public static bool AffectsUnstableRate(HitEvent e) => !(e.HitObject.HitWindows is HitWindows.EmptyHitWindows) && e.Result.IsHit();
     }
 }
