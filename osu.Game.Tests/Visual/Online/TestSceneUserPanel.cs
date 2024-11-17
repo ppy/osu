@@ -34,8 +34,8 @@ namespace osu.Game.Tests.Visual.Online
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
 
-        [Cached]
-        private readonly LocalUserStatisticsProvider statisticsProvider = new LocalUserStatisticsProvider();
+        [Cached(typeof(LocalUserStatisticsProvider))]
+        private readonly TestUserStatisticsProvider statisticsProvider = new TestUserStatisticsProvider();
 
         [Resolved]
         private IRulesetStore rulesetStore { get; set; }
@@ -205,6 +205,12 @@ namespace osu.Game.Tests.Visual.Online
             }
 
             public new TextFlowContainer LastVisitMessage => base.LastVisitMessage;
+        }
+
+        private partial class TestUserStatisticsProvider : LocalUserStatisticsProvider
+        {
+            public new void UpdateStatistics(UserStatistics newStatistics, RulesetInfo ruleset)
+                => base.UpdateStatistics(newStatistics, ruleset);
         }
     }
 }

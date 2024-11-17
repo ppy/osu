@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -18,84 +19,63 @@ namespace osu.Game.Online
     /// </summary>
     public partial class LocalUserStatisticsProvider : Component
     {
+        private readonly Bindable<UserStatisticsUpdate> statisticsUpdate = new Bindable<UserStatisticsUpdate>();
+
+        /// <summary>
+        /// A bindable communicating updates to the local user's statistics on any ruleset.
+        /// This does not guarantee the presence of old statistics, as it is invoked on initial population of statistics.
+        /// </summary>
+        public IBindable<UserStatisticsUpdate> StatisticsUpdate => statisticsUpdate;
+
         [Resolved]
-        private IBindable<RulesetInfo> ruleset { get; set; } = null!;
+        private RulesetStore rulesets { get; set; } = null!;
 
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
 
+        private readonly Dictionary<string, UserStatistics> statisticsCache = new Dictionary<string, UserStatistics>();
+        private readonly Dictionary<string, GetUserRequest> statisticsRequests = new Dictionary<string, GetUserRequest>();
+
         /// <summary>
-        /// The statistics of the local user for the game-wide selected ruleset.
+        /// Returns the <see cref="UserStatistics"/> currently available for the given ruleset.
+        /// This may return null if the requested statistics has not been fetched before yet.
         /// </summary>
-        public IBindable<UserStatistics?> Statistics => statistics;
-
-        private readonly Bindable<UserStatistics?> statistics = new Bindable<UserStatistics?>();
-
-        private readonly Dictionary<string, UserStatistics> allStatistics = new Dictionary<string, UserStatistics>();
+        /// <param name="ruleset">The ruleset to return the corresponding <see cref="UserStatistics"/> for.</param>
+        public UserStatistics? GetStatisticsFor(RulesetInfo ruleset) => statisticsCache.GetValueOrDefault(ruleset.ShortName);
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
-            statistics.BindValueChanged(v =>
-            {
-                if (api.LocalUser.Value != null && v.NewValue != null)
-                    api.LocalUser.Value.Statistics = v.NewValue;
-            });
-
-            ruleset.BindValueChanged(_ => updateStatisticsBindable());
-
-            api.LocalUser.BindValueChanged(_ =>
-            {
-                allStatistics.Clear();
-                updateStatisticsBindable();
-            }, true);
+            api.LocalUser.BindValueChanged(_ => initialiseStatistics(), true);
         }
 
-        private GetUserRequest? currentRequest;
-
-        private void updateStatisticsBindable() => Schedule(() =>
+        private void initialiseStatistics()
         {
-            statistics.Value = null;
+            statisticsCache.Clear();
 
-            if (api.LocalUser.Value == null || api.LocalUser.Value.OnlineID <= 1 || !ruleset.Value.IsLegacyRuleset())
-            {
-                statistics.Value = new UserStatistics();
-                return;
-            }
-
-            if (currentRequest?.CompletionState == APIRequestCompletionState.Waiting)
-            {
-                currentRequest.Cancel();
-                currentRequest = null;
-            }
-
-            if (allStatistics.TryGetValue(ruleset.Value.ShortName, out var existing))
-                statistics.Value = existing;
-            else
-                requestStatistics(ruleset.Value);
-        });
-
-        private void requestStatistics(RulesetInfo ruleset)
-        {
-            currentRequest = new GetUserRequest(api.LocalUser.Value.OnlineID, ruleset);
-            currentRequest.Success += u => statistics.Value = allStatistics[ruleset.ShortName] = u.Statistics;
-            api.Queue(currentRequest);
+            foreach (var ruleset in rulesets.AvailableRulesets.Where(r => r.IsLegacyRuleset()))
+                RefetchStatistics(ruleset);
         }
 
-        /// <summary>
-        /// Returns the <see cref="UserStatistics"/> currently available for the given ruleset.
-        /// This may return null if the requested statistics has not been fetched yet.
-        /// </summary>
-        /// <param name="ruleset">The ruleset to return the corresponding <see cref="UserStatistics"/> for.</param>
-        internal UserStatistics? GetStatisticsFor(RulesetInfo ruleset) => allStatistics.GetValueOrDefault(ruleset.ShortName);
-
-        internal void UpdateStatistics(UserStatistics statistics, RulesetInfo statisticsRuleset)
+        public void RefetchStatistics(RulesetInfo ruleset)
         {
-            allStatistics[statisticsRuleset.ShortName] = statistics;
+            if (statisticsRequests.TryGetValue(ruleset.ShortName, out var previousRequest))
+                previousRequest.Cancel();
 
-            if (statisticsRuleset.ShortName == ruleset.Value.ShortName)
-                updateStatisticsBindable();
+            var request = statisticsRequests[ruleset.ShortName] = new GetUserRequest(api.LocalUser.Value.Id, ruleset);
+            request.Success += u => UpdateStatistics(u.Statistics, ruleset);
+            api.Queue(request);
+        }
+
+        protected void UpdateStatistics(UserStatistics newStatistics, RulesetInfo ruleset)
+        {
+            var oldStatistics = statisticsCache.GetValueOrDefault(ruleset.ShortName);
+
+            statisticsRequests.Remove(ruleset.ShortName);
+            statisticsCache[ruleset.ShortName] = newStatistics;
+            statisticsUpdate.Value = new UserStatisticsUpdate(ruleset, oldStatistics, newStatistics);
         }
     }
+
+    public record UserStatisticsUpdate(RulesetInfo Ruleset, UserStatistics? OldStatistics, UserStatistics NewStatistics);
 }

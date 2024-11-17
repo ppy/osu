@@ -69,7 +69,7 @@ namespace osu.Desktop
         };
 
         private IBindable<APIUser>? user;
-        private IBindable<UserStatistics?>? localStatistics;
+        private IBindable<UserStatisticsUpdate>? statisticsUpdate;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -123,8 +123,8 @@ namespace osu.Desktop
             activity.BindValueChanged(_ => schedulePresenceUpdate());
             privacyMode.BindValueChanged(_ => schedulePresenceUpdate());
 
-            localStatistics = statisticsProvider.Statistics.GetBoundCopy();
-            localStatistics.BindValueChanged(_ => schedulePresenceUpdate());
+            statisticsUpdate = statisticsProvider.StatisticsUpdate.GetBoundCopy();
+            statisticsUpdate.BindValueChanged(_ => schedulePresenceUpdate());
 
             multiplayerClient.RoomUpdated += onRoomUpdated;
         }
@@ -167,7 +167,7 @@ namespace osu.Desktop
 
         private void updatePresence(bool hideIdentifiableInformation)
         {
-            if (user == null || localStatistics == null)
+            if (user == null)
                 return;
 
             // user activity
@@ -237,7 +237,10 @@ namespace osu.Desktop
             if (privacyMode.Value == DiscordRichPresenceMode.Limited)
                 presence.Assets.LargeImageText = string.Empty;
             else
-                presence.Assets.LargeImageText = $"{user.Value.Username}" + (localStatistics.Value?.GlobalRank > 0 ? $" (rank #{localStatistics.Value?.GlobalRank:N0})" : string.Empty);
+            {
+                var statistics = statisticsProvider.GetStatisticsFor(ruleset.Value);
+                presence.Assets.LargeImageText = $"{user.Value.Username}" + (statistics?.GlobalRank > 0 ? $" (rank #{statistics.GlobalRank:N0})" : string.Empty);
+            }
 
             // small image
             presence.Assets.SmallImageKey = ruleset.Value.IsLegacyRuleset() ? $"mode_{ruleset.Value.OnlineID}" : "mode_custom";

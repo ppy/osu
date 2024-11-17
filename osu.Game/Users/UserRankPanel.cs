@@ -12,6 +12,7 @@ using osu.Game.Online;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Profile.Header.Components;
 using osu.Game.Resources.Localisation.Web;
+using osu.Game.Rulesets;
 using osuTK;
 
 namespace osu.Game.Users
@@ -29,8 +30,6 @@ namespace osu.Game.Users
         private ProfileValueDisplay countryRankDisplay = null!;
         private LoadingLayer loadingLayer = null!;
 
-        private readonly IBindable<UserStatistics?> statistics = new Bindable<UserStatistics?>();
-
         public UserRankPanel(APIUser user)
             : base(user)
         {
@@ -47,20 +46,29 @@ namespace osu.Game.Users
         [Resolved]
         private LocalUserStatisticsProvider? statisticsProvider { get; set; }
 
+        [Resolved]
+        private IBindable<RulesetInfo> ruleset { get; set; } = null!;
+
+        private IBindable<UserStatisticsUpdate> statisticsUpdate = null!;
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
             if (statisticsProvider != null)
             {
-                statistics.BindTo(statisticsProvider.Statistics);
-                statistics.BindValueChanged(stats =>
-                {
-                    loadingLayer.State.Value = stats.NewValue == null ? Visibility.Visible : Visibility.Hidden;
-                    globalRankDisplay.Content = stats.NewValue?.GlobalRank?.ToLocalisableString("\\##,##0") ?? "-";
-                    countryRankDisplay.Content = stats.NewValue?.CountryRank?.ToLocalisableString("\\##,##0") ?? "-";
-                }, true);
+                statisticsUpdate = statisticsProvider.StatisticsUpdate.GetBoundCopy();
+                statisticsUpdate.BindValueChanged(_ => updateDisplay(), true);
             }
+        }
+
+        private void updateDisplay()
+        {
+            var statistics = statisticsProvider?.GetStatisticsFor(ruleset.Value);
+
+            loadingLayer.State.Value = statistics == null ? Visibility.Visible : Visibility.Hidden;
+            globalRankDisplay.Content = statistics?.GlobalRank?.ToLocalisableString("\\##,##0") ?? "-";
+            countryRankDisplay.Content = statistics?.CountryRank?.ToLocalisableString("\\##,##0") ?? "-";
         }
 
         protected override Drawable CreateLayout()
