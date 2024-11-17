@@ -5,6 +5,7 @@ using System;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
+using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Mania.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Mods;
 
@@ -73,7 +74,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
             // 0.0 +--------+-+---------------> Release Difference / ms
             //         release_threshold
             if (isOverlapping)
-                holdAddition = 1 / (1 + Math.Exp(0.27 * (release_threshold - closestEndTime)));
+                holdAddition = DifficultyCalculationUtils.Logistic(x: closestEndTime, multiplier: 0.27, midpointOffset: release_threshold);
 
             // Decay and increase individualStrains in own column
             individualStrains[column] = applyDecay(individualStrains[column], startTime - startTimes[column], individual_decay_base);

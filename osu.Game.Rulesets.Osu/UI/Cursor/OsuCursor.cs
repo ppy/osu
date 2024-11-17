@@ -38,6 +38,11 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
         public IBindable<float> CursorScale => cursorScale;
 
+        /// <summary>
+        /// Mods which want to adjust cursor size should do so via this bindable.
+        /// </summary>
+        public readonly Bindable<float> ModScaleAdjust = new Bindable<float>(1);
+
         private readonly Bindable<float> cursorScale = new BindableFloat(1);
 
         private Bindable<float> userCursorScale = null!;
@@ -67,6 +72,8 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             autoCursorScale = config.GetBindable<bool>(OsuSetting.AutoCursorSize);
             autoCursorScale.ValueChanged += _ => cursorScale.Value = CalculateCursorScale();
 
+            ModScaleAdjust.ValueChanged += _ => cursorScale.Value = CalculateCursorScale();
+
             cursorScale.BindValueChanged(e => cursorScaleContainer.Scale = new Vector2(e.NewValue), true);
         }
 
@@ -90,7 +97,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
         protected virtual float CalculateCursorScale()
         {
-            float scale = userCursorScale.Value;
+            float scale = userCursorScale.Value * ModScaleAdjust.Value;
 
             if (autoCursorScale.Value && state != null)
             {

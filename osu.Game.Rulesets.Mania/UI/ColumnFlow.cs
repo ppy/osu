@@ -28,6 +28,12 @@ namespace osu.Game.Rulesets.Mania.UI
         private readonly FillFlowContainer<Container<TContent>> columns;
         private readonly StageDefinition stageDefinition;
 
+        public new bool Masking
+        {
+            get => base.Masking;
+            set => base.Masking = value;
+        }
+
         public ColumnFlow(StageDefinition stageDefinition)
         {
             this.stageDefinition = stageDefinition;
