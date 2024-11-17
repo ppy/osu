@@ -8,7 +8,7 @@ using osu.Game.Rulesets.Difficulty;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty
 {
-    public interface ITaikoDifficultyAttributes
+    public interface ITaikoDifficultyAttributes : IDifficultyAttributes
     {
         /// <summary>
         /// The difficulty corresponding to the stamina skill.

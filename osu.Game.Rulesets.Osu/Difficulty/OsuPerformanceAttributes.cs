@@ -7,7 +7,7 @@ using osu.Game.Rulesets.Difficulty;
 
 namespace osu.Game.Rulesets.Osu.Difficulty
 {
-    public interface IOsuPerformanceAttributes
+    public interface IOsuPerformanceAttributes : IPerformanceAttributes
     {
         public double Aim { get; set; }
 

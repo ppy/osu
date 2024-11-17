@@ -6,11 +6,17 @@ using Newtonsoft.Json;
 
 namespace osu.Game.Rulesets.Difficulty
 {
-    public class PerformanceAttributes
+    public interface IPerformanceAttributes
     {
         /// <summary>
         /// Calculated score performance points.
         /// </summary>
+        public double Total { get; set; }
+    }
+
+    public class PerformanceAttributes : IPerformanceAttributes
+    {
+        /// <inheritdoc/>
         [JsonProperty("pp")]
         public double Total { get; set; }
 

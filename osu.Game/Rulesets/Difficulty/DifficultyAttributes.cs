@@ -9,11 +9,24 @@ using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Difficulty
 {
+    public interface IDifficultyAttributes
+    {
+        /// <summary>
+        /// The combined star rating of all skills.
+        /// </summary>
+        public double StarRating { get; set; }
+
+        /// <summary>
+        /// The maximum achievable combo.
+        /// </summary>
+        public int MaxCombo { get; set; }
+    }
+
     /// <summary>
     /// Describes the difficulty of a beatmap, as output by a <see cref="DifficultyCalculator"/>.
     /// </summary>
     [JsonObject(MemberSerialization.OptIn)]
-    public class DifficultyAttributes
+    public class DifficultyAttributes : IDifficultyAttributes
     {
         protected const int ATTRIB_ID_AIM = 1;
         protected const int ATTRIB_ID_SPEED = 3;
@@ -36,15 +49,11 @@ namespace osu.Game.Rulesets.Difficulty
         /// </summary>
         public Mod[] Mods { get; set; } = Array.Empty<Mod>();
 
-        /// <summary>
-        /// The combined star rating of all skills.
-        /// </summary>
+        /// <inheritdoc>/>
         [JsonProperty("star_rating", Order = -3)]
         public double StarRating { get; set; }
 
-        /// <summary>
-        /// The maximum achievable combo.
-        /// </summary>
+        /// <inheritdoc>/>
         [JsonProperty("max_combo", Order = -2)]
         public int MaxCombo { get; set; }
 

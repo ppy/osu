@@ -11,7 +11,7 @@ using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Osu.Difficulty
 {
-    public interface IOsuDifficultyAttributes
+    public interface IOsuDifficultyAttributes : IDifficultyAttributes
     {
         /// <summary>
         /// The difficulty corresponding to the aim skill.

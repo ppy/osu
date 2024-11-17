@@ -8,7 +8,7 @@ using osu.Game.Rulesets.Difficulty;
 
 namespace osu.Game.Rulesets.Catch.Difficulty
 {
-    public interface ICatchDifficultyAttributes
+    public interface ICatchDifficultyAttributes : IDifficultyAttributes
     {
         /// <summary>
         /// The perceived approach rate inclusive of rate-adjusting mods (DT/HT/etc).

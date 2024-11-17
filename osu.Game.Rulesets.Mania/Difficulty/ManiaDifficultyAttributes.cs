@@ -8,7 +8,7 @@ using osu.Game.Rulesets.Difficulty;
 
 namespace osu.Game.Rulesets.Mania.Difficulty
 {
-    public interface IManiaDifficultyAttributes
+    public interface IManiaDifficultyAttributes : IDifficultyAttributes
     {
         /// <summary>
         /// The hit window for a GREAT hit inclusive of rate-adjusting mods (DT/HT/etc).

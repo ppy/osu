@@ -7,7 +7,7 @@ using osu.Game.Rulesets.Difficulty;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty
 {
-    public interface ITaikoPerformanceAttributes
+    public interface ITaikoPerformanceAttributes : IPerformanceAttributes
     {
         public double Difficulty { get; set; }
 

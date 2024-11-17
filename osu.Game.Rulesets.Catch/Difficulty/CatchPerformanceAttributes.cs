@@ -5,7 +5,7 @@ using osu.Game.Rulesets.Difficulty;
 
 namespace osu.Game.Rulesets.Catch.Difficulty
 {
-    public interface ICatchPerformanceAttributes
+    public interface ICatchPerformanceAttributes : IPerformanceAttributes
     {
     }
 

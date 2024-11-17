@@ -7,7 +7,7 @@ using osu.Game.Rulesets.Difficulty;
 
 namespace osu.Game.Rulesets.Mania.Difficulty
 {
-    public interface IManiaPerformanceAttributes
+    public interface IManiaPerformanceAttributes : IPerformanceAttributes
     {
         public double Difficulty { get; set; }
     }
