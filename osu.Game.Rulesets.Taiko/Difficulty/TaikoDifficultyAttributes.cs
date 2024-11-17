@@ -18,7 +18,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         /// <summary>
         /// The ratio of stamina difficulty from mono-color (single colour) streams to total stamina difficulty.
         /// </summary>
-        [JsonProperty("mono_stamina_factor")]
         public double MonoStaminaFactor { get; set; }
 
         /// <summary>
@@ -58,6 +57,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         /// <inheritdoc/>
         [JsonProperty("stamina_difficulty")]
         public double StaminaDifficulty { get; set; }
+
+        /// <inheritdoc/>
+        [JsonProperty("mono_stamina_factor")]
+        public double MonoStaminaFactor { get; set; }
 
         /// <inheritdoc/>
         [JsonProperty("rhythm_difficulty")]
