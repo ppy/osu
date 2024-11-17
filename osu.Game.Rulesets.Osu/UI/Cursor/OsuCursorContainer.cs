@@ -33,6 +33,11 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
         private readonly CursorRippleVisualiser rippleVisualiser;
 
+        // we still want to receive input even while hidden,
+        // otherwise the cursor may not expand sometimes.
+        // (e.g. holding left/right button before player is loaded)
+        public override bool PropagateNonPositionalInputSubTree => true;
+
         public OsuCursorContainer()
         {
             InternalChild = fadeContainer = new Container
