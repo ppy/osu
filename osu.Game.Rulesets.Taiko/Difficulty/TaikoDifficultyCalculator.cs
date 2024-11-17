@@ -74,7 +74,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         protected override IDifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
         {
             if (beatmap.HitObjects.Count == 0)
-                return new TaikoDifficultyAttributes { Mods = mods };
+                return new TaikoDifficultyAttributes();
 
             Colour colour = (Colour)skills.First(x => x is Colour);
             Rhythm rhythm = (Rhythm)skills.First(x => x is Rhythm);
@@ -93,7 +93,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             TaikoDifficultyAttributes attributes = new TaikoDifficultyAttributes
             {
                 StarRating = starRating,
-                Mods = mods,
                 StaminaDifficulty = staminaRating,
                 RhythmDifficulty = rhythmRating,
                 ColourDifficulty = colourRating,

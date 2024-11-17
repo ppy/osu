@@ -1,9 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 using osu.Game.Beatmaps;
@@ -15,9 +13,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
     public struct OsuDifficultyAttributes : IDifficultyAttributes
     {
         public OsuDifficultyAttributes() { }
-
-        /// <inheritdoc/>
-        public Mod[] Mods { get; set; } = Array.Empty<Mod>();
 
         /// <inheritdoc/>
         public double StarRating { get; set; }
@@ -45,10 +40,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         public double SpeedNoteCount { get; set; }
 
         /// <summary>
-        /// The difficulty corresponding to the flashlight skill.
+        /// The difficulty corresponding to the flashlight skill. A null value indicates the non-existence of <see cref="Mods.OsuModFlashlight"/>.
         /// </summary>
         [JsonProperty("flashlight_difficulty")]
-        public double FlashlightDifficulty { get; set; }
+        public double? FlashlightDifficulty { get; set; }
 
         /// <summary>
         /// Describes how much of <see cref="AimDifficulty"/> is contributed to by hitcircles or sliders.
@@ -112,7 +107,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             yield return (IDifficultyAttributes.ATTRIB_ID_DIFFICULTY, StarRating);
 
             if (ShouldSerializeFlashlightDifficulty())
-                yield return (IDifficultyAttributes.ATTRIB_ID_FLASHLIGHT, FlashlightDifficulty);
+                yield return (IDifficultyAttributes.ATTRIB_ID_FLASHLIGHT, FlashlightDifficulty!);
 
             yield return (IDifficultyAttributes.ATTRIB_ID_SLIDER_FACTOR, SliderFactor);
 
@@ -147,7 +142,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         // unless the fields are also renamed.
 
         [UsedImplicitly]
-        public bool ShouldSerializeFlashlightDifficulty() => Mods.Any(m => m is ModFlashlight);
+        public bool ShouldSerializeFlashlightDifficulty() => FlashlightDifficulty is not null;
 
         #endregion
     }

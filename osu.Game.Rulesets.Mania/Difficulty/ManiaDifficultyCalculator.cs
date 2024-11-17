@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         protected override IDifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
         {
             if (beatmap.HitObjects.Count == 0)
-                return new ManiaDifficultyAttributes { Mods = mods };
+                return new ManiaDifficultyAttributes();
 
             HitWindows hitWindows = new ManiaHitWindows();
             hitWindows.SetDifficulty(beatmap.Difficulty.OverallDifficulty);
@@ -49,7 +49,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             ManiaDifficultyAttributes attributes = new ManiaDifficultyAttributes
             {
                 StarRating = skills[0].DifficultyValue() * difficulty_multiplier,
-                Mods = mods,
                 // In osu-stable mania, rate-adjustment mods don't affect the hit window.
                 // This is done the way it is to introduce fractional differences in order to match osu-stable for the time being.
                 GreatHitWindow = Math.Ceiling((int)(getHitWindow300(mods) * clockRate) / clockRate),

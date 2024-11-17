@@ -4,7 +4,6 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Difficulty
 {
@@ -28,11 +27,6 @@ namespace osu.Game.Rulesets.Difficulty
         protected const int ATTRIB_ID_SPEED_DIFFICULT_STRAIN_COUNT = 23;
         protected const int ATTRIB_ID_AIM_DIFFICULT_STRAIN_COUNT = 25;
         protected const int ATTRIB_ID_OK_HIT_WINDOW = 27;
-
-        /// <summary>
-        /// The mods which were applied to the beatmap.
-        /// </summary>
-        public Mod[] Mods { get; set; }
 
         /// <summary>
         /// The combined star rating of all skills.
