@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using NUnit.Framework;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
@@ -33,6 +34,18 @@ namespace osu.Game.Rulesets.Osu.Tests
         [TestCase(0.42630400627180914d, 4, "very-fast-slider")]
         public void TestClassicMod(double expectedStarRating, int expectedMaxCombo, string name)
             => Test(expectedStarRating, expectedMaxCombo, name, new OsuModClassic());
+
+        [Test]
+        public void TestFlashlightDifficultyNullability()
+        {
+            IWorkingBeatmap beatmap = GetBeatmap("diffcalc-test");
+
+            OsuDifficultyAttributes attributes = (OsuDifficultyAttributes)CreateDifficultyCalculator(beatmap).Calculate();
+            Assert.IsNull(attributes.FlashlightDifficulty);
+
+            attributes = (OsuDifficultyAttributes)CreateDifficultyCalculator(GetBeatmap("diffcalc-test")).Calculate([new OsuModFlashlight()]);
+            Assert.IsNotNull(attributes.FlashlightDifficulty);
+        }
 
         protected override DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap) => new OsuDifficultyCalculator(new OsuRuleset().RulesetInfo, beatmap);
 
