@@ -58,7 +58,8 @@ namespace osu.Game.Users
             if (statisticsProvider != null)
             {
                 statisticsUpdate = statisticsProvider.StatisticsUpdate.GetBoundCopy();
-                statisticsUpdate.BindValueChanged(_ => updateDisplay(), true);
+                statisticsUpdate.BindValueChanged(_ => updateDisplay());
+                ruleset.BindValueChanged(_ => updateDisplay(), true);
             }
         }
 
