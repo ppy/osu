@@ -69,6 +69,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
                         {
                             patternStartIndex = i;
                         }
+
                         inPattern = true;
                     }
 
