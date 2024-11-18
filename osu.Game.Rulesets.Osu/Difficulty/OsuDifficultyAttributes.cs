@@ -6,14 +6,11 @@ using JetBrains.Annotations;
 using Newtonsoft.Json;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
-using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Osu.Difficulty
 {
     public struct OsuDifficultyAttributes : IDifficultyAttributes
     {
-        public OsuDifficultyAttributes() { }
-
         /// <inheritdoc/>
         public double StarRating { get; set; }
 

@@ -10,8 +10,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 {
     public struct TaikoDifficultyAttributes : IDifficultyAttributes
     {
-        public TaikoDifficultyAttributes() { }
-
         /// <inheritdoc/>
         public double StarRating { get; set; }
 

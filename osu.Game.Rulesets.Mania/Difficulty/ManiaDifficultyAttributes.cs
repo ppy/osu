@@ -10,8 +10,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 {
     public struct ManiaDifficultyAttributes : IDifficultyAttributes
     {
-        public ManiaDifficultyAttributes() { }
-
         /// <inheritdoc/>
         public double StarRating { get; set; }
 

@@ -10,8 +10,6 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 {
     public struct CatchDifficultyAttributes : IDifficultyAttributes
     {
-        public CatchDifficultyAttributes() { }
-
         /// <inheritdoc/>
         public double StarRating { get; set; }
 
