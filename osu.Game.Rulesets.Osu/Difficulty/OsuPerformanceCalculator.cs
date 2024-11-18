@@ -123,7 +123,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             performanceAttributes.Total *= multiplier;
 
-            return performanceAttributes;
+            return visualAdjust(performanceAttributes);
         }
 
         // Internal function
@@ -180,6 +180,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 EffectiveMissCount = effectiveMissCount,
                 Total = totalValue
             };
+        }
+
+        private OsuPerformanceAttributes visualAdjust(OsuPerformanceAttributes attributes)
+        {
+            double sum = attributes.Aim + attributes.Speed + attributes.Accuracy + attributes.Flashlight + attributes.Reading;
+            double multiplier = attributes.Total / sum;
+
+            attributes.Aim *= multiplier;
+            attributes.Speed *= multiplier;
+            attributes.Accuracy *= multiplier;
+            attributes.Flashlight *= multiplier;
+            attributes.Reading *= multiplier;
+
+            return attributes;
         }
 
         public static double CalculateDefaultLengthBonus(int objectsCount) => 0.95 + 0.4 * Math.Min(1.0, objectsCount / 2000.0) + (objectsCount > 2000 ? Math.Log10(objectsCount / 2000.0) * 0.5 : 0.0);
