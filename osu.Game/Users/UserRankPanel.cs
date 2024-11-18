@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.LocalisationExtensions;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
@@ -49,23 +50,20 @@ namespace osu.Game.Users
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; } = null!;
 
-        private IBindable<UserStatisticsUpdate> statisticsUpdate = null!;
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
             if (statisticsProvider != null)
-            {
-                statisticsUpdate = statisticsProvider.StatisticsUpdate.GetBoundCopy();
-                statisticsUpdate.BindValueChanged(u =>
-                {
-                    if (u.NewValue.Ruleset.Equals(ruleset.Value))
-                        updateDisplay();
-                });
+                statisticsProvider.StatisticsUpdated += onStatisticsUpdated;
 
-                ruleset.BindValueChanged(_ => updateDisplay(), true);
-            }
+            ruleset.BindValueChanged(_ => updateDisplay(), true);
+        }
+
+        private void onStatisticsUpdated(UserStatisticsUpdate update)
+        {
+            if (update.Ruleset.Equals(ruleset.Value))
+                updateDisplay();
         }
 
         private void updateDisplay()
@@ -231,5 +229,13 @@ namespace osu.Game.Users
         }
 
         protected override Drawable? CreateBackground() => null;
+
+        protected override void Dispose(bool isDisposing)
+        {
+            if (statisticsProvider.IsNotNull())
+                statisticsProvider.StatisticsUpdated -= onStatisticsUpdated;
+
+            base.Dispose(isDisposing);
+        }
     }
 }

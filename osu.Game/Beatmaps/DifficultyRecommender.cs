@@ -9,6 +9,7 @@ using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Game.Online;
 using osu.Game.Rulesets;
@@ -51,8 +52,6 @@ namespace osu.Game.Beatmaps
             }
         }
 
-        private IBindable<UserStatisticsUpdate> statisticsUpdate = null!;
-
         public DifficultyRecommender(LocalUserStatisticsProvider statisticsProvider)
         {
             this.statisticsProvider = statisticsProvider;
@@ -72,9 +71,10 @@ namespace osu.Game.Beatmaps
         {
             base.LoadComplete();
 
-            statisticsUpdate = statisticsProvider.StatisticsUpdate.GetBoundCopy();
-            statisticsUpdate.ValueChanged += u => updateMapping(u.NewValue.Ruleset, u.NewValue.NewStatistics);
+            statisticsProvider.StatisticsUpdated += onStatisticsUpdated;
         }
+
+        private void onStatisticsUpdated(UserStatisticsUpdate update) => updateMapping(update.Ruleset, update.NewStatistics);
 
         private void updateMapping(RulesetInfo ruleset, UserStatistics statistics)
         {
@@ -109,6 +109,14 @@ namespace osu.Game.Beatmaps
             }
 
             return null;
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            if (statisticsProvider.IsNotNull())
+                statisticsProvider.StatisticsUpdated -= onStatisticsUpdated;
+
+            base.Dispose(isDisposing);
         }
     }
 }

@@ -43,7 +43,7 @@ namespace osu.Game.Online
             base.LoadComplete();
 
             spectatorClient.OnUserScoreProcessed += userScoreProcessed;
-            statisticsProvider.StatisticsUpdate.ValueChanged += onStatisticsUpdated;
+            statisticsProvider.StatisticsUpdated += onStatisticsUpdated;
         }
 
         /// <summary>
@@ -76,13 +76,13 @@ namespace osu.Game.Online
             statisticsProvider.RefetchStatistics(scoreInfo.Ruleset);
         }
 
-        private void onStatisticsUpdated(ValueChangedEvent<UserStatisticsUpdate> update) => Schedule(() =>
+        private void onStatisticsUpdated(UserStatisticsUpdate update) => Schedule(() =>
         {
-            if (scorePendingUpdate == null || !update.NewValue.Ruleset.Equals(scorePendingUpdate.Ruleset))
+            if (scorePendingUpdate == null || !update.Ruleset.Equals(scorePendingUpdate.Ruleset))
                 return;
 
-            if (update.NewValue.OldStatistics != null)
-                latestUpdate.Value = new ScoreBasedUserStatisticsUpdate(scorePendingUpdate, update.NewValue.OldStatistics, update.NewValue.NewStatistics);
+            if (update.OldStatistics != null)
+                latestUpdate.Value = new ScoreBasedUserStatisticsUpdate(scorePendingUpdate, update.OldStatistics, update.NewStatistics);
 
             scorePendingUpdate = null;
         });
