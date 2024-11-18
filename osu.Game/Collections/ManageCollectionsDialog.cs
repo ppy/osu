@@ -108,12 +108,10 @@ namespace osu.Game.Collections
                                             RelativeSizeAxes = Axes.Both,
                                             Colour = colours.GreySeaFoamDarker
                                         },
-                                        new FillFlowContainer
+                                        new Container
                                         {
                                             RelativeSizeAxes = Axes.Both,
-                                            Direction = FillDirection.Vertical,
                                             Padding = new MarginPadding(10),
-                                            Spacing = new Vector2(0, 10),
                                             Children = new Drawable[]
                                             {
                                                 searchTextBox = new BasicSearchTextBox
@@ -127,6 +125,10 @@ namespace osu.Game.Collections
                                                 },
                                                 list = new DrawableCollectionList
                                                 {
+                                                    Padding = new MarginPadding
+                                                    {
+                                                        Top = 60,
+                                                    },
                                                     RelativeSizeAxes = Axes.Both,
                                                 }
                                             }

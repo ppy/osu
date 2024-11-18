@@ -21,6 +21,12 @@ namespace osu.Game.Collections
     /// </summary>
     public partial class DrawableCollectionList : OsuRearrangeableListContainer<Live<BeatmapCollection>>
     {
+        public new MarginPadding Padding
+        {
+            get => base.Padding;
+            set => base.Padding = value;
+        }
+
         protected override ScrollContainer<Drawable> CreateScrollContainer() => scroll = new Scroll();
 
         [Resolved]
