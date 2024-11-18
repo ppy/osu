@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         }
 
         /// <summary>
-        /// The length of each section.
+        /// The length of each strain section.
         /// </summary>
         protected virtual int SectionLength => 400;
 
@@ -35,11 +35,6 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         protected double CurrentSectionEnd;
 
         protected readonly List<double> StrainPeaks = new List<double>();
-
-        /// <summary>
-        /// Returns a live enumerable of the difficulties
-        /// </summary>
-        public virtual IEnumerable<double> GetCurrentStrainPeaks() => StrainPeaks.Append(CurrentSectionPeak);
 
         /// <summary>
         /// Returns the strain value at <see cref="DifficultyHitObject"/>. This value is calculated with or without respect to previous objects.
@@ -96,6 +91,11 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// <param name="current">The current hit object.</param>
         /// <returns>The peak strain.</returns>
         protected abstract double CalculateInitialStrain(double time, DifficultyHitObject current);
+
+        /// <summary>
+        /// Returns a live enumerable of the difficulties
+        /// </summary>
+        public virtual IEnumerable<double> GetCurrentStrainPeaks() => StrainPeaks.Append(CurrentSectionPeak);
 
         /// <summary>
         /// Returns the calculated difficulty value representing all <see cref="DifficultyHitObject"/>s that have been processed up to this point.
