@@ -134,7 +134,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
 
             if (e.Key == Key.F && e.ControlPressed && e.ShiftPressed)
             {
-                convertToFruits();
+                convertToStream();
                 return true;
             }
 
@@ -190,7 +190,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
             lastSliderPathVersion = HitObject.Path.Version.Value;
         }
 
-        private void convertToFruits()
+        private void convertToStream()
         {
             if (editorBeatmap == null || beatDivisor == null)
                 return;
@@ -242,7 +242,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
                 Hotkey = new Hotkey(new KeyCombination(InputKey.Control, InputKey.MouseLeft))
             };
 
-            yield return new OsuMenuItem("Convert to fruits", MenuItemType.Destructive, convertToFruits)
+            yield return new OsuMenuItem("Convert to stream", MenuItemType.Destructive, convertToStream)
             {
                 Hotkey = new Hotkey(new KeyCombination(InputKey.Control, InputKey.Shift, InputKey.F))
             };
