@@ -72,6 +72,7 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
             {
                 Anchor = Anchor.TopCentre,
                 Origin = Anchor.TopCentre,
+                Scale = new Vector2(0.8f)
             }
             : null;
     }
