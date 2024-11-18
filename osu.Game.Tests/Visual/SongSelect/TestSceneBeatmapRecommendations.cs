@@ -33,7 +33,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             AddStep("populate ruleset statistics", () =>
             {
-                ((DummyAPIAccess)API).HandleRequest += r =>
+                ((DummyAPIAccess)API).HandleRequest = r =>
                 {
                     switch (r)
                     {
