@@ -230,7 +230,7 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"statistics")]
         public UserStatistics Statistics
         {
-            get => statistics;
+            get => statistics ??= new UserStatistics();
             set
             {
                 if (statistics != null)
@@ -244,11 +244,7 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"rank_history")]
         private APIRankHistory rankHistory
         {
-            set
-            {
-                statistics ??= new UserStatistics();
-                statistics.RankHistory = value;
-            }
+            set => Statistics.RankHistory = value;
         }
 
         [JsonProperty(@"active_tournament_banners")]
