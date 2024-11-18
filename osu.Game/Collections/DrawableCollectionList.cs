@@ -104,8 +104,8 @@ namespace osu.Game.Collections
 
             public Scroll()
             {
-                ScrollbarVisible = false;
                 Padding = new MarginPadding(10);
+                ScrollbarOverlapsContent = false;
 
                 base.Content.Add(new FillFlowContainer
                 {
@@ -187,6 +187,8 @@ namespace osu.Game.Collections
             {
                 Spacing = new Vector2(0, 5);
                 LayoutEasing = Easing.OutQuint;
+
+                Padding = new MarginPadding { Right = 5 };
             }
 
             protected override void LoadComplete()
