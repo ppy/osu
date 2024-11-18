@@ -40,7 +40,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                             Icon = FontAwesome.Solid.Cog,
                             Origin = Anchor.TopLeft,
                             Anchor = Anchor.TopLeft,
-                            Scale = new Vector2(1f),
                             Position = new Vector2(-30, 0),
                             Action = () => opened.Toggle()
                         },
