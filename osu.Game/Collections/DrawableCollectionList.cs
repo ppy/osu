@@ -46,6 +46,26 @@ namespace osu.Game.Collections
             realmSubscription = realm.RegisterForNotifications(r => r.All<BeatmapCollection>().OrderBy(c => c.Name), collectionsChanged);
         }
 
+        /// <summary>
+        /// When non-null, signifies that a new collection was created and should be presented to the user.
+        /// </summary>
+        private Guid? lastCreated;
+
+        protected override void OnItemsChanged()
+        {
+            base.OnItemsChanged();
+
+            if (lastCreated != null)
+            {
+                var createdItem = flow.Children.SingleOrDefault(item => item.Model.Value.ID == lastCreated);
+
+                if (createdItem != null)
+                    scroll.ScrollTo(createdItem);
+
+                lastCreated = null;
+            }
+        }
+
         private void collectionsChanged(IRealmCollection<BeatmapCollection> collections, ChangeSet? changes)
         {
             if (changes == null)
@@ -60,7 +80,11 @@ namespace osu.Game.Collections
             foreach (int i in changes.InsertedIndices)
                 Items.Insert(i, collections[i].ToLive(realm));
 
+            if (changes.InsertedIndices.Length == 1)
+                lastCreated = collections[changes.InsertedIndices[0]].ID;
+
             foreach (int i in changes.NewModifiedIndices)
+
             {
                 var updatedItem = collections[i];
 
