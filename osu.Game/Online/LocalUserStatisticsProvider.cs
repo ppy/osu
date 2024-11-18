@@ -1,10 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Extensions;
 using osu.Game.Online.API;
@@ -19,13 +19,15 @@ namespace osu.Game.Online
     /// </summary>
     public partial class LocalUserStatisticsProvider : Component
     {
-        private readonly Bindable<UserStatisticsUpdate> statisticsUpdate = new Bindable<UserStatisticsUpdate>();
-
         /// <summary>
-        /// A bindable communicating updates to the local user's statistics on any ruleset.
-        /// This does not guarantee the presence of old statistics, as it is invoked on initial population of statistics.
+        /// Invoked whenever a change occured to the statistics of any ruleset,
+        /// either due to change in local user (log out and log in) or as a result of score submission.
         /// </summary>
-        public IBindable<UserStatisticsUpdate> StatisticsUpdate => statisticsUpdate;
+        /// <remarks>
+        /// This does not guarantee the presence of the old statistics,
+        /// specifically in the case of initial population or change in local user.
+        /// </remarks>
+        public event Action<UserStatisticsUpdate>? StatisticsUpdated;
 
         [Resolved]
         private RulesetStore rulesets { get; set; } = null!;
@@ -73,7 +75,7 @@ namespace osu.Game.Online
 
             statisticsRequests.Remove(ruleset.ShortName);
             statisticsCache[ruleset.ShortName] = newStatistics;
-            statisticsUpdate.Value = new UserStatisticsUpdate(ruleset, oldStatistics, newStatistics);
+            StatisticsUpdated?.Invoke(new UserStatisticsUpdate(ruleset, oldStatistics, newStatistics));
         }
     }
 

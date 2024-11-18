@@ -66,7 +66,7 @@ namespace osu.Game.Tests.Visual.Online
                     Origin = Anchor.Centre,
                 });
 
-                statisticsProvider.StatisticsUpdate.BindValueChanged(s =>
+                statisticsProvider.StatisticsUpdated += update =>
                 {
                     text.Clear();
 
@@ -78,14 +78,9 @@ namespace osu.Game.Tests.Visual.Online
                         text.NewLine();
                     }
 
-                    if (s.NewValue == null)
-                        text.AddText("latest update: (null)");
-                    else
-                    {
-                        text.AddText($"latest update: {s.NewValue.Ruleset}"
-                                     + $" ({(s.NewValue.OldStatistics?.TotalScore.ToString() ?? "null")} -> {s.NewValue.NewStatistics.TotalScore})");
-                    }
-                });
+                    text.AddText($"latest update: {update.Ruleset}"
+                                 + $" ({(update.OldStatistics?.TotalScore.ToString() ?? "null")} -> {update.NewStatistics.TotalScore})");
+                };
 
                 Ruleset.Value = new OsuRuleset().RulesetInfo;
             });
@@ -133,6 +128,8 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestRefetchStatistics()
         {
+            UserStatisticsUpdate? update = null;
+
             setUser(1001);
 
             AddStep("update statistics server side",
@@ -142,13 +139,22 @@ namespace osu.Game.Tests.Visual.Online
                 () => statisticsProvider.GetStatisticsFor(new OsuRuleset().RulesetInfo)!.TotalScore,
                 () => Is.EqualTo(4_000_000));
 
+            AddStep("setup event", () =>
+            {
+                update = null;
+                statisticsProvider.StatisticsUpdated -= onStatisticsUpdated;
+                statisticsProvider.StatisticsUpdated += onStatisticsUpdated;
+            });
+
             AddStep("request refetch", () => statisticsProvider.RefetchStatistics(new OsuRuleset().RulesetInfo));
             AddUntilStep("statistics update raised",
-                () => statisticsProvider.StatisticsUpdate.Value.NewStatistics.TotalScore,
+                () => update?.NewStatistics.TotalScore,
                 () => Is.EqualTo(9_000_000));
             AddAssert("statistics match new score",
                 () => statisticsProvider.GetStatisticsFor(new OsuRuleset().RulesetInfo)!.TotalScore,
                 () => Is.EqualTo(9_000_000));
+
+            void onStatisticsUpdated(UserStatisticsUpdate u) => update = u;
         }
 
         private UserStatistics tryGetStatistics(int userId, string rulesetName)

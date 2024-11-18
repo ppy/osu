@@ -69,7 +69,6 @@ namespace osu.Desktop
         };
 
         private IBindable<APIUser>? user;
-        private IBindable<UserStatisticsUpdate>? statisticsUpdate;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -123,10 +122,8 @@ namespace osu.Desktop
             activity.BindValueChanged(_ => schedulePresenceUpdate());
             privacyMode.BindValueChanged(_ => schedulePresenceUpdate());
 
-            statisticsUpdate = statisticsProvider.StatisticsUpdate.GetBoundCopy();
-            statisticsUpdate.BindValueChanged(_ => schedulePresenceUpdate());
-
             multiplayerClient.RoomUpdated += onRoomUpdated;
+            statisticsProvider.StatisticsUpdated += onStatisticsUpdated;
         }
 
         private void onReady(object _, ReadyMessage __)
@@ -141,6 +138,8 @@ namespace osu.Desktop
         }
 
         private void onRoomUpdated() => schedulePresenceUpdate();
+
+        private void onStatisticsUpdated(UserStatisticsUpdate _) => schedulePresenceUpdate();
 
         private ScheduledDelegate? presenceUpdateDelegate;
 
@@ -352,6 +351,9 @@ namespace osu.Desktop
         {
             if (multiplayerClient.IsNotNull())
                 multiplayerClient.RoomUpdated -= onRoomUpdated;
+
+            if (statisticsProvider.IsNotNull())
+                statisticsProvider.StatisticsUpdated -= onStatisticsUpdated;
 
             client.Dispose();
             base.Dispose(isDisposing);
