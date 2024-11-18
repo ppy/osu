@@ -25,7 +25,7 @@ namespace osu.Game.Graphics.Backgrounds
 
         private readonly string fallbackTextureName;
 
-        protected BeatmapBackgroundSprite ColouredDimmableSprite { get; private set; }
+        protected DimmableSprite ColouredDimmableSprite { get; private set; }
 
         protected DimmableBufferedContainer ColouredDimmableBufferedContainer;
 
@@ -65,7 +65,7 @@ namespace osu.Game.Graphics.Backgrounds
             Sprite.Texture = Beatmap?.GetBackground() ?? textures.Get(fallbackTextureName);
         }
 
-        protected override Sprite CreateSprite() => ColouredDimmableSprite = new BeatmapBackgroundSprite
+        protected override Sprite CreateSprite() => ColouredDimmableSprite = new DimmableSprite
         {
             RelativeSizeAxes = Axes.Both,
             Anchor = Anchor.Centre,
@@ -140,7 +140,7 @@ namespace osu.Game.Graphics.Backgrounds
             [BackgroundDependencyLoader]
             private void load(ShaderManager shaders)
             {
-                TextureShader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, "BeatmapBackground");
+                TextureShader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, "ColouredDimmableTexture");
             }
 
             protected override DrawNode CreateDrawNode() => new DimmableBufferedContainerDrawNode(this, SharedData);
@@ -166,13 +166,13 @@ namespace osu.Game.Graphics.Backgrounds
                     dimLevel = Source.DimLevel;
                 }
 
-                private IUniformBuffer<BeatmapBackgroundParameters> beatmapBackgroundParametersBuffer;
+                private IUniformBuffer<DimParameters> dimParametersBuffer;
 
                 protected override void BindUniformResources(IShader shader, IRenderer renderer)
                 {
-                    beatmapBackgroundParametersBuffer ??= renderer.CreateUniformBuffer<BeatmapBackgroundParameters>();
+                    dimParametersBuffer ??= renderer.CreateUniformBuffer<DimParameters>();
 
-                    beatmapBackgroundParametersBuffer.Data = beatmapBackgroundParametersBuffer.Data with
+                    dimParametersBuffer.Data = dimParametersBuffer.Data with
                     {
                         DimColour = new UniformVector4
                         {
@@ -184,17 +184,17 @@ namespace osu.Game.Graphics.Backgrounds
                         DimLevel = dimLevel,
                     };
 
-                    shader.BindUniformBlock("m_BeatmapBackgroundParameters", beatmapBackgroundParametersBuffer);
+                    shader.BindUniformBlock("m_DimParameters", dimParametersBuffer);
                 }
 
                 protected override void Dispose(bool isDisposing)
                 {
                     base.Dispose(isDisposing);
-                    beatmapBackgroundParametersBuffer?.Dispose();
+                    dimParametersBuffer?.Dispose();
                 }
 
                 [StructLayout(LayoutKind.Sequential, Pack = 1)]
-                private record struct BeatmapBackgroundParameters
+                private record struct DimParameters
                 {
                     public UniformVector4 DimColour;
                     public UniformFloat DimLevel;
@@ -203,7 +203,7 @@ namespace osu.Game.Graphics.Backgrounds
             }
         }
 
-        public partial class BeatmapBackgroundSprite : Sprite, IColouredDimmable
+        public partial class DimmableSprite : Sprite, IColouredDimmable
         {
             private Colour4 dimColour;
 
@@ -229,7 +229,7 @@ namespace osu.Game.Graphics.Backgrounds
                 }
             }
 
-            public BeatmapBackgroundSprite()
+            public DimmableSprite()
             {
                 DimColour = Colour4.Black;
                 DimLevel = 0.0f;
@@ -238,16 +238,16 @@ namespace osu.Game.Graphics.Backgrounds
             [BackgroundDependencyLoader]
             private void load(ShaderManager shaders)
             {
-                TextureShader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, "BeatmapBackground");
+                TextureShader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, "ColouredDimmableTexture");
             }
 
             protected override DrawNode CreateDrawNode() => new BeatmapBackgroundSpriteDrawNode(this);
 
             public class BeatmapBackgroundSpriteDrawNode : SpriteDrawNode
             {
-                public new BeatmapBackgroundSprite Source => (BeatmapBackgroundSprite)base.Source;
+                public new DimmableSprite Source => (DimmableSprite)base.Source;
 
-                public BeatmapBackgroundSpriteDrawNode(BeatmapBackgroundSprite source)
+                public BeatmapBackgroundSpriteDrawNode(DimmableSprite source)
                     : base(source)
                 {
                 }
@@ -264,13 +264,13 @@ namespace osu.Game.Graphics.Backgrounds
                     dimLevel = Source.DimLevel;
                 }
 
-                private IUniformBuffer<BeatmapBackgroundParameters> beatmapBackgroundParametersBuffer;
+                private IUniformBuffer<DimParameters> dimParametersBuffer;
 
                 protected override void BindUniformResources(IShader shader, IRenderer renderer)
                 {
-                    beatmapBackgroundParametersBuffer ??= renderer.CreateUniformBuffer<BeatmapBackgroundParameters>();
+                    dimParametersBuffer ??= renderer.CreateUniformBuffer<DimParameters>();
 
-                    beatmapBackgroundParametersBuffer.Data = beatmapBackgroundParametersBuffer.Data with
+                    dimParametersBuffer.Data = dimParametersBuffer.Data with
                     {
                         DimColour = new UniformVector4
                         {
@@ -282,17 +282,17 @@ namespace osu.Game.Graphics.Backgrounds
                         DimLevel = dimLevel,
                     };
 
-                    shader.BindUniformBlock("m_BeatmapBackgroundParameters", beatmapBackgroundParametersBuffer);
+                    shader.BindUniformBlock("m_DimParameters", dimParametersBuffer);
                 }
 
                 protected override void Dispose(bool isDisposing)
                 {
                     base.Dispose(isDisposing);
-                    beatmapBackgroundParametersBuffer?.Dispose();
+                    dimParametersBuffer?.Dispose();
                 }
 
                 [StructLayout(LayoutKind.Sequential, Pack = 1)]
-                private record struct BeatmapBackgroundParameters
+                private record struct DimParameters
                 {
                     public UniformVector4 DimColour;
                     public UniformFloat DimLevel;

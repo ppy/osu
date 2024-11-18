@@ -69,7 +69,7 @@ namespace osu.Game.Storyboards.Drawables
             }
         }
 
-        protected override Sprite CreateSprite() => new BeatmapBackground.BeatmapBackgroundSprite
+        protected override Sprite CreateSprite() => new BeatmapBackground.DimmableSprite
         {
             RelativeSizeAxes = Axes.Both,
             Anchor = Anchor.Centre,

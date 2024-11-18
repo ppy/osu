@@ -108,7 +108,7 @@ namespace osu.Game.Storyboards.Drawables
 
             Sprite.ApplyTransforms(this);
 
-            TextureShader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, "BeatmapBackground");
+            TextureShader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, "ColouredDimmableTexture");
         }
 
         private void skinSourceChanged()
@@ -152,13 +152,13 @@ namespace osu.Game.Storyboards.Drawables
                 // dimLevel = Source.DimLevel;
             }
 
-            private IUniformBuffer<BeatmapBackgroundParameters> beatmapBackgroundParametersBuffer = null!;
+            private IUniformBuffer<DimParameters> dimParametersBuffer = null!;
 
             protected override void BindUniformResources(IShader shader, IRenderer renderer)
             {
-                beatmapBackgroundParametersBuffer ??= renderer.CreateUniformBuffer<BeatmapBackgroundParameters>();
+                dimParametersBuffer ??= renderer.CreateUniformBuffer<DimParameters>();
 
-                beatmapBackgroundParametersBuffer.Data = beatmapBackgroundParametersBuffer.Data with
+                dimParametersBuffer.Data = dimParametersBuffer.Data with
                 {
                     DimColour = new UniformVector4
                     {
@@ -170,17 +170,17 @@ namespace osu.Game.Storyboards.Drawables
                     DimLevel = dimLevel,
                 };
 
-                shader.BindUniformBlock("m_BeatmapBackgroundParameters", beatmapBackgroundParametersBuffer);
+                shader.BindUniformBlock("m_DimParameters", dimParametersBuffer);
             }
 
             protected override void Dispose(bool isDisposing)
             {
                 base.Dispose(isDisposing);
-                beatmapBackgroundParametersBuffer?.Dispose();
+                dimParametersBuffer?.Dispose();
             }
 
             [StructLayout(LayoutKind.Sequential, Pack = 1)]
-            private record struct BeatmapBackgroundParameters
+            private record struct DimParameters
             {
                 public UniformVector4 DimColour;
                 public UniformFloat DimLevel;
