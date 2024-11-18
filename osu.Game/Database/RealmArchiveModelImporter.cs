@@ -117,67 +117,73 @@ namespace osu.Game.Database
 
             await pauseIfNecessaryAsync(parameters, notification, notification.CancellationToken).ConfigureAwait(false);
 
-            await Parallel.ForEachAsync(tasks, notification.CancellationToken, async (task, cancellation) =>
+            try
             {
-                cancellation.ThrowIfCancellationRequested();
-
-                try
+                await Parallel.ForEachAsync(tasks, notification.CancellationToken, async (task, cancellation) =>
                 {
-                    await pauseIfNecessaryAsync(parameters, notification, cancellation).ConfigureAwait(false);
+                    cancellation.ThrowIfCancellationRequested();
 
-                    var model = await Import(task, parameters, cancellation).ConfigureAwait(false);
-
-                    lock (imported)
+                    try
                     {
-                        if (model != null)
-                            imported.Add(model);
-                        current++;
+                        await pauseIfNecessaryAsync(parameters, notification, cancellation).ConfigureAwait(false);
 
-                        notification.Text = $"Imported {current} of {tasks.Length} {HumanisedModelName}s";
-                        notification.Progress = (float)current / tasks.Length;
+                        var model = await Import(task, parameters, cancellation).ConfigureAwait(false);
+
+                        lock (imported)
+                        {
+                            if (model != null)
+                                imported.Add(model);
+                            current++;
+
+                            notification.Text = $"Imported {current} of {tasks.Length} {HumanisedModelName}s";
+                            notification.Progress = (float)current / tasks.Length;
+                        }
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        throw;
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Error(e, $@"Could not import ({task})", LoggingTarget.Database);
+                    }
+                }).ConfigureAwait(false);
+            }
+            finally
+            {
+                if (imported.Count == 0)
+                {
+                    if (notification.CancellationToken.IsCancellationRequested)
+                    {
+                        notification.State = ProgressNotificationState.Cancelled;
+                    }
+                    else
+                    {
+                        notification.Text = $"{HumanisedModelName.Humanize(LetterCasing.Title)} import failed! Check logs for more information.";
+                        notification.State = ProgressNotificationState.Cancelled;
                     }
                 }
-                catch (OperationCanceledException)
-                {
-                    throw;
-                }
-                catch (Exception e)
-                {
-                    Logger.Error(e, $@"Could not import ({task})", LoggingTarget.Database);
-                }
-            }).ConfigureAwait(false);
-
-            if (imported.Count == 0)
-            {
-                if (notification.CancellationToken.IsCancellationRequested)
-                {
-                    notification.State = ProgressNotificationState.Cancelled;
-                    return imported;
-                }
-
-                notification.Text = $"{HumanisedModelName.Humanize(LetterCasing.Title)} import failed! Check logs for more information.";
-                notification.State = ProgressNotificationState.Cancelled;
-            }
-            else
-            {
-                if (tasks.Length > imported.Count)
-                    notification.CompletionText = $"Imported {imported.Count} of {tasks.Length} {HumanisedModelName}s.";
-                else if (imported.Count > 1)
-                    notification.CompletionText = $"Imported {imported.Count} {HumanisedModelName}s!";
                 else
-                    notification.CompletionText = $"Imported {imported.First().GetDisplayString()}!";
-
-                if (imported.Count > 0 && PresentImport != null)
                 {
-                    notification.CompletionText += " Click to view.";
-                    notification.CompletionClickAction = () =>
-                    {
-                        PresentImport?.Invoke(imported);
-                        return true;
-                    };
-                }
+                    if (tasks.Length > imported.Count)
+                        notification.CompletionText = $"Imported {imported.Count} of {tasks.Length} {HumanisedModelName}s.";
+                    else if (imported.Count > 1)
+                        notification.CompletionText = $"Imported {imported.Count} {HumanisedModelName}s!";
+                    else
+                        notification.CompletionText = $"Imported {imported.First().GetDisplayString()}!";
 
-                notification.State = ProgressNotificationState.Completed;
+                    if (imported.Count > 0 && PresentImport != null)
+                    {
+                        notification.CompletionText += " Click to view.";
+                        notification.CompletionClickAction = () =>
+                        {
+                            PresentImport?.Invoke(imported);
+                            return true;
+                        };
+                    }
+
+                    notification.State = ProgressNotificationState.Completed;
+                }
             }
 
             return imported;
