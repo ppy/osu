@@ -15,10 +15,10 @@ using osu.Game.Rulesets.Taiko.Objects;
 
 namespace osu.Game.Rulesets.Taiko.Mods
 {
-    public class TaikoModSimplifiedRhythm : Mod, IApplicableToBeatmap
+    public class TaikoModSimplified : Mod, IApplicableToBeatmap
     {
-        public override string Name => "Simplified Rhythm";
-        public override string Acronym => "SR";
+        public override string Name => "Simplified";
+        public override string Acronym => "SF";
         public override double ScoreMultiplier => 0.6;
         public override LocalisableString Description => "Simplify tricky rhythms!";
         public override ModType Type => ModType.DifficultyReduction;
