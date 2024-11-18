@@ -61,6 +61,9 @@ namespace osu.Game.Beatmaps
             statisticsUpdate = statisticsProvider.StatisticsUpdate.GetBoundCopy();
             statisticsUpdate.BindValueChanged(u =>
             {
+                if (u.NewValue == null)
+                    return;
+
                 // algorithm taken from https://github.com/ppy/osu-web/blob/e6e2825516449e3d0f3f5e1852c6bdd3428c3437/app/Models/User.php#L1505
                 recommendedDifficultyMapping[u.NewValue.Ruleset.ShortName] = Math.Pow((double)(u.NewValue.NewStatistics.PP ?? 0), 0.4) * 0.195;
             }, true);

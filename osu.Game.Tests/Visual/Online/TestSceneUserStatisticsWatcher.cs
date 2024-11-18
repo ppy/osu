@@ -269,7 +269,7 @@ namespace osu.Game.Tests.Visual.Online
 
             AddStep("signal score processed", () => ((ISpectatorClient)spectatorClient).UserScoreProcessed(userId, scoreId));
             AddUntilStep("update received", () => update != null);
-            AddAssert("statistics values are correct", () => dummyAPI.LocalUser.Value.Statistics.TotalScore, () => Is.EqualTo(5_000_000));
+            AddAssert("statistics values are correct", () => statisticsProvider.GetStatisticsFor(ruleset)!.TotalScore, () => Is.EqualTo(5_000_000));
         }
 
         private int nextUserId = 2000;
