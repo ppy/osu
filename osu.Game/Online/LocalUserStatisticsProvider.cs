@@ -55,6 +55,9 @@ namespace osu.Game.Online
         {
             statisticsCache.Clear();
 
+            if (api.LocalUser.Value == null || api.LocalUser.Value.Id <= 1)
+                return;
+
             foreach (var ruleset in rulesets.AvailableRulesets.Where(r => r.IsLegacyRuleset()))
                 RefetchStatistics(ruleset);
         }
