@@ -12,6 +12,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Online;
 using osu.Game.Rulesets;
+using osu.Game.Users;
 
 namespace osu.Game.Beatmaps
 {
@@ -24,7 +25,10 @@ namespace osu.Game.Beatmaps
         private readonly LocalUserStatisticsProvider statisticsProvider;
 
         [Resolved]
-        private Bindable<RulesetInfo> ruleset { get; set; }
+        private Bindable<RulesetInfo> gameRuleset { get; set; }
+
+        [Resolved]
+        private RulesetStore rulesets { get; set; } = null!;
 
         private readonly Dictionary<string, double> recommendedDifficultyMapping = new Dictionary<string, double>();
 
@@ -36,14 +40,14 @@ namespace osu.Game.Beatmaps
         {
             get
             {
-                if (LoadState < LoadState.Ready || ruleset.Value == null)
+                if (LoadState < LoadState.Ready || gameRuleset.Value == null)
                     return Enumerable.Empty<string>();
 
                 return recommendedDifficultyMapping
                        .OrderByDescending(pair => pair.Value)
                        .Select(pair => pair.Key)
-                       .Where(r => !r.Equals(ruleset.Value.ShortName, StringComparison.Ordinal))
-                       .Prepend(ruleset.Value.ShortName);
+                       .Where(r => !r.Equals(gameRuleset.Value.ShortName, StringComparison.Ordinal))
+                       .Prepend(gameRuleset.Value.ShortName);
             }
         }
 
@@ -54,19 +58,28 @@ namespace osu.Game.Beatmaps
             this.statisticsProvider = statisticsProvider;
         }
 
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            foreach (var ruleset in rulesets.AvailableRulesets)
+            {
+                if (statisticsProvider.GetStatisticsFor(ruleset) is UserStatistics statistics)
+                    updateMapping(ruleset, statistics);
+            }
+        }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
             statisticsUpdate = statisticsProvider.StatisticsUpdate.GetBoundCopy();
-            statisticsUpdate.BindValueChanged(u =>
-            {
-                if (u.NewValue == null)
-                    return;
+            statisticsUpdate.ValueChanged += u => updateMapping(u.NewValue.Ruleset, u.NewValue.NewStatistics);
+        }
 
-                // algorithm taken from https://github.com/ppy/osu-web/blob/e6e2825516449e3d0f3f5e1852c6bdd3428c3437/app/Models/User.php#L1505
-                recommendedDifficultyMapping[u.NewValue.Ruleset.ShortName] = Math.Pow((double)(u.NewValue.NewStatistics.PP ?? 0), 0.4) * 0.195;
-            }, true);
+        private void updateMapping(RulesetInfo ruleset, UserStatistics statistics)
+        {
+            // algorithm taken from https://github.com/ppy/osu-web/blob/e6e2825516449e3d0f3f5e1852c6bdd3428c3437/app/Models/User.php#L1505
+            recommendedDifficultyMapping[ruleset.ShortName] = Math.Pow((double)(statistics.PP ?? 0), 0.4) * 0.195;
         }
 
         /// <summary>

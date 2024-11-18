@@ -1071,6 +1071,7 @@ namespace osu.Game
             LocalUserStatisticsProvider statisticsProvider;
 
             loadComponentSingleFile(statisticsProvider = new LocalUserStatisticsProvider(), Add, true);
+            loadComponentSingleFile(difficultyRecommender = new DifficultyRecommender(statisticsProvider), Add, true);
             loadComponentSingleFile(new UserStatisticsWatcher(statisticsProvider), Add, true);
             loadComponentSingleFile(Toolbar = new Toolbar
             {
@@ -1140,8 +1141,6 @@ namespace osu.Game
 
             loadComponentSingleFile(new BackgroundDataStoreProcessor(), Add);
             loadComponentSingleFile(new DetachedBeatmapStore(), Add, true);
-
-            loadComponentSingleFile(difficultyRecommender = new DifficultyRecommender(statisticsProvider), Add, true);
 
             Add(externalLinkOpener = new ExternalLinkOpener());
             Add(new MusicKeyBindingHandler());
