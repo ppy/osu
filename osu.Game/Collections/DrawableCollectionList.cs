@@ -34,6 +34,12 @@ namespace osu.Game.Collections
 
         public IEnumerable<Drawable> OrderedItems => flow.FlowingChildren;
 
+        public string SearchTerm
+        {
+            get => flow.SearchTerm;
+            set => flow.SearchTerm = value;
+        }
+
         protected override FillFlowContainer<RearrangeableListItem<Live<BeatmapCollection>>> CreateListFillFlowContainer() => flow = new Flow
         {
             DragActive = { BindTarget = DragActive }
@@ -128,7 +134,6 @@ namespace osu.Game.Collections
 
             public Scroll()
             {
-                Padding = new MarginPadding(10);
                 ScrollbarOverlapsContent = false;
 
                 base.Content.Add(new FillFlowContainer
@@ -157,7 +162,7 @@ namespace osu.Game.Collections
                 base.Update();
 
                 // AutoSizeAxes cannot be used as the height should represent the post-layout-transform height at all times, so that the placeholder doesn't bounce around.
-                content.Height = ((Flow)Child).Children.Sum(c => c.DrawHeight + 5);
+                content.Height = ((Flow)Child).Children.Sum(c => c.IsPresent ? c.DrawHeight + 5 : 0);
             }
 
             /// <summary>
@@ -203,7 +208,7 @@ namespace osu.Game.Collections
         /// <summary>
         /// The flow of <see cref="DrawableCollectionListItem"/>. Disables layout easing unless a drag is in progress.
         /// </summary>
-        private partial class Flow : FillFlowContainer<RearrangeableListItem<Live<BeatmapCollection>>>
+        private partial class Flow : SearchContainer<RearrangeableListItem<Live<BeatmapCollection>>>
         {
             public readonly IBindable<bool> DragActive = new Bindable<bool>();
 
