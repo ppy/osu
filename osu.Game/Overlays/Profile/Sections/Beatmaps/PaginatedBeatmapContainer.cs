@@ -71,8 +71,7 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
             ? new BeatmapCardNormal(model)
             {
                 Anchor = Anchor.TopCentre,
-                Origin = Anchor.TopCentre,
-                Scale = new Vector2(0.8f)
+                Origin = Anchor.TopCentre
             }
             : null;
     }
