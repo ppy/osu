@@ -23,13 +23,13 @@ namespace osu.Game.Rulesets.Taiko.Mods
         public override LocalisableString Description => "Simplify tricky rhythms!";
         public override ModType Type => ModType.DifficultyReduction;
 
-        [SettingSource("One-third conversion", "Converts 1/3 snap to 1/2 snap.")]
+        [SettingSource("1/3 to 1/2 conversion", "Converts 1/3 patterns to 1/2 rhythm.")]
         public Bindable<bool> OneThirdConversion { get; } = new BindableBool(false);
 
-        [SettingSource("One-sixth conversion", "Converts 1/6 snap to 1/4 snap.")]
+        [SettingSource("1/6 to 1/4 conversion", "Converts 1/6 patterns to 1/4 rhythm.")]
         public Bindable<bool> OneSixthConversion { get; } = new BindableBool(true);
 
-        [SettingSource("One-eighth conversion", "Converts 1/8 snap to 1/4 snap.")]
+        [SettingSource("1/8 to 1/4 conversion", "Converts 1/8 patterns to 1/4 rhythm.")]
         public Bindable<bool> OneEighthConversion { get; } = new BindableBool(false);
 
         public void ApplyToBeatmap(IBeatmap beatmap)
