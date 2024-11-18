@@ -46,13 +46,14 @@ namespace osu.Game.Rulesets.Taiko.Mods
                 { 3, 2 }, // 1/3 snap to 1/2 snap
             };
 
-            int patternStartIndex = 0;
             bool inPattern = false;
 
             List<Hit> hits = taikoBeatmap.HitObjects.Where(obj => obj is Hit).Cast<Hit>().ToList();
 
             foreach (var snapConversion in snapConversions)
             {
+                int patternStartIndex = 0;
+
                 // Skip processing if the corresponding conversion is disabled
                 if (!shouldProcessRhythm(snapConversion.Key))
                     continue;
@@ -73,8 +74,8 @@ namespace osu.Game.Rulesets.Taiko.Mods
                         inPattern = true;
                     }
 
-                    // check if end of pattern or if we're on the last note
-                    if ((inPattern && snapValue != snapConversion.Key) || i == hits.Count)
+                    // check if end of pattern
+                    if (inPattern && snapValue != snapConversion.Key)
                     {
                         // End of the pattern
                         inPattern = false;
@@ -109,7 +110,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
                 }
 
                 // Remove queued notes
-                taikoBeatmap.HitObjects = taikoBeatmap.HitObjects.Except(toRemove).ToList();
+                taikoBeatmap.HitObjects.RemoveAll(obj => toRemove.Contains(obj));
             }
         }
 
