@@ -8,9 +8,11 @@ using System.IO;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.Backgrounds;
 using osu.Game.Skinning;
 using osuTK;
 
@@ -66,6 +68,15 @@ namespace osu.Game.Storyboards.Drawables
                 Invalidate(Invalidation.MiscGeometry);
             }
         }
+
+        protected override Sprite CreateSprite() => new BeatmapBackground.BeatmapBackgroundSprite
+        {
+            RelativeSizeAxes = Axes.Both,
+            Anchor = Anchor.Centre,
+            Origin = Anchor.Centre,
+            DimColour = Colour4.Red,
+            DimLevel = 1.0f,
+        };
 
         public override bool RemoveWhenNotAlive => false;
 
