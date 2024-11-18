@@ -501,6 +501,18 @@ namespace osu.Game.Tests.NonVisual.Filtering
             Assert.That(visibleBeatmaps, Is.EqualTo(expectedBeatmapIndexes));
         }
 
+        [Test]
+        public void TestApplySourceQueries()
+        {
+            const string query = "find me songs with source=\"unit tests\" please";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.AreEqual("find me songs with  please", filterCriteria.SearchText.Trim());
+            Assert.AreEqual(5, filterCriteria.SearchTerms.Length);
+            Assert.AreEqual("unit tests", filterCriteria.Source.SearchTerm);
+            Assert.That(filterCriteria.Source.MatchMode, Is.EqualTo(FilterCriteria.MatchMode.IsolatedPhrase));
+        }
+
         private class CustomFilterCriteria : IRulesetFilterCriteria
         {
             public string? CustomValue { get; set; }
