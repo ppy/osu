@@ -52,19 +52,9 @@ namespace osu.Game.Localisation
         public static LocalisableString Items(int arg0) => new TranslatableString(getKey(@"items"), @"{0} item(s)", arg0);
 
         /// <summary>
-        /// "Data migration will use &quot;copy on write&quot;. No extra disk space will be used, and you can delete or modify either data folder at any point without affecting the other installation."
-        /// </summary>
-        public static LocalisableString DataMigrationNoExtraSpaceWithCoW => new TranslatableString(getKey(@"data_migration_no_extra_space_cow"), @"Data migration will use ""copy on write"". No extra disk space will be used, and you can delete or modify either data folder at any point without affecting the other installation.");
-
-        /// <summary>
         /// "Data migration will use &quot;hard links&quot;. No extra disk space will be used, and you can delete either data folder at any point without affecting the other installation."
         /// </summary>
         public static LocalisableString DataMigrationNoExtraSpace => new TranslatableString(getKey(@"data_migration_no_extra_space"), @"Data migration will use ""hard links"". No extra disk space will be used, and you can delete either data folder at any point without affecting the other installation.");
-
-        /// <summary>
-        /// "Learn more about how &quot;copy on write&quot; work"
-        /// </summary>
-        public static LocalisableString LearnMoreAboutCoW => new TranslatableString(getKey(@"learn_about_cow"), @"Learn more about how ""copy on write"" work");
 
         /// <summary>
         /// "Learn more about how &quot;hard links&quot; work"

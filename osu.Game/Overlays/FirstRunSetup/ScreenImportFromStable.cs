@@ -132,13 +132,7 @@ namespace osu.Game.Overlays.FirstRunSetup
             hardLinkAvailable = legacyImportManager.CheckSongsFolderHardLinkAvailability();
             Logger.Log($"Hard link support for beatmaps is {hardLinkAvailable}");
 
-            if (cowAvailable)
-            {
-                copyInformation.Text = FirstRunOverlayImportFromStableScreenStrings.DataMigrationNoExtraSpaceWithCoW;
-                copyInformation.AddText(@" "); // just to ensure correct spacing
-                copyInformation.AddLink(FirstRunOverlayImportFromStableScreenStrings.LearnMoreAboutCoW, LinkAction.OpenWiki, @"Client/Release_stream/Lazer/File_storage#via-copy-on-write");
-            }
-            else if (hardLinkAvailable)
+            if (cowAvailable || hardLinkAvailable)
             {
                 copyInformation.Text = FirstRunOverlayImportFromStableScreenStrings.DataMigrationNoExtraSpace;
                 copyInformation.AddText(@" "); // just to ensure correct spacing
