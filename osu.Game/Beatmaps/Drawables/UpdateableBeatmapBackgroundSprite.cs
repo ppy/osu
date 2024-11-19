@@ -19,12 +19,12 @@ namespace osu.Game.Beatmaps.Drawables
         /// <summary>
         /// Delay before the background is loaded while on-screen.
         /// </summary>
-        public double BackgroundLoadDelay = 500;
+        public double BackgroundLoadDelay { get; set; } = 500;
 
         /// <summary>
         /// Delay before the background is unloaded while off-screen.
         /// </summary>
-        public double BackgroundUnloadDelay = 10000;
+        public double BackgroundUnloadDelay { get; set; } = 10000;
 
         [Resolved]
         private BeatmapManager beatmaps { get; set; } = null!;
