@@ -140,7 +140,7 @@ namespace osu.Game.Rulesets.Difficulty
         /// This can only be used to compute difficulties for legacy mod combinations.
         /// </remarks>
         /// <returns>A collection of structures describing the difficulty of the beatmap for each mod combination.</returns>
-        public IEnumerable<IDifficultyAttributes> CalculateAllLegacyCombinations(CancellationToken cancellationToken = default)
+        public IEnumerable<(Mod[] Mods, IDifficultyAttributes Attributes)> CalculateAllLegacyCombinations(CancellationToken cancellationToken = default)
         {
             var rulesetInstance = ruleset.CreateInstance();
 
@@ -148,11 +148,13 @@ namespace osu.Game.Rulesets.Difficulty
             {
                 Mod classicMod = rulesetInstance.CreateMod<ModClassic>();
 
-                var finalCombination = ModUtils.FlattenMod(combination);
+                IEnumerable<Mod> finalCombination = ModUtils.FlattenMod(combination);
                 if (classicMod != null)
                     finalCombination = finalCombination.Append(classicMod);
 
-                yield return Calculate(finalCombination.ToArray(), cancellationToken);
+                Mod[] finalMods = finalCombination.ToArray();
+
+                yield return (finalMods, Calculate(finalMods, cancellationToken));
             }
         }
 
