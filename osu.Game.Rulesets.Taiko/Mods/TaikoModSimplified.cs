@@ -116,7 +116,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
         private int getSnapBetweenNotes(ControlPointInfo controlPointInfo, Hit currentNote, Hit nextNote)
         {
-            double gapMs = Math.Max(currentNote.StartTime, nextNote.StartTime) - Math.Min(currentNote.StartTime, nextNote.StartTime);
+            double gapMs = nextNote.StartTime - currentNote.StartTime;
             var currentTimingPoint = controlPointInfo.TimingPointAt(currentNote.StartTime);
 
             return controlPointInfo.GetClosestBeatDivisor(gapMs + currentTimingPoint.Time);
