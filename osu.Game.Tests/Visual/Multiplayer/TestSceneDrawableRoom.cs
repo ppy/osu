@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Linq;
 using NUnit.Framework;
@@ -32,15 +30,40 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Cached]
         protected readonly OverlayColourProvider ColourProvider = new OverlayColourProvider(OverlayColourScheme.Plum);
 
-        private readonly Bindable<Room> selectedRoom = new Bindable<Room>();
+        private readonly Bindable<Room?> selectedRoom = new Bindable<Room?>();
 
         [Test]
         public void TestMultipleStatuses()
         {
-            FillFlowContainer rooms = null;
+            FillFlowContainer rooms = null!;
 
             AddStep("create rooms", () =>
             {
+                PlaylistItem item1 = new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo)
+                {
+                    BeatmapInfo = { StarRating = 2.5 }
+                }.BeatmapInfo);
+
+                PlaylistItem item2 = new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo)
+                {
+                    BeatmapInfo = { StarRating = 4.5 }
+                }.BeatmapInfo);
+
+                PlaylistItem item3 = new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo)
+                {
+                    BeatmapInfo =
+                    {
+                        StarRating = 2.5,
+                        Metadata =
+                        {
+                            Artist = "very very very very very very very very very long artist",
+                            ArtistUnicode = "very very very very very very very very very long artist",
+                            Title = "very very very very very very very very very very very long title",
+                            TitleUnicode = "very very very very very very very very very very very long title",
+                        }
+                    }
+                }.BeatmapInfo);
+
                 Child = rooms = new FillFlowContainer
                 {
                     Anchor = Anchor.Centre,
@@ -52,86 +75,48 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     {
                         createLoungeRoom(new Room
                         {
-                            Name = { Value = "Multiplayer room" },
-                            Status = { Value = new RoomStatusOpen() },
-                            EndDate = { Value = DateTimeOffset.Now.AddDays(1) },
-                            Type = { Value = MatchType.HeadToHead },
-                            Playlist =
-                            {
-                                new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo)
-                                {
-                                    BeatmapInfo =
-                                    {
-                                        StarRating = 2.5
-                                    }
-                                }.BeatmapInfo)
-                            }
+                            Name = "Multiplayer room",
+                            Status = new RoomStatusOpen(),
+                            EndDate = DateTimeOffset.Now.AddDays(1),
+                            Type = MatchType.HeadToHead,
+                            Playlist = [item1],
+                            CurrentPlaylistItem = item1
                         }),
                         createLoungeRoom(new Room
                         {
-                            Name = { Value = "Private room" },
-                            Status = { Value = new RoomStatusOpenPrivate() },
-                            HasPassword = { Value = true },
-                            EndDate = { Value = DateTimeOffset.Now.AddDays(1) },
-                            Type = { Value = MatchType.HeadToHead },
-                            Playlist =
-                            {
-                                new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo)
-                                {
-                                    BeatmapInfo =
-                                    {
-                                        StarRating = 2.5,
-                                        Metadata =
-                                        {
-                                            Artist = "very very very very very very very very very long artist",
-                                            ArtistUnicode = "very very very very very very very very very long artist",
-                                            Title = "very very very very very very very very very very very long title",
-                                            TitleUnicode = "very very very very very very very very very very very long title",
-                                        }
-                                    }
-                                }.BeatmapInfo)
-                            }
+                            Name = "Private room",
+                            Status = new RoomStatusOpenPrivate(),
+                            Password = "*",
+                            EndDate = DateTimeOffset.Now.AddDays(1),
+                            Type = MatchType.HeadToHead,
+                            Playlist = [item3],
+                            CurrentPlaylistItem = item3
                         }),
                         createLoungeRoom(new Room
                         {
-                            Name = { Value = "Playlist room with multiple beatmaps" },
-                            Status = { Value = new RoomStatusPlaying() },
-                            EndDate = { Value = DateTimeOffset.Now.AddDays(1) },
-                            Playlist =
-                            {
-                                new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo)
-                                {
-                                    BeatmapInfo =
-                                    {
-                                        StarRating = 2.5
-                                    }
-                                }.BeatmapInfo),
-                                new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo)
-                                {
-                                    BeatmapInfo =
-                                    {
-                                        StarRating = 4.5
-                                    }
-                                }.BeatmapInfo)
-                            }
+                            Name = "Playlist room with multiple beatmaps",
+                            Status = new RoomStatusPlaying(),
+                            EndDate = DateTimeOffset.Now.AddDays(1),
+                            Playlist = [item1, item2],
+                            CurrentPlaylistItem = item1
                         }),
                         createLoungeRoom(new Room
                         {
-                            Name = { Value = "Finished room" },
-                            Status = { Value = new RoomStatusEnded() },
-                            EndDate = { Value = DateTimeOffset.Now },
+                            Name = "Finished room",
+                            Status = new RoomStatusEnded(),
+                            EndDate = DateTimeOffset.Now,
                         }),
                         createLoungeRoom(new Room
                         {
-                            Name = { Value = "Spotlight room" },
-                            Status = { Value = new RoomStatusOpen() },
-                            Category = { Value = RoomCategory.Spotlight },
+                            Name = "Spotlight room",
+                            Status = new RoomStatusOpen(),
+                            Category = RoomCategory.Spotlight,
                         }),
                         createLoungeRoom(new Room
                         {
-                            Name = { Value = "Featured artist room" },
-                            Status = { Value = new RoomStatusOpen() },
-                            Category = { Value = RoomCategory.FeaturedArtist },
+                            Name = "Featured artist room",
+                            Status = new RoomStatusOpen(),
+                            Category = RoomCategory.FeaturedArtist,
                         }),
                     }
                 };
@@ -145,24 +130,24 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestEnableAndDisablePassword()
         {
-            DrawableRoom drawableRoom = null;
-            Room room = null;
+            DrawableRoom drawableRoom = null!;
+            Room room = null!;
 
             AddStep("create room", () => Child = drawableRoom = createLoungeRoom(room = new Room
             {
-                Name = { Value = "Room with password" },
-                Status = { Value = new RoomStatusOpen() },
-                Type = { Value = MatchType.HeadToHead },
+                Name = "Room with password",
+                Status = new RoomStatusOpen(),
+                Type = MatchType.HeadToHead,
             }));
 
             AddUntilStep("wait for panel load", () => drawableRoom.ChildrenOfType<DrawableRoomParticipantsList>().Any());
 
             AddAssert("password icon hidden", () => Precision.AlmostEquals(0, drawableRoom.ChildrenOfType<DrawableRoom.PasswordProtectedIcon>().Single().Alpha));
 
-            AddStep("set password", () => room.Password.Value = "password");
+            AddStep("set password", () => room.Password = "password");
             AddAssert("password icon visible", () => Precision.AlmostEquals(1, drawableRoom.ChildrenOfType<DrawableRoom.PasswordProtectedIcon>().Single().Alpha));
 
-            AddStep("unset password", () => room.Password.Value = string.Empty);
+            AddStep("unset password", () => room.Password = string.Empty);
             AddAssert("password icon hidden", () => Precision.AlmostEquals(0, drawableRoom.ChildrenOfType<DrawableRoom.PasswordProtectedIcon>().Single().Alpha));
         }
 
@@ -179,43 +164,52 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 {
                     new DrawableMatchRoom(new Room
                     {
-                        Name = { Value = "A host-only room" },
-                        QueueMode = { Value = QueueMode.HostOnly },
-                        Type = { Value = MatchType.HeadToHead }
-                    }),
+                        Name = "A host-only room",
+                        QueueMode = QueueMode.HostOnly,
+                        Type = MatchType.HeadToHead,
+                    })
+                    {
+                        SelectedItem = new Bindable<PlaylistItem?>()
+                    },
                     new DrawableMatchRoom(new Room
                     {
-                        Name = { Value = "An all-players, team-versus room" },
-                        QueueMode = { Value = QueueMode.AllPlayers },
-                        Type = { Value = MatchType.TeamVersus }
-                    }),
+                        Name = "An all-players, team-versus room",
+                        QueueMode = QueueMode.AllPlayers,
+                        Type = MatchType.TeamVersus
+                    })
+                    {
+                        SelectedItem = new Bindable<PlaylistItem?>()
+                    },
                     new DrawableMatchRoom(new Room
                     {
-                        Name = { Value = "A round-robin room" },
-                        QueueMode = { Value = QueueMode.AllPlayersRoundRobin },
-                        Type = { Value = MatchType.HeadToHead }
-                    }),
+                        Name = "A round-robin room",
+                        QueueMode = QueueMode.AllPlayersRoundRobin,
+                        Type = MatchType.HeadToHead
+                    })
+                    {
+                        SelectedItem = new Bindable<PlaylistItem?>()
+                    },
                 }
             });
         }
 
         private DrawableRoom createLoungeRoom(Room room)
         {
-            room.Host.Value ??= new APIUser { Username = "peppy", Id = 2 };
+            room.Host ??= new APIUser { Username = "peppy", Id = 2 };
 
             if (room.RecentParticipants.Count == 0)
             {
-                room.RecentParticipants.AddRange(Enumerable.Range(0, 20).Select(i => new APIUser
+                room.RecentParticipants = Enumerable.Range(0, 20).Select(i => new APIUser
                 {
                     Id = i,
                     Username = $"User {i}"
-                }));
+                }).ToArray();
             }
 
             return new DrawableLoungeRoom(room)
             {
                 MatchingFilter = true,
-                SelectedRoom = { BindTarget = selectedRoom }
+                SelectedRoom = selectedRoom
             };
         }
     }

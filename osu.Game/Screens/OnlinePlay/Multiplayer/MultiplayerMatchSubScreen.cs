@@ -1,13 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
@@ -45,17 +44,17 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         public override string ShortTitle => "room";
 
         [Resolved]
-        private MultiplayerClient client { get; set; }
+        private MultiplayerClient client { get; set; } = null!;
 
         [Resolved(canBeNull: true)]
-        private OsuGame game { get; set; }
+        private OsuGame? game { get; set; }
 
-        private AddItemButton addItemButton;
+        private AddItemButton addItemButton = null!;
 
         public MultiplayerMatchSubScreen(Room room)
             : base(room)
         {
-            Title = room.RoomID.Value == null ? "New room" : room.Name.Value;
+            Title = room.RoomID == null ? "New room" : room.Name;
             Activity.Value = new UserActivity.InLobby(room);
         }
 
@@ -95,7 +94,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                     },
                     Content = new[]
                     {
-                        new Drawable[]
+                        new Drawable?[]
                         {
                             // Participants column
                             new GridContainer
@@ -139,10 +138,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                     null,
                                     new Drawable[]
                                     {
-                                        new MultiplayerPlaylist
+                                        new MultiplayerPlaylist(Room)
                                         {
                                             RelativeSizeAxes = Axes.Both,
-                                            RequestEdit = OpenSongSelection
+                                            RequestEdit = OpenSongSelection,
+                                            SelectedItem = SelectedItem
                                         }
                                     },
                                     new[]
@@ -220,7 +220,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         /// Opens the song selection screen to add or edit an item.
         /// </summary>
         /// <param name="itemToEdit">An optional playlist item to edit. If null, a new item will be added instead.</param>
-        internal void OpenSongSelection(PlaylistItem itemToEdit = null)
+        internal void OpenSongSelection(PlaylistItem? itemToEdit = null)
         {
             if (!this.IsCurrentScreen())
                 return;
@@ -228,9 +228,15 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             this.Push(new MultiplayerMatchSongSelect(Room, itemToEdit));
         }
 
-        protected override Drawable CreateFooter() => new MultiplayerMatchFooter();
+        protected override Drawable CreateFooter() => new MultiplayerMatchFooter
+        {
+            SelectedItem = SelectedItem
+        };
 
-        protected override RoomSettingsOverlay CreateRoomSettingsOverlay(Room room) => new MultiplayerMatchSettingsOverlay(room);
+        protected override RoomSettingsOverlay CreateRoomSettingsOverlay(Room room) => new MultiplayerMatchSettingsOverlay(room)
+        {
+            SelectedItem = SelectedItem
+        };
 
         protected override void UpdateMods()
         {
@@ -245,7 +251,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         }
 
         [Resolved(canBeNull: true)]
-        private IDialogOverlay dialogOverlay { get; set; }
+        private IDialogOverlay? dialogOverlay { get; set; }
 
         private bool exitConfirmed;
 
@@ -275,8 +281,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             return base.OnExiting(e);
         }
 
-        private ModSettingChangeTracker modSettingChangeTracker;
-        private ScheduledDelegate debouncedModSettingsUpdate;
+        private ModSettingChangeTracker? modSettingChangeTracker;
+        private ScheduledDelegate? debouncedModSettingsUpdate;
 
         private void onUserModsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)
         {
@@ -352,7 +358,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             Activity.Value = new UserActivity.InLobby(Room);
         }
 
-        private bool localUserCanAddItem => client.IsHost || Room.QueueMode.Value != QueueMode.HostOnly;
+        private bool localUserCanAddItem => client.IsHost || Room.QueueMode != QueueMode.HostOnly;
 
         private void updateCurrentItem()
         {
@@ -422,7 +428,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 return;
 
             // If there's only one playlist item and we are the host, assume we want to change it. Else add a new one.
-            PlaylistItem itemToEdit = client.IsHost && Room.Playlist.Count == 1 ? Room.Playlist.Single() : null;
+            PlaylistItem? itemToEdit = client.IsHost && Room.Playlist.Count == 1 ? Room.Playlist.Single() : null;
 
             OpenSongSelection(itemToEdit);
 
@@ -434,7 +440,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         {
             base.Dispose(isDisposing);
 
-            if (client != null)
+            if (client.IsNotNull())
             {
                 client.RoomUpdated -= onRoomUpdated;
                 client.LoadRequested -= onLoadRequested;

@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
@@ -35,7 +33,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
             });
         }
 
-        private GetRoomsRequest lastPollRequest;
+        private GetRoomsRequest? lastPollRequest;
 
         protected override Task Poll()
         {
@@ -53,11 +51,11 @@ namespace osu.Game.Screens.OnlinePlay.Components
 
             req.Success += result =>
             {
-                result = result.Where(r => r.Category.Value != RoomCategory.DailyChallenge).ToList();
+                result = result.Where(r => r.Category != RoomCategory.DailyChallenge).ToList();
 
                 foreach (var existing in RoomManager.Rooms.ToArray())
                 {
-                    if (result.All(r => r.RoomID.Value != existing.RoomID.Value))
+                    if (result.All(r => r.RoomID != existing.RoomID))
                         RoomManager.RemoveRoom(existing);
                 }
 
