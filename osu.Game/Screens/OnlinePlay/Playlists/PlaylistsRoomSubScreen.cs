@@ -65,6 +65,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             Room.PropertyChanged += onRoomPropertyChanged;
             updateSetupState();
             updateRoomMaxAttempts();
+            updateRoomPlaylist();
         }
 
         private void onRoomPropertyChanged(object? sender, PropertyChangedEventArgs e)
