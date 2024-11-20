@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
@@ -17,7 +15,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public partial class TestSceneDrawableRoomParticipantsList : OnlinePlayTestScene
     {
-        private DrawableRoomParticipantsList list;
+        private DrawableRoomParticipantsList list = null!;
 
         public override void SetUpSteps()
         {
@@ -27,18 +25,15 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 SelectedRoom.Value = new Room
                 {
-                    Name = { Value = "test room" },
-                    Host =
+                    Name = "test room",
+                    Host = new APIUser
                     {
-                        Value = new APIUser
-                        {
-                            Id = 2,
-                            Username = "peppy",
-                        }
+                        Id = 2,
+                        Username = "peppy",
                     }
                 };
 
-                Child = list = new DrawableRoomParticipantsList
+                Child = list = new DrawableRoomParticipantsList(SelectedRoom.Value)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -143,18 +138,18 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private void addUser(int id)
         {
-            SelectedRoom.Value.RecentParticipants.Add(new APIUser
+            SelectedRoom.Value.RecentParticipants = SelectedRoom.Value.RecentParticipants.Append(new APIUser
             {
                 Id = id,
                 Username = $"User {id}"
-            });
-            SelectedRoom.Value.ParticipantCount.Value++;
+            }).ToArray();
+            SelectedRoom.Value.ParticipantCount++;
         }
 
         private void removeUserAt(int index)
         {
-            SelectedRoom.Value.RecentParticipants.RemoveAt(index);
-            SelectedRoom.Value.ParticipantCount.Value--;
+            SelectedRoom.Value.RecentParticipants = SelectedRoom.Value.RecentParticipants.Where(u => !u.Equals(SelectedRoom.Value.RecentParticipants[index])).ToArray();
+            SelectedRoom.Value.ParticipantCount--;
         }
     }
 }
