@@ -16,6 +16,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
 using osu.Game.Audio;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
@@ -40,6 +41,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         [Resolved]
         private Editor? editor { get; set; }
 
+        [Resolved]
+        private TimelineBlueprintContainer? timelineBlueprintContainer { get; set; }
+
         public SamplePointPiece(HitObject hitObject)
         {
             HitObject = hitObject;
@@ -53,13 +57,43 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         protected virtual double GetTime() => HitObject is IHasRepeats r ? HitObject.StartTime + r.Duration / r.SpanCount() / 2 : HitObject.StartTime;
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuConfigManager config)
         {
             HitObject.DefaultsApplied += _ => updateText();
+            Label.AllowMultiline = false;
+            LabelContainer.AutoSizeAxes = Axes.None;
             updateText();
 
             if (editor != null)
                 editor.ShowSampleEditPopoverRequested += onShowSampleEditPopoverRequested;
+        }
+
+        private readonly Bindable<bool> contracted = new Bindable<bool>();
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            if (timelineBlueprintContainer != null)
+                contracted.BindTo(timelineBlueprintContainer.SamplePointContracted);
+
+            contracted.BindValueChanged(v =>
+            {
+                if (v.NewValue)
+                {
+                    Label.FadeOut(200, Easing.OutQuint);
+                    LabelContainer.ResizeTo(new Vector2(12), 200, Easing.OutQuint);
+                    LabelContainer.CornerRadius = 6;
+                }
+                else
+                {
+                    Label.FadeIn(200, Easing.OutQuint);
+                    LabelContainer.ResizeTo(new Vector2(Label.Width, 16), 200, Easing.OutQuint);
+                    LabelContainer.CornerRadius = 8;
+                }
+            }, true);
+
+            FinishTransforms();
         }
 
         protected override void Dispose(bool isDisposing)
@@ -87,6 +121,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private void updateText()
         {
             Label.Text = $"{abbreviateBank(GetBankValue(GetSamples()))} {GetVolumeValue(GetSamples())}";
+
+            if (!contracted.Value)
+                LabelContainer.ResizeWidthTo(Label.Width, 200, Easing.OutQuint);
         }
 
         private static string? abbreviateBank(string? bank)

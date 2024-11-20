@@ -177,6 +177,9 @@ namespace osu.Game.Skinning.Components
                 case BeatmapAttribute.BPM:
                     return BeatmapsetsStrings.ShowStatsBpm;
 
+                case BeatmapAttribute.MaxPP:
+                    return BeatmapAttributeTextStrings.MaxPP;
+
                 default:
                     return string.Empty;
             }
@@ -224,6 +227,9 @@ namespace osu.Game.Skinning.Components
 
                 case BeatmapAttribute.StarRating:
                     return (starDifficulty?.Stars ?? 0).ToLocalisableString(@"F2");
+
+                case BeatmapAttribute.MaxPP:
+                    return Math.Round(starDifficulty?.PerformanceAttributes?.Total ?? 0, MidpointRounding.AwayFromZero).ToLocalisableString();
 
                 default:
                     return string.Empty;
@@ -279,5 +285,6 @@ namespace osu.Game.Skinning.Components
         RankedStatus,
         BPM,
         Source,
+        MaxPP
     }
 }

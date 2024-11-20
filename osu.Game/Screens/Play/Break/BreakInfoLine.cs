@@ -63,7 +63,7 @@ namespace osu.Game.Screens.Play.Break
         protected virtual LocalisableString Format(T count)
         {
             if (count is Enum countEnum)
-                return countEnum.GetDescription();
+                return countEnum.GetLocalisableDescription();
 
             return count.ToString() ?? string.Empty;
         }

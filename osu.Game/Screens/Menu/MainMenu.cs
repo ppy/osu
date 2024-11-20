@@ -153,9 +153,9 @@ namespace osu.Game.Screens.Menu
                                 else
                                     this.Push(new DailyChallengeIntro(room));
                             },
-                            OnExit = () =>
+                            OnExit = e =>
                             {
-                                exitConfirmedViaHoldOrClick = true;
+                                exitConfirmedViaHoldOrClick = e is MouseEvent;
                                 this.Exit();
                             }
                         }
