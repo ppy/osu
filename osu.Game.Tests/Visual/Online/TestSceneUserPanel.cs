@@ -55,21 +55,21 @@ namespace osu.Game.Tests.Visual.Online
                     {
                         Username = @"flyte",
                         Id = 3103765,
-                        CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c6.jpg"
+                        CoverUrl = @"https://assets.ppy.sh/user-cover-presets/1/df28696b58541a9e67f6755918951d542d93bdf1da41720fcca2fd2c1ea8cf51.jpeg",
                     }),
                     new UserBrickPanel(new APIUser
                     {
                         Username = @"peppy",
                         Id = 2,
                         Colour = "99EB47",
-                        CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
+                        CoverUrl = @"https://assets.ppy.sh/user-profile-covers/8195163/4a8e2ad5a02a2642b631438cfa6c6bd7e2f9db289be881cb27df18331f64144c.jpeg",
                     }),
                     new UserGridPanel(new APIUser
                     {
                         Username = @"flyte",
                         Id = 3103765,
                         CountryCode = CountryCode.JP,
-                        CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c6.jpg",
+                        CoverUrl = @"https://assets.ppy.sh/user-cover-presets/1/df28696b58541a9e67f6755918951d542d93bdf1da41720fcca2fd2c1ea8cf51.jpeg",
                         Status = { Value = UserStatus.Online }
                     }) { Width = 300 },
                     boundPanel1 = new UserGridPanel(new APIUser
@@ -77,7 +77,7 @@ namespace osu.Game.Tests.Visual.Online
                         Username = @"peppy",
                         Id = 2,
                         CountryCode = CountryCode.AU,
-                        CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
+                        CoverUrl = @"https://assets.ppy.sh/user-profile-covers/8195163/4a8e2ad5a02a2642b631438cfa6c6bd7e2f9db289be881cb27df18331f64144c.jpeg",
                         IsSupporter = true,
                         SupportLevel = 3,
                     }) { Width = 300 },
@@ -95,7 +95,7 @@ namespace osu.Game.Tests.Visual.Online
                         Username = @"flyte",
                         Id = 3103765,
                         CountryCode = CountryCode.JP,
-                        CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c6.jpg",
+                        CoverUrl = @"https://assets.ppy.sh/user-cover-presets/1/df28696b58541a9e67f6755918951d542d93bdf1da41720fcca2fd2c1ea8cf51.jpeg",
                         Statistics = new UserStatistics { GlobalRank = 12345, CountryRank = 1234 }
                     }) { Width = 300 },
                     new UserRankPanel(new APIUser
@@ -104,7 +104,7 @@ namespace osu.Game.Tests.Visual.Online
                         Id = 2,
                         Colour = "99EB47",
                         CountryCode = CountryCode.AU,
-                        CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
+                        CoverUrl = @"https://assets.ppy.sh/user-profile-covers/8195163/4a8e2ad5a02a2642b631438cfa6c6bd7e2f9db289be881cb27df18331f64144c.jpeg",
                         Statistics = new UserStatistics { GlobalRank = null, CountryRank = null }
                     }) { Width = 300 }
                 }
@@ -166,6 +166,14 @@ namespace osu.Game.Tests.Visual.Online
                 {
                     GlobalRank = RNG.Next(100000),
                     CountryRank = RNG.Next(100000)
+                });
+            });
+            AddStep("set statistics to something big", () =>
+            {
+                API.UpdateStatistics(new UserStatistics
+                {
+                    GlobalRank = RNG.Next(1_000_000, 100_000_000),
+                    CountryRank = RNG.Next(1_000_000, 100_000_000)
                 });
             });
             AddStep("set statistics to empty", () =>

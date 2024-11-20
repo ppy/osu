@@ -26,7 +26,7 @@ namespace osu.Game.Online.API
             Id = DUMMY_USER_ID,
         });
 
-        public BindableList<APIUser> Friends { get; } = new BindableList<APIUser>();
+        public BindableList<APIRelation> Friends { get; } = new BindableList<APIRelation>();
 
         public Bindable<UserActivity> Activity { get; } = new Bindable<UserActivity>();
 
@@ -201,6 +201,10 @@ namespace osu.Game.Online.API
                 LocalUser.Value.Statistics = newStatistics;
         }
 
+        public void UpdateLocalFriends()
+        {
+        }
+
         public IHubClientConnector? GetHubConnector(string clientName, string endpoint, bool preferMessagePack) => null;
 
         public IChatClient GetChatClient() => new TestChatClientConnector(this);
@@ -214,7 +218,7 @@ namespace osu.Game.Online.API
         public void SetState(APIState newState) => state.Value = newState;
 
         IBindable<APIUser> IAPIProvider.LocalUser => LocalUser;
-        IBindableList<APIUser> IAPIProvider.Friends => Friends;
+        IBindableList<APIRelation> IAPIProvider.Friends => Friends;
         IBindable<UserActivity> IAPIProvider.Activity => Activity;
         IBindable<UserStatistics?> IAPIProvider.Statistics => Statistics;
 

@@ -258,6 +258,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void resetTernaryStates()
         {
+            SelectionNewComboState.Value = TernaryState.False;
             AutoSelectionBankEnabled.Value = true;
             SelectionAdditionBanksEnabled.Value = true;
             SelectionBankStates[HIT_BANK_AUTO].Value = TernaryState.True;
@@ -269,7 +270,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// </summary>
         protected virtual void UpdateTernaryStates()
         {
-            SelectionNewComboState.Value = GetStateFromSelection(SelectedItems.OfType<IHasComboInformation>(), h => h.NewCombo);
+            if (SelectedItems.Any())
+                SelectionNewComboState.Value = GetStateFromSelection(SelectedItems.OfType<IHasComboInformation>(), h => h.NewCombo);
             AutoSelectionBankEnabled.Value = SelectedItems.Count == 0;
 
             var samplesInSelection = SelectedItems.SelectMany(enumerateAllSamples).ToArray();

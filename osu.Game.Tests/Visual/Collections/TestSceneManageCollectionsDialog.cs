@@ -12,6 +12,7 @@ using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Dialog;
 using osu.Game.Rulesets;
@@ -205,7 +206,9 @@ namespace osu.Game.Tests.Visual.Collections
 
             AddStep("click first delete button", () =>
             {
-                InputManager.MoveMouseTo(dialog.ChildrenOfType<DrawableCollectionListItem.DeleteButton>().First(), new Vector2(5, 0));
+                InputManager.MoveMouseTo(dialog
+                                         .ChildrenOfType<DrawableCollectionListItem>().Single(i => i.Model.Value.Name == "1")
+                                         .ChildrenOfType<DrawableCollectionListItem.DeleteButton>().Single(), new Vector2(5, 0));
                 InputManager.Click(MouseButton.Left);
             });
 
@@ -213,9 +216,11 @@ namespace osu.Game.Tests.Visual.Collections
             assertCollectionCount(1);
             assertCollectionName(0, "2");
 
-            AddStep("click first delete button", () =>
+            AddStep("click second delete button", () =>
             {
-                InputManager.MoveMouseTo(dialog.ChildrenOfType<DrawableCollectionListItem.DeleteButton>().First(), new Vector2(5, 0));
+                InputManager.MoveMouseTo(dialog
+                                         .ChildrenOfType<DrawableCollectionListItem>().Single(i => i.Model.Value.Name == "2")
+                                         .ChildrenOfType<DrawableCollectionListItem.DeleteButton>().Single(), new Vector2(5, 0));
                 InputManager.Click(MouseButton.Left);
             });
 
@@ -310,7 +315,7 @@ namespace osu.Game.Tests.Visual.Collections
 
             AddStep("focus first collection", () =>
             {
-                InputManager.MoveMouseTo(firstItem = dialog.ChildrenOfType<DrawableCollectionListItem>().First());
+                InputManager.MoveMouseTo(firstItem = dialog.ChildrenOfType<DrawableCollectionListItem>().Single(i => i.Model.Value.Name == "1"));
                 InputManager.Click(MouseButton.Left);
             });
 
@@ -333,10 +338,44 @@ namespace osu.Game.Tests.Visual.Collections
             AddUntilStep("collection has new name", () => first.Name == "First");
         }
 
+        [Test]
+        public void TestSearch()
+        {
+            BeatmapCollection first = null!;
+
+            AddStep("add two collections", () =>
+            {
+                Realm.Write(r =>
+                {
+                    r.Add(new[]
+                    {
+                        first = new BeatmapCollection(name: "1"),
+                        new BeatmapCollection(name: "2"),
+                    });
+                });
+            });
+
+            assertCollectionName(0, "1");
+            assertCollectionName(1, "2");
+
+            AddStep("search for 1", () => dialog.ChildrenOfType<SearchTextBox>().Single().Current.Value = "1");
+
+            assertCollectionCount(1);
+
+            AddStep("change first collection name", () => Realm.Write(_ => first.Name = "First"));
+
+            assertCollectionCount(0);
+
+            AddStep("search for first", () => dialog.ChildrenOfType<SearchTextBox>().Single().Current.Value = "firs");
+
+            assertCollectionCount(1);
+        }
+
         private void assertCollectionCount(int count)
-            => AddUntilStep($"{count} collections shown", () => dialog.ChildrenOfType<DrawableCollectionListItem>().Count() == count + 1); // +1 for placeholder
+            => AddUntilStep($"{count} collections shown", () => dialog.ChildrenOfType<DrawableCollectionListItem>().Count(i => i.IsPresent) == count + 1); // +1 for placeholder
 
         private void assertCollectionName(int index, string name)
-            => AddUntilStep($"item {index + 1} has correct name", () => dialog.ChildrenOfType<DrawableCollectionListItem>().ElementAt(index).ChildrenOfType<TextBox>().First().Text == name);
+            => AddUntilStep($"item {index + 1} has correct name",
+                () => dialog.ChildrenOfType<DrawableCollectionList>().Single().OrderedItems.ElementAt(index).ChildrenOfType<TextBox>().First().Text == name);
     }
 }

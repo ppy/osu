@@ -36,6 +36,14 @@ namespace osu.Game.Screens.Play.HUD
             Trigger.OnDeactivate += Deactivate;
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            if (Trigger.IsActive)
+                Activate();
+        }
+
         protected virtual void Activate(bool forwardPlayback = true)
         {
             isActive.Value = true;
