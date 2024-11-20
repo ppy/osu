@@ -9,7 +9,7 @@ using Realms;
 namespace osu.Game.Rulesets
 {
     [MapTo("Ruleset")]
-    public class RulesetInfo : RealmObject, IEquatable<RulesetInfo>, IComparable<RulesetInfo>, IRulesetInfo
+    public partial class RulesetInfo : IRealmObject, IEquatable<RulesetInfo>, IComparable<RulesetInfo>, IRulesetInfo
     {
         [PrimaryKey]
         public string ShortName { get; set; } = string.Empty;

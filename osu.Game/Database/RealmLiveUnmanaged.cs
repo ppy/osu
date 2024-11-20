@@ -11,7 +11,7 @@ namespace osu.Game.Database
     /// Usually used for testing purposes where the instance is never required to be managed.
     /// </summary>
     /// <typeparam name="T">The underlying object type.</typeparam>
-    public class RealmLiveUnmanaged<T> : Live<T> where T : RealmObjectBase, IHasGuidPrimaryKey
+    public partial class RealmLiveUnmanaged<T> : Live<T> where T : class, IRealmObjectBase, IHasGuidPrimaryKey
     {
         /// <summary>
         /// The original live data used to create this instance.

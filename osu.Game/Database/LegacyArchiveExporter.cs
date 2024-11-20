@@ -22,7 +22,7 @@ namespace osu.Game.Database
     /// Handles the common scenario of exporting a model to a zip-based archive, usually with a custom file extension.
     /// </summary>
     public abstract class LegacyArchiveExporter<TModel> : LegacyExporter<TModel>
-        where TModel : RealmObject, IHasNamedFiles, IHasGuidPrimaryKey
+        where TModel : class, IRealmObject, IHasNamedFiles, IHasGuidPrimaryKey
     {
         /// <summary>
         /// Whether to always use Shift-JIS encoding for archive filenames (like osu!stable did).

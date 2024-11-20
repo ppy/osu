@@ -14,7 +14,7 @@ using Realms;
 namespace osu.Game.Skinning
 {
     public class RealmBackedResourceStore<T> : ResourceStore<byte[]>
-        where T : RealmObject, IHasRealmFiles, IHasGuidPrimaryKey
+        where T : class, IRealmObject, IHasRealmFiles, IHasGuidPrimaryKey
     {
         private Lazy<Dictionary<string, string>> fileToStoragePathMapping;
 

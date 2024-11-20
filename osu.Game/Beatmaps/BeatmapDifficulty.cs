@@ -6,7 +6,7 @@ using Realms;
 namespace osu.Game.Beatmaps
 {
     [MapTo("BeatmapDifficulty")]
-    public class BeatmapDifficulty : EmbeddedObject, IBeatmapDifficultyInfo
+    public partial class BeatmapDifficulty : IEmbeddedObject, IBeatmapDifficultyInfo
     {
         /// <summary>
         /// The default value used for all difficulty settings except <see cref="SliderMultiplier"/> and <see cref="SliderTickRate"/>.

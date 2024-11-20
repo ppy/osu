@@ -6,7 +6,7 @@ using Realms;
 namespace osu.Game.Configuration
 {
     [MapTo(@"RulesetSetting")]
-    public class RealmRulesetSetting : RealmObject
+    public partial class RealmRulesetSetting : IRealmObject
     {
         [Indexed]
         public string RulesetName { get; set; } = string.Empty;
@@ -14,10 +14,8 @@ namespace osu.Game.Configuration
         [Indexed]
         public int Variant { get; set; }
 
-        [Required]
         public string Key { get; set; } = string.Empty;
 
-        [Required]
         public string Value { get; set; } = string.Empty;
 
         public override string ToString() => $"{Key} => {Value}";

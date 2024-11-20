@@ -14,7 +14,7 @@ namespace osu.Game.Database
     /// Provides a method of working with realm objects over longer application lifetimes.
     /// </summary>
     /// <typeparam name="T">The underlying object type.</typeparam>
-    public class RealmLive<T> : Live<T> where T : RealmObject, IHasGuidPrimaryKey
+    public partial class RealmLive<T> : Live<T> where T : class, IRealmObject, IHasGuidPrimaryKey
     {
         public override bool IsManaged => data.IsManaged;
 
