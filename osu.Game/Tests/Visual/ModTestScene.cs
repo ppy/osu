@@ -40,7 +40,7 @@ namespace osu.Game.Tests.Visual
             base.TearDownSteps();
         }
 
-        protected sealed override IBeatmap CreateBeatmap(RulesetInfo ruleset) => CurrentTestData?.Beatmap ?? base.CreateBeatmap(ruleset);
+        protected sealed override IBeatmap CreateBeatmap(RulesetInfo ruleset) => CurrentTestData?.Beatmap?.Invoke() ?? base.CreateBeatmap(ruleset);
 
         protected sealed override TestPlayer CreatePlayer(Ruleset ruleset)
         {
@@ -107,7 +107,7 @@ namespace osu.Game.Tests.Visual
             /// The beatmap for this test case.
             /// </summary>
             [CanBeNull]
-            public IBeatmap Beatmap;
+            public Func<IBeatmap> Beatmap;
 
             /// <summary>
             /// The conditions that cause this test case to pass.

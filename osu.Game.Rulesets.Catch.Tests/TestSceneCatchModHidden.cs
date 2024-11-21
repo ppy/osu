@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         {
             CreateModTest(new ModTestData
             {
-                Beatmap = new Beatmap
+                Beatmap = () => new Beatmap
                 {
                     HitObjects = new List<HitObject>
                     {
