@@ -44,7 +44,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
             UserLookupCache = new TestUserLookupCache();
             BeatmapLookupCache = new BeatmapLookupCache();
 
-            dependencies = new DependencyContainer(new CachedModelDependencyContainer<Room>(null) { Model = { BindTarget = SelectedRoom } });
+            dependencies = new DependencyContainer();
 
             CacheAs(RequestsHandler);
             CacheAs(SelectedRoom);

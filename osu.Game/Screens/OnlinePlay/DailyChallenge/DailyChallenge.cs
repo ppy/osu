@@ -119,14 +119,6 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             Padding = new MarginPadding { Horizontal = -HORIZONTAL_OVERFLOW_PADDING };
         }
 
-        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
-        {
-            return new CachedModelDependencyContainer<Room>(base.CreateChildDependencies(parent))
-            {
-                Model = { Value = room }
-            };
-        }
-
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
@@ -228,7 +220,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                                                                         Origin = Anchor.Centre,
                                                                         Children = new Drawable[]
                                                                         {
-                                                                            new DailyChallengeTimeRemainingRing(),
+                                                                            new DailyChallengeTimeRemainingRing(room),
                                                                             breakdown = new DailyChallengeScoreBreakdown(),
                                                                             totals = new DailyChallengeTotalsDisplay(),
                                                                         }
@@ -301,7 +293,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                                                 Spacing = new Vector2(10),
                                                 Children = new Drawable[]
                                                 {
-                                                    new PlaylistsReadyButton
+                                                    new PlaylistsReadyButton(room)
                                                     {
                                                         Anchor = Anchor.Centre,
                                                         Origin = Anchor.Centre,
@@ -353,12 +345,12 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
         private void presentScore(long id)
         {
             if (this.IsCurrentScreen())
-                this.Push(new PlaylistItemScoreResultsScreen(room.RoomID.Value!.Value, playlistItem, id));
+                this.Push(new PlaylistItemScoreResultsScreen(room.RoomID!.Value, playlistItem, id));
         }
 
         private void onRoomScoreSet(MultiplayerRoomScoreSetEvent e)
         {
-            if (e.RoomID != room.RoomID.Value || e.PlaylistItemID != playlistItem.ID)
+            if (e.RoomID != room.RoomID || e.PlaylistItemID != playlistItem.ID)
                 return;
 
             userLookupCache.GetUserAsync(e.UserID).ContinueWith(t =>
@@ -410,7 +402,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 
         private void dailyChallengeChanged(ValueChangedEvent<DailyChallengeInfo?> change)
         {
-            if (change.OldValue?.RoomID == room.RoomID.Value && change.NewValue == null && metadataClient.IsConnected.Value)
+            if (change.OldValue?.RoomID == room.RoomID && change.NewValue == null && metadataClient.IsConnected.Value)
             {
                 notificationOverlay?.Post(new SimpleNotification { Text = DailyChallengeStrings.ChallengeEndedNotification });
             }
@@ -437,7 +429,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             roomManager.JoinRoom(room);
             startLoopingTrack(this, musicController);
 
-            metadataClient.BeginWatchingMultiplayerRoom(room.RoomID.Value!.Value).ContinueWith(t =>
+            metadataClient.BeginWatchingMultiplayerRoom(room.RoomID!.Value).ContinueWith(t =>
             {
                 if (t.Exception != null)
                 {
@@ -489,7 +481,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             this.Delay(WaveContainer.DISAPPEAR_DURATION).FadeOut();
 
             roomManager.PartRoom();
-            metadataClient.EndWatchingMultiplayerRoom(room.RoomID.Value!.Value).FireAndForget();
+            metadataClient.EndWatchingMultiplayerRoom(room.RoomID!.Value).FireAndForget();
 
             return base.OnExiting(e);
         }

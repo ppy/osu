@@ -75,7 +75,7 @@ namespace osu.Game.Tests.NonVisual.Multiplayer
                 var newRoom = new Room();
                 newRoom.CopyFrom(SelectedRoom.Value);
 
-                newRoom.RoomID.Value = null;
+                newRoom.RoomID = null;
                 MultiplayerClient.RoomSetupAction = room =>
                 {
                     room.State = MultiplayerRoomState.Playing;
