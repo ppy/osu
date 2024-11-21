@@ -33,8 +33,8 @@ namespace osu.Game.Screens.OnlinePlay
 
         protected LoungeSubScreen Lounge { get; private set; } = null!;
 
+        private readonly ScreenStack screenStack = new OnlinePlaySubScreenStack { RelativeSizeAxes = Axes.Both };
         private OnlinePlayScreenWaveContainer waves = null!;
-        private ScreenStack screenStack = null!;
 
         [Cached(Type = typeof(IRoomManager))]
         protected RoomManager RoomManager { get; private set; }
@@ -65,7 +65,7 @@ namespace osu.Game.Screens.OnlinePlay
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
-                    screenStack = new OnlinePlaySubScreenStack { RelativeSizeAxes = Axes.Both },
+                    screenStack,
                     new Header(ScreenTitle, screenStack),
                     RoomManager,
                     ongoingOperationTracker,
