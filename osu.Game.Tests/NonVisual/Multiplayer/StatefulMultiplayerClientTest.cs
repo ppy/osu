@@ -73,7 +73,7 @@ namespace osu.Game.Tests.NonVisual.Multiplayer
             AddStep("create room initially in gameplay", () =>
             {
                 var newRoom = new Room();
-                newRoom.CopyFrom(SelectedRoom.Value);
+                newRoom.CopyFrom(SelectedRoom.Value!);
 
                 newRoom.RoomID = null;
                 MultiplayerClient.RoomSetupAction = room =>
