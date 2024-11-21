@@ -130,7 +130,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
             });
         }
 
-        private Beatmap singleSpinnerBeatmap => new Beatmap
+        private Beatmap singleSpinnerBeatmap() => new Beatmap
         {
             HitObjects = new List<HitObject>
             {

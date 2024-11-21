@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
         public void TestCorrectReflections([Values] OsuModMirror.MirrorType type, [Values] bool withStrictTracking) => CreateModTest(new ModTestData
         {
             Autoplay = true,
-            Beatmap = new OsuBeatmap
+            Beatmap = () => new OsuBeatmap
             {
                 HitObjects =
                 {
