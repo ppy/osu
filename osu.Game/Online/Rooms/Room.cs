@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using osu.Game.IO.Serialization.Converters;
 using osu.Game.Online.API.Requests.Responses;
@@ -262,6 +263,18 @@ namespace osu.Game.Online.Rooms
         {
             get => availability;
             set => SetField(ref availability, value);
+        }
+
+        [OnDeserialized]
+        private void onDeserialised(StreamingContext context)
+        {
+            // API doesn't populate status so let's do it here.
+            if (EndDate != null && DateTimeOffset.Now >= EndDate)
+                Status = new RoomStatusEnded();
+            else if (HasPassword)
+                Status = new RoomStatusOpenPrivate();
+            else
+                Status = new RoomStatusOpen();
         }
 
         [JsonProperty("id")]
