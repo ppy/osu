@@ -12,7 +12,7 @@ using osu.Game.Tests.Visual.OnlinePlay;
 
 namespace osu.Game.Tests.Visual.Playlists
 {
-    public class TestScenePlaylistsRoomSubScreen : OnlinePlayTestScene
+    public partial class TestScenePlaylistsRoomSubScreen : OnlinePlayTestScene
     {
         protected new TestRoomManager RoomManager => (TestRoomManager)base.RoomManager;
 
