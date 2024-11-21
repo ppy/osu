@@ -407,7 +407,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
         /// <summary>
         /// Creates the gameplay screen to be entered.
         /// </summary>
-        /// <param name="selectedItem"></param>
+        /// <param name="selectedItem">The playlist item about to be played.</param>
         /// <returns>The screen to enter.</returns>
         protected abstract Screen CreateGameplayScreen(PlaylistItem selectedItem);
 
