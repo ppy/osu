@@ -28,9 +28,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public partial class TestSceneMultiplayerPlaylist : MultiplayerTestScene
     {
-        [Cached(typeof(IBindable<PlaylistItem>))]
-        private readonly Bindable<PlaylistItem> currentItem = new Bindable<PlaylistItem>();
-
         private MultiplayerPlaylist list = null!;
         private BeatmapManager beatmaps = null!;
         private BeatmapSetInfo importedSet = null!;
@@ -51,12 +48,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("create list", () =>
             {
-                Child = list = new MultiplayerPlaylist
+                Child = list = new MultiplayerPlaylist(SelectedRoom.Value)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.Both,
-                    Size = new Vector2(0.4f, 0.8f)
+                    Size = new Vector2(0.4f, 0.8f),
+                    SelectedItem = new Bindable<PlaylistItem?>()
                 };
             });
 
@@ -166,9 +164,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 RoomManager.CreateRoom(new Room
                 {
-                    Name = { Value = "test name" },
+                    Name = "test name",
                     Playlist =
-                    {
+                    [
                         new PlaylistItem(new TestBeatmap(Ruleset.Value).BeatmapInfo)
                         {
                             RulesetID = Ruleset.Value.OnlineID
@@ -178,7 +176,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                             RulesetID = Ruleset.Value.OnlineID,
                             Expired = true
                         }
-                    }
+                    ]
                 });
             });
 

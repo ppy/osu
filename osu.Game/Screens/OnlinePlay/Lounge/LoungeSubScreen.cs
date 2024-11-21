@@ -259,7 +259,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             selectionLease.Return();
             selectionLease = null;
 
-            if (SelectedRoom.Value?.RoomID.Value == null)
+            if (SelectedRoom.Value?.RoomID == null)
                 SelectedRoom.Value = new Room();
 
             music?.EnsurePlayingSomething();
@@ -326,23 +326,23 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         /// <param name="room">The room to copy.</param>
         public void OpenCopy(Room room)
         {
-            Debug.Assert(room.RoomID.Value != null);
+            Debug.Assert(room.RoomID != null);
 
             if (joiningRoomOperation != null)
                 return;
 
             joiningRoomOperation = ongoingOperationTracker?.BeginOperation();
 
-            var req = new GetRoomRequest(room.RoomID.Value.Value);
+            var req = new GetRoomRequest(room.RoomID.Value);
 
             req.Success += r =>
             {
                 // ID must be unset as we use this as a marker for whether this is a client-side (not-yet-created) room or not.
-                r.RoomID.Value = null;
+                r.RoomID = null;
 
                 // Null out dates because end date is not supported client-side and the settings overlay will populate a duration.
-                r.EndDate.Value = null;
-                r.Duration.Value = null;
+                r.EndDate = null;
+                r.Duration = null;
 
                 Open(r);
 

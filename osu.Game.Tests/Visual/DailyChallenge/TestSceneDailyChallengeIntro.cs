@@ -68,19 +68,19 @@ namespace osu.Game.Tests.Visual.DailyChallenge
             {
                 API.Perform(new CreateRoomRequest(room = new Room
                 {
-                    RoomID = { Value = roomId },
-                    Name = { Value = "Daily Challenge: June 4, 2024" },
+                    RoomID = roomId,
+                    Name = "Daily Challenge: June 4, 2024",
                     Playlist =
-                    {
+                    [
                         new PlaylistItem(CreateAPIBeatmap(new OsuRuleset().RulesetInfo))
                         {
                             RequiredMods = [new APIMod(new OsuModTraceable())],
                             AllowedMods = [new APIMod(new OsuModDoubleTime())]
                         }
-                    },
-                    StartDate = { Value = DateTimeOffset.Now },
-                    EndDate = { Value = DateTimeOffset.Now.AddHours(24) },
-                    Category = { Value = RoomCategory.DailyChallenge }
+                    ],
+                    StartDate = DateTimeOffset.Now,
+                    EndDate = DateTimeOffset.Now.AddHours(24),
+                    Category = RoomCategory.DailyChallenge
                 }));
             });
             AddStep("signal client", () => metadataClient.DailyChallengeUpdated(new DailyChallengeInfo { RoomID = roomId }));

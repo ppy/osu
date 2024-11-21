@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Game.Online.API.Requests.Responses;
@@ -19,17 +20,16 @@ namespace osu.Game.Tests.Visual.Playlists
 
             AddStep("create list", () =>
             {
-                SelectedRoom.Value = new Room { RoomID = { Value = 7 } };
-
-                for (int i = 0; i < 50; i++)
+                SelectedRoom.Value = new Room
                 {
-                    SelectedRoom.Value.RecentParticipants.Add(new APIUser
+                    RoomID = 7,
+                    RecentParticipants = Enumerable.Range(0, 50).Select(_ => new APIUser
                     {
                         Username = "peppy",
                         Statistics = new UserStatistics { GlobalRank = 1234 },
                         Id = 2
-                    });
-                }
+                    }).ToArray()
+                };
             });
         }
 
@@ -38,7 +38,7 @@ namespace osu.Game.Tests.Visual.Playlists
         {
             AddStep("create component", () =>
             {
-                Child = new ParticipantsDisplay(Direction.Horizontal)
+                Child = new ParticipantsDisplay(SelectedRoom.Value, Direction.Horizontal)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -52,7 +52,7 @@ namespace osu.Game.Tests.Visual.Playlists
         {
             AddStep("create component", () =>
             {
-                Child = new ParticipantsDisplay(Direction.Vertical)
+                Child = new ParticipantsDisplay(SelectedRoom.Value, Direction.Vertical)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,

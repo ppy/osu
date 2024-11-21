@@ -1,12 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Diagnostics;
 using System.Linq;
-using JetBrains.Annotations;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -35,11 +32,9 @@ namespace osu.Game.Tests.Visual.Playlists
 {
     public partial class TestScenePlaylistsRoomCreation : OnlinePlayTestScene
     {
-        private BeatmapManager manager;
-
-        private TestPlaylistsRoomSubScreen match;
-
-        private BeatmapSetInfo importedBeatmap;
+        private BeatmapManager manager = null!;
+        private TestPlaylistsRoomSubScreen match = null!;
+        private BeatmapSetInfo importedBeatmap = null!;
 
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
@@ -52,11 +47,11 @@ namespace osu.Game.Tests.Visual.Playlists
         [SetUpSteps]
         public void SetupSteps()
         {
-            AddStep("set room", () => SelectedRoom!.Value = new Room());
+            AddStep("set room", () => SelectedRoom.Value = new Room());
 
             importBeatmap();
 
-            AddStep("load match", () => LoadScreen(match = new TestPlaylistsRoomSubScreen(SelectedRoom!.Value)));
+            AddStep("load match", () => LoadScreen(match = new TestPlaylistsRoomSubScreen(SelectedRoom.Value)));
             AddUntilStep("wait for load", () => match.IsCurrentScreen());
         }
 
@@ -65,14 +60,17 @@ namespace osu.Game.Tests.Visual.Playlists
         {
             setupAndCreateRoom(room =>
             {
-                room.Name.Value = "my awesome room";
-                room.Host.Value = API.LocalUser.Value;
-                room.RecentParticipants.Add(room.Host.Value);
-                room.EndDate.Value = DateTimeOffset.Now.AddMinutes(5);
-                room.Playlist.Add(new PlaylistItem(importedBeatmap.Beatmaps.First())
-                {
-                    RulesetID = new OsuRuleset().RulesetInfo.OnlineID
-                });
+                room.Name = "my awesome room";
+                room.Host = API.LocalUser.Value;
+                room.RecentParticipants = [room.Host];
+                room.EndDate = DateTimeOffset.Now.AddMinutes(5);
+                room.Playlist =
+                [
+                    new PlaylistItem(importedBeatmap.Beatmaps.First())
+                    {
+                        RulesetID = new OsuRuleset().RulesetInfo.OnlineID
+                    }
+                ];
             });
 
             AddUntilStep("Progress details are hidden", () => match.ChildrenOfType<RoomLocalUserInfo>().FirstOrDefault()?.Parent!.Alpha == 0);
@@ -88,15 +86,18 @@ namespace osu.Game.Tests.Visual.Playlists
         {
             setupAndCreateRoom(room =>
             {
-                room.Name.Value = "my awesome room";
-                room.MaxAttempts.Value = 5;
-                room.Host.Value = API.LocalUser.Value;
-                room.RecentParticipants.Add(room.Host.Value);
-                room.EndDate.Value = DateTimeOffset.Now.AddMinutes(5);
-                room.Playlist.Add(new PlaylistItem(importedBeatmap.Beatmaps.First())
-                {
-                    RulesetID = new OsuRuleset().RulesetInfo.OnlineID
-                });
+                room.Name = "my awesome room";
+                room.MaxAttempts = 5;
+                room.Host = API.LocalUser.Value;
+                room.RecentParticipants = [room.Host];
+                room.EndDate = DateTimeOffset.Now.AddMinutes(5);
+                room.Playlist =
+                [
+                    new PlaylistItem(importedBeatmap.Beatmaps.First())
+                    {
+                        RulesetID = new OsuRuleset().RulesetInfo.OnlineID
+                    }
+                ];
             });
 
             AddUntilStep("Progress details are visible", () => match.ChildrenOfType<RoomLocalUserInfo>().FirstOrDefault()?.Parent!.Alpha == 1);
@@ -107,21 +108,24 @@ namespace osu.Game.Tests.Visual.Playlists
         {
             setupAndCreateRoom(room =>
             {
-                room.Name.Value = "my awesome room";
-                room.Host.Value = API.LocalUser.Value;
-                room.Playlist.Add(new PlaylistItem(importedBeatmap.Beatmaps.First())
-                {
-                    RulesetID = new OsuRuleset().RulesetInfo.OnlineID
-                });
+                room.Name = "my awesome room";
+                room.Host = API.LocalUser.Value;
+                room.Playlist =
+                [
+                    new PlaylistItem(importedBeatmap.Beatmaps.First())
+                    {
+                        RulesetID = new OsuRuleset().RulesetInfo.OnlineID
+                    }
+                ];
             });
 
-            AddAssert("first playlist item selected", () => match.SelectedItem.Value == SelectedRoom!.Value.Playlist[0]);
+            AddAssert("first playlist item selected", () => match.SelectedItem.Value == SelectedRoom.Value.Playlist[0]);
         }
 
         [Test]
         public void TestBeatmapUpdatedOnReImport()
         {
-            string realHash = null;
+            string realHash = null!;
             int realOnlineId = 0;
             int realOnlineSetId = 0;
 
@@ -139,18 +143,15 @@ namespace osu.Game.Tests.Visual.Playlists
                     BeatmapInfo =
                     {
                         OnlineID = realOnlineId,
-                        Metadata = new BeatmapMetadata(),
-                        BeatmapSet =
-                        {
-                            OnlineID = realOnlineSetId
-                        }
+                        Metadata = new BeatmapMetadata()
                     },
                 };
 
+                Debug.Assert(modifiedBeatmap.BeatmapInfo.BeatmapSet != null);
+                modifiedBeatmap.BeatmapInfo.BeatmapSet!.OnlineID = realOnlineSetId;
+
                 modifiedBeatmap.HitObjects.Clear();
                 modifiedBeatmap.HitObjects.Add(new HitCircle { StartTime = 5000 });
-
-                Debug.Assert(modifiedBeatmap.BeatmapInfo.BeatmapSet != null);
 
                 manager.Import(modifiedBeatmap.BeatmapInfo.BeatmapSet);
             });
@@ -158,21 +159,24 @@ namespace osu.Game.Tests.Visual.Playlists
             // Create the room using the real beatmap values.
             setupAndCreateRoom(room =>
             {
-                room.Name.Value = "my awesome room";
-                room.Host.Value = API.LocalUser.Value;
-                room.Playlist.Add(new PlaylistItem(new BeatmapInfo
-                {
-                    MD5Hash = realHash,
-                    OnlineID = realOnlineId,
-                    Metadata = new BeatmapMetadata(),
-                    BeatmapSet = new BeatmapSetInfo
+                room.Name = "my awesome room";
+                room.Host = API.LocalUser.Value;
+                room.Playlist =
+                [
+                    new PlaylistItem(new BeatmapInfo
                     {
-                        OnlineID = realOnlineSetId,
+                        MD5Hash = realHash,
+                        OnlineID = realOnlineId,
+                        Metadata = new BeatmapMetadata(),
+                        BeatmapSet = new BeatmapSetInfo
+                        {
+                            OnlineID = realOnlineSetId,
+                        }
+                    })
+                    {
+                        RulesetID = new OsuRuleset().RulesetInfo.OnlineID
                     }
-                })
-                {
-                    RulesetID = new OsuRuleset().RulesetInfo.OnlineID
-                });
+                ];
             });
 
             AddAssert("match has default beatmap", () => match.Beatmap.IsDefault);
@@ -181,17 +185,11 @@ namespace osu.Game.Tests.Visual.Playlists
             {
                 var originalBeatmap = new TestBeatmap(new OsuRuleset().RulesetInfo)
                 {
-                    BeatmapInfo =
-                    {
-                        OnlineID = realOnlineId,
-                        BeatmapSet =
-                        {
-                            OnlineID = realOnlineSetId
-                        }
-                    },
+                    BeatmapInfo = { OnlineID = realOnlineId },
                 };
 
                 Debug.Assert(originalBeatmap.BeatmapInfo.BeatmapSet != null);
+                originalBeatmap.BeatmapInfo.BeatmapSet.OnlineID = realOnlineSetId;
 
                 manager.Import(originalBeatmap.BeatmapInfo.BeatmapSet);
             });
@@ -201,7 +199,7 @@ namespace osu.Game.Tests.Visual.Playlists
 
         private void setupAndCreateRoom(Action<Room> room)
         {
-            AddStep("setup room", () => room(SelectedRoom!.Value));
+            AddStep("setup room", () => room(SelectedRoom.Value));
 
             AddStep("click create button", () =>
             {
@@ -215,8 +213,7 @@ namespace osu.Game.Tests.Visual.Playlists
             var beatmap = CreateBeatmap(new OsuRuleset().RulesetInfo);
 
             Debug.Assert(beatmap.BeatmapInfo.BeatmapSet != null);
-
-            importedBeatmap = manager.Import(beatmap.BeatmapInfo.BeatmapSet)?.Value.Detach();
+            importedBeatmap = manager.Import(beatmap.BeatmapInfo.BeatmapSet)!.Value.Detach();
         });
 
         private partial class TestPlaylistsRoomSubScreen : PlaylistsRoomSubScreen
@@ -226,8 +223,7 @@ namespace osu.Game.Tests.Visual.Playlists
             public new Bindable<WorkingBeatmap> Beatmap => base.Beatmap;
 
             [Resolved(canBeNull: true)]
-            [CanBeNull]
-            private IDialogOverlay dialogOverlay { get; set; }
+            private IDialogOverlay? dialogOverlay { get; set; }
 
             public TestPlaylistsRoomSubScreen(Room room)
                 : base(room)

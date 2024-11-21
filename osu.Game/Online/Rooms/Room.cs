@@ -1,13 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Newtonsoft.Json;
-using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Game.IO.Serialization.Converters;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
@@ -16,162 +15,332 @@ using osu.Game.Online.Rooms.RoomStatuses;
 namespace osu.Game.Online.Rooms
 {
     [JsonObject(MemberSerialization.OptIn)]
-    public partial class Room : IDependencyInjectionCandidate
+    public partial class Room : INotifyPropertyChanged
     {
-        [Cached]
-        [JsonProperty("id")]
-        public readonly Bindable<long?> RoomID = new Bindable<long?>();
+        public event PropertyChangedEventHandler? PropertyChanged;
 
-        [Cached]
-        [JsonProperty("name")]
-        public readonly Bindable<string> Name = new Bindable<string>();
-
-        [Cached]
-        [JsonProperty("host")]
-        public readonly Bindable<APIUser> Host = new Bindable<APIUser>();
-
-        [Cached]
-        [JsonProperty("playlist")]
-        public readonly BindableList<PlaylistItem> Playlist = new BindableList<PlaylistItem>();
-
-        [Cached]
-        [JsonProperty("channel_id")]
-        public readonly Bindable<int> ChannelId = new Bindable<int>();
-
-        [JsonProperty("current_playlist_item")]
-        [Cached]
-        public readonly Bindable<PlaylistItem> CurrentPlaylistItem = new Bindable<PlaylistItem>();
-
-        [JsonProperty("playlist_item_stats")]
-        [Cached]
-        public readonly Bindable<RoomPlaylistItemStats> PlaylistItemStats = new Bindable<RoomPlaylistItemStats>();
-
-        [JsonProperty("difficulty_range")]
-        [Cached]
-        public readonly Bindable<RoomDifficultyRange> DifficultyRange = new Bindable<RoomDifficultyRange>();
-
-        [Cached]
-        public readonly Bindable<RoomCategory> Category = new Bindable<RoomCategory>();
-
-        // Todo: osu-framework bug (https://github.com/ppy/osu-framework/issues/4106)
-        [JsonProperty("category")]
-        [JsonConverter(typeof(SnakeCaseStringEnumConverter))]
-        private RoomCategory category
+        /// <summary>
+        /// The online room ID. Will be <c>null</c> while the room has not yet been created.
+        /// </summary>
+        public long? RoomID
         {
-            get => Category.Value;
-            set => Category.Value = value;
+            get => roomId;
+            set => SetField(ref roomId, value);
         }
 
-        [Cached]
-        public readonly Bindable<int?> MaxAttempts = new Bindable<int?>();
-
-        [Cached]
-        public readonly Bindable<RoomStatus> Status = new Bindable<RoomStatus>(new RoomStatusOpen());
-
-        [Cached]
-        public readonly Bindable<RoomAvailability> Availability = new Bindable<RoomAvailability>();
-
-        [Cached]
-        public readonly Bindable<MatchType> Type = new Bindable<MatchType>();
-
-        // Todo: osu-framework bug (https://github.com/ppy/osu-framework/issues/4106)
-        [JsonConverter(typeof(SnakeCaseStringEnumConverter))]
-        [JsonProperty("type")]
-        private MatchType type
+        /// <summary>
+        /// The room name.
+        /// </summary>
+        public string Name
         {
-            get => Type.Value;
-            set => Type.Value = value;
+            get => name;
+            set => SetField(ref name, value);
         }
 
-        [Cached]
-        public readonly Bindable<QueueMode> QueueMode = new Bindable<QueueMode>();
-
-        [JsonConverter(typeof(SnakeCaseStringEnumConverter))]
-        [JsonProperty("queue_mode")]
-        private QueueMode queueMode
+        /// <summary>
+        /// Sets the room password. Will be <c>null</c> after the room is created.
+        /// </summary>
+        /// <remarks>
+        /// To check if the room has a password, use <see cref="HasPassword"/>.
+        /// </remarks>
+        public string? Password
         {
-            get => QueueMode.Value;
-            set => QueueMode.Value = value;
-        }
-
-        [Cached]
-        public readonly Bindable<TimeSpan> AutoStartDuration = new Bindable<TimeSpan>();
-
-        [JsonProperty("auto_start_duration")]
-        private ushort autoStartDuration
-        {
-            get => (ushort)AutoStartDuration.Value.TotalSeconds;
-            set => AutoStartDuration.Value = TimeSpan.FromSeconds(value);
-        }
-
-        [Cached]
-        public readonly Bindable<int?> MaxParticipants = new Bindable<int?>();
-
-        [Cached]
-        [JsonProperty("current_user_score")]
-        public readonly Bindable<PlaylistAggregateScore> UserScore = new Bindable<PlaylistAggregateScore>();
-
-        [JsonProperty("has_password")]
-        public readonly Bindable<bool> HasPassword = new Bindable<bool>();
-
-        [Cached]
-        [JsonProperty("recent_participants")]
-        public readonly BindableList<APIUser> RecentParticipants = new BindableList<APIUser>();
-
-        [Cached]
-        [JsonProperty("participant_count")]
-        public readonly Bindable<int> ParticipantCount = new Bindable<int>();
-
-        #region Properties only used for room creation request
-
-        [Cached(Name = nameof(Password))]
-        [JsonProperty("password")]
-        public readonly Bindable<string> Password = new Bindable<string>();
-
-        [Cached]
-        public readonly Bindable<TimeSpan?> Duration = new Bindable<TimeSpan?>();
-
-        [JsonProperty("duration")]
-        private int? duration
-        {
-            get => (int?)Duration.Value?.TotalMinutes;
+            get => password;
             set
             {
-                if (value == null)
-                    Duration.Value = null;
-                else
-                    Duration.Value = TimeSpan.FromMinutes(value.Value);
+                SetField(ref password, value);
+                HasPassword = !string.IsNullOrEmpty(value);
             }
         }
 
-        #endregion
+        /// <summary>
+        /// Whether the room has a password.
+        /// </summary>
+        /// <remarks>
+        /// To set a password, use <see cref="Password"/>.
+        /// </remarks>
+        [JsonProperty("has_password")]
+        public bool HasPassword
+        {
+            get => hasPassword;
+            private set => SetField(ref hasPassword, value);
+        }
 
-        // Only supports retrieval for now
-        [Cached]
+        /// <summary>
+        /// The room host. Will be <c>null</c> while the room has not yet been created.
+        /// </summary>
+        public APIUser? Host
+        {
+            get => host;
+            set => SetField(ref host, value);
+        }
+
+        /// <summary>
+        /// The room category.
+        /// </summary>
+        public RoomCategory Category
+        {
+            get => category;
+            set => SetField(ref category, value);
+        }
+
+        /// <summary>
+        /// The duration for which the room will be open. Will be <c>null</c> after the room is created.
+        /// </summary>
+        /// <remarks>
+        /// To check the room end time, use <see cref="EndDate"/>.
+        /// </remarks>
+        public TimeSpan? Duration
+        {
+            get => duration == null ? null : TimeSpan.FromMinutes(duration.Value);
+            set => SetField(ref duration, value == null ? null : (int)value.Value.TotalMinutes);
+        }
+
+        /// <summary>
+        /// The date at which the room was opened. Will be <c>null</c> while the room has not yet been created.
+        /// </summary>
+        public DateTimeOffset? StartDate
+        {
+            get => startDate;
+            set => SetField(ref startDate, value);
+        }
+
+        /// <summary>
+        /// The date at which the room will be closed.
+        /// </summary>
+        /// <remarks>
+        /// To set the room duration, use <see cref="Duration"/>.
+        /// </remarks>
+        public DateTimeOffset? EndDate
+        {
+            get => endDate;
+            set => SetField(ref endDate, value);
+        }
+
+        /// <summary>
+        /// The maximum number of users allowed in the room.
+        /// </summary>
+        public int? MaxParticipants
+        {
+            get => maxParticipants;
+            set => SetField(ref maxParticipants, value);
+        }
+
+        /// <summary>
+        /// The current number of users in the room.
+        /// </summary>
+        public int ParticipantCount
+        {
+            get => participantCount;
+            set => SetField(ref participantCount, value);
+        }
+
+        /// <summary>
+        /// The set of most recent participants in the room.
+        /// </summary>
+        public IReadOnlyList<APIUser> RecentParticipants
+        {
+            get => recentParticipants;
+            set => SetList(ref recentParticipants, value);
+        }
+
+        /// <summary>
+        /// The match type.
+        /// </summary>
+        public MatchType Type
+        {
+            get => type;
+            set => SetField(ref type, value);
+        }
+
+        /// <summary>
+        /// The maximum number of attempts on the playlist. Only valid for playlist rooms.
+        /// </summary>
+        public int? MaxAttempts
+        {
+            get => maxAttempts;
+            set => SetField(ref maxAttempts, value);
+        }
+
+        /// <summary>
+        /// The room playlist.
+        /// </summary>
+        public IReadOnlyList<PlaylistItem> Playlist
+        {
+            get => playlist;
+            set => SetList(ref playlist, value);
+        }
+
+        /// <summary>
+        /// Describes the items in the playlist.
+        /// </summary>
+        public RoomPlaylistItemStats? PlaylistItemStats
+        {
+            get => playlistItemStats;
+            set => SetField(ref playlistItemStats, value);
+        }
+
+        /// <summary>
+        /// Describes the range of difficulty of the room.
+        /// </summary>
+        public RoomDifficultyRange? DifficultyRange
+        {
+            get => difficultyRange;
+            set => SetField(ref difficultyRange, value);
+        }
+
+        /// <summary>
+        /// The playlist queueing mode. Only valid for multiplayer rooms.
+        /// </summary>
+        public QueueMode QueueMode
+        {
+            get => queueMode;
+            set => SetField(ref queueMode, value);
+        }
+
+        /// <summary>
+        /// Whether to automatically skip map intros. Only valid for multiplayer rooms.
+        /// </summary>
+        public bool AutoSkip
+        {
+            get => autoSkip;
+            set => SetField(ref autoSkip, value);
+        }
+
+        /// <summary>
+        /// The amount of time before the match is automatically started. Only valid for multiplayer rooms.
+        /// </summary>
+        public TimeSpan AutoStartDuration
+        {
+            get => TimeSpan.FromSeconds(autoStartDuration);
+            set => SetField(ref autoStartDuration, (ushort)value.TotalSeconds);
+        }
+
+        /// <summary>
+        /// Provides some extra scoring statistics for the local user in the room.
+        /// </summary>
+        public PlaylistAggregateScore? UserScore
+        {
+            get => userScore;
+            set => SetField(ref userScore, value);
+        }
+
+        /// <summary>
+        /// Represents the current item selected within the room.
+        /// </summary>
+        /// <remarks>
+        /// Only valid for room listing requests (i.e. in the lounge screen), and may not be valid while inside the room.
+        /// </remarks>
+        public PlaylistItem? CurrentPlaylistItem
+        {
+            get => currentPlaylistItem;
+            set => SetField(ref currentPlaylistItem, value);
+        }
+
+        /// <summary>
+        /// The chat channel id for the room. Will be <c>0</c> while the room has not yet been created.
+        /// </summary>
+        public int ChannelId
+        {
+            get => channelId;
+            private set => SetField(ref channelId, value);
+        }
+
+        /// <summary>
+        /// The current room status.
+        /// </summary>
+        public RoomStatus Status
+        {
+            get => status;
+            set => SetField(ref status, value);
+        }
+
+        /// <summary>
+        /// Describes which players are able to join the room.
+        /// </summary>
+        public RoomAvailability Availability
+        {
+            get => availability;
+            set => SetField(ref availability, value);
+        }
+
+        [JsonProperty("id")]
+        private long? roomId;
+
+        [JsonProperty("name")]
+        private string name = string.Empty;
+
+        [JsonProperty("password")]
+        private string? password;
+
+        // Not serialised (internal use only).
+        private bool hasPassword;
+
+        [JsonProperty("host")]
+        private APIUser? host;
+
+        [JsonProperty("category")]
+        [JsonConverter(typeof(SnakeCaseStringEnumConverter))]
+        private RoomCategory category;
+
+        [JsonProperty("duration")]
+        private int? duration;
+
         [JsonProperty("starts_at")]
-        public readonly Bindable<DateTimeOffset?> StartDate = new Bindable<DateTimeOffset?>();
+        private DateTimeOffset? startDate;
 
-        // Only supports retrieval for now
-        [Cached]
         [JsonProperty("ends_at")]
-        public readonly Bindable<DateTimeOffset?> EndDate = new Bindable<DateTimeOffset?>();
+        private DateTimeOffset? endDate;
 
-        // Todo: Find a better way to do this (https://github.com/ppy/osu-framework/issues/1930)
+        // Not yet serialised (not implemented).
+        private int? maxParticipants;
+
+        [JsonProperty("participant_count")]
+        private int participantCount;
+
+        [JsonProperty("recent_participants")]
+        private IReadOnlyList<APIUser> recentParticipants = [];
+
         [JsonProperty("max_attempts", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private int? maxAttempts
-        {
-            get => MaxAttempts.Value;
-            set => MaxAttempts.Value = value;
-        }
+        private int? maxAttempts;
 
-        [Cached]
+        [JsonProperty("playlist")]
+        private IReadOnlyList<PlaylistItem> playlist = [];
+
+        [JsonProperty("playlist_item_stats")]
+        private RoomPlaylistItemStats? playlistItemStats;
+
+        [JsonProperty("difficulty_range")]
+        private RoomDifficultyRange? difficultyRange;
+
+        [JsonConverter(typeof(SnakeCaseStringEnumConverter))]
+        [JsonProperty("type")]
+        private MatchType type;
+
+        [JsonConverter(typeof(SnakeCaseStringEnumConverter))]
+        [JsonProperty("queue_mode")]
+        private QueueMode queueMode;
+
         [JsonProperty("auto_skip")]
-        public readonly Bindable<bool> AutoSkip = new Bindable<bool>();
+        private bool autoSkip;
 
-        public Room()
-        {
-            Password.BindValueChanged(p => HasPassword.Value = !string.IsNullOrEmpty(p.NewValue));
-        }
+        [JsonProperty("auto_start_duration")]
+        private ushort autoStartDuration;
+
+        [JsonProperty("current_user_score")]
+        private PlaylistAggregateScore? userScore;
+
+        [JsonProperty("current_playlist_item")]
+        private PlaylistItem? currentPlaylistItem;
+
+        [JsonProperty("channel_id")]
+        private int channelId;
+
+        // Not serialised (see: GetRoomsRequest).
+        private RoomStatus status = new RoomStatusOpen();
+
+        // Not yet serialised (not implemented).
+        private RoomAvailability availability;
 
         /// <summary>
         /// Copies values from another <see cref="Room"/> into this one.
@@ -182,43 +351,34 @@ namespace osu.Game.Online.Rooms
         /// <param name="other">The <see cref="Room"/> to copy values from.</param>
         public void CopyFrom(Room other)
         {
-            RoomID.Value = other.RoomID.Value;
-            Name.Value = other.Name.Value;
+            RoomID = other.RoomID;
+            Name = other.Name;
 
-            Category.Value = other.Category.Value;
+            Category = other.Category;
 
-            if (other.Host.Value != null && Host.Value?.Id != other.Host.Value.Id)
-                Host.Value = other.Host.Value;
+            if (other.Host != null && Host?.Id != other.Host.Id)
+                Host = other.Host;
 
-            ChannelId.Value = other.ChannelId.Value;
-            Status.Value = other.Status.Value;
-            Availability.Value = other.Availability.Value;
-            HasPassword.Value = other.HasPassword.Value;
-            Type.Value = other.Type.Value;
-            MaxParticipants.Value = other.MaxParticipants.Value;
-            ParticipantCount.Value = other.ParticipantCount.Value;
-            EndDate.Value = other.EndDate.Value;
-            UserScore.Value = other.UserScore.Value;
-            QueueMode.Value = other.QueueMode.Value;
-            AutoStartDuration.Value = other.AutoStartDuration.Value;
-            DifficultyRange.Value = other.DifficultyRange.Value;
-            PlaylistItemStats.Value = other.PlaylistItemStats.Value;
-            CurrentPlaylistItem.Value = other.CurrentPlaylistItem.Value;
-            AutoSkip.Value = other.AutoSkip.Value;
+            ChannelId = other.ChannelId;
+            Status = other.Status;
+            Availability = other.Availability;
+            HasPassword = other.HasPassword;
+            Type = other.Type;
+            MaxParticipants = other.MaxParticipants;
+            ParticipantCount = other.ParticipantCount;
+            EndDate = other.EndDate;
+            UserScore = other.UserScore;
+            QueueMode = other.QueueMode;
+            AutoStartDuration = other.AutoStartDuration;
+            DifficultyRange = other.DifficultyRange;
+            PlaylistItemStats = other.PlaylistItemStats;
+            CurrentPlaylistItem = other.CurrentPlaylistItem;
+            AutoSkip = other.AutoSkip;
 
             other.RemoveExpiredPlaylistItems();
 
-            if (!Playlist.SequenceEqual(other.Playlist))
-            {
-                Playlist.Clear();
-                Playlist.AddRange(other.Playlist);
-            }
-
-            if (!RecentParticipants.SequenceEqual(other.RecentParticipants))
-            {
-                RecentParticipants.Clear();
-                RecentParticipants.AddRange(other.RecentParticipants);
-            }
+            Playlist = other.Playlist;
+            RecentParticipants = other.RecentParticipants;
         }
 
         public void RemoveExpiredPlaylistItems()
@@ -226,8 +386,8 @@ namespace osu.Game.Online.Rooms
             // Todo: This is not the best way/place to do this, but the intention is to display all playlist items when the room has ended,
             // and display only the non-expired playlist items while the room is still active. In order to achieve this, all expired items are removed from the source Room.
             // More refactoring is required before this can be done locally instead - DrawableRoomPlaylist is currently directly bound to the playlist to display items in the room.
-            if (!(Status.Value is RoomStatusEnded))
-                Playlist.RemoveAll(i => i.Expired);
+            if (Status is not RoomStatusEnded)
+                Playlist = Playlist.Where(i => !i.Expired).ToArray();
         }
 
         [JsonObject(MemberSerialization.OptIn)]
@@ -240,7 +400,7 @@ namespace osu.Game.Online.Rooms
             public int CountTotal;
 
             [JsonProperty("ruleset_ids")]
-            public int[] RulesetIDs;
+            public int[] RulesetIDs = [];
         }
 
         [JsonObject(MemberSerialization.OptIn)]
@@ -251,6 +411,29 @@ namespace osu.Game.Online.Rooms
 
             [JsonProperty("max")]
             public double Max;
+        }
+
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null!)
+            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
+        protected bool SetList<T>(ref IReadOnlyList<T> list, IReadOnlyList<T> value, [CallerMemberName] string propertyName = null!)
+        {
+            if (list.SequenceEqual(value))
+                return false;
+
+            list = value;
+            OnPropertyChanged(propertyName);
+            return true;
+        }
+
+        protected bool SetField<T>(ref T field, T value, [CallerMemberName] string propertyName = null!)
+        {
+            if (EqualityComparer<T>.Default.Equals(field, value))
+                return false;
+
+            field = value;
+            OnPropertyChanged(propertyName);
+            return true;
         }
     }
 }
