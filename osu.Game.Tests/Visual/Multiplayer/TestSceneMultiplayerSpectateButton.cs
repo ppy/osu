@@ -48,7 +48,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("create button", () =>
             {
-                PlaylistItem item = SelectedRoom.Value.Playlist.First();
+                PlaylistItem item = SelectedRoom.Value!.Playlist.First();
 
                 AvailabilityTracker.SelectedItem.Value = item;
 

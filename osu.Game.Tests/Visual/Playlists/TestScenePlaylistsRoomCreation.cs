@@ -51,7 +51,7 @@ namespace osu.Game.Tests.Visual.Playlists
 
             importBeatmap();
 
-            AddStep("load match", () => LoadScreen(match = new TestPlaylistsRoomSubScreen(SelectedRoom.Value)));
+            AddStep("load match", () => LoadScreen(match = new TestPlaylistsRoomSubScreen(SelectedRoom.Value!)));
             AddUntilStep("wait for load", () => match.IsCurrentScreen());
         }
 
@@ -119,7 +119,7 @@ namespace osu.Game.Tests.Visual.Playlists
                 ];
             });
 
-            AddAssert("first playlist item selected", () => match.SelectedItem.Value == SelectedRoom.Value.Playlist[0]);
+            AddAssert("first playlist item selected", () => match.SelectedItem.Value == SelectedRoom.Value!.Playlist[0]);
         }
 
         [Test]
@@ -199,7 +199,7 @@ namespace osu.Game.Tests.Visual.Playlists
 
         private void setupAndCreateRoom(Action<Room> room)
         {
-            AddStep("setup room", () => room(SelectedRoom.Value));
+            AddStep("setup room", () => room(SelectedRoom.Value!));
 
             AddStep("click create button", () =>
             {
@@ -218,7 +218,7 @@ namespace osu.Game.Tests.Visual.Playlists
 
         private partial class TestPlaylistsRoomSubScreen : PlaylistsRoomSubScreen
         {
-            public new Bindable<PlaylistItem> SelectedItem => base.SelectedItem;
+            public new Bindable<PlaylistItem?> SelectedItem => base.SelectedItem;
 
             public new Bindable<WorkingBeatmap> Beatmap => base.Beatmap;
 

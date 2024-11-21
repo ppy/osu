@@ -37,10 +37,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestPerUserMods()
         {
-            AddStep("first user has no mods", () => Assert.That(((TestLeaderboard)Leaderboard).UserMods[0], Is.Empty));
+            AddStep("first user has no mods", () => Assert.That(((TestLeaderboard)Leaderboard!).UserMods[0], Is.Empty));
             AddStep("last user has NF mod", () =>
             {
-                Assert.That(((TestLeaderboard)Leaderboard).UserMods[TOTAL_USERS - 1], Has.One.Items);
+                Assert.That(((TestLeaderboard)Leaderboard!).UserMods[TOTAL_USERS - 1], Has.One.Items);
                 Assert.That(((TestLeaderboard)Leaderboard).UserMods[TOTAL_USERS - 1].Single(), Is.TypeOf<OsuModNoFail>());
             });
         }
