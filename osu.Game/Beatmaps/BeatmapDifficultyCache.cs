@@ -252,7 +252,7 @@ namespace osu.Game.Beatmaps
 
                 var performanceCalculator = ruleset.CreatePerformanceCalculator();
                 if (performanceCalculator == null)
-                    return new StarDifficulty(difficulty, new EmptyPerformanceAttributes());
+                    return new StarDifficulty(difficulty, new PerformanceAttributes());
 
                 ScoreProcessor scoreProcessor = ruleset.CreateScoreProcessor();
                 scoreProcessor.Mods.Value = key.OrderedMods;

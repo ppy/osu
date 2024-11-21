@@ -9,6 +9,7 @@ using osu.Game.Rulesets.Difficulty;
 
 namespace osu.Game.Rulesets.Osu.Difficulty
 {
+    [JsonObject(MemberSerialization.OptIn)]
     public struct OsuDifficultyAttributes : IDifficultyAttributes
     {
         /// <inheritdoc/>

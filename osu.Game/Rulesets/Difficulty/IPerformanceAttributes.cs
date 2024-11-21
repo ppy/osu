@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Difficulty
     /// <summary>
     /// Represents a full, minimal implementation of <see cref="IPerformanceAttributes"/>.
     /// </summary>
-    public class EmptyPerformanceAttributes : IPerformanceAttributes
+    public class PerformanceAttributes : IPerformanceAttributes
     {
         public double Total { get; set; }
 

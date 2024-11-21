@@ -8,6 +8,7 @@ using osu.Game.Rulesets.Difficulty;
 
 namespace osu.Game.Rulesets.Mania.Difficulty
 {
+    [JsonObject(MemberSerialization.OptIn)]
     public struct ManiaDifficultyAttributes : IDifficultyAttributes
     {
         /// <inheritdoc/>

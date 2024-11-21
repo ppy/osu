@@ -10,7 +10,6 @@ namespace osu.Game.Rulesets.Difficulty
     /// <summary>
     /// Describes the difficulty of a beatmap, as output by a <see cref="DifficultyCalculator"/>.
     /// </summary>
-    [JsonObject(MemberSerialization.OptIn)]
     public interface IDifficultyAttributes
     {
         protected const int ATTRIB_ID_AIM = 1;
@@ -60,7 +59,7 @@ namespace osu.Game.Rulesets.Difficulty
     /// <summary>
     /// Represents a full, minimal implementation of <see cref="IDifficultyAttributes"/>.
     /// </summary>
-    public class EmptyDifficultyAttributes : IDifficultyAttributes
+    public class DifficultyAttributes : IDifficultyAttributes
     {
         public double StarRating { get; set; }
 

@@ -8,13 +8,13 @@ using osu.Game.Rulesets.Difficulty;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty
 {
+    [JsonObject(MemberSerialization.OptIn)]
     public struct TaikoDifficultyAttributes : IDifficultyAttributes
     {
         /// <inheritdoc/>
         public double StarRating { get; set; }
 
         /// <inheritdoc/>
-        [JsonProperty("max_combo", Order = -2)]
         public int MaxCombo { get; set; }
 
         /// <summary>

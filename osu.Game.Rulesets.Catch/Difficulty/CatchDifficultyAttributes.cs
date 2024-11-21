@@ -8,6 +8,7 @@ using osu.Game.Rulesets.Difficulty;
 
 namespace osu.Game.Rulesets.Catch.Difficulty
 {
+    [JsonObject(MemberSerialization.OptIn)]
     public struct CatchDifficultyAttributes : IDifficultyAttributes
     {
         /// <inheritdoc/>
