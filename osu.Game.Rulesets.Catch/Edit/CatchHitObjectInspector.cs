@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
+using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Screens.Edit.Compose.Components;
 
@@ -21,14 +22,14 @@ namespace osu.Game.Rulesets.Catch.Edit
                 HitObject? precedingObject = EditorBeatmap.HitObjects.LastOrDefault(ho => ho.GetEndTime() < firstSelectedHitObject.StartTime);
                 HitObject? nextObject = EditorBeatmap.HitObjects.FirstOrDefault(ho => ho.StartTime > lastSelectedHitObject.GetEndTime());
 
-                if (precedingObject != null)
+                if (precedingObject != null && precedingObject is not BananaShower)
                 {
                     double previousSnap = snapProvider.ReadCurrentDistanceSnap(precedingObject, firstSelectedHitObject);
                     AddHeader("To previous");
                     AddValue($"{previousSnap:#,0.##}x");
                 }
 
-                if (nextObject != null)
+                if (nextObject != null && nextObject is not BananaShower)
                 {
                     double nextSnap = snapProvider.ReadCurrentDistanceSnap(lastSelectedHitObject, nextObject);
                     AddHeader("To next");
