@@ -15,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Tests.Mods
 {
-    public partial class TestSceneOsuModSuddenDeath : ModFailConditionTestScene
+    public partial class TestSceneOsuModSuddenDeath : ModForceFailTestScene
     {
         protected override Ruleset CreatePlayerRuleset() => new OsuRuleset();
 

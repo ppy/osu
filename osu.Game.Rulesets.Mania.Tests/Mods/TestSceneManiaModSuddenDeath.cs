@@ -13,7 +13,7 @@ using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Mania.Tests.Mods
 {
-    public partial class TestSceneManiaModSuddenDeath : ModFailConditionTestScene
+    public partial class TestSceneManiaModSuddenDeath : ModForceFailTestScene
     {
         protected override Ruleset CreatePlayerRuleset() => new ManiaRuleset();
 

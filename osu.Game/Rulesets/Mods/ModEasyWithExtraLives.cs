@@ -11,7 +11,7 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModEasyWithExtraLives : ModEasy, IApplicableFailOverride, IApplicableToHealthProcessor
+    public abstract class ModEasyWithExtraLives : ModEasy, IBlockFail, IApplicableToHealthProcessor
     {
         [SettingSource("Extra Lives", "Number of extra lives")]
         public Bindable<int> Retries { get; } = new BindableInt(2)
@@ -33,21 +33,20 @@ namespace osu.Game.Rulesets.Mods
             retries = Retries.Value;
         }
 
-        public bool PerformFail()
+        public void ApplyToHealthProcessor(HealthProcessor healthProcessor)
         {
-            if (retries == 0) return true;
+            health.BindTo(healthProcessor.Health);
+        }
+
+        public bool AllowFail()
+        {
+            if (retries == 0)
+                return true;
 
             health.Value = health.MaxValue;
             retries--;
 
             return false;
-        }
-
-        public bool RestartOnFail => false;
-
-        public void ApplyToHealthProcessor(HealthProcessor healthProcessor)
-        {
-            health.BindTo(healthProcessor.Health);
         }
     }
 }

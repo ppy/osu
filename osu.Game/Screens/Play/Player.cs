@@ -153,9 +153,8 @@ namespace osu.Game.Screens.Play
 
         /// <summary>
         /// Whether failing should be allowed.
-        /// By default, this checks whether all selected mods allow failing.
         /// </summary>
-        protected virtual bool CheckModsAllowFailure() => GameplayState.Mods.OfType<IApplicableFailOverride>().All(m => m.PerformFail());
+        protected virtual bool CheckModsAllowFailure() => true;
 
         public readonly PlayerConfiguration Configuration;
 
@@ -247,6 +246,7 @@ namespace osu.Game.Screens.Play
 
             HealthProcessor = gameplayMods.OfType<IApplicableHealthProcessor>().FirstOrDefault()?.CreateHealthProcessor(playableBeatmap.HitObjects[0].StartTime);
             HealthProcessor ??= ruleset.CreateHealthProcessor(playableBeatmap.HitObjects[0].StartTime);
+            HealthProcessor.Mods.Value = gameplayMods;
             HealthProcessor.ApplyBeatmap(playableBeatmap);
 
             dependencies.CacheAs(HealthProcessor);
@@ -374,6 +374,8 @@ namespace osu.Game.Screens.Play
 
             // Bind the judgement processors to ourselves
             ScoreProcessor.HasCompleted.BindValueChanged(_ => checkScoreCompleted());
+
+            ScoreProcessor.Failed += onFail;
             HealthProcessor.Failed += onFail;
 
             // Provide judgement processors to mods after they're loaded so that they're on the gameplay clock,
@@ -951,10 +953,13 @@ namespace osu.Game.Screens.Play
 
         private FailAnimationContainer failAnimationContainer;
 
-        private bool onFail()
+        private bool onFail(bool restart)
         {
             // Failing after the quit sequence has started may cause weird side effects with the fail animation / effects.
             if (GameplayState.HasQuit)
+                return false;
+
+            if (GameplayState.HasFailed)
                 return false;
 
             if (!CheckModsAllowFailure())
@@ -990,7 +995,7 @@ namespace osu.Game.Screens.Play
                     ScoreProcessor.FailScore(Score.ScoreInfo);
                     OnFail();
 
-                    if (GameplayState.Mods.OfType<IApplicableFailOverride>().Any(m => m.RestartOnFail))
+                    if (restart)
                         Restart(true);
                 });
             }

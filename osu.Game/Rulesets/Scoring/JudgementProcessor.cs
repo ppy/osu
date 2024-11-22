@@ -9,6 +9,7 @@ using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Replays;
 
@@ -27,6 +28,16 @@ namespace osu.Game.Rulesets.Scoring
         public event Action<JudgementResult>? JudgementReverted;
 
         /// <summary>
+        /// Invoked when this <see cref="JudgementProcessor"/> is in a failed state.
+        /// </summary>
+        public event FailedDelegate? Failed;
+
+        /// <summary>
+        /// The current selected mods.
+        /// </summary>
+        public readonly Bindable<IReadOnlyList<Mod>> Mods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
+
+        /// <summary>
         /// The maximum number of hits that can be judged.
         /// </summary>
         protected int MaxHits { get; private set; }
@@ -40,6 +51,11 @@ namespace osu.Game.Rulesets.Scoring
         /// The total number of judged <see cref="HitObject"/>s at the current point in time.
         /// </summary>
         public int JudgedHits { get; private set; }
+
+        /// <summary>
+        /// Whether this <see cref="JudgementProcessor"/> has already triggered the failed state.
+        /// </summary>
+        public bool HasFailed { get; private set; }
 
         private JudgementResult? lastAppliedResult;
 
@@ -72,6 +88,8 @@ namespace osu.Game.Rulesets.Scoring
                 throw new ArgumentException(@$"A {nameof(HitResult.LegacyComboIncrease)} hit result cannot be applied.");
 #pragma warning restore CS0618
 
+            result.FailedAtJudgement |= HasFailed;
+
             JudgedHits++;
             lastAppliedResult = result;
 
@@ -87,7 +105,6 @@ namespace osu.Game.Rulesets.Scoring
         public void RevertResult(JudgementResult result)
         {
             JudgedHits--;
-
             RevertResultInternal(result);
 
             JudgementReverted?.Invoke(result);
@@ -108,6 +125,15 @@ namespace osu.Game.Rulesets.Scoring
         /// <param name="result">The judgement scoring result.</param>
         protected abstract void RevertResultInternal(JudgementResult result);
 
+        protected void TriggerFailure(bool restart)
+        {
+            if (HasFailed)
+                return;
+
+            if (Failed?.Invoke(restart) != false)
+                HasFailed = true;
+        }
+
         /// <summary>
         /// Resets this <see cref="JudgementProcessor"/> to a default state.
         /// </summary>
@@ -118,6 +144,7 @@ namespace osu.Game.Rulesets.Scoring
                 MaxHits = JudgedHits;
 
             JudgedHits = 0;
+            HasFailed = false;
         }
 
         /// <summary>
@@ -210,4 +237,11 @@ namespace osu.Game.Rulesets.Scoring
                     || lastAppliedResult.AsNonNull().TimeAbsolute < Clock.CurrentTime);
         }
     }
+
+    /// <summary>
+    /// Handles a failing state.
+    /// </summary>
+    /// <param name="restart">Whether gameplay is expected to be restarted as a result of the fail.</param>
+    /// <returns><c>true</c> if the fail was allowed to occur.</returns>
+    public delegate bool FailedDelegate(bool restart);
 }

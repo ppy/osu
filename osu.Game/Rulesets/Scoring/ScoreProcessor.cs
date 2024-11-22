@@ -87,11 +87,6 @@ namespace osu.Game.Rulesets.Scoring
         public readonly BindableInt Combo = new BindableInt();
 
         /// <summary>
-        /// The current selected mods
-        /// </summary>
-        public readonly Bindable<IReadOnlyList<Mod>> Mods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
-
-        /// <summary>
         /// The current rank.
         /// </summary>
         public IBindable<ScoreRank> Rank => rank;
@@ -266,6 +261,21 @@ namespace osu.Game.Rulesets.Scoring
 
                 updateScore();
             }
+
+            bool hasForcedFail = false;
+            bool forcedRestartOnFail = false;
+
+            for (int i = 0; i < Mods.Value.Count; i++)
+            {
+                if (Mods.Value[i] is IForceFail failMod && failMod.ShouldFail(result))
+                {
+                    hasForcedFail = true;
+                    forcedRestartOnFail = failMod.RestartOnFail;
+                }
+            }
+
+            if (hasForcedFail)
+                TriggerFailure(forcedRestartOnFail);
         }
 
         /// <summary>

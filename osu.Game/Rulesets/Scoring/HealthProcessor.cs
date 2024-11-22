@@ -1,67 +1,51 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Framework.Bindables;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Scoring
 {
     public abstract partial class HealthProcessor : JudgementProcessor
     {
         /// <summary>
-        /// Invoked when the <see cref="ScoreProcessor"/> is in a failed state.
-        /// Return true if the fail was permitted.
-        /// </summary>
-        public event Func<bool>? Failed;
-
-        /// <summary>
-        /// Additional conditions on top of <see cref="CheckDefaultFailCondition"/> that cause a failing state.
-        /// </summary>
-        public event Func<HealthProcessor, JudgementResult, bool>? FailConditions;
-
-        /// <summary>
         /// The current health.
         /// </summary>
         public readonly BindableDouble Health = new BindableDouble(1) { MinValue = 0, MaxValue = 1 };
 
-        /// <summary>
-        /// Whether this ScoreProcessor has already triggered the failed state.
-        /// </summary>
-        public bool HasFailed { get; private set; }
-
-        /// <summary>
-        /// Immediately triggers a failure for this HealthProcessor.
-        /// </summary>
-        public void TriggerFailure()
-        {
-            if (HasFailed)
-                return;
-
-            if (Failed?.Invoke() != false)
-                HasFailed = true;
-        }
-
         protected override void ApplyResultInternal(JudgementResult result)
         {
             result.HealthAtJudgement = Health.Value;
-            result.FailedAtJudgement = HasFailed;
 
-            if (HasFailed)
+            if (result.FailedAtJudgement)
                 return;
 
             Health.Value += GetHealthIncreaseFor(result);
 
-            if (meetsAnyFailCondition(result))
-                TriggerFailure();
+            if (CheckDefaultFailCondition(result))
+            {
+                bool allowFail = true;
+
+                for (int i = 0; i < Mods.Value.Count; i++)
+                {
+                    if (Mods.Value[i] is IBlockFail blockMod)
+                    {
+                        // Intentionally does not early return so that all mods have a chance to update internal states (e.g. ModEasyWithExtraLives).
+                        allowFail &= blockMod.AllowFail();
+                        break;
+                    }
+                }
+
+                if (allowFail)
+                    TriggerFailure(false);
+            }
         }
 
         protected override void RevertResultInternal(JudgementResult result)
         {
             Health.Value = result.HealthAtJudgement;
-
-            // Todo: Revert HasFailed state with proper player support
         }
 
         /// <summary>
@@ -71,40 +55,13 @@ namespace osu.Game.Rulesets.Scoring
         /// <returns>The health increase.</returns>
         protected virtual double GetHealthIncreaseFor(JudgementResult result) => result.HealthIncrease;
 
-        /// <summary>
-        /// Checks whether the default conditions for failing are met.
-        /// </summary>
-        /// <returns><see langword="true"/> if failure should be invoked.</returns>
         protected virtual bool CheckDefaultFailCondition(JudgementResult result) => Precision.AlmostBigger(Health.MinValue, Health.Value);
-
-        /// <summary>
-        /// Whether the current state of <see cref="HealthProcessor"/> or the provided <paramref name="result"/> meets any fail condition.
-        /// </summary>
-        /// <param name="result">The judgement result.</param>
-        private bool meetsAnyFailCondition(JudgementResult result)
-        {
-            if (CheckDefaultFailCondition(result))
-                return true;
-
-            if (FailConditions != null)
-            {
-                foreach (var condition in FailConditions.GetInvocationList())
-                {
-                    bool conditionResult = (bool)condition.Method.Invoke(condition.Target, new object[] { this, result })!;
-                    if (conditionResult)
-                        return true;
-                }
-            }
-
-            return false;
-        }
 
         protected override void Reset(bool storeResults)
         {
             base.Reset(storeResults);
 
             Health.Value = 1;
-            HasFailed = false;
         }
     }
 }
