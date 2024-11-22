@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Mods
             CreateModTest(new ModTestData
             {
                 Mod = new TaikoModRelax(),
-                Beatmap = createBeatmap,
+                CreateBeatmap = createBeatmap,
                 ReplayFrames = replay.Frames,
                 Autoplay = false,
                 PassCondition = () => Player.ScoreProcessor.HasCompleted.Value && Player.ScoreProcessor.Accuracy.Value == 1,

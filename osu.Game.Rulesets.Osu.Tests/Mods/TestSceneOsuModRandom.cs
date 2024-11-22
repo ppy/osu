@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
             {
                 AngleSharpness = { Value = angleSharpness }
             },
-            Beatmap = jumpBeatmap,
+            CreateBeatmap = jumpBeatmap,
             Autoplay = true,
             PassCondition = () => true
         });
@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
             {
                 AngleSharpness = { Value = angleSharpness }
             },
-            Beatmap = streamBeatmap,
+            CreateBeatmap = streamBeatmap,
             Autoplay = true,
             PassCondition = () => true
         });
