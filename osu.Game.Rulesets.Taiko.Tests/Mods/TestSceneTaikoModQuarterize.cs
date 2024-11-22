@@ -12,14 +12,14 @@ using osu.Game.Rulesets.Taiko.Replays;
 
 namespace osu.Game.Rulesets.Taiko.Tests.Mods
 {
-    public partial class TestSceneTaikoModSimplified : TaikoModTestScene
+    public partial class TestSceneTaikoModQuarterize : TaikoModTestScene
     {
         [Test]
         public void TestOneThirdConversion()
         {
             CreateModTest(new ModTestData
             {
-                Mod = new TaikoModSimplified
+                Mod = new TaikoModQuarterize
                 {
                     OneThirdConversion = { Value = true },
                 },
@@ -59,7 +59,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Mods
         [Test]
         public void TestOneSixthConversion() => CreateModTest(new ModTestData
         {
-            Mod = new TaikoModSimplified
+            Mod = new TaikoModQuarterize
             {
                 OneSixthConversion = { Value = true }
             },
@@ -98,7 +98,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Mods
         [Test]
         public void TestOneEighthConversion() => CreateModTest(new ModTestData
         {
-            Mod = new TaikoModSimplified
+            Mod = new TaikoModQuarterize
             {
                 OneEighthConversion = { Value = true }
             },
