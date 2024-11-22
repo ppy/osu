@@ -32,7 +32,7 @@ namespace osu.Game.Tests.Visual.Playlists
             {
                 SelectedRoom.Value = new Room();
 
-                Child = settings = new TestRoomSettings(SelectedRoom.Value)
+                Child = settings = new TestRoomSettings(SelectedRoom.Value!)
                 {
                     RelativeSizeAxes = Axes.Both,
                     State = { Value = Visibility.Visible }
@@ -45,19 +45,19 @@ namespace osu.Game.Tests.Visual.Playlists
         {
             AddStep("clear name and beatmap", () =>
             {
-                SelectedRoom.Value.Name = "";
-                SelectedRoom.Value.Playlist = [];
+                SelectedRoom.Value!.Name = "";
+                SelectedRoom.Value!.Playlist = [];
             });
 
             AddAssert("button disabled", () => !settings.ApplyButton.Enabled.Value);
 
-            AddStep("set name", () => SelectedRoom.Value.Name = "Room name");
+            AddStep("set name", () => SelectedRoom.Value!.Name = "Room name");
             AddAssert("button disabled", () => !settings.ApplyButton.Enabled.Value);
 
-            AddStep("set beatmap", () => SelectedRoom.Value.Playlist = [new PlaylistItem(CreateBeatmap(Ruleset.Value).BeatmapInfo)]);
+            AddStep("set beatmap", () => SelectedRoom.Value!.Playlist = [new PlaylistItem(CreateBeatmap(Ruleset.Value).BeatmapInfo)]);
             AddAssert("button enabled", () => settings.ApplyButton.Enabled.Value);
 
-            AddStep("clear name", () => SelectedRoom.Value.Name = "");
+            AddStep("clear name", () => SelectedRoom.Value!.Name = "");
             AddAssert("button disabled", () => !settings.ApplyButton.Enabled.Value);
         }
 
@@ -73,7 +73,7 @@ namespace osu.Game.Tests.Visual.Playlists
             {
                 settings.NameField.Current.Value = expected_name;
                 settings.DurationField.Current.Value = expectedDuration;
-                SelectedRoom.Value.Playlist = [new PlaylistItem(CreateBeatmap(Ruleset.Value).BeatmapInfo)];
+                SelectedRoom.Value!.Playlist = [new PlaylistItem(CreateBeatmap(Ruleset.Value).BeatmapInfo)];
 
                 RoomManager.CreateRequested = r =>
                 {
@@ -98,8 +98,8 @@ namespace osu.Game.Tests.Visual.Playlists
             {
                 var beatmap = CreateBeatmap(Ruleset.Value).BeatmapInfo;
 
-                SelectedRoom.Value.Name = "Test Room";
-                SelectedRoom.Value.Playlist = [new PlaylistItem(beatmap)];
+                SelectedRoom.Value!.Name = "Test Room";
+                SelectedRoom.Value!.Playlist = [new PlaylistItem(beatmap)];
 
                 errorMessage = $"{not_found_prefix} {beatmap.OnlineID}";
 
@@ -107,13 +107,13 @@ namespace osu.Game.Tests.Visual.Playlists
             });
 
             AddAssert("error not displayed", () => !settings.ErrorText.IsPresent);
-            AddAssert("playlist item valid", () => SelectedRoom.Value.Playlist[0].Valid.Value);
+            AddAssert("playlist item valid", () => SelectedRoom.Value!.Playlist[0].Valid.Value);
 
             AddStep("create room", () => settings.ApplyButton.Action.Invoke());
 
             AddAssert("error displayed", () => settings.ErrorText.IsPresent);
             AddAssert("error has custom text", () => settings.ErrorText.Text != errorMessage);
-            AddAssert("playlist item marked invalid", () => !SelectedRoom.Value.Playlist[0].Valid.Value);
+            AddAssert("playlist item marked invalid", () => !SelectedRoom.Value!.Playlist[0].Valid.Value);
         }
 
         [Test]
@@ -125,8 +125,8 @@ namespace osu.Game.Tests.Visual.Playlists
 
             AddStep("setup", () =>
             {
-                SelectedRoom.Value.Name = "Test Room";
-                SelectedRoom.Value.Playlist = [new PlaylistItem(CreateBeatmap(Ruleset.Value).BeatmapInfo)];
+                SelectedRoom.Value!.Name = "Test Room";
+                SelectedRoom.Value!.Playlist = [new PlaylistItem(CreateBeatmap(Ruleset.Value).BeatmapInfo)];
 
                 RoomManager.CreateRequested = _ => failText;
             });

@@ -18,7 +18,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
         public IBindable<bool> InitialRoomsReceived => initialRoomsReceived;
         private readonly Bindable<bool> initialRoomsReceived = new Bindable<bool>();
 
-        public readonly Bindable<FilterCriteria> Filter = new Bindable<FilterCriteria>();
+        public readonly Bindable<FilterCriteria?> Filter = new Bindable<FilterCriteria?>();
 
         [BackgroundDependencyLoader]
         private void load()
