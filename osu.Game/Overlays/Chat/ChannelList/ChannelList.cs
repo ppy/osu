@@ -77,10 +77,10 @@ namespace osu.Game.Overlays.Chat.ChannelList
                                     RelativeSizeAxes = Axes.X,
                                 }
                             },
-                            announceChannelGroup = new ChannelGroup(ChatStrings.ChannelsListTitleANNOUNCE.ToUpper()),
-                            publicChannelGroup = new ChannelGroup(ChatStrings.ChannelsListTitlePUBLIC.ToUpper()),
+                            announceChannelGroup = new ChannelGroup(ChatStrings.ChannelsListTitleANNOUNCE.ToUpper(), false),
+                            publicChannelGroup = new ChannelGroup(ChatStrings.ChannelsListTitlePUBLIC.ToUpper(), false),
                             selector = new ChannelListItem(ChannelListingChannel),
-                            privateChannelGroup = new ChannelGroup(ChatStrings.ChannelsListTitlePM.ToUpper()),
+                            privateChannelGroup = new ChannelGroup(ChatStrings.ChannelsListTitlePM.ToUpper(), true),
                         },
                     },
                 },
@@ -111,9 +111,9 @@ namespace osu.Game.Overlays.Chat.ChannelList
             item.OnRequestSelect += chan => OnRequestSelect?.Invoke(chan);
             item.OnRequestLeave += chan => OnRequestLeave?.Invoke(chan);
 
-            FillFlowContainer<ChannelListItem> flow = getFlowForChannel(channel);
+            ChannelGroup group = getGroupFromChannel(channel);
             channelMap.Add(channel, item);
-            flow.Add(item);
+            group.AddChannel(item);
 
             updateVisibility();
         }
@@ -123,10 +123,10 @@ namespace osu.Game.Overlays.Chat.ChannelList
             if (!channelMap.TryGetValue(channel, out var item))
                 return;
 
-            FillFlowContainer<ChannelListItem> flow = getFlowForChannel(channel);
+            ChannelGroup group = getGroupFromChannel(channel);
 
             channelMap.Remove(channel);
-            flow.Remove(item, true);
+            group.RemoveChannel(item);
 
             updateVisibility();
         }
@@ -141,21 +141,21 @@ namespace osu.Game.Overlays.Chat.ChannelList
 
         public void ScrollChannelIntoView(Channel channel) => scroll.ScrollIntoView(GetItem(channel));
 
-        private FillFlowContainer<ChannelListItem> getFlowForChannel(Channel channel)
+        private ChannelGroup getGroupFromChannel(Channel channel)
         {
             switch (channel.Type)
             {
                 case ChannelType.Public:
-                    return publicChannelGroup.ItemFlow;
+                    return publicChannelGroup;
 
                 case ChannelType.PM:
-                    return privateChannelGroup.ItemFlow;
+                    return privateChannelGroup;
 
                 case ChannelType.Announce:
-                    return announceChannelGroup.ItemFlow;
+                    return announceChannelGroup;
 
                 default:
-                    return publicChannelGroup.ItemFlow;
+                    return publicChannelGroup;
             }
         }
 
@@ -169,9 +169,9 @@ namespace osu.Game.Overlays.Chat.ChannelList
 
         private partial class ChannelGroup : FillFlowContainer
         {
-            public readonly FillFlowContainer<ChannelListItem> ItemFlow;
+            public readonly ChannelListItemFlow ItemFlow;
 
-            public ChannelGroup(LocalisableString label)
+            public ChannelGroup(LocalisableString label, bool sortByRecent)
             {
                 Direction = FillDirection.Vertical;
                 RelativeSizeAxes = Axes.X;
@@ -186,7 +186,7 @@ namespace osu.Game.Overlays.Chat.ChannelList
                         Margin = new MarginPadding { Left = 18, Bottom = 5 },
                         Font = OsuFont.Torus.With(size: 12, weight: FontWeight.SemiBold),
                     },
-                    ItemFlow = new FillFlowContainer<ChannelListItem>
+                    ItemFlow = new ChannelListItemFlow(sortByRecent)
                     {
                         Direction = FillDirection.Vertical,
                         RelativeSizeAxes = Axes.X,
@@ -194,6 +194,42 @@ namespace osu.Game.Overlays.Chat.ChannelList
                     },
                 };
             }
+
+            public partial class ChannelListItemFlow : FillFlowContainer<ChannelListItem>
+            {
+                private readonly bool sortByRecent;
+
+                public ChannelListItemFlow(bool sortByRecent)
+                {
+                    this.sortByRecent = sortByRecent;
+                }
+
+                public void Reflow() => InvalidateLayout();
+
+                public override IEnumerable<Drawable> FlowingChildren => sortByRecent
+                    ? base.FlowingChildren.OfType<ChannelListItem>().OrderByDescending(i => i.Channel.LastMessageId)
+                    : base.FlowingChildren.OfType<ChannelListItem>().OrderBy(i => i.Channel.Name);
+            }
+
+            public void AddChannel(ChannelListItem item)
+            {
+                ItemFlow.Add(item);
+
+                item.Channel.NewMessagesArrived += newMessagesArrived;
+                item.Channel.PendingMessageResolved += pendingMessageResolved;
+
+                ItemFlow.Reflow();
+            }
+
+            public void RemoveChannel(ChannelListItem item)
+            {
+                item.Channel.NewMessagesArrived -= newMessagesArrived;
+                item.Channel.PendingMessageResolved -= pendingMessageResolved;
+                ItemFlow.Remove(item, true);
+            }
+
+            private void pendingMessageResolved(LocalEchoMessage _, Message __) => ItemFlow.Reflow();
+            private void newMessagesArrived(IEnumerable<Message> _) => ItemFlow.Reflow();
         }
 
         private partial class ChannelSearchTextBox : BasicSearchTextBox
