@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Online.Rooms;
+using osu.Game.Localisation;
 
 namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 {
@@ -59,17 +60,17 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             Pill.Background.FadeColour(colours.ForRoomStatus(room), 100);
 
             if (DateTimeOffset.Now >= room.EndDate)
-                TextFlow.Text = "Ended";
+                TextFlow.Text = RoomStatusPillStrings.Ended;
             else
             {
                 switch (room.Status)
                 {
                     case RoomStatus.Playing:
-                        TextFlow.Text = "Playing";
+                        TextFlow.Text = RoomStatusPillStrings.Playing;
                         break;
 
                     default:
-                        TextFlow.Text = room.HasPassword ? "Open (Private)" : "Open";
+                        TextFlow.Text = room.HasPassword ? RoomStatusPillStrings.OpenPrivate : RoomStatusPillStrings.Open;
                         break;
                 }
             }
