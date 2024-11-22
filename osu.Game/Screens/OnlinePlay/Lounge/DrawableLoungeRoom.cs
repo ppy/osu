@@ -26,6 +26,7 @@ using osu.Game.Input.Bindings;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.Rooms;
+using osu.Game.Online.Rooms.RoomStatuses;
 using osu.Game.Overlays;
 using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
@@ -167,7 +168,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                     })
                 };
 
-                if (Room.Type == MatchType.Playlists && Room.Host?.Id == api.LocalUser.Value.Id && Room.StartDate?.AddMinutes(5) >= DateTimeOffset.Now)
+                if (Room.Type == MatchType.Playlists && Room.Host?.Id == api.LocalUser.Value.Id && Room.StartDate?.AddMinutes(5) >= DateTimeOffset.Now && Room.Status is not RoomStatusEnded)
                 {
                     items.Add(new OsuMenuItem("Close playlist", MenuItemType.Destructive, () =>
                     {
