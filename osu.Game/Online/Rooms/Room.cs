@@ -366,12 +366,8 @@ namespace osu.Game.Online.Rooms
         {
             RoomID = other.RoomID;
             Name = other.Name;
-
             Category = other.Category;
-
-            if (other.Host != null && Host?.Id != other.Host.Id)
-                Host = other.Host;
-
+            Host = other.Host;
             ChannelId = other.ChannelId;
             Status = other.Status;
             Availability = other.Availability;
@@ -387,7 +383,6 @@ namespace osu.Game.Online.Rooms
             PlaylistItemStats = other.PlaylistItemStats;
             CurrentPlaylistItem = other.CurrentPlaylistItem;
             AutoSkip = other.AutoSkip;
-
             Playlist = other.Playlist;
             RecentParticipants = other.RecentParticipants;
         }
