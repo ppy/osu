@@ -1,10 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Linq;
-using JetBrains.Annotations;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -42,10 +39,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public partial class TestSceneMultiplayerMatchSubScreen : MultiplayerTestScene
     {
-        private MultiplayerMatchSubScreen screen;
-
-        private BeatmapManager beatmaps;
-        private BeatmapSetInfo importedSet;
+        private MultiplayerMatchSubScreen screen = null!;
+        private BeatmapManager beatmaps = null!;
+        private BeatmapSetInfo importedSet = null!;
 
         public TestSceneMultiplayerMatchSubScreen()
             : base(false)
@@ -69,41 +65,25 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("load match", () =>
             {
-                SelectedRoom.Value = new Room { Name = { Value = "Test Room" } };
-                LoadScreen(screen = new TestMultiplayerMatchSubScreen(SelectedRoom.Value));
+                SelectedRoom.Value = new Room { Name = "Test Room" };
+                LoadScreen(screen = new TestMultiplayerMatchSubScreen(SelectedRoom.Value!));
             });
 
             AddUntilStep("wait for load", () => screen.IsCurrentScreen());
         }
 
         [Test]
-        [FlakyTest]
-        /*
-         * Fail rate around 1.5%
-         *
-         * TearDown : System.AggregateException : One or more errors occurred. (Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index'))
-  ----> System.ArgumentOutOfRangeException : Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index')
-         * --TearDown
-         *    at System.Threading.Tasks.Task.ThrowIfExceptional(Boolean includeTaskCanceledExceptions)
-         *   at System.Threading.Tasks.Task.Wait(Int32 millisecondsTimeout, CancellationToken cancellationToken)
-         *   at osu.Framework.Extensions.TaskExtensions.WaitSafely(Task task)
-         *   at osu.Framework.Testing.TestScene.checkForErrors()
-         *   at osu.Framework.Testing.TestScene.RunTestsFromNUnit()
-         *--ArgumentOutOfRangeException
-         *   at osu.Framework.Bindables.BindableList`1.removeAt(Int32 index, BindableList`1 caller)
-         *   at osu.Framework.Bindables.BindableList`1.removeAt(Int32 index, BindableList`1 caller)
-         *   at osu.Framework.Bindables.BindableList`1.removeAt(Int32 index, BindableList`1 caller)
-         *   at osu.Game.Online.Multiplayer.MultiplayerClient.<>c__DisplayClass106_0.<PlaylistItemChanged>b__0() in C:\BuildAgent\work\ecd860037212ac52\osu.Game\Online\Multiplayer\MultiplayerClient     .cs:line 702
-         *   at osu.Framework.Threading.ScheduledDelegate.RunTaskInternal()
-         */
         public void TestCreatedRoom()
         {
             AddStep("add playlist item", () =>
             {
-                SelectedRoom.Value.Playlist.Add(new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo)
-                {
-                    RulesetID = new OsuRuleset().RulesetInfo.OnlineID
-                });
+                SelectedRoom.Value!.Playlist =
+                [
+                    new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo)
+                    {
+                        RulesetID = new OsuRuleset().RulesetInfo.OnlineID
+                    }
+                ];
             });
 
             ClickButtonWhenEnabled<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>();
@@ -112,16 +92,18 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
-        [FlakyTest] // See above
         public void TestTaikoOnlyMod()
         {
             AddStep("add playlist item", () =>
             {
-                SelectedRoom.Value.Playlist.Add(new PlaylistItem(new TestBeatmap(new TaikoRuleset().RulesetInfo).BeatmapInfo)
-                {
-                    RulesetID = new TaikoRuleset().RulesetInfo.OnlineID,
-                    AllowedMods = new[] { new APIMod(new TaikoModSwap()) }
-                });
+                SelectedRoom.Value!.Playlist =
+                [
+                    new PlaylistItem(new TestBeatmap(new TaikoRuleset().RulesetInfo).BeatmapInfo)
+                    {
+                        RulesetID = new TaikoRuleset().RulesetInfo.OnlineID,
+                        AllowedMods = new[] { new APIMod(new TaikoModSwap()) }
+                    }
+                ];
             });
 
             ClickButtonWhenEnabled<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>();
@@ -133,32 +115,36 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
-        [FlakyTest] // See above
         public void TestSettingValidity()
         {
             AddAssert("create button not enabled", () => !this.ChildrenOfType<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>().Single().Enabled.Value);
 
             AddStep("set playlist", () =>
             {
-                SelectedRoom.Value.Playlist.Add(new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo)
-                {
-                    RulesetID = new OsuRuleset().RulesetInfo.OnlineID
-                });
+                SelectedRoom.Value!.Playlist =
+                [
+                    new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo)
+                    {
+                        RulesetID = new OsuRuleset().RulesetInfo.OnlineID
+                    }
+                ];
             });
 
             AddAssert("create button enabled", () => this.ChildrenOfType<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>().Single().Enabled.Value);
         }
 
         [Test]
-        [FlakyTest] // See above
         public void TestStartMatchWhileSpectating()
         {
             AddStep("set playlist", () =>
             {
-                SelectedRoom.Value.Playlist.Add(new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First()).BeatmapInfo)
-                {
-                    RulesetID = new OsuRuleset().RulesetInfo.OnlineID
-                });
+                SelectedRoom.Value!.Playlist =
+                [
+                    new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First()).BeatmapInfo)
+                    {
+                        RulesetID = new OsuRuleset().RulesetInfo.OnlineID
+                    }
+                ];
             });
 
             ClickButtonWhenEnabled<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>();
@@ -179,16 +165,18 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
-        [FlakyTest] // See above
         public void TestFreeModSelectionHasAllowedMods()
         {
             AddStep("add playlist item with allowed mod", () =>
             {
-                SelectedRoom.Value.Playlist.Add(new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo)
-                {
-                    RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
-                    AllowedMods = new[] { new APIMod(new OsuModDoubleTime()) }
-                });
+                SelectedRoom.Value!.Playlist =
+                [
+                    new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo)
+                    {
+                        RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
+                        AllowedMods = new[] { new APIMod(new OsuModDoubleTime()) }
+                    }
+                ];
             });
 
             ClickButtonWhenEnabled<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>();
@@ -206,16 +194,18 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
-        [FlakyTest] // See above
         public void TestModSelectKeyWithAllowedMods()
         {
             AddStep("add playlist item with allowed mod", () =>
             {
-                SelectedRoom.Value.Playlist.Add(new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo)
-                {
-                    RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
-                    AllowedMods = new[] { new APIMod(new OsuModDoubleTime()) }
-                });
+                SelectedRoom.Value!.Playlist =
+                [
+                    new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo)
+                    {
+                        RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
+                        AllowedMods = new[] { new APIMod(new OsuModDoubleTime()) }
+                    }
+                ];
             });
 
             ClickButtonWhenEnabled<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>();
@@ -228,15 +218,17 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
-        [FlakyTest] // See above
         public void TestModSelectKeyWithNoAllowedMods()
         {
             AddStep("add playlist item with no allowed mods", () =>
             {
-                SelectedRoom.Value.Playlist.Add(new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo)
-                {
-                    RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
-                });
+                SelectedRoom.Value!.Playlist =
+                [
+                    new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo)
+                    {
+                        RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
+                    }
+                ];
             });
             ClickButtonWhenEnabled<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>();
 
@@ -249,13 +241,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
-        [FlakyTest] // See above
         public void TestNextPlaylistItemSelectedAfterCompletion()
         {
             AddStep("add two playlist items", () =>
             {
-                SelectedRoom.Value.Playlist.AddRange(new[]
-                {
+                SelectedRoom.Value!.Playlist =
+                [
                     new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First()).BeatmapInfo)
                     {
                         RulesetID = new OsuRuleset().RulesetInfo.OnlineID
@@ -264,7 +255,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     {
                         RulesetID = new OsuRuleset().RulesetInfo.OnlineID
                     }
-                });
+                ];
             });
 
             ClickButtonWhenEnabled<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>();
@@ -286,24 +277,26 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
-        [FlakyTest] // See above
         public void TestModSelectOverlay()
         {
             AddStep("add playlist item", () =>
             {
-                SelectedRoom.Value.Playlist.Add(new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo)
-                {
-                    RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
-                    RequiredMods = new[]
+                SelectedRoom.Value!.Playlist =
+                [
+                    new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo)
                     {
-                        new APIMod(new OsuModDoubleTime { SpeedChange = { Value = 2.0 } }),
-                        new APIMod(new OsuModStrictTracking()),
-                    },
-                    AllowedMods = new[]
-                    {
-                        new APIMod(new OsuModFlashlight()),
+                        RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
+                        RequiredMods = new[]
+                        {
+                            new APIMod(new OsuModDoubleTime { SpeedChange = { Value = 2.0 } }),
+                            new APIMod(new OsuModStrictTracking()),
+                        },
+                        AllowedMods = new[]
+                        {
+                            new APIMod(new OsuModFlashlight()),
+                        }
                     }
-                });
+                ];
             });
             ClickButtonWhenEnabled<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>();
 
@@ -323,8 +316,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private partial class TestMultiplayerMatchSubScreen : MultiplayerMatchSubScreen
         {
             [Resolved(canBeNull: true)]
-            [CanBeNull]
-            private IDialogOverlay dialogOverlay { get; set; }
+            private IDialogOverlay? dialogOverlay { get; set; }
 
             public TestMultiplayerMatchSubScreen(Room room)
                 : base(room)

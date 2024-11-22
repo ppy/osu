@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Bindables;
@@ -32,7 +30,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [TestCase(1048576, 1048576)]
         public void TestDisplayTeamResults(int team1Score, int team2Score)
         {
-            MultiplayerResultsScreen screen = null;
+            MultiplayerResultsScreen screen = null!;
 
             AddStep("show results screen", () =>
             {

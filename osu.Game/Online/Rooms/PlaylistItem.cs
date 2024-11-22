@@ -120,18 +120,21 @@ namespace osu.Game.Online.Rooms
 
         #endregion
 
-        public PlaylistItem With(Optional<IBeatmapInfo> beatmap = default, Optional<ushort?> playlistOrder = default) => new PlaylistItem(beatmap.GetOr(Beatmap))
+        public PlaylistItem With(Optional<long> id = default, Optional<IBeatmapInfo> beatmap = default, Optional<ushort?> playlistOrder = default)
         {
-            ID = ID,
-            OwnerID = OwnerID,
-            RulesetID = RulesetID,
-            Expired = Expired,
-            PlaylistOrder = playlistOrder.GetOr(PlaylistOrder),
-            PlayedAt = PlayedAt,
-            AllowedMods = AllowedMods,
-            RequiredMods = RequiredMods,
-            valid = { Value = Valid.Value },
-        };
+            return new PlaylistItem(beatmap.GetOr(Beatmap))
+            {
+                ID = id.GetOr(ID),
+                OwnerID = OwnerID,
+                RulesetID = RulesetID,
+                Expired = Expired,
+                PlaylistOrder = playlistOrder.GetOr(PlaylistOrder),
+                PlayedAt = PlayedAt,
+                AllowedMods = AllowedMods,
+                RequiredMods = RequiredMods,
+                valid = { Value = Valid.Value },
+            };
+        }
 
         public bool Equals(PlaylistItem? other)
             => ID == other?.ID

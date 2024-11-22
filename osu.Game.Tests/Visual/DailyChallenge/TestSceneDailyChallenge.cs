@@ -39,18 +39,18 @@ namespace osu.Game.Tests.Visual.DailyChallenge
         {
             var room = new Room
             {
-                RoomID = { Value = 1234 },
-                Name = { Value = "Daily Challenge: June 4, 2024" },
+                RoomID = 1234,
+                Name = "Daily Challenge: June 4, 2024",
                 Playlist =
-                {
+                [
                     new PlaylistItem(TestResources.CreateTestBeatmapSetInfo().Beatmaps.First())
                     {
                         RequiredMods = [new APIMod(new OsuModTraceable())],
                         AllowedMods = [new APIMod(new OsuModDoubleTime())]
                     }
-                },
-                EndDate = { Value = DateTimeOffset.Now.AddHours(12) },
-                Category = { Value = RoomCategory.DailyChallenge }
+                ],
+                EndDate = DateTimeOffset.Now.AddHours(12),
+                Category = RoomCategory.DailyChallenge
             };
 
             AddStep("add room", () => API.Perform(new CreateRoomRequest(room)));
@@ -62,18 +62,18 @@ namespace osu.Game.Tests.Visual.DailyChallenge
         {
             var room = new Room
             {
-                RoomID = { Value = 1234 },
-                Name = { Value = "Daily Challenge: June 4, 2024" },
+                RoomID = 1234,
+                Name = "Daily Challenge: June 4, 2024",
                 Playlist =
-                {
+                [
                     new PlaylistItem(TestResources.CreateTestBeatmapSetInfo().Beatmaps.First())
                     {
                         RequiredMods = [new APIMod(new OsuModTraceable())],
                         AllowedMods = [new APIMod(new OsuModDoubleTime())]
                     }
-                },
-                EndDate = { Value = DateTimeOffset.Now.AddHours(12) },
-                Category = { Value = RoomCategory.DailyChallenge }
+                ],
+                EndDate = DateTimeOffset.Now.AddHours(12),
+                Category = RoomCategory.DailyChallenge
             };
 
             AddStep("add room", () => API.Perform(new CreateRoomRequest(room)));
@@ -91,18 +91,18 @@ namespace osu.Game.Tests.Visual.DailyChallenge
         {
             var room = new Room
             {
-                RoomID = { Value = 1234 },
-                Name = { Value = "Daily Challenge: June 4, 2024" },
+                RoomID = 1234,
+                Name = "Daily Challenge: June 4, 2024",
                 Playlist =
-                {
+                [
                     new PlaylistItem(TestResources.CreateTestBeatmapSetInfo().Beatmaps.First())
                     {
                         RequiredMods = [new APIMod(new OsuModTraceable())],
                         AllowedMods = [new APIMod(new OsuModDoubleTime())]
                     }
-                },
-                EndDate = { Value = DateTimeOffset.Now.AddHours(12) },
-                Category = { Value = RoomCategory.DailyChallenge }
+                ],
+                EndDate = DateTimeOffset.Now.AddHours(12),
+                Category = RoomCategory.DailyChallenge
             };
 
             AddStep("add room", () => API.Perform(new CreateRoomRequest(room)));

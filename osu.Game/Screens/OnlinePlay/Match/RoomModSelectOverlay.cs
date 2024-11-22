@@ -16,7 +16,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
 {
     public partial class RoomModSelectOverlay : UserModSelectOverlay
     {
-        public Bindable<PlaylistItem> SelectedItem { get; } = new Bindable<PlaylistItem>();
+        public Bindable<PlaylistItem?> SelectedItem { get; } = new Bindable<PlaylistItem?>();
 
         [Resolved]
         private RulesetStore rulesets { get; set; } = null!;
