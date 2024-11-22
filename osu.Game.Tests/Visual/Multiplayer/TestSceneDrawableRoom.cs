@@ -121,9 +121,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 };
             });
 
-            AddUntilStep("wait for panel load", () => rooms.Count == 6);
+            AddUntilStep("wait for panel load", () => rooms.Count == 7);
             AddUntilStep("correct status text", () => rooms.ChildrenOfType<OsuSpriteText>().Count(s => s.Text.ToString().StartsWith("Currently playing", StringComparison.Ordinal)) == 2);
-            AddUntilStep("correct status text", () => rooms.ChildrenOfType<OsuSpriteText>().Count(s => s.Text.ToString().StartsWith("Ready to play", StringComparison.Ordinal)) == 4);
+            AddUntilStep("correct status text", () => rooms.ChildrenOfType<OsuSpriteText>().Count(s => s.Text.ToString().StartsWith("Ready to play", StringComparison.Ordinal)) == 5);
         }
 
         [Test]
