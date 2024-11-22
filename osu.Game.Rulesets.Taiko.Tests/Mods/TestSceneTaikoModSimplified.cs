@@ -24,15 +24,15 @@ namespace osu.Game.Rulesets.Taiko.Tests.Mods
                     OneThirdConversion = { Value = true },
                 },
                 Autoplay = false,
-                Beatmap = new Beatmap
+                CreateBeatmap = () => new Beatmap
                 {
                     HitObjects = new List<HitObject>
                     {
                         new Hit { StartTime = 1000, Type = HitType.Centre },
                         new Hit { StartTime = 1500, Type = HitType.Centre },
                         new Hit { StartTime = 2000, Type = HitType.Centre },
-                        new Hit { StartTime = 2333, Type = HitType.Centre },
-                        new Hit { StartTime = 2666, Type = HitType.Rim },
+                        new Hit { StartTime = 2333, Type = HitType.Centre }, // mod moves this to 2500
+                        new Hit { StartTime = 2666, Type = HitType.Rim },    // mod removes this
                         new Hit { StartTime = 3000, Type = HitType.Centre },
                         new Hit { StartTime = 3500, Type = HitType.Centre },
                     },
@@ -64,15 +64,15 @@ namespace osu.Game.Rulesets.Taiko.Tests.Mods
                 OneSixthConversion = { Value = true }
             },
             Autoplay = false,
-            Beatmap = new Beatmap
+            CreateBeatmap = () => new Beatmap
             {
                 HitObjects = new List<HitObject>
                 {
                     new Hit { StartTime = 1000, Type = HitType.Centre },
                     new Hit { StartTime = 1250, Type = HitType.Centre },
                     new Hit { StartTime = 1500, Type = HitType.Centre },
-                    new Hit { StartTime = 1666, Type = HitType.Centre },
-                    new Hit { StartTime = 1833, Type = HitType.Rim },
+                    new Hit { StartTime = 1666, Type = HitType.Centre }, // mod moves this to 1750
+                    new Hit { StartTime = 1833, Type = HitType.Rim },    // mod removes this
                     new Hit { StartTime = 2000, Type = HitType.Centre },
                     new Hit { StartTime = 2250, Type = HitType.Centre },
                 },
@@ -103,14 +103,14 @@ namespace osu.Game.Rulesets.Taiko.Tests.Mods
                 OneEighthConversion = { Value = true }
             },
             Autoplay = false,
-            Beatmap = new Beatmap
+            CreateBeatmap = () => new Beatmap
             {
                 HitObjects = new List<HitObject>
                 {
                     new Hit { StartTime = 1000, Type = HitType.Centre },
                     new Hit { StartTime = 1250, Type = HitType.Centre },
                     new Hit { StartTime = 1500, Type = HitType.Centre },
-                    new Hit { StartTime = 1625, Type = HitType.Rim },
+                    new Hit { StartTime = 1625, Type = HitType.Rim },    // mod removes this
                     new Hit { StartTime = 1750, Type = HitType.Centre },
                     new Hit { StartTime = 2000, Type = HitType.Centre },
                 },
