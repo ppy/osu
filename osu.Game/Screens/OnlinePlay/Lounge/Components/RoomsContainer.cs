@@ -28,6 +28,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
         public IReadOnlyList<DrawableRoom> Rooms => roomFlow.FlowingChildren.Cast<DrawableRoom>().ToArray();
 
+        public Bindable<int> VisibleRoomCount = new Bindable<int>();
+
         private readonly IBindableList<Room> rooms = new BindableList<Room>();
         private readonly FillFlowContainer<DrawableLoungeRoom> roomFlow;
 
@@ -92,6 +94,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                     r.MatchingFilter = matchingFilter;
                 }
             });
+
+            VisibleRoomCount.Value = roomFlow.Count(r => r.MatchingFilter);
 
             static bool matchPermissions(DrawableLoungeRoom room, RoomPermissionsFilter accessType)
             {
