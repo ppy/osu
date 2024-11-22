@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -31,7 +29,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         protected readonly BindableList<MultiplayerRoomUser> MultiplayerUsers = new BindableList<MultiplayerRoomUser>();
 
-        protected MultiplayerGameplayLeaderboard Leaderboard { get; private set; }
+        protected MultiplayerGameplayLeaderboard? Leaderboard { get; private set; }
 
         protected virtual MultiplayerRoomUser CreateUser(int userId) => new MultiplayerRoomUser(userId);
 
@@ -40,7 +38,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private readonly BindableList<int> multiplayerUserIds = new BindableList<int>();
         private readonly BindableDictionary<int, SpectatorState> watchedUserStates = new BindableDictionary<int, SpectatorState>();
 
-        private OsuConfigManager config;
+        private OsuConfigManager config = null!;
 
         private readonly Mock<SpectatorClient> spectatorClient = new Mock<SpectatorClient>();
         private readonly Mock<MultiplayerClient> multiplayerClient = new Mock<MultiplayerClient>();
@@ -133,7 +131,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 LoadComponentAsync(Leaderboard = CreateLeaderboard(), Add);
             });
 
-            AddUntilStep("wait for load", () => Leaderboard.IsLoaded);
+            AddUntilStep("wait for load", () => Leaderboard!.IsLoaded);
 
             AddStep("check watch requests were sent", () =>
             {
@@ -146,7 +144,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public void TestScoreUpdates()
         {
             AddRepeatStep("update state", UpdateUserStatesRandomly, 100);
-            AddToggleStep("switch compact mode", expanded => Leaderboard.Expanded.Value = expanded);
+            AddToggleStep("switch compact mode", expanded => Leaderboard!.Expanded.Value = expanded);
         }
 
         [Test]
