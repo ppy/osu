@@ -120,10 +120,9 @@ namespace osu.Game.Overlays.Chat.ChannelList
 
         public void RemoveChannel(Channel channel)
         {
-            if (!channelMap.ContainsKey(channel))
+            if (!channelMap.TryGetValue(channel, out var item))
                 return;
 
-            ChannelListItem item = channelMap[channel];
             FillFlowContainer<ChannelListItem> flow = getFlowForChannel(channel);
 
             channelMap.Remove(channel);
@@ -134,10 +133,10 @@ namespace osu.Game.Overlays.Chat.ChannelList
 
         public ChannelListItem GetItem(Channel channel)
         {
-            if (!channelMap.ContainsKey(channel))
+            if (!channelMap.TryGetValue(channel, out var item))
                 throw new ArgumentOutOfRangeException();
 
-            return channelMap[channel];
+            return item;
         }
 
         public void ScrollChannelIntoView(Channel channel) => scroll.ScrollIntoView(GetItem(channel));
