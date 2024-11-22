@@ -2,24 +2,33 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Screens.Play;
 
 namespace osu.Game.Rulesets.Scoring
 {
     public abstract partial class HealthProcessor : JudgementProcessor
     {
         /// <summary>
-        /// Invoked when the <see cref="ScoreProcessor"/> is in a failed state.
+        /// Invoked when the <see cref="HealthProcessor"/> is in a failed state.
         /// Return true if the fail was permitted.
         /// </summary>
         public event Func<bool>? Failed;
 
         /// <summary>
-        /// Additional conditions on top of <see cref="CheckDefaultFailCondition"/> that cause a failing state.
+        /// The current selected mods.
         /// </summary>
-        public event Func<HealthProcessor, JudgementResult, bool>? FailConditions;
+        public readonly Bindable<IReadOnlyList<Mod>> Mods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
+
+        /// <summary>
+        /// Mods which can override fail ordered in the correct order for checks.
+        /// </summary>
+        public IApplicableFailOverride[] OrderedFailOverrideMods { get; private set; } = Array.Empty<IApplicableFailOverride>();
 
         /// <summary>
         /// The current health.
@@ -27,20 +36,40 @@ namespace osu.Game.Rulesets.Scoring
         public readonly BindableDouble Health = new BindableDouble(1) { MinValue = 0, MaxValue = 1 };
 
         /// <summary>
-        /// Whether this ScoreProcessor has already triggered the failed state.
+        /// Whether this <see cref="HealthProcessor"/> has already triggered the failed state.
         /// </summary>
         public bool HasFailed { get; private set; }
 
         /// <summary>
+        /// If this <see cref="HealthProcessor"/> is in a failed state due to a mod, this returns the instance of that mod.
+        /// </summary>
+        /// <remarks>
+        /// Used in <see cref="Player"/> to determine whether to perform a restart on failure, if the triggering mod is configured as such.
+        /// </remarks>
+        public Mod? ModTriggeringFailure { get; private set; }
+
+        /// <summary>
         /// Immediately triggers a failure for this HealthProcessor.
         /// </summary>
-        public void TriggerFailure()
+        /// <param name="triggeringMod">An optional mod that triggered failure.</param>
+        public void TriggerFailure(Mod? triggeringMod = null)
         {
             if (HasFailed)
                 return;
 
             if (Failed?.Invoke() != false)
                 HasFailed = true;
+
+            if (triggeringMod != null)
+                ModTriggeringFailure = triggeringMod;
+        }
+
+        protected HealthProcessor()
+        {
+            Mods.BindValueChanged(mods =>
+            {
+                OrderedFailOverrideMods = mods.NewValue.OfType<IApplicableFailOverride>().OrderByDescending(m => m.RestartOnFail).ToArray();
+            });
         }
 
         protected override void ApplyResultInternal(JudgementResult result)
@@ -86,13 +115,12 @@ namespace osu.Game.Rulesets.Scoring
             if (CheckDefaultFailCondition(result))
                 return true;
 
-            if (FailConditions != null)
+            foreach (var condition in OrderedFailOverrideMods)
             {
-                foreach (var condition in FailConditions.GetInvocationList())
+                if (condition.CheckFail(result) == FailState.Force)
                 {
-                    bool conditionResult = (bool)condition.Method.Invoke(condition.Target, new object[] { this, result })!;
-                    if (conditionResult)
-                        return true;
+                    ModTriggeringFailure = condition as Mod;
+                    return true;
                 }
             }
 

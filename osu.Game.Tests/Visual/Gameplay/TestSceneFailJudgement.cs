@@ -3,7 +3,9 @@
 
 using System;
 using System.Linq;
+using osu.Framework.Localisation;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
@@ -47,7 +49,19 @@ namespace osu.Game.Tests.Visual.Gameplay
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                HealthProcessor.FailConditions += (_, _) => true;
+                HealthProcessor.Mods.Value = new[] { new ModFailOnFirstJudgement() };
+            }
+
+            // this test ensures that the game fails at exactly the first judgement, ModSuddenDeath does not ensure that as it doesn't take into account IgnoreMiss judgements.
+            // to make the test work as desired, create a custom mod that fails on any applied judgement.
+            private class ModFailOnFirstJudgement : ModFailCondition
+            {
+                public override string Name => "";
+                public override LocalisableString Description => "";
+                public override double ScoreMultiplier => 1.0;
+                public override string Acronym => "";
+
+                public override FailState CheckFail(JudgementResult? result) => FailState.Force;
             }
         }
     }
