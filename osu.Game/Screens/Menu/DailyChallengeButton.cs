@@ -156,15 +156,15 @@ namespace osu.Game.Screens.Menu
                     Room = room;
                     cover.OnlineInfo = TooltipContent = room.Playlist.FirstOrDefault()?.Beatmap.BeatmapSet as APIBeatmapSet;
 
-                    if (room.StartDate.Value != null && room.RoomID.Value != lastDailyChallengeRoomID)
+                    if (room.StartDate != null && room.RoomID != lastDailyChallengeRoomID)
                     {
-                        lastDailyChallengeRoomID = room.RoomID.Value;
+                        lastDailyChallengeRoomID = room.RoomID;
 
                         // new challenge is live, reset intro played static.
                         statics.SetValue(Static.DailyChallengeIntroPlayed, false);
 
                         // we only want to notify the user if the new challenge just went live.
-                        if (Math.Abs((DateTimeOffset.Now - room.StartDate.Value!.Value).TotalSeconds) < 1800)
+                        if (Math.Abs((DateTimeOffset.Now - room.StartDate.Value).TotalSeconds) < 1800)
                             notificationOverlay?.Post(new NewDailyChallengeNotification(room));
                     }
 
@@ -180,7 +180,7 @@ namespace osu.Game.Screens.Menu
             if (Room == null)
                 return;
 
-            var remaining = (Room.EndDate.Value - DateTimeOffset.Now) ?? TimeSpan.Zero;
+            var remaining = (Room.EndDate - DateTimeOffset.Now) ?? TimeSpan.Zero;
 
             if (remaining <= TimeSpan.Zero)
             {

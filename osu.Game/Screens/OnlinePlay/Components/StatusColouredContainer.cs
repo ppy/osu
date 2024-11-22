@@ -1,39 +1,52 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
+using System.ComponentModel;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Online.Rooms;
+using Container = osu.Framework.Graphics.Containers.Container;
 
 namespace osu.Game.Screens.OnlinePlay.Components
 {
     public partial class StatusColouredContainer : Container
     {
+        [Resolved]
+        private OsuColour colours { get; set; } = null!;
+
         private readonly double transitionDuration;
+        private readonly Room room;
 
-        [Resolved(typeof(Room), nameof(Room.Status))]
-        private Bindable<RoomStatus> status { get; set; }
-
-        [Resolved(typeof(Room), nameof(Room.Category))]
-        private Bindable<RoomCategory> category { get; set; }
-
-        public StatusColouredContainer(double transitionDuration = 100)
+        public StatusColouredContainer(Room room, double transitionDuration = 100)
         {
+            this.room = room;
             this.transitionDuration = transitionDuration;
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        protected override void LoadComplete()
         {
-            status.BindValueChanged(s =>
-            {
-                this.FadeColour(colours.ForRoomCategory(category.Value) ?? s.NewValue.GetAppropriateColour(colours), transitionDuration);
-            }, true);
+            base.LoadComplete();
+
+            room.PropertyChanged += onRoomPropertyChanged;
+            updateRoomStatus();
+        }
+
+        private void onRoomPropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(Room.Status))
+                updateRoomStatus();
+        }
+
+        private void updateRoomStatus()
+        {
+            this.FadeColour(colours.ForRoomCategory(room.Category) ?? room.Status.GetAppropriateColour(colours), transitionDuration);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            room.PropertyChanged -= onRoomPropertyChanged;
         }
     }
 }
