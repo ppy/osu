@@ -95,14 +95,15 @@ namespace osu.Game.Rulesets.Taiko.Mods
                             }
                             else
                             {
-                                // 1/6 and 1/3: Adjust the second note and remove the third
+                                // 1/6 and 1/3: Remove the second note and adjust the third
                                 if (currentHitPosition % 3 == 1)
                                 {
-                                    hits[j].StartTime = hits[j - 1].StartTime + (controlPointInfo.TimingPointAt(hits[j].StartTime).BeatLength / Convert.ToDouble(snapConversion.Value));
-                                }
-                                else if (currentHitPosition % 3 == 2)
-                                {
                                     toRemove.Add(hits[j]);
+                                }
+                                else if (currentHitPosition % 3 == 2 && j < hits.Count - 1)
+                                {
+                                    double offset = controlPointInfo.TimingPointAt(hits[j].StartTime).BeatLength / Convert.ToDouble(snapConversion.Value);
+                                    hits[j].StartTime = hits[j + 1].StartTime - offset;
                                 }
                             }
                         }
