@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using System;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Primitives;
 using osu.Game.Rulesets.Mania.Beatmaps;
@@ -71,7 +72,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
             for (int i = 0; i < stageDefinitions.Count; i++)
             {
-                var newStage = new Stage(firstColumnIndex, stageDefinitions[i], ref columnAction);
+                var newStage = CreateStage(firstColumnIndex, stageDefinitions[i], ref columnAction);
 
                 playfieldGrid.Content[0][i] = newStage;
 
@@ -81,6 +82,9 @@ namespace osu.Game.Rulesets.Mania.UI
                 firstColumnIndex += newStage.Columns.Length;
             }
         }
+
+        [Pure]
+        protected virtual Stage CreateStage(int firstColumnIndex, StageDefinition stageDefinition, ref ManiaAction columnAction) => new Stage(firstColumnIndex, stageDefinition, ref columnAction);
 
         public override void Add(HitObject hitObject) => getStageByColumn(((ManiaHitObject)hitObject).Column).Add(hitObject);
 

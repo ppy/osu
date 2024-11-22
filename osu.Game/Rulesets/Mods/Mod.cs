@@ -266,8 +266,7 @@ namespace osu.Game.Rulesets.Mods
 
                 // TODO: special case for handling number types
 
-                PropertyInfo property = targetSetting.GetType().GetProperty(nameof(Bindable<bool>.Value))!;
-                property.SetValue(targetSetting, property.GetValue(sourceSetting));
+                BindableValueAccessor.SetValue(targetSetting, BindableValueAccessor.GetValue(sourceSetting));
             }
         }
 

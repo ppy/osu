@@ -25,6 +25,8 @@ namespace osu.Desktop.Updater
         [Resolved]
         private ILocalUserPlayInfo? localUserInfo { get; set; }
 
+        private bool isInGameplay => localUserInfo?.PlayingState.Value != LocalUserPlayingState.NotPlaying;
+
         private UpdateInfo? pendingUpdate;
 
         public VelopackUpdateManager()
@@ -43,7 +45,7 @@ namespace osu.Desktop.Updater
 
         protected override async Task<bool> PerformUpdateCheck() => await checkForUpdateAsync().ConfigureAwait(false);
 
-        private async Task<bool> checkForUpdateAsync(UpdateProgressNotification? notification = null)
+        private async Task<bool> checkForUpdateAsync()
         {
             // whether to check again in 30 minutes. generally only if there's an error or no update was found (yet).
             bool scheduleRecheck = false;
@@ -51,10 +53,10 @@ namespace osu.Desktop.Updater
             try
             {
                 // Avoid any kind of update checking while gameplay is running.
-                if (localUserInfo?.IsPlaying.Value == true)
+                if (isInGameplay)
                 {
                     scheduleRecheck = true;
-                    return false;
+                    return true;
                 }
 
                 // TODO: we should probably be checking if there's a more recent update, rather than shortcutting here.
@@ -66,7 +68,7 @@ namespace osu.Desktop.Updater
                     {
                         Activated = () =>
                         {
-                            restartToApplyUpdate();
+                            Task.Run(restartToApplyUpdate);
                             return true;
                         }
                     });
@@ -84,23 +86,22 @@ namespace osu.Desktop.Updater
                 }
 
                 // An update is found, let's notify the user and start downloading it.
-                if (notification == null)
+                UpdateProgressNotification notification = new UpdateProgressNotification
                 {
-                    notification = new UpdateProgressNotification
+                    CompletionClickAction = () =>
                     {
-                        CompletionClickAction = restartToApplyUpdate,
-                    };
+                        Task.Run(restartToApplyUpdate);
+                        return true;
+                    },
+                };
 
-                    Schedule(() => notificationOverlay.Post(notification));
-                }
-
+                runOutsideOfGameplay(() => notificationOverlay.Post(notification));
                 notification.StartDownload();
 
                 try
                 {
                     await updateManager.DownloadUpdatesAsync(pendingUpdate, p => notification.Progress = p / 100f).ConfigureAwait(false);
-
-                    notification.State = ProgressNotificationState.Completed;
+                    runOutsideOfGameplay(() => notification.State = ProgressNotificationState.Completed);
                 }
                 catch (Exception e)
                 {
@@ -127,13 +128,21 @@ namespace osu.Desktop.Updater
             return true;
         }
 
-        private bool restartToApplyUpdate()
+        private void runOutsideOfGameplay(Action action)
         {
-            // TODO: Migrate this to async flow whenever available (see https://github.com/ppy/osu/pull/28743#discussion_r1740505665).
-            // Currently there's an internal Thread.Sleep(300) which will cause a stutter when the user clicks to restart.
-            updateManager.WaitExitThenApplyUpdates(pendingUpdate?.TargetFullRelease);
+            if (isInGameplay)
+            {
+                Scheduler.AddDelayed(() => runOutsideOfGameplay(action), 1000);
+                return;
+            }
+
+            action();
+        }
+
+        private async Task restartToApplyUpdate()
+        {
+            await updateManager.WaitExitThenApplyUpdatesAsync(pendingUpdate?.TargetFullRelease).ConfigureAwait(false);
             Schedule(() => game.AttemptExit());
-            return true;
         }
     }
 }

@@ -7,15 +7,16 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Overlays;
 using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Edit.Setup
 {
-    internal partial class ResourcesSection : SetupSection
+    public partial class ResourcesSection : SetupSection
     {
-        private LabelledFileChooser audioTrackChooser = null!;
-        private LabelledFileChooser backgroundChooser = null!;
+        private FormFileSelector audioTrackChooser = null!;
+        private FormFileSelector backgroundChooser = null!;
 
         public override LocalisableString Title => EditorSetupStrings.ResourcesHeader;
 
@@ -34,27 +35,32 @@ namespace osu.Game.Screens.Edit.Setup
         [Resolved]
         private Editor? editor { get; set; }
 
-        [Resolved]
-        private SetupScreenHeader header { get; set; } = null!;
+        private SetupScreenHeaderBackground headerBackground = null!;
 
         [BackgroundDependencyLoader]
         private void load()
         {
+            headerBackground = new SetupScreenHeaderBackground
+            {
+                RelativeSizeAxes = Axes.X,
+                Height = 110,
+            };
+
             Children = new Drawable[]
             {
-                backgroundChooser = new LabelledFileChooser(".jpg", ".jpeg", ".png")
+                backgroundChooser = new FormFileSelector(".jpg", ".jpeg", ".png")
                 {
-                    Label = GameplaySettingsStrings.BackgroundHeader,
-                    FixedLabelWidth = LABEL_WIDTH,
-                    TabbableContentContainer = this
+                    Caption = GameplaySettingsStrings.BackgroundHeader,
+                    PlaceholderText = EditorSetupStrings.ClickToSelectBackground,
                 },
-                audioTrackChooser = new LabelledFileChooser(".mp3", ".ogg")
+                audioTrackChooser = new FormFileSelector(".mp3", ".ogg")
                 {
-                    Label = EditorSetupStrings.AudioTrack,
-                    FixedLabelWidth = LABEL_WIDTH,
-                    TabbableContentContainer = this
+                    Caption = EditorSetupStrings.AudioTrack,
+                    PlaceholderText = EditorSetupStrings.ClickToSelectTrack,
                 },
             };
+
+            backgroundChooser.PreviewContainer.Add(headerBackground);
 
             if (!string.IsNullOrEmpty(working.Value.Metadata.BackgroundFile))
                 backgroundChooser.Current.Value = new FileInfo(working.Value.Metadata.BackgroundFile);
@@ -64,8 +70,6 @@ namespace osu.Game.Screens.Edit.Setup
 
             backgroundChooser.Current.BindValueChanged(backgroundChanged);
             audioTrackChooser.Current.BindValueChanged(audioTrackChanged);
-
-            updatePlaceholderText();
         }
 
         public bool ChangeBackgroundImage(FileInfo source)
@@ -92,7 +96,7 @@ namespace osu.Game.Screens.Edit.Setup
             editorBeatmap.SaveState();
 
             working.Value.Metadata.BackgroundFile = destination.Name;
-            header.Background.UpdateBackground();
+            headerBackground.UpdateBackground();
 
             editor?.ApplyToBackground(bg => bg.RefreshBackground());
 
@@ -132,22 +136,12 @@ namespace osu.Game.Screens.Edit.Setup
         {
             if (file.NewValue == null || !ChangeBackgroundImage(file.NewValue))
                 backgroundChooser.Current.Value = file.OldValue;
-
-            updatePlaceholderText();
         }
 
         private void audioTrackChanged(ValueChangedEvent<FileInfo?> file)
         {
             if (file.NewValue == null || !ChangeAudioTrack(file.NewValue))
                 audioTrackChooser.Current.Value = file.OldValue;
-
-            updatePlaceholderText();
-        }
-
-        private void updatePlaceholderText()
-        {
-            audioTrackChooser.Text = audioTrackChooser.Current.Value?.Name ?? EditorSetupStrings.ClickToSelectTrack;
-            backgroundChooser.Text = backgroundChooser.Current.Value?.Name ?? EditorSetupStrings.ClickToSelectBackground;
         }
     }
 }

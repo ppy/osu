@@ -298,7 +298,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                 {
                     foreach (var badge in badges)
                     {
-                        if (badge.Accuracy > score.Accuracy)
+                        if (badge.Rank > score.Rank)
                             continue;
 
                         using (BeginDelayedSequence(

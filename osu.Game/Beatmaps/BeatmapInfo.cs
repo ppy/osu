@@ -60,7 +60,7 @@ namespace osu.Game.Beatmaps
         }
 
         [UsedImplicitly]
-        private BeatmapInfo()
+        protected BeatmapInfo()
         {
         }
 

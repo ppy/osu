@@ -183,7 +183,17 @@ namespace osu.Game.Beatmaps.Formats
             if (scrollSpeedEncodedAsSliderVelocity)
             {
                 foreach (var point in legacyControlPoints.EffectPoints)
-                    legacyControlPoints.Add(point.Time, new DifficultyControlPoint { SliderVelocity = point.ScrollSpeed });
+                {
+                    legacyControlPoints.Add(point.Time, new DifficultyControlPoint
+                    {
+                        SliderVelocityBindable =
+                        {
+                            MinValue = point.ScrollSpeedBindable.MinValue,
+                            MaxValue = point.ScrollSpeedBindable.MaxValue,
+                            Value = point.ScrollSpeedBindable.Value,
+                        }
+                    });
+                }
             }
 
             LegacyControlPointProperties lastControlPointProperties = new LegacyControlPointProperties();
@@ -539,7 +549,7 @@ namespace osu.Game.Beatmaps.Formats
         private string getSampleBank(IList<HitSampleInfo> samples, bool banksOnly = false)
         {
             LegacySampleBank normalBank = toLegacySampleBank(samples.SingleOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL)?.Bank);
-            LegacySampleBank addBank = toLegacySampleBank(samples.FirstOrDefault(s => !string.IsNullOrEmpty(s.Name) && s.Name != HitSampleInfo.HIT_NORMAL)?.Bank);
+            LegacySampleBank addBank = toLegacySampleBank(samples.FirstOrDefault(s => !string.IsNullOrEmpty(s.Name) && s.Name != HitSampleInfo.HIT_NORMAL && !s.EditorAutoBank)?.Bank);
 
             StringBuilder sb = new StringBuilder();
 

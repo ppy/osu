@@ -107,7 +107,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             if (segment.Count == 0)
                 return;
 
-            var first = segment[0];
+            PathControlPoint first = segment[0];
 
             if (first.Type != PathType.PERFECT_CURVE)
                 return;
@@ -178,7 +178,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
         private bool isSplittable(PathControlPointPiece<T> p) =>
             // A hit object can only be split on control points which connect two different path segments.
-            p.ControlPoint.Type.HasValue && p != Pieces.FirstOrDefault() && p != Pieces.LastOrDefault();
+            p.ControlPoint.Type.HasValue && p.ControlPoint != controlPoints.FirstOrDefault() && p.ControlPoint != controlPoints.LastOrDefault();
 
         private void onControlPointsChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
@@ -273,10 +273,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                     if (selectedPieces.Length != 1)
                         return false;
 
-                    var selectedPiece = selectedPieces.Single();
-                    var selectedPoint = selectedPiece.ControlPoint;
+                    PathControlPointPiece<T> selectedPiece = selectedPieces.Single();
+                    PathControlPoint selectedPoint = selectedPiece.ControlPoint;
 
-                    var validTypes = path_types;
+                    PathType?[] validTypes = path_types;
 
                     if (selectedPoint == controlPoints[0])
                         validTypes = validTypes.Where(t => t != null).ToArray();
@@ -313,7 +313,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                     if (Pieces.All(p => !p.IsSelected.Value))
                         return false;
 
-                    var type = path_types[e.Key - Key.Number1];
+                    PathType? type = path_types[e.Key - Key.Number1];
 
                     // The first control point can never be inherit type
                     if (Pieces[0].IsSelected.Value && type == null)
@@ -333,6 +333,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             base.Dispose(isDisposing);
             foreach (var p in Pieces)
                 p.ControlPoint.Changed -= controlPointChanged;
+
+            if (draggedControlPointIndex >= 0)
+                DragEnded();
         }
 
         private void selectionRequested(PathControlPointPiece<T> piece, MouseButtonEvent e)
@@ -353,9 +356,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         {
             changeHandler?.BeginChange();
 
+            double originalDistance = hitObject.Path.Distance;
+
             foreach (var p in Pieces.Where(p => p.IsSelected.Value))
             {
-                var pointsInSegment = hitObject.Path.PointsInSegment(p.ControlPoint);
+                List<PathControlPoint> pointsInSegment = hitObject.Path.PointsInSegment(p.ControlPoint);
                 int indexInSegment = pointsInSegment.IndexOf(p.ControlPoint);
 
                 if (type?.Type == SplineType.PerfectCurve)
@@ -375,6 +380,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
             EnsureValidPathTypes();
 
+            if (hitObject.Path.Distance < originalDistance)
+                hitObject.SnapTo(distanceSnapProvider);
+            else
+                hitObject.Path.ExpectedDistance.Value = originalDistance;
+
             changeHandler?.EndChange();
         }
 
@@ -385,7 +395,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
         private Vector2[] dragStartPositions;
         private PathType?[] dragPathTypes;
-        private int draggedControlPointIndex;
+        private int draggedControlPointIndex = -1;
         private HashSet<PathControlPoint> selectedControlPoints;
 
         private List<MenuItem> curveTypeItems;
@@ -405,14 +415,14 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         public void DragInProgress(DragEvent e)
         {
             Vector2[] oldControlPoints = hitObject.Path.ControlPoints.Select(cp => cp.Position).ToArray();
-            var oldPosition = hitObject.Position;
+            Vector2 oldPosition = hitObject.Position;
             double oldStartTime = hitObject.StartTime;
 
             if (selectedControlPoints.Contains(hitObject.Path.ControlPoints[0]))
             {
                 // Special handling for selections containing head control point - the position of the hit object changes which means the snapped position and time have to be taken into account
                 Vector2 newHeadPosition = Parent!.ToScreenSpace(e.MousePosition + (dragStartPositions[0] - dragStartPositions[draggedControlPointIndex]));
-                var result = positionSnapProvider?.FindSnappedPositionAndTime(newHeadPosition);
+                SnapResult result = positionSnapProvider?.FindSnappedPositionAndTime(newHeadPosition);
 
                 Vector2 movementDelta = Parent!.ToLocalSpace(result?.ScreenSpacePosition ?? newHeadPosition) - hitObject.Position;
 
@@ -421,7 +431,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
                 for (int i = 1; i < hitObject.Path.ControlPoints.Count; i++)
                 {
-                    var controlPoint = hitObject.Path.ControlPoints[i];
+                    PathControlPoint controlPoint = hitObject.Path.ControlPoints[i];
                     // Since control points are relative to the position of the hit object, all points that are _not_ selected
                     // need to be offset _back_ by the delta corresponding to the movement of the head point.
                     // All other selected control points (if any) will move together with the head point
@@ -432,13 +442,13 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             }
             else
             {
-                var result = positionSnapProvider?.FindSnappedPositionAndTime(Parent!.ToScreenSpace(e.MousePosition), SnapType.GlobalGrids);
+                SnapResult result = positionSnapProvider?.FindSnappedPositionAndTime(Parent!.ToScreenSpace(e.MousePosition), SnapType.GlobalGrids);
 
                 Vector2 movementDelta = Parent!.ToLocalSpace(result?.ScreenSpacePosition ?? Parent!.ToScreenSpace(e.MousePosition)) - dragStartPositions[draggedControlPointIndex] - hitObject.Position;
 
                 for (int i = 0; i < controlPoints.Count; ++i)
                 {
-                    var controlPoint = controlPoints[i];
+                    PathControlPoint controlPoint = controlPoints[i];
                     if (selectedControlPoints.Contains(controlPoint))
                         controlPoint.Position = dragStartPositions[i] + movementDelta;
                 }
@@ -466,7 +476,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             EnsureValidPathTypes();
         }
 
-        public void DragEnded() => changeHandler?.EndChange();
+        public void DragEnded()
+        {
+            changeHandler?.EndChange();
+            draggedControlPointIndex = -1;
+        }
 
         #endregion
 
@@ -488,8 +502,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
                 curveTypeItems = new List<MenuItem>();
 
-                foreach (PathType? type in path_types)
+                for (int i = 0; i < path_types.Length; ++i)
                 {
+                    PathType? type = path_types[i];
+
                     // special inherit case
                     if (type == null)
                     {
@@ -499,7 +515,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                         curveTypeItems.Add(new OsuMenuItemSpacer());
                     }
 
-                    curveTypeItems.Add(createMenuItemForPathType(type));
+                    curveTypeItems.Add(createMenuItemForPathType(type, InputKey.Number1 + i));
                 }
 
                 if (selectedPieces.Any(piece => piece.ControlPoint.Type?.Type == SplineType.Catmull))
@@ -533,7 +549,15 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
                 return menuItems.ToArray();
 
-                CurveTypeMenuItem createMenuItemForPathType(PathType? type) => new CurveTypeMenuItem(type, _ => updatePathTypeOfSelectedPieces(type));
+                CurveTypeMenuItem createMenuItemForPathType(PathType? type, InputKey? key = null)
+                {
+                    Hotkey hotkey = default;
+
+                    if (key != null)
+                        hotkey = new Hotkey(new KeyCombination(InputKey.Alt, key.Value));
+
+                    return new CurveTypeMenuItem(type, _ => updatePathTypeOfSelectedPieces(type)) { Hotkey = hotkey };
+                }
             }
         }
 

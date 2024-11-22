@@ -10,7 +10,7 @@ using osu.Game.Rulesets.Edit.Tools;
 
 namespace osu.Game.Rulesets.Catch.Edit
 {
-    public class FruitCompositionTool : HitObjectCompositionTool
+    public class FruitCompositionTool : CompositionTool
     {
         public FruitCompositionTool()
             : base(nameof(Fruit))
@@ -19,6 +19,6 @@ namespace osu.Game.Rulesets.Catch.Edit
 
         public override Drawable CreateIcon() => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Circles);
 
-        public override PlacementBlueprint CreatePlacementBlueprint() => new FruitPlacementBlueprint();
+        public override HitObjectPlacementBlueprint CreatePlacementBlueprint() => new FruitPlacementBlueprint();
     }
 }

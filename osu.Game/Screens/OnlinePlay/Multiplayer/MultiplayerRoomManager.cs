@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Diagnostics;
 using osu.Framework.Allocation;
@@ -18,12 +16,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
     public partial class MultiplayerRoomManager : RoomManager
     {
         [Resolved]
-        private MultiplayerClient multiplayerClient { get; set; }
+        private MultiplayerClient multiplayerClient { get; set; } = null!;
 
-        public override void CreateRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null)
-            => base.CreateRoom(room, r => joinMultiplayerRoom(r, r.Password.Value, onSuccess, onError), onError);
+        public override void CreateRoom(Room room, Action<Room>? onSuccess = null, Action<string>? onError = null)
+            => base.CreateRoom(room, r => joinMultiplayerRoom(r, r.Password, onSuccess, onError), onError);
 
-        public override void JoinRoom(Room room, string password = null, Action<Room> onSuccess = null, Action<string> onError = null)
+        public override void JoinRoom(Room room, string? password = null, Action<Room>? onSuccess = null, Action<string>? onError = null)
         {
             if (!multiplayerClient.IsConnected.Value)
             {
@@ -33,7 +31,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             // this is done here as a pre-check to avoid clicking on already closed rooms in the lounge from triggering a server join.
             // should probably be done at a higher level, but due to the current structure of things this is the easiest place for now.
-            if (room.Status.Value is RoomStatusEnded)
+            if (room.Status is RoomStatusEnded)
             {
                 onError?.Invoke("Cannot join an ended room.");
                 return;
@@ -51,9 +49,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             multiplayerClient.LeaveRoom();
         }
 
-        private void joinMultiplayerRoom(Room room, string password, Action<Room> onSuccess = null, Action<string> onError = null)
+        private void joinMultiplayerRoom(Room room, string? password, Action<Room>? onSuccess = null, Action<string>? onError = null)
         {
-            Debug.Assert(room.RoomID.Value != null);
+            Debug.Assert(room.RoomID != null);
 
             multiplayerClient.JoinRoom(room, password).ContinueWith(t =>
             {

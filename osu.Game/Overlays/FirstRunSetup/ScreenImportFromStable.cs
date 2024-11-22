@@ -314,6 +314,7 @@ namespace osu.Game.Overlays.FirstRunSetup
             private partial class DirectoryChooserPopover : OsuPopover
             {
                 public DirectoryChooserPopover(Bindable<DirectoryInfo?> currentDirectory)
+                    : base(false)
                 {
                     Child = new Container
                     {
@@ -324,6 +325,13 @@ namespace osu.Game.Overlays.FirstRunSetup
                             CurrentPath = { BindTarget = currentDirectory }
                         },
                     };
+                }
+
+                [BackgroundDependencyLoader]
+                private void load(OverlayColourProvider colourProvider)
+                {
+                    Body.BorderColour = colourProvider.Highlight1;
+                    Body.BorderThickness = 2;
                 }
             }
         }

@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Overlays;
@@ -24,6 +25,8 @@ namespace osu.Game.Graphics.UserInterface
         private readonly Container nubContainer;
 
         private readonly HoverClickSounds hoverClickSounds;
+
+        private readonly Container mainContent;
 
         private Color4 accentColour;
 
@@ -62,7 +65,7 @@ namespace osu.Game.Graphics.UserInterface
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
                     Padding = new MarginPadding { Horizontal = 2 },
-                    Child = new CircularContainer
+                    Child = mainContent = new CircularContainer
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
@@ -133,6 +136,26 @@ namespace osu.Game.Graphics.UserInterface
                 Alpha = disabled ? 0.3f : 1;
                 hoverClickSounds.Enabled.Value = !disabled;
             }, true);
+        }
+
+        protected override void OnFocus(FocusEvent e)
+        {
+            base.OnFocus(e);
+
+            mainContent.EdgeEffect = new EdgeEffectParameters
+            {
+                Type = EdgeEffectType.Glow,
+                Colour = AccentColour.Darken(1),
+                Hollow = true,
+                Radius = 2,
+            };
+        }
+
+        protected override void OnFocusLost(FocusLostEvent e)
+        {
+            base.OnFocusLost(e);
+
+            mainContent.EdgeEffect = default;
         }
 
         protected override bool OnHover(HoverEvent e)

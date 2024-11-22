@@ -114,7 +114,7 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
 
         protected override DrawableHitObject CreateHitObject(HitObject hitObject) => new DrawableJuiceStream((JuiceStream)hitObject);
 
-        protected override PlacementBlueprint CreateBlueprint() => new JuiceStreamPlacementBlueprint();
+        protected override HitObjectPlacementBlueprint CreateBlueprint() => new JuiceStreamPlacementBlueprint();
 
         private void addMoveAndClickSteps(double time, float position, bool end = false)
         {

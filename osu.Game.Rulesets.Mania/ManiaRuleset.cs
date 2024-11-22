@@ -419,9 +419,12 @@ namespace osu.Game.Rulesets.Mania
             return new ManiaFilterCriteria();
         }
 
-        public override IEnumerable<SetupSection> CreateEditorSetupSections() =>
+        public override IEnumerable<Drawable> CreateEditorSetupSections() =>
         [
+            new MetadataSection(),
             new ManiaDifficultySection(),
+            new ResourcesSection(),
+            new DesignSection(),
         ];
 
         public int GetKeyCount(IBeatmapInfo beatmapInfo, IReadOnlyList<Mod>? mods = null)

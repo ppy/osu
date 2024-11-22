@@ -145,6 +145,28 @@ namespace osu.Game.Tests.Visual.Navigation
         }
 
         [Test]
+        public void TestEnterGameplayWhileFilteringToNoSelection()
+        {
+            TestPlaySongSelect songSelect = null;
+
+            PushAndConfirm(() => songSelect = new TestPlaySongSelect());
+            AddUntilStep("wait for song select", () => songSelect.BeatmapSetsLoaded);
+            AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).WaitSafely());
+            AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
+
+            AddStep("force selection", () =>
+            {
+                songSelect.FinaliseSelection();
+                songSelect.FilterControl.CurrentTextSearch.Value = "test";
+            });
+
+            AddUntilStep("wait for player", () => !songSelect.IsCurrentScreen());
+            AddStep("return to song select", () => songSelect.MakeCurrent());
+
+            AddUntilStep("wait for selection lost", () => songSelect.Beatmap.IsDefault);
+        }
+
+        [Test]
         public void TestSongSelectBackActionHandling()
         {
             TestPlaySongSelect songSelect = null;

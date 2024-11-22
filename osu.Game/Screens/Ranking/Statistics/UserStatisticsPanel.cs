@@ -37,7 +37,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                 {
                     if (update.NewValue?.Score.MatchesOnlineID(achievedScore) == true)
                         DisplayedUserStatisticsUpdate.Value = update.NewValue;
-                });
+                }, true);
             }
         }
 

@@ -31,6 +31,9 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         public override Quad ScreenSpaceDrawQuad => MainPiece.Drawable.ScreenSpaceDrawQuad;
 
+        // done strictly for editor purposes.
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => MainPiece.Drawable.ReceivePositionalInputAt(screenSpacePos);
+
         /// <summary>
         /// Rolling number of tick hits. This increases for hits and decreases for misses.
         /// </summary>
@@ -78,6 +81,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         {
             base.RecreatePieces();
             updateColour();
+            Height = HitObject.IsStrong ? TaikoStrongableHitObject.DEFAULT_STRONG_SIZE : TaikoHitObject.DEFAULT_SIZE;
         }
 
         protected override void OnFree()

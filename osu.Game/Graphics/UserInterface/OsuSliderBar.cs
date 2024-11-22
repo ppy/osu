@@ -46,7 +46,7 @@ namespace osu.Game.Graphics.UserInterface
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            CurrentNumber.BindValueChanged(current => TooltipText = getTooltipText(current.NewValue), true);
+            CurrentNumber.BindValueChanged(current => TooltipText = GetDisplayableValue(current.NewValue), true);
         }
 
         protected override void OnUserChange(T value)
@@ -55,7 +55,7 @@ namespace osu.Game.Graphics.UserInterface
 
             playSample(value);
 
-            TooltipText = getTooltipText(value);
+            TooltipText = GetDisplayableValue(value);
         }
 
         private void playSample(T value)
@@ -83,7 +83,7 @@ namespace osu.Game.Graphics.UserInterface
             channel.Play();
         }
 
-        private LocalisableString getTooltipText(T value)
+        public LocalisableString GetDisplayableValue(T value)
         {
             if (CurrentNumber.IsInteger)
                 return int.CreateTruncating(value).ToString("N0");

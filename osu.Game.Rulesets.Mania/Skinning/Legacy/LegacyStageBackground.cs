@@ -54,7 +54,8 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                 },
                 columnBackgrounds = new ColumnFlow<Drawable>(stageDefinition)
                 {
-                    RelativeSizeAxes = Axes.Y
+                    RelativeSizeAxes = Axes.Y,
+                    Masking = false,
                 },
                 new HitTargetInsetContainer
                 {
@@ -126,8 +127,8 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                             },
                             new Container
                             {
+                                X = isLastColumn ? -0.16f : 0,
                                 Anchor = Anchor.TopRight,
-                                Origin = Anchor.TopRight,
                                 RelativeSizeAxes = Axes.Y,
                                 Width = rightLineWidth,
                                 Scale = new Vector2(0.740f, 1),

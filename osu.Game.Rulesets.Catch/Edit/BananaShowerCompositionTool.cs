@@ -10,7 +10,7 @@ using osu.Game.Rulesets.Edit.Tools;
 
 namespace osu.Game.Rulesets.Catch.Edit
 {
-    public class BananaShowerCompositionTool : HitObjectCompositionTool
+    public class BananaShowerCompositionTool : CompositionTool
     {
         public BananaShowerCompositionTool()
             : base(nameof(BananaShower))
@@ -19,6 +19,6 @@ namespace osu.Game.Rulesets.Catch.Edit
 
         public override Drawable CreateIcon() => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Spinners);
 
-        public override PlacementBlueprint CreatePlacementBlueprint() => new BananaShowerPlacementBlueprint();
+        public override HitObjectPlacementBlueprint CreatePlacementBlueprint() => new BananaShowerPlacementBlueprint();
     }
 }

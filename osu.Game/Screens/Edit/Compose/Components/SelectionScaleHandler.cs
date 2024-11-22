@@ -52,10 +52,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// If the default <see langword="null"/> value is supplied, a sane implementation-defined default will be used.
         /// </param>
         /// <param name="adjustAxis">The axes to adjust the scale in.</param>
-        public void ScaleSelection(Vector2 scale, Vector2? origin = null, Axes adjustAxis = Axes.Both)
+        /// <param name="axisRotation">The rotation of the axes in degrees.</param>
+        public void ScaleSelection(Vector2 scale, Vector2? origin = null, Axes adjustAxis = Axes.Both, float axisRotation = 0)
         {
             Begin();
-            Update(scale, origin, adjustAxis);
+            Update(scale, origin, adjustAxis, axisRotation);
             Commit();
         }
 
@@ -91,7 +92,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// If the default <see langword="null"/> value is supplied, a sane implementation-defined default will be used.
         /// </param>
         /// <param name="adjustAxis">The axes to adjust the scale in.</param>
-        public virtual void Update(Vector2 scale, Vector2? origin = null, Axes adjustAxis = Axes.Both)
+        /// <param name="axisRotation">The rotation of the axes in degrees.</param>
+        public virtual void Update(Vector2 scale, Vector2? origin = null, Axes adjustAxis = Axes.Both, float axisRotation = 0)
         {
         }
 

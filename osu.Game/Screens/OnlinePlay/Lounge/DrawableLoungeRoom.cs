@@ -1,9 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
+using System.ComponentModel;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -28,6 +27,7 @@ using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osuTK;
 using osuTK.Graphics;
+using Container = osu.Framework.Graphics.Containers.Container;
 
 namespace osu.Game.Screens.OnlinePlay.Lounge
 {
@@ -39,14 +39,19 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         private const float transition_duration = 60;
         private const float selection_border_width = 4;
 
-        public readonly Bindable<Room> SelectedRoom = new Bindable<Room>();
+        public required Bindable<Room?> SelectedRoom
+        {
+            get => selectedRoom;
+            set => selectedRoom.Current = value;
+        }
 
         [Resolved(canBeNull: true)]
-        private LoungeSubScreen lounge { get; set; }
+        private LoungeSubScreen? lounge { get; set; }
 
-        private Sample sampleSelect;
-        private Sample sampleJoin;
-        private Drawable selectionBox;
+        private readonly BindableWithCurrent<Room?> selectedRoom = new BindableWithCurrent<Room?>();
+        private Sample? sampleSelect;
+        private Sample? sampleJoin;
+        private Drawable selectionBox = null!;
 
         public DrawableLoungeRoom(Room room)
             : base(room)
@@ -61,7 +66,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
             AddRangeInternal(new Drawable[]
             {
-                new StatusColouredContainer(transition_duration)
+                new StatusColouredContainer(Room, transition_duration)
                 {
                     RelativeSizeAxes = Axes.Both,
                     Child = selectionBox = new Container
@@ -89,12 +94,24 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             base.LoadComplete();
 
             Alpha = matchingFilter ? 1 : 0;
-            selectionBox.Alpha = SelectedRoom.Value == Room ? 1 : 0;
+            selectionBox.Alpha = selectedRoom.Value == Room ? 1 : 0;
 
-            SelectedRoom.BindValueChanged(updateSelectedRoom);
+            selectedRoom.BindValueChanged(updateSelectedRoom);
+
+            Room.PropertyChanged += onRoomPropertyChanged;
+            updateSelectedItem();
         }
 
-        private void updateSelectedRoom(ValueChangedEvent<Room> selected)
+        private void onRoomPropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(Room.CurrentPlaylistItem))
+                updateSelectedItem();
+        }
+
+        private void updateSelectedItem()
+            => SelectedItem.Value = Room.CurrentPlaylistItem;
+
+        private void updateSelectedRoom(ValueChangedEvent<Room?> selected)
         {
             if (selected.NewValue == Room)
                 selectionBox.FadeIn(transition_duration);
@@ -104,7 +121,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
         public bool FilteringActive { get; set; }
 
-        public IEnumerable<LocalisableString> FilterTerms => new LocalisableString[] { Room.Name.Value };
+        public IEnumerable<LocalisableString> FilterTerms => new LocalisableString[] { Room.Name };
 
         private bool matchingFilter = true;
 
@@ -140,7 +157,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             if (e.Repeat)
                 return false;
 
-            if (SelectedRoom.Value != Room)
+            if (selectedRoom.Value != Room)
                 return false;
 
             switch (e.Action)
@@ -157,18 +174,18 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         {
         }
 
-        protected override bool ShouldBeConsideredForInput(Drawable child) => SelectedRoom.Value == Room || child is HoverSounds;
+        protected override bool ShouldBeConsideredForInput(Drawable child) => selectedRoom.Value == Room || child is HoverSounds;
 
         protected override bool OnClick(ClickEvent e)
         {
-            if (Room != SelectedRoom.Value)
+            if (Room != selectedRoom.Value)
             {
                 sampleSelect?.Play();
-                SelectedRoom.Value = Room;
+                selectedRoom.Value = Room;
                 return true;
             }
 
-            if (Room.HasPassword.Value)
+            if (Room.HasPassword)
             {
                 this.ShowPopover();
                 return true;
@@ -179,12 +196,18 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             return true;
         }
 
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            Room.PropertyChanged -= onRoomPropertyChanged;
+        }
+
         public partial class PasswordEntryPopover : OsuPopover
         {
             private readonly Room room;
 
             [Resolved(canBeNull: true)]
-            private LoungeSubScreen lounge { get; set; }
+            private LoungeSubScreen? lounge { get; set; }
 
             public override bool HandleNonPositionalInput => true;
 
@@ -195,10 +218,10 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                 this.room = room;
             }
 
-            private OsuPasswordTextBox passwordTextBox;
-            private RoundedButton joinButton;
-            private OsuSpriteText errorText;
-            private Sample sampleJoinFail;
+            private OsuPasswordTextBox passwordTextBox = null!;
+            private RoundedButton joinButton = null!;
+            private OsuSpriteText errorText = null!;
+            private Sample? sampleJoinFail;
 
             [BackgroundDependencyLoader]
             private void load(OsuColour colours, AudioManager audio)

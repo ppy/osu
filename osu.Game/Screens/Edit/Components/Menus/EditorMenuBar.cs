@@ -7,7 +7,10 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osuTK;
@@ -78,8 +81,11 @@ namespace osu.Game.Screens.Edit.Components.Menus
 
         protected override DrawableMenuItem CreateDrawableMenuItem(MenuItem item) => new DrawableEditorBarMenuItem(item);
 
-        private partial class DrawableEditorBarMenuItem : DrawableOsuMenuItem
+        internal partial class DrawableEditorBarMenuItem : DrawableMenuItem
         {
+            private HoverClickSounds hoverClickSounds = null!;
+            private TextContainer text = null!;
+
             public DrawableEditorBarMenuItem(MenuItem item)
                 : base(item)
             {
@@ -92,6 +98,8 @@ namespace osu.Game.Screens.Edit.Components.Menus
                 BackgroundColour = colourProvider.Background2;
                 ForegroundColourHover = colourProvider.Content1;
                 BackgroundColourHover = colourProvider.Background1;
+
+                AddInternal(hoverClickSounds = new HoverClickSounds());
             }
 
             protected override void LoadComplete()
@@ -100,6 +108,36 @@ namespace osu.Game.Screens.Edit.Components.Menus
 
                 Foreground.Anchor = Anchor.CentreLeft;
                 Foreground.Origin = Anchor.CentreLeft;
+                Item.Action.BindDisabledChanged(_ => updateState(), true);
+            }
+
+            protected override bool OnHover(HoverEvent e)
+            {
+                updateState();
+                return base.OnHover(e);
+            }
+
+            protected override void OnHoverLost(HoverLostEvent e)
+            {
+                updateState();
+                base.OnHoverLost(e);
+            }
+
+            private void updateState()
+            {
+                hoverClickSounds.Enabled.Value = IsActionable;
+                Alpha = IsActionable ? 1 : 0.2f;
+
+                if (IsHovered && IsActionable)
+                {
+                    text.BoldText.FadeIn(DrawableOsuMenuItem.TRANSITION_LENGTH, Easing.OutQuint);
+                    text.NormalText.FadeOut(DrawableOsuMenuItem.TRANSITION_LENGTH, Easing.OutQuint);
+                }
+                else
+                {
+                    text.BoldText.FadeOut(DrawableOsuMenuItem.TRANSITION_LENGTH, Easing.OutQuint);
+                    text.NormalText.FadeIn(DrawableOsuMenuItem.TRANSITION_LENGTH, Easing.OutQuint);
+                }
             }
 
             protected override void UpdateBackgroundColour()
@@ -118,15 +156,55 @@ namespace osu.Game.Screens.Edit.Components.Menus
                     base.UpdateForegroundColour();
             }
 
-            protected override DrawableOsuMenuItem.TextContainer CreateTextContainer() => new TextContainer();
+            protected sealed override Drawable CreateContent() => text = new TextContainer();
+        }
 
-            private new partial class TextContainer : DrawableOsuMenuItem.TextContainer
+        private partial class TextContainer : Container, IHasText
+        {
+            public LocalisableString Text
             {
-                public TextContainer()
+                get => NormalText.Text;
+                set
                 {
-                    NormalText.Font = OsuFont.TorusAlternate;
-                    BoldText.Font = OsuFont.TorusAlternate.With(weight: FontWeight.Bold);
+                    NormalText.Text = value;
+                    BoldText.Text = value;
                 }
+            }
+
+            public readonly SpriteText NormalText;
+            public readonly SpriteText BoldText;
+
+            public TextContainer()
+            {
+                AutoSizeAxes = Axes.Both;
+
+                Child = new Container
+                {
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+
+                    AutoSizeAxes = Axes.Both,
+                    Padding = new MarginPadding { Horizontal = 17, Vertical = DrawableOsuMenuItem.MARGIN_VERTICAL, },
+
+                    Children = new Drawable[]
+                    {
+                        NormalText = new OsuSpriteText
+                        {
+                            AlwaysPresent = true, // ensures that the menu item does not change width when switching between normal and bold text.
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            Font = OsuFont.GetFont(size: DrawableOsuMenuItem.TEXT_SIZE),
+                        },
+                        BoldText = new OsuSpriteText
+                        {
+                            AlwaysPresent = true, // ensures that the menu item does not change width when switching between normal and bold text.
+                            Alpha = 0,
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            Font = OsuFont.GetFont(size: DrawableOsuMenuItem.TEXT_SIZE, weight: FontWeight.Bold),
+                        }
+                    }
+                };
             }
         }
 

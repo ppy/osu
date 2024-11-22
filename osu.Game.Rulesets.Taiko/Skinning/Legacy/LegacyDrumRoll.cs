@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -9,6 +10,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Graphics;
 using osu.Game.Skinning;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
@@ -19,12 +21,21 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
         {
             get
             {
-                var headDrawQuad = headCircle.ScreenSpaceDrawQuad;
-                var tailDrawQuad = tailCircle.ScreenSpaceDrawQuad;
+                // the reason why this calculation is so involved is that the head & tail sprites have different sizes/radii.
+                // therefore naively taking the SSDQs of them and making a quad out of them results in a trapezoid shape and not a box.
+                var headCentre = headCircle.ScreenSpaceDrawQuad.Centre;
+                var tailCentre = (tailCircle.ScreenSpaceDrawQuad.TopLeft + tailCircle.ScreenSpaceDrawQuad.BottomLeft) / 2;
 
-                return new Quad(headDrawQuad.TopLeft, tailDrawQuad.TopRight, headDrawQuad.BottomLeft, tailDrawQuad.BottomRight);
+                float headRadius = headCircle.ScreenSpaceDrawQuad.Height / 2;
+                float tailRadius = tailCircle.ScreenSpaceDrawQuad.Height / 2;
+                float radius = Math.Max(headRadius, tailRadius);
+
+                var rectangle = new RectangleF(headCentre.X, headCentre.Y, tailCentre.X - headCentre.X, 0).Inflate(radius);
+                return new Quad(rectangle.TopLeft, rectangle.TopRight, rectangle.BottomLeft, rectangle.BottomRight);
             }
         }
+
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => ScreenSpaceDrawQuad.Contains(screenSpacePos);
 
         private LegacyCirclePiece headCircle = null!;
 
