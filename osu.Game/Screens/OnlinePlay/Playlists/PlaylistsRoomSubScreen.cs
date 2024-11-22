@@ -12,7 +12,9 @@ using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Input;
+using osu.Game.Online.API.Requests;
 using osu.Game.Online.Rooms;
+using osu.Game.Online.Rooms.RoomStatuses;
 using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Match;
 using osu.Game.Screens.OnlinePlay.Match.Components;
@@ -255,7 +257,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
         protected override Drawable CreateFooter() => new PlaylistsRoomFooter(Room)
         {
-            OnStart = StartPlay
+            OnStart = StartPlay,
+            OnClose = closePlaylist,
         };
 
         protected override RoomSettingsOverlay CreateRoomSettingsOverlay(Room room) => new PlaylistsRoomSettingsOverlay(room)
@@ -271,6 +274,16 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         {
             selectionPollingComponent.TimeBetweenPolls.Value = isIdle.Value ? 30000 : 5000;
             Logger.Log($"Polling adjusted (selection: {selectionPollingComponent.TimeBetweenPolls.Value})");
+        }
+
+        private void closePlaylist()
+        {
+            DialogOverlay?.Push(new ClosePlaylistDialog(Room, () =>
+            {
+                var request = new ClosePlaylistRequest(Room.RoomID!.Value);
+                request.Success += () => Room.Status = new RoomStatusEnded();
+                API.Queue(request);
+            }));
         }
 
         protected override Screen CreateGameplayScreen(PlaylistItem selectedItem)
