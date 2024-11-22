@@ -29,38 +29,28 @@ namespace osu.Game.Tests.Visual.OnlinePlay
         {
             for (int i = 0; i < count; i++)
             {
-                var room = new Room
+                AddRoom(new Room
                 {
-                    RoomID = -currentRoomId,
                     Name = $@"Room {currentRoomId}",
                     Host = new APIUser { Username = @"Host" },
                     Duration = TimeSpan.FromSeconds(10),
                     Category = withSpotlightRooms && i % 2 == 0 ? RoomCategory.Spotlight : RoomCategory.Normal,
-                };
-
-                if (withPassword)
-                    room.Password = @"password";
-
-                if (ruleset != null)
-                {
-                    room.PlaylistItemStats = new Room.RoomPlaylistItemStats
-                    {
-                        RulesetIDs = new[] { ruleset.OnlineID },
-                    };
-
-                    room.Playlist =
-                    [
-                        new PlaylistItem(new BeatmapInfo { Metadata = new BeatmapMetadata() })
-                        {
-                            RulesetID = ruleset.OnlineID,
-                        }
-                    ];
-                }
-
-                CreateRoom(room);
-
-                currentRoomId++;
+                    Password = withPassword ? @"password" : null,
+                    PlaylistItemStats = ruleset == null
+                        ? null
+                        : new Room.RoomPlaylistItemStats { RulesetIDs = [ruleset.OnlineID] },
+                    Playlist = ruleset == null
+                        ? Array.Empty<PlaylistItem>()
+                        : [new PlaylistItem(new BeatmapInfo { Metadata = new BeatmapMetadata() }) { RulesetID = ruleset.OnlineID }]
+                });
             }
+        }
+
+        public void AddRoom(Room room)
+        {
+            room.RoomID = -currentRoomId;
+            CreateRoom(room);
+            currentRoomId++;
         }
     }
 }

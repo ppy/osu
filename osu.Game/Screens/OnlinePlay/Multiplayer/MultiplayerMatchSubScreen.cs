@@ -401,7 +401,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             StartPlay();
         }
 
-        protected override Screen CreateGameplayScreen()
+        protected override Screen CreateGameplayScreen(PlaylistItem selectedItem)
         {
             Debug.Assert(client.LocalUser != null);
             Debug.Assert(client.Room != null);
@@ -415,7 +415,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                     return new MultiSpectatorScreen(Room, users.Take(PlayerGrid.MAX_PLAYERS).ToArray());
 
                 default:
-                    return new MultiplayerPlayerLoader(() => new MultiplayerPlayer(Room, SelectedItem.Value, users));
+                    return new MultiplayerPlayerLoader(() => new MultiplayerPlayer(Room, selectedItem, users));
             }
         }
 

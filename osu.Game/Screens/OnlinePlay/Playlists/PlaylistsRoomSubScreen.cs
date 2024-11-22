@@ -273,10 +273,13 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             Logger.Log($"Polling adjusted (selection: {selectionPollingComponent.TimeBetweenPolls.Value})");
         }
 
-        protected override Screen CreateGameplayScreen() => new PlayerLoader(() => new PlaylistsPlayer(Room, SelectedItem.Value)
+        protected override Screen CreateGameplayScreen(PlaylistItem selectedItem)
         {
-            Exited = () => leaderboard.RefetchScores()
-        });
+            return new PlayerLoader(() => new PlaylistsPlayer(Room, selectedItem)
+            {
+                Exited = () => leaderboard.RefetchScores()
+            });
+        }
 
         protected override void Dispose(bool isDisposing)
         {

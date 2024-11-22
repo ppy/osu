@@ -58,7 +58,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
             client.ToggleSpectate().ContinueWith(_ => endOperation());
 
-            void endOperation() => clickOperation?.Dispose();
+            void endOperation() => clickOperation.Dispose();
         }
 
         [BackgroundDependencyLoader]

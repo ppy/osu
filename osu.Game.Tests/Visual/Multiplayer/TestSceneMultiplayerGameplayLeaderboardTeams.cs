@@ -39,7 +39,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 LoadComponentAsync(new MatchScoreDisplay
                 {
-                    Team1Score = { BindTarget = Leaderboard.TeamScores[0] },
+                    Team1Score = { BindTarget = Leaderboard!.TeamScores[0] },
                     Team2Score = { BindTarget = Leaderboard.TeamScores[1] }
                 }, Add);
 

@@ -119,7 +119,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddAssert("4 circles displayed", () => list.ChildrenOfType<UpdateableAvatar>().Count() == 4);
             AddAssert("46 hidden users", () => list.ChildrenOfType<DrawableRoomParticipantsList.HiddenUserCount>().Single().Count == 46);
 
-            AddStep("remove from end", () => removeUserAt(SelectedRoom.Value.RecentParticipants.Count - 1));
+            AddStep("remove from end", () => removeUserAt(SelectedRoom.Value!.RecentParticipants.Count - 1));
             AddAssert("4 circles displayed", () => list.ChildrenOfType<UpdateableAvatar>().Count() == 4);
             AddAssert("45 hidden users", () => list.ChildrenOfType<DrawableRoomParticipantsList.HiddenUserCount>().Single().Count == 45);
 
@@ -138,18 +138,18 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private void addUser(int id)
         {
-            SelectedRoom.Value.RecentParticipants = SelectedRoom.Value.RecentParticipants.Append(new APIUser
+            SelectedRoom.Value!.RecentParticipants = SelectedRoom.Value!.RecentParticipants.Append(new APIUser
             {
                 Id = id,
                 Username = $"User {id}"
             }).ToArray();
-            SelectedRoom.Value.ParticipantCount++;
+            SelectedRoom.Value!.ParticipantCount++;
         }
 
         private void removeUserAt(int index)
         {
-            SelectedRoom.Value.RecentParticipants = SelectedRoom.Value.RecentParticipants.Where(u => !u.Equals(SelectedRoom.Value.RecentParticipants[index])).ToArray();
-            SelectedRoom.Value.ParticipantCount--;
+            SelectedRoom.Value!.RecentParticipants = SelectedRoom.Value!.RecentParticipants.Where(u => !u.Equals(SelectedRoom.Value!.RecentParticipants[index])).ToArray();
+            SelectedRoom.Value!.ParticipantCount--;
         }
     }
 }

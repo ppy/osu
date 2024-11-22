@@ -163,7 +163,7 @@ namespace osu.Game.Rulesets.Edit
             return (lastBefore, firstAfter);
         }
 
-        protected abstract double ReadCurrentDistanceSnap(HitObject before, HitObject after);
+        public abstract double ReadCurrentDistanceSnap(HitObject before, HitObject after);
 
         protected override void Update()
         {

@@ -18,7 +18,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
     /// </summary>
     public class OnlinePlayTestSceneDependencies : IReadOnlyDependencyContainer, IOnlinePlayTestSceneDependencies
     {
-        public Bindable<Room> SelectedRoom { get; }
+        public Bindable<Room?> SelectedRoom { get; }
         public IRoomManager RoomManager { get; }
         public OngoingOperationTracker OngoingOperationTracker { get; }
         public OnlinePlayBeatmapAvailabilityTracker AvailabilityTracker { get; }
@@ -36,7 +36,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
 
         public OnlinePlayTestSceneDependencies()
         {
-            SelectedRoom = new Bindable<Room>();
+            SelectedRoom = new Bindable<Room?>();
             RequestsHandler = new TestRoomRequestsHandler();
             OngoingOperationTracker = new OngoingOperationTracker();
             AvailabilityTracker = new OnlinePlayBeatmapAvailabilityTracker();
