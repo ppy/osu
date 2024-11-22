@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.ComponentModel;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -35,8 +36,9 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             Pill.Background.Alpha = 1;
 
             room.PropertyChanged += onRoomPropertyChanged;
-            updateDisplay();
 
+            Scheduler.AddDelayed(updateDisplay, 5000, true);
+            updateDisplay();
             FinishTransforms(true);
         }
 
@@ -46,6 +48,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             {
                 case nameof(Room.Status):
                 case nameof(Room.EndDate):
+                case nameof(Room.HasPassword):
                     updateDisplay();
                     break;
             }
@@ -53,8 +56,23 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
         private void updateDisplay()
         {
-            Pill.Background.FadeColour(room.Status.GetAppropriateColour(colours), 100);
-            TextFlow.Text = room.Status.Message;
+            Pill.Background.FadeColour(colours.ForRoomStatus(room), 100);
+
+            if (DateTimeOffset.Now >= room.EndDate)
+                TextFlow.Text = "Ended";
+            else
+            {
+                switch (room.Status)
+                {
+                    case RoomStatus.Playing:
+                        TextFlow.Text = "Playing";
+                        break;
+
+                    default:
+                        TextFlow.Text = room.HasPassword ? "Open (Private)" : "Open";
+                        break;
+                }
+            }
         }
 
         protected override void Dispose(bool isDisposing)
