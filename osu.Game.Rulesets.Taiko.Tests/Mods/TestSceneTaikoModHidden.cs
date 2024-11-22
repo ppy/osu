@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Mods
                 Mod = new TaikoModHidden(),
                 Autoplay = true,
                 PassCondition = checkAllMaxResultJudgements(2),
-                Beatmap = () =>
+                CreateBeatmap = () =>
                 {
                     var beatmap = new Beatmap<TaikoHitObject>
                     {

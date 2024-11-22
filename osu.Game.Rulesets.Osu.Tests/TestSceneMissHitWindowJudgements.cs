@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 Autoplay = false,
                 Mod = new TestAutoMod(),
-                Beatmap = () => new Beatmap
+                CreateBeatmap = () => new Beatmap
                 {
                     HitObjects = { new HitCircle { Position = new Vector2(256, 192) } }
                 },
@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             CreateModTest(new ModTestData
             {
                 Autoplay = false,
-                Beatmap = () => new Beatmap
+                CreateBeatmap = () => new Beatmap
                 {
                     HitObjects = { new HitCircle { Position = new Vector2(256, 192) } }
                 },
