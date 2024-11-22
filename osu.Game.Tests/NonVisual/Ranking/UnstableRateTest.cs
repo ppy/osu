@@ -20,7 +20,7 @@ namespace osu.Game.Tests.NonVisual.Ranking
         public void TestDistributedHits()
         {
             var events = Enumerable.Range(-5, 11)
-                                   .Select(t => new HitEvent(t - 5, 1.0, HitResult.Great, new HitObject(), null, null));
+                                   .Select(t => new HitEvent(t - 5, t - 5, HitResult.Great, new HitObject(), null, null));
 
             var unstableRate = new UnstableRate(events);
 
@@ -33,9 +33,9 @@ namespace osu.Game.Tests.NonVisual.Ranking
         {
             var events = new[]
             {
-                new HitEvent(-100, 1.0, HitResult.Miss, new HitObject(), null, null),
-                new HitEvent(0, 1.0, HitResult.Great, new HitObject(), null, null),
-                new HitEvent(200, 1.0, HitResult.Meh, new HitObject { HitWindows = HitWindows.Empty }, null, null),
+                new HitEvent(-100, -100, HitResult.Miss, new HitObject(), null, null),
+                new HitEvent(0, 0, HitResult.Great, new HitObject(), null, null),
+                new HitEvent(200, 200, HitResult.Meh, new HitObject { HitWindows = HitWindows.Empty }, null, null),
             };
 
             var unstableRate = new UnstableRate(events);
@@ -48,10 +48,10 @@ namespace osu.Game.Tests.NonVisual.Ranking
         {
             var events = new[]
             {
-                new HitEvent(-150, 1.5, HitResult.Great, new HitObject(), null, null),
-                new HitEvent(-150, 1.5, HitResult.Great, new HitObject(), null, null),
-                new HitEvent(150, 1.5, HitResult.Great, new HitObject(), null, null),
-                new HitEvent(150, 1.5, HitResult.Great, new HitObject(), null, null),
+                new HitEvent(-150, -150 * 1.5, HitResult.Great, new HitObject(), null, null),
+                new HitEvent(-150, -150 * 1.5, HitResult.Great, new HitObject(), null, null),
+                new HitEvent(150, 150 * 1.5, HitResult.Great, new HitObject(), null, null),
+                new HitEvent(150, 150 * 1.5, HitResult.Great, new HitObject(), null, null),
             };
 
             var unstableRate = new UnstableRate(events);
@@ -64,10 +64,10 @@ namespace osu.Game.Tests.NonVisual.Ranking
         {
             var events = new[]
             {
-                new HitEvent(-50, 0.5, HitResult.Great, new HitObject(), null, null),
-                new HitEvent(75, 0.75, HitResult.Great, new HitObject(), null, null),
-                new HitEvent(-100, 1.0, HitResult.Great, new HitObject(), null, null),
-                new HitEvent(125, 1.25, HitResult.Great, new HitObject(), null, null),
+                new HitEvent(-50, -50 * 0.5, HitResult.Great, new HitObject(), null, null),
+                new HitEvent(75, 75 * 0.75, HitResult.Great, new HitObject(), null, null),
+                new HitEvent(-100, -100 * 1.0, HitResult.Great, new HitObject(), null, null),
+                new HitEvent(125, 125 * 1.25, HitResult.Great, new HitObject(), null, null),
             };
 
             var unstableRate = new UnstableRate(events);

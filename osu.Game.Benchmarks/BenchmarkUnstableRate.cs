@@ -19,7 +19,10 @@ namespace osu.Game.Benchmarks
             events = new List<HitEvent>();
 
             for (int i = 0; i < 1000; i++)
-                events.Add(new HitEvent(RNG.NextDouble(-200.0, 200.0), RNG.NextDouble(1.0, 2.0), HitResult.Great, new HitObject(), null, null));
+            {
+                double timeOffset = RNG.NextDouble(-200.0, 200.0);
+                events.Add(new HitEvent(timeOffset, timeOffset * RNG.NextDouble(1.0, 2.0), HitResult.Great, new HitObject(), null, null));
+            }
         }
 
         [Benchmark]

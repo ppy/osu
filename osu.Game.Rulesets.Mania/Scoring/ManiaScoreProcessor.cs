@@ -77,6 +77,8 @@ namespace osu.Game.Rulesets.Mania.Scoring
             return anyImperfect ? rank : ScoreRank.X;
         }
 
+        protected override double GetScaledTimeOffsetForResult(JudgementResult result) => result.TimeOffset;
+
         private class JudgementOrderComparer : IComparer<HitObject>
         {
             public static readonly JudgementOrderComparer DEFAULT = new JudgementOrderComparer();
