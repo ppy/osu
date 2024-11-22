@@ -388,19 +388,8 @@ namespace osu.Game.Online.Rooms
             CurrentPlaylistItem = other.CurrentPlaylistItem;
             AutoSkip = other.AutoSkip;
 
-            other.RemoveExpiredPlaylistItems();
-
             Playlist = other.Playlist;
             RecentParticipants = other.RecentParticipants;
-        }
-
-        public void RemoveExpiredPlaylistItems()
-        {
-            // Todo: This is not the best way/place to do this, but the intention is to display all playlist items when the room has ended,
-            // and display only the non-expired playlist items while the room is still active. In order to achieve this, all expired items are removed from the source Room.
-            // More refactoring is required before this can be done locally instead - DrawableRoomPlaylist is currently directly bound to the playlist to display items in the room.
-            if (Status is not RoomStatusEnded)
-                Playlist = Playlist.Where(i => !i.Expired).ToArray();
         }
 
         [JsonObject(MemberSerialization.OptIn)]
