@@ -39,11 +39,11 @@ namespace osu.Game.Rulesets.Taiko.Mods
             List<Hit> toRemove = new List<Hit>();
 
             // Snap conversions for rhythms
-            var snapConversions = new Dictionary<int, int>
+            var snapConversions = new Dictionary<int, double>
             {
-                { 8, 4 }, // 1/8 snap to 1/4 snap
-                { 6, 4 }, // 1/6 snap to 1/4 snap
-                { 3, 2 }, // 1/3 snap to 1/2 snap
+                { 8, 4.0 }, // 1/8 snap to 1/4 snap
+                { 6, 4.0 }, // 1/6 snap to 1/4 snap
+                { 3, 2.0 }, // 1/3 snap to 1/2 snap
             };
 
             bool inPattern = false;
@@ -102,7 +102,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
                                 }
                                 else if (currentHitPosition % 3 == 2 && j < hits.Count - 1)
                                 {
-                                    double offset = controlPointInfo.TimingPointAt(hits[j].StartTime).BeatLength / Convert.ToDouble(snapConversion.Value);
+                                    double offset = controlPointInfo.TimingPointAt(hits[j].StartTime).BeatLength / snapConversion.Value;
                                     hits[j].StartTime = hits[j + 1].StartTime - offset;
                                 }
                             }
