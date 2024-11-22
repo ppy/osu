@@ -1,9 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
+using System.ComponentModel;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -17,20 +16,14 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 {
     public partial class PlaylistsReadyButton : ReadyButton
     {
-        [Resolved(typeof(Room), nameof(Room.EndDate))]
-        private Bindable<DateTimeOffset?> endDate { get; set; }
-
-        [Resolved(typeof(Room), nameof(Room.MaxAttempts))]
-        private Bindable<int?> maxAttempts { get; set; }
-
-        [Resolved(typeof(Room), nameof(Room.UserScore))]
-        private Bindable<PlaylistAggregateScore> userScore { get; set; }
-
         [Resolved]
-        private IBindable<WorkingBeatmap> gameBeatmap { get; set; }
+        private IBindable<WorkingBeatmap> gameBeatmap { get; set; } = null!;
 
-        public PlaylistsReadyButton()
+        private readonly Room room;
+
+        public PlaylistsReadyButton(Room room)
         {
+            this.room = room;
             Text = "Start";
         }
 
@@ -46,15 +39,24 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         {
             base.LoadComplete();
 
-            userScore.BindValueChanged(aggregate =>
-            {
-                if (maxAttempts.Value == null)
-                    return;
+            room.PropertyChanged += onRoomPropertyChanged;
+            updateRoomUserScore();
+        }
 
-                int remaining = maxAttempts.Value.Value - aggregate.NewValue.PlaylistItemAttempts.Sum(a => a.Attempts);
+        private void onRoomPropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(Room.UserScore))
+                updateRoomUserScore();
+        }
 
-                hasRemainingAttempts = remaining > 0;
-            });
+        private void updateRoomUserScore()
+        {
+            if (room.MaxAttempts == null || room.UserScore == null)
+                return;
+
+            int remaining = room.MaxAttempts.Value - room.UserScore.PlaylistItemAttempts.Sum(a => a.Attempts);
+
+            hasRemainingAttempts = remaining > 0;
         }
 
         protected override void Update()
@@ -80,6 +82,12 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
         private bool enoughTimeLeft =>
             // This should probably consider the length of the currently selected item, rather than a constant 30 seconds.
-            endDate.Value != null && DateTimeOffset.UtcNow.AddSeconds(30).AddMilliseconds(gameBeatmap.Value.Track.Length) < endDate.Value;
+            room.EndDate != null && DateTimeOffset.UtcNow.AddSeconds(30).AddMilliseconds(gameBeatmap.Value.Track.Length) < room.EndDate;
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            room.PropertyChanged -= onRoomPropertyChanged;
+        }
     }
 }

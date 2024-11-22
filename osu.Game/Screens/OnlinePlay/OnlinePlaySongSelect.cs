@@ -32,9 +32,6 @@ namespace osu.Game.Screens.OnlinePlay
 
         public override bool AllowEditing => false;
 
-        [Resolved(typeof(Room), nameof(Room.Playlist))]
-        protected BindableList<PlaylistItem> Playlist { get; private set; } = null!;
-
         [Resolved]
         private RulesetStore rulesets { get; set; } = null!;
 

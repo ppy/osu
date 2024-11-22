@@ -58,10 +58,17 @@ namespace osu.Game.Rulesets.Edit
         /// </summary>
         /// <param name="referenceObject">An object to be used as a reference point for this operation.</param>
         /// <param name="distance">The distance to convert.</param>
+        /// <param name="target">Whether the distance measured should be from the start or the end of <paramref name="referenceObject"/>.</param>
         /// <returns>
         /// A value that represents <paramref name="distance"/> snapped to the closest beat of the timing point.
         /// The distance will always be less than or equal to the provided <paramref name="distance"/>.
         /// </returns>
-        float FindSnappedDistance(HitObject referenceObject, float distance);
+        float FindSnappedDistance(HitObject referenceObject, float distance, DistanceSnapTarget target);
+    }
+
+    public enum DistanceSnapTarget
+    {
+        Start,
+        End,
     }
 }

@@ -176,7 +176,7 @@ namespace osu.Game.Screens.Ranking.Statistics
             for (int i = 1; i <= axis_points; i++)
             {
                 double axisValue = i * axisValueStep;
-                float position = (float)(axisValue / maxValue);
+                float position = maxValue == 0 ? 0 : (float)(axisValue / maxValue);
                 float alpha = 1f - position * 0.8f;
 
                 axisFlow.Add(new OsuSpriteText
@@ -348,7 +348,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                 boxAdjustment.FadeTo(!hasAdjustment ? 0 : 1, duration, Easing.OutQuint);
             }
 
-            private float offsetForValue(float value) => (1 - minimum_height) * value / maxValue;
+            private float offsetForValue(float value) => maxValue == 0 ? 0 : (1 - minimum_height) * value / maxValue;
 
             private float heightForValue(float value) => minimum_height + offsetForValue(value);
         }

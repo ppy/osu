@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -28,13 +26,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public partial class TestSceneMultiplayerSpectateButton : MultiplayerTestScene
     {
-        private MultiplayerSpectateButton spectateButton;
-        private MatchStartControl startControl;
+        private MultiplayerSpectateButton spectateButton = null!;
+        private MatchStartControl startControl = null!;
 
-        private readonly Bindable<PlaylistItem> selectedItem = new Bindable<PlaylistItem>();
-
-        private BeatmapSetInfo importedSet;
-        private BeatmapManager beatmaps;
+        private BeatmapSetInfo importedSet = null!;
+        private BeatmapManager beatmaps = null!;
 
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
@@ -52,14 +48,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("create button", () =>
             {
-                AvailabilityTracker.SelectedItem.BindTo(selectedItem);
+                PlaylistItem item = SelectedRoom.Value!.Playlist.First();
+
+                AvailabilityTracker.SelectedItem.Value = item;
 
                 importedSet = beatmaps.GetAllUsableBeatmapSets().First();
                 Beatmap.Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First());
-                selectedItem.Value = new PlaylistItem(Beatmap.Value.BeatmapInfo)
-                {
-                    RulesetID = Beatmap.Value.BeatmapInfo.Ruleset.OnlineID,
-                };
 
                 Child = new PopoverContainer
                 {
@@ -75,12 +69,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
                                 Size = new Vector2(200, 50),
+                                SelectedItem = new Bindable<PlaylistItem?>(item)
                             },
                             startControl = new MatchStartControl
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
                                 Size = new Vector2(200, 50),
+                                SelectedItem = new Bindable<PlaylistItem?>(item)
                             }
                         }
                     }
