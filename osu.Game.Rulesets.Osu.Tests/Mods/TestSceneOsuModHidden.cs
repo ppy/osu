@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
         {
             Mod = new TestOsuModHidden(),
             Autoplay = true,
-            Beatmap = new Beatmap
+            CreateBeatmap = () => new Beatmap
             {
                 HitObjects = new List<HitObject>
                 {
@@ -63,7 +63,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
         {
             Mod = new TestOsuModHidden(),
             Autoplay = true,
-            Beatmap = new Beatmap
+            CreateBeatmap = () => new Beatmap
             {
                 HitObjects = new List<HitObject>
                 {
@@ -98,7 +98,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
         {
             Mod = new TestOsuModHidden(),
             Autoplay = true,
-            Beatmap = new Beatmap
+            CreateBeatmap = () => new Beatmap
             {
                 HitObjects = new List<HitObject>
                 {
@@ -122,7 +122,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
         {
             Mod = new OsuModHidden { OnlyFadeApproachCircles = { Value = true } },
             Autoplay = true,
-            Beatmap = new Beatmap
+            CreateBeatmap = () => new Beatmap
             {
                 HitObjects = new List<HitObject>
                 {

@@ -73,10 +73,10 @@ namespace osu.Game.Tests.Visual.UserInterface
             });
         });
 
-        [TestCase(BeatmapAttribute.CircleSize, "Circle Size: 1.00")]
-        [TestCase(BeatmapAttribute.HPDrain, "HP Drain: 2.00")]
-        [TestCase(BeatmapAttribute.Accuracy, "Accuracy: 3.00")]
-        [TestCase(BeatmapAttribute.ApproachRate, "Approach Rate: 4.00")]
+        [TestCase(BeatmapAttribute.CircleSize, "Circle Size: 1")]
+        [TestCase(BeatmapAttribute.HPDrain, "HP Drain: 2")]
+        [TestCase(BeatmapAttribute.Accuracy, "Accuracy: 3")]
+        [TestCase(BeatmapAttribute.ApproachRate, "Approach Rate: 4")]
         [TestCase(BeatmapAttribute.Title, "Title: _Title")]
         [TestCase(BeatmapAttribute.Artist, "Artist: _Artist")]
         [TestCase(BeatmapAttribute.Creator, "Creator: _Creator")]
@@ -121,15 +121,15 @@ namespace osu.Game.Tests.Visual.UserInterface
                     Difficulty =
                     {
                         ApproachRate = 10,
-                        CircleSize = 9
+                        CircleSize = 9.5f
                     }
                 }
             }));
 
-            test(BeatmapAttribute.BPM, new OsuModDoubleTime(), "BPM: 100.00", "BPM: 150.00");
+            test(BeatmapAttribute.BPM, new OsuModDoubleTime(), "BPM: 100", "BPM: 150");
             test(BeatmapAttribute.Length, new OsuModDoubleTime(), "Length: 00:30", "Length: 00:20");
-            test(BeatmapAttribute.ApproachRate, new OsuModDoubleTime(), "Approach Rate: 10.00", "Approach Rate: 11.00");
-            test(BeatmapAttribute.CircleSize, new OsuModHardRock(), "Circle Size: 9.00", "Circle Size: 10.00");
+            test(BeatmapAttribute.ApproachRate, new OsuModDoubleTime(), "Approach Rate: 10", "Approach Rate: 11");
+            test(BeatmapAttribute.CircleSize, new OsuModHardRock(), "Circle Size: 9.5", "Circle Size: 10");
 
             void test(BeatmapAttribute attribute, Mod mod, string before, string after)
             {

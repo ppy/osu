@@ -455,7 +455,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                 applyToBeatmap?.Invoke(Beatmap.Value);
 
-                LoadScreen(spectatorScreen = new MultiSpectatorScreen(SelectedRoom.Value, playingUsers.ToArray()));
+                LoadScreen(spectatorScreen = new MultiSpectatorScreen(SelectedRoom.Value!, playingUsers.ToArray()));
             });
 
             AddUntilStep("wait for screen load", () => spectatorScreen.LoadState == LoadState.Loaded && (!waitForPlayerLoad || spectatorScreen.AllPlayersLoaded));
