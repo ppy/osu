@@ -1,10 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Linq;
-using JetBrains.Annotations;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -42,10 +39,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public partial class TestSceneMultiplayerMatchSubScreen : MultiplayerTestScene
     {
-        private MultiplayerMatchSubScreen screen;
-
-        private BeatmapManager beatmaps;
-        private BeatmapSetInfo importedSet;
+        private MultiplayerMatchSubScreen screen = null!;
+        private BeatmapManager beatmaps = null!;
+        private BeatmapSetInfo importedSet = null!;
 
         public TestSceneMultiplayerMatchSubScreen()
             : base(false)
@@ -70,7 +66,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("load match", () =>
             {
                 SelectedRoom.Value = new Room { Name = "Test Room" };
-                LoadScreen(screen = new TestMultiplayerMatchSubScreen(SelectedRoom.Value));
+                LoadScreen(screen = new TestMultiplayerMatchSubScreen(SelectedRoom.Value!));
             });
 
             AddUntilStep("wait for load", () => screen.IsCurrentScreen());
@@ -81,7 +77,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("add playlist item", () =>
             {
-                SelectedRoom.Value.Playlist =
+                SelectedRoom.Value!.Playlist =
                 [
                     new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo)
                     {
@@ -100,7 +96,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("add playlist item", () =>
             {
-                SelectedRoom.Value.Playlist =
+                SelectedRoom.Value!.Playlist =
                 [
                     new PlaylistItem(new TestBeatmap(new TaikoRuleset().RulesetInfo).BeatmapInfo)
                     {
@@ -125,7 +121,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("set playlist", () =>
             {
-                SelectedRoom.Value.Playlist =
+                SelectedRoom.Value!.Playlist =
                 [
                     new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo)
                     {
@@ -142,7 +138,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("set playlist", () =>
             {
-                SelectedRoom.Value.Playlist =
+                SelectedRoom.Value!.Playlist =
                 [
                     new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First()).BeatmapInfo)
                     {
@@ -173,7 +169,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("add playlist item with allowed mod", () =>
             {
-                SelectedRoom.Value.Playlist =
+                SelectedRoom.Value!.Playlist =
                 [
                     new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo)
                     {
@@ -202,7 +198,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("add playlist item with allowed mod", () =>
             {
-                SelectedRoom.Value.Playlist =
+                SelectedRoom.Value!.Playlist =
                 [
                     new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo)
                     {
@@ -226,7 +222,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("add playlist item with no allowed mods", () =>
             {
-                SelectedRoom.Value.Playlist =
+                SelectedRoom.Value!.Playlist =
                 [
                     new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo)
                     {
@@ -249,7 +245,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("add two playlist items", () =>
             {
-                SelectedRoom.Value.Playlist =
+                SelectedRoom.Value!.Playlist =
                 [
                     new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First()).BeatmapInfo)
                     {
@@ -285,7 +281,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("add playlist item", () =>
             {
-                SelectedRoom.Value.Playlist =
+                SelectedRoom.Value!.Playlist =
                 [
                     new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo)
                     {
@@ -320,8 +316,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private partial class TestMultiplayerMatchSubScreen : MultiplayerMatchSubScreen
         {
             [Resolved(canBeNull: true)]
-            [CanBeNull]
-            private IDialogOverlay dialogOverlay { get; set; }
+            private IDialogOverlay? dialogOverlay { get; set; }
 
             public TestMultiplayerMatchSubScreen(Room room)
                 : base(room)

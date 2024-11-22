@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
@@ -23,7 +21,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
     {
         protected new TestRoomManager RoomManager => (TestRoomManager)base.RoomManager;
 
-        private RoomsContainer container;
+        private RoomsContainer container = null!;
 
         public override void SetUpSteps()
         {
@@ -65,7 +63,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("select first room", () => container.Rooms.First().TriggerClick());
             AddAssert("first spotlight selected", () => checkRoomSelected(RoomManager.Rooms.First(r => r.Category == RoomCategory.Spotlight)));
 
-            AddStep("remove last room", () => RoomManager.RemoveRoom(RoomManager.Rooms.MinBy(r => r.RoomID)));
+            AddStep("remove last room", () => RoomManager.RemoveRoom(RoomManager.Rooms.MinBy(r => r.RoomID)!));
             AddAssert("first spotlight still selected", () => checkRoomSelected(RoomManager.Rooms.First(r => r.Category == RoomCategory.Spotlight)));
 
             AddStep("remove spotlight room", () => RoomManager.RemoveRoom(RoomManager.Rooms.Single(r => r.Category == RoomCategory.Spotlight)));
@@ -157,7 +155,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("add rooms", () => RoomManager.AddRooms(3, new CatchRuleset().RulesetInfo));
 
             // Todo: What even is this case...?
-            AddStep("set empty filter criteria", () => container.Filter.Value = null);
+            AddStep("set empty filter criteria", () => container.Filter.Value = new FilterCriteria());
             AddUntilStep("5 rooms visible", () => container.Rooms.Count(r => r.IsPresent) == 5);
 
             AddStep("filter osu! rooms", () => container.Filter.Value = new FilterCriteria { Ruleset = new OsuRuleset().RulesetInfo });
@@ -195,9 +193,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("add rooms", () => RoomManager.AddRooms(3, withPassword: true));
         }
 
-        private bool checkRoomSelected(Room room) => SelectedRoom.Value == room;
+        private bool checkRoomSelected(Room? room) => SelectedRoom.Value == room;
 
-        private Room getRoomInFlow(int index) =>
+        private Room? getRoomInFlow(int index) =>
             (container.ChildrenOfType<FillFlowContainer<DrawableLoungeRoom>>().First().FlowingChildren.ElementAt(index) as DrawableRoom)?.Room;
     }
 }
