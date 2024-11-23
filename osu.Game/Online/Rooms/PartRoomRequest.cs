@@ -23,6 +23,6 @@ namespace osu.Game.Online.Rooms
             return req;
         }
 
-        protected override string Target => $"rooms/{room.RoomID.Value}/users/{User!.Id}";
+        protected override string Target => $"rooms/{room.RoomID}/users/{User!.Id}";
     }
 }
