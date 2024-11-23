@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
         /// <summary>
         /// Calculates and sets the effective BPM and slider velocity for each note object, considering clock rate and scroll speed.
         /// </summary>
-        public void LoadEffectiveBPM(ControlPointInfo controlPointInfo, double clockRate)
+        public void ProcessEffectiveBPM(ControlPointInfo controlPointInfo, double clockRate)
         {
             foreach (var currentNoteObject in noteObjects)
             {

@@ -59,7 +59,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             List<TaikoDifficultyHitObject> centreObjects = new List<TaikoDifficultyHitObject>();
             List<TaikoDifficultyHitObject> rimObjects = new List<TaikoDifficultyHitObject>();
             List<TaikoDifficultyHitObject> noteObjects = new List<TaikoDifficultyHitObject>();
-            EffectiveBPMPreprocessor bpmLoader = new EffectiveBPMPreprocessor(beatmap, noteObjects);
+            EffectiveBPMPreprocessor noteObjectEffectiveBPM = new EffectiveBPMPreprocessor(beatmap, noteObjects);
 
             for (int i = 2; i < beatmap.HitObjects.Count; i++)
             {
@@ -71,7 +71,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             }
 
             TaikoColourDifficultyPreprocessor.ProcessAndAssign(difficultyHitObjects);
-            bpmLoader.LoadEffectiveBPM(beatmap.ControlPointInfo, clockRate);
+            noteObjectEffectiveBPM.ProcessEffectiveBPM(beatmap.ControlPointInfo, clockRate);
 
             return difficultyHitObjects;
         }
