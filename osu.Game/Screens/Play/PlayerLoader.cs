@@ -122,7 +122,9 @@ namespace osu.Game.Screens.Play
             // not ready if the user is dragging a slider or otherwise.
             && (inputManager.DraggedDrawable == null || inputManager.DraggedDrawable is OsuLogo)
             // not ready if a focused overlay is visible, like settings.
-            && inputManager.FocusedDrawable == null;
+            && inputManager.FocusedDrawable is not OsuFocusedOverlayContainer
+            // or if a child of a focused overlay is focused, like settings' search textbox.
+            && inputManager.FocusedDrawable?.FindClosestParent<OsuFocusedOverlayContainer>() == null;
 
         private readonly Func<Player> createPlayer;
 
@@ -330,6 +332,9 @@ namespace osu.Game.Screens.Play
         {
             cancelLoad();
             ContentOut();
+
+            quickRestartBlackLayer?.FadeOut(100, Easing.OutQuint).Expire();
+            quickRestartBlackLayer = null;
 
             // Ensure the screen doesn't expire until all the outwards fade operations have completed.
             this.Delay(CONTENT_OUT_DURATION).FadeOut();

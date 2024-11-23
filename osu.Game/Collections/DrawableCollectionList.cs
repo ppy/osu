@@ -21,6 +21,12 @@ namespace osu.Game.Collections
     /// </summary>
     public partial class DrawableCollectionList : OsuRearrangeableListContainer<Live<BeatmapCollection>>
     {
+        public new MarginPadding Padding
+        {
+            get => base.Padding;
+            set => base.Padding = value;
+        }
+
         protected override ScrollContainer<Drawable> CreateScrollContainer() => scroll = new Scroll();
 
         [Resolved]
@@ -34,6 +40,12 @@ namespace osu.Game.Collections
 
         public IEnumerable<Drawable> OrderedItems => flow.FlowingChildren;
 
+        public string SearchTerm
+        {
+            get => flow.SearchTerm;
+            set => flow.SearchTerm = value;
+        }
+
         protected override FillFlowContainer<RearrangeableListItem<Live<BeatmapCollection>>> CreateListFillFlowContainer() => flow = new Flow
         {
             DragActive = { BindTarget = DragActive }
@@ -44,6 +56,26 @@ namespace osu.Game.Collections
             base.LoadComplete();
 
             realmSubscription = realm.RegisterForNotifications(r => r.All<BeatmapCollection>().OrderBy(c => c.Name), collectionsChanged);
+        }
+
+        /// <summary>
+        /// When non-null, signifies that a new collection was created and should be presented to the user.
+        /// </summary>
+        private Guid? lastCreated;
+
+        protected override void OnItemsChanged()
+        {
+            base.OnItemsChanged();
+
+            if (lastCreated != null)
+            {
+                var createdItem = flow.Children.SingleOrDefault(item => item.Model.Value.ID == lastCreated);
+
+                if (createdItem != null)
+                    scroll.ScrollTo(createdItem);
+
+                lastCreated = null;
+            }
         }
 
         private void collectionsChanged(IRealmCollection<BeatmapCollection> collections, ChangeSet? changes)
@@ -60,7 +92,11 @@ namespace osu.Game.Collections
             foreach (int i in changes.InsertedIndices)
                 Items.Insert(i, collections[i].ToLive(realm));
 
+            if (changes.InsertedIndices.Length == 1)
+                lastCreated = collections[changes.InsertedIndices[0]].ID;
+
             foreach (int i in changes.NewModifiedIndices)
+
             {
                 var updatedItem = collections[i];
 
@@ -104,8 +140,7 @@ namespace osu.Game.Collections
 
             public Scroll()
             {
-                ScrollbarVisible = false;
-                Padding = new MarginPadding(10);
+                ScrollbarOverlapsContent = false;
 
                 base.Content.Add(new FillFlowContainer
                 {
@@ -133,7 +168,7 @@ namespace osu.Game.Collections
                 base.Update();
 
                 // AutoSizeAxes cannot be used as the height should represent the post-layout-transform height at all times, so that the placeholder doesn't bounce around.
-                content.Height = ((Flow)Child).Children.Sum(c => c.DrawHeight + 5);
+                content.Height = ((Flow)Child).Children.Sum(c => c.IsPresent ? c.DrawHeight + 5 : 0);
             }
 
             /// <summary>
@@ -179,7 +214,7 @@ namespace osu.Game.Collections
         /// <summary>
         /// The flow of <see cref="DrawableCollectionListItem"/>. Disables layout easing unless a drag is in progress.
         /// </summary>
-        private partial class Flow : FillFlowContainer<RearrangeableListItem<Live<BeatmapCollection>>>
+        private partial class Flow : SearchContainer<RearrangeableListItem<Live<BeatmapCollection>>>
         {
             public readonly IBindable<bool> DragActive = new Bindable<bool>();
 
@@ -187,6 +222,8 @@ namespace osu.Game.Collections
             {
                 Spacing = new Vector2(0, 5);
                 LayoutEasing = Easing.OutQuint;
+
+                Padding = new MarginPadding { Right = 5 };
             }
 
             protected override void LoadComplete()

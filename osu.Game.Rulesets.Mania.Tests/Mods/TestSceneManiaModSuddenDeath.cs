@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
             Mod = new ManiaModSuddenDeath(),
             PassCondition = () => ((ModFailConditionTestPlayer)Player).CheckFailed(false),
             Autoplay = false,
-            Beatmap = new Beatmap
+            CreateBeatmap = () => new Beatmap
             {
                 HitObjects = new List<HitObject>
                 {
@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
             Mod = new ManiaModSuddenDeath(),
             PassCondition = () => ((ModFailConditionTestPlayer)Player).CheckFailed(true) && Player.Results.Count == 2,
             Autoplay = false,
-            Beatmap = new Beatmap
+            CreateBeatmap = () => new Beatmap
             {
                 HitObjects = new List<HitObject>
                 {

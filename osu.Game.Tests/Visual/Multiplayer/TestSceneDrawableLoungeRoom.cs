@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Linq;
 using System.Threading;
@@ -10,6 +8,7 @@ using System.Threading.Tasks;
 using Moq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Testing;
@@ -25,14 +24,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
     {
         private readonly Room room = new Room
         {
-            HasPassword = { Value = true }
+            Password = "*"
         };
 
         [Cached]
         protected readonly OverlayColourProvider ColourProvider = new OverlayColourProvider(OverlayColourScheme.Pink);
 
-        private DrawableLoungeRoom drawableRoom;
-        private SearchTextBox searchTextBox;
+        private DrawableLoungeRoom drawableRoom = null!;
+        private SearchTextBox searchTextBox = null!;
 
         private readonly ManualResetEventSlim allowResponseCallback = new ManualResetEventSlim();
 
@@ -78,6 +77,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
+                            SelectedRoom = new Bindable<Room?>()
                         }
                     }
                 };
@@ -87,7 +87,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestFocusViaKeyboardCommit()
         {
-            DrawableLoungeRoom.PasswordEntryPopover popover = null;
+            DrawableLoungeRoom.PasswordEntryPopover? popover = null;
 
             AddAssert("search textbox has focus", () => checkFocus(searchTextBox));
             AddStep("click room twice", () =>
@@ -103,11 +103,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("enter password", () => popover.ChildrenOfType<OsuPasswordTextBox>().Single().Text = "password");
             AddStep("commit via enter", () => InputManager.Key(Key.Enter));
 
-            AddAssert("popover has focus", () => checkFocus(popover));
+            AddAssert("popover has focus", () => checkFocus(popover!));
 
             AddStep("attempt another enter", () => InputManager.Key(Key.Enter));
 
-            AddAssert("popover still has focus", () => checkFocus(popover));
+            AddAssert("popover still has focus", () => checkFocus(popover!));
 
             AddStep("unblock response", () => allowResponseCallback.Set());
 
@@ -122,7 +122,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestFocusViaMouseCommit()
         {
-            DrawableLoungeRoom.PasswordEntryPopover popover = null;
+            DrawableLoungeRoom.PasswordEntryPopover? popover = null;
 
             AddAssert("search textbox has focus", () => checkFocus(searchTextBox));
             AddStep("click room twice", () =>
@@ -144,11 +144,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 InputManager.Click(MouseButton.Left);
             });
 
-            AddAssert("popover has focus", () => checkFocus(popover));
+            AddAssert("popover has focus", () => checkFocus(popover!));
 
             AddStep("attempt another click", () => InputManager.Click(MouseButton.Left));
 
-            AddAssert("popover still has focus", () => checkFocus(popover));
+            AddAssert("popover still has focus", () => checkFocus(popover!));
 
             AddStep("unblock response", () => allowResponseCallback.Set());
 

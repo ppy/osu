@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
             Mod = new OsuModSuddenDeath(),
             PassCondition = () => ((ModFailConditionTestPlayer)Player).CheckFailed(false),
             Autoplay = false,
-            Beatmap = new Beatmap
+            CreateBeatmap = () => new Beatmap
             {
                 HitObjects = new List<HitObject>
                 {
@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
             Mod = new OsuModSuddenDeath(),
             PassCondition = () => ((ModFailConditionTestPlayer)Player).CheckFailed(true),
             Autoplay = false,
-            Beatmap = new Beatmap
+            CreateBeatmap = () => new Beatmap
             {
                 HitObjects = new List<HitObject>
                 {
