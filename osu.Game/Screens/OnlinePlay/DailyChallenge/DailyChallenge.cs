@@ -532,7 +532,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
         private void startPlay()
         {
             sampleStart?.Play();
-            this.Push(new PlayerLoader(() => new PlaylistsPlayer(room, playlistItem)
+            this.Push(new PlayerLoader(() => new DailyChallengePlayer(room, playlistItem)
             {
                 Exited = () => Scheduler.AddOnce(() => leaderboard.RefetchScores())
             }));
