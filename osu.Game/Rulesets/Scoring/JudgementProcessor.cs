@@ -201,17 +201,14 @@ namespace osu.Game.Rulesets.Scoring
         protected virtual HitResult GetSimulatedHitResult(Judgement judgement) => judgement.MaxResult;
 
         /// <summary>
-        /// Gets the rate-scaled time offset for a <see cref="JudgementResult"/>.
+        /// Gets the time scale for a <see cref="JudgementResult"/>.
         /// </summary>
         /// <param name="judgementResult">The judgement result.</param>
-        /// <returns>The rate-scaled time offset.</returns>
-        /// <remarks>
-        /// If a ruleset has rate-scaled hit windows, then this may be equal to the time offset as it is already scaled.
-        /// </remarks>
-        protected virtual double GetScaledTimeOffsetForResult(JudgementResult judgementResult)
+        /// <returns>The time scale.</returns>
+        protected virtual double GetTimeScaleForResult(JudgementResult judgementResult)
         {
             Debug.Assert(judgementResult.GameplayRate != null);
-            return judgementResult.TimeOffset / judgementResult.GameplayRate.Value;
+            return judgementResult.GameplayRate.Value;
         }
 
         protected override void Update()

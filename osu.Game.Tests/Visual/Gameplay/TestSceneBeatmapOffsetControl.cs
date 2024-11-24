@@ -64,16 +64,16 @@ namespace osu.Game.Tests.Visual.Gameplay
                 List<HitEvent> hitEvents =
                 [
                     // 10 events total. one of them (head circle) being timed / having hitwindows, rest having no hitwindows
-                    new HitEvent(30, 30, HitResult.LargeTickHit, new SliderHeadCircle { ClassicSliderBehaviour = true }, null, null),
-                    new HitEvent(0, 0, HitResult.LargeTickHit, new SliderTick(), null, null),
-                    new HitEvent(0, 0, HitResult.LargeTickHit, new SliderTick(), null, null),
-                    new HitEvent(0, 0, HitResult.LargeTickHit, new SliderTick(), null, null),
-                    new HitEvent(0, 0, HitResult.LargeTickHit, new SliderTick(), null, null),
-                    new HitEvent(0, 0, HitResult.LargeTickHit, new SliderTick(), null, null),
-                    new HitEvent(0, 0, HitResult.LargeTickHit, new SliderTick(), null, null),
-                    new HitEvent(0, 0, HitResult.LargeTickHit, new SliderTick(), null, null),
-                    new HitEvent(0, 0, HitResult.LargeTickHit, new SliderTick(), null, null),
-                    new HitEvent(0, 0, HitResult.LargeTickHit, new SliderTick(), null, null),
+                    new HitEvent(30, 1, HitResult.LargeTickHit, new SliderHeadCircle { ClassicSliderBehaviour = true }, null, null),
+                    new HitEvent(0, 1, HitResult.LargeTickHit, new SliderTick(), null, null),
+                    new HitEvent(0, 1, HitResult.LargeTickHit, new SliderTick(), null, null),
+                    new HitEvent(0, 1, HitResult.LargeTickHit, new SliderTick(), null, null),
+                    new HitEvent(0, 1, HitResult.LargeTickHit, new SliderTick(), null, null),
+                    new HitEvent(0, 1, HitResult.LargeTickHit, new SliderTick(), null, null),
+                    new HitEvent(0, 1, HitResult.LargeTickHit, new SliderTick(), null, null),
+                    new HitEvent(0, 1, HitResult.LargeTickHit, new SliderTick(), null, null),
+                    new HitEvent(0, 1, HitResult.LargeTickHit, new SliderTick(), null, null),
+                    new HitEvent(0, 1, HitResult.LargeTickHit, new SliderTick(), null, null),
                 ];
 
                 foreach (var ev in hitEvents)

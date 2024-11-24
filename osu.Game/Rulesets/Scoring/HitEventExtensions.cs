@@ -32,9 +32,10 @@ namespace osu.Game.Rulesets.Scoring
 
                 count++;
 
-                // ScaledTimeOffset is used to account for TimeOffset _usually_ scaling with gameplay rate.
-                double nextMean = mean + (e.ScaledTimeOffset - mean) / count;
-                sumOfSquares += (e.ScaledTimeOffset - mean) * (e.ScaledTimeOffset - nextMean);
+                // Division by TimeScale is used to account for TimeOffset _usually_ scaling with gameplay rate.
+                double currentValue = e.TimeOffset / e.TimeScale;
+                double nextMean = mean + (currentValue - mean) / count;
+                sumOfSquares += (currentValue - mean) * (currentValue - nextMean);
                 mean = nextMean;
             }
 
