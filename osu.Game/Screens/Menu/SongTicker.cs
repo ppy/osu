@@ -13,7 +13,6 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
-using osuTK.Graphics;
 
 namespace osu.Game.Screens.Menu
 {
