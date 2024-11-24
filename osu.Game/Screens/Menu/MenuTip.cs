@@ -118,7 +118,6 @@ namespace osu.Game.Screens.Menu
                 "You can create mod presets to make toggling your favorite mod combinations easier!",
                 "Many mods have customisation settings that drastically change how they function. Click the Mod Customisation button in mod select to view settings!",
                 "Press Ctrl-Shift-R to switch to a random skin!",
-                "Press Ctrl-Shift-F to toggle the FPS Counter. But make sure not to pay too much attention to it!",
                 "While watching a replay, press Ctrl-H to toggle replay settings!",
                 "You can easily copy the mods from scores on a leaderboard by right-clicking on them!",
                 "Ctrl-Enter at song select will start a beatmap in autoplay mode!"
