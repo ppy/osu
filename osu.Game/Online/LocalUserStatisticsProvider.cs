@@ -36,7 +36,6 @@ namespace osu.Game.Online
         private IAPIProvider api { get; set; } = null!;
 
         private readonly Dictionary<string, UserStatistics> statisticsCache = new Dictionary<string, UserStatistics>();
-        private readonly Dictionary<string, GetUserRequest> statisticsRequests = new Dictionary<string, GetUserRequest>();
 
         /// <summary>
         /// Returns the <see cref="UserStatistics"/> currently available for the given ruleset.
@@ -62,23 +61,21 @@ namespace osu.Game.Online
                 RefetchStatistics(ruleset);
         }
 
-        public void RefetchStatistics(RulesetInfo ruleset)
+        public void RefetchStatistics(RulesetInfo ruleset, Action<UserStatisticsUpdate>? callback = null)
         {
-            if (statisticsRequests.TryGetValue(ruleset.ShortName, out var previousRequest))
-                previousRequest.Cancel();
-
-            var request = statisticsRequests[ruleset.ShortName] = new GetUserRequest(api.LocalUser.Value.Id, ruleset);
-            request.Success += u => UpdateStatistics(u.Statistics, ruleset);
+            var request = new GetUserRequest(api.LocalUser.Value.Id, ruleset);
+            request.Success += u => UpdateStatistics(u.Statistics, ruleset, callback);
             api.Queue(request);
         }
 
-        protected void UpdateStatistics(UserStatistics newStatistics, RulesetInfo ruleset)
+        protected void UpdateStatistics(UserStatistics newStatistics, RulesetInfo ruleset, Action<UserStatisticsUpdate>? callback = null)
         {
             var oldStatistics = statisticsCache.GetValueOrDefault(ruleset.ShortName);
-
-            statisticsRequests.Remove(ruleset.ShortName);
             statisticsCache[ruleset.ShortName] = newStatistics;
-            StatisticsUpdated?.Invoke(new UserStatisticsUpdate(ruleset, oldStatistics, newStatistics));
+
+            var update = new UserStatisticsUpdate(ruleset, oldStatistics, newStatistics);
+            callback?.Invoke(update);
+            StatisticsUpdated?.Invoke(update);
         }
     }
 
