@@ -37,11 +37,13 @@ namespace osu.Game.Overlays.Chat.ChannelList
 
         private readonly Dictionary<Channel, ChannelListItem> channelMap = new Dictionary<Channel, ChannelListItem>();
 
+        public ChannelGroup AnnounceChannelGroup { get; private set; } = null!;
+        public ChannelGroup PublicChannelGroup { get; private set; } = null!;
+        public ChannelGroup PrivateChannelGroup { get; private set; } = null!;
+
         private OsuScrollContainer scroll = null!;
         private SearchContainer groupFlow = null!;
-        private ChannelGroup announceChannelGroup = null!;
-        private ChannelGroup publicChannelGroup = null!;
-        private ChannelGroup privateChannelGroup = null!;
+
         private ChannelListItem selector = null!;
         private TextBox searchTextBox = null!;
 
@@ -77,10 +79,10 @@ namespace osu.Game.Overlays.Chat.ChannelList
                                     RelativeSizeAxes = Axes.X,
                                 }
                             },
-                            announceChannelGroup = new ChannelGroup(ChatStrings.ChannelsListTitleANNOUNCE.ToUpper(), false),
-                            publicChannelGroup = new ChannelGroup(ChatStrings.ChannelsListTitlePUBLIC.ToUpper(), false),
+                            AnnounceChannelGroup = new ChannelGroup(ChatStrings.ChannelsListTitleANNOUNCE.ToUpper(), false),
+                            PublicChannelGroup = new ChannelGroup(ChatStrings.ChannelsListTitlePUBLIC.ToUpper(), false),
                             selector = new ChannelListItem(ChannelListingChannel),
-                            privateChannelGroup = new ChannelGroup(ChatStrings.ChannelsListTitlePM.ToUpper(), true),
+                            PrivateChannelGroup = new ChannelGroup(ChatStrings.ChannelsListTitlePM.ToUpper(), true),
                         },
                     },
                 },
@@ -146,28 +148,28 @@ namespace osu.Game.Overlays.Chat.ChannelList
             switch (channel.Type)
             {
                 case ChannelType.Public:
-                    return publicChannelGroup;
+                    return PublicChannelGroup;
 
                 case ChannelType.PM:
-                    return privateChannelGroup;
+                    return PrivateChannelGroup;
 
                 case ChannelType.Announce:
-                    return announceChannelGroup;
+                    return AnnounceChannelGroup;
 
                 default:
-                    return publicChannelGroup;
+                    return PublicChannelGroup;
             }
         }
 
         private void updateVisibility()
         {
-            if (announceChannelGroup.ItemFlow.Children.Count == 0)
-                announceChannelGroup.Hide();
+            if (AnnounceChannelGroup.ItemFlow.Children.Count == 0)
+                AnnounceChannelGroup.Hide();
             else
-                announceChannelGroup.Show();
+                AnnounceChannelGroup.Show();
         }
 
-        private partial class ChannelGroup : FillFlowContainer
+        public partial class ChannelGroup : FillFlowContainer
         {
             public readonly ChannelListItemFlow ItemFlow;
 
@@ -207,7 +209,7 @@ namespace osu.Game.Overlays.Chat.ChannelList
                 public void Reflow() => InvalidateLayout();
 
                 public override IEnumerable<Drawable> FlowingChildren => sortByRecent
-                    ? base.FlowingChildren.OfType<ChannelListItem>().OrderByDescending(i => i.Channel.LastMessageId)
+                    ? base.FlowingChildren.OfType<ChannelListItem>().OrderByDescending(i => i.Channel.LastMessageId ?? long.MinValue)
                     : base.FlowingChildren.OfType<ChannelListItem>().OrderBy(i => i.Channel.Name);
             }
 
