@@ -3,8 +3,11 @@
 
 using System.Collections.Generic;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Footer;
@@ -58,6 +61,15 @@ namespace osu.Game.Screens
         /// Whether overlays should be able to be opened when this screen is current.
         /// </summary>
         IBindable<OverlayActivation> OverlayActivationMode { get; }
+
+        /// <summary>
+        /// Controls the visibility state of <see cref="BackButton"/> to better work with screen-specific transitions (i.e. quick restart in player).
+        /// The back button can still be triggered by the <see cref="GlobalAction.Back"/> action even while hidden.
+        /// </summary>
+        /// <remarks>
+        /// This is ignored when <see cref="AllowBackButton"/> is set to false.
+        /// </remarks>
+        IBindable<Visibility> BackButtonState { get; }
 
         /// <summary>
         /// The current <see cref="UserActivity"/> for this screen.
