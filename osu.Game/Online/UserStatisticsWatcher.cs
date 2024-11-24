@@ -23,8 +23,6 @@ namespace osu.Game.Online
         public IBindable<ScoreBasedUserStatisticsUpdate?> LatestUpdate => latestUpdate;
         private readonly Bindable<ScoreBasedUserStatisticsUpdate?> latestUpdate = new Bindable<ScoreBasedUserStatisticsUpdate?>();
 
-        private ScoreInfo? scorePendingUpdate;
-
         [Resolved]
         private SpectatorClient spectatorClient { get; set; } = null!;
 
@@ -43,7 +41,6 @@ namespace osu.Game.Online
             base.LoadComplete();
 
             spectatorClient.OnUserScoreProcessed += userScoreProcessed;
-            statisticsProvider.StatisticsUpdated += onStatisticsUpdated;
         }
 
         /// <summary>
@@ -72,20 +69,12 @@ namespace osu.Game.Online
             if (!watchedScores.Remove(scoreId, out var scoreInfo))
                 return;
 
-            scorePendingUpdate = scoreInfo;
-            statisticsProvider.RefetchStatistics(scoreInfo.Ruleset);
+            statisticsProvider.RefetchStatistics(scoreInfo.Ruleset, u => Schedule(() =>
+            {
+                if (u.OldStatistics != null)
+                    latestUpdate.Value = new ScoreBasedUserStatisticsUpdate(scoreInfo, u.OldStatistics, u.NewStatistics);
+            }));
         }
-
-        private void onStatisticsUpdated(UserStatisticsUpdate update) => Schedule(() =>
-        {
-            if (scorePendingUpdate == null || !update.Ruleset.Equals(scorePendingUpdate.Ruleset))
-                return;
-
-            if (update.OldStatistics != null)
-                latestUpdate.Value = new ScoreBasedUserStatisticsUpdate(scorePendingUpdate, update.OldStatistics, update.NewStatistics);
-
-            scorePendingUpdate = null;
-        });
 
         protected override void Dispose(bool isDisposing)
         {
