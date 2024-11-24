@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -25,11 +23,11 @@ namespace osu.Game.Tests.Visual.Online
     [TestFixture]
     public partial class TestSceneUserPanel : OsuTestScene
     {
-        private readonly Bindable<UserActivity> activity = new Bindable<UserActivity>();
+        private readonly Bindable<UserActivity?> activity = new Bindable<UserActivity?>();
         private readonly Bindable<UserStatus?> status = new Bindable<UserStatus?>();
 
-        private UserGridPanel boundPanel1;
-        private TestUserListPanel boundPanel2;
+        private UserGridPanel boundPanel1 = null!;
+        private TestUserListPanel boundPanel2 = null!;
 
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
@@ -38,7 +36,7 @@ namespace osu.Game.Tests.Visual.Online
         private readonly TestUserStatisticsProvider statisticsProvider = new TestUserStatisticsProvider();
 
         [Resolved]
-        private IRulesetStore rulesetStore { get; set; }
+        private IRulesetStore rulesetStore { get; set; } = null!;
 
         [SetUp]
         public void SetUp() => Schedule(() =>
@@ -209,8 +207,8 @@ namespace osu.Game.Tests.Visual.Online
 
         private partial class TestUserStatisticsProvider : LocalUserStatisticsProvider
         {
-            public new void UpdateStatistics(UserStatistics newStatistics, RulesetInfo ruleset)
-                => base.UpdateStatistics(newStatistics, ruleset);
+            public new void UpdateStatistics(UserStatistics newStatistics, RulesetInfo ruleset, Action<UserStatisticsUpdate>? callback = null)
+                => base.UpdateStatistics(newStatistics, ruleset, callback);
         }
     }
 }
