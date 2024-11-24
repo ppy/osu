@@ -205,7 +205,7 @@ namespace osu.Game.Tests.Visual.Online
             public new TextFlowContainer LastVisitMessage => base.LastVisitMessage;
         }
 
-        private partial class TestUserStatisticsProvider : LocalUserStatisticsProvider
+        public partial class TestUserStatisticsProvider : LocalUserStatisticsProvider
         {
             public new void UpdateStatistics(UserStatistics newStatistics, RulesetInfo ruleset, Action<UserStatisticsUpdate>? callback = null)
                 => base.UpdateStatistics(newStatistics, ruleset, callback);
