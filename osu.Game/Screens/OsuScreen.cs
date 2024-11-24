@@ -11,6 +11,7 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays;
@@ -55,6 +56,10 @@ namespace osu.Game.Screens
         public readonly Bindable<OverlayActivation> OverlayActivationMode;
 
         IBindable<OverlayActivation> IOsuScreen.OverlayActivationMode => OverlayActivationMode;
+
+        public readonly Bindable<Visibility> BackButtonState = new Bindable<Visibility>(Visibility.Visible);
+
+        IBindable<Visibility> IOsuScreen.BackButtonState => BackButtonState;
 
         public virtual bool CursorVisible => true;
 

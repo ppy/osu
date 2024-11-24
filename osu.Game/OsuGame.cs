@@ -1581,12 +1581,20 @@ namespace osu.Game
 
             if (current is IOsuScreen currentOsuScreen)
             {
+                if (currentOsuScreen.AllowBackButton)
+                    BackButton.State.UnbindFrom(currentOsuScreen.BackButtonState);
+
                 OverlayActivationMode.UnbindFrom(currentOsuScreen.OverlayActivationMode);
                 API.Activity.UnbindFrom(currentOsuScreen.Activity);
             }
 
             if (newScreen is IOsuScreen newOsuScreen)
             {
+                if (newOsuScreen.AllowBackButton)
+                    ((IBindable<Visibility>)BackButton.State).BindTo(newOsuScreen.BackButtonState);
+                else
+                    BackButton.Hide();
+
                 OverlayActivationMode.BindTo(newOsuScreen.OverlayActivationMode);
                 API.Activity.BindTo(newOsuScreen.Activity);
 
@@ -1596,11 +1604,6 @@ namespace osu.Game
                     CloseAllOverlays();
                 else
                     Toolbar.Show();
-
-                if (newOsuScreen.AllowBackButton)
-                    BackButton.Show();
-                else
-                    BackButton.Hide();
 
                 if (newOsuScreen.ShowFooter)
                 {
