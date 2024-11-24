@@ -113,7 +113,7 @@ namespace osu.Game.Screens.Edit.Setup
                 beatmaps.AddFile(set, stream, newFilename);
 
             working.Value.Metadata.BackgroundFile = newFilename;
-            updateAllDifficultiesButton.Enabled.Value = true;
+            updateAllDifficultiesButton.Enabled.Value = set.Beatmaps.Count > 1;
 
             editorBeatmap.SaveState();
 
@@ -152,7 +152,7 @@ namespace osu.Game.Screens.Edit.Setup
                 beatmaps.AddFile(set, stream, newFilename);
 
             working.Value.Metadata.AudioFile = newFilename;
-            updateAllDifficultiesButton.Enabled.Value = true;
+            updateAllDifficultiesButton.Enabled.Value = set.Beatmaps.Count > 1;
 
             editorBeatmap.SaveState();
             music.ReloadCurrentTrack();
