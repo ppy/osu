@@ -200,7 +200,6 @@ namespace osu.Game.Screens.Edit.Setup
                 beatmaps.Save(otherBeatmap, otherWorking.Beatmap);
             }
 
-            editorBeatmap.SaveState();
             syncResourcesButton.Enabled.Value = false;
         }
 
