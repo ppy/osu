@@ -15,6 +15,8 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Collections;
 using osu.Game.Database;
+using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Localisation;
 using osu.Game.Overlays.Dialog;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Catch;
@@ -603,6 +605,60 @@ namespace osu.Game.Tests.Visual.Editing
                     return success;
                 });
             }
+        }
+
+        [Test]
+        public void TestUpdateBackgroundOnAllDifficulties()
+        {
+            AddStep("enter setup mode", () => InputManager.Key(Key.F4));
+            AddAssert("button disabled", () => !getButton().Enabled.Value);
+            AddAssert("set background", () => setBackground(expected: "bg.jpg"));
+
+            // there is only one diff so this should still be disabled.
+            AddAssert("button still disabled", () => !getButton().Enabled.Value);
+
+            AddStep("save", () => Editor.Save());
+            AddStep("create new difficulty", () => Editor.CreateNewDifficulty(new OsuRuleset().RulesetInfo));
+            AddUntilStep("wait for dialog", () => DialogOverlay.CurrentDialog is CreateNewDifficultyDialog);
+            AddStep("confirm creation with no objects", () => DialogOverlay.CurrentDialog!.PerformOkAction());
+            AddUntilStep("wait for created", () =>
+            {
+                string? difficultyName = Editor.ChildrenOfType<EditorBeatmap>().SingleOrDefault()?.BeatmapInfo.DifficultyName;
+                return difficultyName != null && difficultyName == "New Difficulty";
+            });
+
+            AddAssert("new difficulty uses same background", () => Beatmap.Value.Metadata.BackgroundFile == "bg.jpg");
+            AddStep("enter setup mode", () => InputManager.Key(Key.F4));
+            AddUntilStep("wait for load", () => Editor.ChildrenOfType<SetupScreen>().Any());
+            AddAssert("button disabled", () => !getButton().Enabled.Value);
+            AddAssert("set background", () => setBackground(expected: "bg (1).jpg"));
+            AddAssert("new background added", () => Beatmap.Value.BeatmapSetInfo.Files.Any(f => f.Filename == "bg (1).jpg"));
+            AddAssert("new difficulty uses new background", () => Beatmap.Value.Metadata.BackgroundFile == "bg (1).jpg");
+
+            AddAssert("button enabled", () => getButton().Enabled.Value);
+            AddStep("press button", () => getButton().TriggerClick());
+
+            AddAssert("new difficulty still uses new background", () => Beatmap.Value.BeatmapSetInfo.Beatmaps[1].Metadata.BackgroundFile == "bg (1).jpg");
+            AddAssert("old difficulty uses new background", () => Beatmap.Value.BeatmapSetInfo.Beatmaps[0].Metadata.BackgroundFile == "bg (1).jpg");
+            AddAssert("old background removed", () => Beatmap.Value.BeatmapSetInfo.Files.All(f => f.Filename != "bg.jpg"));
+
+            AddStep("save", () => Editor.Save());
+            AddStep("switch to previous difficulty", () => Editor.SwitchToDifficulty(Beatmap.Value.BeatmapSetInfo.Beatmaps.First()));
+            AddAssert("old difficulty still uses new background", () => Beatmap.Value.Metadata.BackgroundFile == "bg (1).jpg");
+
+            bool setBackground(string expected)
+            {
+                var setup = Editor.ChildrenOfType<SetupScreen>().First();
+
+                return setFile(TestResources.GetQuickTestBeatmapForImport(), extractedFolder =>
+                {
+                    bool success = setup.ChildrenOfType<ResourcesSection>().First().ChangeBackgroundImage(new FileInfo(Path.Combine(extractedFolder, "machinetop_background.jpg")));
+                    Assert.That(Beatmap.Value.Metadata.BackgroundFile, Is.EqualTo(expected));
+                    return success;
+                });
+            }
+
+            RoundedButton getButton() => Editor.ChildrenOfType<RoundedButton>().Single(b => b.Text == EditorSetupStrings.ResourcesUpdateAllDifficulties);
         }
 
         private bool setFile(string archivePath, Func<string, bool> func)
