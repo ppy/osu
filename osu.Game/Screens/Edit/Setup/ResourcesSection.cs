@@ -77,27 +77,35 @@ namespace osu.Game.Screens.Edit.Setup
             if (!source.Exists)
                 return false;
 
+            var beatmap = working.Value.BeatmapInfo;
             var set = working.Value.BeatmapSetInfo;
 
-            var destination = new FileInfo($@"bg{source.Extension}");
+            string[] filenames = set.Files.Select(f => f.Filename).Where(f =>
+                f.StartsWith(@"bg", StringComparison.OrdinalIgnoreCase) &&
+                f.EndsWith(source.Extension, StringComparison.OrdinalIgnoreCase)).ToArray();
 
-            // remove the previous background for now.
-            // in the future we probably want to check if this is being used elsewhere (other difficulties?)
-            var oldFile = set.GetFile(working.Value.Metadata.BackgroundFile);
+            string currentFilename = working.Value.Metadata.BackgroundFile;
+            string? newFilename = null;
+
+            var oldFile = set.GetFile(currentFilename);
+
+            if (oldFile != null && set.Beatmaps.Where(b => !b.Equals(beatmap)).All(b => b.Metadata.BackgroundFile != currentFilename))
+            {
+                beatmaps.DeleteFile(set, oldFile);
+                newFilename = currentFilename;
+            }
+
+            newFilename ??= NamingUtils.GetNextBestFilename(filenames, $@"bg{source.Extension}");
 
             using (var stream = source.OpenRead())
-            {
-                if (oldFile != null)
-                    beatmaps.DeleteFile(set, oldFile);
+                beatmaps.AddFile(set, stream, newFilename);
 
-                beatmaps.AddFile(set, stream, destination.Name);
-            }
+            working.Value.Metadata.BackgroundFile = newFilename;
+            updateAllDifficultiesButton.Enabled.Value = true;
 
             editorBeatmap.SaveState();
 
-            working.Value.Metadata.BackgroundFile = destination.Name;
             headerBackground.UpdateBackground();
-
             editor?.ApplyToBackground(bg => bg.RefreshBackground());
 
             return true;
@@ -108,23 +116,31 @@ namespace osu.Game.Screens.Edit.Setup
             if (!source.Exists)
                 return false;
 
+            var beatmap = working.Value.BeatmapInfo;
             var set = working.Value.BeatmapSetInfo;
 
-            var destination = new FileInfo($@"audio{source.Extension}");
+            string[] filenames = set.Files.Select(f => f.Filename).Where(f =>
+                f.StartsWith(@"audio", StringComparison.OrdinalIgnoreCase) &&
+                f.EndsWith(source.Extension, StringComparison.OrdinalIgnoreCase)).ToArray();
 
-            // remove the previous audio track for now.
-            // in the future we probably want to check if this is being used elsewhere (other difficulties?)
-            var oldFile = set.GetFile(working.Value.Metadata.AudioFile);
+            string currentFilename = working.Value.Metadata.AudioFile;
+            string? newFilename = null;
 
-            using (var stream = source.OpenRead())
+            var oldFile = set.GetFile(currentFilename);
+
+            if (oldFile != null && set.Beatmaps.Where(b => !b.Equals(beatmap)).All(b => b.Metadata.AudioFile != currentFilename))
             {
-                if (oldFile != null)
-                    beatmaps.DeleteFile(set, oldFile);
-
-                beatmaps.AddFile(set, stream, destination.Name);
+                beatmaps.DeleteFile(set, oldFile);
+                newFilename = currentFilename;
             }
 
-            working.Value.Metadata.AudioFile = destination.Name;
+            newFilename ??= NamingUtils.GetNextBestFilename(filenames, $@"audio{source.Extension}");
+
+            using (var stream = source.OpenRead())
+                beatmaps.AddFile(set, stream, newFilename);
+
+            working.Value.Metadata.AudioFile = newFilename;
+            updateAllDifficultiesButton.Enabled.Value = true;
 
             editorBeatmap.SaveState();
             music.ReloadCurrentTrack();
