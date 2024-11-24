@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// The scale to apply to the <see cref="TimeOffset"/> to account for potential rate adjustments.
         /// </summary>
-        public readonly double TimeScale;
+        public readonly double? TimeScale;
 
         /// <summary>
         /// The hit result.
@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Scoring
         /// <param name="hitObject">The <see cref="HitObject"/> that triggered the event.</param>
         /// <param name="lastHitObject">The previous <see cref="HitObject"/>.</param>
         /// <param name="position">A position corresponding to the event.</param>
-        public HitEvent(double timeOffset, double timeScale, HitResult result, HitObject hitObject, [CanBeNull] HitObject lastHitObject, [CanBeNull] Vector2? position)
+        public HitEvent(double timeOffset, double? timeScale, HitResult result, HitObject hitObject, [CanBeNull] HitObject lastHitObject, [CanBeNull] Vector2? position)
         {
             TimeOffset = timeOffset;
             TimeScale = timeScale;

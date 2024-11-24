@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace osu.Game.Rulesets.Scoring
@@ -21,6 +22,8 @@ namespace osu.Game.Rulesets.Scoring
         /// </returns>
         public static double? CalculateUnstableRate(this IEnumerable<HitEvent> hitEvents)
         {
+            Debug.Assert(hitEvents.All(ev => ev.TimeScale != null));
+
             int count = 0;
             double mean = 0;
             double sumOfSquares = 0;
@@ -33,7 +36,7 @@ namespace osu.Game.Rulesets.Scoring
                 count++;
 
                 // Division by TimeScale is used to account for TimeOffset _usually_ scaling with gameplay rate.
-                double currentValue = e.TimeOffset / e.TimeScale;
+                double currentValue = e.TimeOffset / e.TimeScale!.Value;
                 double nextMean = mean + (currentValue - mean) / count;
                 sumOfSquares += (currentValue - mean) * (currentValue - nextMean);
                 mean = nextMean;

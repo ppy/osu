@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Extensions.TypeExtensions;
@@ -205,11 +204,7 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         /// <param name="judgementResult">The judgement result.</param>
         /// <returns>The time scale.</returns>
-        protected virtual double GetTimeScaleForResult(JudgementResult judgementResult)
-        {
-            Debug.Assert(judgementResult.GameplayRate != null);
-            return judgementResult.GameplayRate.Value;
-        }
+        protected virtual double? GetTimeScaleForResult(JudgementResult judgementResult) => judgementResult.GameplayRate;
 
         protected override void Update()
         {
