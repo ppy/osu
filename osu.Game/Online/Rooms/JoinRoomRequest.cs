@@ -7,7 +7,7 @@ using osu.Game.Online.API;
 
 namespace osu.Game.Online.Rooms
 {
-    public class JoinRoomRequest : APIRequest
+    public class JoinRoomRequest : APIRequest<Room>
     {
         public readonly Room Room;
         public readonly string? Password;
