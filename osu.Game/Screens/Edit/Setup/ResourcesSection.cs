@@ -66,7 +66,7 @@ namespace osu.Game.Screens.Edit.Setup
                 updateAllDifficultiesButton = new RoundedButton
                 {
                     RelativeSizeAxes = Axes.X,
-                    Text = "Update all difficulties",
+                    Text = EditorSetupStrings.ResourcesUpdateAllDifficulties,
                     Action = updateAllDifficulties,
                     Enabled = { Value = false },
                 }
