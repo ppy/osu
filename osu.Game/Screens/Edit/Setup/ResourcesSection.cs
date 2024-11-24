@@ -40,7 +40,7 @@ namespace osu.Game.Screens.Edit.Setup
         private Editor? editor { get; set; }
 
         private SetupScreenHeaderBackground headerBackground = null!;
-        private RoundedButton updateAllDifficultiesButton = null!;
+        private RoundedButton syncResourcesButton = null!;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -63,11 +63,11 @@ namespace osu.Game.Screens.Edit.Setup
                     Caption = EditorSetupStrings.AudioTrack,
                     PlaceholderText = EditorSetupStrings.ClickToSelectTrack,
                 },
-                updateAllDifficultiesButton = new RoundedButton
+                syncResourcesButton = new RoundedButton
                 {
                     RelativeSizeAxes = Axes.X,
                     Text = EditorSetupStrings.ResourcesUpdateAllDifficulties,
-                    Action = updateAllDifficulties,
+                    Action = syncResources,
                     Enabled = { Value = false },
                 }
             };
@@ -116,7 +116,7 @@ namespace osu.Game.Screens.Edit.Setup
                 beatmaps.AddFile(set, stream, newFilename);
 
             working.Value.Metadata.BackgroundFile = newBackgroundFile = newFilename;
-            updateAllDifficultiesButton.Enabled.Value = set.Beatmaps.Count > 1;
+            syncResourcesButton.Enabled.Value = set.Beatmaps.Count > 1;
 
             editorBeatmap.SaveState();
 
@@ -155,7 +155,7 @@ namespace osu.Game.Screens.Edit.Setup
                 beatmaps.AddFile(set, stream, newFilename);
 
             working.Value.Metadata.AudioFile = newAudioFile = newFilename;
-            updateAllDifficultiesButton.Enabled.Value = set.Beatmaps.Count > 1;
+            updateSyncResourcesButton();
 
             editorBeatmap.SaveState();
             music.ReloadCurrentTrack();
@@ -163,7 +163,16 @@ namespace osu.Game.Screens.Edit.Setup
             return true;
         }
 
-        private void updateAllDifficulties()
+        private void updateSyncResourcesButton()
+        {
+            var set = working.Value.BeatmapSetInfo;
+
+            syncResourcesButton.Enabled.Value =
+                (newBackgroundFile != null && set.Beatmaps.DistinctBy(b => b.Metadata.BackgroundFile, StringComparer.OrdinalIgnoreCase).Count() > 1) ||
+                (newAudioFile != null && set.Beatmaps.DistinctBy(b => b.Metadata.AudioFile, StringComparer.OrdinalIgnoreCase).Count() > 1);
+        }
+
+        private void syncResources()
         {
             var beatmap = working.Value.BeatmapInfo;
             var set = working.Value.BeatmapSetInfo;
@@ -192,7 +201,7 @@ namespace osu.Game.Screens.Edit.Setup
             }
 
             editorBeatmap.SaveState();
-            updateAllDifficultiesButton.Enabled.Value = false;
+            syncResourcesButton.Enabled.Value = false;
         }
 
         private void backgroundChanged(ValueChangedEvent<FileInfo?> file)
