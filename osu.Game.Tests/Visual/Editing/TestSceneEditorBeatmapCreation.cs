@@ -104,28 +104,12 @@ namespace osu.Game.Tests.Visual.Editing
             {
                 var setup = Editor.ChildrenOfType<SetupScreen>().First();
 
-                string temp = TestResources.GetTestBeatmapForImport();
-
-                string extractedFolder = $"{temp}_extracted";
-                Directory.CreateDirectory(extractedFolder);
-
-                try
+                return setFile(TestResources.GetTestBeatmapForImport(), extractedFolder =>
                 {
-                    using (var zip = ZipArchive.Open(temp))
-                        zip.WriteToDirectory(extractedFolder);
-
                     bool success = setup.ChildrenOfType<ResourcesSection>().First().ChangeAudioTrack(new FileInfo(Path.Combine(extractedFolder, "03. Renatus - Soleily 192kbps.mp3")));
-
-                    // ensure audio file is copied to beatmap as "audio.mp3" rather than original filename.
                     Assert.That(Beatmap.Value.Metadata.AudioFile == "audio.mp3");
-
                     return success;
-                }
-                finally
-                {
-                    File.Delete(temp);
-                    Directory.Delete(extractedFolder, true);
-                }
+                });
             });
 
             AddAssert("track is not virtual", () => Beatmap.Value.Track is not TrackVirtual);
@@ -529,6 +513,117 @@ namespace osu.Game.Tests.Visual.Editing
                 var set = beatmapManager.QueryBeatmapSet(s => s.ID == setId);
                 return set != null && set.PerformRead(s => s.Beatmaps.Count == 3 && s.Files.Count == 3);
             });
+        }
+
+        [Test]
+        public void TestMultipleBackgroundFiles()
+        {
+            AddStep("enter setup mode", () => InputManager.Key(Key.F4));
+            AddAssert("set background", () => setBackground(expected: "bg.jpg"));
+
+            AddStep("save", () => Editor.Save());
+            AddStep("create new difficulty", () => Editor.CreateNewDifficulty(new OsuRuleset().RulesetInfo));
+            AddUntilStep("wait for dialog", () => DialogOverlay.CurrentDialog is CreateNewDifficultyDialog);
+            AddStep("confirm creation with no objects", () => DialogOverlay.CurrentDialog!.PerformOkAction());
+            AddUntilStep("wait for created", () =>
+            {
+                string? difficultyName = Editor.ChildrenOfType<EditorBeatmap>().SingleOrDefault()?.BeatmapInfo.DifficultyName;
+                return difficultyName != null && difficultyName == "New Difficulty";
+            });
+
+            AddAssert("new difficulty uses same background", () => Beatmap.Value.Metadata.BackgroundFile == "bg.jpg");
+            AddStep("enter setup mode", () => InputManager.Key(Key.F4));
+            AddUntilStep("wait for load", () => Editor.ChildrenOfType<SetupScreen>().Any());
+            AddAssert("set background", () => setBackground(expected: "bg (1).jpg"));
+            AddAssert("new difficulty uses new background", () => Beatmap.Value.Metadata.BackgroundFile == "bg (1).jpg");
+
+            AddStep("save", () => Editor.Save());
+            AddStep("switch to previous difficulty", () => Editor.SwitchToDifficulty(Beatmap.Value.BeatmapSetInfo.Beatmaps.First()));
+            AddAssert("old difficulty uses old background", () => Beatmap.Value.Metadata.BackgroundFile == "bg.jpg");
+            AddAssert("old background not removed", () => Beatmap.Value.BeatmapSetInfo.Files.Any(f => f.Filename == "bg.jpg"));
+
+            AddStep("enter setup mode", () => InputManager.Key(Key.F4));
+            AddUntilStep("wait for load", () => Editor.ChildrenOfType<SetupScreen>().Any());
+            AddStep("set background", () => setBackground(expected: "bg.jpg"));
+            AddAssert("other background not removed", () => Beatmap.Value.BeatmapSetInfo.Files.Any(f => f.Filename == "bg (1).jpg"));
+
+            bool setBackground(string expected)
+            {
+                var setup = Editor.ChildrenOfType<SetupScreen>().First();
+
+                return setFile(TestResources.GetQuickTestBeatmapForImport(), extractedFolder =>
+                {
+                    bool success = setup.ChildrenOfType<ResourcesSection>().First().ChangeBackgroundImage(new FileInfo(Path.Combine(extractedFolder, "machinetop_background.jpg")));
+                    Assert.That(Beatmap.Value.Metadata.BackgroundFile, Is.EqualTo(expected));
+                    return success;
+                });
+            }
+        }
+
+        [Test]
+        public void TestMultipleAudioFiles()
+        {
+            AddStep("enter setup mode", () => InputManager.Key(Key.F4));
+            AddAssert("set audio", () => setAudio(expected: "audio.mp3"));
+
+            AddStep("save", () => Editor.Save());
+            AddStep("create new difficulty", () => Editor.CreateNewDifficulty(new OsuRuleset().RulesetInfo));
+            AddUntilStep("wait for dialog", () => DialogOverlay.CurrentDialog is CreateNewDifficultyDialog);
+            AddStep("confirm creation with no objects", () => DialogOverlay.CurrentDialog!.PerformOkAction());
+            AddUntilStep("wait for created", () =>
+            {
+                string? difficultyName = Editor.ChildrenOfType<EditorBeatmap>().SingleOrDefault()?.BeatmapInfo.DifficultyName;
+                return difficultyName != null && difficultyName == "New Difficulty";
+            });
+
+            AddAssert("new difficulty uses same audio", () => Beatmap.Value.Metadata.AudioFile == "audio.mp3");
+            AddStep("enter setup mode", () => InputManager.Key(Key.F4));
+            AddUntilStep("wait for load", () => Editor.ChildrenOfType<SetupScreen>().Any());
+            AddAssert("set audio", () => setAudio(expected: "audio (1).mp3"));
+            AddAssert("new difficulty uses new audio", () => Beatmap.Value.Metadata.AudioFile == "audio (1).mp3");
+
+            AddStep("save", () => Editor.Save());
+            AddStep("switch to previous difficulty", () => Editor.SwitchToDifficulty(Beatmap.Value.BeatmapSetInfo.Beatmaps.First()));
+            AddAssert("old difficulty uses old audio", () => Beatmap.Value.Metadata.AudioFile == "audio.mp3");
+            AddAssert("old audio not removed", () => Beatmap.Value.BeatmapSetInfo.Files.Any(f => f.Filename == "audio.mp3"));
+
+            AddStep("enter setup mode", () => InputManager.Key(Key.F4));
+            AddUntilStep("wait for load", () => Editor.ChildrenOfType<SetupScreen>().Any());
+            AddStep("set audio", () => setAudio(expected: "audio.mp3"));
+            AddAssert("other audio not removed", () => Beatmap.Value.BeatmapSetInfo.Files.Any(f => f.Filename == "audio (1).mp3"));
+
+            bool setAudio(string expected)
+            {
+                var setup = Editor.ChildrenOfType<SetupScreen>().First();
+
+                return setFile(TestResources.GetTestBeatmapForImport(), extractedFolder =>
+                {
+                    bool success = setup.ChildrenOfType<ResourcesSection>().First().ChangeAudioTrack(new FileInfo(Path.Combine(extractedFolder, "03. Renatus - Soleily 192kbps.mp3")));
+                    Assert.That(Beatmap.Value.Metadata.AudioFile, Is.EqualTo(expected));
+                    return success;
+                });
+            }
+        }
+
+        private bool setFile(string archivePath, Func<string, bool> func)
+        {
+            string temp = archivePath;
+
+            string extractedFolder = $"{temp}_extracted";
+            Directory.CreateDirectory(extractedFolder);
+
+            try
+            {
+                using (var zip = ZipArchive.Open(temp))
+                    zip.WriteToDirectory(extractedFolder);
+
+                return func(extractedFolder);
+            }
+            finally
+            {
+                File.Delete(temp);
+                Directory.Delete(extractedFolder, true);
+            }
         }
     }
 }
