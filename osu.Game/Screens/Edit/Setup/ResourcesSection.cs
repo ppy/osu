@@ -1,7 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.IO;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -10,6 +12,8 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Overlays;
 using osu.Game.Localisation;
+using osu.Game.Models;
+using osu.Game.Utils;
 
 namespace osu.Game.Screens.Edit.Setup
 {
@@ -36,6 +40,7 @@ namespace osu.Game.Screens.Edit.Setup
         private Editor? editor { get; set; }
 
         private SetupScreenHeaderBackground headerBackground = null!;
+        private RoundedButton updateAllDifficultiesButton = null!;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -58,6 +63,13 @@ namespace osu.Game.Screens.Edit.Setup
                     Caption = EditorSetupStrings.AudioTrack,
                     PlaceholderText = EditorSetupStrings.ClickToSelectTrack,
                 },
+                updateAllDifficultiesButton = new RoundedButton
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Text = "Update all difficulties",
+                    Action = updateAllDifficulties,
+                    Enabled = { Value = false },
+                }
             };
 
             backgroundChooser.PreviewContainer.Add(headerBackground);
@@ -146,6 +158,41 @@ namespace osu.Game.Screens.Edit.Setup
             music.ReloadCurrentTrack();
 
             return true;
+        }
+
+        private void updateAllDifficulties()
+        {
+            var beatmap = working.Value.BeatmapInfo;
+            var set = working.Value.BeatmapSetInfo;
+
+            string backgroundFile = working.Value.Metadata.BackgroundFile;
+            string audioFile = working.Value.Metadata.AudioFile;
+
+            foreach (var otherBeatmap in set.Beatmaps.Where(b => !b.Equals(beatmap)))
+            {
+                var otherWorking = beatmaps.GetWorkingBeatmap(otherBeatmap);
+
+                if (!string.Equals(otherBeatmap.Metadata.BackgroundFile, backgroundFile, StringComparison.OrdinalIgnoreCase))
+                {
+                    if (set.GetFile(otherBeatmap.Metadata.BackgroundFile) is RealmNamedFileUsage file)
+                        beatmaps.DeleteFile(set, file);
+
+                    otherBeatmap.Metadata.BackgroundFile = backgroundFile;
+                }
+
+                if (!string.Equals(otherBeatmap.Metadata.AudioFile, audioFile, StringComparison.OrdinalIgnoreCase))
+                {
+                    if (set.GetFile(otherBeatmap.Metadata.AudioFile) is RealmNamedFileUsage file)
+                        beatmaps.DeleteFile(set, file);
+
+                    otherBeatmap.Metadata.AudioFile = audioFile;
+                }
+
+                beatmaps.Save(otherBeatmap, otherWorking.Beatmap);
+            }
+
+            editorBeatmap.SaveState();
+            updateAllDifficultiesButton.Enabled.Value = false;
         }
 
         private void backgroundChanged(ValueChangedEvent<FileInfo?> file)
