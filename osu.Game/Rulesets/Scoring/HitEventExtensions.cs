@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Scoring
         /// A non-null <see langword="double"/> value if unstable rate could be calculated,
         /// and <see langword="null"/> if unstable rate cannot be calculated due to <paramref name="hitEvents"/> being empty.
         /// </returns>
-        public static double? CalculateUnstableRate(this IEnumerable<HitEvent> hitEvents)
+        public static double? CalculateUnstableRate(this IReadOnlyList<HitEvent> hitEvents)
         {
             Debug.Assert(hitEvents.All(ev => ev.GameplayRate != null));
 
