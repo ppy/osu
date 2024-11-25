@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Scoring
 {
@@ -69,7 +70,8 @@ namespace osu.Game.Rulesets.Scoring
             return timeOffsets.Average();
         }
 
-        public static bool AffectsUnstableRate(HitEvent e) => e.HitObject.HitWindows != HitWindows.Empty && e.Result.IsHit();
+        public static bool AffectsUnstableRate(HitEvent e) => AffectsUnstableRate(e.HitObject, e.Result);
+        public static bool AffectsUnstableRate(HitObject hitObject, HitResult result) => hitObject.HitWindows != HitWindows.Empty && result.IsHit();
 
         public class UnstableRateCalculationResult
         {
