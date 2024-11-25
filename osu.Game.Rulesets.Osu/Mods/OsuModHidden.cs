@@ -2,12 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.Intrinsics.X86;
 using osu.Framework.Graphics;
 using osu.Framework.Bindables;
 using osu.Framework.Localisation;
+using osu.Framework.Utils;
 using osu.Game.Configuration;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
@@ -16,12 +17,13 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Skinning;
+using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModHidden : ModHidden, IHidesApproachCircles, IApplicableToHealthProcessor, IUpdatableByPlayfield
+    public class OsuModHidden : ModHidden, IHidesApproachCircles, IApplicableToHealthProcessor, IUpdatableByPlayfield, IApplicableToScoreProcessor
     {
         [SettingSource("Only fade approach circles", "The main object body will not fade when enabled.")]
         public Bindable<bool> OnlyFadeApproachCircles { get; } = new BindableBool();
@@ -65,13 +67,26 @@ namespace osu.Game.Rulesets.Osu.Mods
                     continue;
 
                 var hitObject = target.HitObject;
-                double fadeOutStartTime = hitObject.StartTime - hitObject.TimePreempt + hitObject.TimeFadeIn;
-                double fadeOutDuration = hitObject.TimePreempt * fadeDurationFactor;
+                double fadeOutStartTime = hitObject.StartTime - hitObject.TimePreempt;
+                double fadeInEndTime = fadeOutStartTime + hitObject.TimeFadeIn;
+                double fadeOutDuration = hitObject.TimePreempt * fadeDurationFactor + hitObject.TimeFadeIn;
 
-                using (target.BeginAbsoluteSequence(fadeOutStartTime))
+                if (target.Result.HasResult)
                 {
-                    target.ApproachCircle.FadeOutFromOne(fadeOutDuration);
+                    target.ApproachCircle.Hide();
+                    continue;
                 }
+
+                var fadeTarget = fadeDurationFactor;/*= fadeDurationFactor < 0.2
+                    ? 0
+                    : Interpolation.ValueAt((float)target.Time.Current, 1f, 0f, fadeOutStartTime, fadeOutStartTime + fadeOutDuration, Easing.InQuart);*/
+                var fadeInTarget = Interpolation.ValueAt((float)target.Time.Current, 0f, 1f, fadeOutStartTime, fadeInEndTime);
+
+                fadeInTarget = Math.Clamp(fadeInTarget, 0f, 1f);
+                fadeTarget = Math.Clamp(fadeTarget, 0f, 1f);
+                //Logger.Log($"{fadeTarget}");
+
+                target.ApproachCircle.FadeTo(MathF.Min(fadeTarget, fadeInTarget), hitObject.TimePreempt * 0.05f);
             }
         }
 
@@ -100,8 +115,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 if (drawableObject is DrawableHitCircle circle)
                 {
                     using (circle.BeginAbsoluteSequence(hitObject.StartTime - hitObject.TimePreempt))
-
-                        circle.ApproachCircle.FadeTo(this.fadeDurationFactor, fadeDuration, Easing.InQuart);
+                        circle.ApproachCircle.FadeOut();
                 }
                 else if (drawableObject is DrawableSpinner spinner)
                 {
@@ -227,10 +241,22 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void ApplyToHealthProcessor(HealthProcessor healthProcessor)
         {
+            return;
             healthProcessor.Health.ValueChanged += newHealth =>
             {
-                fadeDurationFactor = Math.Clamp(0.75f - (float)newHealth.NewValue, 0.1f, 0.9f);
+                fadeDurationFactor = Math.Clamp(Interpolation.ValueAt((float)newHealth.NewValue, 1.2f, -0.1f, 0.2f, 0.8f), 0f, 1f);
             };
         }
+
+        public override void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
+        {
+            scoreProcessor.Combo.ValueChanged += combo =>
+            {
+                fadeDurationFactor = combo.NewValue == 0f ? 1f : 1f - (float)combo.NewValue / 20f;
+                fadeDurationFactor = Math.Clamp(fadeDurationFactor, 0f, 1f);
+            };
+        }
+
+
     }
 }
