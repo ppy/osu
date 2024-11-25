@@ -20,34 +20,36 @@ namespace osu.Game.Rulesets.Scoring
         /// A non-null <see langword="double"/> value if unstable rate could be calculated,
         /// and <see langword="null"/> if unstable rate cannot be calculated due to <paramref name="hitEvents"/> being empty.
         /// </returns>
-        public static UnstableRateCalculationResult? CalculateUnstableRate(this IReadOnlyList<HitEvent> hitEvents, UnstableRateCalculationResult? previousResult = null)
+        public static UnstableRateCalculationResult? CalculateUnstableRate(this IReadOnlyList<HitEvent> hitEvents, UnstableRateCalculationResult? result = null)
         {
             Debug.Assert(hitEvents.All(ev => ev.GameplayRate != null));
 
-            int count = 0;
-            double mean = previousResult?.Mean ?? 0;
-            double sumOfSquares = previousResult?.SumOfSquares ?? 0;
+            result ??= new UnstableRateCalculationResult();
 
-            for (int i = previousResult?.CalculatedHitEventsCount - 1 ?? 0; i < hitEvents.Count; i++)
+            // Handle rewinding in the simplest way possible.
+            if (hitEvents.Count < result.NextProcessableIndex + 1)
+                result = new UnstableRateCalculationResult();
+
+            for (int i = result.NextProcessableIndex; i < hitEvents.Count; i++)
             {
                 HitEvent e = hitEvents[i];
 
                 if (!AffectsUnstableRate(e))
                     continue;
 
-                count++;
+                result.NextProcessableIndex++;
 
                 // Division by gameplay rate is to account for TimeOffset scaling with gameplay rate.
                 double currentValue = e.TimeOffset / e.GameplayRate!.Value;
-                double nextMean = mean + (currentValue - mean) / count;
-                sumOfSquares += (currentValue - mean) * (currentValue - nextMean);
-                mean = nextMean;
+                double nextMean = result.Mean + (currentValue - result.Mean) / result.NextProcessableIndex;
+                result.SumOfSquares += (currentValue - result.Mean) * (currentValue - nextMean);
+                result.Mean = nextMean;
             }
 
-            if (count == 0)
+            if (result.NextProcessableIndex == 0)
                 return null;
 
-            return new UnstableRateCalculationResult(hitEvents.Count, sumOfSquares, mean, 10.0 * Math.Sqrt(sumOfSquares / count));
+            return result;
         }
 
         /// <summary>
@@ -69,6 +71,13 @@ namespace osu.Game.Rulesets.Scoring
 
         public static bool AffectsUnstableRate(HitEvent e) => e.HitObject.HitWindows != HitWindows.Empty && e.Result.IsHit();
 
-        public record UnstableRateCalculationResult(int CalculatedHitEventsCount, double SumOfSquares, double Mean, double Result);
+        public class UnstableRateCalculationResult
+        {
+            public int NextProcessableIndex;
+            public double SumOfSquares;
+            public double Mean;
+
+            public double Result => 10.0 * Math.Sqrt(SumOfSquares / NextProcessableIndex);
+        }
     }
 }
