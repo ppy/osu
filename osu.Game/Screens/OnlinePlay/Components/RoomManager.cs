@@ -72,9 +72,13 @@ namespace osu.Game.Screens.OnlinePlay.Components
             currentJoinRoomRequest?.Cancel();
             currentJoinRoomRequest = new JoinRoomRequest(room, password);
 
-            currentJoinRoomRequest.Success += () =>
+            currentJoinRoomRequest.Success += result =>
             {
                 joinedRoom.Value = room;
+
+                AddOrUpdateRoom(result);
+                room.CopyFrom(result); // Also copy back to the source model, since this is likely to have been stored elsewhere.
+
                 onSuccess?.Invoke(room);
             };
 
