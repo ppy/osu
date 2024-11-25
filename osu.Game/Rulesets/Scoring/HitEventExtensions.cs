@@ -20,16 +20,18 @@ namespace osu.Game.Rulesets.Scoring
         /// A non-null <see langword="double"/> value if unstable rate could be calculated,
         /// and <see langword="null"/> if unstable rate cannot be calculated due to <paramref name="hitEvents"/> being empty.
         /// </returns>
-        public static double? CalculateUnstableRate(this IReadOnlyList<HitEvent> hitEvents)
+        public static UnstableRateCalculationResult? CalculateUnstableRate(this IReadOnlyList<HitEvent> hitEvents, UnstableRateCalculationResult? previousResult = null)
         {
             Debug.Assert(hitEvents.All(ev => ev.GameplayRate != null));
 
             int count = 0;
-            double mean = 0;
-            double sumOfSquares = 0;
+            double mean = previousResult?.Mean ?? 0;
+            double sumOfSquares = previousResult?.SumOfSquares ?? 0;
 
-            foreach (var e in hitEvents)
+            for (int i = previousResult?.CalculatedHitEventsCount - 1 ?? 0; i < hitEvents.Count; i++)
             {
+                HitEvent e = hitEvents[i];
+
                 if (!AffectsUnstableRate(e))
                     continue;
 
@@ -45,7 +47,7 @@ namespace osu.Game.Rulesets.Scoring
             if (count == 0)
                 return null;
 
-            return 10.0 * Math.Sqrt(sumOfSquares / count);
+            return new UnstableRateCalculationResult(hitEvents.Count, sumOfSquares, mean, 10.0 * Math.Sqrt(sumOfSquares / count));
         }
 
         /// <summary>
@@ -66,5 +68,7 @@ namespace osu.Game.Rulesets.Scoring
         }
 
         public static bool AffectsUnstableRate(HitEvent e) => e.HitObject.HitWindows != HitWindows.Empty && e.Result.IsHit();
+
+        public record UnstableRateCalculationResult(int CalculatedHitEventsCount, double SumOfSquares, double Mean, double Result);
     }
 }

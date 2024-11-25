@@ -18,7 +18,7 @@ namespace osu.Game.Screens.Ranking.Statistics
         public UnstableRate(IReadOnlyList<HitEvent> hitEvents)
             : base("Unstable Rate")
         {
-            Value = hitEvents.CalculateUnstableRate();
+            Value = hitEvents.CalculateUnstableRate()?.Result;
         }
 
         protected override string DisplayValue(double? value) => value == null ? "(not available)" : value.Value.ToString(@"N2");
