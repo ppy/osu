@@ -3,12 +3,10 @@
 
 using System;
 using osu.Framework.IO.Stores;
+using osu.Framework.Logging;
 
 namespace osu.Game.Online
 {
-    /// <summary>
-    /// An <see cref="OnlineStore"/> which proxies external media lookups through osu-web.
-    /// </summary>
     public class OsuOnlineStore : OnlineStore
     {
         private readonly string apiEndpointUrl;
@@ -20,8 +18,11 @@ namespace osu.Game.Online
 
         protected override string GetLookupUrl(string url)
         {
-            if (Uri.TryCreate(url, UriKind.Absolute, out Uri? uri) && uri.Host.EndsWith(@".ppy.sh", StringComparison.OrdinalIgnoreCase))
-                return url;
+            if (!Uri.TryCreate(url, UriKind.Absolute, out Uri? uri) || !uri.Host.EndsWith(@".ppy.sh", StringComparison.OrdinalIgnoreCase))
+            {
+                Logger.Log($@"Blocking resource lookup from external website: {url}", LoggingTarget.Network, LogLevel.Important);
+                return string.Empty;
+            }
 
             return $@"{apiEndpointUrl}/beatmapsets/discussions/media-url?url={url}";
         }
