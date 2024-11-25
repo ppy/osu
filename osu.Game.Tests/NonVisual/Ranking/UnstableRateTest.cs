@@ -20,7 +20,8 @@ namespace osu.Game.Tests.NonVisual.Ranking
         public void TestDistributedHits()
         {
             var events = Enumerable.Range(-5, 11)
-                                   .Select(t => new HitEvent(t - 5, 1.0, HitResult.Great, new HitObject(), null, null));
+                                   .Select(t => new HitEvent(t - 5, 1.0, HitResult.Great, new HitObject(), null, null))
+                                   .ToList();
 
             var unstableRate = new UnstableRate(events);
 
