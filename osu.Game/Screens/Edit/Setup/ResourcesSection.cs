@@ -200,6 +200,8 @@ namespace osu.Game.Screens.Edit.Setup
                 beatmaps.Save(otherBeatmap, otherWorking.Beatmap);
             }
 
+            newAudioFile = null;
+            newBackgroundFile = null;
             syncResourcesButton.Enabled.Value = false;
         }
 
