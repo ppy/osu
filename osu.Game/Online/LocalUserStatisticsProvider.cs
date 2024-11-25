@@ -63,6 +63,9 @@ namespace osu.Game.Online
 
         public void RefetchStatistics(RulesetInfo ruleset, Action<UserStatisticsUpdate>? callback = null)
         {
+            if (!ruleset.IsLegacyRuleset())
+                throw new InvalidOperationException($@"Retrieving statistics is not supported for ruleset {ruleset.ShortName}");
+
             var request = new GetUserRequest(api.LocalUser.Value.Id, ruleset);
             request.Success += u => UpdateStatistics(u.Statistics, ruleset, callback);
             api.Queue(request);
