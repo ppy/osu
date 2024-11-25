@@ -45,7 +45,7 @@ namespace osu.Game.Screens.Play.HUD
         }
 
         private bool changesUnstableRate(JudgementResult judgement)
-            => !(judgement.HitObject.HitWindows is HitWindows.EmptyHitWindows) && judgement.IsHit;
+            => judgement.HitObject.HitWindows != HitWindows.Empty && judgement.IsHit;
 
         protected override void LoadComplete()
         {
