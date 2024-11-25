@@ -150,7 +150,7 @@ namespace osu.Game.Beatmaps
 
         public bool EpilepsyWarning { get; set; }
 
-        public bool SamplesMatchPlaybackRate { get; set; } = true;
+        public bool SamplesMatchPlaybackRate { get; set; }
 
         /// <summary>
         /// The time at which this beatmap was last played by the local user.
@@ -181,7 +181,7 @@ namespace osu.Game.Beatmaps
         public double? EditorTimestamp { get; set; }
 
         [Ignored]
-        public CountdownType Countdown { get; set; } = CountdownType.Normal;
+        public CountdownType Countdown { get; set; } = CountdownType.None;
 
         /// <summary>
         /// The number of beats to move the countdown backwards (compared to its default location).
