@@ -60,10 +60,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
                 }
 
                 foreach (var incoming in result)
-                {
-                    incoming.RemoveExpiredPlaylistItems();
                     RoomManager.AddOrUpdateRoom(incoming);
-                }
 
                 initialRoomsReceived.Value = true;
                 tcs.SetResult(true);
