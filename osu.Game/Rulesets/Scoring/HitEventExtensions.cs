@@ -65,6 +65,6 @@ namespace osu.Game.Rulesets.Scoring
             return timeOffsets.Average();
         }
 
-        public static bool AffectsUnstableRate(HitEvent e) => !(e.HitObject.HitWindows is HitWindows.EmptyHitWindows) && e.Result.IsHit();
+        public static bool AffectsUnstableRate(HitEvent e) => e.HitObject.HitWindows != HitWindows.Empty && e.Result.IsHit();
     }
 }
