@@ -23,6 +23,7 @@ using osu.Game.Database;
 using osu.Game.IO;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Play.HUD;
+using osuTK;
 
 namespace osu.Game.Skinning
 {
@@ -312,6 +313,57 @@ namespace osu.Game.Skinning
                             hudLayout.Update(ruleset, hudLayout.TryGetDrawableInfo(ruleset, out var rulesetHUDComponents)
                                 ? rulesetHUDComponents.Concat(comboCounters).ToArray()
                                 : comboCounters);
+                        }
+                    });
+
+                    break;
+                }
+
+                case 2:
+                {
+                    // Legacy health bar is moved from the global HUD components target into per-ruleset.
+                    // On osu!mania, the health bar is moved from the HUD to Playfield target for stage-based positioning.
+                    if (resources == null)
+                        break;
+
+                    var hudLayout = layoutInfos.GetValueOrDefault(GlobalSkinnableContainers.MainHUDComponents);
+                    var playfieldLayout = layoutInfos.GetValueOrDefault(GlobalSkinnableContainers.Playfield);
+
+                    if (hudLayout == null || !hudLayout.TryGetDrawableInfo(null, out var globalHUDComponents))
+                        globalHUDComponents = Array.Empty<SerialisedDrawableInfo>();
+
+                    var legacyHealthBars = globalHUDComponents.Where(h => h.Type.Name == nameof(LegacyHealthDisplay)).ToArray();
+                    hudLayout?.Update(null, globalHUDComponents.Except(legacyHealthBars).ToArray());
+
+                    resources.RealmAccess.Run(r =>
+                    {
+                        foreach (var ruleset in r.All<RulesetInfo>())
+                        {
+                            if (ruleset.ShortName == @"mania")
+                            {
+                                // should avoid adding legacy health bar to non-legacy skins (unless explicitly added by user).
+                                if (!legacyHealthBars.Any())
+                                    break;
+
+                                var legacyManiaHealthDisplay = new LegacyHealthDisplay
+                                {
+                                    Rotation = -90f,
+                                    Anchor = Anchor.BottomRight,
+                                    Origin = Anchor.TopLeft,
+                                    X = 1,
+                                    Scale = new Vector2(0.7f),
+                                }.CreateSerialisedInfo();
+
+                                playfieldLayout?.Update(ruleset, playfieldLayout.TryGetDrawableInfo(ruleset, out var maniaPlayfieldComponents)
+                                    ? maniaPlayfieldComponents.Append(legacyManiaHealthDisplay).ToArray()
+                                    : new[] { legacyManiaHealthDisplay });
+                            }
+                            else
+                            {
+                                hudLayout?.Update(ruleset, hudLayout.TryGetDrawableInfo(ruleset, out var rulesetHUDComponents)
+                                    ? rulesetHUDComponents.Concat(legacyHealthBars).ToArray()
+                                    : legacyHealthBars);
+                            }
                         }
                     });
 

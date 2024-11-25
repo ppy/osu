@@ -376,7 +376,8 @@ namespace osu.Game.Skinning
                                     }
                                 })
                                 {
-                                    new LegacyDefaultComboCounter()
+                                    new LegacyDefaultComboCounter(),
+                                    new LegacyHealthDisplay(),
                                 };
                             }
 
@@ -415,7 +416,6 @@ namespace osu.Game.Skinning
                                     new LegacyScoreCounter(),
                                     new LegacyAccuracyCounter(),
                                     new LegacySongProgress(),
-                                    new LegacyHealthDisplay(),
                                     new BarHitErrorMeter(),
                                 }
                             };
