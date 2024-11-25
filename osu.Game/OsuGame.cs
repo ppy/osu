@@ -29,6 +29,7 @@ using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Input.Handlers.Tablet;
+using osu.Framework.IO.Stores;
 using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
@@ -818,6 +819,8 @@ namespace osu.Game
         protected virtual UpdateManager CreateUpdateManager() => new UpdateManager();
 
         protected override Container CreateScalingContainer() => new ScalingContainer(ScalingMode.Everything);
+
+        protected override OnlineStore CreateOnlineStore() => new OsuOnlineStore(CreateEndpoints().APIEndpointUrl);
 
         #region Beatmap progression
 
