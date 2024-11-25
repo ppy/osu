@@ -142,7 +142,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                         sliderRepeat.CirclePiece.FadeOut(fadeDuration);
 
                     using (drawableObject.BeginAbsoluteSequence(drawableObject.HitStateUpdateTime))
-                        sliderRepeat.FadeOut();
+                        sliderRepeat.FadeOut(fadeDuration);
 
                     break;
 
@@ -252,7 +252,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             scoreProcessor.Combo.ValueChanged += combo =>
             {
-                fadeDurationFactor = combo.NewValue == 0f ? 1f : 1f - (float)combo.NewValue / 20f;
+                fadeDurationFactor = combo.NewValue == 0f ? 1f : 1f - (float)combo.NewValue / 25f;
                 fadeDurationFactor = Math.Clamp(fadeDurationFactor, 0f, 1f);
             };
         }
