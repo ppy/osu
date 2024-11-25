@@ -57,7 +57,7 @@ namespace osu.Game.Screens.Play.HUD
 
         private void updateDisplay()
         {
-            double? unstableRate = scoreProcessor.HitEvents.CalculateUnstableRate();
+            double? unstableRate = scoreProcessor.HitEvents.CalculateUnstableRate()?.Result;
 
             valid.Value = unstableRate != null;
             if (unstableRate != null)
