@@ -15,9 +15,9 @@ namespace osu.Game.Localisation
         public static LocalisableString ToggleToolbarShortcut => new TranslatableString(getKey(@"toggle_toolbar_shortcut"), @"Press Ctrl-T anywhere in the game to toggle the toolbar!");
 
         /// <summary>
-        /// "Press Ctrl-O anywhere in the game to access options!"
+        /// "Press Ctrl-O anywhere in the game to access settings!"
         /// </summary>
-        public static LocalisableString GameSettingsShortcut => new TranslatableString(getKey(@"game_settings_shortcut"), @"Press Ctrl-O anywhere in the game to access options!");
+        public static LocalisableString GameSettingsShortcut => new TranslatableString(getKey(@"game_settings_shortcut"), @"Press Ctrl-O anywhere in the game to access settings!");
 
         /// <summary>
         /// "All settings are dynamic and take effect in real-time. Try changing the skin while watching autoplay!"
@@ -85,9 +85,9 @@ namespace osu.Game.Localisation
         public static LocalisableString ConfigurableHotkeys => new TranslatableString(getKey(@"configurable_hotkeys"), @"Most of the hotkeys in the game are configurable and can be changed to anything you want. Check the bindings panel under input settings!");
 
         /// <summary>
-        /// "Your gameplay HUD can be customized by using the skin layout editor. Open it at any time via Ctrl-Shift-S!"
+        /// "Your gameplay HUD can be customised by using the skin layout editor. Open it at any time via Ctrl-Shift-S!"
         /// </summary>
-        public static LocalisableString SkinEditor => new TranslatableString(getKey(@"skin_editor"), @"Your gameplay HUD can be customized by using the skin layout editor. Open it at any time via Ctrl-Shift-S!");
+        public static LocalisableString SkinEditor => new TranslatableString(getKey(@"skin_editor"), @"Your gameplay HUD can be customised by using the skin layout editor. Open it at any time via Ctrl-Shift-S!");
 
         /// <summary>
         /// "You can create mod presets to make toggling your favorite mod combinations easier!"
@@ -95,9 +95,9 @@ namespace osu.Game.Localisation
         public static LocalisableString ModPresets => new TranslatableString(getKey(@"mod_presets"), @"You can create mod presets to make toggling your favorite mod combinations easier!");
 
         /// <summary>
-        /// "Many mods have customisation settings that drastically change how they function. Click the Mod Customisation button in mod select to view settings!"
+        /// "Many mods have customisation settings that drastically change how they function. Click the Customise button in mod select to view settings!"
         /// </summary>
-        public static LocalisableString ModCustomisationSettings => new TranslatableString(getKey(@"mod_customisation_settings"), @"Many mods have customisation settings that drastically change how they function. Click the Mod Customisation button in mod select to view settings!");
+        public static LocalisableString ModCustomisationSettings => new TranslatableString(getKey(@"mod_customisation_settings"), @"Many mods have customisation settings that drastically change how they function. Click the Customise button in mod select to view settings!");
 
         /// <summary>
         /// "Press Ctrl-Shift-R to switch to a random skin!"
