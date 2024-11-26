@@ -200,7 +200,7 @@ namespace osu.Game.Graphics
         /// </summary>
         public Color4 ForRoomStatus(Room room)
         {
-            if (DateTimeOffset.Now >= room.EndDate)
+            if (room.HasEnded)
                 return YellowDarker;
 
             switch (room.Status)

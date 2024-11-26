@@ -30,7 +30,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             // this is done here as a pre-check to avoid clicking on already closed rooms in the lounge from triggering a server join.
             // should probably be done at a higher level, but due to the current structure of things this is the easiest place for now.
-            if (DateTimeOffset.Now >= room.EndDate)
+            if (room.HasEnded)
             {
                 onError?.Invoke("Cannot join an ended room.");
                 return;
