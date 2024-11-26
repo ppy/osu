@@ -35,7 +35,7 @@ namespace osu.Game.Overlays
         private IAPIProvider api { get; set; } = null!;
 
         private Container<Drawable> medalContainer = null!;
-        private MedalAnimation? lastAnimation;
+        private MedalAnimation? currentMedalDisplay;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -54,11 +54,7 @@ namespace osu.Game.Overlays
         {
             base.LoadComplete();
 
-            OverlayActivationMode.BindValueChanged(val =>
-            {
-                if (val.NewValue == OverlayActivation.All && (queuedMedals.Any() || medalContainer.Any() || lastAnimation?.IsLoaded == false))
-                    Show();
-            }, true);
+            OverlayActivationMode.BindValueChanged(_ => displayIfReady(), true);
         }
 
         private void handleMedalMessages(SocketMessage obj)
@@ -86,31 +82,13 @@ namespace osu.Game.Overlays
             queuedMedals.Enqueue(medalAnimation);
             Logger.Log($"Queueing medal unlock for \"{medal.Name}\" ({queuedMedals.Count} to display)");
 
-            if (OverlayActivationMode.Value == OverlayActivation.All)
-                Scheduler.AddOnce(Show);
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-
-            if (medalContainer.Any() || lastAnimation?.IsLoaded == false)
-                return;
-
-            if (!queuedMedals.TryDequeue(out lastAnimation))
-            {
-                Logger.Log("All queued medals have been displayed!");
-                Hide();
-                return;
-            }
-
-            Logger.Log($"Preparing to display \"{lastAnimation.Medal.Name}\"");
-            LoadComponentAsync(lastAnimation, medalContainer.Add);
+            Schedule(displayIfReady);
         }
 
         protected override bool OnClick(ClickEvent e)
         {
-            lastAnimation?.Dismiss();
+            dismissDisplayedMedal();
+            loadNextMedal();
             return true;
         }
 
@@ -118,11 +96,55 @@ namespace osu.Game.Overlays
         {
             if (e.Action == GlobalAction.Back)
             {
-                lastAnimation?.Dismiss();
+                dismissDisplayedMedal();
+                loadNextMedal();
                 return true;
             }
 
             return base.OnPressed(e);
+        }
+
+        private void dismissDisplayedMedal()
+        {
+            if (currentMedalDisplay?.IsLoaded == false)
+                return;
+
+            currentMedalDisplay?.Dismiss();
+            currentMedalDisplay = null;
+        }
+
+        private void displayIfReady()
+        {
+            if (OverlayActivationMode.Value != OverlayActivation.All)
+                return;
+
+            if (currentMedalDisplay != null)
+            {
+                Show();
+                return;
+            }
+
+            if (queuedMedals.Any())
+            {
+                Show();
+                loadNextMedal();
+            }
+        }
+
+        private void loadNextMedal()
+        {
+            if (currentMedalDisplay != null)
+                return;
+
+            if (!queuedMedals.TryDequeue(out currentMedalDisplay))
+            {
+                Logger.Log("All queued medals have been displayed!");
+                Hide();
+                return;
+            }
+
+            Logger.Log($"Preparing to display \"{currentMedalDisplay.Medal.Name}\"");
+            LoadComponentAsync(currentMedalDisplay, m => medalContainer.Add(m));
         }
 
         protected override void Dispose(bool isDisposing)
