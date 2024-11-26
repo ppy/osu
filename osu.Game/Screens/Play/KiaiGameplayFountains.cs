@@ -25,7 +25,7 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            kiaiStarEffectsEnabled = config.GetBindable<bool>(OsuSetting.KiaiStarFountain);
+            kiaiStarEffectsEnabled = config.GetBindable<bool>(OsuSetting.StarFountains);
 
             RelativeSizeAxes = Axes.Both;
 
