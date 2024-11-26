@@ -77,14 +77,14 @@ namespace osu.Game.Tests.Visual.Menus
         }
 
         [Test]
-        public void TestGameplayKiaiStarToggle()
+        public void TestGameplayStarFountainsSetting()
         {
-            Bindable<bool> kiaiStarEffectsEnabled = null!;
+            Bindable<bool> starFountainsEnabled = null!;
 
             AddStep("load configuration", () =>
             {
                 var config = new OsuConfigManager(LocalStorage);
-                kiaiStarEffectsEnabled = config.GetBindable<bool>(OsuSetting.StarFountains);
+                starFountainsEnabled = config.GetBindable<bool>(OsuSetting.StarFountains);
             });
 
             AddStep("make fountains", () =>
@@ -106,21 +106,21 @@ namespace osu.Game.Tests.Visual.Menus
                 };
             });
 
-            AddStep("enable KiaiStarEffects", () => kiaiStarEffectsEnabled.Value = true);
+            AddStep("enable KiaiStarEffects", () => starFountainsEnabled.Value = true);
             AddRepeatStep("activate fountains (enabled)", () =>
             {
                 ((KiaiGameplayFountains.GameplayStarFountain)Children[0]).Shoot(1);
                 ((KiaiGameplayFountains.GameplayStarFountain)Children[1]).Shoot(-1);
             }, 100);
 
-            AddStep("disable KiaiStarEffects", () => kiaiStarEffectsEnabled.Value = false);
+            AddStep("disable KiaiStarEffects", () => starFountainsEnabled.Value = false);
             AddRepeatStep("attempt to activate fountains (disabled)", () =>
             {
                 ((KiaiGameplayFountains.GameplayStarFountain)Children[0]).Shoot(1);
                 ((KiaiGameplayFountains.GameplayStarFountain)Children[1]).Shoot(-1);
             }, 100);
 
-            AddStep("re-enable KiaiStarEffects", () => kiaiStarEffectsEnabled.Value = true);
+            AddStep("re-enable KiaiStarEffects", () => starFountainsEnabled.Value = true);
             AddRepeatStep("activate fountains (re-enabled)", () =>
             {
                 ((KiaiGameplayFountains.GameplayStarFountain)Children[0]).Shoot(1);
