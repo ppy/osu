@@ -63,17 +63,17 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         Origin = Anchor.Centre,
                         Texture = source.GetTexture("spinner-top"),
                     },
-                    fixedMiddle = new Sprite
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Texture = source.GetTexture("spinner-middle"),
-                    },
                     spinningMiddle = new Sprite
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Texture = source.GetTexture("spinner-middle2"),
+                    },
+                    fixedMiddle = new Sprite
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Texture = source.GetTexture("spinner-middle"),
                     },
                 }
             });
