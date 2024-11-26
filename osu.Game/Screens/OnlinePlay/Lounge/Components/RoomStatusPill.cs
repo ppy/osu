@@ -59,7 +59,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         {
             Pill.Background.FadeColour(colours.ForRoomStatus(room), 100);
 
-            if (DateTimeOffset.Now >= room.EndDate)
+            if (room.HasEnded)
                 TextFlow.Text = RoomStatusPillStrings.Ended;
             else
             {

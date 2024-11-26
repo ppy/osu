@@ -374,6 +374,15 @@ namespace osu.Game.Online.Rooms
             RecentParticipants = other.RecentParticipants;
         }
 
+        /// <summary>
+        /// Whether the room is no longer available.
+        /// </summary>
+        /// <remarks>
+        /// This property does not update in real-time and needs to be queried periodically.
+        /// Subscribe to <see cref="EndDate"/> to be notified of any immediate changes.
+        /// </remarks>
+        public bool HasEnded => DateTimeOffset.Now >= EndDate;
+
         [JsonObject(MemberSerialization.OptIn)]
         public class RoomPlaylistItemStats
         {
