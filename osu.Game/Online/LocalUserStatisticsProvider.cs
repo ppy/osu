@@ -47,10 +47,16 @@ namespace osu.Game.Online
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            api.LocalUser.BindValueChanged(_ => initialiseStatistics(), true);
+
+            api.LocalUser.BindValueChanged(_ =>
+            {
+                // queuing up requests directly on user change is unsafe, as the API status may have not been updated yet.
+                // schedule a frame to allow the API to be in its correct state sending requests.
+                Schedule(initialiseStatistics);
+            }, true);
         }
 
-        private void initialiseStatistics() => Schedule(() =>
+        private void initialiseStatistics()
         {
             statisticsCache.Clear();
 
@@ -59,7 +65,7 @@ namespace osu.Game.Online
 
             foreach (var ruleset in rulesets.AvailableRulesets.Where(r => r.IsLegacyRuleset()))
                 RefetchStatistics(ruleset);
-        });
+        }
 
         public void RefetchStatistics(RulesetInfo ruleset, Action<UserStatisticsUpdate>? callback = null)
         {
