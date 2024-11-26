@@ -38,6 +38,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
             MinValue = 0f,
             MaxValue = OsuPlayfield.BASE_SIZE.X,
+            Precision = 0.01f,
         };
 
         /// <summary>
@@ -47,6 +48,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
             MinValue = 0f,
             MaxValue = OsuPlayfield.BASE_SIZE.Y,
+            Precision = 0.01f,
         };
 
         /// <summary>
@@ -56,6 +58,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
             MinValue = 4f,
             MaxValue = 128f,
+            Precision = 0.01f,
         };
 
         /// <summary>
@@ -65,6 +68,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
             MinValue = -180f,
             MaxValue = 180f,
+            Precision = 0.01f,
         };
 
         /// <summary>
