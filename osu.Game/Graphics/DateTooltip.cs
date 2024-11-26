@@ -37,18 +37,8 @@ namespace osu.Game.Graphics
                     Padding = new MarginPadding(10),
                     Children = new Drawable[]
                     {
-                        dateText = new OsuSpriteText
-                        {
-                            Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft,
-                        },
-                        timeText = new OsuSpriteText
-                        {
-                            Font = OsuFont.GetFont(size: 12, weight: FontWeight.Regular),
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft,
-                        }
+                        dateText = createSpriteText(FontWeight.Bold),
+                        timeText = createSpriteText(FontWeight.Regular),
                     }
                 },
             };
@@ -73,5 +63,15 @@ namespace osu.Game.Graphics
         }
 
         public void Move(Vector2 pos) => Position = pos;
+
+        private OsuSpriteText createSpriteText(FontWeight weight)
+        {
+            return new OsuSpriteText
+            {
+                Font = OsuFont.GetFont(size: 12, weight: weight),
+                Anchor = Anchor.BottomLeft,
+                Origin = Anchor.BottomLeft,
+            };
+        }
     }
 }
