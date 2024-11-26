@@ -12,6 +12,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Logging;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -28,16 +29,14 @@ namespace osu.Game.Overlays.MedalSplash
         [CanBeNull]
         public event Action<DisplayState> StateChanged;
 
-        private readonly Medal medal;
         private readonly Container medalContainer;
-        private readonly Sprite medalSprite, medalGlow;
+        private readonly Sprite medalGlow;
         private readonly OsuSpriteText unlocked, name;
         private readonly TextFlowContainer description;
         private DisplayState state;
 
         public DrawableMedal(Medal medal)
         {
-            this.medal = medal;
             Position = new Vector2(0f, MedalAnimation.DISC_SIZE / 2);
 
             FillFlowContainer infoFlow;
@@ -51,7 +50,7 @@ namespace osu.Game.Overlays.MedalSplash
                     Alpha = 0f,
                     Children = new Drawable[]
                     {
-                        medalSprite = new Sprite
+                        new DelayedLoadWrapper(() => new MedalOnlineSprite(medal), 0)
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
@@ -122,11 +121,12 @@ namespace osu.Game.Overlays.MedalSplash
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, TextureStore textures, LargeTextureStore largeTextures)
+        private void load(OsuColour colours, TextureStore textures)
         {
-            medalSprite.Texture = largeTextures.Get(medal.ImageUrl);
             medalGlow.Texture = textures.Get(@"MedalSplash/medal-glow");
             description.Colour = colours.BlueLight;
+
+            Logger.Log("loaded");
         }
 
         protected override void LoadComplete()
@@ -189,6 +189,31 @@ namespace osu.Game.Overlays.MedalSplash
                     name.FadeInFromZero(duration + 100);
                     description.FadeInFromZero(duration * 2);
                     break;
+            }
+        }
+
+        private partial class MedalOnlineSprite : Sprite
+        {
+            private readonly Medal medal;
+
+            public MedalOnlineSprite(Medal medal)
+            {
+                this.medal = medal;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours, TextureStore textures, LargeTextureStore largeTextures)
+            {
+                Texture = largeTextures.Get(medal.ImageUrl);
+
+                Anchor = Anchor.Centre;
+                Origin = Anchor.Centre;
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                this.FadeInFromZero(150, Easing.OutQuint);
             }
         }
     }
