@@ -54,7 +54,7 @@ namespace osu.Game.Overlays
         {
             base.LoadComplete();
 
-            OverlayActivationMode.BindValueChanged(_ => displayIfReady(), true);
+            OverlayActivationMode.BindValueChanged(_ => showNextMedal(), true);
         }
 
         public override void Hide()
@@ -84,10 +84,13 @@ namespace osu.Game.Overlays
 
             var medalAnimation = new MedalAnimation(medal);
 
-            queuedMedals.Enqueue(medalAnimation);
             Logger.Log($"Queueing medal unlock for \"{medal.Name}\" ({queuedMedals.Count} to display)");
 
-            Schedule(displayIfReady);
+            LoadComponentAsync(medalAnimation, m =>
+            {
+                queuedMedals.Enqueue(m);
+                showNextMedal();
+            });
         }
 
         protected override bool OnClick(ClickEvent e)
@@ -130,30 +133,21 @@ namespace osu.Game.Overlays
             showNextMedal();
         }
 
-        private void displayIfReady()
-        {
-            if (OverlayActivationMode.Value != OverlayActivation.All)
-                return;
-
-            if (currentMedalDisplay != null || queuedMedals.Any())
-                showNextMedal();
-        }
-
         private void showNextMedal()
         {
-            // A medal is already loading / loaded, so just ensure the overlay is visible.
-            if (currentMedalDisplay != null)
-            {
-                Show();
+            // If already displayed, keep displaying medals regardless of activation mode changes.
+            if (OverlayActivationMode.Value != OverlayActivation.All && State.Value == Visibility.Hidden)
                 return;
-            }
+
+            // A medal is already displaying.
+            if (currentMedalDisplay != null)
+                return;
 
             if (queuedMedals.TryDequeue(out currentMedalDisplay))
             {
-                Logger.Log($"Preparing to display \"{currentMedalDisplay.Medal.Name}\"");
-
+                Logger.Log($"Displaying \"{currentMedalDisplay.Medal.Name}\"");
+                medalContainer.Add(currentMedalDisplay);
                 Show();
-                LoadComponentAsync(currentMedalDisplay, m => medalContainer.Add(m));
             }
         }
 
