@@ -31,6 +31,11 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                     LabelText = GraphicsSettingsStrings.HitLighting,
                     Current = config.GetBindable<bool>(OsuSetting.HitLighting)
                 },
+                new SettingsCheckbox
+                {
+                    LabelText = GameplaySettingsStrings.KiaiStarFountain,
+                    Current = config.GetBindable<bool>(OsuSetting.KiaiStarFountain)
+                },
             };
         }
     }
