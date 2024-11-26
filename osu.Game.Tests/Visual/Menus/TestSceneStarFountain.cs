@@ -84,7 +84,7 @@ namespace osu.Game.Tests.Visual.Menus
             AddStep("load configuration", () =>
             {
                 var config = new OsuConfigManager(LocalStorage);
-                kiaiStarEffectsEnabled = config.GetBindable<bool>(OsuSetting.KiaiStarFountain);
+                kiaiStarEffectsEnabled = config.GetBindable<bool>(OsuSetting.StarFountains);
             });
 
             AddStep("make fountains", () =>

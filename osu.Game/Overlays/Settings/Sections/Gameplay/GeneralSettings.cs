@@ -33,8 +33,8 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = GameplaySettingsStrings.KiaiStarFountain,
-                    Current = config.GetBindable<bool>(OsuSetting.KiaiStarFountain)
+                    LabelText = GameplaySettingsStrings.StarFountains,
+                    Current = config.GetBindable<bool>(OsuSetting.StarFountains)
                 },
             };
         }
