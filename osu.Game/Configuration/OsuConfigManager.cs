@@ -214,6 +214,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.EditorContractSidebars, false);
 
             SetDefault(OsuSetting.AlwaysShowHoldForMenuButton, false);
+            SetDefault(OsuSetting.AlwaysRequireHoldingForPause, false);
         }
 
         protected override bool CheckLookupContainsPrivateInformation(OsuSetting lookup)
@@ -444,5 +445,6 @@ namespace osu.Game.Configuration
         EditorRotationOrigin,
         EditorTimelineShowBreaks,
         EditorAdjustExistingObjectsOnTimingChanges,
+        AlwaysRequireHoldingForPause
     }
 }
