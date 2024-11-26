@@ -44,7 +44,7 @@ namespace osu.Game.Tests.Visual.Skinning
         {
             LegacySkin skin = null!;
 
-            AddStep("load skin with some configuration", () =>
+            AddStep("load skin", () =>
             {
                 skin = loadSkin<LegacySkin>(new Dictionary<GlobalSkinnableContainers, SkinLayoutInfo>
                 {
@@ -120,16 +120,195 @@ namespace osu.Game.Tests.Visual.Skinning
 
         #endregion
 
+        #region Version 2
+
+        [Test]
+        public void TestMigration_2()
+        {
+            LegacySkin skin = null!;
+
+            AddStep("load skin", () =>
+            {
+                skin = loadSkin<LegacySkin>(new Dictionary<GlobalSkinnableContainers, SkinLayoutInfo>
+                {
+                    {
+                        GlobalSkinnableContainers.MainHUDComponents,
+                        createLayout(1, [nameof(LegacyHealthDisplay)])
+                    },
+                    {
+                        GlobalSkinnableContainers.Playfield,
+                        createLayout(1)
+                    }
+                });
+            });
+
+            // HUD
+            AddAssert("health display removed from global HUD", () =>
+            {
+                var dict = skin.LayoutInfos[GlobalSkinnableContainers.MainHUDComponents].DrawableInfo;
+                return dict.Single(kvp => kvp.Key == @"global").Value.Single().Type.Name == nameof(BigBlackBox);
+            });
+            AddAssert("health display moved to each ruleset except mania", () =>
+            {
+                var dict = skin.LayoutInfos[GlobalSkinnableContainers.MainHUDComponents].DrawableInfo.ToArray();
+                dict = dict.Where(kvp => kvp.Key != @"global" && kvp.Key != @"mania").ToArray();
+
+                return dict.All(kvp => kvp.Value.Select(d => d.Type.Name).SequenceEqual([nameof(BigBlackBox), nameof(LegacyHealthDisplay)])) &&
+                       dict.All(kvp => kvp.Value.Single(d => d.Type.Name == nameof(LegacyHealthDisplay)).Rotation == 0f);
+            });
+            AddAssert("no health display in mania HUD", () =>
+            {
+                var dict = skin.LayoutInfos[GlobalSkinnableContainers.MainHUDComponents].DrawableInfo;
+                return dict.Single(kvp => kvp.Key == @"mania").Value.Single().Type.Name == nameof(BigBlackBox);
+            });
+
+            // Playfield
+            AddAssert("health display in mania moved to playfield", () =>
+            {
+                var dict = skin.LayoutInfos[GlobalSkinnableContainers.Playfield].DrawableInfo;
+                return dict.Single(kvp => kvp.Key == @"mania").Value.Select(d => d.Type.Name).SequenceEqual([nameof(BigBlackBox), nameof(LegacyHealthDisplay)]) &&
+                       dict.Single(kvp => kvp.Key == @"mania").Value.Single(d => d.Type.Name == nameof(LegacyHealthDisplay)).Rotation == -90f;
+            });
+            AddAssert("rest is unaffected", () =>
+            {
+                var dict = skin.LayoutInfos[GlobalSkinnableContainers.Playfield].DrawableInfo;
+                return dict.Where(kvp => kvp.Key != @"mania").All(kvp => kvp.Value.Single().Type.Name == nameof(BigBlackBox));
+            });
+        }
+
+        [Test]
+        public void TestMigration_2_NonLegacySkin()
+        {
+            ArgonSkin skin = null!;
+
+            AddStep("load argon skin", () =>
+            {
+                skin = loadSkin<ArgonSkin>(new Dictionary<GlobalSkinnableContainers, SkinLayoutInfo>
+                {
+                    {
+                        GlobalSkinnableContainers.MainHUDComponents,
+                        createLayout(1, [nameof(LegacyHealthDisplay)])
+                    },
+                    {
+                        GlobalSkinnableContainers.Playfield,
+                        createLayout(1)
+                    }
+                });
+            });
+
+            // One may argue that if a LegacyHealthDisplay exists in a non-legacy skin,
+            // then it should be swapped with the mania variant similar to legacy skins.
+            // This is not simple to achieve as we have to be aware of the presence of
+            // the health display in the HUD layout while migrating the Playfield layout,
+            // which is impossible with the current structure of skin layout migration.
+            // Instead, don't touch any non-legacy skin and call it a day.
+
+            // HUD
+            AddAssert("health display still in global HUD", () =>
+            {
+                var dict = skin.LayoutInfos[GlobalSkinnableContainers.MainHUDComponents].DrawableInfo;
+
+                return dict.Single(kvp => kvp.Key == @"global").Value.Select(d => d.Type.Name).SequenceEqual([nameof(BigBlackBox), nameof(LegacyHealthDisplay)]) &&
+                       dict.Single(kvp => kvp.Key == @"global").Value.Single(d => d.Type.Name == nameof(LegacyHealthDisplay)).Rotation == 0f;
+            });
+            AddAssert("ruleset HUDs unaffected", () =>
+            {
+                var dict = skin.LayoutInfos[GlobalSkinnableContainers.MainHUDComponents].DrawableInfo.ToArray();
+                return dict.Where(kvp => kvp.Key != @"global").All(kvp => kvp.Value.Single().Type.Name == nameof(BigBlackBox));
+            });
+
+            // Playfield
+            AddAssert("playfield unaffected", () =>
+            {
+                var dict = skin.LayoutInfos[GlobalSkinnableContainers.Playfield].DrawableInfo.ToArray();
+                return dict.All(kvp => kvp.Value.Single().Type.Name == nameof(BigBlackBox));
+            });
+        }
+
+        [Test]
+        public void TestMigration_2_NoHUD()
+        {
+            LegacySkin skin = null!;
+
+            AddStep("load skin", () =>
+            {
+                skin = loadSkin<LegacySkin>(new Dictionary<GlobalSkinnableContainers, SkinLayoutInfo>
+                {
+                    {
+                        GlobalSkinnableContainers.Playfield,
+                        createLayout(1)
+                    },
+                });
+            });
+
+            // In this case, we must add a health display to the Playfield target,
+            // otherwise on mania the user will not see a health display anymore.
+
+            // HUD
+            AddAssert("HUD not configured", () => !skin.LayoutInfos.ContainsKey(GlobalSkinnableContainers.MainHUDComponents));
+
+            // Playfield
+            AddAssert("health display in mania moved to playfield", () =>
+            {
+                var dict = skin.LayoutInfos[GlobalSkinnableContainers.Playfield].DrawableInfo;
+                return dict.Single(kvp => kvp.Key == @"mania").Value.Select(d => d.Type.Name).SequenceEqual([nameof(BigBlackBox), nameof(LegacyHealthDisplay)]) &&
+                       dict.Single(kvp => kvp.Key == @"mania").Value.Single(d => d.Type.Name == nameof(LegacyHealthDisplay)).Rotation == -90f;
+            });
+            AddAssert("rest is unaffected", () =>
+            {
+                var dict = skin.LayoutInfos[GlobalSkinnableContainers.Playfield].DrawableInfo;
+                return dict.Where(kvp => kvp.Key != @"mania").All(d => d.Value.Single().Type.Name == nameof(BigBlackBox));
+            });
+        }
+
+        [Test]
+        public void TestMigration_2_NoPlayfield()
+        {
+            LegacySkin skin = null!;
+
+            AddStep("load skin", () =>
+            {
+                skin = loadSkin<LegacySkin>(new Dictionary<GlobalSkinnableContainers, SkinLayoutInfo>
+                {
+                    {
+                        GlobalSkinnableContainers.MainHUDComponents,
+                        createLayout(1, [nameof(LegacyHealthDisplay)])
+                    }
+                });
+            });
+
+            // HUD
+            AddAssert("health display removed from global HUD", () =>
+            {
+                var dict = skin.LayoutInfos[GlobalSkinnableContainers.MainHUDComponents].DrawableInfo;
+                return dict.Single(kvp => kvp.Key == @"global").Value.Single().Type.Name == nameof(BigBlackBox);
+            });
+            AddAssert("health display moved to each ruleset except mania", () =>
+            {
+                var dict = skin.LayoutInfos[GlobalSkinnableContainers.MainHUDComponents].DrawableInfo.ToArray();
+                dict = dict.Where(kvp => kvp.Key != @"global" && kvp.Key != @"mania").ToArray();
+
+                return dict.All(kvp => kvp.Value.Select(d => d.Type.Name).SequenceEqual([nameof(BigBlackBox), nameof(LegacyHealthDisplay)])) &&
+                       dict.All(kvp => kvp.Value.Single(d => d.Type.Name == nameof(LegacyHealthDisplay)).Rotation == 0f);
+            });
+            AddAssert("no health display in mania HUD", () =>
+            {
+                var dict = skin.LayoutInfos[GlobalSkinnableContainers.MainHUDComponents].DrawableInfo;
+                return dict.Single(kvp => kvp.Key == @"mania").Value.Single().Type.Name == nameof(BigBlackBox);
+            });
+
+            // Playfield
+            AddAssert("playfield not configured", () => !skin.LayoutInfos.ContainsKey(GlobalSkinnableContainers.Playfield));
+        }
+
+        #endregion
+
         private SkinLayoutInfo createLayout(int version, string[]? globalComponents = null, string? ruleset = null, string[]? rulesetComponents = null)
         {
-            var info = new SkinLayoutInfo
-            {
-                Version = version,
-                DrawableInfo =
-                {
-                    { "global", globalComponents?.Select(c => resolveComponent(c).CreateSerialisedInfo()).ToArray() ?? Array.Empty<SerialisedDrawableInfo>() },
-                }
-            };
+            var info = new SkinLayoutInfo { Version = version };
+
+            if (globalComponents != null)
+                info.DrawableInfo.Add(@"global", globalComponents.Select(c => resolveComponent(c).CreateSerialisedInfo()).ToArray());
 
             if (ruleset != null && rulesetComponents != null)
                 info.DrawableInfo.Add(ruleset, rulesetComponents.Select(c => resolveComponent(c).CreateSerialisedInfo()).ToArray());
