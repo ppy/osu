@@ -85,7 +85,7 @@ namespace osu.Game.Tests.Visual.Ranking
                     : offset > 16 ? HitResult.Good
                     : offset > 8 ? HitResult.Great
                     : HitResult.Perfect;
-                return new HitEvent(h.TimeOffset, 1.0, result, placeholder_object, placeholder_object, null);
+                return new HitEvent(h.TimeOffset, h.TimeScale, result, placeholder_object, placeholder_object, null);
             }).ToList());
         }
 
@@ -93,7 +93,7 @@ namespace osu.Game.Tests.Visual.Ranking
         public void TestNonBasicHitResultsAreIgnored()
         {
             createTest(CreateDistributedHitEvents(0, 50)
-                       .Select(h => new HitEvent(h.TimeOffset, 1.0, h.TimeOffset > 0 ? HitResult.Ok : HitResult.LargeTickHit, placeholder_object, placeholder_object, null))
+                       .Select(h => new HitEvent(h.TimeOffset, h.TimeScale, h.TimeOffset > 0 ? HitResult.Ok : HitResult.LargeTickHit, placeholder_object, placeholder_object, null))
                        .ToList());
         }
 
@@ -110,7 +110,7 @@ namespace osu.Game.Tests.Visual.Ranking
                     : offset > 8 ? HitResult.Great
                     : HitResult.Perfect;
 
-                return new HitEvent(h.TimeOffset, 1.0, result, placeholder_object, placeholder_object, null);
+                return new HitEvent(h.TimeOffset, h.TimeScale, result, placeholder_object, placeholder_object, null);
             });
             var narrow = CreateDistributedHitEvents(0, 50).Select(h =>
             {
@@ -121,7 +121,7 @@ namespace osu.Game.Tests.Visual.Ranking
                     : offset > 10 ? HitResult.Good
                     : offset > 5 ? HitResult.Great
                     : HitResult.Perfect;
-                return new HitEvent(h.TimeOffset, 1.0, result, placeholder_object, placeholder_object, null);
+                return new HitEvent(h.TimeOffset, h.TimeScale, result, placeholder_object, placeholder_object, null);
             });
             createTest(wide.Concat(narrow).ToList());
         }

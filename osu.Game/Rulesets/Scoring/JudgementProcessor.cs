@@ -199,6 +199,13 @@ namespace osu.Game.Rulesets.Scoring
         /// <returns>The simulated <see cref="HitResult"/> for the judgement.</returns>
         protected virtual HitResult GetSimulatedHitResult(Judgement judgement) => judgement.MaxResult;
 
+        /// <summary>
+        /// Gets the time scale for a <see cref="JudgementResult"/>.
+        /// </summary>
+        /// <param name="judgementResult">The judgement result.</param>
+        /// <returns>The time scale.</returns>
+        protected virtual double? GetTimeScaleForResult(JudgementResult judgementResult) => judgementResult.GameplayRate;
+
         protected override void Update()
         {
             base.Update();

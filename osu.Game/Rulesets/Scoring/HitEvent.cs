@@ -20,9 +20,9 @@ namespace osu.Game.Rulesets.Scoring
         public readonly double TimeOffset;
 
         /// <summary>
-        /// The true gameplay rate at the time of the event.
+        /// The scale to apply to the <see cref="TimeOffset"/> to account for potential rate adjustments.
         /// </summary>
-        public readonly double? GameplayRate;
+        public readonly double? TimeScale;
 
         /// <summary>
         /// The hit result.
@@ -50,15 +50,15 @@ namespace osu.Game.Rulesets.Scoring
         /// Creates a new <see cref="HitEvent"/>.
         /// </summary>
         /// <param name="timeOffset">The time offset from the end of <paramref name="hitObject"/> at which the event occurs.</param>
+        /// <param name="timeScale">The rate-scaled <paramref name="timeOffset"/></param>
         /// <param name="result">The <see cref="HitResult"/>.</param>
-        /// <param name="gameplayRate">The true gameplay rate at the time of the event.</param>
         /// <param name="hitObject">The <see cref="HitObject"/> that triggered the event.</param>
         /// <param name="lastHitObject">The previous <see cref="HitObject"/>.</param>
         /// <param name="position">A position corresponding to the event.</param>
-        public HitEvent(double timeOffset, double? gameplayRate, HitResult result, HitObject hitObject, [CanBeNull] HitObject lastHitObject, [CanBeNull] Vector2? position)
+        public HitEvent(double timeOffset, double? timeScale, HitResult result, HitObject hitObject, [CanBeNull] HitObject lastHitObject, [CanBeNull] Vector2? position)
         {
             TimeOffset = timeOffset;
-            GameplayRate = gameplayRate;
+            TimeScale = timeScale;
             Result = result;
             HitObject = hitObject;
             LastHitObject = lastHitObject;
@@ -70,6 +70,6 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         /// <param name="positionOffset">The positional offset.</param>
         /// <returns>The new <see cref="HitEvent"/>.</returns>
-        public HitEvent With(Vector2? positionOffset) => new HitEvent(TimeOffset, GameplayRate, Result, HitObject, LastHitObject, positionOffset);
+        public HitEvent With(Vector2? positionOffset) => new HitEvent(TimeOffset, TimeScale, Result, HitObject, LastHitObject, positionOffset);
     }
 }
