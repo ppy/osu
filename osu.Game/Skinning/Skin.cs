@@ -293,9 +293,9 @@ namespace osu.Game.Skinning
                         break;
 
                     var comboCounters = globalHUDComponents.Where(c =>
-                        c.Type.Name == nameof(LegacyDefaultComboCounter) ||
-                        c.Type.Name == nameof(DefaultComboCounter) ||
-                        c.Type.Name == nameof(ArgonComboCounter)).ToArray();
+                        c.Type == typeof(LegacyDefaultComboCounter) ||
+                        c.Type == typeof(DefaultComboCounter) ||
+                        c.Type == typeof(ArgonComboCounter)).ToArray();
 
                     layout.Update(null, globalHUDComponents.Except(comboCounters).ToArray());
 
@@ -322,7 +322,7 @@ namespace osu.Game.Skinning
                             if (!isLegacySkin || !layout.TryGetDrawableInfo(null, out var globalHUDComponents))
                                 break;
 
-                            var healthDisplays = globalHUDComponents.Where(c => c.Type.Name == nameof(LegacyHealthDisplay)).ToArray();
+                            var healthDisplays = globalHUDComponents.Where(c => c.Type == typeof(LegacyHealthDisplay)).ToArray();
                             layout.Update(null, globalHUDComponents.Except(healthDisplays).ToArray());
 
                             resources.RealmAccess.Run(r =>
