@@ -15,6 +15,7 @@ using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Rendering.Dummy;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
+using osu.Framework.Testing;
 using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.IO;
@@ -22,9 +23,11 @@ using osu.Game.Models;
 using osu.Game.Rulesets;
 using osu.Game.Skinning;
 using osu.Game.Skinning.Components;
+using osu.Game.Tests.Visual;
 
-namespace osu.Game.Tests.Visual.Skinning
+namespace osu.Game.Tests.Skins
 {
+    [HeadlessTest]
     public partial class TestSceneSkinMigration : OsuTestScene
     {
         [Resolved]
