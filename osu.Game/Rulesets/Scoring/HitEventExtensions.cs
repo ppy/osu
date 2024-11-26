@@ -28,26 +28,26 @@ namespace osu.Game.Rulesets.Scoring
             result ??= new UnstableRateCalculationResult();
 
             // Handle rewinding in the simplest way possible.
-            if (hitEvents.Count < result.NextProcessableIndex + 1)
+            if (hitEvents.Count < result.EventCount + 1)
                 result = new UnstableRateCalculationResult();
 
-            for (int i = result.NextProcessableIndex; i < hitEvents.Count; i++)
+            for (int i = result.EventCount; i < hitEvents.Count; i++)
             {
                 HitEvent e = hitEvents[i];
 
                 if (!AffectsUnstableRate(e))
                     continue;
 
-                result.NextProcessableIndex++;
+                result.EventCount++;
 
                 // Division by gameplay rate is to account for TimeOffset scaling with gameplay rate.
                 double currentValue = e.TimeOffset / e.GameplayRate!.Value;
-                double nextMean = result.Mean + (currentValue - result.Mean) / result.NextProcessableIndex;
+                double nextMean = result.Mean + (currentValue - result.Mean) / result.EventCount;
                 result.SumOfSquares += (currentValue - result.Mean) * (currentValue - nextMean);
                 result.Mean = nextMean;
             }
 
-            if (result.NextProcessableIndex == 0)
+            if (result.EventCount == 0)
                 return null;
 
             return result;
@@ -75,11 +75,11 @@ namespace osu.Game.Rulesets.Scoring
 
         public class UnstableRateCalculationResult
         {
-            public int NextProcessableIndex;
+            public int EventCount;
             public double SumOfSquares;
             public double Mean;
 
-            public double Result => 10.0 * Math.Sqrt(SumOfSquares / NextProcessableIndex);
+            public double Result => 10.0 * Math.Sqrt(SumOfSquares / EventCount);
         }
     }
 }
