@@ -73,13 +73,36 @@ namespace osu.Game.Rulesets.Scoring
         public static bool AffectsUnstableRate(HitEvent e) => AffectsUnstableRate(e.HitObject, e.Result);
         public static bool AffectsUnstableRate(HitObject hitObject, HitResult result) => hitObject.HitWindows != HitWindows.Empty && result.IsHit();
 
+        /// <summary>
+        /// Data type returned by <see cref="HitEventExtensions.CalculateUnstableRate"/> which allows efficient incremental processing.
+        /// </summary>
+        /// <remarks>
+        /// This should be passed back into future <see cref="HitEventExtensions.CalculateUnstableRate"/> calls as a parameter.
+        ///
+        /// The optimisations used here rely on hit events being a consecutive sequence from a single gameplay session.
+        /// When a new gameplay session is started, any existing results should be disposed.
+        /// </remarks>
         public class UnstableRateCalculationResult
         {
+            /// <summary>
+            /// Total events processed. For internal incremental calculation use.
+            /// </summary>
             public int EventCount;
+
+            /// <summary>
+            /// Last sum-of-squares value. For internal incremental calculation use.
+            /// </summary>
             public double SumOfSquares;
+
+            /// <summary>
+            /// Last mean value. For internal incremental calculation use.
+            /// </summary>
             public double Mean;
 
-            public double Result => 10.0 * Math.Sqrt(SumOfSquares / EventCount);
+            /// <summary>
+            /// The unstable rate.
+            /// </summary>
+            public double Result => EventCount == 0 ? 0 : 10.0 * Math.Sqrt(SumOfSquares / EventCount);
         }
     }
 }
