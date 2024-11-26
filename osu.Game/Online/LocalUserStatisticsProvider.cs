@@ -50,7 +50,7 @@ namespace osu.Game.Online
             api.LocalUser.BindValueChanged(_ => initialiseStatistics(), true);
         }
 
-        private void initialiseStatistics()
+        private void initialiseStatistics() => Schedule(() =>
         {
             statisticsCache.Clear();
 
@@ -59,7 +59,7 @@ namespace osu.Game.Online
 
             foreach (var ruleset in rulesets.AvailableRulesets.Where(r => r.IsLegacyRuleset()))
                 RefetchStatistics(ruleset);
-        }
+        });
 
         public void RefetchStatistics(RulesetInfo ruleset, Action<UserStatisticsUpdate>? callback = null)
         {
