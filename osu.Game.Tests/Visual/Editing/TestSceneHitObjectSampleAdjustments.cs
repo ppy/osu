@@ -777,7 +777,6 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
-        [Solo]
         public void TestSelectingObjectDoesNotMutateSamples()
         {
             clickSamplePiece(0);
