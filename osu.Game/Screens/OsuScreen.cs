@@ -11,7 +11,6 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays;
@@ -38,7 +37,7 @@ namespace osu.Game.Screens
 
         public string Description => Title;
 
-        public virtual bool AllowBackButton => true;
+        public virtual bool AllowUserExit => true;
 
         public virtual bool ShowFooter => false;
 
@@ -57,9 +56,14 @@ namespace osu.Game.Screens
 
         IBindable<OverlayActivation> IOsuScreen.OverlayActivationMode => OverlayActivationMode;
 
-        public readonly Bindable<Visibility> BackButtonState = new Bindable<Visibility>(Visibility.Visible);
+        /// <summary>
+        /// The initial visibility state of the back button when this screen is entered for the first time.
+        /// </summary>
+        protected virtual bool InitialBackButtonVisibility => AllowUserExit;
 
-        IBindable<Visibility> IOsuScreen.BackButtonState => BackButtonState;
+        public readonly Bindable<bool> BackButtonVisibility;
+
+        IBindable<bool> IOsuScreen.BackButtonVisibility => BackButtonVisibility;
 
         public virtual bool CursorVisible => true;
 
@@ -159,6 +163,7 @@ namespace osu.Game.Screens
             Origin = Anchor.Centre;
 
             OverlayActivationMode = new Bindable<OverlayActivation>(InitialOverlayActivationMode);
+            BackButtonVisibility = new Bindable<bool>(InitialBackButtonVisibility);
         }
 
         [BackgroundDependencyLoader(true)]
