@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
@@ -112,24 +111,11 @@ namespace osu.Game.Overlays
 
         private void progressDisplayByUser()
         {
-            // For now, we want to make sure that medals are definitely seen by the user.
-            // So we block exiting the overlay until the load of the active medal completes.
-            if (currentMedalDisplay?.IsLoaded == false)
-                return;
-
             // Dismissing may sometimes play out the medal animation rather than immediately dismissing.
             if (currentMedalDisplay?.Dismiss() == false)
                 return;
 
             currentMedalDisplay = null;
-
-            if (!queuedMedals.Any())
-            {
-                Logger.Log("All queued medals have been displayed, hiding overlay!");
-                base.Hide();
-                return;
-            }
-
             showNextMedal();
         }
 
@@ -148,6 +134,11 @@ namespace osu.Game.Overlays
                 Logger.Log($"Displaying \"{currentMedalDisplay.Medal.Name}\"");
                 medalContainer.Add(currentMedalDisplay);
                 Show();
+            }
+            else if (State.Value == Visibility.Visible)
+            {
+                Logger.Log("All queued medals have been displayed, hiding overlay!");
+                base.Hide();
             }
         }
 
