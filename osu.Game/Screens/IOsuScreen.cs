@@ -3,10 +3,8 @@
 
 using System.Collections.Generic;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
@@ -24,15 +22,20 @@ namespace osu.Game.Screens
         bool DisallowExternalBeatmapRulesetChanges { get; }
 
         /// <summary>
-        /// Whether the user can exit this <see cref="IOsuScreen"/> by pressing the back button.
+        /// Whether the user can exit this <see cref="IOsuScreen"/>.
         /// </summary>
-        bool AllowBackButton { get; }
+        /// <remarks>
+        /// When overriden to <c>false</c>,
+        /// the user is blocked from exiting the screen via the <see cref="GlobalAction.Back"/> action,
+        /// and the back button is hidden from this screen by the initial state of <see cref="BackButtonVisibility"/> being set to hidden.
+        /// </remarks>
+        bool AllowUserExit { get; }
 
         /// <summary>
         /// Whether a footer (and a back button) should be displayed underneath the screen.
         /// </summary>
         /// <remarks>
-        /// Temporarily, the back button is shown regardless of whether <see cref="AllowBackButton"/> is true.
+        /// Temporarily, the back button is shown regardless of whether <see cref="AllowUserExit"/> is true.
         /// </remarks>
         bool ShowFooter { get; }
 
@@ -63,13 +66,9 @@ namespace osu.Game.Screens
         IBindable<OverlayActivation> OverlayActivationMode { get; }
 
         /// <summary>
-        /// Controls the visibility state of <see cref="BackButton"/> to better work with screen-specific transitions (i.e. quick restart in player).
-        /// The back button can still be triggered by the <see cref="GlobalAction.Back"/> action even while hidden.
+        /// Whether the back button should be displayed in this screen.
         /// </summary>
-        /// <remarks>
-        /// This is ignored when <see cref="AllowBackButton"/> is set to false.
-        /// </remarks>
-        IBindable<Visibility> BackButtonState { get; }
+        IBindable<bool> BackButtonVisibility { get; }
 
         /// <summary>
         /// The current <see cref="UserActivity"/> for this screen.

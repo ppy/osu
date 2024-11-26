@@ -175,6 +175,11 @@ namespace osu.Game
         /// </summary>
         public readonly IBindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>();
 
+        /// <summary>
+        /// Whether the back button is currently displayed.
+        /// </summary>
+        public readonly IBindable<bool> BackButtonVisibility = new Bindable<bool>();
+
         IBindable<LocalUserPlayingState> ILocalUserPlayInfo.PlayingState => playingState;
 
         private readonly Bindable<LocalUserPlayingState> playingState = new Bindable<LocalUserPlayingState>();
@@ -1019,7 +1024,7 @@ namespace osu.Game
                                             if (!(ScreenStack.CurrentScreen is IOsuScreen currentScreen))
                                                 return;
 
-                                            if (!((Drawable)currentScreen).IsLoaded || (currentScreen.AllowBackButton && !currentScreen.OnBackButton()))
+                                            if (!((Drawable)currentScreen).IsLoaded || (currentScreen.AllowUserExit && !currentScreen.OnBackButton()))
                                                 ScreenStack.Exit();
                                         }
                                     },
@@ -1187,6 +1192,14 @@ namespace osu.Game
             OverlayActivationMode.ValueChanged += mode =>
             {
                 if (mode.NewValue != OverlayActivation.All) CloseAllOverlays();
+            };
+
+            BackButtonVisibility.ValueChanged += visible =>
+            {
+                if (visible.NewValue)
+                    BackButton.Show();
+                else
+                    BackButton.Hide();
             };
 
             // Importantly, this should be run after binding PostNotification to the import handlers so they can present the import after game startup.
@@ -1581,20 +1594,14 @@ namespace osu.Game
 
             if (current is IOsuScreen currentOsuScreen)
             {
-                if (currentOsuScreen.AllowBackButton)
-                    BackButton.State.UnbindFrom(currentOsuScreen.BackButtonState);
-
+                BackButtonVisibility.UnbindFrom(currentOsuScreen.BackButtonVisibility);
                 OverlayActivationMode.UnbindFrom(currentOsuScreen.OverlayActivationMode);
                 API.Activity.UnbindFrom(currentOsuScreen.Activity);
             }
 
             if (newScreen is IOsuScreen newOsuScreen)
             {
-                if (newOsuScreen.AllowBackButton)
-                    ((IBindable<Visibility>)BackButton.State).BindTo(newOsuScreen.BackButtonState);
-                else
-                    BackButton.Hide();
-
+                BackButtonVisibility.BindTo(newOsuScreen.BackButtonVisibility);
                 OverlayActivationMode.BindTo(newOsuScreen.OverlayActivationMode);
                 API.Activity.BindTo(newOsuScreen.Activity);
 

@@ -57,7 +57,7 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public event Action OnGameplayStarted;
 
-        public override bool AllowBackButton => false; // handled by HoldForMenuButton
+        public override bool AllowUserExit => false; // handled by HoldForMenuButton
 
         protected override bool PlayExitSound => !isRestarting;
 
