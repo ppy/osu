@@ -205,7 +205,7 @@ namespace osu.Game.Rulesets.Mods
         {
             foreach (var hitObject in hitObjects)
             {
-                if (!(hitObject.HitWindows is HitWindows.EmptyHitWindows))
+                if (hitObject.HitWindows != HitWindows.Empty)
                     yield return hitObject;
 
                 foreach (HitObject nested in getAllApplicableHitObjects(hitObject.NestedHitObjects))
