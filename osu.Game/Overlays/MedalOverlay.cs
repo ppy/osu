@@ -57,6 +57,11 @@ namespace osu.Game.Overlays
             OverlayActivationMode.BindValueChanged(_ => displayIfReady(), true);
         }
 
+        public override void Hide()
+        {
+            // don't allow hiding the overlay via any method other than our own.
+        }
+
         private void handleMedalMessages(SocketMessage obj)
         {
             if (obj.Event != @"new")
@@ -87,8 +92,7 @@ namespace osu.Game.Overlays
 
         protected override bool OnClick(ClickEvent e)
         {
-            dismissDisplayedMedal();
-            loadNextMedal();
+            progressDisplayByUser();
             return true;
         }
 
@@ -96,21 +100,31 @@ namespace osu.Game.Overlays
         {
             if (e.Action == GlobalAction.Back)
             {
-                dismissDisplayedMedal();
-                loadNextMedal();
+                progressDisplayByUser();
                 return true;
             }
 
             return base.OnPressed(e);
         }
 
-        private void dismissDisplayedMedal()
+        private void progressDisplayByUser()
         {
+            // For now, we want to make sure that medals are definitely seen by the user.
+            // So we block exiting the overlay until the load of the active medal completes.
             if (currentMedalDisplay?.IsLoaded == false)
                 return;
 
             currentMedalDisplay?.Dismiss();
             currentMedalDisplay = null;
+
+            if (!queuedMedals.Any())
+            {
+                Logger.Log("All queued medals have been displayed, hiding overlay!");
+                base.Hide();
+                return;
+            }
+
+            showNextMedal();
         }
 
         private void displayIfReady()
@@ -118,33 +132,26 @@ namespace osu.Game.Overlays
             if (OverlayActivationMode.Value != OverlayActivation.All)
                 return;
 
-            if (currentMedalDisplay != null)
-            {
-                Show();
-                return;
-            }
-
-            if (queuedMedals.Any())
-            {
-                Show();
-                loadNextMedal();
-            }
+            if (currentMedalDisplay != null || queuedMedals.Any())
+                showNextMedal();
         }
 
-        private void loadNextMedal()
+        private void showNextMedal()
         {
+            // A medal is already loading / loaded, so just ensure the overlay is visible.
             if (currentMedalDisplay != null)
-                return;
-
-            if (!queuedMedals.TryDequeue(out currentMedalDisplay))
             {
-                Logger.Log("All queued medals have been displayed!");
-                Hide();
+                Show();
                 return;
             }
 
-            Logger.Log($"Preparing to display \"{currentMedalDisplay.Medal.Name}\"");
-            LoadComponentAsync(currentMedalDisplay, m => medalContainer.Add(m));
+            if (queuedMedals.TryDequeue(out currentMedalDisplay))
+            {
+                Logger.Log($"Preparing to display \"{currentMedalDisplay.Medal.Name}\"");
+
+                Show();
+                LoadComponentAsync(currentMedalDisplay, m => medalContainer.Add(m));
+            }
         }
 
         protected override void Dispose(bool isDisposing)
