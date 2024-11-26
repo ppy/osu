@@ -245,18 +245,19 @@ namespace osu.Game.Overlays
             this.FadeOut(200);
         }
 
-        public void Dismiss()
+        public bool Dismiss()
         {
             if (drawableMedal != null && drawableMedal.State != DisplayState.Full)
             {
                 // if we haven't yet, play out the animation fully
                 drawableMedal.State = DisplayState.Full;
                 FinishTransforms(true);
-                return;
+                return false;
             }
 
             Hide();
             Expire();
+            return true;
         }
 
         private partial class BackgroundStrip : Container

@@ -114,7 +114,10 @@ namespace osu.Game.Overlays
             if (currentMedalDisplay?.IsLoaded == false)
                 return;
 
-            currentMedalDisplay?.Dismiss();
+            // Dismissing may sometimes play out the medal animation rather than immediately dismissing.
+            if (currentMedalDisplay?.Dismiss() == false)
+                return;
+
             currentMedalDisplay = null;
 
             if (!queuedMedals.Any())
