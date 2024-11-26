@@ -12,7 +12,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Logging;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -125,8 +124,6 @@ namespace osu.Game.Overlays.MedalSplash
         {
             medalGlow.Texture = textures.Get(@"MedalSplash/medal-glow");
             description.Colour = colours.BlueLight;
-
-            Logger.Log("loaded");
         }
 
         protected override void LoadComplete()
