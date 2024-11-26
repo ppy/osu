@@ -138,6 +138,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.LightenDuringBreaks, true);
 
             SetDefault(OsuSetting.HitLighting, true);
+            SetDefault(OsuSetting.KiaiStarFountain, true);
 
             SetDefault(OsuSetting.HUDVisibilityMode, HUDVisibilityMode.Always);
             SetDefault(OsuSetting.ShowHealthDisplayWhenCantFail, true);
@@ -414,6 +415,7 @@ namespace osu.Game.Configuration
         NotifyOnPrivateMessage,
         UIHoldActivationDelay,
         HitLighting,
+        KiaiStarFountain,
         MenuBackgroundSource,
         GameplayDisableWinKey,
         SeasonalBackgroundMode,

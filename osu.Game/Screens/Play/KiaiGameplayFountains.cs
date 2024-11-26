@@ -5,8 +5,10 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Utils;
+using osu.Game.Configuration;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.Containers;
 using osu.Game.Screens.Menu;
@@ -18,9 +20,13 @@ namespace osu.Game.Screens.Play
         private StarFountain leftFountain = null!;
         private StarFountain rightFountain = null!;
 
+        private Bindable<bool> kiaiStarEffectsEnabled = null!;
+
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuConfigManager config)
         {
+            kiaiStarEffectsEnabled = config.GetBindable<bool>(OsuSetting.KiaiStarFountain);
+
             RelativeSizeAxes = Axes.Both;
 
             Children = new[]
@@ -47,6 +53,12 @@ namespace osu.Game.Screens.Play
         protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
         {
             base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
+
+            if (!kiaiStarEffectsEnabled.Value)
+                return;
+
+            if (!kiaiStarEffectsEnabled.Value)
+                return;
 
             if (effectPoint.KiaiMode && !isTriggered)
             {
@@ -75,6 +87,8 @@ namespace osu.Game.Screens.Play
             private partial class GameplayStarFountainSpewer : StarFountainSpewer
             {
                 protected override double ShootDuration => 400;
+
+                private readonly Bindable<bool> kiaiStarEffectsEnabled = new Bindable<bool>();
 
                 public GameplayStarFountainSpewer()
                     : base(perSecond: 180)

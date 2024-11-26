@@ -75,6 +75,11 @@ namespace osu.Game.Localisation
         public static LocalisableString FadePlayfieldWhenHealthLow => new TranslatableString(getKey(@"fade_playfield_when_health_low"), @"Fade playfield to red when health is low");
 
         /// <summary>
+        /// "Star fountain during kiai time"
+        /// </summary>
+        public static LocalisableString KiaiStarFountain => new TranslatableString(getKey(@"star_fountain_during_kiai_time"), @"Star fountain during kiai time");
+
+        /// <summary>
         /// "Always show key overlay"
         /// </summary>
         public static LocalisableString AlwaysShowKeyOverlay => new TranslatableString(getKey(@"key_overlay"), @"Always show key overlay");
