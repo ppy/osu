@@ -11,7 +11,7 @@ using osu.Game.Scoring;
 namespace osu.Game.Screens.OnlinePlay.Playlists
 {
     /// <summary>
-    /// Shows the user's best score for a given playlist item, with scores around included.
+    /// Shows the user's submitted score in a given playlist item, with scores around included.
     /// </summary>
     public partial class PlaylistItemUserResultsScreen : PlaylistItemResultsScreen
     {
@@ -20,7 +20,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         {
         }
 
-        protected override APIRequest<MultiplayerScore> CreateScoreRequest() => new ShowPlaylistUserScoreRequest(RoomId, PlaylistItem.ID, API.LocalUser.Value.Id);
+        protected override APIRequest<MultiplayerScore> CreateScoreRequest() => new ShowPlaylistScoreRequest(RoomId, PlaylistItem.ID, Score?.OnlineID ?? -1);
 
         protected override ScoreInfo[] PerformSuccessCallback(Action<IEnumerable<ScoreInfo>> callback, List<MultiplayerScore> scores, MultiplayerScores? pivot = null)
         {
