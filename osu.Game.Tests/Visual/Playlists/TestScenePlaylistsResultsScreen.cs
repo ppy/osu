@@ -231,7 +231,7 @@ namespace osu.Game.Tests.Visual.Playlists
             // pre-check for requests we should be handling (as they are scheduled below).
             switch (request)
             {
-                case ShowPlaylistUserScoreRequest:
+                case ShowPlaylistScoreRequest:
                 case IndexPlaylistScoresRequest:
                     break;
 
@@ -253,7 +253,7 @@ namespace osu.Game.Tests.Visual.Playlists
 
                 switch (request)
                 {
-                    case ShowPlaylistUserScoreRequest s:
+                    case ShowPlaylistScoreRequest s:
                         if (userScore == null)
                             triggerFail(s);
                         else
