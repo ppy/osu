@@ -127,7 +127,7 @@ namespace osu.Game.Beatmaps
 
         public bool EpilepsyWarning { get; set; }
 
-        public bool SamplesMatchPlaybackRate { get; set; } = true;
+        public bool SamplesMatchPlaybackRate { get; set; }
 
         public double DistanceSpacing { get; set; } = 1.0;
 
@@ -135,7 +135,7 @@ namespace osu.Game.Beatmaps
 
         public double TimelineZoom { get; set; } = 1.0;
 
-        public CountdownType Countdown { get; set; } = CountdownType.Normal;
+        public CountdownType Countdown { get; set; } = CountdownType.None;
 
         public int CountdownOffset { get; set; }
 
