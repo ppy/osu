@@ -148,28 +148,6 @@ namespace osu.Game.Skinning
                     Logger.Error(ex, "Failed to load skin configuration.");
                 }
             }
-
-            if (layoutInfos.Values.Any())
-            {
-                int version = layoutInfos.Values.Min(l => l.Version);
-
-                for (int i = version + 1; i <= SkinLayoutInfo.LATEST_VERSION; i++)
-                    applyMigration(i);
-
-                foreach (var layout in layoutInfos.Values)
-                {
-                    layout.Version = SkinLayoutInfo.LATEST_VERSION;
-
-                    foreach (var kvp in layout.DrawableInfo.ToArray())
-                    {
-                        foreach (var di in kvp.Value)
-                        {
-                            if (!isValidDrawable(di))
-                                layout.DrawableInfo[kvp.Key] = kvp.Value.Where(i => i.Type != di.Type).ToArray();
-                        }
-                    }
-                }
-            }
         }
 
         protected virtual IResourceStore<TextureUpload> CreateTextureLoaderStore(IStorageResourceProvider resources, IResourceStore<byte[]> storage)
@@ -266,6 +244,20 @@ namespace osu.Game.Skinning
                 Logger.Log($"Ferrying {deserializedContent.Count()} components in {target} to global section of new {nameof(SkinLayoutInfo)} format");
             }
 
+            for (int i = layout.Version + 1; i <= SkinLayoutInfo.LATEST_VERSION; i++)
+                applyMigration(layout, target, i);
+
+            layout.Version = SkinLayoutInfo.LATEST_VERSION;
+
+            foreach (var kvp in layout.DrawableInfo.ToArray())
+            {
+                foreach (var di in kvp.Value)
+                {
+                    if (!isValidDrawable(di))
+                        layout.DrawableInfo[kvp.Key] = kvp.Value.Where(i => i.Type != di.Type).ToArray();
+                }
+            }
+
             return layout;
         }
 
@@ -283,7 +275,7 @@ namespace osu.Game.Skinning
             return true;
         }
 
-        private void applyMigration(int version)
+        private void applyMigration(SkinLayoutInfo layout, GlobalSkinnableContainers target, int version)
         {
             switch (version)
             {
@@ -291,10 +283,8 @@ namespace osu.Game.Skinning
                 {
                     // Combo counters were moved out of the global HUD components into per-ruleset.
                     // This is to allow some rulesets to customise further (ie. mania and catch moving the combo to within their play area).
-                    if (!layoutInfos.TryGetValue(GlobalSkinnableContainers.MainHUDComponents, out var hudLayout))
-                        break;
-
-                    if (!hudLayout.TryGetDrawableInfo(null, out var globalHUDComponents) ||
+                    if (target != GlobalSkinnableContainers.MainHUDComponents ||
+                        !layout.TryGetDrawableInfo(null, out var globalHUDComponents) ||
                         resources == null)
                         break;
 
@@ -303,13 +293,13 @@ namespace osu.Game.Skinning
                         c.Type.Name == nameof(DefaultComboCounter) ||
                         c.Type.Name == nameof(ArgonComboCounter)).ToArray();
 
-                    hudLayout.Update(null, globalHUDComponents.Except(comboCounters).ToArray());
+                    layout.Update(null, globalHUDComponents.Except(comboCounters).ToArray());
 
                     resources.RealmAccess.Run(r =>
                     {
                         foreach (var ruleset in r.All<RulesetInfo>())
                         {
-                            hudLayout.Update(ruleset, hudLayout.TryGetDrawableInfo(ruleset, out var rulesetHUDComponents)
+                            layout.Update(ruleset, layout.TryGetDrawableInfo(ruleset, out var rulesetHUDComponents)
                                 ? rulesetHUDComponents.Concat(comboCounters).ToArray()
                                 : comboCounters);
                         }
