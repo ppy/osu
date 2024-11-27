@@ -9,7 +9,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
-using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Overlays;
 using osu.Game.Localisation;
 using osu.Game.Models;
@@ -19,8 +18,8 @@ namespace osu.Game.Screens.Edit.Setup
 {
     public partial class ResourcesSection : SetupSection
     {
-        private FormFileSelector audioTrackChooser = null!;
-        private FormFileSelector backgroundChooser = null!;
+        private FormBeatmapFileSelector audioTrackChooser = null!;
+        private FormBeatmapFileSelector backgroundChooser = null!;
 
         public override LocalisableString Title => EditorSetupStrings.ResourcesHeader;
 
@@ -40,7 +39,6 @@ namespace osu.Game.Screens.Edit.Setup
         private Editor? editor { get; set; }
 
         private SetupScreenHeaderBackground headerBackground = null!;
-        private RoundedButton syncResourcesButton = null!;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -51,25 +49,20 @@ namespace osu.Game.Screens.Edit.Setup
                 Height = 110,
             };
 
+            bool multipleDifficulties = working.Value.BeatmapSetInfo.Beatmaps.Count > 1;
+
             Children = new Drawable[]
             {
-                backgroundChooser = new FormFileSelector(".jpg", ".jpeg", ".png")
+                backgroundChooser = new FormBeatmapFileSelector(multipleDifficulties, ".jpg", ".jpeg", ".png")
                 {
                     Caption = GameplaySettingsStrings.BackgroundHeader,
                     PlaceholderText = EditorSetupStrings.ClickToSelectBackground,
                 },
-                audioTrackChooser = new FormFileSelector(".mp3", ".ogg")
+                audioTrackChooser = new FormBeatmapFileSelector(multipleDifficulties, ".mp3", ".ogg")
                 {
                     Caption = EditorSetupStrings.AudioTrack,
                     PlaceholderText = EditorSetupStrings.ClickToSelectTrack,
                 },
-                syncResourcesButton = new RoundedButton
-                {
-                    RelativeSizeAxes = Axes.X,
-                    Text = EditorSetupStrings.ResourcesUpdateAllDifficulties,
-                    Action = syncResources,
-                    Enabled = { Value = false },
-                }
             };
 
             backgroundChooser.PreviewContainer.Add(headerBackground);
@@ -84,39 +77,56 @@ namespace osu.Game.Screens.Edit.Setup
             audioTrackChooser.Current.BindValueChanged(audioTrackChanged);
         }
 
-        private string? newBackgroundFile;
-        private string? newAudioFile;
-
-        public bool ChangeBackgroundImage(FileInfo source)
+        public bool ChangeBackgroundImage(FileInfo source, bool applyToAllDifficulties)
         {
             if (!source.Exists)
                 return false;
 
-            var beatmap = working.Value.BeatmapInfo;
             var set = working.Value.BeatmapSetInfo;
 
-            string[] filenames = set.Files.Select(f => f.Filename).Where(f =>
-                f.StartsWith(@"bg", StringComparison.OrdinalIgnoreCase) &&
-                f.EndsWith(source.Extension, StringComparison.OrdinalIgnoreCase)).ToArray();
-
-            string currentFilename = working.Value.Metadata.BackgroundFile;
-            string? newFilename = null;
-
-            var oldFile = set.GetFile(currentFilename);
-
-            if (oldFile != null && set.Beatmaps.Where(b => !b.Equals(beatmap)).All(b => b.Metadata.BackgroundFile != currentFilename))
+            if (applyToAllDifficulties)
             {
-                beatmaps.DeleteFile(set, oldFile);
-                newFilename = currentFilename;
+                string newFilename = $@"bg{source.Extension}";
+
+                foreach (var beatmapInSet in set.Beatmaps)
+                {
+                    if (set.GetFile(beatmapInSet.Metadata.BackgroundFile) is RealmNamedFileUsage existingFile)
+                        beatmaps.DeleteFile(set, existingFile);
+
+                    if (beatmapInSet.Metadata.BackgroundFile != newFilename)
+                    {
+                        beatmapInSet.Metadata.BackgroundFile = newFilename;
+
+                        if (!beatmapInSet.Equals(working.Value.BeatmapInfo))
+                            beatmaps.Save(beatmapInSet, beatmaps.GetWorkingBeatmap(beatmapInSet).Beatmap);
+                    }
+                }
+            }
+            else
+            {
+                var beatmap = working.Value.BeatmapInfo;
+
+                string[] filenames = set.Files.Select(f => f.Filename).Where(f =>
+                    f.StartsWith(@"bg", StringComparison.OrdinalIgnoreCase) &&
+                    f.EndsWith(source.Extension, StringComparison.OrdinalIgnoreCase)).ToArray();
+
+                string currentFilename = working.Value.Metadata.BackgroundFile;
+
+                var oldFile = set.GetFile(currentFilename);
+                string? newFilename = null;
+
+                if (oldFile != null && set.Beatmaps.Where(b => !b.Equals(beatmap)).All(b => b.Metadata.BackgroundFile != currentFilename))
+                {
+                    beatmaps.DeleteFile(set, oldFile);
+                    newFilename = currentFilename;
+                }
+
+                newFilename ??= NamingUtils.GetNextBestFilename(filenames, $@"bg{source.Extension}");
+                working.Value.Metadata.BackgroundFile = newFilename;
             }
 
-            newFilename ??= NamingUtils.GetNextBestFilename(filenames, $@"bg{source.Extension}");
-
             using (var stream = source.OpenRead())
-                beatmaps.AddFile(set, stream, newFilename);
-
-            working.Value.Metadata.BackgroundFile = newBackgroundFile = newFilename;
-            syncResourcesButton.Enabled.Value = set.Beatmaps.Count > 1;
+                beatmaps.AddFile(set, stream, working.Value.Metadata.BackgroundFile);
 
             editorBeatmap.SaveState();
 
@@ -126,36 +136,56 @@ namespace osu.Game.Screens.Edit.Setup
             return true;
         }
 
-        public bool ChangeAudioTrack(FileInfo source)
+        public bool ChangeAudioTrack(FileInfo source, bool applyToAllDifficulties)
         {
             if (!source.Exists)
                 return false;
 
-            var beatmap = working.Value.BeatmapInfo;
             var set = working.Value.BeatmapSetInfo;
 
-            string[] filenames = set.Files.Select(f => f.Filename).Where(f =>
-                f.StartsWith(@"audio", StringComparison.OrdinalIgnoreCase) &&
-                f.EndsWith(source.Extension, StringComparison.OrdinalIgnoreCase)).ToArray();
-
-            string currentFilename = working.Value.Metadata.AudioFile;
-            string? newFilename = null;
-
-            var oldFile = set.GetFile(currentFilename);
-
-            if (oldFile != null && set.Beatmaps.Where(b => !b.Equals(beatmap)).All(b => b.Metadata.AudioFile != currentFilename))
+            if (applyToAllDifficulties)
             {
-                beatmaps.DeleteFile(set, oldFile);
-                newFilename = currentFilename;
+                string newFilename = $@"audio{source.Extension}";
+
+                foreach (var beatmapInSet in set.Beatmaps)
+                {
+                    if (set.GetFile(beatmapInSet.Metadata.AudioFile) is RealmNamedFileUsage existingFile)
+                        beatmaps.DeleteFile(set, existingFile);
+
+                    if (beatmapInSet.Metadata.AudioFile != newFilename)
+                    {
+                        beatmapInSet.Metadata.AudioFile = newFilename;
+
+                        if (!beatmapInSet.Equals(working.Value.BeatmapInfo))
+                            beatmaps.Save(beatmapInSet, beatmaps.GetWorkingBeatmap(beatmapInSet).Beatmap);
+                    }
+                }
+            }
+            else
+            {
+                var beatmap = working.Value.BeatmapInfo;
+
+                string[] filenames = set.Files.Select(f => f.Filename).Where(f =>
+                    f.StartsWith(@"audio", StringComparison.OrdinalIgnoreCase) &&
+                    f.EndsWith(source.Extension, StringComparison.OrdinalIgnoreCase)).ToArray();
+
+                string currentFilename = working.Value.Metadata.AudioFile;
+
+                var oldFile = set.GetFile(currentFilename);
+                string? newFilename = null;
+
+                if (oldFile != null && set.Beatmaps.Where(b => !b.Equals(beatmap)).All(b => b.Metadata.AudioFile != currentFilename))
+                {
+                    beatmaps.DeleteFile(set, oldFile);
+                    newFilename = currentFilename;
+                }
+
+                newFilename ??= NamingUtils.GetNextBestFilename(filenames, $@"audio{source.Extension}");
+                working.Value.Metadata.AudioFile = newFilename;
             }
 
-            newFilename ??= NamingUtils.GetNextBestFilename(filenames, $@"audio{source.Extension}");
-
             using (var stream = source.OpenRead())
-                beatmaps.AddFile(set, stream, newFilename);
-
-            working.Value.Metadata.AudioFile = newAudioFile = newFilename;
-            updateSyncResourcesButton();
+                beatmaps.AddFile(set, stream, working.Value.Metadata.AudioFile);
 
             editorBeatmap.SaveState();
             music.ReloadCurrentTrack();
@@ -163,57 +193,15 @@ namespace osu.Game.Screens.Edit.Setup
             return true;
         }
 
-        private void updateSyncResourcesButton()
-        {
-            var set = working.Value.BeatmapSetInfo;
-
-            syncResourcesButton.Enabled.Value =
-                (newBackgroundFile != null && set.Beatmaps.DistinctBy(b => b.Metadata.BackgroundFile, StringComparer.OrdinalIgnoreCase).Count() > 1) ||
-                (newAudioFile != null && set.Beatmaps.DistinctBy(b => b.Metadata.AudioFile, StringComparer.OrdinalIgnoreCase).Count() > 1);
-        }
-
-        private void syncResources()
-        {
-            var beatmap = working.Value.BeatmapInfo;
-            var set = working.Value.BeatmapSetInfo;
-
-            foreach (var otherBeatmap in set.Beatmaps.Where(b => !b.Equals(beatmap)))
-            {
-                var otherWorking = beatmaps.GetWorkingBeatmap(otherBeatmap);
-
-                if (newBackgroundFile != null && !string.Equals(otherBeatmap.Metadata.BackgroundFile, newBackgroundFile, StringComparison.OrdinalIgnoreCase))
-                {
-                    if (set.GetFile(otherBeatmap.Metadata.BackgroundFile) is RealmNamedFileUsage file)
-                        beatmaps.DeleteFile(set, file);
-
-                    otherBeatmap.Metadata.BackgroundFile = newBackgroundFile;
-                }
-
-                if (newAudioFile != null && !string.Equals(otherBeatmap.Metadata.AudioFile, newAudioFile, StringComparison.OrdinalIgnoreCase))
-                {
-                    if (set.GetFile(otherBeatmap.Metadata.AudioFile) is RealmNamedFileUsage file)
-                        beatmaps.DeleteFile(set, file);
-
-                    otherBeatmap.Metadata.AudioFile = newAudioFile;
-                }
-
-                beatmaps.Save(otherBeatmap, otherWorking.Beatmap);
-            }
-
-            newAudioFile = null;
-            newBackgroundFile = null;
-            syncResourcesButton.Enabled.Value = false;
-        }
-
         private void backgroundChanged(ValueChangedEvent<FileInfo?> file)
         {
-            if (file.NewValue == null || !ChangeBackgroundImage(file.NewValue))
+            if (file.NewValue == null || !ChangeBackgroundImage(file.NewValue, backgroundChooser.ApplyToAllDifficulties.Value))
                 backgroundChooser.Current.Value = file.OldValue;
         }
 
         private void audioTrackChanged(ValueChangedEvent<FileInfo?> file)
         {
-            if (file.NewValue == null || !ChangeAudioTrack(file.NewValue))
+            if (file.NewValue == null || !ChangeAudioTrack(file.NewValue, audioTrackChooser.ApplyToAllDifficulties.Value))
                 audioTrackChooser.Current.Value = file.OldValue;
         }
     }
