@@ -98,7 +98,7 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("enter compose mode", () => InputManager.Key(Key.F1));
             AddUntilStep("wait for timeline load", () => Editor.ChildrenOfType<Timeline>().FirstOrDefault()?.IsLoaded == true);
 
-            AddStep("enter setup mode", () => InputManager.Key(Key.F4));
+            AddStep("enter setup mode", () => Editor.Mode.Value = EditorScreenMode.SongSetup);
             AddAssert("track is virtual", () => Beatmap.Value.Track is TrackVirtual);
             AddAssert("switch track to real track", () => setAudio(applyToAllDifficulties: true, expected: "audio.mp3"));
 
@@ -508,43 +508,21 @@ namespace osu.Game.Tests.Visual.Editing
         [Test]
         public void TestSingleBackgroundFile()
         {
-            AddStep("enter setup mode", () => InputManager.Key(Key.F4));
+            AddStep("enter setup mode", () => Editor.Mode.Value = EditorScreenMode.SongSetup);
             AddAssert("set background", () => setBackground(applyToAllDifficulties: true, expected: "bg.jpg"));
 
-            AddStep("save", () => Editor.Save());
-            AddStep("create new difficulty", () => Editor.CreateNewDifficulty(new OsuRuleset().RulesetInfo));
-            AddUntilStep("wait for dialog", () => DialogOverlay.CurrentDialog is CreateNewDifficultyDialog);
-            AddStep("confirm creation with no objects", () => DialogOverlay.CurrentDialog!.PerformOkAction());
-            AddUntilStep("wait for created", () =>
-            {
-                string? difficultyName = Editor.ChildrenOfType<EditorBeatmap>().SingleOrDefault()?.BeatmapInfo.DifficultyName;
-                return difficultyName != null && difficultyName == "New Difficulty";
-            });
+            createNewDifficulty();
+            createNewDifficulty();
 
-            AddStep("create new difficulty", () => Editor.CreateNewDifficulty(new OsuRuleset().RulesetInfo));
-            AddUntilStep("wait for dialog", () => DialogOverlay.CurrentDialog is CreateNewDifficultyDialog);
-            AddStep("confirm creation with no objects", () => DialogOverlay.CurrentDialog!.PerformOkAction());
-            AddUntilStep("wait for created", () =>
-            {
-                string? difficultyName = Editor.ChildrenOfType<EditorBeatmap>().SingleOrDefault()?.BeatmapInfo.DifficultyName;
-                return difficultyName != null && difficultyName == "New Difficulty (1)";
-            });
+            switchToDifficulty(1);
 
-            AddStep("switch to second difficulty", () => Editor.SwitchToDifficulty(Beatmap.Value.BeatmapSetInfo.Beatmaps.ElementAt(1)));
-            AddUntilStep("wait for editor load", () => Editor.IsLoaded);
-            AddStep("enter setup mode", () => InputManager.Key(Key.F4));
-            AddUntilStep("wait for load", () => Editor.ChildrenOfType<SetupScreen>().Any());
             AddAssert("set background on second diff only", () => setBackground(applyToAllDifficulties: false, expected: "bg (1).jpg"));
             AddAssert("file added", () => Beatmap.Value.BeatmapSetInfo.Files.Any(f => f.Filename == "bg (1).jpg"));
-            AddStep("save", () => Editor.Save());
 
-            AddStep("switch to first difficulty", () => Editor.SwitchToDifficulty(Beatmap.Value.BeatmapSetInfo.Beatmaps.First()));
-            AddUntilStep("wait for editor load", () => Editor.IsLoaded);
-            AddStep("enter setup mode", () => InputManager.Key(Key.F4));
-            AddUntilStep("wait for load", () => Editor.ChildrenOfType<SetupScreen>().Any());
+            switchToDifficulty(0);
+
             AddAssert("set background on first diff only", () => setBackground(applyToAllDifficulties: false, expected: "bg (2).jpg"));
             AddAssert("file added", () => Beatmap.Value.BeatmapSetInfo.Files.Any(f => f.Filename == "bg (2).jpg"));
-            AddStep("save", () => Editor.Save());
 
             AddAssert("set background on all diff", () => setBackground(applyToAllDifficulties: true, expected: "bg.jpg"));
             AddAssert("all diff uses one background", () => Beatmap.Value.BeatmapSetInfo.Beatmaps.All(b => b.Metadata.BackgroundFile == "bg.jpg"));
@@ -555,43 +533,21 @@ namespace osu.Game.Tests.Visual.Editing
         [Test]
         public void TestSingleAudioFile()
         {
-            AddStep("enter setup mode", () => InputManager.Key(Key.F4));
+            AddStep("enter setup mode", () => Editor.Mode.Value = EditorScreenMode.SongSetup);
             AddAssert("set audio", () => setAudio(applyToAllDifficulties: true, expected: "audio.mp3"));
 
-            AddStep("save", () => Editor.Save());
-            AddStep("create new difficulty", () => Editor.CreateNewDifficulty(new OsuRuleset().RulesetInfo));
-            AddUntilStep("wait for dialog", () => DialogOverlay.CurrentDialog is CreateNewDifficultyDialog);
-            AddStep("confirm creation with no objects", () => DialogOverlay.CurrentDialog!.PerformOkAction());
-            AddUntilStep("wait for created", () =>
-            {
-                string? difficultyName = Editor.ChildrenOfType<EditorBeatmap>().SingleOrDefault()?.BeatmapInfo.DifficultyName;
-                return difficultyName != null && difficultyName == "New Difficulty";
-            });
+            createNewDifficulty();
+            createNewDifficulty();
 
-            AddStep("create new difficulty", () => Editor.CreateNewDifficulty(new OsuRuleset().RulesetInfo));
-            AddUntilStep("wait for dialog", () => DialogOverlay.CurrentDialog is CreateNewDifficultyDialog);
-            AddStep("confirm creation with no objects", () => DialogOverlay.CurrentDialog!.PerformOkAction());
-            AddUntilStep("wait for created", () =>
-            {
-                string? difficultyName = Editor.ChildrenOfType<EditorBeatmap>().SingleOrDefault()?.BeatmapInfo.DifficultyName;
-                return difficultyName != null && difficultyName == "New Difficulty (1)";
-            });
+            switchToDifficulty(1);
 
-            AddStep("switch to second difficulty", () => Editor.SwitchToDifficulty(Beatmap.Value.BeatmapSetInfo.Beatmaps.ElementAt(1)));
-            AddUntilStep("wait for editor load", () => Editor.IsLoaded);
-            AddStep("enter setup mode", () => InputManager.Key(Key.F4));
-            AddUntilStep("wait for load", () => Editor.ChildrenOfType<SetupScreen>().Any());
             AddAssert("set audio on second diff only", () => setAudio(applyToAllDifficulties: false, expected: "audio (1).mp3"));
             AddAssert("file added", () => Beatmap.Value.BeatmapSetInfo.Files.Any(f => f.Filename == "audio (1).mp3"));
-            AddStep("save", () => Editor.Save());
 
-            AddStep("switch to first difficulty", () => Editor.SwitchToDifficulty(Beatmap.Value.BeatmapSetInfo.Beatmaps.First()));
-            AddUntilStep("wait for editor load", () => Editor.IsLoaded);
-            AddStep("enter setup mode", () => InputManager.Key(Key.F4));
-            AddUntilStep("wait for load", () => Editor.ChildrenOfType<SetupScreen>().Any());
+            switchToDifficulty(0);
+
             AddAssert("set audio on first diff only", () => setAudio(applyToAllDifficulties: false, expected: "audio (2).mp3"));
             AddAssert("file added", () => Beatmap.Value.BeatmapSetInfo.Files.Any(f => f.Filename == "audio (2).mp3"));
-            AddStep("save", () => Editor.Save());
 
             AddAssert("set audio on all diff", () => setAudio(applyToAllDifficulties: true, expected: "audio.mp3"));
             AddAssert("all diff uses one audio", () => Beatmap.Value.BeatmapSetInfo.Beatmaps.All(b => b.Metadata.AudioFile == "audio.mp3"));
@@ -602,32 +558,19 @@ namespace osu.Game.Tests.Visual.Editing
         [Test]
         public void TestMultipleBackgroundFiles()
         {
-            AddStep("enter setup mode", () => InputManager.Key(Key.F4));
+            AddStep("enter setup mode", () => Editor.Mode.Value = EditorScreenMode.SongSetup);
             AddAssert("set background", () => setBackground(applyToAllDifficulties: false, expected: "bg.jpg"));
 
-            AddStep("save", () => Editor.Save());
-            AddStep("create new difficulty", () => Editor.CreateNewDifficulty(new OsuRuleset().RulesetInfo));
-            AddUntilStep("wait for dialog", () => DialogOverlay.CurrentDialog is CreateNewDifficultyDialog);
-            AddStep("confirm creation with no objects", () => DialogOverlay.CurrentDialog!.PerformOkAction());
-            AddUntilStep("wait for created", () =>
-            {
-                string? difficultyName = Editor.ChildrenOfType<EditorBeatmap>().SingleOrDefault()?.BeatmapInfo.DifficultyName;
-                return difficultyName != null && difficultyName == "New Difficulty";
-            });
+            createNewDifficulty();
 
             AddAssert("new difficulty uses same background", () => Beatmap.Value.Metadata.BackgroundFile == "bg.jpg");
-            AddStep("enter setup mode", () => InputManager.Key(Key.F4));
-            AddUntilStep("wait for load", () => Editor.ChildrenOfType<SetupScreen>().Any());
             AddAssert("set background", () => setBackground(applyToAllDifficulties: false, expected: "bg (1).jpg"));
             AddAssert("new difficulty uses new background", () => Beatmap.Value.Metadata.BackgroundFile == "bg (1).jpg");
 
-            AddStep("save", () => Editor.Save());
-            AddStep("switch to previous difficulty", () => Editor.SwitchToDifficulty(Beatmap.Value.BeatmapSetInfo.Beatmaps.First()));
+            switchToDifficulty(0);
+
             AddAssert("old difficulty uses old background", () => Beatmap.Value.Metadata.BackgroundFile == "bg.jpg");
             AddAssert("old background not removed", () => Beatmap.Value.BeatmapSetInfo.Files.Any(f => f.Filename == "bg.jpg"));
-
-            AddStep("enter setup mode", () => InputManager.Key(Key.F4));
-            AddUntilStep("wait for load", () => Editor.ChildrenOfType<SetupScreen>().Any());
             AddStep("set background", () => setBackground(applyToAllDifficulties: false, expected: "bg.jpg"));
             AddAssert("other background not removed", () => Beatmap.Value.BeatmapSetInfo.Files.Any(f => f.Filename == "bg (1).jpg"));
         }
@@ -635,34 +578,58 @@ namespace osu.Game.Tests.Visual.Editing
         [Test]
         public void TestMultipleAudioFiles()
         {
-            AddStep("enter setup mode", () => InputManager.Key(Key.F4));
+            AddStep("enter setup mode", () => Editor.Mode.Value = EditorScreenMode.SongSetup);
             AddAssert("set audio", () => setAudio(applyToAllDifficulties: false, expected: "audio.mp3"));
 
+            createNewDifficulty();
+
+            AddAssert("new difficulty uses same audio", () => Beatmap.Value.Metadata.AudioFile == "audio.mp3");
+            AddStep("enter setup mode", () => Editor.Mode.Value = EditorScreenMode.SongSetup);
+            AddUntilStep("wait for load", () => Editor.ChildrenOfType<SetupScreen>().Any());
+            AddAssert("set audio", () => setAudio(applyToAllDifficulties: false, expected: "audio (1).mp3"));
+            AddAssert("new difficulty uses new audio", () => Beatmap.Value.Metadata.AudioFile == "audio (1).mp3");
+
+            switchToDifficulty(0);
+
+            AddAssert("old difficulty uses old audio", () => Beatmap.Value.Metadata.AudioFile == "audio.mp3");
+            AddAssert("old audio not removed", () => Beatmap.Value.BeatmapSetInfo.Files.Any(f => f.Filename == "audio.mp3"));
+            AddStep("set audio", () => setAudio(applyToAllDifficulties: false, expected: "audio.mp3"));
+            AddAssert("other audio not removed", () => Beatmap.Value.BeatmapSetInfo.Files.Any(f => f.Filename == "audio (1).mp3"));
+        }
+
+        private void createNewDifficulty()
+        {
+            string? currentDifficulty = null;
+
             AddStep("save", () => Editor.Save());
-            AddStep("create new difficulty", () => Editor.CreateNewDifficulty(new OsuRuleset().RulesetInfo));
+            AddStep("create new difficulty", () =>
+            {
+                currentDifficulty = EditorBeatmap.BeatmapInfo.DifficultyName;
+                Editor.CreateNewDifficulty(new OsuRuleset().RulesetInfo);
+            });
+
             AddUntilStep("wait for dialog", () => DialogOverlay.CurrentDialog is CreateNewDifficultyDialog);
             AddStep("confirm creation with no objects", () => DialogOverlay.CurrentDialog!.PerformOkAction());
             AddUntilStep("wait for created", () =>
             {
                 string? difficultyName = Editor.ChildrenOfType<EditorBeatmap>().SingleOrDefault()?.BeatmapInfo.DifficultyName;
-                return difficultyName != null && difficultyName == "New Difficulty";
+                return difficultyName != null && difficultyName != currentDifficulty;
             });
 
-            AddAssert("new difficulty uses same audio", () => Beatmap.Value.Metadata.AudioFile == "audio.mp3");
-            AddStep("enter setup mode", () => InputManager.Key(Key.F4));
+            AddUntilStep("wait for editor load", () => Editor.IsLoaded);
+            AddStep("enter setup mode", () => Editor.Mode.Value = EditorScreenMode.SongSetup);
             AddUntilStep("wait for load", () => Editor.ChildrenOfType<SetupScreen>().Any());
-            AddAssert("set audio", () => setAudio(applyToAllDifficulties: false, expected: "audio (1).mp3"));
-            AddAssert("new difficulty uses new audio", () => Beatmap.Value.Metadata.AudioFile == "audio (1).mp3");
+        }
 
+        private void switchToDifficulty(int index)
+        {
             AddStep("save", () => Editor.Save());
-            AddStep("switch to previous difficulty", () => Editor.SwitchToDifficulty(Beatmap.Value.BeatmapSetInfo.Beatmaps.First()));
-            AddAssert("old difficulty uses old audio", () => Beatmap.Value.Metadata.AudioFile == "audio.mp3");
-            AddAssert("old audio not removed", () => Beatmap.Value.BeatmapSetInfo.Files.Any(f => f.Filename == "audio.mp3"));
+            AddStep($"switch to difficulty #{index + 1}", () =>
+                Editor.SwitchToDifficulty(Beatmap.Value.BeatmapSetInfo.Beatmaps.ElementAt(index)));
 
-            AddStep("enter setup mode", () => InputManager.Key(Key.F4));
+            AddUntilStep("wait for editor load", () => Editor.IsLoaded);
+            AddStep("enter setup mode", () => Editor.Mode.Value = EditorScreenMode.SongSetup);
             AddUntilStep("wait for load", () => Editor.ChildrenOfType<SetupScreen>().Any());
-            AddStep("set audio", () => setAudio(applyToAllDifficulties: false, expected: "audio.mp3"));
-            AddAssert("other audio not removed", () => Beatmap.Value.BeatmapSetInfo.Files.Any(f => f.Filename == "audio (1).mp3"));
         }
 
         private bool setBackground(bool applyToAllDifficulties, string expected)
