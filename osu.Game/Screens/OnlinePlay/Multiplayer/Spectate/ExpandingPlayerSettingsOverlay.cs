@@ -8,15 +8,21 @@ using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Play.HUD;
+using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 {
-    public partial class MultiSpectatorSettings : ExpandingContainer
+    public partial class ExpandingPlayerSettingsOverlay : ExpandingContainer
     {
-        public const float CONTRACTED_WIDTH = 30;
-        public const int EXPANDED_WIDTH = 300;
+        private const float padding = 10;
 
-        public MultiSpectatorSettings()
+        public const float CONTRACTED_WIDTH = button_size + padding * 2;
+        public const float EXPANDED_WIDTH = player_settings_width + button_size + padding * 3;
+
+        private const float player_settings_width = 270;
+        private const float button_size = IconButton.DEFAULT_BUTTON_SIZE;
+
+        public ExpandingPlayerSettingsOverlay()
             : base(CONTRACTED_WIDTH, EXPANDED_WIDTH)
         {
             Origin = Anchor.TopRight;
@@ -30,6 +36,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                 Anchor = Anchor.TopLeft,
                 Direction = FillDirection.Horizontal,
                 AutoSizeAxes = Axes.Both,
+                Margin = new MarginPadding(padding),
+                Spacing = new Vector2(padding),
                 Children = new Drawable[]
                 {
                     new IconButton
