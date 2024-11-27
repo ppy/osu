@@ -20,8 +20,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         {
         }
 
-        protected override APIRequest<MultiplayerScore> CreateScoreRequest() => Score == null
-            ? new ShowPlaylistScoreRequest(RoomId, PlaylistItem.ID, Score?.OnlineID ?? -1)
+        protected override APIRequest<MultiplayerScore> CreateScoreRequest() => Score != null
+            ? new ShowPlaylistScoreRequest(RoomId, PlaylistItem.ID, Score.OnlineID)
             : new ShowPlaylistUserScoreRequest(RoomId, PlaylistItem.ID, API.LocalUser.Value.Id);
 
         protected override ScoreInfo[] PerformSuccessCallback(Action<IEnumerable<ScoreInfo>> callback, List<MultiplayerScore> scores, MultiplayerScores? pivot = null)
