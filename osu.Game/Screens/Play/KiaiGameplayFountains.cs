@@ -20,12 +20,12 @@ namespace osu.Game.Screens.Play
         private StarFountain leftFountain = null!;
         private StarFountain rightFountain = null!;
 
-        private Bindable<bool> kiaiStarFountainsEnabled = null!;
+        private Bindable<bool> kiaiStarFountains = null!;
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            kiaiStarFountainsEnabled = config.GetBindable<bool>(OsuSetting.StarFountains);
+            kiaiStarFountains = config.GetBindable<bool>(OsuSetting.StarFountains);
 
             RelativeSizeAxes = Axes.Both;
 
@@ -54,10 +54,7 @@ namespace osu.Game.Screens.Play
         {
             base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
 
-            if (!kiaiStarFountainsEnabled.Value)
-                return;
-
-            if (!kiaiStarFountainsEnabled.Value)
+            if (!kiaiStarFountains.Value)
                 return;
 
             if (effectPoint.KiaiMode && !isTriggered)
