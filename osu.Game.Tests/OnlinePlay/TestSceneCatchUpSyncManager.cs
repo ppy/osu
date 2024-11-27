@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using NUnit.Framework;
@@ -15,20 +13,23 @@ using osu.Game.Tests.Visual;
 
 namespace osu.Game.Tests.OnlinePlay
 {
+    // NOTE: This test scene never calls ProcessFrame on clocks.
+    // The current tests are fine without this as they are testing very static scenarios, but it's worth knowing
+    // if adding further tests to this class.
     [HeadlessTest]
     public partial class TestSceneCatchUpSyncManager : OsuTestScene
     {
-        private GameplayClockContainer master;
-        private SpectatorSyncManager syncManager;
+        private GameplayClockContainer master = null!;
+        private SpectatorSyncManager syncManager = null!;
 
-        private Dictionary<SpectatorPlayerClock, int> clocksById;
-        private SpectatorPlayerClock player1;
-        private SpectatorPlayerClock player2;
+        private Dictionary<SpectatorPlayerClock, int> clocksById = null!;
+        private SpectatorPlayerClock player1 = null!;
+        private SpectatorPlayerClock player2 = null!;
 
         [SetUp]
         public void Setup()
         {
-            syncManager = new SpectatorSyncManager(master = new GameplayClockContainer(new TestManualClock()));
+            syncManager = new SpectatorSyncManager(master = new GameplayClockContainer(new TestManualClock(), false, false));
             player1 = syncManager.CreateManagedClock();
             player2 = syncManager.CreateManagedClock();
 
@@ -188,6 +189,8 @@ namespace osu.Game.Tests.OnlinePlay
 
             public void Reset()
             {
+                IsRunning = false;
+                CurrentTime = 0;
             }
 
             public void ResetSpeedAdjustments()

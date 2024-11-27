@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System.Linq;
 using Humanizer;
@@ -75,9 +73,9 @@ namespace osu.Game.Tests.NonVisual.Multiplayer
             AddStep("create room initially in gameplay", () =>
             {
                 var newRoom = new Room();
-                newRoom.CopyFrom(SelectedRoom.Value);
+                newRoom.CopyFrom(SelectedRoom.Value!);
 
-                newRoom.RoomID.Value = null;
+                newRoom.RoomID = null;
                 MultiplayerClient.RoomSetupAction = room =>
                 {
                     room.State = MultiplayerRoomState.Playing;

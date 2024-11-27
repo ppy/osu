@@ -1,12 +1,13 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Framework.Utils;
+using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.Edit.Blueprints.Components;
 using osu.Game.Rulesets.Mania.Objects;
@@ -18,25 +19,40 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 {
     public partial class HoldNotePlacementBlueprint : ManiaPlacementBlueprint<HoldNote>
     {
-        private readonly EditBodyPiece bodyPiece;
-        private readonly EditNotePiece headPiece;
-        private readonly EditNotePiece tailPiece;
+        private EditBodyPiece bodyPiece = null!;
+        private Circle headPiece = null!;
+        private Circle tailPiece = null!;
 
         [Resolved]
-        private IScrollingInfo scrollingInfo { get; set; }
+        private IScrollingInfo scrollingInfo { get; set; } = null!;
 
-        protected override bool IsValidForPlacement => HitObject.Duration > 0;
+        protected override bool IsValidForPlacement => Precision.DefinitelyBigger(HitObject.Duration, 0);
 
         public HoldNotePlacementBlueprint()
             : base(new HoldNote())
+        {
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
         {
             RelativeSizeAxes = Axes.Both;
 
             InternalChildren = new Drawable[]
             {
                 bodyPiece = new EditBodyPiece { Origin = Anchor.TopCentre },
-                headPiece = new EditNotePiece { Origin = Anchor.Centre },
-                tailPiece = new EditNotePiece { Origin = Anchor.Centre }
+                headPiece = new Circle
+                {
+                    Origin = Anchor.Centre,
+                    Colour = colours.Yellow,
+                    Height = 10
+                },
+                tailPiece = new Circle
+                {
+                    Origin = Anchor.Centre,
+                    Colour = colours.Yellow,
+                    Height = 10
+                },
             };
         }
 
@@ -46,8 +62,8 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 
             if (Column != null)
             {
-                headPiece.Y = Parent.ToLocalSpace(Column.ScreenSpacePositionAtTime(HitObject.StartTime)).Y;
-                tailPiece.Y = Parent.ToLocalSpace(Column.ScreenSpacePositionAtTime(HitObject.EndTime)).Y;
+                headPiece.Y = Parent!.ToLocalSpace(Column.ScreenSpacePositionAtTime(HitObject.StartTime)).Y;
+                tailPiece.Y = Parent!.ToLocalSpace(Column.ScreenSpacePositionAtTime(HitObject.EndTime)).Y;
 
                 switch (scrollingInfo.Direction.Value)
                 {

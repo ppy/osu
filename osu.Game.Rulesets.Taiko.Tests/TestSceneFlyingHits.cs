@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
 
         private void addFlyingHit(HitType hitType)
         {
-            var tick = new DrumRollTick { HitWindows = HitWindows.Empty, StartTime = DrawableRuleset.Playfield.Time.Current };
+            var tick = new DrumRollTick(new DrumRoll()) { HitWindows = HitWindows.Empty, StartTime = DrawableRuleset.Playfield.Time.Current };
 
             DrawableDrumRollTick h;
             DrawableRuleset.Playfield.Add(h = new DrawableDrumRollTick(tick) { JudgementType = hitType });

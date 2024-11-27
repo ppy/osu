@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
@@ -37,11 +36,12 @@ namespace osu.Game.Rulesets.Mania
                 new SettingsSlider<double, ManiaScrollSlider>
                 {
                     LabelText = RulesetSettingsStrings.ScrollSpeed,
-                    Current = config.GetBindable<double>(ManiaRulesetSetting.ScrollTime),
-                    KeyboardStep = 5
+                    Current = config.GetBindable<double>(ManiaRulesetSetting.ScrollSpeed),
+                    KeyboardStep = 1
                 },
                 new SettingsCheckbox
                 {
+                    Keywords = new[] { "color" },
                     LabelText = RulesetSettingsStrings.TimingBasedColouring,
                     Current = config.GetBindable<bool>(ManiaRulesetSetting.TimingBasedNoteColouring),
                 }
@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Mania
 
         private partial class ManiaScrollSlider : RoundedSliderBar<double>
         {
-            public override LocalisableString TooltipText => RulesetSettingsStrings.ScrollSpeedTooltip(Current.Value, (int)Math.Round(DrawableManiaRuleset.MAX_TIME_RANGE / Current.Value));
+            public override LocalisableString TooltipText => RulesetSettingsStrings.ScrollSpeedTooltip((int)DrawableManiaRuleset.ComputeScrollTime(Current.Value), Current.Value);
         }
     }
 }

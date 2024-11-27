@@ -11,6 +11,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Skinning.Default;
+using osu.Game.Screens.Play;
 using osu.Game.Skinning;
 using osuTK;
 
@@ -33,10 +34,15 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         private void load(OsuRulesetConfigManager? rulesetConfig)
         {
             rulesetConfig?.BindWith(OsuRulesetSetting.ShowCursorRipples, showRipples);
+
+            AddInternal(ripplePool);
         }
 
         public bool OnPressed(KeyBindingPressEvent<OsuAction> e)
         {
+            if ((Clock as IGameplayClock)?.IsRewinding == true)
+                return false;
+
             if (showRipples.Value)
             {
                 AddInternal(ripplePool.Get(r =>
@@ -95,7 +101,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 {
                     new RingPiece(3)
                     {
-                        Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2),
+                        Size = OsuHitObject.OBJECT_DIMENSIONS,
                         Alpha = 0.1f,
                     }
                 };

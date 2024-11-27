@@ -65,6 +65,8 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         public override Playfield Playfield => playfield.Value;
 
+        public override PlayfieldAdjustmentContainer PlayfieldAdjustmentContainer => playfieldAdjustmentContainer;
+
         public override Container Overlays { get; } = new Container { RelativeSizeAxes = Axes.Both };
 
         public override IAdjustableAudioComponent Audio => audioContainer;
@@ -74,6 +76,21 @@ namespace osu.Game.Rulesets.UI
         public override Container FrameStableComponents { get; } = new Container { RelativeSizeAxes = Axes.Both };
 
         public override IFrameStableClock FrameStableClock => frameStabilityContainer;
+
+        private readonly PlayfieldAdjustmentContainer playfieldAdjustmentContainer;
+
+        private bool allowBackwardsSeeks;
+
+        public override bool AllowBackwardsSeeks
+        {
+            get => allowBackwardsSeeks;
+            set
+            {
+                allowBackwardsSeeks = value;
+                if (frameStabilityContainer != null)
+                    frameStabilityContainer.AllowBackwardsSeeks = value;
+            }
+        }
 
         private bool frameStablePlayback = true;
 
@@ -116,8 +133,7 @@ namespace osu.Game.Rulesets.UI
         protected DrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
             : base(ruleset)
         {
-            if (beatmap == null)
-                throw new ArgumentNullException(nameof(beatmap), "Beatmap cannot be null.");
+            ArgumentNullException.ThrowIfNull(beatmap);
 
             if (!(beatmap is Beatmap<TObject> tBeatmap))
                 throw new ArgumentException($"{GetType()} expected the beatmap to contain hitobjects of type {typeof(TObject)}.", nameof(beatmap));
@@ -128,6 +144,7 @@ namespace osu.Game.Rulesets.UI
             RelativeSizeAxes = Axes.Both;
 
             KeyBindingInputManager = CreateInputManager();
+            playfieldAdjustmentContainer = CreatePlayfieldAdjustmentContainer();
             playfield = new Lazy<Playfield>(() => CreatePlayfield().With(p =>
             {
                 p.NewResult += (_, r) => NewResult?.Invoke(r);
@@ -172,14 +189,14 @@ namespace osu.Game.Rulesets.UI
             InternalChild = frameStabilityContainer = new FrameStabilityContainer(GameplayStartTime)
             {
                 FrameStablePlayback = FrameStablePlayback,
+                AllowBackwardsSeeks = AllowBackwardsSeeks,
                 Children = new Drawable[]
                 {
                     FrameStableComponents,
                     audioContainer.WithChild(KeyBindingInputManager
                         .WithChildren(new Drawable[]
                         {
-                            CreatePlayfieldAdjustmentContainer()
-                                .WithChild(Playfield),
+                            playfieldAdjustmentContainer.WithChild(Playfield),
                             Overlays
                         })),
                 }
@@ -221,7 +238,7 @@ namespace osu.Game.Rulesets.UI
 
         public override void RequestResume(Action continueResume)
         {
-            if (ResumeOverlay != null && UseResumeOverlay && (Cursor == null || (Cursor.LastFrameState == Visibility.Visible && Contains(Cursor.ActiveCursor.ScreenSpaceDrawQuad.Centre))))
+            if (ResumeOverlay != null && UseResumeOverlay)
             {
                 ResumeOverlay.GameplayCursor = Cursor;
                 ResumeOverlay.ResumeAction = continueResume;
@@ -329,11 +346,11 @@ namespace osu.Game.Rulesets.UI
         /// <returns>The representing <see cref="DrawableHitObject{TObject}"/>.</returns>
         public abstract DrawableHitObject<TObject> CreateDrawableRepresentation(TObject h);
 
-        public void Attach(KeyCounterDisplay keyCounter) =>
-            (KeyBindingInputManager as ICanAttachHUDPieces)?.Attach(keyCounter);
+        public void Attach(InputCountController inputCountController) =>
+            (KeyBindingInputManager as ICanAttachHUDPieces)?.Attach(inputCountController);
 
-        public void Attach(ClicksPerSecondCalculator calculator) =>
-            (KeyBindingInputManager as ICanAttachHUDPieces)?.Attach(calculator);
+        public void Attach(ClicksPerSecondController controller) =>
+            (KeyBindingInputManager as ICanAttachHUDPieces)?.Attach(controller);
 
         /// <summary>
         /// Creates a key conversion input manager. An exception will be thrown if a valid <see cref="RulesetInputManager{T}"/> is not returned.
@@ -438,6 +455,12 @@ namespace osu.Game.Rulesets.UI
         public abstract Playfield Playfield { get; }
 
         /// <summary>
+        /// A container which encapsulates the <see cref="Playfield"/> and provides any adjustments to
+        /// ensure correct scale and position.
+        /// </summary>
+        public abstract PlayfieldAdjustmentContainer PlayfieldAdjustmentContainer { get; }
+
+        /// <summary>
         /// Content to be placed above hitobjects. Will be affected by frame stability and adjustments applied to <see cref="Audio"/>.
         /// </summary>
         public abstract Container Overlays { get; }
@@ -456,6 +479,12 @@ namespace osu.Game.Rulesets.UI
         /// Whether to enable frame-stable playback.
         /// </summary>
         internal abstract bool FrameStablePlayback { get; set; }
+
+        /// <summary>
+        /// When a replay is not attached, we usually block any backwards seeks.
+        /// This will bypass the check. Should only be used for tests.
+        /// </summary>
+        public abstract bool AllowBackwardsSeeks { get; set; }
 
         /// <summary>
         /// The mods which are to be applied.
@@ -504,7 +533,7 @@ namespace osu.Game.Rulesets.UI
         public ResumeOverlay ResumeOverlay { get; protected set; }
 
         /// <summary>
-        /// Whether the <see cref="ResumeOverlay"/> should be used to return the user's cursor position to its previous location after a pause.
+        /// Whether a <see cref="ResumeOverlay"/> should be displayed on resuming after a pause.
         /// </summary>
         /// <remarks>
         /// Defaults to <c>true</c>.

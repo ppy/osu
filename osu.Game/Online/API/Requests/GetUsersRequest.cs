@@ -1,12 +1,16 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
+using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Online.API.Requests
 {
+    /// <summary>
+    /// Looks up users with the given <see cref="UserIds"/>.
+    /// In comparison to <see cref="LookupUsersRequest"/>, the response here contains <see cref="APIUser.RulesetsStatistics"/>,
+    /// but in exchange is subject to more stringent rate limiting.
+    /// </summary>
     public class GetUsersRequest : APIRequest<GetUsersResponse>
     {
         public readonly int[] UserIds;

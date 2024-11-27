@@ -78,11 +78,11 @@ namespace osu.Game.Tests.Visual.Navigation
 
         private KeyBindingsSubsection osuBindingSubsection => keyBindingPanel
                                                               .ChildrenOfType<VariantBindingsSubsection>()
-                                                              .FirstOrDefault(s => s.Ruleset.ShortName == "osu");
+                                                              .FirstOrDefault(s => s.Ruleset!.ShortName == "osu");
 
         private OsuButton configureBindingsButton => Game.Settings
                                                          .ChildrenOfType<BindingSettings>().SingleOrDefault()?
-                                                         .ChildrenOfType<OsuButton>()?
+                                                         .ChildrenOfType<OsuButton>()
                                                          .First(b => b.Text.ToString() == "Configure");
 
         private KeyBindingPanel keyBindingPanel => Game.Settings

@@ -1,9 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -24,7 +24,7 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
 
         protected override TabItem<MatchType> CreateTabItem(MatchType value) => new GameTypePickerItem(value);
 
-        protected override Dropdown<MatchType> CreateDropdown() => null;
+        protected override Dropdown<MatchType>? CreateDropdown() => null;
 
         public MatchTypePicker()
         {
@@ -39,7 +39,8 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
         {
             private const float transition_duration = 200;
 
-            private readonly CircularContainer hover, selection;
+            private readonly CircularContainer hover;
+            private readonly CircularContainer selection;
 
             public GameTypePickerItem(MatchType value)
                 : base(value)
@@ -78,14 +79,17 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
                             },
                         },
                     },
-                    new HoverClickSounds(),
+                    new HoverSounds(HoverSampleSet.TabSelect),
                 };
             }
 
+            private Sample selectSample = null!;
+
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            private void load(OsuColour colours, AudioManager audio)
             {
                 selection.Colour = colours.Yellow;
+                selectSample = audio.Samples.Get(@"UI/tabselect-select");
             }
 
             protected override bool OnHover(HoverEvent e)
@@ -109,6 +113,8 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
             {
                 selection.FadeOut(transition_duration, Easing.OutQuint);
             }
+
+            protected override void OnActivatedByUser() => selectSample.Play();
         }
     }
 }

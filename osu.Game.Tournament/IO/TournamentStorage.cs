@@ -1,7 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
@@ -43,6 +45,6 @@ namespace osu.Game.Tournament.IO
             Logger.Log("Changing tournament storage: " + GetFullPath(string.Empty));
         }
 
-        public IEnumerable<string> ListTournaments() => AllTournaments.GetDirectories(string.Empty);
+        public IEnumerable<string> ListTournaments() => AllTournaments.GetDirectories(string.Empty).Order(StringComparer.CurrentCultureIgnoreCase);
     }
 }

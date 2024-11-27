@@ -1,10 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Objects
@@ -14,16 +14,16 @@ namespace osu.Game.Rulesets.Osu.Objects
     /// </summary>
     public abstract class SliderEndCircle : HitCircle
     {
-        private readonly Slider slider;
+        protected readonly Slider Slider;
 
         protected SliderEndCircle(Slider slider)
         {
-            this.slider = slider;
+            Slider = slider;
         }
 
         public int RepeatIndex { get; set; }
 
-        public double SpanDuration => slider.SpanDuration;
+        public double SpanDuration => Slider.SpanDuration;
 
         protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, IBeatmapDifficultyInfo difficulty)
         {
@@ -40,10 +40,17 @@ namespace osu.Game.Rulesets.Osu.Objects
             else
             {
                 // The first end circle should fade in with the slider.
-                TimePreempt += StartTime - slider.StartTime;
+                TimePreempt += StartTime - Slider.StartTime;
             }
         }
 
         protected override HitWindows CreateHitWindows() => HitWindows.Empty;
+
+        public override Judgement CreateJudgement() => new SliderEndJudgement();
+
+        public class SliderEndJudgement : OsuJudgement
+        {
+            public override HitResult MaxResult => HitResult.LargeTickHit;
+        }
     }
 }

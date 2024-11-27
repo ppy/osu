@@ -10,6 +10,8 @@ namespace osu.Game.Overlays.Notifications
 {
     public partial class ProgressCompletionNotification : SimpleNotification
     {
+        public override string PopInSampleName => "UI/notification-done";
+
         public ProgressCompletionNotification()
         {
             Icon = FontAwesome.Solid.Check;

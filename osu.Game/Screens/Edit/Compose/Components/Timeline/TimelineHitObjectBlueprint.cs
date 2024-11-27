@@ -6,6 +6,7 @@ using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -29,7 +30,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
     public partial class TimelineHitObjectBlueprint : SelectionBlueprint<HitObject>
     {
-        private const float circle_size = 38;
+        private const float circle_size = 32;
 
         private Container? repeatsContainer;
 
@@ -49,7 +50,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private readonly Border border;
 
         private readonly Container colouredComponents;
+        private readonly Container sampleComponents;
         private readonly OsuSpriteText comboIndexText;
+        private readonly SamplePointPiece samplePointPiece;
+        private readonly DifficultyPointPiece? difficultyPointPiece;
 
         [Resolved]
         private ISkinSource skin { get; set; } = null!;
@@ -101,10 +105,16 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                         },
                     }
                 },
-                new SamplePointPiece(Item)
+                samplePointPiece = new SamplePointPiece(Item)
                 {
                     Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.TopCentre
+                    Origin = Anchor.TopCentre,
+                    RelativePositionAxes = Axes.X,
+                    AlternativeColor = Item is IHasRepeats
+                },
+                sampleComponents = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
                 },
             });
 
@@ -118,7 +128,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             if (item is IHasSliderVelocity)
             {
-                AddInternal(new DifficultyPointPiece(Item)
+                AddInternal(difficultyPointPiece = new DifficultyPointPiece(Item)
                 {
                     Anchor = Anchor.TopLeft,
                     Origin = Anchor.BottomCentre
@@ -233,6 +243,22 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     X = (float)(i + 1) / (repeats.RepeatCount + 1)
                 });
             }
+
+            // Add node sample pieces
+            sampleComponents.Clear();
+
+            for (int i = 0; i < repeats.RepeatCount + 2; i++)
+            {
+                sampleComponents.Add(new NodeSamplePointPiece(Item, i)
+                {
+                    X = (float)i / (repeats.RepeatCount + 1),
+                    RelativePositionAxes = Axes.X,
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.TopCentre
+                });
+            }
+
+            samplePointPiece.X = 1f / (repeats.RepeatCount + 1) / 2;
         }
 
         protected override bool ShouldBeConsideredForInput(Drawable child) => true;
@@ -243,6 +269,33 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         public override Quad SelectionQuad => circle.ScreenSpaceDrawQuad;
 
         public override Vector2 ScreenSpaceSelectionPoint => ScreenSpaceDrawQuad.TopLeft;
+
+        protected override bool ComputeIsMaskedAway(RectangleF maskingBounds)
+        {
+            // Since children are exceeding the component size, we need to use a custom quad to compute whether it should be masked away.
+
+            // If the component isn't considered masked away by itself, there's no need to apply custom logic.
+            if (!base.ComputeIsMaskedAway(maskingBounds))
+                return false;
+
+            // If the component is considered masked away, we'll use children to create an extended quad that encapsulates all parts of this blueprint
+            // to ensure it doesn't pop in and out of existence abruptly when scrolling the timeline.
+            var rect = RectangleF.Union(ScreenSpaceDrawQuad.AABBFloat, circle.ScreenSpaceDrawQuad.AABBFloat);
+            rect = RectangleF.Union(rect, samplePointPiece.ScreenSpaceDrawQuad.AABBFloat);
+
+            if (difficultyPointPiece != null)
+                rect = RectangleF.Union(rect, difficultyPointPiece.ScreenSpaceDrawQuad.AABBFloat);
+
+            return !Precision.AlmostIntersects(maskingBounds, rect);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (skin.IsNotNull())
+                skin.SourceChanged -= updateColour;
+        }
 
         private partial class Tick : Circle
         {
@@ -374,12 +427,12 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                                 if (e.CurrentState.Keyboard.ShiftPressed && hitObject is IHasSliderVelocity hasSliderVelocity)
                                 {
-                                    double newVelocity = hasSliderVelocity.SliderVelocity * (repeatHitObject.Duration / proposedDuration);
+                                    double newVelocity = hasSliderVelocity.SliderVelocityMultiplier * (repeatHitObject.Duration / proposedDuration);
 
-                                    if (Precision.AlmostEquals(newVelocity, hasSliderVelocity.SliderVelocity))
+                                    if (Precision.AlmostEquals(newVelocity, hasSliderVelocity.SliderVelocityMultiplier))
                                         return;
 
-                                    hasSliderVelocity.SliderVelocity = newVelocity;
+                                    hasSliderVelocity.SliderVelocityMultiplier = newVelocity;
                                     beatmap.Update(hitObject);
                                 }
                                 else
@@ -388,7 +441,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                     double lengthOfOneRepeat = repeatHitObject.Duration / (repeatHitObject.RepeatCount + 1);
                                     int proposedCount = Math.Max(0, (int)Math.Round(proposedDuration / lengthOfOneRepeat) - 1);
 
-                                    if (proposedCount == repeatHitObject.RepeatCount || lengthOfOneRepeat == 0)
+                                    if (proposedCount == repeatHitObject.RepeatCount || Precision.AlmostEquals(lengthOfOneRepeat, 0))
                                         return;
 
                                     repeatHitObject.RepeatCount = proposedCount;
@@ -441,6 +494,12 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         /// </summary>
         public partial class ExtendableCircle : CompositeDrawable
         {
+            public new ColourInfo Colour
+            {
+                get => Content.Colour;
+                set => Content.Colour = value;
+            }
+
             protected readonly Circle Content;
 
             public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Content.ReceivePositionalInputAt(screenSpacePos);
@@ -460,7 +519,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     {
                         Type = EdgeEffectType.Shadow,
                         Radius = 5,
-                        Colour = Color4.Black.Opacity(0.4f)
+                        Colour = Color4.Black.Opacity(0.05f)
                     }
                 };
             }

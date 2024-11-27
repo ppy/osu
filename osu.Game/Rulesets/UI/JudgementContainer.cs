@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Judgements;
@@ -18,7 +16,7 @@ namespace osu.Game.Rulesets.UI
 
             // remove any existing judgements for the judged object.
             // this can be the case when rewinding.
-            RemoveAll(c => c.JudgedObject == judgement.JudgedObject, false);
+            RemoveAll(c => c.JudgedHitObject == judgement.JudgedHitObject, false);
 
             base.Add(judgement);
         }

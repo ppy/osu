@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Drawing;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -11,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
@@ -23,27 +22,27 @@ namespace osu.Game.Tournament.Screens.Setup
 {
     public partial class SetupScreen : TournamentScreen
     {
-        private FillFlowContainer fillFlow;
+        private FillFlowContainer fillFlow = null!;
 
-        private LoginOverlay loginOverlay;
-        private ResolutionSelector resolution;
-
-        [Resolved]
-        private MatchIPCInfo ipc { get; set; }
+        private LoginOverlay? loginOverlay;
+        private ResolutionSelector resolution = null!;
 
         [Resolved]
-        private StableInfo stableInfo { get; set; }
+        private MatchIPCInfo ipc { get; set; } = null!;
 
         [Resolved]
-        private IAPIProvider api { get; set; }
+        private StableInfo stableInfo { get; set; } = null!;
 
         [Resolved]
-        private RulesetStore rulesets { get; set; }
+        private IAPIProvider api { get; set; } = null!;
 
-        [Resolved(canBeNull: true)]
-        private TournamentSceneManager sceneManager { get; set; }
+        [Resolved]
+        private RulesetStore rulesets { get; set; } = null!;
 
-        private Bindable<Size> windowSize;
+        [Resolved]
+        private TournamentSceneManager? sceneManager { get; set; }
+
+        private Bindable<Size> windowSize = null!;
 
         [BackgroundDependencyLoader]
         private void load(FrameworkConfigManager frameworkConfig)
@@ -57,14 +56,18 @@ namespace osu.Game.Tournament.Screens.Setup
                     RelativeSizeAxes = Axes.Both,
                     Colour = OsuColour.Gray(0.2f),
                 },
-                fillFlow = new FillFlowContainer
+                new OsuScrollContainer
                 {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Direction = FillDirection.Vertical,
-                    Padding = new MarginPadding(10),
-                    Spacing = new Vector2(10),
-                }
+                    RelativeSizeAxes = Axes.Both,
+                    Child = fillFlow = new FillFlowContainer
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Direction = FillDirection.Vertical,
+                        Padding = new MarginPadding(10),
+                        Spacing = new Vector2(10),
+                    },
+                },
             };
 
             api.LocalUser.BindValueChanged(_ => Schedule(reload));
@@ -106,11 +109,11 @@ namespace osu.Game.Tournament.Screens.Setup
 
                         loginOverlay.State.Value = Visibility.Visible;
                     },
-                    Value = api?.LocalUser.Value.Username,
-                    Failing = api?.IsLoggedIn != true,
+                    Value = api.LocalUser.Value.Username,
+                    Failing = api.IsLoggedIn != true,
                     Description = "In order to access the API and display metadata, signing in is required."
                 },
-                new LabelledDropdown<RulesetInfo>
+                new LabelledDropdown<RulesetInfo?>
                 {
                     Label = "Ruleset",
                     Description = "Decides what stats are displayed and which ranks are retrieved for players. This requires a restart to reload data for an existing bracket.",
@@ -136,6 +139,12 @@ namespace osu.Game.Tournament.Screens.Setup
                     Label = "Auto advance screens",
                     Description = "Screens will progress automatically from gameplay -> results -> map pool",
                     Current = LadderInfo.AutoProgressScreens,
+                },
+                new LabelledSwitchButton
+                {
+                    Label = "Display team seeds",
+                    Description = "Team seeds will display alongside each team at the top in gameplay/map pool screens.",
+                    Current = LadderInfo.DisplayTeamSeeds,
                 },
             };
         }

@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -26,7 +24,10 @@ namespace osu.Game.Tests.Visual.Editing
 
             beatmap.ControlPointInfo.Add(100000, new TimingControlPoint { BeatLength = 100 });
             beatmap.ControlPointInfo.Add(50000, new DifficultyControlPoint { SliderVelocity = 2 });
+            beatmap.ControlPointInfo.Add(80000, new EffectControlPoint { KiaiMode = true });
+            beatmap.ControlPointInfo.Add(110000, new EffectControlPoint { KiaiMode = false });
             beatmap.BeatmapInfo.Bookmarks = new[] { 75000, 125000 };
+            beatmap.Breaks.Add(new ManualBreakPeriod(90000, 120000));
 
             editorBeatmap = new EditorBeatmap(beatmap);
         }

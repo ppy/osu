@@ -8,11 +8,13 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
@@ -91,12 +93,66 @@ namespace osu.Game.Tests.Visual.Online
         }
 
         [Test]
+        public void TestHitResultsWithSameNameAreGrouped()
+        {
+            AddStep("Load scores without user best", () =>
+            {
+                var allScores = createScores();
+                allScores.UserScore = null;
+                scoresContainer.Scores = allScores;
+            });
+
+            AddUntilStep("wait for scores displayed", () => scoresContainer.ChildrenOfType<ScoreTableRowBackground>().Any());
+            AddAssert("only one column for slider end", () =>
+            {
+                ScoreTable scoreTable = scoresContainer.ChildrenOfType<ScoreTable>().First();
+                return scoreTable.Columns.Count(c => c.Header.Equals("slider end")) == 1;
+            });
+
+            AddAssert("all rows show non-zero slider ends", () =>
+            {
+                ScoreTable scoreTable = scoresContainer.ChildrenOfType<ScoreTable>().First();
+                int sliderEndColumnIndex = Array.FindIndex(scoreTable.Columns, c => c != null && c.Header.Equals("slider end"));
+                bool sliderEndFilledInEachRow = true;
+
+                for (int i = 0; i < scoreTable.Content?.GetLength(0); i++)
+                {
+                    switch (scoreTable.Content[i, sliderEndColumnIndex])
+                    {
+                        case OsuSpriteText text:
+                            if (text.Text.Equals(0.0d.ToLocalisableString(@"N0")))
+                                sliderEndFilledInEachRow = false;
+                            break;
+
+                        default:
+                            sliderEndFilledInEachRow = false;
+                            break;
+                    }
+                }
+
+                return sliderEndFilledInEachRow;
+            });
+        }
+
+        [Test]
         public void TestUserBest()
         {
             AddStep("Load scores with personal best", () =>
             {
                 var allScores = createScores();
                 allScores.UserScore = createUserBest();
+                scoresContainer.Scores = allScores;
+            });
+
+            AddUntilStep("wait for scores displayed", () => scoresContainer.ChildrenOfType<ScoreTableRowBackground>().Any());
+            AddAssert("best score displayed", () => scoresContainer.ChildrenOfType<DrawableTopScore>().Count() == 2);
+
+            AddStep("Load scores with personal best FC", () =>
+            {
+                var allScores = createScores();
+                allScores.UserScore = createUserBest();
+                allScores.UserScore.Score.Accuracy = 1;
+                scoresContainer.Beatmap.Value.MaxCombo = allScores.UserScore.Score.MaxCombo = 1337;
                 scoresContainer.Scores = allScores;
             });
 
@@ -154,6 +210,19 @@ namespace osu.Game.Tests.Visual.Online
             });
         }
 
+        [Test]
+        public void TestUnrankedPP()
+        {
+            AddStep("Load scores with unranked PP", () =>
+            {
+                var allScores = createScores();
+                allScores.Scores[0].Ranked = false;
+                allScores.UserScore = createUserBest();
+                allScores.UserScore.Score.Ranked = false;
+                scoresContainer.Scores = allScores;
+            });
+        }
+
         private ulong onlineID = 1;
 
         private APIScoresCollection createScores()
@@ -184,6 +253,7 @@ namespace osu.Game.Tests.Visual.Online
                         MaxCombo = 1234,
                         TotalScore = 1234567890,
                         Accuracy = 1,
+                        Ranked = true,
                     },
                     new SoloScoreInfo
                     {
@@ -206,6 +276,7 @@ namespace osu.Game.Tests.Visual.Online
                         MaxCombo = 1234,
                         TotalScore = 1234789,
                         Accuracy = 0.9997,
+                        Ranked = true,
                     },
                     new SoloScoreInfo
                     {
@@ -227,6 +298,7 @@ namespace osu.Game.Tests.Visual.Online
                         MaxCombo = 1234,
                         TotalScore = 12345678,
                         Accuracy = 0.9854,
+                        Ranked = true,
                     },
                     new SoloScoreInfo
                     {
@@ -247,6 +319,7 @@ namespace osu.Game.Tests.Visual.Online
                         MaxCombo = 1234,
                         TotalScore = 1234567,
                         Accuracy = 0.8765,
+                        Ranked = true,
                     },
                     new SoloScoreInfo
                     {
@@ -263,19 +336,24 @@ namespace osu.Game.Tests.Visual.Online
                         MaxCombo = 1234,
                         TotalScore = 123456,
                         Accuracy = 0.6543,
+                        Ranked = true,
                     },
                 }
             };
 
             const int initial_great_count = 2000;
             const int initial_tick_count = 100;
+            const int initial_slider_end_count = 500;
 
             int greatCount = initial_great_count;
             int tickCount = initial_tick_count;
+            int sliderEndCount = initial_slider_end_count;
 
-            foreach (var s in scores.Scores)
+            foreach (var (score, index) in scores.Scores.Select((s, i) => (s, i)))
             {
-                s.Statistics = new Dictionary<HitResult, int>
+                HitResult sliderEndResult = index % 2 == 0 ? HitResult.SliderTailHit : HitResult.SmallTickHit;
+
+                score.Statistics = new Dictionary<HitResult, int>
                 {
                     { HitResult.Great, greatCount },
                     { HitResult.LargeTickHit, tickCount },
@@ -283,10 +361,19 @@ namespace osu.Game.Tests.Visual.Online
                     { HitResult.Meh, RNG.Next(100) },
                     { HitResult.Miss, initial_great_count - greatCount },
                     { HitResult.LargeTickMiss, initial_tick_count - tickCount },
+                    { sliderEndResult, sliderEndCount },
+                };
+
+                // Some hit results, including SliderTailHit and SmallTickHit, are only displayed
+                // when the maximum number is known
+                score.MaximumStatistics = new Dictionary<HitResult, int>
+                {
+                    { sliderEndResult, initial_slider_end_count },
                 };
 
                 greatCount -= 100;
                 tickCount -= RNG.Next(1, 5);
+                sliderEndCount -= 20;
             }
 
             return scores;
@@ -309,6 +396,7 @@ namespace osu.Game.Tests.Visual.Online
                 MaxCombo = 1234,
                 TotalScore = 123456,
                 Accuracy = 0.6543,
+                Ranked = true,
             },
             Position = 1337,
         };

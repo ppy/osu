@@ -73,7 +73,12 @@ namespace osu.Game.Tests.Resources
 
         private static string getTempFilename() => temp_storage.GetFullPath(Guid.NewGuid() + ".osz");
 
-        private static int importId;
+        private static int testId = 1;
+
+        /// <summary>
+        /// Get a unique int value which is incremented each call.
+        /// </summary>
+        public static int GetNextTestID() => Interlocked.Increment(ref testId);
 
         /// <summary>
         /// Create a test beatmap set model.
@@ -88,7 +93,7 @@ namespace osu.Game.Tests.Resources
 
             RulesetInfo getRuleset() => rulesets?[j++ % rulesets.Length];
 
-            int setId = Interlocked.Increment(ref importId);
+            int setId = GetNextTestID();
 
             var metadata = new BeatmapMetadata
             {
@@ -179,7 +184,7 @@ namespace osu.Game.Tests.Resources
             BeatmapHash = beatmap.Hash,
             Ruleset = beatmap.Ruleset,
             Mods = new Mod[] { new TestModHardRock(), new TestModDoubleTime() },
-            TotalScore = 2845370,
+            TotalScore = 284537,
             Accuracy = 0.95,
             MaxCombo = 999,
             Position = 1,

@@ -10,6 +10,7 @@ using osu.Game.Rulesets.Catch.Objects.Drawables;
 using osu.Game.Rulesets.Catch.Replays;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.UI;
+using osu.Game.Screens.Play;
 using osuTK;
 
 namespace osu.Game.Rulesets.Catch.UI
@@ -31,7 +32,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
         private readonly CatchComboDisplay comboDisplay;
 
-        private readonly CatcherTrailDisplay catcherTrails;
+        public readonly CatcherTrailDisplay CatcherTrails;
 
         private Catcher catcher = null!;
 
@@ -54,7 +55,7 @@ namespace osu.Game.Rulesets.Catch.UI
             Children = new Drawable[]
             {
                 catcherContainer = new Container<Catcher> { RelativeSizeAxes = Axes.Both },
-                catcherTrails = new CatcherTrailDisplay(),
+                CatcherTrails = new CatcherTrailDisplay(),
                 comboDisplay = new CatchComboDisplay
                 {
                     RelativeSizeAxes = Axes.None,
@@ -83,7 +84,7 @@ namespace osu.Game.Rulesets.Catch.UI
         {
             base.Update();
 
-            var replayState = (GetContainingInputManager().CurrentState as RulesetInputManagerInputState<CatchAction>)?.LastReplayState as CatchFramedReplayInputHandler.CatchReplayState;
+            var replayState = (GetContainingInputManager()!.CurrentState as RulesetInputManagerInputState<CatchAction>)?.LastReplayState as CatchFramedReplayInputHandler.CatchReplayState;
 
             SetCatcherPosition(
                 replayState?.CatcherX ??
@@ -96,7 +97,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
             comboDisplay.X = Catcher.X;
 
-            if (Time.Elapsed <= 0)
+            if ((Clock as IGameplayClock)?.IsRewinding == true)
             {
                 // This is probably a wrong value, but currently the true value is not recorded.
                 // Setting `true` will prevent generation of false-positive after-images (with more false-negatives).
@@ -109,9 +110,9 @@ namespace osu.Game.Rulesets.Catch.UI
 
             if (Catcher.Dashing || Catcher.HyperDashing)
             {
-                double generationInterval = Catcher.HyperDashing ? 25 : 50;
+                const double trail_generation_interval = 16;
 
-                if (Time.Current - catcherTrails.LastDashTrailTime >= generationInterval)
+                if (Time.Current - CatcherTrails.LastDashTrailTime >= trail_generation_interval)
                     displayCatcherTrail(Catcher.HyperDashing ? CatcherTrailAnimation.HyperDashing : CatcherTrailAnimation.Dashing);
             }
 
@@ -169,6 +170,6 @@ namespace osu.Game.Rulesets.Catch.UI
             }
         }
 
-        private void displayCatcherTrail(CatcherTrailAnimation animation) => catcherTrails.Add(new CatcherTrailEntry(Time.Current, Catcher.CurrentState, Catcher.X, Catcher.BodyScale, animation));
+        private void displayCatcherTrail(CatcherTrailAnimation animation) => CatcherTrails.Add(new CatcherTrailEntry(Time.Current, Catcher.CurrentState, Catcher.X, Catcher.BodyScale, animation));
     }
 }

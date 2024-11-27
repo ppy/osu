@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework;
 using osu.Framework.Extensions.Color4Extensions;
@@ -27,10 +25,10 @@ namespace osu.Game.Graphics.UserInterface
         private const float idle_width = 0.8f;
         private const float hover_width = 0.9f;
 
-        private const float hover_duration = 500;
+        private const float hover_duration = 300;
         private const float click_duration = 200;
 
-        public event Action<SelectionState> StateChanged;
+        public event Action<SelectionState>? StateChanged;
 
         private SelectionState state;
 
@@ -56,7 +54,7 @@ namespace osu.Game.Graphics.UserInterface
         private readonly Box rightGlow;
         private readonly Box background;
         private readonly SpriteText spriteText;
-        private Vector2 hoverSpacing => new Vector2(3f, 0f);
+        private Vector2 hoverSpacing => new Vector2(1.4f, 0f);
 
         public DialogButton(HoverSampleSet sampleSet = HoverSampleSet.Button)
             : base(sampleSet)
@@ -152,6 +150,7 @@ namespace osu.Game.Graphics.UserInterface
                                             TriangleScale = 4,
                                             ColourDark = OsuColour.Gray(0.88f),
                                             Shear = new Vector2(-0.2f, 0),
+                                            ClampAxes = Axes.Y
                                         },
                                     },
                                 },
@@ -281,15 +280,15 @@ namespace osu.Game.Graphics.UserInterface
 
             if (newState == SelectionState.Selected)
             {
-                spriteText.TransformSpacingTo(hoverSpacing, hover_duration, Easing.OutElastic);
-                ColourContainer.ResizeWidthTo(hover_width, hover_duration, Easing.OutElastic);
+                spriteText.TransformSpacingTo(hoverSpacing, hover_duration, Easing.OutQuint);
+                ColourContainer.ResizeWidthTo(hover_width, hover_duration, Easing.OutQuint);
                 glowContainer.FadeIn(hover_duration, Easing.OutQuint);
             }
             else
             {
-                ColourContainer.ResizeWidthTo(idle_width, hover_duration, Easing.OutElastic);
-                spriteText.TransformSpacingTo(Vector2.Zero, hover_duration, Easing.OutElastic);
-                glowContainer.FadeOut(hover_duration, Easing.OutQuint);
+                ColourContainer.ResizeWidthTo(idle_width, hover_duration / 2, Easing.OutQuint);
+                spriteText.TransformSpacingTo(Vector2.Zero, hover_duration / 2, Easing.OutQuint);
+                glowContainer.FadeOut(hover_duration / 2, Easing.OutQuint);
             }
         }
 

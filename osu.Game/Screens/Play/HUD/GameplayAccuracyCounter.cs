@@ -23,11 +23,11 @@ namespace osu.Game.Screens.Play.HUD
         {
             base.LoadComplete();
 
-            AccuracyDisplay.BindValueChanged(mod =>
+            AccuracyDisplay.BindValueChanged(mode =>
             {
                 Current.UnbindBindings();
 
-                switch (mod.NewValue)
+                switch (mode.NewValue)
                 {
                     case AccuracyDisplayMode.Standard:
                         Current.BindTo(scoreProcessor.Accuracy);

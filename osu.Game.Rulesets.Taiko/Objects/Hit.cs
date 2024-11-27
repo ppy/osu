@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -72,7 +70,7 @@ namespace osu.Game.Rulesets.Taiko.Objects
             }
         }
 
-        protected override StrongNestedHitObject CreateStrongNestedHit(double startTime) => new StrongNestedHit
+        protected override StrongNestedHitObject CreateStrongNestedHit(double startTime) => new StrongNestedHit(this)
         {
             StartTime = startTime,
             Samples = Samples
@@ -80,6 +78,10 @@ namespace osu.Game.Rulesets.Taiko.Objects
 
         public class StrongNestedHit : StrongNestedHitObject
         {
+            public StrongNestedHit(TaikoHitObject parent)
+                : base(parent)
+            {
+            }
         }
     }
 }

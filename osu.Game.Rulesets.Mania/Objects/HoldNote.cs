@@ -6,9 +6,8 @@
 using System.Collections.Generic;
 using System.Threading;
 using osu.Game.Audio;
-using osu.Game.Beatmaps;
-using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
 
@@ -74,33 +73,28 @@ namespace osu.Game.Rulesets.Mania.Objects
         /// <summary>
         /// The head note of the hold.
         /// </summary>
-        public HeadNote Head { get; private set; }
+        public HeadNote Head { get; protected set; }
 
         /// <summary>
         /// The tail note of the hold.
         /// </summary>
-        public TailNote Tail { get; private set; }
-
-        public override double MaximumJudgementOffset => Tail.MaximumJudgementOffset;
+        public TailNote Tail { get; protected set; }
 
         /// <summary>
-        /// The time between ticks of this hold.
+        /// The body of the hold.
+        /// This is an invisible and silent object that tracks the holding state of the <see cref="HoldNote"/>.
         /// </summary>
-        private double tickSpacing = 50;
+        public HoldNoteBody Body { get; protected set; }
 
-        protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, IBeatmapDifficultyInfo difficulty)
-        {
-            base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
-
-            TimingControlPoint timingPoint = controlPointInfo.TimingPointAt(StartTime);
-            tickSpacing = timingPoint.BeatLength / difficulty.SliderTickRate;
-        }
+        public override double MaximumJudgementOffset => Tail.MaximumJudgementOffset;
 
         protected override void CreateNestedHitObjects(CancellationToken cancellationToken)
         {
             base.CreateNestedHitObjects(cancellationToken);
 
-            createTicks(cancellationToken);
+            // Generally node samples will be populated by ManiaBeatmapConverter, but in a case like the editor they may not be.
+            // Ensure they are set to a sane default here.
+            NodeSamples ??= CreateDefaultNodeSamples(this);
 
             AddNested(Head = new HeadNote
             {
@@ -113,32 +107,34 @@ namespace osu.Game.Rulesets.Mania.Objects
             {
                 StartTime = EndTime,
                 Column = Column,
-                Samples = GetNodeSamples((NodeSamples?.Count - 1) ?? 1),
+                Samples = GetNodeSamples(NodeSamples.Count - 1),
             });
-        }
 
-        private void createTicks(CancellationToken cancellationToken)
-        {
-            if (tickSpacing == 0)
-                return;
-
-            for (double t = StartTime + tickSpacing; t <= EndTime - tickSpacing; t += tickSpacing)
+            AddNested(Body = new HoldNoteBody
             {
-                cancellationToken.ThrowIfCancellationRequested();
-
-                AddNested(new HoldNoteTick
-                {
-                    StartTime = t,
-                    Column = Column
-                });
-            }
+                StartTime = StartTime,
+                Column = Column
+            });
         }
 
         public override Judgement CreateJudgement() => new IgnoreJudgement();
 
         protected override HitWindows CreateHitWindows() => HitWindows.Empty;
 
-        public IList<HitSampleInfo> GetNodeSamples(int nodeIndex) =>
-            nodeIndex < NodeSamples?.Count ? NodeSamples[nodeIndex] : Samples;
+        public IList<HitSampleInfo> GetNodeSamples(int nodeIndex) => nodeIndex < NodeSamples?.Count ? NodeSamples[nodeIndex] : Samples;
+
+        /// <summary>
+        /// Create the default note samples for a hold note, based off their main sample.
+        /// </summary>
+        /// <remarks>
+        /// By default, osu!mania beatmaps in only play samples at the start of the hold note.
+        /// </remarks>
+        /// <param name="obj">The object to use as a basis for the head sample.</param>
+        /// <returns>Defaults for assigning to <see cref="HoldNote.NodeSamples"/>.</returns>
+        public static List<IList<HitSampleInfo>> CreateDefaultNodeSamples(HitObject obj) => new List<IList<HitSampleInfo>>
+        {
+            obj.Samples,
+            new List<HitSampleInfo>(),
+        };
     }
 }

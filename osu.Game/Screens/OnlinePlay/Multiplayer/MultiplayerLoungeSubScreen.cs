@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -12,6 +10,7 @@ using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
+using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
@@ -26,12 +25,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
     public partial class MultiplayerLoungeSubScreen : LoungeSubScreen
     {
         [Resolved]
-        private IAPIProvider api { get; set; }
+        private IAPIProvider api { get; set; } = null!;
 
         [Resolved]
-        private MultiplayerClient client { get; set; }
+        private MultiplayerClient client { get; set; } = null!;
 
-        private Dropdown<RoomPermissionsFilter> roomAccessTypeDropdown;
+        private Dropdown<RoomPermissionsFilter> roomAccessTypeDropdown = null!;
 
         public override void OnResuming(ScreenTransitionEvent e)
         {
@@ -41,7 +40,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             // To work around this, temporarily remove the room and trigger an immediate listing poll.
             if (e.Last is MultiplayerMatchSubScreen match)
             {
-                RoomManager.RemoveRoom(match.Room);
+                RoomManager?.RemoveRoom(match.Room);
                 ListingPollingComponent.PollImmediately();
             }
         }
@@ -51,6 +50,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             roomAccessTypeDropdown = new SlimEnumDropdown<RoomPermissionsFilter>
             {
                 RelativeSizeAxes = Axes.None,
+                Current = Config.GetBindable<RoomPermissionsFilter>(OsuSetting.MultiplayerRoomFilter),
                 Width = 160,
             };
 
@@ -71,8 +71,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         protected override Room CreateNewRoom() => new Room
         {
-            Name = { Value = $"{api.LocalUser}'s awesome room" },
-            Type = { Value = MatchType.HeadToHead },
+            Name = $"{api.LocalUser}'s awesome room",
+            Type = MatchType.HeadToHead,
         };
 
         protected override RoomSubScreen CreateRoomSubScreen(Room room) => new MultiplayerMatchSubScreen(room);
@@ -81,7 +81,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         protected override void OpenNewRoom(Room room)
         {
-            if (client?.IsConnected.Value != true)
+            if (!client.IsConnected.Value)
             {
                 Logger.Log("Not currently connected to the multiplayer server.", LoggingTarget.Runtime, LogLevel.Important);
                 return;
@@ -93,7 +93,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         private partial class MultiplayerListingPollingComponent : ListingPollingComponent
         {
             [Resolved]
-            private MultiplayerClient client { get; set; }
+            private MultiplayerClient client { get; set; } = null!;
 
             private readonly IBindable<bool> isConnected = new Bindable<bool>();
 

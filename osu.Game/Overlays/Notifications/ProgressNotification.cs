@@ -4,6 +4,8 @@
 using System;
 using System.Threading;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -25,7 +27,14 @@ namespace osu.Game.Overlays.Notifications
 
         public Func<bool>? CancelRequested { get; set; }
 
+        /// <summary>
+        /// Whether the operation represented by the <see cref="ProgressNotification"/> is still ongoing.
+        /// </summary>
+        public bool Ongoing => State != ProgressNotificationState.Completed && State != ProgressNotificationState.Cancelled;
+
         protected override bool AllowFlingDismiss => false;
+
+        public override string PopOutSampleName => State is ProgressNotificationState.Cancelled ? base.PopOutSampleName : "";
 
         /// <summary>
         /// The function to post completion notifications back to.
@@ -45,7 +54,7 @@ namespace osu.Game.Overlays.Notifications
             set
             {
                 text = value;
-                Schedule(() => textDrawable.Text = text);
+                Scheduler.AddOnce(t => textDrawable.Text = t, text);
             }
         }
 
@@ -122,6 +131,7 @@ namespace osu.Game.Overlays.Notifications
                     cancellationTokenSource.Cancel();
 
                     IconContent.FadeColour(ColourInfo.GradientVertical(Color4.Gray, Color4.Gray.Lighten(0.5f)), colour_fade_duration);
+                    cancelSample?.Play();
                     loadingSpinner.Hide();
 
                     var icon = new SpriteIcon
@@ -190,6 +200,8 @@ namespace osu.Game.Overlays.Notifications
 
         private LoadingSpinner loadingSpinner = null!;
 
+        private Sample? cancelSample;
+
         private readonly TextFlowContainer textDrawable;
 
         public ProgressNotification()
@@ -217,7 +229,7 @@ namespace osu.Game.Overlays.Notifications
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, AudioManager audioManager)
         {
             colourQueued = colours.YellowDark;
             colourActive = colours.Blue;
@@ -236,6 +248,8 @@ namespace osu.Game.Overlays.Notifications
                     Size = new Vector2(loading_spinner_size),
                 }
             });
+
+            cancelSample = audioManager.Samples.Get(@"UI/notification-cancel");
         }
 
         public override void Close(bool runFlingAnimation)

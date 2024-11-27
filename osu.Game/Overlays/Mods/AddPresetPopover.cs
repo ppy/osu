@@ -8,10 +8,12 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input.Events;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
@@ -87,12 +89,24 @@ namespace osu.Game.Overlays.Mods
         {
             base.LoadComplete();
 
-            ScheduleAfterChildren(() => GetContainingInputManager().ChangeFocus(nameTextBox));
+            ScheduleAfterChildren(() => GetContainingFocusManager()!.ChangeFocus(nameTextBox));
 
             nameTextBox.Current.BindValueChanged(s =>
             {
                 createButton.Enabled.Value = !string.IsNullOrWhiteSpace(s.NewValue);
             }, true);
+        }
+
+        public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+        {
+            switch (e.Action)
+            {
+                case GlobalAction.Select:
+                    createButton.TriggerClick();
+                    return true;
+            }
+
+            return base.OnPressed(e);
         }
 
         private void createPreset()
@@ -101,8 +115,8 @@ namespace osu.Game.Overlays.Mods
             {
                 Name = nameTextBox.Current.Value,
                 Description = descriptionTextBox.Current.Value,
-                Mods = selectedMods.Value.ToArray(),
-                Ruleset = r.Find<RulesetInfo>(ruleset.Value.ShortName)
+                Mods = selectedMods.Value.Where(mod => mod.Type != ModType.System).ToArray(),
+                Ruleset = r.Find<RulesetInfo>(ruleset.Value.ShortName)!
             }));
 
             this.HidePopover();

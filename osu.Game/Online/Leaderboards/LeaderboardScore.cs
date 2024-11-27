@@ -17,6 +17,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using osu.Framework.Platform;
 using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -31,7 +32,10 @@ using osuTK;
 using osuTK.Graphics;
 using osu.Game.Online.API;
 using osu.Game.Resources.Localisation.Web;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Utils;
+using CommonStrings = osu.Game.Localisation.CommonStrings;
+using WebCommonStrings = osu.Game.Resources.Localisation.Web.CommonStrings;
 
 namespace osu.Game.Online.Leaderboards
 {
@@ -69,6 +73,12 @@ namespace osu.Game.Online.Leaderboards
 
         [Resolved(canBeNull: true)]
         private SongSelect songSelect { get; set; }
+
+        [Resolved(canBeNull: true)]
+        private Clipboard clipboard { get; set; }
+
+        [Resolved]
+        private IAPIProvider api { get; set; }
 
         public ITooltip<ScoreInfo> GetCustomTooltip() => new LeaderboardScoreTooltip();
         public virtual ScoreInfo TooltipContent => Score;
@@ -163,7 +173,8 @@ namespace osu.Game.Online.Leaderboards
                                         {
                                             Anchor = Anchor.BottomLeft,
                                             Origin = Anchor.BottomLeft,
-                                            AutoSizeAxes = Axes.Both,
+                                            AutoSizeAxes = Axes.X,
+                                            Height = 28,
                                             Direction = FillDirection.Horizontal,
                                             Spacing = new Vector2(10f, 0f),
                                             Children = new Drawable[]
@@ -242,7 +253,7 @@ namespace osu.Game.Online.Leaderboards
                                     Origin = Anchor.BottomRight,
                                     AutoSizeAxes = Axes.Both,
                                     Direction = FillDirection.Horizontal,
-                                    ChildrenEnumerable = Score.Mods.Select(mod => new ModIcon(mod) { Scale = new Vector2(0.375f) })
+                                    ChildrenEnumerable = Score.Mods.AsOrdered().Select(mod => new ModIcon(mod) { Scale = new Vector2(0.375f) })
                                 },
                             },
                         },
@@ -356,14 +367,12 @@ namespace osu.Game.Online.Leaderboards
                                 },
                             },
                         },
-                        new GlowingSpriteText
+                        new OsuSpriteText
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
-                            TextColour = Color4.White,
-                            GlowColour = Color4Extensions.FromHex(@"83ccfa"),
                             Text = statistic.Value,
-                            Font = OsuFont.GetFont(size: 17, weight: FontWeight.Bold),
+                            Font = OsuFont.GetFont(size: 17, weight: FontWeight.Bold, fixedWidth: true)
                         },
                     },
                 };
@@ -420,13 +429,16 @@ namespace osu.Game.Online.Leaderboards
             {
                 List<MenuItem> items = new List<MenuItem>();
 
-                if (Score.Mods.Length > 0 && modsContainer.Any(s => s.IsHovered) && songSelect != null)
+                if (Score.Mods.Length > 0 && songSelect != null)
                     items.Add(new OsuMenuItem("Use these mods", MenuItemType.Highlighted, () => songSelect.Mods.Value = Score.Mods));
+
+                if (Score.OnlineID > 0)
+                    items.Add(new OsuMenuItem(CommonStrings.CopyLink, MenuItemType.Standard, () => clipboard?.SetText($@"{api.WebsiteRootUrl}/scores/{Score.OnlineID}")));
 
                 if (Score.Files.Count > 0)
                 {
-                    items.Add(new OsuMenuItem("Export", MenuItemType.Standard, () => scoreManager.Export(Score)));
-                    items.Add(new OsuMenuItem(CommonStrings.ButtonsDelete, MenuItemType.Destructive, () => dialogOverlay?.Push(new LocalScoreDeleteDialog(Score))));
+                    items.Add(new OsuMenuItem(CommonStrings.Export, MenuItemType.Standard, () => scoreManager.Export(Score)));
+                    items.Add(new OsuMenuItem(WebCommonStrings.ButtonsDelete, MenuItemType.Destructive, () => dialogOverlay?.Push(new LocalScoreDeleteDialog(Score))));
                 }
 
                 return items.ToArray();

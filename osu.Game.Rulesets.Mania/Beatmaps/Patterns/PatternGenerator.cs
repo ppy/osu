@@ -1,10 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
+using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns
@@ -27,11 +26,11 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns
         /// <summary>
         /// The beatmap which <see cref="HitObject"/> is a part of.
         /// </summary>
-        protected readonly ManiaBeatmap Beatmap;
+        protected readonly IBeatmap Beatmap;
 
         protected readonly int TotalColumns;
 
-        protected PatternGenerator(HitObject hitObject, ManiaBeatmap beatmap, Pattern previousPattern)
+        protected PatternGenerator(HitObject hitObject, IBeatmap beatmap, int totalColumns, Pattern previousPattern)
         {
             ArgumentNullException.ThrowIfNull(hitObject);
             ArgumentNullException.ThrowIfNull(beatmap);
@@ -40,8 +39,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns
             HitObject = hitObject;
             Beatmap = beatmap;
             PreviousPattern = previousPattern;
-
-            TotalColumns = Beatmap.TotalColumns;
+            TotalColumns = totalColumns;
         }
 
         /// <summary>

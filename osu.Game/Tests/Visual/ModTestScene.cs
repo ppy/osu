@@ -20,35 +20,35 @@ namespace osu.Game.Tests.Visual
     {
         protected sealed override bool HasCustomSteps => true;
 
-        private ModTestData currentTestData;
+        protected ModTestData CurrentTestData { get; private set; }
 
         protected void CreateModTest(ModTestData testData) => CreateTest(() =>
         {
-            AddStep("set test data", () => currentTestData = testData);
+            AddStep("set test data", () => CurrentTestData = testData);
         });
 
         public override void TearDownSteps()
         {
             AddUntilStep("test passed", () =>
             {
-                if (currentTestData == null)
+                if (CurrentTestData == null)
                     return true;
 
-                return currentTestData.PassCondition?.Invoke() ?? false;
+                return CurrentTestData.PassCondition?.Invoke() ?? false;
             });
 
             base.TearDownSteps();
         }
 
-        protected sealed override IBeatmap CreateBeatmap(RulesetInfo ruleset) => currentTestData?.Beatmap ?? base.CreateBeatmap(ruleset);
+        protected sealed override IBeatmap CreateBeatmap(RulesetInfo ruleset) => CurrentTestData?.CreateBeatmap?.Invoke() ?? base.CreateBeatmap(ruleset);
 
         protected sealed override TestPlayer CreatePlayer(Ruleset ruleset)
         {
             var mods = new List<Mod>(SelectedMods.Value);
 
-            if (currentTestData.Mods != null)
-                mods.AddRange(currentTestData.Mods);
-            if (currentTestData.Autoplay)
+            if (CurrentTestData.Mods != null)
+                mods.AddRange(CurrentTestData.Mods);
+            if (CurrentTestData.Autoplay)
                 mods.Add(ruleset.GetAutoplayMod());
 
             SelectedMods.Value = mods;
@@ -56,7 +56,7 @@ namespace osu.Game.Tests.Visual
             return CreateModPlayer(ruleset);
         }
 
-        protected virtual TestPlayer CreateModPlayer(Ruleset ruleset) => new ModTestPlayer(currentTestData, AllowFail);
+        protected virtual TestPlayer CreateModPlayer(Ruleset ruleset) => new ModTestPlayer(CurrentTestData, AllowFail);
 
         protected partial class ModTestPlayer : TestPlayer
         {
@@ -93,7 +93,7 @@ namespace osu.Game.Tests.Visual
         protected class ModTestData
         {
             /// <summary>
-            /// Whether to use a replay to simulate an auto-play. True by default.
+            /// Whether to use a replay to simulate an autoplay. True by default.
             /// </summary>
             public bool Autoplay = true;
 
@@ -104,10 +104,11 @@ namespace osu.Game.Tests.Visual
             public List<ReplayFrame> ReplayFrames;
 
             /// <summary>
-            /// The beatmap for this test case.
+            /// A function which should create a new instance of a beatmap containing relevant
+            /// content to the test.
             /// </summary>
             [CanBeNull]
-            public IBeatmap Beatmap;
+            public Func<IBeatmap> CreateBeatmap;
 
             /// <summary>
             /// The conditions that cause this test case to pass.

@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using Foundation;
 using Microsoft.Maui.Devices;
@@ -17,7 +15,7 @@ namespace osu.iOS
     {
         public override Version AssemblyVersion => new Version(NSBundle.MainBundle.InfoDictionary["CFBundleVersion"].ToString());
 
-        protected override UpdateManager CreateUpdateManager() => new SimpleUpdateManager();
+        protected override UpdateManager CreateUpdateManager() => new MobileUpdateNotifier();
 
         protected override BatteryInfo CreateBatteryInfo() => new IOSBatteryInfo();
 

@@ -21,8 +21,6 @@ namespace osu.Game.Screens
 {
     public partial class Loader : StartupScreen
     {
-        private bool showDisclaimer;
-
         public Loader()
         {
             ValidForResume = false;
@@ -35,13 +33,7 @@ namespace osu.Game.Screens
         private LoadingSpinner spinner;
         private ScheduledDelegate spinnerShow;
 
-        protected virtual OsuScreen CreateLoadableScreen()
-        {
-            if (showDisclaimer)
-                return new Disclaimer(getIntroSequence());
-
-            return getIntroSequence();
-        }
+        protected virtual OsuScreen CreateLoadableScreen() => getIntroSequence();
 
         private IntroScreen getIntroSequence()
         {
@@ -107,9 +99,8 @@ namespace osu.Game.Screens
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase game, OsuConfigManager config)
+        private void load(OsuConfigManager config)
         {
-            showDisclaimer = game.IsDeployedBuild;
             introSequence = config.Get<IntroSequence>(OsuSetting.IntroSequence);
         }
 
@@ -127,12 +118,20 @@ namespace osu.Game.Screens
             {
                 loadTargets.Add(manager.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.TEXTURE));
                 loadTargets.Add(manager.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.BLUR));
-
-                loadTargets.Add(manager.Load(@"CursorTrail", FragmentShaderDescriptor.TEXTURE));
-
-                loadTargets.Add(manager.Load(VertexShaderDescriptor.TEXTURE_2, "TriangleBorder"));
-
                 loadTargets.Add(manager.Load(VertexShaderDescriptor.TEXTURE_3, FragmentShaderDescriptor.TEXTURE));
+
+                loadTargets.Add(manager.Load(VertexShaderDescriptor.TEXTURE_2, @"TriangleBorder"));
+                loadTargets.Add(manager.Load(VertexShaderDescriptor.TEXTURE_2, @"FastCircle"));
+                loadTargets.Add(manager.Load(VertexShaderDescriptor.TEXTURE_2, @"CircularProgress"));
+                loadTargets.Add(manager.Load(VertexShaderDescriptor.TEXTURE_2, @"ArgonBarPath"));
+                loadTargets.Add(manager.Load(VertexShaderDescriptor.TEXTURE_2, @"ArgonBarPathBackground"));
+                loadTargets.Add(manager.Load(VertexShaderDescriptor.TEXTURE_2, @"SaturationSelectorBackground"));
+                loadTargets.Add(manager.Load(VertexShaderDescriptor.TEXTURE_2, @"HueSelectorBackground"));
+                loadTargets.Add(manager.Load(@"LogoAnimation", @"LogoAnimation"));
+
+                // Ruleset local shader usage (should probably move somewhere else).
+                loadTargets.Add(manager.Load(VertexShaderDescriptor.TEXTURE_2, @"SpinnerGlow"));
+                loadTargets.Add(manager.Load(@"CursorTrail", FragmentShaderDescriptor.TEXTURE));
             }
 
             protected virtual bool AllLoaded => loadTargets.All(s => s.IsLoaded);

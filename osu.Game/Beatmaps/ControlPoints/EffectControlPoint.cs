@@ -21,7 +21,6 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// </summary>
         public readonly BindableDouble ScrollSpeedBindable = new BindableDouble(1)
         {
-            Precision = 0.01,
             MinValue = 0.01,
             MaxValue = 10
         };
@@ -35,7 +34,7 @@ namespace osu.Game.Beatmaps.ControlPoints
             set => ScrollSpeedBindable.Value = value;
         }
 
-        public override Color4 GetRepresentingColour(OsuColour colours) => colours.Purple;
+        public override Color4 GetRepresentingColour(OsuColour colours) => colours.Orange1;
 
         /// <summary>
         /// Whether this control point enables Kiai mode.
@@ -49,6 +48,12 @@ namespace osu.Game.Beatmaps.ControlPoints
         {
             get => KiaiModeBindable.Value;
             set => KiaiModeBindable.Value = value;
+        }
+
+        public EffectControlPoint()
+        {
+            KiaiModeBindable.BindValueChanged(_ => RaiseChanged());
+            ScrollSpeedBindable.BindValueChanged(_ => RaiseChanged());
         }
 
         public override bool IsRedundant(ControlPoint? existing)

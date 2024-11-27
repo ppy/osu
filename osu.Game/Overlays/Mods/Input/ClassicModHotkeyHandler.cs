@@ -20,7 +20,7 @@ namespace osu.Game.Overlays.Mods.Input
         {
             [Key.Q] = new[] { typeof(ModEasy) },
             [Key.W] = new[] { typeof(ModNoFail) },
-            [Key.E] = new[] { typeof(ModHalfTime) },
+            [Key.E] = new[] { typeof(ModHalfTime), typeof(ModDaycore) },
             [Key.A] = new[] { typeof(ModHardRock) },
             [Key.S] = new[] { typeof(ModSuddenDeath), typeof(ModPerfect) },
             [Key.D] = new[] { typeof(ModDoubleTime), typeof(ModNightcore) },
@@ -42,7 +42,7 @@ namespace osu.Game.Overlays.Mods.Input
             if (!mod_type_lookup.TryGetValue(e.Key, out var typesToMatch))
                 return false;
 
-            var matchingMods = availableMods.Where(modState => matches(modState, typesToMatch) && !modState.Filtered.Value).ToArray();
+            var matchingMods = availableMods.Where(modState => matches(modState, typesToMatch) && modState.Visible).ToArray();
 
             if (matchingMods.Length == 0)
                 return false;

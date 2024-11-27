@@ -1,14 +1,14 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
+using System.Diagnostics;
 using System.Globalization;
-using JetBrains.Annotations;
 using Newtonsoft.Json;
+using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.IO.Network;
 using osu.Framework.Logging;
+using osu.Game.Extensions;
 using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Online.API
@@ -24,18 +24,17 @@ namespace osu.Game.Online.API
         /// <summary>
         /// The deserialised response object. May be null if the request or deserialisation failed.
         /// </summary>
-        [CanBeNull]
-        public T Response { get; private set; }
+        public T? Response { get; private set; }
 
         /// <summary>
         /// Invoked on successful completion of an API request.
         /// This will be scheduled to the API's internal scheduler (run on update thread automatically).
         /// </summary>
-        public new event APISuccessHandler<T> Success;
+        public new event APISuccessHandler<T>? Success;
 
         protected APIRequest()
         {
-            base.Success += () => Success?.Invoke(Response);
+            base.Success += () => Success?.Invoke(Response!);
         }
 
         protected override void PostProcess()
@@ -45,8 +44,11 @@ namespace osu.Game.Online.API
             if (WebRequest != null)
             {
                 Response = ((OsuJsonWebRequest<T>)WebRequest).ResponseObject;
-                Logger.Log($"{GetType()} finished with response size of {WebRequest.ResponseStream.Length:#,0} bytes", LoggingTarget.Network);
+                Logger.Log($"{GetType().ReadableName()} finished with response size of {WebRequest.ResponseStream.Length:#,0} bytes", LoggingTarget.Network);
             }
+
+            if (Response == null)
+                TriggerFailure(new ArgumentNullException(nameof(Response)));
         }
 
         internal void TriggerSuccess(T result)
@@ -69,27 +71,28 @@ namespace osu.Game.Online.API
 
         protected virtual WebRequest CreateWebRequest() => new OsuWebRequest(Uri);
 
-        protected virtual string Uri => $@"{API.APIEndpointUrl}/api/v2/{Target}";
+        protected virtual string Uri => $@"{API!.APIEndpointUrl}/api/v2/{Target}";
 
-        protected APIAccess API;
-        protected WebRequest WebRequest;
+        protected IAPIProvider? API;
+
+        protected WebRequest? WebRequest;
 
         /// <summary>
         /// The currently logged in user. Note that this will only be populated during <see cref="Perform"/>.
         /// </summary>
-        protected APIUser User { get; private set; }
+        protected APIUser? User { get; private set; }
 
         /// <summary>
         /// Invoked on successful completion of an API request.
         /// This will be scheduled to the API's internal scheduler (run on update thread automatically).
         /// </summary>
-        public event APISuccessHandler Success;
+        public event APISuccessHandler? Success;
 
         /// <summary>
         /// Invoked on failure to complete an API request.
         /// This will be scheduled to the API's internal scheduler (run on update thread automatically).
         /// </summary>
-        public event APIFailureHandler Failure;
+        public event APIFailureHandler? Failure;
 
         private readonly object completionStateLock = new object();
 
@@ -99,16 +102,29 @@ namespace osu.Game.Online.API
         /// </summary>
         public APIRequestCompletionState CompletionState { get; private set; }
 
-        public void Perform(IAPIProvider api)
+        /// <summary>
+        /// Should be called before <see cref="Perform"/> to give API context.
+        /// </summary>
+        /// <remarks>
+        /// This allows scheduling of operations back to the correct thread (which may be required before <see cref="Perform"/> is called).
+        /// </remarks>
+        public void AttachAPI(IAPIProvider apiAccess)
         {
-            if (!(api is APIAccess apiAccess))
+            if (API != null && API != apiAccess)
+                throw new InvalidOperationException("Attached API cannot be changed after initial set.");
+
+            API = apiAccess;
+        }
+
+        public void Perform()
+        {
+            if (API == null)
             {
                 Fail(new NotSupportedException($"A {nameof(APIAccess)} is required to perform requests."));
                 return;
             }
 
-            API = apiAccess;
-            User = apiAccess.LocalUser.Value;
+            User = API.LocalUser.Value;
 
             if (isFailing) return;
 
@@ -116,10 +132,11 @@ namespace osu.Game.Online.API
             WebRequest.Failed += Fail;
             WebRequest.AllowRetryOnTimeout = false;
 
-            WebRequest.AddHeader("x-api-version", API.APIVersion.ToString(CultureInfo.InvariantCulture));
+            WebRequest.AddHeader(@"Accept-Language", API.Language.ToCultureCode());
+            WebRequest.AddHeader(@"x-api-version", API.APIVersion.ToString(CultureInfo.InvariantCulture));
 
             if (!string.IsNullOrEmpty(API.AccessToken))
-                WebRequest.AddHeader("Authorization", $"Bearer {API.AccessToken}");
+                WebRequest.AddHeader(@"Authorization", $@"Bearer {API.AccessToken}");
 
             if (isFailing) return;
 
@@ -138,6 +155,8 @@ namespace osu.Game.Online.API
 
             PostProcess();
 
+            if (isFailing) return;
+
             TriggerSuccess();
         }
 
@@ -150,6 +169,8 @@ namespace osu.Game.Online.API
 
         internal void TriggerSuccess()
         {
+            Debug.Assert(API != null);
+
             lock (completionStateLock)
             {
                 if (CompletionState != APIRequestCompletionState.Waiting)
@@ -158,14 +179,13 @@ namespace osu.Game.Online.API
                 CompletionState = APIRequestCompletionState.Completed;
             }
 
-            if (API == null)
-                Success?.Invoke();
-            else
-                API.Schedule(() => Success?.Invoke());
+            API.Schedule(() => Success?.Invoke());
         }
 
         internal void TriggerFailure(Exception e)
         {
+            Debug.Assert(API != null);
+
             lock (completionStateLock)
             {
                 if (CompletionState != APIRequestCompletionState.Waiting)
@@ -174,10 +194,7 @@ namespace osu.Game.Online.API
                 CompletionState = APIRequestCompletionState.Failed;
             }
 
-            if (API == null)
-                Failure?.Invoke(e);
-            else
-                API.Schedule(() => Failure?.Invoke(e));
+            API.Schedule(() => Failure?.Invoke(e));
         }
 
         public void Cancel() => Fail(new OperationCanceledException(@"Request cancelled"));
@@ -194,7 +211,7 @@ namespace osu.Game.Online.API
                 // in the case of a cancellation we don't care about whether there's an error in the response.
                 if (!(e is OperationCanceledException))
                 {
-                    string responseString = WebRequest?.GetResponseString();
+                    string? responseString = WebRequest?.GetResponseString();
 
                     // naive check whether there's an error in the response to avoid unnecessary JSON deserialisation.
                     if (!string.IsNullOrEmpty(responseString) && responseString.Contains(@"""error"""))
@@ -232,7 +249,7 @@ namespace osu.Game.Online.API
         private class DisplayableError
         {
             [JsonProperty("error")]
-            public string ErrorMessage { get; set; }
+            public string ErrorMessage { get; set; } = string.Empty;
         }
     }
 

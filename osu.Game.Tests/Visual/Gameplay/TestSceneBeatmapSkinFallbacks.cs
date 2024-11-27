@@ -18,6 +18,7 @@ using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Skinning.Legacy;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Play.HUD;
 using osu.Game.Skinning;
 using osu.Game.Storyboards;
 
@@ -36,8 +37,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void TestEmptyLegacyBeatmapSkinFallsBack()
         {
             CreateSkinTest(TrianglesSkin.CreateInfo(), () => new LegacyBeatmapSkin(new BeatmapInfo(), null));
-            AddUntilStep("wait for hud load", () => Player.ChildrenOfType<SkinComponentsContainer>().All(c => c.ComponentsLoaded));
-            AddAssert("hud from default skin", () => AssertComponentsFromExpectedSource(SkinComponentsContainerLookup.TargetArea.MainHUDComponents, skinManager.CurrentSkin.Value));
+            AddUntilStep("wait for hud load", () => Player.ChildrenOfType<SkinnableContainer>().All(c => c.ComponentsLoaded));
+            AddAssert("hud from default skin", () => AssertComponentsFromExpectedSource(GlobalSkinnableContainers.MainHUDComponents, skinManager.CurrentSkin.Value));
         }
 
         protected void CreateSkinTest(SkinInfo gameCurrentSkin, Func<ISkin> getBeatmapSkin)
@@ -52,9 +53,9 @@ namespace osu.Game.Tests.Visual.Gameplay
             });
         }
 
-        protected bool AssertComponentsFromExpectedSource(SkinComponentsContainerLookup.TargetArea target, ISkin expectedSource)
+        protected bool AssertComponentsFromExpectedSource(GlobalSkinnableContainers target, ISkin expectedSource)
         {
-            var targetContainer = Player.ChildrenOfType<SkinComponentsContainer>().First(s => s.Lookup.Target == target);
+            var targetContainer = Player.ChildrenOfType<SkinnableContainer>().First(s => s.Lookup.Lookup == target);
             var actualComponentsContainer = targetContainer.ChildrenOfType<Container>().SingleOrDefault(c => c.Parent == targetContainer);
 
             if (actualComponentsContainer == null)
@@ -62,13 +63,13 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             var actualInfo = actualComponentsContainer.CreateSerialisedInfo();
 
-            var expectedComponentsContainer = expectedSource.GetDrawableComponent(new SkinComponentsContainerLookup(target)) as Container;
+            var expectedComponentsContainer = expectedSource.GetDrawableComponent(new GlobalSkinnableContainerLookup(target)) as Container;
             if (expectedComponentsContainer == null)
                 return false;
 
             var expectedComponentsAdjustmentContainer = new DependencyProvidingContainer
             {
-                Position = actualComponentsContainer.Parent.ToSpaceOfOtherDrawable(actualComponentsContainer.DrawPosition, Content),
+                Position = actualComponentsContainer.Parent!.ToSpaceOfOtherDrawable(actualComponentsContainer.DrawPosition, Content),
                 Size = actualComponentsContainer.DrawSize,
                 Child = expectedComponentsContainer,
                 // proxy the same required dependencies that `actualComponentsContainer` is using.
@@ -77,7 +78,8 @@ namespace osu.Game.Tests.Visual.Gameplay
                     (typeof(ScoreProcessor), actualComponentsContainer.Dependencies.Get<ScoreProcessor>()),
                     (typeof(HealthProcessor), actualComponentsContainer.Dependencies.Get<HealthProcessor>()),
                     (typeof(GameplayState), actualComponentsContainer.Dependencies.Get<GameplayState>()),
-                    (typeof(IGameplayClock), actualComponentsContainer.Dependencies.Get<IGameplayClock>())
+                    (typeof(IGameplayClock), actualComponentsContainer.Dependencies.Get<IGameplayClock>()),
+                    (typeof(InputCountController), actualComponentsContainer.Dependencies.Get<InputCountController>())
                 },
             };
 

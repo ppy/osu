@@ -34,13 +34,13 @@ namespace osu.Game.Database
         }
 
         public void DeleteFile(TModel item, RealmNamedFileUsage file) =>
-            performFileOperation(item, managed => DeleteFile(managed, managed.Files.First(f => f.Filename == file.Filename), managed.Realm));
+            performFileOperation(item, managed => DeleteFile(managed, managed.Files.First(f => f.Filename == file.Filename), managed.Realm!));
 
         public void ReplaceFile(TModel item, RealmNamedFileUsage file, Stream contents) =>
-            performFileOperation(item, managed => ReplaceFile(file, contents, managed.Realm));
+            performFileOperation(item, managed => ReplaceFile(file, contents, managed.Realm!));
 
         public void AddFile(TModel item, Stream contents, string filename) =>
-            performFileOperation(item, managed => AddFile(managed, contents, filename, managed.Realm));
+            performFileOperation(item, managed => AddFile(managed, contents, filename, managed.Realm!));
 
         private void performFileOperation(TModel item, Action<TModel> operation)
         {
@@ -52,7 +52,7 @@ namespace osu.Game.Database
                 // (ie. if an async import finished very recently).
                 Realm.Realm.Write(realm =>
                 {
-                    var managed = realm.Find<TModel>(item.ID);
+                    var managed = realm.FindWithRefresh<TModel>(item.ID);
                     Debug.Assert(managed != null);
                     operation(managed);
 
@@ -105,7 +105,12 @@ namespace osu.Game.Database
         /// </summary>
         public void Delete(List<TModel> items, bool silent = false)
         {
-            if (items.Count == 0) return;
+            if (items.Count == 0)
+            {
+                if (!silent)
+                    PostNotification?.Invoke(new ProgressCompletionNotification { Text = $"No {HumanisedModelName}s found to delete!" });
+                return;
+            }
 
             var notification = new ProgressNotification
             {
@@ -142,7 +147,12 @@ namespace osu.Game.Database
         /// </summary>
         public void Undelete(List<TModel> items, bool silent = false)
         {
-            if (!items.Any()) return;
+            if (!items.Any())
+            {
+                if (!silent)
+                    PostNotification?.Invoke(new ProgressCompletionNotification { Text = $"No {HumanisedModelName}s found to restore!" });
+                return;
+            }
 
             var notification = new ProgressNotification
             {
@@ -178,13 +188,14 @@ namespace osu.Game.Database
             // (ie. if an async import finished very recently).
             return Realm.Write(realm =>
             {
-                if (!item.IsManaged)
-                    item = realm.Find<TModel>(item.ID);
+                TModel? processableItem = item;
+                if (!processableItem.IsManaged)
+                    processableItem = realm.Find<TModel>(item.ID);
 
-                if (item?.DeletePending != false)
+                if (processableItem?.DeletePending != false)
                     return false;
 
-                item.DeletePending = true;
+                processableItem.DeletePending = true;
                 return true;
             });
         }
@@ -195,13 +206,14 @@ namespace osu.Game.Database
             // (ie. if an async import finished very recently).
             Realm.Write(realm =>
             {
-                if (!item.IsManaged)
-                    item = realm.Find<TModel>(item.ID);
+                TModel? processableItem = item;
+                if (!processableItem.IsManaged)
+                    processableItem = realm.Find<TModel>(item.ID);
 
-                if (item?.DeletePending != true)
+                if (processableItem?.DeletePending != true)
                     return;
 
-                item.DeletePending = false;
+                processableItem.DeletePending = false;
             });
         }
 

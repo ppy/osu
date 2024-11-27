@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System;
 using System.Collections;
@@ -37,8 +35,7 @@ namespace osu.Game.Utils
         /// <param name="capacity">The number of items the queue can hold.</param>
         public LimitedCapacityQueue(int capacity)
         {
-            if (capacity < 0)
-                throw new ArgumentOutOfRangeException(nameof(capacity));
+            ArgumentOutOfRangeException.ThrowIfNegative(capacity);
 
             this.capacity = capacity;
             array = new T[capacity];

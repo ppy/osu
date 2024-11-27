@@ -36,9 +36,10 @@ namespace osu.Game.Beatmaps
                 BeatmapSet = new BeatmapSetInfo(),
                 Difficulty = new BeatmapDifficulty
                 {
-                    DrainRate = 0,
                     CircleSize = 0,
+                    DrainRate = 0,
                     OverallDifficulty = 0,
+                    ApproachRate = 0,
                 },
                 Ruleset = new DummyRuleset().RulesetInfo
             }, audio)
@@ -52,7 +53,7 @@ namespace osu.Game.Beatmaps
 
         protected override IBeatmap GetBeatmap() => new Beatmap();
 
-        protected override Texture GetBackground() => textures?.Get(@"Backgrounds/bg4");
+        public override Texture GetBackground() => textures?.Get(@"Backgrounds/bg2");
 
         protected override Track GetBeatmapTrack() => GetVirtualTrack();
 
@@ -69,9 +70,9 @@ namespace osu.Game.Beatmaps
                 throw new NotImplementedException();
             }
 
-            public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new DummyBeatmapConverter { Beatmap = beatmap };
+            public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new DummyBeatmapConverter(beatmap);
 
-            public override DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap) => null;
+            public override DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap) => throw new NotImplementedException();
 
             public override string Description => "dummy";
 
@@ -79,9 +80,15 @@ namespace osu.Game.Beatmaps
 
             private class DummyBeatmapConverter : IBeatmapConverter
             {
-                public event Action<HitObject, IEnumerable<HitObject>> ObjectConverted;
+                public IBeatmap Beatmap { get; }
 
-                public IBeatmap Beatmap { get; set; }
+                public DummyBeatmapConverter(IBeatmap beatmap)
+                {
+                    Beatmap = beatmap;
+                }
+
+                [CanBeNull]
+                public event Action<HitObject, IEnumerable<HitObject>> ObjectConverted;
 
                 public bool CanConvert() => true;
 

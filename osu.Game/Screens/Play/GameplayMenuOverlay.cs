@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -20,6 +21,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osuTK;
 using osuTK.Graphics;
+using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Play
 {
@@ -30,26 +32,33 @@ namespace osu.Game.Screens.Play
         private const int button_height = 70;
         private const float background_alpha = 0.75f;
 
-        protected override bool BlockNonPositionalInput => true;
-
         protected override bool BlockScrollInput => false;
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
-        public Action? OnRetry;
-        public Action? OnQuit;
+        public Action? OnResume { get; init; }
+        public Action? OnRetry { get; init; }
+        public Action? OnQuit { get; init; }
 
         /// <summary>
         /// Action that is invoked when <see cref="GlobalAction.Back"/> is triggered.
         /// </summary>
-        protected virtual Action BackAction => () => InternalButtons.LastOrDefault()?.TriggerClick();
+        protected virtual Action BackAction => () =>
+        {
+            // We prefer triggering the button click as it will animate...
+            // but sometimes buttons aren't present (see FailOverlay's constructor as an example).
+            if (Buttons.Any())
+                Buttons.Last().TriggerClick();
+            else
+                OnQuit?.Invoke();
+        };
 
         /// <summary>
         /// Action that is invoked when <see cref="GlobalAction.Select"/> is triggered.
         /// </summary>
         protected virtual Action SelectAction => () => InternalButtons.Selected?.TriggerClick();
 
-        public abstract string Header { get; }
+        public abstract LocalisableString Header { get; }
 
         protected SelectionCycleFillFlowContainer<DialogButton> InternalButtons = null!;
         public IReadOnlyList<DialogButton> Buttons => InternalButtons;
@@ -119,6 +128,15 @@ namespace osu.Game.Screens.Play
                 },
             };
 
+            if (OnResume != null)
+                AddButton(GameplayMenuOverlayStrings.Continue, colours.Green, () => OnResume.Invoke());
+
+            if (OnRetry != null)
+                AddButton(GameplayMenuOverlayStrings.Retry, colours.YellowDark, () => OnRetry.Invoke());
+
+            if (OnQuit != null)
+                AddButton(GameplayMenuOverlayStrings.Quit, new Color4(170, 27, 39, 255), () => OnQuit.Invoke());
+
             State.ValueChanged += _ => InternalButtons.Deselect();
 
             updateInfoText();
@@ -153,7 +171,7 @@ namespace osu.Game.Screens.Play
 
         protected override bool OnMouseMove(MouseMoveEvent e) => true;
 
-        protected void AddButton(string text, Color4 colour, Action? action)
+        protected void AddButton(LocalisableString text, Color4 colour, Action? action)
         {
             var button = new Button
             {
@@ -209,13 +227,13 @@ namespace osu.Game.Screens.Play
         private void updateInfoText()
         {
             playInfoText.Clear();
-            playInfoText.AddText("Retry count: ");
+            playInfoText.AddText(GameplayMenuOverlayStrings.RetryCount);
             playInfoText.AddText(retries.ToString(), cp => cp.Font = cp.Font.With(weight: FontWeight.Bold));
 
             if (getSongProgress() is int progress)
             {
                 playInfoText.NewLine();
-                playInfoText.AddText("Song progress: ");
+                playInfoText.AddText(GameplayMenuOverlayStrings.SongProgress);
                 playInfoText.AddText($"{progress}%", cp => cp.Font = cp.Font.With(weight: FontWeight.Bold));
             }
         }

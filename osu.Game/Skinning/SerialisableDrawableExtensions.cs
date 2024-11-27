@@ -18,6 +18,10 @@ namespace osu.Game.Skinning
             // todo: can probably make this better via deserialisation directly using a common interface.
             component.Position = drawableInfo.Position;
             component.Rotation = drawableInfo.Rotation;
+            if (drawableInfo.Width is float width && width != 0 && (component as CompositeDrawable)?.AutoSizeAxes.HasFlag(Axes.X) != true)
+                component.Width = width;
+            if (drawableInfo.Height is float height && height != 0 && (component as CompositeDrawable)?.AutoSizeAxes.HasFlag(Axes.Y) != true)
+                component.Height = height;
             component.Scale = drawableInfo.Scale;
             component.Anchor = drawableInfo.Anchor;
             component.Origin = drawableInfo.Origin;

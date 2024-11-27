@@ -20,12 +20,12 @@ namespace osu.Game.Overlays.Settings
             Padding = new MarginPadding { Left = SettingsPanel.CONTENT_MARGINS, Right = SettingsPanel.CONTENT_MARGINS };
         }
 
-        public LocalisableString TooltipText { get; set; }
-
         public IEnumerable<string> Keywords { get; set; } = Array.Empty<string>();
 
         public BindableBool CanBeShown { get; } = new BindableBool(true);
         IBindable<bool> IConditionalFilterable.CanBeShown => CanBeShown;
+
+        public LocalisableString TooltipText { get; set; }
 
         public override IEnumerable<LocalisableString> FilterTerms
         {

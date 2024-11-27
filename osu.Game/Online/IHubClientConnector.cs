@@ -31,6 +31,11 @@ namespace osu.Game.Online
         public Action<HubConnection>? ConfigureConnection { get; set; }
 
         /// <summary>
+        /// Forcefully disconnects the client from the server.
+        /// </summary>
+        Task Disconnect();
+
+        /// <summary>
         /// Reconnect if already connected.
         /// </summary>
         Task Reconnect();
