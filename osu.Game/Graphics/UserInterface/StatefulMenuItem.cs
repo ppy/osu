@@ -53,7 +53,7 @@ namespace osu.Game.Graphics.UserInterface
         /// </summary>
         /// <param name="state">The state to retrieve the relevant icon for.</param>
         /// <returns>The icon to be displayed for <paramref name="state"/>.</returns>
-        public abstract IconUsage? GetIconForState(object state);
+        public abstract IconUsage? GetIconForState(object? state);
     }
 
     public abstract class StatefulMenuItem<T> : StatefulMenuItem
@@ -97,7 +97,7 @@ namespace osu.Game.Graphics.UserInterface
             State.BindValueChanged(state => base.State.Value = state.NewValue);
         }
 
-        public sealed override IconUsage? GetIconForState(object state) => GetIconForState((T)state);
+        public sealed override IconUsage? GetIconForState(object? state) => GetIconForState((T)state!);
 
         /// <summary>
         /// Retrieves the icon to be displayed for a state.

@@ -994,7 +994,7 @@ namespace osu.Game.Screens.Select
 
             selectedMods.BindValueChanged(_ =>
             {
-                if (decoupledRuleset.Value.Equals(rulesetNoDebounce))
+                if (decoupledRuleset.Value?.Equals(rulesetNoDebounce) ?? false)
                     advancedStats.Mods.Value = selectedMods.Value;
             }, true);
 

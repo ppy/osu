@@ -66,7 +66,7 @@ namespace osu.Game.Screens.Edit.Setup
                 syncingColours = true;
 
                 comboColours.Colours.Clear();
-                comboColours.Colours.AddRange(Beatmap.BeatmapSkin?.ComboColours);
+                comboColours.Colours.AddRange(Beatmap.BeatmapSkin?.ComboColours ?? []);
 
                 syncingColours = false;
             });
