@@ -223,8 +223,10 @@ namespace osu.Game.Online.API.Requests.Responses
 
         /// <summary>
         /// User statistics for the requested ruleset (in the case of a <see cref="GetUserRequest"/> or <see cref="GetFriendsRequest"/> response).
-        /// Otherwise empty.
         /// </summary>
+        /// <remarks>
+        /// This returns null when accessed from <see cref="IAPIProvider.LocalUser"/>. Use <see cref="LocalUserStatisticsProvider"/> instead.
+        /// </remarks>
         [JsonProperty(@"statistics")]
         public UserStatistics Statistics
         {
