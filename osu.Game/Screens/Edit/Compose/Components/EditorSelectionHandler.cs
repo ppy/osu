@@ -258,8 +258,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void resetTernaryStates()
         {
-            if (SelectionNewComboState.Value == TernaryState.Indeterminate)
-                SelectionNewComboState.Value = TernaryState.False;
+            if (SelectedItems.Count > 0)
+                return;
+
+            SelectionNewComboState.Value = TernaryState.False;
             AutoSelectionBankEnabled.Value = true;
             SelectionAdditionBanksEnabled.Value = true;
             SelectionBankStates[HIT_BANK_AUTO].Value = TernaryState.True;

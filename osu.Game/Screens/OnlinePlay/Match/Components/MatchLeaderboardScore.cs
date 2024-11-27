@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
@@ -17,7 +15,7 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
     {
         private readonly APIUserScoreAggregate score;
 
-        public override ScoreInfo TooltipContent => null; // match aggregate scores can't show statistics that the custom tooltip displays.
+        public override ScoreInfo? TooltipContent => null; // match aggregate scores can't show statistics that the custom tooltip displays.
 
         public MatchLeaderboardScore(APIUserScoreAggregate score, int? rank, bool isOnlineScope = true)
             : base(score.CreateScoreInfo(), rank, isOnlineScope)

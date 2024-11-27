@@ -20,7 +20,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
     /// </summary>
     public abstract partial class OnlinePlayTestScene : ScreenTestScene, IOnlinePlayTestSceneDependencies
     {
-        public Bindable<Room> SelectedRoom => OnlinePlayDependencies.SelectedRoom;
+        public Bindable<Room?> SelectedRoom => OnlinePlayDependencies.SelectedRoom;
         public IRoomManager RoomManager => OnlinePlayDependencies.RoomManager;
         public OngoingOperationTracker OngoingOperationTracker => OnlinePlayDependencies.OngoingOperationTracker;
         public OnlinePlayBeatmapAvailabilityTracker AvailabilityTracker => OnlinePlayDependencies.AvailabilityTracker;
