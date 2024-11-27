@@ -23,6 +23,9 @@ namespace osu.Game.Graphics.UserInterface
         DialogCancel,
 
         [Description("dialog-ok")]
-        DialogOk
+        DialogOk,
+
+        [Description("menu-open")]
+        MenuOpen,
     }
 }
