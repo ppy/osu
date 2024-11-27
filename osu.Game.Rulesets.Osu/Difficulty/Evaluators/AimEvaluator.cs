@@ -38,14 +38,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             const int radius = OsuDifficultyHitObject.NORMALISED_RADIUS;
             const int diameter = OsuDifficultyHitObject.NORMALISED_DIAMETER;
 
-            // We take only half of the hitwindow since hitting an object earlier is actually harder
-            double hitWindow = ((OsuDifficultyHitObject)current).HitWindowGreat * 0.5;
-
             // Calculate the velocity to the current hitobject, which starts with a base distance / time assuming the last object is a hitcircle.
             double currVelocity = osuCurrObj.LazyJumpDistance / osuCurrObj.StrainTime;
-
-            // Calculate velocity with hitwindow leeway added to the strain time
-            double currHitWindowPenalizedVelocity = osuCurrObj.LazyJumpDistance / (osuCurrObj.StrainTime + hitWindow);
 
             // But if the last object is a slider, then we extend the travel velocity through the slider into the current object.
             if (osuLastObj.BaseObject is Slider && withSliderTravelDistance)
@@ -58,7 +52,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             // As above, do the same for the previous hitobject.
             double prevVelocity = osuLastObj.LazyJumpDistance / osuLastObj.StrainTime;
-            double prevHitWindowPenalizedVelocity = osuLastObj.LazyJumpDistance / (osuCurrObj.StrainTime + hitWindow);
 
             if (osuLastLastObj.BaseObject is Slider && withSliderTravelDistance)
             {
@@ -85,8 +78,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     double lastLastAngle = osuLastLastObj.Angle.Value;
 
                     // Rewarding angles, take the smaller velocity as base.
-                    // This includes hitwindow-penalized velocity since you can always hit one object earlier and another later withing the bounds of the 300 hitwindow
-                    double angleBonus = Math.Min(Math.Min(currHitWindowPenalizedVelocity, prevHitWindowPenalizedVelocity), Math.Min(currVelocity, prevVelocity));
+                    double angleBonus = Math.Min(currVelocity, prevVelocity);
 
                     wideAngleBonus = calcWideAngleBonus(currAngle);
 
