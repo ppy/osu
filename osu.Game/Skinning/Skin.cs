@@ -343,7 +343,15 @@ namespace osu.Game.Skinning
 
                         case GlobalSkinnableContainers.Playfield:
                             if (!isLegacySkin)
+                            {
+                                // One may argue that if a LegacyHealthDisplay exists in a non-legacy skin,
+                                // then it should be swapped with the mania variant similar to legacy skins.
+                                // This is not simple to achieve as we have to be aware of the presence of
+                                // the health display in the HUD layout while migrating the Playfield layout,
+                                // which is impossible with the current structure of skin layout migration.
+                                // Instead, don't touch any non-legacy skin and call it a day.
                                 break;
+                            }
 
                             resources.RealmAccess.Run(r =>
                             {
