@@ -46,5 +46,18 @@ namespace osu.Game.Rulesets.Difficulty.Utils
         /// <param name="exponent">Exponent</param>
         /// <returns>The output of logistic function</returns>
         public static double Logistic(double exponent, double maxValue = 1) => maxValue / (1 + Math.Exp(exponent));
+
+        /// <summary>
+        /// Smootherstep function (https://en.wikipedia.org/wiki/Smoothstep#Variations)
+        /// </summary>
+        /// <param name="x">Value to calculate the function for</param>
+        /// <param name="start">Value at which function returns 0</param>
+        /// <param name="end">Value at which function returns 1</param>
+        public static double Smootherstep(double x, double start, double end)
+        {
+            x = Math.Clamp((x - start) / (end - start), 0.0, 1.0);
+
+            return x * x * x * (x * (6.0 * x - 15.0) + 10.0);
+        }
     }
 }
