@@ -1,13 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using JetBrains.Annotations;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics.Containers;
@@ -34,14 +31,14 @@ namespace osu.Game.Tests.Visual.Playlists
         private const int scores_per_result = 10;
         private const int real_user_position = 200;
 
-        private TestResultsScreen resultsScreen;
+        private TestResultsScreen resultsScreen = null!;
 
         private int lowestScoreId; // Score ID of the lowest score in the list.
         private int highestScoreId; // Score ID of the highest score in the list.
 
         private bool requestComplete;
         private int totalCount;
-        private ScoreInfo userScore;
+        private ScoreInfo userScore = null!;
 
         [SetUpSteps]
         public override void SetUpSteps()
@@ -205,7 +202,7 @@ namespace osu.Game.Tests.Visual.Playlists
             AddAssert("placeholder shown", () => this.ChildrenOfType<MessagePlaceholder>().Count(), () => Is.EqualTo(1));
         }
 
-        private void createResults(Func<ScoreInfo> getScore = null)
+        private void createResults(Func<ScoreInfo>? getScore = null)
         {
             AddStep("load results", () =>
             {
@@ -229,7 +226,7 @@ namespace osu.Game.Tests.Visual.Playlists
             AddWaitStep("wait for display", 5);
         }
 
-        private void bindHandler(bool delayed = false, ScoreInfo userScore = null, bool failRequests = false, bool noScores = false) => ((DummyAPIAccess)API).HandleRequest = request =>
+        private void bindHandler(bool delayed = false, ScoreInfo? userScore = null, bool failRequests = false, bool noScores = false) => ((DummyAPIAccess)API).HandleRequest = request =>
         {
             // pre-check for requests we should be handling (as they are scheduled below).
             switch (request)
@@ -286,7 +283,7 @@ namespace osu.Game.Tests.Visual.Playlists
             req.TriggerFailure(new WebException("Failed."));
         }
 
-        private MultiplayerScore createUserResponse([NotNull] ScoreInfo userScore)
+        private MultiplayerScore createUserResponse(ScoreInfo userScore)
         {
             var multiplayerUserScore = new MultiplayerScore
             {
@@ -420,7 +417,7 @@ namespace osu.Game.Tests.Visual.Playlists
             public new LoadingSpinner RightSpinner => base.RightSpinner;
             public new ScorePanelList ScorePanelList => base.ScorePanelList;
 
-            public TestResultsScreen([CanBeNull] ScoreInfo score, int roomId, PlaylistItem playlistItem)
+            public TestResultsScreen(ScoreInfo? score, int roomId, PlaylistItem playlistItem)
                 : base(score, roomId, playlistItem)
             {
                 AllowRetry = true;

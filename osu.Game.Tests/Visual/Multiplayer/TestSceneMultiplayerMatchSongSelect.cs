@@ -1,12 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using JetBrains.Annotations;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -35,17 +32,16 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public partial class TestSceneMultiplayerMatchSongSelect : MultiplayerTestScene
     {
-        private BeatmapManager manager;
-        private RulesetStore rulesets;
+        private BeatmapManager manager = null!;
+        private RulesetStore rulesets = null!;
 
-        private IList<BeatmapInfo> beatmaps => importedBeatmapSet?.PerformRead(s => s.Beatmaps) ?? new List<BeatmapInfo>();
+        private IList<BeatmapInfo> beatmaps => importedBeatmapSet.PerformRead(s => s.Beatmaps);
 
-        private TestMultiplayerMatchSongSelect songSelect;
-
-        private Live<BeatmapSetInfo> importedBeatmapSet;
+        private TestMultiplayerMatchSongSelect songSelect = null!;
+        private Live<BeatmapSetInfo> importedBeatmapSet = null!;
 
         [Resolved]
-        private OsuConfigManager configManager { get; set; }
+        private OsuConfigManager configManager { get; set; } = null!;
 
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
@@ -57,7 +53,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             Dependencies.Cache(detachedBeatmapStore = new DetachedBeatmapStore());
             Dependencies.Cache(Realm);
 
-            importedBeatmapSet = manager.Import(TestResources.CreateTestBeatmapSetInfo(8, rulesets.AvailableRulesets.ToArray()));
+            importedBeatmapSet = manager.Import(TestResources.CreateTestBeatmapSetInfo(8, rulesets.AvailableRulesets.ToArray()))!;
 
             Add(detachedBeatmapStore);
         }
@@ -71,7 +67,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 SelectedMods.SetDefault();
             });
 
-            AddStep("create song select", () => LoadScreen(songSelect = new TestMultiplayerMatchSongSelect(SelectedRoom.Value)));
+            AddStep("create song select", () => LoadScreen(songSelect = new TestMultiplayerMatchSongSelect(SelectedRoom.Value!)));
             AddUntilStep("wait for present", () => songSelect.IsCurrentScreen() && songSelect.BeatmapSetsLoaded);
         }
 
@@ -88,7 +84,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestBeatmapConfirmed()
         {
-            BeatmapInfo selectedBeatmap = null;
+            BeatmapInfo selectedBeatmap = null!;
 
             setUp();
 
@@ -117,8 +113,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
             setUp();
 
             AddStep("change ruleset", () => Ruleset.Value = new OsuRuleset().RulesetInfo);
-            AddStep($"select {allowedMod.ReadableName()} as allowed", () => songSelect.FreeMods.Value = new[] { (Mod)Activator.CreateInstance(allowedMod) });
-            AddStep($"select {requiredMod.ReadableName()} as required", () => songSelect.Mods.Value = new[] { (Mod)Activator.CreateInstance(requiredMod) });
+            AddStep($"select {allowedMod.ReadableName()} as allowed", () => songSelect.FreeMods.Value = new[] { (Mod)Activator.CreateInstance(allowedMod)! });
+            AddStep($"select {requiredMod.ReadableName()} as required", () => songSelect.Mods.Value = new[] { (Mod)Activator.CreateInstance(requiredMod)! });
 
             AddAssert("freemods empty", () => songSelect.FreeMods.Value.Count == 0);
 
@@ -141,7 +137,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("create song select", () =>
             {
-                SelectedRoom.Value.Playlist.Single().RulesetID = 2;
+                SelectedRoom.Value!.Playlist.Single().RulesetID = 2;
                 songSelect = new TestMultiplayerMatchSongSelect(SelectedRoom.Value, SelectedRoom.Value.Playlist.Single());
                 songSelect.OnLoadComplete += _ => Ruleset.Value = new TaikoRuleset().RulesetInfo;
                 LoadScreen(songSelect);
@@ -171,7 +167,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             public new BeatmapCarousel Carousel => base.Carousel;
 
-            public TestMultiplayerMatchSongSelect(Room room, [CanBeNull] PlaylistItem itemToEdit = null)
+            public TestMultiplayerMatchSongSelect(Room room, PlaylistItem? itemToEdit = null)
                 : base(room, itemToEdit)
             {
             }
