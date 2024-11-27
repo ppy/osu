@@ -178,7 +178,7 @@ namespace osu.Game
         /// <summary>
         /// Whether the back button is currently displayed.
         /// </summary>
-        public readonly IBindable<bool> BackButtonVisibility = new Bindable<bool>();
+        private readonly IBindable<bool> backButtonVisibility = new Bindable<bool>();
 
         IBindable<LocalUserPlayingState> ILocalUserPlayInfo.PlayingState => playingState;
 
@@ -1194,7 +1194,7 @@ namespace osu.Game
                 if (mode.NewValue != OverlayActivation.All) CloseAllOverlays();
             };
 
-            BackButtonVisibility.ValueChanged += visible =>
+            backButtonVisibility.ValueChanged += visible =>
             {
                 if (visible.NewValue)
                     BackButton.Show();
@@ -1594,14 +1594,14 @@ namespace osu.Game
 
             if (current is IOsuScreen currentOsuScreen)
             {
-                BackButtonVisibility.UnbindFrom(currentOsuScreen.BackButtonVisibility);
+                backButtonVisibility.UnbindFrom(currentOsuScreen.BackButtonVisibility);
                 OverlayActivationMode.UnbindFrom(currentOsuScreen.OverlayActivationMode);
                 API.Activity.UnbindFrom(currentOsuScreen.Activity);
             }
 
             if (newScreen is IOsuScreen newOsuScreen)
             {
-                BackButtonVisibility.BindTo(newOsuScreen.BackButtonVisibility);
+                backButtonVisibility.BindTo(newOsuScreen.BackButtonVisibility);
                 OverlayActivationMode.BindTo(newOsuScreen.OverlayActivationMode);
                 API.Activity.BindTo(newOsuScreen.Activity);
 
