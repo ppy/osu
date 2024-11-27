@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Testing;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets;
@@ -82,7 +83,7 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
-        public void TestNudgeSelection()
+        public void TestNudgeSelectionTime()
         {
             HitCircle[] addedObjects = null!;
 
@@ -101,6 +102,51 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddStep("nudge backwards", () => InputManager.Key(Key.J));
             AddAssert("objects reverted to original position", () => addedObjects[0].StartTime == 100);
+        }
+
+        [Test]
+        public void TestNudgeSelectionPosition()
+        {
+            HitCircle addedObject = null!;
+
+            AddStep("add hitobjects", () => EditorBeatmap.AddRange(new[]
+            {
+                addedObject = new HitCircle { StartTime = 200, Position = new Vector2(100) },
+            }));
+
+            AddStep("select object", () => EditorBeatmap.SelectedHitObjects.Add(addedObject));
+
+            AddStep("nudge up", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.Key(Key.Up);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+            AddAssert("object position moved up", () => addedObject.Position.Y, () => Is.EqualTo(99).Within(Precision.FLOAT_EPSILON));
+
+            AddStep("nudge down", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.Key(Key.Down);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+            AddAssert("object position moved down", () => addedObject.Position.Y, () => Is.EqualTo(100).Within(Precision.FLOAT_EPSILON));
+
+            AddStep("nudge left", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.Key(Key.Left);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+            AddAssert("object position moved left", () => addedObject.Position.X, () => Is.EqualTo(99).Within(Precision.FLOAT_EPSILON));
+
+            AddStep("nudge right", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.Key(Key.Right);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+            AddAssert("object position moved right", () => addedObject.Position.X, () => Is.EqualTo(100).Within(Precision.FLOAT_EPSILON));
         }
 
         [Test]
@@ -217,6 +263,51 @@ namespace osu.Game.Tests.Visual.Editing
             moveMouseToObject(() => addedObjects[1]);
             AddStep("click second", () => InputManager.Click(MouseButton.Left));
             AddAssert("2 hitobjects selected", () => EditorBeatmap.SelectedHitObjects.Count == 2 && !EditorBeatmap.SelectedHitObjects.Contains(addedObjects[1]));
+        }
+
+        [Test]
+        public void TestMultiSelectWithDragBox()
+        {
+            var addedObjects = new[]
+            {
+                new HitCircle { StartTime = 100 },
+                new HitCircle { StartTime = 200, Position = new Vector2(100) },
+                new HitCircle { StartTime = 300, Position = new Vector2(512, 0) },
+                new HitCircle { StartTime = 400, Position = new Vector2(412, 100) },
+            };
+            AddStep("add hitobjects", () => EditorBeatmap.AddRange(addedObjects));
+
+            AddStep("start dragging", () =>
+            {
+                InputManager.MoveMouseTo(blueprintContainer.ScreenSpaceDrawQuad.Centre);
+                InputManager.PressButton(MouseButton.Left);
+            });
+            AddStep("drag to left corner", () => InputManager.MoveMouseTo(blueprintContainer.ScreenSpaceDrawQuad.TopLeft - new Vector2(5)));
+            AddStep("end dragging", () => InputManager.ReleaseButton(MouseButton.Left));
+
+            AddAssert("2 hitobjects selected", () => EditorBeatmap.SelectedHitObjects, () => Has.Count.EqualTo(2));
+
+            AddStep("start dragging with control", () =>
+            {
+                InputManager.MoveMouseTo(blueprintContainer.ScreenSpaceDrawQuad.Centre);
+                InputManager.PressButton(MouseButton.Left);
+                InputManager.PressKey(Key.ControlLeft);
+            });
+            AddStep("drag to left corner", () => InputManager.MoveMouseTo(blueprintContainer.ScreenSpaceDrawQuad.TopRight + new Vector2(5, -5)));
+            AddStep("end dragging", () => InputManager.ReleaseButton(MouseButton.Left));
+            AddStep("release control", () => InputManager.ReleaseKey(Key.ControlLeft));
+
+            AddAssert("4 hitobjects selected", () => EditorBeatmap.SelectedHitObjects, () => Has.Count.EqualTo(4));
+
+            AddStep("start dragging without control", () =>
+            {
+                InputManager.MoveMouseTo(blueprintContainer.ScreenSpaceDrawQuad.Centre);
+                InputManager.PressButton(MouseButton.Left);
+            });
+            AddStep("drag to left corner", () => InputManager.MoveMouseTo(blueprintContainer.ScreenSpaceDrawQuad.TopRight + new Vector2(5, -5)));
+            AddStep("end dragging", () => InputManager.ReleaseButton(MouseButton.Left));
+
+            AddAssert("2 hitobjects selected", () => EditorBeatmap.SelectedHitObjects, () => Has.Count.EqualTo(2));
         }
 
         [Test]

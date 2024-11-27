@@ -25,7 +25,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
                 Direction = FillDirection.Horizontal,
-                Spacing = new Vector2(4, 0),
+                Spacing = new Vector2(3, 0),
                 Children = new Drawable[]
                 {
                     new BeatmapSetOnlineStatusPill
@@ -33,13 +33,14 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                         AutoSizeAxes = Axes.Both,
                         Status = beatmapSet.Status,
                         Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft
+                        Origin = Anchor.CentreLeft,
+                        TextSize = 13f
                     },
                     new DifficultySpectrumDisplay(beatmapSet)
                     {
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
-                        DotSize = new Vector2(6, 12)
+                        DotSize = new Vector2(5, 10)
                     }
                 }
             };

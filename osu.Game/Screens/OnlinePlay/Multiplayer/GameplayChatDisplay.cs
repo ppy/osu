@@ -1,9 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -20,12 +17,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
     public partial class GameplayChatDisplay : MatchChatDisplay, IKeyBindingHandler<GlobalAction>
     {
         [Resolved(CanBeNull = true)]
-        [CanBeNull]
-        private ILocalUserPlayInfo localUserInfo { get; set; }
+        private ILocalUserPlayInfo? localUserInfo { get; set; }
 
-        private readonly IBindable<bool> localUserPlaying = new Bindable<bool>();
+        private readonly IBindable<LocalUserPlayingState> localUserPlaying = new Bindable<LocalUserPlayingState>();
 
-        public override bool PropagatePositionalInputSubTree => !localUserPlaying.Value;
+        public override bool PropagatePositionalInputSubTree => localUserPlaying.Value != LocalUserPlayingState.Playing;
 
         public Bindable<bool> Expanded = new Bindable<bool>();
 
@@ -58,7 +54,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             base.LoadComplete();
 
             if (localUserInfo != null)
-                localUserPlaying.BindTo(localUserInfo.IsPlaying);
+                localUserPlaying.BindTo(localUserInfo.PlayingState);
 
             localUserPlaying.BindValueChanged(playing =>
             {
@@ -67,7 +63,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 TextBox.HoldFocus = false;
 
                 // only hold focus (after sending a message) during breaks
-                TextBox.ReleaseFocusOnCommit = playing.NewValue;
+                TextBox.ReleaseFocusOnCommit = playing.NewValue == LocalUserPlayingState.Playing;
             }, true);
 
             Expanded.BindValueChanged(_ => updateExpandedState(), true);

@@ -17,6 +17,7 @@ using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Overlays;
 
 namespace osu.Game.Graphics.UserInterfaceV2
@@ -27,26 +28,22 @@ namespace osu.Game.Graphics.UserInterfaceV2
         public Bindable<T> Current
         {
             get => current.Current;
-            set => current.Current = value;
-        }
-
-        private bool instantaneous = true;
-
-        /// <summary>
-        /// Whether changes to the slider should instantaneously transfer to the text box (and vice versa).
-        /// If <see langword="false"/>, the transfer will happen on text box commit (explicit, or implicit via focus loss), or on slider drag end.
-        /// </summary>
-        public bool Instantaneous
-        {
-            get => instantaneous;
             set
             {
-                instantaneous = value;
-
-                if (slider.IsNotNull())
-                    slider.TransferValueOnCommit = !instantaneous;
+                current.Current = value;
+                currentNumberInstantaneous.Default = current.Default;
             }
         }
+
+        private readonly BindableNumberWithCurrent<T> current = new BindableNumberWithCurrent<T>();
+
+        private readonly BindableNumber<T> currentNumberInstantaneous = new BindableNumber<T>();
+
+        /// <summary>
+        /// Whether changes to the value should instantaneously transfer to outside bindables.
+        /// If <see langword="false"/>, the transfer will happen on text box commit (explicit, or implicit via focus loss), or on slider commit.
+        /// </summary>
+        public bool TransferValueOnCommit { get; set; }
 
         private CompositeDrawable? tabbableContentContainer;
 
@@ -61,8 +58,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
             }
         }
 
-        private readonly BindableNumberWithCurrent<T> current = new BindableNumberWithCurrent<T>();
-
         /// <summary>
         /// Caption describing this slider bar, displayed on top of the controls.
         /// </summary>
@@ -76,15 +71,17 @@ namespace osu.Game.Graphics.UserInterfaceV2
         private Box background = null!;
         private Box flashLayer = null!;
         private FormTextBox.InnerTextBox textBox = null!;
-        private Slider slider = null!;
+        private InnerSlider slider = null!;
         private FormFieldCaption caption = null!;
         private IFocusManager focusManager = null!;
 
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
+        private readonly Bindable<Language> currentLanguage = new Bindable<Language>();
+
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, OsuGame? game)
         {
             RelativeSizeAxes = Axes.X;
             Height = 50;
@@ -107,7 +104,12 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding(9),
+                    Padding = new MarginPadding
+                    {
+                        Vertical = 9,
+                        Left = 9,
+                        Right = 5,
+                    },
                     Children = new Drawable[]
                     {
                         caption = new FormFieldCaption
@@ -133,18 +135,21 @@ namespace osu.Game.Graphics.UserInterfaceV2
                             },
                             TabbableContentContainer = tabbableContentContainer,
                         },
-                        slider = new Slider
+                        slider = new InnerSlider
                         {
                             Anchor = Anchor.CentreRight,
                             Origin = Anchor.CentreRight,
                             RelativeSizeAxes = Axes.X,
                             Width = 0.5f,
-                            Current = Current,
-                            TransferValueOnCommit = !instantaneous,
+                            Current = currentNumberInstantaneous,
+                            OnCommit = () => current.Value = currentNumberInstantaneous.Value,
                         }
                     },
                 },
             };
+
+            if (game != null)
+                currentLanguage.BindTo(game.CurrentLanguage);
         }
 
         protected override void LoadComplete()
@@ -158,11 +163,32 @@ namespace osu.Game.Graphics.UserInterfaceV2
             textBox.Current.BindValueChanged(textChanged);
 
             slider.IsDragging.BindValueChanged(_ => updateState());
+            slider.Focused.BindValueChanged(_ => updateState());
 
-            current.BindValueChanged(_ =>
+            current.ValueChanged += e => currentNumberInstantaneous.Value = e.NewValue;
+            current.MinValueChanged += v => currentNumberInstantaneous.MinValue = v;
+            current.MaxValueChanged += v => currentNumberInstantaneous.MaxValue = v;
+            current.PrecisionChanged += v => currentNumberInstantaneous.Precision = v;
+            current.DisabledChanged += disabled =>
             {
+                if (disabled)
+                {
+                    // revert any changes before disabling to make sure we are in a consistent state.
+                    currentNumberInstantaneous.Value = current.Value;
+                }
+
+                currentNumberInstantaneous.Disabled = disabled;
+            };
+
+            current.CopyTo(currentNumberInstantaneous);
+            currentLanguage.BindValueChanged(_ => Schedule(updateValueDisplay));
+            currentNumberInstantaneous.BindValueChanged(e =>
+            {
+                if (!TransferValueOnCommit)
+                    current.Value = e.NewValue;
+
                 updateState();
-                updateTextBoxFromSlider();
+                updateValueDisplay();
             }, true);
         }
 
@@ -170,17 +196,15 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         private void textChanged(ValueChangedEvent<string> change)
         {
-            if (!instantaneous) return;
-
             tryUpdateSliderFromTextBox();
         }
 
         private void textCommitted(TextBox t, bool isNew)
         {
             tryUpdateSliderFromTextBox();
-
             // If the attempted update above failed, restore text box to match the slider.
-            Current.TriggerChange();
+            currentNumberInstantaneous.TriggerChange();
+            current.Value = currentNumberInstantaneous.Value;
 
             flashLayer.Colour = ColourInfo.GradientVertical(colourProvider.Dark2.Opacity(0), colourProvider.Dark2);
             flashLayer.FadeOutFromOne(800, Easing.OutQuint);
@@ -192,7 +216,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
             try
             {
-                switch (Current)
+                switch (currentNumberInstantaneous)
                 {
                     case Bindable<int> bindableInt:
                         bindableInt.Value = int.Parse(textBox.Current.Value);
@@ -203,7 +227,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                         break;
 
                     default:
-                        Current.Parse(textBox.Current.Value, CultureInfo.CurrentCulture);
+                        currentNumberInstantaneous.Parse(textBox.Current.Value, CultureInfo.CurrentCulture);
                         break;
                 }
             }
@@ -236,16 +260,18 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         private void updateState()
         {
+            bool childHasFocus = slider.Focused.Value || textBox.Focused.Value;
+
             textBox.Alpha = 1;
 
-            background.Colour = Current.Disabled ? colourProvider.Background4 : colourProvider.Background5;
-            caption.Colour = Current.Disabled ? colourProvider.Foreground1 : colourProvider.Content2;
-            textBox.Colour = Current.Disabled ? colourProvider.Foreground1 : colourProvider.Content1;
+            background.Colour = currentNumberInstantaneous.Disabled ? colourProvider.Background4 : colourProvider.Background5;
+            caption.Colour = currentNumberInstantaneous.Disabled ? colourProvider.Foreground1 : colourProvider.Content2;
+            textBox.Colour = currentNumberInstantaneous.Disabled ? colourProvider.Foreground1 : colourProvider.Content1;
 
-            BorderThickness = IsHovered || textBox.Focused.Value || slider.IsDragging.Value ? 2 : 0;
-            BorderColour = textBox.Focused.Value ? colourProvider.Highlight1 : colourProvider.Light4;
+            BorderThickness = childHasFocus || IsHovered || slider.IsDragging.Value ? 2 : 0;
+            BorderColour = childHasFocus ? colourProvider.Highlight1 : colourProvider.Light4;
 
-            if (textBox.Focused.Value)
+            if (childHasFocus)
                 background.Colour = ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Dark3);
             else if (IsHovered || slider.IsDragging.Value)
                 background.Colour = ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Dark4);
@@ -253,16 +279,19 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 background.Colour = colourProvider.Background5;
         }
 
-        private void updateTextBoxFromSlider()
+        private void updateValueDisplay()
         {
             if (updatingFromTextBox) return;
 
-            textBox.Text = slider.GetDisplayableValue(Current.Value).ToString();
+            textBox.Text = slider.GetDisplayableValue(currentNumberInstantaneous.Value).ToString();
         }
 
-        private partial class Slider : OsuSliderBar<T>
+        private partial class InnerSlider : OsuSliderBar<T>
         {
+            public BindableBool Focused { get; } = new BindableBool();
+
             public BindableBool IsDragging { get; set; } = new BindableBool();
+            public Action? OnCommit { get; set; }
 
             private Box leftBox = null!;
             private Box rightBox = null!;
@@ -320,7 +349,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-
                 updateState();
             }
 
@@ -358,16 +386,40 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 base.OnHoverLost(e);
             }
 
+            protected override void OnFocus(FocusEvent e)
+            {
+                updateState();
+                Focused.Value = true;
+                base.OnFocus(e);
+            }
+
+            protected override void OnFocusLost(FocusLostEvent e)
+            {
+                updateState();
+                Focused.Value = false;
+                base.OnFocusLost(e);
+            }
+
             private void updateState()
             {
                 rightBox.Colour = colourProvider.Background6;
-                leftBox.Colour = IsHovered || IsDragged ? colourProvider.Highlight1.Opacity(0.5f) : colourProvider.Dark2;
-                nub.Colour = IsHovered || IsDragged ? colourProvider.Highlight1 : colourProvider.Light4;
+                leftBox.Colour = HasFocus || IsHovered || IsDragged ? colourProvider.Highlight1.Opacity(0.5f) : colourProvider.Dark2;
+                nub.Colour = HasFocus || IsHovered || IsDragged ? colourProvider.Highlight1 : colourProvider.Light4;
             }
 
             protected override void UpdateValue(float value)
             {
                 nub.MoveToX(value, 200, Easing.OutPow10);
+            }
+
+            protected override bool Commit()
+            {
+                bool result = base.Commit();
+
+                if (result)
+                    OnCommit?.Invoke();
+
+                return result;
             }
         }
     }

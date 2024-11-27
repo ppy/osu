@@ -72,7 +72,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                         },
                         new FormSliderBar<float>
                         {
-                            Caption = "Instantaneous slider",
+                            Caption = "Slider",
                             Current = new BindableFloat
                             {
                                 MinValue = 0,
@@ -80,19 +80,6 @@ namespace osu.Game.Tests.Visual.UserInterface
                                 Value = 5,
                                 Precision = 0.1f,
                             },
-                            TabbableContentContainer = this,
-                        },
-                        new FormSliderBar<float>
-                        {
-                            Caption = "Non-instantaneous slider",
-                            Current = new BindableFloat
-                            {
-                                MinValue = 0,
-                                MaxValue = 10,
-                                Value = 5,
-                                Precision = 0.1f,
-                            },
-                            Instantaneous = false,
                             TabbableContentContainer = this,
                         },
                         new FormEnumDropdown<CountdownType>
@@ -104,6 +91,17 @@ namespace osu.Game.Tests.Visual.UserInterface
                         {
                             Caption = "Audio file",
                             PlaceholderText = "Select an audio file",
+                        },
+                        new FormColourPalette
+                        {
+                            Caption = "Combo colours",
+                            Colours =
+                            {
+                                Colour4.Red,
+                                Colour4.Green,
+                                Colour4.Blue,
+                                Colour4.Yellow,
+                            }
                         },
                     },
                 },

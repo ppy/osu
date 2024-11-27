@@ -1,9 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -16,6 +16,7 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.Drawables;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -26,30 +27,33 @@ using osu.Game.Overlays;
 using osu.Game.Screens.OnlinePlay.Components;
 using osuTK;
 using osuTK.Graphics;
+using Container = osu.Framework.Graphics.Containers.Container;
 
 namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 {
-    public partial class DrawableRoom : CompositeDrawable
+    public abstract partial class DrawableRoom : CompositeDrawable
     {
         protected const float CORNER_RADIUS = 10;
         private const float height = 100;
 
         public readonly Room Room;
 
-        protected Container ButtonsContainer { get; private set; }
+        protected readonly Bindable<PlaylistItem?> SelectedItem = new Bindable<PlaylistItem?>();
+        protected Container ButtonsContainer { get; private set; } = null!;
 
         private readonly Bindable<MatchType> roomType = new Bindable<MatchType>();
         private readonly Bindable<RoomCategory> roomCategory = new Bindable<RoomCategory>();
         private readonly Bindable<bool> hasPassword = new Bindable<bool>();
 
-        private DrawableRoomParticipantsList drawableRoomParticipantsList;
-        private RoomSpecialCategoryPill specialCategoryPill;
-        private PasswordProtectedIcon passwordIcon;
-        private EndDateInfo endDateInfo;
+        private DrawableRoomParticipantsList? drawableRoomParticipantsList;
+        private RoomSpecialCategoryPill? specialCategoryPill;
+        private PasswordProtectedIcon? passwordIcon;
+        private EndDateInfo? endDateInfo;
+        private SpriteText? roomName;
+        private UpdateableBeatmapBackgroundSprite background = null!;
+        private DelayedLoadWrapper wrapper = null!;
 
-        private DelayedLoadWrapper wrapper;
-
-        public DrawableRoom(Room room)
+        protected DrawableRoom(Room room)
         {
             Room = room;
 
@@ -77,7 +81,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 AutoSizeAxes = Axes.X
             };
 
-            InternalChildren = new[]
+            InternalChildren = new Drawable[]
             {
                 // This resolves internal 1px gaps due to applying the (parenting) corner radius and masking across multiple filling background sprites.
                 new Box
@@ -85,7 +89,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                     RelativeSizeAxes = Axes.Both,
                     Colour = colours.Background5,
                 },
-                CreateBackground().With(d =>
+                background = CreateBackground().With(d =>
                 {
                     d.RelativeSizeAxes = Axes.Both;
                 }),
@@ -155,17 +159,17 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                                                 Spacing = new Vector2(5),
                                                                 Children = new Drawable[]
                                                                 {
-                                                                    new RoomStatusPill
+                                                                    new RoomStatusPill(Room)
                                                                     {
                                                                         Anchor = Anchor.CentreLeft,
                                                                         Origin = Anchor.CentreLeft
                                                                     },
-                                                                    specialCategoryPill = new RoomSpecialCategoryPill
+                                                                    specialCategoryPill = new RoomSpecialCategoryPill(Room)
                                                                     {
                                                                         Anchor = Anchor.CentreLeft,
                                                                         Origin = Anchor.CentreLeft
                                                                     },
-                                                                    endDateInfo = new EndDateInfo
+                                                                    endDateInfo = new EndDateInfo(Room)
                                                                     {
                                                                         Anchor = Anchor.CentreLeft,
                                                                         Origin = Anchor.CentreLeft,
@@ -180,13 +184,15 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                                                 Direction = FillDirection.Vertical,
                                                                 Children = new Drawable[]
                                                                 {
-                                                                    new TruncatingSpriteText
+                                                                    roomName = new TruncatingSpriteText
                                                                     {
                                                                         RelativeSizeAxes = Axes.X,
-                                                                        Font = OsuFont.GetFont(size: 28),
-                                                                        Current = { BindTarget = Room.Name }
+                                                                        Font = OsuFont.GetFont(size: 28)
                                                                     },
-                                                                    new RoomStatusText()
+                                                                    new RoomStatusText(Room)
+                                                                    {
+                                                                        SelectedItem = { BindTarget = SelectedItem }
+                                                                    }
                                                                 }
                                                             }
                                                         },
@@ -218,7 +224,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                                 Children = new Drawable[]
                                                 {
                                                     ButtonsContainer,
-                                                    drawableRoomParticipantsList = new DrawableRoomParticipantsList
+                                                    drawableRoomParticipantsList = new DrawableRoomParticipantsList(Room)
                                                     {
                                                         Anchor = Anchor.CentreRight,
                                                         Origin = Anchor.CentreRight,
@@ -243,36 +249,71 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         {
             base.LoadComplete();
 
+            Room.PropertyChanged += onRoomPropertyChanged;
+
             wrapper.DelayedLoadComplete += _ =>
             {
+                Debug.Assert(specialCategoryPill != null);
+                Debug.Assert(endDateInfo != null);
+                Debug.Assert(passwordIcon != null);
+
                 wrapper.FadeInFromZero(200);
 
-                roomCategory.BindTo(Room.Category);
-                roomCategory.BindValueChanged(c =>
-                {
-                    if (c.NewValue > RoomCategory.Normal)
-                        specialCategoryPill.Show();
-                    else
-                        specialCategoryPill.Hide();
-                }, true);
-
-                roomType.BindTo(Room.Type);
-                roomType.BindValueChanged(t =>
-                {
-                    endDateInfo.Alpha = t.NewValue == MatchType.Playlists ? 1 : 0;
-                }, true);
-
-                hasPassword.BindTo(Room.HasPassword);
-                hasPassword.BindValueChanged(v => passwordIcon.Alpha = v.NewValue ? 1 : 0, true);
+                updateRoomName();
+                updateRoomCategory();
+                updateRoomType();
+                updateRoomHasPassword();
             };
+
+            SelectedItem.BindValueChanged(item => background.Beatmap.Value = item.NewValue?.Beatmap, true);
         }
 
-        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
+        private void onRoomPropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
-            return new CachedModelDependencyContainer<Room>(base.CreateChildDependencies(parent))
+            switch (e.PropertyName)
             {
-                Model = { Value = Room }
-            };
+                case nameof(Room.Name):
+                    updateRoomName();
+                    break;
+
+                case nameof(Room.Category):
+                    updateRoomCategory();
+                    break;
+
+                case nameof(Room.Type):
+                    updateRoomType();
+                    break;
+
+                case nameof(Room.HasPassword):
+                    updateRoomHasPassword();
+                    break;
+            }
+        }
+
+        private void updateRoomName()
+        {
+            if (roomName != null)
+                roomName.Text = Room.Name;
+        }
+
+        private void updateRoomCategory()
+        {
+            if (Room.Category > RoomCategory.Normal)
+                specialCategoryPill?.Show();
+            else
+                specialCategoryPill?.Hide();
+        }
+
+        private void updateRoomType()
+        {
+            if (endDateInfo != null)
+                endDateInfo.Alpha = Room.Type == MatchType.Playlists ? 1 : 0;
+        }
+
+        private void updateRoomHasPassword()
+        {
+            if (passwordIcon != null)
+                passwordIcon.Alpha = Room.HasPassword ? 1 : 0;
         }
 
         private int numberOfAvatars = 7;
@@ -289,29 +330,29 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             }
         }
 
-        protected virtual Drawable CreateBackground() => new OnlinePlayBackgroundSprite();
+        protected virtual UpdateableBeatmapBackgroundSprite CreateBackground() => new UpdateableBeatmapBackgroundSprite();
 
         protected virtual IEnumerable<Drawable> CreateBottomDetails()
         {
             var pills = new List<Drawable>();
 
-            if (Room.Type.Value != MatchType.Playlists)
+            if (Room.Type != MatchType.Playlists)
             {
-                pills.AddRange(new OnlinePlayComposite[]
+                pills.AddRange(new Drawable[]
                 {
-                    new MatchTypePill(),
-                    new QueueModePill(),
+                    new MatchTypePill(Room),
+                    new QueueModePill(Room),
                 });
             }
 
             pills.AddRange(new Drawable[]
             {
-                new PlaylistCountPill
+                new PlaylistCountPill(Room)
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
                 },
-                new StarRatingRangeDisplay
+                new StarRatingRangeDisplay(Room)
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
@@ -322,19 +363,29 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             return pills;
         }
 
-        private partial class RoomStatusText : OnlinePlayComposite
+        protected override void Dispose(bool isDisposing)
         {
-            [Resolved]
-            private OsuColour colours { get; set; }
+            base.Dispose(isDisposing);
+            Room.PropertyChanged -= onRoomPropertyChanged;
+        }
+
+        private partial class RoomStatusText : CompositeDrawable
+        {
+            public readonly IBindable<PlaylistItem?> SelectedItem = new Bindable<PlaylistItem?>();
 
             [Resolved]
-            private BeatmapLookupCache beatmapLookupCache { get; set; }
+            private OsuColour colours { get; set; } = null!;
 
-            private SpriteText statusText;
-            private LinkFlowContainer beatmapText;
+            [Resolved]
+            private BeatmapLookupCache beatmapLookupCache { get; set; } = null!;
 
-            public RoomStatusText()
+            private readonly Room room;
+            private SpriteText statusText = null!;
+            private LinkFlowContainer beatmapText = null!;
+
+            public RoomStatusText(Room room)
             {
+                this.room = room;
                 RelativeSizeAxes = Axes.X;
                 AutoSizeAxes = Axes.Y;
             }
@@ -383,17 +434,17 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                CurrentPlaylistItem.BindValueChanged(onSelectedItemChanged, true);
+                SelectedItem.BindValueChanged(onSelectedItemChanged, true);
             }
 
-            private CancellationTokenSource beatmapLookupCancellation;
+            private CancellationTokenSource? beatmapLookupCancellation;
 
-            private void onSelectedItemChanged(ValueChangedEvent<PlaylistItem> item)
+            private void onSelectedItemChanged(ValueChangedEvent<PlaylistItem?> item)
             {
                 beatmapLookupCancellation?.Cancel();
                 beatmapText.Clear();
 
-                if (Type.Value == MatchType.Playlists)
+                if (room.Type == MatchType.Playlists)
                 {
                     statusText.Text = "Ready to play";
                     return;
