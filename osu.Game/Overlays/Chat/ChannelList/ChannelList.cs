@@ -171,10 +171,12 @@ namespace osu.Game.Overlays.Chat.ChannelList
 
         public partial class ChannelGroup : FillFlowContainer
         {
+            private readonly bool sortByRecent;
             public readonly ChannelListItemFlow ItemFlow;
 
             public ChannelGroup(LocalisableString label, bool sortByRecent)
             {
+                this.sortByRecent = sortByRecent;
                 Direction = FillDirection.Vertical;
                 RelativeSizeAxes = Axes.X;
                 AutoSizeAxes = Axes.Y;
@@ -217,21 +219,39 @@ namespace osu.Game.Overlays.Chat.ChannelList
             {
                 ItemFlow.Add(item);
 
-                item.Channel.NewMessagesArrived += newMessagesArrived;
-                item.Channel.PendingMessageResolved += pendingMessageResolved;
+                if (sortByRecent)
+                {
+                    item.Channel.NewMessagesArrived += newMessagesArrived;
+                    item.Channel.PendingMessageResolved += pendingMessageResolved;
+                }
 
                 ItemFlow.Reflow();
             }
 
             public void RemoveChannel(ChannelListItem item)
             {
-                item.Channel.NewMessagesArrived -= newMessagesArrived;
-                item.Channel.PendingMessageResolved -= pendingMessageResolved;
+                if (sortByRecent)
+                {
+                    item.Channel.NewMessagesArrived -= newMessagesArrived;
+                    item.Channel.PendingMessageResolved -= pendingMessageResolved;
+                }
+
                 ItemFlow.Remove(item, true);
             }
 
             private void pendingMessageResolved(LocalEchoMessage _, Message __) => ItemFlow.Reflow();
             private void newMessagesArrived(IEnumerable<Message> _) => ItemFlow.Reflow();
+
+            protected override void Dispose(bool isDisposing)
+            {
+                base.Dispose(isDisposing);
+
+                foreach (var item in ItemFlow)
+                {
+                    item.Channel.NewMessagesArrived -= newMessagesArrived;
+                    item.Channel.PendingMessageResolved -= pendingMessageResolved;
+                }
+            }
         }
 
         private partial class ChannelSearchTextBox : BasicSearchTextBox
