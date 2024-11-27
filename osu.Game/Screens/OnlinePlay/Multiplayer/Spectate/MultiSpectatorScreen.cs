@@ -127,7 +127,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                 {
                     ReadyToStart = performInitialSeek,
                 },
-                new MultiSpectatorSettings()
+                new ExpandingPlayerSettingsOverlay()
             };
 
             for (int i = 0; i < Users.Count; i++)
