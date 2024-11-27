@@ -18,9 +18,9 @@ namespace osu.Game.Screens.Ranking.Statistics
     {
         private readonly ScoreInfo achievedScore;
 
-        internal readonly Bindable<UserStatisticsUpdate?> DisplayedUserStatisticsUpdate = new Bindable<UserStatisticsUpdate?>();
+        internal readonly Bindable<ScoreBasedUserStatisticsUpdate?> DisplayedUserStatisticsUpdate = new Bindable<ScoreBasedUserStatisticsUpdate?>();
 
-        private IBindable<UserStatisticsUpdate?> latestGlobalStatisticsUpdate = null!;
+        private IBindable<ScoreBasedUserStatisticsUpdate?> latestGlobalStatisticsUpdate = null!;
 
         public UserStatisticsPanel(ScoreInfo achievedScore)
         {

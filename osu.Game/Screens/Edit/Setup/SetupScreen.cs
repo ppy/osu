@@ -1,55 +1,81 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Screens;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
+using osuTK;
 
 namespace osu.Game.Screens.Edit.Setup
 {
     public partial class SetupScreen : EditorScreen
     {
-        [Cached]
-        private SectionsContainer<SetupSection> sections { get; } = new SetupScreenSectionsContainer();
-
-        [Cached]
-        private SetupScreenHeader header = new SetupScreenHeader();
+        public const float COLUMN_WIDTH = 450;
+        public const float SPACING = 28;
+        public const float MAX_WIDTH = 2 * COLUMN_WIDTH + SPACING;
 
         public SetupScreen()
             : base(EditorScreenMode.SongSetup)
         {
         }
 
+        private OsuScrollContainer scroll = null!;
+        private FillFlowContainer flow = null!;
+
         [BackgroundDependencyLoader]
         private void load(EditorBeatmap beatmap, OverlayColourProvider colourProvider)
         {
             var ruleset = beatmap.BeatmapInfo.Ruleset.CreateInstance();
 
-            List<SetupSection> sectionsEnumerable =
-            [
-                new ResourcesSection(),
-                new MetadataSection()
-            ];
-
-            sectionsEnumerable.AddRange(ruleset.CreateEditorSetupSections());
-            sectionsEnumerable.Add(new DesignSection());
-
-            Add(new Box
+            Children = new Drawable[]
             {
-                Colour = colourProvider.Background3,
-                RelativeSizeAxes = Axes.Both,
-            });
+                new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = colourProvider.Background3,
+                },
+                scroll = new OsuScrollContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Padding = new MarginPadding(15),
+                    Child = flow = new FillFlowContainer
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Direction = FillDirection.Full,
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopCentre,
+                        Spacing = new Vector2(25),
+                        ChildrenEnumerable = ruleset.CreateEditorSetupSections().Select(section => section.With(s =>
+                        {
+                            s.Width = 450;
+                            s.Anchor = Anchor.TopCentre;
+                            s.Origin = Anchor.TopCentre;
+                        })),
+                    }
+                }
+            };
+        }
 
-            Add(sections.With(s =>
+        protected override void UpdateAfterChildren()
+        {
+            base.UpdateAfterChildren();
+
+            if (scroll.DrawWidth > MAX_WIDTH)
             {
-                s.RelativeSizeAxes = Axes.Both;
-                s.ChildrenEnumerable = sectionsEnumerable;
-                s.FixedHeader = header;
-            }));
+                flow.RelativeSizeAxes = Axes.None;
+                flow.Width = MAX_WIDTH;
+            }
+            else
+            {
+                flow.RelativeSizeAxes = Axes.X;
+                flow.Width = 1;
+            }
         }
 
         public override void OnExiting(ScreenExitEvent e)
@@ -61,20 +87,6 @@ namespace osu.Game.Screens.Edit.Setup
             // This is important to ensure that if the user is still editing a textbox, it will commit
             // (and potentially block the exit procedure for save).
             GetContainingFocusManager()?.TriggerFocusContention(this);
-        }
-
-        private partial class SetupScreenSectionsContainer : SectionsContainer<SetupSection>
-        {
-            protected override UserTrackingScrollContainer CreateScrollContainer()
-            {
-                var scrollContainer = base.CreateScrollContainer();
-
-                // Workaround for masking issues (see https://github.com/ppy/osu-framework/issues/1675#issuecomment-910023157)
-                // Note that this actually causes the full scroll range to be reduced by 2px at the bottom, but it's not really noticeable.
-                scrollContainer.Margin = new MarginPadding { Top = 2 };
-
-                return scrollContainer;
-            }
         }
     }
 }

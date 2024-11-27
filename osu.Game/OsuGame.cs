@@ -148,8 +148,7 @@ namespace osu.Game
         [Resolved]
         private FrameworkConfigManager frameworkConfig { get; set; }
 
-        [Cached]
-        private readonly DifficultyRecommender difficultyRecommender = new DifficultyRecommender();
+        private DifficultyRecommender difficultyRecommender;
 
         [Cached]
         private readonly LegacyImportManager legacyImportManager = new LegacyImportManager();
@@ -175,14 +174,9 @@ namespace osu.Game
         /// </summary>
         public readonly IBindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>();
 
-        /// <summary>
-        /// Whether the local user is currently interacting with the game in a way that should not be interrupted.
-        /// </summary>
-        /// <remarks>
-        /// This is exclusively managed by <see cref="Player"/>. If other components are mutating this state, a more
-        /// resilient method should be used to ensure correct state.
-        /// </remarks>
-        public Bindable<bool> LocalUserPlaying = new BindableBool();
+        IBindable<LocalUserPlayingState> ILocalUserPlayInfo.PlayingState => playingState;
+
+        private readonly Bindable<LocalUserPlayingState> playingState = new Bindable<LocalUserPlayingState>();
 
         protected OsuScreenStack ScreenStack;
 
@@ -302,7 +296,7 @@ namespace osu.Game
         protected override UserInputManager CreateUserInputManager()
         {
             var userInputManager = base.CreateUserInputManager();
-            (userInputManager as OsuUserInputManager)?.LocalUserPlaying.BindTo(LocalUserPlaying);
+            (userInputManager as OsuUserInputManager)?.PlayingState.BindTo(playingState);
             return userInputManager;
         }
 
@@ -391,11 +385,11 @@ namespace osu.Game
             // Transfer any runtime changes back to configuration file.
             SkinManager.CurrentSkinInfo.ValueChanged += skin => configSkin.Value = skin.NewValue.ID.ToString();
 
-            LocalUserPlaying.BindValueChanged(p =>
+            playingState.BindValueChanged(p =>
             {
-                BeatmapManager.PauseImports = p.NewValue;
-                SkinManager.PauseImports = p.NewValue;
-                ScoreManager.PauseImports = p.NewValue;
+                BeatmapManager.PauseImports = p.NewValue != LocalUserPlayingState.NotPlaying;
+                SkinManager.PauseImports = p.NewValue != LocalUserPlayingState.NotPlaying;
+                ScoreManager.PauseImports = p.NewValue != LocalUserPlayingState.NotPlaying;
             }, true);
 
             IsActive.BindValueChanged(active => updateActiveState(active.NewValue), true);
@@ -1074,7 +1068,11 @@ namespace osu.Game
                 ScreenStack.Push(CreateLoader().With(l => l.RelativeSizeAxes = Axes.Both));
             });
 
-            loadComponentSingleFile(new UserStatisticsWatcher(), Add, true);
+            LocalUserStatisticsProvider statisticsProvider;
+
+            loadComponentSingleFile(statisticsProvider = new LocalUserStatisticsProvider(), Add, true);
+            loadComponentSingleFile(difficultyRecommender = new DifficultyRecommender(statisticsProvider), Add, true);
+            loadComponentSingleFile(new UserStatisticsWatcher(statisticsProvider), Add, true);
             loadComponentSingleFile(Toolbar = new Toolbar
             {
                 OnHome = delegate
@@ -1144,7 +1142,6 @@ namespace osu.Game
             loadComponentSingleFile(new BackgroundDataStoreProcessor(), Add);
             loadComponentSingleFile(new DetachedBeatmapStore(), Add, true);
 
-            Add(difficultyRecommender);
             Add(externalLinkOpener = new ExternalLinkOpener());
             Add(new MusicKeyBindingHandler());
             Add(new OnlineStatusNotifier(() => ScreenStack.CurrentScreen));
@@ -1553,6 +1550,16 @@ namespace osu.Game
                 scope.SetTag(@"screen", newScreen?.GetType().ReadableName() ?? @"none");
             });
 
+            switch (current)
+            {
+                case Player player:
+                    player.PlayingState.UnbindFrom(playingState);
+
+                    // reset for sanity.
+                    playingState.Value = LocalUserPlayingState.NotPlaying;
+                    break;
+            }
+
             switch (newScreen)
             {
                 case IntroScreen intro:
@@ -1565,13 +1572,14 @@ namespace osu.Game
                     versionManager?.Show();
                     break;
 
+                case Player player:
+                    player.PlayingState.BindTo(playingState);
+                    break;
+
                 default:
                     versionManager?.Hide();
                     break;
             }
-
-            // reset on screen change for sanity.
-            LocalUserPlaying.Value = false;
 
             if (current is IOsuScreen currentOsuScreen)
             {
@@ -1621,7 +1629,5 @@ namespace osu.Game
             if (newScreen == null)
                 Exit();
         }
-
-        IBindable<bool> ILocalUserPlayInfo.IsPlaying => LocalUserPlaying;
     }
 }

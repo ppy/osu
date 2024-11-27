@@ -70,6 +70,8 @@ namespace osu.Game.Rulesets.Catch.Edit
             }));
         }
 
+        protected override Drawable CreateHitObjectInspector() => new CatchHitObjectInspector(DistanceSnapProvider);
+
         protected override IEnumerable<TernaryButton> CreateTernaryButtons()
             => base.CreateTernaryButtons()
                    .Concat(DistanceSnapProvider.CreateTernaryButtons());
@@ -112,6 +114,26 @@ namespace osu.Game.Rulesets.Catch.Edit
 
         public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
+        }
+
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            if (e.Repeat)
+                return false;
+
+            handleToggleViaKey(e);
+            return base.OnKeyDown(e);
+        }
+
+        protected override void OnKeyUp(KeyUpEvent e)
+        {
+            handleToggleViaKey(e);
+            base.OnKeyUp(e);
+        }
+
+        private void handleToggleViaKey(KeyboardEvent key)
+        {
+            DistanceSnapProvider.HandleToggleViaKey(key);
         }
 
         public override SnapResult FindSnappedPositionAndTime(Vector2 screenSpacePosition, SnapType snapType = SnapType.All)

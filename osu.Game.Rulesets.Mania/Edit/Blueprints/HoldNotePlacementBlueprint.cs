@@ -4,8 +4,10 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
+using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.Edit.Blueprints.Components;
 using osu.Game.Rulesets.Mania.Objects;
@@ -17,9 +19,9 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 {
     public partial class HoldNotePlacementBlueprint : ManiaPlacementBlueprint<HoldNote>
     {
-        private readonly EditBodyPiece bodyPiece;
-        private readonly EditNotePiece headPiece;
-        private readonly EditNotePiece tailPiece;
+        private EditBodyPiece bodyPiece = null!;
+        private Circle headPiece = null!;
+        private Circle tailPiece = null!;
 
         [Resolved]
         private IScrollingInfo scrollingInfo { get; set; } = null!;
@@ -29,13 +31,28 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
         public HoldNotePlacementBlueprint()
             : base(new HoldNote())
         {
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
             RelativeSizeAxes = Axes.Both;
 
             InternalChildren = new Drawable[]
             {
                 bodyPiece = new EditBodyPiece { Origin = Anchor.TopCentre },
-                headPiece = new EditNotePiece { Origin = Anchor.Centre },
-                tailPiece = new EditNotePiece { Origin = Anchor.Centre }
+                headPiece = new Circle
+                {
+                    Origin = Anchor.Centre,
+                    Colour = colours.Yellow,
+                    Height = 10
+                },
+                tailPiece = new Circle
+                {
+                    Origin = Anchor.Centre,
+                    Colour = colours.Yellow,
+                    Height = 10
+                },
             };
         }
 

@@ -19,6 +19,7 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Taiko.Skinning.Default;
 using osu.Game.Screens.Play;
 using osu.Game.Skinning;
+using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
@@ -33,6 +34,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         /// Offset away from the start time of the swell at which the ring starts appearing.
         /// </summary>
         private const double ring_appear_offset = 100;
+
+        private Vector2 baseSize;
 
         private readonly Container<DrawableSwellTick> ticks;
         private readonly Container bodyContainer;
@@ -140,6 +143,12 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
             });
+
+        protected override void RecreatePieces()
+        {
+            base.RecreatePieces();
+            Size = baseSize = new Vector2(TaikoHitObject.DEFAULT_SIZE);
+        }
 
         protected override void OnFree()
         {
@@ -269,7 +278,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         {
             base.Update();
 
-            Size = BaseSize * Parent!.RelativeChildSize;
+            Size = baseSize * Parent!.RelativeChildSize;
 
             // Make the swell stop at the hit target
             X = Math.Max(0, X);
