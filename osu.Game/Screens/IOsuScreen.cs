@@ -35,7 +35,8 @@ namespace osu.Game.Screens
         /// Whether a footer (and a back button) should be displayed underneath the screen.
         /// </summary>
         /// <remarks>
-        /// Temporarily, the back button is shown regardless of whether <see cref="AllowUserExit"/> is true.
+        /// Temporarily, the footer's own back button is shown regardless of whether <see cref="BackButtonVisibility"/> is set to hidden.
+        /// This will be corrected as the footer becomes used more commonly.
         /// </remarks>
         bool ShowFooter { get; }
 
