@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Utils;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
@@ -34,6 +35,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             var osuLastObj = (OsuDifficultyHitObject)current.Previous(0);
             var osuLastLastObj = (OsuDifficultyHitObject)current.Previous(1);
 
+            const int radius = OsuDifficultyHitObject.NORMALISED_RADIUS;
             const int diameter = OsuDifficultyHitObject.NORMALISED_DIAMETER;
 
             // Calculate the velocity to the current hitobject, which starts with a base distance / time assuming the last object is a hitcircle.
@@ -63,6 +65,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double acuteAngleBonus = 0;
             double sliderBonus = 0;
             double velocityChangeBonus = 0;
+            double wiggleBonus = 0;
 
             double aimStrain = currVelocity; // Start strain with regular velocity.
 
@@ -89,6 +92,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     wideAngleBonus *= angleBonus * (1 - Math.Min(wideAngleBonus, Math.Pow(calcWideAngleBonus(lastAngle), 3)));
                     // Penalize acute angles if they're repeated, reducing the penalty as the lastLastAngle gets more obtuse.
                     acuteAngleBonus *= 1 - Math.Min(acuteAngleBonus, Math.Pow(calcAcuteAngleBonus(lastLastAngle), 3));
+
+                    wiggleBonus = angleBonus
+                                  * DifficultyCalculationUtils.Smootherstep(osuCurrObj.LazyJumpDistance, diameter * 2, diameter)
+                                  * DifficultyCalculationUtils.Smootherstep(osuCurrObj.LazyJumpDistance, radius, diameter)
+                                  * DifficultyCalculationUtils.Smootherstep(currAngle, double.DegreesToRadians(110), double.DegreesToRadians(60))
+                                  * DifficultyCalculationUtils.Smootherstep(lastAngle, double.DegreesToRadians(110), double.DegreesToRadians(60));
                 }
             }
 
@@ -116,6 +125,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 sliderBonus = osuLastObj.TravelDistance / osuLastObj.TravelTime;
             }
 
+            aimStrain += wiggleBonus * 1.1;
             // Add in acute angle bonus or wide angle bonus + velocity change bonus, whichever is larger.
             aimStrain += Math.Max(acuteAngleBonus * acute_angle_multiplier, wideAngleBonus * wide_angle_multiplier + velocityChangeBonus * velocity_change_multiplier);
 
