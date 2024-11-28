@@ -59,7 +59,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                         Action = () => OnClose?.Invoke(),
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Size = new Vector2(200, 1),
+                        Size = new Vector2(120, 1),
                         Alpha = 0,
                         RelativeSizeAxes = Axes.Y,
                     }
