@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         public double EffectiveMissCount { get; set; }
 
         [JsonProperty("speed_deviation")]
-        public double SpeedDeviation { get; set; }
+        public double? SpeedDeviation { get; set; }
 
         public override IEnumerable<PerformanceDisplayAttribute> GetAttributesForDisplay()
         {

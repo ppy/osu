@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private double effectiveMissCount;
 
         private double hitWindow300, hitWindow100, hitWindow50;
-        private double speedDeviation;
+        private double? speedDeviation;
 
         public OsuPerformanceCalculator()
             : base(new OsuRuleset())
@@ -212,7 +212,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double computeSpeedValue(ScoreInfo score, OsuDifficultyAttributes attributes)
         {
-            if (score.Mods.Any(h => h is OsuModRelax) || speedDeviation == double.PositiveInfinity)
+            if (score.Mods.Any(h => h is OsuModRelax) || speedDeviation == null)
                 return 0.0;
 
             double speedValue = OsuStrainSkill.DifficultyToPerformance(attributes.SpeedDifficulty);
@@ -241,9 +241,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 speedValue *= 1.0 + 0.04 * (12.0 - attributes.ApproachRate);
             }
 
-            // Apply antirake nerf
-            double speedAntiRakeMultiplier = calculateSpeedRakeNerf(attributes);
-            speedValue *= speedAntiRakeMultiplier;
+            // Apply improper tapping nerf for too high deviation values
+            double speedHighDeviationMultiplier = calculateSpeedHighDeviationNerf(attributes);
+            speedValue *= speedHighDeviationMultiplier;
 
             // Calculate accuracy assuming the worst case scenario
             double relevantTotalDiff = totalHits - attributes.SpeedNoteCount;
@@ -348,10 +348,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         /// Treats all speed notes as hit circles. This is not good way to do this, but fixing this is impossible under the limitation of current speed pp.
         /// If score was set with slideracc - tries to remove mistaps on sliders from total mistaps.
         /// </summary>
-        private double calculateSpeedDeviation(ScoreInfo score, OsuDifficultyAttributes attributes)
+        private double? calculateSpeedDeviation(ScoreInfo score, OsuDifficultyAttributes attributes)
         {
             if (totalSuccessfulHits == 0)
-                return double.PositiveInfinity;
+                return null;
 
             // Calculate accuracy assuming the worst case scenario
             double speedNoteCount = attributes.SpeedNoteCount;
@@ -374,10 +374,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         /// will always return the same deviation. Misses are ignored because they are usually due to misaiming.
         /// 300s and 100s are assumed to follow a normal distribution, whereas 50s are assumed to follow a uniform distribution.
         /// </summary>
-        private double calculateDeviation(double relevantCountGreat, double relevantCountOk, double relevantCountMeh, double relevantCountMiss)
+        private double? calculateDeviation(double relevantCountGreat, double relevantCountOk, double relevantCountMeh, double relevantCountMiss)
         {
             if (relevantCountGreat + relevantCountOk + relevantCountMeh <= 0)
-                return double.PositiveInfinity;
+                return null;
 
             double objectCount = relevantCountGreat + relevantCountOk + relevantCountMeh + relevantCountMiss;
 
@@ -418,15 +418,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return deviation;
         }
 
-        // Calculates multiplier for speed accounting for rake based on the deviation and speed difficulty
+        // Calculates multiplier for speed accounting for improper tapping based on the deviation and speed difficulty
         // https://www.desmos.com/calculator/dmogdhzofn
-        private double calculateSpeedRakeNerf(OsuDifficultyAttributes attributes)
+        private double calculateSpeedHighDeviationNerf(OsuDifficultyAttributes attributes)
         {
+            if (speedDeviation == null)
+                return 0;
+
             // Base speed value
             double speedValue = OsuStrainSkill.DifficultyToPerformance(attributes.SpeedDifficulty);
 
             // Starting from this pp amount - penalty will be applied
-            double abusePoint = 100 + 220 * Math.Pow(22 / speedDeviation, 6.5);
+            double abusePoint = 100 + 220 * Math.Pow(22 / speedDeviation.Value, 6.5);
 
             if (speedValue <= abusePoint)
                 return 1.0;
@@ -435,8 +438,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             const double scale = 50;
             double adjustedSpeedValue = scale * (Math.Log((speedValue - abusePoint) / scale + 1) + abusePoint / scale);
 
-            // 200 UR and less are considered not raked and will be punished only by normal acc scaling
-            double lerp = 1 - Math.Clamp((speedDeviation - 20) / (24 - 20), 0, 1);
+            // 200 UR and less are considered tapped correctly to ensure that normal scores would be punished as little as possible
+            double lerp = 1 - Math.Clamp((speedDeviation.Value - 20) / (24 - 20), 0, 1);
             adjustedSpeedValue = double.Lerp(adjustedSpeedValue, speedValue, lerp);
 
             return adjustedSpeedValue / speedValue;
