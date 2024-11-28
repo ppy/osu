@@ -20,6 +20,9 @@
     <AdditionalFiles Include="$(MSBuildThisFileDirectory)CodeAnalysis\BannedSymbols.txt" />
   </ItemGroup>
   <PropertyGroup Label="Code Analysis">
+    <AnalysisMode>Default</AnalysisMode>
+    <AnalysisModeDesign>Default</AnalysisModeDesign>
+    <AnalysisModeDocumentation>Recommended</AnalysisModeDocumentation>
   </PropertyGroup>
   <PropertyGroup Label="Documentation">
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
