@@ -15,7 +15,9 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty("count")]
         public int PlayCount { get; set; }
 
+#pragma warning disable CA1507 // Happens to name the same because of casing preference
         [JsonProperty("beatmap")]
+#pragma warning restore CA1507
         private APIBeatmap beatmap { get; set; }
 
         public APIBeatmap BeatmapInfo

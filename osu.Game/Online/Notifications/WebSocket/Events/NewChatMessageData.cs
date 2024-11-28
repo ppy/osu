@@ -19,7 +19,9 @@ namespace osu.Game.Online.Notifications.WebSocket.Events
         [JsonProperty(@"messages")]
         public List<Message> Messages { get; set; } = null!;
 
+#pragma warning disable CA1507 // Happens to name the same because of casing preference
         [JsonProperty(@"users")]
+#pragma warning restore CA1507
         private List<APIUser> users { get; set; } = null!;
 
         [OnDeserialized]
