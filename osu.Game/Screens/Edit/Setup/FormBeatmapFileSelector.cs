@@ -27,19 +27,19 @@ namespace osu.Game.Screens.Edit.Setup
     /// </remarks>
     public partial class FormBeatmapFileSelector : FormFileSelector
     {
-        private readonly bool multipleDifficulties;
+        private readonly bool beatmapHasMultipleDifficulties;
 
         public readonly Bindable<bool> ApplyToAllDifficulties = new Bindable<bool>(true);
 
-        public FormBeatmapFileSelector(bool multipleDifficulties, params string[] handledExtensions)
+        public FormBeatmapFileSelector(bool beatmapHasMultipleDifficulties, params string[] handledExtensions)
             : base(handledExtensions)
         {
-            this.multipleDifficulties = multipleDifficulties;
+            this.beatmapHasMultipleDifficulties = beatmapHasMultipleDifficulties;
         }
 
         protected override FileChooserPopover CreatePopover(string[] handledExtensions, Bindable<FileInfo?> current, string? chooserPath)
         {
-            var popover = new BeatmapFileChooserPopover(handledExtensions, current, chooserPath, multipleDifficulties);
+            var popover = new BeatmapFileChooserPopover(handledExtensions, current, chooserPath, beatmapHasMultipleDifficulties);
 
             popover.ApplyToAllDifficulties.ValueChanged += v =>
             {
@@ -52,16 +52,16 @@ namespace osu.Game.Screens.Edit.Setup
 
         private partial class BeatmapFileChooserPopover : FileChooserPopover
         {
-            private readonly bool multipleDifficulties;
+            private readonly bool beatmapHasMultipleDifficulties;
 
             public readonly Bindable<bool?> ApplyToAllDifficulties = new Bindable<bool?>();
 
             private Container changeScopeContainer = null!;
 
-            public BeatmapFileChooserPopover(string[] handledExtensions, Bindable<FileInfo?> current, string? chooserPath, bool multipleDifficulties)
+            public BeatmapFileChooserPopover(string[] handledExtensions, Bindable<FileInfo?> current, string? chooserPath, bool beatmapHasMultipleDifficulties)
                 : base(handledExtensions, current, chooserPath)
             {
-                this.multipleDifficulties = multipleDifficulties;
+                this.beatmapHasMultipleDifficulties = beatmapHasMultipleDifficulties;
             }
 
             [BackgroundDependencyLoader]
@@ -142,7 +142,7 @@ namespace osu.Game.Screens.Edit.Setup
 
             protected override void OnFileSelected(FileInfo file)
             {
-                if (multipleDifficulties)
+                if (beatmapHasMultipleDifficulties)
                     changeScopeContainer.FadeIn(200, Easing.InQuint);
                 else
                     base.OnFileSelected(file);
