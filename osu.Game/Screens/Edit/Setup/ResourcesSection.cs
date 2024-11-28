@@ -33,9 +33,6 @@ namespace osu.Game.Screens.Edit.Setup
         private IBindable<WorkingBeatmap> working { get; set; } = null!;
 
         [Resolved]
-        private EditorBeatmap editorBeatmap { get; set; } = null!;
-
-        [Resolved]
         private Editor? editor { get; set; }
 
         private SetupScreenHeaderBackground headerBackground = null!;
@@ -114,25 +111,17 @@ namespace osu.Game.Screens.Edit.Setup
             {
                 newFilename = $"{baseFilename}{source.Extension}";
 
-                foreach (var beatmapInSet in set.Beatmaps)
+                foreach (var beatmap in set.Beatmaps)
                 {
-                    string filenameInBeatmap = readFilename(beatmapInSet.Metadata);
+                    if (set.GetFile(readFilename(beatmap.Metadata)) is RealmNamedFileUsage otherExistingFile)
+                        beatmaps.DeleteFile(set, otherExistingFile);
 
-                    if (set.GetFile(filenameInBeatmap) is RealmNamedFileUsage existingFile)
-                        beatmaps.DeleteFile(set, existingFile);
-
-                    if (filenameInBeatmap != newFilename)
-                    {
-                        writeFilename(beatmapInSet.Metadata, newFilename);
-
-                        if (!beatmapInSet.Equals(working.Value.BeatmapInfo))
-                            beatmaps.Save(beatmapInSet, beatmaps.GetWorkingBeatmap(beatmapInSet).Beatmap);
-                    }
+                    writeFilename(beatmap.Metadata, newFilename);
                 }
             }
             else
             {
-                var beatmap = working.Value.BeatmapInfo;
+                var thisBeatmap = working.Value.BeatmapInfo;
 
                 string[] filenames = set.Files.Select(f => f.Filename).Where(f =>
                     f.StartsWith(baseFilename, StringComparison.OrdinalIgnoreCase) &&
@@ -142,7 +131,7 @@ namespace osu.Game.Screens.Edit.Setup
 
                 var oldFile = set.GetFile(currentFilename);
 
-                if (oldFile != null && set.Beatmaps.Where(b => !b.Equals(beatmap)).All(b => readFilename(b.Metadata) != currentFilename))
+                if (oldFile != null && set.Beatmaps.Where(b => !b.Equals(thisBeatmap)).All(b => readFilename(b.Metadata) != currentFilename))
                 {
                     beatmaps.DeleteFile(set, oldFile);
                     newFilename = currentFilename;
@@ -157,7 +146,9 @@ namespace osu.Game.Screens.Edit.Setup
             using (var stream = source.OpenRead())
                 beatmaps.AddFile(set, stream, newFilename);
 
-            editorBeatmap.SaveState();
+            // editor change handler cannot be aware of any file changes or other difficulties having their metadata modified.
+            // for simplicity's sake, trigger a save when changing any resource to ensure the change is correctly saved.
+            editor?.Save();
         }
 
         private void backgroundChanged(ValueChangedEvent<FileInfo?> file)

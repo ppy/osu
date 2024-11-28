@@ -107,9 +107,6 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddStep("test play", () => Editor.TestGameplay());
 
-            AddUntilStep("wait for dialog", () => DialogOverlay.CurrentDialog != null);
-            AddStep("confirm save", () => InputManager.Key(Key.Number1));
-
             AddUntilStep("wait for return to editor", () => Editor.IsCurrentScreen());
 
             AddAssert("track is still not virtual", () => Beatmap.Value.Track is not TrackVirtual);
