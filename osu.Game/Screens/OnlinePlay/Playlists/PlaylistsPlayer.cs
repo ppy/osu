@@ -56,7 +56,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         protected override ResultsScreen CreateResults(ScoreInfo score)
         {
             Debug.Assert(Room.RoomID != null);
-            return new PlaylistItemUserResultsScreen(score, Room.RoomID.Value, PlaylistItem)
+            return new PlaylistItemScoreResultsScreen(score, Room.RoomID.Value, PlaylistItem)
             {
                 AllowRetry = true,
                 ShowUserStatistics = true,
