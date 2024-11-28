@@ -398,7 +398,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double deviation = hitWindow300 / (Math.Sqrt(2) * SpecialFunctions.ErfInv(pLowerBound));
 
             double randomValue = Math.Sqrt(2 / Math.PI) * hitWindow100 * Math.Exp(-0.5 * Math.Pow(hitWindow100 / deviation, 2))
-                                / (deviation * SpecialFunctions.Erf(hitWindow100 / (Math.Sqrt(2) * deviation)));
+                                 / (deviation * SpecialFunctions.Erf(hitWindow100 / (Math.Sqrt(2) * deviation)));
 
             deviation *= Math.Sqrt(1 - randomValue);
 
