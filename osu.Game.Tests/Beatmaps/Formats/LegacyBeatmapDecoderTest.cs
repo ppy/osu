@@ -1000,7 +1000,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                     Assert.That(decoded.BeatmapInfo.WidescreenStoryboard, Is.False);
                     Assert.That(decoded.BeatmapInfo.EpilepsyWarning, Is.False);
                     Assert.That(decoded.BeatmapInfo.SamplesMatchPlaybackRate, Is.False);
-                    Assert.That(decoded.BeatmapInfo.Countdown, Is.EqualTo(CountdownType.Normal));
+                    Assert.That(decoded.BeatmapInfo.Countdown, Is.EqualTo(CountdownType.None));
                     Assert.That(decoded.BeatmapInfo.CountdownOffset, Is.EqualTo(0));
                     Assert.That(decoded.BeatmapInfo.Metadata.PreviewTime, Is.EqualTo(-1));
                     Assert.That(decoded.BeatmapInfo.Ruleset.OnlineID, Is.EqualTo(0));

@@ -192,7 +192,6 @@ namespace osu.Game.Beatmaps.Formats
         private static void applyLegacyDefaults(BeatmapInfo beatmapInfo)
         {
             beatmapInfo.WidescreenStoryboard = false;
-            beatmapInfo.SamplesMatchPlaybackRate = false;
         }
 
         protected override void ParseLine(Beatmap beatmap, Section section, string line)

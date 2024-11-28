@@ -138,6 +138,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.LightenDuringBreaks, true);
 
             SetDefault(OsuSetting.HitLighting, true);
+            SetDefault(OsuSetting.StarFountains, true);
 
             SetDefault(OsuSetting.HUDVisibilityMode, HUDVisibilityMode.Always);
             SetDefault(OsuSetting.ShowHealthDisplayWhenCantFail, true);
@@ -214,6 +215,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.EditorContractSidebars, false);
 
             SetDefault(OsuSetting.AlwaysShowHoldForMenuButton, false);
+            SetDefault(OsuSetting.AlwaysRequireHoldingForPause, false);
         }
 
         protected override bool CheckLookupContainsPrivateInformation(OsuSetting lookup)
@@ -413,6 +415,7 @@ namespace osu.Game.Configuration
         NotifyOnPrivateMessage,
         UIHoldActivationDelay,
         HitLighting,
+        StarFountains,
         MenuBackgroundSource,
         GameplayDisableWinKey,
         SeasonalBackgroundMode,
@@ -444,5 +447,6 @@ namespace osu.Game.Configuration
         EditorRotationOrigin,
         EditorTimelineShowBreaks,
         EditorAdjustExistingObjectsOnTimingChanges,
+        AlwaysRequireHoldingForPause
     }
 }
