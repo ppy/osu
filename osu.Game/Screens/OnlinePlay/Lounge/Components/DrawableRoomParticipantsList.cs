@@ -1,13 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
-using System.Collections.Specialized;
-using System.Diagnostics;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -16,31 +13,33 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Users.Drawables;
 using osuTK;
+using Container = osu.Framework.Graphics.Containers.Container;
 
 namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 {
-    public partial class DrawableRoomParticipantsList : OnlinePlayComposite
+    public partial class DrawableRoomParticipantsList : CompositeDrawable
     {
         public const float SHEAR_WIDTH = 12f;
-
         private const float avatar_size = 36;
-
         private const float height = 60f;
-
         private static readonly Vector2 shear = new Vector2(SHEAR_WIDTH / height, 0);
 
-        private FillFlowContainer<CircularAvatar> avatarFlow;
+        private readonly Room room;
 
-        private CircularAvatar hostAvatar;
-        private LinkFlowContainer hostText;
-        private HiddenUserCount hiddenUsers;
-        private OsuSpriteText totalCount;
+        private FillFlowContainer<CircularAvatar> avatarFlow = null!;
+        private CircularAvatar hostAvatar = null!;
+        private LinkFlowContainer hostText = null!;
+        private HiddenUserCount hiddenUsers = null!;
+        private OsuSpriteText totalCount = null!;
 
-        public DrawableRoomParticipantsList()
+        public DrawableRoomParticipantsList(Room room)
         {
+            this.room = room;
+
             AutoSizeAxes = Axes.X;
             Height = height;
         }
@@ -165,14 +164,11 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         {
             base.LoadComplete();
 
-            RecentParticipants.BindCollectionChanged(onParticipantsChanged, true);
-            ParticipantCount.BindValueChanged(_ =>
-            {
-                updateHiddenUsers();
-                totalCount.Text = ParticipantCount.Value.ToString();
-            }, true);
+            room.PropertyChanged += onRoomPropertyChanged;
 
-            Host.BindValueChanged(onHostChanged, true);
+            updateRoomHost();
+            updateRoomParticipantCount();
+            updateRoomParticipants();
         }
 
         private int numberOfCircles = 4;
@@ -192,43 +188,38 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
                 // Reinitialising the list looks janky, but this is unlikely to be used in a setting where it's visible.
                 clearUsers();
-                foreach (var u in RecentParticipants)
+                foreach (var u in room.RecentParticipants)
                     addUser(u);
 
                 updateHiddenUsers();
             }
         }
 
-        private void onParticipantsChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void updateRoomParticipants()
         {
-            switch (e.Action)
+            HashSet<APIUser> newUsers = room.RecentParticipants.ToHashSet();
+
+            avatarFlow.RemoveAll(a =>
             {
-                case NotifyCollectionChangedAction.Add:
-                    Debug.Assert(e.NewItems != null);
+                // Avatar with no user. Really shouldn't ever be the case but asserting it correctly is difficult.
+                if (a.User == null)
+                    return false;
 
-                    foreach (var added in e.NewItems.OfType<APIUser>())
-                        addUser(added);
-                    break;
+                // User was previously and still is a participant. Keep them around but remove them from the new set.
+                // This will be useful when we add all remaining users (now just the new participants) to the flow.
+                if (newUsers.Contains(a.User))
+                {
+                    newUsers.Remove(a.User);
+                    return false;
+                }
 
-                case NotifyCollectionChangedAction.Remove:
-                    Debug.Assert(e.OldItems != null);
+                // User is no longer a participant. Remove them from the flow.
+                return true;
+            }, true);
 
-                    foreach (var removed in e.OldItems.OfType<APIUser>())
-                        removeUser(removed);
-                    break;
-
-                case NotifyCollectionChangedAction.Reset:
-                    clearUsers();
-                    break;
-
-                case NotifyCollectionChangedAction.Replace:
-                case NotifyCollectionChangedAction.Move:
-                    // Easiest is to just reinitialise the whole list. These are unlikely to ever be use cases.
-                    clearUsers();
-                    foreach (var u in RecentParticipants)
-                        addUser(u);
-                    break;
-            }
+            // Add all remaining users to the flow.
+            foreach (var u in newUsers)
+                addUser(u);
 
             updateHiddenUsers();
         }
@@ -241,11 +232,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 avatarFlow.Add(new CircularAvatar { User = user });
         }
 
-        private void removeUser(APIUser user)
-        {
-            avatarFlow.RemoveAll(a => a.User == user, true);
-        }
-
         private void clearUsers()
         {
             avatarFlow.Clear();
@@ -255,8 +241,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         private void updateHiddenUsers()
         {
             int hiddenCount = 0;
-            if (RecentParticipants.Count > NumberOfCircles)
-                hiddenCount = ParticipantCount.Value - NumberOfCircles + 1;
+            if (room.RecentParticipants.Count > NumberOfCircles)
+                hiddenCount = room.ParticipantCount - NumberOfCircles + 1;
 
             hiddenUsers.Count = hiddenCount;
 
@@ -264,26 +250,56 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 avatarFlow.Remove(avatarFlow.Last(), true);
             else if (displayedCircles < NumberOfCircles)
             {
-                var nextUser = RecentParticipants.FirstOrDefault(u => avatarFlow.All(a => a.User != u));
+                var nextUser = room.RecentParticipants.FirstOrDefault(u => avatarFlow.All(a => a.User != u));
                 if (nextUser != null) addUser(nextUser);
             }
         }
 
-        private void onHostChanged(ValueChangedEvent<APIUser> host)
+        private void onRoomPropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
-            hostAvatar.User = host.NewValue;
+            switch (e.PropertyName)
+            {
+                case nameof(Room.Host):
+                    updateRoomHost();
+                    break;
+
+                case nameof(Room.ParticipantCount):
+                    updateRoomParticipantCount();
+                    break;
+
+                case nameof(Room.RecentParticipants):
+                    updateRoomParticipants();
+                    break;
+            }
+        }
+
+        private void updateRoomHost()
+        {
+            hostAvatar.User = room.Host;
             hostText.Clear();
 
-            if (host.NewValue != null)
+            if (room.Host != null)
             {
                 hostText.AddText("hosted by ");
-                hostText.AddUserLink(host.NewValue);
+                hostText.AddUserLink(room.Host);
             }
+        }
+
+        private void updateRoomParticipantCount()
+        {
+            updateHiddenUsers();
+            totalCount.Text = room.ParticipantCount.ToString();
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            room.PropertyChanged -= onRoomPropertyChanged;
         }
 
         private partial class CircularAvatar : CompositeDrawable
         {
-            public APIUser User
+            public APIUser? User
             {
                 get => avatar.User;
                 set => avatar.User = value;

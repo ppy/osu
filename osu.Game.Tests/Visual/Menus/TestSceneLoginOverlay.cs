@@ -10,11 +10,13 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Login;
 using osu.Game.Overlays.Settings;
+using osu.Game.Tests.Visual.Online;
 using osu.Game.Users;
 using osu.Game.Users.Drawables;
 using osuTK.Input;
@@ -30,6 +32,9 @@ namespace osu.Game.Tests.Visual.Menus
 
         [Resolved]
         private OsuConfigManager configManager { get; set; } = null!;
+
+        [Cached(typeof(LocalUserStatisticsProvider))]
+        private readonly TestSceneUserPanel.TestUserStatisticsProvider statisticsProvider = new TestSceneUserPanel.TestUserStatisticsProvider();
 
         [BackgroundDependencyLoader]
         private void load()
@@ -170,6 +175,7 @@ namespace osu.Game.Tests.Visual.Menus
             AddStep("enter code", () => loginOverlay.ChildrenOfType<OsuTextBox>().First().Text = "88800088");
             assertAPIState(APIState.Online);
 
+            AddStep("feed statistics", () => statisticsProvider.UpdateStatistics(new UserStatistics(), Ruleset.Value));
             AddStep("click on flag", () =>
             {
                 InputManager.MoveMouseTo(loginOverlay.ChildrenOfType<UpdateableFlag>().First());
