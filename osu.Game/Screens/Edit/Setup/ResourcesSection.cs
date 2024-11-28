@@ -49,16 +49,16 @@ namespace osu.Game.Screens.Edit.Setup
                 Height = 110,
             };
 
-            bool multipleDifficulties = working.Value.BeatmapSetInfo.Beatmaps.Count > 1;
+            bool beatmapHasMultipleDifficulties = working.Value.BeatmapSetInfo.Beatmaps.Count > 1;
 
             Children = new Drawable[]
             {
-                backgroundChooser = new FormBeatmapFileSelector(multipleDifficulties, ".jpg", ".jpeg", ".png")
+                backgroundChooser = new FormBeatmapFileSelector(beatmapHasMultipleDifficulties, ".jpg", ".jpeg", ".png")
                 {
                     Caption = GameplaySettingsStrings.BackgroundHeader,
                     PlaceholderText = EditorSetupStrings.ClickToSelectBackground,
                 },
-                audioTrackChooser = new FormBeatmapFileSelector(multipleDifficulties, ".mp3", ".ogg")
+                audioTrackChooser = new FormBeatmapFileSelector(beatmapHasMultipleDifficulties, ".mp3", ".ogg")
                 {
                     Caption = EditorSetupStrings.AudioTrack,
                     PlaceholderText = EditorSetupStrings.ClickToSelectTrack,
