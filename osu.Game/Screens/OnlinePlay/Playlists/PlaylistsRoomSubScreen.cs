@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
@@ -285,7 +286,11 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             DialogOverlay?.Push(new ClosePlaylistDialog(Room, () =>
             {
                 var request = new ClosePlaylistRequest(Room.RoomID!.Value);
-                request.Success += () => Room.Status = new RoomStatusEnded();
+                request.Success += () =>
+                {
+                    Room.Status = new RoomStatusEnded();
+                    Room.EndDate = DateTimeOffset.UtcNow;
+                };
                 API.Queue(request);
             }));
         }
