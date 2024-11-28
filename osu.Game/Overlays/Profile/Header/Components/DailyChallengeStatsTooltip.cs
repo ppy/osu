@@ -140,7 +140,6 @@ namespace osu.Game.Overlays.Profile.Header.Components
 
         // reference: https://github.com/ppy/osu-web/blob/a97f156014e00ea1aa315140da60542e798a9f06/resources/js/profile-page/daily-challenge.tsx#L13-L47
 
-        // Rounding down is needed here to ensure the overlay shows the same colour as osu-web for the play count.
         public static RankingTier TierForPlayCount(int playCount) => TierForDaily((int)Math.Floor(playCount / 3.0d));
 
         public static RankingTier TierForDaily(int daily)
