@@ -83,8 +83,14 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
         private void onRoomChanged(object? sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(Room.Status) || e.PropertyName == nameof(Room.Host) || e.PropertyName == nameof(Room.StartDate))
-                updateState();
+            switch (e.PropertyName)
+            {
+                case nameof(Room.Status):
+                case nameof(Room.Host):
+                case nameof(Room.StartDate):
+                    updateState();
+                    break;
+            }
         }
 
         private void updateState()
