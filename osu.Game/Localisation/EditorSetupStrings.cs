@@ -189,11 +189,6 @@ namespace osu.Game.Localisation
         public static LocalisableString AudioTrack => new TranslatableString(getKey(@"audio_track"), @"Audio Track");
 
         /// <summary>
-        /// "Update all difficulties"
-        /// </summary>
-        public static LocalisableString ResourcesUpdateAllDifficulties => new TranslatableString(getKey(@"resources_update_all_difficulties"), @"Update all difficulties");
-
-        /// <summary>
         /// "Click to select a track"
         /// </summary>
         public static LocalisableString ClickToSelectTrack => new TranslatableString(getKey(@"click_to_select_track"), @"Click to select a track");
@@ -202,6 +197,21 @@ namespace osu.Game.Localisation
         /// "Click to select a background image"
         /// </summary>
         public static LocalisableString ClickToSelectBackground => new TranslatableString(getKey(@"click_to_select_background"), @"Click to select a background image");
+
+        /// <summary>
+        /// "Apply this change to all difficulties?"
+        /// </summary>
+        public static LocalisableString ApplicationScopeSelectionTitle => new TranslatableString(getKey(@"application_scope_selection_title"), @"Apply this change to all difficulties?");
+
+        /// <summary>
+        /// "Apply to all difficulties"
+        /// </summary>
+        public static LocalisableString ApplyToAllDifficulties => new TranslatableString(getKey(@"apply_to_all_difficulties"), @"Apply to all difficulties");
+
+        /// <summary>
+        /// "Only apply to this difficulty"
+        /// </summary>
+        public static LocalisableString ApplyToThisDifficulty => new TranslatableString(getKey(@"apply_to_this_difficulty"), @"Only apply to this difficulty");
 
         /// <summary>
         /// "Ruleset ({0})"
