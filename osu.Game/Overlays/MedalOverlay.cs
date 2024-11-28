@@ -85,11 +85,11 @@ namespace osu.Game.Overlays
 
             Logger.Log($"Queueing medal unlock for \"{medal.Name}\" ({queuedMedals.Count} to display)");
 
-            LoadComponentAsync(medalAnimation, m =>
+            Schedule(() => LoadComponentAsync(medalAnimation, m =>
             {
                 queuedMedals.Enqueue(m);
                 showNextMedal();
-            });
+            }));
         }
 
         protected override bool OnClick(ClickEvent e)
