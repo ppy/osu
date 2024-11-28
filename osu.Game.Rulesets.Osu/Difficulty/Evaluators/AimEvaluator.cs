@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         private const double acute_angle_multiplier = 2.45;
         private const double slider_multiplier = 1.35;
         private const double velocity_change_multiplier = 0.75;
-        private const double wiggle_multiplier = 1.1;
+        private const double wiggle_multiplier = 1.5;
 
         /// <summary>
         /// Evaluates the difficulty of aiming the current object, based on:
@@ -93,10 +93,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     // Penalize acute angles if they're repeated, reducing the penalty as the lastLastAngle gets more obtuse.
                     acuteAngleBonus *= 1 - Math.Min(acuteAngleBonus, Math.Pow(calcAcuteAngleBonus(lastLastAngle), 3));
 
+                    // Apply wiggle bonus for jumps that are [radius, 2*diameter] in distance and with < 110 angle
                     wiggleBonus = angleBonus
-                                  * DifficultyCalculationUtils.Smootherstep(osuCurrObj.LazyJumpDistance, diameter * 2, diameter)
                                   * DifficultyCalculationUtils.Smootherstep(osuCurrObj.LazyJumpDistance, radius, diameter)
+                                  * DifficultyCalculationUtils.Smootherstep(osuCurrObj.LazyJumpDistance, diameter * 2, diameter)
                                   * DifficultyCalculationUtils.Smootherstep(currAngle, double.DegreesToRadians(110), double.DegreesToRadians(60))
+                                  * DifficultyCalculationUtils.Smootherstep(osuLastObj.LazyJumpDistance, radius, diameter)
+                                  * DifficultyCalculationUtils.Smootherstep(osuLastObj.LazyJumpDistance, diameter * 2, diameter)
                                   * DifficultyCalculationUtils.Smootherstep(lastAngle, double.DegreesToRadians(110), double.DegreesToRadians(60));
                 }
             }
