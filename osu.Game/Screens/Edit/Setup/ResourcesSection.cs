@@ -10,6 +10,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Overlays;
 using osu.Game.Localisation;
+using osu.Game.Utils;
 
 namespace osu.Game.Screens.Edit.Setup
 {
@@ -48,12 +49,14 @@ namespace osu.Game.Screens.Edit.Setup
 
             Children = new Drawable[]
             {
-                backgroundChooser = new FormFileSelector(".jpg", ".jpeg", ".png")
+                backgroundChooser = new FormFileSelector(SupportedExtensions.IMAGE_EXTENSIONS)
                 {
                     Caption = GameplaySettingsStrings.BackgroundHeader,
                     PlaceholderText = EditorSetupStrings.ClickToSelectBackground,
                 },
-                audioTrackChooser = new FormFileSelector(".mp3", ".ogg")
+                // `SupportedExtensions.AUDIO_EXTENSIONS` not used here specifically it includes `.wav` for samples, which is strictly disallowed by ranking criteria
+                // (https://osu.ppy.sh/wiki/en/Ranking_criteria#audio)
+                audioTrackChooser = new FormFileSelector(@".mp3", @".ogg")
                 {
                     Caption = EditorSetupStrings.AudioTrack,
                     PlaceholderText = EditorSetupStrings.ClickToSelectTrack,
