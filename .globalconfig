@@ -58,13 +58,19 @@ dotnet_diagnostic.CA1806.severity = suggestion
 # Potential false positive around reflection/too much noise
 dotnet_diagnostic.CA1822.severity = none
 
+# CA1826: Do not use Enumerable method on indexable collections
+dotnet_diagnostic.CA1826.severity = suggestion
+
 # CA1859: Use concrete types when possible for improved performance
 # Involves design considerations
-dotnet_diagnostic.CA1859.severity = none
+dotnet_diagnostic.CA1859.severity = suggestion
+
+# CA1860: Avoid using 'Enumerable.Any()' extension method
+dotnet_diagnostic.CA1860.severity = suggestion
 
 # CA1861: Avoid constant arrays as arguments
 # Outdated with collection expressions
-dotnet_diagnostic.CA1861.severity = none
+dotnet_diagnostic.CA1861.severity = suggestion
 
 # CA2007: Consider calling ConfigureAwait on the awaited task
 dotnet_diagnostic.CA2007.severity = warning
