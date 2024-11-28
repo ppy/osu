@@ -14,6 +14,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Overlays;
 using osuTK;
+using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Edit.Setup
 {
@@ -100,7 +101,7 @@ namespace osu.Game.Screens.Edit.Setup
                                         {
                                             Anchor = Anchor.Centre,
                                             Origin = Anchor.Centre,
-                                            Text = "Apply this change to all difficulties?",
+                                            Text = EditorSetupStrings.ApplicationScopeSelectionTitle,
                                             Margin = new MarginPadding { Bottom = 20f },
                                         },
                                         new RoundedButton
@@ -108,7 +109,7 @@ namespace osu.Game.Screens.Edit.Setup
                                             Anchor = Anchor.Centre,
                                             Origin = Anchor.Centre,
                                             Width = 300f,
-                                            Text = "Apply to all difficulties",
+                                            Text = EditorSetupStrings.ApplyToAllDifficulties,
                                             Action = () =>
                                             {
                                                 ApplyToAllDifficulties.Value = true;
@@ -121,7 +122,7 @@ namespace osu.Game.Screens.Edit.Setup
                                             Anchor = Anchor.Centre,
                                             Origin = Anchor.Centre,
                                             Width = 300f,
-                                            Text = "Only apply to this difficulty",
+                                            Text = EditorSetupStrings.ApplyToThisDifficulty,
                                             Action = () =>
                                             {
                                                 ApplyToAllDifficulties.Value = false;
