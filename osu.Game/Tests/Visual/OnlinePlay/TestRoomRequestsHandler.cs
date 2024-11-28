@@ -71,7 +71,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
                         return true;
                     }
 
-                    joinRoomRequest.TriggerSuccess();
+                    joinRoomRequest.TriggerSuccess(createResponseRoom(room, true));
                     return true;
                 }
 

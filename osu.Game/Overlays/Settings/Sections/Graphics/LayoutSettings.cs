@@ -268,7 +268,8 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
         private void updateScreenModeWarning()
         {
-            if (RuntimeInfo.OS == RuntimeInfo.Platform.macOS)
+            // Can be removed once we stop supporting SDL2.
+            if (RuntimeInfo.OS == RuntimeInfo.Platform.macOS && !FrameworkEnvironment.UseSDL3)
             {
                 if (windowModeDropdown.Current.Value == WindowMode.Fullscreen)
                     windowModeDropdown.SetNoticeText(LayoutSettingsStrings.FullscreenMacOSNote, true);
