@@ -198,7 +198,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("make second user host", () => MultiplayerClient.TransferHost(3));
 
-            AddUntilStep("kick buttons not visible", () => this.ChildrenOfType<ParticipantPanel.KickButton>().Count(d => d.IsPresent) == 0);
+            AddUntilStep("kick buttons not visible", () => !this.ChildrenOfType<ParticipantPanel.KickButton>().Any(d => d.IsPresent));
 
             AddStep("make local user host again", () => MultiplayerClient.TransferHost(API.LocalUser.Value.Id));
 

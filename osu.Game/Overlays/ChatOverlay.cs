@@ -386,9 +386,8 @@ namespace osu.Game.Overlays
                     {
                         channelList.RemoveChannel(channel);
 
-                        if (loadedChannels.ContainsKey(channel))
+                        if (loadedChannels.TryGetValue(channel, out var loaded))
                         {
-                            DrawableChannel loaded = loadedChannels[channel];
                             loadedChannels.Remove(channel);
                             // DrawableChannel removed from cache must be manually disposed
                             loaded.Dispose();

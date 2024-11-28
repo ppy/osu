@@ -27,6 +27,7 @@
     <AnalysisModeInteroperability>Recommended</AnalysisModeInteroperability>
     <AnalysisModeMaintainability>Recommended</AnalysisModeMaintainability>
     <AnalysisModeNaming>Default</AnalysisModeNaming>
+    <AnalysisModePerformance>Minimum</AnalysisModePerformance>
   </PropertyGroup>
   <PropertyGroup Label="Documentation">
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
