@@ -75,6 +75,14 @@ dotnet_diagnostic.CA1861.severity = suggestion
 # CA2007: Consider calling ConfigureAwait on the awaited task
 dotnet_diagnostic.CA2007.severity = warning
 
+# CA2016: Forward the 'CancellationToken' parameter to methods
+# Some overloads are having special handling for debugger
+dotnet_diagnostic.CA2016.severity = suggestion
+
+# CA2021: Do not call Enumerable.Cast<T> or Enumerable.OfType<T> with incompatible types
+# Causing a lot of false positives with generics
+dotnet_diagnostic.CA2021.severity = none
+
 # CA2101: Specify marshaling for P/Invoke string arguments
 # Reports warning for all non-UTF16 usages on DllImport; consider migrating to LibraryImport
 dotnet_diagnostic.CA2101.severity = none
