@@ -464,11 +464,6 @@ namespace osu.Game.Tests.Visual.Playlists
 
         private partial class TestScoreResultsScreen : PlaylistItemScoreResultsScreen
         {
-            public new LoadingSpinner LeftSpinner => base.LeftSpinner;
-            public new LoadingSpinner CentreSpinner => base.CentreSpinner;
-            public new LoadingSpinner RightSpinner => base.RightSpinner;
-            public new ScorePanelList ScorePanelList => base.ScorePanelList;
-
             public TestScoreResultsScreen(ScoreInfo score, int roomId, PlaylistItem playlistItem)
                 : base(score, roomId, playlistItem)
             {
@@ -478,11 +473,6 @@ namespace osu.Game.Tests.Visual.Playlists
 
         private partial class TestUserBestResultsScreen : PlaylistItemUserBestResultsScreen
         {
-            public new LoadingSpinner LeftSpinner => base.LeftSpinner;
-            public new LoadingSpinner CentreSpinner => base.CentreSpinner;
-            public new LoadingSpinner RightSpinner => base.RightSpinner;
-            public new ScorePanelList ScorePanelList => base.ScorePanelList;
-
             public TestUserBestResultsScreen(int roomId, PlaylistItem playlistItem, int userId)
                 : base(roomId, playlistItem, userId)
             {
