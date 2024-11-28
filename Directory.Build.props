@@ -28,6 +28,7 @@
     <AnalysisModeMaintainability>Recommended</AnalysisModeMaintainability>
     <AnalysisModeNaming>Default</AnalysisModeNaming>
     <AnalysisModePerformance>Minimum</AnalysisModePerformance>
+    <AnalysisModeReliability>Recommended</AnalysisModeReliability>
   </PropertyGroup>
   <PropertyGroup Label="Documentation">
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
