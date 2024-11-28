@@ -56,7 +56,7 @@ namespace osu.Game.Screens.Edit.Setup
 
             public readonly Bindable<bool?> ApplyToAllDifficulties = new Bindable<bool?>();
 
-            private Container changeScopeContainer = null!;
+            private Container selectApplicationScopeContainer = null!;
 
             public BeatmapFileChooserPopover(string[] handledExtensions, Bindable<FileInfo?> current, string? chooserPath, bool beatmapHasMultipleDifficulties)
                 : base(handledExtensions, current, chooserPath)
@@ -67,7 +67,7 @@ namespace osu.Game.Screens.Edit.Setup
             [BackgroundDependencyLoader]
             private void load(OverlayColourProvider colourProvider, OsuColour colours)
             {
-                Add(changeScopeContainer = new InputBlockingContainer
+                Add(selectApplicationScopeContainer = new InputBlockingContainer
                 {
                     Alpha = 0f,
                     RelativeSizeAxes = Axes.Both,
@@ -143,7 +143,7 @@ namespace osu.Game.Screens.Edit.Setup
             protected override void OnFileSelected(FileInfo file)
             {
                 if (beatmapHasMultipleDifficulties)
-                    changeScopeContainer.FadeIn(200, Easing.InQuint);
+                    selectApplicationScopeContainer.FadeIn(200, Easing.InQuint);
                 else
                     base.OnFileSelected(file);
             }
