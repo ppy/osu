@@ -77,7 +77,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
         private void hideCloseButton()
         {
-            closeButton?.ResizeWidthTo(0, 100, Easing.OutQuint)
+            closeButton.ResizeWidthTo(0, 100, Easing.OutQuint)
                        .Then().FadeOut().Expire();
         }
 
