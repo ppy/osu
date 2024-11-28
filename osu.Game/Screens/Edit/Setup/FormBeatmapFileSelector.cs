@@ -40,13 +40,7 @@ namespace osu.Game.Screens.Edit.Setup
         protected override FileChooserPopover CreatePopover(string[] handledExtensions, Bindable<FileInfo?> current, string? chooserPath)
         {
             var popover = new BeatmapFileChooserPopover(handledExtensions, current, chooserPath, beatmapHasMultipleDifficulties);
-
-            popover.ApplyToAllDifficulties.ValueChanged += v =>
-            {
-                Debug.Assert(v.NewValue != null);
-                ApplyToAllDifficulties.Value = v.NewValue.Value;
-            };
-
+            popover.ApplyToAllDifficulties.BindTo(ApplyToAllDifficulties);
             return popover;
         }
 
@@ -54,7 +48,7 @@ namespace osu.Game.Screens.Edit.Setup
         {
             private readonly bool beatmapHasMultipleDifficulties;
 
-            public readonly Bindable<bool?> ApplyToAllDifficulties = new Bindable<bool?>();
+            public readonly Bindable<bool> ApplyToAllDifficulties = new Bindable<bool>(true);
 
             private Container selectApplicationScopeContainer = null!;
 
@@ -115,7 +109,11 @@ namespace osu.Game.Screens.Edit.Setup
                                             Origin = Anchor.Centre,
                                             Width = 300f,
                                             Text = "Apply to all difficulties",
-                                            Action = () => ApplyToAllDifficulties.Value = true,
+                                            Action = () =>
+                                            {
+                                                ApplyToAllDifficulties.Value = true;
+                                                updateFileSelection();
+                                            },
                                             BackgroundColour = colours.Red2,
                                         },
                                         new RoundedButton
@@ -124,7 +122,11 @@ namespace osu.Game.Screens.Edit.Setup
                                             Origin = Anchor.Centre,
                                             Width = 300f,
                                             Text = "Only apply to this difficulty",
-                                            Action = () => ApplyToAllDifficulties.Value = false,
+                                            Action = () =>
+                                            {
+                                                ApplyToAllDifficulties.Value = false;
+                                                updateFileSelection();
+                                            },
                                         },
                                     }
                                 }
@@ -132,12 +134,6 @@ namespace osu.Game.Screens.Edit.Setup
                         },
                     }
                 });
-            }
-
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-                ApplyToAllDifficulties.ValueChanged += onChangeScopeSelected;
             }
 
             protected override void OnFileSelected(FileInfo file)
@@ -148,11 +144,8 @@ namespace osu.Game.Screens.Edit.Setup
                     base.OnFileSelected(file);
             }
 
-            private void onChangeScopeSelected(ValueChangedEvent<bool?> c)
+            private void updateFileSelection()
             {
-                if (c.NewValue == null)
-                    return;
-
                 Debug.Assert(FileSelector.CurrentFile.Value != null);
                 base.OnFileSelected(FileSelector.CurrentFile.Value);
             }
