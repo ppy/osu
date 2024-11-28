@@ -144,10 +144,12 @@ namespace osu.Game.Overlays
 
         protected override void Dispose(bool isDisposing)
         {
-            base.Dispose(isDisposing);
-
+            // this event subscription fires async loads, which hard-fail if `CompositeDrawable.disposalCancellationSource` is canceled, which happens in the base call.
+            // therefore, unsubscribe from this event early to reduce the chances of a stray event firing at an inconvenient spot.
             if (api.IsNotNull())
                 api.NotificationsClient.MessageReceived -= handleMedalMessages;
+
+            base.Dispose(isDisposing);
         }
     }
 }
