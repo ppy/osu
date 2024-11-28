@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 
@@ -78,12 +79,14 @@ namespace osu.Game.Rulesets.Mods
             dho.ApplyCustomUpdateState += (o, state) =>
             {
                 // Increased visibility is applied to the entire first object, including all of its nested hitobjects.
-                if (IncreaseFirstObjectVisibility.Value && isObjectEqualToOrNestedIn(o.HitObject, FirstObject))
+                // TODO Not sure if this OverrideShowHitObject() is necessary, seems not beacause of pooling
+                if ((IncreaseFirstObjectVisibility.Value && isObjectEqualToOrNestedIn(o.HitObject, FirstObject)))
                     ApplyIncreasedVisibilityState(o, state);
                 else
                     ApplyNormalVisibilityState(o, state);
             };
         }
+
 
         /// <summary>
         /// Checks whether a given object is nested within a target.
