@@ -45,7 +45,9 @@ namespace osu.Game.Online.API.Requests.Responses
 
         public KudosuAction Action;
 
+#pragma warning disable CA1507 // Happens to name the same because of casing preference
         [JsonProperty("action")]
+#pragma warning restore CA1507
         private string action
         {
             set

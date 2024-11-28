@@ -666,10 +666,7 @@ namespace osu.Game.Utils
         {
             // 2020-10-07 jbialogrodzki #730 Since this is public API we should probably
             // handle null arguments? It doesn't seem to have been done consistently in this class though.
-            if (coefficients == null)
-            {
-                throw new ArgumentNullException(nameof(coefficients));
-            }
+            ArgumentNullException.ThrowIfNull(coefficients);
 
             // 2020-10-07 jbialogrodzki #730 Zero polynomials need explicit handling.
             // Without this check, we attempted to peek coefficients at negative indices!

@@ -25,6 +25,8 @@
     <AnalysisModeDocumentation>Recommended</AnalysisModeDocumentation>
     <AnalysisModeGlobalization>Recommended</AnalysisModeGlobalization>
     <AnalysisModeInteroperability>Recommended</AnalysisModeInteroperability>
+    <AnalysisModeMaintainability>Recommended</AnalysisModeMaintainability>
+    <AnalysisModeNaming>Default</AnalysisModeNaming>
   </PropertyGroup>
   <PropertyGroup Label="Documentation">
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
