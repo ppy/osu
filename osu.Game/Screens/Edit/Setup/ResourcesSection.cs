@@ -82,57 +82,12 @@ namespace osu.Game.Screens.Edit.Setup
             if (!source.Exists)
                 return false;
 
-            var set = working.Value.BeatmapSetInfo;
-
-            if (applyToAllDifficulties)
-            {
-                string newFilename = $@"bg{source.Extension}";
-
-                foreach (var beatmapInSet in set.Beatmaps)
-                {
-                    if (set.GetFile(beatmapInSet.Metadata.BackgroundFile) is RealmNamedFileUsage existingFile)
-                        beatmaps.DeleteFile(set, existingFile);
-
-                    if (beatmapInSet.Metadata.BackgroundFile != newFilename)
-                    {
-                        beatmapInSet.Metadata.BackgroundFile = newFilename;
-
-                        if (!beatmapInSet.Equals(working.Value.BeatmapInfo))
-                            beatmaps.Save(beatmapInSet, beatmaps.GetWorkingBeatmap(beatmapInSet).Beatmap);
-                    }
-                }
-            }
-            else
-            {
-                var beatmap = working.Value.BeatmapInfo;
-
-                string[] filenames = set.Files.Select(f => f.Filename).Where(f =>
-                    f.StartsWith(@"bg", StringComparison.OrdinalIgnoreCase) &&
-                    f.EndsWith(source.Extension, StringComparison.OrdinalIgnoreCase)).ToArray();
-
-                string currentFilename = working.Value.Metadata.BackgroundFile;
-
-                var oldFile = set.GetFile(currentFilename);
-                string? newFilename = null;
-
-                if (oldFile != null && set.Beatmaps.Where(b => !b.Equals(beatmap)).All(b => b.Metadata.BackgroundFile != currentFilename))
-                {
-                    beatmaps.DeleteFile(set, oldFile);
-                    newFilename = currentFilename;
-                }
-
-                newFilename ??= NamingUtils.GetNextBestFilename(filenames, $@"bg{source.Extension}");
-                working.Value.Metadata.BackgroundFile = newFilename;
-            }
-
-            using (var stream = source.OpenRead())
-                beatmaps.AddFile(set, stream, working.Value.Metadata.BackgroundFile);
-
-            editorBeatmap.SaveState();
+            changeResource(source, applyToAllDifficulties, @"bg",
+                metadata => metadata.BackgroundFile,
+                (metadata, name) => metadata.BackgroundFile = name);
 
             headerBackground.UpdateBackground();
             editor?.ApplyToBackground(bg => bg.RefreshBackground());
-
             return true;
         }
 
@@ -141,20 +96,34 @@ namespace osu.Game.Screens.Edit.Setup
             if (!source.Exists)
                 return false;
 
+            changeResource(source, applyToAllDifficulties, @"audio",
+                metadata => metadata.AudioFile,
+                (metadata, name) => metadata.AudioFile = name);
+
+            music.ReloadCurrentTrack();
+            return true;
+        }
+
+        private void changeResource(FileInfo source, bool applyToAllDifficulties, string baseFilename, Func<BeatmapMetadata, string> readFilename, Action<BeatmapMetadata, string> writeFilename)
+        {
             var set = working.Value.BeatmapSetInfo;
+
+            string newFilename = string.Empty;
 
             if (applyToAllDifficulties)
             {
-                string newFilename = $@"audio{source.Extension}";
+                newFilename = $"{baseFilename}{source.Extension}";
 
                 foreach (var beatmapInSet in set.Beatmaps)
                 {
-                    if (set.GetFile(beatmapInSet.Metadata.AudioFile) is RealmNamedFileUsage existingFile)
+                    string filenameInBeatmap = readFilename(beatmapInSet.Metadata);
+
+                    if (set.GetFile(filenameInBeatmap) is RealmNamedFileUsage existingFile)
                         beatmaps.DeleteFile(set, existingFile);
 
-                    if (beatmapInSet.Metadata.AudioFile != newFilename)
+                    if (filenameInBeatmap != newFilename)
                     {
-                        beatmapInSet.Metadata.AudioFile = newFilename;
+                        writeFilename(beatmapInSet.Metadata, newFilename);
 
                         if (!beatmapInSet.Equals(working.Value.BeatmapInfo))
                             beatmaps.Save(beatmapInSet, beatmaps.GetWorkingBeatmap(beatmapInSet).Beatmap);
@@ -166,31 +135,29 @@ namespace osu.Game.Screens.Edit.Setup
                 var beatmap = working.Value.BeatmapInfo;
 
                 string[] filenames = set.Files.Select(f => f.Filename).Where(f =>
-                    f.StartsWith(@"audio", StringComparison.OrdinalIgnoreCase) &&
+                    f.StartsWith(baseFilename, StringComparison.OrdinalIgnoreCase) &&
                     f.EndsWith(source.Extension, StringComparison.OrdinalIgnoreCase)).ToArray();
 
-                string currentFilename = working.Value.Metadata.AudioFile;
+                string currentFilename = readFilename(working.Value.Metadata);
 
                 var oldFile = set.GetFile(currentFilename);
-                string? newFilename = null;
 
-                if (oldFile != null && set.Beatmaps.Where(b => !b.Equals(beatmap)).All(b => b.Metadata.AudioFile != currentFilename))
+                if (oldFile != null && set.Beatmaps.Where(b => !b.Equals(beatmap)).All(b => readFilename(b.Metadata) != currentFilename))
                 {
                     beatmaps.DeleteFile(set, oldFile);
                     newFilename = currentFilename;
                 }
 
-                newFilename ??= NamingUtils.GetNextBestFilename(filenames, $@"audio{source.Extension}");
-                working.Value.Metadata.AudioFile = newFilename;
+                if (string.IsNullOrEmpty(newFilename))
+                    newFilename = NamingUtils.GetNextBestFilename(filenames, $@"{baseFilename}{source.Extension}");
+
+                writeFilename(working.Value.Metadata, newFilename);
             }
 
             using (var stream = source.OpenRead())
-                beatmaps.AddFile(set, stream, working.Value.Metadata.AudioFile);
+                beatmaps.AddFile(set, stream, newFilename);
 
             editorBeatmap.SaveState();
-            music.ReloadCurrentTrack();
-
-            return true;
         }
 
         private void backgroundChanged(ValueChangedEvent<FileInfo?> file)
