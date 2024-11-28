@@ -12,6 +12,7 @@ using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Input;
+using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Match;
@@ -31,6 +32,9 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         public override string ShortTitle => "playlist";
 
         private readonly IBindable<bool> isIdle = new BindableBool();
+
+        [Resolved]
+        private IAPIProvider api { get; set; } = null!;
 
         [Resolved(CanBeNull = true)]
         private IdleTracker? idleTracker { get; set; }
@@ -143,7 +147,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                             RequestResults = item =>
                                             {
                                                 Debug.Assert(Room.RoomID != null);
-                                                ParentScreen?.Push(new PlaylistItemUserResultsScreen(null, Room.RoomID.Value, item));
+                                                ParentScreen?.Push(new PlaylistItemUserBestResultsScreen(Room.RoomID.Value, item, api.LocalUser.Value.Id));
                                             }
                                         }
                                     },
