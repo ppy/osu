@@ -17,6 +17,7 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Screens.Edit;
+using osu.Game.Utils;
 
 namespace osu.Game.Beatmaps.Formats
 {
@@ -446,7 +447,7 @@ namespace osu.Game.Beatmaps.Formats
                         // Some very old beatmaps had incorrect type specifications for their backgrounds (ie. using 1 for VIDEO
                         // instead of 0 for BACKGROUND). To handle this gracefully, check the file extension against known supported
                         // video extensions and handle similar to a background if it doesn't match.
-                        if (!OsuGameBase.VIDEO_EXTENSIONS.Contains(Path.GetExtension(filename).ToLowerInvariant()))
+                        if (!SupportedExtensions.VIDEO_EXTENSIONS.Contains(Path.GetExtension(filename).ToLowerInvariant()))
                         {
                             beatmap.BeatmapInfo.Metadata.BackgroundFile = filename;
                             lineSupportedByEncoder = true;

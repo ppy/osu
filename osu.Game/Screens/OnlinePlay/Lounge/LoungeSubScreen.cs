@@ -379,6 +379,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             this.Push(CreateRoomSubScreen(room));
         }
 
+        public void RefreshRooms() => ListingPollingComponent.PollImmediately();
+
         private void updateLoadingLayer()
         {
             if (operationInProgress.Value || !ListingPollingComponent.InitialRoomsReceived.Value)

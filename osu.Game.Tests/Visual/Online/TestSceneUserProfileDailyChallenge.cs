@@ -37,7 +37,7 @@ namespace osu.Game.Tests.Visual.Online
             AddSliderStep("weekly best", 0, 250, 1, v => update(s => s.WeeklyStreakBest = v));
             AddSliderStep("top 10%", 0, 999, 0, v => update(s => s.Top10PercentPlacements = v));
             AddSliderStep("top 50%", 0, 999, 0, v => update(s => s.Top50PercentPlacements = v));
-            AddSliderStep("playcount", 0, 999, 0, v => update(s => s.PlayCount = v));
+            AddSliderStep("playcount", 0, 1500, 1, v => update(s => s.PlayCount = v));
             AddStep("create", () =>
             {
                 Clear();
@@ -66,8 +66,8 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestPlayCountRankingTier()
         {
-            AddAssert("1 before silver", () => DailyChallengeStatsTooltip.TierForPlayCount(30) == RankingTier.Bronze);
-            AddAssert("first silver", () => DailyChallengeStatsTooltip.TierForPlayCount(31) == RankingTier.Silver);
+            AddAssert("1 before silver", () => DailyChallengeStatsTooltip.TierForPlayCount(29) == RankingTier.Bronze);
+            AddAssert("first silver", () => DailyChallengeStatsTooltip.TierForPlayCount(30) == RankingTier.Silver);
         }
     }
 }
