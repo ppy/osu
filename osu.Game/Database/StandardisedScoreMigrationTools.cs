@@ -246,7 +246,7 @@ namespace osu.Game.Database
 
             // warning: ordering is important here - both total score and ranks are dependent on accuracy!
             score.Accuracy = ComputeAccuracy(score, scoreProcessor);
-            score.Rank = computeRank(score, scoreProcessor);
+            score.Rank = ComputeRank(score, scoreProcessor);
             (score.TotalScoreWithoutMods, score.TotalScore) = convertFromLegacyTotalScore(score, ruleset, beatmap);
         }
 
@@ -270,7 +270,7 @@ namespace osu.Game.Database
 
             // warning: ordering is important here - both total score and ranks are dependent on accuracy!
             score.Accuracy = ComputeAccuracy(score, scoreProcessor);
-            score.Rank = computeRank(score, scoreProcessor);
+            score.Rank = ComputeRank(score, scoreProcessor);
             (score.TotalScoreWithoutMods, score.TotalScore) = convertFromLegacyTotalScore(score, ruleset, difficulty, attributes);
         }
 
@@ -636,6 +636,9 @@ namespace osu.Game.Database
 
         public static ScoreRank ComputeRank(ScoreInfo scoreInfo) =>
             ComputeRank(scoreInfo.Accuracy, scoreInfo.Statistics, scoreInfo.Mods, scoreInfo.Ruleset.CreateInstance().CreateScoreProcessor());
+
+        public static ScoreRank ComputeRank(ScoreInfo scoreInfo, ScoreProcessor processor) =>
+            ComputeRank(scoreInfo.Accuracy, scoreInfo.Statistics, scoreInfo.Mods, processor);
 
         public static ScoreRank ComputeRank(double accuracy, IReadOnlyDictionary<HitResult, int> statistics, IList<Mod> mods, ScoreProcessor scoreProcessor)
         {
