@@ -9,9 +9,11 @@ using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
-using osu.Game.Online.API;
+using osu.Game.Online;
 using osu.Game.Rulesets;
+using osu.Game.Users;
 
 namespace osu.Game.Beatmaps
 {
@@ -21,18 +23,63 @@ namespace osu.Game.Beatmaps
     /// </summary>
     public partial class DifficultyRecommender : Component
     {
-        [Resolved]
-        private IAPIProvider api { get; set; }
+        private readonly LocalUserStatisticsProvider statisticsProvider;
 
         [Resolved]
-        private Bindable<RulesetInfo> ruleset { get; set; }
+        private Bindable<RulesetInfo> gameRuleset { get; set; }
+
+        [Resolved]
+        private RulesetStore rulesets { get; set; } = null!;
 
         private readonly Dictionary<string, double> recommendedDifficultyMapping = new Dictionary<string, double>();
+
+        /// <returns>
+        /// Rulesets ordered descending by their respective recommended difficulties.
+        /// The currently selected ruleset will always be first.
+        /// </returns>
+        private IEnumerable<string> orderedRulesets
+        {
+            get
+            {
+                if (LoadState < LoadState.Ready || gameRuleset.Value == null)
+                    return Enumerable.Empty<string>();
+
+                return recommendedDifficultyMapping
+                       .OrderByDescending(pair => pair.Value)
+                       .Select(pair => pair.Key)
+                       .Where(r => !r.Equals(gameRuleset.Value.ShortName, StringComparison.Ordinal))
+                       .Prepend(gameRuleset.Value.ShortName);
+            }
+        }
+
+        public DifficultyRecommender(LocalUserStatisticsProvider statisticsProvider)
+        {
+            this.statisticsProvider = statisticsProvider;
+        }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            api.LocalUser.BindValueChanged(_ => populateValues(), true);
+            foreach (var ruleset in rulesets.AvailableRulesets)
+            {
+                if (statisticsProvider.GetStatisticsFor(ruleset) is UserStatistics statistics)
+                    updateMapping(ruleset, statistics);
+            }
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            statisticsProvider.StatisticsUpdated += onStatisticsUpdated;
+        }
+
+        private void onStatisticsUpdated(UserStatisticsUpdate update) => updateMapping(update.Ruleset, update.NewStatistics);
+
+        private void updateMapping(RulesetInfo ruleset, UserStatistics statistics)
+        {
+            // algorithm taken from https://github.com/ppy/osu-web/blob/e6e2825516449e3d0f3f5e1852c6bdd3428c3437/app/Models/User.php#L1505
+            recommendedDifficultyMapping[ruleset.ShortName] = Math.Pow((double)(statistics.PP ?? 0), 0.4) * 0.195;
         }
 
         /// <summary>
@@ -64,35 +111,12 @@ namespace osu.Game.Beatmaps
             return null;
         }
 
-        private void populateValues()
+        protected override void Dispose(bool isDisposing)
         {
-            if (api.LocalUser.Value.RulesetsStatistics == null)
-                return;
+            if (statisticsProvider.IsNotNull())
+                statisticsProvider.StatisticsUpdated -= onStatisticsUpdated;
 
-            foreach (var kvp in api.LocalUser.Value.RulesetsStatistics)
-            {
-                // algorithm taken from https://github.com/ppy/osu-web/blob/e6e2825516449e3d0f3f5e1852c6bdd3428c3437/app/Models/User.php#L1505
-                recommendedDifficultyMapping[kvp.Key] = Math.Pow((double)(kvp.Value.PP ?? 0), 0.4) * 0.195;
-            }
-        }
-
-        /// <returns>
-        /// Rulesets ordered descending by their respective recommended difficulties.
-        /// The currently selected ruleset will always be first.
-        /// </returns>
-        private IEnumerable<string> orderedRulesets
-        {
-            get
-            {
-                if (LoadState < LoadState.Ready || ruleset.Value == null)
-                    return Enumerable.Empty<string>();
-
-                return recommendedDifficultyMapping
-                       .OrderByDescending(pair => pair.Value)
-                       .Select(pair => pair.Key)
-                       .Where(r => !r.Equals(ruleset.Value.ShortName, StringComparison.Ordinal))
-                       .Prepend(ruleset.Value.ShortName);
-            }
+            base.Dispose(isDisposing);
         }
     }
 }
