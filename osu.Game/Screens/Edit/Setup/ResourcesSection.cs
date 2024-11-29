@@ -54,9 +54,7 @@ namespace osu.Game.Screens.Edit.Setup
                     Caption = GameplaySettingsStrings.BackgroundHeader,
                     PlaceholderText = EditorSetupStrings.ClickToSelectBackground,
                 },
-                // `SupportedExtensions.AUDIO_EXTENSIONS` not used here specifically because it includes `.wav` for samples, which is strictly disallowed by ranking criteria
-                // (https://osu.ppy.sh/wiki/en/Ranking_criteria#audio)
-                audioTrackChooser = new FormFileSelector(@".mp3", @".ogg")
+                audioTrackChooser = new FormFileSelector(SupportedExtensions.AUDIO_EXTENSIONS)
                 {
                     Caption = EditorSetupStrings.AudioTrack,
                     PlaceholderText = EditorSetupStrings.ClickToSelectTrack,
