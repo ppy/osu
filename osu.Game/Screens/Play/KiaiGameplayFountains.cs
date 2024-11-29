@@ -5,8 +5,10 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Utils;
+using osu.Game.Configuration;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.Containers;
 using osu.Game.Screens.Menu;
@@ -18,9 +20,13 @@ namespace osu.Game.Screens.Play
         private StarFountain leftFountain = null!;
         private StarFountain rightFountain = null!;
 
+        private Bindable<bool> kiaiStarFountains = null!;
+
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuConfigManager config)
         {
+            kiaiStarFountains = config.GetBindable<bool>(OsuSetting.StarFountains);
+
             RelativeSizeAxes = Axes.Both;
 
             Children = new[]
@@ -47,6 +53,9 @@ namespace osu.Game.Screens.Play
         protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
         {
             base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
+
+            if (!kiaiStarFountains.Value)
+                return;
 
             if (effectPoint.KiaiMode && !isTriggered)
             {
