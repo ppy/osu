@@ -10,6 +10,7 @@ using osu.Game.Beatmaps.Legacy;
 using osu.Game.IO;
 using osu.Game.Storyboards;
 using osu.Game.Storyboards.Commands;
+using osu.Game.Utils;
 using osuTK;
 using osuTK.Graphics;
 
@@ -112,7 +113,7 @@ namespace osu.Game.Beatmaps.Formats
                         //
                         // This avoids potential weird crashes when ffmpeg attempts to parse an image file as a video
                         // (see https://github.com/ppy/osu/issues/22829#issuecomment-1465552451).
-                        if (!OsuGameBase.VIDEO_EXTENSIONS.Contains(Path.GetExtension(path).ToLowerInvariant()))
+                        if (!SupportedExtensions.VIDEO_EXTENSIONS.Contains(Path.GetExtension(path).ToLowerInvariant()))
                             break;
 
                         storyboard.GetLayer("Video").Add(storyboardSprite = new StoryboardVideo(path, offset));

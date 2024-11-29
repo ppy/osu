@@ -8,6 +8,7 @@ using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Storyboards.Drawables;
+using osu.Game.Utils;
 
 namespace osu.Game.Storyboards
 {
@@ -97,8 +98,6 @@ namespace osu.Game.Storyboards
         public virtual DrawableStoryboard CreateDrawable(IReadOnlyList<Mod>? mods = null) =>
             new DrawableStoryboard(this, mods);
 
-        private static readonly string[] image_extensions = { @".png", @".jpg" };
-
         public virtual string? GetStoragePathFromStoryboardPath(string path)
         {
             string? resolvedPath = null;
@@ -110,7 +109,7 @@ namespace osu.Game.Storyboards
             else
             {
                 // Some old storyboards don't include a file extension, so let's best guess at one.
-                foreach (string ext in image_extensions)
+                foreach (string ext in SupportedExtensions.IMAGE_EXTENSIONS)
                 {
                     if ((resolvedPath = BeatmapInfo.BeatmapSet?.GetPathForFile($"{path}{ext}")) != null)
                         break;
