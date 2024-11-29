@@ -91,12 +91,12 @@ namespace osu.Game.Tests.Visual.Ranking
             UserStatisticsWatcher userStatisticsWatcher = null!;
             ScoreInfo score = null!;
 
-            AddStep("create user statistics watcher", () => Add(userStatisticsWatcher = new UserStatisticsWatcher()));
+            AddStep("create user statistics watcher", () => Add(userStatisticsWatcher = new UserStatisticsWatcher(new LocalUserStatisticsProvider())));
             AddStep("set user statistics update", () =>
             {
                 score = TestResources.CreateTestScoreInfo();
                 score.OnlineID = 1234;
-                ((Bindable<UserStatisticsUpdate>)userStatisticsWatcher.LatestUpdate).Value = new UserStatisticsUpdate(score,
+                ((Bindable<ScoreBasedUserStatisticsUpdate>)userStatisticsWatcher.LatestUpdate).Value = new ScoreBasedUserStatisticsUpdate(score,
                     new UserStatistics
                     {
                         Level = new UserStatistics.LevelInfo
@@ -157,7 +157,7 @@ namespace osu.Game.Tests.Visual.Ranking
                 Score = { Value = score },
                 DisplayedUserStatisticsUpdate =
                 {
-                    Value = new UserStatisticsUpdate(score, new UserStatistics
+                    Value = new ScoreBasedUserStatisticsUpdate(score, new UserStatistics
                     {
                         Level = new UserStatistics.LevelInfo
                         {
