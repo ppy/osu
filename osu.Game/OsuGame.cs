@@ -195,7 +195,8 @@ namespace osu.Game
 
         private MainMenu menuScreen;
 
-        private VersionManager versionManager;
+        [CanBeNull]
+        private DevBuildBanner devBuildBanner;
 
         [CanBeNull]
         private IntroScreen introScreen;
@@ -1055,10 +1056,7 @@ namespace osu.Game
             }, topMostOverlayContent.Add);
 
             if (!IsDeployedBuild)
-            {
-                dependencies.Cache(versionManager = new VersionManager());
-                loadComponentSingleFile(versionManager, ScreenContainer.Add);
-            }
+                loadComponentSingleFile(devBuildBanner = new DevBuildBanner(), ScreenContainer.Add);
 
             loadComponentSingleFile(osuLogo, _ =>
             {
@@ -1564,12 +1562,12 @@ namespace osu.Game
             {
                 case IntroScreen intro:
                     introScreen = intro;
-                    versionManager?.Show();
+                    devBuildBanner?.Show();
                     break;
 
                 case MainMenu menu:
                     menuScreen = menu;
-                    versionManager?.Show();
+                    devBuildBanner?.Show();
                     break;
 
                 case Player player:
@@ -1577,7 +1575,7 @@ namespace osu.Game
                     break;
 
                 default:
-                    versionManager?.Hide();
+                    devBuildBanner?.Hide();
                     break;
             }
 
