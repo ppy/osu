@@ -19,6 +19,6 @@ namespace osu.Game.Graphics.Containers.Markdown
         }
 
         protected override ImageContainer CreateImageContainer(string url)
-            => base.CreateImageContainer($@"https://osu.ppy.sh/beatmapsets/discussions/media-url?url={url}");
+            => base.CreateImageContainer($@"https://osu.ppy.sh/media-url?url={url}");
     }
 }
