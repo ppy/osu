@@ -35,6 +35,7 @@ using osu.Game.Screens.Edit.Components.Menus;
 using osu.Game.Skinning;
 using osu.Framework.Graphics.Cursor;
 using osu.Game.Input.Bindings;
+using osu.Game.Utils;
 
 namespace osu.Game.Overlays.SkinEditor
 {
@@ -709,7 +710,7 @@ namespace osu.Game.Overlays.SkinEditor
 
         Task ICanAcceptFiles.Import(ImportTask[] tasks, ImportParameters parameters) => throw new NotImplementedException();
 
-        public IEnumerable<string> HandledExtensions => new[] { ".jpg", ".jpeg", ".png" };
+        public IEnumerable<string> HandledExtensions => SupportedExtensions.IMAGE_EXTENSIONS;
 
         #endregion
 
