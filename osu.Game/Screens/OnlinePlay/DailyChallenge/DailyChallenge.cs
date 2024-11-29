@@ -345,7 +345,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
         private void presentScore(long id)
         {
             if (this.IsCurrentScreen())
-                this.Push(new PlaylistItemScoreResultsScreen(room.RoomID!.Value, playlistItem, id));
+                this.Push(new PlaylistItemScoreResultsScreen(id, room.RoomID!.Value, playlistItem));
         }
 
         private void onRoomScoreSet(MultiplayerRoomScoreSetEvent e)
