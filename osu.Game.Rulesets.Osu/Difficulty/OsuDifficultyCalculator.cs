@@ -41,6 +41,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double speedRating = Math.Sqrt(skills[2].DifficultyValue()) * difficulty_multiplier;
             double speedNotes = ((Speed)skills[2]).RelevantNoteCount();
 
+
+            double staminaRating = Math.Sqrt(skills.First(x=> x is Stamina).DifficultyValue()) * difficulty_multiplier;
+            speedRating += staminaRating;
+
             double flashlightRating = 0.0;
 
             if (mods.Any(h => h is OsuModFlashlight))
@@ -143,6 +147,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             if (mods.Any(h => h is OsuModFlashlight))
                 skills.Add(new Flashlight(mods));
+
+            skills.Add(new Stamina(mods));
 
             return skills.ToArray();
         }
