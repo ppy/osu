@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using osu.Game.Utils;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Utils
 {
@@ -70,7 +71,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Utils
         /// <param name="bins">The bins of difficulties in the map.</param>
         /// <param name="skill">The skill level to get the miss probabilities with.</param>
         /// /// <param name="hitProbability">Converts difficulties and skill to miss probabilities.</param>
-        public PoissonBinomial(Bin[] bins, double skill, Func<double, double, double> hitProbability)
+        public PoissonBinomial(List<Bin> bins, double skill, Func<double, double, double> hitProbability)
         {
             double variance = 0;
             double gamma = 0;

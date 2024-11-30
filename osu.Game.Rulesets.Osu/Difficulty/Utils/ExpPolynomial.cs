@@ -4,13 +4,22 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Game.Utils;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Utils
 {
+    /// <summary>
+    /// Represents a polynomial fitted to the logarithm of a given set of points.
+    /// The resulting polynomial is exponentiated, ensuring low residuals for
+    /// small inputs while handling exponentially increasing trends in the data.
+    /// This approach is useful for modelling the results of decreasing skill with few coefficients,
+    /// as linear decreases in skill correspond with exponential increases in miss counts.
+    /// </summary>
     public struct ExpPolynomial
     {
         private double[]? coefficients;
 
+        // The matrix that minimizes the square error at X values [0.0, 0.30, 0.60, 0.80, 0.90, 0.95, 1.0].
         private static readonly double[][] matrix =
         {
             new[] { 0.0, 3.14395, 5.18439, 6.46975, 1.4638, -9.53526, 0.0 },
@@ -18,14 +27,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Utils
         };
 
         /// <summary>
-        /// Computes a quartic or cubic function that starts at 0 and ends at the highest judgement count in the array.
+        /// Computes the coefficients of a quartic polynomial, starting at 0 and ending at the highest miss count in the array.
         /// </summary>
-        /// <param name="judgementCounts">A list of judgements, with X values [0.0, 0.05, ..., 0.95, 1.0].</param>
-        public void Fit(double[] judgementCounts)
+        /// <param name="missCounts">A list of miss counts, with X values [1, 0.95, 0.9, 0.8, 0.6, 0.3, 0] corresponding to their skill levels.</param>
+        public void Fit(double[] missCounts)
         {
-            List<double> logMissCounts = judgementCounts.Select(x => Math.Log(x + 1)).ToList();
+            List<double> logMissCounts = missCounts.Select(x => Math.Log(x + 1)).ToList();
 
-            // The polynomial will pass through the point (1, endPoint).
             double endPoint = logMissCounts.Max();
 
             double[] penalties = { 1, 0.95, 0.9, 0.8, 0.6, 0.3, 0 };
@@ -35,14 +43,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Utils
                 logMissCounts[i] -= endPoint * (1 - penalties[i]);
             }
 
-            // The precomputed matrix assumes the misscounts go in order of greatest to least.
+            // The precomputed matrix assumes the miss counts go in order of greatest to least.
             logMissCounts.Reverse();
 
-            coefficients = new double[3];
+            coefficients = new double[4];
 
-            coefficients[2] = endPoint;
+            coefficients[3] = endPoint;
 
-            // Now we dot product the adjusted misscounts with the precomputed matrix.
+            // Now we dot product the adjusted miss counts with the precomputed matrix.
             for (int row = 0; row < matrix.Length; row++)
             {
                 for (int column = 0; column < matrix[row].Length; column++)
@@ -57,7 +65,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Utils
         /// <summary>
         /// Solve for the miss penalty at a specified miss count.
         /// </summary>
-        /// <returns>The penalty value at the specified miss count.</returns>
         public double GetPenaltyAt(double missCount)
         {
             if (coefficients is null)
@@ -69,9 +76,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Utils
             List<double?> xVals = SpecialFunctions.SolvePolynomialRoots(listCoefficients);
 
             const double max_error = 1e-7;
-            double? largestValue = xVals.Where(x => x >= 0 - max_error && x <= 1 + max_error).OrderDescending().FirstOrDefault();
 
-            return largestValue != null ? Math.Clamp(largestValue.Value, 0, 1) : 1;
+            // We find the largest value of x (corresponding to the penalty) found as a root of the function, with a fallback of a 100% penalty if no roots were found.
+            double largestValue = xVals.Where(x => x >= 0 - max_error && x <= 1 + max_error).OrderDescending().FirstOrDefault() ?? 1;
+
+            return Math.Clamp(largestValue, 0, 1);
         }
     }
 }

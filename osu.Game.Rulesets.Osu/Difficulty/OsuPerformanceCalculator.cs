@@ -306,14 +306,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return flashlightValue;
         }
 
-        // The miss penalty formulas assume that a player will miss on the hardest parts of a map.
-        // With the curve fitted miss penalty, we use a pre-computed curve of skill levels for each
-        // miss count, raised to the power of 1.5 to account for skill -> sr -> pp changing the exponent.
+        // Due to the unavailability of miss location in PP, the following formulas assume that a player will miss on the hardest parts of a map.
+
+        // With the curve fitted miss penalty, we use a pre-computed curve of skill levels for each miss count, raised to the power of 1.5 as
+        // the multiple of the exponents on star rating and PP. This power should be changed if either SR or PP begin to use a different exponent.
+        // As a result, this exponent is not subject to balance.
         private double calculateCurveFittedMissPenalty(double missCount, ExpPolynomial curve) => Math.Pow(1 - curve.GetPenaltyAt(missCount), 1.5);
 
-        // With the strain count miss penalty, we use the amount of relatively difficult sections to
-        // adjust miss penalty to make it more punishing on maps with lower amount of hard sections.
-        private double calculateStrainCountMissPenalty(double missCount, double difficultStrainCount) => 0.96 / ((missCount / (4 * Math.Pow(Math.Log(difficultStrainCount), 0.94))) + 1);
+        // With the strain count miss penalty, we use the amount of relatively difficult sections to adjust the miss penalty,
+        // to make it more punishing on maps with lower amount of hard sections. This formula is subject to balance.
+        private double calculateStrainCountMissPenalty(double missCount, double difficultStrainCount) => 0.96 / (missCount / (4 * Math.Pow(Math.Log(difficultStrainCount), 0.94)) + 1);
 
         private double getComboScalingFactor(OsuDifficultyAttributes attributes) => attributes.MaxCombo <= 0 ? 1.0 : Math.Min(Math.Pow(scoreMaxCombo, 0.8) / Math.Pow(attributes.MaxCombo, 0.8), 1.0);
         private int totalHits => countGreat + countOk + countMeh + countMiss;

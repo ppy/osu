@@ -11,16 +11,22 @@ using osu.Game.Rulesets.Osu.Difficulty.Utils;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Aggregation
 {
-    public abstract class OsuProbSkill : Skill
+    public abstract class OsuProbabilitySkill : Skill
     {
-        protected OsuProbSkill(Mod[] mods)
+        protected OsuProbabilitySkill(Mod[] mods)
             : base(mods)
         {
         }
 
-        /// The skill level returned from this class will have FcProbability chance of hitting every note correctly.
-        /// A higher value rewards short, high difficulty sections, whereas a lower value rewards consistent, lower difficulty.
-        protected abstract double FcProbability { get; }
+        // We assume players have a 2% chance to hit every note in the map.
+        // A higher value of fc_probability increases the influence of difficulty spikes,
+        // while a lower value increases the influence of length and consistent difficulty.
+        private const double fc_probability = 0.02;
+
+        private const int bin_count = 32;
+
+        // The number of difficulties there must be before we can be sure that binning difficulties would not change the output significantly.
+        private double binThreshold => 2 * bin_count;
 
         private readonly List<double> difficulties = new List<double>();
 
@@ -36,32 +42,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Aggregation
 
         protected abstract double HitProbability(double skill, double difficulty);
 
-        private double difficultyValueBinned()
-        {
-            double maxDiff = difficulties.Max();
-            if (maxDiff <= 1e-10) return 0;
-
-            var bins = Bin.CreateBins(difficulties);
-
-            const double lower_bound = 0;
-            double upperBoundEstimate = 3.0 * maxDiff;
-
-            double skill = RootFinding.FindRootExpand(
-                skill => fcProbability(skill) - FcProbability,
-                lower_bound,
-                upperBoundEstimate,
-                accuracy: 1e-4);
-
-            return skill;
-
-            double fcProbability(double s)
-            {
-                if (s <= 0) return 0;
-
-                return bins.Aggregate(1.0, (current, bin) => current * Math.Pow(HitProbability(s, bin.Difficulty), bin.Count));
-            }
-        }
-
         private double difficultyValueExact()
         {
             double maxDiff = difficulties.Max();
@@ -71,7 +51,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Aggregation
             double upperBoundEstimate = 3.0 * maxDiff;
 
             double skill = RootFinding.FindRootExpand(
-                skill => fcProbability(skill) - FcProbability,
+                skill => fcProbability(skill) - fc_probability,
                 lower_bound,
                 upperBoundEstimate,
                 accuracy: 1e-4);
@@ -86,32 +66,56 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Aggregation
             }
         }
 
-        public override double DifficultyValue()
+        private double difficultyValueBinned()
         {
-            if (difficulties.Count == 0)
-                return 0;
+            double maxDiff = difficulties.Max();
+            if (maxDiff <= 1e-10) return 0;
 
-            return difficulties.Count < 64 ? difficultyValueExact() : difficultyValueBinned();
+            var bins = Bin.CreateBins(difficulties, bin_count);
+
+            const double lower_bound = 0;
+            double upperBoundEstimate = 3.0 * maxDiff;
+
+            double skill = RootFinding.FindRootExpand(
+                skill => fcProbability(skill) - fc_probability,
+                lower_bound,
+                upperBoundEstimate,
+                accuracy: 1e-4);
+
+            return skill;
+
+            double fcProbability(double s)
+            {
+                if (s <= 0) return 0;
+
+                return bins.Aggregate(1.0, (current, bin) => current * Math.Pow(HitProbability(s, bin.Difficulty), bin.Count));
+            }
         }
 
-        /// <summary>
-        /// The coefficients of a quartic fitted to the miss counts at each skill level.
-        /// </summary>
-        /// <returns>The coefficients for ax^4+bx^3+cx^2. The 4th coefficient for dx^1 can be deduced from the first 3 in the performance calculator.</returns>
+        public override double DifficultyValue()
+        {
+            if (difficulties.Count == 0) return 0;
+
+            return difficulties.Count > binThreshold ? difficultyValueBinned() : difficultyValueExact();
+        }
+
+        /// <returns>
+        /// A polynomial fitted to the miss counts at each skill level.
+        /// </returns>
         public ExpPolynomial GetMissPenaltyCurve()
         {
             double[] missCounts = new double[7];
             double[] penalties = { 1, 0.95, 0.9, 0.8, 0.6, 0.3, 0 };
 
+            ExpPolynomial missPenaltyCurve = new ExpPolynomial();
+
+            // If there are no notes, we just return the curve with all coefficients set to zero.
+            if (difficulties.Count == 0 || difficulties.Max() == 0)
+                return missPenaltyCurve;
+
             double fcSkill = DifficultyValue();
 
-            ExpPolynomial curve = new ExpPolynomial();
-
-            // If there are no notes, we just return the empty polynomial.
-            if (difficulties.Count == 0 || difficulties.Max() == 0)
-                return curve;
-
-            var bins = Bin.CreateBins(difficulties);
+            var bins = Bin.CreateBins(difficulties, bin_count);
 
             for (int i = 0; i < penalties.Length; i++)
             {
@@ -126,15 +130,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Aggregation
                 missCounts[i] = getMissCountAtSkill(penalizedSkill, bins);
             }
 
-            curve.Fit(missCounts);
+            missPenaltyCurve.Fit(missCounts);
 
-            return curve;
+            return missPenaltyCurve;
         }
 
         /// <summary>
-        /// Find the lowest misscount that a player with the provided <paramref name="skill"/> would have a 2% chance of achieving.
+        /// Find the lowest miss count that a player with the provided <paramref name="skill"/> would have a 2% chance of achieving or better.
         /// </summary>
-        private double getMissCountAtSkill(double skill, Bin[] bins)
+        private double getMissCountAtSkill(double skill, List<Bin> bins)
         {
             double maxDiff = difficulties.Max();
 
@@ -143,9 +147,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Aggregation
             if (skill <= 0)
                 return difficulties.Count;
 
-            var poiBin = difficulties.Count > 64 ? new PoissonBinomial(bins, skill, HitProbability) : new PoissonBinomial(difficulties, skill, HitProbability);
+            var poiBin = difficulties.Count > binThreshold ? new PoissonBinomial(bins, skill, HitProbability) : new PoissonBinomial(difficulties, skill, HitProbability);
 
-            return Math.Max(0, RootFinding.FindRootExpand(x => poiBin.CDF(x) - FcProbability, -50, 1000, accuracy: 1e-4));
+            return Math.Max(0, RootFinding.FindRootExpand(x => poiBin.CDF(x) - fc_probability, -50, 1000, accuracy: 1e-4));
         }
     }
 }

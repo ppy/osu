@@ -18,12 +18,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Utils
         /// <param name="maxIterations">The maximum number of iterations before the function throws an error.</param>
         /// <param name="accuracy">The desired precision in which the root is returned.</param>
         /// <param name="expansionFactor">The multiplier on the upper bound when no root is found within the provided bounds.</param>
-        public static double FindRootExpand(Func<double, double> function, double guessLowerBound, double guessUpperBound, int maxIterations = 25, double accuracy = 1e-6D, double expansionFactor = 2)
+        /// <param name="maxExpansions">The maximum number of times the bounds of the function should increase.</param>
+        public static double FindRootExpand(Func<double, double> function, double guessLowerBound, double guessUpperBound, int maxIterations = 25, double accuracy = 1e-6D, double expansionFactor = 2, double maxExpansions = 32)
         {
             double a = guessLowerBound;
             double b = guessUpperBound;
             double fa = function(a);
             double fb = function(b);
+
+            int expansions = 0;
 
             while (fa * fb > 0)
             {
@@ -31,6 +34,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Utils
                 b *= expansionFactor;
                 fa = function(a);
                 fb = function(b);
+
+                expansions++;
+
+                if (expansions > maxExpansions)
+                {
+                    throw new MaximumIterationsException("No root was found within the provided function.");
+                }
             }
 
             double t = 0.5;
@@ -96,6 +106,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Utils
             }
 
             return 0;
+        }
+
+        private class MaximumIterationsException : Exception
+        {
+            public MaximumIterationsException(string message)
+                : base(message)
+            {
+            }
         }
     }
 }

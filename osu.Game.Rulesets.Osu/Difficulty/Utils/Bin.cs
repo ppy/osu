@@ -12,27 +12,25 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Utils
         public double Difficulty;
         public double Count;
 
-        private const int bin_count = 32;
-
         /// <summary>
-        /// Create an array of equally spaced bins. Count is linearly interpolated into each bin.
+        /// Create an array of spaced bins. Count is linearly interpolated into each bin.
         /// For example, if we have bins with values [1,2,3,4,5] and want to insert the value 3.2,
         /// we will add 0.8 to the count of 3's and 0.2 to the count of 4's
         /// </summary>
-        public static Bin[] CreateBins(List<double> difficulties)
+        public static List<Bin> CreateBins(List<double> difficulties, int totalBins)
         {
             double maxDifficulty = difficulties.Max();
 
-            var bins = new Bin[bin_count];
+            var binsArray = new Bin[totalBins];
 
-            for (int i = 0; i < bin_count; i++)
+            for (int i = 0; i < totalBins; i++)
             {
-                bins[i].Difficulty = maxDifficulty * (i + 1) / bin_count;
+                binsArray[i].Difficulty = maxDifficulty * (i + 1) / totalBins;
             }
 
             foreach (double d in difficulties)
             {
-                double binIndex = bin_count * (d / maxDifficulty) - 1;
+                double binIndex = totalBins * (d / maxDifficulty) - 1;
 
                 int lowerBound = (int)Math.Floor(binIndex);
                 double t = binIndex - lowerBound;
@@ -41,19 +39,24 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Utils
                 //We don't store that since it doesn't contribute to difficulty
                 if (lowerBound >= 0)
                 {
-                    bins[lowerBound].Count += (1 - t);
+                    binsArray[lowerBound].Count += (1 - t);
                 }
 
                 int upperBound = lowerBound + 1;
 
                 // this can be == bin_count for the maximum difficulty object, in which case t will be 0 anyway
-                if (upperBound < bin_count)
+                if (upperBound < totalBins)
                 {
-                    bins[upperBound].Count += t;
+                    binsArray[upperBound].Count += t;
                 }
             }
 
-            return bins;
+            var binsList = binsArray.ToList();
+
+            // For a slight performance improvement, we remove bins that don't contribute to difficulty.
+            binsList.RemoveAll(bin => bin.Count == 0);
+
+            return binsList;
         }
     }
 }
