@@ -15,33 +15,36 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     /// </summary>
     public class Speed : OsuStrainSkill
     {
-        private double skillMultiplier => 1.400;
-        private double strainDecayBase => 0.2;
+        private double totalMultiplier => 0.99;
+        private double burstMultiplier => 2.0;
+        private double staminaMultiplier => 0.014;
 
-        private double currentStrain;
+        private double currentBurstStrain;
+        private double currentStaminaStrain;
         private double currentRhythm;
-
-        protected override int ReducedSectionCount => 5;
 
         public Speed(Mod[] mods)
             : base(mods)
         {
         }
 
-        private double strainDecay(double ms) => Math.Pow(strainDecayBase, ms / 1000);
+        private double strainDecayBurst(double ms) => Math.Pow(0.1, ms / 1000);
+        private double strainDecayStamina(double ms) => Math.Pow(0.985, ms / 1000);
 
-        protected override double CalculateInitialStrain(double time, DifficultyHitObject current) => (currentStrain * currentRhythm) * strainDecay(time - current.Previous(0).StartTime);
+        protected override double CalculateInitialStrain(double time, DifficultyHitObject current) => (currentBurstStrain * currentRhythm) * strainDecayBurst(time - current.Previous(0).StartTime);
 
         protected override double StrainValueAt(DifficultyHitObject current)
         {
-            currentStrain *= strainDecay(((OsuDifficultyHitObject)current).StrainTime);
-            currentStrain += SpeedEvaluator.EvaluateDifficultyOf(current) * skillMultiplier;
-
+            currentBurstStrain *= strainDecayBurst(((OsuDifficultyHitObject)current).StrainTime);
             currentRhythm = RhythmEvaluator.EvaluateDifficultyOf(current);
+            currentBurstStrain += SpeedEvaluator.EvaluateDifficultyOf(current) * burstMultiplier * currentRhythm;
 
-            double totalStrain = currentStrain * currentRhythm;
+            currentStaminaStrain *= strainDecayStamina(((OsuDifficultyHitObject)current).StrainTime);
+            currentStaminaStrain += StaminaEvaluator.EvaluateDifficultyOf(current) * staminaMultiplier;
 
-            return totalStrain;
+            double combinedStrain = currentBurstStrain + currentStaminaStrain;
+
+            return combinedStrain * totalMultiplier;
         }
 
         public double RelevantNoteCount()
