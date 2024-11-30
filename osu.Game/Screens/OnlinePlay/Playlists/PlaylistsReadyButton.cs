@@ -88,13 +88,15 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
         private bool enoughTimeLeft()
         {
-            // this doesn't consider mods which apply variable rates, yet.
+            // TODO: This doesn't consider mods which apply variable rates, yet.
             double rate = ModUtils.CalculateRateWithMods(mods.Value);
 
-            double hitLength = Math.Round(gameBeatmap.Value.Track.Length / rate);
+            // We want to avoid users not being able to submit scores if they chose to not skip,
+            // so track length is chosen over playable length.
+            double trackLength = Math.Round(gameBeatmap.Value.Track.Length / rate);
 
-            // This should probably consider the length of the currently selected item, rather than a constant 30 seconds.
-            return room.EndDate != null && DateTimeOffset.UtcNow.AddSeconds(30).AddMilliseconds(hitLength) < room.EndDate;
+            // Additional 30 second delay added to account for load and/or submit time.
+            return room.EndDate != null && DateTimeOffset.UtcNow.AddSeconds(30).AddMilliseconds(trackLength) < room.EndDate;
         }
 
         protected override void Dispose(bool isDisposing)
