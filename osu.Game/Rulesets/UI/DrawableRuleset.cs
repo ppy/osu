@@ -16,6 +16,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Cursor;
@@ -184,8 +185,10 @@ namespace osu.Game.Rulesets.UI
         private OsuConfigManager config { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load(CancellationToken? cancellationToken)
+        private void load(CancellationToken? cancellationToken, AudioNormalizationManager audioNormalizationManager)
         {
+            audioContainer.AddAdjustment(AdjustableProperty.Volume, audioNormalizationManager.SampleNormalizeVolume);
+
             InternalChild = frameStabilityContainer = new FrameStabilityContainer(GameplayStartTime)
             {
                 FrameStablePlayback = FrameStablePlayback,

@@ -97,11 +97,6 @@ namespace osu.Game
         /// </summary>
         public const int SAMPLE_DEBOUNCE_TIME = 20;
 
-        /// <summary>
-        /// The maximum volume at which audio tracks should play back at. This can be set lower than 1 to create some head-room for sound effects.
-        /// </summary>
-        private const double global_track_volume_adjust = 0.8;
-
         public virtual bool UseDevelopmentServer => DebugUtils.IsDebugBuild;
 
         public virtual EndpointConfiguration CreateEndpoints() =>
@@ -215,6 +210,8 @@ namespace osu.Game
 
         protected SafeAreaContainer SafeAreaContainer { get; private set; }
 
+        protected AudioNormalizationManager AudioNormalizationManager { get; private set; }
+
         /// <summary>
         /// For now, this is used as a source specifically for beat synced components.
         /// Going forward, it could potentially be used as the single source-of-truth for beatmap timing.
@@ -226,8 +223,6 @@ namespace osu.Game
         private Container content;
 
         private DependencyContainer dependencies;
-
-        private readonly BindableNumber<double> globalTrackVolumeAdjust = new BindableNumber<double>(global_track_volume_adjust);
 
         private Bindable<string> frameworkLocale = null!;
 
@@ -351,11 +346,6 @@ namespace osu.Game
             RegisterImportHandler(ScoreManager);
             RegisterImportHandler(SkinManager);
 
-            // drop track volume game-wide to leave some head-room for UI effects / samples.
-            // this means that for the time being, gameplay sample playback is louder relative to the audio track, compared to stable.
-            // we may want to revisit this if users notice or complain about the difference (consider this a bit of a trial).
-            Audio.Tracks.AddAdjustment(AdjustableProperty.Volume, globalTrackVolumeAdjust);
-
             Beatmap = new NonNullableBindable<WorkingBeatmap>(defaultBeatmap);
 
             dependencies.CacheAs<IBindable<WorkingBeatmap>>(Beatmap);
@@ -374,6 +364,8 @@ namespace osu.Game
             PreviewTrackManager previewTrackManager;
             dependencies.Cache(previewTrackManager = new PreviewTrackManager(BeatmapManager.BeatmapTrackStore));
             base.Content.Add(previewTrackManager);
+
+            dependencies.Cache(AudioNormalizationManager = new AudioNormalizationManager(LocalConfig, Beatmap));
 
             base.Content.Add(MusicController = new MusicController());
             dependencies.CacheAs(MusicController);

@@ -12,6 +12,7 @@ using osu.Framework.Extensions;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
+using osu.Game.Audio;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Collections;
 using osu.Game.Database;
@@ -171,6 +172,23 @@ namespace osu.Game.Beatmaps
                 // this can happen in tests, mostly
                 if (!b.Ruleset.IsManaged)
                     b.Ruleset = realm.Find<RulesetInfo>(b.Ruleset.ShortName) ?? throw new ArgumentNullException(nameof(b.Ruleset));
+            }
+
+            foreach (BeatmapInfo beatmapInfo in beatmapSet.Beatmaps)
+            {
+                if (beatmapInfo.AudioNormalization != null) continue;
+
+                AudioNormalization audioNormalization = new AudioNormalization(beatmapInfo, beatmapSet, Files);
+
+                if (audioNormalization.IntegratedLoudness == null)
+                {
+                    Logger.Log($"Failed to calculate audio normalization values for {beatmapInfo.Metadata.Title} [{beatmapInfo.DifficultyName}]", LoggingTarget.Runtime, LogLevel.Error);
+                    continue;
+                }
+
+                beatmapInfo.AudioNormalization = audioNormalization;
+                beatmapInfo.AudioNormalization.PopulateSet(beatmapInfo, beatmapSet);
+                Logger.Log($"Processed loudness values for {beatmapInfo.Metadata.Title} [{beatmapInfo.DifficultyName}]");
             }
 
             validateOnlineIds(beatmapSet, realm);

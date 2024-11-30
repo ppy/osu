@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
+using osu.Game.Audio;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Collections;
 using osu.Game.Database;
@@ -40,6 +41,8 @@ namespace osu.Game.Beatmaps
         public BeatmapDifficulty Difficulty { get; set; } = null!;
 
         public BeatmapMetadata Metadata { get; set; } = null!;
+
+        public AudioNormalization? AudioNormalization { get; set; }
 
         [JsonIgnore]
         [Backlink(nameof(ScoreInfo.BeatmapInfo))]
