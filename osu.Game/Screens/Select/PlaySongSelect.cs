@@ -14,12 +14,14 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
+using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
+using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Users;
 using osu.Game.Utils;
 using osuTK.Input;
@@ -32,6 +34,9 @@ namespace osu.Game.Screens.Select
 
         [Resolved]
         private INotificationOverlay? notifications { get; set; }
+
+        [Resolved]
+        private LeaderboardScoresProvider<BeatmapLeaderboardScope, ScoreInfo> leaderboardProvider { get; set; } = null!;
 
         public override bool AllowExternalScreenChange => true;
 
@@ -58,13 +63,7 @@ namespace osu.Game.Screens.Select
 
         protected override BeatmapDetailArea CreateBeatmapDetailArea()
         {
-            playBeatmapDetailArea = new PlayBeatmapDetailArea
-            {
-                Leaderboard =
-                {
-                    ScoreSelected = PresentScore
-                }
-            };
+            playBeatmapDetailArea = new PlayBeatmapDetailArea(PresentScore);
 
             return playBeatmapDetailArea;
         }
@@ -131,14 +130,14 @@ namespace osu.Game.Screens.Select
                 {
                     player = new ReplayPlayer((beatmap, mods) => replayGeneratingMod.CreateScoreFromReplayData(beatmap, mods))
                     {
-                        LeaderboardScores = { BindTarget = playBeatmapDetailArea.Leaderboard.Scores }
+                        LeaderboardScores = { BindTarget = leaderboardProvider.Scores }
                     };
                 }
                 else
                 {
                     player = new SoloPlayer
                     {
-                        LeaderboardScores = { BindTarget = playBeatmapDetailArea.Leaderboard.Scores }
+                        LeaderboardScores = { BindTarget = leaderboardProvider.Scores }
                     };
                 }
 

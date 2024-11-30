@@ -2,13 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Threading;
-using osu.Framework.Allocation;
-using osu.Framework.Bindables;
-using osu.Framework.Development;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -17,11 +11,12 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Online.API;
 using osu.Game.Online.Placeholders;
 using osuTK;
 using osuTK.Graphics;
 using osu.Game.Localisation;
+using System.Threading;
+using osu.Framework.Allocation;
 
 namespace osu.Game.Online.Leaderboards
 {
@@ -33,17 +28,8 @@ namespace osu.Game.Online.Leaderboards
     /// <typeparam name="TScoreInfo">The score model class.</typeparam>
     public abstract partial class Leaderboard<TScope, TScoreInfo> : CompositeDrawable
     {
-        /// <summary>
-        /// The currently displayed scores.
-        /// </summary>
-        public IBindableList<TScoreInfo> Scores => scores;
-
-        private readonly BindableList<TScoreInfo> scores = new BindableList<TScoreInfo>();
-
-        /// <summary>
-        /// Whether the current scope should refetch in response to changes in API connectivity state.
-        /// </summary>
-        protected abstract bool IsOnlineScope { get; }
+        [Resolved]
+        private LeaderboardScoresProvider<TScope, TScoreInfo> leaderboardProvider { get; set; } = null!;
 
         private const double fade_duration = 300;
 
@@ -54,33 +40,6 @@ namespace osu.Game.Online.Leaderboards
         private FillFlowContainer<LeaderboardScore>? scoreFlowContainer;
 
         private readonly LoadingSpinner loading;
-
-        private CancellationTokenSource? currentFetchCancellationSource;
-        private CancellationTokenSource? currentScoresAsyncLoadCancellationSource;
-
-        private APIRequest? fetchScoresRequest;
-
-        private LeaderboardState state;
-
-        [Resolved(CanBeNull = true)]
-        private IAPIProvider? api { get; set; }
-
-        private readonly IBindable<APIState> apiState = new Bindable<APIState>();
-
-        private TScope scope = default!;
-
-        public TScope Scope
-        {
-            get => scope;
-            set
-            {
-                if (EqualityComparer<TScope>.Default.Equals(value, scope))
-                    return;
-
-                scope = value;
-                RefetchScores();
-            }
-        }
 
         protected Leaderboard()
         {
@@ -127,69 +86,14 @@ namespace osu.Game.Online.Leaderboards
         {
             base.LoadComplete();
 
-            if (api != null)
-            {
-                apiState.BindTo(api.State);
-                apiState.BindValueChanged(state =>
-                {
-                    switch (state.NewValue)
-                    {
-                        case APIState.Online:
-                        case APIState.Offline:
-                            if (IsOnlineScope)
-                                RefetchScores();
-
-                            break;
-                    }
-                });
-            }
-
-            RefetchScores();
+            leaderboardProvider.State.BindValueChanged(s => onStateChange(s.NewValue));
+            leaderboardProvider.OnLoadScores += onLoadScores;
         }
 
-        /// <summary>
-        /// Perform a full refetch of scores using current criteria.
-        /// </summary>
-        public void RefetchScores() => Scheduler.AddOnce(refetchScores);
-
-        /// <summary>
-        /// Clear all scores from the display.
-        /// </summary>
-        public void ClearScores()
+        private void onLoadScores(TScoreInfo? userScore = default, CancellationToken cancellationToken = default, Action? onSuccess = default)
         {
-            cancelPendingWork();
-            SetScores(null);
-        }
-
-        /// <summary>
-        /// Call when a retrieval or display failure happened to show a relevant message to the user.
-        /// </summary>
-        /// <param name="state">The state to display.</param>
-        protected void SetErrorState(LeaderboardState state)
-        {
-            switch (state)
-            {
-                case LeaderboardState.NoScores:
-                case LeaderboardState.Retrieving:
-                case LeaderboardState.Success:
-                    throw new InvalidOperationException($"State {state} cannot be set by a leaderboard implementation.");
-            }
-
-            Debug.Assert(!scores.Any());
-
-            setState(state);
-        }
-
-        /// <summary>
-        /// Call when retrieved scores are ready to be displayed.
-        /// </summary>
-        /// <param name="scores">The scores to display.</param>
-        /// <param name="userScore">The user top score, if any.</param>
-        protected void SetScores(IEnumerable<TScoreInfo>? scores, TScoreInfo? userScore = default)
-        {
-            this.scores.Clear();
-            if (scores != null)
-                this.scores.AddRange(scores);
+            if (!leaderboardProvider.Scores.Any())
+                return;
 
             // Non-delayed schedule may potentially run inline (due to IsMainThread check passing) after leaderboard  is disposed.
             // This is guarded against in BeatmapLeaderboard via web request cancellation, but let's be extra safe.
@@ -210,67 +114,20 @@ namespace osu.Game.Online.Leaderboards
                 else
                     userScoreContainer.Show();
 
-                updateScoresDrawables();
+                updateScoresDrawables(cancellationToken, onSuccess);
             }
         }
-
-        /// <summary>
-        /// Performs a fetch/refresh of scores to be displayed.
-        /// </summary>
-        /// <param name="cancellationToken"></param>
-        /// <returns>An <see cref="APIRequest"/> responsible for the fetch operation. This will be queued and performed automatically.</returns>
-        protected abstract APIRequest? FetchScores(CancellationToken cancellationToken);
 
         protected abstract LeaderboardScore CreateDrawableScore(TScoreInfo model, int index);
 
         protected abstract LeaderboardScore CreateDrawableTopScore(TScoreInfo model);
 
-        private void refetchScores()
+        private void updateScoresDrawables(CancellationToken cancellationToken, Action? onSuccess)
         {
-            Debug.Assert(ThreadSafety.IsUpdateThread);
-
-            ClearScores();
-            setState(LeaderboardState.Retrieving);
-
-            currentFetchCancellationSource = new CancellationTokenSource();
-
-            fetchScoresRequest = FetchScores(currentFetchCancellationSource.Token);
-
-            if (fetchScoresRequest == null)
-                return;
-
-            fetchScoresRequest.Failure += e => Schedule(() =>
-            {
-                if (e is OperationCanceledException || currentFetchCancellationSource.IsCancellationRequested)
-                    return;
-
-                SetErrorState(LeaderboardState.NetworkFailure);
-            });
-
-            api?.Queue(fetchScoresRequest);
-        }
-
-        private void cancelPendingWork()
-        {
-            currentFetchCancellationSource?.Cancel();
-            currentScoresAsyncLoadCancellationSource?.Cancel();
-            fetchScoresRequest?.Cancel();
-        }
-
-        private void updateScoresDrawables()
-        {
-            currentScoresAsyncLoadCancellationSource?.Cancel();
-
             scoreFlowContainer?
                 .FadeOut(fade_duration, Easing.OutQuint)
                 .Expire();
             scoreFlowContainer = null;
-
-            if (!scores.Any())
-            {
-                setState(LeaderboardState.NoScores);
-                return;
-            }
 
             LoadComponentAsync(new FillFlowContainer<LeaderboardScore>
             {
@@ -278,11 +135,10 @@ namespace osu.Game.Online.Leaderboards
                 AutoSizeAxes = Axes.Y,
                 Spacing = new Vector2(0f, 5f),
                 Padding = new MarginPadding { Top = 10, Bottom = 5 },
-                ChildrenEnumerable = scores.Select((s, index) => CreateDrawableScore(s, index + 1))
+                ChildrenEnumerable = leaderboardProvider.Scores.Select((s, index) => CreateDrawableScore(s, index + 1))
             }, newFlow =>
             {
-                setState(LeaderboardState.Success);
-
+                onSuccess?.Invoke();
                 scrollContainer.Add(scoreFlowContainer = newFlow);
 
                 double delay = 0;
@@ -296,24 +152,20 @@ namespace osu.Game.Online.Leaderboards
                 }
 
                 scrollContainer.ScrollToStart(false);
-            }, (currentScoresAsyncLoadCancellationSource = new CancellationTokenSource()).Token);
+
+            }, cancellationToken);
         }
 
         #region Placeholder handling
 
         private Placeholder? placeholder;
 
-        private void setState(LeaderboardState state)
+        private void onStateChange(LeaderboardState state)
         {
-            if (state == this.state)
-                return;
-
             if (state == LeaderboardState.Retrieving)
                 loading.Show();
             else
                 loading.Hide();
-
-            this.state = state;
 
             placeholder?.FadeOut(150, Easing.OutQuint).Expire();
 
@@ -335,7 +187,7 @@ namespace osu.Game.Online.Leaderboards
                 case LeaderboardState.NetworkFailure:
                     return new ClickablePlaceholder(LeaderboardStrings.CouldntFetchScores, FontAwesome.Solid.Sync)
                     {
-                        Action = RefetchScores
+                        Action = leaderboardProvider.RefetchScores
                     };
 
                 case LeaderboardState.NoneSelected:

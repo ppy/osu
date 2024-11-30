@@ -48,6 +48,7 @@ using osu.Game.IO;
 using osu.Game.Localisation;
 using osu.Game.Online;
 using osu.Game.Online.Chat;
+using osu.Game.Online.Leaderboards;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapListing;
@@ -69,6 +70,7 @@ using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Select;
+using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Skinning;
 using osu.Game.Updater;
 using osu.Game.Users;
@@ -1067,6 +1069,10 @@ namespace osu.Game
                 // Loader has to be created after the logo has finished loading as Loader performs logo transformations on entering.
                 ScreenStack.Push(CreateLoader().With(l => l.RelativeSizeAxes = Axes.Both));
             });
+
+            LeaderboardScoresProvider<BeatmapLeaderboardScope, ScoreInfo> scoresProvider;
+            loadComponentSingleFile(scoresProvider = new BeatmapLeaderboardScoresProvider(), Add, true);
+
 
             LocalUserStatisticsProvider statisticsProvider;
 
