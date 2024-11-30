@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     /// </summary>
     public class Aim : OsuStrainSkill
     {
-        public Aim(Mod[] mods, bool withSliders)
+        public Aim(Mod[] mods, bool withSliders = true)
             : base(mods)
         {
             this.withSliders = withSliders;
