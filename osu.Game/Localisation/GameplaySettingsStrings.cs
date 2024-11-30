@@ -90,6 +90,11 @@ namespace osu.Game.Localisation
         public static LocalisableString AlwaysShowHoldForMenuButton => new TranslatableString(getKey(@"always_show_hold_for_menu_button"), @"Always show hold for menu button");
 
         /// <summary>
+        /// "Require holding key to pause gameplay"
+        /// </summary>
+        public static LocalisableString AlwaysRequireHoldForMenu => new TranslatableString(getKey(@"require_holding_key_to_pause_gameplay"), @"Require holding key to pause gameplay");
+
+        /// <summary>
         /// "Always play first combo break sound"
         /// </summary>
         public static LocalisableString AlwaysPlayFirstComboBreak => new TranslatableString(getKey(@"always_play_first_combo_break"), @"Always play first combo break sound");

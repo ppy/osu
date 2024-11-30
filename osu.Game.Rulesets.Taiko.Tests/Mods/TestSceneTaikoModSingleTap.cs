@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Mods
         {
             Mod = new TaikoModSingleTap(),
             Autoplay = false,
-            Beatmap = new Beatmap
+            CreateBeatmap = () => new Beatmap
             {
                 HitObjects = new List<HitObject>
                 {
@@ -65,7 +65,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Mods
         {
             Mod = new TaikoModSingleTap(),
             Autoplay = false,
-            Beatmap = new Beatmap
+            CreateBeatmap = () => new Beatmap
             {
                 HitObjects = new List<HitObject>
                 {
@@ -110,7 +110,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Mods
         {
             Mod = new TaikoModSingleTap(),
             Autoplay = false,
-            Beatmap = new Beatmap
+            CreateBeatmap = () => new Beatmap
             {
                 HitObjects = new List<HitObject>
                 {
@@ -136,7 +136,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Mods
         {
             Mod = new TaikoModSingleTap(),
             Autoplay = false,
-            Beatmap = new Beatmap
+            CreateBeatmap = () => new Beatmap
             {
                 HitObjects = new List<HitObject>
                 {
@@ -175,7 +175,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Mods
         {
             Mod = new TaikoModSingleTap(),
             Autoplay = false,
-            Beatmap = new Beatmap
+            CreateBeatmap = () => new Beatmap
             {
                 Breaks =
                 {

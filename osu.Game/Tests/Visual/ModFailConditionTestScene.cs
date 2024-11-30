@@ -20,7 +20,7 @@ namespace osu.Game.Tests.Visual
         protected void CreateHitObjectTest(HitObjectTestData testData, bool shouldMiss) => CreateModTest(new ModTestData
         {
             Mod = mod,
-            Beatmap = new Beatmap
+            CreateBeatmap = () => new Beatmap
             {
                 BeatmapInfo = { Ruleset = CreatePlayerRuleset().RulesetInfo },
                 HitObjects = { testData.HitObject }

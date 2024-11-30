@@ -156,6 +156,13 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             return true;
         }
 
+        // this allows sliders to be drawn outside compose area (after starting from a point within the compose area).
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => base.ReceivePositionalInputAt(screenSpacePos) || PlacementActive == PlacementState.Active;
+
+        // ReceivePositionalInputAtSubTree generally always returns true when masking is disabled, but we don't want that,
+        // otherwise a slider path tooltip will be displayed anywhere in the editor (outside compose area).
+        protected override bool ReceivePositionalInputAtSubTree(Vector2 screenSpacePos) => ReceivePositionalInputAt(screenSpacePos);
+
         private void beginNewSegment(PathControlPoint lastPoint)
         {
             segmentStart = lastPoint;

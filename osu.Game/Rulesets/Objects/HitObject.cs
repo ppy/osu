@@ -233,7 +233,7 @@ namespace osu.Game.Rulesets.Objects
 
             // Fall back to using the normal sample bank otherwise.
             if (Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL) is HitSampleInfo existingNormal)
-                return existingNormal.With(newName: sampleName);
+                return existingNormal.With(newName: sampleName, newEditorAutoBank: true);
 
             return new HitSampleInfo(sampleName);
         }

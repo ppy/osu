@@ -103,26 +103,11 @@ permissions:
 env:
   EXECUTION_ID: execution-${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}
 
+defaults:
+  run:
+    shell: bash -euo pipefail {0}
+
 jobs:
-  master-environment:
-    name: Save master environment
-    runs-on: ubuntu-latest
-    outputs:
-      HEAD: ${{ steps.get-head.outputs.HEAD }}
-    steps:
-      - name: Checkout osu
-        uses: actions/checkout@v4
-        with:
-          ref: master
-          sparse-checkout: |
-            README.md
-
-      - name: Get HEAD ref
-        id: get-head
-        run: |
-          ref=$(git log -1 --format='%H')
-          echo "HEAD=https://github.com/${{ github.repository }}/commit/${ref}" >> "${GITHUB_OUTPUT}"
-
   check-permissions:
     name: Check permissions
     runs-on: ubuntu-latest
@@ -138,9 +123,23 @@ jobs:
           done
           exit 1
 
+  run-diffcalc:
+    name: Run spreadsheet generator
+    needs: check-permissions
+    uses: ./.github/workflows/_diffcalc_processor.yml
+    with:
+      # Can't reference env... Why GitHub, WHY?
+      id: execution-${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}
+      head-sha: https://github.com/${{ github.repository }}/commit/${{ github.event.pull_request.head.sha || github.sha }}
+      pr-url: ${{ github.event.issue.pull_request.html_url || '' }}
+      pr-text: ${{ github.event.comment.body || '' }}
+      dispatch-inputs: ${{ (github.event.type == 'workflow_dispatch' && toJSON(inputs)) || '' }}
+    secrets:
+      DIFFCALC_GOOGLE_CREDENTIALS: ${{ secrets.DIFFCALC_GOOGLE_CREDENTIALS }}
+
   create-comment:
     name: Create PR comment
-    needs: [ master-environment, check-permissions ]
+    needs: check-permissions
     runs-on: ubuntu-latest
     if: ${{ github.event_name == 'issue_comment' && github.event.issue.pull_request }}
     steps:
@@ -153,244 +152,34 @@ jobs:
 
             *This comment will update on completion*
 
-  directory:
-    name: Prepare directory
-    needs: check-permissions
-    runs-on: self-hosted
-    outputs:
-      GENERATOR_DIR: ${{ steps.set-outputs.outputs.GENERATOR_DIR }}
-      GENERATOR_ENV: ${{ steps.set-outputs.outputs.GENERATOR_ENV }}
-      GOOGLE_CREDS_FILE: ${{ steps.set-outputs.outputs.GOOGLE_CREDS_FILE }}
-    steps:
-      - name: Checkout diffcalc-sheet-generator
-        uses: actions/checkout@v4
-        with:
-          path: ${{ env.EXECUTION_ID }}
-          repository: 'smoogipoo/diffcalc-sheet-generator'
-
-      - name: Set outputs
-        id: set-outputs
-        run: |
-          echo "GENERATOR_DIR=${{ github.workspace }}/${{ env.EXECUTION_ID }}" >> "${GITHUB_OUTPUT}"
-          echo "GENERATOR_ENV=${{ github.workspace }}/${{ env.EXECUTION_ID }}/.env" >> "${GITHUB_OUTPUT}"
-          echo "GOOGLE_CREDS_FILE=${{ github.workspace }}/${{ env.EXECUTION_ID }}/google-credentials.json" >> "${GITHUB_OUTPUT}"
-
-  environment:
-    name: Setup environment
-    needs: [ master-environment, directory ]
-    runs-on: self-hosted
-    env:
-      VARS_JSON: ${{ toJSON(vars) }}
-    steps:
-      - name: Add base environment
-        run: |
-          # Required by diffcalc-sheet-generator
-          cp '${{ needs.directory.outputs.GENERATOR_DIR }}/.env.sample' "${{ needs.directory.outputs.GENERATOR_ENV }}"
-
-          # Add Google credentials
-          echo '${{ secrets.DIFFCALC_GOOGLE_CREDENTIALS }}' | base64 -d > "${{ needs.directory.outputs.GOOGLE_CREDS_FILE }}"
-
-          # Add repository variables
-          echo "${VARS_JSON}" | jq -c '. | to_entries | .[]' | while read -r line; do
-              opt=$(jq -r '.key' <<< ${line})
-              val=$(jq -r '.value' <<< ${line})
-
-              if [[ "${opt}" =~ ^DIFFCALC_ ]]; then
-                optNoPrefix=$(echo "${opt}" | cut -d '_' -f2-)
-                sed -i "s;^${optNoPrefix}=.*$;${optNoPrefix}=${val};" "${{ needs.directory.outputs.GENERATOR_ENV }}"
-              fi
-          done
-
-      - name: Add master environment
-        run: |
-          sed -i "s;^OSU_A=.*$;OSU_A=${{ needs.master-environment.outputs.HEAD }};" "${{ needs.directory.outputs.GENERATOR_ENV }}"
-
-      - name: Add pull-request environment
-        if: ${{ github.event_name == 'issue_comment' && github.event.issue.pull_request }}
-        run: |
-          sed -i "s;^OSU_B=.*$;OSU_B=${{ github.event.issue.pull_request.html_url }};" "${{ needs.directory.outputs.GENERATOR_ENV }}"
-
-      - name: Add comment environment
-        if: ${{ github.event_name == 'issue_comment' }}
-        env:
-          COMMENT_BODY: ${{ github.event.comment.body }}
-        run: |
-          # Add comment environment
-          echo "$COMMENT_BODY" | sed -r 's/\r$//' | grep -E '^\w+=' | while read -r line; do
-              opt=$(echo "${line}" | cut -d '=' -f1)
-              sed -i "s;^${opt}=.*$;${line};" "${{ needs.directory.outputs.GENERATOR_ENV }}"
-          done
-
-      - name: Add dispatch environment
-        if: ${{ github.event_name == 'workflow_dispatch' }}
-        run: |
-          sed -i 's;^OSU_B=.*$;OSU_B=${{ inputs.osu-b }};' "${{ needs.directory.outputs.GENERATOR_ENV }}"
-          sed -i 's/^RULESET=.*$/RULESET=${{ inputs.ruleset }}/' "${{ needs.directory.outputs.GENERATOR_ENV }}"
-          sed -i 's/^GENERATORS=.*$/GENERATORS=${{ inputs.generators }}/' "${{ needs.directory.outputs.GENERATOR_ENV }}"
-
-          if [[ '${{ inputs.osu-a }}' != 'latest' ]]; then
-              sed -i 's;^OSU_A=.*$;OSU_A=${{ inputs.osu-a }};' "${{ needs.directory.outputs.GENERATOR_ENV }}"
-          fi
-
-          if [[ '${{ inputs.difficulty-calculator-a }}' != 'latest' ]]; then
-              sed -i 's;^DIFFICULTY_CALCULATOR_A=.*$;DIFFICULTY_CALCULATOR_A=${{ inputs.difficulty-calculator-a }};' "${{ needs.directory.outputs.GENERATOR_ENV }}"
-          fi
-
-          if [[ '${{ inputs.difficulty-calculator-b }}' != 'latest' ]]; then
-              sed -i 's;^DIFFICULTY_CALCULATOR_B=.*$;DIFFICULTY_CALCULATOR_B=${{ inputs.difficulty-calculator-b }};' "${{ needs.directory.outputs.GENERATOR_ENV }}"
-          fi
-
-          if [[ '${{ inputs.score-processor-a }}' != 'latest' ]]; then
-              sed -i 's;^SCORE_PROCESSOR_A=.*$;SCORE_PROCESSOR_A=${{ inputs.score-processor-a }};' "${{ needs.directory.outputs.GENERATOR_ENV }}"
-          fi
-
-          if [[ '${{ inputs.score-processor-b }}' != 'latest' ]]; then
-              sed -i 's;^SCORE_PROCESSOR_B=.*$;SCORE_PROCESSOR_B=${{ inputs.score-processor-b }};' "${{ needs.directory.outputs.GENERATOR_ENV }}"
-          fi
-
-          if [[ '${{ inputs.converts }}' == 'true' ]]; then
-              sed -i 's/^NO_CONVERTS=.*$/NO_CONVERTS=0/' "${{ needs.directory.outputs.GENERATOR_ENV }}"
-          else
-              sed -i 's/^NO_CONVERTS=.*$/NO_CONVERTS=1/' "${{ needs.directory.outputs.GENERATOR_ENV }}"
-          fi
-
-          if [[ '${{ inputs.ranked-only }}' == 'true' ]]; then
-              sed -i 's/^RANKED_ONLY=.*$/RANKED_ONLY=1/' "${{ needs.directory.outputs.GENERATOR_ENV }}"
-          else
-              sed -i 's/^RANKED_ONLY=.*$/RANKED_ONLY=0/' "${{ needs.directory.outputs.GENERATOR_ENV }}"
-          fi
-
-  scores:
-    name: Setup scores
-    needs: [ directory, environment ]
-    runs-on: self-hosted
-    steps:
-      - name: Query latest data
-        id: query
-        run: |
-          ruleset=$(cat ${{ needs.directory.outputs.GENERATOR_ENV }} | grep -E '^RULESET=' | cut -d '=' -f2-)
-          performance_data_name=$(curl -s "https://data.ppy.sh/" | grep "performance_${ruleset}_top_1000\b" | tail -1 | awk -F "'" '{print $2}' | sed 's/\.tar\.bz2//g')
-
-          echo "TARGET_DIR=${{ needs.directory.outputs.GENERATOR_DIR }}/sql/${ruleset}" >> "${GITHUB_OUTPUT}"
-          echo "DATA_NAME=${performance_data_name}" >> "${GITHUB_OUTPUT}"
-
-      - name: Restore cache
-        id: restore-cache
-        uses: maxnowack/local-cache@720e69c948191660a90aa1cf6a42fc4d2dacdf30 # v2
-        with:
-          path: ${{ steps.query.outputs.DATA_NAME }}.tar.bz2
-          key: ${{ steps.query.outputs.DATA_NAME }}
-
-      - name: Download
-        if: steps.restore-cache.outputs.cache-hit != 'true'
-        run: |
-          wget -q -nc "https://data.ppy.sh/${{ steps.query.outputs.DATA_NAME }}.tar.bz2"
-
-      - name: Extract
-        run: |
-          tar -I lbzip2 -xf "${{ steps.query.outputs.DATA_NAME }}.tar.bz2"
-          rm -r "${{ steps.query.outputs.TARGET_DIR }}"
-          mv "${{ steps.query.outputs.DATA_NAME }}" "${{ steps.query.outputs.TARGET_DIR }}"
-
-  beatmaps:
-    name: Setup beatmaps
-    needs: directory
-    runs-on: self-hosted
-    steps:
-      - name: Query latest data
-        id: query
-        run: |
-          beatmaps_data_name=$(curl -s "https://data.ppy.sh/" | grep "osu_files" | tail -1 | awk -F "'" '{print $2}' | sed 's/\.tar\.bz2//g')
-
-          echo "TARGET_DIR=${{ needs.directory.outputs.GENERATOR_DIR }}/beatmaps" >> "${GITHUB_OUTPUT}"
-          echo "DATA_NAME=${beatmaps_data_name}" >> "${GITHUB_OUTPUT}"
-
-      - name: Restore cache
-        id: restore-cache
-        uses: maxnowack/local-cache@720e69c948191660a90aa1cf6a42fc4d2dacdf30 # v2
-        with:
-          path: ${{ steps.query.outputs.DATA_NAME }}.tar.bz2
-          key: ${{ steps.query.outputs.DATA_NAME }}
-
-      - name: Download
-        if: steps.restore-cache.outputs.cache-hit != 'true'
-        run: |
-          wget -q -nc "https://data.ppy.sh/${{ steps.query.outputs.DATA_NAME }}.tar.bz2"
-
-      - name: Extract
-        run: |
-          tar -I lbzip2 -xf "${{ steps.query.outputs.DATA_NAME }}.tar.bz2"
-          rm -r "${{ steps.query.outputs.TARGET_DIR }}"
-          mv "${{ steps.query.outputs.DATA_NAME }}" "${{ steps.query.outputs.TARGET_DIR }}"
-
-  generator:
-    name: Run generator
-    needs: [ directory, environment, scores, beatmaps ]
-    runs-on: self-hosted
-    timeout-minutes: 720
-    outputs:
-      TARGET: ${{ steps.run.outputs.TARGET }}
-      SPREADSHEET_LINK: ${{ steps.run.outputs.SPREADSHEET_LINK }}
-    steps:
-      - name: Run
-        id: run
-        run: |
-          # Add the GitHub token. This needs to be done here because it's unique per-job.
-          sed -i 's/^GH_TOKEN=.*$/GH_TOKEN=${{ github.token }}/' "${{ needs.directory.outputs.GENERATOR_ENV }}"
-
-          cd "${{ needs.directory.outputs.GENERATOR_DIR }}"
-          docker-compose up --build generator
-
-          link=$(docker-compose logs generator -n 10 | grep 'http' | sed -E 's/^.*(http.*)$/\1/')
-          target=$(cat "${{ needs.directory.outputs.GENERATOR_ENV }}" | grep -E '^OSU_B=' | cut -d '=' -f2-)
-
-          echo "TARGET=${target}" >> "${GITHUB_OUTPUT}"
-          echo "SPREADSHEET_LINK=${link}" >> "${GITHUB_OUTPUT}"
-
-      - name: Shutdown
-        if: ${{ always() }}
-        run: |
-          cd "${{ needs.directory.outputs.GENERATOR_DIR }}"
-          docker-compose down -v
-
   output-cli:
-    name: Output info
-    needs: generator
+    name: Info
+    needs: run-diffcalc
     runs-on: ubuntu-latest
     steps:
       - name: Output info
         run: |
-          echo "Target: ${{ needs.generator.outputs.TARGET }}"
-          echo "Spreadsheet: ${{ needs.generator.outputs.SPREADSHEET_LINK }}"
-
-  cleanup:
-    name: Cleanup
-    needs: [ directory, generator ]
-    if: ${{ always() && needs.directory.result == 'success' }}
-    runs-on: self-hosted
-    steps:
-      - name: Cleanup
-        run: |
-          rm -rf "${{ needs.directory.outputs.GENERATOR_DIR }}"
+          echo "Target: ${{ needs.run-diffcalc.outputs.target }}"
+          echo "Spreadsheet: ${{ needs.run-diffcalc.outputs.sheet }}"
 
   update-comment:
     name: Update PR comment
-    needs: [ create-comment, generator ]
+    needs: [ create-comment, run-diffcalc ]
     runs-on: ubuntu-latest
     if: ${{ always() && needs.create-comment.result == 'success' }}
     steps:
       - name: Update comment on success
-        if: ${{ needs.generator.result == 'success' }}
+        if: ${{ needs.run-diffcalc.result == 'success' }}
         uses: thollander/actions-comment-pull-request@fabd468d3a1a0b97feee5f6b9e499eab0dd903f6 # v2.5.0
         with:
           comment_tag: ${{ env.EXECUTION_ID }}
           mode: recreate
           message: |
-            Target: ${{ needs.generator.outputs.TARGET }}
-            Spreadsheet: ${{ needs.generator.outputs.SPREADSHEET_LINK }}
+            Target: ${{ needs.run-diffcalc.outputs.target }}
+            Spreadsheet: ${{ needs.run-diffcalc.outputs.sheet }}
 
       - name: Update comment on failure
-        if: ${{ needs.generator.result == 'failure' }}
+        if: ${{ needs.run-diffcalc.result == 'failure' }}
         uses: thollander/actions-comment-pull-request@fabd468d3a1a0b97feee5f6b9e499eab0dd903f6 # v2.5.0
         with:
           comment_tag: ${{ env.EXECUTION_ID }}
@@ -399,7 +188,7 @@ jobs:
             Difficulty calculation failed: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
       - name: Update comment on cancellation
-        if: ${{ needs.generator.result == 'cancelled' }}
+        if: ${{ needs.run-diffcalc.result == 'cancelled' }}
         uses: thollander/actions-comment-pull-request@fabd468d3a1a0b97feee5f6b9e499eab0dd903f6 # v2.5.0
         with:
           comment_tag: ${{ env.EXECUTION_ID }}

@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double sliderFactor = aimRating > 0 ? aimRatingNoSliders / aimRating : 1;
 
             ExpPolynomial aimMissPenaltyCurve = ((Aim)skills[0]).GetMissPenaltyCurve();
-            double speedDifficultyStrainCount = ((OsuStrainSkill)skills[2]).CountDifficultStrains();
+            double speedDifficultyStrainCount = ((OsuStrainSkill)skills[2]).CountTopWeightedStrains();
 
             if (mods.Any(m => m is OsuModTouchDevice))
             {

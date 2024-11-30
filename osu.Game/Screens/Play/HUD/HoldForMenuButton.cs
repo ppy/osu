@@ -162,14 +162,18 @@ namespace osu.Game.Screens.Play.HUD
             private bool pendingAnimation;
             private ScheduledDelegate shakeOperation;
 
+            private Bindable<bool> alwaysRequireHold;
+
             public HoldButton(bool isDangerousAction)
                 : base(isDangerousAction)
             {
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            private void load(OsuColour colours, OsuConfigManager config)
             {
+                alwaysRequireHold = config.GetBindable<bool>(OsuSetting.AlwaysRequireHoldingForPause);
+
                 Size = new Vector2(60);
 
                 Child = new CircularContainer
@@ -299,7 +303,13 @@ namespace osu.Game.Screens.Play.HUD
                 {
                     case GlobalAction.Back:
                         if (!pendingAnimation)
-                            BeginConfirm();
+                        {
+                            if (IsDangerousAction || alwaysRequireHold.Value)
+                                BeginConfirm();
+                            else
+                                Confirm();
+                        }
+
                         return true;
 
                     case GlobalAction.PauseGameplay:
@@ -307,7 +317,13 @@ namespace osu.Game.Screens.Play.HUD
                         if (ReplayLoaded.Value) return false;
 
                         if (!pendingAnimation)
-                            BeginConfirm();
+                        {
+                            if (IsDangerousAction || alwaysRequireHold.Value)
+                                BeginConfirm();
+                            else
+                                Confirm();
+                        }
+
                         return true;
                 }
 

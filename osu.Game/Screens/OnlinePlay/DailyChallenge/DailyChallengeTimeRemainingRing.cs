@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.ComponentModel;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -10,21 +11,29 @@ using osu.Framework.Threading;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 {
-    public partial class DailyChallengeTimeRemainingRing : OnlinePlayComposite
+    public partial class DailyChallengeTimeRemainingRing : CompositeDrawable
     {
-        private CircularProgress progress = null!;
-        private OsuSpriteText timeText = null!;
+        private readonly Room room;
 
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
         [Resolved]
         private OsuColour colours { get; set; } = null!;
+
+        private CircularProgress progress = null!;
+        private OsuSpriteText timeText = null!;
+
+        public DailyChallengeTimeRemainingRing(Room room)
+        {
+            this.room = room;
+        }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -90,10 +99,21 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
         {
             base.LoadComplete();
 
-            StartDate.BindValueChanged(_ => Scheduler.AddOnce(updateState));
-            EndDate.BindValueChanged(_ => Scheduler.AddOnce(updateState));
+            room.PropertyChanged += onRoomPropertyChanged;
             updateState();
+
             FinishTransforms(true);
+        }
+
+        private void onRoomPropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case nameof(Room.StartDate):
+                case nameof(Room.EndDate):
+                    Scheduler.AddOnce(updateState);
+                    break;
+            }
         }
 
         private ScheduledDelegate? scheduledUpdate;
@@ -105,7 +125,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 
             const float transition_duration = 300;
 
-            if (StartDate.Value == null || EndDate.Value == null || EndDate.Value < DateTimeOffset.Now)
+            if (room.StartDate == null || room.EndDate == null || room.EndDate < DateTimeOffset.Now)
             {
                 timeText.Text = TimeSpan.Zero.ToString(@"hh\:mm\:ss");
                 progress.Progress = 0;
@@ -114,8 +134,8 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                 return;
             }
 
-            var roomDuration = EndDate.Value.Value - StartDate.Value.Value;
-            var remaining = EndDate.Value.Value - DateTimeOffset.Now;
+            var roomDuration = room.EndDate.Value - room.StartDate.Value;
+            var remaining = room.EndDate.Value - DateTimeOffset.Now;
 
             timeText.Text = remaining.ToString(@"hh\:mm\:ss");
             progress.Progress = remaining.TotalSeconds / roomDuration.TotalSeconds;
@@ -137,6 +157,12 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             }
 
             scheduledUpdate = Scheduler.AddDelayed(updateState, 1000);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            room.PropertyChanged -= onRoomPropertyChanged;
         }
     }
 }
