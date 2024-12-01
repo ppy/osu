@@ -75,10 +75,6 @@ namespace osu.Game.Rulesets.Mods
                 _combo = ComputeNewComboValue(_combo, judgement);
                 if (oldCombo == _combo)
                     return;
-                else
-                {
-
-                }
                 uint comboValue = GetHiddenComboInfluence(judgement);
                 if (comboValue == 0) return;
                 _combo = !judgement.IsHit ? 0 : _combo + comboValue;
@@ -97,14 +93,23 @@ namespace osu.Game.Rulesets.Mods
             }
         }
 
-        protected float GetAndUpdateDrawableHitObjectComboAlpha(DrawableHitObject dho, bool? hasStarted = null)
+        /// <summary>
+        /// Gets the alpha value for a hit object based on the current combo. And stores it internally.
+        /// Hitobjects that have already started will never have this value decreased.
+        /// </summary>
+        /// <param name="hasStarted">
+        /// An optional to use instead of computing it from drawableHitObject.
+        /// The default can handle objects implementing IHasTimePreempt.
+        /// </param>
+        /// <returns></returns>
+        protected float GetAndUpdateDrawableHitObjectComboAlpha(DrawableHitObject drawableHitObject, bool? hasStarted = null)
         {
             if (EnableAtCombo.Value == 0) return 0;
-            HitObject? ho = dho.HitObject;
+            HitObject? ho = drawableHitObject.HitObject;
 
-            hasStarted ??= ho.StartTime - ((ho as IHasTimePreempt)?.TimePreempt ?? 0) < dho.Time.Current;
+            hasStarted ??= ho.StartTime - ((ho as IHasTimePreempt)?.TimePreempt ?? 0) < drawableHitObject.Time.Current;
 
-            if (_opacityTable.TryGetValue(dho.HitObject, out float alpha))
+            if (_opacityTable.TryGetValue(drawableHitObject.HitObject, out float alpha))
             {
                 if (_alpha > alpha || !hasStarted.Value)
                 {
