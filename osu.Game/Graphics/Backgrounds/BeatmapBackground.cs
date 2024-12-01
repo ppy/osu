@@ -181,7 +181,6 @@ namespace osu.Game.Graphics.Backgrounds
                             Z = dimColour.B,
                             W = dimColour.A
                         },
-                        DimLevel = dimLevel,
                     };
 
                     shader.BindUniformBlock("m_DimParameters", dimParametersBuffer);
@@ -197,8 +196,6 @@ namespace osu.Game.Graphics.Backgrounds
                 private record struct DimParameters
                 {
                     public UniformVector4 DimColour;
-                    public UniformFloat DimLevel;
-                    private readonly UniformPadding12 pad1;
                 }
             }
         }
@@ -279,7 +276,6 @@ namespace osu.Game.Graphics.Backgrounds
                             Z = dimColour.B,
                             W = dimColour.A
                         },
-                        DimLevel = dimLevel,
                     };
 
                     shader.BindUniformBlock("m_DimParameters", dimParametersBuffer);
@@ -295,8 +291,6 @@ namespace osu.Game.Graphics.Backgrounds
                 private record struct DimParameters
                 {
                     public UniformVector4 DimColour;
-                    public UniformFloat DimLevel;
-                    private readonly UniformPadding12 pad1;
                 }
             }
         }

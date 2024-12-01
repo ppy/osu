@@ -167,7 +167,6 @@ namespace osu.Game.Storyboards.Drawables
                         Z = dimColour.B,
                         W = dimColour.A
                     },
-                    DimLevel = dimLevel,
                 };
 
                 shader.BindUniformBlock("m_DimParameters", dimParametersBuffer);
@@ -183,8 +182,6 @@ namespace osu.Game.Storyboards.Drawables
             private record struct DimParameters
             {
                 public UniformVector4 DimColour;
-                public UniformFloat DimLevel;
-                private readonly UniformPadding12 pad1;
             }
         }
     }
