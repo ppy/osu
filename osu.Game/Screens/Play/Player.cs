@@ -83,7 +83,7 @@ namespace osu.Game.Screens.Play
         /// </summary>
         protected virtual bool PauseOnFocusLost => true;
 
-        public Action<bool> RestartRequested;
+        public Action<bool> PrepareLoaderForRestart;
 
         private bool isRestarting;
         private bool skipExitTransition;
@@ -719,12 +719,8 @@ namespace osu.Game.Screens.Play
             // stopping here is to ensure music doesn't become audible after exiting back to PlayerLoader.
             musicController.Stop();
 
-            if (RestartRequested != null)
-            {
-                skipExitTransition = quickRestart;
-                RestartRequested?.Invoke(quickRestart);
-                return true;
-            }
+            skipExitTransition = quickRestart;
+            PrepareLoaderForRestart?.Invoke(quickRestart);
 
             return PerformExit(quickRestart);
         }
