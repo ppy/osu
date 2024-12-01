@@ -4,11 +4,9 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
-using System.Runtime.Intrinsics.X86;
 using osu.Framework.Graphics;
 using osu.Framework.Bindables;
 using osu.Framework.Localisation;
-using osu.Framework.Utils;
 using osu.Game.Configuration;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
@@ -18,13 +16,11 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Skinning;
-using osu.Game.Rulesets.Osu.UI;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModHidden : ModHidden, IHidesApproachCircles, IUpdatableByPlayfield, IApplicableToScoreProcessor
+    public class OsuModHidden : ModHidden, IHidesApproachCircles, IApplicableToDrawableRuleset<OsuHitObject>
     {
         [SettingSource("Only fade approach circles", "The main object body will not fade when enabled.")]
         public Bindable<bool> OnlyFadeApproachCircles { get; } = new BindableBool();
@@ -36,6 +32,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public const double FADE_IN_DURATION_MULTIPLIER = 0.4;
         public const double FADE_OUT_DURATION_MULTIPLIER = 0.3;
+        private Playfield _playfield = null!;
 
         protected override bool IsFirstAdjustableObject(HitObject hitObject) => !(hitObject is Spinner || hitObject is SpinnerTick);
 
@@ -51,44 +48,6 @@ namespace osu.Game.Rulesets.Osu.Mods
                 osuObject.TimeFadeIn = osuObject.TimePreempt * FADE_IN_DURATION_MULTIPLIER;
                 foreach (var nested in osuObject.NestedHitObjects.OfType<OsuHitObject>())
                     applyFadeInAdjustment(nested);
-            }
-        }
-
-        public void Update(Playfield playfield)
-        {
-            return;
-            foreach (var drawableHitObject in playfield.HitObjectContainer.AliveObjects)
-            {
-                var target = (drawableHitObject switch
-                {
-                    DrawableHitCircle drawableHitCircle => drawableHitCircle,
-                    DrawableSlider drawableSlider => drawableSlider.HeadCircle,
-                    _ => null
-                });
-                if (target == null)
-                    continue;
-
-                var hitObject = target.HitObject;
-                double fadeOutStartTime = hitObject.StartTime - hitObject.TimePreempt;
-                double fadeInEndTime = fadeOutStartTime + hitObject.TimeFadeIn;
-                double fadeOutDuration = hitObject.TimePreempt * fadeDurationFactor + hitObject.TimeFadeIn;
-
-                if (target.Result.HasResult)
-                {
-                    target.ApproachCircle.Hide();
-                    continue;
-                }
-
-                var fadeTarget = fadeDurationFactor; /*= fadeDurationFactor < 0.2
-                    ? 0
-                    : Interpolation.ValueAt((float)target.Time.Current, 1f, 0f, fadeOutStartTime, fadeOutStartTime + fadeOutDuration, Easing.InQuart);*/
-                var fadeInTarget = Interpolation.ValueAt((float)target.Time.Current, 0f, 1f, fadeOutStartTime, fadeInEndTime);
-
-                fadeInTarget = Math.Clamp(fadeInTarget, 0f, 1f);
-                fadeTarget = Math.Clamp(fadeTarget, 0f, 1f);
-                //Logger.Log($"{fadeTarget}");
-
-                target.ApproachCircle.FadeTo(MathF.Min(fadeTarget, fadeInTarget), hitObject.TimePreempt * 0.05f);
             }
         }
 
@@ -117,20 +76,18 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             (double fadeStartTime, double fadeDuration) = getFadeOutParameters(drawableOsuObject);
 
-            increaseVisibility = increaseVisibility || OverrideShowHitObjects();
             // process approach circle hiding first (to allow for early return below).
-            if (!increaseVisibility)
+            if (drawableObject is DrawableHitCircle circle2 && !circle2.Result.HasResult)
             {
-                if (drawableObject is DrawableHitCircle circle)
-                {
-                    using (circle.BeginAbsoluteSequence(hitObject.StartTime - hitObject.TimePreempt))
-                        circle.ApproachCircle.FadeTo(_alpha);
-                }
-                else if (drawableObject is DrawableSpinner spinner)
-                {
-                    spinner.Body.OnSkinChanged += () => hideSpinnerApproachCircle(spinner);
-                    hideSpinnerApproachCircle(spinner);
-                }
+                float alpha = increaseVisibility ? 1 : GetAndUpdateDrawableHitObjectComboAlpha(circle2);
+
+                using (circle2.BeginAbsoluteSequence(hitObject.StartTime - hitObject.TimePreempt))
+                    circle2.ApproachCircle.FadeTo(alpha * 0.9f, Math.Min(hitObject.TimeFadeIn * 2, hitObject.TimePreempt));
+            }
+            else if (!increaseVisibility && drawableObject is DrawableSpinner spinner)
+            {
+                spinner.Body.OnSkinChanged += () => hideSpinnerApproachCircle(spinner);
+                hideSpinnerApproachCircle(spinner);
             }
 
             if (OnlyFadeApproachCircles.Value)
@@ -147,36 +104,29 @@ namespace osu.Game.Rulesets.Osu.Mods
                 case DrawableSliderRepeat sliderRepeat:
                     using (drawableObject.BeginAbsoluteSequence(fadeStartTime))
                         // only apply to circle piece – reverse arrow is not affected by hidden.
-                        //sliderRepeat.CirclePiece.Hide();
                         sliderRepeat.CirclePiece.FadeOut(fadeDuration);
 
                     using (drawableObject.BeginAbsoluteSequence(drawableObject.HitStateUpdateTime))
-                        sliderRepeat.FadeOut(fadeDuration);
+                        sliderRepeat.FadeOut();
 
                     break;
 
                 case DrawableHitCircle circle:
-                    Drawable fadeTarget = circle;
-
-                    if (increaseVisibility || true) // TODO clean this up
-                    {
-                        // only fade the circle piece (not the approach circle) for the increased visibility object.
-                        fadeTarget = circle.CirclePiece;
-                    }
-
+                    // Only fade the circle piece, so that approach circles can be faded independently above
+                    Drawable fadeTarget = circle.CirclePiece;
                     using (drawableObject.BeginAbsoluteSequence(fadeStartTime))
-                        fadeTarget.FadeTo(_alpha * 0.5f, fadeDuration);
+                        fadeTarget.FadeOut(fadeDuration);
                     break;
 
                 case DrawableSlider slider:
                     using (slider.BeginAbsoluteSequence(fadeStartTime))
-                        slider.Body.FadeTo(_alpha * 0.5f, fadeDuration, Easing.Out);
+                        slider.Body.FadeOut(fadeDuration, Easing.Out);
 
                     break;
 
                 case DrawableSliderTick sliderTick:
                     using (sliderTick.BeginAbsoluteSequence(fadeStartTime))
-                        sliderTick.FadeTo(_alpha * 0.5f, fadeDuration);
+                        sliderTick.FadeOut(fadeDuration);
 
                     break;
 
@@ -245,30 +195,11 @@ namespace osu.Game.Rulesets.Osu.Mods
                 approachCircle.Hide();
         }
 
-        private float _alpha => OverrideShowHitObjects() ? 1 : 0;
-        private float fadeDurationFactor = 0.9f;
-        private int combo = 0;
-
-        /*
-        public override void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
+        public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
-            scoreProcessor.NewJudgement += result =>
-            {
-                if (result.HitObject is HitCircle and not SliderEndCircle)
-                    combo++;
-            };
-
-            scoreProcessor.JudgementReverted += result =>
-            {
-                if (result.HitObject is HitCircle and not SliderEndCircle)
-                    combo--;
-            };
-            scoreProcessor.Combo.ValueChanged += combo =>
-            {
-                fadeDurationFactor = combo.NewValue == 0f ? 1f : 1f - (float)combo.NewValue / 25f;
-                fadeDurationFactor = Math.Clamp(fadeDurationFactor, 0f, 1f);
-            };
+            _playfield = drawableRuleset.Playfield;
         }
-        */
+
+        public override Playfield PlayfieldAccessor => _playfield;
     }
 }
