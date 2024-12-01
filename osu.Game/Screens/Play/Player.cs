@@ -722,6 +722,16 @@ namespace osu.Game.Screens.Play
             skipExitTransition = quickRestart;
             PrepareLoaderForRestart?.Invoke(quickRestart);
 
+            if (!this.IsCurrentScreen())
+            {
+                // if we're called externally (i.e. from results screen),
+                // use MakeCurrent to exit results screen as well as this player screen
+                // since ValidForResume = false in here
+                Debug.Assert(!ValidForResume);
+                this.MakeCurrent();
+                return true;
+            }
+
             return PerformExit(quickRestart);
         }
 
