@@ -1,3 +1,5 @@
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing;
@@ -35,8 +37,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
         /// <returns>The calculated object density.</returns>
         public static double CalculateObjectDensity(TaikoDifficultyHitObject noteObject)
         {
-            return 150 - (150 - 50)
-                * DifficultyCalculationUtils.Logistic(noteObject.DeltaTime, 200, 1.0 / 30);
+            return 50 * DifficultyCalculationUtils.Logistic(noteObject.DeltaTime, 200, 1.0 / 30);
         }
     }
 }

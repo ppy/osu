@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using System.Linq;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Rhythm.Data
@@ -12,19 +11,19 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Rhythm.Data
     /// </summary>
     public class EvenHitObjects : EvenRhythm<TaikoDifficultyHitObject>, IHasInterval
     {
-        public TaikoDifficultyHitObject FirstHitObject => Children.First();
+        public TaikoDifficultyHitObject FirstHitObject => Children[0];
 
         public EvenHitObjects? Previous;
 
         /// <summary>
         /// <see cref="DifficultyHitObject.StartTime"/> of the first hit object.
         /// </summary>
-        public double StartTime => Children.First().StartTime;
+        public double StartTime => Children[0].StartTime;
 
         /// <summary>
         /// The interval between the first and final hit object within this group.
         /// </summary>
-        public double Duration => Children.Last().StartTime - Children.First().StartTime;
+        public double Duration => Children[^1].StartTime - Children[0].StartTime;
 
         /// <summary>
         /// The interval in ms of each hit object in this <see cref="EvenHitObjects"/>. This is only defined if there is
