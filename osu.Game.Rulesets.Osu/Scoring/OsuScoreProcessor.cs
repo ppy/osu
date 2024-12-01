@@ -17,15 +17,22 @@ namespace osu.Game.Rulesets.Osu.Scoring
         }
 
         public override ScoreRank RankFromScore(double accuracy, IReadOnlyDictionary<HitResult, int> results)
-            => adjustRank(base.RankFromScore(accuracy, results), results.GetValueOrDefault(HitResult.Miss));
+            => adjustRankFromMisses(base.RankFromScore(accuracy, results), results.GetValueOrDefault(HitResult.Miss));
 
         protected override ScoreRank MinimumRankFromScore(double accuracy, IReadOnlyDictionary<HitResult, int> results)
-            // this will be wrong when the remaining judgements do not affect accuracy and the player did not miss before,
-            // but it's a bit of a tiny detail to fix. we'll at least show an S/SS rank when the user completes the beatmap
-            // (especially when the beatmap has an outro storyboard).
-            => adjustRank(base.RankFromScore(accuracy, results), JudgedHits == MaxHits ? results.GetValueOrDefault(HitResult.Miss) : int.MaxValue);
+        {
+            // when computing minimum rank in osu!, always assume the player has missed...
+            int misses = int.MaxValue;
 
-        private ScoreRank adjustRank(ScoreRank rank, int misses)
+            // ...unless the player reached the end, at which point show the minimum rank with the player's misses count.
+            // this gives the effect where minimum rank becomes equal to actual rank when the player finishes the beatmap.
+            if (JudgedHits == MaxHits)
+                misses = results.GetValueOrDefault(HitResult.Miss);
+
+            return adjustRankFromMisses(base.RankFromScore(accuracy, results), misses);
+        }
+
+        private ScoreRank adjustRankFromMisses(ScoreRank rank, int misses)
         {
             switch (rank)
             {
