@@ -18,13 +18,14 @@ namespace osu.Game.Online
 
         protected override string GetLookupUrl(string url)
         {
+            // add leading dot to avoid matching hosts named "<anything>ppy.sh"
             if (!Uri.TryCreate(url, UriKind.Absolute, out Uri? uri) || !uri.Host.EndsWith(@".ppy.sh", StringComparison.OrdinalIgnoreCase))
             {
                 Logger.Log($@"Blocking resource lookup from external website: {url}", LoggingTarget.Network, LogLevel.Important);
                 return string.Empty;
             }
 
-            return $@"{apiEndpointUrl}/beatmapsets/discussions/media-url?url={url}";
+            return url;
         }
     }
 }
