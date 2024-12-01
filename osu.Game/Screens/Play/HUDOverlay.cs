@@ -88,7 +88,6 @@ namespace osu.Game.Screens.Play
 
         private readonly FillFlowContainer bottomRightElements;
         private readonly FillFlowContainer topRightElements;
-        private readonly Container rightSettings;
 
         internal readonly IBindable<bool> IsPlaying = new Bindable<bool>();
 
@@ -116,6 +115,8 @@ namespace osu.Game.Screens.Play
 
         public HUDOverlay([CanBeNull] DrawableRuleset drawableRuleset, IReadOnlyList<Mod> mods, bool alwaysShowLeaderboard = true)
         {
+            Container rightSettings;
+
             this.drawableRuleset = drawableRuleset;
             this.mods = mods;
 
