@@ -37,7 +37,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
         /// <returns>The calculated object density.</returns>
         public static double CalculateObjectDensity(TaikoDifficultyHitObject noteObject)
         {
-            return 50 * DifficultyCalculationUtils.Logistic(noteObject.DeltaTime, 200, 1.0 / 30);
+            double objectDensity = 50 * DifficultyCalculationUtils.Logistic(noteObject.DeltaTime, 200, 1.0 / 300);
+
+            return 1 - DifficultyCalculationUtils.Logistic(noteObject.EffectiveBPM, objectDensity, 1.0 / 240);
         }
     }
 }

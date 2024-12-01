@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
                 return 0.0;
             }
 
-            ObjectDensity = ReadingEvaluator.CalculateObjectDensity(taikoObject);
+            ObjectDensity = ReadingEvaluator.CalculateObjectDensity(taikoObject) * 10;
 
             currentStrain *= StrainDecayBase;
             currentStrain += ReadingEvaluator.EvaluateDifficultyOf(taikoObject) * SkillMultiplier;
