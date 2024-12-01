@@ -79,9 +79,6 @@ namespace osu.Game.Screens.Menu
         [Resolved(canBeNull: true)]
         private IDialogOverlay dialogOverlay { get; set; }
 
-        [Resolved(canBeNull: true)]
-        private VersionManager versionManager { get; set; }
-
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenDefault();
 
         protected override bool PlayExitSound => false;
@@ -292,16 +289,6 @@ namespace osu.Game.Screens.Menu
 
                 return originalAction.Invoke();
             }
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-
-            bottomElementsFlow.Margin = new MarginPadding
-            {
-                Bottom = (versionManager?.DrawHeight + 5) ?? 0
-            };
         }
 
         protected override void LogoSuspending(OsuLogo logo)
