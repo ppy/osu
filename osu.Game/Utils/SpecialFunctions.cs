@@ -23,7 +23,7 @@ namespace osu.Game.Utils
     {
         private const double sqrt2 = 1.4142135623730950488016887242096980785696718753769d;
         private const double sqrt2_pi = 2.5066282746310005024157652848110452530069867406099d;
-        private const double m_2_pi = 6.28318530717958647692528676655900576d;
+        private const double pi_mult_2 = 6.28318530717958647692528676655900576d;
 
         /// <summary>
         /// **************************************
@@ -905,8 +905,8 @@ namespace osu.Game.Utils
                 q = -2 * Math.Sqrt(q);
 
                 xVals[0] = q * Math.Cos(t / 3) - b;
-                xVals[1] = q * Math.Cos((t + m_2_pi) / 3) - b;
-                xVals[2] = q * Math.Cos((t - m_2_pi) / 3) - b;
+                xVals[1] = q * Math.Cos((t + pi_mult_2) / 3) - b;
+                xVals[2] = q * Math.Cos((t - pi_mult_2) / 3) - b;
 
                 return xVals;
             }
