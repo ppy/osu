@@ -23,16 +23,14 @@ namespace osu.Game.Screens.Play.HUD
 
         private const float padding = 10;
 
-        public const float CONTRACTED_WIDTH = button_size + padding * 2;
         public const float EXPANDED_WIDTH = player_settings_width + padding * 2;
 
         private const float player_settings_width = 270;
-        private const float button_size = IconButton.DEFAULT_BUTTON_SIZE;
+
+        private const int fade_duration = 200;
 
         public override void Show() => this.FadeIn(fade_duration);
         public override void Hide() => this.FadeOut(fade_duration);
-
-        private const int fade_duration = 200;
 
         // we'll handle this ourselves because we have slightly custom logic.
         protected override bool ExpandOnHover => false;

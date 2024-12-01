@@ -88,6 +88,7 @@ namespace osu.Game.Screens.Play
 
         private readonly FillFlowContainer bottomRightElements;
         private readonly FillFlowContainer topRightElements;
+        private readonly Container rightSettings;
 
         internal readonly IBindable<bool> IsPlaying = new Bindable<bool>();
 
@@ -163,7 +164,14 @@ namespace osu.Game.Screens.Play
                         HoldToQuit = CreateHoldForMenuButton(),
                     }
                 },
-                PlayerSettingsOverlay = new PlayerSettingsOverlay(),
+                rightSettings = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Children = new Drawable[]
+                    {
+                        PlayerSettingsOverlay = new PlayerSettingsOverlay(),
+                    }
+                },
                 LeaderboardFlow = new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Both,
@@ -173,7 +181,7 @@ namespace osu.Game.Screens.Play
                 },
             };
 
-            hideTargets = new List<Drawable> { mainComponents, topRightElements, PlayerSettingsOverlay };
+            hideTargets = new List<Drawable> { mainComponents, topRightElements, rightSettings };
 
             if (rulesetComponents != null)
                 hideTargets.Add(rulesetComponents);
