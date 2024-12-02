@@ -53,7 +53,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("load storyboard with only video", () =>
             {
                 // LegacyStoryboardDecoder doesn't parse WidescreenStoryboard, so it is set manually
-                loadStoryboard("storyboard_only_video.osu", s => s.BeatmapInfo.WidescreenStoryboard = false);
+                loadStoryboard("storyboard_only_video.osu", s => s.Beatmap.WidescreenStoryboard = false);
             });
 
             AddAssert("storyboard is correct width", () => Precision.AlmostEquals(storyboard?.Width ?? 0f, 480 * 16 / 9f));
