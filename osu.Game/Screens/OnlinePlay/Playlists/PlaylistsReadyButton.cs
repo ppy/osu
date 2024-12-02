@@ -88,7 +88,6 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
         private bool enoughTimeLeft()
         {
-            // TODO: This doesn't consider mods which apply variable rates, yet.
             double rate = ModUtils.CalculateRateWithMods(mods.Value);
 
             // We want to avoid users not being able to submit scores if they chose to not skip,
