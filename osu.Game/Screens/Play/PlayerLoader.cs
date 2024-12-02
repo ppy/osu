@@ -485,6 +485,8 @@ namespace osu.Game.Screens.Play
 
             if (quickRestart)
             {
+                BackButtonVisibility.Value = false;
+
                 // A quick restart starts by triggering a fade to black
                 AddInternal(quickRestartBlackLayer = new Box
                 {
@@ -503,6 +505,8 @@ namespace osu.Game.Screens.Play
                     .Delay(quick_restart_initial_delay)
                     .ScaleTo(1)
                     .FadeInFromZero(500, Easing.OutQuint);
+
+                this.Delay(quick_restart_initial_delay).Schedule(() => BackButtonVisibility.Value = true);
             }
             else
             {
