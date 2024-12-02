@@ -37,7 +37,7 @@ namespace osu.Game.Screens
 
         public string Description => Title;
 
-        public virtual bool AllowBackButton => true;
+        public virtual bool AllowUserExit => true;
 
         public virtual bool ShowFooter => false;
 
@@ -55,6 +55,15 @@ namespace osu.Game.Screens
         public readonly Bindable<OverlayActivation> OverlayActivationMode;
 
         IBindable<OverlayActivation> IOsuScreen.OverlayActivationMode => OverlayActivationMode;
+
+        /// <summary>
+        /// The initial visibility state of the back button when this screen is entered for the first time.
+        /// </summary>
+        protected virtual bool InitialBackButtonVisibility => AllowUserExit;
+
+        public readonly Bindable<bool> BackButtonVisibility;
+
+        IBindable<bool> IOsuScreen.BackButtonVisibility => BackButtonVisibility;
 
         public virtual bool CursorVisible => true;
 
@@ -154,6 +163,7 @@ namespace osu.Game.Screens
             Origin = Anchor.Centre;
 
             OverlayActivationMode = new Bindable<OverlayActivation>(InitialOverlayActivationMode);
+            BackButtonVisibility = new Bindable<bool>(InitialBackButtonVisibility);
         }
 
         [BackgroundDependencyLoader(true)]
