@@ -39,7 +39,10 @@ namespace osu.Game.Skinning
 
         public bool Protected { get; set; }
 
-        public Type GetInstanceType()
+        /// <summary>
+        /// Returns the specific subtype of <see cref="Skin"/> that will be constructed on calling <see cref="CreateInstance"/>.
+        /// </summary>
+        internal Type GetInstanceType()
         {
             var type = string.IsNullOrEmpty(InstantiationInfo)
                 // handle the case of skins imported before InstantiationInfo was added.
