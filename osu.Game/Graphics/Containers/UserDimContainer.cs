@@ -40,7 +40,7 @@ namespace osu.Game.Graphics.Containers
         /// <summary>
         /// Whether the content of this container is currently being displayed.
         /// </summary>
-        public bool ContentDisplayed { get; protected set; }
+        public bool ContentDisplayed { get; private set; }
 
         protected Bindable<double> UserDimLevel { get; private set; } = null!;
 

@@ -75,7 +75,6 @@ namespace osu.Game.Storyboards.Drawables
             Anchor = Anchor.Centre,
             Origin = Anchor.Centre,
             DimColour = Colour4.Red,
-            DimLevel = 1.0f,
         };
 
         public override bool RemoveWhenNotAlive => false;

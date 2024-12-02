@@ -170,8 +170,6 @@ namespace osu.Game.Storyboards.Drawables
 
                     private Colour4 dimColour = Colour4.Red;
 
-                    private float dimLevel = 0.5f;
-
                     private IUniformBuffer<DimParameters>? dimParametersBuffer;
 
                     protected override void BindUniformResources(IShader shader, IRenderer renderer)

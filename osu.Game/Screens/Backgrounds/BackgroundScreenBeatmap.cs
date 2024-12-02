@@ -161,7 +161,6 @@ namespace osu.Game.Screens.Backgrounds
 
                     base.Add(background = value);
 
-                    background.DimLevel = DimLevel;
                     background.DimColour = DimColour;
                     background.BlurTo(blurTarget, 0, Easing.OutQuint);
                 }
@@ -207,7 +206,6 @@ namespace osu.Game.Screens.Backgrounds
 
                 if (background != null)
                 {
-                    background.DimLevel = DimLevel;
                     background.DimColour = DimColour;
                 }
             }
@@ -230,16 +228,14 @@ namespace osu.Game.Screens.Backgrounds
                     if (IgnoreUserSettings.Value || (ShowStoryboard.Value && StoryboardReplacesBackground.Value))
                         return Colour4.Black;
 
-                    return new Colour4((float)userDimColour.Value, (float)userDimColour.Value, (float)userDimColour.Value, 1.0f);
+                    float grayscaleDimColour = (float)userDimColour.Value * DimLevel;
+                    return new Colour4(grayscaleDimColour, grayscaleDimColour, grayscaleDimColour, 1.0f);
                 }
             }
 
             protected override void UpdateVisuals()
             {
-                ContentDisplayed = ShowDimContent;
-
-                Content.FadeTo(ContentDisplayed ? 1 : 0, BACKGROUND_FADE_DURATION, Easing.OutQuint);
-                background?.TransformTo(nameof(BeatmapBackground.DimLevel), DimLevel, BACKGROUND_FADE_DURATION, Easing.OutQuint);
+                base.UpdateVisuals();
 
                 background?.TransformTo(nameof(BeatmapBackground.DimColour), DimColour, BACKGROUND_FADE_DURATION, Easing.OutQuint);
 

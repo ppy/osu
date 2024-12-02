@@ -31,18 +31,10 @@ namespace osu.Game.Graphics.Backgrounds
 
         private Colour4 dimColour;
 
-        private float dimLevel;
-
         public Colour4 DimColour
         {
             get => dimColour;
             set => ColouredDimmable.DimColour = dimColour = value;
-        }
-
-        public float DimLevel
-        {
-            get => dimLevel;
-            set => ColouredDimmable.DimLevel = dimLevel = value;
         }
 
         /// <summary>
@@ -56,7 +48,6 @@ namespace osu.Game.Graphics.Backgrounds
             this.fallbackTextureName = fallbackTextureName;
 
             DimColour = Colour4.Black;
-            DimLevel = 0.0f;
         }
 
         [BackgroundDependencyLoader]
@@ -76,7 +67,6 @@ namespace osu.Game.Graphics.Backgrounds
         protected override BufferedContainer CreateBufferedContainer()
         {
             ColouredDimmableSprite.DimColour = Colour4.Black;
-            ColouredDimmableSprite.DimLevel = 0.0f;
 
             return ColouredDimmableBufferedContainer = new DimmableBufferedContainer(cachedFrameBuffer: true)
             {
@@ -84,7 +74,6 @@ namespace osu.Game.Graphics.Backgrounds
                 RedrawOnScale = false,
                 Child = Sprite,
                 DimColour = DimColour,
-                DimLevel = DimLevel
             };
         }
 
@@ -100,15 +89,11 @@ namespace osu.Game.Graphics.Backgrounds
         public interface IColouredDimmable : IDrawable
         {
             Colour4 DimColour { get; set; }
-
-            float DimLevel { get; set; }
         }
 
         public partial class DimmableBufferedContainer : BufferedContainer, IColouredDimmable
         {
             private Colour4 dimColour;
-
-            private float dimLevel;
 
             public Colour4 DimColour
             {
@@ -120,21 +105,10 @@ namespace osu.Game.Graphics.Backgrounds
                 }
             }
 
-            public float DimLevel
-            {
-                get => dimLevel;
-                set
-                {
-                    dimLevel = value;
-                    Invalidate(Invalidation.DrawNode);
-                }
-            }
-
             public DimmableBufferedContainer(RenderBufferFormat[] formats = null, bool pixelSnapping = false, bool cachedFrameBuffer = false)
                 : base(formats, pixelSnapping, cachedFrameBuffer)
             {
                 DimColour = Colour4.Black;
-                DimLevel = 0.0f;
             }
 
             [BackgroundDependencyLoader]
@@ -156,14 +130,11 @@ namespace osu.Game.Graphics.Backgrounds
 
                 private Colour4 dimColour;
 
-                private float dimLevel;
-
                 public override void ApplyState()
                 {
                     base.ApplyState();
 
                     dimColour = Source.DimColour;
-                    dimLevel = Source.DimLevel;
                 }
 
                 private IUniformBuffer<DimParameters> dimParametersBuffer;
@@ -204,8 +175,6 @@ namespace osu.Game.Graphics.Backgrounds
         {
             private Colour4 dimColour;
 
-            private float dimLevel;
-
             public Colour4 DimColour
             {
                 get => dimColour;
@@ -216,20 +185,9 @@ namespace osu.Game.Graphics.Backgrounds
                 }
             }
 
-            public float DimLevel
-            {
-                get => dimLevel;
-                set
-                {
-                    dimLevel = value;
-                    Invalidate(Invalidation.DrawNode);
-                }
-            }
-
             public DimmableSprite()
             {
                 DimColour = Colour4.Black;
-                DimLevel = 0.0f;
             }
 
             [BackgroundDependencyLoader]
@@ -251,14 +209,11 @@ namespace osu.Game.Graphics.Backgrounds
 
                 private Colour4 dimColour;
 
-                private float dimLevel;
-
                 public override void ApplyState()
                 {
                     base.ApplyState();
 
                     dimColour = Source.DimColour;
-                    dimLevel = Source.DimLevel;
                 }
 
                 private IUniformBuffer<DimParameters> dimParametersBuffer;

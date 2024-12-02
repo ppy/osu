@@ -142,8 +142,6 @@ namespace osu.Game.Storyboards.Drawables
 
             private Colour4 dimColour = Colour4.Red;
 
-            private float dimLevel = 1.0f;
-
             public override void ApplyState()
             {
                 base.ApplyState();
