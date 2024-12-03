@@ -156,7 +156,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 double n = totalHits;
 
                 // Proportion of greats + goods hit.
-                double p = totalSuccessfulHits / n;
+                double p = Math.Max(0, totalSuccessfulHits - 0.1 * h100) / n;
 
                 // We can be 99% confident that p is at least this value.
                 double pLowerBound = (n * p + z * z / 2) / (n + z * z) - z / (n + z * z) * Math.Sqrt(n * p * (1 - p) + z * z / 4);
