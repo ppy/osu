@@ -22,14 +22,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
         }
 
         /// <summary>
-        /// Gives a bonus for target ratio using a bell-shaped function.
-        /// </summary>
-        private static double bellCurve(double ratio, double targetRatio, double width, double multiplier)
-        {
-            return multiplier * Math.Exp(Math.E * -(Math.Pow(ratio - targetRatio, 2) / Math.Pow(width, 2)));
-        }
-
-        /// <summary>
         /// Calculates the difficulty of a given ratio using a combination of periodic penalties and bonuses.
         /// </summary>
         private static double ratioDifficulty(double ratio, int terms = 8)
@@ -45,10 +37,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
             difficulty += terms;
 
             // Give bonus to near-1 ratios
-            difficulty += bellCurve(ratio, 1, 0.5, 1);
+            difficulty += DifficultyCalculationUtils.BellCurve(ratio, 1, 0.5);
 
-            // Penalise ratios that are VERY near 1
-            difficulty -= bellCurve(ratio, 1, 0.3, 1);
+            // Penalize ratios that are VERY near 1
+            difficulty -= DifficultyCalculationUtils.BellCurve(ratio, 1, 0.3);
 
             return difficulty / Math.Sqrt(8);
         }

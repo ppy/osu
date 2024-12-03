@@ -8,6 +8,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
+using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing;
@@ -215,8 +216,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 double staminaPeak = staminaPeaks[i] * 0.0317;
                 double readingPeak = readingPeaks[i] * reading_skill_multiplier;
 
-                double peak = norm(1.5, colourPeak, staminaPeak);
-                peak = norm(2, peak, rhythmPeak, readingPeak);
+                double peak = DifficultyCalculationUtils.Norm(1.5, colourPeak, staminaPeak);
+                peak = DifficultyCalculationUtils.Norm(2, peak, rhythmPeak, readingPeak);
 
                 // Sections with 0 strain are excluded to avoid worst-case time complexity of the following sort (e.g. /b/2351871).
                 // These sections will not contribute to the difficulty.
@@ -263,12 +264,5 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
             return 10.43 * Math.Log(sr / 8 + 1);
         }
-
-        /// <summary>
-        /// Returns the <i>p</i>-norm of an <i>n</i>-dimensional vector.
-        /// </summary>
-        /// <param name="p">The value of <i>p</i> to calculate the norm for.</param>
-        /// <param name="values">The coefficients of the vector.</param>
-        private double norm(double p, params double[] values) => Math.Pow(values.Sum(x => Math.Pow(x, p)), 1 / p);
     }
 }
