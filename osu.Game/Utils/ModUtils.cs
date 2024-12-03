@@ -286,6 +286,7 @@ namespace osu.Game.Utils
         {
             double rate = 1;
 
+            // TODO: This doesn't consider mods which apply variable rates, yet.
             foreach (var mod in mods.OfType<IApplicableToRate>())
                 rate = mod.ApplyToRate(0, rate);
 
