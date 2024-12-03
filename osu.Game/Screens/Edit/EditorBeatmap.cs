@@ -118,6 +118,14 @@ namespace osu.Game.Screens.Edit
                 playableBeatmap.Breaks.AddRange(Breaks);
             });
 
+            Bookmarks = new BindableList<int>(playableBeatmap.Bookmarks);
+            Bookmarks.BindCollectionChanged((_, _) =>
+            {
+                BeginChange();
+                playableBeatmap.Bookmarks = Bookmarks.OrderBy(x => x).Distinct().ToArray();
+                EndChange();
+            });
+
             PreviewTime = new BindableInt(BeatmapInfo.Metadata.PreviewTime);
             PreviewTime.BindValueChanged(s =>
             {
@@ -270,7 +278,9 @@ namespace osu.Game.Screens.Edit
             set => PlayableBeatmap.CountdownOffset = value;
         }
 
-        public int[] Bookmarks
+        public readonly BindableList<int> Bookmarks;
+
+        int[] IBeatmap.Bookmarks
         {
             get => PlayableBeatmap.Bookmarks;
             set => PlayableBeatmap.Bookmarks = value;
