@@ -53,8 +53,16 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     Action = () =>
                     {
                         checkForUpdatesButton.Enabled.Value = false;
+
+                        var checkingNotification = new ProgressNotification { Text = GeneralSettingsStrings.CheckingForUpdates, };
+                        notifications?.Post(checkingNotification);
+
                         Task.Run(updateManager.CheckForUpdateAsync).ContinueWith(task => Schedule(() =>
                         {
+                            // This sequence allows the notification to be immediately dismissed.
+                            checkingNotification.State = ProgressNotificationState.Cancelled;
+                            checkingNotification.Close(false);
+
                             if (!task.GetResultSafely())
                             {
                                 notifications?.Post(new SimpleNotification
