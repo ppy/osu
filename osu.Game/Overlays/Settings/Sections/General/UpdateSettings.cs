@@ -13,6 +13,7 @@ using osu.Framework.Screens;
 using osu.Framework.Statistics;
 using osu.Game.Configuration;
 using osu.Game.Localisation;
+using osu.Game.Overlays.Dialog;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Overlays.Settings.Sections.Maintenance;
 using osu.Game.Updater;
@@ -36,13 +37,40 @@ namespace osu.Game.Overlays.Settings.Sections.General
         [Resolved]
         private Storage storage { get; set; } = null!;
 
+        [Resolved]
+        private IDialogOverlay dialogOverlay { get; set; } = null!;
+
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config, OsuGame? game)
         {
+            var releaseStream = config.GetBindable<ReleaseStream>(OsuSetting.ReleaseStream);
             Add(new SettingsEnumDropdown<ReleaseStream>
             {
                 LabelText = GeneralSettingsStrings.ReleaseStream,
-                Current = config.GetBindable<ReleaseStream>(OsuSetting.ReleaseStream),
+                Current = releaseStream,
+            });
+
+            bool debounce = false;
+            releaseStream.BindValueChanged(r =>
+            {
+                if (debounce)
+                {
+                    debounce = false;
+                    return;
+                }
+
+                if (game?.RestartAppWhenExited() == true)
+                {
+                    game.AttemptExit();
+                }
+                else
+                {
+                    dialogOverlay.Push(new ConfirmDialog("You must restart after changing release streams. Are you sure about this?", () => game?.AttemptExit(), () =>
+                    {
+                        debounce = true;
+                        releaseStream.Value = r.OldValue;
+                    }));
+                }
             });
 
             if (updateManager?.CanCheckForUpdate == true)
