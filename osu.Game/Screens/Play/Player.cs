@@ -646,7 +646,6 @@ namespace osu.Game.Screens.Play
             // import current score if possible.
             prepareAndImportScoreAsync();
 
-            // Screen may not be current if a restart has been performed.
             if (this.IsCurrentScreen())
             {
                 skipExitTransition = skipTransition;
@@ -656,6 +655,12 @@ namespace osu.Game.Screens.Play
                 // - the pause / fail dialog was requested but is already displayed (user showing intention to exit).
                 // - the pause / fail dialog was requested but couldn't be displayed due to the type or state of this Player instance.
                 this.Exit();
+            }
+            else
+            {
+                // May be restarting from results screen.
+                if (this.GetChildScreen() != null)
+                    this.MakeCurrent();
             }
 
             return true;
@@ -721,16 +726,6 @@ namespace osu.Game.Screens.Play
 
             skipExitTransition = quickRestart;
             PrepareLoaderForRestart?.Invoke(quickRestart);
-
-            if (!this.IsCurrentScreen())
-            {
-                // if we're called externally (i.e. from results screen),
-                // use MakeCurrent to exit results screen as well as this player screen
-                // since ValidForResume = false in here
-                Debug.Assert(!ValidForResume);
-                this.MakeCurrent();
-                return true;
-            }
 
             return PerformExit(quickRestart);
         }
