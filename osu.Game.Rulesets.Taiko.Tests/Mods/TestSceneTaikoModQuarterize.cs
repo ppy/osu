@@ -52,7 +52,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Mods
                     new TaikoReplayFrame(3500, TaikoAction.LeftCentre),
                     new TaikoReplayFrame(3700),
                 },
-                PassCondition = () => Player.ScoreProcessor.Combo.Value == 6
+                PassCondition = () => Player.ScoreProcessor.Combo.Value == 6 && Player.ScoreProcessor.Accuracy.Value == 1
             });
         }
 
@@ -92,7 +92,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Mods
                 new TaikoReplayFrame(2250, TaikoAction.LeftCentre),
                 new TaikoReplayFrame(2450),
             },
-            PassCondition = () => Player.ScoreProcessor.Combo.Value == 6
+            PassCondition = () => Player.ScoreProcessor.Combo.Value == 6 && Player.ScoreProcessor.Accuracy.Value == 1
         });
 
         [Test]
@@ -127,7 +127,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Mods
                 new TaikoReplayFrame(1900),
                 new TaikoReplayFrame(2000, TaikoAction.LeftCentre),
             },
-            PassCondition = () => Player.ScoreProcessor.Combo.Value == 5
+            PassCondition = () => Player.ScoreProcessor.Combo.Value == 5 && Player.ScoreProcessor.Accuracy.Value == 1
         });
     }
 }
