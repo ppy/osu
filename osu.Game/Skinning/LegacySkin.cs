@@ -364,6 +364,8 @@ namespace osu.Game.Skinning
                         case GlobalSkinnableContainers.MainHUDComponents:
                             if (containerLookup.Ruleset != null)
                             {
+                                // Notably, there may be existing ruleset skin transformers that override the default layout returned here.
+                                // Any added component in here should be considered in the existing transformers if applicable.
                                 return new DefaultSkinComponentsContainer(container =>
                                 {
                                     var combo = container.OfType<LegacyDefaultComboCounter>().FirstOrDefault();
