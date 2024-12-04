@@ -39,7 +39,7 @@ namespace osu.Game.Tests.Visual.Skinning
             AddStep("use argon skin", () => skins.CurrentSkinInfo.Value = ArgonSkin.CreateInfo().ToLiveUnmanaged());
             testPlayerScreen((r, components) =>
             {
-                string[] globalComponents = new[]
+                string[] globalComponents =
                 {
                     nameof(ArgonAccuracyCounter), nameof(ArgonHealthDisplay), nameof(ArgonKeyCounterDisplay),
                     nameof(ArgonPerformancePointsCounter), nameof(ArgonScoreCounter), nameof(ArgonSongProgress), nameof(ArgonWedgePiece),
@@ -87,7 +87,7 @@ namespace osu.Game.Tests.Visual.Skinning
             AddStep("use legacy skin", () => skins.CurrentSkinInfo.Value = DefaultLegacySkin.CreateInfo().ToLiveUnmanaged());
             testPlayerScreen((r, components) =>
             {
-                string[] globalComponents = new[]
+                string[] globalComponents =
                 {
                     nameof(BarHitErrorMeter), nameof(LegacyAccuracyCounter), nameof(LegacyScoreCounter), nameof(LegacySongProgress),
                 };
