@@ -126,7 +126,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                 syncManager = new SpectatorSyncManager(masterClockContainer)
                 {
                     ReadyToStart = performInitialSeek,
-                }
+                },
+                new PlayerSettingsOverlay()
             };
 
             for (int i = 0; i < Users.Count; i++)

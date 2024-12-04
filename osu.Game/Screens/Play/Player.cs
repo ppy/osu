@@ -57,7 +57,7 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public event Action OnGameplayStarted;
 
-        public override bool AllowBackButton => false; // handled by HoldForMenuButton
+        public override bool AllowUserExit => false; // handled by HoldForMenuButton
 
         protected override bool PlayExitSound => !isRestarting;
 
@@ -457,7 +457,7 @@ namespace osu.Game.Screens.Play
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre
                     },
-                    BreakOverlay = new BreakOverlay(working.Beatmap.BeatmapInfo.LetterboxInBreaks, ScoreProcessor)
+                    BreakOverlay = new BreakOverlay(working.Beatmap.LetterboxInBreaks, ScoreProcessor)
                     {
                         Clock = DrawableRuleset.FrameStableClock,
                         ProcessCustomClock = false,
@@ -976,7 +976,9 @@ namespace osu.Game.Screens.Play
                 if (PauseOverlay.State.Value == Visibility.Visible)
                     PauseOverlay.Hide();
 
-                failAnimationContainer.Start();
+                bool restartOnFail = GameplayState.Mods.OfType<IApplicableFailOverride>().Any(m => m.RestartOnFail);
+                if (!restartOnFail)
+                    failAnimationContainer.Start();
 
                 // Failures can be triggered either by a judgement, or by a mod.
                 //
@@ -990,7 +992,7 @@ namespace osu.Game.Screens.Play
                     ScoreProcessor.FailScore(Score.ScoreInfo);
                     OnFail();
 
-                    if (GameplayState.Mods.OfType<IApplicableFailOverride>().Any(m => m.RestartOnFail))
+                    if (restartOnFail)
                         Restart(true);
                 });
             }

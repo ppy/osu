@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -11,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Online;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
@@ -24,17 +23,20 @@ namespace osu.Game.Tests.Visual.Online
     [TestFixture]
     public partial class TestSceneUserPanel : OsuTestScene
     {
-        private readonly Bindable<UserActivity> activity = new Bindable<UserActivity>();
+        private readonly Bindable<UserActivity?> activity = new Bindable<UserActivity?>();
         private readonly Bindable<UserStatus?> status = new Bindable<UserStatus?>();
 
-        private UserGridPanel boundPanel1;
-        private TestUserListPanel boundPanel2;
+        private UserGridPanel boundPanel1 = null!;
+        private TestUserListPanel boundPanel2 = null!;
 
         [Cached]
-        private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
+        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
+
+        [Cached(typeof(LocalUserStatisticsProvider))]
+        private readonly TestUserStatisticsProvider statisticsProvider = new TestUserStatisticsProvider();
 
         [Resolved]
-        private IRulesetStore rulesetStore { get; set; }
+        private IRulesetStore rulesetStore { get; set; } = null!;
 
         [SetUp]
         public void SetUp() => Schedule(() =>
@@ -42,7 +44,11 @@ namespace osu.Game.Tests.Visual.Online
             activity.Value = null;
             status.Value = null;
 
-            Child = new FillFlowContainer
+            Remove(statisticsProvider, false);
+            Clear();
+            Add(statisticsProvider);
+
+            Add(new FillFlowContainer
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -108,7 +114,7 @@ namespace osu.Game.Tests.Visual.Online
                         Statistics = new UserStatistics { GlobalRank = null, CountryRank = null }
                     }) { Width = 300 }
                 }
-            };
+            });
 
             boundPanel1.Status.BindTo(status);
             boundPanel1.Activity.BindTo(activity);
@@ -162,24 +168,21 @@ namespace osu.Game.Tests.Visual.Online
         {
             AddStep("update statistics", () =>
             {
-                API.UpdateStatistics(new UserStatistics
+                statisticsProvider.UpdateStatistics(new UserStatistics
                 {
                     GlobalRank = RNG.Next(100000),
                     CountryRank = RNG.Next(100000)
-                });
+                }, Ruleset.Value);
             });
             AddStep("set statistics to something big", () =>
             {
-                API.UpdateStatistics(new UserStatistics
+                statisticsProvider.UpdateStatistics(new UserStatistics
                 {
                     GlobalRank = RNG.Next(1_000_000, 100_000_000),
                     CountryRank = RNG.Next(1_000_000, 100_000_000)
-                });
+                }, Ruleset.Value);
             });
-            AddStep("set statistics to empty", () =>
-            {
-                API.UpdateStatistics(new UserStatistics());
-            });
+            AddStep("set statistics to empty", () => statisticsProvider.UpdateStatistics(new UserStatistics(), Ruleset.Value));
         }
 
         private UserActivity soloGameStatusForRuleset(int rulesetId) => new UserActivity.InSoloGame(new BeatmapInfo(), rulesetStore.GetRuleset(rulesetId)!);
@@ -200,6 +203,12 @@ namespace osu.Game.Tests.Visual.Online
             }
 
             public new TextFlowContainer LastVisitMessage => base.LastVisitMessage;
+        }
+
+        public partial class TestUserStatisticsProvider : LocalUserStatisticsProvider
+        {
+            public new void UpdateStatistics(UserStatistics newStatistics, RulesetInfo ruleset, Action<UserStatisticsUpdate>? callback = null)
+                => base.UpdateStatistics(newStatistics, ruleset, callback);
         }
     }
 }
