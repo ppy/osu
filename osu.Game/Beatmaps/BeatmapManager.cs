@@ -154,8 +154,17 @@ namespace osu.Game.Beatmaps
                 DifficultyName = NamingUtils.GetNextBestName(targetBeatmapSet.Beatmaps.Select(b => b.DifficultyName), "New Difficulty")
             };
             var newBeatmap = new Beatmap { BeatmapInfo = newBeatmapInfo };
+
             foreach (var timingPoint in referenceWorkingBeatmap.Beatmap.ControlPointInfo.TimingPoints)
                 newBeatmap.ControlPointInfo.Add(timingPoint.Time, timingPoint.DeepClone());
+
+            foreach (var effectPoint in referenceWorkingBeatmap.Beatmap.ControlPointInfo.EffectPoints)
+            {
+                if (!rulesetInfo.Equals(referenceWorkingBeatmap.BeatmapInfo.Ruleset))
+                    effectPoint.ScrollSpeedBindable.SetDefault();
+
+                newBeatmap.ControlPointInfo.Add(effectPoint.Time, effectPoint.DeepClone());
+            }
 
             return addDifficultyToSet(targetBeatmapSet, newBeatmap, referenceWorkingBeatmap.Skin);
         }
