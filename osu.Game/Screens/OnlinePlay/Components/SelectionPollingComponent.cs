@@ -36,7 +36,6 @@ namespace osu.Game.Screens.OnlinePlay.Components
 
             req.Success += result =>
             {
-                result.RemoveExpiredPlaylistItems();
                 RoomManager.AddOrUpdateRoom(result);
                 tcs.SetResult(true);
             };

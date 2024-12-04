@@ -37,11 +37,13 @@ namespace osu.Game.Overlays.Chat.ChannelList
 
         private readonly Dictionary<Channel, ChannelListItem> channelMap = new Dictionary<Channel, ChannelListItem>();
 
+        public ChannelGroup AnnounceChannelGroup { get; private set; } = null!;
+        public ChannelGroup PublicChannelGroup { get; private set; } = null!;
+        public ChannelGroup PrivateChannelGroup { get; private set; } = null!;
+
         private OsuScrollContainer scroll = null!;
         private SearchContainer groupFlow = null!;
-        private ChannelGroup announceChannelGroup = null!;
-        private ChannelGroup publicChannelGroup = null!;
-        private ChannelGroup privateChannelGroup = null!;
+
         private ChannelListItem selector = null!;
         private TextBox searchTextBox = null!;
 
@@ -77,10 +79,10 @@ namespace osu.Game.Overlays.Chat.ChannelList
                                     RelativeSizeAxes = Axes.X,
                                 }
                             },
-                            announceChannelGroup = new ChannelGroup(ChatStrings.ChannelsListTitleANNOUNCE.ToUpper()),
-                            publicChannelGroup = new ChannelGroup(ChatStrings.ChannelsListTitlePUBLIC.ToUpper()),
+                            AnnounceChannelGroup = new ChannelGroup(ChatStrings.ChannelsListTitleANNOUNCE.ToUpper(), false),
+                            PublicChannelGroup = new ChannelGroup(ChatStrings.ChannelsListTitlePUBLIC.ToUpper(), false),
                             selector = new ChannelListItem(ChannelListingChannel),
-                            privateChannelGroup = new ChannelGroup(ChatStrings.ChannelsListTitlePM.ToUpper()),
+                            PrivateChannelGroup = new ChannelGroup(ChatStrings.ChannelsListTitlePM.ToUpper(), true),
                         },
                     },
                 },
@@ -111,69 +113,70 @@ namespace osu.Game.Overlays.Chat.ChannelList
             item.OnRequestSelect += chan => OnRequestSelect?.Invoke(chan);
             item.OnRequestLeave += chan => OnRequestLeave?.Invoke(chan);
 
-            FillFlowContainer<ChannelListItem> flow = getFlowForChannel(channel);
+            ChannelGroup group = getGroupFromChannel(channel);
             channelMap.Add(channel, item);
-            flow.Add(item);
+            group.AddChannel(item);
 
             updateVisibility();
         }
 
         public void RemoveChannel(Channel channel)
         {
-            if (!channelMap.ContainsKey(channel))
+            if (!channelMap.TryGetValue(channel, out var item))
                 return;
 
-            ChannelListItem item = channelMap[channel];
-            FillFlowContainer<ChannelListItem> flow = getFlowForChannel(channel);
+            ChannelGroup group = getGroupFromChannel(channel);
 
             channelMap.Remove(channel);
-            flow.Remove(item, true);
+            group.RemoveChannel(item);
 
             updateVisibility();
         }
 
         public ChannelListItem GetItem(Channel channel)
         {
-            if (!channelMap.ContainsKey(channel))
+            if (!channelMap.TryGetValue(channel, out var item))
                 throw new ArgumentOutOfRangeException();
 
-            return channelMap[channel];
+            return item;
         }
 
         public void ScrollChannelIntoView(Channel channel) => scroll.ScrollIntoView(GetItem(channel));
 
-        private FillFlowContainer<ChannelListItem> getFlowForChannel(Channel channel)
+        private ChannelGroup getGroupFromChannel(Channel channel)
         {
             switch (channel.Type)
             {
                 case ChannelType.Public:
-                    return publicChannelGroup.ItemFlow;
+                    return PublicChannelGroup;
 
                 case ChannelType.PM:
-                    return privateChannelGroup.ItemFlow;
+                    return PrivateChannelGroup;
 
                 case ChannelType.Announce:
-                    return announceChannelGroup.ItemFlow;
+                    return AnnounceChannelGroup;
 
                 default:
-                    return publicChannelGroup.ItemFlow;
+                    return PublicChannelGroup;
             }
         }
 
         private void updateVisibility()
         {
-            if (announceChannelGroup.ItemFlow.Children.Count == 0)
-                announceChannelGroup.Hide();
+            if (AnnounceChannelGroup.ItemFlow.Children.Count == 0)
+                AnnounceChannelGroup.Hide();
             else
-                announceChannelGroup.Show();
+                AnnounceChannelGroup.Show();
         }
 
-        private partial class ChannelGroup : FillFlowContainer
+        public partial class ChannelGroup : FillFlowContainer
         {
-            public readonly FillFlowContainer<ChannelListItem> ItemFlow;
+            private readonly bool sortByRecent;
+            public readonly ChannelListItemFlow ItemFlow;
 
-            public ChannelGroup(LocalisableString label)
+            public ChannelGroup(LocalisableString label, bool sortByRecent)
             {
+                this.sortByRecent = sortByRecent;
                 Direction = FillDirection.Vertical;
                 RelativeSizeAxes = Axes.X;
                 AutoSizeAxes = Axes.Y;
@@ -187,13 +190,67 @@ namespace osu.Game.Overlays.Chat.ChannelList
                         Margin = new MarginPadding { Left = 18, Bottom = 5 },
                         Font = OsuFont.Torus.With(size: 12, weight: FontWeight.SemiBold),
                     },
-                    ItemFlow = new FillFlowContainer<ChannelListItem>
+                    ItemFlow = new ChannelListItemFlow(sortByRecent)
                     {
                         Direction = FillDirection.Vertical,
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
                     },
                 };
+            }
+
+            public partial class ChannelListItemFlow : FillFlowContainer<ChannelListItem>
+            {
+                private readonly bool sortByRecent;
+
+                public ChannelListItemFlow(bool sortByRecent)
+                {
+                    this.sortByRecent = sortByRecent;
+                }
+
+                public void Reflow() => InvalidateLayout();
+
+                public override IEnumerable<Drawable> FlowingChildren => sortByRecent
+                    ? base.FlowingChildren.OfType<ChannelListItem>().OrderByDescending(i => i.Channel.LastMessageId ?? long.MinValue)
+                    : base.FlowingChildren.OfType<ChannelListItem>().OrderBy(i => i.Channel.Name);
+            }
+
+            public void AddChannel(ChannelListItem item)
+            {
+                ItemFlow.Add(item);
+
+                if (sortByRecent)
+                {
+                    item.Channel.NewMessagesArrived += newMessagesArrived;
+                    item.Channel.PendingMessageResolved += pendingMessageResolved;
+                }
+
+                ItemFlow.Reflow();
+            }
+
+            public void RemoveChannel(ChannelListItem item)
+            {
+                if (sortByRecent)
+                {
+                    item.Channel.NewMessagesArrived -= newMessagesArrived;
+                    item.Channel.PendingMessageResolved -= pendingMessageResolved;
+                }
+
+                ItemFlow.Remove(item, true);
+            }
+
+            private void pendingMessageResolved(LocalEchoMessage _, Message __) => ItemFlow.Reflow();
+            private void newMessagesArrived(IEnumerable<Message> _) => ItemFlow.Reflow();
+
+            protected override void Dispose(bool isDisposing)
+            {
+                base.Dispose(isDisposing);
+
+                foreach (var item in ItemFlow)
+                {
+                    item.Channel.NewMessagesArrived -= newMessagesArrived;
+                    item.Channel.PendingMessageResolved -= pendingMessageResolved;
+                }
             }
         }
 
