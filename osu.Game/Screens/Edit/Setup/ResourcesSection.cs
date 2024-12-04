@@ -103,6 +103,7 @@ namespace osu.Game.Screens.Edit.Setup
 
         private void changeResource(FileInfo source, bool applyToAllDifficulties, string baseFilename, Func<BeatmapMetadata, string> readFilename, Action<BeatmapMetadata, string> writeFilename)
         {
+            var thisBeatmap = working.Value.BeatmapInfo;
             var set = working.Value.BeatmapSetInfo;
 
             string newFilename = string.Empty;
@@ -117,12 +118,17 @@ namespace osu.Game.Screens.Edit.Setup
                         beatmaps.DeleteFile(set, otherExistingFile);
 
                     writeFilename(beatmap.Metadata, newFilename);
+
+                    if (!beatmap.Equals(thisBeatmap))
+                    {
+                        // save the difficulty to re-encode the .osu file, updating any reference of the old filename.
+                        var beatmapWorking = beatmaps.GetWorkingBeatmap(beatmap);
+                        beatmaps.Save(beatmap, beatmapWorking.Beatmap, beatmapWorking.GetSkin());
+                    }
                 }
             }
             else
             {
-                var thisBeatmap = working.Value.BeatmapInfo;
-
                 string[] filenames = set.Files.Select(f => f.Filename).Where(f =>
                     f.StartsWith(baseFilename, StringComparison.OrdinalIgnoreCase) &&
                     f.EndsWith(source.Extension, StringComparison.OrdinalIgnoreCase)).ToArray();
