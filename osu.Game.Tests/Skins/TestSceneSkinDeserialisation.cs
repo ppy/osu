@@ -8,6 +8,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
+using osu.Framework.Testing;
 using osu.Game.Database;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play.HUD;
@@ -27,6 +28,7 @@ namespace osu.Game.Tests.Skins
     /// If this test breaks, check any naming or class structure changes.
     /// Migration rules may need to be added to <see cref="Skin"/>.
     /// </remarks>
+    [HeadlessTest]
     public partial class TestSceneSkinDeserialisation : OsuTestScene
     {
         private static readonly string[] available_skins =
