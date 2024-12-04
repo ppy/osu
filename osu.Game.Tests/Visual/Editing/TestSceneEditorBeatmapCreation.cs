@@ -4,15 +4,20 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Text;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
+using osu.Framework.Extensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.IO.Stores;
+using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Beatmaps.Formats;
 using osu.Game.Collections;
 using osu.Game.Database;
 using osu.Game.Overlays.Dialog;
@@ -27,6 +32,7 @@ using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
 using osu.Game.Screens.Edit.Setup;
+using osu.Game.Skinning;
 using osu.Game.Storyboards;
 using osu.Game.Tests.Resources;
 using osuTK;
@@ -528,6 +534,32 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
+        public void TestBackgroundFileChangesPreserveOnEncode()
+        {
+            AddStep("enter setup mode", () => Editor.Mode.Value = EditorScreenMode.SongSetup);
+            AddAssert("set background", () => setBackground(applyToAllDifficulties: true, expected: "bg.jpg"));
+
+            createNewDifficulty();
+            createNewDifficulty();
+
+            switchToDifficulty(0);
+
+            AddAssert("set different background on all diff", () => setBackgroundDifferentExtension(applyToAllDifficulties: true, expected: "bg.jpeg"));
+            AddAssert("all diff uses one background", () => Beatmap.Value.BeatmapSetInfo.Beatmaps.All(b => b.Metadata.BackgroundFile == "bg.jpeg"));
+            AddAssert("all diff encode same background", () =>
+            {
+                return Beatmap.Value.BeatmapSetInfo.Beatmaps.All(b =>
+                {
+                    var files = new RealmFileStore(Realm, Dependencies.Get<GameHost>().Storage);
+                    using var store = new RealmBackedResourceStore<BeatmapSetInfo>(b.BeatmapSet!.ToLive(Realm), files.Store, Realm);
+                    string[] osu = Encoding.UTF8.GetString(store.Get(b.File!.Filename)).Split(Environment.NewLine);
+                    Assert.That(osu, Does.Contain("0,0,\"bg.jpeg\",0,0"));
+                    return true;
+                });
+            });
+        }
+
+        [Test]
         public void TestSingleAudioFile()
         {
             AddStep("enter setup mode", () => Editor.Mode.Value = EditorScreenMode.SongSetup);
@@ -637,6 +669,25 @@ namespace osu.Game.Tests.Visual.Editing
             {
                 bool success = setup.ChildrenOfType<ResourcesSection>().First().ChangeBackgroundImage(
                     new FileInfo(Path.Combine(extractedFolder, @"machinetop_background.jpg")),
+                    applyToAllDifficulties);
+
+                Assert.That(Beatmap.Value.Metadata.BackgroundFile, Is.EqualTo(expected));
+                return success;
+            });
+        }
+
+        private bool setBackgroundDifferentExtension(bool applyToAllDifficulties, string expected)
+        {
+            var setup = Editor.ChildrenOfType<SetupScreen>().First();
+
+            return setFile(TestResources.GetQuickTestBeatmapForImport(), extractedFolder =>
+            {
+                File.Move(
+                    Path.Combine(extractedFolder, @"machinetop_background.jpg"),
+                    Path.Combine(extractedFolder, @"machinetop_background.jpeg"));
+
+                bool success = setup.ChildrenOfType<ResourcesSection>().First().ChangeBackgroundImage(
+                    new FileInfo(Path.Combine(extractedFolder, @"machinetop_background.jpeg")),
                     applyToAllDifficulties);
 
                 Assert.That(Beatmap.Value.Metadata.BackgroundFile, Is.EqualTo(expected));
