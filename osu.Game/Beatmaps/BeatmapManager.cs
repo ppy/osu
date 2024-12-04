@@ -408,7 +408,7 @@ namespace osu.Game.Beatmaps
                     // user requested abort
                     return;
 
-                var video = b.Files.FirstOrDefault(f => OsuGameBase.VIDEO_EXTENSIONS.Any(ex => f.Filename.EndsWith(ex, StringComparison.OrdinalIgnoreCase)));
+                var video = b.Files.FirstOrDefault(f => SupportedExtensions.VIDEO_EXTENSIONS.Any(ex => f.Filename.EndsWith(ex, StringComparison.OrdinalIgnoreCase)));
 
                 if (video != null)
                 {
@@ -559,7 +559,11 @@ namespace osu.Game.Beatmaps
                 // If we seem to be missing files, now is a good time to re-fetch.
                 bool missingFiles = beatmapInfo.BeatmapSet?.Files.Count == 0;
 
-                if (refetch || beatmapInfo.IsManaged || missingFiles)
+                if (beatmapInfo.IsManaged)
+                {
+                    beatmapInfo = beatmapInfo.Detach();
+                }
+                else if (refetch || missingFiles)
                 {
                     Guid id = beatmapInfo.ID;
                     beatmapInfo = Realm.Run(r => r.Find<BeatmapInfo>(id)?.Detach()) ?? beatmapInfo;

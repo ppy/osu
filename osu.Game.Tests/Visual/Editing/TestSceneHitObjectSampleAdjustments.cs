@@ -527,8 +527,11 @@ namespace osu.Game.Tests.Visual.Editing
             checkPlacementSampleBank(HitSampleInfo.BANK_NORMAL);
             checkPlacementSampleAdditionBank(HitSampleInfo.BANK_NORMAL);
 
-            void checkPlacementSampleBank(string expected) => AddAssert($"Placement sample is {expected}", () => EditorBeatmap.PlacementObject.Value.Samples.First(s => s.Name == HitSampleInfo.HIT_NORMAL).Bank, () => Is.EqualTo(expected));
-            void checkPlacementSampleAdditionBank(string expected) => AddAssert($"Placement sample addition is {expected}", () => EditorBeatmap.PlacementObject.Value.Samples.First(s => s.Name != HitSampleInfo.HIT_NORMAL).Bank, () => Is.EqualTo(expected));
+            void checkPlacementSampleBank(string expected) => AddAssert($"Placement sample is {expected}",
+                () => EditorBeatmap.PlacementObject.Value.Samples.First(s => s.Name == HitSampleInfo.HIT_NORMAL).Bank, () => Is.EqualTo(expected));
+
+            void checkPlacementSampleAdditionBank(string expected) => AddAssert($"Placement sample addition is {expected}",
+                () => EditorBeatmap.PlacementObject.Value.Samples.First(s => s.Name != HitSampleInfo.HIT_NORMAL).Bank, () => Is.EqualTo(expected));
         }
 
         [Test]
@@ -781,15 +784,39 @@ namespace osu.Game.Tests.Visual.Editing
             setAdditionBankViaPopover(HitSampleInfo.BANK_SOFT);
             dismissPopover();
 
-            hitObjectHasSamples(0, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_FINISH);
-            hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_NORMAL);
-            hitObjectHasSampleAdditionBank(0, HitSampleInfo.BANK_SOFT);
+            assertNoChanges();
 
-            AddStep("select first object", () => EditorBeatmap.SelectedHitObjects.Add(EditorBeatmap.HitObjects[0]));
+            AddStep("select first object", () =>
+            {
+                EditorBeatmap.SelectedHitObjects.Clear();
+                EditorBeatmap.SelectedHitObjects.Add(EditorBeatmap.HitObjects[0]);
+            });
+            assertNoChanges();
 
-            hitObjectHasSamples(0, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_FINISH);
-            hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_NORMAL);
-            hitObjectHasSampleAdditionBank(0, HitSampleInfo.BANK_SOFT);
+            AddStep("select second object", () =>
+            {
+                EditorBeatmap.SelectedHitObjects.Clear();
+                EditorBeatmap.SelectedHitObjects.Add(EditorBeatmap.HitObjects[1]);
+            });
+            assertNoChanges();
+
+            AddStep("select first object", () =>
+            {
+                EditorBeatmap.SelectedHitObjects.Clear();
+                EditorBeatmap.SelectedHitObjects.Add(EditorBeatmap.HitObjects[0]);
+            });
+            assertNoChanges();
+
+            void assertNoChanges()
+            {
+                hitObjectHasSamples(0, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_FINISH);
+                hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_NORMAL);
+                hitObjectHasSampleAdditionBank(0, HitSampleInfo.BANK_SOFT);
+
+                hitObjectHasSamples(1, HitSampleInfo.HIT_NORMAL);
+                hitObjectHasSampleNormalBank(1, HitSampleInfo.BANK_SOFT);
+                hitObjectHasSampleAdditionBank(1, HitSampleInfo.BANK_SOFT);
+            }
         }
 
         private void clickSamplePiece(int objectIndex) => AddStep($"click {objectIndex.ToOrdinalWords()} sample piece", () =>
@@ -883,11 +910,12 @@ namespace osu.Game.Tests.Visual.Editing
             return h.Samples.All(o => o.Volume == volume);
         });
 
-        private void hitObjectNodeHasSampleVolume(int objectIndex, int nodeIndex, int volume) => AddAssert($"{objectIndex.ToOrdinalWords()} object {nodeIndex.ToOrdinalWords()} node has volume {volume}", () =>
-        {
-            var h = EditorBeatmap.HitObjects.ElementAt(objectIndex) as IHasRepeats;
-            return h is not null && h.NodeSamples[nodeIndex].All(o => o.Volume == volume);
-        });
+        private void hitObjectNodeHasSampleVolume(int objectIndex, int nodeIndex, int volume) => AddAssert(
+            $"{objectIndex.ToOrdinalWords()} object {nodeIndex.ToOrdinalWords()} node has volume {volume}", () =>
+            {
+                var h = EditorBeatmap.HitObjects.ElementAt(objectIndex) as IHasRepeats;
+                return h is not null && h.NodeSamples[nodeIndex].All(o => o.Volume == volume);
+            });
 
         private void setBankViaPopover(string bank) => AddStep($"set bank {bank} via popover", () =>
         {
@@ -944,29 +972,33 @@ namespace osu.Game.Tests.Visual.Editing
             return h.Samples.Where(o => o.Name != HitSampleInfo.HIT_NORMAL).All(o => o.Bank == bank);
         });
 
-        private void hitObjectNodeHasSamples(int objectIndex, int nodeIndex, params string[] samples) => AddAssert($"{objectIndex.ToOrdinalWords()} object {nodeIndex.ToOrdinalWords()} node has samples {string.Join(',', samples)}", () =>
-        {
-            var h = EditorBeatmap.HitObjects.ElementAt(objectIndex) as IHasRepeats;
-            return h is not null && h.NodeSamples[nodeIndex].Select(s => s.Name).SequenceEqual(samples);
-        });
+        private void hitObjectNodeHasSamples(int objectIndex, int nodeIndex, params string[] samples) => AddAssert(
+            $"{objectIndex.ToOrdinalWords()} object {nodeIndex.ToOrdinalWords()} node has samples {string.Join(',', samples)}", () =>
+            {
+                var h = EditorBeatmap.HitObjects.ElementAt(objectIndex) as IHasRepeats;
+                return h is not null && h.NodeSamples[nodeIndex].Select(s => s.Name).SequenceEqual(samples);
+            });
 
-        private void hitObjectNodeHasSampleBank(int objectIndex, int nodeIndex, string bank) => AddAssert($"{objectIndex.ToOrdinalWords()} object {nodeIndex.ToOrdinalWords()} node has bank {bank}", () =>
-        {
-            var h = EditorBeatmap.HitObjects.ElementAt(objectIndex) as IHasRepeats;
-            return h is not null && h.NodeSamples[nodeIndex].All(o => o.Bank == bank);
-        });
+        private void hitObjectNodeHasSampleBank(int objectIndex, int nodeIndex, string bank) => AddAssert($"{objectIndex.ToOrdinalWords()} object {nodeIndex.ToOrdinalWords()} node has bank {bank}",
+            () =>
+            {
+                var h = EditorBeatmap.HitObjects.ElementAt(objectIndex) as IHasRepeats;
+                return h is not null && h.NodeSamples[nodeIndex].All(o => o.Bank == bank);
+            });
 
-        private void hitObjectNodeHasSampleNormalBank(int objectIndex, int nodeIndex, string bank) => AddAssert($"{objectIndex.ToOrdinalWords()} object {nodeIndex.ToOrdinalWords()} node has normal bank {bank}", () =>
-        {
-            var h = EditorBeatmap.HitObjects.ElementAt(objectIndex) as IHasRepeats;
-            return h is not null && h.NodeSamples[nodeIndex].Where(o => o.Name == HitSampleInfo.HIT_NORMAL).All(o => o.Bank == bank);
-        });
+        private void hitObjectNodeHasSampleNormalBank(int objectIndex, int nodeIndex, string bank) => AddAssert(
+            $"{objectIndex.ToOrdinalWords()} object {nodeIndex.ToOrdinalWords()} node has normal bank {bank}", () =>
+            {
+                var h = EditorBeatmap.HitObjects.ElementAt(objectIndex) as IHasRepeats;
+                return h is not null && h.NodeSamples[nodeIndex].Where(o => o.Name == HitSampleInfo.HIT_NORMAL).All(o => o.Bank == bank);
+            });
 
-        private void hitObjectNodeHasSampleAdditionBank(int objectIndex, int nodeIndex, string bank) => AddAssert($"{objectIndex.ToOrdinalWords()} object {nodeIndex.ToOrdinalWords()} node has addition bank {bank}", () =>
-        {
-            var h = EditorBeatmap.HitObjects.ElementAt(objectIndex) as IHasRepeats;
-            return h is not null && h.NodeSamples[nodeIndex].Where(o => o.Name != HitSampleInfo.HIT_NORMAL).All(o => o.Bank == bank);
-        });
+        private void hitObjectNodeHasSampleAdditionBank(int objectIndex, int nodeIndex, string bank) => AddAssert(
+            $"{objectIndex.ToOrdinalWords()} object {nodeIndex.ToOrdinalWords()} node has addition bank {bank}", () =>
+            {
+                var h = EditorBeatmap.HitObjects.ElementAt(objectIndex) as IHasRepeats;
+                return h is not null && h.NodeSamples[nodeIndex].Where(o => o.Name != HitSampleInfo.HIT_NORMAL).All(o => o.Bank == bank);
+            });
 
         private void editorTimeIs(double time) => AddAssert($"editor time is {time}", () => Precision.AlmostEquals(EditorClock.CurrentTimeAccurate, time, 1));
     }

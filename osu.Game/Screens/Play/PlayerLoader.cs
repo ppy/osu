@@ -28,6 +28,7 @@ using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Performance;
+using osu.Game.Scoring;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play.PlayerSettings;
 using osu.Game.Skinning;
@@ -77,6 +78,8 @@ namespace osu.Game.Screens.Play
 
         private FillFlowContainer disclaimers = null!;
         private OsuScrollContainer settingsScroll = null!;
+
+        private Bindable<ScoreInfo?> lastScore = null!;
 
         private Bindable<bool> showStoryboards = null!;
 
@@ -179,6 +182,8 @@ namespace osu.Game.Screens.Play
         {
             muteWarningShownOnce = sessionStatics.GetBindable<bool>(Static.MutedAudioNotificationShownOnce);
             batteryWarningShownOnce = sessionStatics.GetBindable<bool>(Static.LowBatteryNotificationShownOnce);
+            lastScore = sessionStatics.GetBindable<ScoreInfo?>(Static.LastLocalUserScore);
+
             showStoryboards = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
 
             const float padding = 25;
@@ -237,7 +242,7 @@ namespace osu.Game.Screens.Play
                 sampleRestart = new SkinnableSound(new SampleInfo(@"Gameplay/restart", @"pause-retry-click"))
             };
 
-            if (Beatmap.Value.BeatmapInfo.EpilepsyWarning)
+            if (Beatmap.Value.Beatmap.EpilepsyWarning)
             {
                 disclaimers.Add(epilepsyWarning = new PlayerLoaderDisclaimer(PlayerLoaderStrings.EpilepsyWarningTitle, PlayerLoaderStrings.EpilepsyWarningContent));
             }
@@ -346,6 +351,8 @@ namespace osu.Game.Screens.Play
 
             highPerformanceSession?.Dispose();
             highPerformanceSession = null;
+
+            lastScore.Value = null;
 
             return base.OnExiting(e);
         }
@@ -478,6 +485,8 @@ namespace osu.Game.Screens.Play
 
             if (quickRestart)
             {
+                BackButtonVisibility.Value = false;
+
                 // A quick restart starts by triggering a fade to black
                 AddInternal(quickRestartBlackLayer = new Box
                 {
@@ -496,6 +505,8 @@ namespace osu.Game.Screens.Play
                     .Delay(quick_restart_initial_delay)
                     .ScaleTo(1)
                     .FadeInFromZero(500, Easing.OutQuint);
+
+                this.Delay(quick_restart_initial_delay).Schedule(() => BackButtonVisibility.Value = true);
             }
             else
             {

@@ -78,12 +78,12 @@ namespace osu.Game.Tests.Visual.Spectator
         /// <param name="state">The spectator state to end play with.</param>
         public void SendEndPlay(int userId, SpectatedUserState state = SpectatedUserState.Quit)
         {
-            if (!userBeatmapDictionary.ContainsKey(userId))
+            if (!userBeatmapDictionary.TryGetValue(userId, out int value))
                 return;
 
             ((ISpectatorClient)this).UserFinishedPlaying(userId, new SpectatorState
             {
-                BeatmapID = userBeatmapDictionary[userId],
+                BeatmapID = value,
                 RulesetID = 0,
                 Mods = userModsDictionary[userId],
                 State = state

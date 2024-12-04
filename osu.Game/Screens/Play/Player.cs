@@ -57,7 +57,7 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public event Action OnGameplayStarted;
 
-        public override bool AllowBackButton => false; // handled by HoldForMenuButton
+        public override bool AllowUserExit => false; // handled by HoldForMenuButton
 
         protected override bool PlayExitSound => !isRestarting;
 
@@ -457,7 +457,7 @@ namespace osu.Game.Screens.Play
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre
                     },
-                    BreakOverlay = new BreakOverlay(working.Beatmap.BeatmapInfo.LetterboxInBreaks, ScoreProcessor)
+                    BreakOverlay = new BreakOverlay(working.Beatmap.LetterboxInBreaks, ScoreProcessor)
                     {
                         Clock = DrawableRuleset.FrameStableClock,
                         ProcessCustomClock = false,

@@ -375,6 +375,7 @@ namespace osu.Game.Online.Rooms
             Type = other.Type;
             MaxParticipants = other.MaxParticipants;
             ParticipantCount = other.ParticipantCount;
+            StartDate = other.StartDate;
             EndDate = other.EndDate;
             UserScore = other.UserScore;
             QueueMode = other.QueueMode;
