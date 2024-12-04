@@ -35,6 +35,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
         {
             var taikoBeatmap = (TaikoBeatmap)beatmap;
             var controlPointInfo = taikoBeatmap.ControlPointInfo;
+            List<Hit> hits = taikoBeatmap.HitObjects.Where(obj => obj is Hit).Cast<Hit>().ToList();
             List<Hit> toRemove = new List<Hit>();
 
             // Snap conversions for rhythms
@@ -46,8 +47,6 @@ namespace osu.Game.Rulesets.Taiko.Mods
             };
 
             bool inPattern = false;
-
-            List<Hit> hits = taikoBeatmap.HitObjects.Where(obj => obj is Hit).Cast<Hit>().ToList();
 
             foreach (var snapConversion in snapConversions)
             {
@@ -73,10 +72,10 @@ namespace osu.Game.Rulesets.Taiko.Mods
                         inPattern = true;
                     }
 
-                    // check if end of pattern
+                    // Check if end of pattern
                     if (inPattern && snapValue != snapConversion.Key)
                     {
-                        // End of the pattern
+                        // End pattern
                         inPattern = false;
 
                         // Iterate through the pattern
