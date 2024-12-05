@@ -10,7 +10,7 @@ namespace osu.Game.Overlays.Settings.Sections.DebugSettings
 {
     public partial class GeneralSettings : SettingsSubsection
     {
-        protected override LocalisableString Header => "General";
+        protected override LocalisableString Header => @"General";
 
         [BackgroundDependencyLoader]
         private void load(FrameworkDebugConfigManager config, FrameworkConfigManager frameworkConfig)
@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Settings.Sections.DebugSettings
             {
                 new SettingsCheckbox
                 {
-                    LabelText = "Show log overlay",
+                    LabelText = @"Show log overlay",
                     Current = frameworkConfig.GetBindable<bool>(FrameworkSetting.ShowLogOverlay)
                 },
                 new SettingsCheckbox
