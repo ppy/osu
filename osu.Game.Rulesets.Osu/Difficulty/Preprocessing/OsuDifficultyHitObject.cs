@@ -86,6 +86,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// </summary>
         public double HitWindowGreat { get; private set; }
 
+        /// <summary>
+        /// The maximum combo played before this <see cref="OsuDifficultyHitObject"/>.
+        /// </summary>
+        public int PreviousMaxCombo { get; private set; }
+
+        /// <summary>
+        /// The maximum combo played after this <see cref="OsuDifficultyHitObject"/>.
+        /// </summary>
+        public int CurrentMaxCombo { get; private set; }
+
         private readonly OsuHitObject? lastLastObject;
         private readonly OsuHitObject lastObject;
 
@@ -108,6 +118,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             }
 
             setDistances(clockRate);
+
+            PreviousMaxCombo = index > 0 ? ((OsuDifficultyHitObject)Previous(0)).CurrentMaxCombo : getObjectCombo(lastObject);
+            CurrentMaxCombo = PreviousMaxCombo + getObjectCombo(hitObject);
         }
 
         public double OpacityAt(double time, bool hidden)
@@ -347,6 +360,24 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             }
 
             return pos;
+        }
+
+        private int getObjectCombo(HitObject hitObject)
+        {
+            int combo = 0;
+
+            addCombo(hitObject, ref combo);
+
+            return combo;
+
+            static void addCombo(HitObject hitObject, ref int combo)
+            {
+                if (hitObject.Judgement.MaxResult.AffectsCombo())
+                    combo++;
+
+                foreach (var nested in hitObject.NestedHitObjects)
+                    addCombo(nested, ref combo);
+            }
         }
     }
 }
