@@ -346,6 +346,7 @@ namespace osu.Game.Screens.Select.Carousel
             }
 
             private RecommendationType type = RecommendationType.NotRecommended;
+
             public RecommendationType Type
             {
                 get => type;

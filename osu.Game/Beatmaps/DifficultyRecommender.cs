@@ -125,7 +125,7 @@ namespace osu.Game.Beatmaps
             var difficulties = new Dictionary<DrawableCarouselBeatmap, StarDifficulty?>();
 
             foreach (DrawableCarouselItem beatmap in beatmaps)
-                ((DrawableCarouselBeatmap)beatmap).StarDifficultyChangedCallback = (d) => updateRecommendedHighlight((DrawableCarouselBeatmap)beatmap, d);
+                ((DrawableCarouselBeatmap)beatmap).StarDifficultyChangedCallback = d => updateRecommendedHighlight((DrawableCarouselBeatmap)beatmap, d);
 
             void updateRecommendedHighlight(DrawableCarouselBeatmap updatedBeatmap, StarDifficulty? updatedDifficulty)
             {
@@ -149,7 +149,7 @@ namespace osu.Game.Beatmaps
 
                 foreach ((DrawableCarouselBeatmap beatmap, StarDifficulty? difficulty) in difficulties)
                 {
-                    if (difficulty == null || difficulty.Value.PerformanceAttributes == null)
+                    if (difficulty?.PerformanceAttributes == null)
                         continue;
 
                     double mapPerformance = difficulty.Value.PerformanceAttributes!.Total;
@@ -174,7 +174,6 @@ namespace osu.Game.Beatmaps
 
                 foreach ((DrawableCarouselBeatmap beatmap, _) in difficulties)
                     beatmap.Recommendation = beatmap == bestMatch ? bestMatchType : RecommendationType.NotRecommended;
-
             }
         }
 
