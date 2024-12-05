@@ -242,7 +242,7 @@ namespace osu.Game.Screens.Play
                 sampleRestart = new SkinnableSound(new SampleInfo(@"Gameplay/restart", @"pause-retry-click"))
             };
 
-            if (Beatmap.Value.BeatmapInfo.EpilepsyWarning)
+            if (Beatmap.Value.Beatmap.EpilepsyWarning)
             {
                 disclaimers.Add(epilepsyWarning = new PlayerLoaderDisclaimer(PlayerLoaderStrings.EpilepsyWarningTitle, PlayerLoaderStrings.EpilepsyWarningContent));
             }
@@ -457,7 +457,7 @@ namespace osu.Game.Screens.Play
             CurrentPlayer = createPlayer();
             CurrentPlayer.Configuration.AutomaticallySkipIntro |= quickRestart;
             CurrentPlayer.RestartCount = restartCount++;
-            CurrentPlayer.RestartRequested = restartRequested;
+            CurrentPlayer.PrepareLoaderForRestart = prepareForRestart;
 
             LoadTask = LoadComponentAsync(CurrentPlayer, _ =>
             {
@@ -470,13 +470,11 @@ namespace osu.Game.Screens.Play
         {
         }
 
-        private void restartRequested(bool quickRestartRequested)
+        private void prepareForRestart(bool quickRestartRequested)
         {
             quickRestart = quickRestartRequested;
             hideOverlays = true;
             ValidForResume = true;
-
-            this.MakeCurrent();
         }
 
         private void contentIn(double delayBeforeSideDisplays = 0)
@@ -485,6 +483,8 @@ namespace osu.Game.Screens.Play
 
             if (quickRestart)
             {
+                BackButtonVisibility.Value = false;
+
                 // A quick restart starts by triggering a fade to black
                 AddInternal(quickRestartBlackLayer = new Box
                 {
@@ -503,6 +503,8 @@ namespace osu.Game.Screens.Play
                     .Delay(quick_restart_initial_delay)
                     .ScaleTo(1)
                     .FadeInFromZero(500, Easing.OutQuint);
+
+                this.Delay(quick_restart_initial_delay).Schedule(() => BackButtonVisibility.Value = true);
             }
             else
             {
