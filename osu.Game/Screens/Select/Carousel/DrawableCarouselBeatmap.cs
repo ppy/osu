@@ -95,7 +95,7 @@ namespace osu.Game.Screens.Select.Carousel
 
         public Action<StarDifficulty?>? StarDifficultyChangedCallback = null;
 
-        public RecommendationType RecommendedType { set => recommendationStar.Type = value; }
+        public RecommendationType Recommendation { set => recommendationStar.Type = value; }
 
         public DrawableCarouselBeatmap(CarouselBeatmap panel)
         {

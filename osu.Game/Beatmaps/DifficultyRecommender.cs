@@ -173,7 +173,7 @@ namespace osu.Game.Beatmaps
                 }
 
                 foreach ((DrawableCarouselBeatmap beatmap, _) in difficulties)
-                    beatmap.RecommendedType = beatmap == bestMatch ? bestMatchType : RecommendationType.NotRecommended;
+                    beatmap.Recommendation = beatmap == bestMatch ? bestMatchType : RecommendationType.NotRecommended;
 
             }
         }
