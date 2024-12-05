@@ -174,7 +174,7 @@ namespace osu.Game.Screens.Select.Carousel
             }
             else
             {
-                DrawableCarouselItem?[] beatmaps = visibleBeatmaps.Select(c => c.CreateDrawableRepresentation()).ToArray();
+                DrawableCarouselItem[] beatmaps = visibleBeatmaps.Select(c => c.CreateDrawableRepresentation()).Where(i => i != null).Cast<DrawableCarouselItem>().ToArray();
 
                 // on selection we show our child beatmaps.
                 // for now this is a simple drawable construction each selection.
