@@ -457,7 +457,7 @@ namespace osu.Game.Screens.Play
             CurrentPlayer = createPlayer();
             CurrentPlayer.Configuration.AutomaticallySkipIntro |= quickRestart;
             CurrentPlayer.RestartCount = restartCount++;
-            CurrentPlayer.RestartRequested = restartRequested;
+            CurrentPlayer.PrepareLoaderForRestart = prepareForRestart;
 
             LoadTask = LoadComponentAsync(CurrentPlayer, _ =>
             {
@@ -470,13 +470,11 @@ namespace osu.Game.Screens.Play
         {
         }
 
-        private void restartRequested(bool quickRestartRequested)
+        private void prepareForRestart(bool quickRestartRequested)
         {
             quickRestart = quickRestartRequested;
             hideOverlays = true;
             ValidForResume = true;
-
-            this.MakeCurrent();
         }
 
         private void contentIn(double delayBeforeSideDisplays = 0)
