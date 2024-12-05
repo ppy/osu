@@ -14,7 +14,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
-using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets.Mods;
@@ -36,7 +35,7 @@ namespace osu.Game.Screens.Select
         private INotificationOverlay? notifications { get; set; }
 
         [Resolved]
-        private LeaderboardScoresProvider<BeatmapLeaderboardScope, ScoreInfo> leaderboardProvider { get; set; } = null!;
+        private BeatmapLeaderboardScoresProvider scoresProvider { get; set; } = null!;
 
         public override bool AllowExternalScreenChange => true;
 
@@ -63,7 +62,7 @@ namespace osu.Game.Screens.Select
 
         protected override BeatmapDetailArea CreateBeatmapDetailArea()
         {
-            playBeatmapDetailArea = new PlayBeatmapDetailArea(PresentScore);
+            playBeatmapDetailArea = new PlayBeatmapDetailArea(scoresProvider, PresentScore);
 
             return playBeatmapDetailArea;
         }
@@ -130,14 +129,14 @@ namespace osu.Game.Screens.Select
                 {
                     player = new ReplayPlayer((beatmap, mods) => replayGeneratingMod.CreateScoreFromReplayData(beatmap, mods))
                     {
-                        LeaderboardScores = { BindTarget = leaderboardProvider.Scores }
+                        LeaderboardScores = { BindTarget = scoresProvider.Scores }
                     };
                 }
                 else
                 {
                     player = new SoloPlayer
                     {
-                        LeaderboardScores = { BindTarget = leaderboardProvider.Scores }
+                        LeaderboardScores = { BindTarget = scoresProvider.Scores }
                     };
                 }
 

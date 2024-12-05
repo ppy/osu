@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Framework.Allocation;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Scoring;
 
@@ -10,12 +9,14 @@ namespace osu.Game.Screens.Select.Leaderboards
 {
     public partial class BeatmapLeaderboard : Leaderboard<BeatmapLeaderboardScope, ScoreInfo>
     {
-        [Resolved]
-        private LeaderboardScoresProvider<BeatmapLeaderboardScope, ScoreInfo> leaderboardProvider { get; set; } = null!;
 
         public Action<ScoreInfo>? ScoreSelected;
 
-        protected override LeaderboardScore CreateDrawableScore(ScoreInfo model, int index) => new LeaderboardScore(model, index, leaderboardProvider.IsOnlineScope)
+        public BeatmapLeaderboard(BeatmapLeaderboardScoresProvider leaderboardScoresProvider) : base(leaderboardScoresProvider)
+        {
+        }
+
+        protected override LeaderboardScore CreateDrawableScore(ScoreInfo model, int index) => new LeaderboardScore(model, index, LeaderboardScoresProvider.IsOnlineScope)
         {
             Action = () => ScoreSelected?.Invoke(model)
         };

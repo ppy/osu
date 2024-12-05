@@ -8,7 +8,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
-using osu.Game.Online.Leaderboards;
 using osu.Game.Scoring;
 using osu.Game.Screens.Select.Leaderboards;
 
@@ -16,8 +15,7 @@ namespace osu.Game.Screens.Select
 {
     public partial class PlayBeatmapDetailArea : BeatmapDetailArea
     {
-        [Resolved]
-        private LeaderboardScoresProvider<BeatmapLeaderboardScope, ScoreInfo> leaderboardProvider { get; set; } = null!;
+        private BeatmapLeaderboardScoresProvider leaderboardScoresProvider;
 
         private BeatmapLeaderboard leaderboard;
 
@@ -28,7 +26,7 @@ namespace osu.Game.Screens.Select
             {
                 base.Beatmap = value;
 
-                ((BeatmapLeaderboardScoresProvider)leaderboardProvider).BeatmapInfo = value is DummyWorkingBeatmap ? null : value?.BeatmapInfo;
+                leaderboardScoresProvider.BeatmapInfo = value is DummyWorkingBeatmap ? null : value?.BeatmapInfo;
             }
         }
 
@@ -36,9 +34,11 @@ namespace osu.Game.Screens.Select
 
         private Bindable<bool> selectedModsFilter = null!;
 
-        public PlayBeatmapDetailArea(Action<ScoreInfo>? onScoreSelected = null)
+        public PlayBeatmapDetailArea(BeatmapLeaderboardScoresProvider leaderboardScoresProvider, Action<ScoreInfo>? onScoreSelected = null)
         {
-            Add(leaderboard = new BeatmapLeaderboard
+            this.leaderboardScoresProvider = leaderboardScoresProvider;
+
+            Add(leaderboard = new BeatmapLeaderboard(leaderboardScoresProvider)
             {
                 ScoreSelected = onScoreSelected,
                 RelativeSizeAxes = Axes.Both
@@ -62,19 +62,19 @@ namespace osu.Game.Screens.Select
         {
             base.Refresh();
 
-            leaderboardProvider.RefetchScores();
+            leaderboardScoresProvider.RefetchScores();
         }
 
         protected override void OnTabChanged(BeatmapDetailAreaTabItem tab, bool selectedMods)
         {
             base.OnTabChanged(tab, selectedMods);
 
-            ((BeatmapLeaderboardScoresProvider)leaderboardProvider).FilterMods = selectedMods;
+            leaderboardScoresProvider.FilterMods = selectedMods;
 
             switch (tab)
             {
                 case BeatmapDetailAreaLeaderboardTabItem<BeatmapLeaderboardScope> leaderboard:
-                    leaderboardProvider.Scope = leaderboard.Scope;
+                    leaderboardScoresProvider.Scope = leaderboard.Scope;
                     this.leaderboard.Show();
                     break;
 

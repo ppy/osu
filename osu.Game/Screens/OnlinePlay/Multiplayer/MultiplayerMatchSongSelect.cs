@@ -13,6 +13,7 @@ using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Select;
+using osu.Game.Screens.Select.Leaderboards;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
@@ -23,6 +24,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         [Resolved]
         private OngoingOperationTracker operationTracker { get; set; } = null!;
+
+        [Resolved]
+        private BeatmapLeaderboardScoresProvider scoresProvider { get; set; } = null!;
 
         private readonly Room room;
         private readonly IBindable<bool> operationInProgress = new Bindable<bool>();
@@ -120,7 +124,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             return true;
         }
 
-        protected override BeatmapDetailArea CreateBeatmapDetailArea() => new PlayBeatmapDetailArea();
+        protected override BeatmapDetailArea CreateBeatmapDetailArea() => new PlayBeatmapDetailArea(scoresProvider);
 
         protected override bool IsValidMod(Mod mod) => base.IsValidMod(mod) && mod.ValidForMultiplayer;
 

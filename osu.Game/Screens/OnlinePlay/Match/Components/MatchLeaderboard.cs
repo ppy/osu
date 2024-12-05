@@ -8,6 +8,10 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
 {
     public partial class MatchLeaderboard : Leaderboard<MatchLeaderboardScope, APIUserScoreAggregate>
     {
+        public MatchLeaderboard(MatchLeaderboardScoresProvider leaderboardScoresProvider) : base(leaderboardScoresProvider)
+        {
+        }
+
         protected override LeaderboardScore CreateDrawableScore(APIUserScoreAggregate model, int index) => new MatchLeaderboardScore(model, index);
 
         protected override LeaderboardScore CreateDrawableTopScore(APIUserScoreAggregate model) => new MatchLeaderboardScore(model, model.Position, false);

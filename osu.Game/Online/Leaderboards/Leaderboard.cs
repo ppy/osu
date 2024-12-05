@@ -16,7 +16,6 @@ using osuTK;
 using osuTK.Graphics;
 using osu.Game.Localisation;
 using System.Threading;
-using osu.Framework.Allocation;
 
 namespace osu.Game.Online.Leaderboards
 {
@@ -28,8 +27,7 @@ namespace osu.Game.Online.Leaderboards
     /// <typeparam name="TScoreInfo">The score model class.</typeparam>
     public abstract partial class Leaderboard<TScope, TScoreInfo> : CompositeDrawable
     {
-        [Resolved]
-        private LeaderboardScoresProvider<TScope, TScoreInfo> leaderboardProvider { get; set; } = null!;
+        protected LeaderboardScoresProvider<TScope, TScoreInfo> LeaderboardScoresProvider;
 
         private const double fade_duration = 300;
 
@@ -41,8 +39,12 @@ namespace osu.Game.Online.Leaderboards
 
         private readonly LoadingSpinner loading;
 
-        protected Leaderboard()
+        private CancellationTokenSource? currentScoresAsyncLoadCancellationSource = null;
+
+        protected Leaderboard(LeaderboardScoresProvider<TScope, TScoreInfo> leaderboardScoresProvider)
         {
+            LeaderboardScoresProvider = leaderboardScoresProvider;
+
             InternalChildren = new Drawable[]
             {
                 new OsuContextMenuContainer
@@ -86,15 +88,11 @@ namespace osu.Game.Online.Leaderboards
         {
             base.LoadComplete();
 
-            leaderboardProvider.State.BindValueChanged(s => onStateChange(s.NewValue));
-            leaderboardProvider.OnLoadScores += onLoadScores;
+            LeaderboardScoresProvider.State.BindValueChanged(state => onStateChange(state.NewValue));
         }
 
-        private void onLoadScores(TScoreInfo? userScore = default, CancellationToken cancellationToken = default, Action? onSuccess = default)
+        private void applyNewScores(LeaderboardState state)
         {
-            if (!leaderboardProvider.Scores.Any())
-                return;
-
             // Non-delayed schedule may potentially run inline (due to IsMainThread check passing) after leaderboard  is disposed.
             // This is guarded against in BeatmapLeaderboard via web request cancellation, but let's be extra safe.
             if (!IsDisposed)
@@ -107,14 +105,14 @@ namespace osu.Game.Online.Leaderboards
 
             void applyNewScores()
             {
-                userScoreContainer.Score.Value = userScore;
+                userScoreContainer.Score.Value = LeaderboardScoresProvider.UserScore;
 
-                if (userScore == null)
+                if (LeaderboardScoresProvider.UserScore == null)
                     userScoreContainer.Hide();
                 else
                     userScoreContainer.Show();
 
-                updateScoresDrawables(cancellationToken, onSuccess);
+                updateScoresDrawables(state);
             }
         }
 
@@ -122,12 +120,20 @@ namespace osu.Game.Online.Leaderboards
 
         protected abstract LeaderboardScore CreateDrawableTopScore(TScoreInfo model);
 
-        private void updateScoresDrawables(CancellationToken cancellationToken, Action? onSuccess)
+        private void updateScoresDrawables(LeaderboardState state)
         {
+            currentScoresAsyncLoadCancellationSource?.Cancel();
+
             scoreFlowContainer?
                 .FadeOut(fade_duration, Easing.OutQuint)
                 .Expire();
             scoreFlowContainer = null;
+
+            if (state == LeaderboardState.NoScores)
+            {
+                setPlaceholder(state);
+                return;
+            }
 
             LoadComponentAsync(new FillFlowContainer<LeaderboardScore>
             {
@@ -135,10 +141,11 @@ namespace osu.Game.Online.Leaderboards
                 AutoSizeAxes = Axes.Y,
                 Spacing = new Vector2(0f, 5f),
                 Padding = new MarginPadding { Top = 10, Bottom = 5 },
-                ChildrenEnumerable = leaderboardProvider.Scores.Select((s, index) => CreateDrawableScore(s, index + 1))
+                ChildrenEnumerable = LeaderboardScoresProvider.Scores.Select((s, index) => CreateDrawableScore(s, index + 1))
             }, newFlow =>
             {
-                onSuccess?.Invoke();
+                setPlaceholder(state);
+
                 scrollContainer.Add(scoreFlowContainer = newFlow);
 
                 double delay = 0;
@@ -153,14 +160,25 @@ namespace osu.Game.Online.Leaderboards
 
                 scrollContainer.ScrollToStart(false);
 
-            }, cancellationToken);
+            }, (currentScoresAsyncLoadCancellationSource = new CancellationTokenSource()).Token);
+        }
+
+        private void onStateChange(LeaderboardState state)
+        {
+            if (state == LeaderboardState.Success | state == LeaderboardState.NoScores)
+            {
+                applyNewScores(state);
+                return;
+            }
+
+            setPlaceholder(state);
         }
 
         #region Placeholder handling
 
         private Placeholder? placeholder;
 
-        private void onStateChange(LeaderboardState state)
+        private void setPlaceholder(LeaderboardState state)
         {
             if (state == LeaderboardState.Retrieving)
                 loading.Show();
@@ -187,7 +205,7 @@ namespace osu.Game.Online.Leaderboards
                 case LeaderboardState.NetworkFailure:
                     return new ClickablePlaceholder(LeaderboardStrings.CouldntFetchScores, FontAwesome.Solid.Sync)
                     {
-                        Action = leaderboardProvider.RefetchScores
+                        Action = LeaderboardScoresProvider.RefetchScores
                     };
 
                 case LeaderboardState.NoneSelected:

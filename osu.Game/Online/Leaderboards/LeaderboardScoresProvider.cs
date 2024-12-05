@@ -21,7 +21,13 @@ namespace osu.Game.Online.Leaderboards
         /// </summary>
         public IBindableList<TScoreInfo> Scores => scores;
 
+        public TScoreInfo? UserScore { get; private set; }
+
         private readonly BindableList<TScoreInfo> scores = new BindableList<TScoreInfo>();
+
+        public IBindable<LeaderboardState> State => state;
+
+        private readonly Bindable<LeaderboardState> state = new Bindable<LeaderboardState>();
 
         /// <summary>
         /// Whether the current scope should refetch in response to changes in API connectivity state.
@@ -30,8 +36,7 @@ namespace osu.Game.Online.Leaderboards
 
         private APIRequest? fetchScoresRequest;
 
-        private readonly Bindable<LeaderboardState> state = new Bindable<LeaderboardState>();
-        public IBindable<LeaderboardState> State => state;
+        public Action<CancellationToken>? OnStateChange;
 
         [Resolved(CanBeNull = true)]
         private IAPIProvider? api { get; set; }
@@ -39,7 +44,6 @@ namespace osu.Game.Online.Leaderboards
         private readonly IBindable<APIState> apiState = new Bindable<APIState>();
 
         private CancellationTokenSource? currentFetchCancellationSource;
-        private CancellationTokenSource? currentScoresAsyncLoadCancellationSource = null;
 
         public Action<TScoreInfo?, CancellationToken, Action>? OnLoadScores;
 
@@ -147,7 +151,6 @@ namespace osu.Game.Online.Leaderboards
         private void cancelPendingWork()
         {
             currentFetchCancellationSource?.Cancel();
-            currentScoresAsyncLoadCancellationSource?.Cancel();
             fetchScoresRequest?.Cancel();
         }
 
@@ -171,16 +174,12 @@ namespace osu.Game.Online.Leaderboards
             if (scores != null)
                 this.scores.AddRange(scores);
 
-            currentScoresAsyncLoadCancellationSource?.Cancel();
+            UserScore = userScore;
 
             if (!this.scores.Any())
-            {
                 setState(LeaderboardState.NoScores);
-                return;
-            }
-
-            currentScoresAsyncLoadCancellationSource = new CancellationTokenSource();
-            OnLoadScores?.Invoke(userScore, currentScoresAsyncLoadCancellationSource.Token, () => setState(LeaderboardState.Success));
+            else
+                setState(LeaderboardState.Success);
         }
     }
 }
