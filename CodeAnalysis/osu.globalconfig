@@ -1,5 +1,6 @@
 # .NET Code Style
 # IDE styles reference: https://docs.microsoft.com/dotnet/fundamentals/code-analysis/style-rules/
+is_global = true
 
 # IDE0001: Simplify names
 dotnet_diagnostic.IDE0001.severity = warning
