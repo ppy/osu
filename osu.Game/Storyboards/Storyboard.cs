@@ -18,6 +18,7 @@ namespace osu.Game.Storyboards
         public IEnumerable<StoryboardLayer> Layers => layers.Values;
 
         public BeatmapInfo BeatmapInfo = new BeatmapInfo();
+        public IBeatmap Beatmap { get; set; } = new Beatmap();
 
         /// <summary>
         /// Whether the storyboard should prefer textures from the current skin before using local storyboard textures.

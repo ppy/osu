@@ -48,7 +48,7 @@ namespace osu.Game.Screens.Menu
 
         public override bool HideOverlaysOnEnter => Buttons == null || Buttons.State == ButtonSystemState.Initial;
 
-        public override bool AllowBackButton => false;
+        public override bool AllowUserExit => false;
 
         public override bool AllowExternalScreenChange => true;
 

@@ -115,6 +115,8 @@ namespace osu.Game.Screens.Play
 
         public HUDOverlay([CanBeNull] DrawableRuleset drawableRuleset, IReadOnlyList<Mod> mods, bool alwaysShowLeaderboard = true)
         {
+            Container rightSettings;
+
             this.drawableRuleset = drawableRuleset;
             this.mods = mods;
 
@@ -146,7 +148,6 @@ namespace osu.Game.Screens.Play
                     Children = new Drawable[]
                     {
                         ModDisplay = CreateModsContainer(),
-                        PlayerSettingsOverlay = CreatePlayerSettingsOverlay(),
                     }
                 },
                 bottomRightElements = new FillFlowContainer
@@ -164,6 +165,14 @@ namespace osu.Game.Screens.Play
                         HoldToQuit = CreateHoldForMenuButton(),
                     }
                 },
+                rightSettings = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Children = new Drawable[]
+                    {
+                        PlayerSettingsOverlay = new PlayerSettingsOverlay(),
+                    }
+                },
                 LeaderboardFlow = new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Both,
@@ -173,7 +182,7 @@ namespace osu.Game.Screens.Play
                 },
             };
 
-            hideTargets = new List<Drawable> { mainComponents, topRightElements };
+            hideTargets = new List<Drawable> { mainComponents, topRightElements, rightSettings };
 
             if (rulesetComponents != null)
                 hideTargets.Add(rulesetComponents);
@@ -388,8 +397,6 @@ namespace osu.Game.Screens.Play
             Anchor = Anchor.TopRight,
             Origin = Anchor.TopRight,
         };
-
-        protected PlayerSettingsOverlay CreatePlayerSettingsOverlay() => new PlayerSettingsOverlay();
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {

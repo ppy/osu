@@ -41,7 +41,7 @@ namespace osu.Game.Tests.Database
                 Assert.That(lastChanges?.ModifiedIndices, Is.Empty);
                 Assert.That(lastChanges?.NewModifiedIndices, Is.Empty);
 
-                realm.Write(r => r.All<BeatmapSetInfo>().First().Beatmaps.First().CountdownOffset = 5);
+                realm.Write(r => r.All<BeatmapSetInfo>().First().Beatmaps.First().EditorTimestamp = 5);
                 realm.Run(r => r.Refresh());
 
                 Assert.That(collectionChanges, Is.EqualTo(1));
