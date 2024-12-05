@@ -27,6 +27,7 @@ namespace osu.Game.Screens.Select.Carousel
 
         private readonly HoverLayer hoverLayer;
 
+        public Container<Drawable> OutsideContent;
         protected override Container<Drawable> Content { get; } = new Container { RelativeSizeAxes = Axes.Both };
 
         private const float corner_radius = 10;
@@ -37,17 +38,24 @@ namespace osu.Game.Screens.Select.Carousel
             RelativeSizeAxes = Axes.X;
             Height = DrawableCarouselItem.MAX_HEIGHT;
 
-            InternalChild = BorderContainer = new Container
+            InternalChildren = new Drawable[]
             {
-                RelativeSizeAxes = Axes.Both,
-                Masking = true,
-                CornerRadius = corner_radius,
-                BorderColour = new Color4(221, 255, 255, 255),
-                Children = new Drawable[]
+                OutsideContent = new Container
                 {
-                    Content,
-                    hoverLayer = new HoverLayer(),
-                    new HeaderSounds(),
+                    RelativeSizeAxes = Axes.Both
+                },
+                BorderContainer = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Masking = true,
+                    CornerRadius = corner_radius,
+                    BorderColour = new Color4(221, 255, 255, 255),
+                    Children = new Drawable[]
+                    {
+                        Content,
+                        hoverLayer = new HoverLayer(),
+                        new HeaderSounds(),
+                    }
                 }
             };
         }

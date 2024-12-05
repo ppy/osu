@@ -17,6 +17,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Collections;
@@ -63,6 +64,7 @@ namespace osu.Game.Screens.Select.Carousel
         private DifficultyIcon difficultyIcon = null!;
 
         private OsuSpriteText keyCountText = null!;
+        private RecommendationStar recommendationStar = null!;
 
         [Resolved]
         private BeatmapSetOverlay? beatmapOverlay { get; set; }
@@ -91,6 +93,10 @@ namespace osu.Game.Screens.Select.Carousel
         private IBindable<StarDifficulty?> starDifficultyBindable = null!;
         private CancellationTokenSource? starDifficultyCancellationSource;
 
+        public Action<StarDifficulty?>? StarDifficultyChangedCallback = null;
+
+        public RecommendationType RecommendedType { set => recommendationStar.Type = value; }
+
         public DrawableCarouselBeatmap(CarouselBeatmap panel)
         {
             beatmapInfo = panel.BeatmapInfo;
@@ -110,6 +116,8 @@ namespace osu.Game.Screens.Select.Carousel
 
             if (manager != null)
                 hideRequested = manager.Hide;
+
+            Header.OutsideContent.Add(recommendationStar = new RecommendationStar());
 
             Header.Children = new Drawable[]
             {
@@ -247,8 +255,12 @@ namespace osu.Game.Screens.Select.Carousel
                 starDifficultyBindable.BindValueChanged(d =>
                 {
                     starCounter.Current = (float)(d.NewValue?.Stars ?? 0);
+
                     if (d.NewValue != null)
+                    {
                         difficultyIcon.Current.Value = d.NewValue.Value;
+                        StarDifficultyChangedCallback?.Invoke(d.NewValue);
+                    }
                 }, true);
 
                 updateKeyCount();
@@ -311,6 +323,61 @@ namespace osu.Game.Screens.Select.Carousel
         {
             base.Dispose(isDisposing);
             starDifficultyCancellationSource?.Cancel();
+        }
+
+        public enum RecommendationType
+        {
+            NotRecommended,
+            TooEasy,
+            TooHard,
+            Recommended
+        }
+
+        private partial class RecommendationStar : SpriteIcon, IHasTooltip
+        {
+            public RecommendationStar()
+            {
+                Anchor = Anchor.CentreLeft;
+                Origin = Anchor.CentreRight;
+                Icon = FontAwesome.Solid.Star;
+                Size = new Vector2(32f);
+                Margin = new MarginPadding { Horizontal = 8f };
+                updateType();
+            }
+
+            private RecommendationType type = RecommendationType.NotRecommended;
+            public RecommendationType Type
+            {
+                get => type;
+                set
+                {
+                    if (type == value)
+                        return;
+
+                    type = value;
+                    updateType();
+                }
+            }
+
+            public LocalisableString TooltipText => type switch
+            {
+                RecommendationType.Recommended => "This difficulty is recommended for your skill level.",
+                RecommendationType.TooEasy => "This difficulty is the closest to your skill level but may be too easy.\nConsider using difficulty-increasing mods.",
+                RecommendationType.TooHard => "This difficulty is the closest to your skill level but may be too hard.\nConsider using difficulty-reduction mods.",
+                _ => ""
+            };
+
+            private void updateType()
+            {
+                if (type == RecommendationType.NotRecommended)
+                {
+                    Hide();
+                    return;
+                }
+
+                Show();
+                Colour = type == RecommendationType.Recommended ? Color4.Gold : Color4.Silver;
+            }
         }
     }
 }

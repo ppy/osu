@@ -154,6 +154,9 @@ namespace osu.Game.Screens.Select.Carousel
             updateBeatmapDifficulties();
         }
 
+        [Resolved(CanBeNull = true)]
+        private DifficultyRecommender? recommender { get; set; }
+
         private void updateBeatmapDifficulties()
         {
             Debug.Assert(Item != null);
@@ -171,6 +174,8 @@ namespace osu.Game.Screens.Select.Carousel
             }
             else
             {
+                DrawableCarouselItem?[] beatmaps = visibleBeatmaps.Select(c => c.CreateDrawableRepresentation()).ToArray();
+
                 // on selection we show our child beatmaps.
                 // for now this is a simple drawable construction each selection.
                 // can be improved in the future.
@@ -178,7 +183,7 @@ namespace osu.Game.Screens.Select.Carousel
                 {
                     X = 100,
                     RelativeSizeAxes = Axes.Both,
-                    ChildrenEnumerable = visibleBeatmaps.Select(c => c.CreateDrawableRepresentation()!)
+                    ChildrenEnumerable = beatmaps
                 };
 
                 beatmapsLoadTask = LoadComponentAsync(beatmapContainer, loaded =>
@@ -189,6 +194,8 @@ namespace osu.Game.Screens.Select.Carousel
 
                     Content.Child = loaded;
                     updateBeatmapYPositions();
+
+                    recommender?.ScheduleRecommendedHighlight(beatmaps);
                 });
             }
         }
