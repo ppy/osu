@@ -5,11 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
-using osu.Framework.Screens;
 using osu.Game.Localisation;
-using osu.Game.Screens;
-using osu.Game.Screens.Import;
-using osu.Game.Screens.Utility;
 
 namespace osu.Game.Overlays.Settings.Sections.DebugSettings
 {
@@ -18,7 +14,7 @@ namespace osu.Game.Overlays.Settings.Sections.DebugSettings
         protected override LocalisableString Header => CommonStrings.General;
 
         [BackgroundDependencyLoader]
-        private void load(FrameworkDebugConfigManager config, FrameworkConfigManager frameworkConfig, IPerformFromScreenRunner? performer)
+        private void load(FrameworkDebugConfigManager config, FrameworkConfigManager frameworkConfig)
         {
             Children = new Drawable[]
             {
@@ -32,16 +28,6 @@ namespace osu.Game.Overlays.Settings.Sections.DebugSettings
                     LabelText = DebugSettingsStrings.BypassFrontToBackPass,
                     Current = config.GetBindable<bool>(DebugSetting.BypassFrontToBackPass)
                 },
-                new SettingsButton
-                {
-                    Text = DebugSettingsStrings.ImportFiles,
-                    Action = () => performer?.PerformFromScreen(menu => menu.Push(new FileImportScreen()))
-                },
-                new SettingsButton
-                {
-                    Text = DebugSettingsStrings.RunLatencyCertifier,
-                    Action = () => performer?.PerformFromScreen(menu => menu.Push(new LatencyCertifierScreen()))
-                }
             };
         }
     }
