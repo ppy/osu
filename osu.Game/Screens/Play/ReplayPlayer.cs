@@ -11,6 +11,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Input.Bindings;
@@ -33,6 +34,8 @@ namespace osu.Game.Screens.Play
         private readonly bool replayIsFailedScore;
 
         protected override UserActivity InitialActivity => new UserActivity.WatchingReplay(Score.ScoreInfo);
+
+        protected override bool ShowFailOverlay => false;
 
         // Disallow replays from failing. (see https://github.com/ppy/osu/issues/6108)
         protected override bool CheckModsAllowFailure()
@@ -155,6 +158,20 @@ namespace osu.Game.Screens.Play
             double target = Math.Clamp(GameplayClockContainer.CurrentTime + amount * BASE_SEEK_AMOUNT, 0, GameplayState.Beatmap.GetLastObjectTime());
 
             Seek(target);
+        }
+
+        protected override void OnFail()
+        {
+            // Replays will always show the results screen on failing.
+            Scheduler.AddDelayed(() =>
+            {
+                if (!this.IsCurrentScreen())
+                    // This player instance may already be in the process of exiting.
+                    return;
+
+                ValidForResume = false;
+                this.Push(CreateResults(Score.ScoreInfo));
+            }, RESULTS_DISPLAY_DELAY);
         }
 
         public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
