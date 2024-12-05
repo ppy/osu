@@ -5,13 +5,12 @@ using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
-using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.DebugSettings
 {
     public partial class GeneralSettings : SettingsSubsection
     {
-        protected override LocalisableString Header => CommonStrings.General;
+        protected override LocalisableString Header => "General";
 
         [BackgroundDependencyLoader]
         private void load(FrameworkDebugConfigManager config, FrameworkConfigManager frameworkConfig)
@@ -20,12 +19,12 @@ namespace osu.Game.Overlays.Settings.Sections.DebugSettings
             {
                 new SettingsCheckbox
                 {
-                    LabelText = DebugSettingsStrings.ShowLogOverlay,
+                    LabelText = "Show log overlay",
                     Current = frameworkConfig.GetBindable<bool>(FrameworkSetting.ShowLogOverlay)
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = DebugSettingsStrings.BypassFrontToBackPass,
+                    LabelText = @"Bypass front-to-back render pass",
                     Current = config.GetBindable<bool>(DebugSetting.BypassFrontToBackPass)
                 },
             };
