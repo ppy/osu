@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
     /// <summary>
     /// A pattern generator for IHasDistance hit objects.
     /// </summary>
-    internal class PathObjectPatternGenerator : PatternGenerator
+    internal class PathObjectPatternGenerator : LegacyPatternGenerator
     {
         public readonly int StartTime;
         public readonly int EndTime;

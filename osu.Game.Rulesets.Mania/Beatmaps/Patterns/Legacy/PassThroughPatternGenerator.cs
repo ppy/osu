@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
     /// A simple generator which, for any object, if the hitobject has an end time
     /// it becomes a <see cref="HoldNote"/> or otherwise a <see cref="Note"/>.
     /// </summary>
-    internal class PassThroughPatternGenerator : PatternGenerator
+    internal class PassThroughPatternGenerator : LegacyPatternGenerator
     {
         public PassThroughPatternGenerator(LegacyRandom random, HitObject hitObject, IBeatmap beatmap, int totalColumns, Pattern previousPattern)
             : base(random, hitObject, beatmap, previousPattern, totalColumns)
