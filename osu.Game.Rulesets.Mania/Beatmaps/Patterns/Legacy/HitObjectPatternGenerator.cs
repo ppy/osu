@@ -16,7 +16,7 @@ using osu.Game.Utils;
 
 namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 {
-    internal class HitObjectPatternGenerator : PatternGenerator
+    internal class HitObjectPatternGenerator : LegacyPatternGenerator
     {
         public PatternType StairType { get; private set; }
 

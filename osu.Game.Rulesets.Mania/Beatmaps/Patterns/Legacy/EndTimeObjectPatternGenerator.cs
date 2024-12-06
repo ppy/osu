@@ -12,7 +12,7 @@ using osu.Game.Utils;
 
 namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 {
-    internal class EndTimeObjectPatternGenerator : PatternGenerator
+    internal class EndTimeObjectPatternGenerator : LegacyPatternGenerator
     {
         private readonly int endTime;
         private readonly PatternType convertType;

@@ -140,7 +140,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             double endTime = (original as IHasDuration)?.EndTime ?? startTime;
             Vector2 position = (original as IHasPosition)?.Position ?? Vector2.Zero;
 
-            Patterns.PatternGenerator conversion;
+            PatternGenerator conversion;
 
             switch (legacy.LegacyType & LegacyHitObjectType.ObjectTypes)
             {

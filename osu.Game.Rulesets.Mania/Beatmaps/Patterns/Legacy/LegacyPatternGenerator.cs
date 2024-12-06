@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
     /// <summary>
     /// A pattern generator for legacy hit objects.
     /// </summary>
-    internal abstract class PatternGenerator : Patterns.PatternGenerator
+    internal abstract class LegacyPatternGenerator : PatternGenerator
     {
         /// <summary>
         /// The column index at which to start generating random notes.
@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
         /// </summary>
         protected readonly LegacyRandom Random;
 
-        protected PatternGenerator(LegacyRandom random, HitObject hitObject, IBeatmap beatmap, Pattern previousPattern, int totalColumns)
+        protected LegacyPatternGenerator(LegacyRandom random, HitObject hitObject, IBeatmap beatmap, Pattern previousPattern, int totalColumns)
             : base(hitObject, beatmap, totalColumns, previousPattern)
         {
             ArgumentNullException.ThrowIfNull(random);
@@ -132,7 +132,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
         /// <param name="nextColumn">A function to retrieve the next column. If null, a randomisation scheme will be used.</param>
         /// <param name="validation">A function to perform additional validation checks to determine if a column is a valid candidate for a <see cref="HitObject"/>.</param>
         /// <param name="lowerBound">The minimum column index. If null, <see cref="RandomStart"/> is used.</param>
-        /// <param name="upperBound">The maximum column index. If null, <see cref="Patterns.PatternGenerator.TotalColumns">TotalColumns</see> is used.</param>
+        /// <param name="upperBound">The maximum column index. If null, <see cref="PatternGenerator.TotalColumns">TotalColumns</see> is used.</param>
         /// <param name="patterns">A list of patterns for which the validity of a column should be checked against.
         /// A column is not a valid candidate if a <see cref="HitObject"/> occupies the same column in any of the patterns.</param>
         /// <returns>A column which has passed the <paramref name="validation"/> check and for which there are no
@@ -189,7 +189,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
         /// Returns a random column index in the range [<paramref name="lowerBound"/>, <paramref name="upperBound"/>).
         /// </summary>
         /// <param name="lowerBound">The minimum column index. If null, <see cref="RandomStart"/> is used.</param>
-        /// <param name="upperBound">The maximum column index. If null, <see cref="Patterns.PatternGenerator.TotalColumns"/> is used.</param>
+        /// <param name="upperBound">The maximum column index. If null, <see cref="PatternGenerator.TotalColumns"/> is used.</param>
         protected int GetRandomColumn(int? lowerBound = null, int? upperBound = null) => Random.Next(lowerBound ?? RandomStart, upperBound ?? TotalColumns);
 
         /// <summary>
