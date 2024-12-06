@@ -175,7 +175,6 @@ namespace osu.Game.Online.Leaderboards
                     setPlaceholder(state);
                     break;
             }
-
         }
 
         #region Placeholder handling
