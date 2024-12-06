@@ -147,7 +147,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                 case LegacyHitObjectType.Circle:
                     if (IsForCurrentRuleset)
                     {
-                        conversion = new SpecificBeatmapPatternGenerator(Random, original, beatmap, TotalColumns, lastPattern);
+                        conversion = new PassThroughPatternGenerator(Random, original, beatmap, TotalColumns, lastPattern);
                         recordNote(startTime, position);
                     }
                     else
@@ -162,7 +162,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                 case LegacyHitObjectType.Slider:
                     if (IsForCurrentRuleset)
                     {
-                        conversion = new SpecificBeatmapPatternGenerator(Random, original, beatmap, TotalColumns, lastPattern);
+                        conversion = new PassThroughPatternGenerator(Random, original, beatmap, TotalColumns, lastPattern);
                         recordNote(original.StartTime, position);
                     }
                     else
@@ -188,7 +188,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                     break;
 
                 case LegacyHitObjectType.Hold:
-                    conversion = new SpecificBeatmapPatternGenerator(Random, original, beatmap, TotalColumns, lastPattern);
+                    conversion = new PassThroughPatternGenerator(Random, original, beatmap, TotalColumns, lastPattern);
                     recordNote(endTime, position);
                     computeDensity(endTime);
                     break;
@@ -226,54 +226,6 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         {
             lastTime = time;
             lastPosition = position;
-        }
-
-        /// <summary>
-        /// A pattern generator for osu!mania-specific beatmaps.
-        /// </summary>
-        private class SpecificBeatmapPatternGenerator : Patterns.Legacy.PatternGenerator
-        {
-            public SpecificBeatmapPatternGenerator(LegacyRandom random, HitObject hitObject, IBeatmap beatmap, int totalColumns, Pattern previousPattern)
-                : base(random, hitObject, beatmap, previousPattern, totalColumns)
-            {
-            }
-
-            public override IEnumerable<Pattern> Generate()
-            {
-                yield return generate();
-            }
-
-            private Pattern generate()
-            {
-                var positionData = HitObject as IHasXPosition;
-
-                int column = GetColumn(positionData?.X ?? 0);
-
-                var pattern = new Pattern();
-
-                if (HitObject is IHasDuration endTimeData)
-                {
-                    pattern.Add(new HoldNote
-                    {
-                        StartTime = HitObject.StartTime,
-                        Duration = endTimeData.Duration,
-                        Column = column,
-                        Samples = HitObject.Samples,
-                        NodeSamples = (HitObject as IHasRepeats)?.NodeSamples ?? HoldNote.CreateDefaultNodeSamples(HitObject)
-                    });
-                }
-                else if (HitObject is IHasXPosition)
-                {
-                    pattern.Add(new Note
-                    {
-                        StartTime = HitObject.StartTime,
-                        Samples = HitObject.Samples,
-                        Column = column
-                    });
-                }
-
-                return pattern;
-            }
         }
     }
 }
