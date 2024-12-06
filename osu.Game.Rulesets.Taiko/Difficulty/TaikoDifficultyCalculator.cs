@@ -77,6 +77,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             if (beatmap.HitObjects.Count == 0)
                 return new TaikoDifficultyAttributes { Mods = mods };
 
+            bool isRelax = mods.Any(h => h is TaikoModRelax);
+
             Colour colour = (Colour)skills.First(x => x is Colour);
             Rhythm rhythm = (Rhythm)skills.First(x => x is Rhythm);
             Stamina stamina = (Stamina)skills.First(x => x is Stamina);
@@ -88,15 +90,18 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             double monoStaminaRating = singleColourStamina.DifficultyValue() * stamina_skill_multiplier;
             double monoStaminaFactor = staminaRating == 0 ? 1 : Math.Pow(monoStaminaRating / staminaRating, 5);
 
-            double combinedRating = combinedDifficultyValue(rhythm, colour, stamina);
+            double combinedRating = combinedDifficultyValue(rhythm, colour, stamina, isRelax);
             double starRating = rescale(combinedRating * 1.4);
 
             // TODO: This is temporary measure as we don't detect abuse of multiple-input playstyles of converts within the current system.
             if (beatmap.BeatmapInfo.Ruleset.OnlineID == 0)
             {
                 starRating *= 0.925;
-                // For maps with low colour variance and high stamina requirement, multiple inputs are more likely to be abused.
-                if (colourRating < 2 && staminaRating > 8)
+
+                // For maps with either relax or low colour variance and high stamina requirement, multiple inputs are more likely to be abused.
+                if (isRelax)
+                    starRating *= 0.60;
+                else if (colourRating < 2 && staminaRating > 8)
                     starRating *= 0.80;
             }
 
@@ -138,7 +143,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         /// For each section, the peak strains of all separate skills are combined into a single peak strain for the section.
         /// The resulting partial rating of the beatmap is a weighted sum of the combined peaks (higher peaks are weighted more).
         /// </remarks>
-        private double combinedDifficultyValue(Rhythm rhythm, Colour colour, Stamina stamina)
+        private double combinedDifficultyValue(Rhythm rhythm, Colour colour, Stamina stamina, bool isRelax)
         {
             List<double> peaks = new List<double>();
 
@@ -151,6 +156,12 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 double colourPeak = colourPeaks[i] * colour_skill_multiplier;
                 double rhythmPeak = rhythmPeaks[i] * rhythm_skill_multiplier;
                 double staminaPeak = staminaPeaks[i] * stamina_skill_multiplier;
+
+                if (isRelax)
+                {
+                    colourPeak = 0; // There is no colour difficulty in relax.
+                    staminaPeak /= 1.5; // Stamina difficulty is decreased with an increased available finger count.
+                }
 
                 double peak = norm(1.5, colourPeak, staminaPeak);
                 peak = norm(2, peak, rhythmPeak);
