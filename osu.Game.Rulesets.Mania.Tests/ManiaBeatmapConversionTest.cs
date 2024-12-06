@@ -22,6 +22,7 @@ namespace osu.Game.Rulesets.Mania.Tests
 
         [TestCase("basic")]
         [TestCase("zero-length-slider")]
+        [TestCase("mania-specific-spinner")]
         [TestCase("20544")]
         [TestCase("100374")]
         [TestCase("1450162")]
