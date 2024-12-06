@@ -184,6 +184,8 @@ namespace osu.Game.Screens.Select.Leaderboards
 
             void localScoresChanged(IRealmCollection<ScoreInfo> sender, ChangeSet? changes)
             {
+                SetState(LeaderboardState.Retrieving);
+
                 if (cancellationToken.IsCancellationRequested)
                     return;
 

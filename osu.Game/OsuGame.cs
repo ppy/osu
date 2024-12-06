@@ -69,7 +69,6 @@ using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Select;
-using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Skinning;
 using osu.Game.Updater;
 using osu.Game.Users;
@@ -1068,8 +1067,6 @@ namespace osu.Game
                 // Loader has to be created after the logo has finished loading as Loader performs logo transformations on entering.
                 ScreenStack.Push(CreateLoader().With(l => l.RelativeSizeAxes = Axes.Both));
             });
-
-            loadComponentSingleFile(new BeatmapLeaderboardScoresProvider(), Add, true);
 
             LocalUserStatisticsProvider statisticsProvider;
 

@@ -96,7 +96,7 @@ namespace osu.Game.Online.Leaderboards
             Debug.Assert(ThreadSafety.IsUpdateThread);
 
             ClearScores();
-            setState(LeaderboardState.Retrieving);
+            SetState(LeaderboardState.Retrieving);
 
             currentFetchCancellationSource = new CancellationTokenSource();
 
@@ -132,7 +132,7 @@ namespace osu.Game.Online.Leaderboards
 
             Debug.Assert(!scores.Any());
 
-            setState(state);
+            SetState(state);
         }
 
         /// <summary>
@@ -155,7 +155,7 @@ namespace osu.Game.Online.Leaderboards
         }
 
 
-        private void setState(LeaderboardState state)
+        protected void SetState(LeaderboardState state)
         {
             if (state == this.state.Value)
                 return;
@@ -177,9 +177,9 @@ namespace osu.Game.Online.Leaderboards
             UserScore = userScore;
 
             if (!this.scores.Any())
-                setState(LeaderboardState.NoScores);
+                SetState(LeaderboardState.NoScores);
             else
-                setState(LeaderboardState.Success);
+                SetState(LeaderboardState.Success);
         }
     }
 }

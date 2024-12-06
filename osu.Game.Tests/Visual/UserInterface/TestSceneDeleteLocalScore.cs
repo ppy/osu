@@ -35,6 +35,7 @@ namespace osu.Game.Tests.Visual.UserInterface
     public partial class TestSceneDeleteLocalScore : OsuManualInputManagerTestScene
     {
         private readonly ContextMenuContainer contextMenuContainer;
+        private readonly BeatmapLeaderboardScoresProvider scoresProvider;
         private readonly BeatmapLeaderboard leaderboard;
 
         private BeatmapManager beatmapManager;
@@ -54,13 +55,19 @@ namespace osu.Game.Tests.Visual.UserInterface
                 contextMenuContainer = new OsuContextMenuContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Child = leaderboard = new BeatmapLeaderboard
+                    Children = new Drawable[]
                     {
-                        Origin = Anchor.Centre,
-                        Anchor = Anchor.Centre,
-                        Size = new Vector2(550f, 450f),
-                        Scope = BeatmapLeaderboardScope.Local,
-                        BeatmapInfo = TestResources.CreateTestBeatmapSetInfo().Beatmaps.First()
+                        scoresProvider = new BeatmapLeaderboardScoresProvider
+                        {
+                            Scope = BeatmapLeaderboardScope.Local,
+                            BeatmapInfo = TestResources.CreateTestBeatmapSetInfo().Beatmaps.First()
+                        },
+                        leaderboard = new BeatmapLeaderboard(scoresProvider)
+                        {
+                            Origin = Anchor.Centre,
+                            Anchor = Anchor.Centre,
+                            Size = new Vector2(550f, 450f),
+                        }
                     }
                 },
                 dialogOverlay = new DialogOverlay()
@@ -123,8 +130,8 @@ namespace osu.Game.Tests.Visual.UserInterface
             });
             AddStep("set up leaderboard", () =>
             {
-                leaderboard.BeatmapInfo = beatmapInfo;
-                leaderboard.RefetchScores(); // Required in the case that the beatmap hasn't changed
+                scoresProvider.BeatmapInfo = beatmapInfo;
+                scoresProvider.RefetchScores(); // Required in the case that the beatmap hasn't changed
             });
 
             // Ensure the leaderboard items have finished showing up
@@ -164,8 +171,8 @@ namespace osu.Game.Tests.Visual.UserInterface
                 InputManager.PressButton(MouseButton.Left);
             });
 
-            AddUntilStep("wait for fetch", () => leaderboard.Scores.Any());
-            AddUntilStep("score removed from leaderboard", () => leaderboard.Scores.All(s => s.OnlineID != scoreBeingDeleted.OnlineID));
+            AddUntilStep("wait for fetch", () => scoresProvider.Scores.Any());
+            AddUntilStep("score removed from leaderboard", () => scoresProvider.Scores.All(s => s.OnlineID != scoreBeingDeleted.OnlineID));
 
             // "Clean up"
             AddStep("release left mouse button", () => InputManager.ReleaseButton(MouseButton.Left));
@@ -175,8 +182,8 @@ namespace osu.Game.Tests.Visual.UserInterface
         public void TestDeleteViaDatabase()
         {
             AddStep("delete top score", () => scoreManager.Delete(importedScores[0]));
-            AddUntilStep("wait for fetch", () => leaderboard.Scores.Any());
-            AddUntilStep("score removed from leaderboard", () => leaderboard.Scores.All(s => s.OnlineID != importedScores[0].OnlineID));
+            AddUntilStep("wait for fetch", () => scoresProvider.Scores.Any());
+            AddUntilStep("score removed from leaderboard", () => scoresProvider.Scores.All(s => s.OnlineID != importedScores[0].OnlineID));
         }
     }
 }

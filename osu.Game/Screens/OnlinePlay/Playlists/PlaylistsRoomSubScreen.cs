@@ -34,8 +34,6 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
         [Resolved(CanBeNull = true)]
         private IdleTracker? idleTracker { get; set; }
-
-        private MatchLeaderboardScoresProvider leaderboardScoresProvider = null!;
         private SelectionPollingComponent selectionPollingComponent = null!;
         private FillFlowContainer progressSection = null!;
         private DrawableRoomPlaylist drawablePlaylist = null!;
@@ -220,7 +218,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                     {
                                         new OverlinedHeader("Leaderboard")
                                     },
-                                    new Drawable[] { new MatchLeaderboard(leaderboardScoresProvider) { RelativeSizeAxes = Axes.Both }, },
+                                    new Drawable[] { new MatchLeaderboard(MatchScoresProvider) { RelativeSizeAxes = Axes.Both }, },
                                 },
                                 RowDimensions = new[]
                                 {
@@ -277,7 +275,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         {
             return new PlayerLoader(() => new PlaylistsPlayer(Room, selectedItem)
             {
-                Exited = () => leaderboardScoresProvider.RefetchScores()
+                Exited = () => MatchScoresProvider.RefetchScores()
             });
         }
 

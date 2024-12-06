@@ -29,7 +29,8 @@ namespace osu.Game.Tests.Visual.SongSelect
 {
     public partial class TestSceneBeatmapLeaderboard : OsuTestScene
     {
-        private readonly FailableLeaderboard leaderboard;
+        private readonly BeatmapLeaderboard leaderboard;
+        private readonly FailableScoresProvider scoresProvider;
 
         [Cached(typeof(IDialogOverlay))]
         private readonly DialogOverlay dialogOverlay;
@@ -58,12 +59,15 @@ namespace osu.Game.Tests.Visual.SongSelect
                 {
                     Depth = -1
                 },
-                leaderboard = new FailableLeaderboard
+                scoresProvider = new FailableScoresProvider
+                {
+                    Scope = BeatmapLeaderboardScope.Global
+                },
+                leaderboard = new BeatmapLeaderboard(scoresProvider)
                 {
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
                     Size = new Vector2(550f, 450f),
-                    Scope = BeatmapLeaderboardScope.Global,
                 }
             });
         }
@@ -73,14 +77,14 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             BeatmapInfo beatmapInfo = null!;
 
-            AddStep(@"Set scope", () => leaderboard.Scope = BeatmapLeaderboardScope.Local);
+            AddStep(@"Set scope", () => scoresProvider.Scope = BeatmapLeaderboardScope.Local);
 
             AddStep(@"Set beatmap", () =>
             {
                 beatmapManager.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();
                 beatmapInfo = beatmapManager.GetAllUsableBeatmapSets().First().Beatmaps.First();
 
-                leaderboard.BeatmapInfo = beatmapInfo;
+                scoresProvider.BeatmapInfo = beatmapInfo;
             });
 
             clearScores();
@@ -102,14 +106,14 @@ namespace osu.Game.Tests.Visual.SongSelect
             BeatmapInfo beatmapInfo = null!;
             string originalHash = string.Empty;
 
-            AddStep(@"Set scope", () => leaderboard.Scope = BeatmapLeaderboardScope.Local);
+            AddStep(@"Set scope", () => scoresProvider.Scope = BeatmapLeaderboardScope.Local);
 
             AddStep(@"Import beatmap", () =>
             {
                 beatmapManager.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();
                 beatmapInfo = beatmapManager.GetAllUsableBeatmapSets().First().Beatmaps.First();
 
-                leaderboard.BeatmapInfo = beatmapInfo;
+                scoresProvider.BeatmapInfo = beatmapInfo;
             });
 
             clearScores();
@@ -163,8 +167,8 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestGlobalScoresDisplay()
         {
-            AddStep(@"Set scope", () => leaderboard.Scope = BeatmapLeaderboardScope.Global);
-            AddStep(@"New Scores", () => leaderboard.SetScores(generateSampleScores(new BeatmapInfo())));
+            AddStep(@"Set scope", () => scoresProvider.Scope = BeatmapLeaderboardScope.Global);
+            AddStep(@"New Scores", () => scoresProvider.SetScores(generateSampleScores(new BeatmapInfo())));
         }
 
         [Test]
@@ -177,19 +181,19 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestPlaceholderStates()
         {
-            AddStep("ensure no scores displayed", () => leaderboard.SetScores(null));
+            AddStep("ensure no scores displayed", () => scoresProvider.SetScores(null));
 
-            AddStep(@"Network failure", () => leaderboard.SetErrorState(LeaderboardState.NetworkFailure));
-            AddStep(@"No supporter", () => leaderboard.SetErrorState(LeaderboardState.NotSupporter));
-            AddStep(@"Not logged in", () => leaderboard.SetErrorState(LeaderboardState.NotLoggedIn));
-            AddStep(@"Ruleset unavailable", () => leaderboard.SetErrorState(LeaderboardState.RulesetUnavailable));
-            AddStep(@"Beatmap unavailable", () => leaderboard.SetErrorState(LeaderboardState.BeatmapUnavailable));
-            AddStep(@"None selected", () => leaderboard.SetErrorState(LeaderboardState.NoneSelected));
+            AddStep(@"Network failure", () => scoresProvider.SetErrorState(LeaderboardState.NetworkFailure));
+            AddStep(@"No supporter", () => scoresProvider.SetErrorState(LeaderboardState.NotSupporter));
+            AddStep(@"Not logged in", () => scoresProvider.SetErrorState(LeaderboardState.NotLoggedIn));
+            AddStep(@"Ruleset unavailable", () => scoresProvider.SetErrorState(LeaderboardState.RulesetUnavailable));
+            AddStep(@"Beatmap unavailable", () => scoresProvider.SetErrorState(LeaderboardState.BeatmapUnavailable));
+            AddStep(@"None selected", () => scoresProvider.SetErrorState(LeaderboardState.NoneSelected));
         }
 
         private void showPersonalBestWithNullPosition()
         {
-            leaderboard.SetScores(leaderboard.Scores, new ScoreInfo
+            scoresProvider.SetScores(scoresProvider.Scores, new ScoreInfo
             {
                 Rank = ScoreRank.XH,
                 Accuracy = 1,
@@ -208,7 +212,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private void showPersonalBest()
         {
-            leaderboard.SetScores(leaderboard.Scores, new ScoreInfo
+            scoresProvider.SetScores(scoresProvider.Scores, new ScoreInfo
             {
                 Position = 999,
                 Rank = ScoreRank.XH,
@@ -458,7 +462,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             };
         }
 
-        private partial class FailableLeaderboard : BeatmapLeaderboard
+        private partial class FailableScoresProvider : BeatmapLeaderboardScoresProvider
         {
             public new void SetErrorState(LeaderboardState state) => base.SetErrorState(state);
             public new void SetScores(IEnumerable<ScoreInfo>? scores, ScoreInfo? userScore = null) => base.SetScores(scores, userScore);
