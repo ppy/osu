@@ -154,7 +154,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                     {
                         // Note: The density is used during the pattern generator constructor, and intentionally computed first.
                         computeDensity(startTime);
-                        conversion = new HitObjectPatternGenerator(Random, original, beatmap, TotalColumns, lastPattern, lastTime, lastPosition, density, lastStair);
+                        conversion = new HitCirclePatternGenerator(Random, original, beatmap, TotalColumns, lastPattern, lastTime, lastPosition, density, lastStair);
                         recordNote(startTime, position);
                     }
 
@@ -168,7 +168,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                     }
                     else
                     {
-                        var generator = new PathObjectPatternGenerator(Random, original, beatmap, TotalColumns, lastPattern);
+                        var generator = new SliderPatternGenerator(Random, original, beatmap, TotalColumns, lastPattern);
                         conversion = generator;
 
                         for (int i = 0; i <= generator.SpanCount; i++)
@@ -185,7 +185,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                 case LegacyHitObjectType.Spinner:
                     // Note: Some older mania-specific beatmaps can have spinners that are converted rather than passed through.
                     //       Newer beatmaps will usually use the "hold" hitobject type below.
-                    conversion = new EndTimeObjectPatternGenerator(Random, original, beatmap, TotalColumns, lastPattern);
+                    conversion = new SpinnerPatternGenerator(Random, original, beatmap, TotalColumns, lastPattern);
                     recordNote(endTime, new Vector2(256, 192));
                     computeDensity(endTime);
                     break;
@@ -202,8 +202,8 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
             foreach (var newPattern in conversion.Generate())
             {
-                lastPattern = conversion is EndTimeObjectPatternGenerator ? lastPattern : newPattern;
-                lastStair = (conversion as HitObjectPatternGenerator)?.StairType ?? lastStair;
+                lastPattern = conversion is SpinnerPatternGenerator ? lastPattern : newPattern;
+                lastStair = (conversion as HitCirclePatternGenerator)?.StairType ?? lastStair;
 
                 foreach (var obj in newPattern.HitObjects)
                     yield return obj;
