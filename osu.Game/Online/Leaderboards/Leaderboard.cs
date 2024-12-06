@@ -39,7 +39,7 @@ namespace osu.Game.Online.Leaderboards
 
         private readonly LoadingSpinner loading;
 
-        private CancellationTokenSource? currentScoresAsyncLoadCancellationSource = null;
+        private CancellationTokenSource? currentScoresAsyncLoadCancellationSource;
 
         protected Leaderboard(LeaderboardScoresProvider<TScope, TScoreInfo> leaderboardScoresProvider)
         {
@@ -91,7 +91,7 @@ namespace osu.Game.Online.Leaderboards
             LeaderboardScoresProvider.State.BindValueChanged(state => onStateChange(state.NewValue));
         }
 
-        private void applyNewScores(LeaderboardState state)
+        private void setNewScores(LeaderboardState state)
         {
             // Non-delayed schedule may potentially run inline (due to IsMainThread check passing) after leaderboard  is disposed.
             // This is guarded against in BeatmapLeaderboard via web request cancellation, but let's be extra safe.
@@ -159,19 +159,23 @@ namespace osu.Game.Online.Leaderboards
                 }
 
                 scrollContainer.ScrollToStart(false);
-
             }, (currentScoresAsyncLoadCancellationSource = new CancellationTokenSource()).Token);
         }
 
         private void onStateChange(LeaderboardState state)
         {
-            if (state == LeaderboardState.Success | state == LeaderboardState.NoScores)
+            switch (state)
             {
-                applyNewScores(state);
-                return;
+                case LeaderboardState.Success:
+                case LeaderboardState.NoScores:
+                    setNewScores(state);
+                    break;
+
+                default:
+                    setPlaceholder(state);
+                    break;
             }
 
-            setPlaceholder(state);
         }
 
         #region Placeholder handling

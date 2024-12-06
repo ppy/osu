@@ -86,7 +86,6 @@ namespace osu.Game.Screens.Select.Leaderboards
 
         private IDisposable? scoreSubscription;
 
-
         [BackgroundDependencyLoader]
         private void load()
         {

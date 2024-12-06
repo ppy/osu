@@ -34,6 +34,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
         [Resolved(CanBeNull = true)]
         private IdleTracker? idleTracker { get; set; }
+
         private SelectionPollingComponent selectionPollingComponent = null!;
         private FillFlowContainer progressSection = null!;
         private DrawableRoomPlaylist drawablePlaylist = null!;

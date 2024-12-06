@@ -9,10 +9,10 @@ namespace osu.Game.Screens.Select.Leaderboards
 {
     public partial class BeatmapLeaderboard : Leaderboard<BeatmapLeaderboardScope, ScoreInfo>
     {
-
         public Action<ScoreInfo>? ScoreSelected;
 
-        public BeatmapLeaderboard(BeatmapLeaderboardScoresProvider leaderboardScoresProvider) : base(leaderboardScoresProvider)
+        public BeatmapLeaderboard(BeatmapLeaderboardScoresProvider leaderboardScoresProvider)
+            : base(leaderboardScoresProvider)
         {
         }
 

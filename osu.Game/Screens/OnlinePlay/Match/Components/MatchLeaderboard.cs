@@ -8,7 +8,8 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
 {
     public partial class MatchLeaderboard : Leaderboard<MatchLeaderboardScope, APIUserScoreAggregate>
     {
-        public MatchLeaderboard(MatchLeaderboardScoresProvider leaderboardScoresProvider) : base(leaderboardScoresProvider)
+        public MatchLeaderboard(MatchLeaderboardScoresProvider leaderboardScoresProvider)
+            : base(leaderboardScoresProvider)
         {
         }
 

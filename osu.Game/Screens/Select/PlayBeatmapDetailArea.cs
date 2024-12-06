@@ -15,9 +15,9 @@ namespace osu.Game.Screens.Select
 {
     public partial class PlayBeatmapDetailArea : BeatmapDetailArea
     {
-        private BeatmapLeaderboardScoresProvider leaderboardScoresProvider;
+        private readonly BeatmapLeaderboardScoresProvider leaderboardScoresProvider;
 
-        private BeatmapLeaderboard leaderboard;
+        private readonly BeatmapLeaderboard leaderboard;
 
         public override WorkingBeatmap Beatmap
         {
@@ -26,7 +26,7 @@ namespace osu.Game.Screens.Select
             {
                 base.Beatmap = value;
 
-                leaderboardScoresProvider.BeatmapInfo = value is DummyWorkingBeatmap ? null : value?.BeatmapInfo;
+                leaderboardScoresProvider.BeatmapInfo = value is DummyWorkingBeatmap ? null : value.BeatmapInfo;
             }
         }
 
@@ -73,9 +73,9 @@ namespace osu.Game.Screens.Select
 
             switch (tab)
             {
-                case BeatmapDetailAreaLeaderboardTabItem<BeatmapLeaderboardScope> leaderboard:
-                    leaderboardScoresProvider.Scope = leaderboard.Scope;
-                    this.leaderboard.Show();
+                case BeatmapDetailAreaLeaderboardTabItem<BeatmapLeaderboardScope> leaderboardTab:
+                    leaderboardScoresProvider.Scope = leaderboardTab.Scope;
+                    leaderboard.Show();
                     break;
 
                 default:

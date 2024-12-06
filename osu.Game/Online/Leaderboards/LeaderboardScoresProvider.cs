@@ -154,7 +154,6 @@ namespace osu.Game.Online.Leaderboards
             fetchScoresRequest?.Cancel();
         }
 
-
         protected void SetState(LeaderboardState state)
         {
             if (state == this.state.Value)
