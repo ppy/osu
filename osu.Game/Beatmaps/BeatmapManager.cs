@@ -15,6 +15,7 @@ using osu.Framework.Audio.Track;
 using osu.Framework.Extensions;
 using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Database;
 using osu.Game.Extensions;
@@ -160,10 +161,12 @@ namespace osu.Game.Beatmaps
 
             foreach (var effectPoint in referenceWorkingBeatmap.Beatmap.ControlPointInfo.EffectPoints)
             {
-                if (!rulesetInfo.Equals(referenceWorkingBeatmap.BeatmapInfo.Ruleset))
-                    effectPoint.ScrollSpeedBindable.SetDefault();
+                var clonedEffectPoint = (EffectControlPoint)effectPoint.DeepClone();
 
-                newBeatmap.ControlPointInfo.Add(effectPoint.Time, effectPoint.DeepClone());
+                if (!rulesetInfo.Equals(referenceWorkingBeatmap.BeatmapInfo.Ruleset))
+                    clonedEffectPoint.ScrollSpeedBindable.SetDefault();
+
+                newBeatmap.ControlPointInfo.Add(clonedEffectPoint.Time, clonedEffectPoint);
             }
 
             return addDifficultyToSet(targetBeatmapSet, newBeatmap, referenceWorkingBeatmap.Skin);
