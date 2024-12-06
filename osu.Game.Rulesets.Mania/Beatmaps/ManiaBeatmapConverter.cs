@@ -126,15 +126,33 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
         protected override IEnumerable<ManiaHitObject> ConvertHitObject(HitObject original, IBeatmap beatmap, CancellationToken cancellationToken)
         {
-            if (original is ManiaHitObject maniaObj)
+            LegacyHitObjectType legacyType;
+
+            switch (original)
             {
-                yield return maniaObj;
+                case ManiaHitObject maniaObj:
+                {
+                    yield return maniaObj;
 
-                yield break;
+                    yield break;
+                }
+
+                case IHasLegacyHitObjectType legacy:
+                    legacyType = legacy.LegacyType & LegacyHitObjectType.ObjectTypes;
+                    break;
+
+                case IHasPath:
+                    legacyType = LegacyHitObjectType.Slider;
+                    break;
+
+                case IHasDuration:
+                    legacyType = LegacyHitObjectType.Hold;
+                    break;
+
+                default:
+                    legacyType = LegacyHitObjectType.Circle;
+                    break;
             }
-
-            if (original is not IHasLegacyHitObjectType legacy)
-                yield break;
 
             double startTime = original.StartTime;
             double endTime = (original as IHasDuration)?.EndTime ?? startTime;
@@ -142,7 +160,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
             PatternGenerator conversion;
 
-            switch (legacy.LegacyType & LegacyHitObjectType.ObjectTypes)
+            switch (legacyType)
             {
                 case LegacyHitObjectType.Circle:
                     if (IsForCurrentRuleset)
@@ -197,7 +215,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                     break;
 
                 default:
-                    throw new ArgumentException($"Invalid legacy object type: {legacy.LegacyType}", nameof(original));
+                    throw new ArgumentException($"Invalid legacy object type: {legacyType}", nameof(original));
             }
 
             foreach (var newPattern in conversion.Generate())
