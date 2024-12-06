@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Linq;
 using JetBrains.Annotations;
@@ -96,8 +94,8 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                 if (conversionDifficulty != null)
                     return conversionDifficulty.Value;
 
-                HitObject lastObject = Beatmap.HitObjects.LastOrDefault();
-                HitObject firstObject = Beatmap.HitObjects.FirstOrDefault();
+                HitObject? lastObject = Beatmap.HitObjects.LastOrDefault();
+                HitObject? firstObject = Beatmap.HitObjects.FirstOrDefault();
 
                 // Drain time in seconds
                 int drainTime = (int)(((lastObject?.StartTime ?? 0) - (firstObject?.StartTime ?? 0) - Beatmap.TotalBreakTime) / 1000);
@@ -138,7 +136,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
         /// <returns>A column which has passed the <paramref name="validation"/> check and for which there are no
         /// <see cref="HitObject"/>s in any of <paramref name="patterns"/> occupying the same column.</returns>
         /// <exception cref="NotEnoughColumnsException">If there are no valid candidate columns.</exception>
-        protected int FindAvailableColumn(int initialColumn, int? lowerBound = null, int? upperBound = null, Func<int, int> nextColumn = null, [InstantHandle] Func<int, bool> validation = null,
+        protected int FindAvailableColumn(int initialColumn, int? lowerBound = null, int? upperBound = null, Func<int, int>? nextColumn = null, [InstantHandle] Func<int, bool>? validation = null,
                                           params Pattern[] patterns)
         {
             lowerBound ??= RandomStart;
