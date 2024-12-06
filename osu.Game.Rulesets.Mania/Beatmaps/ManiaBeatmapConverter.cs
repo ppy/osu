@@ -152,6 +152,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                     }
                     else
                     {
+                        // Note: The density is used during the pattern generator constructor, and intentionally computed first.
                         computeDensity(startTime);
                         conversion = new HitObjectPatternGenerator(Random, original, beatmap, TotalColumns, lastPattern, lastTime, lastPosition, density, lastStair);
                         recordNote(startTime, position);
@@ -182,6 +183,8 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                     break;
 
                 case LegacyHitObjectType.Spinner:
+                    // Note: Some older mania-specific beatmaps can have spinners that are converted rather than passed through.
+                    //       Newer beatmaps will usually use the "hold" hitobject type below.
                     conversion = new EndTimeObjectPatternGenerator(Random, original, beatmap, TotalColumns, lastPattern);
                     recordNote(endTime, new Vector2(256, 192));
                     computeDensity(endTime);
