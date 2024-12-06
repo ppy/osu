@@ -23,13 +23,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 
         public override IEnumerable<Pattern> Generate()
         {
-            yield return generate();
-        }
-
-        private Pattern generate()
-        {
             var positionData = HitObject as IHasXPosition;
-
             int column = GetColumn(positionData?.X ?? 0);
 
             var pattern = new Pattern();
@@ -45,7 +39,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                     NodeSamples = (HitObject as IHasRepeats)?.NodeSamples ?? HoldNote.CreateDefaultNodeSamples(HitObject)
                 });
             }
-            else if (HitObject is IHasXPosition)
+            else
             {
                 pattern.Add(new Note
                 {
@@ -55,7 +49,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                 });
             }
 
-            return pattern;
+            yield return pattern;
         }
     }
 }
