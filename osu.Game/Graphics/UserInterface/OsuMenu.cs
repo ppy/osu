@@ -4,8 +4,6 @@
 #nullable disable
 
 using osu.Framework.Allocation;
-using osu.Framework.Audio;
-using osu.Framework.Audio.Sample;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -20,11 +18,11 @@ namespace osu.Game.Graphics.UserInterface
 {
     public partial class OsuMenu : Menu
     {
-        private Sample sampleOpen;
-        private Sample sampleClose;
-
         // todo: this shouldn't be required after https://github.com/ppy/osu-framework/issues/4519 is fixed.
         private bool wasOpened;
+
+        [Resolved]
+        private OsuMenuSamples menuSamples { get; set; } = null!;
 
         public OsuMenu(Direction direction, bool topLevelMenu = false)
             : base(direction, topLevelMenu)
@@ -33,13 +31,8 @@ namespace osu.Game.Graphics.UserInterface
 
             MaskingContainer.CornerRadius = 4;
             ItemsContainer.Padding = new MarginPadding(5);
-        }
 
-        [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
-        {
-            sampleOpen = audio.Samples.Get(@"UI/dropdown-open");
-            sampleClose = audio.Samples.Get(@"UI/dropdown-close");
+            OnSubmenuOpen += _ => { menuSamples?.PlaySubOpenSample(); };
         }
 
         protected override void Update()
@@ -64,7 +57,7 @@ namespace osu.Game.Graphics.UserInterface
         protected override void AnimateOpen()
         {
             if (!TopLevelMenu && !wasOpened)
-                sampleOpen?.Play();
+                menuSamples?.PlayOpenSample();
 
             this.FadeIn(300, Easing.OutQuint);
             wasOpened = true;
@@ -73,7 +66,7 @@ namespace osu.Game.Graphics.UserInterface
         protected override void AnimateClose()
         {
             if (!TopLevelMenu && wasOpened)
-                sampleClose?.Play();
+                menuSamples?.PlayCloseSample();
 
             this.FadeOut(300, Easing.OutQuint);
             wasOpened = false;
