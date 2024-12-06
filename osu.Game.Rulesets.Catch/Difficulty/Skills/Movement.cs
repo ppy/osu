@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Game.Rulesets.Catch.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
@@ -49,13 +50,47 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
         {
             var catchCurrent = (CatchDifficultyHitObject)current;
 
-            lastPlayerPosition ??= catchCurrent.LastNormalizedPosition;
+            lastPlayerPosition ??= catchCurrent.NormalizedPositionLast0;
 
             float playerPosition = Math.Clamp(
                 lastPlayerPosition.Value,
                 catchCurrent.NormalizedPosition - (normalized_hitobject_radius - absolute_player_positioning_error),
                 catchCurrent.NormalizedPosition + (normalized_hitobject_radius - absolute_player_positioning_error)
             );
+
+            float groupness = getGroupness(catchCurrent);
+
+            // If 3 objects are in group - player will try to cheese them
+            if (groupness > 0)
+            {
+                // Coordinates of the group
+                float leftCoords = Math.Min(Math.Min(catchCurrent.NormalizedPosition, catchCurrent.NormalizedPositionLast0), (float)catchCurrent.NormalizedPositionLast1!);
+                float rightCoords = Math.Max(Math.Max(catchCurrent.NormalizedPosition, catchCurrent.NormalizedPositionLast0), (float)catchCurrent.NormalizedPositionLast1!);
+                float centerCoords = (leftCoords + rightCoords) / 2;
+
+                // Distance from player to the boundaries of group
+                float leftDelta = Math.Abs(lastPlayerPosition.Value - leftCoords);
+                float rightDelta = Math.Abs(lastPlayerPosition.Value - rightCoords);
+
+                // Normalized deltas:
+                leftDelta = normalizeDelta(leftDelta, normalized_hitobject_radius);
+                rightDelta = normalizeDelta(rightDelta, normalized_hitobject_radius);
+
+                // Determines how close player is to position where they can hit it
+                float closetness = 1;
+                closetness *= 1 - leftDelta;
+                closetness *= 1 - rightDelta;
+
+                // Player will be more likely to move if it's far away from center of group
+                float resultPosition = float.Lerp(centerCoords, lastPlayerPosition.Value, closetness);
+
+                // Assume that player will take the easier route
+                if (Math.Abs(playerPosition - lastPlayerPosition.Value) < Math.Abs(resultPosition - lastPlayerPosition.Value))
+                    resultPosition = playerPosition;
+
+                // Player will be more likely to move to group center if objects are close enough
+                playerPosition = float.Lerp(playerPosition, resultPosition, groupness);
+            }
 
             float distanceMoved = playerPosition - lastPlayerPosition.Value;
 
@@ -101,5 +136,39 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
 
             return distanceAddition / weightedStrainTime;
         }
+
+        private float getGroupness(CatchDifficultyHitObject obj)
+        {
+            if (obj.NormalizedPositionLast1.IsNull())
+                return 0;
+
+            // Raw deltas between objects
+            float delta01 = Math.Abs(obj.NormalizedPosition - obj.NormalizedPositionLast0);
+            float delta02 = Math.Abs((float)(obj.NormalizedPosition - obj.NormalizedPositionLast1));
+            float delta12 = Math.Abs((float)(obj.NormalizedPositionLast0 - obj.NormalizedPositionLast1));
+
+            // Normalized deltas:
+            // 0 - very close, inbetween - moderately close, 1 - too far
+            delta01 = normalizeDelta(delta01, 2 * normalized_hitobject_radius);
+            delta02 = normalizeDelta(delta02, 2 * normalized_hitobject_radius);
+            delta12 = normalizeDelta(delta12, 2 * normalized_hitobject_radius);
+
+            // If at least one is far apart - groupness is 0
+            float groupness = 1;
+            groupness *= 1 - delta01;
+            groupness *= 1 - delta02;
+            groupness *= 1 - delta12;
+
+            return groupness;
+        }
+
+        /// <summary>
+        /// Normalizing delta:
+        /// 0 - very close, inbetween - moderately close, 1 - too far
+        /// </summary>
+        /// <param name="delta"></param>
+        /// <param name="shift">Deltas lower than shift will be 0</param>
+        /// <returns></returns>
+        private float normalizeDelta(float delta, float shift) => Math.Clamp(delta - shift + absolute_player_positioning_error, 0, absolute_player_positioning_error) / absolute_player_positioning_error;
     }
 }
