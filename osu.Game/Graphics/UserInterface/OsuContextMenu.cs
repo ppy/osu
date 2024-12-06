@@ -53,8 +53,8 @@ namespace osu.Game.Graphics.UserInterface
             if (!playClickSample)
                 return;
 
-            menuSamples?.PlayClickSample();
-            menuSamples?.PlayOpenSample();
+            menuSamples.PlayClickSample();
+            menuSamples.PlayOpenSample();
         }
 
         protected override void AnimateClose()
@@ -62,7 +62,7 @@ namespace osu.Game.Graphics.UserInterface
             this.FadeOut(fade_duration, Easing.OutQuint);
 
             if (wasOpened)
-                menuSamples?.PlayCloseSample();
+                menuSamples.PlayCloseSample();
 
             wasOpened = false;
         }
