@@ -154,8 +154,8 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.Right }, GlobalAction.EditorSeekToNextSamplePoint),
             new KeyBinding(new[] { InputKey.Control, InputKey.B }, GlobalAction.EditorAddBookmark),
             new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.B }, GlobalAction.EditorRemoveClosestBookmark),
-            new KeyBinding(InputKey.None, GlobalAction.EditorSeekToPreviousBookmark),
-            new KeyBinding(InputKey.None, GlobalAction.EditorSeekToNextBookmark),
+            new KeyBinding(new[] { InputKey.Alt, InputKey.Left }, GlobalAction.EditorSeekToPreviousBookmark),
+            new KeyBinding(new[] { InputKey.Alt, InputKey.Right }, GlobalAction.EditorSeekToNextBookmark),
         };
 
         private static IEnumerable<KeyBinding> editorTestPlayKeyBindings => new[]
