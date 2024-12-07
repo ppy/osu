@@ -49,6 +49,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles.Components
                     ring = new RingPiece
                     {
                         BorderThickness = 4,
+                        Size = OsuHitObject.OBJECT_DIMENSIONS
                     }
                 }
             };
