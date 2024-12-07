@@ -83,7 +83,7 @@ namespace osu.Game.Screens.Play
         /// </summary>
         protected virtual bool PauseOnFocusLost => true;
 
-        public Action<bool> RestartRequested;
+        public Action<bool> PrepareLoaderForRestart;
 
         private bool isRestarting;
         private bool skipExitTransition;
@@ -646,7 +646,6 @@ namespace osu.Game.Screens.Play
             // import current score if possible.
             prepareAndImportScoreAsync();
 
-            // Screen may not be current if a restart has been performed.
             if (this.IsCurrentScreen())
             {
                 skipExitTransition = skipTransition;
@@ -656,6 +655,12 @@ namespace osu.Game.Screens.Play
                 // - the pause / fail dialog was requested but is already displayed (user showing intention to exit).
                 // - the pause / fail dialog was requested but couldn't be displayed due to the type or state of this Player instance.
                 this.Exit();
+            }
+            else
+            {
+                // May be restarting from results screen.
+                if (this.GetChildScreen() != null)
+                    this.MakeCurrent();
             }
 
             return true;
@@ -719,12 +724,8 @@ namespace osu.Game.Screens.Play
             // stopping here is to ensure music doesn't become audible after exiting back to PlayerLoader.
             musicController.Stop();
 
-            if (RestartRequested != null)
-            {
-                skipExitTransition = quickRestart;
-                RestartRequested?.Invoke(quickRestart);
-                return true;
-            }
+            skipExitTransition = quickRestart;
+            PrepareLoaderForRestart?.Invoke(quickRestart);
 
             return PerformExit(quickRestart);
         }

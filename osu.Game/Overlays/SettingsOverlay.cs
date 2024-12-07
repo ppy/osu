@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Development;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -27,21 +28,28 @@ namespace osu.Game.Overlays
         public LocalisableString Title => SettingsStrings.HeaderTitle;
         public LocalisableString Description => SettingsStrings.HeaderDescription;
 
-        protected override IEnumerable<SettingsSection> CreateSections() => new SettingsSection[]
+        protected override IEnumerable<SettingsSection> CreateSections()
         {
-            // This list should be kept in sync with ScreenBehaviour.
-            new GeneralSection(),
-            new SkinSection(),
-            new InputSection(createSubPanel(new KeyBindingPanel())),
-            new UserInterfaceSection(),
-            new GameplaySection(),
-            new RulesetSection(),
-            new AudioSection(),
-            new GraphicsSection(),
-            new OnlineSection(),
-            new MaintenanceSection(),
-            new DebugSection(),
-        };
+            var sections = new List<SettingsSection>
+            {
+                // This list should be kept in sync with ScreenBehaviour.
+                new GeneralSection(),
+                new SkinSection(),
+                new InputSection(createSubPanel(new KeyBindingPanel())),
+                new UserInterfaceSection(),
+                new GameplaySection(),
+                new RulesetSection(),
+                new AudioSection(),
+                new GraphicsSection(),
+                new OnlineSection(),
+                new MaintenanceSection(),
+            };
+
+            if (DebugUtils.IsDebugBuild)
+                sections.Add(new DebugSection());
+
+            return sections;
+        }
 
         private readonly List<SettingsSubPanel> subPanels = new List<SettingsSubPanel>();
 
