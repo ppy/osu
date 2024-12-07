@@ -35,6 +35,8 @@ namespace osu.Game.Screens.Play
     {
         public const float FADE_DURATION = 300;
 
+        private const float mods_fade_duration = 1000;
+
         public const Easing FADE_EASING = Easing.OutQuint;
 
         /// <summary>
@@ -85,7 +87,6 @@ namespace osu.Game.Screens.Play
         private readonly BindableBool replayLoaded = new BindableBool();
 
         private static bool hasShownNotificationOnce;
-
         private readonly FillFlowContainer bottomRightElements;
         private readonly FillFlowContainer topRightElements;
 
@@ -248,6 +249,14 @@ namespace osu.Game.Screens.Play
 
                 updateVisibility();
             }, true);
+
+            ModDisplay.ExpansionMode = ExpansionMode.AlwaysExpanded;
+            Scheduler.AddDelayed(() =>
+            {
+                ModDisplay.ExpansionMode = ExpansionMode.ExpandOnHover;
+            }, 1200);
+
+            ModDisplay.FadeInFromZero(mods_fade_duration, FADE_EASING);
         }
 
         protected override void Update()

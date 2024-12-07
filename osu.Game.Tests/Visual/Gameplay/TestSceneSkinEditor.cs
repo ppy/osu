@@ -20,6 +20,7 @@ using osu.Game.Overlays.Settings;
 using osu.Game.Overlays.SkinEditor;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Play.HUD.HitErrorMeters;
@@ -52,6 +53,11 @@ namespace osu.Game.Tests.Visual.Gameplay
         public override void SetUpSteps()
         {
             base.SetUpSteps();
+
+            AddStep("Add DT and HD", () =>
+            {
+                LoadPlayer([new OsuModDoubleTime { SpeedChange = { Value = 1.337 } }, new OsuModHidden()]);
+            });
 
             AddStep("reset skin", () => skins.CurrentSkinInfo.SetDefault());
             AddUntilStep("wait for hud load", () => targetContainer.ComponentsLoaded);
