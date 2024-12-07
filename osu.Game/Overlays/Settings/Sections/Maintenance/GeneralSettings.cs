@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Localisation;
 using osu.Framework.Screens;
@@ -18,19 +19,22 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         [BackgroundDependencyLoader]
         private void load(IPerformFromScreenRunner? performer)
         {
-            Children = new[]
+            // the screen does not look appropriate on iOS with system file selection implemented,
+            // and functionality is already provided by opening said files externally.
+            if (RuntimeInfo.OS != RuntimeInfo.Platform.iOS)
             {
-                new SettingsButton
+                Add(new SettingsButton
                 {
                     Text = DebugSettingsStrings.ImportFiles,
                     Action = () => performer?.PerformFromScreen(menu => menu.Push(new FileImportScreen()))
-                },
-                new SettingsButton
-                {
-                    Text = DebugSettingsStrings.RunLatencyCertifier,
-                    Action = () => performer?.PerformFromScreen(menu => menu.Push(new LatencyCertifierScreen()))
-                }
-            };
+                });
+            }
+
+            Add(new SettingsButton
+            {
+                Text = DebugSettingsStrings.RunLatencyCertifier,
+                Action = () => performer?.PerformFromScreen(menu => menu.Push(new LatencyCertifierScreen()))
+            });
         }
     }
 }
