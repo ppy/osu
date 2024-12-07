@@ -1,0 +1,60 @@
+{
+  "Mappings": [
+    {
+      "RandomW": 273071671,
+      "RandomX": 842502087,
+      "RandomY": 3579807591,
+      "RandomZ": 273326509,
+      "StartTime": 11783.0,
+      "Objects": [
+        {
+          "StartTime": 11783.0,
+          "EndTime": 15116.0,
+          "Column": 0
+        }
+      ]
+    },
+    {
+      "RandomW": 2659271247,
+      "RandomX": 3579807591,
+      "RandomY": 273326509,
+      "RandomZ": 273071671,
+      "StartTime": 91545.0,
+      "Objects": [
+        {
+          "StartTime": 91545.0,
+          "EndTime": 92735.0,
+          "Column": 0
+        }
+      ]
+    },
+    {
+      "RandomW": 3083635271,
+      "RandomX": 273326509,
+      "RandomY": 273071671,
+      "RandomZ": 2659271247,
+      "StartTime": 152497.0,
+      "Objects": [
+        {
+          "StartTime": 152497.0,
+          "EndTime": 153687.0,
+          "Column": 1
+        }
+      ]
+    },
+    {
+      "RandomW": 4073591514,
+      "RandomX": 273071671,
+      "RandomY": 2659271247,
+      "RandomZ": 3083635271,
+      "StartTime": 231545.0,
+      "Objects": [
+        {
+          "StartTime": 231545.0,
+          "EndTime": 232974.0,
+          "Column": 3
+        }
+      ]
+    }
+  ]
+}
