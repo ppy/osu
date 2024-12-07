@@ -54,11 +54,6 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             base.SetUpSteps();
 
-            AddStep("Add DT and HD", () =>
-            {
-                LoadPlayer([new OsuModDoubleTime { SpeedChange = { Value = 1.337 } }, new OsuModHidden()]);
-            });
-
             AddStep("reset skin", () => skins.CurrentSkinInfo.SetDefault());
             AddUntilStep("wait for hud load", () => targetContainer.ComponentsLoaded);
 
