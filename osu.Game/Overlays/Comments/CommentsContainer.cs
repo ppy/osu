@@ -244,7 +244,7 @@ namespace osu.Game.Overlays.Comments
         protected void OnSuccess(CommentBundle response)
         {
             commentCounter.Current.Value = response.Total;
-            newCommentEditor.CommentableMeta.Value = response.CommentableMeta.SingleOrDefault(m => m.Id == id.Value && m.Type == type.Value.ToString().ToSnakeCase().ToLowerInvariant());
+            newCommentEditor.CommentableMeta.Value = response.CommentableMeta.SingleOrDefault(m => m.Id == id.Value && string.Equals(m.Type, type.Value.ToString().ToSnakeCase(), StringComparison.OrdinalIgnoreCase));
 
             if (!response.Comments.Any())
             {

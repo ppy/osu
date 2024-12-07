@@ -59,14 +59,14 @@ namespace osu.Game.Screens.Ranking.Statistics.User
                             new SimpleStatisticTable.Spacer(),
                             new PerformancePointsChangeRow { StatisticsUpdate = { BindTarget = StatisticsUpdate } },
                         },
-                        new Drawable[] { },
+                        [],
                         new Drawable[]
                         {
                             new MaximumComboChangeRow { StatisticsUpdate = { BindTarget = StatisticsUpdate } },
                             new SimpleStatisticTable.Spacer(),
                             new AccuracyChangeRow { StatisticsUpdate = { BindTarget = StatisticsUpdate } },
                         },
-                        new Drawable[] { },
+                        [],
                         new Drawable[]
                         {
                             new RankedScoreChangeRow { StatisticsUpdate = { BindTarget = StatisticsUpdate } },

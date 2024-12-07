@@ -45,6 +45,11 @@ namespace osu.Game.Localisation
         public static LocalisableString CheckUpdate => new TranslatableString(getKey(@"check_update"), @"Check for updates");
 
         /// <summary>
+        /// "Checking for updates"
+        /// </summary>
+        public static LocalisableString CheckingForUpdates => new TranslatableString(getKey(@"checking_for_updates"), @"Checking for updates");
+
+        /// <summary>
         /// "Open osu! folder"
         /// </summary>
         public static LocalisableString OpenOsuFolder => new TranslatableString(getKey(@"open_osu_folder"), @"Open osu! folder");
