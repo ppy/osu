@@ -107,6 +107,8 @@ namespace osu.Game.Beatmaps
         /// </summary>
         int CountdownOffset { get; internal set; }
 
+        int[] Bookmarks { get; internal set; }
+
         /// <summary>
         /// Creates a shallow-clone of this beatmap and returns it.
         /// </summary>
