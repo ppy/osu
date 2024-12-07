@@ -20,6 +20,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Rulesets.Mods;
+using Realms;
 
 namespace osu.Game.Overlays
 {
@@ -60,6 +61,8 @@ namespace osu.Game.Overlays
         [Resolved]
         private IBindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
 
+        public readonly BindableList<Live<BeatmapSetInfo>> Playlist = new BindableList<Live<BeatmapSetInfo>>();
+
         public DrawableTrack CurrentTrack { get; private set; } = new DrawableTrack(new TrackVirtual(1000));
 
         [Resolved]
@@ -70,6 +73,8 @@ namespace osu.Game.Overlays
         private readonly BindableDouble audioDuckVolume = new BindableDouble(1);
 
         private AudioFilter audioDuckFilter = null!;
+
+        private IDisposable? beatmapSubscription;
 
         private readonly Bindable<RandomSelectAlgorithm> randomSelectAlgorithm = new Bindable<RandomSelectAlgorithm>();
         private readonly List<Live<BeatmapSetInfo>> previousRandomSets = new List<Live<BeatmapSetInfo>>();
@@ -90,12 +95,29 @@ namespace osu.Game.Overlays
         {
             base.LoadComplete();
 
+            Playlist.AddRange(realm.Realm.All<BeatmapSetInfo>().Where(x => !x.DeletePending).AsEnumerable().Select(x => x.ToLive(realm)));
+
+            beatmapSubscription = realm.RegisterForNotifications(r => r.All<BeatmapSetInfo>().Where(s => !s.DeletePending), beatmapsChanged);
+
             beatmap.BindValueChanged(b =>
             {
                 if (b.NewValue != null)
                     changeBeatmap(b.NewValue);
             }, true);
             mods.BindValueChanged(_ => ResetTrackAdjustments(), true);
+        }
+
+        private void beatmapsChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet? changes)
+        {
+            Playlist.Clear();
+            Playlist.AddRange(sender.Select(x => x.ToLive(realm)));
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            beatmapSubscription?.Dispose();
         }
 
         /// <summary>
@@ -275,7 +297,6 @@ namespace osu.Game.Overlays
         /// </summary>
         /// <param name="onSuccess">Invoked when the operation has been performed successfully.</param>
         /// <param name="allowProtectedTracks">Whether to include <see cref="BeatmapSetInfo.Protected"/> beatmap sets when navigating.</param>
-        /// <returns>A <see cref="ScheduledDelegate"/> of the operation.</returns>
         public void NextTrack(Action? onSuccess = null, bool allowProtectedTracks = false) => Schedule(() =>
         {
             bool res = next(allowProtectedTracks);
@@ -459,9 +480,7 @@ namespace osu.Game.Overlays
 
         private TrackChangeDirection? queuedDirection;
 
-        private IEnumerable<Live<BeatmapSetInfo>> getBeatmapSets() => realm.Realm.All<BeatmapSetInfo>().Where(s => !s.DeletePending)
-                                                                           .AsEnumerable()
-                                                                           .Select(s => new RealmLive<BeatmapSetInfo>(s, realm));
+        private IEnumerable<Live<BeatmapSetInfo>> getBeatmapSets() => Playlist.Where(s => !s.Value.DeletePending);
 
         private void changeBeatmap(WorkingBeatmap newWorking)
         {
