@@ -49,7 +49,7 @@ namespace osu.Game.Skinning
 
             SpriteName.BindValueChanged(name =>
             {
-                ((SpriteComponentLookup)ComponentLookup).LookupName = name.NewValue ?? string.Empty;
+                ((SpriteComponentLookup)ComponentLookup).LookupName = name.NewValue;
                 if (IsLoaded)
                     SkinChanged(CurrentSkin);
             });

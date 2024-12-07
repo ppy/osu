@@ -37,7 +37,7 @@ namespace osu.Game.Graphics.UserInterface
         private partial class ToggleTextContainer : TextContainer
         {
             private readonly StatefulMenuItem menuItem;
-            private readonly Bindable<object> state;
+            private readonly Bindable<object?> state;
             private readonly SpriteIcon stateIcon;
 
             public ToggleTextContainer(StatefulMenuItem menuItem)
@@ -61,7 +61,7 @@ namespace osu.Game.Graphics.UserInterface
                 state.BindValueChanged(updateState, true);
             }
 
-            private void updateState(ValueChangedEvent<object> state)
+            private void updateState(ValueChangedEvent<object?> state)
             {
                 var icon = menuItem.GetIconForState(state.NewValue);
 

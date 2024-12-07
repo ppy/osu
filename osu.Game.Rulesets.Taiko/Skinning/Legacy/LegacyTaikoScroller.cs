@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 {
     public partial class LegacyTaikoScroller : CompositeDrawable
     {
-        public Bindable<JudgementResult> LastResult = new Bindable<JudgementResult>();
+        public Bindable<JudgementResult?> LastResult = new Bindable<JudgementResult?>();
 
         public LegacyTaikoScroller()
         {
