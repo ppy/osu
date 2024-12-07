@@ -247,7 +247,7 @@ namespace osu.Game.Rulesets.Mania
                     return new Mod[]
                     {
                         new ManiaModHardRock(),
-                        new MultiMod(new ManiaModSuddenDeath(), new ManiaModPerfect()),
+                        new MultiMod(new ManiaModSuddenDeath(), new ManiaModPerfect(), new ManiaModFullPerfect()),
                         new MultiMod(new ManiaModDoubleTime(), new ManiaModNightcore()),
                         new MultiMod(new ManiaModFadeIn(), new ManiaModHidden(), new ManiaModCover()),
                         new ManiaModFlashlight(),
