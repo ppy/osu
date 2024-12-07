@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -91,7 +92,7 @@ namespace osu.Game.Storyboards
                 // Importantly, do this after the NullOrEmpty because EF may have stored the non-nullable value as null to the database, bypassing compile-time constraints.
                 backgroundPath = backgroundPath.ToLowerInvariant();
 
-                return GetLayer("Background").Elements.Any(e => e.Path.ToLowerInvariant() == backgroundPath);
+                return GetLayer("Background").Elements.Any(e => string.Equals(e.Path, backgroundPath, StringComparison.OrdinalIgnoreCase));
             }
         }
 

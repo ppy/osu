@@ -87,9 +87,9 @@ namespace osu.Game
     {
 #if DEBUG
         // Different port allows running release and debug builds alongside each other.
-        public const int IPC_PORT = 44824;
+        public const string IPC_PIPE_NAME = "osu-lazer-debug";
 #else
-        public const int IPC_PORT = 44823;
+        public const string IPC_PIPE_NAME = "osu-lazer";
 #endif
 
         /// <summary>
