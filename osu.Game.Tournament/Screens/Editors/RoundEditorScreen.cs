@@ -26,6 +26,9 @@ namespace osu.Game.Tournament.Screens.Editors
 
         public partial class RoundRow : CompositeDrawable, IModelBacked<TournamentRound>
         {
+            [Resolved]
+            private TournamentGameBase? game { get; set; }
+
             public TournamentRound Model { get; }
 
             [Resolved]
@@ -37,6 +40,12 @@ namespace osu.Game.Tournament.Screens.Editors
             public RoundRow(TournamentRound round)
             {
                 Model = round;
+
+                Model.Name.Default = Model.Name.Value;
+                Model.Description.Default = Model.Description.Value;
+                Model.StartDate.Default = Model.StartDate.Value;
+                Model.BanCount.Default = Model.BanCount.Value;
+                Model.BestOf.Default = Model.BestOf.Value;
 
                 Masking = true;
                 CornerRadius = 10;
@@ -122,6 +131,22 @@ namespace osu.Game.Tournament.Screens.Editors
                 AutoSizeAxes = Axes.Y;
             }
 
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                // TournamentGameBase won't be loaded so early, probably binding the event here
+                game?.IsSaveTriggered.BindValueChanged(state =>
+                {
+                    if (!state.NewValue) return;
+
+                    Model.Name.Default = Model.Name.Value;
+                    Model.Description.Default = Model.Description.Value;
+                    Model.StartDate.Default = Model.StartDate.Value;
+                    Model.BanCount.Default = Model.BanCount.Value;
+                    Model.BestOf.Default = Model.BestOf.Value;
+                });
+            }
+
             public partial class RoundBeatmapEditor : CompositeDrawable
             {
                 private readonly TournamentRound round;
@@ -154,6 +179,9 @@ namespace osu.Game.Tournament.Screens.Editors
 
                 public partial class RoundBeatmapRow : CompositeDrawable
                 {
+                    [Resolved]
+                    private TournamentGameBase? game { get; set; }
+
                     public RoundBeatmap Model { get; }
 
                     [Resolved]
@@ -232,7 +260,7 @@ namespace osu.Game.Tournament.Screens.Editors
                     [BackgroundDependencyLoader]
                     private void load()
                     {
-                        beatmapId.Value = Model.ID;
+                        beatmapId.Default = beatmapId.Value = Model.ID;
                         beatmapId.BindValueChanged(id =>
                         {
                             Model.ID = id.NewValue ?? 0;
@@ -263,8 +291,16 @@ namespace osu.Game.Tournament.Screens.Editors
                             API.Queue(req);
                         }, true);
 
-                        mods.Value = Model.Mods;
+                        mods.Default = mods.Value = Model.Mods;
                         mods.BindValueChanged(modString => Model.Mods = modString.NewValue);
+
+                        game?.IsSaveTriggered.BindValueChanged(state =>
+                        {
+                            if (!state.NewValue) return;
+
+                            beatmapId.Default = beatmapId.Value;
+                            mods.Default = mods.Value;
+                        });
                     }
 
                     private void updatePanel() => Schedule(() =>
