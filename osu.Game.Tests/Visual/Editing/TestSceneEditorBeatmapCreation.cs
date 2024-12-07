@@ -19,6 +19,7 @@ using osu.Game.Overlays.Dialog;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Catch.Objects;
+using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.UI;
@@ -154,6 +155,7 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddStep("set unique difficulty name", () => EditorBeatmap.BeatmapInfo.DifficultyName = firstDifficultyName);
             AddStep("add timing point", () => EditorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = 1000 }));
+            AddStep("add effect point", () => EditorBeatmap.ControlPointInfo.Add(500, new EffectControlPoint { KiaiMode = true }));
             AddStep("add hitobjects", () => EditorBeatmap.AddRange(new[]
             {
                 new HitCircle
@@ -200,6 +202,11 @@ namespace osu.Game.Tests.Visual.Editing
                 var timingPoint = EditorBeatmap.ControlPointInfo.TimingPoints.Single();
                 return timingPoint.Time == 0 && timingPoint.BeatLength == 1000;
             });
+            AddAssert("created difficulty has effect points", () =>
+            {
+                var effectPoint = EditorBeatmap.ControlPointInfo.EffectPoints.Single();
+                return effectPoint.Time == 500 && effectPoint.KiaiMode && effectPoint.ScrollSpeedBindable.IsDefault;
+            });
             AddAssert("created difficulty has no objects", () => EditorBeatmap.HitObjects.Count == 0);
 
             AddAssert("status is modified", () => EditorBeatmap.BeatmapInfo.Status == BeatmapOnlineStatus.LocallyModified);
@@ -216,6 +223,104 @@ namespace osu.Game.Tests.Visual.Editing
                        && set != null
                        && set.PerformRead(s =>
                            s.Beatmaps.Count == 2 && s.Beatmaps.Any(b => b.DifficultyName == secondDifficultyName) && s.Beatmaps.All(b => s.Status == BeatmapOnlineStatus.LocallyModified));
+            });
+        }
+
+        [Test]
+        public void TestCreateNewDifficultyWithScrollSpeed_SameRuleset()
+        {
+            string firstDifficultyName = Guid.NewGuid().ToString();
+
+            AddStep("save beatmap", () => Editor.Save());
+            AddStep("create new difficulty", () => Editor.CreateNewDifficulty(new ManiaRuleset().RulesetInfo));
+
+            AddStep("set unique difficulty name", () => EditorBeatmap.BeatmapInfo.DifficultyName = firstDifficultyName);
+            AddStep("add timing point", () => EditorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = 1000 }));
+            AddStep("add effect points", () =>
+            {
+                EditorBeatmap.ControlPointInfo.Add(250, new EffectControlPoint { KiaiMode = false, ScrollSpeed = 0.05 });
+                EditorBeatmap.ControlPointInfo.Add(500, new EffectControlPoint { KiaiMode = true, ScrollSpeed = 0.1 });
+                EditorBeatmap.ControlPointInfo.Add(750, new EffectControlPoint { KiaiMode = true, ScrollSpeed = 0.15 });
+                EditorBeatmap.ControlPointInfo.Add(1000, new EffectControlPoint { KiaiMode = false, ScrollSpeed = 0.2 });
+                EditorBeatmap.ControlPointInfo.Add(1500, new EffectControlPoint { KiaiMode = false, ScrollSpeed = 0.3 });
+            });
+
+            AddStep("save beatmap", () => Editor.Save());
+
+            AddStep("create new difficulty", () => Editor.CreateNewDifficulty(new ManiaRuleset().RulesetInfo));
+
+            AddUntilStep("wait for dialog", () => DialogOverlay.CurrentDialog is CreateNewDifficultyDialog);
+            AddStep("confirm creation with no objects", () => DialogOverlay.CurrentDialog!.PerformOkAction());
+
+            AddUntilStep("wait for created", () =>
+            {
+                string? difficultyName = Editor.ChildrenOfType<EditorBeatmap>().SingleOrDefault()?.BeatmapInfo.DifficultyName;
+                return difficultyName != null && difficultyName != firstDifficultyName;
+            });
+
+            AddAssert("created difficulty has timing point", () =>
+            {
+                var timingPoint = EditorBeatmap.ControlPointInfo.TimingPoints.Single();
+                return timingPoint.Time == 0 && timingPoint.BeatLength == 1000;
+            });
+
+            AddAssert("created difficulty has effect points", () =>
+            {
+                return EditorBeatmap.ControlPointInfo.EffectPoints.SequenceEqual(new[]
+                {
+                    new EffectControlPoint { Time = 250, KiaiMode = false, ScrollSpeed = 0.05 },
+                    new EffectControlPoint { Time = 500, KiaiMode = true, ScrollSpeed = 0.1 },
+                    new EffectControlPoint { Time = 750, KiaiMode = true, ScrollSpeed = 0.15 },
+                    new EffectControlPoint { Time = 1000, KiaiMode = false, ScrollSpeed = 0.2 },
+                    new EffectControlPoint { Time = 1500, KiaiMode = false, ScrollSpeed = 0.3 },
+                });
+            });
+        }
+
+        [Test]
+        public void TestCreateNewDifficultyWithScrollSpeed_DifferentRuleset()
+        {
+            string firstDifficultyName = Guid.NewGuid().ToString();
+
+            AddStep("save beatmap", () => Editor.Save());
+            AddStep("create new difficulty", () => Editor.CreateNewDifficulty(new ManiaRuleset().RulesetInfo));
+
+            AddStep("set unique difficulty name", () => EditorBeatmap.BeatmapInfo.DifficultyName = firstDifficultyName);
+            AddStep("add timing point", () => EditorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = 1000 }));
+            AddStep("add effect points", () =>
+            {
+                EditorBeatmap.ControlPointInfo.Add(250, new EffectControlPoint { KiaiMode = false, ScrollSpeed = 0.05 });
+                EditorBeatmap.ControlPointInfo.Add(500, new EffectControlPoint { KiaiMode = true, ScrollSpeed = 0.1 });
+                EditorBeatmap.ControlPointInfo.Add(750, new EffectControlPoint { KiaiMode = true, ScrollSpeed = 0.15 });
+                EditorBeatmap.ControlPointInfo.Add(1000, new EffectControlPoint { KiaiMode = false, ScrollSpeed = 0.2 });
+                EditorBeatmap.ControlPointInfo.Add(1500, new EffectControlPoint { KiaiMode = false, ScrollSpeed = 0.3 });
+            });
+
+            AddStep("save beatmap", () => Editor.Save());
+
+            AddStep("create new difficulty", () => Editor.CreateNewDifficulty(new TaikoRuleset().RulesetInfo));
+
+            AddUntilStep("wait for created", () =>
+            {
+                string? difficultyName = Editor.ChildrenOfType<EditorBeatmap>().SingleOrDefault()?.BeatmapInfo.DifficultyName;
+                return difficultyName != null && difficultyName != firstDifficultyName;
+            });
+
+            AddAssert("created difficulty has timing point", () =>
+            {
+                var timingPoint = EditorBeatmap.ControlPointInfo.TimingPoints.Single();
+                return timingPoint.Time == 0 && timingPoint.BeatLength == 1000;
+            });
+
+            AddAssert("created difficulty has effect points", () =>
+            {
+                // since this difficulty is on another ruleset, scroll speed specifications are completely reset,
+                // therefore discarding some effect points in the process due to being redundant.
+                return EditorBeatmap.ControlPointInfo.EffectPoints.SequenceEqual(new[]
+                {
+                    new EffectControlPoint { Time = 500, KiaiMode = true },
+                    new EffectControlPoint { Time = 1000, KiaiMode = false },
+                });
             });
         }
 
