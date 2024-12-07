@@ -208,8 +208,8 @@ namespace osu.Game.Tests.Visual.UserInterface
             {
             }
 
-            protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
-                => new DifficultyAttributes(mods, mods.OfType<TestMod>().SingleOrDefault()?.Difficulty.Value ?? 0);
+            protected override IDifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
+                => new DifficultyAttributes { StarRating = mods.OfType<TestMod>().SingleOrDefault()?.Difficulty.Value ?? 0 };
 
             protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
                 => Array.Empty<DifficultyHitObject>();
@@ -225,7 +225,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             {
             }
 
-            protected override PerformanceAttributes CreatePerformanceAttributes(ScoreInfo score, DifficultyAttributes attributes)
+            protected override IPerformanceAttributes CreatePerformanceAttributes(ScoreInfo score, IDifficultyAttributes attributes)
                 => new PerformanceAttributes { Total = score.Mods.OfType<TestMod>().SingleOrDefault()?.Performance.Value ?? 0 };
         }
 

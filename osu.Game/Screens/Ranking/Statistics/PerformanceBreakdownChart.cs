@@ -176,8 +176,8 @@ namespace osu.Game.Screens.Ranking.Statistics
             var perfectDisplayAttributes = breakdown.PerfectPerformance.GetAttributesForDisplay();
 
             setTotalValues(
-                displayAttributes.First(a => a.PropertyName == nameof(PerformanceAttributes.Total)),
-                perfectDisplayAttributes.First(a => a.PropertyName == nameof(PerformanceAttributes.Total))
+                displayAttributes.First(a => a.PropertyName == nameof(IPerformanceAttributes.Total)),
+                perfectDisplayAttributes.First(a => a.PropertyName == nameof(IPerformanceAttributes.Total))
             );
 
             var rowDimensions = new List<Dimension>();
@@ -185,7 +185,7 @@ namespace osu.Game.Screens.Ranking.Statistics
 
             foreach (PerformanceDisplayAttribute attr in displayAttributes)
             {
-                if (attr.PropertyName == nameof(PerformanceAttributes.Total)) continue;
+                if (attr.PropertyName == nameof(IPerformanceAttributes.Total)) continue;
 
                 var row = createAttributeRow(attr, perfectDisplayAttributes.First(a => a.PropertyName == attr.PropertyName));
 
