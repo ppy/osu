@@ -70,7 +70,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             double totalStrains = ObjectStrains.Count;
             double lengthFactor = 0.74 * Math.Pow(0.9987, totalStrains);
             //// Use a weighted sum of all strains. Constants are arbitrary and give nice values
-            return ObjectStrains.Sum(s => (1.1 - lengthFactor)/ (1 + Math.Exp(-10 * (s / consistentTopStrain - 0.88 - lengthFactor / 4.0))));
+            return ObjectStrains.Sum(s => (1.1 - lengthFactor) / (1 + Math.Exp(-10 * (s / consistentTopStrain - 0.88 - lengthFactor / 4.0))));
         }
 
         public static double DifficultyToPerformance(double difficulty) => Math.Pow(5.0 * Math.Max(1.0, difficulty / 0.0675) - 4.0, 3.0) / 100000.0;
