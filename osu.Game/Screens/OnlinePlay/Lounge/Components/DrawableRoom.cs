@@ -208,13 +208,13 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                                                                 },
                                                                                 new ExternalRoomButton(Room.RoomID)
                                                                                 {
-                                                                                Margin = new MarginPadding
-                                                                                {
-                                                                                    Left = 3,
-                                                                                },
-                                                                                Anchor = Anchor.CentreLeft,
-                                                                                Origin = Anchor.CentreLeft,
-                                                                                Size = new Vector2(12)
+                                                                                    Margin = new MarginPadding
+                                                                                    {
+                                                                                        Left = 3,
+                                                                                    },
+                                                                                    Anchor = Anchor.CentreLeft,
+                                                                                    Origin = Anchor.CentreLeft,
+                                                                                    Size = new Vector2(12)
                                                                                 }
                                                                             },
                                                                         }
