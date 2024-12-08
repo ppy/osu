@@ -20,6 +20,7 @@ using osu.Game.Beatmaps.Drawables;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Chat;
 using osu.Game.Online.Rooms;
@@ -94,7 +95,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                     d.RelativeSizeAxes = Axes.Both;
                 }),
                 wrapper = new DelayedLoadWrapper(() =>
-                    new Container
+                    new OsuContextMenuContainer
                     {
                         Name = @"Room content",
                         RelativeSizeAxes = Axes.Both,
@@ -184,10 +185,39 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                                                 Direction = FillDirection.Vertical,
                                                                 Children = new Drawable[]
                                                                 {
-                                                                    roomName = new TruncatingSpriteText
+                                                                    new GridContainer
                                                                     {
                                                                         RelativeSizeAxes = Axes.X,
-                                                                        Font = OsuFont.GetFont(size: 28)
+                                                                        AutoSizeAxes = Axes.Y,
+                                                                        ColumnDimensions = new[]
+                                                                        {
+                                                                            new Dimension(GridSizeMode.AutoSize),
+                                                                            new Dimension(GridSizeMode.AutoSize),
+                                                                        },
+                                                                        RowDimensions = new[]
+                                                                        {
+                                                                            new Dimension(GridSizeMode.AutoSize)
+                                                                        },
+                                                                        Content = new[]
+                                                                        {
+                                                                            new Drawable[]
+                                                                            {
+                                                                                roomName = new TruncatingSpriteText
+                                                                                {
+                                                                                    Font = OsuFont.GetFont(size: 28),
+                                                                                },
+                                                                                new ExternalRoomButton(Room.RoomID)
+                                                                                {
+                                                                                Margin = new MarginPadding
+                                                                                {
+                                                                                    Left = 3,
+                                                                                },
+                                                                                Anchor = Anchor.CentreLeft,
+                                                                                Origin = Anchor.CentreLeft,
+                                                                                Size = new Vector2(12)
+                                                                                }
+                                                                            },
+                                                                        }
                                                                     },
                                                                     new RoomStatusText(Room)
                                                                     {
