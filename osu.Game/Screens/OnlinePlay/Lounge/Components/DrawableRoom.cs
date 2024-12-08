@@ -366,8 +366,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                     Left = 3,
                                 },
                                 Anchor = Anchor.CentreLeft,
-                                Origin = Anchor.CentreLeft,
-                                Size = new Vector2(12)
+                                Origin = Anchor.CentreLeft
                             }
                         },
                     }
