@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Audio;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
@@ -51,6 +52,9 @@ namespace osu.Game.Rulesets.Osu.Edit
         private HitObjectComposer composer { get; set; } = null!;
 
         private Bindable<TernaryState> newComboState = null!;
+
+        private HitObject? getPreviousHitObject(double startTime) => editorBeatmap?.HitObjects.TakeWhile(h => h.StartTime <= startTime).LastOrDefault();
+
 
         [BackgroundDependencyLoader]
         private void load()
@@ -154,6 +158,9 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             var newlyAdded = new List<HitCircle>();
 
+            var lastHitObject = getPreviousHitObject(startTime);
+            var lastHitNormal = lastHitObject?.Samples?.FirstOrDefault(x => x.Name == HitSampleInfo.HIT_NORMAL);
+
             for (int i = 0; i < totalPoints; ++i)
             {
                 float angle = float.DegreesToRadians(offsetAngleInput.Current.Value) + (i + 1) * (2 * float.Pi / pointInput.Current.Value);
@@ -170,6 +177,12 @@ namespace osu.Game.Rulesets.Osu.Edit
                     circle.StartTime = startTime;
                     circle.NewCombo = newCombo;
 
+                    if (lastHitNormal != null)
+                    {
+                        circle.Samples.Add(new HitSampleInfo(HitSampleInfo.HIT_NORMAL));
+                        circle.Samples = circle.Samples.Select(s => s.With(newVolume: lastHitNormal.Volume)).ToList();
+                    }
+
                     editorBeatmap.Update(circle);
                 }
                 else
@@ -185,6 +198,11 @@ namespace osu.Game.Rulesets.Osu.Edit
 
                     // TODO: probably ensure samples also follow current ternary status (not trivial)
                     circle.Samples.Add(circle.CreateHitSampleInfo());
+
+                    if (lastHitNormal != null)
+                    {
+                        circle.Samples = circle.Samples.Select(s => s.With(newVolume: lastHitNormal.Volume)).ToList();
+                    }
                 }
 
                 if (position.X < 0 || position.Y < 0 || position.X > OsuPlayfield.BASE_SIZE.X || position.Y > OsuPlayfield.BASE_SIZE.Y)
