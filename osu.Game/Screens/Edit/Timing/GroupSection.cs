@@ -21,7 +21,7 @@ namespace osu.Game.Screens.Edit.Timing
         private OsuButton button = null!;
 
         [Resolved]
-        protected Bindable<ControlPointGroup> SelectedGroup { get; private set; } = null!;
+        protected Bindable<ControlPointGroup?> SelectedGroup { get; private set; } = null!;
 
         [Resolved]
         protected EditorBeatmap Beatmap { get; private set; } = null!;
