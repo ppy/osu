@@ -77,13 +77,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 }
                 else
                 {
-                    double fullComboThreshold = attributes.MaxCombo - countSliderEndsDropped;
-
-                    if (scoreMaxCombo < fullComboThreshold)
-                        effectiveMissCount = fullComboThreshold / Math.Max(1.0, scoreMaxCombo);
-
-                    // Combine regular misses with tick misses since tick misses break combo as well
-                    effectiveMissCount = Math.Min(effectiveMissCount, countSliderTickMiss + countMiss);
+                    effectiveMissCount = countMiss;
                 }
             }
 
@@ -114,6 +108,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double speedValue = computeSpeedValue(score, osuAttributes);
             double accuracyValue = computeAccuracyValue(score, osuAttributes);
             double flashlightValue = computeFlashlightValue(score, osuAttributes);
+
             double totalValue =
                 Math.Pow(
                     Math.Pow(aimValue, 1.1) +
@@ -183,8 +178,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                     estimateImproperlyFollowedDifficultSliders = Math.Clamp(countSliderEndsDropped + countSliderTickMiss, 0, estimateDifficultSliders);
                 }
 
-                double sliderNerfFactor = (1 - attributes.SliderFactor) * Math.Pow(1 - estimateImproperlyFollowedDifficultSliders / estimateDifficultSliders, 3) + attributes.SliderFactor;
-                aimValue *= sliderNerfFactor;
+                double sliderNerfFactor = (1 - attributes.SliderFactor) * (1 - estimateImproperlyFollowedDifficultSliders / estimateDifficultSliders) + attributes.SliderFactor;
+                aimValue *= Math.Pow(sliderNerfFactor, 3);
             }
 
             aimValue *= accuracy;
