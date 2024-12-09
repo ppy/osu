@@ -54,7 +54,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             distance = Math.Min(distance, single_spacing_threshold);
 
             // Max distance bonus is 1 * `distance_multiplier` at single_spacing_threshold
-            double distanceBonus = Math.Pow(distance / single_spacing_threshold, 3.95) * distance_multiplier;
+            double distanceBonus = Math.Pow(distance / single_spacing_threshold, 3.6) * distance_multiplier;
 
             // Base difficulty with all bonuses
             double difficulty = (1 + speedBonus + distanceBonus) * 1000 / strainTime;
