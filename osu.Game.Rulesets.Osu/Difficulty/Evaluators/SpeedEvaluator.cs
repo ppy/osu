@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
@@ -34,6 +35,29 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             var osuPrevObj = current.Index > 0 ? (OsuDifficultyHitObject)current.Previous(0) : null;
 
             double strainTime = osuCurrObj.StrainTime;
+
+            // // Nerf doubletappable doubles.
+            // double currDeltaTime = Math.Max(1, osuCurrObj.DeltaTime);
+
+            // // It's easier to gallop if you have more time between doubles
+            // // Get max between next and prev ratio to avoid nerfing triples
+            // double speedRatio = Math.Max(getSpeedRatio(osuCurrObj, osuPrevObj), getSpeedRatio(osuCurrObj, osuNextObj));
+
+            // // Can't doubletap if circles don't intersect
+            // double normalizedDistance = Math.Min(1, osuCurrObj.LazyJumpDistance / (OsuDifficultyHitObject.NORMALISED_RADIUS * 2));
+            // double distanceFactor = normalizedDistance < 0.5 ? 1.0 : 1 - Math.Pow((normalizedDistance - 0.5) / 0.5, 0.5);
+
+            // // Use HitWindowGreat * 2, because even if you can't get 300 with doubletapping - you still can gallop
+            // const double power = 2;
+            // double windowRatio = Math.Pow(Math.Min(1, currDeltaTime / (osuCurrObj.HitWindowGreat * 2)), power);
+
+            // // Nerf even more if you don't need to gallop anymore
+            // double halfPoint = Math.Pow(0.5, power);
+            // if (windowRatio < halfPoint)
+            //     windowRatio *= windowRatio / halfPoint;
+
+            // double doubletapness = Math.Pow(speedRatio, distanceFactor * (1 - windowRatio));
+
             double doubletapness = 1.0 - osuCurrObj.GetDoubletapness((OsuDifficultyHitObject?)osuCurrObj.Next(0));
 
             // Cap deltatime to the OD 300 hitwindow.
@@ -61,6 +85,19 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             // Apply penalty if there's doubletappable doubles
             return difficulty * doubletapness;
+        }
+
+        private static double getSpeedRatio(OsuDifficultyHitObject current, OsuDifficultyHitObject? other)
+        {
+            if (other.IsNull())
+                return 0;
+
+            double currDeltaTime = Math.Max(1, current.DeltaTime);
+            double otherDeltaTime = Math.Max(1, other.DeltaTime);
+
+            double deltaDifference = Math.Abs(currDeltaTime - otherDeltaTime);
+
+            return currDeltaTime / Math.Max(currDeltaTime, deltaDifference);
         }
     }
 }
