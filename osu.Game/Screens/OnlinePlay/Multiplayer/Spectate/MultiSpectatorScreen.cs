@@ -54,6 +54,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         private SpectatorSyncManager syncManager = null!;
         private PlayerGrid grid = null!;
         private MultiSpectatorLeaderboard leaderboard = null!;
+        private FillFlowContainer leaderboardFlow = null!;
         private PlayerArea? currentAudioSource;
 
         private readonly Room room;
@@ -76,7 +77,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         [BackgroundDependencyLoader]
         private void load()
         {
-            FillFlowContainer leaderboardFlow;
             Container scoreDisplayContainer;
 
             InternalChildren = new Drawable[]
@@ -157,6 +157,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             {
                 Expanded = { Value = true },
             }, chat => leaderboardFlow.Insert(1, chat));
+
+            var replayAnalysisSettings = Ruleset.Value.CreateInstance().CreateReplayAnalysisSettings();
+            if (replayAnalysisSettings is not null)
+                leaderboardFlow.Insert(2, replayAnalysisSettings);
         }
 
         protected override void LoadComplete()

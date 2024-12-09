@@ -1297,6 +1297,16 @@ namespace osu.Game.Screens.Play
             }
         }
 
+        /// <summary>
+        /// Create and add <see cref="ReplayAnalysisSettings"/> to settings overlay.
+        /// </summary>
+        protected void AddReplayAnalysisSettings()
+        {
+            var replayAnalysisSettings = DrawableRuleset.Ruleset.CreateReplayAnalysisSettings();
+            if (replayAnalysisSettings is not null)
+                HUDOverlay.PlayerSettingsOverlay.Add(replayAnalysisSettings);
+        }
+
         #endregion
 
         IBindable<bool> ISamplePlaybackDisabler.SamplePlaybackDisabled => samplePlaybackDisabled;
