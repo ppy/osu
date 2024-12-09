@@ -206,7 +206,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                                                                 {
                                                                                     Font = OsuFont.GetFont(size: 28),
                                                                                 },
-                                                                                new ExternalRoomButton(Room.RoomID)
+                                                                                new RoomLinkButton(Room.RoomID)
                                                                                 {
                                                                                     Margin = new MarginPadding
                                                                                     {

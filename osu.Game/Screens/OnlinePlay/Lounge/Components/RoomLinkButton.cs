@@ -7,14 +7,14 @@ using osu.Game.Online.API;
 
 namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 {
-    public partial class ExternalRoomButton : ExternalLinkButton
+    public partial class RoomLinkButton : ExternalLinkButton
     {
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
 
         private readonly long? roomID;
 
-        public ExternalRoomButton(long? roomID)
+        public RoomLinkButton(long? roomID)
         {
             this.roomID = roomID;
         }

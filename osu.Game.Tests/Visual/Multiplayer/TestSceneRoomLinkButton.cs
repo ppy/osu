@@ -8,14 +8,14 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public partial class TestSceneExternalRoomButton : OsuTestScene
+    public partial class TestSceneRoomLinkButton : OsuTestScene
     {
-        public TestSceneExternalRoomButton()
+        public TestSceneRoomLinkButton()
         {
             Child = new OsuContextMenuContainer
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = new ExternalRoomButton(1)
+                Child = new RoomLinkButton(1)
                 {
                     Size = new Vector2(50),
                     Anchor = Anchor.Centre,
