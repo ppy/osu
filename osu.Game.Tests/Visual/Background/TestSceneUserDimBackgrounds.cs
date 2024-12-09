@@ -10,6 +10,8 @@ using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Framework.Input.States;
@@ -19,7 +21,7 @@ using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Database;
-using osu.Game.Graphics;
+using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets;
@@ -33,7 +35,6 @@ using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Select;
 using osu.Game.Tests.Resources;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.Background
 {
@@ -101,10 +102,10 @@ namespace osu.Game.Tests.Visual.Background
                 return songSelect.IsBackgroundCurrent();
             });
 
-            AddUntilStep("Screen is dimmed and blur applied", () =>
+            AddUntilStep("Screen is dimmed, blur applied and dim colour adjusted", () =>
             {
                 InputManager.MoveMouseTo(playerLoader.VisualSettingsPos);
-                return songSelect.IsBackgroundDimmed() && songSelect.IsUserBlurApplied();
+                return songSelect.IsBackgroundDimmed() && songSelect.IsUserBlurApplied() && songSelect.IsBackgroundColourOffset();
             });
 
             AddStep("Stop background preview", () => InputManager.MoveMouseTo(playerLoader.ScreenPos));
@@ -122,7 +123,7 @@ namespace osu.Game.Tests.Visual.Background
             performFullSetup();
             AddStep("Trigger hover event", () => playerLoader.TriggerOnHover());
             AddAssert("Background retained from song select", () => songSelect.IsBackgroundCurrent());
-            AddUntilStep("Screen is dimmed and blur applied", () => songSelect.IsBackgroundDimmed() && songSelect.IsUserBlurApplied());
+            AddUntilStep("Screen is dimmed, blur applied and dim colour adjusted", () => songSelect.IsBackgroundDimmed() && songSelect.IsUserBlurApplied() && songSelect.IsBackgroundColourOffset());
         }
 
         /// <summary>
@@ -167,11 +168,11 @@ namespace osu.Game.Tests.Visual.Background
         public void TestDisableUserDimBackground()
         {
             performFullSetup();
-            AddUntilStep("Screen is dimmed and blur applied", () => songSelect.IsBackgroundDimmed() && songSelect.IsUserBlurApplied());
+            AddUntilStep("Screen is dimmed, blur applied and dim colour adjusted", () => songSelect.IsBackgroundDimmed() && songSelect.IsUserBlurApplied() && songSelect.IsBackgroundColourOffset());
             AddStep("Disable user dim", () => songSelect.IgnoreUserSettings.Value = true);
             AddUntilStep("Screen is undimmed and user blur removed", () => songSelect.IsBackgroundUndimmed() && songSelect.IsUserBlurDisabled());
             AddStep("Enable user dim", () => songSelect.IgnoreUserSettings.Value = false);
-            AddUntilStep("Screen is dimmed and blur applied", () => songSelect.IsBackgroundDimmed() && songSelect.IsUserBlurApplied());
+            AddUntilStep("Screen is dimmed, blur applied and dim colour adjusted", () => songSelect.IsBackgroundDimmed() && songSelect.IsUserBlurApplied() && songSelect.IsBackgroundColourOffset());
         }
 
         /// <summary>
@@ -225,9 +226,9 @@ namespace osu.Game.Tests.Visual.Background
         {
             performFullSetup(true);
             AddStep("Pause", () => player.Pause());
-            AddUntilStep("Screen is dimmed and blur applied", () => songSelect.IsBackgroundDimmed() && songSelect.IsUserBlurApplied());
+            AddUntilStep("Screen is dimmed, blur applied and dim colour adjusted", () => songSelect.IsBackgroundDimmed() && songSelect.IsUserBlurApplied() && songSelect.IsBackgroundColourOffset());
             AddStep("Unpause", () => player.Resume());
-            AddUntilStep("Screen is dimmed and blur applied", () => songSelect.IsBackgroundDimmed() && songSelect.IsUserBlurApplied());
+            AddUntilStep("Screen is dimmed, blur applied and dim colour adjusted", () => songSelect.IsBackgroundDimmed() && songSelect.IsUserBlurApplied() && songSelect.IsBackgroundColourOffset());
         }
 
         /// <summary>
@@ -260,9 +261,67 @@ namespace osu.Game.Tests.Visual.Background
                                                                                                  playerLoader.VisualSettingsPos.ScreenSpaceDrawQuad.Height / 2
                                                                                              )));
             AddStep("Resume PlayerLoader", () => player.Restart());
-            AddUntilStep("Screen is dimmed and blur applied", () => songSelect.IsBackgroundDimmed() && songSelect.IsUserBlurApplied());
+            AddUntilStep("Screen is dimmed, blur applied and dim colour adjusted", () => songSelect.IsBackgroundDimmed() && songSelect.IsUserBlurApplied() && songSelect.IsBackgroundColourOffset());
             AddStep("Move mouse to center of screen", () => InputManager.MoveMouseTo(playerLoader.ScreenPos));
             AddUntilStep("Screen is undimmed and user blur removed", () => songSelect.IsBackgroundUndimmed() && songSelect.CheckBackgroundBlur(playerLoader.ExpectedBackgroundBlur));
+        }
+
+        /// <summary>
+        /// Check if both the Sprite and BufferedContainer can handle dimming and don't handle it at the same time.
+        /// </summary>
+        [Test]
+        public void TestDimmingHandlers()
+        {
+            AddStep("Disallow blurring", () => TestBeatmapBackground.AllowBlur = false);
+
+            SetUpSteps();
+
+            performFullSetup();
+
+            AddUntilStep("Screen is dimmed and dim colour adjusted", () => songSelect.IsBackgroundDimmed() && songSelect.IsBackgroundColourOffset());
+            AddUntilStep("BufferedContainer is not initialized", () => songSelect.IsBufferedContainerNull());
+            AddUntilStep("Sprite is dimmed", () => songSelect.IsSpriteDimmed());
+
+            AddStep("Allow blurring", () => TestBeatmapBackground.AllowBlur = true);
+
+            SetUpSteps();
+
+            performFullSetup();
+
+            AddUntilStep("Screen is dimmed, blur applied and dim colour adjusted", () => songSelect.IsBackgroundDimmed() && songSelect.IsUserBlurApplied() && songSelect.IsBackgroundColourOffset());
+            AddUntilStep("BufferedContainer is initialized", () => !songSelect.IsBufferedContainerNull());
+            AddUntilStep("BufferedContainer is dimmed", () => songSelect.IsBufferedContainerDimmed());
+            AddUntilStep("Sprite is not dimmed", () => !songSelect.IsSpriteDimmed());
+        }
+
+        /// <summary>
+        /// Check if BufferedContainer redraws the framebuffer on dim changes.
+        /// </summary>
+        [Test]
+        public void TestNoBufferRedrawOnDimChange()
+        {
+            performFullSetup();
+
+            AddUntilStep("Screen is dimmed, blur applied and dim colour adjusted", () => songSelect.IsBackgroundDimmed() && songSelect.IsUserBlurApplied() && songSelect.IsBackgroundColourOffset());
+            AddUntilStep("BufferedContainer is initialized", () => !songSelect.IsBufferedContainerNull());
+
+            AddStep("Start tracking redraws", () => songSelect.RequiredRedraw = false);
+
+            AddStep("Undim the screen", () =>
+            {
+                songSelect.DimLevel.Value = 0.0;
+                songSelect.DimColour.Value = 0.0;
+            });
+            AddUntilStep("Screen is undimmed and blur applied", () => songSelect.IsBackgroundUndimmed() && songSelect.IsUserBlurApplied());
+            AddUntilStep("Redraw wasn't required", () => !songSelect.RequiredRedraw);
+
+            AddStep("Dim the screen", () =>
+            {
+                songSelect.DimLevel.Value = 0.7;
+                songSelect.DimColour.Value = 0.5;
+            });
+            AddUntilStep("Screen is dimmed, blur applied and dim colour adjusted", () => songSelect.IsBackgroundDimmed() && songSelect.IsUserBlurApplied() && songSelect.IsBackgroundColourOffset());
+            AddUntilStep("Redraw wasn't required", () => !songSelect.RequiredRedraw);
         }
 
         private void createFakeStoryboard() => AddStep("Create storyboard", () =>
@@ -273,7 +332,7 @@ namespace osu.Game.Tests.Visual.Background
             {
                 Size = new Vector2(500, 50),
                 Alpha = 1,
-                Colour = Color4.White,
+                Colour = Colour4.White,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Text = "THIS IS A STORYBOARD",
@@ -301,6 +360,7 @@ namespace osu.Game.Tests.Visual.Background
                 SelectedMods.Value = new[] { new OsuModNoFail() };
                 songSelect.DimLevel.Value = 0.7f;
                 songSelect.BlurLevel.Value = 0.4f;
+                songSelect.DimColour.Value = 0.5f;
             });
         }
 
@@ -324,6 +384,7 @@ namespace osu.Game.Tests.Visual.Background
             public readonly Bindable<bool> IgnoreUserSettings = new Bindable<bool>();
             public readonly Bindable<double> DimLevel = new BindableDouble();
             public readonly Bindable<double> BlurLevel = new BindableDouble();
+            public readonly Bindable<double> DimColour = new BindableDouble();
 
             public new BeatmapCarousel Carousel => base.Carousel;
 
@@ -332,13 +393,39 @@ namespace osu.Game.Tests.Visual.Background
             {
                 config.BindWith(OsuSetting.DimLevel, DimLevel);
                 config.BindWith(OsuSetting.BlurLevel, BlurLevel);
+                config.BindWith(OsuSetting.DimColour, DimColour);
             }
 
-            public bool IsBackgroundBlack() => background.CurrentColour == OsuColour.Gray(0);
+            public bool IsBackgroundBlack() => background.CurrentColour == Colour4.Black && background.CurrentColourOffset == Colour4.Black;
 
-            public bool IsBackgroundDimmed() => background.CurrentColour == OsuColour.Gray(1f - background.CurrentDim);
+            public bool IsBackgroundDimmed()
+            {
+                Colour4 parentDrawColour = background.ParentDrawColour;
+                Colour4 targetColour = new Colour4(
+                    parentDrawColour.R * (1f - background.CurrentDim),
+                    parentDrawColour.G * (1f - background.CurrentDim),
+                    parentDrawColour.B * (1f - background.CurrentDim),
+                    parentDrawColour.A
+                );
 
-            public bool IsBackgroundUndimmed() => background.CurrentColour == Color4.White;
+                return background.CurrentColour == targetColour;
+            }
+
+            public bool IsBackgroundUndimmed() => background.CurrentColour == background.ParentDrawColour && background.CurrentColourOffset == Colour4.Black;
+
+            public bool IsBackgroundColourOffset()
+            {
+                Colour4 currentDimColour = background.CurrentDimColour;
+                Colour4 parentDrawColour = background.ParentDrawColour;
+                Colour4 targetColourOffset = new Colour4(
+                    parentDrawColour.R * currentDimColour.R * background.CurrentDim,
+                    parentDrawColour.G * currentDimColour.G * background.CurrentDim,
+                    parentDrawColour.B * currentDimColour.B * background.CurrentDim,
+                    1
+                );
+
+                return background.CurrentColourOffset == targetColourOffset;
+            }
 
             public bool IsUserBlurApplied() => Precision.AlmostEquals(background.CurrentBlur, new Vector2((float)BlurLevel.Value * BackgroundScreenBeatmap.USER_BLUR_FACTOR), 0.1f);
 
@@ -355,6 +442,18 @@ namespace osu.Game.Tests.Visual.Background
             /// </summary>
             /// <returns>Whether or not the original background (The one created in DummySongSelect) is still the current background</returns>
             public bool IsBackgroundCurrent() => background?.IsCurrentScreen() == true;
+
+            public bool IsSpriteDimmed() => background.IsSpriteDimmed;
+
+            public bool IsBufferedContainerDimmed() => background.IsBufferedContainerDimmed;
+
+            public bool IsBufferedContainerNull() => background.IsBufferedContainerNull;
+
+            public bool RequiredRedraw
+            {
+                get => background.RequiredRedraw;
+                set => background.RequiredRedraw = value;
+            }
         }
 
         private partial class FadeAccessibleResults : ResultsScreen
@@ -435,15 +534,39 @@ namespace osu.Game.Tests.Visual.Background
         {
             protected override DimmableBackground CreateFadeContainer() => dimmable = new TestDimmableBackground { RelativeSizeAxes = Axes.Both };
 
-            public Color4 CurrentColour => dimmable.CurrentColour;
+            protected override BeatmapBackground CreateBeatmapBackground(WorkingBeatmap beatmap) => beatmapBackground = new TestBeatmapBackground(beatmap);
+
+            public Colour4 CurrentColour => beatmapBackground.CurrentColour;
+
+            public Colour4 CurrentColourOffset => beatmapBackground.CurrentColourOffset;
+
+            public Colour4 ContentDrawColour => beatmapBackground.ContentDrawColour;
+
+            public bool IsSpriteDimmed => beatmapBackground.IsSpriteDimmed;
+
+            public bool IsBufferedContainerDimmed => beatmapBackground.IsBufferedContainerDimmed;
+
+            public bool IsBufferedContainerNull => beatmapBackground.IsBufferedContainerNull;
+
+            public Colour4 ParentDrawColour => DrawColourInfo.Colour;
 
             public float CurrentAlpha => dimmable.CurrentAlpha;
 
             public float CurrentDim => dimmable.DimLevel;
 
+            public Colour4 CurrentDimColour => dimmable.DimColour;
+
             public Vector2 CurrentBlur => Background?.BlurSigma ?? Vector2.Zero;
 
+            public bool RequiredRedraw
+            {
+                get => beatmapBackground.RequiredRedraw;
+                set => beatmapBackground.RequiredRedraw = value;
+            }
+
             private TestDimmableBackground dimmable;
+
+            private TestBeatmapBackground beatmapBackground;
 
             public FadeAccessibleBackground(WorkingBeatmap beatmap)
                 : base(beatmap)
@@ -453,10 +576,136 @@ namespace osu.Game.Tests.Visual.Background
 
         private partial class TestDimmableBackground : BackgroundScreenBeatmap.DimmableBackground
         {
-            public Color4 CurrentColour => Content.Colour;
             public float CurrentAlpha => Content.Alpha;
 
             public new float DimLevel => base.DimLevel;
+
+            public new Colour4 DimColour => base.DimColour;
+        }
+
+        private partial class TestBeatmapBackground : BeatmapBackground
+        {
+            public static bool AllowBlur = true;
+
+            // BeatmapBackground shader uses mix function to apply dimming with colour, which can be extended as:
+            // mix(TextureColour, DimColour, DimLevel) = TextureColour * (1 - DimLevel) + DimColour * DimLevel
+            // The result is then multiplied by vertex colour (supplied by DrawColourInfo.Colour),
+            // which can apply some external dimming that shouldn't be affected by DimColour
+            // (for example - opening settings during replay, pausing, etc.):
+            // FinalColour = DrawColourInfo.Colour * mix(TextureColour, DimColour, DimLevel)
+            // FinalColour = DrawColourInfo.Colour * TextureColour * (1 - DimLevel) + DrawColourInfo.Colour * DimColour * DimLevel
+            //
+            // These two parts can be split into separate variables:
+            // CurrentColour = DrawColourInfo.Colour * TextureColour * (1 - DimLevel)
+            // CurrentColourOffset = DrawColourInfo.Colour * DimColour * DimLevel
+            //
+            // CurrentColour can be used to track how much the texture was dimmed, and
+            // CurrentColourOffset can be used to track how much colour was added as an offset.
+            //
+            // Two separate variables are needed because just one Colour variable would be ambiguous, for example:
+            // if Colour == Colour4.White, that could mean either that
+            // DimLevel == 0.0, or
+            // DimLevel == 1.0 and DimColour == Colour4.White.
+            public Colour4 CurrentColour
+            {
+                get
+                {
+                    Colour4 drawColour = DrawColourInfo.Colour;
+                    float dimLevel = ColouredDimmable.DimLevel;
+
+                    return new Colour4(
+                        drawColour.R * (1 - dimLevel),
+                        drawColour.G * (1 - dimLevel),
+                        drawColour.B * (1 - dimLevel),
+                        drawColour.A
+                    );
+                }
+            }
+
+            public Colour4 CurrentColourOffset
+            {
+                get
+                {
+                    Colour4 drawColour = DrawColourInfo.Colour;
+                    Colour4 dimColour = ColouredDimmable.DimColour;
+                    float dimLevel = ColouredDimmable.DimLevel;
+
+                    return new Colour4(
+                        drawColour.R * dimColour.R * dimLevel,
+                        drawColour.G * dimColour.G * dimLevel,
+                        drawColour.B * dimColour.B * dimLevel,
+                        drawColour.A
+                    );
+                }
+            }
+
+            public Colour4 ContentDrawColour => ColouredDimmable.DrawColourInfo.Colour;
+
+            public bool IsSpriteDimmed => ColouredDimmableSprite.DimLevel != 0.0f;
+
+            public bool IsBufferedContainerDimmed => ColouredDimmableBufferedContainer != null && ColouredDimmableBufferedContainer.DimLevel != 0.0f;
+
+            public bool IsBufferedContainerNull => ColouredDimmableBufferedContainer == null;
+
+            public bool RequiredRedraw
+            {
+                get => dimmableBufferedContainer.RequiredRedraw;
+                set => dimmableBufferedContainer.RequiredRedraw = value;
+            }
+
+            private TestDimmableBufferedContainer dimmableBufferedContainer;
+
+            public TestBeatmapBackground(WorkingBeatmap beatmap)
+                : base(beatmap)
+            {
+            }
+
+            public override void BlurTo(Vector2 newBlurSigma, double duration = 0, Easing easing = Easing.None)
+            {
+                if (AllowBlur)
+                {
+                    base.BlurTo(newBlurSigma, duration, easing);
+                }
+            }
+
+            protected override BufferedContainer CreateBufferedContainer()
+            {
+                ColouredDimmableSprite.DimColour = Colour4.Black;
+                ColouredDimmableSprite.DimLevel = 0.0f;
+
+                return ColouredDimmableBufferedContainer = dimmableBufferedContainer = new TestDimmableBufferedContainer(cachedFrameBuffer: true)
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    RedrawOnScale = false,
+                    Child = Sprite,
+                    DimColour = DimColour,
+                    DimLevel = DimLevel
+                };
+            }
+        }
+
+        private partial class TestDimmableBufferedContainer : BeatmapBackground.DimmableBufferedContainer
+        {
+            // Ideally this one would be tracked inside of the DrawNode and set to true
+            // when framebuffer is redrawn, but DrawNode's are a bit broken in the
+            // headless testing mode, so an indirect check is used (see RequiresChildrenUpdate).
+            public bool RequiredRedraw;
+
+            public TestDimmableBufferedContainer(RenderBufferFormat[] formats = null, bool pixelSnapping = false, bool cachedFrameBuffer = false)
+                : base(formats, pixelSnapping, cachedFrameBuffer)
+            {
+            }
+
+            protected override bool RequiresChildrenUpdate
+            {
+                get
+                {
+                    // A bit hacky, but at least it doesn't require exposing BufferedContainer.updateVersion
+                    bool requiresChildrenUpdate = base.RequiresChildrenUpdate;
+                    RequiredRedraw |= requiresChildrenUpdate;
+                    return requiresChildrenUpdate;
+                }
+            }
         }
     }
 }
