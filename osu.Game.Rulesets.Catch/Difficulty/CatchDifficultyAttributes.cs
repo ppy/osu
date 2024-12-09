@@ -8,8 +8,15 @@ using osu.Game.Rulesets.Difficulty;
 
 namespace osu.Game.Rulesets.Catch.Difficulty
 {
-    public class CatchDifficultyAttributes : DifficultyAttributes
+    [JsonObject(MemberSerialization.OptIn)]
+    public struct CatchDifficultyAttributes : IDifficultyAttributes
     {
+        /// <inheritdoc/>
+        public double StarRating { get; set; }
+
+        /// <inheritdoc/>
+        public int MaxCombo { get; set; }
+
         /// <summary>
         /// The perceived approach rate inclusive of rate-adjusting mods (DT/HT/etc).
         /// </summary>
@@ -19,22 +26,19 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         [JsonProperty("approach_rate")]
         public double ApproachRate { get; set; }
 
-        public override IEnumerable<(int attributeId, object value)> ToDatabaseAttributes()
+        public IEnumerable<(int attributeId, object value)> ToDatabaseAttributes()
         {
-            foreach (var v in base.ToDatabaseAttributes())
-                yield return v;
-
+            yield return (IDifficultyAttributes.ATTRIB_ID_MAX_COMBO, MaxCombo);
             // Todo: osu!catch should not output star rating in the 'aim' attribute.
-            yield return (ATTRIB_ID_AIM, StarRating);
-            yield return (ATTRIB_ID_APPROACH_RATE, ApproachRate);
+            yield return (IDifficultyAttributes.ATTRIB_ID_AIM, StarRating);
+            yield return (IDifficultyAttributes.ATTRIB_ID_APPROACH_RATE, ApproachRate);
         }
 
-        public override void FromDatabaseAttributes(IReadOnlyDictionary<int, double> values, IBeatmapOnlineInfo onlineInfo)
+        public void FromDatabaseAttributes(IReadOnlyDictionary<int, double> values, IBeatmapOnlineInfo onlineInfo)
         {
-            base.FromDatabaseAttributes(values, onlineInfo);
-
-            StarRating = values[ATTRIB_ID_AIM];
-            ApproachRate = values[ATTRIB_ID_APPROACH_RATE];
+            MaxCombo = (int)values[IDifficultyAttributes.ATTRIB_ID_MAX_COMBO];
+            StarRating = values[IDifficultyAttributes.ATTRIB_ID_AIM];
+            ApproachRate = values[IDifficultyAttributes.ATTRIB_ID_APPROACH_RATE];
         }
     }
 }
