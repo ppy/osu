@@ -2,7 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osu.Framework.Localisation;
+using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Game.Localisation;
 using osu.Game.Screens;
@@ -15,22 +17,32 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
     {
         protected override LocalisableString Header => CommonStrings.General;
 
+        private SystemFileImportComponent systemFileImport = null!;
+
         [BackgroundDependencyLoader]
-        private void load(IPerformFromScreenRunner? performer)
+        private void load(OsuGame game, GameHost host, IPerformFromScreenRunner? performer)
         {
-            Children = new[]
+            Add(systemFileImport = new SystemFileImportComponent(game, host));
+
+            AddRange(new Drawable[]
             {
                 new SettingsButton
                 {
                     Text = DebugSettingsStrings.ImportFiles,
-                    Action = () => performer?.PerformFromScreen(menu => menu.Push(new FileImportScreen()))
+                    Action = () =>
+                    {
+                        if (systemFileImport.PresentIfAvailable())
+                            return;
+
+                        performer?.PerformFromScreen(menu => menu.Push(new FileImportScreen()));
+                    },
                 },
                 new SettingsButton
                 {
                     Text = DebugSettingsStrings.RunLatencyCertifier,
                     Action = () => performer?.PerformFromScreen(menu => menu.Push(new LatencyCertifierScreen()))
                 }
-            };
+            });
         }
     }
 }
