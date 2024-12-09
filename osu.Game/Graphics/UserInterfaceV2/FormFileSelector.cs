@@ -255,6 +255,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
             protected override string PopInSampleName => "UI/overlay-big-pop-in";
             protected override string PopOutSampleName => "UI/overlay-big-pop-out";
 
+            private readonly FileSelector fileSelector;
+
             public FileChooserPopover(string[] handledExtensions, Bindable<FileInfo?> currentFile, string? chooserPath)
                 : base(false)
             {
@@ -264,7 +266,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                     // simplest solution to avoid underlying text to bleed through the bottom border
                     // https://github.com/ppy/osu/pull/30005#issuecomment-2378884430
                     Padding = new MarginPadding { Bottom = 1 },
-                    Child = new OsuFileSelector(chooserPath, handledExtensions)
+                    Child = fileSelector = new FileSelector(chooserPath, handledExtensions)
                     {
                         RelativeSizeAxes = Axes.Both,
                         CurrentFile = { BindTarget = currentFile }
@@ -273,24 +275,43 @@ namespace osu.Game.Graphics.UserInterfaceV2
             }
 
             [BackgroundDependencyLoader]
-            private void load(OverlayColourProvider colourProvider)
+            private void load()
             {
-                Add(new Container
+                if (fileSelector.UsingSystemFileSelector)
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Masking = true,
-                    BorderThickness = 2,
-                    CornerRadius = 10,
-                    BorderColour = colourProvider.Highlight1,
-                    Children = new Drawable[]
+                    // keep present for FileSelector scheduling to still work.
+                    Body.AlwaysPresent = true;
+                    Body.Hide();
+                }
+            }
+
+            private partial class FileSelector : OsuFileSelector
+            {
+                public FileSelector(string? initialPath = null, string[]? validFileExtensions = null)
+                    : base(initialPath, validFileExtensions)
+                {
+                }
+
+                [BackgroundDependencyLoader]
+                private void load(OverlayColourProvider colourProvider)
+                {
+                    TopLevelContent.Add(new Container
                     {
-                        new Box
+                        RelativeSizeAxes = Axes.Both,
+                        Masking = true,
+                        BorderThickness = 2,
+                        CornerRadius = 10,
+                        BorderColour = colourProvider.Highlight1,
+                        Children = new Drawable[]
                         {
-                            Colour = Color4.Transparent,
-                            RelativeSizeAxes = Axes.Both,
-                        },
-                    }
-                });
+                            new Box
+                            {
+                                Colour = Color4.Transparent,
+                                RelativeSizeAxes = Axes.Both,
+                            },
+                        }
+                    });
+                }
             }
         }
     }
