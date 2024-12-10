@@ -148,14 +148,17 @@ namespace osu.Game.Screens.Edit.Setup
             {
                 foreach (var b in otherBeatmaps)
                 {
-                    if (readFilename(b.Metadata) != newFilename)
-                    {
-                        writeFilename(b.Metadata, newFilename);
+                    // This operation is quite expensive, so only perform it if required.
+                    if (readFilename(b.Metadata) == newFilename) continue;
 
-                        // save the difficulty to re-encode the .osu file, updating any reference of the old filename.
-                        var beatmapWorking = beatmaps.GetWorkingBeatmap(b);
-                        beatmaps.Save(b, beatmapWorking.Beatmap, beatmapWorking.GetSkin());
-                    }
+                    writeFilename(b.Metadata, newFilename);
+
+                    // save the difficulty to re-encode the .osu file, updating any reference of the old filename.
+                    //
+                    // note that this triggers a full save flow, including triggering a difficulty calculation.
+                    // this is not a cheap operation and should be reconsidered in the future.
+                    var beatmapWorking = beatmaps.GetWorkingBeatmap(b);
+                    beatmaps.Save(b, beatmapWorking.Beatmap, beatmapWorking.GetSkin());
                 }
             }
 
