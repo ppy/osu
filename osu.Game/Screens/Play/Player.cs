@@ -329,6 +329,13 @@ namespace osu.Game.Screens.Play
             // we may want to limit this in the future to disallow rulesets from outright replacing elements the user expects to be there.
             failAnimationContainer.Add(createOverlayComponents(Beatmap.Value));
 
+            if (Configuration.HidePlayerConfiguration)
+            {
+                HUDOverlay.HideConfigSettings.Value = true;
+                HUDOverlay.HideConfigSettings.Disabled = true;
+                HUDOverlay.PlayerSettingsOverlay.Hide();
+            }
+
             if (!DrawableRuleset.AllowGameplayOverlays)
             {
                 HUDOverlay.ShowHud.Value = false;
