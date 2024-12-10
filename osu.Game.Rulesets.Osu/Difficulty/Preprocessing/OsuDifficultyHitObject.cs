@@ -218,7 +218,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
                 float distanceBetweenStartPositions = (BaseObject.StackedPosition * scalingFactor - lastObject.StackedPosition * scalingFactor).Length;
 
-                if (MinimumJumpDistance < distanceBetweenStartPositions && LazyJumpDistance >= distanceBetweenStartPositions)
+                if (MinimumJumpDistance < distanceBetweenStartPositions)
                 {
                     // MinimumJumpDistance can be sometimes calculated to be ~0 in cases where the player wouldn't move the cursor anywhere and treat the slider as just a normal circle.
                     //
@@ -230,7 +230,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                     // Therefore, we set minimal distance and time to be that of a normal start-to-start jump.
 
                     MinimumJumpTime = StrainTime;
-                    MinimumJumpDistance = distanceBetweenStartPositions;
+                    MinimumJumpDistance = Math.Min(LazyJumpDistance, distanceBetweenStartPositions);
                 }
             }
 
