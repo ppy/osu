@@ -56,7 +56,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             for (double i = 0; i < 5000; i += RNG.NextDouble() * 10 + i / 1000)
                 objects.Add(new HitObject { StartTime = i });
 
-            graph.Objects = objects;
+            graph.SetFromObjects(objects);
         }
 
         private partial class TestSongProgressGraph : DefaultSongProgressGraph
