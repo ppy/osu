@@ -68,7 +68,7 @@ namespace osu.Game.Screens.Select.Leaderboards
         }
 
         [Resolved]
-        private IBindable<RulesetInfo> ruleset { get; set; } = null!;
+        private IBindable<RulesetInfo?> ruleset { get; set; } = null!;
 
         [Resolved]
         private IBindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
@@ -186,6 +186,7 @@ namespace osu.Game.Screens.Select.Leaderboards
             scoreSubscription?.Dispose();
             scoreSubscription = null;
 
+            Debug.Assert(ruleset.Value != null);
             scoreSubscription = realm.RegisterForNotifications(r =>
                 r.All<ScoreInfo>().Filter($"{nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.ID)} == $0"
                                           + $" AND {nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.Hash)} == {nameof(ScoreInfo.BeatmapHash)}"
