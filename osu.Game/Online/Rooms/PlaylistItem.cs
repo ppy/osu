@@ -67,6 +67,9 @@ namespace osu.Game.Online.Rooms
             set => Beatmap = new APIBeatmap { OnlineID = value };
         }
 
+        [JsonProperty("beatmapset_id")]
+        public int? BeatmapSetId { get; set; }
+
         /// <summary>
         /// A beatmap representing this playlist item.
         /// In many cases, this will *not* contain any usable information apart from OnlineID.
@@ -101,6 +104,7 @@ namespace osu.Game.Online.Rooms
             PlayedAt = item.PlayedAt;
             RequiredMods = item.RequiredMods.ToArray();
             AllowedMods = item.AllowedMods.ToArray();
+            BeatmapSetId = item.BeatmapSetID;
         }
 
         public void MarkInvalid() => valid.Value = false;
@@ -133,12 +137,14 @@ namespace osu.Game.Online.Rooms
                 AllowedMods = AllowedMods,
                 RequiredMods = RequiredMods,
                 valid = { Value = Valid.Value },
+                BeatmapSetId = BeatmapSetId
             };
         }
 
         public bool Equals(PlaylistItem? other)
             => ID == other?.ID
                && Beatmap.OnlineID == other.Beatmap.OnlineID
+               && BeatmapSetId == other.BeatmapSetId
                && RulesetID == other.RulesetID
                && Expired == other.Expired
                && PlaylistOrder == other.PlaylistOrder
