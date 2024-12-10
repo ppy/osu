@@ -38,24 +38,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Utils
 
             double[] penalties = { 1, 0.95, 0.9, 0.8, 0.6, 0.3, 0 };
 
-            for (int i = 0; i < logMissCounts.Count; i++)
-            {
-                logMissCounts[i] -= endPoint * (1 - penalties[i]);
-            }
+            coefficients = new double[3];
 
-            // The precomputed matrix assumes the miss counts go in order of greatest to least.
-            logMissCounts.Reverse();
+            coefficients[2] = endPoint;
 
-            coefficients = new double[4];
-
-            coefficients[3] = endPoint;
-
-            // Now we dot product the adjusted miss counts with the precomputed matrix.
+            // Now we dot product the adjusted miss counts with the matrix.
             for (int row = 0; row < matrix.Length; row++)
             {
                 for (int column = 0; column < matrix[row].Length; column++)
                 {
-                    coefficients[row] += matrix[row][column] * logMissCounts[column];
+                    coefficients[row] += matrix[row][column] * (logMissCounts[column] - endPoint * (1 - penalties[column]));
                 }
 
                 coefficients[2] -= coefficients[row];
