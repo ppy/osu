@@ -103,54 +103,63 @@ namespace osu.Game.Screens.Edit.Setup
 
         private void changeResource(FileInfo source, bool applyToAllDifficulties, string baseFilename, Func<BeatmapMetadata, string> readFilename, Action<BeatmapMetadata, string> writeFilename)
         {
-            var thisBeatmap = working.Value.BeatmapInfo;
             var set = working.Value.BeatmapSetInfo;
+            var beatmap = working.Value.BeatmapInfo;
 
-            string newFilename = string.Empty;
+            var otherBeatmaps = set.Beatmaps.Where(b => !b.Equals(beatmap));
 
+            // First, clean up files which will no longer be used.
             if (applyToAllDifficulties)
             {
-                newFilename = $"{baseFilename}{source.Extension}";
-
-                foreach (var beatmap in set.Beatmaps)
+                foreach (var b in set.Beatmaps)
                 {
-                    if (set.GetFile(readFilename(beatmap.Metadata)) is RealmNamedFileUsage otherExistingFile)
+                    if (set.GetFile(readFilename(b.Metadata)) is RealmNamedFileUsage otherExistingFile)
                         beatmaps.DeleteFile(set, otherExistingFile);
-
-                    writeFilename(beatmap.Metadata, newFilename);
-
-                    if (!beatmap.Equals(thisBeatmap))
-                    {
-                        // save the difficulty to re-encode the .osu file, updating any reference of the old filename.
-                        var beatmapWorking = beatmaps.GetWorkingBeatmap(beatmap);
-                        beatmaps.Save(beatmap, beatmapWorking.Beatmap, beatmapWorking.GetSkin());
-                    }
                 }
             }
             else
             {
-                string[] filenames = set.Files.Select(f => f.Filename).Where(f =>
+                RealmNamedFileUsage? oldFile = set.GetFile(readFilename(working.Value.Metadata));
+
+                if (oldFile != null)
+                {
+                    bool oldFileUsedInOtherDiff = otherBeatmaps
+                        .Any(b => readFilename(b.Metadata) == oldFile.Filename);
+                    if (!oldFileUsedInOtherDiff)
+                        beatmaps.DeleteFile(set, oldFile);
+                }
+            }
+
+            // Choose a new filename that doesn't clash with any other existing files.
+            string newFilename = $"{baseFilename}{source.Extension}";
+
+            if (set.GetFile(newFilename) != null)
+            {
+                string[] existingFilenames = set.Files.Select(f => f.Filename).Where(f =>
                     f.StartsWith(baseFilename, StringComparison.OrdinalIgnoreCase) &&
                     f.EndsWith(source.Extension, StringComparison.OrdinalIgnoreCase)).ToArray();
-
-                string currentFilename = readFilename(working.Value.Metadata);
-
-                var oldFile = set.GetFile(currentFilename);
-
-                if (oldFile != null && set.Beatmaps.Where(b => !b.Equals(thisBeatmap)).All(b => readFilename(b.Metadata) != currentFilename))
-                {
-                    beatmaps.DeleteFile(set, oldFile);
-                    newFilename = currentFilename;
-                }
-
-                if (string.IsNullOrEmpty(newFilename))
-                    newFilename = NamingUtils.GetNextBestFilename(filenames, $@"{baseFilename}{source.Extension}");
-
-                writeFilename(working.Value.Metadata, newFilename);
+                newFilename = NamingUtils.GetNextBestFilename(existingFilenames, $@"{baseFilename}{source.Extension}");
             }
 
             using (var stream = source.OpenRead())
                 beatmaps.AddFile(set, stream, newFilename);
+
+            if (applyToAllDifficulties)
+            {
+                foreach (var b in otherBeatmaps)
+                {
+                    if (readFilename(b.Metadata) != newFilename)
+                    {
+                        writeFilename(b.Metadata, newFilename);
+
+                        // save the difficulty to re-encode the .osu file, updating any reference of the old filename.
+                        var beatmapWorking = beatmaps.GetWorkingBeatmap(b);
+                        beatmaps.Save(b, beatmapWorking.Beatmap, beatmapWorking.GetSkin());
+                    }
+                }
+            }
+
+            writeFilename(beatmap.Metadata, newFilename);
 
             // editor change handler cannot be aware of any file changes or other difficulties having their metadata modified.
             // for simplicity's sake, trigger a save when changing any resource to ensure the change is correctly saved.
