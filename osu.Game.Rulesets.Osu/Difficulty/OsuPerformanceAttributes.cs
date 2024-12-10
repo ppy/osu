@@ -7,8 +7,14 @@ using osu.Game.Rulesets.Difficulty;
 
 namespace osu.Game.Rulesets.Osu.Difficulty
 {
-    public class OsuPerformanceAttributes : PerformanceAttributes
+    public struct OsuPerformanceAttributes : IPerformanceAttributes
     {
+        /// <summary>
+        /// Calculated score performance points.
+        /// </summary>
+        [JsonProperty("pp")]
+        public double Total { get; set; }
+
         [JsonProperty("aim")]
         public double Aim { get; set; }
 
@@ -24,11 +30,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         [JsonProperty("effective_miss_count")]
         public double EffectiveMissCount { get; set; }
 
-        public override IEnumerable<PerformanceDisplayAttribute> GetAttributesForDisplay()
+        public IEnumerable<PerformanceDisplayAttribute> GetAttributesForDisplay()
         {
-            foreach (var attribute in base.GetAttributesForDisplay())
-                yield return attribute;
-
+            yield return new PerformanceDisplayAttribute(nameof(Total), "Achieved PP", Total);
             yield return new PerformanceDisplayAttribute(nameof(Aim), "Aim", Aim);
             yield return new PerformanceDisplayAttribute(nameof(Speed), "Speed", Speed);
             yield return new PerformanceDisplayAttribute(nameof(Accuracy), "Accuracy", Accuracy);

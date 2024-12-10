@@ -34,6 +34,18 @@ namespace osu.Game.Rulesets.Osu.Tests
         public void TestClassicMod(double expectedStarRating, int expectedMaxCombo, string name)
             => Test(expectedStarRating, expectedMaxCombo, name, new OsuModClassic());
 
+        [Test]
+        public void TestFlashlightDifficultyNullability()
+        {
+            IWorkingBeatmap beatmap = GetBeatmap("diffcalc-test");
+
+            OsuDifficultyAttributes attributes = (OsuDifficultyAttributes)CreateDifficultyCalculator(beatmap).Calculate();
+            Assert.IsNull(attributes.FlashlightDifficulty);
+
+            attributes = (OsuDifficultyAttributes)CreateDifficultyCalculator(GetBeatmap("diffcalc-test")).Calculate([new OsuModFlashlight()]);
+            Assert.IsNotNull(attributes.FlashlightDifficulty);
+        }
+
         protected override DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap) => new OsuDifficultyCalculator(new OsuRuleset().RulesetInfo, beatmap);
 
         protected override Ruleset CreateRuleset() => new OsuRuleset();
