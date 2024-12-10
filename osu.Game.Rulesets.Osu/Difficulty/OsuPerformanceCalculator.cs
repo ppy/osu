@@ -271,11 +271,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // Increasing the accuracy value by object count for Blinds isn't ideal, so the minimum buff is given.
             if (score.Mods.Any(m => m is OsuModBlinds))
                 accuracyValue *= 1.14;
+            // Use different multiplier when adding hidden or traceable to flashlight.
+            else if (score.Mods.Any(m => m is OsuModFlashlight))
+                accuracyValue *= score.Mods.Any(m => m is OsuModHidden || m is OsuModTraceable) ? 1.12 : 1.08;
             else if (score.Mods.Any(m => m is OsuModHidden || m is OsuModTraceable))
                 accuracyValue *= 1.08;
-
-            if (score.Mods.Any(m => m is OsuModFlashlight))
-                accuracyValue *= 1.02;
 
             return accuracyValue;
         }
@@ -293,9 +293,21 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             flashlightValue *= getComboScalingFactor(attributes);
 
-            // Account for shorter maps having a higher ratio of 0 combo/100 combo flashlight radius.
-            flashlightValue *= 0.7 + 0.1 * Math.Min(1.0, totalHits / 200.0) +
-                               (totalHits > 200 ? 0.2 * Math.Min(1.0, (totalHits - 200) / 200.0) : 0.0);
+            // Account for shorter maps having more time played at a larger flashlight radius.
+            flashlightValue *= Math.Min(1, 0.7 + 0.1 * Math.Max(0, Math.Log(attributes.MaxCombo / 100.0)) + 0.1 * Math.Max(0, Math.Log(attributes.MaxCombo / 200.0)));
+
+            // Account for scores where the flashlight radius is increased due to misses.
+            int missingCombo = attributes.MaxCombo - scoreMaxCombo;
+            double missingComboPercentage = (double)missingCombo / attributes.MaxCombo;
+
+            // For balancing purposes, assume the player made 3 misses for every memorisation mistake.
+            double averageMissingComboLength = Math.Max(missingCombo, 1) / Math.Max(effectiveMissCount / 3, 1);
+
+            double maximumSizePercentage = Math.Clamp(averageMissingComboLength, 0, 100) / averageMissingComboLength * missingComboPercentage;
+            double mediumSizePercentage = Math.Clamp(averageMissingComboLength - 100, 0, 100) / averageMissingComboLength * missingComboPercentage;
+            double minimumSizePercentage = 1.0 - mediumSizePercentage - maximumSizePercentage;
+
+            flashlightValue *= minimumSizePercentage + 0.6 * mediumSizePercentage + 0.2 * maximumSizePercentage;
 
             // Scale the flashlight value with accuracy _slightly_.
             flashlightValue *= 0.5 + accuracy / 2.0;
