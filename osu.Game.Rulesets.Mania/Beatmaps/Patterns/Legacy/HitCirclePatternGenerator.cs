@@ -16,13 +16,16 @@ using osu.Game.Utils;
 
 namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 {
-    internal class HitObjectPatternGenerator : PatternGenerator
+    /// <summary>
+    /// Converter for legacy "HitCircle" hit objects.
+    /// </summary>
+    internal class HitCirclePatternGenerator : LegacyPatternGenerator
     {
         public PatternType StairType { get; private set; }
 
         private readonly PatternType convertType;
 
-        public HitObjectPatternGenerator(LegacyRandom random, HitObject hitObject, IBeatmap beatmap, int totalColumns, Pattern previousPattern, double previousTime, Vector2 previousPosition,
+        public HitCirclePatternGenerator(LegacyRandom random, HitObject hitObject, IBeatmap beatmap, int totalColumns, Pattern previousPattern, double previousTime, Vector2 previousPosition,
                                          double density, PatternType lastStair)
             : base(random, hitObject, beatmap, previousPattern, totalColumns)
         {
@@ -114,10 +117,10 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                 }
 
                 if (convertType.HasFlag(PatternType.Cycle) && PreviousPattern.HitObjects.Count() == 1
-                                                               // If we convert to 7K + 1, let's not overload the special key
-                                                               && (TotalColumns != 8 || lastColumn != 0)
-                                                               // Make sure the last column was not the centre column
-                                                               && (TotalColumns % 2 == 0 || lastColumn != TotalColumns / 2))
+                                                           // If we convert to 7K + 1, let's not overload the special key
+                                                           && (TotalColumns != 8 || lastColumn != 0)
+                                                           // Make sure the last column was not the centre column
+                                                           && (TotalColumns % 2 == 0 || lastColumn != TotalColumns / 2))
                 {
                     // Generate a new pattern by cycling backwards (similar to Reverse but for only one hit object)
                     int column = RandomStart + TotalColumns - lastColumn - 1;

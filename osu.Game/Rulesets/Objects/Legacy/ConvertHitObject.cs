@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
         public Vector2 Position { get; set; }
 
-        public LegacyHitObjectType LegacyType { get; set; }
+        public LegacyHitObjectType LegacyType { get; set; } = LegacyHitObjectType.Circle;
 
         public override Judgement CreateJudgement() => new IgnoreJudgement();
 
