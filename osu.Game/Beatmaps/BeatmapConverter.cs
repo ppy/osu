@@ -85,6 +85,7 @@ namespace osu.Game.Beatmaps
             beatmap.TimelineZoom = original.TimelineZoom;
             beatmap.Countdown = original.Countdown;
             beatmap.CountdownOffset = original.CountdownOffset;
+            beatmap.Bookmarks = original.Bookmarks;
 
             return beatmap;
         }
