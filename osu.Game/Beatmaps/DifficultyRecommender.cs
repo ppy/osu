@@ -20,6 +20,8 @@ namespace osu.Game.Beatmaps
     /// </summary>
     public partial class DifficultyRecommender : Component
     {
+        public event Action? StarRatingUpdated;
+
         private readonly LocalUserStatisticsProvider statisticsProvider;
 
         [Resolved]
@@ -77,7 +79,11 @@ namespace osu.Game.Beatmaps
         {
             // algorithm taken from https://github.com/ppy/osu-web/blob/e6e2825516449e3d0f3f5e1852c6bdd3428c3437/app/Models/User.php#L1505
             recommendedDifficultyMapping[ruleset.ShortName] = Math.Pow((double)(statistics.PP ?? 0), 0.4) * 0.195;
+
+            StarRatingUpdated?.Invoke();
         }
+
+        public double GetRecommendedStarRatingFor(RulesetInfo ruleset) => recommendedDifficultyMapping[ruleset.ShortName];
 
         /// <summary>
         /// Find the recommended difficulty from a selection of available difficulties for the current local user.

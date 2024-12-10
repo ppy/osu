@@ -65,7 +65,7 @@ namespace osu.Game.Overlays.BeatmapListing
         }
 
         private readonly BeatmapSearchTextBox textBox;
-        private readonly BeatmapSearchMultipleSelectionFilterRow<SearchGeneral> generalFilter;
+        private readonly BeatmapSearchGeneralFilterRow generalFilter;
         private readonly BeatmapSearchRulesetFilterRow modeFilter;
         private readonly BeatmapSearchFilterRow<SearchCategory> categoryFilter;
         private readonly BeatmapSearchFilterRow<SearchGenre> genreFilter;
@@ -161,6 +161,13 @@ namespace osu.Game.Overlays.BeatmapListing
             {
                 ExplicitContent.Value = allow.NewValue ? SearchExplicit.Show : SearchExplicit.Hide;
             }, true);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            generalFilter.Ruleset.BindTo(Ruleset);
         }
 
         public void TakeFocus() => textBox.TakeFocus();
