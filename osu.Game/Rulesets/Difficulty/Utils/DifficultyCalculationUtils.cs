@@ -59,5 +59,16 @@ namespace osu.Game.Rulesets.Difficulty.Utils
 
             return x * x * x * (x * (6.0 * x - 15.0) + 10.0);
         }
+
+        /// <summary>
+        /// Reverse linear interpolation function (https://en.wikipedia.org/wiki/Linear_interpolation)
+        /// </summary>
+        /// <param name="x">Value to calculate the function for</param>
+        /// <param name="start">Value at which function returns 0</param>
+        /// <param name="end">Value at which function returns 1</param>
+        public static double ReverseLerp(double x, double start, double end)
+        {
+            return Math.Clamp((x - start) / (end - start), 0.0, 1.0);
+        }
     }
 }
