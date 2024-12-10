@@ -148,15 +148,7 @@ namespace osu.Desktop.Windows
             foreach (var association in uri_associations)
                 association.UpdateDescription(getLocalisedString(association.Description));
 
-            string getLocalisedString(LocalisableString s)
-            {
-                if (localisation == null)
-                    return s.ToString();
-
-                var b = localisation.GetLocalisedBindableString(s);
-                b.UnbindAll();
-                return b.Value;
-            }
+            string getLocalisedString(LocalisableString s) => localisation?.GetLocalisedString(s) ?? s.ToString();
         }
 
         #region Native interop
