@@ -13,6 +13,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Acronym => @"SG";
         public override LocalisableString Description => @"You must only use one key!";
         public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(OsuModAlternate) }).ToArray();
+        public override bool Ranked => true;
 
         protected override bool CheckValidNewAction(OsuAction action) => LastAcceptedAction == null || LastAcceptedAction == action;
     }
