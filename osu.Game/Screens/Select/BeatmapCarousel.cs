@@ -246,9 +246,6 @@ namespace osu.Game.Screens.Select
 
             if (detachedBeatmapStore != null && detachedBeatmapSets == null)
             {
-                // This is performing an unnecessary second lookup on realm (in addition to the subscription), but for performance reasons
-                // we require it to be separate: the subscription's initial callback (with `ChangeSet` of `null`) will run on the update
-                // thread. If we attempt to detach beatmaps in this callback the game will fall over (it takes time).
                 detachedBeatmapSets = detachedBeatmapStore.GetDetachedBeatmaps(cancellationToken);
                 detachedBeatmapSets.BindCollectionChanged(beatmapSetsChanged);
                 loadNewRoot();
