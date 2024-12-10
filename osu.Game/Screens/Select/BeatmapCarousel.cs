@@ -113,7 +113,7 @@ namespace osu.Game.Screens.Select
         private RealmAccess realm { get; set; } = null!;
 
         [Resolved]
-        private DetachedBeatmapStore? detachedBeatmapStore { get; set; }
+        private BeatmapStore? beatmapStore { get; set; }
 
         private IBindableList<BeatmapSetInfo>? detachedBeatmapSets;
 
@@ -244,9 +244,9 @@ namespace osu.Game.Screens.Select
 
             RightClickScrollingEnabled.BindValueChanged(enabled => Scroll.RightMouseScrollbar = enabled.NewValue, true);
 
-            if (detachedBeatmapStore != null && detachedBeatmapSets == null)
+            if (beatmapStore != null && detachedBeatmapSets == null)
             {
-                detachedBeatmapSets = detachedBeatmapStore.GetDetachedBeatmaps(cancellationToken);
+                detachedBeatmapSets = beatmapStore.GetBeatmaps(cancellationToken);
                 detachedBeatmapSets.BindCollectionChanged(beatmapSetsChanged);
                 loadNewRoot();
             }
