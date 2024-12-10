@@ -56,6 +56,9 @@ namespace osu.Game.Online.Rooms
         [Key(10)]
         public double StarRating { get; set; }
 
+        [Key(11)]
+        public int? BeatmapSetID { get; set; }
+
         [SerializationConstructor]
         public MultiplayerPlaylistItem()
         {
