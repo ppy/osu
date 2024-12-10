@@ -36,8 +36,9 @@ namespace osu.Game.Screens.OnlinePlay
             }
         }
 
-        private OsuSpriteText count = null!;
+        public new Action Action { set => throw new NotSupportedException("The click action is handled by the button itself."); }
 
+        private OsuSpriteText count = null!;
         private Circle circle = null!;
 
         private readonly FreeModSelectOverlay freeModSelectOverlay;
@@ -45,6 +46,9 @@ namespace osu.Game.Screens.OnlinePlay
         public FooterButtonFreeMods(FreeModSelectOverlay freeModSelectOverlay)
         {
             this.freeModSelectOverlay = freeModSelectOverlay;
+
+            // Overwrite any external behaviour as we delegate the main toggle action to a sub-button.
+            base.Action = toggleAllFreeMods;
         }
 
         [Resolved]
@@ -98,9 +102,6 @@ namespace osu.Game.Screens.OnlinePlay
             base.LoadComplete();
 
             Current.BindValueChanged(_ => updateModDisplay(), true);
-
-            // Overwrite any external behaviour as we delegate the main toggle action to a sub-button.
-            Action = toggleAllFreeMods;
         }
 
         /// <summary>
