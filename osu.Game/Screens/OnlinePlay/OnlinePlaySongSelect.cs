@@ -41,10 +41,12 @@ namespace osu.Game.Screens.OnlinePlay
         protected override UserActivity InitialActivity => new UserActivity.InLobby(room);
 
         protected readonly Bindable<IReadOnlyList<Mod>> FreeMods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
+        protected readonly Bindable<bool> FreePlay = new Bindable<bool>();
 
         private readonly Room room;
         private readonly PlaylistItem? initialItem;
-        private readonly FreeModSelectOverlay freeModSelectOverlay;
+        private readonly FreeModSelectOverlay freeModSelect;
+        private FooterButton freeModsFooterButton = null!;
 
         private IDisposable? freeModSelectOverlayRegistration;
 
@@ -61,7 +63,7 @@ namespace osu.Game.Screens.OnlinePlay
 
             Padding = new MarginPadding { Horizontal = HORIZONTAL_OVERFLOW_PADDING };
 
-            freeModSelectOverlay = new FreeModSelectOverlay
+            freeModSelect = new FreeModSelectOverlay
             {
                 SelectedMods = { BindTarget = FreeMods },
                 IsValidMod = IsValidFreeMod,
@@ -72,7 +74,7 @@ namespace osu.Game.Screens.OnlinePlay
         private void load()
         {
             LeftArea.Padding = new MarginPadding { Top = Header.HEIGHT };
-            LoadComponent(freeModSelectOverlay);
+            LoadComponent(freeModSelect);
         }
 
         protected override void LoadComplete()
@@ -108,12 +110,36 @@ namespace osu.Game.Screens.OnlinePlay
                     Mods.Value = initialItem.RequiredMods.Select(m => m.ToMod(rulesetInstance)).ToArray();
                     FreeMods.Value = initialItem.AllowedMods.Select(m => m.ToMod(rulesetInstance)).ToArray();
                 }
+
+                if (initialItem.BeatmapSetId != null)
+                    FreePlay.Value = true;
             }
 
             Mods.BindValueChanged(onModsChanged);
             Ruleset.BindValueChanged(onRulesetChanged);
+            FreePlay.BindValueChanged(onFreePlayChanged, true);
 
-            freeModSelectOverlayRegistration = OverlayManager?.RegisterBlockingOverlay(freeModSelectOverlay);
+            freeModSelectOverlayRegistration = OverlayManager?.RegisterBlockingOverlay(freeModSelect);
+        }
+
+        private void onFreePlayChanged(ValueChangedEvent<bool> enabled)
+        {
+            if (enabled.NewValue)
+            {
+                freeModsFooterButton.Enabled.Value = false;
+                ModsFooterButton.Enabled.Value = false;
+
+                ModSelect.Hide();
+                freeModSelect.Hide();
+
+                Mods.Value = [];
+                FreeMods.Value = [];
+            }
+            else
+            {
+                freeModsFooterButton.Enabled.Value = true;
+                ModsFooterButton.Enabled.Value = true;
+            }
         }
 
         private void onModsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)
@@ -121,7 +147,7 @@ namespace osu.Game.Screens.OnlinePlay
             FreeMods.Value = FreeMods.Value.Where(checkCompatibleFreeMod).ToList();
 
             // Reset the validity delegate to update the overlay's display.
-            freeModSelectOverlay.IsValidMod = IsValidFreeMod;
+            freeModSelect.IsValidMod = IsValidFreeMod;
         }
 
         private void onRulesetChanged(ValueChangedEvent<RulesetInfo> ruleset)
@@ -135,7 +161,8 @@ namespace osu.Game.Screens.OnlinePlay
             {
                 RulesetID = Ruleset.Value.OnlineID,
                 RequiredMods = Mods.Value.Select(m => new APIMod(m)).ToArray(),
-                AllowedMods = FreeMods.Value.Select(m => new APIMod(m)).ToArray()
+                AllowedMods = FreeMods.Value.Select(m => new APIMod(m)).ToArray(),
+                BeatmapSetId = FreePlay.Value ? Beatmap.Value.BeatmapSetInfo.OnlineID : null
             };
 
             return SelectItem(item);
@@ -150,9 +177,9 @@ namespace osu.Game.Screens.OnlinePlay
 
         public override bool OnBackButton()
         {
-            if (freeModSelectOverlay.State.Value == Visibility.Visible)
+            if (freeModSelect.State.Value == Visibility.Visible)
             {
-                freeModSelectOverlay.Hide();
+                freeModSelect.Hide();
                 return true;
             }
 
@@ -161,7 +188,7 @@ namespace osu.Game.Screens.OnlinePlay
 
         public override bool OnExiting(ScreenExitEvent e)
         {
-            freeModSelectOverlay.Hide();
+            freeModSelect.Hide();
             return base.OnExiting(e);
         }
 
@@ -173,9 +200,15 @@ namespace osu.Game.Screens.OnlinePlay
         protected override IEnumerable<(FooterButton, OverlayContainer?)> CreateSongSelectFooterButtons()
         {
             var baseButtons = base.CreateSongSelectFooterButtons().ToList();
-            var freeModsButton = new FooterButtonFreeMods(freeModSelectOverlay) { Current = FreeMods };
 
-            baseButtons.Insert(baseButtons.FindIndex(b => b.Item1 is FooterButtonMods) + 1, (freeModsButton, freeModSelectOverlay));
+            freeModsFooterButton = new FooterButtonFreeMods(freeModSelect) { Current = FreeMods };
+            var freePlayButton = new FooterButtonFreePlay { Current = FreePlay };
+
+            baseButtons.InsertRange(baseButtons.FindIndex(b => b.Item1 is FooterButtonMods) + 1, new (FooterButton, OverlayContainer?)[]
+            {
+                (freeModsFooterButton, freeModSelect),
+                (freePlayButton, null)
+            });
 
             return baseButtons;
         }
