@@ -17,7 +17,6 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         private ContextMenuContainer contextMenuContainer
             => Editor.ChildrenOfType<ContextMenuContainer>().First();
 
-
         [Test]
         public void TestDrawnSliderClosesMenu()
         {
@@ -27,7 +26,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             AddStep("move mouse to top left of playfield", () =>
             {
                 playfield = this.ChildrenOfType<Playfield>().Single();
-                var location = (3 * playfield.ScreenSpaceDrawQuad.TopLeft + playfield.ScreenSpaceDrawQuad.BottomRight) / 4;
+                var location = (3 * playfield.ScreenSpaceDrawQuad.TopLeft + playfield.ScreenSpaceDrawQuad.BottomRight / 4);
                 InputManager.MoveMouseTo(location);
             });
             AddStep("place circle", () => InputManager.Click(MouseButton.Left));
@@ -35,14 +34,14 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             AddUntilStep("context menu is visible", () => contextMenuContainer.ChildrenOfType<OsuContextMenu>().Single().State == MenuState.Open);
             AddStep("move mouse to bottom right of playfield", () =>
             {
-                var location = (playfield.ScreenSpaceDrawQuad.TopLeft + 3 * playfield.ScreenSpaceDrawQuad.BottomRight) / 4;
+                var location = (playfield.ScreenSpaceDrawQuad.TopLeft + 3 * playfield.ScreenSpaceDrawQuad.BottomRight / 4);
                 InputManager.MoveMouseTo(location);
             });
             AddStep("select slider placement tool", () => InputManager.Key(Key.Number3));
             AddStep("begin placement", () => InputManager.PressButton(MouseButton.Left));
             AddStep("move mouse to top right of playfield", () =>
             {
-                var location = (playfield.ScreenSpaceDrawQuad.TopRight + playfield.ScreenSpaceDrawQuad.BottomLeft) / 4;
+                var location = (playfield.ScreenSpaceDrawQuad.TopRight + playfield.ScreenSpaceDrawQuad.BottomLeft / 4);
                 InputManager.MoveMouseTo(location);
             });
             AddStep("end placement", () => InputManager.ReleaseButton(MouseButton.Left));
@@ -58,7 +57,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             AddStep("move mouse to top left of playfield", () =>
             {
                 playfield = this.ChildrenOfType<Playfield>().Single();
-                var location = (3 * playfield.ScreenSpaceDrawQuad.TopLeft + playfield.ScreenSpaceDrawQuad.BottomRight) / 4;
+                var location = (3 * playfield.ScreenSpaceDrawQuad.TopLeft + playfield.ScreenSpaceDrawQuad.BottomRight / 4);
                 InputManager.MoveMouseTo(location);
             });
             AddStep("place circle", () => InputManager.Click(MouseButton.Left));
@@ -66,7 +65,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             AddUntilStep("context menu is visible", () => contextMenuContainer.ChildrenOfType<OsuContextMenu>().Single().State == MenuState.Open);
             AddStep("move mouse to bottom right of playfield", () =>
             {
-                var location = (playfield.ScreenSpaceDrawQuad.TopLeft + 3 * playfield.ScreenSpaceDrawQuad.BottomRight) / 4;
+                var location = (playfield.ScreenSpaceDrawQuad.TopLeft + 3 * playfield.ScreenSpaceDrawQuad.BottomRight / 4);
                 InputManager.MoveMouseTo(location);
             });
             AddStep("place circle", () => InputManager.Click(MouseButton.Left));
