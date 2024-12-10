@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -40,7 +38,7 @@ namespace osu.Game.Overlays.BeatmapListing
 
         private partial class FeaturedArtistsTabItem : MultipleSelectionFilterTabItem
         {
-            private Bindable<bool> disclaimerShown;
+            private Bindable<bool> disclaimerShown = null!;
 
             public FeaturedArtistsTabItem()
                 : base(SearchGeneral.FeaturedArtists)
@@ -48,13 +46,13 @@ namespace osu.Game.Overlays.BeatmapListing
             }
 
             [Resolved]
-            private OsuColour colours { get; set; }
+            private OsuColour colours { get; set; } = null!;
 
             [Resolved]
-            private SessionStatics sessionStatics { get; set; }
+            private SessionStatics sessionStatics { get; set; } = null!;
 
-            [Resolved(canBeNull: true)]
-            private IDialogOverlay dialogOverlay { get; set; }
+            [Resolved]
+            private IDialogOverlay? dialogOverlay { get; set; }
 
             protected override void LoadComplete()
             {
