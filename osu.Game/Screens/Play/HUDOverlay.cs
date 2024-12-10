@@ -78,7 +78,7 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public Bindable<bool> ShowHud { get; } = new BindableBool();
 
-        public Bindable<bool> HideConfigSettings { get; } = new Bindable<bool>();
+        public Bindable<bool> HidePlayerConfiguration { get; } = new Bindable<bool>();
 
         private Bindable<HUDVisibilityMode> configVisibilityMode;
         private Bindable<bool> configLeaderboardVisibility;
@@ -350,7 +350,7 @@ namespace osu.Game.Screens.Play
                 return;
             }
 
-            if (configSettingsOverlay.Value && replayLoaded.Value && !HideConfigSettings.Value)
+            if (configSettingsOverlay.Value && replayLoaded.Value && !HidePlayerConfiguration.Value)
                 PlayerSettingsOverlay.Show();
             else
                 PlayerSettingsOverlay.Hide();

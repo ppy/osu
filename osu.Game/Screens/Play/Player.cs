@@ -330,11 +330,7 @@ namespace osu.Game.Screens.Play
             failAnimationContainer.Add(createOverlayComponents(Beatmap.Value));
 
             if (Configuration.HidePlayerConfiguration)
-            {
-                HUDOverlay.HideConfigSettings.Value = true;
-                HUDOverlay.HideConfigSettings.Disabled = true;
-                HUDOverlay.PlayerSettingsOverlay.Hide();
-            }
+                HUDOverlay.HidePlayerConfiguration.Value = true;
 
             if (!DrawableRuleset.AllowGameplayOverlays)
             {
