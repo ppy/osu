@@ -33,11 +33,11 @@ namespace osu.Game.Rulesets.Mania
                     LabelText = RulesetSettingsStrings.ScrollingDirection,
                     Current = config.GetBindable<ManiaScrollingDirection>(ManiaRulesetSetting.ScrollDirection)
                 },
-                new SettingsSlider<int, ManiaScrollSlider>
+                new SettingsSlider<double, ManiaScrollSlider>
                 {
                     LabelText = RulesetSettingsStrings.ScrollSpeed,
-                    Current = config.GetBindable<int>(ManiaRulesetSetting.ScrollSpeed),
-                    KeyboardStep = 5
+                    Current = config.GetBindable<double>(ManiaRulesetSetting.ScrollSpeed),
+                    KeyboardStep = 1
                 },
                 new SettingsCheckbox
                 {
@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Mania
             };
         }
 
-        private partial class ManiaScrollSlider : RoundedSliderBar<int>
+        private partial class ManiaScrollSlider : RoundedSliderBar<double>
         {
             public override LocalisableString TooltipText => RulesetSettingsStrings.ScrollSpeedTooltip((int)DrawableManiaRuleset.ComputeScrollTime(Current.Value), Current.Value);
         }
