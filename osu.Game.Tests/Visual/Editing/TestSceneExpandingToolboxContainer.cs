@@ -13,7 +13,7 @@ namespace osu.Game.Tests.Visual.Editing
     [TestFixture]
     public partial class TestSceneExpandingToolboxContainer : EditorClockTestScene
     {
-        private ExpandingToolboxContainer toolbox;
+        private ExpandingToolboxContainer toolbox = null!;
 
         [SetUpSteps]
         public void SetUpSteps()
