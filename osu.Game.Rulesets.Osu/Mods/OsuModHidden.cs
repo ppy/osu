@@ -25,6 +25,14 @@ namespace osu.Game.Rulesets.Osu.Mods
         [SettingSource("Only fade approach circles", "The main object body will not fade when enabled.")]
         public Bindable<bool> OnlyFadeApproachCircles { get; } = new BindableBool();
 
+        [SettingSource("Enable at combo", "The combo at which the hidden effect will take full effect. 0 for always.")]
+        public BindableNumber<int> EnableAtCombo { get; } = new BindableNumber<int>()
+        {
+            MinValue = 0,
+            MaxValue = 100,
+            Precision = 1,
+        };
+
         public override LocalisableString Description => @"Play with no approach circles and fading circles/sliders.";
         public override double ScoreMultiplier => UsesDefaultConfiguration ? 1.06 : 1;
 
@@ -32,7 +40,9 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public const double FADE_IN_DURATION_MULTIPLIER = 0.4;
         public const double FADE_OUT_DURATION_MULTIPLIER = 0.3;
-        private Playfield _playfield = null!;
+        private Playfield playfield = null!;
+
+        protected override int EnableAtComboValue => EnableAtCombo.Value;
 
         protected override bool IsFirstAdjustableObject(HitObject hitObject) => !(hitObject is Spinner || hitObject is SpinnerTick);
 
@@ -197,9 +207,9 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
-            _playfield = drawableRuleset.Playfield;
+            playfield = drawableRuleset.Playfield;
         }
 
-        public override Playfield PlayfieldAccessor => _playfield;
+        public override Playfield PlayfieldAccessor => playfield;
     }
 }
