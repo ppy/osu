@@ -297,6 +297,38 @@ namespace osu.Game.Tests.Skins
             AddAssert("playfield not configured", () => !skin.LayoutInfos.ContainsKey(GlobalSkinnableContainers.Playfield));
         }
 
+        [Test]
+        public void TestMigration_2_PlayfieldHasHealthDisplay()
+        {
+            LegacySkin skin = null!;
+
+            AddStep("load skin", () =>
+            {
+                skin = loadSkin<LegacySkin>(new Dictionary<GlobalSkinnableContainers, SkinLayoutInfo>
+                {
+                    {
+                        GlobalSkinnableContainers.Playfield,
+                        createLayout(1, [], "mania", [nameof(LegacyHealthDisplay)])
+                    }
+                });
+            });
+
+            // HUD
+            AddAssert("HUD not configured", () => !skin.LayoutInfos.ContainsKey(GlobalSkinnableContainers.MainHUDComponents));
+
+            // Playfield
+            AddAssert("no extra health display added", () =>
+            {
+                var dict = skin.LayoutInfos[GlobalSkinnableContainers.Playfield].DrawableInfo;
+                return dict.Single(kvp => kvp.Key == @"mania").Value.Select(d => d.Type.Name).SequenceEqual([nameof(BigBlackBox), nameof(LegacyHealthDisplay)]);
+            });
+            AddAssert("rest is unaffected", () =>
+            {
+                var dict = skin.LayoutInfos[GlobalSkinnableContainers.Playfield].DrawableInfo;
+                return dict.Where(kvp => kvp.Key != @"mania").All(d => d.Value.Single().Type.Name == nameof(BigBlackBox));
+            });
+        }
+
         #endregion
 
         private SkinLayoutInfo createLayout(int version, string[]? globalComponents = null, string? ruleset = null, string[]? rulesetComponents = null)
