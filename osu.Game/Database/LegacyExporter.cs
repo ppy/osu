@@ -3,12 +3,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Platform;
 using osu.Game.Extensions;
+using osu.Game.IO;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Utils;
 using Realms;
@@ -40,13 +42,15 @@ namespace osu.Game.Database
         protected abstract string FileExtension { get; }
 
         protected readonly Storage UserFileStorage;
-        private readonly Storage exportStorage;
+        private readonly Storage? exportStorage;
 
         public Action<Notification>? PostNotification { get; set; }
 
         protected LegacyExporter(Storage storage)
         {
-            exportStorage = storage.GetStorageForDirectory(@"exports");
+            if (storage is OsuStorage osuStorage)
+                exportStorage = osuStorage.GetExportStorage();
+
             UserFileStorage = storage.GetStorageForDirectory(@"files");
         }
 
@@ -68,6 +72,8 @@ namespace osu.Game.Database
         /// <param name="cancellationToken">A cancellation token.</param>
         public async Task ExportAsync(Live<TModel> model, CancellationToken cancellationToken = default)
         {
+            Debug.Assert(exportStorage != null);
+
             string itemFilename = model.PerformRead(s => GetFilename(s).GetValidFilename());
 
             if (itemFilename.Length > MAX_FILENAME_LENGTH - FileExtension.Length)
