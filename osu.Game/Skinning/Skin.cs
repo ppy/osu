@@ -360,6 +360,13 @@ namespace osu.Game.Skinning
                                 if (!layout.TryGetDrawableInfo(maniaRuleset, out var maniaPlayfieldComponents))
                                     maniaPlayfieldComponents = Array.Empty<SerialisedDrawableInfo>();
 
+                                if (maniaPlayfieldComponents.Any(c => c.Type == typeof(LegacyHealthDisplay)))
+                                {
+                                    // if the skin already has a health display in the playfield target,
+                                    // let's just let it be rather than force a health display through.
+                                    return;
+                                }
+
                                 layout.Update(maniaRuleset, maniaPlayfieldComponents.Append(new LegacyHealthDisplay
                                 {
                                     Rotation = -90f,
