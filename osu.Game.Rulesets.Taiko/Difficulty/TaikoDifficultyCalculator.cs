@@ -32,11 +32,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         private double simpleRhythmPenalty = 1;
         private double simpleColourPenalty = 1;
 
-        private double colourDifficultStrains;
-        private double rhythmDifficultStrains;
-        private double readingDifficultStrains;
-        private double staminaDifficultStrains;
-
         public override int Version => 20241115;
 
         public TaikoDifficultyCalculator(IRulesetInfo ruleset, IWorkingBeatmap beatmap)
@@ -108,22 +103,22 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         /// Lower skill values are penalised more heavily relative to predefined thresholds and their
         /// interaction with the opposing skill rating.
         /// </summary>
-        private double simplePatternPenalty(double rhythmRating, double colourRating, double clockRate)
+        private double simplePatternPenalty(double rhythmRating, double colourRating, double staminaStrains, double rhythmStrains, double clockRate)
         {
             double colourThreshold = 1.25 * clockRate; // Threshold changes based on rate
             const double stamina_threshold = 1250.0;
 
             // We count difficult stamina strains to ensure that even if there's no rhythm, very heavy stamina maps still give their respective difficulty.
-            double staminaTransition = Math.Clamp((staminaDifficultStrains - stamina_threshold) / (1350 - stamina_threshold), 0, 1);
+            double staminaTransition = Math.Clamp((staminaStrains - stamina_threshold) / (1350 - stamina_threshold), 0, 1);
             double staminaFactor = (1 - staminaTransition) * 1.0 + staminaTransition * 0.85;
-            staminaFactor *= Math.Min(1, stamina_threshold / Math.Min(2000, staminaDifficultStrains));
+            staminaFactor *= Math.Min(1, stamina_threshold / Math.Min(2000, staminaStrains));
 
             simpleRhythmPenalty = patternRating(rhythmRating, 2.5, 5, colourRating);
             simpleRhythmPenalty *= staminaFactor;
             simpleRhythmPenalty = Math.Max(0, simpleRhythmPenalty);
 
             // For awkwardly snapped maps with low rhythm strain count, we add a penalty.
-            double rhythmTransition = 1 - Math.Max(0, (50 - rhythmDifficultStrains) / 50.0);
+            double rhythmTransition = 1 - Math.Max(0, (50 - rhythmStrains) / 50.0);
             double colourFactor = Math.Max(1, 0.50 * ((colourThreshold - colourRating) / colourThreshold));
             simpleColourPenalty = Math.Max(0, rhythmTransition * colourFactor);
 
@@ -149,12 +144,11 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             double monoStaminaRating = singleColourStamina.DifficultyValue() * stamina_skill_multiplier;
             double monoStaminaFactor = staminaRating == 0 ? 1 : Math.Pow(monoStaminaRating / staminaRating, 5);
 
-            colourDifficultStrains = colour.CountTopWeightedStrains();
-            rhythmDifficultStrains = rhythm.CountTopWeightedStrains();
-            readingDifficultStrains = reading.CountTopWeightedStrains();
-            staminaDifficultStrains = stamina.CountTopWeightedStrains() * Math.Min(clockRate, 1.25); // Bonus is capped past 1.25x rate
-
-            double patternPenalty = simplePatternPenalty(rhythmRating, colourRating, clockRate);
+            double colourDifficultStrains = colour.CountTopWeightedStrains();
+            double rhythmDifficultStrains = rhythm.CountTopWeightedStrains();
+            double readingDifficultStrains = reading.CountTopWeightedStrains();
+            double staminaDifficultStrains = stamina.CountTopWeightedStrains() * Math.Min(clockRate, 1.25); // Bonus is capped past 1.25x rate
+            double patternPenalty = simplePatternPenalty(rhythmRating, colourRating, staminaDifficultStrains, rhythmDifficultStrains, clockRate);
 
             double combinedRating = combinedDifficultyValue(rhythm, reading, colour, stamina);
             double starRating = rescale(combinedRating * 1.8);
@@ -207,17 +201,17 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             var readingPeaks = reading.GetCurrentStrainPeaks().ToList();
             var staminaPeaks = stamina.GetCurrentStrainPeaks().ToList();
 
+            double simpleRhythm = Math.Exp(-simpleRhythmPenalty / 14);
+
             for (int i = 0; i < colourPeaks.Count; i++)
             {
                 // Peaks uses separate constants due to strain pertaining differently to display values.
-                double baseColourPeak = colourPeaks[i] * 0.0359;
-                double colourPeak = baseColourPeak * Math.Exp(-simpleRhythmPenalty / 14);
+                double colourPeak = colourPeaks[i] * 0.0359 * simpleRhythm;
                 double rhythmPeak = rhythmPeaks[i] * 0.0379 * simpleColourPenalty;
                 double staminaPeak = staminaPeaks[i] * 0.0317;
-                double readingPeak = readingPeaks[i] * reading_skill_multiplier;
+                double readingPeak = readingPeaks[i] * 0.0084;
 
-                double peak = DifficultyCalculationUtils.Norm(1.5, colourPeak, staminaPeak);
-                peak = DifficultyCalculationUtils.Norm(2, peak, rhythmPeak, readingPeak);
+                double peak = DifficultyCalculationUtils.Norm(2, DifficultyCalculationUtils.Norm(1.5, colourPeak, staminaPeak), rhythmPeak, readingPeak);
 
                 // Sections with 0 strain are excluded to avoid worst-case time complexity of the following sort (e.g. /b/2351871).
                 // These sections will not contribute to the difficulty.
@@ -246,12 +240,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             if (rating > threshold)
                 return 0;
 
-            // To prevent against breaking values we define 0.01 as minimum difficulty.
-            rating = Math.Max(0.01, rating);
-            otherRating = Math.Max(0.01, otherRating);
-
             // Penalise based on logarithmic difference from the skill-based threshold, scaled by the influence of the other rating
-            return Math.Log(threshold / rating) * Math.Min(upperBound, Math.Log(Math.Max(1, otherRating - upperBound)) + upperBound);
+            return Math.Log(Math.Max(threshold / Math.Max(rating, 0.1), 1)) *
+                   Math.Min(upperBound, Math.Log(Math.Max(1, otherRating - upperBound)) + upperBound);
         }
 
         /// <summary>

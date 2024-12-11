@@ -3,6 +3,7 @@
 
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
+using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Taiko.Difficulty.Evaluators;
 
@@ -29,8 +30,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             double difficulty = RhythmEvaluator.EvaluateDifficultyOf(current, greatHitWindow);
 
             // To prevent abuse of exceedingly long intervals between awkward rhythms, we penalise its difficulty.
-            if (current.DeltaTime > 400)
-                difficulty *= 0.5;
+            difficulty *= DifficultyCalculationUtils.Logistic(current.DeltaTime, 350, -1 / 25.0, 0.5) + 0.5;
 
             return difficulty;
         }

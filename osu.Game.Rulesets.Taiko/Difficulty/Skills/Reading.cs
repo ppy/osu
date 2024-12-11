@@ -29,14 +29,12 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 
         protected override double StrainValueOf(DifficultyHitObject current)
         {
-            if (current is not TaikoDifficultyHitObject taikoObject)
-                return 0.0;
-
-            // Drum Rolls and Swells are exempt.
             if (current.BaseObject is not Hit)
             {
                 return 0.0;
             }
+
+            var taikoObject = (TaikoDifficultyHitObject)current;
 
             ObjectDensity = ReadingEvaluator.CalculateObjectDensity(taikoObject) * 10;
 
