@@ -20,8 +20,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 
         private double currentStrain;
 
-        public double ObjectDensity { get; private set; }
-
         public Reading(Mod[] mods)
             : base(mods)
         {
@@ -36,10 +34,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 
             var taikoObject = (TaikoDifficultyHitObject)current;
 
-            ObjectDensity = ReadingEvaluator.CalculateObjectDensity(taikoObject) * 10;
-
             currentStrain *= StrainDecayBase;
             currentStrain += ReadingEvaluator.EvaluateDifficultyOf(taikoObject) * SkillMultiplier;
+            currentStrain += ReadingEvaluator.CalculateObjectDensity(taikoObject) * SkillMultiplier;
 
             return currentStrain;
         }
