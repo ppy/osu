@@ -54,7 +54,7 @@ namespace osu.Game.Tests.Visual.Background
             Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
             Dependencies.Cache(manager = new BeatmapManager(LocalStorage, Realm, null, audio, Resources, host, Beatmap.Default));
             Dependencies.Cache(new OsuConfigManager(LocalStorage));
-            Dependencies.Cache(beatmapStore = new RealmDetachedBeatmapStore());
+            Dependencies.CacheAs(beatmapStore = new RealmDetachedBeatmapStore());
             Dependencies.Cache(Realm);
 
             manager.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();

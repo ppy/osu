@@ -70,7 +70,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             Dependencies.Cache(new RealmRulesetStore(Realm));
             Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, Realm, API, audio, Resources, host, Beatmap.Default));
-            Dependencies.Cache(beatmapStore = new RealmDetachedBeatmapStore());
+            Dependencies.CacheAs(beatmapStore = new RealmDetachedBeatmapStore());
             Dependencies.Cache(Realm);
 
             Add(beatmapStore);
