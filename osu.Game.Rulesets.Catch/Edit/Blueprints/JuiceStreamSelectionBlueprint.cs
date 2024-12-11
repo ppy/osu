@@ -190,6 +190,8 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
             lastSliderPathVersion = HitObject.Path.Version.Value;
         }
 
+        // duplicated in `SliderSelectionBlueprint.convertToStream()`
+        // consider extracting common helper when applying changes here
         private void convertToStream()
         {
             if (editorBeatmap == null || beatDivisor == null)
