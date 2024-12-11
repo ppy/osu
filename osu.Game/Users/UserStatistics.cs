@@ -4,8 +4,12 @@
 #nullable disable
 
 using System;
+using System.Collections.Generic;
+using System.Runtime.Serialization;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using osu.Framework.Localisation;
+using osu.Game.Localisation;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Scoring;
 using osu.Game.Utils;
@@ -74,6 +78,9 @@ namespace osu.Game.Users
         [JsonProperty(@"grade_counts")]
         public Grades GradesCount;
 
+        [JsonProperty(@"variants")]
+        public List<Variant> Variants = null!;
+
         public struct Grades
         {
             [JsonProperty(@"ssh")]
@@ -117,6 +124,39 @@ namespace osu.Game.Users
                     }
                 }
             }
+        }
+        public enum GameVariant
+        {
+            [EnumMember(Value = "4k")]
+            FourKey,
+            [EnumMember(Value = "7k")]
+            SevenKey
+        }
+
+        public class Variant
+        {
+            [JsonProperty("country_rank")]
+            public int? CountryRank;
+
+            [JsonProperty("global_rank")]
+            public int? GlobalRank;
+
+            [JsonProperty("mode")]
+            public string Mode;
+
+            [JsonProperty("pp")]
+            public decimal PP;
+
+            [JsonProperty("variant")]
+            [JsonConverter(typeof(StringEnumConverter))]
+            public GameVariant? VariantType;
+
+            public LocalisableString VariantDisplay => VariantType switch
+            {
+                GameVariant.FourKey => CommonStrings.FourKey,
+                GameVariant.SevenKey => CommonStrings.SevenKey,
+                _ => string.Empty
+            };
         }
     }
 }

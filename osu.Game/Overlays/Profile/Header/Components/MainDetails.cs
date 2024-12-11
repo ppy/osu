@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.LocalisationExtensions;
@@ -164,12 +165,55 @@ namespace osu.Game.Overlays.Profile.Header.Components
             detailGlobalRank.Content = user?.Statistics?.GlobalRank?.ToLocalisableString("\\##,##0") ?? (LocalisableString)"-";
 
             var rankHighest = user?.RankHighest;
+            var variants = user?.Statistics.Variants;
 
-            detailGlobalRank.ContentTooltipText = rankHighest != null
-                ? UsersStrings.ShowRankHighest(rankHighest.Rank.ToLocalisableString("\\##,##0"), rankHighest.UpdatedAt.ToLocalisableString(@"d MMM yyyy"))
+            #region Global rank tooltip
+            var tooltipParts = new List<LocalisableString>();
+
+            if (variants?.Count > 0)
+            {
+                foreach (var variant in variants)
+                {
+                    if (variant.GlobalRank != null)
+                    {
+                        tooltipParts.Add($"{variant.VariantDisplay}: {variant.GlobalRank.ToLocalisableString("\\##,##0")}");
+                    }
+                }
+            }
+
+            if (rankHighest != null)
+            {
+                tooltipParts.Add(UsersStrings.ShowRankHighest(
+                    rankHighest.Rank.ToLocalisableString("\\##,##0"),
+                    rankHighest.UpdatedAt.ToLocalisableString(@"d MMM yyyy"))
+                );
+            }
+
+            detailGlobalRank.ContentTooltipText = tooltipParts.Any()
+                ? string.Join("\n", tooltipParts)
                 : string.Empty;
+            #endregion
 
             detailCountryRank.Content = user?.Statistics?.CountryRank?.ToLocalisableString("\\##,##0") ?? (LocalisableString)"-";
+
+            #region Country rank tooltip
+            var countryTooltipParts = new List<LocalisableString>();
+
+            if (variants?.Count > 0)
+            {
+                foreach (var variant in variants)
+                {
+                    if (variant.CountryRank != null)
+                    {
+                        countryTooltipParts.Add($"{variant.VariantDisplay}: {variant.CountryRank.Value.ToLocalisableString("\\##,##0")}");
+                    }
+                }
+            }
+
+            detailCountryRank.ContentTooltipText = countryTooltipParts.Any()
+                ? string.Join("\n", countryTooltipParts)
+                : string.Empty;
+            #endregion
 
             rankGraph.Statistics.Value = user?.Statistics;
         }
