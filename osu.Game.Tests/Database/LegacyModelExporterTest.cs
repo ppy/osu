@@ -12,7 +12,6 @@ using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Database;
-using osu.Game.IO;
 using osu.Game.Overlays.Notifications;
 using Realms;
 
@@ -22,9 +21,7 @@ namespace osu.Game.Tests.Database
     public class LegacyModelExporterTest
     {
         private TestLegacyModelExporter legacyExporter = null!;
-
-        private OsuStorage storage = null!;
-        private TemporaryNativeStorage underlyingStorage = null!;
+        private TemporaryNativeStorage storage = null!;
 
         private const string short_filename = "normal file name";
 
@@ -34,7 +31,7 @@ namespace osu.Game.Tests.Database
         [SetUp]
         public void SetUp()
         {
-            storage = new OsuStorage(new HeadlessGameHost(), underlyingStorage = new TemporaryNativeStorage("export-storage"));
+            storage = new TemporaryNativeStorage("export-storage");
             legacyExporter = new TestLegacyModelExporter(storage);
         }
 
@@ -105,8 +102,8 @@ namespace osu.Game.Tests.Database
         [TearDown]
         public void TearDown()
         {
-            if (underlyingStorage.IsNotNull())
-                underlyingStorage.Dispose();
+            if (storage.IsNotNull())
+                storage.Dispose();
         }
 
         private class TestLegacyModelExporter : LegacyExporter<TestModel>
