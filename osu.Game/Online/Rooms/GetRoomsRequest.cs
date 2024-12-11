@@ -11,12 +11,12 @@ namespace osu.Game.Online.Rooms
 {
     public class GetRoomsRequest : APIRequest<List<Room>>
     {
-        private readonly RoomStatusFilter status;
+        private readonly RoomModeFilter mode;
         private readonly string category;
 
-        public GetRoomsRequest(RoomStatusFilter status, string category)
+        public GetRoomsRequest(RoomModeFilter mode, string category)
         {
-            this.status = status;
+            this.mode = mode;
             this.category = category;
         }
 
@@ -24,8 +24,8 @@ namespace osu.Game.Online.Rooms
         {
             var req = base.CreateWebRequest();
 
-            if (status != RoomStatusFilter.Open)
-                req.AddParameter("mode", status.ToString().ToSnakeCase().ToLowerInvariant());
+            if (mode != RoomModeFilter.Open)
+                req.AddParameter("mode", mode.ToString().ToSnakeCase().ToLowerInvariant());
 
             if (!string.IsNullOrEmpty(category))
                 req.AddParameter("category", category);

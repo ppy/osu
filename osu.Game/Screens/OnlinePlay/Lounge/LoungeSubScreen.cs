@@ -83,7 +83,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         private LoadingLayer loadingLayer = null!;
         private RoomsContainer roomsContainer = null!;
         private SearchTextBox searchTextBox = null!;
-        private Dropdown<RoomStatusFilter> statusDropdown = null!;
+        private Dropdown<RoomModeFilter> statusDropdown = null!;
 
         [BackgroundDependencyLoader(true)]
         private void load()
@@ -223,12 +223,12 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         {
             SearchString = searchTextBox.Current.Value,
             Ruleset = ruleset.Value,
-            Status = statusDropdown.Current.Value
+            Mode = statusDropdown.Current.Value
         };
 
         protected virtual IEnumerable<Drawable> CreateFilterControls()
         {
-            statusDropdown = new SlimEnumDropdown<RoomStatusFilter>
+            statusDropdown = new SlimEnumDropdown<RoomModeFilter>
             {
                 RelativeSizeAxes = Axes.None,
                 Width = 160,
