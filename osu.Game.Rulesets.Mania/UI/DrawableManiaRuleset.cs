@@ -56,7 +56,7 @@ namespace osu.Game.Rulesets.Mania.UI
         protected new ManiaRulesetConfigManager Config => (ManiaRulesetConfigManager)base.Config;
 
         private readonly Bindable<ManiaScrollingDirection> configDirection = new Bindable<ManiaScrollingDirection>();
-        private readonly BindableInt configScrollSpeed = new BindableInt();
+        private readonly BindableDouble configScrollSpeed = new BindableDouble();
 
         private double currentTimeRange;
         protected double TargetTimeRange;
@@ -160,7 +160,7 @@ namespace osu.Game.Rulesets.Mania.UI
         /// </summary>
         /// <param name="scrollSpeed">The scroll speed.</param>
         /// <returns>The scroll time.</returns>
-        public static double ComputeScrollTime(int scrollSpeed) => MAX_TIME_RANGE / scrollSpeed;
+        public static double ComputeScrollTime(double scrollSpeed) => MAX_TIME_RANGE / scrollSpeed;
 
         public override PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new ManiaPlayfieldAdjustmentContainer();
 

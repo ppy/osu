@@ -10,6 +10,7 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
 using osu.Game.Scoring;
+using osu.Game.Screens.Play;
 
 namespace osu.Game.Configuration
 {
@@ -77,7 +78,8 @@ namespace osu.Game.Configuration
         TouchInputActive,
 
         /// <summary>
-        /// Stores the local user's last score (can be completed or aborted).
+        /// Contains the local user's last score (can be completed or aborted) after exiting <see cref="Player"/>.
+        /// Will be cleared to <c>null</c> when leaving <see cref="PlayerLoader"/>.
         /// </summary>
         LastLocalUserScore,
 

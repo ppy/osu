@@ -99,7 +99,7 @@ namespace osu.Desktop
 
             var hostOptions = new HostOptions
             {
-                IPCPort = !tournamentClient ? OsuGame.IPC_PORT : null,
+                IPCPipeName = !tournamentClient ? OsuGame.IPC_PIPE_NAME : null,
                 FriendlyGameName = OsuGameBase.GAME_NAME,
             };
 

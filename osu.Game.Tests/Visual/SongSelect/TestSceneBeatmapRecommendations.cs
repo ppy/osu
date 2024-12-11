@@ -8,14 +8,14 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Allocation;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Mania;
@@ -28,25 +28,31 @@ namespace osu.Game.Tests.Visual.SongSelect
 {
     public partial class TestSceneBeatmapRecommendations : OsuGameTestScene
     {
-        [Resolved]
-        private IRulesetStore rulesetStore { get; set; }
-
         [SetUpSteps]
         public override void SetUpSteps()
         {
             AddStep("populate ruleset statistics", () =>
             {
-                Dictionary<string, UserStatistics> rulesetStatistics = new Dictionary<string, UserStatistics>();
-
-                rulesetStore.AvailableRulesets.Where(ruleset => ruleset.IsLegacyRuleset()).ForEach(rulesetInfo =>
+                ((DummyAPIAccess)API).HandleRequest = r =>
                 {
-                    rulesetStatistics[rulesetInfo.ShortName] = new UserStatistics
+                    switch (r)
                     {
-                        PP = getNecessaryPP(rulesetInfo.OnlineID)
-                    };
-                });
+                        case GetUserRequest userRequest:
+                            userRequest.TriggerSuccess(new APIUser
+                            {
+                                Id = 99,
+                                Statistics = new UserStatistics
+                                {
+                                    PP = getNecessaryPP(userRequest.Ruleset?.OnlineID ?? 0)
+                                }
+                            });
 
-                API.LocalUser.Value.RulesetsStatistics = rulesetStatistics;
+                            return true;
+
+                        default:
+                            return false;
+                    }
+                };
             });
 
             decimal getNecessaryPP(int? rulesetID)
