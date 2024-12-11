@@ -531,6 +531,9 @@ namespace osu.Game.Rulesets.Edit
 
             if (!(tool is SelectTool))
                 EditorBeatmap.SelectedHitObjects.Clear();
+
+            // Prevent object context menu from staying open.
+            GetContainingFocusManager()?.ChangeFocus(null);
         }
 
         #endregion
