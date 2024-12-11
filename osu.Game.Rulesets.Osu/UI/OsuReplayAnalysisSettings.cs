@@ -5,13 +5,14 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Osu.Configuration;
+using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play.PlayerSettings;
 
 namespace osu.Game.Rulesets.Osu.UI
 {
-    public partial class ReplayAnalysisSettings : PlayerSettingsGroup
+    public partial class OsuReplayAnalysisSettings : ReplayAnalysisSettings
     {
-        private readonly OsuRulesetConfigManager config;
+        protected new OsuRulesetConfigManager Config => (OsuRulesetConfigManager)base.Config;
 
         [SettingSource("Show click markers", SettingControlType = typeof(PlayerCheckbox))]
         public BindableBool ShowClickMarkers { get; } = new BindableBool();
@@ -34,22 +35,19 @@ namespace osu.Game.Rulesets.Osu.UI
             Precision = 200,
         };
 
-        public ReplayAnalysisSettings(OsuRulesetConfigManager config)
-            : base("Analysis Settings")
+        public OsuReplayAnalysisSettings(Ruleset ruleset)
+            : base(ruleset)
         {
-            this.config = config;
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            AddRange(this.CreateSettingsControls());
-
-            config.BindWith(OsuRulesetSetting.ReplayClickMarkersEnabled, ShowClickMarkers);
-            config.BindWith(OsuRulesetSetting.ReplayFrameMarkersEnabled, ShowAimMarkers);
-            config.BindWith(OsuRulesetSetting.ReplayCursorPathEnabled, ShowCursorPath);
-            config.BindWith(OsuRulesetSetting.ReplayCursorHideEnabled, HideSkinCursor);
-            config.BindWith(OsuRulesetSetting.ReplayAnalysisDisplayLength, DisplayLength);
+            Config.BindWith(OsuRulesetSetting.ReplayClickMarkersEnabled, ShowClickMarkers);
+            Config.BindWith(OsuRulesetSetting.ReplayFrameMarkersEnabled, ShowAimMarkers);
+            Config.BindWith(OsuRulesetSetting.ReplayCursorPathEnabled, ShowCursorPath);
+            Config.BindWith(OsuRulesetSetting.ReplayCursorHideEnabled, HideSkinCursor);
+            Config.BindWith(OsuRulesetSetting.ReplayAnalysisDisplayLength, DisplayLength);
         }
     }
 }
