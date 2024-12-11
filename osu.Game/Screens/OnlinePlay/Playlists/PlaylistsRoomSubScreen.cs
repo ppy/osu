@@ -16,7 +16,6 @@ using osu.Game.Input;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.Rooms;
-using osu.Game.Online.Rooms.RoomStatuses;
 using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Match;
 using osu.Game.Screens.OnlinePlay.Match.Components;
@@ -286,11 +285,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             DialogOverlay?.Push(new ClosePlaylistDialog(Room, () =>
             {
                 var request = new ClosePlaylistRequest(Room.RoomID!.Value);
-                request.Success += () =>
-                {
-                    Room.Status = new RoomStatusEnded();
-                    Room.EndDate = DateTimeOffset.UtcNow;
-                };
+                request.Success += () => Room.EndDate = DateTimeOffset.UtcNow;
                 API.Queue(request);
             }));
         }
