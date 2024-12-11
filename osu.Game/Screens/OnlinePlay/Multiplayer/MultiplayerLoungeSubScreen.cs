@@ -31,6 +31,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         private MultiplayerClient client { get; set; } = null!;
 
         private Dropdown<RoomPermissionsFilter> roomAccessTypeDropdown = null!;
+        private OsuCheckbox showInProgress = null!;
 
         public override void OnResuming(ScreenTransitionEvent e)
         {
@@ -56,7 +57,16 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             roomAccessTypeDropdown.Current.BindValueChanged(_ => UpdateFilter());
 
-            return base.CreateFilterControls().Append(roomAccessTypeDropdown);
+            showInProgress = new OsuCheckbox
+            {
+                LabelText = "Show playing rooms",
+                RelativeSizeAxes = Axes.None,
+                Width = 200,
+                Current = { Value = true }
+            };
+            showInProgress.Current.BindValueChanged(_ => UpdateFilter());
+
+            return base.CreateFilterControls().Concat([roomAccessTypeDropdown, showInProgress]);
         }
 
         protected override FilterCriteria CreateFilterCriteria()
@@ -64,6 +74,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             var criteria = base.CreateFilterCriteria();
             criteria.Category = @"realtime";
             criteria.Permissions = roomAccessTypeDropdown.Current.Value;
+            criteria.Status = showInProgress.Current.Value ? null : RoomStatusFilter.Idle;
             return criteria;
         }
 
