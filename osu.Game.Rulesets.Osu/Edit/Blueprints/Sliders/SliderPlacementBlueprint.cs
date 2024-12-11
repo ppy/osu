@@ -40,6 +40,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         private int currentSegmentLength;
         private bool usingCustomSegmentType;
 
+        public override bool DragBlocksClick => false;
+
         [Resolved]
         private IPositionSnapProvider? positionSnapProvider { get; set; }
 
