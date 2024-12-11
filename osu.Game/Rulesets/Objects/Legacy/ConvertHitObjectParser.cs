@@ -243,7 +243,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                     return PathType.CATMULL;
 
                 case 'B':
-                    if (input.Length > 1 && int.TryParse(input.Substring(1), out int degree) && degree > 0)
+                    if (input.Length > 1 && int.TryParse(input.AsSpan(1), out int degree) && degree > 0)
                         return PathType.BSpline(degree);
 
                     return PathType.BEZIER;

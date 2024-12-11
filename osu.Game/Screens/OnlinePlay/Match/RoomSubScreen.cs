@@ -71,7 +71,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
         protected RulesetStore Rulesets { get; private set; } = null!;
 
         [Resolved]
-        private IAPIProvider api { get; set; } = null!;
+        protected IAPIProvider API { get; private set; } = null!;
 
         [Resolved(canBeNull: true)]
         protected OnlinePlayScreen? ParentScreen { get; private set; }
@@ -80,7 +80,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
         private PreviewTrackManager previewTrackManager { get; set; } = null!;
 
         [Resolved(canBeNull: true)]
-        private IDialogOverlay? dialogOverlay { get; set; }
+        protected IDialogOverlay? DialogOverlay { get; private set; }
 
         [Cached]
         private readonly OnlinePlayBeatmapAvailabilityTracker beatmapAvailabilityTracker = new OnlinePlayBeatmapAvailabilityTracker();
@@ -282,7 +282,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
             }
         }
 
-        protected virtual bool IsConnected => api.State.Value == APIState.Online;
+        protected virtual bool IsConnected => API.State.Value == APIState.Online;
 
         public override bool OnBackButton()
         {
@@ -361,17 +361,17 @@ namespace osu.Game.Screens.OnlinePlay.Match
 
             bool hasUnsavedChanges = Room.RoomID == null && Room.Playlist.Count > 0;
 
-            if (dialogOverlay == null || !hasUnsavedChanges)
+            if (DialogOverlay == null || !hasUnsavedChanges)
                 return true;
 
             // if the dialog is already displayed, block exiting until the user explicitly makes a decision.
-            if (dialogOverlay.CurrentDialog is ConfirmDiscardChangesDialog discardChangesDialog)
+            if (DialogOverlay.CurrentDialog is ConfirmDiscardChangesDialog discardChangesDialog)
             {
                 discardChangesDialog.Flash();
                 return false;
             }
 
-            dialogOverlay.Push(new ConfirmDiscardChangesDialog(() =>
+            DialogOverlay.Push(new ConfirmDiscardChangesDialog(() =>
             {
                 ExitConfirmed = true;
                 settingsOverlay.Hide();

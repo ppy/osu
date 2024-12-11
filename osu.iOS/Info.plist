@@ -68,6 +68,8 @@
 			<array>
 				<string>sh.ppy.osu.items</string>
 			</array>
+			<key>UTTypeDescription</key>
+			<string>osu! replay</string>
 			<key>UTTypeIdentifier</key>
 			<string>sh.ppy.osu.osr</string>
 			<key>UTTypeTagSpecification</key>
@@ -81,6 +83,8 @@
 			<array>
 				<string>sh.ppy.osu.items</string>
 			</array>
+			<key>UTTypeDescription</key>
+			<string>osu! skin</string>
 			<key>UTTypeIdentifier</key>
 			<string>sh.ppy.osu.osk</string>
 			<key>UTTypeTagSpecification</key>
@@ -94,6 +98,8 @@
 			<array>
 				<string>sh.ppy.osu.items</string>
 			</array>
+			<key>UTTypeDescription</key>
+			<string>osu! beatmap</string>
 			<key>UTTypeIdentifier</key>
 			<string>sh.ppy.osu.osz</string>
 			<key>UTTypeTagSpecification</key>
@@ -107,6 +113,8 @@
 			<array>
 				<string>sh.ppy.osu.items</string>
 			</array>
+			<key>UTTypeDescription</key>
+			<string>osu! beatmap</string>
 			<key>UTTypeIdentifier</key>
 			<string>sh.ppy.osu.olz</string>
 			<key>UTTypeTagSpecification</key>
