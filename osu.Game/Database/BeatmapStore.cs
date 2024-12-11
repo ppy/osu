@@ -30,6 +30,6 @@ namespace osu.Game.Database
         /// It is generally expected that once a beatmap store is in a good state, the overhead of this call
         /// should be negligible.
         /// </remarks>
-        public abstract IBindableList<BeatmapSetInfo> GetBeatmaps(CancellationToken? cancellationToken);
+        public abstract IBindableList<BeatmapSetInfo> GetBeatmapSets(CancellationToken? cancellationToken);
     }
 }

@@ -27,7 +27,7 @@ namespace osu.Game.Database
         [Resolved]
         private RealmAccess realm { get; set; } = null!;
 
-        public override IBindableList<BeatmapSetInfo> GetBeatmaps(CancellationToken? cancellationToken)
+        public override IBindableList<BeatmapSetInfo> GetBeatmapSets(CancellationToken? cancellationToken)
         {
             loaded.Wait(cancellationToken ?? CancellationToken.None);
             return detachedBeatmapSets.GetBoundCopy();

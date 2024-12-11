@@ -112,27 +112,13 @@ namespace osu.Game.Screens.Select
         [Resolved]
         private RealmAccess realm { get; set; } = null!;
 
-        [Resolved]
-        private BeatmapStore? beatmapStore { get; set; }
-
         private IBindableList<BeatmapSetInfo>? detachedBeatmapSets;
 
         private readonly NoResultsPlaceholder noResultsPlaceholder;
 
         private IEnumerable<CarouselBeatmapSet> beatmapSets => root.Items.OfType<CarouselBeatmapSet>();
 
-        internal IEnumerable<BeatmapSetInfo> BeatmapSets
-        {
-            get => beatmapSets.Select(g => g.BeatmapSet);
-            set
-            {
-                if (LoadState != LoadState.NotLoaded)
-                    throw new InvalidOperationException("If not using a realm source, beatmap sets must be set before load.");
-
-                detachedBeatmapSets = new BindableList<BeatmapSetInfo>(value);
-                Schedule(loadNewRoot);
-            }
-        }
+        internal IEnumerable<BeatmapSetInfo> BeatmapSets => beatmapSets.Select(g => g.BeatmapSet);
 
         private void loadNewRoot()
         {
@@ -234,7 +220,7 @@ namespace osu.Game.Screens.Select
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config, AudioManager audio, CancellationToken? cancellationToken)
+        private void load(OsuConfigManager config, AudioManager audio, BeatmapStore beatmaps, CancellationToken? cancellationToken)
         {
             spinSample = audio.Samples.Get("SongSelect/random-spin");
             randomSelectSample = audio.Samples.Get(@"SongSelect/select-random");
@@ -244,12 +230,9 @@ namespace osu.Game.Screens.Select
 
             RightClickScrollingEnabled.BindValueChanged(enabled => Scroll.RightMouseScrollbar = enabled.NewValue, true);
 
-            if (beatmapStore != null && detachedBeatmapSets == null)
-            {
-                detachedBeatmapSets = beatmapStore.GetBeatmaps(cancellationToken);
-                detachedBeatmapSets.BindCollectionChanged(beatmapSetsChanged);
-                loadNewRoot();
-            }
+            detachedBeatmapSets = beatmaps.GetBeatmapSets(cancellationToken);
+            detachedBeatmapSets.BindCollectionChanged(beatmapSetsChanged);
+            loadNewRoot();
         }
 
         private readonly HashSet<BeatmapSetInfo> setsRequiringUpdate = new HashSet<BeatmapSetInfo>();
