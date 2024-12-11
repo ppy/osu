@@ -69,6 +69,23 @@ namespace osu.Game.Skinning
 
                     modelManager.AddFile(original, stream, file);
                 }
+
+                string skinIniPath = Path.Combine(task.Path, "skin.ini");
+
+                if (!File.Exists(skinIniPath))
+                    return;
+
+                using (var stream = File.OpenRead(skinIniPath))
+                using (var lineReader = new LineBufferedReader(stream))
+                {
+                    var decodedSkinIni = new LegacySkinDecoder().Decode(lineReader);
+
+                    if (!string.IsNullOrEmpty(decodedSkinIni.SkinInfo.Name))
+                        skinInfo.Name = decodedSkinIni.SkinInfo.Name;
+
+                    if (!string.IsNullOrEmpty(decodedSkinIni.SkinInfo.Creator))
+                        skinInfo.Creator = decodedSkinIni.SkinInfo.Creator;
+                }
             });
 
             return Task.FromResult(skinInfoLive)!;
