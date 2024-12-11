@@ -46,23 +46,40 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (mods.Any(h => h is OsuModFlashlight))
                 flashlightRating = Math.Sqrt(skills[3].DifficultyValue()) * difficulty_multiplier;
 
-            double sliderFactor = aimRating > 0 ? aimRatingNoSliders / aimRating : 1;
-
             double aimDifficultyStrainCount = ((OsuStrainSkill)skills[0]).CountTopWeightedStrains();
             double speedDifficultyStrainCount = ((OsuStrainSkill)skills[2]).CountTopWeightedStrains();
 
             if (mods.Any(m => m is OsuModTouchDevice))
             {
                 aimRating = Math.Pow(aimRating, 0.8);
+                aimRatingNoSliders = Math.Pow(aimRatingNoSliders, 0.8);
                 flashlightRating = Math.Pow(flashlightRating, 0.8);
             }
 
             if (mods.Any(h => h is OsuModRelax))
             {
                 aimRating *= 0.9;
+                aimRatingNoSliders *= 0.9;
                 speedRating = 0.0;
                 flashlightRating *= 0.7;
             }
+
+
+            double aimRelevantObjectCount = ((OsuStrainSkill)skills[0]).CountRelevantObjects();
+            double aimNoSlidersRelevantObjectCount = ((OsuStrainSkill)skills[1]).CountRelevantObjects();
+            double speedRelevantObjectCount = ((OsuStrainSkill)skills[2]).CountRelevantObjects();
+
+            double aimLengthBonus = (aimRelevantObjectCount < 25 ? 0.8 + aimRelevantObjectCount / 150.0 : 0.9 + Math.Min(1.5, aimRelevantObjectCount / 375.0) +
+                     (aimRelevantObjectCount > 562.5 ? Math.Log10(aimRelevantObjectCount / 562.5) : 0));
+            aimRating *= Math.Cbrt(aimLengthBonus);
+            double aimNoSlidersLengthBonus = (aimNoSlidersRelevantObjectCount < 25 ? 0.8 + aimNoSlidersRelevantObjectCount / 150.0 : 0.9 + aimNoSlidersRelevantObjectCount / 375.0);
+            aimRatingNoSliders *= Math.Cbrt(aimNoSlidersLengthBonus);
+
+            double speedLengthBonus = 0.9 + 0.5 * Math.Min(1.0, speedRelevantObjectCount / 500.0) +
+                     (speedRelevantObjectCount > 500 ? Math.Log10(speedRelevantObjectCount / 500.0) * 0.3 : 0.0);
+            speedRating *= Math.Cbrt(speedLengthBonus);
+
+            double sliderFactor = aimRating > 0 ? aimRatingNoSliders / aimRating : 1;
 
             double baseAimPerformance = OsuStrainSkill.DifficultyToPerformance(aimRating);
             double baseSpeedPerformance = OsuStrainSkill.DifficultyToPerformance(speedRating);
@@ -79,7 +96,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 );
 
             double starRating = basePerformance > 0.00001
-                ? Math.Cbrt(OsuPerformanceCalculator.PERFORMANCE_BASE_MULTIPLIER) * 0.027 * (Math.Cbrt(100000 / Math.Pow(2, 1 / 1.1) * basePerformance) + 4)
+                ? Math.Cbrt(OsuPerformanceCalculator.PERFORMANCE_BASE_MULTIPLIER) * 0.026 * (Math.Cbrt(100000 / Math.Pow(2, 1 / 1.1) * basePerformance) + 4)
                 : 0;
 
             double preempt = IBeatmapDifficultyInfo.DifficultyRange(beatmap.Difficulty.ApproachRate, 1800, 1200, 450) / clockRate;
@@ -105,6 +122,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 SliderFactor = sliderFactor,
                 AimDifficultStrainCount = aimDifficultyStrainCount,
                 SpeedDifficultStrainCount = speedDifficultyStrainCount,
+                AimRelevantObjectCount = aimRelevantObjectCount,
+                SpeedRelevantObjectCount = speedRelevantObjectCount,
                 ApproachRate = preempt > 1200 ? (1800 - preempt) / 120 : (1200 - preempt) / 150 + 5,
                 OverallDifficulty = (80 - hitWindowGreat) / 6,
                 DrainRate = drainRate,
