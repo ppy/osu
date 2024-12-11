@@ -104,7 +104,12 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public IBindable<bool> ShowingOverlayComponents = new Bindable<bool>();
 
-        public virtual bool ShowAnalysisSettings => false;
+        /// <summary>
+        /// Whether to add <see cref="ReplayAnalysisSettings"/> to <see cref="PlayerSettingsOverlay"/>
+        /// and an indicator for implementations of <see cref="DrawableRuleset"/> to put an analysis overlay
+        /// on the player.
+        /// </summary>
+        public virtual bool UseAnalysisSettings => false;
 
         // Should match PlayerLoader for consistency. Cached here for the rare case we push a Player
         // without the loading screen (one such usage is the skin editor's scene library).
@@ -331,7 +336,7 @@ namespace osu.Game.Screens.Play
             // we may want to limit this in the future to disallow rulesets from outright replacing elements the user expects to be there.
             failAnimationContainer.Add(createOverlayComponents(Beatmap.Value));
 
-            if (ShowAnalysisSettings)
+            if (UseAnalysisSettings)
                 addReplayAnalysisSettings();
 
             if (!DrawableRuleset.AllowGameplayOverlays)

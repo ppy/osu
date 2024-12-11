@@ -18,7 +18,7 @@ namespace osu.Game.Screens.Play
 {
     public abstract partial class SpectatorPlayer : Player
     {
-        public override bool ShowAnalysisSettings => true;
+        public override bool UseAnalysisSettings => true;
 
         [Resolved]
         protected SpectatorClient SpectatorClient { get; private set; } = null!;

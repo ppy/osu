@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Play
     {
         public const double BASE_SEEK_AMOUNT = 1000;
 
-        public override bool ShowAnalysisSettings => true;
+        public override bool UseAnalysisSettings => true;
 
         private readonly Func<IBeatmap, IReadOnlyList<Mod>, Score> createScore;
 
