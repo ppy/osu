@@ -83,7 +83,8 @@ namespace osu.Game.Beatmaps
             StarRatingUpdated?.Invoke();
         }
 
-        public double GetRecommendedStarRatingFor(RulesetInfo ruleset) => recommendedDifficultyMapping[ruleset.ShortName];
+        public double? GetRecommendedStarRatingFor(RulesetInfo ruleset)
+            => recommendedDifficultyMapping.TryGetValue(ruleset.ShortName, out double starRating) ? starRating : null;
 
         /// <summary>
         /// Find the recommended difficulty from a selection of available difficulties for the current local user.

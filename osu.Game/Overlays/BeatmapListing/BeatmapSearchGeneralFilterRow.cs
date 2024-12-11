@@ -91,8 +91,16 @@ namespace osu.Game.Overlays.BeatmapListing
             {
                 // fallback to profile default game mode if beatmap listing mode filter is set to Any
                 // TODO: find a way to update `PlayMode` when the profile default game mode has changed
-                var ruleset = Ruleset.Value.IsLegacyRuleset() ? Ruleset.Value : rulesets.GetRuleset(api.LocalUser.Value.PlayMode)!;
-                Text.Text = LocalisableString.Interpolate($"{Value.GetLocalisableDescription()} ({recommender?.GetRecommendedStarRatingFor(ruleset).FormatStarRating()})");
+                RulesetInfo? ruleset = Ruleset.Value.IsLegacyRuleset() ? Ruleset.Value : rulesets.GetRuleset(api.LocalUser.Value.PlayMode);
+
+                if (ruleset == null) return;
+
+                double? starRating = recommender?.GetRecommendedStarRatingFor(ruleset);
+
+                if (starRating != null)
+                    Text.Text = LocalisableString.Interpolate($"{Value.GetLocalisableDescription()} ({starRating.Value.FormatStarRating()})");
+                else
+                    Text.Text = Value.GetLocalisableDescription();
             }
         }
 
