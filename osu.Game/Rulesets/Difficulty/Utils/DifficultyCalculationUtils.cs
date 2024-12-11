@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 
 namespace osu.Game.Rulesets.Difficulty.Utils
 {
@@ -46,5 +47,23 @@ namespace osu.Game.Rulesets.Difficulty.Utils
         /// <param name="exponent">Exponent</param>
         /// <returns>The output of logistic function</returns>
         public static double Logistic(double exponent, double maxValue = 1) => maxValue / (1 + Math.Exp(exponent));
+
+        /// <summary>
+        /// Calculates a Gaussian-based bell curve function (https://en.wikipedia.org/wiki/Gaussian_function)
+        /// </summary>
+        /// <param name="x">Value to calculate the function for</param>
+        /// <param name="mean">The mean (center) of the bell curve</param>
+        /// <param name="width">The width (spread) of the curve</param>
+        /// <param name="multiplier">Multiplier to adjust the curve's height</param>
+        /// <returns>The output of the bell curve function of <paramref name="x"/></returns>
+        public static double BellCurve(double x, double mean, double width, double multiplier = 1.0) => multiplier * Math.Exp(Math.E * -(Math.Pow(x - mean, 2) / Math.Pow(width, 2)));
+
+        /// <summary>
+        /// Returns the <i>p</i>-norm of an <i>n</i>-dimensional vector (https://en.wikipedia.org/wiki/Norm_(mathematics))
+        /// </summary>
+        /// <param name="p">The value of <i>p</i> to calculate the norm for.</param>
+        /// <param name="values">The coefficients of the vector.</param>
+        /// <returns>The <i>p</i>-norm of the vector.</returns>
+        public static double Norm(double p, params double[] values) => Math.Pow(values.Sum(x => Math.Pow(x, p)), 1 / p);
     }
 }

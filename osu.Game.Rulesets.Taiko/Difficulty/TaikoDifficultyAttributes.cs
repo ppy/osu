@@ -29,16 +29,43 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         public double RhythmDifficulty { get; set; }
 
         /// <summary>
+        /// The difficulty corresponding to the reading skill.
+        /// </summary>
+        [JsonProperty("reading_difficulty")]
+        public double ReadingDifficulty { get; set; }
+
+        /// <summary>
+        /// Determines the object density of a beatmap, based on DeltaTime.
+        /// </summary>
+        [JsonProperty("object_density")]
+        public double ObjectDensity { get; set; }
+
+        /// <summary>
         /// The difficulty corresponding to the colour skill.
         /// </summary>
         [JsonProperty("colour_difficulty")]
         public double ColourDifficulty { get; set; }
 
         /// <summary>
-        /// The difficulty corresponding to the hardest parts of the map.
+        /// The penalty factor corresponding to patterns based on their correlation between skills.
         /// </summary>
-        [JsonProperty("peak_difficulty")]
-        public double PeakDifficulty { get; set; }
+        [JsonProperty("simple_pattern_factor")]
+        public double SimplePattern { get; set; }
+
+        /// <summary>
+        /// Determines the amount of difficult strain peaks present within each skill.
+        /// </summary>
+        [JsonProperty("stamina_difficult_strains")]
+        public double StaminaTopStrains { get; set; }
+
+        [JsonProperty("rhythm_difficult_strains")]
+        public double RhythmTopStrains { get; set; }
+
+        [JsonProperty("reading_difficult_strains")]
+        public double ReadingTopStrains { get; set; }
+
+        [JsonProperty("colour_difficult_strains")]
+        public double ColourTopStrains { get; set; }
 
         /// <summary>
         /// The perceived hit window for a GREAT hit inclusive of rate-adjusting mods (DT/HT/etc).
