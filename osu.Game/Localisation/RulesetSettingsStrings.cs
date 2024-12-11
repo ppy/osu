@@ -80,9 +80,9 @@ namespace osu.Game.Localisation
         public static LocalisableString TimingBasedColouring => new TranslatableString(getKey(@"Timing_based_colouring"), @"Timing-based note colouring");
 
         /// <summary>
-        /// "{0}ms (speed {1})"
+        /// "{0}ms (speed {1:N1})"
         /// </summary>
-        public static LocalisableString ScrollSpeedTooltip(int scrollTime, int scrollSpeed) => new TranslatableString(getKey(@"ruleset"), @"{0}ms (speed {1})", scrollTime, scrollSpeed);
+        public static LocalisableString ScrollSpeedTooltip(int scrollTime, double scrollSpeed) => new TranslatableString(getKey(@"ruleset"), @"{0}ms (speed {1:N1})", scrollTime, scrollSpeed);
 
         /// <summary>
         /// "Touch control scheme"

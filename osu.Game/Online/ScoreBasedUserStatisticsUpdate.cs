@@ -9,7 +9,7 @@ namespace osu.Game.Online
     /// <summary>
     /// Contains data about the change in a user's profile statistics after completing a score.
     /// </summary>
-    public class UserStatisticsUpdate
+    public class ScoreBasedUserStatisticsUpdate
     {
         /// <summary>
         /// The score set by the user that triggered the update.
@@ -27,12 +27,12 @@ namespace osu.Game.Online
         public UserStatistics After { get; }
 
         /// <summary>
-        /// Creates a new <see cref="UserStatisticsUpdate"/>.
+        /// Creates a new <see cref="ScoreBasedUserStatisticsUpdate"/>.
         /// </summary>
         /// <param name="score">The score set by the user that triggered the update.</param>
         /// <param name="before">The user's profile statistics prior to the score being set.</param>
         /// <param name="after">The user's profile statistics after the score was set.</param>
-        public UserStatisticsUpdate(ScoreInfo score, UserStatistics before, UserStatistics after)
+        public ScoreBasedUserStatisticsUpdate(ScoreInfo score, UserStatistics before, UserStatistics after)
         {
             Score = score;
             Before = before;
