@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -90,6 +91,12 @@ namespace osu.Game.Graphics.Containers
             private readonly bool applyUIScale;
             private Bindable<float> uiScale;
 
+            private static readonly Vector2 base_target_draw_size = new Vector2(1024, 768);
+            private static readonly float base_aspect_ratio = base_target_draw_size.X / base_target_draw_size.Y;
+
+            [Resolved]
+            private GameHost host { get; set; }
+
             protected float CurrentScale { get; private set; } = 1;
 
             public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
@@ -111,6 +118,15 @@ namespace osu.Game.Graphics.Containers
 
             protected override void Update()
             {
+                // If the window size constitutes an aspect ratio smaller than the base size,
+                // then the DrawSizePreservingFillContainer starts descaling the game to ensure it always fits.
+                // We do not desire this behaviour when the window dimensions are small already (e.g. 852x393 on iPhone 16).
+                // The number 576 is picked arbitrarily here as a cutoff point which keeps the game scaled appropriately.
+                float minimumScalingHeight = Math.Min(576f, host.Window.Size.Width / base_aspect_ratio);
+                float windowSizeFactor = Math.Min(1f, host.Window.Size.Height / minimumScalingHeight);
+                // Easiest method to apply this compensation is by adjusting the TargetDrawSize.
+                TargetDrawSize = base_target_draw_size * windowSizeFactor;
+
                 Scale = new Vector2(CurrentScale);
                 Size = new Vector2(1 / CurrentScale);
 
