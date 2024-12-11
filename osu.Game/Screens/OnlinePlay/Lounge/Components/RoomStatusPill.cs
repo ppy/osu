@@ -37,7 +37,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
             room.PropertyChanged += onRoomPropertyChanged;
 
-            Scheduler.AddDelayed(updateDisplay, 5000, true);
+            // Timed update required to track rooms which have hit the end time, see `HasEnded`.
+            Scheduler.AddDelayed(updateDisplay, 1000, true);
             updateDisplay();
             FinishTransforms(true);
         }

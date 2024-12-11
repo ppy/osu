@@ -30,7 +30,8 @@ namespace osu.Game.Screens.OnlinePlay.Components
 
             room.PropertyChanged += onRoomPropertyChanged;
 
-            Scheduler.AddDelayed(updateRoomStatus, 5000, true);
+            // Timed update required to track rooms which have hit the end time, see `HasEnded`.
+            Scheduler.AddDelayed(updateRoomStatus, 1000, true);
             updateRoomStatus();
         }
 
