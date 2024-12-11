@@ -9,6 +9,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
+using osu.Game.Screens.Edit.Setup;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.UserInterface
@@ -89,8 +90,13 @@ namespace osu.Game.Tests.Visual.UserInterface
                         },
                         new FormFileSelector
                         {
-                            Caption = "Audio file",
-                            PlaceholderText = "Select an audio file",
+                            Caption = "File selector",
+                            PlaceholderText = "Select a file",
+                        },
+                        new FormBeatmapFileSelector(true)
+                        {
+                            Caption = "File selector with intermediate choice dialog",
+                            PlaceholderText = "Select a file",
                         },
                         new FormColourPalette
                         {

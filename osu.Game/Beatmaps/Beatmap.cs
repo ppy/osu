@@ -139,6 +139,8 @@ namespace osu.Game.Beatmaps
 
         public int CountdownOffset { get; set; }
 
+        public int[] Bookmarks { get; set; } = Array.Empty<int>();
+
         IBeatmap IBeatmap.Clone() => Clone();
 
         public Beatmap<T> Clone() => (Beatmap<T>)MemberwiseClone();
