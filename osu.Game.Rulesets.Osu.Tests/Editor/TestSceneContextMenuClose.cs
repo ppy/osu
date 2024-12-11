@@ -17,7 +17,6 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         private ContextMenuContainer contextMenuContainer
             => Editor.ChildrenOfType<ContextMenuContainer>().First();
 
-
         [Test]
         public void TestToolChangeClosesMenu()
         {
