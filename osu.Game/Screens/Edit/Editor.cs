@@ -80,8 +80,6 @@ namespace osu.Game.Screens.Edit
 
         public override float BackgroundParallaxAmount => 0.1f;
 
-        public override bool AllowBackButton => false;
-
         public override bool HideOverlaysOnEnter => true;
 
         public override bool DisallowExternalBeatmapRulesetChanges => true;
@@ -193,6 +191,8 @@ namespace osu.Game.Screens.Edit
                 return new UserActivity.ModdingBeatmap(Beatmap.Value.BeatmapInfo);
             }
         }
+
+        protected override bool InitialBackButtonVisibility => false;
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
             => dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
@@ -422,6 +422,29 @@ namespace osu.Game.Screens.Edit
                                         Items = new MenuItem[]
                                         {
                                             new EditorMenuItem(EditorStrings.SetPreviewPointToCurrent, MenuItemType.Standard, SetPreviewPointToCurrentTime),
+                                            new EditorMenuItem(EditorStrings.Bookmarks)
+                                            {
+                                                Items = new MenuItem[]
+                                                {
+                                                    new EditorMenuItem(EditorStrings.AddBookmark, MenuItemType.Standard, addBookmarkAtCurrentTime)
+                                                    {
+                                                        Hotkey = new Hotkey(GlobalAction.EditorAddBookmark),
+                                                    },
+                                                    new EditorMenuItem(EditorStrings.RemoveClosestBookmark, MenuItemType.Destructive, removeBookmarksInProximityToCurrentTime)
+                                                    {
+                                                        Hotkey = new Hotkey(GlobalAction.EditorRemoveClosestBookmark)
+                                                    },
+                                                    new EditorMenuItem(EditorStrings.SeekToPreviousBookmark, MenuItemType.Standard, () => seekBookmark(-1))
+                                                    {
+                                                        Hotkey = new Hotkey(GlobalAction.EditorSeekToPreviousBookmark)
+                                                    },
+                                                    new EditorMenuItem(EditorStrings.SeekToNextBookmark, MenuItemType.Standard, () => seekBookmark(1))
+                                                    {
+                                                        Hotkey = new Hotkey(GlobalAction.EditorSeekToNextBookmark)
+                                                    },
+                                                    new EditorMenuItem(EditorStrings.ResetBookmarks, MenuItemType.Destructive, () => editorBeatmap.Bookmarks.Clear())
+                                                }
+                                            }
                                         }
                                     }
                                 }
@@ -753,6 +776,14 @@ namespace osu.Game.Screens.Edit
                 case GlobalAction.EditorSeekToNextSamplePoint:
                     seekSamplePoint(1);
                     return true;
+
+                case GlobalAction.EditorSeekToPreviousBookmark:
+                    seekBookmark(-1);
+                    return true;
+
+                case GlobalAction.EditorSeekToNextBookmark:
+                    seekBookmark(1);
+                    return true;
             }
 
             if (e.Repeat)
@@ -760,9 +791,12 @@ namespace osu.Game.Screens.Edit
 
             switch (e.Action)
             {
-                case GlobalAction.Back:
-                    // as we don't want to display the back button, manual handling of exit action is required.
-                    this.Exit();
+                case GlobalAction.EditorAddBookmark:
+                    addBookmarkAtCurrentTime();
+                    return true;
+
+                case GlobalAction.EditorRemoveClosestBookmark:
+                    removeBookmarksInProximityToCurrentTime();
                     return true;
 
                 case GlobalAction.EditorCloneSelection:
@@ -795,6 +829,19 @@ namespace osu.Game.Screens.Edit
             }
 
             return false;
+        }
+
+        private void addBookmarkAtCurrentTime()
+        {
+            int bookmark = (int)clock.CurrentTimeAccurate;
+            int idx = editorBeatmap.Bookmarks.BinarySearch(bookmark);
+            if (idx < 0)
+                editorBeatmap.Bookmarks.Insert(~idx, bookmark);
+        }
+
+        private void removeBookmarksInProximityToCurrentTime()
+        {
+            editorBeatmap.Bookmarks.RemoveAll(b => Math.Abs(b - clock.CurrentTimeAccurate) < 2000);
         }
 
         public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
@@ -1130,6 +1177,16 @@ namespace osu.Game.Screens.Edit
 
             if (found != null)
                 clock.SeekSmoothlyTo(found.StartTime);
+        }
+
+        private void seekBookmark(int direction)
+        {
+            int? targetBookmark = direction < 1
+                ? editorBeatmap.Bookmarks.Cast<int?>().LastOrDefault(b => b < clock.CurrentTimeAccurate)
+                : editorBeatmap.Bookmarks.Cast<int?>().FirstOrDefault(b => b > clock.CurrentTimeAccurate);
+
+            if (targetBookmark != null)
+                clock.SeekSmoothlyTo(targetBookmark.Value);
         }
 
         private void seekSamplePoint(int direction)

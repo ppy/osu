@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -54,23 +52,23 @@ namespace osu.Game.Screens.OnlinePlay
         /// <summary>
         /// Invoked when this item requests to be deleted.
         /// </summary>
-        public Action<PlaylistItem> RequestDeletion;
+        public Action<PlaylistItem>? RequestDeletion;
 
         /// <summary>
         /// Invoked when this item requests its results to be shown.
         /// </summary>
-        public Action<PlaylistItem> RequestResults;
+        public Action<PlaylistItem>? RequestResults;
 
         /// <summary>
         /// Invoked when this item requests to be edited.
         /// </summary>
-        public Action<PlaylistItem> RequestEdit;
+        public Action<PlaylistItem>? RequestEdit;
 
         /// <summary>
         /// The currently-selected item, used to show a border around this item.
         /// May be updated by this item if <see cref="AllowSelection"/> is <c>true</c>.
         /// </summary>
-        public readonly Bindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();
+        public readonly Bindable<PlaylistItem?> SelectedItem = new Bindable<PlaylistItem?>();
 
         public readonly PlaylistItem Item;
 
@@ -79,48 +77,48 @@ namespace osu.Game.Screens.OnlinePlay
         private readonly DelayedLoadWrapper onScreenLoader = new DelayedLoadWrapper(Empty) { RelativeSizeAxes = Axes.Both };
         private readonly IBindable<bool> valid = new Bindable<bool>();
 
-        private IBeatmapInfo beatmap;
-        private IRulesetInfo ruleset;
+        private IBeatmapInfo? beatmap;
+        private IRulesetInfo? ruleset;
         private Mod[] requiredMods = Array.Empty<Mod>();
 
-        private Container borderContainer;
-        private FillFlowContainer difficultyIconContainer;
-        private LinkFlowContainer beatmapText;
-        private LinkFlowContainer authorText;
-        private ExplicitContentBeatmapBadge explicitContent;
-        private ModDisplay modDisplay;
-        private FillFlowContainer buttonsFlow;
-        private UpdateableAvatar ownerAvatar;
-        private Drawable showResultsButton;
-        private Drawable editButton;
-        private Drawable removeButton;
-        private PanelBackground panelBackground;
-        private FillFlowContainer mainFillFlow;
-        private BeatmapCardThumbnail thumbnail;
+        private Container? borderContainer;
+        private FillFlowContainer? difficultyIconContainer;
+        private LinkFlowContainer? beatmapText;
+        private LinkFlowContainer? authorText;
+        private ExplicitContentBeatmapBadge? explicitContent;
+        private ModDisplay? modDisplay;
+        private FillFlowContainer? buttonsFlow;
+        private UpdateableAvatar? ownerAvatar;
+        private Drawable? showResultsButton;
+        private Drawable? editButton;
+        private Drawable? removeButton;
+        private PanelBackground? panelBackground;
+        private FillFlowContainer? mainFillFlow;
+        private BeatmapCardThumbnail? thumbnail;
 
         [Resolved]
-        private RealmAccess realm { get; set; }
+        private RealmAccess realm { get; set; } = null!;
 
         [Resolved]
-        private RulesetStore rulesets { get; set; }
+        private RulesetStore rulesets { get; set; } = null!;
 
         [Resolved]
-        private BeatmapManager beatmaps { get; set; }
+        private BeatmapManager beatmaps { get; set; } = null!;
 
         [Resolved]
-        private OsuColour colours { get; set; }
+        private OsuColour colours { get; set; } = null!;
 
         [Resolved]
-        private UserLookupCache userLookupCache { get; set; }
+        private UserLookupCache userLookupCache { get; set; } = null!;
 
         [Resolved]
-        private BeatmapLookupCache beatmapLookupCache { get; set; }
+        private BeatmapLookupCache beatmapLookupCache { get; set; } = null!;
 
         [Resolved(CanBeNull = true)]
-        private BeatmapSetOverlay beatmapOverlay { get; set; }
+        private BeatmapSetOverlay? beatmapOverlay { get; set; }
 
         [Resolved(CanBeNull = true)]
-        private ManageCollectionsDialog manageCollectionsDialog { get; set; }
+        private ManageCollectionsDialog? manageCollectionsDialog { get; set; }
 
         public DrawableRoomPlaylistItem(PlaylistItem item)
             : base(item)
@@ -136,7 +134,8 @@ namespace osu.Game.Screens.OnlinePlay
         [BackgroundDependencyLoader]
         private void load()
         {
-            borderContainer.BorderColour = colours.Yellow;
+            if (borderContainer != null)
+                borderContainer.BorderColour = colours.Yellow;
 
             ruleset = rulesets.GetRuleset(Item.RulesetID);
             var rulesetInstance = ruleset?.CreateInstance();
@@ -163,7 +162,8 @@ namespace osu.Game.Screens.OnlinePlay
                     return;
                 }
 
-                borderContainer.BorderThickness = IsSelectedItem ? border_thickness : 0;
+                if (borderContainer != null)
+                    borderContainer.BorderThickness = IsSelectedItem ? border_thickness : 0;
             }, true);
 
             valid.BindValueChanged(_ => Scheduler.AddOnce(refresh));
@@ -177,7 +177,11 @@ namespace osu.Game.Screens.OnlinePlay
                         if (showItemOwner)
                         {
                             var foundUser = await userLookupCache.GetUserAsync(Item.OwnerID).ConfigureAwait(false);
-                            Schedule(() => ownerAvatar.User = foundUser);
+                            Schedule(() =>
+                            {
+                                if (ownerAvatar != null)
+                                    ownerAvatar.User = foundUser;
+                            });
                         }
 
                         beatmap = await beatmapLookupCache.GetBeatmapAsync(Item.Beatmap.OnlineID).ConfigureAwait(false);
@@ -278,69 +282,89 @@ namespace osu.Game.Screens.OnlinePlay
 
         private void refresh()
         {
-            if (!valid.Value)
+            if (borderContainer != null)
             {
-                borderContainer.BorderThickness = border_thickness;
-                borderContainer.BorderColour = colours.Red;
-            }
-
-            if (beatmap != null)
-            {
-                difficultyIconContainer.Children = new Drawable[]
+                if (!valid.Value)
                 {
-                    thumbnail = new BeatmapCardThumbnail(beatmap.BeatmapSet!, (IBeatmapSetOnlineInfo)beatmap.BeatmapSet!)
-                    {
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
-                        Width = 60,
-                        Masking = true,
-                        CornerRadius = 10,
-                        RelativeSizeAxes = Axes.Y,
-                        Dimmed = { Value = IsHovered }
-                    },
-                    new DifficultyIcon(beatmap, ruleset, requiredMods)
-                    {
-                        Size = new Vector2(24),
-                        TooltipType = DifficultyIconTooltipType.Extended,
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
-                    },
-                };
+                    borderContainer.BorderThickness = border_thickness;
+                    borderContainer.BorderColour = colours.Red;
+                }
             }
-            else
-                difficultyIconContainer.Clear();
 
-            panelBackground.Beatmap.Value = beatmap;
-
-            beatmapText.Clear();
-
-            if (beatmap != null)
+            if (difficultyIconContainer != null)
             {
-                beatmapText.AddLink(beatmap.GetDisplayTitleRomanisable(includeCreator: false),
-                    LinkAction.OpenBeatmap,
-                    beatmap.OnlineID.ToString(),
-                    null,
-                    text =>
+                if (beatmap != null)
+                {
+                    difficultyIconContainer.Children = new Drawable[]
                     {
-                        text.Truncate = true;
-                    });
+                        thumbnail = new BeatmapCardThumbnail(beatmap.BeatmapSet!, (IBeatmapSetOnlineInfo)beatmap.BeatmapSet!)
+                        {
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            Width = 60,
+                            Masking = true,
+                            CornerRadius = 10,
+                            RelativeSizeAxes = Axes.Y,
+                            Dimmed = { Value = IsHovered }
+                        },
+                        new DifficultyIcon(beatmap, ruleset, requiredMods)
+                        {
+                            Size = new Vector2(24),
+                            TooltipType = DifficultyIconTooltipType.Extended,
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                        },
+                    };
+                }
+                else
+                    difficultyIconContainer.Clear();
             }
 
-            authorText.Clear();
+            if (panelBackground != null)
+                panelBackground.Beatmap.Value = beatmap;
 
-            if (!string.IsNullOrEmpty(beatmap?.Metadata.Author.Username))
+            if (beatmapText != null)
             {
-                authorText.AddText("mapped by ");
-                authorText.AddUserLink(beatmap.Metadata.Author);
+                beatmapText.Clear();
+
+                if (beatmap != null)
+                {
+                    beatmapText.AddLink(beatmap.GetDisplayTitleRomanisable(includeCreator: false),
+                        LinkAction.OpenBeatmap,
+                        beatmap.OnlineID.ToString(),
+                        null,
+                        text =>
+                        {
+                            text.Truncate = true;
+                        });
+                }
             }
 
-            bool hasExplicitContent = (beatmap?.BeatmapSet as IBeatmapSetOnlineInfo)?.HasExplicitContent == true;
-            explicitContent.Alpha = hasExplicitContent ? 1 : 0;
+            if (authorText != null)
+            {
+                authorText.Clear();
 
-            modDisplay.Current.Value = requiredMods.ToArray();
+                if (!string.IsNullOrEmpty(beatmap?.Metadata.Author.Username))
+                {
+                    authorText.AddText("mapped by ");
+                    authorText.AddUserLink(beatmap.Metadata.Author);
+                }
+            }
 
-            buttonsFlow.Clear();
-            buttonsFlow.ChildrenEnumerable = createButtons();
+            if (explicitContent != null)
+            {
+                bool hasExplicitContent = (beatmap?.BeatmapSet as IBeatmapSetOnlineInfo)?.HasExplicitContent == true;
+                explicitContent.Alpha = hasExplicitContent ? 1 : 0;
+            }
+
+            if (modDisplay != null)
+                modDisplay.Current.Value = requiredMods.ToArray();
+
+            if (buttonsFlow != null)
+            {
+                buttonsFlow.Clear();
+                buttonsFlow.ChildrenEnumerable = createButtons();
+            }
 
             difficultyIconContainer.FadeInFromZero(500, Easing.OutQuint);
             mainFillFlow.FadeInFromZero(500, Easing.OutQuint);
@@ -601,7 +625,7 @@ namespace osu.Game.Screens.OnlinePlay
             private readonly IBeatmapInfo beatmap;
 
             [Resolved]
-            private BeatmapManager beatmapManager { get; set; }
+            private BeatmapManager beatmapManager { get; set; } = null!;
 
             // required for download tracking, as this button hides itself. can probably be removed with a bit of consideration.
             public override bool IsPresent => true;
@@ -656,7 +680,7 @@ namespace osu.Game.Screens.OnlinePlay
         // For now, this is the same implementation as in PanelBackground, but supports a beatmap info rather than a working beatmap
         private partial class PanelBackground : Container // todo: should be a buffered container (https://github.com/ppy/osu-framework/issues/3222)
         {
-            public readonly Bindable<IBeatmapInfo> Beatmap = new Bindable<IBeatmapInfo>();
+            public readonly Bindable<IBeatmapInfo?> Beatmap = new Bindable<IBeatmapInfo?>();
 
             public PanelBackground()
             {

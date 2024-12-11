@@ -341,6 +341,84 @@ namespace osu.Game.Rulesets.Difficulty
             public double GetMostCommonBeatLength() => baseBeatmap.GetMostCommonBeatLength();
             public IBeatmap Clone() => new ProgressiveCalculationBeatmap(baseBeatmap.Clone());
 
+            public double AudioLeadIn
+            {
+                get => baseBeatmap.AudioLeadIn;
+                set => baseBeatmap.AudioLeadIn = value;
+            }
+
+            public float StackLeniency
+            {
+                get => baseBeatmap.StackLeniency;
+                set => baseBeatmap.StackLeniency = value;
+            }
+
+            public bool SpecialStyle
+            {
+                get => baseBeatmap.SpecialStyle;
+                set => baseBeatmap.SpecialStyle = value;
+            }
+
+            public bool LetterboxInBreaks
+            {
+                get => baseBeatmap.LetterboxInBreaks;
+                set => baseBeatmap.LetterboxInBreaks = value;
+            }
+
+            public bool WidescreenStoryboard
+            {
+                get => baseBeatmap.WidescreenStoryboard;
+                set => baseBeatmap.WidescreenStoryboard = value;
+            }
+
+            public bool EpilepsyWarning
+            {
+                get => baseBeatmap.EpilepsyWarning;
+                set => baseBeatmap.EpilepsyWarning = value;
+            }
+
+            public bool SamplesMatchPlaybackRate
+            {
+                get => baseBeatmap.SamplesMatchPlaybackRate;
+                set => baseBeatmap.SamplesMatchPlaybackRate = value;
+            }
+
+            public double DistanceSpacing
+            {
+                get => baseBeatmap.DistanceSpacing;
+                set => baseBeatmap.DistanceSpacing = value;
+            }
+
+            public int GridSize
+            {
+                get => baseBeatmap.GridSize;
+                set => baseBeatmap.GridSize = value;
+            }
+
+            public double TimelineZoom
+            {
+                get => baseBeatmap.TimelineZoom;
+                set => baseBeatmap.TimelineZoom = value;
+            }
+
+            public CountdownType Countdown
+            {
+                get => baseBeatmap.Countdown;
+                set => baseBeatmap.Countdown = value;
+            }
+
+            public int CountdownOffset
+            {
+                get => baseBeatmap.CountdownOffset;
+                set => baseBeatmap.CountdownOffset = value;
+            }
+
+            public int[] Bookmarks
+            {
+                get => baseBeatmap.Bookmarks;
+                set => baseBeatmap.Bookmarks = value;
+            }
+
             #endregion
         }
     }

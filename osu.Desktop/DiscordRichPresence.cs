@@ -15,6 +15,7 @@ using osu.Framework.Threading;
 using osu.Game;
 using osu.Game.Configuration;
 using osu.Game.Extensions;
+using osu.Game.Online;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
@@ -46,6 +47,9 @@ namespace osu.Desktop
 
         [Resolved]
         private MultiplayerClient multiplayerClient { get; set; } = null!;
+
+        [Resolved]
+        private LocalUserStatisticsProvider statisticsProvider { get; set; } = null!;
 
         [Resolved]
         private OsuConfigManager config { get; set; } = null!;
@@ -117,7 +121,9 @@ namespace osu.Desktop
             status.BindValueChanged(_ => schedulePresenceUpdate());
             activity.BindValueChanged(_ => schedulePresenceUpdate());
             privacyMode.BindValueChanged(_ => schedulePresenceUpdate());
+
             multiplayerClient.RoomUpdated += onRoomUpdated;
+            statisticsProvider.StatisticsUpdated += onStatisticsUpdated;
         }
 
         private void onReady(object _, ReadyMessage __)
@@ -132,6 +138,8 @@ namespace osu.Desktop
         }
 
         private void onRoomUpdated() => schedulePresenceUpdate();
+
+        private void onStatisticsUpdated(UserStatisticsUpdate _) => schedulePresenceUpdate();
 
         private ScheduledDelegate? presenceUpdateDelegate;
 
@@ -167,7 +175,7 @@ namespace osu.Desktop
                 presence.State = clampLength(activity.Value.GetStatus(hideIdentifiableInformation));
                 presence.Details = clampLength(activity.Value.GetDetails(hideIdentifiableInformation) ?? string.Empty);
 
-                if (getBeatmapID(activity.Value) is int beatmapId && beatmapId > 0)
+                if (activity.Value.GetBeatmapID(hideIdentifiableInformation) is int beatmapId && beatmapId > 0)
                 {
                     presence.Buttons = new[]
                     {
@@ -229,10 +237,8 @@ namespace osu.Desktop
                 presence.Assets.LargeImageText = string.Empty;
             else
             {
-                if (user.Value.RulesetsStatistics != null && user.Value.RulesetsStatistics.TryGetValue(ruleset.Value.ShortName, out UserStatistics? statistics))
-                    presence.Assets.LargeImageText = $"{user.Value.Username}" + (statistics.GlobalRank > 0 ? $" (rank #{statistics.GlobalRank:N0})" : string.Empty);
-                else
-                    presence.Assets.LargeImageText = $"{user.Value.Username}" + (user.Value.Statistics?.GlobalRank > 0 ? $" (rank #{user.Value.Statistics.GlobalRank:N0})" : string.Empty);
+                var statistics = statisticsProvider.GetStatisticsFor(ruleset.Value);
+                presence.Assets.LargeImageText = $"{user.Value.Username}" + (statistics?.GlobalRank > 0 ? $" (rank #{statistics.GlobalRank:N0})" : string.Empty);
             }
 
             // small image
@@ -327,24 +333,13 @@ namespace osu.Desktop
             return true;
         }
 
-        private static int? getBeatmapID(UserActivity activity)
-        {
-            switch (activity)
-            {
-                case UserActivity.InGame game:
-                    return game.BeatmapID;
-
-                case UserActivity.EditingBeatmap edit:
-                    return edit.BeatmapID;
-            }
-
-            return null;
-        }
-
         protected override void Dispose(bool isDisposing)
         {
             if (multiplayerClient.IsNotNull())
                 multiplayerClient.RoomUpdated -= onRoomUpdated;
+
+            if (statisticsProvider.IsNotNull())
+                statisticsProvider.StatisticsUpdated -= onStatisticsUpdated;
 
             client.Dispose();
             base.Dispose(isDisposing);

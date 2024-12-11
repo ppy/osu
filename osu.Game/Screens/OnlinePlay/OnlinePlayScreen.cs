@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -27,16 +25,16 @@ namespace osu.Game.Screens.OnlinePlay
 
         public IScreen CurrentSubScreen => screenStack.CurrentScreen;
 
-        public override bool CursorVisible => (screenStack?.CurrentScreen as IOnlinePlaySubScreen)?.CursorVisible ?? true;
+        public override bool CursorVisible => (screenStack.CurrentScreen as IOnlinePlaySubScreen)?.CursorVisible ?? true;
 
         // this is required due to PlayerLoader eventually being pushed to the main stack
         // while leases may be taken out by a subscreen.
         public override bool DisallowExternalBeatmapRulesetChanges => true;
 
-        protected LoungeSubScreen Lounge { get; private set; }
+        protected LoungeSubScreen Lounge { get; private set; } = null!;
 
-        private OnlinePlayScreenWaveContainer waves;
-        private ScreenStack screenStack;
+        private readonly ScreenStack screenStack = new OnlinePlaySubScreenStack { RelativeSizeAxes = Axes.Both };
+        private OnlinePlayScreenWaveContainer waves = null!;
 
         [Cached(Type = typeof(IRoomManager))]
         protected RoomManager RoomManager { get; private set; }
@@ -45,7 +43,7 @@ namespace osu.Game.Screens.OnlinePlay
         private readonly OngoingOperationTracker ongoingOperationTracker = new OngoingOperationTracker();
 
         [Resolved]
-        protected IAPIProvider API { get; private set; }
+        protected IAPIProvider API { get; private set; } = null!;
 
         protected OnlinePlayScreen()
         {
@@ -67,7 +65,7 @@ namespace osu.Game.Screens.OnlinePlay
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
-                    screenStack = new OnlinePlaySubScreenStack { RelativeSizeAxes = Axes.Both },
+                    screenStack,
                     new Header(ScreenTitle, screenStack),
                     RoomManager,
                     ongoingOperationTracker,
@@ -182,7 +180,7 @@ namespace osu.Game.Screens.OnlinePlay
             if (!(screenStack.CurrentScreen is IOnlinePlaySubScreen onlineSubScreen))
                 return false;
 
-            if (((Drawable)onlineSubScreen).IsLoaded && onlineSubScreen.AllowBackButton && onlineSubScreen.OnBackButton())
+            if (((Drawable)onlineSubScreen).IsLoaded && onlineSubScreen.AllowUserExit && onlineSubScreen.OnBackButton())
                 return true;
 
             if (screenStack.CurrentScreen != null && !(screenStack.CurrentScreen is LoungeSubScreen))
