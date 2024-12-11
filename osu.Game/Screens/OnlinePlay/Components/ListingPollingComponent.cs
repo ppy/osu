@@ -47,7 +47,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
 
             lastPollRequest?.Cancel();
 
-            var req = new GetRoomsRequest(Filter.Value.Status, Filter.Value.Category);
+            var req = new GetRoomsRequest(Filter.Value);
 
             req.Success += result =>
             {
