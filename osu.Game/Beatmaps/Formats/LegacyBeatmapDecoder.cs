@@ -51,7 +51,7 @@ namespace osu.Game.Beatmaps.Formats
         }
 
         /// <summary>
-        /// Whether or not beatmap or runtime offsets should be applied. Defaults on; only disable for testing purposes.
+        /// Whether beatmap or runtime offsets should be applied. Defaults on; only disable for testing purposes.
         /// </summary>
         public bool ApplyOffsets = true;
 
