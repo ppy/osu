@@ -18,6 +18,8 @@ namespace osu.Game.Screens.Play
 {
     public abstract partial class SpectatorPlayer : Player
     {
+        public override bool ShowAnalysisSettings => true;
+
         [Resolved]
         protected SpectatorClient SpectatorClient { get; private set; } = null!;
 
@@ -50,8 +52,6 @@ namespace osu.Game.Screens.Play
                 Anchor = Anchor.TopCentre,
                 Origin = Anchor.TopCentre,
             });
-
-            AddReplayAnalysisSettings();
         }
 
         protected override void LoadComplete()

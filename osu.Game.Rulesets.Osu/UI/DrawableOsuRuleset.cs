@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Osu.UI
         [BackgroundDependencyLoader]
         private void load(Player? player)
         {
-            if (player is ReplayPlayer || player is SpectatorPlayer)
+            if (player != null && player.ShowAnalysisSettings)
             {
                 ReplayAnalysisOverlay analysisOverlay;
                 PlayfieldAdjustmentContainer.Add(analysisOverlay = new ReplayAnalysisOverlay(player.Score.Replay));

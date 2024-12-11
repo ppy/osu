@@ -28,6 +28,8 @@ namespace osu.Game.Screens.Play
     {
         public const double BASE_SEEK_AMOUNT = 1000;
 
+        public override bool ShowAnalysisSettings => true;
+
         private readonly Func<IBeatmap, IReadOnlyList<Mod>, Score> createScore;
 
         private readonly bool replayIsFailedScore;
@@ -71,8 +73,6 @@ namespace osu.Game.Screens.Play
                 playbackSettings.UserPlaybackRate.BindTo(master.UserPlaybackRate);
 
             HUDOverlay.PlayerSettingsOverlay.AddAtStart(playbackSettings);
-
-            AddReplayAnalysisSettings();
         }
 
         protected override void PrepareReplay()
