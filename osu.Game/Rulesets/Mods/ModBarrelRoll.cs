@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Mods
 
         private PlayfieldAdjustmentContainer playfieldAdjustmentContainer = null!;
 
-        public void Update(Playfield playfield)
+        public virtual void Update(Playfield playfield)
         {
             playfieldAdjustmentContainer.Rotation = CurrentRotation = (Direction.Value == RotationDirection.Counterclockwise ? -1 : 1) * 360 * (float)(playfield.Time.Current / 60000 * SpinSpeed.Value);
         }

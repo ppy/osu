@@ -90,8 +90,7 @@ namespace osu.Game.Beatmaps
             }
 
             if (string.IsNullOrEmpty(beatmapInfo.MD5Hash)
-                && string.IsNullOrEmpty(beatmapInfo.Path)
-                && beatmapInfo.OnlineID <= 0)
+                && string.IsNullOrEmpty(beatmapInfo.Path))
             {
                 onlineMetadata = null;
                 return false;
@@ -240,10 +239,9 @@ namespace osu.Game.Beatmaps
             using var cmd = db.CreateCommand();
 
             cmd.CommandText =
-                @"SELECT beatmapset_id, beatmap_id, approved, user_id, checksum, last_update FROM osu_beatmaps WHERE checksum = @MD5Hash OR beatmap_id = @OnlineID OR filename = @Path";
+                @"SELECT beatmapset_id, beatmap_id, approved, user_id, checksum, last_update FROM osu_beatmaps WHERE checksum = @MD5Hash OR filename = @Path";
 
             cmd.Parameters.Add(new SqliteParameter(@"@MD5Hash", beatmapInfo.MD5Hash));
-            cmd.Parameters.Add(new SqliteParameter(@"@OnlineID", beatmapInfo.OnlineID));
             cmd.Parameters.Add(new SqliteParameter(@"@Path", beatmapInfo.Path));
 
             using var reader = cmd.ExecuteReader();
@@ -281,11 +279,10 @@ namespace osu.Game.Beatmaps
                 SELECT `b`.`beatmapset_id`, `b`.`beatmap_id`, `b`.`approved`, `b`.`user_id`, `b`.`checksum`, `b`.`last_update`, `s`.`submit_date`, `s`.`approved_date`
                 FROM `osu_beatmaps` AS `b`
                 JOIN `osu_beatmapsets` AS `s` ON `s`.`beatmapset_id` = `b`.`beatmapset_id`
-                WHERE `b`.`checksum` = @MD5Hash OR `b`.`beatmap_id` = @OnlineID OR `b`.`filename` = @Path
+                WHERE `b`.`checksum` = @MD5Hash OR `b`.`filename` = @Path
                 """;
 
             cmd.Parameters.Add(new SqliteParameter(@"@MD5Hash", beatmapInfo.MD5Hash));
-            cmd.Parameters.Add(new SqliteParameter(@"@OnlineID", beatmapInfo.OnlineID));
             cmd.Parameters.Add(new SqliteParameter(@"@Path", beatmapInfo.Path));
 
             using var reader = cmd.ExecuteReader();

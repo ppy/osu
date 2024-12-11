@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osuTK;
 using osu.Game.Rulesets.Objects.Types;
 using System;
@@ -11,7 +9,6 @@ using System.IO;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Audio;
 using System.Linq;
-using JetBrains.Annotations;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Legacy;
@@ -24,24 +21,32 @@ namespace osu.Game.Rulesets.Objects.Legacy
     /// <summary>
     /// A HitObjectParser to parse legacy Beatmaps.
     /// </summary>
-    public abstract class ConvertHitObjectParser : HitObjectParser
+    public class ConvertHitObjectParser : HitObjectParser
     {
         /// <summary>
         /// The offset to apply to all time values.
         /// </summary>
-        protected readonly double Offset;
+        private readonly double offset;
 
         /// <summary>
         /// The .osu format (beatmap) version.
         /// </summary>
-        protected readonly int FormatVersion;
+        private readonly int formatVersion;
 
-        protected bool FirstObject { get; private set; } = true;
+        /// <summary>
+        /// Whether the current hitobject is the first hitobject in the beatmap.
+        /// </summary>
+        private bool firstObject = true;
 
-        protected ConvertHitObjectParser(double offset, int formatVersion)
+        /// <summary>
+        /// The last parsed hitobject.
+        /// </summary>
+        private ConvertHitObject? lastObject;
+
+        internal ConvertHitObjectParser(double offset, int formatVersion)
         {
-            Offset = offset;
-            FormatVersion = formatVersion;
+            this.offset = offset;
+            this.formatVersion = formatVersion;
         }
 
         public override HitObject Parse(string text)
@@ -49,11 +54,11 @@ namespace osu.Game.Rulesets.Objects.Legacy
             string[] split = text.Split(',');
 
             Vector2 pos =
-                FormatVersion >= LegacyBeatmapEncoder.FIRST_LAZER_VERSION
+                formatVersion >= LegacyBeatmapEncoder.FIRST_LAZER_VERSION
                     ? new Vector2(Parsing.ParseFloat(split[0], Parsing.MAX_COORDINATE_VALUE), Parsing.ParseFloat(split[1], Parsing.MAX_COORDINATE_VALUE))
                     : new Vector2((int)Parsing.ParseFloat(split[0], Parsing.MAX_COORDINATE_VALUE), (int)Parsing.ParseFloat(split[1], Parsing.MAX_COORDINATE_VALUE));
 
-            double startTime = Parsing.ParseDouble(split[2]) + Offset;
+            double startTime = Parsing.ParseDouble(split[2]) + offset;
 
             LegacyHitObjectType type = (LegacyHitObjectType)Parsing.ParseInt(split[3]);
 
@@ -66,11 +71,11 @@ namespace osu.Game.Rulesets.Objects.Legacy
             var soundType = (LegacyHitSoundType)Parsing.ParseInt(split[4]);
             var bankInfo = new SampleBankInfo();
 
-            HitObject result = null;
+            ConvertHitObject? result = null;
 
             if (type.HasFlag(LegacyHitObjectType.Circle))
             {
-                result = CreateHit(pos, combo, comboOffset);
+                result = createHitCircle(pos, combo, comboOffset);
 
                 if (split.Length > 5)
                     readCustomSampleBanks(split[5], bankInfo);
@@ -145,13 +150,13 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 for (int i = 0; i < nodes; i++)
                     nodeSamples.Add(convertSoundType(nodeSoundTypes[i], nodeBankInfos[i]));
 
-                result = CreateSlider(pos, combo, comboOffset, convertPathString(split[5], pos), length, repeatCount, nodeSamples);
+                result = createSlider(pos, combo, comboOffset, convertPathString(split[5], pos), length, repeatCount, nodeSamples);
             }
             else if (type.HasFlag(LegacyHitObjectType.Spinner))
             {
-                double duration = Math.Max(0, Parsing.ParseDouble(split[5]) + Offset - startTime);
+                double duration = Math.Max(0, Parsing.ParseDouble(split[5]) + offset - startTime);
 
-                result = CreateSpinner(new Vector2(512, 384) / 2, combo, comboOffset, duration);
+                result = createSpinner(new Vector2(512, 384) / 2, combo, duration);
 
                 if (split.Length > 6)
                     readCustomSampleBanks(split[6], bankInfo);
@@ -169,18 +174,19 @@ namespace osu.Game.Rulesets.Objects.Legacy
                     readCustomSampleBanks(string.Join(':', ss.Skip(1)), bankInfo);
                 }
 
-                result = CreateHold(pos, combo, comboOffset, endTime + Offset - startTime);
+                result = createHold(pos, endTime + offset - startTime);
             }
 
             if (result == null)
                 throw new InvalidDataException($"Unknown hit object type: {split[3]}");
 
             result.StartTime = startTime;
+            result.LegacyType = type;
 
             if (result.Samples.Count == 0)
                 result.Samples = convertSoundType(soundType, bankInfo);
 
-            FirstObject = false;
+            firstObject = false;
 
             return result;
         }
@@ -200,12 +206,19 @@ namespace osu.Game.Rulesets.Objects.Legacy
             if (!Enum.IsDefined(addBank))
                 addBank = LegacySampleBank.Normal;
 
-            string stringBank = bank.ToString().ToLowerInvariant();
+            string? stringBank = bank.ToString().ToLowerInvariant();
+            string? stringAddBank = addBank.ToString().ToLowerInvariant();
+
             if (stringBank == @"none")
                 stringBank = null;
-            string stringAddBank = addBank.ToString().ToLowerInvariant();
+
             if (stringAddBank == @"none")
+            {
+                bankInfo.EditorAutoBank = true;
                 stringAddBank = null;
+            }
+            else
+                bankInfo.EditorAutoBank = false;
 
             bankInfo.BankForNormal = stringBank;
             bankInfo.BankForAdditions = string.IsNullOrEmpty(stringAddBank) ? stringBank : stringAddBank;
@@ -230,7 +243,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                     return PathType.CATMULL;
 
                 case 'B':
-                    if (input.Length > 1 && int.TryParse(input.Substring(1), out int degree) && degree > 0)
+                    if (input.Length > 1 && int.TryParse(input.AsSpan(1), out int degree) && degree > 0)
                         return PathType.BSpline(degree);
 
                     return PathType.BEZIER;
@@ -351,7 +364,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
             {
                 int endPointLength = endPoint == null ? 0 : 1;
 
-                if (FormatVersion < LegacyBeatmapEncoder.FIRST_LAZER_VERSION)
+                if (formatVersion < LegacyBeatmapEncoder.FIRST_LAZER_VERSION)
                 {
                     if (vertices.Length + endPointLength != 3)
                         type = PathType.BEZIER;
@@ -387,7 +400,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 // Legacy CATMULL sliders don't support multiple segments, so adjacent CATMULL segments should be treated as a single one.
                 // Importantly, this is not applied to the first control point, which may duplicate the slider path's position
                 // resulting in a duplicate (0,0) control point in the resultant list.
-                if (type == PathType.CATMULL && endIndex > 1 && FormatVersion < LegacyBeatmapEncoder.FIRST_LAZER_VERSION)
+                if (type == PathType.CATMULL && endIndex > 1 && formatVersion < LegacyBeatmapEncoder.FIRST_LAZER_VERSION)
                     continue;
 
                 // The last control point of each segment is not allowed to start a new implicit segment.
@@ -436,7 +449,15 @@ namespace osu.Game.Rulesets.Objects.Legacy
         /// <param name="newCombo">Whether the hit object creates a new combo.</param>
         /// <param name="comboOffset">When starting a new combo, the offset of the new combo relative to the current one.</param>
         /// <returns>The hit object.</returns>
-        protected abstract HitObject CreateHit(Vector2 position, bool newCombo, int comboOffset);
+        private ConvertHitObject createHitCircle(Vector2 position, bool newCombo, int comboOffset)
+        {
+            return lastObject = new ConvertHitCircle
+            {
+                Position = position,
+                NewCombo = firstObject || lastObject is ConvertSpinner || newCombo,
+                ComboOffset = newCombo ? comboOffset : 0
+            };
+        }
 
         /// <summary>
         /// Creats a legacy Slider-type hit object.
@@ -449,27 +470,51 @@ namespace osu.Game.Rulesets.Objects.Legacy
         /// <param name="repeatCount">The slider repeat count.</param>
         /// <param name="nodeSamples">The samples to be played when the slider nodes are hit. This includes the head and tail of the slider.</param>
         /// <returns>The hit object.</returns>
-        protected abstract HitObject CreateSlider(Vector2 position, bool newCombo, int comboOffset, PathControlPoint[] controlPoints, double? length, int repeatCount,
-                                                  IList<IList<HitSampleInfo>> nodeSamples);
+        private ConvertHitObject createSlider(Vector2 position, bool newCombo, int comboOffset, PathControlPoint[] controlPoints, double? length, int repeatCount,
+                                              IList<IList<HitSampleInfo>> nodeSamples)
+        {
+            return lastObject = new ConvertSlider
+            {
+                Position = position,
+                NewCombo = firstObject || lastObject is ConvertSpinner || newCombo,
+                ComboOffset = newCombo ? comboOffset : 0,
+                Path = new SliderPath(controlPoints, length),
+                NodeSamples = nodeSamples,
+                RepeatCount = repeatCount
+            };
+        }
 
         /// <summary>
         /// Creates a legacy Spinner-type hit object.
         /// </summary>
         /// <param name="position">The position of the hit object.</param>
         /// <param name="newCombo">Whether the hit object creates a new combo.</param>
-        /// <param name="comboOffset">When starting a new combo, the offset of the new combo relative to the current one.</param>
         /// <param name="duration">The spinner duration.</param>
         /// <returns>The hit object.</returns>
-        protected abstract HitObject CreateSpinner(Vector2 position, bool newCombo, int comboOffset, double duration);
+        private ConvertHitObject createSpinner(Vector2 position, bool newCombo, double duration)
+        {
+            return lastObject = new ConvertSpinner
+            {
+                Position = position,
+                Duration = duration,
+                NewCombo = newCombo
+                // Spinners cannot have combo offset.
+            };
+        }
 
         /// <summary>
         /// Creates a legacy Hold-type hit object.
         /// </summary>
         /// <param name="position">The position of the hit object.</param>
-        /// <param name="newCombo">Whether the hit object creates a new combo.</param>
-        /// <param name="comboOffset">When starting a new combo, the offset of the new combo relative to the current one.</param>
         /// <param name="duration">The hold duration.</param>
-        protected abstract HitObject CreateHold(Vector2 position, bool newCombo, int comboOffset, double duration);
+        private ConvertHitObject createHold(Vector2 position, double duration)
+        {
+            return lastObject = new ConvertHold
+            {
+                Position = position,
+                Duration = duration
+            };
+        }
 
         private List<HitSampleInfo> convertSoundType(LegacyHitSoundType type, SampleBankInfo bankInfo)
         {
@@ -477,7 +522,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
             if (string.IsNullOrEmpty(bankInfo.Filename))
             {
-                soundTypes.Add(new LegacyHitSampleInfo(HitSampleInfo.HIT_NORMAL, bankInfo.BankForNormal, bankInfo.Volume, bankInfo.CustomSampleBank,
+                soundTypes.Add(new LegacyHitSampleInfo(HitSampleInfo.HIT_NORMAL, bankInfo.BankForNormal, bankInfo.Volume, true, bankInfo.CustomSampleBank,
                     // if the sound type doesn't have the Normal flag set, attach it anyway as a layered sample.
                     // None also counts as a normal non-layered sample: https://osu.ppy.sh/help/wiki/osu!_File_Formats/Osu_(file_format)#hitsounds
                     type != LegacyHitSoundType.None && !type.HasFlag(LegacyHitSoundType.Normal)));
@@ -489,13 +534,13 @@ namespace osu.Game.Rulesets.Objects.Legacy
             }
 
             if (type.HasFlag(LegacyHitSoundType.Finish))
-                soundTypes.Add(new LegacyHitSampleInfo(HitSampleInfo.HIT_FINISH, bankInfo.BankForAdditions, bankInfo.Volume, bankInfo.CustomSampleBank));
+                soundTypes.Add(new LegacyHitSampleInfo(HitSampleInfo.HIT_FINISH, bankInfo.BankForAdditions, bankInfo.Volume, bankInfo.EditorAutoBank, bankInfo.CustomSampleBank));
 
             if (type.HasFlag(LegacyHitSoundType.Whistle))
-                soundTypes.Add(new LegacyHitSampleInfo(HitSampleInfo.HIT_WHISTLE, bankInfo.BankForAdditions, bankInfo.Volume, bankInfo.CustomSampleBank));
+                soundTypes.Add(new LegacyHitSampleInfo(HitSampleInfo.HIT_WHISTLE, bankInfo.BankForAdditions, bankInfo.Volume, bankInfo.EditorAutoBank, bankInfo.CustomSampleBank));
 
             if (type.HasFlag(LegacyHitSoundType.Clap))
-                soundTypes.Add(new LegacyHitSampleInfo(HitSampleInfo.HIT_CLAP, bankInfo.BankForAdditions, bankInfo.Volume, bankInfo.CustomSampleBank));
+                soundTypes.Add(new LegacyHitSampleInfo(HitSampleInfo.HIT_CLAP, bankInfo.BankForAdditions, bankInfo.Volume, bankInfo.EditorAutoBank, bankInfo.CustomSampleBank));
 
             return soundTypes;
         }
@@ -505,21 +550,19 @@ namespace osu.Game.Rulesets.Objects.Legacy
             /// <summary>
             /// An optional overriding filename which causes all bank/sample specifications to be ignored.
             /// </summary>
-            public string Filename;
+            public string? Filename;
 
             /// <summary>
             /// The bank identifier to use for the base ("hitnormal") sample.
             /// Transferred to <see cref="HitSampleInfo.Bank"/> when appropriate.
             /// </summary>
-            [CanBeNull]
-            public string BankForNormal;
+            public string? BankForNormal;
 
             /// <summary>
             /// The bank identifier to use for additions ("hitwhistle", "hitfinish", "hitclap").
             /// Transferred to <see cref="HitSampleInfo.Bank"/> when appropriate.
             /// </summary>
-            [CanBeNull]
-            public string BankForAdditions;
+            public string? BankForAdditions;
 
             /// <summary>
             /// Hit sample volume (0-100).
@@ -534,10 +577,13 @@ namespace osu.Game.Rulesets.Objects.Legacy
             /// </summary>
             public int CustomSampleBank;
 
+            /// <summary>
+            /// Whether the bank for additions should be inherited from the normal sample in edit.
+            /// </summary>
+            public bool EditorAutoBank = true;
+
             public SampleBankInfo Clone() => (SampleBankInfo)MemberwiseClone();
         }
-
-#nullable enable
 
         public class LegacyHitSampleInfo : HitSampleInfo, IEquatable<LegacyHitSampleInfo>
         {
@@ -558,21 +604,22 @@ namespace osu.Game.Rulesets.Objects.Legacy
             /// </summary>
             public bool BankSpecified;
 
-            public LegacyHitSampleInfo(string name, string? bank = null, int volume = 0, int customSampleBank = 0, bool isLayered = false)
-                : base(name, bank ?? SampleControlPoint.DEFAULT_BANK, customSampleBank >= 2 ? customSampleBank.ToString() : null, volume)
+            public LegacyHitSampleInfo(string name, string? bank = null, int volume = 0, bool editorAutoBank = false, int customSampleBank = 0, bool isLayered = false)
+                : base(name, bank ?? SampleControlPoint.DEFAULT_BANK, customSampleBank >= 2 ? customSampleBank.ToString() : null, volume, editorAutoBank)
             {
                 CustomSampleBank = customSampleBank;
                 BankSpecified = !string.IsNullOrEmpty(bank);
                 IsLayered = isLayered;
             }
 
-            public sealed override HitSampleInfo With(Optional<string> newName = default, Optional<string> newBank = default, Optional<string?> newSuffix = default, Optional<int> newVolume = default)
-                => With(newName, newBank, newVolume);
+            public sealed override HitSampleInfo With(Optional<string> newName = default, Optional<string> newBank = default, Optional<string?> newSuffix = default, Optional<int> newVolume = default,
+                                                      Optional<bool> newEditorAutoBank = default)
+                => With(newName, newBank, newVolume, newEditorAutoBank);
 
             public virtual LegacyHitSampleInfo With(Optional<string> newName = default, Optional<string> newBank = default, Optional<int> newVolume = default,
-                                                    Optional<int> newCustomSampleBank = default,
-                                                    Optional<bool> newIsLayered = default)
-                => new LegacyHitSampleInfo(newName.GetOr(Name), newBank.GetOr(Bank), newVolume.GetOr(Volume), newCustomSampleBank.GetOr(CustomSampleBank), newIsLayered.GetOr(IsLayered));
+                                                    Optional<bool> newEditorAutoBank = default, Optional<int> newCustomSampleBank = default, Optional<bool> newIsLayered = default)
+                => new LegacyHitSampleInfo(newName.GetOr(Name), newBank.GetOr(Bank), newVolume.GetOr(Volume), newEditorAutoBank.GetOr(EditorAutoBank), newCustomSampleBank.GetOr(CustomSampleBank),
+                    newIsLayered.GetOr(IsLayered));
 
             public bool Equals(LegacyHitSampleInfo? other)
                 // The additions to equality checks here are *required* to ensure that pooling works correctly.
@@ -605,8 +652,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
             };
 
             public sealed override LegacyHitSampleInfo With(Optional<string> newName = default, Optional<string> newBank = default, Optional<int> newVolume = default,
-                                                            Optional<int> newCustomSampleBank = default,
-                                                            Optional<bool> newIsLayered = default)
+                                                            Optional<bool> newEditorAutoBank = default, Optional<int> newCustomSampleBank = default, Optional<bool> newIsLayered = default)
                 => new FileHitSampleInfo(Filename, newVolume.GetOr(Volume));
 
             public bool Equals(FileHitSampleInfo? other)

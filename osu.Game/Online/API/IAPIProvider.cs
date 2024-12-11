@@ -22,17 +22,12 @@ namespace osu.Game.Online.API
         /// <summary>
         /// The user's friends.
         /// </summary>
-        IBindableList<APIUser> Friends { get; }
+        IBindableList<APIRelation> Friends { get; }
 
         /// <summary>
         /// The current user's activity.
         /// </summary>
         IBindable<UserActivity> Activity { get; }
-
-        /// <summary>
-        /// The current user's online statistics.
-        /// </summary>
-        IBindable<UserStatistics?> Statistics { get; }
 
         /// <summary>
         /// The language supplied by this provider to API requests.
@@ -130,9 +125,9 @@ namespace osu.Game.Online.API
         void Logout();
 
         /// <summary>
-        /// Sets Statistics bindable.
+        /// Update the friends status of the current user.
         /// </summary>
-        void UpdateStatistics(UserStatistics newStatistics);
+        void UpdateLocalFriends();
 
         /// <summary>
         /// Schedule a callback to run on the update thread.

@@ -29,7 +29,6 @@ using osu.Game.Input.Bindings;
 using osu.Game.Screens.Select.Carousel;
 using osuTK;
 using osuTK.Input;
-using Realms;
 
 namespace osu.Game.Screens.Select
 {
@@ -207,8 +206,6 @@ namespace osu.Game.Screens.Select
 
         private CarouselRoot root;
 
-        private IDisposable? subscriptionBeatmaps;
-
         private readonly DrawablePool<DrawableCarouselBeatmapSet> setPool = new DrawablePool<DrawableCarouselBeatmapSet>(100);
 
         private Sample? spinSample;
@@ -216,18 +213,12 @@ namespace osu.Game.Screens.Select
 
         private int visibleSetsCount;
 
-        public BeatmapCarousel(FilterCriteria initialCriterial)
+        public BeatmapCarousel(FilterCriteria initialCriteria)
         {
             root = new CarouselRoot(this);
             InternalChild = new Container
             {
                 RelativeSizeAxes = Axes.Both,
-                Padding = new MarginPadding
-                {
-                    // Avoid clash between scrollbar and osu! logo.
-                    Top = 10,
-                    Bottom = 100,
-                },
                 Children = new Drawable[]
                 {
                     setPool,
@@ -239,7 +230,7 @@ namespace osu.Game.Screens.Select
                 }
             };
 
-            activeCriteria = initialCriterial;
+            activeCriteria = initialCriteria;
         }
 
         [BackgroundDependencyLoader]
@@ -251,8 +242,7 @@ namespace osu.Game.Screens.Select
             config.BindWith(OsuSetting.RandomSelectAlgorithm, RandomAlgorithm);
             config.BindWith(OsuSetting.SongSelectRightMouseScroll, RightClickScrollingEnabled);
 
-            RightClickScrollingEnabled.ValueChanged += enabled => Scroll.RightMouseScrollbar = enabled.NewValue;
-            RightClickScrollingEnabled.TriggerChange();
+            RightClickScrollingEnabled.BindValueChanged(enabled => Scroll.RightMouseScrollbar = enabled.NewValue, true);
 
             if (detachedBeatmapStore != null && detachedBeatmapSets == null)
             {
@@ -263,13 +253,6 @@ namespace osu.Game.Screens.Select
                 detachedBeatmapSets.BindCollectionChanged(beatmapSetsChanged);
                 loadNewRoot();
             }
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            subscriptionBeatmaps = realm.RegisterForNotifications(r => r.All<BeatmapInfo>().Where(b => !b.Hidden), beatmapsChanged);
         }
 
         private readonly HashSet<BeatmapSetInfo> setsRequiringUpdate = new HashSet<BeatmapSetInfo>();
@@ -322,6 +305,11 @@ namespace osu.Game.Screens.Select
         {
             try
             {
+                // To handle the beatmap update flow, attempt to track selection changes across delete-insert transactions.
+                // When an update occurs, the previous beatmap set is either soft or hard deleted.
+                // Check if the current selection was potentially deleted by re-querying its validity.
+                bool selectedSetMarkedDeleted = SelectedBeatmapSet != null && fetchFromID(SelectedBeatmapSet.ID)?.DeletePending != false;
+
                 foreach (var set in setsRequiringRemoval) removeBeatmapSet(set.ID);
 
                 foreach (var set in setsRequiringUpdate) updateBeatmapSet(set);
@@ -330,11 +318,6 @@ namespace osu.Game.Screens.Select
                 {
                     // If SelectedBeatmapInfo is non-null, the set should also be non-null.
                     Debug.Assert(SelectedBeatmapSet != null);
-
-                    // To handle the beatmap update flow, attempt to track selection changes across delete-insert transactions.
-                    // When an update occurs, the previous beatmap set is either soft or hard deleted.
-                    // Check if the current selection was potentially deleted by re-querying its validity.
-                    bool selectedSetMarkedDeleted = fetchFromID(SelectedBeatmapSet.ID)?.DeletePending != false;
 
                     if (selectedSetMarkedDeleted && setsRequiringUpdate.Any())
                     {
@@ -371,35 +354,6 @@ namespace osu.Game.Screens.Select
             setsRequiringUpdate.Clear();
 
             BeatmapSetInfo? fetchFromID(Guid id) => realm.Realm.Find<BeatmapSetInfo>(id);
-        }
-
-        private void beatmapsChanged(IRealmCollection<BeatmapInfo> sender, ChangeSet? changes)
-        {
-            // we only care about actual changes in hidden status.
-            if (changes == null)
-                return;
-
-            bool changed = false;
-
-            foreach (int i in changes.InsertedIndices)
-            {
-                var beatmapInfo = sender[i];
-                var beatmapSet = beatmapInfo.BeatmapSet;
-
-                Debug.Assert(beatmapSet != null);
-
-                // Only require to action here if the beatmap is missing.
-                // This avoids processing these events unnecessarily when new beatmaps are imported, for example.
-                if (root.BeatmapSetsByID.TryGetValue(beatmapSet.ID, out var existingSets)
-                    && existingSets.SelectMany(s => s.Beatmaps).All(b => b.BeatmapInfo.ID != beatmapInfo.ID))
-                {
-                    updateBeatmapSet(beatmapSet.Detach());
-                    changed = true;
-                }
-            }
-
-            if (changed)
-                invalidateAfterChange();
         }
 
         public void RemoveBeatmapSet(BeatmapSetInfo beatmapSet) => Schedule(() =>
@@ -1116,11 +1070,6 @@ namespace osu.Game.Screens.Select
             // adjusting the item's overall X position can cause it to become masked away when
             // child items (difficulties) are still visible.
             item.Header.X = offsetX(dist, visibleHalfHeight) - (parent?.X ?? 0);
-
-            // We are applying a multiplicative alpha (which is internally done by nesting an
-            // additional container and setting that container's alpha) such that we can
-            // layer alpha transformations on top.
-            item.SetMultiplicativeAlpha(Math.Clamp(1.75f - 1.5f * dist, 0, 1));
         }
 
         private enum PendingScrollOperation
@@ -1271,13 +1220,38 @@ namespace osu.Game.Screens.Select
 
                 return base.OnDragStart(e);
             }
-        }
 
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
+            protected override ScrollbarContainer CreateScrollbar(Direction direction)
+            {
+                return new PaddedScrollbar();
+            }
 
-            subscriptionBeatmaps?.Dispose();
+            protected partial class PaddedScrollbar : OsuScrollbar
+            {
+                public PaddedScrollbar()
+                    : base(Direction.Vertical)
+                {
+                }
+            }
+
+            private const float top_padding = 10;
+            private const float bottom_padding = 70;
+
+            protected override float ToScrollbarPosition(float scrollPosition)
+            {
+                if (Precision.AlmostEquals(0, ScrollableExtent))
+                    return 0;
+
+                return top_padding + (ScrollbarMovementExtent - (top_padding + bottom_padding)) * (scrollPosition / ScrollableExtent);
+            }
+
+            protected override float FromScrollbarPosition(float scrollbarPosition)
+            {
+                if (Precision.AlmostEquals(0, ScrollbarMovementExtent))
+                    return 0;
+
+                return ScrollableExtent * ((scrollbarPosition - top_padding) / (ScrollbarMovementExtent - (top_padding + bottom_padding)));
+            }
         }
     }
 }

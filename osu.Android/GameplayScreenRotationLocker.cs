@@ -5,7 +5,6 @@ using Android.Content.PM;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Game;
 using osu.Game.Screens.Play;
 
 namespace osu.Android
@@ -28,7 +27,7 @@ namespace osu.Android
         {
             gameActivity.RunOnUiThread(() =>
             {
-                gameActivity.RequestedOrientation = userPlaying.NewValue != LocalUserPlayingState.NotPlaying ? ScreenOrientation.Locked : gameActivity.DefaultOrientation;
+                gameActivity.RequestedOrientation = userPlaying.NewValue == LocalUserPlayingState.Playing ? ScreenOrientation.Locked : gameActivity.DefaultOrientation;
             });
         }
     }
