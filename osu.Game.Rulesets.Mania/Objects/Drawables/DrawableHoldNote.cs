@@ -239,7 +239,12 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             // Position and resize the body to lie half-way under the head and the tail notes.
             // The rationale for this is account for heads/tails with corner radius.
             bodyPiece.Y = (Direction.Value == ScrollingDirection.Up ? 1 : -1) * Head.Height / 2;
-            bodyPiece.Height = DrawHeight - Head.Height / 2 + Tail.Height / 2;
+            bodyPiece.Height = DrawHeight - Head.Height / 2;
+
+            if (Tail.TailOrigin == HoldNoteTailOrigin.Inverted)
+                bodyPiece.Height -= Tail.Height / 2;
+            else
+                bodyPiece.Height += Tail.Height / 2;
 
             if (Time.Current >= HitObject.StartTime)
             {
