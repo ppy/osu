@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Overlays;
@@ -25,6 +26,8 @@ namespace osu.Game.Graphics.UserInterface
         private readonly Container nubContainer;
 
         private readonly HoverClickSounds hoverClickSounds;
+
+        private readonly Container mainContent;
 
         private Color4 accentColour;
 
@@ -60,12 +63,13 @@ namespace osu.Game.Graphics.UserInterface
             RangePadding = EXPANDED_SIZE / 2;
             Children = new Drawable[]
             {
-                new Container
+                mainContent = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
+                    Masking = true,
+                    CornerRadius = 5,
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
-                    Padding = new MarginPadding { Horizontal = 2 },
                     Child = new Container
                     {
                         RelativeSizeAxes = Axes.Both,
@@ -138,6 +142,26 @@ namespace osu.Game.Graphics.UserInterface
             }, true);
         }
 
+        protected override void OnFocus(FocusEvent e)
+        {
+            base.OnFocus(e);
+
+            mainContent.EdgeEffect = new EdgeEffectParameters
+            {
+                Type = EdgeEffectType.Glow,
+                Colour = AccentColour.Darken(1),
+                Hollow = true,
+                Radius = 2,
+            };
+        }
+
+        protected override void OnFocusLost(FocusLostEvent e)
+        {
+            base.OnFocusLost(e);
+
+            mainContent.EdgeEffect = default;
+        }
+
         protected override bool OnHover(HoverEvent e)
         {
             updateGlow();
@@ -167,8 +191,8 @@ namespace osu.Game.Graphics.UserInterface
         protected override void UpdateAfterChildren()
         {
             base.UpdateAfterChildren();
-            LeftBox.Scale = new Vector2(Math.Clamp(RangePadding + Nub.DrawPosition.X - Nub.DrawWidth / 2.15f, 0, Math.Max(0, DrawWidth)), 1);
-            RightBox.Scale = new Vector2(Math.Clamp(DrawWidth - Nub.DrawPosition.X - RangePadding - Nub.DrawWidth / 2.15f, 0, Math.Max(0, DrawWidth)), 1);
+            LeftBox.Scale = new Vector2(Math.Clamp(RangePadding + Nub.DrawPosition.X - Nub.DrawWidth / 2.3f, 0, Math.Max(0, DrawWidth)), 1);
+            RightBox.Scale = new Vector2(Math.Clamp(DrawWidth - Nub.DrawPosition.X - RangePadding - Nub.DrawWidth / 2.3f, 0, Math.Max(0, DrawWidth)), 1);
         }
 
         protected override void UpdateValue(float value)

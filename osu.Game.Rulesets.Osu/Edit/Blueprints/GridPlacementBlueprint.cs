@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Edit;
 using osuTK;
@@ -31,12 +32,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints
         public override void EndPlacement(bool commit)
         {
             if (!commit && PlacementActive != PlacementState.Finished)
-            {
-                gridToolboxGroup.StartPosition.Value = originalOrigin;
-                gridToolboxGroup.Spacing.Value = originalSpacing;
-                if (!gridToolboxGroup.GridLinesRotation.Disabled)
-                    gridToolboxGroup.GridLinesRotation.Value = originalRotation;
-            }
+                resetGridState();
 
             base.EndPlacement(commit);
 
@@ -103,6 +99,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints
 
         public override void UpdateTimeAndPosition(SnapResult result)
         {
+            if (State.Value == Visibility.Hidden)
+                return;
+
             var pos = ToLocalSpace(result.ScreenSpacePosition);
 
             if (PlacementActive != PlacementState.Active)
@@ -121,6 +120,20 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints
                     gridToolboxGroup.SetGridFromPoints(gridToolboxGroup.StartPosition.Value, pos);
                 }
             }
+        }
+
+        protected override void PopOut()
+        {
+            base.PopOut();
+            resetGridState();
+        }
+
+        private void resetGridState()
+        {
+            gridToolboxGroup.StartPosition.Value = originalOrigin;
+            gridToolboxGroup.Spacing.Value = originalSpacing;
+            if (!gridToolboxGroup.GridLinesRotation.Disabled)
+                gridToolboxGroup.GridLinesRotation.Value = originalRotation;
         }
     }
 }

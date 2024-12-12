@@ -178,6 +178,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         {
             base.OnDeselected();
 
+            if (placementControlPoint != null)
+                endControlPointPlacement();
+
             updateVisualDefinition();
             BodyPiece.RecyclePath();
         }
@@ -377,13 +380,16 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         protected override void OnMouseUp(MouseUpEvent e)
         {
             if (placementControlPoint != null)
-            {
-                if (IsDragged)
-                    ControlPointVisualiser?.DragEnded();
+                endControlPointPlacement();
+        }
 
-                placementControlPoint = null;
-                changeHandler?.EndChange();
-            }
+        private void endControlPointPlacement()
+        {
+            if (IsDragged)
+                ControlPointVisualiser?.DragEnded();
+
+            placementControlPoint = null;
+            changeHandler?.EndChange();
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)
@@ -545,6 +551,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             HitObject.Position += first;
         }
 
+        // duplicated in `JuiceStreamSelectionBlueprint.convertToStream()`
+        // consider extracting common helper when applying changes here
         private void convertToStream()
         {
             if (editorBeatmap == null || beatDivisor == null)

@@ -376,10 +376,18 @@ namespace osu.Game.Overlays
             {
                 Live<BeatmapSetInfo> result;
 
-                var possibleSets = getBeatmapSets().Where(s => !s.Value.Protected || allowProtectedTracks).ToArray();
+                var possibleSets = getBeatmapSets().Where(s => !s.Value.Protected || allowProtectedTracks).ToList();
 
-                if (possibleSets.Length == 0)
+                if (possibleSets.Count == 0)
                     return null;
+
+                // if there is only one possible set left, play it, even if it is the same as the current track.
+                // looping is preferable over playing nothing.
+                if (possibleSets.Count == 1)
+                    return possibleSets.Single();
+
+                // now that we actually know there is a choice, do not allow the current track to be played again.
+                possibleSets.RemoveAll(s => s.Value.Equals(current?.BeatmapSetInfo));
 
                 // condition below checks if the signs of `randomHistoryDirection` and `direction` are opposite and not zero.
                 // if that is the case, it means that the user had previously chosen next track `randomHistoryDirection` times and wants to go back,
@@ -410,20 +418,20 @@ namespace osu.Game.Overlays
                 switch (randomSelectAlgorithm.Value)
                 {
                     case RandomSelectAlgorithm.Random:
-                        result = possibleSets[RNG.Next(possibleSets.Length)];
+                        result = possibleSets[RNG.Next(possibleSets.Count)];
                         break;
 
                     case RandomSelectAlgorithm.RandomPermutation:
-                        var notYetPlayedSets = possibleSets.Except(previousRandomSets).ToArray();
+                        var notYetPlayedSets = possibleSets.Except(previousRandomSets).ToList();
 
-                        if (notYetPlayedSets.Length == 0)
+                        if (notYetPlayedSets.Count == 0)
                         {
                             notYetPlayedSets = possibleSets;
                             previousRandomSets.Clear();
                             randomHistoryDirection = 0;
                         }
 
-                        result = notYetPlayedSets[RNG.Next(notYetPlayedSets.Length)];
+                        result = notYetPlayedSets[RNG.Next(notYetPlayedSets.Count)];
                         break;
 
                     default:
