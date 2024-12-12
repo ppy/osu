@@ -35,7 +35,7 @@ namespace osu.Game.Screens.Play.HUD
             Current.BindTo(scoreProcessor.HighestCombo);
         }
 
-        protected override IHasText CreateText() => new TextComponent()
+        protected override IHasText CreateText() => new TextComponent
         {
             ShowLabel = { BindTarget = ShowLabel },
             Font = { BindTarget = Font },

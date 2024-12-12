@@ -49,7 +49,7 @@ namespace osu.Game.Screens.Play.HUD.ClicksPerSecond
             Current.Value = controller.Value;
         }
 
-        protected override IHasText CreateText() => new TextComponent()
+        protected override IHasText CreateText() => new TextComponent
         {
             ShowLabel = { BindTarget = ShowLabel },
             Font = { BindTarget = Font },

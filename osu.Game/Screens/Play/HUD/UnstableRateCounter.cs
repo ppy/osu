@@ -110,6 +110,7 @@ namespace osu.Game.Screens.Play.HUD
                 get => text.Text;
                 set => text.Text = value;
             }
+
             public Bindable<bool> ShowLabel { get; } = new BindableBool();
             public Bindable<Typeface> Font { get; } = new Bindable<Typeface>();
 

@@ -61,7 +61,7 @@ namespace osu.Game.Screens.Play.HUD
             return $@"{count:0}";
         }
 
-        protected override IHasText CreateText() => new TextComponent()
+        protected override IHasText CreateText() => new TextComponent
         {
             ShowLabel = { BindTarget = ShowLabel },
             Font = { BindTarget = Font },
@@ -74,6 +74,7 @@ namespace osu.Game.Screens.Play.HUD
                 get => text.Text;
                 set => text.Text = value;
             }
+
             public Bindable<bool> ShowLabel { get; } = new BindableBool();
             public Bindable<Typeface> Font { get; } = new Bindable<Typeface>();
 
