@@ -8,9 +8,10 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using osu.Framework.Extensions;
 using osu.Framework.Localisation;
-using osu.Game.Localisation;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Scoring;
 using osu.Game.Utils;
 
@@ -128,8 +129,10 @@ namespace osu.Game.Users
         public enum GameVariant
         {
             [EnumMember(Value = "4k")]
+            [LocalisableDescription(typeof(BeatmapsStrings), nameof(BeatmapsStrings.VariantMania4k))]
             FourKey,
             [EnumMember(Value = "7k")]
+            [LocalisableDescription(typeof(BeatmapsStrings), nameof(BeatmapsStrings.VariantMania7k))]
             SevenKey
         }
 
@@ -151,12 +154,7 @@ namespace osu.Game.Users
             [JsonConverter(typeof(StringEnumConverter))]
             public GameVariant? VariantType;
 
-            public LocalisableString VariantDisplay => VariantType switch
-            {
-                GameVariant.FourKey => CommonStrings.FourKey,
-                GameVariant.SevenKey => CommonStrings.SevenKey,
-                _ => string.Empty
-            };
+            public LocalisableString VariantDisplay => VariantType?.GetLocalisableDescription() ?? string.Empty;
         }
     }
 }
