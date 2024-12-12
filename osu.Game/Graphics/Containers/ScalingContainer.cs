@@ -118,14 +118,19 @@ namespace osu.Game.Graphics.Containers
 
             protected override void Update()
             {
-                // If the window size constitutes an aspect ratio smaller than the base size,
-                // then the DrawSizePreservingFillContainer starts descaling the game to ensure it always fits.
-                // We do not desire this behaviour when the window dimensions are small already (e.g. 852x393 on iPhone 16).
-                // The number 576 is picked arbitrarily here as a cutoff point which keeps the game scaled appropriately.
-                float minimumScalingHeight = Math.Min(576f, host.Window.Size.Width / base_aspect_ratio);
-                float windowSizeFactor = Math.Min(1f, host.Window.Size.Height / minimumScalingHeight);
-                // Easiest method to apply this compensation is by adjusting the TargetDrawSize.
-                TargetDrawSize = base_target_draw_size * windowSizeFactor;
+                if (host.Window != null)
+                {
+                    // If the window size constitutes an aspect ratio smaller than the base size,
+                    // then the DrawSizePreservingFillContainer starts descaling the game to ensure it always fits.
+                    // We do not desire this behaviour when the window dimensions are small already (e.g. 852x393 on iPhone 16).
+                    // The number 576 is picked arbitrarily here as a cutoff point which keeps the game scaled appropriately.
+                    float minimumScalingHeight = Math.Min(576f, host.Window.Size.Width / base_aspect_ratio);
+                    float windowSizeFactor = Math.Min(1f, host.Window.Size.Height / minimumScalingHeight);
+                    // Easiest method to apply this compensation is by adjusting the TargetDrawSize.
+                    TargetDrawSize = base_target_draw_size * windowSizeFactor;
+                }
+                else
+                    TargetDrawSize = base_target_draw_size;
 
                 Scale = new Vector2(CurrentScale);
                 Size = new Vector2(1 / CurrentScale);
