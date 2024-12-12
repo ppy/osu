@@ -86,6 +86,8 @@ namespace osu.Game.Tests.Visual
 
         protected virtual bool Autoplay => false;
 
+        protected virtual bool ShowSettingsOverlay => true;
+
         protected void LoadPlayer() => LoadPlayer(Array.Empty<Mod>());
 
         protected void LoadPlayer(Mod[] mods)
@@ -136,6 +138,6 @@ namespace osu.Game.Tests.Visual
 
         protected sealed override Ruleset CreateRuleset() => CreatePlayerRuleset();
 
-        protected virtual TestPlayer CreatePlayer(Ruleset ruleset) => new TestPlayer(false, false, AllowBackwardsSeeks);
+        protected virtual TestPlayer CreatePlayer(Ruleset ruleset) => new TestPlayer(false, false, AllowBackwardsSeeks, ShowSettingsOverlay);
     }
 }

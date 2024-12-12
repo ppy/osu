@@ -45,5 +45,10 @@ namespace osu.Game.Screens.Play
         /// Whether the gameplay leaderboard should always be shown (usually in a contracted state).
         /// </summary>
         public bool AlwaysShowLeaderboard { get; set; }
+
+        /// <summary>
+        /// Whether the right overlay containing settings should be shown or not.
+        /// </summary>
+        public bool ShowSettingsOverlay { get; set; }
     }
 }

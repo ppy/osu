@@ -37,6 +37,8 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         protected override bool Autoplay => true;
 
+        protected override bool ShowSettingsOverlay => false;
+
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
 

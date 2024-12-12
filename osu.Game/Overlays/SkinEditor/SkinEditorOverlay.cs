@@ -347,6 +347,7 @@ namespace osu.Game.Overlays.SkinEditor
                 {
                     ShowResults = false,
                     AutomaticallySkipIntro = true,
+                    ShowSettingsOverlay = false,
                 })
             {
             }

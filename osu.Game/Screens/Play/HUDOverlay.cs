@@ -84,6 +84,8 @@ namespace osu.Game.Screens.Play
 
         private readonly BindableBool replayLoaded = new BindableBool();
 
+        private readonly bool showSettingsOverlay;
+
         private static bool hasShownNotificationOnce;
 
         private readonly FillFlowContainer bottomRightElements;
@@ -113,12 +115,13 @@ namespace osu.Game.Screens.Play
         /// </summary>
         internal readonly Drawable PlayfieldSkinLayer;
 
-        public HUDOverlay([CanBeNull] DrawableRuleset drawableRuleset, IReadOnlyList<Mod> mods, bool alwaysShowLeaderboard = true)
+        public HUDOverlay([CanBeNull] DrawableRuleset drawableRuleset, IReadOnlyList<Mod> mods, bool alwaysShowLeaderboard = true, bool showSettingsOverlay = true)
         {
             Container rightSettings;
 
             this.drawableRuleset = drawableRuleset;
             this.mods = mods;
+            this.showSettingsOverlay = showSettingsOverlay;
 
             RelativeSizeAxes = Axes.Both;
 
@@ -189,6 +192,9 @@ namespace osu.Game.Screens.Play
 
             if (!alwaysShowLeaderboard)
                 hideTargets.Add(LeaderboardFlow);
+
+            if (!showSettingsOverlay)
+                hideTargets.Add(rightSettings);
         }
 
         [BackgroundDependencyLoader(true)]
@@ -348,7 +354,7 @@ namespace osu.Game.Screens.Play
                 return;
             }
 
-            if (configSettingsOverlay.Value && replayLoaded.Value)
+            if (configSettingsOverlay.Value && replayLoaded.Value && showSettingsOverlay)
                 PlayerSettingsOverlay.Show();
             else
                 PlayerSettingsOverlay.Hide();
