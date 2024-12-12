@@ -73,7 +73,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 : 0.9 + Math.Min(1.5, aimRelevantObjectCount / 375.0) +
                   (aimRelevantObjectCount > 562.5 ? Math.Log10(aimRelevantObjectCount / 562.5) : 0);
             aimRating *= Math.Cbrt(aimLengthBonus);
-            double aimNoSlidersLengthBonus = aimNoSlidersRelevantObjectCount < 25 ? 0.8 + aimNoSlidersRelevantObjectCount / 150.0 : 0.9 + aimNoSlidersRelevantObjectCount / 375.0;
+            double aimNoSlidersLengthBonus = aimNoSlidersRelevantObjectCount < 25
+                ? 0.8 + aimNoSlidersRelevantObjectCount / 150.0
+                : 0.9 + Math.Min(1.5, aimNoSlidersRelevantObjectCount / 375.0) +
+                  (aimNoSlidersRelevantObjectCount > 562.5 ? Math.Log10(aimNoSlidersRelevantObjectCount / 562.5) : 0);
             aimRatingNoSliders *= Math.Cbrt(aimNoSlidersLengthBonus);
 
             double speedLengthBonus = 0.9 + 0.5 * Math.Min(1.0, speedRelevantObjectCount / 500.0) +
