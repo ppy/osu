@@ -63,11 +63,16 @@ namespace osu.Game.Rulesets.Edit
 
         protected override bool OnMouseDown(MouseDownEvent e) => true;
 
-        protected override void OnMouseUp(MouseUpEvent e)
+        protected override bool OnClick(ClickEvent e)
         {
-            base.OnMouseUp(e);
+            if (!ReceivePositionalInputAt(e.ScreenSpaceMousePosition)) return false;
 
-            Expanded.Value = FillFlow.ScreenSpaceDrawQuad.Contains(e.ScreenSpaceMousePosition);
+            base.OnClick(e);
+
+            if (contractSidebars.Value)
+                Expanded.Value = !Expanded.Value;
+
+            return true;
         }
     }
 }
