@@ -10,14 +10,14 @@ namespace osu.Game.Localisation.HUD
         private const string prefix = @"osu.Game.Resources.Localisation.HUD.SongProgress";
 
         /// <summary>
-        /// "Show difficulty graph"
+        /// "Difficulty graph type"
         /// </summary>
-        public static LocalisableString ShowGraph => new TranslatableString(getKey(@"show_graph"), "Show difficulty graph");
+        public static LocalisableString GraphType => new TranslatableString(getKey(@"graph_type"), "Difficulty graph type");
 
         /// <summary>
-        /// "Whether a graph displaying difficulty throughout the beatmap should be shown"
+        /// "Type of a graph displaying difficulty throughout the beatmap"
         /// </summary>
-        public static LocalisableString ShowGraphDescription => new TranslatableString(getKey(@"show_graph_description"), "Whether a graph displaying difficulty throughout the beatmap should be shown");
+        public static LocalisableString GraphTypeDescription => new TranslatableString(getKey(@"graph_type_description"), "Type of a graph displaying difficulty throughout the beatmap");
 
         /// <summary>
         /// "Show time"
