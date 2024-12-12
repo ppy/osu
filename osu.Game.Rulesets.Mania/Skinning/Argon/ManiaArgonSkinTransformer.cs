@@ -164,7 +164,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
 
                         case 1: return colour_cyan;
 
-                        default: throw new ArgumentOutOfRangeException();
+                        default: throw new ArgumentOutOfRangeException(nameof(columnIndex));
                     }
 
                 case 3:
@@ -176,7 +176,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
 
                         case 2: return colour_cyan;
 
-                        default: throw new ArgumentOutOfRangeException();
+                        default: throw new ArgumentOutOfRangeException(nameof(columnIndex));
                     }
 
                 case 4:
@@ -190,7 +190,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
 
                         case 3: return colour_purple;
 
-                        default: throw new ArgumentOutOfRangeException();
+                        default: throw new ArgumentOutOfRangeException(nameof(columnIndex));
                     }
 
                 case 5:
@@ -206,7 +206,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
 
                         case 4: return colour_cyan;
 
-                        default: throw new ArgumentOutOfRangeException();
+                        default: throw new ArgumentOutOfRangeException(nameof(columnIndex));
                     }
 
                 case 6:
@@ -224,7 +224,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
 
                         case 5: return colour_pink;
 
-                        default: throw new ArgumentOutOfRangeException();
+                        default: throw new ArgumentOutOfRangeException(nameof(columnIndex));
                     }
 
                 case 7:
@@ -244,7 +244,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
 
                         case 6: return colour_pink;
 
-                        default: throw new ArgumentOutOfRangeException();
+                        default: throw new ArgumentOutOfRangeException(nameof(columnIndex));
                     }
 
                 case 8:
@@ -266,7 +266,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
 
                         case 7: return colour_purple;
 
-                        default: throw new ArgumentOutOfRangeException();
+                        default: throw new ArgumentOutOfRangeException(nameof(columnIndex));
                     }
 
                 case 9:
@@ -290,7 +290,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
 
                         case 8: return colour_purple;
 
-                        default: throw new ArgumentOutOfRangeException();
+                        default: throw new ArgumentOutOfRangeException(nameof(columnIndex));
                     }
 
                 case 10:
@@ -316,7 +316,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
 
                         case 9: return colour_purple;
 
-                        default: throw new ArgumentOutOfRangeException();
+                        default: throw new ArgumentOutOfRangeException(nameof(columnIndex));
                     }
             }
 
@@ -339,7 +339,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
 
                 case 5: return colour_green;
 
-                default: throw new ArgumentOutOfRangeException();
+                default: throw new ArgumentOutOfRangeException(nameof(columnIndex));
             }
         }
     }

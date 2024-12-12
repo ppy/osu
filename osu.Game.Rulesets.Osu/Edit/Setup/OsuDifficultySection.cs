@@ -119,7 +119,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Setup
                 {
                     Caption = "Stack Leniency",
                     HintText = "In play mode, osu! automatically stacks notes which occur at the same location. Increasing this value means it is more likely to snap notes of further time-distance.",
-                    Current = new BindableFloat(Beatmap.BeatmapInfo.StackLeniency)
+                    Current = new BindableFloat(Beatmap.StackLeniency)
                     {
                         Default = 0.7f,
                         MinValue = 0,
@@ -148,7 +148,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Setup
             Beatmap.Difficulty.OverallDifficulty = overallDifficultySlider.Current.Value;
             Beatmap.Difficulty.SliderMultiplier = baseVelocitySlider.Current.Value;
             Beatmap.Difficulty.SliderTickRate = tickRateSlider.Current.Value;
-            Beatmap.BeatmapInfo.StackLeniency = stackLeniency.Current.Value;
+            Beatmap.StackLeniency = stackLeniency.Current.Value;
 
             Beatmap.UpdateAllHitObjects();
             Beatmap.SaveState();

@@ -29,18 +29,28 @@ namespace osu.Game.Screens.OnlinePlay.Components
             base.LoadComplete();
 
             room.PropertyChanged += onRoomPropertyChanged;
+
+            // Timed update required to track rooms which have hit the end time, see `HasEnded`.
+            Scheduler.AddDelayed(updateRoomStatus, 1000, true);
             updateRoomStatus();
         }
 
         private void onRoomPropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(Room.Status))
-                updateRoomStatus();
+            switch (e.PropertyName)
+            {
+                case nameof(Room.Category):
+                case nameof(Room.Status):
+                case nameof(Room.EndDate):
+                case nameof(Room.HasPassword):
+                    updateRoomStatus();
+                    break;
+            }
         }
 
         private void updateRoomStatus()
         {
-            this.FadeColour(colours.ForRoomCategory(room.Category) ?? room.Status.GetAppropriateColour(colours), transitionDuration);
+            this.FadeColour(colours.ForRoomCategory(room.Category) ?? colours.ForRoomStatus(room), transitionDuration);
         }
 
         protected override void Dispose(bool isDisposing)

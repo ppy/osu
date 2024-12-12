@@ -14,7 +14,6 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
-using osu.Game.Online.Rooms.RoomStatuses;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.OnlinePlay.Lounge;
@@ -76,7 +75,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         createLoungeRoom(new Room
                         {
                             Name = "Multiplayer room",
-                            Status = new RoomStatusOpen(),
                             EndDate = DateTimeOffset.Now.AddDays(1),
                             Type = MatchType.HeadToHead,
                             Playlist = [item1],
@@ -85,7 +83,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         createLoungeRoom(new Room
                         {
                             Name = "Private room",
-                            Status = new RoomStatusOpenPrivate(),
                             Password = "*",
                             EndDate = DateTimeOffset.Now.AddDays(1),
                             Type = MatchType.HeadToHead,
@@ -95,36 +92,38 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         createLoungeRoom(new Room
                         {
                             Name = "Playlist room with multiple beatmaps",
-                            Status = new RoomStatusPlaying(),
+                            Status = RoomStatus.Playing,
                             EndDate = DateTimeOffset.Now.AddDays(1),
                             Playlist = [item1, item2],
                             CurrentPlaylistItem = item1
                         }),
                         createLoungeRoom(new Room
                         {
-                            Name = "Finished room",
-                            Status = new RoomStatusEnded(),
+                            Name = "Closing soon",
+                            EndDate = DateTimeOffset.Now.AddSeconds(5),
+                        }),
+                        createLoungeRoom(new Room
+                        {
+                            Name = "Closed room",
                             EndDate = DateTimeOffset.Now,
                         }),
                         createLoungeRoom(new Room
                         {
                             Name = "Spotlight room",
-                            Status = new RoomStatusOpen(),
                             Category = RoomCategory.Spotlight,
                         }),
                         createLoungeRoom(new Room
                         {
                             Name = "Featured artist room",
-                            Status = new RoomStatusOpen(),
                             Category = RoomCategory.FeaturedArtist,
                         }),
                     }
                 };
             });
 
-            AddUntilStep("wait for panel load", () => rooms.Count == 6);
+            AddUntilStep("wait for panel load", () => rooms.Count == 7);
             AddUntilStep("correct status text", () => rooms.ChildrenOfType<OsuSpriteText>().Count(s => s.Text.ToString().StartsWith("Currently playing", StringComparison.Ordinal)) == 2);
-            AddUntilStep("correct status text", () => rooms.ChildrenOfType<OsuSpriteText>().Count(s => s.Text.ToString().StartsWith("Ready to play", StringComparison.Ordinal)) == 4);
+            AddUntilStep("correct status text", () => rooms.ChildrenOfType<OsuSpriteText>().Count(s => s.Text.ToString().StartsWith("Ready to play", StringComparison.Ordinal)) == 5);
         }
 
         [Test]
@@ -136,7 +135,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("create room", () => Child = drawableRoom = createLoungeRoom(room = new Room
             {
                 Name = "Room with password",
-                Status = new RoomStatusOpen(),
                 Type = MatchType.HeadToHead,
             }));
 

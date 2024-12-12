@@ -62,7 +62,12 @@ namespace osu.Game.Beatmaps
         #region Resource getters
 
         protected virtual Waveform GetWaveform() => new Waveform(null);
-        protected virtual Storyboard GetStoryboard() => new Storyboard { BeatmapInfo = BeatmapInfo };
+
+        protected virtual Storyboard GetStoryboard() => new Storyboard
+        {
+            BeatmapInfo = BeatmapInfo,
+            Beatmap = Beatmap,
+        };
 
         protected abstract IBeatmap GetBeatmap();
         public abstract Texture GetBackground();

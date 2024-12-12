@@ -1,12 +1,14 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Storyboards.Drawables;
+using osu.Game.Utils;
 
 namespace osu.Game.Storyboards
 {
@@ -16,6 +18,7 @@ namespace osu.Game.Storyboards
         public IEnumerable<StoryboardLayer> Layers => layers.Values;
 
         public BeatmapInfo BeatmapInfo = new BeatmapInfo();
+        public IBeatmap Beatmap { get; set; } = new Beatmap();
 
         /// <summary>
         /// Whether the storyboard should prefer textures from the current skin before using local storyboard textures.
@@ -89,14 +92,12 @@ namespace osu.Game.Storyboards
                 // Importantly, do this after the NullOrEmpty because EF may have stored the non-nullable value as null to the database, bypassing compile-time constraints.
                 backgroundPath = backgroundPath.ToLowerInvariant();
 
-                return GetLayer("Background").Elements.Any(e => e.Path.ToLowerInvariant() == backgroundPath);
+                return GetLayer("Background").Elements.Any(e => string.Equals(e.Path, backgroundPath, StringComparison.OrdinalIgnoreCase));
             }
         }
 
         public virtual DrawableStoryboard CreateDrawable(IReadOnlyList<Mod>? mods = null) =>
             new DrawableStoryboard(this, mods);
-
-        private static readonly string[] image_extensions = { @".png", @".jpg" };
 
         public virtual string? GetStoragePathFromStoryboardPath(string path)
         {
@@ -109,7 +110,7 @@ namespace osu.Game.Storyboards
             else
             {
                 // Some old storyboards don't include a file extension, so let's best guess at one.
-                foreach (string ext in image_extensions)
+                foreach (string ext in SupportedExtensions.IMAGE_EXTENSIONS)
                 {
                     if ((resolvedPath = BeatmapInfo.BeatmapSet?.GetPathForFile($"{path}{ext}")) != null)
                         break;

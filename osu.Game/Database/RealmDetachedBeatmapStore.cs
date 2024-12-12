@@ -8,14 +8,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Online.Multiplayer;
 using Realms;
 
 namespace osu.Game.Database
 {
-    public partial class DetachedBeatmapStore : Component
+    public partial class RealmDetachedBeatmapStore : BeatmapStore
     {
         private readonly ManualResetEventSlim loaded = new ManualResetEventSlim();
 
@@ -28,7 +27,7 @@ namespace osu.Game.Database
         [Resolved]
         private RealmAccess realm { get; set; } = null!;
 
-        public IBindableList<BeatmapSetInfo> GetDetachedBeatmaps(CancellationToken? cancellationToken)
+        public override IBindableList<BeatmapSetInfo> GetBeatmapSets(CancellationToken? cancellationToken)
         {
             loaded.Wait(cancellationToken ?? CancellationToken.None);
             return detachedBeatmapSets.GetBoundCopy();

@@ -115,7 +115,7 @@ jobs:
     steps:
       - name: Check permissions
         run: |
-          ALLOWED_USERS=(smoogipoo peppy bdach frenzibyte)
+          ALLOWED_USERS=(smoogipoo peppy bdach frenzibyte tsunyoku stanriders)
           for i in "${ALLOWED_USERS[@]}"; do
               if [[ "${{ github.actor }}" == "$i" ]]; then
                   exit 0
