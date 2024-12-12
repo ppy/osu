@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         private const double acute_angle_multiplier = 2.35;
         private const double slider_multiplier = 1.35;
         private const double velocity_change_multiplier = 0.75;
-        private const double wiggle_multiplier = 1.035;
+        private const double wiggle_multiplier = 1.02;
 
         /// <summary>
         /// Evaluates the difficulty of aiming the current object, based on:
@@ -97,10 +97,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     // https://www.desmos.com/calculator/iis7lgbppe
                     wiggleBonus = angleBonus
                                   * DifficultyCalculationUtils.Smootherstep(osuCurrObj.LazyJumpDistance, radius, diameter)
-                                  * Math.Pow(DifficultyCalculationUtils.ReverseLerp(osuCurrObj.LazyJumpDistance, diameter * 2.5, diameter), 1.5)
+                                  * Math.Pow(DifficultyCalculationUtils.ReverseLerp(osuCurrObj.LazyJumpDistance, diameter * 3, diameter), 1.8)
                                   * DifficultyCalculationUtils.Smootherstep(currAngle, double.DegreesToRadians(110), double.DegreesToRadians(60))
                                   * DifficultyCalculationUtils.Smootherstep(osuLastObj.LazyJumpDistance, radius, diameter)
-                                  * Math.Pow(DifficultyCalculationUtils.ReverseLerp(osuLastObj.LazyJumpDistance, diameter * 2.5, diameter), 1.5)
+                                  * Math.Pow(DifficultyCalculationUtils.ReverseLerp(osuLastObj.LazyJumpDistance, diameter * 3, diameter), 1.8)
                                   * DifficultyCalculationUtils.Smootherstep(lastAngle, double.DegreesToRadians(110), double.DegreesToRadians(60));
                 }
             }
