@@ -144,6 +144,13 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                     foreach (var nested in hitObject.NestedHitObjects)
                         simulateHit(nested, ref attributes);
                     return;
+
+                case StrongNestedHitObject:
+                    // we never need to deal with these directly.
+                    // the only thing strong hits do in terms of scoring is double their object's score increase,
+                    // which is already handled at the parent object level via the `strongable.IsStrong` check lower down in this method.
+                    // not handling these here can lead to them falsely being counted as combo-increasing when handling strong drum rolls!
+                    return;
             }
 
             if (hitObject is DrumRollTick tick)
