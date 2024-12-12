@@ -61,7 +61,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             yield return showInProgress = new OsuCheckbox
             {
-                LabelText = "Show playing rooms",
+                LabelText = "Show in-progress rooms",
                 RelativeSizeAxes = Axes.None,
                 Width = 200,
                 Padding = new MarginPadding { Vertical = 5, },
