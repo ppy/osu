@@ -69,8 +69,10 @@ namespace osu.Game.Rulesets.Edit
 
             base.OnClick(e);
 
-            if (contractSidebars.Value)
-                Expanded.Value = !Expanded.Value;
+            if (contractSidebars.Value && !Expanded.Value)
+            {
+                Expanded.Value = true;
+            }
 
             return true;
         }
