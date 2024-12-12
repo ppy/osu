@@ -18,7 +18,6 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer.Countdown;
 using osu.Game.Online.Rooms;
-using osu.Game.Online.Rooms.RoomStatuses;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
@@ -395,15 +394,17 @@ namespace osu.Game.Online.Multiplayer
                 switch (state)
                 {
                     case MultiplayerRoomState.Open:
-                        APIRoom.Status = APIRoom.HasPassword ? new RoomStatusOpenPrivate() : new RoomStatusOpen();
+                        APIRoom.Status = RoomStatus.Idle;
                         break;
 
+                    case MultiplayerRoomState.WaitingForLoad:
                     case MultiplayerRoomState.Playing:
-                        APIRoom.Status = new RoomStatusPlaying();
+                        APIRoom.Status = RoomStatus.Playing;
                         break;
 
                     case MultiplayerRoomState.Closed:
-                        APIRoom.Status = new RoomStatusEnded();
+                        APIRoom.EndDate = DateTimeOffset.Now;
+                        APIRoom.Status = RoomStatus.Idle;
                         break;
                 }
 
@@ -821,7 +822,6 @@ namespace osu.Game.Online.Multiplayer
             Room.Settings = settings;
             APIRoom.Name = Room.Settings.Name;
             APIRoom.Password = Room.Settings.Password;
-            APIRoom.Status = string.IsNullOrEmpty(Room.Settings.Password) ? new RoomStatusOpen() : new RoomStatusOpenPrivate();
             APIRoom.Type = Room.Settings.MatchType;
             APIRoom.QueueMode = Room.Settings.QueueMode;
             APIRoom.AutoStartDuration = Room.Settings.AutoStartDuration;

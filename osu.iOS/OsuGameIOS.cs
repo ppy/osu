@@ -5,6 +5,8 @@ using System;
 using Foundation;
 using Microsoft.Maui.Devices;
 using osu.Framework.Graphics;
+using osu.Framework.iOS;
+using osu.Framework.Platform;
 using osu.Game;
 using osu.Game.Updater;
 using osu.Game.Utils;
@@ -18,6 +20,8 @@ namespace osu.iOS
         protected override UpdateManager CreateUpdateManager() => new MobileUpdateNotifier();
 
         protected override BatteryInfo CreateBatteryInfo() => new IOSBatteryInfo();
+
+        protected override Storage CreateStorage(GameHost host, Storage defaultStorage) => new OsuStorageIOS((IOSGameHost)host, defaultStorage);
 
         protected override Edges SafeAreaOverrideEdges =>
             // iOS shows a home indicator at the bottom, and adds a safe area to account for this.

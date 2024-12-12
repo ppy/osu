@@ -6,12 +6,10 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using osu.Game.IO.Serialization.Converters;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
-using osu.Game.Online.Rooms.RoomStatuses;
 
 namespace osu.Game.Online.Rooms
 {
@@ -248,7 +246,7 @@ namespace osu.Game.Online.Rooms
         }
 
         /// <summary>
-        /// The current room status.
+        /// The current status of the room.
         /// </summary>
         public RoomStatus Status
         {
@@ -263,18 +261,6 @@ namespace osu.Game.Online.Rooms
         {
             get => availability;
             set => SetField(ref availability, value);
-        }
-
-        [OnDeserialized]
-        private void onDeserialised(StreamingContext context)
-        {
-            // API doesn't populate status so let's do it here.
-            if (EndDate != null && DateTimeOffset.Now >= EndDate)
-                Status = new RoomStatusEnded();
-            else if (HasPassword)
-                Status = new RoomStatusOpenPrivate();
-            else
-                Status = new RoomStatusOpen();
         }
 
         [JsonProperty("id")]
@@ -349,8 +335,9 @@ namespace osu.Game.Online.Rooms
         [JsonProperty("channel_id")]
         private int channelId;
 
-        // Not serialised (see: GetRoomsRequest).
-        private RoomStatus status = new RoomStatusOpen();
+        [JsonProperty("status")]
+        [JsonConverter(typeof(SnakeCaseStringEnumConverter))]
+        private RoomStatus status;
 
         // Not yet serialised (not implemented).
         private RoomAvailability availability;
@@ -387,6 +374,15 @@ namespace osu.Game.Online.Rooms
             Playlist = other.Playlist;
             RecentParticipants = other.RecentParticipants;
         }
+
+        /// <summary>
+        /// Whether the room is no longer available.
+        /// </summary>
+        /// <remarks>
+        /// This property does not update in real-time and needs to be queried periodically.
+        /// Subscribe to <see cref="EndDate"/> to be notified of any immediate changes.
+        /// </remarks>
+        public bool HasEnded => DateTimeOffset.Now >= EndDate;
 
         [JsonObject(MemberSerialization.OptIn)]
         public class RoomPlaylistItemStats
