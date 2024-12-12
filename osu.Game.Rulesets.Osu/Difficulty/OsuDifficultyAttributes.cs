@@ -52,14 +52,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         [JsonProperty("speed_difficult_strain_count")]
         public double SpeedDifficultStrainCount { get; set; }
 
-        // DEV ATTRIBUTE - DO NOT STORE
-        [JsonProperty("aim_relevant_object_count")]
-        public double AimRelevantObjectCount { get; set; }
-
-        // DEV ATTRIBUTE - DO NOTE STORE
-        [JsonProperty("speed_relevant_object_count")]
-        public double SpeedRelevantObjectCount { get; set; }
-
         /// <summary>
         /// The perceived approach rate inclusive of rate-adjusting mods (DT/HT/etc).
         /// </summary>
