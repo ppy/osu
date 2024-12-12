@@ -65,7 +65,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 RelativeSizeAxes = Axes.None,
                 Width = 200,
                 Padding = new MarginPadding { Vertical = 5, },
-                Current = { Value = true }
+                Current = Config.GetBindable<bool>(OsuSetting.MultiplayerShowInProgressFilter),
             };
 
             showInProgress.Current.BindValueChanged(_ => UpdateFilter());
