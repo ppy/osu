@@ -118,6 +118,14 @@ namespace osu.Game.Screens.Edit
                 playableBeatmap.Breaks.AddRange(Breaks);
             });
 
+            Bookmarks = new BindableList<int>(playableBeatmap.Bookmarks);
+            Bookmarks.BindCollectionChanged((_, _) =>
+            {
+                BeginChange();
+                playableBeatmap.Bookmarks = Bookmarks.OrderBy(x => x).Distinct().ToArray();
+                EndChange();
+            });
+
             PreviewTime = new BindableInt(BeatmapInfo.Metadata.PreviewTime);
             PreviewTime.BindValueChanged(s =>
             {
@@ -197,6 +205,86 @@ namespace osu.Game.Screens.Edit
         public IEnumerable<BeatmapStatistic> GetStatistics() => PlayableBeatmap.GetStatistics();
 
         public double GetMostCommonBeatLength() => PlayableBeatmap.GetMostCommonBeatLength();
+
+        public double AudioLeadIn
+        {
+            get => PlayableBeatmap.AudioLeadIn;
+            set => PlayableBeatmap.AudioLeadIn = value;
+        }
+
+        public float StackLeniency
+        {
+            get => PlayableBeatmap.StackLeniency;
+            set => PlayableBeatmap.StackLeniency = value;
+        }
+
+        public bool SpecialStyle
+        {
+            get => PlayableBeatmap.SpecialStyle;
+            set => PlayableBeatmap.SpecialStyle = value;
+        }
+
+        public bool LetterboxInBreaks
+        {
+            get => PlayableBeatmap.LetterboxInBreaks;
+            set => PlayableBeatmap.LetterboxInBreaks = value;
+        }
+
+        public bool WidescreenStoryboard
+        {
+            get => PlayableBeatmap.WidescreenStoryboard;
+            set => PlayableBeatmap.WidescreenStoryboard = value;
+        }
+
+        public bool EpilepsyWarning
+        {
+            get => PlayableBeatmap.EpilepsyWarning;
+            set => PlayableBeatmap.EpilepsyWarning = value;
+        }
+
+        public bool SamplesMatchPlaybackRate
+        {
+            get => PlayableBeatmap.SamplesMatchPlaybackRate;
+            set => PlayableBeatmap.SamplesMatchPlaybackRate = value;
+        }
+
+        public double DistanceSpacing
+        {
+            get => PlayableBeatmap.DistanceSpacing;
+            set => PlayableBeatmap.DistanceSpacing = value;
+        }
+
+        public int GridSize
+        {
+            get => PlayableBeatmap.GridSize;
+            set => PlayableBeatmap.GridSize = value;
+        }
+
+        public double TimelineZoom
+        {
+            get => PlayableBeatmap.TimelineZoom;
+            set => PlayableBeatmap.TimelineZoom = value;
+        }
+
+        public CountdownType Countdown
+        {
+            get => PlayableBeatmap.Countdown;
+            set => PlayableBeatmap.Countdown = value;
+        }
+
+        public int CountdownOffset
+        {
+            get => PlayableBeatmap.CountdownOffset;
+            set => PlayableBeatmap.CountdownOffset = value;
+        }
+
+        public readonly BindableList<int> Bookmarks;
+
+        int[] IBeatmap.Bookmarks
+        {
+            get => PlayableBeatmap.Bookmarks;
+            set => PlayableBeatmap.Bookmarks = value;
+        }
 
         public IBeatmap Clone() => (EditorBeatmap)MemberwiseClone();
 

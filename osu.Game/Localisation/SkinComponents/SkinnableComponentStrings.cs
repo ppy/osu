@@ -79,6 +79,11 @@ namespace osu.Game.Localisation.SkinComponents
         /// </summary>
         public static LocalisableString TextColourDescription => new TranslatableString(getKey(@"text_colour_description"), @"The colour of the text.");
 
+        /// <summary>
+        /// "Use relative size"
+        /// </summary>
+        public static LocalisableString UseRelativeSize => new TranslatableString(getKey(@"use_relative_size"), @"Use relative size");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

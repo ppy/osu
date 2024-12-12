@@ -20,6 +20,11 @@ namespace osu.Game.Localisation
         public static LocalisableString BeatmapVideos => new TranslatableString(getKey(@"beatmap_videos"), @"Are you sure you want to delete all beatmaps videos? This cannot be undone!");
 
         /// <summary>
+        /// "Are you sure you want to reset all local beatmap offsets? This cannot be undone!"
+        /// </summary>
+        public static LocalisableString Offsets => new TranslatableString(getKey(@"offsets"), @"Are you sure you want to reset all local beatmap offsets? This cannot be undone!");
+
+        /// <summary>
         /// "Are you sure you want to delete all skins? This cannot be undone!"
         /// </summary>
         public static LocalisableString Skins => new TranslatableString(getKey(@"skins"), @"Are you sure you want to delete all skins? This cannot be undone!");

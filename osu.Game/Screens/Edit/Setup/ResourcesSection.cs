@@ -1,22 +1,25 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.IO;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
-using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Overlays;
 using osu.Game.Localisation;
+using osu.Game.Models;
+using osu.Game.Utils;
 
 namespace osu.Game.Screens.Edit.Setup
 {
     public partial class ResourcesSection : SetupSection
     {
-        private FormFileSelector audioTrackChooser = null!;
-        private FormFileSelector backgroundChooser = null!;
+        private FormBeatmapFileSelector audioTrackChooser = null!;
+        private FormBeatmapFileSelector backgroundChooser = null!;
 
         public override LocalisableString Title => EditorSetupStrings.ResourcesHeader;
 
@@ -28,9 +31,6 @@ namespace osu.Game.Screens.Edit.Setup
 
         [Resolved]
         private IBindable<WorkingBeatmap> working { get; set; } = null!;
-
-        [Resolved]
-        private EditorBeatmap editorBeatmap { get; set; } = null!;
 
         [Resolved]
         private Editor? editor { get; set; }
@@ -46,14 +46,16 @@ namespace osu.Game.Screens.Edit.Setup
                 Height = 110,
             };
 
+            bool beatmapHasMultipleDifficulties = working.Value.BeatmapSetInfo.Beatmaps.Count > 1;
+
             Children = new Drawable[]
             {
-                backgroundChooser = new FormFileSelector(".jpg", ".jpeg", ".png")
+                backgroundChooser = new FormBeatmapFileSelector(beatmapHasMultipleDifficulties, SupportedExtensions.IMAGE_EXTENSIONS)
                 {
                     Caption = GameplaySettingsStrings.BackgroundHeader,
                     PlaceholderText = EditorSetupStrings.ClickToSelectBackground,
                 },
-                audioTrackChooser = new FormFileSelector(".mp3", ".ogg")
+                audioTrackChooser = new FormBeatmapFileSelector(beatmapHasMultipleDifficulties, SupportedExtensions.AUDIO_EXTENSIONS)
                 {
                     Caption = EditorSetupStrings.AudioTrack,
                     PlaceholderText = EditorSetupStrings.ClickToSelectTrack,
@@ -72,75 +74,110 @@ namespace osu.Game.Screens.Edit.Setup
             audioTrackChooser.Current.BindValueChanged(audioTrackChanged);
         }
 
-        public bool ChangeBackgroundImage(FileInfo source)
+        public bool ChangeBackgroundImage(FileInfo source, bool applyToAllDifficulties)
         {
             if (!source.Exists)
                 return false;
 
-            var set = working.Value.BeatmapSetInfo;
+            changeResource(source, applyToAllDifficulties, @"bg",
+                metadata => metadata.BackgroundFile,
+                (metadata, name) => metadata.BackgroundFile = name);
 
-            var destination = new FileInfo($@"bg{source.Extension}");
-
-            // remove the previous background for now.
-            // in the future we probably want to check if this is being used elsewhere (other difficulties?)
-            var oldFile = set.GetFile(working.Value.Metadata.BackgroundFile);
-
-            using (var stream = source.OpenRead())
-            {
-                if (oldFile != null)
-                    beatmaps.DeleteFile(set, oldFile);
-
-                beatmaps.AddFile(set, stream, destination.Name);
-            }
-
-            editorBeatmap.SaveState();
-
-            working.Value.Metadata.BackgroundFile = destination.Name;
             headerBackground.UpdateBackground();
-
             editor?.ApplyToBackground(bg => bg.RefreshBackground());
-
             return true;
         }
 
-        public bool ChangeAudioTrack(FileInfo source)
+        public bool ChangeAudioTrack(FileInfo source, bool applyToAllDifficulties)
         {
             if (!source.Exists)
                 return false;
 
+            changeResource(source, applyToAllDifficulties, @"audio",
+                metadata => metadata.AudioFile,
+                (metadata, name) => metadata.AudioFile = name);
+
+            music.ReloadCurrentTrack();
+            return true;
+        }
+
+        private void changeResource(FileInfo source, bool applyToAllDifficulties, string baseFilename, Func<BeatmapMetadata, string> readFilename, Action<BeatmapMetadata, string> writeFilename)
+        {
             var set = working.Value.BeatmapSetInfo;
+            var beatmap = working.Value.BeatmapInfo;
 
-            var destination = new FileInfo($@"audio{source.Extension}");
+            var otherBeatmaps = set.Beatmaps.Where(b => !b.Equals(beatmap));
 
-            // remove the previous audio track for now.
-            // in the future we probably want to check if this is being used elsewhere (other difficulties?)
-            var oldFile = set.GetFile(working.Value.Metadata.AudioFile);
-
-            using (var stream = source.OpenRead())
+            // First, clean up files which will no longer be used.
+            if (applyToAllDifficulties)
             {
-                if (oldFile != null)
-                    beatmaps.DeleteFile(set, oldFile);
+                foreach (var b in set.Beatmaps)
+                {
+                    if (set.GetFile(readFilename(b.Metadata)) is RealmNamedFileUsage otherExistingFile)
+                        beatmaps.DeleteFile(set, otherExistingFile);
+                }
+            }
+            else
+            {
+                RealmNamedFileUsage? oldFile = set.GetFile(readFilename(working.Value.Metadata));
 
-                beatmaps.AddFile(set, stream, destination.Name);
+                if (oldFile != null)
+                {
+                    bool oldFileUsedInOtherDiff = otherBeatmaps
+                        .Any(b => readFilename(b.Metadata) == oldFile.Filename);
+                    if (!oldFileUsedInOtherDiff)
+                        beatmaps.DeleteFile(set, oldFile);
+                }
             }
 
-            working.Value.Metadata.AudioFile = destination.Name;
+            // Choose a new filename that doesn't clash with any other existing files.
+            string newFilename = $"{baseFilename}{source.Extension}";
 
-            editorBeatmap.SaveState();
-            music.ReloadCurrentTrack();
+            if (set.GetFile(newFilename) != null)
+            {
+                string[] existingFilenames = set.Files.Select(f => f.Filename).Where(f =>
+                    f.StartsWith(baseFilename, StringComparison.OrdinalIgnoreCase) &&
+                    f.EndsWith(source.Extension, StringComparison.OrdinalIgnoreCase)).ToArray();
+                newFilename = NamingUtils.GetNextBestFilename(existingFilenames, $@"{baseFilename}{source.Extension}");
+            }
 
-            return true;
+            using (var stream = source.OpenRead())
+                beatmaps.AddFile(set, stream, newFilename);
+
+            if (applyToAllDifficulties)
+            {
+                foreach (var b in otherBeatmaps)
+                {
+                    // This operation is quite expensive, so only perform it if required.
+                    if (readFilename(b.Metadata) == newFilename) continue;
+
+                    writeFilename(b.Metadata, newFilename);
+
+                    // save the difficulty to re-encode the .osu file, updating any reference of the old filename.
+                    //
+                    // note that this triggers a full save flow, including triggering a difficulty calculation.
+                    // this is not a cheap operation and should be reconsidered in the future.
+                    var beatmapWorking = beatmaps.GetWorkingBeatmap(b);
+                    beatmaps.Save(b, beatmapWorking.Beatmap, beatmapWorking.GetSkin());
+                }
+            }
+
+            writeFilename(beatmap.Metadata, newFilename);
+
+            // editor change handler cannot be aware of any file changes or other difficulties having their metadata modified.
+            // for simplicity's sake, trigger a save when changing any resource to ensure the change is correctly saved.
+            editor?.Save();
         }
 
         private void backgroundChanged(ValueChangedEvent<FileInfo?> file)
         {
-            if (file.NewValue == null || !ChangeBackgroundImage(file.NewValue))
+            if (file.NewValue == null || !ChangeBackgroundImage(file.NewValue, backgroundChooser.ApplyToAllDifficulties.Value))
                 backgroundChooser.Current.Value = file.OldValue;
         }
 
         private void audioTrackChanged(ValueChangedEvent<FileInfo?> file)
         {
-            if (file.NewValue == null || !ChangeAudioTrack(file.NewValue))
+            if (file.NewValue == null || !ChangeAudioTrack(file.NewValue, audioTrackChooser.ApplyToAllDifficulties.Value))
                 audioTrackChooser.Current.Value = file.OldValue;
         }
     }

@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,7 +20,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public partial class TestSceneMultiplayerPlayer : MultiplayerTestScene
     {
-        private MultiplayerPlayer player;
+        private MultiplayerPlayer player = null!;
 
         [Test]
         public void TestGameplay()
@@ -49,7 +47,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("score changed", () => player.GameplayState.ScoreProcessor.TotalScore.Value > 0);
         }
 
-        private void setup(Func<IReadOnlyList<Mod>> mods = null)
+        private void setup(Func<IReadOnlyList<Mod>>? mods = null)
         {
             AddStep("set beatmap", () =>
             {
@@ -64,10 +62,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("initialise gameplay", () =>
             {
-                Stack.Push(player = new MultiplayerPlayer(MultiplayerClient.ServerAPIRoom, new PlaylistItem(Beatmap.Value.BeatmapInfo)
+                Stack.Push(player = new MultiplayerPlayer(MultiplayerClient.ServerAPIRoom!, new PlaylistItem(Beatmap.Value.BeatmapInfo)
                 {
                     RulesetID = Beatmap.Value.BeatmapInfo.Ruleset.OnlineID,
-                }, MultiplayerClient.ServerRoom?.Users.ToArray()));
+                }, MultiplayerClient.ServerRoom!.Users.ToArray()));
             });
 
             AddUntilStep("wait for player to be current", () => player.IsCurrentScreen() && player.IsLoaded);

@@ -88,7 +88,7 @@ jobs:
       # Attempt to upload results even if test fails.
       # https://docs.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions#always
       - name: Upload Test Results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: ${{ always() }}
         with:
           name: osu-test-results-${{matrix.os.prettyname}}-${{matrix.threadingMode}}
@@ -114,7 +114,10 @@ jobs:
           dotnet-version: "8.0.x"
 
       - name: Install .NET workloads
-        run: dotnet workload install maui-android
+        # since windows image 20241113.3.0, not specifying a version here
+        # installs the .NET 7 version of android workload for very unknown reasons.
+        # revisit once we upgrade to .NET 9, it's probably fixed there.
+        run: dotnet workload install android --version (dotnet --version)
 
       - name: Compile
         run: dotnet build -c Debug osu.Android.slnf

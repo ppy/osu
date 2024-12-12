@@ -101,7 +101,7 @@ namespace osu.Game.Rulesets
         /// <param name="acronym">The acronym to query for .</param>
         public Mod? CreateModFromAcronym(string acronym)
         {
-            return AllMods.FirstOrDefault(m => m.Acronym == acronym)?.CreateInstance();
+            return AllMods.FirstOrDefault(m => string.Equals(m.Acronym, acronym, StringComparison.OrdinalIgnoreCase))?.CreateInstance();
         }
 
         /// <summary>

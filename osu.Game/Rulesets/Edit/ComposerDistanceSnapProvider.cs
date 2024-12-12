@@ -100,7 +100,7 @@ namespace osu.Game.Rulesets.Edit
                 }
             });
 
-            DistanceSpacingMultiplier.Value = editorBeatmap.BeatmapInfo.DistanceSpacing;
+            DistanceSpacingMultiplier.Value = editorBeatmap.DistanceSpacing;
             DistanceSpacingMultiplier.BindValueChanged(multiplier =>
             {
                 distanceSpacingSlider.ContractedLabelText = $"D. S. ({multiplier.NewValue:0.##x})";
@@ -109,7 +109,7 @@ namespace osu.Game.Rulesets.Edit
                 if (multiplier.NewValue != multiplier.OldValue)
                     onScreenDisplay?.Display(new DistanceSpacingToast(multiplier.NewValue.ToLocalisableString(@"0.##x"), multiplier));
 
-                editorBeatmap.BeatmapInfo.DistanceSpacing = multiplier.NewValue;
+                editorBeatmap.DistanceSpacing = multiplier.NewValue;
             }, true);
 
             DistanceSpacingMultiplier.BindDisabledChanged(disabled => distanceSpacingSlider.Alpha = disabled ? 0 : 1, true);
@@ -163,7 +163,7 @@ namespace osu.Game.Rulesets.Edit
             return (lastBefore, firstAfter);
         }
 
-        protected abstract double ReadCurrentDistanceSnap(HitObject before, HitObject after);
+        public abstract double ReadCurrentDistanceSnap(HitObject before, HitObject after);
 
         protected override void Update()
         {

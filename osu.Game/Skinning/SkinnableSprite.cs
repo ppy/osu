@@ -1,8 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -14,6 +14,7 @@ using osu.Game.Configuration;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Localisation.SkinComponents;
 using osu.Game.Overlays.Settings;
+using osu.Game.Utils;
 using osuTK;
 
 namespace osu.Game.Skinning
@@ -93,10 +94,10 @@ namespace osu.Game.Skinning
                 // but that requires further thought.
                 var highestPrioritySkin = getHighestPriorityUserSkin(((SkinnableSprite)SettingSourceObject).source.AllSources) as Skin;
 
-                string[]? availableFiles = highestPrioritySkin?.SkinInfo.PerformRead(s => s.Files
-                                                                                           .Where(f => f.Filename.EndsWith(".png", StringComparison.Ordinal)
-                                                                                                       || f.Filename.EndsWith(".jpg", StringComparison.Ordinal))
-                                                                                           .Select(f => f.Filename).Distinct()).ToArray();
+                string[]? availableFiles = highestPrioritySkin?.SkinInfo.PerformRead(
+                    s => s.Files
+                          .Where(f => SupportedExtensions.IMAGE_EXTENSIONS.Contains(Path.GetExtension(f.Filename).ToLowerInvariant()))
+                          .Select(f => f.Filename).Distinct()).ToArray();
 
                 if (availableFiles?.Length > 0)
                     Items = availableFiles;

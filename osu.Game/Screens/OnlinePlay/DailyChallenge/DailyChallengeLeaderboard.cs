@@ -138,7 +138,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             if (request?.CompletionState == APIRequestCompletionState.Waiting)
                 return;
 
-            request = new IndexPlaylistScoresRequest(room.RoomID.Value!.Value, playlistItem.ID);
+            request = new IndexPlaylistScoresRequest(room.RoomID!.Value, playlistItem.ID);
 
             request.Success += req => Schedule(() =>
             {

@@ -101,7 +101,7 @@ namespace osu.Game.Input.Bindings
 
             new KeyBinding(new[] { InputKey.Alt, InputKey.Home }, GlobalAction.Home),
 
-            new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.F }, GlobalAction.ToggleFPSDisplay),
+            new KeyBinding(InputKey.None, GlobalAction.ToggleFPSDisplay),
             new KeyBinding(new[] { InputKey.Control, InputKey.T }, GlobalAction.ToggleToolbar),
             new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.S }, GlobalAction.ToggleSkinEditor),
 
@@ -134,7 +134,8 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.Control, InputKey.D }, GlobalAction.EditorCloneSelection),
             new KeyBinding(new[] { InputKey.J }, GlobalAction.EditorNudgeLeft),
             new KeyBinding(new[] { InputKey.K }, GlobalAction.EditorNudgeRight),
-            new KeyBinding(new[] { InputKey.G }, GlobalAction.EditorCycleGridDisplayMode),
+            new KeyBinding(new[] { InputKey.G }, GlobalAction.EditorCycleGridSpacing),
+            new KeyBinding(new[] { InputKey.Shift, InputKey.G }, GlobalAction.EditorCycleGridType),
             new KeyBinding(new[] { InputKey.F5 }, GlobalAction.EditorTestGameplay),
             new KeyBinding(new[] { InputKey.T }, GlobalAction.EditorTapForBPM),
             new KeyBinding(new[] { InputKey.Control, InputKey.H }, GlobalAction.EditorFlipHorizontally),
@@ -151,6 +152,10 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.Control, InputKey.Right }, GlobalAction.EditorSeekToNextHitObject),
             new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.Left }, GlobalAction.EditorSeekToPreviousSamplePoint),
             new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.Right }, GlobalAction.EditorSeekToNextSamplePoint),
+            new KeyBinding(new[] { InputKey.Control, InputKey.B }, GlobalAction.EditorAddBookmark),
+            new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.B }, GlobalAction.EditorRemoveClosestBookmark),
+            new KeyBinding(new[] { InputKey.Alt, InputKey.Left }, GlobalAction.EditorSeekToPreviousBookmark),
+            new KeyBinding(new[] { InputKey.Alt, InputKey.Right }, GlobalAction.EditorSeekToNextBookmark),
         };
 
         private static IEnumerable<KeyBinding> editorTestPlayKeyBindings => new[]
@@ -368,8 +373,8 @@ namespace osu.Game.Input.Bindings
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleChatFocus))]
         ToggleChatFocus,
 
-        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorCycleGridDisplayMode))]
-        EditorCycleGridDisplayMode,
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorCycleGridSpacing))]
+        EditorCycleGridSpacing,
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorTestGameplay))]
         EditorTestGameplay,
@@ -472,6 +477,21 @@ namespace osu.Game.Input.Bindings
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorSeekToNextSamplePoint))]
         EditorSeekToNextSamplePoint,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorCycleGridType))]
+        EditorCycleGridType,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorAddBookmark))]
+        EditorAddBookmark,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorRemoveClosestBookmark))]
+        EditorRemoveClosestBookmark,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorSeekToPreviousBookmark))]
+        EditorSeekToPreviousBookmark,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorSeekToNextBookmark))]
+        EditorSeekToNextBookmark,
     }
 
     public enum GlobalActionCategory
