@@ -4,6 +4,8 @@
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
+using osu.Framework.Bindables;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Edit;
 using osuTK;
 using osuTK.Input;
@@ -14,6 +16,7 @@ namespace osu.Game.Tests.Visual.Editing
     public partial class TestSceneExpandingToolboxContainer : EditorClockTestScene
     {
         private ExpandingToolboxContainer toolbox = null!;
+        private Bindable<bool> contractSidebars = null!;
 
         [SetUpSteps]
         public void SetUpSteps()
@@ -27,27 +30,35 @@ namespace osu.Game.Tests.Visual.Editing
                 };
                 Child = toolbox;
             });
+            AddStep("load contractSidebars configuration", () =>
+            {
+                var config = new OsuConfigManager(LocalStorage);
+                contractSidebars = config.GetBindable<bool>(OsuSetting.EditorContractSidebars);
+                contractSidebars.Value = true;
+            });
         }
 
         [Test]
-        public void TestOnMouseUpFunctionality()
+        public void TestExpandingToolbox()
         {
-            AddStep("click on sidebar", () =>
+            AddStep("state - sidebar collapsed", () => toolbox.Expanded.Value = false);
+            AddStep("click on toolbox", () =>
             {
                 InputManager.MoveMouseTo(toolbox.ScreenSpaceDrawQuad.Centre);
-                InputManager.PressButton(MouseButton.Left);
-                InputManager.ReleaseButton(MouseButton.Left);
+                InputManager.Click(MouseButton.Left);
+                AddAssert("sidebar expands after click", () => toolbox.Expanded.Value);
             });
-            AddAssert("sidebar remains expanded", () => toolbox.Expanded.Value);
 
-            AddStep("hold and move cursor inside, release", () =>
+            AddStep("state - sidebar collapsed", () => toolbox.Expanded.Value = false);
+
+            AddStep("hold and move cursor inside", () =>
             {
-                InputManager.MoveMouseTo(toolbox.ScreenSpaceDrawQuad.Centre);
+                InputManager.MoveMouseTo(toolbox.ScreenSpaceDrawQuad.TopLeft);
                 InputManager.PressButton(MouseButton.Left);
-                InputManager.MoveMouseTo(toolbox.ScreenSpaceDrawQuad.BottomLeft);
+                InputManager.MoveMouseTo(toolbox.ScreenSpaceDrawQuad.BottomRight);
                 InputManager.ReleaseButton(MouseButton.Left);
+                AddAssert("sidebar remains collapsed", () => !toolbox.Expanded.Value);
             });
-            AddAssert("sidebar remains expanded", () => toolbox.Expanded.Value);
         }
     }
 }
