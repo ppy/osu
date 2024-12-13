@@ -41,6 +41,7 @@ using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Cursor;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.IO;
@@ -73,8 +74,6 @@ namespace osu.Game
     [Cached(typeof(OsuGameBase))]
     public partial class OsuGameBase : Framework.Game, ICanAcceptFiles, IBeatSyncProvider
     {
-        public static readonly string[] VIDEO_EXTENSIONS = { ".mp4", ".mov", ".avi", ".flv", ".mpg", ".wmv", ".m4v" };
-
 #if DEBUG
         public const string GAME_NAME = "osu! (development)";
 #else
@@ -198,7 +197,7 @@ namespace osu.Game
         public readonly Bindable<Dictionary<ModType, IReadOnlyList<Mod>>> AvailableMods = new Bindable<Dictionary<ModType, IReadOnlyList<Mod>>>(new Dictionary<ModType, IReadOnlyList<Mod>>());
 
         private BeatmapDifficultyCache difficultyCache;
-        private BeatmapUpdater beatmapUpdater;
+        private IBeatmapUpdater beatmapUpdater;
 
         private UserLookupCache userCache;
         private BeatmapLookupCache beatmapCache;
@@ -324,7 +323,7 @@ namespace osu.Game
             base.Content.Add(difficultyCache);
 
             // TODO: OsuGame or OsuGameBase?
-            dependencies.CacheAs(beatmapUpdater = new BeatmapUpdater(BeatmapManager, difficultyCache, API, Storage));
+            dependencies.CacheAs(beatmapUpdater = CreateBeatmapUpdater());
             dependencies.CacheAs(SpectatorClient = new OnlineSpectatorClient(endpoints));
             dependencies.CacheAs(MultiplayerClient = new OnlineMultiplayerClient(endpoints));
             dependencies.CacheAs(metadataClient = new OnlineMetadataClient(endpoints));
@@ -384,6 +383,10 @@ namespace osu.Game
             base.Content.Add(beatmapClock);
 
             GlobalActionContainer globalBindings;
+
+            OsuMenuSamples menuSamples;
+            dependencies.Cache(menuSamples = new OsuMenuSamples());
+            base.Content.Add(menuSamples);
 
             base.Content.Add(SafeAreaContainer = new SafeAreaContainer
             {
@@ -562,6 +565,8 @@ namespace osu.Game
                 realmBlocker?.Dispose();
             }
         }
+
+        protected virtual IBeatmapUpdater CreateBeatmapUpdater() => new BeatmapUpdater(BeatmapManager, difficultyCache, API, Storage);
 
         protected override UserInputManager CreateUserInputManager() => new OsuUserInputManager();
 

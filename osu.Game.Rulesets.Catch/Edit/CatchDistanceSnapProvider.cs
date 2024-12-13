@@ -10,7 +10,7 @@ namespace osu.Game.Rulesets.Catch.Edit
 {
     public partial class CatchDistanceSnapProvider : ComposerDistanceSnapProvider
     {
-        protected override double ReadCurrentDistanceSnap(HitObject before, HitObject after)
+        public override double ReadCurrentDistanceSnap(HitObject before, HitObject after)
         {
             // osu!catch's distance snap implementation is limited, in that a custom spacing cannot be specified.
             // Therefore this functionality is not currently used.

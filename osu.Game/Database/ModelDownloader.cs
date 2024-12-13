@@ -68,18 +68,23 @@ namespace osu.Game.Database
             {
                 Task.Factory.StartNew(async () =>
                 {
-                    bool importSuccessful;
+                    bool importSuccessful = false;
 
-                    if (originalModel != null)
-                        importSuccessful = (await importer.ImportAsUpdate(notification, new ImportTask(filename), originalModel).ConfigureAwait(false)) != null;
-                    else
-                        importSuccessful = (await importer.Import(notification, new[] { new ImportTask(filename) }).ConfigureAwait(false)).Any();
+                    try
+                    {
+                        if (originalModel != null)
+                            importSuccessful = (await importer.ImportAsUpdate(notification, new ImportTask(filename), originalModel).ConfigureAwait(false)) != null;
+                        else
+                            importSuccessful = (await importer.Import(notification, new[] { new ImportTask(filename) }).ConfigureAwait(false)).Any();
+                    }
+                    finally
+                    {
+                        // for now a failed import will be marked as a failed download for simplicity.
+                        if (!importSuccessful)
+                            DownloadFailed?.Invoke(request);
 
-                    // for now a failed import will be marked as a failed download for simplicity.
-                    if (!importSuccessful)
-                        DownloadFailed?.Invoke(request);
-
-                    CurrentDownloads.Remove(request);
+                        CurrentDownloads.Remove(request);
+                    }
                 }, TaskCreationOptions.LongRunning);
             };
 

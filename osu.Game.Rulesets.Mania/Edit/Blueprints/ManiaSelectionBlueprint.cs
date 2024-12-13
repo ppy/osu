@@ -37,16 +37,10 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            directionBindable.BindValueChanged(onDirectionChanged, true);
+            directionBindable.BindValueChanged(OnDirectionChanged, true);
         }
 
-        private void onDirectionChanged(ValueChangedEvent<ScrollingDirection> direction)
-        {
-            var anchor = direction.NewValue == ScrollingDirection.Up ? Anchor.TopCentre : Anchor.BottomCentre;
-            Anchor = Origin = anchor;
-            foreach (var child in InternalChildren)
-                child.Anchor = child.Origin = anchor;
-        }
+        protected abstract void OnDirectionChanged(ValueChangedEvent<ScrollingDirection> direction);
 
         protected override void Update()
         {

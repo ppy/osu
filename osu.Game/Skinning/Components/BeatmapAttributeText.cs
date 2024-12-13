@@ -177,6 +177,9 @@ namespace osu.Game.Skinning.Components
                 case BeatmapAttribute.BPM:
                     return BeatmapsetsStrings.ShowStatsBpm;
 
+                case BeatmapAttribute.MaxPP:
+                    return BeatmapAttributeTextStrings.MaxPP;
+
                 default:
                     return string.Empty;
             }
@@ -208,22 +211,25 @@ namespace osu.Game.Skinning.Components
                     return beatmap.Value.BeatmapInfo.Status.GetLocalisableDescription();
 
                 case BeatmapAttribute.BPM:
-                    return FormatUtils.RoundBPM(beatmap.Value.BeatmapInfo.BPM, ModUtils.CalculateRateWithMods(mods.Value)).ToLocalisableString(@"F2");
+                    return FormatUtils.RoundBPM(beatmap.Value.BeatmapInfo.BPM, ModUtils.CalculateRateWithMods(mods.Value)).ToLocalisableString(@"0.##");
 
                 case BeatmapAttribute.CircleSize:
-                    return computeDifficulty().CircleSize.ToLocalisableString(@"F2");
+                    return computeDifficulty().CircleSize.ToLocalisableString(@"0.##");
 
                 case BeatmapAttribute.HPDrain:
-                    return computeDifficulty().DrainRate.ToLocalisableString(@"F2");
+                    return computeDifficulty().DrainRate.ToLocalisableString(@"0.##");
 
                 case BeatmapAttribute.Accuracy:
-                    return computeDifficulty().OverallDifficulty.ToLocalisableString(@"F2");
+                    return computeDifficulty().OverallDifficulty.ToLocalisableString(@"0.##");
 
                 case BeatmapAttribute.ApproachRate:
-                    return computeDifficulty().ApproachRate.ToLocalisableString(@"F2");
+                    return computeDifficulty().ApproachRate.ToLocalisableString(@"0.##");
 
                 case BeatmapAttribute.StarRating:
                     return (starDifficulty?.Stars ?? 0).ToLocalisableString(@"F2");
+
+                case BeatmapAttribute.MaxPP:
+                    return Math.Round(starDifficulty?.PerformanceAttributes?.Total ?? 0, MidpointRounding.AwayFromZero).ToLocalisableString();
 
                 default:
                     return string.Empty;
@@ -279,5 +285,6 @@ namespace osu.Game.Skinning.Components
         RankedStatus,
         BPM,
         Source,
+        MaxPP
     }
 }

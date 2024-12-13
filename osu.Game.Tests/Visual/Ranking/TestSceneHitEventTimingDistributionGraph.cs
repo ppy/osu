@@ -41,6 +41,13 @@ namespace osu.Game.Tests.Visual.Ranking
         }
 
         [Test]
+        public void TestZeroEvents()
+        {
+            createTest(new List<HitEvent>());
+            AddStep("update offset", () => graph.UpdateOffset(10));
+        }
+
+        [Test]
         public void TestManyDistributedEventsOffset()
         {
             createTest(CreateDistributedHitEvents(-3.5));
