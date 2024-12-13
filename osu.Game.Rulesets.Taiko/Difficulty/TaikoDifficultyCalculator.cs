@@ -77,14 +77,16 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             if (beatmap.HitObjects.Count == 0)
                 return new TaikoDifficultyAttributes { Mods = mods };
 
-            Colour colour = (Colour)skills.First(x => x is Colour);
-            Rhythm rhythm = (Rhythm)skills.First(x => x is Rhythm);
-            Stamina stamina = (Stamina)skills.First(x => x is Stamina);
-            Stamina singleColourStamina = (Stamina)skills.Last(x => x is Stamina);
-
+            Colour colour = skills.OfType<Colour>().Single();
             double colourRating = colour.DifficultyValue() * colour_skill_multiplier;
+
+            Rhythm rhythm = skills.OfType<Rhythm>().Single();
             double rhythmRating = rhythm.DifficultyValue() * rhythm_skill_multiplier;
+
+            Stamina stamina = skills.OfType<Stamina>().Single(s => !s.MonoColour);
             double staminaRating = stamina.DifficultyValue() * stamina_skill_multiplier;
+
+            Stamina singleColourStamina = skills.OfType<Stamina>().Single(s => s.MonoColour);
             double monoStaminaRating = singleColourStamina.DifficultyValue() * stamina_skill_multiplier;
             double monoStaminaFactor = staminaRating == 0 ? 1 : Math.Pow(monoStaminaRating / staminaRating, 5);
 

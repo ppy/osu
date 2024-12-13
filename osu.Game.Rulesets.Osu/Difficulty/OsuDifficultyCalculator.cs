@@ -36,27 +36,21 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (beatmap.HitObjects.Count == 0)
                 return new OsuDifficultyAttributes { Mods = mods };
 
-            var aim = (Aim)skills.First(s => s is Aim);
-            var aimWithoutSliders = (AimWithoutSliders)skills.First(s => s is AimWithoutSliders);
-            var speed = (Speed)skills.First(s => s is Speed);
-
+            var aim = skills.OfType<Aim>().Single(a => a.IncludeSliders);
             double aimRating = Math.Sqrt(aim.DifficultyValue()) * difficulty_multiplier;
+            double aimDifficultyStrainCount = aim.CountTopWeightedStrains();
+
+            var aimWithoutSliders = skills.OfType<Aim>().Single(a => !a.IncludeSliders);
             double aimRatingNoSliders = Math.Sqrt(aimWithoutSliders.DifficultyValue()) * difficulty_multiplier;
-            double speedRating = Math.Sqrt(speed.DifficultyValue()) * difficulty_multiplier;
-            double speedNotes = speed.RelevantNoteCount();
-
-            double flashlightRating = 0.0;
-
-            if (mods.Any(h => h is OsuModFlashlight))
-            {
-                var flashlight = (Flashlight)skills.First(s => s is Flashlight);
-                flashlightRating = Math.Sqrt(flashlight.DifficultyValue()) * difficulty_multiplier;
-            }
-
             double sliderFactor = aimRating > 0 ? aimRatingNoSliders / aimRating : 1;
 
-            double aimDifficultyStrainCount = ((OsuStrainSkill)skills[0]).CountTopWeightedStrains();
-            double speedDifficultyStrainCount = ((OsuStrainSkill)skills[2]).CountTopWeightedStrains();
+            var speed = skills.OfType<Speed>().Single();
+            double speedRating = Math.Sqrt(speed.DifficultyValue()) * difficulty_multiplier;
+            double speedNotes = speed.RelevantNoteCount();
+            double speedDifficultyStrainCount = speed.CountTopWeightedStrains();
+
+            var flashlight = skills.OfType<Flashlight>().SingleOrDefault();
+            double flashlightRating = flashlight == null ? 0.0 : Math.Sqrt(flashlight.DifficultyValue()) * difficulty_multiplier;
 
             if (mods.Any(m => m is OsuModTouchDevice))
             {
@@ -143,8 +137,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
             var skills = new List<Skill>
             {
-                new Aim(mods),
-                new AimWithoutSliders(mods),
+                new Aim(mods, true),
+                new Aim(mods, false),
                 new Speed(mods)
             };
 

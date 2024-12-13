@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             CatchDifficultyAttributes attributes = new CatchDifficultyAttributes
             {
-                StarRating = Math.Sqrt(skills.First(s => s is Movement).DifficultyValue()) * difficulty_multiplier,
+                StarRating = Math.Sqrt(skills.OfType<Movement>().Single().DifficultyValue()) * difficulty_multiplier,
                 Mods = mods,
                 ApproachRate = preempt > 1200.0 ? -(preempt - 1800.0) / 120.0 : -(preempt - 1200.0) / 150.0 + 5.0,
                 MaxCombo = beatmap.GetMaxCombo(),
