@@ -62,6 +62,11 @@ namespace osu.Game.Screens.Play.HUD
                 }
             });
 
+            // For future consideration, this icon should probably not exist.
+            //
+            // If we remove it, the following needs attention:
+            // - Mobile support (swipe from side of screen?)
+            // - Consolidating this overlay with the one at player loader (to have the animation hint at its presence)
             AddInternal(button = new IconButton
             {
                 Icon = FontAwesome.Solid.Cog,
