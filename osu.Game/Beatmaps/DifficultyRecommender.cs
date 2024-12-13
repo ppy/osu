@@ -77,8 +77,11 @@ namespace osu.Game.Beatmaps
 
         private void updateMapping(RulesetInfo ruleset, UserStatistics statistics)
         {
-            // algorithm taken from https://github.com/ppy/osu-web/blob/e6e2825516449e3d0f3f5e1852c6bdd3428c3437/app/Models/User.php#L1505
-            recommendedDifficultyMapping[ruleset.ShortName] = Math.Pow((double)(statistics.PP ?? 0), 0.4) * 0.195;
+            // algorithm taken from https://github.com/ppy/osu-web/blob/027026fccc91525e39cee5d2f369f1b343eb1bf1/app/Models/UserStatistics/Model.php#L93-L94
+            recommendedDifficultyMapping[ruleset.ShortName] =
+                ruleset.ShortName == @"taiko"
+                    ? Math.Pow((double)(statistics.PP ?? 0), 0.35) * 0.27
+                    : Math.Pow((double)(statistics.PP ?? 0), 0.4) * 0.195;
 
             StarRatingUpdated?.Invoke();
         }
