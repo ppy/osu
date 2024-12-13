@@ -23,8 +23,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         /// <summary>
         /// The number of <see cref="Slider"/>s weighted by difficulty.
         /// </summary>
-        [JsonProperty("difficult_slider_count")]
-        public double AimDifficultSliders { get; set; }
+        [JsonProperty("aim_difficult_slider_count")]
+        public double AimDifficultSliderCount { get; set; }
 
         /// <summary>
         /// The difficulty corresponding to the speed skill.

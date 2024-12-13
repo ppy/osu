@@ -99,7 +99,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 StarRating = starRating,
                 Mods = mods,
                 AimDifficulty = aimRating,
-                AimDifficultSliders = difficultSliders,
+                AimDifficultSliderCount = difficultSliders,
                 SpeedDifficulty = speedRating,
                 SpeedNoteCount = speedNotes,
                 FlashlightDifficulty = flashlightRating,
