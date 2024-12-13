@@ -80,6 +80,7 @@ namespace osu.Game.Graphics.Cursor
                         Margin = new MarginPadding(5),
                         AutoSizeAxes = Axes.Both,
                         MaximumSize = new Vector2(max_width, float.PositiveInfinity),
+                        TextAnchor = Anchor.TopCentre,
                     }
                 };
             }
