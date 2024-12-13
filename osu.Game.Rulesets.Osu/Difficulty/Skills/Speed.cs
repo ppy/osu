@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             currentRhythm = RhythmEvaluator.EvaluateDifficultyOf(current);
 
             double totalStrain = currentStrain * currentRhythm;
-            ObjectStrains.Add((totalStrain, current.BaseObject.GetType()));
+            ObjectStrains.Add(totalStrain);
 
             return totalStrain;
         }
@@ -50,11 +50,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             if (ObjectStrains.Count == 0)
                 return 0;
 
-            double maxStrain = ObjectStrains.Select(x => x.Strain).Max();
+            double maxStrain = ObjectStrains.Max();
             if (maxStrain == 0)
                 return 0;
 
-            return ObjectStrains.Select(x => x.Strain).Sum(strain => 1.0 / (1.0 + Math.Exp(-(strain / maxStrain * 12.0 - 6.0))));
+            return ObjectStrains.Sum(strain => 1.0 / (1.0 + Math.Exp(-(strain / maxStrain * 12.0 - 6.0))));
         }
     }
 }
