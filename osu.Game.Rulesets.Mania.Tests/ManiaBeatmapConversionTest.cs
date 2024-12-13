@@ -26,6 +26,7 @@ namespace osu.Game.Rulesets.Mania.Tests
         [TestCase("20544")]
         [TestCase("100374")]
         [TestCase("1450162")]
+        [TestCase("4869637")]
         public void Test(string name) => base.Test(name);
 
         protected override IEnumerable<ConvertValue> CreateConvertValue(HitObject hitObject)
