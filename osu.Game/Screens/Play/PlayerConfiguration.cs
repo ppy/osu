@@ -49,6 +49,6 @@ namespace osu.Game.Screens.Play
         /// <summary>
         /// Whether the right overlay containing settings should be shown or not.
         /// </summary>
-        public bool ShowSettingsOverlay { get; set; }
+        public bool ShowSettingsOverlay { get; set; } = true;
     }
 }
