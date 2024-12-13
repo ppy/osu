@@ -84,7 +84,6 @@ namespace osu.Game.Screens.Ranking
         /// </summary>
         public bool ShowUserStatistics { get; init; }
 
-        // Only show the relevant button otherwise things look silly.
         private Sample? popInSample;
 
         protected ResultsScreen(ScoreInfo? score)
@@ -197,7 +196,10 @@ namespace osu.Game.Screens.Ranking
                     Width = 300
                 });
 
-                // for simplicity, only allow when we're guaranteed the replay is already downloaded and present.
+                // for simplicity, only allow this when coming from a replay player where we know the replay is ready to be played.
+                //
+                // if we show it in all cases, consider the case where a user comes from song select and potentially has to download
+                // the replay before it can be played back. it wouldn't flow well with the quick retry in such a case.
                 allowHotkeyRetry = player is ReplayPlayer;
             }
 
