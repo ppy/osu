@@ -36,6 +36,7 @@ namespace osu.Game.Input.Bindings
                                                                        .Concat(editorKeyBindings)
                                                                        .Concat(editorTestPlayKeyBindings)
                                                                        .Concat(inGameKeyBindings)
+                                                                       .Concat(multiplayerKeyBindings)
                                                                        .Concat(replayKeyBindings)
                                                                        .Concat(songSelectKeyBindings)
                                                                        .Concat(audioControlKeyBindings)
@@ -56,6 +57,9 @@ namespace osu.Game.Input.Bindings
 
                 case GlobalActionCategory.InGame:
                     return inGameKeyBindings;
+
+                case GlobalActionCategory.Multiplayer:
+                    return multiplayerKeyBindings;
 
                 case GlobalActionCategory.Replay:
                     return replayKeyBindings;
@@ -184,6 +188,12 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(InputKey.F2, GlobalAction.ExportReplay),
             new KeyBinding(InputKey.Plus, GlobalAction.IncreaseOffset),
             new KeyBinding(InputKey.Minus, GlobalAction.DecreaseOffset),
+        };
+
+        private static IEnumerable<KeyBinding> multiplayerKeyBindings => new[]
+        {
+            new KeyBinding(new[] { InputKey.Control, InputKey.R }, GlobalAction.MultiplayerReady),
+            new KeyBinding(new[] { InputKey.Control, InputKey.S }, GlobalAction.MultiplayerSpectate),
         };
 
         private static IEnumerable<KeyBinding> replayKeyBindings => new[]
@@ -492,6 +502,12 @@ namespace osu.Game.Input.Bindings
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorSeekToNextBookmark))]
         EditorSeekToNextBookmark,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.MultiplayerReady))]
+        MultiplayerReady,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.MultiplayerSpectate))]
+        MultiplayerSpectate,
     }
 
     public enum GlobalActionCategory
@@ -499,6 +515,7 @@ namespace osu.Game.Input.Bindings
         General,
         Editor,
         InGame,
+        Multiplayer,
         Replay,
         SongSelect,
         AudioControl,

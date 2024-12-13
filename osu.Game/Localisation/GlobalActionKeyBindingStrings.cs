@@ -449,6 +449,16 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString EditorSeekToNextBookmark => new TranslatableString(getKey(@"editor_seek_to_next_bookmark"), @"Seek to next bookmark");
 
+        /// <summary>
+        /// "Ready"
+        /// </summary>
+        public static LocalisableString MultiplayerReady => new TranslatableString(getKey(@"multiplayer_ready"), @"Ready");
+
+        /// <summary>
+        /// "Spectate"
+        /// </summary>
+        public static LocalisableString MultiplayerSpectate => new TranslatableString(getKey(@"multiplayer_spectate"), @"Spectate");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

@@ -11,7 +11,10 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Framework.Threading;
+using osu.Game.Input.Bindings;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.Countdown;
 using osu.Game.Online.Rooms;
@@ -21,7 +24,7 @@ using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 {
-    public partial class MatchStartControl : CompositeDrawable
+    public partial class MatchStartControl : CompositeDrawable, IKeyBindingHandler<GlobalAction>
     {
         public required Bindable<PlaylistItem?> SelectedItem
         {
@@ -249,6 +252,28 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
                 countReady = newCountReady;
             });
+        }
+
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+        {
+            if (!readyButton.Enabled.Value)
+            {
+                return false;
+            }
+
+            switch (e.Action)
+            {
+                case GlobalAction.MultiplayerReady:
+                    onReadyButtonClick();
+                    return true;
+
+                default:
+                    return false;
+            }
+        }
+
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
+        {
         }
 
         protected override void Dispose(bool isDisposing)
