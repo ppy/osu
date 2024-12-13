@@ -17,6 +17,7 @@ using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods.Input;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Screens.Edit.Compose.Components;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
@@ -53,7 +54,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.ModSelectHotkeyStyle, ModSelectHotkeyStyle.Sequential);
             SetDefault(OsuSetting.ModSelectTextSearchStartsActive, true);
 
-            SetDefault(OsuSetting.ChatDisplayHeight, ChatOverlay.DEFAULT_HEIGHT, 0.2f, 1f);
+            SetDefault(OsuSetting.ChatDisplayHeight, ChatOverlay.DEFAULT_HEIGHT, 0.2f, 1f, 0.01f);
 
             SetDefault(OsuSetting.BeatmapListingCardSize, BeatmapCardSize.Normal);
 
@@ -131,12 +132,13 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.Prefer24HourTime, !CultureInfoHelper.SystemCulture.DateTimeFormat.ShortTimePattern.Contains(@"tt"));
 
             // Gameplay
-            SetDefault(OsuSetting.PositionalHitsoundsLevel, 0.2f, 0, 1);
+            SetDefault(OsuSetting.PositionalHitsoundsLevel, 0.2f, 0, 1, 0.01f);
             SetDefault(OsuSetting.DimLevel, 0.7, 0, 1, 0.01);
             SetDefault(OsuSetting.BlurLevel, 0, 0, 1, 0.01);
             SetDefault(OsuSetting.LightenDuringBreaks, true);
 
             SetDefault(OsuSetting.HitLighting, true);
+            SetDefault(OsuSetting.StarFountains, true);
 
             SetDefault(OsuSetting.HUDVisibilityMode, HUDVisibilityMode.Always);
             SetDefault(OsuSetting.ShowHealthDisplayWhenCantFail, true);
@@ -168,13 +170,13 @@ namespace osu.Game.Configuration
 
             SetDefault(OsuSetting.Scaling, ScalingMode.Off);
             SetDefault(OsuSetting.SafeAreaConsiderations, true);
-            SetDefault(OsuSetting.ScalingBackgroundDim, 0.9f, 0.5f, 1f);
+            SetDefault(OsuSetting.ScalingBackgroundDim, 0.9f, 0.5f, 1f, 0.01f);
 
-            SetDefault(OsuSetting.ScalingSizeX, 0.8f, 0.2f, 1f);
-            SetDefault(OsuSetting.ScalingSizeY, 0.8f, 0.2f, 1f);
+            SetDefault(OsuSetting.ScalingSizeX, 0.8f, 0.2f, 1f, 0.01f);
+            SetDefault(OsuSetting.ScalingSizeY, 0.8f, 0.2f, 1f, 0.01f);
 
-            SetDefault(OsuSetting.ScalingPositionX, 0.5f, 0f, 1f);
-            SetDefault(OsuSetting.ScalingPositionY, 0.5f, 0f, 1f);
+            SetDefault(OsuSetting.ScalingPositionX, 0.5f, 0f, 1f, 0.01f);
+            SetDefault(OsuSetting.ScalingPositionY, 0.5f, 0f, 1f, 0.01f);
 
             SetDefault(OsuSetting.UIScale, 1f, 0.8f, 1.6f, 0.01f);
 
@@ -193,10 +195,14 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.EditorAutoSeekOnPlacement, true);
             SetDefault(OsuSetting.EditorLimitedDistanceSnap, false);
             SetDefault(OsuSetting.EditorShowSpeedChanges, false);
+            SetDefault(OsuSetting.EditorScaleOrigin, EditorOrigin.GridCentre);
+            SetDefault(OsuSetting.EditorRotationOrigin, EditorOrigin.GridCentre);
+            SetDefault(OsuSetting.EditorAdjustExistingObjectsOnTimingChanges, true);
 
             SetDefault(OsuSetting.HideCountryFlags, false);
 
             SetDefault(OsuSetting.MultiplayerRoomFilter, RoomPermissionsFilter.All);
+            SetDefault(OsuSetting.MultiplayerShowInProgressFilter, true);
 
             SetDefault(OsuSetting.LastProcessedMetadataId, -1);
 
@@ -204,9 +210,13 @@ namespace osu.Game.Configuration
             SetDefault<UserStatus?>(OsuSetting.UserOnlineStatus, null);
 
             SetDefault(OsuSetting.EditorTimelineShowTimingChanges, true);
+            SetDefault(OsuSetting.EditorTimelineShowBreaks, true);
             SetDefault(OsuSetting.EditorTimelineShowTicks, true);
 
+            SetDefault(OsuSetting.EditorContractSidebars, false);
+
             SetDefault(OsuSetting.AlwaysShowHoldForMenuButton, false);
+            SetDefault(OsuSetting.AlwaysRequireHoldingForPause, false);
         }
 
         protected override bool CheckLookupContainsPrivateInformation(OsuSetting lookup)
@@ -406,6 +416,7 @@ namespace osu.Game.Configuration
         NotifyOnPrivateMessage,
         UIHoldActivationDelay,
         HitLighting,
+        StarFountains,
         MenuBackgroundSource,
         GameplayDisableWinKey,
         SeasonalBackgroundMode,
@@ -431,6 +442,13 @@ namespace osu.Game.Configuration
         HideCountryFlags,
         EditorTimelineShowTimingChanges,
         EditorTimelineShowTicks,
-        AlwaysShowHoldForMenuButton
+        AlwaysShowHoldForMenuButton,
+        EditorContractSidebars,
+        EditorScaleOrigin,
+        EditorRotationOrigin,
+        EditorTimelineShowBreaks,
+        EditorAdjustExistingObjectsOnTimingChanges,
+        AlwaysRequireHoldingForPause,
+        MultiplayerShowInProgressFilter,
     }
 }

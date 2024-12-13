@@ -5,6 +5,7 @@
 
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Development;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
@@ -90,11 +91,13 @@ namespace osu.Game.Overlays.FirstRunSetup
                         new GraphicsSection(),
                         new OnlineSection(),
                         new MaintenanceSection(),
-                        new DebugSection(),
                     },
                     SearchTerm = SettingsItem<bool>.CLASSIC_DEFAULT_SEARCH_TERM,
                 }
             };
+
+            if (DebugUtils.IsDebugBuild)
+                searchContainer.Add(new DebugSection());
         }
 
         private void applyClassic()

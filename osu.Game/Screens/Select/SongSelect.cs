@@ -610,11 +610,6 @@ namespace osu.Game.Screens.Select
                 beatmapInfoPrevious = beatmap;
             }
 
-            // we can't run this in the debounced run due to the selected mods bindable not being debounced,
-            // since mods could be updated to the new ruleset instances while the decoupled bindable is held behind,
-            // therefore resulting in performing difficulty calculation with invalid states.
-            advancedStats.Ruleset.Value = ruleset;
-
             void run()
             {
                 // clear pending task immediately to track any potential nested debounce operation.
@@ -716,12 +711,6 @@ namespace osu.Game.Screens.Select
 
             Carousel.AllowSelection = true;
 
-            if (pendingFilterApplication)
-            {
-                Carousel.Filter(FilterControl.CreateCriteria());
-                pendingFilterApplication = false;
-            }
-
             BeatmapDetails.Refresh();
 
             beginLooping();
@@ -752,6 +741,17 @@ namespace osu.Game.Screens.Select
             wedgeBackground.ScaleTo(1, 500, Easing.OutQuint);
 
             FilterControl.Activate();
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (Carousel.AllowSelection && pendingFilterApplication)
+            {
+                Carousel.Filter(FilterControl.CreateCriteria());
+                pendingFilterApplication = false;
+            }
         }
 
         public override void OnSuspending(ScreenTransitionEvent e)
@@ -878,6 +878,8 @@ namespace osu.Game.Screens.Select
             ModSelect.Beatmap.Value = beatmap;
 
             advancedStats.BeatmapInfo = beatmap.BeatmapInfo;
+            advancedStats.Mods.Value = selectedMods.Value;
+            advancedStats.Ruleset.Value = Ruleset.Value;
 
             bool beatmapSelected = beatmap is not DummyWorkingBeatmap;
 
@@ -989,6 +991,12 @@ namespace osu.Game.Screens.Select
             decoupledRuleset.DisabledChanged += r => Ruleset.Disabled = r;
 
             Beatmap.BindValueChanged(updateCarouselSelection);
+
+            selectedMods.BindValueChanged(_ =>
+            {
+                if (decoupledRuleset.Value.Equals(rulesetNoDebounce))
+                    advancedStats.Mods.Value = selectedMods.Value;
+            }, true);
 
             boundLocalBindables = true;
         }

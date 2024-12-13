@@ -122,7 +122,10 @@ namespace osu.Game.Overlays.Toolbar
 
             rulesetSelectionChannel[r.NewValue] = channel;
             channel.Play();
-            musicController?.DuckMomentarily(500, new DuckParameters { DuckDuration = 0 });
+
+            // Longer unduck delay for Mania sample
+            int unduckDelay = r.NewValue.OnlineID == 3 ? 750 : 500;
+            musicController?.DuckMomentarily(unduckDelay, new DuckParameters { DuckDuration = 0 });
         }
 
         public override bool HandleNonPositionalInput => !Current.Disabled && base.HandleNonPositionalInput;

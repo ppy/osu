@@ -3,13 +3,14 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 {
-    public abstract partial class OnlinePlayPill : OnlinePlayComposite
+    public abstract partial class OnlinePlayPill : CompositeDrawable
     {
         protected PillContainer Pill { get; private set; } = null!;
         protected OsuTextFlowContainer TextFlow { get; private set; } = null!;

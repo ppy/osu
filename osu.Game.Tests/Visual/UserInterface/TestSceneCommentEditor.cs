@@ -12,6 +12,7 @@ using osu.Framework.Localisation;
 using osu.Framework.Testing;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Comments;
 using osuTK;
@@ -28,9 +29,10 @@ namespace osu.Game.Tests.Visual.UserInterface
         private TestCancellableCommentEditor cancellableCommentEditor = null!;
         private DummyAPIAccess dummyAPI => (DummyAPIAccess)API;
 
-        [SetUp]
-        public void SetUp() => Schedule(() =>
-            Add(new FillFlowContainer
+        [SetUpSteps]
+        public void SetUpSteps()
+        {
+            AddStep("create content", () => Child = new FillFlowContainer
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -43,7 +45,8 @@ namespace osu.Game.Tests.Visual.UserInterface
                     commentEditor = new TestCommentEditor(),
                     cancellableCommentEditor = new TestCancellableCommentEditor()
                 }
-            }));
+            });
+        }
 
         [Test]
         public void TestCommitViaKeyboard()
@@ -134,6 +137,34 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
+        public void TestCommentsDisabled()
+        {
+            AddStep("no reason for disable", () => commentEditor.CommentableMeta.Value = new CommentableMeta
+            {
+                CurrentUserAttributes = new CommentableMeta.CommentableCurrentUserAttributes(),
+            });
+            AddAssert("textbox enabled", () => commentEditor.ChildrenOfType<TextBox>().Single().ReadOnly, () => Is.False);
+
+            AddStep("specific reason for disable", () => commentEditor.CommentableMeta.Value = new CommentableMeta
+            {
+                CurrentUserAttributes = new CommentableMeta.CommentableCurrentUserAttributes
+                {
+                    CanNewCommentReason = "This comment section is disabled. For reasons.",
+                }
+            });
+            AddAssert("textbox disabled", () => commentEditor.ChildrenOfType<TextBox>().Single().ReadOnly, () => Is.True);
+
+            AddStep("entire commentable meta missing", () => commentEditor.CommentableMeta.Value = null);
+            AddAssert("textbox enabled", () => commentEditor.ChildrenOfType<TextBox>().Single().ReadOnly, () => Is.False);
+
+            AddStep("current user attributes missing", () => commentEditor.CommentableMeta.Value = new CommentableMeta
+            {
+                CurrentUserAttributes = null,
+            });
+            AddAssert("textbox enabled", () => commentEditor.ChildrenOfType<TextBox>().Single().ReadOnly, () => Is.True);
+        }
+
+        [Test]
         public void TestCancelAction()
         {
             AddStep("click cancel button", () =>
@@ -167,8 +198,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             protected override LocalisableString GetButtonText(bool isLoggedIn) =>
                 isLoggedIn ? @"Commit" : "You're logged out!";
 
-            protected override LocalisableString GetPlaceholderText(bool isLoggedIn) =>
-                isLoggedIn ? @"This text box is empty" : "Still empty, but now you can't type in it.";
+            protected override LocalisableString GetPlaceholderText() => @"This text box is empty";
         }
 
         private partial class TestCancellableCommentEditor : CancellableCommentEditor
@@ -189,7 +219,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             }
 
             protected override LocalisableString GetButtonText(bool isLoggedIn) => @"Save";
-            protected override LocalisableString GetPlaceholderText(bool isLoggedIn) => @"Multiline textboxes soon";
+            protected override LocalisableString GetPlaceholderText() => @"Multiline textboxes soon";
         }
     }
 }

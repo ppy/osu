@@ -5,6 +5,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Mania.Edit.Blueprints;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Screens.Edit.Compose.Components;
@@ -106,7 +107,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
             AddStep("select everything", () => EditorBeatmap.SelectedHitObjects.AddRange(EditorBeatmap.HitObjects));
             AddStep("start drag", () =>
             {
-                InputManager.MoveMouseTo(this.ChildrenOfType<Column>().First());
+                InputManager.MoveMouseTo(this.ChildrenOfType<NoteSelectionBlueprint>().Single(blueprint => blueprint.IsSelected && blueprint.HitObject.StartTime == 0));
                 InputManager.PressButton(MouseButton.Left);
             });
             AddStep("end drag", () =>
@@ -117,6 +118,46 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
 
             AddAssert("all objects in last column", () => EditorBeatmap.HitObjects.All(ho => ((ManiaHitObject)ho).Column == 3));
             AddAssert("all objects remain selected", () => EditorBeatmap.SelectedHitObjects.SequenceEqual(EditorBeatmap.HitObjects));
+        }
+
+        [Test]
+        public void TestOffScreenObjectsRemainSelectedOnHorizontalFlip()
+        {
+            AddStep("create objects", () =>
+            {
+                for (int i = 0; i < 20; ++i)
+                    EditorBeatmap.Add(new Note { StartTime = 1000 * i, Column = i % 4 });
+            });
+
+            AddStep("select everything", () => EditorBeatmap.SelectedHitObjects.AddRange(EditorBeatmap.HitObjects));
+            AddStep("flip", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.Key(Key.H);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+
+            AddAssert("all objects remain selected", () => EditorBeatmap.SelectedHitObjects.SequenceEqual(EditorBeatmap.HitObjects));
+        }
+
+        [Test]
+        public void TestOffScreenObjectsRemainSelectedOnVerticalFlip()
+        {
+            AddStep("create objects", () =>
+            {
+                for (int i = 0; i < 20; ++i)
+                    EditorBeatmap.Add(new Note { StartTime = 1000 * i, Column = i % 4 });
+            });
+
+            AddStep("select everything", () => EditorBeatmap.SelectedHitObjects.AddRange(EditorBeatmap.HitObjects));
+            AddStep("flip", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.Key(Key.J);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+
+            AddAssert("all objects remain selected", () => EditorBeatmap.SelectedHitObjects.SequenceEqual(EditorBeatmap.HitObjects.Reverse()));
         }
     }
 }

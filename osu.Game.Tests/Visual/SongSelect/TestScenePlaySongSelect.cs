@@ -56,20 +56,20 @@ namespace osu.Game.Tests.Visual.SongSelect
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
         {
-            DetachedBeatmapStore detachedBeatmapStore;
+            BeatmapStore beatmapStore;
 
             // These DI caches are required to ensure for interactive runs this test scene doesn't nuke all user beatmaps in the local install.
             // At a point we have isolated interactive test runs enough, this can likely be removed.
             Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
             Dependencies.Cache(Realm);
             Dependencies.Cache(manager = new BeatmapManager(LocalStorage, Realm, null, audio, Resources, host, defaultBeatmap = Beatmap.Default));
-            Dependencies.Cache(detachedBeatmapStore = new DetachedBeatmapStore());
+            Dependencies.CacheAs(beatmapStore = new RealmDetachedBeatmapStore());
 
             Dependencies.Cache(music = new MusicController());
 
             // required to get bindables attached
             Add(music);
-            Add(detachedBeatmapStore);
+            Add(beatmapStore);
 
             Dependencies.Cache(config = new OsuConfigManager(LocalStorage));
         }
@@ -174,6 +174,29 @@ namespace osu.Game.Tests.Visual.SongSelect
             changeMods(new ModAdaptiveSpeed());
             increaseModSpeed();
             AddAssert("adaptive speed still active", () => songSelect!.Mods.Value.First() is ModAdaptiveSpeed);
+
+            OsuModDoubleTime dtWithAdjustPitch = new OsuModDoubleTime
+            {
+                SpeedChange = { Value = 1.05 },
+                AdjustPitch = { Value = true },
+            };
+            changeMods(dtWithAdjustPitch);
+
+            decreaseModSpeed();
+            AddAssert("no mods selected", () => songSelect!.Mods.Value.Count == 0);
+
+            decreaseModSpeed();
+            AddAssert("half time activated at 0.95x", () => songSelect!.Mods.Value.OfType<ModHalfTime>().Single().SpeedChange.Value, () => Is.EqualTo(0.95).Within(0.005));
+            AddAssert("half time has adjust pitch active", () => songSelect!.Mods.Value.OfType<ModHalfTime>().Single().AdjustPitch.Value, () => Is.True);
+
+            AddStep("turn off adjust pitch", () => songSelect!.Mods.Value.OfType<ModHalfTime>().Single().AdjustPitch.Value = false);
+
+            increaseModSpeed();
+            AddAssert("no mods selected", () => songSelect!.Mods.Value.Count == 0);
+
+            increaseModSpeed();
+            AddAssert("double time activated at 1.05x", () => songSelect!.Mods.Value.OfType<ModDoubleTime>().Single().SpeedChange.Value, () => Is.EqualTo(1.05).Within(0.005));
+            AddAssert("double time has adjust pitch inactive", () => songSelect!.Mods.Value.OfType<ModDoubleTime>().Single().AdjustPitch.Value, () => Is.False);
 
             void increaseModSpeed() => AddStep("increase mod speed", () =>
             {
