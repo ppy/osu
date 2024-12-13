@@ -55,6 +55,8 @@ namespace osu.Game.Screens.Ranking
         [Resolved]
         private Player? player { get; set; }
 
+        private bool skipExitTransition;
+
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
 
@@ -203,6 +205,7 @@ namespace osu.Game.Screens.Ranking
                     {
                         if (!this.IsCurrentScreen()) return;
 
+                        skipExitTransition = true;
                         player?.Restart(true);
                     },
                 });
@@ -313,7 +316,8 @@ namespace osu.Game.Screens.Ranking
             // HitObject references from HitEvent.
             Score?.HitEvents.Clear();
 
-            this.FadeOut(100);
+            if (!skipExitTransition)
+                this.FadeOut(100);
             return false;
         }
 

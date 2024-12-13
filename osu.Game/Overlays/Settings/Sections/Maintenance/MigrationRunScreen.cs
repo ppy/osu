@@ -26,7 +26,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         [Resolved(canBeNull: true)]
         private OsuGame game { get; set; }
 
-        public override bool AllowBackButton => false;
+        public override bool AllowUserExit => false;
 
         public override bool AllowExternalScreenChange => false;
 

@@ -78,7 +78,7 @@ namespace osu.Game.Scoring
         /// Perform a lookup query on available <see cref="ScoreInfo"/>s.
         /// </summary>
         /// <param name="query">The query.</param>
-        /// <returns>The first result for the provided query, or null if no results were found.</returns>
+        /// <returns>The first result for the provided query in its detached form, or null if no results were found.</returns>
         public ScoreInfo? Query(Expression<Func<ScoreInfo, bool>> query)
         {
             return Realm.Run(r => r.All<ScoreInfo>().FirstOrDefault(query)?.Detach());
@@ -88,8 +88,14 @@ namespace osu.Game.Scoring
         {
             ScoreInfo? databasedScoreInfo = null;
 
-            if (originalScoreInfo is ScoreInfo scoreInfo && !string.IsNullOrEmpty(scoreInfo.Hash))
-                databasedScoreInfo = Query(s => s.Hash == scoreInfo.Hash);
+            if (originalScoreInfo is ScoreInfo scoreInfo)
+            {
+                if (scoreInfo.IsManaged)
+                    return scoreInfo.Detach();
+
+                if (!string.IsNullOrEmpty(scoreInfo.Hash))
+                    databasedScoreInfo = Query(s => s.Hash == scoreInfo.Hash);
+            }
 
             if (originalScoreInfo.OnlineID > 0)
                 databasedScoreInfo ??= Query(s => s.OnlineID == originalScoreInfo.OnlineID);

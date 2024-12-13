@@ -16,6 +16,7 @@ using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Database;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Osu;
@@ -23,6 +24,7 @@ using osu.Game.Rulesets.Taiko;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Carousel;
 using osu.Game.Screens.Select.Filter;
+using osu.Game.Tests.Beatmaps;
 using osu.Game.Tests.Resources;
 using osuTK.Input;
 
@@ -41,6 +43,9 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private const int set_count = 5;
         private const int diff_count = 3;
+
+        [Cached(typeof(BeatmapStore))]
+        private TestBeatmapStore beatmaps = new TestBeatmapStore();
 
         [BackgroundDependencyLoader]
         private void load(RulesetStore rulesets)
@@ -1329,7 +1334,8 @@ namespace osu.Game.Tests.Visual.SongSelect
 
                 carouselAdjust?.Invoke(carousel);
 
-                carousel.BeatmapSets = beatmapSets;
+                beatmaps.BeatmapSets.Clear();
+                beatmaps.BeatmapSets.AddRange(beatmapSets);
 
                 (target ?? this).Child = carousel;
             });

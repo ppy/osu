@@ -15,7 +15,7 @@ namespace osu.Game.Graphics.UserInterface
         private const int fade_duration = 250;
 
         [Resolved]
-        private OsuContextMenuSamples samples { get; set; } = null!;
+        private OsuMenuSamples menuSamples { get; set; } = null!;
 
         // todo: this shouldn't be required after https://github.com/ppy/osu-framework/issues/4519 is fixed.
         private bool wasOpened;
@@ -47,15 +47,14 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override void AnimateOpen()
         {
+            wasOpened = true;
             this.FadeIn(fade_duration, Easing.OutQuint);
 
-            if (playClickSample)
-                samples.PlayClickSample();
+            if (!playClickSample)
+                return;
 
-            if (!wasOpened)
-                samples.PlayOpenSample();
-
-            wasOpened = true;
+            menuSamples.PlayClickSample();
+            menuSamples.PlayOpenSample();
         }
 
         protected override void AnimateClose()
@@ -63,7 +62,7 @@ namespace osu.Game.Graphics.UserInterface
             this.FadeOut(fade_duration, Easing.OutQuint);
 
             if (wasOpened)
-                samples.PlayCloseSample();
+                menuSamples.PlayCloseSample();
 
             wasOpened = false;
         }

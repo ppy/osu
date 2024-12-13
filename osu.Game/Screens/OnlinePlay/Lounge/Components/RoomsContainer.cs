@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -80,18 +81,33 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                     bool matchingFilter = true;
 
                     matchingFilter &= criteria.Ruleset == null || r.Room.PlaylistItemStats?.RulesetIDs.Any(id => id == criteria.Ruleset.OnlineID) != false;
-
-                    if (!string.IsNullOrEmpty(criteria.SearchString))
-                    {
-                        // Room name isn't translatable, so ToString() is used here for simplicity.
-                        matchingFilter &= r.FilterTerms.Any(term => term.ToString().Contains(criteria.SearchString, StringComparison.InvariantCultureIgnoreCase));
-                    }
-
                     matchingFilter &= matchPermissions(r, criteria.Permissions);
+
+                    // Room name isn't translatable, so ToString() is used here for simplicity.
+                    string[] filterTerms = r.FilterTerms.Select(t => t.ToString()).ToArray();
+                    string[] searchTerms = criteria.SearchString.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                    matchingFilter &= searchTerms.All(searchTerm => filterTerms.Any(filterTerm => checkTerm(filterTerm, searchTerm)));
 
                     r.MatchingFilter = matchingFilter;
                 }
             });
+
+            // Lifted from SearchContainer.
+            static bool checkTerm(string haystack, string needle)
+            {
+                int index = 0;
+
+                for (int i = 0; i < needle.Length; i++)
+                {
+                    int found = CultureInfo.InvariantCulture.CompareInfo.IndexOf(haystack, needle[i], index, CompareOptions.OrdinalIgnoreCase);
+                    if (found < 0)
+                        return false;
+
+                    index = found + 1;
+                }
+
+                return true;
+            }
 
             static bool matchPermissions(DrawableLoungeRoom room, RoomPermissionsFilter accessType)
             {

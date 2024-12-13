@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using osu.Framework.Bindables;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
+using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Footer;
@@ -21,15 +22,21 @@ namespace osu.Game.Screens
         bool DisallowExternalBeatmapRulesetChanges { get; }
 
         /// <summary>
-        /// Whether the user can exit this <see cref="IOsuScreen"/> by pressing the back button.
+        /// Whether the user can exit this <see cref="IOsuScreen"/>.
         /// </summary>
-        bool AllowBackButton { get; }
+        /// <remarks>
+        /// When overriden to <c>false</c>,
+        /// the user is blocked from exiting the screen via the <see cref="GlobalAction.Back"/> action,
+        /// and the back button is hidden from this screen by the initial state of <see cref="BackButtonVisibility"/> being set to hidden.
+        /// </remarks>
+        bool AllowUserExit { get; }
 
         /// <summary>
         /// Whether a footer (and a back button) should be displayed underneath the screen.
         /// </summary>
         /// <remarks>
-        /// Temporarily, the back button is shown regardless of whether <see cref="AllowBackButton"/> is true.
+        /// Temporarily, the footer's own back button is shown regardless of whether <see cref="BackButtonVisibility"/> is set to hidden.
+        /// This will be corrected as the footer becomes used more commonly.
         /// </remarks>
         bool ShowFooter { get; }
 
@@ -58,6 +65,11 @@ namespace osu.Game.Screens
         /// Whether overlays should be able to be opened when this screen is current.
         /// </summary>
         IBindable<OverlayActivation> OverlayActivationMode { get; }
+
+        /// <summary>
+        /// Whether the back button should be displayed in this screen.
+        /// </summary>
+        IBindable<bool> BackButtonVisibility { get; }
 
         /// <summary>
         /// The current <see cref="UserActivity"/> for this screen.

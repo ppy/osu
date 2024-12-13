@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using osu.Framework.Allocation;
@@ -22,9 +23,13 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Input.Bindings;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
 using osu.Game.Online.Rooms;
+using osu.Game.Overlays;
 using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
+using osu.Game.Screens.OnlinePlay.Playlists;
 using osuTK;
 using osuTK.Graphics;
 using Container = osu.Framework.Graphics.Containers.Container;
@@ -47,6 +52,12 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
         [Resolved(canBeNull: true)]
         private LoungeSubScreen? lounge { get; set; }
+
+        [Resolved]
+        private IDialogOverlay? dialogOverlay { get; set; }
+
+        [Resolved]
+        private IAPIProvider api { get; set; } = null!;
 
         private readonly BindableWithCurrent<Room?> selectedRoom = new BindableWithCurrent<Room?>();
         private Sample? sampleSelect;
@@ -144,13 +155,34 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
         public Popover GetPopover() => new PasswordEntryPopover(Room);
 
-        public MenuItem[] ContextMenuItems => new MenuItem[]
+        public MenuItem[] ContextMenuItems
         {
-            new OsuMenuItem("Create copy", MenuItemType.Standard, () =>
+            get
             {
-                lounge?.OpenCopy(Room);
-            })
-        };
+                var items = new List<MenuItem>
+                {
+                    new OsuMenuItem("Create copy", MenuItemType.Standard, () =>
+                    {
+                        lounge?.OpenCopy(Room);
+                    })
+                };
+
+                if (Room.Type == MatchType.Playlists && Room.Host?.Id == api.LocalUser.Value.Id && Room.StartDate?.AddMinutes(5) >= DateTimeOffset.Now && !Room.HasEnded)
+                {
+                    items.Add(new OsuMenuItem("Close playlist", MenuItemType.Destructive, () =>
+                    {
+                        dialogOverlay?.Push(new ClosePlaylistDialog(Room, () =>
+                        {
+                            var request = new ClosePlaylistRequest(Room.RoomID!.Value);
+                            request.Success += () => lounge?.RefreshRooms();
+                            api.Queue(request);
+                        }));
+                    }));
+                }
+
+                return items.ToArray();
+            }
+        }
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {

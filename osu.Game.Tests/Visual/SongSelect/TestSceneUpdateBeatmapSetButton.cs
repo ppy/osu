@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -10,12 +9,14 @@ using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Dialog;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Carousel;
 using osu.Game.Screens.Select.Filter;
+using osu.Game.Tests.Beatmaps;
 using osu.Game.Tests.Online;
 using osu.Game.Tests.Resources;
 using osuTK.Input;
@@ -30,6 +31,9 @@ namespace osu.Game.Tests.Visual.SongSelect
         private TestSceneOnlinePlayBeatmapAvailabilityTracker.TestBeatmapModelDownloader beatmapDownloader = null!;
 
         private BeatmapSetInfo testBeatmapSetInfo = null!;
+
+        [Cached(typeof(BeatmapStore))]
+        private TestBeatmapStore beatmaps = new TestBeatmapStore();
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
@@ -246,13 +250,12 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private BeatmapCarousel createCarousel()
         {
+            beatmaps.BeatmapSets.Clear();
+            beatmaps.BeatmapSets.Add(testBeatmapSetInfo = TestResources.CreateTestBeatmapSetInfo(5));
+
             return carousel = new BeatmapCarousel(new FilterCriteria())
             {
                 RelativeSizeAxes = Axes.Both,
-                BeatmapSets = new List<BeatmapSetInfo>
-                {
-                    (testBeatmapSetInfo = TestResources.CreateTestBeatmapSetInfo(5)),
-                }
             };
         }
     }
