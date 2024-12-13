@@ -84,6 +84,7 @@ namespace osu.Game.Screens.Ranking
         /// </summary>
         public bool ShowUserStatistics { get; init; }
 
+        // Only show the relevant button otherwise things look silly.
         private Sample? popInSample;
 
         protected ResultsScreen(ScoreInfo? score)
@@ -186,6 +187,8 @@ namespace osu.Game.Screens.Ranking
                 Scheduler.AddDelayed(() => OverlayActivationMode.Value = OverlayActivation.All, shouldFlair ? AccuracyCircle.TOTAL_DURATION + 1000 : 0);
             }
 
+            bool allowHotkeyRetry = false;
+
             if (AllowWatchingReplay)
             {
                 buttons.Add(new ReplayDownloadButton(SelectedScore.Value)
@@ -193,12 +196,19 @@ namespace osu.Game.Screens.Ranking
                     Score = { BindTarget = SelectedScore },
                     Width = 300
                 });
+
+                // for simplicity, only allow when we're guaranteed the replay is already downloaded and present.
+                allowHotkeyRetry = player is ReplayPlayer;
             }
 
             if (player != null && AllowRetry)
             {
                 buttons.Add(new RetryButton { Width = 300 });
+                allowHotkeyRetry = true;
+            }
 
+            if (allowHotkeyRetry)
+            {
                 AddInternal(new HotkeyRetryOverlay
                 {
                     Action = () =>
