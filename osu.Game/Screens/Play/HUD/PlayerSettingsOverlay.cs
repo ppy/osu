@@ -86,11 +86,31 @@ namespace osu.Game.Screens.Play.HUD
             inputManager = GetContainingInputManager()!;
         }
 
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
+            screenSpacePos.X > button.ScreenSpaceDrawQuad.TopLeft.X;
+
+        protected override bool OnMouseMove(MouseMoveEvent e)
+        {
+            checkExpanded();
+            return base.OnMouseMove(e);
+        }
+
         protected override void Update()
         {
             base.Update();
 
-            Expanded.Value = inputManager.CurrentState.Mouse.Position.X >= button.ScreenSpaceDrawQuad.TopLeft.X;
+            // Only check expanded if already expanded.
+            // This is because if we are always checking, it would bypass blocking overlays.
+            // Case in point: the skin editor overlay blocks input from reaching the player, but checking raw coordinates would make settings pop out.
+            if (Expanded.Value)
+                checkExpanded();
+        }
+
+        private void checkExpanded()
+        {
+            float screenMouseX = inputManager.CurrentState.Mouse.Position.X;
+
+            Expanded.Value = screenMouseX >= button.ScreenSpaceDrawQuad.TopLeft.X && screenMouseX <= ToScreenSpace(new Vector2(DrawWidth + EXPANDED_WIDTH, 0)).X;
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
