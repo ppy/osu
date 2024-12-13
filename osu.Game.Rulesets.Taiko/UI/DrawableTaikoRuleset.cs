@@ -35,8 +35,6 @@ namespace osu.Game.Rulesets.Taiko.UI
     {
         public new BindableDouble TimeRange => base.TimeRange;
 
-        public readonly BindableBool LockPlayfieldAspectRange = new BindableBool(true);
-
         public new TaikoInputManager KeyBindingInputManager => (TaikoInputManager)base.KeyBindingInputManager;
 
         protected new TaikoPlayfieldAdjustmentContainer PlayfieldAdjustmentContainer => (TaikoPlayfieldAdjustmentContainer)base.PlayfieldAdjustmentContainer;
@@ -110,10 +108,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             return ControlPoints[result];
         }
 
-        public override PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new TaikoPlayfieldAdjustmentContainer
-        {
-            LockPlayfieldAspectRange = { BindTarget = LockPlayfieldAspectRange }
-        };
+        public override PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new TaikoPlayfieldAdjustmentContainer();
 
         protected override PassThroughInputManager CreateInputManager() => new TaikoInputManager(Ruleset.RulesetInfo);
 
