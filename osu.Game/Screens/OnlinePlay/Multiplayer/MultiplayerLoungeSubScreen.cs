@@ -63,7 +63,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             {
                 LabelText = "Show in-progress rooms",
                 RelativeSizeAxes = Axes.None,
-                Width = 200,
+                Width = 220,
                 Padding = new MarginPadding { Vertical = 5, },
                 Current = Config.GetBindable<bool>(OsuSetting.MultiplayerShowInProgressFilter),
             };
