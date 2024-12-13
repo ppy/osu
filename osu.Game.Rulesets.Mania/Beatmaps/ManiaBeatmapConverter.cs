@@ -220,8 +220,11 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
             foreach (var newPattern in conversion.Generate())
             {
-                lastPattern = conversion is SpinnerPatternGenerator ? lastPattern : newPattern;
-                lastStair = (conversion as HitCirclePatternGenerator)?.StairType ?? lastStair;
+                if (conversion is HitCirclePatternGenerator circleGenerator)
+                    lastStair = circleGenerator.StairType;
+
+                if (conversion is HitCirclePatternGenerator || conversion is SliderPatternGenerator)
+                    lastPattern = newPattern;
 
                 foreach (var obj in newPattern.HitObjects)
                     yield return obj;
