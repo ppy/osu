@@ -82,7 +82,8 @@ namespace osu.Game.Overlays.BeatmapListing
             {
                 base.LoadComplete();
 
-                if (recommender != null) recommender.StarRatingUpdated += updateText;
+                if (recommender != null)
+                    recommender.StarRatingUpdated += updateText;
 
                 Ruleset.BindValueChanged(_ => updateText(), true);
             }
@@ -101,6 +102,14 @@ namespace osu.Game.Overlays.BeatmapListing
                     Text.Text = LocalisableString.Interpolate($"{Value.GetLocalisableDescription()} ({starRating.Value.FormatStarRating()})");
                 else
                     Text.Text = Value.GetLocalisableDescription();
+            }
+
+            protected override void Dispose(bool isDisposing)
+            {
+                base.Dispose(isDisposing);
+
+                if (recommender != null)
+                    recommender.StarRatingUpdated -= updateText;
             }
         }
 
