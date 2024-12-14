@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -8,7 +8,7 @@ using osu.Framework.Graphics.Rendering.Vertices;
 using osuTK;
 using osuTK.Graphics.ES30;
 
-namespace osu.Game.Graphics.OpenGL.Vertices
+namespace osu.Game.Graphics.Rendering.Vertices
 {
     [StructLayout(LayoutKind.Sequential)]
     public struct PositionAndColourVertex : IEquatable<PositionAndColourVertex>, IVertex
