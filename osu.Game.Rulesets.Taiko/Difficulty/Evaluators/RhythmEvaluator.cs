@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
         /// <summary>
         /// Determines if the pattern of hit object intervals is consistent based on a given threshold.
         /// </summary>
-        private static bool isConsistentPattern(EvenHitObjects evenHitObjects, double threshold = 0.1)
+        private static double repeatedIntervalPenalty(EvenHitObjects evenHitObjects, double threshold = 0.1)
         {
             // Collect the last 4 intervals (current and the last 3 previous).
             List<double?> intervals = new List<double?>();
@@ -65,20 +65,20 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
 
             // If there are fewer than 4 valid intervals, skip the consistency check.
             if (intervals.Count < interval_count)
-                return false;
+                return 1.0; // No penalty applied if there isn't enough data.
 
             for (int i = 0; i < intervals.Count; i++)
             {
                 for (int j = i + 1; j < intervals.Count; j++)
                 {
                     double ratio = intervals[i]!.Value / intervals[j]!.Value;
-                    if (Math.Abs(1 - ratio) <= threshold) // If any two intervals are similar, return true.
-                        return true;
+                    if (Math.Abs(1 - ratio) <= threshold) // If any two intervals are similar, apply penalty.
+                        return 0.3;
                 }
             }
 
             // No similar intervals were found.
-            return false;
+            return 1.0;
         }
 
         private static double evaluateDifficultyOf(EvenHitObjects evenHitObjects, double hitWindow)
@@ -99,11 +99,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
                     maxValue: 1);
             }
 
-            // Penalise regular intervals within the last four intervals.
-            if (isConsistentPattern(evenHitObjects))
-            {
-                intervalDifficulty *= 0.4;
-            }
+            // Apply consistency penalty
+            intervalDifficulty *= repeatedIntervalPenalty(evenHitObjects);
 
             // Penalise patterns that can be hit within a single hit window.
             intervalDifficulty *= DifficultyCalculationUtils.Logistic(
