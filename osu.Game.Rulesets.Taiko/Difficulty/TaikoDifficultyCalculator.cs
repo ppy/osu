@@ -110,7 +110,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
             // We count difficult stamina strains to ensure that even if there's no rhythm, very heavy stamina maps still give their respective difficulty.
             double staminaTransition = Math.Clamp((staminaStrains - stamina_threshold) / (1350 - stamina_threshold), 0, 1);
-            double staminaFactor = (1 - staminaTransition) * 1.0 + staminaTransition * 0.85;
+            double staminaFactor = (1 - staminaTransition) * 1.0 + staminaTransition * 0.80;
             staminaFactor *= Math.Min(1, stamina_threshold / Math.Min(2000, staminaStrains));
 
             simpleRhythmPenalty = patternRating(rhythmRating, 2.5, 5, colourRating);
@@ -150,7 +150,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             double patternPenalty = simplePatternPenalty(rhythmRating, colourRating, staminaDifficultStrains, rhythmDifficultStrains, clockRate);
 
             double combinedRating = combinedDifficultyValue(rhythm, reading, colour, stamina);
-            double starRating = rescale(combinedRating * 1.8);
+            double starRating = rescale(combinedRating * 1.81);
 
             // Converts are penalised outside of the scope of difficulty calculation, as our assumptions surrounding playstyle becomes out-of-scope.
             if (beatmap.BeatmapInfo.Ruleset.OnlineID == 0)
@@ -205,7 +205,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             {
                 // Peaks uses separate constants due to strain pertaining differently to display values.
                 double colourPeak = colourPeaks[i] * 0.0359 * simpleRhythm;
-                double rhythmPeak = rhythmPeaks[i] * 0.0379 * simpleColourPenalty;
+                double rhythmPeak = rhythmPeaks[i] * 0.0430 * simpleColourPenalty;
                 double staminaPeak = staminaPeaks[i] * 0.0317;
                 double readingPeak = readingPeaks[i] * 0.0084;
 

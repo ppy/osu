@@ -29,17 +29,5 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
 
             return high_sv_multiplier * DifficultyCalculationUtils.Logistic(effectiveBPM, center, 1.0 / (range / 10));
         }
-
-        /// <summary>
-        /// Calculates the object density based on the DeltaTime, EffectiveBPM, and CurrentSliderVelocity.
-        /// </summary>
-        /// <param name="noteObject">The current noteObject to evaluate.</param>
-        /// <returns>The calculated object density.</returns>
-        public static double CalculateObjectDensity(TaikoDifficultyHitObject noteObject)
-        {
-            double objectDensity = 50 * DifficultyCalculationUtils.Logistic(noteObject.DeltaTime, 200, 1.0 / 300);
-
-            return 1 - DifficultyCalculationUtils.Logistic(noteObject.EffectiveBPM, objectDensity, 1.0 / 240);
-        }
     }
 }
