@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
             int consistentCount = 0;
             double totalDeltaTime = 0.0;
 
-            TaikoDifficultyHitObject? current = hitObject;
+            TaikoDifficultyHitObject current = hitObject;
 
             while (current.Previous(1) is TaikoDifficultyHitObject previousHitObject)
             {
