@@ -11,10 +11,9 @@ namespace osu.Game.Rulesets.Mania.Mods
 {
     public class ManiaModPerfect : ModPerfect
     {
-
     [SettingSource("Full perfect", "Placeholder")]
     public BindableBool allPerfect { get; } = new BindableBool(false);
-
+    
         protected override bool FailCondition(HealthProcessor healthProcessor, JudgementResult result)
         {
             if (!isRelevantResult(result.Judgement.MinResult) && !isRelevantResult(result.Judgement.MaxResult) && !isRelevantResult(result.Type))
