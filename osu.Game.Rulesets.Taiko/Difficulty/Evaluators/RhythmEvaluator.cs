@@ -117,6 +117,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
             return ratioDifficulty(evenPatterns.IntervalRatio);
         }
 
+        /// <summary>
+        /// Evaluate the difficulty of a hitobject considering its interval change.
+        /// </summary>
         public static double EvaluateDifficultyOf(DifficultyHitObject hitObject, double hitWindow)
         {
             TaikoDifficultyHitObjectRhythm rhythm = ((TaikoDifficultyHitObject)hitObject).Rhythm;

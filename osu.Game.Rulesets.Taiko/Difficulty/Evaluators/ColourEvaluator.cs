@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
         }
 
         /// <summary>
-        /// Calculates a consistency penalty based on the number of consecutive consistent intervals, considering the delta between each colour sequence.
+        /// Calculates a consistency penalty based on the number of consecutive consistent intervals, considering the delta time between each colour sequence.
         /// </summary>
         private static double consistentIntervalPenalty(TaikoDifficultyHitObject hitObject, double threshold = 0.01)
         {
@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
 
             TaikoDifficultyHitObject? current = hitObject;
 
-            while (current?.Previous(1) is TaikoDifficultyHitObject previousHitObject)
+            while (current.Previous(1) is TaikoDifficultyHitObject previousHitObject)
             {
                 double currentInterval = current.DeltaTime;
 
@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
 
                 double previousInterval = previousHitObject.DeltaTime;
 
-                // If the current interval is consistent, accumulate delta time and increase count
+                // If the current interval is consistent, accumulate delta time and increase count within the Margin of Error.
                 if (Math.Abs(1 - currentInterval / previousInterval) <= threshold)
                 {
                     consistentCount++;
@@ -72,7 +72,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
         }
 
         /// <summary>
-        /// Evaluate the difficulty of a hit object with consideration for consistency.
+        /// Evaluate the difficulty of the first hitobject within a colour streak.
         /// </summary>
         public static double EvaluateDifficultyOf(DifficultyHitObject hitObject)
         {
