@@ -71,7 +71,7 @@ namespace osu.Game.Skinning
                     Math.Min(textureUpload.Height, max_supported_texture_size)
                 )));
 
-                return new TextureUpload(image);
+                return new TextureUpload(PremultipliedImage.FromStraight(image));
             }
 
             return textureUpload;
