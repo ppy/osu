@@ -265,8 +265,8 @@ namespace osu.Game.Rulesets.Osu.Skinning
             }
 
             protected Color4 ColourAtPosition(Vector2 localPos) => DrawColourInfo.Colour.HasSingleColour
-                ? ((SRGBColour)DrawColourInfo.Colour).Linear
-                : DrawColourInfo.Colour.Interpolate(Vector2.Divide(localPos, drawSize)).Linear;
+                ? ((SRGBColour)DrawColourInfo.Colour).SRGB
+                : DrawColourInfo.Colour.Interpolate(Vector2.Divide(localPos, drawSize)).SRGB;
 
             protected virtual Color4 PointColour(SmokePoint point)
             {
@@ -352,25 +352,25 @@ namespace osu.Game.Rulesets.Osu.Skinning
                 {
                     Position = localTopLeft,
                     TexturePosition = textureRect.TopLeft,
-                    Colour = Color4Extensions.Multiply(ColourAtPosition(localTopLeft), colour),
+                    Colour = Color4Extensions.Multiply(ColourAtPosition(localTopLeft), colour).ToPremultiplied(),
                 });
                 quadBatch.Add(new TexturedVertex2D(renderer)
                 {
                     Position = localTopRight,
                     TexturePosition = textureRect.TopRight,
-                    Colour = Color4Extensions.Multiply(ColourAtPosition(localTopRight), colour),
+                    Colour = Color4Extensions.Multiply(ColourAtPosition(localTopRight), colour).ToPremultiplied(),
                 });
                 quadBatch.Add(new TexturedVertex2D(renderer)
                 {
                     Position = localBotRight,
                     TexturePosition = textureRect.BottomRight,
-                    Colour = Color4Extensions.Multiply(ColourAtPosition(localBotRight), colour),
+                    Colour = Color4Extensions.Multiply(ColourAtPosition(localBotRight), colour).ToPremultiplied(),
                 });
                 quadBatch.Add(new TexturedVertex2D(renderer)
                 {
                     Position = localBotLeft,
                     TexturePosition = textureRect.BottomLeft,
-                    Colour = Color4Extensions.Multiply(ColourAtPosition(localBotLeft), colour),
+                    Colour = Color4Extensions.Multiply(ColourAtPosition(localBotLeft), colour).ToPremultiplied(),
                 });
             }
 

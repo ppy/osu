@@ -7,7 +7,9 @@ using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Rendering.Vertices;
@@ -19,7 +21,6 @@ using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Framework.Timing;
 using osuTK;
-using osuTK.Graphics;
 using osuTK.Graphics.ES30;
 
 namespace osu.Game.Rulesets.Osu.UI.Cursor
@@ -292,7 +293,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                         Position = new Vector2(part.Position.X - texture.DisplayWidth * originPosition.X * part.Scale.X, part.Position.Y + texture.DisplayHeight * (1 - originPosition.Y) * part.Scale.Y),
                         TexturePosition = textureRect.BottomLeft,
                         TextureRect = new Vector4(0, 0, 1, 1),
-                        Colour = DrawColourInfo.Colour.BottomLeft.Linear,
+                        Colour = DrawColourInfo.Colour.BottomLeft.SRGB.ToPremultiplied(),
                         Time = part.Time
                     });
 
@@ -301,7 +302,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                         Position = new Vector2(part.Position.X + texture.DisplayWidth * (1 - originPosition.X) * part.Scale.X, part.Position.Y + texture.DisplayHeight * (1 - originPosition.Y) * part.Scale.Y),
                         TexturePosition = textureRect.BottomRight,
                         TextureRect = new Vector4(0, 0, 1, 1),
-                        Colour = DrawColourInfo.Colour.BottomRight.Linear,
+                        Colour = DrawColourInfo.Colour.BottomRight.SRGB.ToPremultiplied(),
                         Time = part.Time
                     });
 
@@ -310,7 +311,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                         Position = new Vector2(part.Position.X + texture.DisplayWidth * (1 - originPosition.X) * part.Scale.X, part.Position.Y - texture.DisplayHeight * originPosition.Y * part.Scale.Y),
                         TexturePosition = textureRect.TopRight,
                         TextureRect = new Vector4(0, 0, 1, 1),
-                        Colour = DrawColourInfo.Colour.TopRight.Linear,
+                        Colour = DrawColourInfo.Colour.TopRight.SRGB.ToPremultiplied(),
                         Time = part.Time
                     });
 
@@ -319,7 +320,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                         Position = new Vector2(part.Position.X - texture.DisplayWidth * originPosition.X * part.Scale.X, part.Position.Y - texture.DisplayHeight * originPosition.Y * part.Scale.Y),
                         TexturePosition = textureRect.TopLeft,
                         TextureRect = new Vector4(0, 0, 1, 1),
-                        Colour = DrawColourInfo.Colour.TopLeft.Linear,
+                        Colour = DrawColourInfo.Colour.TopLeft.SRGB.ToPremultiplied(),
                         Time = part.Time
                     });
                 }
@@ -354,7 +355,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             public Vector2 Position;
 
             [VertexMember(4, VertexAttribPointerType.Float)]
-            public Color4 Colour;
+            public PremultipliedColour Colour;
 
             [VertexMember(2, VertexAttribPointerType.Float)]
             public Vector2 TexturePosition;
