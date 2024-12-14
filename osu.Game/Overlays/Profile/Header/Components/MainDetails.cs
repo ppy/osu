@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.LocalisationExtensions;
@@ -189,7 +188,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 );
             }
 
-            detailGlobalRank.ContentTooltipText = tooltipParts.Any()
+            detailGlobalRank.ContentTooltipText = tooltipParts.Count > 0
                 ? string.Join("\n", tooltipParts)
                 : string.Empty;
             #endregion
@@ -210,7 +209,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 }
             }
 
-            detailCountryRank.ContentTooltipText = countryTooltipParts.Any()
+            detailCountryRank.ContentTooltipText = countryTooltipParts.Count > 0
                 ? string.Join("\n", countryTooltipParts)
                 : string.Empty;
             #endregion
