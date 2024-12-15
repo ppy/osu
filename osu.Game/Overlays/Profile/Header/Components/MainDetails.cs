@@ -164,9 +164,10 @@ namespace osu.Game.Overlays.Profile.Header.Components
             detailGlobalRank.Content = user?.Statistics?.GlobalRank?.ToLocalisableString("\\##,##0") ?? (LocalisableString)"-";
 
             var rankHighest = user?.RankHighest;
-            var variants = user?.Statistics.Variants;
+            var variants = user?.Statistics?.Variants;
 
             #region Global rank tooltip
+
             var tooltipParts = new List<LocalisableString>();
 
             if (variants?.Count > 0)
@@ -191,11 +192,13 @@ namespace osu.Game.Overlays.Profile.Header.Components
             detailGlobalRank.ContentTooltipText = tooltipParts.Count > 0
                 ? string.Join("\n", tooltipParts)
                 : string.Empty;
+
             #endregion
 
             detailCountryRank.Content = user?.Statistics?.CountryRank?.ToLocalisableString("\\##,##0") ?? (LocalisableString)"-";
 
             #region Country rank tooltip
+
             var countryTooltipParts = new List<LocalisableString>();
 
             if (variants?.Count > 0)
@@ -212,6 +215,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
             detailCountryRank.ContentTooltipText = countryTooltipParts.Count > 0
                 ? string.Join("\n", countryTooltipParts)
                 : string.Empty;
+
             #endregion
 
             rankGraph.Statistics.Value = user?.Statistics;
