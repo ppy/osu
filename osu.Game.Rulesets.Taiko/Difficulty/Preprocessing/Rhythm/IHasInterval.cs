@@ -4,7 +4,7 @@
 namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Rhythm
 {
     /// <summary>
-    /// The interface for hitobjects that provide an interval value,
+    /// The interface for hitobjects that provide an interval value.
     /// </summary>
     public interface IHasInterval
     {

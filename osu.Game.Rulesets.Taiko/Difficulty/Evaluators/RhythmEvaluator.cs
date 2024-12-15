@@ -71,7 +71,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
                     for (int j = i + 1; j < intervals.Count; j++)
                     {
                         double ratio = intervals[i]!.Value / intervals[j]!.Value;
-                        if (Math.Abs(1 - ratio) <= threshold) // If any two intervals are similar, apply penalty.
+                        if (Math.Abs(1 - ratio) <= threshold) // If any two intervals are similar, apply a penalty.
                             return 0.3;
                     }
                 }
@@ -85,7 +85,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
                 ? sameInterval(evenHitObjects, 4)
                 : 1.0; // Returns a non-penalty if there are 6 or more notes within an interval.
 
-            return Math.Min(longIntervalPenalty, shortIntervalPenalty);
+            return Math.Min(longIntervalPenalty, shortIntervalPenalty); // Returns the harsher penalty between the two checks.
         }
 
         private static double evaluateDifficultyOf(EvenHitObjects evenHitObjects, double hitWindow)

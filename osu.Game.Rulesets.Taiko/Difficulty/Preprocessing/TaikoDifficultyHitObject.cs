@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
         public readonly int NoteIndex;
 
         /// <summary>
-        /// The rhythm required to hit this hit object.
+        /// Rhythm data for this this hit object.
         /// </summary>
         public readonly TaikoDifficultyHitObjectRhythm Rhythm;
 
@@ -57,8 +57,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
         public double? HitObjectInterval { get; set; }
 
         /// <summary>
-        /// Colour data for this hit object. This is used by colour evaluator to calculate colour difficulty, but can be used
-        /// by other skills in the future.
+        /// Colour data for this hit object. This is used by colour evaluator to calculate colour difficulty, but is used
+        /// by other skills.
         /// </summary>
         public readonly TaikoDifficultyHitObjectColour Colour;
 
@@ -85,8 +85,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
         {
             noteDifficultyHitObjects = noteObjects;
 
-            // Create the Colour object, its properties should be filled in by TaikoDifficultyPreprocessor
+            // Create a Colour object, its properties are filled in by TaikoColourDifficultyPreprocessor
             Colour = new TaikoDifficultyHitObjectColour();
+
+            // Create a Rhythm object, its properties are filled in by TaikoDifficultyHitObjectRhythm
             Rhythm = new TaikoDifficultyHitObjectRhythm(this);
 
             switch ((hitObject as Hit)?.Type)
