@@ -46,39 +46,46 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
         }
 
         /// <summary>
-        /// Determines if the pattern of hit object intervals is consistent based on a given threshold.
+        /// Determines if the changes in hit object intervals is consistent based on a given threshold.
         /// </summary>
         private static double repeatedIntervalPenalty(EvenHitObjects evenHitObjects, double threshold = 0.1)
         {
-            // Collect the last 3 intervals (current and the last 2 previous).
-            List<double?> intervals = new List<double?>();
-            var currentObject = evenHitObjects;
-            const int interval_count = 3;
-
-            for (int i = 0; i < interval_count && currentObject != null; i++)
+            double sameInterval(EvenHitObjects startObject, int intervalCount)
             {
-                intervals.Add(currentObject.HitObjectInterval);
-                currentObject = currentObject.Previous;
-            }
+                List<double?> intervals = new List<double?>();
+                var currentObject = startObject;
 
-            intervals.RemoveAll(interval => interval == null);
-
-            // If there are fewer than 3 valid intervals, skip the consistency check.
-            if (intervals.Count < interval_count)
-                return 1.0; // No penalty applied if there isn't enough data.
-
-            for (int i = 0; i < intervals.Count; i++)
-            {
-                for (int j = i + 1; j < intervals.Count; j++)
+                for (int i = 0; i < intervalCount && currentObject != null; i++)
                 {
-                    double ratio = intervals[i]!.Value / intervals[j]!.Value;
-                    if (Math.Abs(1 - ratio) <= threshold) // If any two intervals are similar, apply penalty.
-                        return 0.3;
+                    intervals.Add(currentObject.HitObjectInterval);
+                    currentObject = currentObject.Previous;
                 }
+
+                intervals.RemoveAll(interval => interval == null);
+
+                if (intervals.Count < intervalCount)
+                    return 1.0; // No penalty if there aren't enough valid intervals.
+
+                for (int i = 0; i < intervals.Count; i++)
+                {
+                    for (int j = i + 1; j < intervals.Count; j++)
+                    {
+                        double ratio = intervals[i]!.Value / intervals[j]!.Value;
+                        if (Math.Abs(1 - ratio) <= threshold) // If any two intervals are similar, apply penalty.
+                            return 0.3;
+                    }
+                }
+
+                return 1.0; // No penalty if all intervals are different.
             }
 
-            // No similar intervals were found.
-            return 1.0;
+            double longIntervalPenalty = sameInterval(evenHitObjects, 3);
+
+            double shortIntervalPenalty = evenHitObjects.Children.Count < 6
+                ? sameInterval(evenHitObjects, 4)
+                : 1.0; // Returns a non-penalty if there are 6 or more notes within an interval.
+
+            return Math.Min(longIntervalPenalty, shortIntervalPenalty);
         }
 
         private static double evaluateDifficultyOf(EvenHitObjects evenHitObjects, double hitWindow)
