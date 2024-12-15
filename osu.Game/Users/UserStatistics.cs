@@ -126,11 +126,13 @@ namespace osu.Game.Users
                 }
             }
         }
+
         public enum GameVariant
         {
             [EnumMember(Value = "4k")]
             [LocalisableDescription(typeof(BeatmapsStrings), nameof(BeatmapsStrings.VariantMania4k))]
             FourKey,
+
             [EnumMember(Value = "7k")]
             [LocalisableDescription(typeof(BeatmapsStrings), nameof(BeatmapsStrings.VariantMania7k))]
             SevenKey
