@@ -50,10 +50,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
         /// </summary>
         private static double repeatedIntervalPenalty(EvenHitObjects evenHitObjects, double threshold = 0.1)
         {
-            // Collect the last 4 intervals (current and the last 3 previous).
+            // Collect the last 3 intervals (current and the last 2 previous).
             List<double?> intervals = new List<double?>();
             var currentObject = evenHitObjects;
-            const int interval_count = 4;
+            const int interval_count = 3;
 
             for (int i = 0; i < interval_count && currentObject != null; i++)
             {
@@ -63,7 +63,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
 
             intervals.RemoveAll(interval => interval == null);
 
-            // If there are fewer than 4 valid intervals, skip the consistency check.
+            // If there are fewer than 3 valid intervals, skip the consistency check.
             if (intervals.Count < interval_count)
                 return 1.0; // No penalty applied if there isn't enough data.
 
