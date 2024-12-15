@@ -4,11 +4,11 @@
 #nullable disable
 
 using System;
+using System.Drawing;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Primitives;
 using osu.Framework.Layout;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
@@ -17,6 +17,7 @@ using osu.Game.Screens;
 using osu.Game.Screens.Backgrounds;
 using osuTK;
 using osuTK.Graphics;
+using RectangleF = osu.Framework.Graphics.Primitives.RectangleF;
 
 namespace osu.Game.Graphics.Containers
 {
@@ -120,12 +121,14 @@ namespace osu.Game.Graphics.Containers
             {
                 if (host.Window != null)
                 {
+                    // todo: should read from SDL_GetWindowDisplayScale through IWindow for correct results on Android.
+                    SizeF windowSize = host.Window.ClientSize / host.Window.Scale;
                     // If the window size constitutes an aspect ratio smaller than the base size,
                     // then the DrawSizePreservingFillContainer starts descaling the game to ensure it always fits.
                     // We do not desire this behaviour when the window dimensions are small already (e.g. 852x393 on iPhone 16).
                     // The number 576 is picked arbitrarily here as a cutoff point which keeps the game scaled appropriately.
-                    float minimumScalingHeight = Math.Min(576f, host.Window.Size.Width / base_aspect_ratio);
-                    float windowSizeFactor = Math.Min(1f, host.Window.Size.Height / minimumScalingHeight);
+                    float minimumScalingHeight = Math.Min(576f, windowSize.Width / base_aspect_ratio);
+                    float windowSizeFactor = Math.Min(1f, windowSize.Height / minimumScalingHeight);
                     // Easiest method to apply this compensation is by adjusting the TargetDrawSize.
                     TargetDrawSize = base_target_draw_size * windowSizeFactor;
                 }
