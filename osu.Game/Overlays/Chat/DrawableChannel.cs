@@ -155,8 +155,13 @@ namespace osu.Game.Overlays.Chat
             {
                 addDaySeparatorIfRequired(lastMessage, message);
 
-                ChatLineFlow.Add(CreateChatLine(message));
-                lastMessage = message;
+                var chatLine = CreateChatLine(message);
+
+                if (chatLine != null)
+                {
+                    ChatLineFlow.Add(chatLine);
+                    lastMessage = message;
+                }
             }
 
             var staleMessages = chatLines.Where(c => c.LifetimeEnd == double.MaxValue).ToArray();
