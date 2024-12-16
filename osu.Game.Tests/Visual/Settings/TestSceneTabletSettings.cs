@@ -136,6 +136,8 @@ namespace osu.Game.Tests.Visual.Settings
             public Bindable<Vector2> OutputAreaOffset { get; } = new Bindable<Vector2>();
             public Bindable<Vector2> OutputAreaSize { get; } = new Bindable<Vector2>();
 
+            public Bindable<Vector2> OutputSize { get; } = new Bindable<Vector2>();
+
             public Bindable<float> Rotation { get; } = new Bindable<float>();
 
             public BindableFloat PressureThreshold { get; } = new BindableFloat
