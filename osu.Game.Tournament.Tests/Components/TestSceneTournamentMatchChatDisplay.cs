@@ -152,6 +152,12 @@ namespace osu.Game.Tournament.Tests.Components
             AddStep("change channel to 2", () => chatDisplay.Channel.Value = testChannel2);
 
             AddStep("change channel to 1", () => chatDisplay.Channel.Value = testChannel);
+
+            AddStep("!mp message (shouldn't display)", () => testChannel.AddNewMessages(new Message(nextMessageId())
+            {
+                Sender = redUser.ToAPIUser(),
+                Content = "!mp wangs"
+            }));
         }
 
         private int messageId;
