@@ -9,7 +9,7 @@ using osu.Game.Screens.Play;
 
 namespace osu.Android
 {
-    public partial class GameplayScreenRotationLocker : Component
+    public partial class AndroidScreenRotationLocker : Component
     {
         private IBindable<LocalUserPlayingState> localUserPlaying = null!;
 
