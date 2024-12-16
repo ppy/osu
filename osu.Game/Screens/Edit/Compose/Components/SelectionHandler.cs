@@ -30,6 +30,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
     /// </summary>
     public abstract partial class SelectionHandler<T> : CompositeDrawable, IKeyBindingHandler<PlatformAction>, IKeyBindingHandler<GlobalAction>, IHasContextMenu
     {
+        public bool IsInSelectionMode { get; set; }
+
         /// <summary>
         /// How much padding around the selection area is added.
         /// </summary>
@@ -271,7 +273,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <returns>Whether a selection was performed.</returns>
         internal virtual bool MouseDownSelectionRequested(SelectionBlueprint<T> blueprint, MouseButtonEvent e)
         {
-            if (e.Button == MouseButton.Middle || (e.ShiftPressed && e.Button == MouseButton.Right))
+            if (e.Button == MouseButton.Middle || (!IsInSelectionMode || (e.ShiftPressed && e.Button == MouseButton.Right)))
             {
                 handleQuickDeletion(blueprint);
                 return true;
