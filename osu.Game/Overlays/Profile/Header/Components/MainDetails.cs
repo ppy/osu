@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Scoring;
@@ -163,13 +164,20 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 scoreRankInfo.Value.RankCount = user?.Statistics?.GradesCount[scoreRankInfo.Key] ?? 0;
 
             detailGlobalRank.Content = user?.Statistics?.GlobalRank?.ToLocalisableString("\\##,##0") ?? (LocalisableString)"-";
+            detailGlobalRank.ContentTooltipText = getGlobalRankTooltipText(user);
 
+            detailCountryRank.Content = user?.Statistics?.CountryRank?.ToLocalisableString("\\##,##0") ?? (LocalisableString)"-";
+            detailCountryRank.ContentTooltipText = getCountryRankTooltipText(user);
+
+            rankGraph.Statistics.Value = user?.Statistics;
+        }
+
+        private static LocalisableString getGlobalRankTooltipText(APIUser? user)
+        {
             var rankHighest = user?.RankHighest;
             var variants = user?.Statistics?.Variants;
 
-            #region Global rank tooltip
-
-            var tooltipParts = new List<LocalisableString>();
+            LocalisableString? result = null;
 
             if (variants?.Count > 0)
             {
@@ -177,30 +185,36 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 {
                     if (variant.GlobalRank != null)
                     {
-                        tooltipParts.Add($"{variant.VariantType.GetLocalisableDescription()}: {variant.GlobalRank.ToLocalisableString("\\##,##0")}");
+                        var variantText = LocalisableString.Interpolate($"{variant.VariantType.GetLocalisableDescription()}: {variant.GlobalRank.ToLocalisableString("\\##,##0")}");
+
+                        if (result == null)
+                            result = variantText;
+                        else
+                            result = LocalisableString.Interpolate($"{result}\n{variantText}");
                     }
                 }
             }
 
             if (rankHighest != null)
             {
-                tooltipParts.Add(UsersStrings.ShowRankHighest(
+                var rankHighestText = UsersStrings.ShowRankHighest(
                     rankHighest.Rank.ToLocalisableString("\\##,##0"),
-                    rankHighest.UpdatedAt.ToLocalisableString(@"d MMM yyyy"))
-                );
+                    rankHighest.UpdatedAt.ToLocalisableString(@"d MMM yyyy"));
+
+                if (result == null)
+                    result = rankHighestText;
+                else
+                    result = LocalisableString.Interpolate($"{result}\n{rankHighestText}");
             }
 
-            detailGlobalRank.ContentTooltipText = tooltipParts.Count > 0
-                ? string.Join("\n", tooltipParts)
-                : string.Empty;
+            return result ?? default;
+        }
 
-            #endregion
+        private static LocalisableString getCountryRankTooltipText(APIUser? user)
+        {
+            var variants = user?.Statistics?.Variants;
 
-            detailCountryRank.Content = user?.Statistics?.CountryRank?.ToLocalisableString("\\##,##0") ?? (LocalisableString)"-";
-
-            #region Country rank tooltip
-
-            var countryTooltipParts = new List<LocalisableString>();
+            LocalisableString? result = null;
 
             if (variants?.Count > 0)
             {
@@ -208,18 +222,17 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 {
                     if (variant.CountryRank != null)
                     {
-                        countryTooltipParts.Add($"{variant.VariantType.GetLocalisableDescription()}: {variant.CountryRank.Value.ToLocalisableString("\\##,##0")}");
+                        var variantText = LocalisableString.Interpolate($"{variant.VariantType.GetLocalisableDescription()}: {variant.CountryRank.ToLocalisableString("\\##,##0")}");
+
+                        if (result == null)
+                            result = variantText;
+                        else
+                            result = LocalisableString.Interpolate($"{result}\n{variantText}");
                     }
                 }
             }
 
-            detailCountryRank.ContentTooltipText = countryTooltipParts.Count > 0
-                ? string.Join("\n", countryTooltipParts)
-                : string.Empty;
-
-            #endregion
-
-            rankGraph.Statistics.Value = user?.Statistics;
+            return result ?? default;
         }
 
         private partial class ScoreRankInfo : CompositeDrawable
