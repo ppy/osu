@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays.Volume;
@@ -59,13 +60,12 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestAltScrollNotBlocked()
         {
-            bool scrollReceived = false;
+            TestGlobalScrollAdjustsVolume volumeAdjust = null!;
 
-            AddStep("add volume control receptor", () => Add(new VolumeControlReceptor
+            AddStep("add volume control receptor", () => Add(volumeAdjust = new TestGlobalScrollAdjustsVolume
             {
                 RelativeSizeAxes = Axes.Both,
                 Depth = float.MaxValue,
-                ScrollActionRequested = (_, _, _) => scrollReceived = true,
             }));
 
             AddStep("hold alt", () => InputManager.PressKey(Key.AltLeft));
@@ -75,8 +75,19 @@ namespace osu.Game.Tests.Visual.UserInterface
                 InputManager.ScrollVerticalBy(10);
             });
 
-            AddAssert("receptor received scroll input", () => scrollReceived);
+            AddAssert("receptor received scroll input", () => volumeAdjust.ScrollReceived);
             AddStep("release alt", () => InputManager.ReleaseKey(Key.AltLeft));
+        }
+
+        public partial class TestGlobalScrollAdjustsVolume : GlobalScrollAdjustsVolume
+        {
+            public bool ScrollReceived { get; private set; }
+
+            protected override bool OnScroll(ScrollEvent e)
+            {
+                ScrollReceived = true;
+                return base.OnScroll(e);
+            }
         }
 
         private partial class TestOverlay : OsuFocusedOverlayContainer
