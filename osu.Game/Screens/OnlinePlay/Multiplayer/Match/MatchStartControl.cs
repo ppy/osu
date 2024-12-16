@@ -256,7 +256,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
-            if (!readyButton.Enabled.Value)
+            if (e.Repeat)
             {
                 return false;
             }
@@ -264,7 +264,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             switch (e.Action)
             {
                 case GlobalAction.MultiplayerReady:
-                    onReadyButtonClick();
+                    readyButton.TriggerClick();
                     return true;
 
                 default:
