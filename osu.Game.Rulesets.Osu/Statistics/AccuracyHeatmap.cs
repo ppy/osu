@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Osu.Statistics
         private const float rotation = 45;
 
         private BufferedContainer bufferedGrid = null!;
-        private GridContainer? pointGrid = null!;
+        private GridContainer? pointGrid;
 
         private readonly ScoreInfo score;
         private readonly IBeatmap playableBeatmap;
