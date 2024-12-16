@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -176,7 +177,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 {
                     if (variant.GlobalRank != null)
                     {
-                        tooltipParts.Add($"{variant.VariantDisplay}: {variant.GlobalRank.ToLocalisableString("\\##,##0")}");
+                        tooltipParts.Add($"{variant.VariantType.GetLocalisableDescription()}: {variant.GlobalRank.ToLocalisableString("\\##,##0")}");
                     }
                 }
             }
@@ -207,7 +208,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 {
                     if (variant.CountryRank != null)
                     {
-                        countryTooltipParts.Add($"{variant.VariantDisplay}: {variant.CountryRank.Value.ToLocalisableString("\\##,##0")}");
+                        countryTooltipParts.Add($"{variant.VariantType.GetLocalisableDescription()}: {variant.CountryRank.Value.ToLocalisableString("\\##,##0")}");
                     }
                 }
             }

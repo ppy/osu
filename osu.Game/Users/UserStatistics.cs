@@ -6,9 +6,9 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+using JetBrains.Annotations;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using osu.Framework.Extensions;
 using osu.Framework.Localisation;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Resources.Localisation.Web;
@@ -80,7 +80,8 @@ namespace osu.Game.Users
         public Grades GradesCount;
 
         [JsonProperty(@"variants")]
-        public List<Variant> Variants = null!;
+        [CanBeNull]
+        public List<Variant> Variants;
 
         public struct Grades
         {
@@ -127,7 +128,7 @@ namespace osu.Game.Users
             }
         }
 
-        public enum GameVariant
+        public enum RulesetVariant
         {
             [EnumMember(Value = "4k")]
             [LocalisableDescription(typeof(BeatmapsStrings), nameof(BeatmapsStrings.VariantMania4k))]
@@ -154,9 +155,7 @@ namespace osu.Game.Users
 
             [JsonProperty("variant")]
             [JsonConverter(typeof(StringEnumConverter))]
-            public GameVariant? VariantType;
-
-            public LocalisableString VariantDisplay => VariantType?.GetLocalisableDescription() ?? string.Empty;
+            public RulesetVariant VariantType;
         }
     }
 }
