@@ -114,10 +114,7 @@ namespace osu.Game.Screens.Play.HUD
 
                 Font.BindValueChanged(typeface =>
                 {
-                    // We only have bold weight for venera, so let's force that.
-                    FontWeight fontWeight = typeface.NewValue == Typeface.Venera ? FontWeight.Bold : FontWeight.Regular;
-
-                    FontUsage f = OsuFont.GetFont(typeface.NewValue, weight: fontWeight);
+                    FontUsage f = OsuFont.GetFont(typeface.NewValue, weight: FontWeight.Regular);
 
                     // align baseline with fonts that aren't venera
                     comboLabel.Padding = new MarginPadding { Bottom = typeface.NewValue == Typeface.Venera ? 3f : 1f };

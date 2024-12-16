@@ -120,10 +120,7 @@ namespace osu.Game.Screens.Play.HUD
 
                 Font.BindValueChanged(typeface =>
                 {
-                    // We only have bold weight for venera, so let's force that.
-                    FontWeight fontWeight = typeface.NewValue == Typeface.Venera ? FontWeight.Bold : FontWeight.Regular;
-
-                    FontUsage f = OsuFont.GetFont(typeface.NewValue, weight: fontWeight);
+                    FontUsage f = OsuFont.GetFont(typeface.NewValue, weight: FontWeight.Regular);
 
                     // Fixed width looks better on venera only in my opinion.
                     text.Font = f.With(size: 16, fixedWidth: typeface.NewValue == Typeface.Venera);
