@@ -204,7 +204,7 @@ namespace osu.Game.Screens.Edit.Timing
             {
                 RelativeSizeAxes = Axes.Both;
 
-                InternalChildren = new Drawable[]
+                InternalChildren = new[]
                 {
                     background = new Box
                     {
