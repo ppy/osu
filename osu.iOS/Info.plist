@@ -153,5 +153,7 @@
 	</array>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.music-games</string>
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+	<false/>
 </dict>
 </plist>
