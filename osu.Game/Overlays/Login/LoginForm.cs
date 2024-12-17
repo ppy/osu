@@ -140,6 +140,9 @@ namespace osu.Game.Overlays.Login
 
         private void performLogin()
         {
+            // Ensure username is trimmed and fix it visually for the user if not.
+            username.Text = username.Text.Trim();
+
             if (!string.IsNullOrEmpty(username.Text) && !string.IsNullOrEmpty(password.Text))
                 api.Login(username.Text, password.Text);
             else
