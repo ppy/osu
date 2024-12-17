@@ -36,7 +36,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         private readonly Bindable<Vector2> areaOffset = new Bindable<Vector2>();
         private readonly Bindable<Vector2> areaSize = new Bindable<Vector2>();
-        private readonly Bindable<Vector2> outputSize = new Bindable<Vector2>();
+        private readonly Bindable<Vector2> outputAreaSize = new Bindable<Vector2>();
+        private readonly Bindable<Vector2> outputAreaPosition = new Bindable<Vector2>();
         private readonly IBindable<TabletInfo> tablet = new Bindable<TabletInfo>();
 
         private readonly BindableNumber<float> offsetX = new BindableNumber<float> { MinValue = 0 };
@@ -50,6 +51,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         private Bindable<ScalingMode> scalingMode = null!;
         private Bindable<float> scalingSizeX = null!;
         private Bindable<float> scalingSizeY = null!;
+        private Bindable<float> scalingPositionX = new Bindable<float>();
+        private Bindable<float> scalingPositionY = new Bindable<float>();
 
         [Resolved]
         private GameHost host { get; set; }
@@ -87,6 +90,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             scalingMode = osuConfig.GetBindable<ScalingMode>(OsuSetting.Scaling);
             scalingSizeX = osuConfig.GetBindable<float>(OsuSetting.ScalingSizeX);
             scalingSizeY = osuConfig.GetBindable<float>(OsuSetting.ScalingSizeY);
+            scalingPositionX = osuConfig.GetBindable<float>(OsuSetting.ScalingPositionX);
+            scalingPositionY = osuConfig.GetBindable<float>(OsuSetting.ScalingPositionY);
 
             Children = new Drawable[]
             {
@@ -254,7 +259,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 sizeY.Value = val.NewValue.Y;
             }), true);
 
-            outputSize.BindTo(tabletHandler.OutputSize);
+            outputAreaSize.BindTo(tabletHandler.OutputAreaSize);
+            outputAreaPosition.BindTo(tabletHandler.OutputAreaPosition);
 
             sizeX.BindValueChanged(val =>
             {
@@ -280,9 +286,11 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             });
 
             updateScaling();
-            scalingSizeX.BindValueChanged(size => updateScaling());
-            scalingSizeY.BindValueChanged(size => updateScaling());
-            scalingMode.BindValueChanged(mode => updateScaling());
+            scalingMode.BindValueChanged(_ => updateScaling());
+            scalingSizeX.BindValueChanged(_ => updateScaling());
+            scalingSizeY.BindValueChanged(_ => updateScaling());
+            scalingPositionX.BindValueChanged(_ => updateScaling());
+            scalingPositionY.BindValueChanged(_ => updateScaling());
 
             tablet.BindTo(tabletHandler.Tablet);
             tablet.BindValueChanged(val => Schedule(() =>
@@ -371,17 +379,15 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         private void updateScaling()
         {
-            switch (scalingMode.Value)
+            if (scalingMode.Value == ScalingMode.Everything)
             {
-                case ScalingMode.Everything:
-                    outputSize.Value = new Vector2(
-                        host.Window.ClientSize.Width * scalingSizeX.Value,
-                        host.Window.ClientSize.Height * scalingSizeY.Value);
-                    break;
-
-                default:
-                    outputSize.Value = new Vector2(host.Window.ClientSize.Width, host.Window.ClientSize.Height);
-                    break;
+                outputAreaSize.Value = new Vector2(scalingSizeX.Value, scalingSizeY.Value);
+                outputAreaPosition.Value = new Vector2(scalingPositionX.Value, scalingPositionY.Value);
+            }
+            else
+            {
+                outputAreaSize.Value = new Vector2(1, 1);
+                outputAreaPosition.Value = new Vector2(0.5f, 0.5f);
             }
         }
 
