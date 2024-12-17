@@ -12,10 +12,10 @@ using osu.Framework.Graphics;
 using osu.Game.Rulesets.Scoring;
 using System.Collections.Generic;
 using osu.Game.Rulesets.Osu.Objects;
-using System.Linq;
 using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Screens.Play;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Osu.Judgements;
 
 namespace osu.Game.Rulesets.Osu.Skinning
 {
@@ -67,9 +67,10 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
         private void updateHeatmap(JudgementResult j)
         {
-            var e = scoreProcessor.HitEvents.Last();
-            if (e.Position != null && scoreProcessor.HitEvents.Count > 0)
-                heatmap.AddPoint(((OsuHitObject)j.HitObject).StackedEndPosition, ((OsuHitObject)j.HitObject).StackedEndPosition, e.Position.Value, radius);
+            if (j is not OsuHitCircleJudgementResult circleJudgementResult || circleJudgementResult.CursorPositionAtHit == null)
+                return;
+
+            heatmap.AddPoint(((OsuHitObject)j.HitObject).StackedEndPosition, ((OsuHitObject)j.HitObject).StackedEndPosition, circleJudgementResult.CursorPositionAtHit.Value, radius);
         }
     }
 }
