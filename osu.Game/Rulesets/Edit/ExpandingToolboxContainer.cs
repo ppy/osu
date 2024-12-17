@@ -65,8 +65,6 @@ namespace osu.Game.Rulesets.Edit
 
         protected override bool OnClick(ClickEvent e)
         {
-            if (!ReceivePositionalInputAt(e.ScreenSpaceMousePosition)) return false;
-
             base.OnClick(e);
 
             if (contractSidebars.Value && !Expanded.Value)

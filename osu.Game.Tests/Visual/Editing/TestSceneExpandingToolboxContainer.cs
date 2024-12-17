@@ -46,8 +46,8 @@ namespace osu.Game.Tests.Visual.Editing
             {
                 InputManager.MoveMouseTo(toolbox.ScreenSpaceDrawQuad.Centre);
                 InputManager.Click(MouseButton.Left);
-                AddAssert("sidebar expands after click", () => toolbox.Expanded.Value);
             });
+            AddAssert("sidebar expands after click", () => toolbox.Expanded.Value);
 
             AddStep("state - sidebar collapsed", () => toolbox.Expanded.Value = false);
 
