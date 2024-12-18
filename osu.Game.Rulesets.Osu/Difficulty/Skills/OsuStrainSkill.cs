@@ -23,10 +23,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// </summary>
         protected virtual double ReducedStrainBaseline => 0.75;
 
-        protected virtual double StrainDecayBase => 0.15;
-
-        protected double StrainDecay(double ms) => Math.Pow(StrainDecayBase, ms / 1000);
-
         protected OsuStrainSkill(Mod[] mods)
             : base(mods)
         {
@@ -61,9 +57,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return difficulty;
         }
 
-        /// <summary>
-        /// Converts difficulty value from <see cref="OsuDifficultyAttributes"/> to base performance.
-        /// </summary>
         public static double DifficultyToPerformance(double difficulty) => Math.Pow(5.0 * Math.Max(1.0, difficulty / 0.0675) - 4.0, 3.0) / 100000.0;
     }
 }

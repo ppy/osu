@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double currentDensityAimStrain = 0;
 
-        public override void Process(DifficultyHitObject current)
+        protected override double StrainValueAt(DifficultyHitObject current)
         {
             double densityReadingDifficulty = ReadingEvaluator.EvaluateDifficultyOf(current);
             double densityAimingFactor = ReadingEvaluator.EvaluateAimingDensityFactorOf(current);
@@ -37,21 +37,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             currentDensityAimStrain += densityAimingFactor * AimEvaluator.EvaluateDifficultyOf(current, true) * aimComponentMultiplier;
 
             double totalDensityDifficulty = (currentDensityAimStrain + densityReadingDifficulty) * skillMultiplier;
-
-            ObjectStrains.Add(totalDensityDifficulty);
-
-            if (current.Index == 0)
-                CurrentSectionEnd = Math.Ceiling(current.StartTime / SectionLength) * SectionLength;
-
-            while (current.StartTime > CurrentSectionEnd)
-            {
-                StrainPeaks.Add(CurrentSectionPeak);
-                CurrentSectionPeak = 0;
-                CurrentSectionEnd += SectionLength;
-            }
-
-            CurrentSectionPeak = Math.Max(totalDensityDifficulty, CurrentSectionPeak);
+            return totalDensityDifficulty;
         }
+
+        protected override double CalculateInitialStrain(double time, DifficultyHitObject current) => 0;
 
         private double reducedNoteCount => 5;
         private double reducedNoteBaseline => 0.7;
@@ -85,15 +74,5 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         public static double DifficultyToPerformance(double difficulty) => Math.Max(
             Math.Max(Math.Pow(difficulty, 1.5) * 20, Math.Pow(difficulty, 2) * 17.0),
             Math.Max(Math.Pow(difficulty, 3) * 10.5, Math.Pow(difficulty, 4) * 6.00));
-
-        protected override double StrainValueAt(DifficultyHitObject current)
-        {
-            throw new NotImplementedException();
-        }
-
-        protected override double CalculateInitialStrain(double time, DifficultyHitObject current)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

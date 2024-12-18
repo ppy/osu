@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 {
     public class OsuDifficultyCalculator : DifficultyCalculator
     {
-        public const double DIFFICULTY_MULTIPLIER = 0.0675;
+        private const double difficulty_multiplier = 0.0675;
         public const double SUM_POWER = 1.1;
         public const double FL_SUM_POWER = 1.5;
         public override int Version => 20241007;
@@ -37,17 +37,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (beatmap.HitObjects.Count == 0)
                 return new OsuDifficultyAttributes { Mods = mods };
 
-            double aimRating = Math.Sqrt(skills[0].DifficultyValue()) * DIFFICULTY_MULTIPLIER;
-            double aimRatingNoSliders = Math.Sqrt(skills[1].DifficultyValue()) * DIFFICULTY_MULTIPLIER;
-            double speedRating = Math.Sqrt(skills.OfType<Speed>().First().DifficultyValue()) * DIFFICULTY_MULTIPLIER;
+            double aimRating = Math.Sqrt(skills[0].DifficultyValue()) * difficulty_multiplier;
+            double aimRatingNoSliders = Math.Sqrt(skills[1].DifficultyValue()) * difficulty_multiplier;
+            double speedRating = Math.Sqrt(skills.OfType<Speed>().First().DifficultyValue()) * difficulty_multiplier;
             double speedNotes = skills.OfType<Speed>().First().RelevantNoteCount();
 
-            double flashlightRating = Math.Sqrt(skills.OfType<Flashlight>().First().DifficultyValue()) * DIFFICULTY_MULTIPLIER;
-            double readingLowARRating = Math.Sqrt(skills.OfType<ReadingLowAR>().First().DifficultyValue()) * DIFFICULTY_MULTIPLIER;
+            double flashlightRating = Math.Sqrt(skills.OfType<Flashlight>().First().DifficultyValue()) * difficulty_multiplier;
+            double readingLowARRating = Math.Sqrt(skills.OfType<ReadingLowAR>().First().DifficultyValue()) * difficulty_multiplier;
 
             double sliderFactor = aimRating > 0 ? aimRatingNoSliders / aimRating : 1;
 
-            double aimDifficultyStrainCount = skills[0].CountTopWeightedStrains();
+            double aimDifficultyStrainCount = skills.OfType<Aim>().First().CountTopWeightedStrains();
             double speedDifficultyStrainCount = skills.OfType<Speed>().First().CountTopWeightedStrains();
             double lowArDifficultyStrainCount = skills.OfType<ReadingLowAR>().First().CountTopWeightedStrains();
 
@@ -62,7 +62,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             {
                 aimRating *= 0.9;
                 speedRating = 0.0;
-                readingLowARRating *= 0.95;
                 flashlightRating *= 0.7;
                 readingLowARRating *= 0.95;
             }

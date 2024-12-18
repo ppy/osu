@@ -61,9 +61,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         [JsonProperty("low_ar_difficult_strain_count")]
         public double LowArDifficultStrainCount { get; set; }
 
-        [JsonProperty("hidden_difficult_strain_count")]
-        public double HiddenDifficultStrainCount { get; set; }
-
         /// <summary>
         /// The perceived approach rate inclusive of rate-adjusting mods (DT/HT/etc).
         /// </summary>
