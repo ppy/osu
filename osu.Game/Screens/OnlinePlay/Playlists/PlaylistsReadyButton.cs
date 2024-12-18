@@ -68,9 +68,6 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         {
             get
             {
-                if (Enabled.Value)
-                    return string.Empty;
-
                 if (!enoughTimeLeft)
                     return "No time left!";
 

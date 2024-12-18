@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Lists;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Objects;
@@ -40,7 +41,13 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// The breaks in this beatmap.
         /// </summary>
-        List<BreakPeriod> Breaks { get; }
+        SortedList<BreakPeriod> Breaks { get; set; }
+
+        /// <summary>
+        /// All lines from the [Events] section which aren't handled in the encoding process yet.
+        /// These lines should be written out to the beatmap file on save or export.
+        /// </summary>
+        List<string> UnhandledEventLines { get; }
 
         /// <summary>
         /// Total amount of break time in the beatmap.

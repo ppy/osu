@@ -65,7 +65,8 @@ namespace osu.Game.Database
                          if (!d.Beatmaps.Contains(existingBeatmap))
                          {
                              Debug.Fail("Beatmaps should never become detached under normal circumstances. If this ever triggers, it should be investigated further.");
-                             Logger.Log("WARNING: One of the difficulties in a beatmap was detached from its set. Please save a copy of logs and report this to devs.", LoggingTarget.Database, LogLevel.Important);
+                             Logger.Log("WARNING: One of the difficulties in a beatmap was detached from its set. Please save a copy of logs and report this to devs.", LoggingTarget.Database,
+                                 LogLevel.Important);
                              d.Beatmaps.Add(existingBeatmap);
                          }
 
@@ -291,7 +292,24 @@ namespace osu.Game.Database
             if (!RealmAccess.CurrentThreadSubscriptionsAllowed)
                 throw new InvalidOperationException($"Make sure to call {nameof(RealmAccess)}.{nameof(RealmAccess.RegisterForNotifications)}");
 
-            return collection.SubscribeForNotifications(callback);
+            bool initial = true;
+            return collection.SubscribeForNotifications(((sender, changes) =>
+            {
+                if (initial)
+                {
+                    initial = false;
+
+                    // Realm might coalesce the initial callback, meaning we never receive a `ChangeSet` of `null` marking the first callback.
+                    // Let's decouple it for simplicity in handling.
+                    if (changes != null)
+                    {
+                        callback(sender, null);
+                        return;
+                    }
+                }
+
+                callback(sender, changes);
+            }));
         }
 
         /// <summary>

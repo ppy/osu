@@ -17,6 +17,7 @@ using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods.Input;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Screens.Edit.Compose.Components;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
@@ -67,13 +68,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.Username, string.Empty);
             SetDefault(OsuSetting.Token, string.Empty);
 
-#pragma warning disable CS0618 // Type or member is obsolete
-            // this default set MUST remain despite the setting being deprecated, because `SetDefault()` calls are implicitly used to declare the type returned for the lookup.
-            // if this is removed, the setting will be interpreted as a string, and `Migrate()` will fail due to cast failure.
-            // can be removed 20240618
-            SetDefault(OsuSetting.AutomaticallyDownloadWhenSpectating, false);
-#pragma warning restore CS0618 // Type or member is obsolete
-            SetDefault(OsuSetting.AutomaticallyDownloadMissingBeatmaps, false);
+            SetDefault(OsuSetting.AutomaticallyDownloadMissingBeatmaps, true);
 
             SetDefault(OsuSetting.SavePassword, true).ValueChanged += enabled =>
             {
@@ -199,6 +194,11 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.EditorAutoSeekOnPlacement, true);
             SetDefault(OsuSetting.EditorLimitedDistanceSnap, false);
             SetDefault(OsuSetting.EditorShowSpeedChanges, false);
+            SetDefault(OsuSetting.EditorScaleOrigin, EditorOrigin.GridCentre);
+            SetDefault(OsuSetting.EditorRotationOrigin, EditorOrigin.GridCentre);
+            SetDefault(OsuSetting.EditorAdjustExistingObjectsOnTimingChanges, true);
+
+            SetDefault(OsuSetting.HideCountryFlags, false);
 
             SetDefault(OsuSetting.MultiplayerRoomFilter, RoomPermissionsFilter.All);
 
@@ -206,6 +206,14 @@ namespace osu.Game.Configuration
 
             SetDefault(OsuSetting.ComboColourNormalisationAmount, 0.2f, 0f, 1f, 0.01f);
             SetDefault<UserStatus?>(OsuSetting.UserOnlineStatus, null);
+
+            SetDefault(OsuSetting.EditorTimelineShowTimingChanges, true);
+            SetDefault(OsuSetting.EditorTimelineShowBreaks, true);
+            SetDefault(OsuSetting.EditorTimelineShowTicks, true);
+
+            SetDefault(OsuSetting.EditorContractSidebars, false);
+
+            SetDefault(OsuSetting.AlwaysShowHoldForMenuButton, false);
         }
 
         protected override bool CheckLookupContainsPrivateInformation(OsuSetting lookup)
@@ -239,12 +247,6 @@ namespace osu.Game.Configuration
 
             // migrations can be added here using a condition like:
             // if (combined < 20220103) { performMigration() }
-            if (combined < 20230918)
-            {
-#pragma warning disable CS0618 // Type or member is obsolete
-                SetValue(OsuSetting.AutomaticallyDownloadMissingBeatmaps, Get<bool>(OsuSetting.AutomaticallyDownloadWhenSpectating)); // can be removed 20240618
-#pragma warning restore CS0618 // Type or member is obsolete
-            }
         }
 
         public override TrackedSettings CreateTrackedSettings()
@@ -419,9 +421,6 @@ namespace osu.Game.Configuration
         EditorAutoSeekOnPlacement,
         DiscordRichPresence,
 
-        [Obsolete($"Use {nameof(AutomaticallyDownloadMissingBeatmaps)} instead.")] // can be removed 20240318
-        AutomaticallyDownloadWhenSpectating,
-
         ShowOnlineExplicitContent,
         LastProcessedMetadataId,
         SafeAreaConsiderations,
@@ -435,6 +434,15 @@ namespace osu.Game.Configuration
         TouchDisableGameplayTaps,
         ModSelectTextSearchStartsActive,
         UserOnlineStatus,
-        MultiplayerRoomFilter
+        MultiplayerRoomFilter,
+        HideCountryFlags,
+        EditorTimelineShowTimingChanges,
+        EditorTimelineShowTicks,
+        AlwaysShowHoldForMenuButton,
+        EditorContractSidebars,
+        EditorScaleOrigin,
+        EditorRotationOrigin,
+        EditorTimelineShowBreaks,
+        EditorAdjustExistingObjectsOnTimingChanges,
     }
 }

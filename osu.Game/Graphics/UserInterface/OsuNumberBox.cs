@@ -7,6 +7,11 @@ namespace osu.Game.Graphics.UserInterface
     {
         protected override bool AllowIme => false;
 
+        public OsuNumberBox()
+        {
+            SelectAllOnFocus = true;
+        }
+
         protected override bool CanAddCharacter(char character) => char.IsAsciiDigit(character);
     }
 }

@@ -42,7 +42,11 @@ namespace osu.Game.Online.API
 
         public string WebsiteRootUrl { get; }
 
-        public int APIVersion => 20220705; // We may want to pull this from the game version eventually.
+        /// <summary>
+        /// The API response version.
+        /// See: https://osu.ppy.sh/docs/index.html#api-versions
+        /// </summary>
+        public int APIVersion { get; }
 
         public Exception LastLoginError { get; private set; }
 
@@ -53,7 +57,7 @@ namespace osu.Game.Online.API
         private string password;
 
         public IBindable<APIUser> LocalUser => localUser;
-        public IBindableList<APIUser> Friends => friends;
+        public IBindableList<APIRelation> Friends => friends;
         public IBindable<UserActivity> Activity => activity;
         public IBindable<UserStatistics> Statistics => statistics;
 
@@ -63,7 +67,7 @@ namespace osu.Game.Online.API
 
         private Bindable<APIUser> localUser { get; } = new Bindable<APIUser>(createGuestUser());
 
-        private BindableList<APIUser> friends { get; } = new BindableList<APIUser>();
+        private BindableList<APIRelation> friends { get; } = new BindableList<APIRelation>();
 
         private Bindable<UserActivity> activity { get; } = new Bindable<UserActivity>();
 
@@ -84,12 +88,23 @@ namespace osu.Game.Online.API
             this.config = config;
             this.versionHash = versionHash;
 
+            if (game.IsDeployedBuild)
+                APIVersion = game.AssemblyVersion.Major * 10000 + game.AssemblyVersion.Minor;
+            else
+            {
+                var now = DateTimeOffset.Now;
+                APIVersion = now.Year * 10000 + now.Month * 100 + now.Day;
+            }
+
             APIEndpointUrl = endpointConfiguration.APIEndpointUrl;
             WebsiteRootUrl = endpointConfiguration.WebsiteRootUrl;
             NotificationsClient = setUpNotificationsClient();
 
             authentication = new OAuth(endpointConfiguration.APIClientID, endpointConfiguration.APIClientSecret, APIEndpointUrl);
+
             log = Logger.GetLogger(LoggingTarget.Network);
+            log.Add($@"API endpoint root: {APIEndpointUrl}");
+            log.Add($@"API request version: {APIVersion}");
 
             ProvidedUsername = config.Get<string>(OsuSetting.Username);
 
@@ -103,12 +118,11 @@ namespace osu.Game.Online.API
                 u.OldValue?.Activity.UnbindFrom(activity);
                 u.NewValue.Activity.BindTo(activity);
 
-                if (u.OldValue != null)
-                    localUserStatus.UnbindFrom(u.OldValue.Status);
-                localUserStatus.BindTo(u.NewValue.Status);
+                u.OldValue?.Status.UnbindFrom(localUserStatus);
+                u.NewValue.Status.BindTo(localUserStatus);
             }, true);
 
-            localUserStatus.BindValueChanged(val => configStatus.Value = val.NewValue);
+            localUserStatus.BindTo(configStatus);
 
             var thread = new Thread(run)
             {
@@ -145,9 +159,11 @@ namespace osu.Game.Online.API
 
         private void onTokenChanged(ValueChangedEvent<OAuthToken> e) => config.SetValue(OsuSetting.Token, config.Get<bool>(OsuSetting.SavePassword) ? authentication.TokenString : string.Empty);
 
-        internal new void Schedule(Action action) => base.Schedule(action);
+        void IAPIProvider.Schedule(Action action) => base.Schedule(action);
 
         public string AccessToken => authentication.RequestAccessToken();
+
+        public Guid SessionIdentifier { get; } = Guid.NewGuid();
 
         /// <summary>
         /// Number of consecutive requests which failed due to network issues.
@@ -344,19 +360,7 @@ namespace osu.Game.Online.API
                 }
             }
 
-            var friendsReq = new GetFriendsRequest();
-            friendsReq.Failure += _ => state.Value = APIState.Failing;
-            friendsReq.Success += res =>
-            {
-                friends.Clear();
-                friends.AddRange(res);
-            };
-
-            if (!handleRequest(friendsReq))
-            {
-                state.Value = APIState.Failing;
-                return;
-            }
+            UpdateLocalFriends();
 
             // The Success callback event is fired on the main thread, so we should wait for that to run before proceeding.
             // Without this, we will end up circulating this Connecting loop multiple times and queueing up many web requests
@@ -369,7 +373,8 @@ namespace osu.Game.Online.API
         {
             try
             {
-                request.Perform(this);
+                request.AttachAPI(this);
+                request.Perform();
             }
             catch (Exception e)
             {
@@ -467,7 +472,8 @@ namespace osu.Game.Online.API
         {
             try
             {
-                req.Perform(this);
+                req.AttachAPI(this);
+                req.Perform();
 
                 if (req.CompletionState != APIRequestCompletionState.Completed)
                     return false;
@@ -552,6 +558,8 @@ namespace osu.Game.Online.API
         {
             lock (queue)
             {
+                request.AttachAPI(this);
+
                 if (state.Value == APIState.Offline)
                 {
                     request.Fail(new WebException(@"User not logged in"));
@@ -583,6 +591,7 @@ namespace osu.Game.Online.API
             password = null;
             SecondFactorCode = null;
             authentication.Clear();
+            configStatus.Value = UserStatus.Online;
 
             // Scheduled prior to state change such that the state changed event is invoked with the correct user and their friends present
             Schedule(() =>
@@ -601,6 +610,22 @@ namespace osu.Game.Online.API
 
             if (IsLoggedIn)
                 localUser.Value.Statistics = newStatistics;
+        }
+
+        public void UpdateLocalFriends()
+        {
+            if (!IsLoggedIn)
+                return;
+
+            var friendsReq = new GetFriendsRequest();
+            friendsReq.Failure += _ => state.Value = APIState.Failing;
+            friendsReq.Success += res =>
+            {
+                friends.Clear();
+                friends.AddRange(res);
+            };
+
+            Queue(friendsReq);
         }
 
         private static APIUser createGuestUser() => new GuestUser();

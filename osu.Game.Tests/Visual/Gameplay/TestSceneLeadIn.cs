@@ -27,6 +27,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [TestCase(2000, 0)]
         [TestCase(3000, first_hit_object - 3000)]
         [TestCase(10000, first_hit_object - 10000)]
+        [FlakyTest]
         public void TestLeadInProducesCorrectStartTime(double leadIn, double expectedStartTime)
         {
             loadPlayerWithBeatmap(new TestBeatmap(new OsuRuleset().RulesetInfo)
@@ -41,13 +42,14 @@ namespace osu.Game.Tests.Visual.Gameplay
         [TestCase(0, 0)]
         [TestCase(-1000, -1000)]
         [TestCase(-10000, -10000)]
+        [FlakyTest]
         public void TestStoryboardProducesCorrectStartTimeSimpleAlpha(double firstStoryboardEvent, double expectedStartTime)
         {
             var storyboard = new Storyboard();
 
             var sprite = new StoryboardSprite("unknown", Anchor.TopLeft, Vector2.Zero);
 
-            sprite.TimelineGroup.Alpha.Add(Easing.None, firstStoryboardEvent, firstStoryboardEvent + 500, 0, 1);
+            sprite.Commands.AddAlpha(Easing.None, firstStoryboardEvent, firstStoryboardEvent + 500, 0, 1);
 
             storyboard.GetLayer("Background").Add(sprite);
 
@@ -64,6 +66,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [TestCase(0, 0, true)]
         [TestCase(-1000, -1000, true)]
         [TestCase(-10000, -10000, true)]
+        [FlakyTest]
         public void TestStoryboardProducesCorrectStartTimeFadeInAfterOtherEvents(double firstStoryboardEvent, double expectedStartTime, bool addEventToLoop)
         {
             const double loop_start_time = -20000;
@@ -73,17 +76,17 @@ namespace osu.Game.Tests.Visual.Gameplay
             var sprite = new StoryboardSprite("unknown", Anchor.TopLeft, Vector2.Zero);
 
             // these should be ignored as we have an alpha visibility blocker proceeding this command.
-            sprite.TimelineGroup.Scale.Add(Easing.None, loop_start_time, -18000, 0, 1);
-            var loopGroup = sprite.AddLoop(loop_start_time, 50);
-            loopGroup.Scale.Add(Easing.None, loop_start_time, -18000, 0, 1);
+            sprite.Commands.AddScale(Easing.None, loop_start_time, -18000, 0, 1);
+            var loopGroup = sprite.AddLoopingGroup(loop_start_time, 50);
+            loopGroup.AddScale(Easing.None, loop_start_time, -18000, 0, 1);
 
-            var target = addEventToLoop ? loopGroup : sprite.TimelineGroup;
+            var target = addEventToLoop ? loopGroup : sprite.Commands;
             double loopRelativeOffset = addEventToLoop ? -loop_start_time : 0;
-            target.Alpha.Add(Easing.None, loopRelativeOffset + firstStoryboardEvent, loopRelativeOffset + firstStoryboardEvent + 500, 0, 1);
+            target.AddAlpha(Easing.None, loopRelativeOffset + firstStoryboardEvent, loopRelativeOffset + firstStoryboardEvent + 500, 0, 1);
 
             // these should be ignored due to being in the future.
-            sprite.TimelineGroup.Alpha.Add(Easing.None, 18000, 20000, 0, 1);
-            loopGroup.Alpha.Add(Easing.None, 38000, 40000, 0, 1);
+            sprite.Commands.AddAlpha(Easing.None, 18000, 20000, 0, 1);
+            loopGroup.AddAlpha(Easing.None, 38000, 40000, 0, 1);
 
             storyboard.GetLayer("Background").Add(sprite);
 

@@ -469,6 +469,40 @@ namespace osu.Game.Tests.Beatmaps.Formats
         }
 
         [Test]
+        public void TestDecodeBeatmapHitObjectCoordinatesLegacy()
+        {
+            var decoder = new LegacyBeatmapDecoder();
+
+            using (var resStream = TestResources.OpenResource("hitobject-coordinates-legacy.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var hitObjects = decoder.Decode(stream).HitObjects;
+
+                var positionData = hitObjects[0] as IHasPosition;
+
+                Assert.IsNotNull(positionData);
+                Assert.AreEqual(new Vector2(256, 256), positionData!.Position);
+            }
+        }
+
+        [Test]
+        public void TestDecodeBeatmapHitObjectCoordinatesLazer()
+        {
+            var decoder = new LegacyBeatmapDecoder(LegacyBeatmapEncoder.FIRST_LAZER_VERSION);
+
+            using (var resStream = TestResources.OpenResource("hitobject-coordinates-lazer.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var hitObjects = decoder.Decode(stream).HitObjects;
+
+                var positionData = hitObjects[0] as IHasPosition;
+
+                Assert.IsNotNull(positionData);
+                Assert.AreEqual(new Vector2(256.99853f, 256.001f), positionData!.Position);
+            }
+        }
+
+        [Test]
         public void TestDecodeBeatmapHitObjects()
         {
             var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
@@ -528,8 +562,17 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual("Gameplay/normal-hitnormal2", getTestableSampleInfo(hitObjects[2]).LookupNames.First());
                 Assert.AreEqual("Gameplay/normal-hitnormal", getTestableSampleInfo(hitObjects[3]).LookupNames.First());
 
-                // The control point at the end time of the slider should be applied
-                Assert.AreEqual("Gameplay/soft-hitnormal8", getTestableSampleInfo(hitObjects[4]).LookupNames.First());
+                // The fourth object is a slider.
+                // `Samples` of a slider are presumed to control the volume of sounds that last the entire duration of the slider
+                // (such as ticks, slider slide sounds, etc.)
+                // Thus, the point of query of control points used for `Samples` is just beyond the start time of the slider.
+                Assert.AreEqual("Gameplay/soft-hitnormal11", getTestableSampleInfo(hitObjects[4]).LookupNames.First());
+
+                // That said, the `NodeSamples` of the slider are responsible for the sounds of the slider's head / tail / repeats / large ticks etc.
+                // Therefore, they should be read at the time instant correspondent to the given node.
+                // This means that the tail should use bank 8 rather than 11.
+                Assert.AreEqual("Gameplay/soft-hitnormal11", ((ConvertSlider)hitObjects[4]).NodeSamples[0][0].LookupNames.First());
+                Assert.AreEqual("Gameplay/soft-hitnormal8", ((ConvertSlider)hitObjects[4]).NodeSamples[1][0].LookupNames.First());
             }
 
             static HitSampleInfo getTestableSampleInfo(HitObject hitObject) => hitObject.Samples[0];
@@ -1186,6 +1229,37 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 IBeatmap beatmap = working.GetPlayableBeatmap(ruleset.RulesetInfo, Array.Empty<Mod>());
 
                 Assert.That(beatmap.HitObjects[0].GetEndTime(), Is.EqualTo(3153));
+            }
+        }
+
+        [Test]
+        public void TestBeatmapDifficultyIsClamped()
+        {
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
+
+            using (var resStream = TestResources.OpenResource("out-of-range-difficulties.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var decoded = decoder.Decode(stream).Difficulty;
+                Assert.That(decoded.DrainRate, Is.EqualTo(10));
+                Assert.That(decoded.CircleSize, Is.EqualTo(10));
+                Assert.That(decoded.OverallDifficulty, Is.EqualTo(10));
+                Assert.That(decoded.ApproachRate, Is.EqualTo(10));
+                Assert.That(decoded.SliderMultiplier, Is.EqualTo(3.6));
+                Assert.That(decoded.SliderTickRate, Is.EqualTo(8));
+            }
+        }
+
+        [Test]
+        public void TestManiaBeatmapDifficultyCircleSizeClamp()
+        {
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
+
+            using (var resStream = TestResources.OpenResource("out-of-range-difficulties-mania.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var decoded = decoder.Decode(stream).Difficulty;
+                Assert.That(decoded.CircleSize, Is.EqualTo(14));
             }
         }
     }

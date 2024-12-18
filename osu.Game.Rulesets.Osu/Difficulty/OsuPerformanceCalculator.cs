@@ -14,7 +14,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 {
     public class OsuPerformanceCalculator : PerformanceCalculator
     {
-        public const double PERFORMANCE_BASE_MULTIPLIER = 1.14; // This is being adjusted to keep the final pp value scaled around what it used to be when changing things.
+        public const double PERFORMANCE_BASE_MULTIPLIER = 1.114; // This is being adjusted to keep the final pp value scaled around what it used to be when changing things.
+
+        private bool usingClassicSliderAccuracy;
 
         private double accuracy;
         private int scoreMaxCombo;
@@ -23,6 +25,19 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private int countMeh;
         private int countMiss;
 
+        /// <summary>
+        /// Missed slider ticks that includes missed reverse arrows. Will only be correct on non-classic scores
+        /// </summary>
+        private int countSliderTickMiss;
+
+        /// <summary>
+        /// Amount of missed slider tails that don't break combo. Will only be correct on non-classic scores
+        /// </summary>
+        private int countSliderEndsDropped;
+
+        /// <summary>
+        /// Estimated total amount of combo breaks
+        /// </summary>
         private double effectiveMissCount;
 
         public OsuPerformanceCalculator()
@@ -34,16 +49,48 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
             var osuAttributes = (OsuDifficultyAttributes)attributes;
 
+            usingClassicSliderAccuracy = score.Mods.OfType<OsuModClassic>().Any(m => m.NoSliderHeadAccuracy.Value);
+
             accuracy = score.Accuracy;
             scoreMaxCombo = score.MaxCombo;
             countGreat = score.Statistics.GetValueOrDefault(HitResult.Great);
             countOk = score.Statistics.GetValueOrDefault(HitResult.Ok);
             countMeh = score.Statistics.GetValueOrDefault(HitResult.Meh);
             countMiss = score.Statistics.GetValueOrDefault(HitResult.Miss);
-            effectiveMissCount = calculateEffectiveMissCount(osuAttributes);
+            countSliderEndsDropped = osuAttributes.SliderCount - score.Statistics.GetValueOrDefault(HitResult.SliderTailHit);
+            countSliderTickMiss = score.Statistics.GetValueOrDefault(HitResult.LargeTickMiss);
+            effectiveMissCount = countMiss;
+
+            if (osuAttributes.SliderCount > 0)
+            {
+                if (usingClassicSliderAccuracy)
+                {
+                    // Consider that full combo is maximum combo minus dropped slider tails since they don't contribute to combo but also don't break it
+                    // In classic scores we can't know the amount of dropped sliders so we estimate to 10% of all sliders on the map
+                    double fullComboThreshold = attributes.MaxCombo - 0.1 * osuAttributes.SliderCount;
+
+                    if (scoreMaxCombo < fullComboThreshold)
+                        effectiveMissCount = fullComboThreshold / Math.Max(1.0, scoreMaxCombo);
+
+                    // In classic scores there can't be more misses than a sum of all non-perfect judgements
+                    effectiveMissCount = Math.Min(effectiveMissCount, totalImperfectHits);
+                }
+                else
+                {
+                    double fullComboThreshold = attributes.MaxCombo - countSliderEndsDropped;
+
+                    if (scoreMaxCombo < fullComboThreshold)
+                        effectiveMissCount = fullComboThreshold / Math.Max(1.0, scoreMaxCombo);
+
+                    // Combine regular misses with tick misses since tick misses break combo as well
+                    effectiveMissCount = Math.Min(effectiveMissCount, countSliderTickMiss + countMiss);
+                }
+            }
+
+            effectiveMissCount = Math.Max(countMiss, effectiveMissCount);
+            effectiveMissCount = Math.Min(totalHits, effectiveMissCount);
 
             double multiplier = PERFORMANCE_BASE_MULTIPLIER;
-            double power = OsuDifficultyCalculator.SUM_POWER;
 
             if (score.Mods.Any(m => m is OsuModNoFail))
                 multiplier *= Math.Max(0.90, 1.0 - 0.02 * effectiveMissCount);
@@ -63,33 +110,27 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 effectiveMissCount = Math.Min(effectiveMissCount + countOk * okMultiplier + countMeh * mehMultiplier, totalHits);
             }
 
+            double power = OsuDifficultyCalculator.SUM_POWER;
+
             double aimValue = computeAimValue(score, osuAttributes);
             double speedValue = computeSpeedValue(score, osuAttributes);
             double mechanicalValue = Math.Pow(Math.Pow(aimValue, power) + Math.Pow(speedValue, power), 1.0 / power);
 
             // Cognition
 
-            // Get HDFL value for capping reading performance
-            // In theory stuff like AR13, AR13 +HD and AR-INF +HD should use this values
-            // While AR-INF without HD shoud use normal flashlight values
-            // Because in first case you're clicking air, while in AR-INF case you're see the notes
-            // But implementing it is pretty annoying, so I left it "as is"
-            double potentialHiddenFlashlightValue = computeFlashlightValue(score, osuAttributes, true);
-
             double lowARValue = computeReadingLowARValue(score, osuAttributes);
 
             double readingARValue = lowARValue;
 
-            double flashlightValue = 0;
-            if (score.Mods.Any(h => h is OsuModFlashlight))
-                flashlightValue = computeFlashlightValue(score, osuAttributes);
+            double flashlightValue = computeFlashlightValue(score, osuAttributes);
 
             // Reduce AR reading bonus if FL is present
             double flPower = OsuDifficultyCalculator.FL_SUM_POWER;
-            double flashlightARValue = Math.Pow(Math.Pow(flashlightValue, flPower) + Math.Pow(readingARValue, flPower), 1.0 / flPower);
+            double flashlightARValue = score.Mods.Any(h => h is OsuModFlashlight) ?
+                Math.Pow(Math.Pow(flashlightValue, flPower) + Math.Pow(readingARValue, flPower), 1.0 / flPower) : readingARValue;
 
             double cognitionValue = flashlightARValue;
-            cognitionValue = AdjustCognitionPerformance(cognitionValue, mechanicalValue, potentialHiddenFlashlightValue);
+            cognitionValue = AdjustCognitionPerformance(cognitionValue, mechanicalValue, flashlightValue);
 
             double accuracyValue = computeAccuracyValue(score, osuAttributes);
 
@@ -98,12 +139,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 (Math.Pow(Math.Pow(mechanicalValue, power) + Math.Pow(accuracyValue, power), 1.0 / power)
                 + cognitionValue) * multiplier;
 
+            // Fancy stuff for better visual display of FL pp
+
+            // Calculate reading difficulty as there was no FL in the first place
+            double visualCognitionValue = AdjustCognitionPerformance(readingARValue, mechanicalValue, flashlightValue);
+
+            double visualFlashlightValue = cognitionValue - visualCognitionValue;
+
             return new OsuPerformanceAttributes
             {
                 Aim = aimValue,
                 Speed = speedValue,
                 Accuracy = accuracyValue,
-                Cognition = cognitionValue,
+                Flashlight = visualFlashlightValue,
+                Reading = visualCognitionValue,
                 EffectiveMissCount = effectiveMissCount,
                 Total = totalValue
             };
@@ -118,11 +167,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double lengthBonus = CalculateDefaultLengthBonus(totalHits);
             aimValue *= lengthBonus;
 
-            // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
             if (effectiveMissCount > 0)
-                aimValue *= 0.97 * Math.Pow(1 - Math.Pow(effectiveMissCount / totalHits, 0.775), effectiveMissCount);
-
-            aimValue *= getComboScalingFactor(attributes);
+                aimValue *= calculateMissPenalty(effectiveMissCount, attributes.AimDifficultStrainCount);
 
             double approachRateFactor = 0.0;
             if (attributes.ApproachRate > 10.33)
@@ -146,8 +192,22 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             if (attributes.SliderCount > 0)
             {
-                double estimateSliderEndsDropped = Math.Clamp(Math.Min(countOk + countMeh + countMiss, attributes.MaxCombo - scoreMaxCombo), 0, estimateDifficultSliders);
-                double sliderNerfFactor = (1 - attributes.SliderFactor) * Math.Pow(1 - estimateSliderEndsDropped / estimateDifficultSliders, 3) + attributes.SliderFactor;
+                double estimateImproperlyFollowedDifficultSliders;
+
+                if (usingClassicSliderAccuracy)
+                {
+                    // When the score is considered classic (regardless if it was made on old client or not) we consider all missing combo to be dropped difficult sliders
+                    int maximumPossibleDroppedSliders = totalImperfectHits;
+                    estimateImproperlyFollowedDifficultSliders = Math.Clamp(Math.Min(maximumPossibleDroppedSliders, attributes.MaxCombo - scoreMaxCombo), 0, estimateDifficultSliders);
+                }
+                else
+                {
+                    // We add tick misses here since they too mean that the player didn't follow the slider properly
+                    // We however aren't adding misses here because missing slider heads has a harsh penalty by itself and doesn't mean that the rest of the slider wasn't followed properly
+                    estimateImproperlyFollowedDifficultSliders = Math.Clamp(countSliderEndsDropped + countSliderTickMiss, 0, estimateDifficultSliders);
+                }
+
+                double sliderNerfFactor = (1 - attributes.SliderFactor) * Math.Pow(1 - estimateImproperlyFollowedDifficultSliders / estimateDifficultSliders, 3) + attributes.SliderFactor;
                 aimValue *= sliderNerfFactor;
             }
 
@@ -168,11 +228,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double lengthBonus = CalculateDefaultLengthBonus(totalHits);
             speedValue *= lengthBonus;
 
-            // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
             if (effectiveMissCount > 0)
-                speedValue *= 0.97 * Math.Pow(1 - Math.Pow(effectiveMissCount / totalHits, 0.775), Math.Pow(effectiveMissCount, .875));
-
-            speedValue *= getComboScalingFactor(attributes);
+                speedValue *= calculateMissPenalty(effectiveMissCount, attributes.SpeedDifficultStrainCount);
 
             double approachRateFactor = 0.0;
             if (attributes.ApproachRate > 10.33)
@@ -199,7 +256,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double relevantAccuracy = attributes.SpeedNoteCount == 0 ? 0 : (relevantCountGreat * 6.0 + relevantCountOk * 2.0 + relevantCountMeh) / (attributes.SpeedNoteCount * 6.0);
 
             // Scale the speed value with accuracy and OD.
-            speedValue *= (0.95 + Math.Pow(attributes.OverallDifficulty, 2) / 750) * Math.Pow((accuracy + relevantAccuracy) / 2.0, (14.5 - Math.Max(attributes.OverallDifficulty, 8)) / 2);
+            speedValue *= (0.95 + Math.Pow(attributes.OverallDifficulty, 2) / 750) * Math.Pow((accuracy + relevantAccuracy) / 2.0, (14.5 - attributes.OverallDifficulty) / 2);
 
             // Scale the speed value with # of 50s to punish doubletapping.
             speedValue *= Math.Pow(0.99, countMeh < totalHits / 500.0 ? 0 : countMeh - totalHits / 500.0);
@@ -216,6 +273,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double betterAccuracyPercentage;
             int amountHitObjectsWithAccuracy = attributes.HitCircleCount;
 
+            if (!usingClassicSliderAccuracy)
+                amountHitObjectsWithAccuracy += attributes.SliderCount;
+
             if (amountHitObjectsWithAccuracy > 0)
                 betterAccuracyPercentage = ((countGreat - (totalHits - amountHitObjectsWithAccuracy)) * 6 + countOk * 2 + countMeh) / (double)(amountHitObjectsWithAccuracy * 6);
             else
@@ -227,7 +287,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             // Lots of arbitrary values from testing.
             // Considering to use derivation from perfect accuracy in a probabilistic manner - assume normal distribution.
-            double accuracyValue = Math.Pow(1.52163, attributes.OverallDifficulty) * Math.Pow(betterAccuracyPercentage, 24) * 2.83;
+            double accuracyValue = Math.Pow(1.52163, attributes.OverallDifficulty) * Math.Pow(betterAccuracyPercentage, 24) * 2.92;
 
             // Bonus for many hitcircles - it's harder to keep good accuracy up for longer.
             accuracyValue *= Math.Min(1.15, Math.Pow(amountHitObjectsWithAccuracy / 1000.0, 0.3));
@@ -250,14 +310,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // This one is goes from 0.0 on delta=0 to 1.0 somewhere around delta=3.4
             double deltaBonus = (1 - Math.Pow(0.95, Math.Pow(ARODDelta, 4)));
 
+            // Nerf delta bonus on OD lower than 10 and 9
+            if (attributes.OverallDifficulty < 10)
+                deltaBonus *= Math.Pow(attributes.OverallDifficulty / 10, 2);
+            if (attributes.OverallDifficulty < 9)
+                deltaBonus *= Math.Pow(attributes.OverallDifficulty / 9, 4);
+
             accuracyValue *= 1 + visualBonus * (1 + 2 * deltaBonus);
 
             return accuracyValue;
         }
 
-        private double computeFlashlightValue(ScoreInfo score, OsuDifficultyAttributes attributes, bool alwaysUseHD = false)
+        private double computeFlashlightValue(ScoreInfo score, OsuDifficultyAttributes attributes)
         {
-            double flashlightValue = Math.Pow(alwaysUseHD ? attributes.HiddenFlashlightDifficulty : attributes.FlashlightDifficulty, 2.0) * 25.0;
+            double flashlightValue = Flashlight.DifficultyToPerformance(attributes.FlashlightDifficulty);
 
             // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
             if (effectiveMissCount > 0)
@@ -277,30 +343,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return flashlightValue;
         }
 
-        public static double ComputePerfectFlashlightValue(double flashlightDifficulty, int objectsCount)
-        {
-            double flashlightValue = Flashlight.DifficultyToPerformance(flashlightDifficulty);
-
-            flashlightValue *= 0.7 + 0.1 * Math.Min(1.0, objectsCount / 200.0) +
-                               (objectsCount > 200 ? 0.2 * Math.Min(1.0, (objectsCount - 200) / 200.0) : 0.0);
-
-            return flashlightValue;
-        }
-
         private double computeReadingLowARValue(ScoreInfo score, OsuDifficultyAttributes attributes)
         {
-            double rawReading = attributes.ReadingDifficultyLowAR;
-
-            if (score.Mods.Any(m => m is OsuModTouchDevice))
-                rawReading = Math.Pow(rawReading, 0.8);
-
-            double readingValue = ReadingLowAR.DifficultyToPerformance(rawReading);
+            double readingValue = ReadingLowAR.DifficultyToPerformance(attributes.ReadingDifficultyLowAR);
 
             // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
             if (effectiveMissCount > 0)
-                readingValue *= 0.97 * Math.Pow(1 - Math.Pow(effectiveMissCount / totalHits, 0.775), Math.Pow(effectiveMissCount, .875));
-
-            readingValue *= getComboScalingFactor(attributes);
+                readingValue *= calculateMissPenalty(effectiveMissCount, attributes.LowArDifficultStrainCount);
 
             // Scale the reading value with accuracy _harshly_. Additional note: it would have it's own curve in Statistical Accuracy rework.
             readingValue *= accuracy * accuracy;
@@ -309,31 +358,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             return readingValue;
         }
-        private double calculateEffectiveMissCount(OsuDifficultyAttributes attributes)
+
+        // Limits reading difficulty by the difficulty of full-memorisation (assumed to be mechanicalPerformance + flashlightPerformance + 25)
+        // Desmos graph assuming that x = cognitionPerformance, while y = mechanicalPerformance + flaslightPerformance
+        // https://www.desmos.com/3d/vjygrxtkqs
+        public static double AdjustCognitionPerformance(double cognitionPerformance, double mechanicalPerformance, double flashlightPerformance)
         {
-            // Guess the number of misses + slider breaks from combo
-            double comboBasedMissCount = 0.0;
-
-            if (attributes.SliderCount > 0)
-            {
-                double fullComboThreshold = attributes.MaxCombo - 0.1 * attributes.SliderCount;
-                if (scoreMaxCombo < fullComboThreshold)
-                    comboBasedMissCount = fullComboThreshold / Math.Max(1.0, scoreMaxCombo);
-            }
-
-            // Clamp miss count to maximum amount of possible breaks
-            comboBasedMissCount = Math.Min(comboBasedMissCount, countOk + countMeh + countMiss);
-
-            return Math.Max(countMiss, comboBasedMissCount);
-        }
-        private double getComboScalingFactor(OsuDifficultyAttributes attributes) => attributes.MaxCombo <= 0 ? 1.0 : Math.Min(Math.Pow(scoreMaxCombo, 0.8) / Math.Pow(attributes.MaxCombo, 0.8), 1.0);
-        private int totalHits => countGreat + countOk + countMeh + countMiss;
-
-        // Adjusts cognition performance accounting for full-memory
-        public static double AdjustCognitionPerformance(double cognitionPerformance, double mechanicalPerformance, double flaslightPerformance)
-        {
-            // Assuming that less than 25 mechanical pp is not worthy for memory
-            double capPerformance = mechanicalPerformance + flaslightPerformance + 25;
+            // Assuming that less than 25 pp is not worthy for memory
+            double capPerformance = mechanicalPerformance + flashlightPerformance + 25;
 
             double ratio = cognitionPerformance / capPerformance;
             if (ratio > 50) return capPerformance;
@@ -342,7 +374,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return ratio * capPerformance;
         }
 
+        // Miss penalty assumes that a player will miss on the hardest parts of a map,
+        // so we use the amount of relatively difficult sections to adjust miss penalty
+        // to make it more punishing on maps with lower amount of hard sections.
+        private double calculateMissPenalty(double missCount, double difficultStrainCount) => 0.96 / ((missCount / (4 * Math.Pow(Math.Log(difficultStrainCount), 0.94))) + 1);
+
+        private double getComboScalingFactor(OsuDifficultyAttributes attributes) => attributes.MaxCombo <= 0 ? 1.0 : Math.Min(Math.Pow(scoreMaxCombo, 0.8) / Math.Pow(attributes.MaxCombo, 0.8), 1.0);
+
         private static double softmin(double a, double b, double power = Math.E) => a * b / Math.Log(Math.Pow(power, a) + Math.Pow(power, b), power);
+
         private static double logistic(double x) => 1 / (1 + Math.Exp(-x));
+
+        private int totalHits => countGreat + countOk + countMeh + countMiss;
+        private int totalImperfectHits => countOk + countMeh + countMiss;
     }
 }

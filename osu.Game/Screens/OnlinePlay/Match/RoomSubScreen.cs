@@ -17,12 +17,9 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input.Bindings;
-using osu.Framework.Input.Events;
 using osu.Framework.Screens;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
-using osu.Game.Input.Bindings;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
@@ -82,6 +79,9 @@ namespace osu.Game.Screens.OnlinePlay.Match
 
         [Resolved(canBeNull: true)]
         protected OnlinePlayScreen ParentScreen { get; private set; }
+
+        [Resolved]
+        private PreviewTrackManager previewTrackManager { get; set; } = null!;
 
         [Cached]
         private readonly OnlinePlayBeatmapAvailabilityTracker beatmapAvailabilityTracker = new OnlinePlayBeatmapAvailabilityTracker();
@@ -243,6 +243,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
 
             LoadComponent(UserModsSelectOverlay = new RoomModSelectOverlay
             {
+                SelectedItem = { BindTarget = SelectedItem },
                 SelectedMods = { BindTarget = UserMods },
                 IsValidMod = _ => false
             });
@@ -455,7 +456,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
             // Retrieve the corresponding local beatmap, since we can't directly use the playlist's beatmap info
             var localBeatmap = beatmap == null ? null : beatmapManager.QueryBeatmap(b => b.OnlineID == beatmap.OnlineID);
 
-            UserModsSelectOverlay.Beatmap = Beatmap.Value = beatmapManager.GetWorkingBeatmap(localBeatmap);
+            UserModsSelectOverlay.Beatmap.Value = Beatmap.Value = beatmapManager.GetWorkingBeatmap(localBeatmap);
         }
 
         protected virtual void UpdateMods()
@@ -485,6 +486,8 @@ namespace osu.Game.Screens.OnlinePlay.Match
         {
             UserModsSelectOverlay.Hide();
             endHandlingTrack();
+
+            previewTrackManager.StopAnyPlaying(this);
         }
 
         private void endHandlingTrack()
@@ -530,22 +533,6 @@ namespace osu.Game.Screens.OnlinePlay.Match
         /// </summary>
         /// <param name="room">The room to change the settings of.</param>
         protected abstract RoomSettingsOverlay CreateRoomSettingsOverlay(Room room);
-
-        public partial class UserModSelectButton : PurpleRoundedButton, IKeyBindingHandler<GlobalAction>
-        {
-            public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
-            {
-                if (e.Action == GlobalAction.ToggleModSelection && !e.Repeat)
-                {
-                    TriggerClick();
-                    return true;
-                }
-
-                return false;
-            }
-
-            public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e) { }
-        }
 
         protected override void Dispose(bool isDisposing)
         {

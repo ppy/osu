@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,7 +30,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
 
         private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
 
-        private RollingCounter<int> counter;
+        private RollingCounter<int> counter = null!;
 
         public PerformanceStatistic(ScoreInfo score)
             : base(BeatmapsetsStrings.ShowScoreboardHeaderspp)
@@ -55,10 +53,10 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
                     var performanceCalculator = score.Ruleset.CreateInstance().CreatePerformanceCalculator();
 
                     // Performance calculation requires the beatmap and ruleset to be locally available. If not, return a default value.
-                    if (attributes?.Attributes == null || performanceCalculator == null)
+                    if (attributes?.DifficultyAttributes == null || performanceCalculator == null)
                         return;
 
-                    var result = await performanceCalculator.CalculateAsync(score, attributes.Value.Attributes, cancellationToken ?? default).ConfigureAwait(false);
+                    var result = await performanceCalculator.CalculateAsync(score, attributes.Value.DifficultyAttributes, cancellationToken ?? default).ConfigureAwait(false);
 
                     Schedule(() => setPerformanceValue(score, result.Total));
                 }, cancellationToken ?? default);
@@ -107,7 +105,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
 
         protected override void Dispose(bool isDisposing)
         {
-            cancellationTokenSource?.Cancel();
+            cancellationTokenSource.Cancel();
             base.Dispose(isDisposing);
         }
 

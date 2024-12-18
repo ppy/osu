@@ -132,7 +132,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
             Autoplay = false,
             Beatmap = new Beatmap
             {
-                Breaks = new List<BreakPeriod>
+                Breaks =
                 {
                     new BreakPeriod(500, 2000),
                 },

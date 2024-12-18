@@ -17,7 +17,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
         private const double overlap_multiplier = 1;
 
-        public static double EvaluateDensityOf(DifficultyHitObject current, bool applyDistanceNerf = true)
+        private const double slider_body_length_multiplier = 1.3;
+
+        public static double EvaluateDensityOf(DifficultyHitObject current, bool applyDistanceNerf = true, bool applySliderbodyDensity = true, double angleNerfMultiplier = 1.0)
         {
             var currObj = (OsuDifficultyHitObject)current;
 
@@ -38,7 +40,28 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double loopDifficulty = currObj.OpacityAt(loopObj.BaseObject.StartTime, false);
 
                 // Small distances means objects may be cheesed, so it doesn't matter whether they are arranged confusingly.
-                if (applyDistanceNerf) loopDifficulty *= (logistic((loopObj.MinimumJumpDistance - 80) / 10) + 0.2) / 1.2;
+                if (applyDistanceNerf) loopDifficulty *= (logistic((loopObj.LazyJumpDistance - 80) / 10) + 0.2) / 1.2;
+
+                // Additional buff for long sliderbodies. OVERBUFFED ON PURPOSE
+                if (applySliderbodyDensity && loopObj.BaseObject is Slider slider)
+                {
+                    // In radiuses, with minimal of 1
+                    double sliderBodyLength = Math.Max(1, slider.Velocity * slider.SpanDuration / slider.Radius);
+
+                    // Bandaid to fix abuze
+                    sliderBodyLength = Math.Min(sliderBodyLength, 1 + slider.LazyTravelDistance / 8);
+
+                    // The maximum is 3x buff
+                    double sliderBodyBuff = Math.Log10(sliderBodyLength);
+
+                    // Limit the max buff to prevent abuse with very long sliders.
+                    // With explicit coverage of cases like one very long slider on the map, or just very few objects visible before/after.
+                    double maxBuff = 0.5;
+                    if (i > 0) maxBuff += 1;
+                    if (i < readingObjects.Count - 1) maxBuff += 1;
+
+                    loopDifficulty *= 1 + slider_body_length_multiplier * Math.Min(sliderBodyBuff, maxBuff);
+                }
 
                 // Reduce density bonus for this object if they're too apart in time
                 // Nerf starts on 1500ms and reaches maximum (*=0) on 3000ms
@@ -63,12 +86,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 density += loopDifficulty;
 
                 // Angles nerf
-                double currAngleNerf = (loopObj.AnglePredictability / 2) + 0.5;
+                // Why it's /2 + 0.5?
+                // Because there was a bug initially that made angle predictability to be from 0.5 to 1
+                // And removing this bug caused balance to be destroyed
+                double angleNerf = (loopObj.AnglePredictability / 2) + 0.5;
 
-                // Apply the nerf only when it's repeated
-                double angleNerf = currAngleNerf;
-
-                densityAnglesNerf += angleNerf * loopDifficulty;
+                densityAnglesNerf += angleNerf * loopDifficulty * angleNerfMultiplier;
 
                 prevObj0 = loopObj;
             }
@@ -109,6 +132,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             var sortedDifficulties = overlapDifficulties.OrderByDescending(d => d.Difficulty).ToList();
 
+            // Nerf overlap values of easier notes that are in the same place as hard notes
             for (int i = 0; i < sortedDifficulties.Count; i++)
             {
                 var harderObject = sortedDifficulties[i];
@@ -136,6 +160,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             const double threshold = 0.6;
             double weight = 1.0;
 
+            // Sum the overlap values to get difficulty
             foreach (var diffObject in sortedDifficulties.Where(d => d.Difficulty > threshold).OrderByDescending(d => d.Difficulty))
             {
                 // Add weighted difficulty
@@ -150,7 +175,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             if (current.BaseObject is Spinner || current.Index == 0)
                 return 0;
 
-            double difficulty = Math.Pow(4 * Math.Log(Math.Max(1, ((OsuDifficultyHitObject)current).Density)), 2.5);
+            double difficulty = Math.Pow(4 * Math.Log(Math.Max(1, EvaluateDensityOf(current, true, true))), 2.5);
 
             double overlapBonus = EvaluateOverlapDifficultyOf(current) * difficulty;
             difficulty += overlapBonus;
@@ -160,14 +185,51 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
         public static double EvaluateAimingDensityFactorOf(DifficultyHitObject current)
         {
-            double difficulty = ((OsuDifficultyHitObject)current).Density;
+            double difficulty = EvaluateDensityOf(current, true, false, 0.5);
 
-            return Math.Max(0, Math.Pow(difficulty, 1.5) - 1);
+            return Math.Max(0, Math.Pow(difficulty, 1.37) - 1);
+        }
+
+        // Returns value from 0 to 1, where 0 is very predictable and 1 is very unpredictable
+        public static double EvaluateInpredictabilityOf(DifficultyHitObject current)
+        {
+            if (current.BaseObject is Spinner || current.Index == 0 || current.Previous(0).BaseObject is Spinner)
+                return 0;
+
+            var osuCurrObj = (OsuDifficultyHitObject)current;
+            var osuLastObj = (OsuDifficultyHitObject)current.Previous(0);
+
+            double currVelocity = osuCurrObj.LazyJumpDistance / osuCurrObj.StrainTime;
+            double prevVelocity = osuLastObj.LazyJumpDistance / osuLastObj.StrainTime;
+
+            double velocityChangeFactor = 0;
+
+            // https://www.desmos.com/calculator/kqxmqc8pkg
+            if (currVelocity > 0 || prevVelocity > 0)
+            {
+                double velocityChange = Math.Max(0,
+                Math.Min(
+                    Math.Abs(prevVelocity - currVelocity) - 0.5 * Math.Min(currVelocity, prevVelocity),
+                    Math.Max(((OsuHitObject)osuCurrObj.BaseObject).Radius / Math.Max(osuCurrObj.StrainTime, osuLastObj.StrainTime), Math.Min(currVelocity, prevVelocity))
+                    )); // Stealed from xexxar
+                velocityChangeFactor = velocityChange / Math.Max(currVelocity, prevVelocity); // maxiumum is 0.4
+                velocityChangeFactor /= 0.4;
+            }
+
+            // Rhythm difference punishment for velocity and angle bonuses
+            double rhythmSimilarity = 1 - getRhythmDifference(osuCurrObj.StrainTime, osuLastObj.StrainTime);
+
+            // Make differentiation going from 1/4 to 1/2 and bigger difference
+            // To 1/3 to 1/2 and smaller difference
+            rhythmSimilarity = Math.Clamp(rhythmSimilarity, 0.5, 0.75);
+            rhythmSimilarity = 4 * (rhythmSimilarity - 0.5);
+
+            return velocityChangeFactor * rhythmSimilarity;
         }
 
         private static double getTimeNerfFactor(double deltaTime) => Math.Clamp(2 - deltaTime / (reading_window_size / 2), 0, 1);
         private static double getRhythmDifference(double t1, double t2) => 1 - Math.Min(t1, t2) / Math.Max(t1, t2);
-        private static double logistic(double x) => 1 / (1 + Math.Exp(-x));
+        private static double logistic(double x) => 1.0 / (1 + Math.Exp(-x));
 
         // Finds the overlapness of the last object for which StartTime lower than target
         private static double boundBinarySearch(List<OsuDifficultyHitObject.ReadingObject> arr, double target)

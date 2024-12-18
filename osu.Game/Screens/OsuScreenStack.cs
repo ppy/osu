@@ -17,6 +17,12 @@ namespace osu.Game.Screens
 
         protected float ParallaxAmount => parallaxContainer.ParallaxAmount;
 
+        public new MarginPadding Padding
+        {
+            get => base.Padding;
+            set => base.Padding = value;
+        }
+
         public OsuScreenStack()
         {
             InternalChild = parallaxContainer = new ParallaxContainer

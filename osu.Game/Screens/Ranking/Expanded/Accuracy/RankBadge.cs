@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -34,8 +32,8 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
 
         public readonly ScoreRank Rank;
 
-        private Drawable rankContainer;
-        private Drawable overlay;
+        private Drawable rankContainer = null!;
+        private Drawable overlay = null!;
 
         /// <summary>
         /// Creates a new <see cref="RankBadge"/>.

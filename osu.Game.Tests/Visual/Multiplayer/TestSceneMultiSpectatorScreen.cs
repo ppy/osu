@@ -424,7 +424,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public void TestIntroStoryboardElement() => testLeadIn(b =>
         {
             var sprite = new StoryboardSprite("unknown", Anchor.TopLeft, Vector2.Zero);
-            sprite.TimelineGroup.Alpha.Add(Easing.None, -2000, 0, 0, 1);
+            sprite.Commands.AddAlpha(Easing.None, -2000, 0, 0, 1);
             b.Storyboard.GetLayer("Background").Add(sprite);
         });
 

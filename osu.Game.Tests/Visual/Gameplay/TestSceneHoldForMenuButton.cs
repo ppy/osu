@@ -1,13 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Testing;
+using osu.Game.Configuration;
 using osu.Game.Screens.Play.HUD;
 using osuTK;
 using osuTK.Input;
@@ -21,11 +21,19 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         protected override double TimePerAction => 100; // required for the early exit test, since hold-to-confirm delay is 200ms
 
-        private HoldForMenuButton holdForMenuButton;
+        private HoldForMenuButton holdForMenuButton = null!;
+
+        [Resolved]
+        private OsuConfigManager config { get; set; } = null!;
 
         [SetUpSteps]
         public void SetUpSteps()
         {
+            AddStep("set button always on", () =>
+            {
+                config.SetValue(OsuSetting.AlwaysShowHoldForMenuButton, true);
+            });
+
             AddStep("create button", () =>
             {
                 exitAction = false;

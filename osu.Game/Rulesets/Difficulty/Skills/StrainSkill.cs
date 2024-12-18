@@ -20,21 +20,21 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// </summary>
         protected virtual double DecayWeight => 0.9;
 
+        protected StrainSkill(Mod[] mods)
+            : base(mods)
+        {
+        }
+
         /// <summary>
         /// The length of each strain section.
         /// </summary>
         protected virtual int SectionLength => 400;
 
-        private double currentSectionPeak; // We also keep track of the peak strain level in the current section.
+        public double CurrentSectionPeak { get; protected set; } // We also keep track of the peak level in the current section.
 
-        private double currentSectionEnd;
+        protected double CurrentSectionEnd;
 
-        private readonly List<double> strainPeaks = new List<double>();
-
-        protected StrainSkill(Mod[] mods)
-            : base(mods)
-        {
-        }
+        protected readonly List<double> StrainPeaks = new List<double>();
 
         /// <summary>
         /// Returns the strain value at <see cref="DifficultyHitObject"/>. This value is calculated with or without respect to previous objects.
@@ -44,20 +44,24 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// <summary>
         /// Process a <see cref="DifficultyHitObject"/> and update current strain values accordingly.
         /// </summary>
-        public sealed override void Process(DifficultyHitObject current)
+        public override void Process(DifficultyHitObject current)
         {
             // The first object doesn't generate a strain, so we begin with an incremented section end
             if (current.Index == 0)
-                currentSectionEnd = Math.Ceiling(current.StartTime / SectionLength) * SectionLength;
+                CurrentSectionEnd = Math.Ceiling(current.StartTime / SectionLength) * SectionLength;
 
-            while (current.StartTime > currentSectionEnd)
+            while (current.StartTime > CurrentSectionEnd)
             {
                 saveCurrentPeak();
-                startNewSectionFrom(currentSectionEnd, current);
-                currentSectionEnd += SectionLength;
+                startNewSectionFrom(CurrentSectionEnd, current);
+                CurrentSectionEnd += SectionLength;
             }
 
-            currentSectionPeak = Math.Max(StrainValueAt(current), currentSectionPeak);
+            double strain = StrainValueAt(current);
+            CurrentSectionPeak = Math.Max(strain, CurrentSectionPeak);
+
+            // Store the strain value for the object
+            ObjectStrains.Add(strain);
         }
 
         /// <summary>
@@ -65,7 +69,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// </summary>
         private void saveCurrentPeak()
         {
-            strainPeaks.Add(currentSectionPeak);
+            StrainPeaks.Add(CurrentSectionPeak);
         }
 
         /// <summary>
@@ -77,7 +81,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         {
             // The maximum strain of the new section is not zero by default
             // This means we need to capture the strain level at the beginning of the new section, and use that as the initial peak level.
-            currentSectionPeak = CalculateInitialStrain(time, current);
+            CurrentSectionPeak = CalculateInitialStrain(time, current);
         }
 
         /// <summary>
@@ -89,10 +93,9 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         protected abstract double CalculateInitialStrain(double time, DifficultyHitObject current);
 
         /// <summary>
-        /// Returns a live enumerable of the peak strains for each <see cref="SectionLength"/> section of the beatmap,
-        /// including the peak of the current section.
+        /// Returns a live enumerable of the difficulties
         /// </summary>
-        public IEnumerable<double> GetCurrentStrainPeaks() => strainPeaks.Append(currentSectionPeak);
+        public virtual IEnumerable<double> GetCurrentStrainPeaks() => StrainPeaks.Append(CurrentSectionPeak);
 
         /// <summary>
         /// Returns the calculated difficulty value representing all <see cref="DifficultyHitObject"/>s that have been processed up to this point.

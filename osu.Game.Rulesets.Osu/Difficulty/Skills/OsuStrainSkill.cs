@@ -13,12 +13,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     public abstract class OsuStrainSkill : StrainSkill
     {
         /// <summary>
-        /// The default multiplier applied by <see cref="OsuStrainSkill"/> to the final difficulty value after all other calculations.
-        /// May be overridden via <see cref="DifficultyMultiplier"/>.
-        /// </summary>
-        public const double DEFAULT_DIFFICULTY_MULTIPLIER = 1.06;
-
-        /// <summary>
         /// The number of sections with the highest strains, which the peak strain reductions will apply to.
         /// This is done in order to decrease their impact on the overall difficulty of the map for this skill.
         /// </summary>
@@ -29,10 +23,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// </summary>
         protected virtual double ReducedStrainBaseline => 0.75;
 
-        /// <summary>
-        /// The final multiplier to be applied to <see cref="DifficultyValue"/> after all other calculations.
-        /// </summary>
-        protected virtual double DifficultyMultiplier => DEFAULT_DIFFICULTY_MULTIPLIER;
+        protected virtual double StrainDecayBase => 0.15;
+
+        protected double StrainDecay(double ms) => Math.Pow(StrainDecayBase, ms / 1000);
 
         protected OsuStrainSkill(Mod[] mods)
             : base(mods)
@@ -65,7 +58,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 weight *= DecayWeight;
             }
 
-            return difficulty * DifficultyMultiplier;
+            return difficulty;
         }
 
         /// <summary>

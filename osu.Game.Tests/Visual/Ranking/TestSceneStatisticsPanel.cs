@@ -5,14 +5,18 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using NUnit.Framework;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Difficulty;
@@ -23,6 +27,7 @@ using osu.Game.Screens.Ranking.Statistics;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
+using osu.Game.Screens.Ranking.Statistics.User;
 using osu.Game.Tests.Resources;
 using osu.Game.Users;
 using osuTK;
@@ -78,6 +83,69 @@ namespace osu.Game.Tests.Visual.Ranking
         public void TestNullScore()
         {
             loadPanel(null);
+        }
+
+        [Test]
+        public void TestStatisticsShownCorrectlyIfUpdateDeliveredBeforeLoad()
+        {
+            UserStatisticsWatcher userStatisticsWatcher = null!;
+            ScoreInfo score = null!;
+
+            AddStep("create user statistics watcher", () => Add(userStatisticsWatcher = new UserStatisticsWatcher()));
+            AddStep("set user statistics update", () =>
+            {
+                score = TestResources.CreateTestScoreInfo();
+                score.OnlineID = 1234;
+                ((Bindable<UserStatisticsUpdate>)userStatisticsWatcher.LatestUpdate).Value = new UserStatisticsUpdate(score,
+                    new UserStatistics
+                    {
+                        Level = new UserStatistics.LevelInfo
+                        {
+                            Current = 5,
+                            Progress = 20,
+                        },
+                        GlobalRank = 38000,
+                        CountryRank = 12006,
+                        PP = 2134,
+                        RankedScore = 21123849,
+                        Accuracy = 0.985,
+                        PlayCount = 13375,
+                        PlayTime = 354490,
+                        TotalScore = 128749597,
+                        TotalHits = 0,
+                        MaxCombo = 1233,
+                    }, new UserStatistics
+                    {
+                        Level = new UserStatistics.LevelInfo
+                        {
+                            Current = 5,
+                            Progress = 30,
+                        },
+                        GlobalRank = 36000,
+                        CountryRank = 12000,
+                        PP = (decimal)2134.5,
+                        RankedScore = 23897015,
+                        Accuracy = 0.984,
+                        PlayCount = 13376,
+                        PlayTime = 35789,
+                        TotalScore = 132218497,
+                        TotalHits = 0,
+                        MaxCombo = 1233,
+                    });
+            });
+            AddStep("load user statistics panel", () => Child = new DependencyProvidingContainer
+            {
+                CachedDependencies = [(typeof(UserStatisticsWatcher), userStatisticsWatcher)],
+                RelativeSizeAxes = Axes.Both,
+                Child = new UserStatisticsPanel(score)
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    State = { Value = Visibility.Visible },
+                    Score = { Value = score, }
+                }
+            });
+            AddUntilStep("overall ranking present", () => this.ChildrenOfType<OverallRanking>().Any());
+            AddUntilStep("loading spinner not visible", () => this.ChildrenOfType<LoadingLayer>().All(l => l.State.Value == Visibility.Hidden));
         }
 
         private void loadPanel(ScoreInfo score) => AddStep("load panel", () =>

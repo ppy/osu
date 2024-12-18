@@ -12,10 +12,12 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
+using osu.Game.Beatmaps.Drawables.Cards;
 using osu.Game.Database;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
@@ -317,17 +319,18 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 p.RequestResults = _ => resultsRequested = true;
             });
 
-            AddStep("move mouse to first item title", () =>
-            {
-                var drawQuad = playlist.ChildrenOfType<LinkFlowContainer>().First().ScreenSpaceDrawQuad;
-                var location = (drawQuad.TopLeft + drawQuad.BottomLeft) / 2 + new Vector2(drawQuad.Width * 0.2f, 0);
-                InputManager.MoveMouseTo(location);
-            });
-            AddUntilStep("wait for text load", () => playlist.ChildrenOfType<DrawableLinkCompiler>().Any());
+            AddUntilStep("wait for load", () => playlist.ChildrenOfType<DrawableLinkCompiler>().Any() && playlist.ChildrenOfType<BeatmapCardThumbnail>().First().DrawWidth > 0);
+
+            AddStep("move mouse to first item title", () => InputManager.MoveMouseTo(playlist.ChildrenOfType<LinkFlowContainer>().First().ChildrenOfType<SpriteText>().First()));
             AddAssert("first item title not hovered", () => playlist.ChildrenOfType<DrawableLinkCompiler>().First().IsHovered, () => Is.False);
-            AddStep("click left mouse", () => InputManager.Click(MouseButton.Left));
+
+            AddStep("click title", () =>
+            {
+                InputManager.MoveMouseTo(playlist.ChildrenOfType<LinkFlowContainer>().First().ChildrenOfType<SpriteText>().First());
+                InputManager.Click(MouseButton.Left);
+            });
+
             AddUntilStep("first item selected", () => playlist.ChildrenOfType<DrawableRoomPlaylistItem>().First().IsSelectedItem, () => Is.True);
-            // implies being clickable.
             AddUntilStep("first item title hovered", () => playlist.ChildrenOfType<DrawableLinkCompiler>().First().IsHovered, () => Is.True);
 
             AddStep("move mouse to second item results button", () => InputManager.MoveMouseTo(playlist.ChildrenOfType<GrayButton>().ElementAt(5)));

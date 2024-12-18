@@ -7,7 +7,6 @@ T:SixLabors.ImageSharp.IDeepCloneable`1;Use osu.Game.Utils.IDeepCloneable<T> ins
 M:osu.Framework.Graphics.Sprites.SpriteText.#ctor;Use OsuSpriteText.
 M:osu.Framework.Bindables.IBindableList`1.GetBoundCopy();Fails on iOS. Use manual ctor + BindTo instead. (see https://github.com/mono/mono/issues/19900)
 T:NuGet.Packaging.CollectionExtensions;Don't use internal extension methods.
-M:System.Enum.HasFlag(System.Enum);Use osu.Framework.Extensions.EnumExtensions.HasFlagFast<T>() instead.
 M:Realms.IRealmCollection`1.SubscribeForNotifications`1(Realms.NotificationCallbackDelegate{``0});Use osu.Game.Database.RealmObjectExtensions.QueryAsyncWithNotifications(IRealmCollection<T>,NotificationCallbackDelegate<T>) instead.
 M:System.Guid.#ctor;Probably meaning to use Guid.NewGuid() instead. If actually wanting empty, use Guid.Empty.
 M:Realms.CollectionExtensions.SubscribeForNotifications`1(System.Linq.IQueryable{``0},Realms.NotificationCallbackDelegate{``0});Use osu.Game.Database.RealmObjectExtensions.QueryAsyncWithNotifications(IQueryable<T>,NotificationCallbackDelegate<T>) instead.

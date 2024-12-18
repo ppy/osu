@@ -41,6 +41,13 @@ namespace osu.Game.Tests.Visual.Ranking
         }
 
         [Test]
+        public void TestZeroEvents()
+        {
+            createTest(new List<HitEvent>());
+            AddStep("update offset", () => graph.UpdateOffset(10));
+        }
+
+        [Test]
         public void TestManyDistributedEventsOffset()
         {
             createTest(CreateDistributedHitEvents(-3.5));
@@ -80,6 +87,14 @@ namespace osu.Game.Tests.Visual.Ranking
                     : HitResult.Perfect;
                 return new HitEvent(h.TimeOffset, 1.0, result, placeholder_object, placeholder_object, null);
             }).ToList());
+        }
+
+        [Test]
+        public void TestNonBasicHitResultsAreIgnored()
+        {
+            createTest(CreateDistributedHitEvents(0, 50)
+                       .Select(h => new HitEvent(h.TimeOffset, 1.0, h.TimeOffset > 0 ? HitResult.Ok : HitResult.LargeTickHit, placeholder_object, placeholder_object, null))
+                       .ToList());
         }
 
         [Test]

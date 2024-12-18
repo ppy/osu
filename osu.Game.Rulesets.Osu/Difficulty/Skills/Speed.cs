@@ -6,7 +6,6 @@ using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Evaluators;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
@@ -16,51 +15,44 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     /// </summary>
     public class Speed : OsuStrainSkill
     {
-        private double skillMultiplier => 1375;
-        private double strainDecayBase => 0.3;
+        protected double SkillMultiplier => 1.42;
+        protected override double StrainDecayBase => 0.3;
 
-        private double currentStrain;
-        private double currentRhythm;
+        protected double CurrentStrain;
+        protected double CurrentRhythm;
 
         protected override int ReducedSectionCount => 5;
-        protected override double DifficultyMultiplier => 1.04;
-
-        private readonly List<double> objectStrains = new List<double>();
 
         public Speed(Mod[] mods)
             : base(mods)
         {
         }
 
-        private double strainDecay(double ms) => Math.Pow(strainDecayBase, ms / 1000);
-
-        protected override double CalculateInitialStrain(double time, DifficultyHitObject current) => (currentStrain * currentRhythm) * strainDecay(time - current.Previous(0).StartTime);
+        protected override double CalculateInitialStrain(double time, DifficultyHitObject current) => (CurrentStrain * CurrentRhythm) * StrainDecay(time - current.Previous(0).StartTime);
 
         protected override double StrainValueAt(DifficultyHitObject current)
         {
-            currentStrain *= strainDecay(((OsuDifficultyHitObject)current).StrainTime);
-            currentStrain += SpeedEvaluator.EvaluateDifficultyOf(current) * skillMultiplier;
+            OsuDifficultyHitObject currODHO = (OsuDifficultyHitObject)current;
 
-            currentRhythm = RhythmEvaluator.EvaluateDifficultyOf(current);
+            CurrentStrain *= StrainDecay(currODHO.StrainTime);
+            CurrentStrain += SpeedEvaluator.EvaluateDifficultyOf(current) * SkillMultiplier;
 
-            double totalStrain = currentStrain * currentRhythm;
-
-            objectStrains.Add(totalStrain);
+            CurrentRhythm = RhythmEvaluator.EvaluateDifficultyOf(current);
+            double totalStrain = CurrentStrain * CurrentRhythm;
 
             return totalStrain;
         }
 
         public double RelevantNoteCount()
         {
-            if (objectStrains.Count == 0)
+            if (ObjectStrains.Count == 0)
                 return 0;
 
-            double maxStrain = objectStrains.Max();
-
+            double maxStrain = ObjectStrains.Max();
             if (maxStrain == 0)
                 return 0;
 
-            return objectStrains.Sum(strain => 1.0 / (1.0 + Math.Exp(-(strain / maxStrain * 12.0 - 6.0))));
+            return ObjectStrains.Sum(strain => 1.0 / (1.0 + Math.Exp(-(strain / maxStrain * 12.0 - 6.0))));
         }
     }
 }

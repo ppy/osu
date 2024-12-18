@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -29,7 +30,11 @@ namespace osu.Game.Collections
 
         private IDisposable? realmSubscription;
 
-        protected override FillFlowContainer<RearrangeableListItem<Live<BeatmapCollection>>> CreateListFillFlowContainer() => new Flow
+        private Flow flow = null!;
+
+        public IEnumerable<Drawable> OrderedItems => flow.FlowingChildren;
+
+        protected override FillFlowContainer<RearrangeableListItem<Live<BeatmapCollection>>> CreateListFillFlowContainer() => flow = new Flow
         {
             DragActive = { BindTarget = DragActive }
         };
@@ -43,8 +48,25 @@ namespace osu.Game.Collections
 
         private void collectionsChanged(IRealmCollection<BeatmapCollection> collections, ChangeSet? changes)
         {
-            Items.Clear();
-            Items.AddRange(collections.AsEnumerable().Select(c => c.ToLive(realm)));
+            if (changes == null)
+            {
+                Items.AddRange(collections.AsEnumerable().Select(c => c.ToLive(realm)));
+                return;
+            }
+
+            foreach (int i in changes.DeletedIndices.OrderDescending())
+                Items.RemoveAt(i);
+
+            foreach (int i in changes.InsertedIndices)
+                Items.Insert(i, collections[i].ToLive(realm));
+
+            foreach (int i in changes.NewModifiedIndices)
+            {
+                var updatedItem = collections[i];
+
+                Items.RemoveAt(i);
+                Items.Insert(i, updatedItem.ToLive(realm));
+            }
         }
 
         protected override OsuRearrangeableListItem<Live<BeatmapCollection>> CreateOsuDrawable(Live<BeatmapCollection> item)
@@ -123,9 +145,34 @@ namespace osu.Game.Collections
                 var previous = PlaceholderItem;
 
                 placeholderContainer.Clear(false);
-                placeholderContainer.Add(PlaceholderItem = new DrawableCollectionListItem(new BeatmapCollection().ToLiveUnmanaged(), false));
+                placeholderContainer.Add(PlaceholderItem = new NewCollectionEntryItem());
 
                 return previous;
+            }
+        }
+
+        private partial class NewCollectionEntryItem : DrawableCollectionListItem
+        {
+            [Resolved]
+            private RealmAccess realm { get; set; } = null!;
+
+            public NewCollectionEntryItem()
+                : base(new BeatmapCollection().ToLiveUnmanaged(), false)
+            {
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                TextBox.OnCommit += (sender, newText) =>
+                {
+                    if (string.IsNullOrEmpty(TextBox.Text))
+                        return;
+
+                    realm.Write(r => r.Add(new BeatmapCollection(TextBox.Text)));
+                    TextBox.Text = string.Empty;
+                };
             }
         }
 

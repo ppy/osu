@@ -59,7 +59,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         private ISkinSource currentSkin = null!;
 
-        public Stage(int firstColumnIndex, StageDefinition definition, ref ManiaAction normalColumnStartAction, ref ManiaAction specialColumnStartAction)
+        public Stage(int firstColumnIndex, StageDefinition definition, ref ManiaAction columnStartAction)
         {
             this.firstColumnIndex = firstColumnIndex;
             Definition = definition;
@@ -138,7 +138,7 @@ namespace osu.Game.Rulesets.Mania.UI
                 {
                     RelativeSizeAxes = Axes.Both,
                     Width = 1,
-                    Action = { Value = isSpecial ? specialColumnStartAction++ : normalColumnStartAction++ }
+                    Action = { Value = columnStartAction++ }
                 };
 
                 topLevelContainer.Add(column.TopLevelContainer.CreateProxy());

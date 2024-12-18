@@ -9,14 +9,13 @@ using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Evaluators;
+using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
-
-    public class ReadingLowAR : Skill
+    public class ReadingLowAR : StrainSkill
     {
-        private readonly List<double> difficulties = new List<double>();
-        private double skillMultiplier => 1.26;
+        private double skillMultiplier => 1.22;
         private double aimComponentMultiplier => 0.4;
 
         public ReadingLowAR(Mod[] mods)
@@ -39,18 +38,28 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             double totalDensityDifficulty = (currentDensityAimStrain + densityReadingDifficulty) * skillMultiplier;
 
-            difficulties.Add(totalDensityDifficulty);
+            ObjectStrains.Add(totalDensityDifficulty);
+
+            if (current.Index == 0)
+                CurrentSectionEnd = Math.Ceiling(current.StartTime / SectionLength) * SectionLength;
+
+            while (current.StartTime > CurrentSectionEnd)
+            {
+                StrainPeaks.Add(CurrentSectionPeak);
+                CurrentSectionPeak = 0;
+                CurrentSectionEnd += SectionLength;
+            }
+
+            CurrentSectionPeak = Math.Max(totalDensityDifficulty, CurrentSectionPeak);
         }
 
         private double reducedNoteCount => 5;
         private double reducedNoteBaseline => 0.7;
         public override double DifficultyValue()
         {
-            double difficulty = 0;
-
             // Sections with 0 difficulty are excluded to avoid worst-case time complexity of the following sort (e.g. /b/2351871).
             // These sections will not contribute to the difficulty.
-            var peaks = difficulties.Where(p => p > 0);
+            var peaks = ObjectStrains.Where(p => p > 0);
 
             List<double> values = peaks.OrderByDescending(d => d).ToList();
 
@@ -61,6 +70,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             }
 
             values = values.OrderByDescending(d => d).ToList();
+
+            double difficulty = 0;
 
             // Difficulty is the weighted sum of the highest strains from every section.
             // We're sorting from highest to lowest strain.
@@ -74,5 +85,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         public static double DifficultyToPerformance(double difficulty) => Math.Max(
             Math.Max(Math.Pow(difficulty, 1.5) * 20, Math.Pow(difficulty, 2) * 17.0),
             Math.Max(Math.Pow(difficulty, 3) * 10.5, Math.Pow(difficulty, 4) * 6.00));
+
+        protected override double StrainValueAt(DifficultyHitObject current)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override double CalculateInitialStrain(double time, DifficultyHitObject current)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

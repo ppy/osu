@@ -9,10 +9,12 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Utils;
 using osuTK;
 
 namespace osu.Game.Beatmaps.Drawables
@@ -124,12 +126,8 @@ namespace osu.Game.Beatmaps.Drawables
             miscFillFlowContainer.Show();
 
             double rate = 1;
-
             if (displayedContent.Mods != null)
-            {
-                foreach (var mod in displayedContent.Mods.OfType<IApplicableToRate>())
-                    rate = mod.ApplyToRate(0, rate);
-            }
+                rate = ModUtils.CalculateRateWithMods(displayedContent.Mods);
 
             double bpmAdjusted = displayedContent.BeatmapInfo.BPM * rate;
 
@@ -149,7 +147,8 @@ namespace osu.Game.Beatmaps.Drawables
             approachRate.Text = @" AR: " + adjustedDifficulty.ApproachRate.ToString(@"0.##");
             overallDifficulty.Text = @" OD: " + adjustedDifficulty.OverallDifficulty.ToString(@"0.##");
 
-            length.Text = "Length: " + TimeSpan.FromMilliseconds(displayedContent.BeatmapInfo.Length / rate).ToString(@"mm\:ss");
+            TimeSpan lengthTimeSpan = TimeSpan.FromMilliseconds(displayedContent.BeatmapInfo.Length / rate);
+            length.Text = "Length: " + lengthTimeSpan.ToFormattedDuration();
             bpm.Text = " BPM: " + Math.Round(bpmAdjusted, 0);
         }
 

@@ -79,6 +79,11 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString DiscordPresenceOff => new TranslatableString(getKey(@"discord_presence_off"), @"Off");
 
+        /// <summary>
+        /// "Hide country flags"
+        /// </summary>
+        public static LocalisableString HideCountryFlags => new TranslatableString(getKey(@"hide_country_flags"), @"Hide country flags");
+
         private static string getKey(string key) => $"{prefix}:{key}";
     }
 }

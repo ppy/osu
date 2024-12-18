@@ -10,6 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Input.Bindings;
+using osu.Game.Localisation;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Match.Components;
 using osu.Game.Screens.Play;
@@ -22,9 +23,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         [CanBeNull]
         private ILocalUserPlayInfo localUserInfo { get; set; }
 
-        private readonly IBindable<bool> localUserPlaying = new Bindable<bool>();
+        private readonly IBindable<LocalUserPlayingState> localUserPlaying = new Bindable<LocalUserPlayingState>();
 
-        public override bool PropagatePositionalInputSubTree => !localUserPlaying.Value;
+        public override bool PropagatePositionalInputSubTree => localUserPlaying.Value != LocalUserPlayingState.Playing;
 
         public Bindable<bool> Expanded = new Bindable<bool>();
 
@@ -41,7 +42,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             Background.Alpha = 0.2f;
 
-            TextBox.FocusLost = () => expandedFromTextBoxFocus.Value = false;
+            TextBox.PlaceholderText = ChatStrings.InGameInputPlaceholder;
+            TextBox.Focus = () => TextBox.PlaceholderText = Resources.Localisation.Web.ChatStrings.InputPlaceholder;
+            TextBox.FocusLost = () =>
+            {
+                TextBox.PlaceholderText = ChatStrings.InGameInputPlaceholder;
+                expandedFromTextBoxFocus.Value = false;
+            };
         }
 
         protected override bool OnHover(HoverEvent e) => true; // use UI mouse cursor.
@@ -51,7 +58,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             base.LoadComplete();
 
             if (localUserInfo != null)
-                localUserPlaying.BindTo(localUserInfo.IsPlaying);
+                localUserPlaying.BindTo(localUserInfo.PlayingState);
 
             localUserPlaying.BindValueChanged(playing =>
             {
@@ -60,7 +67,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 TextBox.HoldFocus = false;
 
                 // only hold focus (after sending a message) during breaks
-                TextBox.ReleaseFocusOnCommit = playing.NewValue;
+                TextBox.ReleaseFocusOnCommit = playing.NewValue == LocalUserPlayingState.Playing;
             }, true);
 
             Expanded.BindValueChanged(_ => updateExpandedState(), true);

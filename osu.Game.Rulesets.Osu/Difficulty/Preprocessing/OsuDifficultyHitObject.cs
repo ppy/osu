@@ -22,7 +22,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// </summary>
         public const int NORMALISED_RADIUS = 50; // Change radius to 50 to make 100 the diameter. Easier for mental maths.
 
-        private const int min_delta_time = 25;
+        public const int NORMALISED_DIAMETER = NORMALISED_RADIUS * 2;
+
+        public const int MIN_DELTA_TIME = 25;
+
         private const float maximum_slider_radius = NORMALISED_RADIUS * 2.4f;
         private const float assumed_slider_radius = NORMALISED_RADIUS * 1.8f;
 
@@ -87,14 +90,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         public double? Angle { get; private set; }
 
         /// <summary>
+        /// Signed version of the Angle.
+        /// Potentially should be used for more accurate angle bonuses
+        /// Ranges from -PI to PI
+        /// </summary>
+        public double? AngleSigned { get; private set; }
+
+        /// <summary>
         /// Retrieves the full hit window for a Great <see cref="HitResult"/>.
         /// </summary>
         public double HitWindowGreat { get; private set; }
-
-        /// <summary>
-        /// Density of the object for given preempt. Saved for optimization, density calculation is expensive.
-        /// </summary>
-        public double Density { get; private set; }
 
         /// <summary>
         /// Predictabiliy of the angle. Gives high values only in exceptionally repetitive patterns.
@@ -130,7 +135,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             Preempt = BaseObject.TimePreempt / clockRate;
 
             // Capped to 25ms to prevent difficulty calculation breaking from simultaneous objects.
-            StrainTime = Math.Max(DeltaTime, min_delta_time);
+            StrainTime = Math.Max(DeltaTime, MIN_DELTA_TIME);
 
             if (BaseObject is Slider sliderObject)
             {
@@ -146,8 +151,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             AnglePredictability = CalculateAnglePredictability();
 
             (ReadingObjects, OverlapValues) = getReadingObjects();
-
-            Density = ReadingEvaluator.EvaluateDensityOf(this);
         }
 
         private (IList<ReadingObject>, IDictionary<int, double>) getReadingObjects()
@@ -165,7 +168,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             var readingObjects = new List<ReadingObject>(visibleObjects.Count);
             OverlapValues = new Dictionary<int, double>();
 
-            //foreach (var loopObj in visibleObjects)
             for (int loopIndex = 0; loopIndex < visibleObjects.Count; loopIndex++)
             {
                 var loopObj = visibleObjects[loopIndex];
@@ -320,7 +322,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             var visibleObjects = new List<OsuDifficultyHitObject>();
 
-            for (int i = 0; i < current.Count; i++)
+            for (int i = 0; i < current.Index; i++)
             {
                 OsuDifficultyHitObject hitObject = (OsuDifficultyHitObject)current.Previous(i);
 
@@ -389,6 +391,25 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             angleDifference -= prevAngleAdjust;
 
+            // Explicit nerf for same pattern repeating
+            OsuDifficultyHitObject? prevObj3 = (OsuDifficultyHitObject?)Previous(3);
+            OsuDifficultyHitObject? prevObj4 = (OsuDifficultyHitObject?)Previous(4);
+            OsuDifficultyHitObject? prevObj5 = (OsuDifficultyHitObject?)Previous(5);
+
+            // 3-3 repeat
+            double similarity3_1 = getGeneralSimilarity(this, prevObj2);
+            double similarity3_2 = getGeneralSimilarity(prevObj0, prevObj3);
+            double similarity3_3 = getGeneralSimilarity(prevObj1, prevObj4);
+
+            double similarity3_total = similarity3_1 * similarity3_2 * similarity3_3;
+
+            // 4-4 repeat
+            double similarity4_1 = getGeneralSimilarity(this, prevObj3);
+            double similarity4_2 = getGeneralSimilarity(prevObj0, prevObj4);
+            double similarity4_3 = getGeneralSimilarity(prevObj1, prevObj5);
+
+            double similarity4_total = similarity4_1 * similarity4_2 * similarity4_3;
+
             // Bandaid to fix Rubik's Cube +EZ
             double wideness = 0;
             if (Angle!.Value > Math.PI * 0.5)
@@ -405,12 +426,36 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             // Angle difference more than 15 degrees gets no penalty
             double adjustedAngleDifference = Math.Min(Math.PI / 12, angleDifference);
-            return rhythmFactor * Math.Cos(Math.Min(Math.PI / 2, 6 * adjustedAngleDifference));
+            double predictability = Math.Cos(Math.Min(Math.PI / 2, 6 * adjustedAngleDifference)) * rhythmFactor;
+
+            // Punish for big pattern similarity
+            return 1 - (1 - predictability) * (1 - Math.Max(similarity3_total, similarity4_total));
+        }
+
+        private double getGeneralSimilarity(OsuDifficultyHitObject? o1, OsuDifficultyHitObject? o2)
+        {
+            if (o1 == null || o2 == null)
+                return 1;
+
+            if (o1.AngleSigned == null || o2.AngleSigned == null)
+                return o1.AngleSigned == o2.AngleSigned ? 1 : 0;
+
+
+            double timeSimilarity = 1 - getTimeDifference(o1.StrainTime, o2.StrainTime);
+
+            double angleDelta = Math.Abs((double)o1.AngleSigned - (double)o2.AngleSigned);
+            angleDelta = Math.Clamp(angleDelta - 0.1, 0, 0.15);
+            double angleSimilarity = 1 - angleDelta / 0.15;
+
+            double distanceDelta = Math.Abs(o1.LazyJumpDistance - o2.LazyJumpDistance) / NORMALISED_RADIUS;
+            double distanceSimilarity = 1 / Math.Max(1, distanceDelta);
+
+            return timeSimilarity * angleSimilarity * distanceSimilarity;
         }
 
         public double OpacityAt(double time, bool hidden)
         {
-            var baseObject = BaseObject; // Optimization
+            var baseObject = BaseObject;
 
             if (time > baseObject.StartTime)
             {
@@ -439,6 +484,24 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             return Math.Clamp((time - fadeInStartTime) / fadeInDuration, 0.0, 1.0);
         }
 
+        /// <summary>
+        /// Returns how possible is it to doubletap this object together with the next one and get perfect judgement in range from 0 to 1
+        /// </summary>
+        public double GetDoubletapness(OsuDifficultyHitObject? osuNextObj)
+        {
+            if (osuNextObj != null)
+            {
+                double currDeltaTime = Math.Max(1, DeltaTime);
+                double nextDeltaTime = Math.Max(1, osuNextObj.DeltaTime);
+                double deltaDifference = Math.Abs(nextDeltaTime - currDeltaTime);
+                double speedRatio = currDeltaTime / Math.Max(currDeltaTime, deltaDifference);
+                double windowRatio = Math.Pow(Math.Min(1, currDeltaTime / HitWindowGreat), 2);
+                return 1.0 - Math.Pow(speedRatio, 1 - windowRatio);
+            }
+
+            return 0;
+        }
+
         private void setDistances(double clockRate)
         {
             if (BaseObject is Slider currentSlider)
@@ -446,7 +509,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 computeSliderCursorPosition(currentSlider);
                 // Bonus for repeat sliders until a better per nested object strain system can be achieved.
                 TravelDistance = currentSlider.LazyTravelDistance * (float)Math.Pow(1 + currentSlider.RepeatCount / 2.5, 1.0 / 2.5);
-                TravelTime = Math.Max(currentSlider.LazyTravelTime / clockRate, min_delta_time);
+                TravelTime = Math.Max(currentSlider.LazyTravelTime / clockRate, MIN_DELTA_TIME);
             }
 
             // We don't need to calculate either angle or distance when one of the last->curr objects is a spinner
@@ -470,8 +533,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             if (lastObject is Slider lastSlider)
             {
-                double lastTravelTime = Math.Max(lastSlider.LazyTravelTime / clockRate, min_delta_time);
-                MinimumJumpTime = Math.Max(StrainTime - lastTravelTime, min_delta_time);
+                double lastTravelTime = Math.Max(lastSlider.LazyTravelTime / clockRate, MIN_DELTA_TIME);
+                MinimumJumpTime = Math.Max(StrainTime - lastTravelTime, MIN_DELTA_TIME);
 
                 //
                 // There are two types of slider-to-object patterns to consider in order to better approximate the real movement a player will take to jump between the hitobjects.
@@ -509,7 +572,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 float dot = Vector2.Dot(v1, v2);
                 float det = v1.X * v2.Y - v1.Y * v2.X;
 
-                Angle = Math.Abs(Math.Atan2(det, dot));
+                AngleSigned = Math.Atan2(det, dot);
+                Angle = Math.Abs(AngleSigned.Value);
             }
         }
 

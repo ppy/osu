@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -59,7 +58,7 @@ namespace osu.Game.Screens.Ranking.Statistics
         /// <param name="hitEvents">The <see cref="HitEvent"/>s to display the timing distribution of.</param>
         public HitEventTimingDistributionGraph(IReadOnlyList<HitEvent> hitEvents)
         {
-            this.hitEvents = hitEvents.Where(e => !(e.HitObject.HitWindows is HitWindows.EmptyHitWindows) && e.Result.IsHit()).ToList();
+            this.hitEvents = hitEvents.Where(e => !(e.HitObject.HitWindows is HitWindows.EmptyHitWindows) && e.Result.IsBasic() && e.Result.IsHit()).ToList();
             bins = Enumerable.Range(0, total_timing_distribution_bins).Select(_ => new Dictionary<HitResult, int>()).ToArray<IDictionary<HitResult, int>>();
         }
 
@@ -177,7 +176,7 @@ namespace osu.Game.Screens.Ranking.Statistics
             for (int i = 1; i <= axis_points; i++)
             {
                 double axisValue = i * axisValueStep;
-                float position = (float)(axisValue / maxValue);
+                float position = maxValue == 0 ? 0 : (float)(axisValue / maxValue);
                 float alpha = 1f - position * 0.8f;
 
                 axisFlow.Add(new OsuSpriteText
@@ -282,7 +281,7 @@ namespace osu.Game.Screens.Ranking.Statistics
 
             protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
             {
-                if (invalidation.HasFlagFast(Invalidation.DrawSize))
+                if (invalidation.HasFlag(Invalidation.DrawSize))
                 {
                     if (lastDrawHeight != null && lastDrawHeight != DrawHeight)
                         Scheduler.AddOnce(updateMetrics, false);
@@ -349,7 +348,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                 boxAdjustment.FadeTo(!hasAdjustment ? 0 : 1, duration, Easing.OutQuint);
             }
 
-            private float offsetForValue(float value) => (1 - minimum_height) * value / maxValue;
+            private float offsetForValue(float value) => maxValue == 0 ? 0 : (1 - minimum_height) * value / maxValue;
 
             private float heightForValue(float value) => minimum_height + offsetForValue(value);
         }
