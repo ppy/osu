@@ -166,7 +166,7 @@ namespace osu.Game.Screens.Play
                 return;
 
             float timeBoxTargetWidth = (float)Math.Max(0, (remainingTimeForCurrentPeriod - timingPoint.BeatLength / currentPeriod.Value.Value.Duration));
-            remainingTimeBox.ResizeWidthTo(timeBoxTargetWidth, timingPoint.BeatLength * 2, Easing.OutQuint);
+            remainingTimeBox.ResizeWidthTo(timeBoxTargetWidth, timingPoint.BeatLength * 3.5, Easing.OutQuint);
         }
 
         private void updateDisplay(ValueChangedEvent<Period?> period)
