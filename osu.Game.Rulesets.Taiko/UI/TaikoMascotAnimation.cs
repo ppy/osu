@@ -14,7 +14,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
-    public sealed class TaikoMascotAnimation : BeatSyncedContainer
+    public sealed partial class TaikoMascotAnimation : BeatSyncedContainer
     {
         private readonly TextureAnimation textureAnimation;
 
@@ -27,7 +27,8 @@ namespace osu.Game.Rulesets.Taiko.UI
             InternalChild = textureAnimation = createTextureAnimation(state).With(animation =>
             {
                 animation.Origin = animation.Anchor = Anchor.BottomLeft;
-                animation.Scale = new Vector2(0.51f); // close enough to stable
+                // matches stable (https://github.com/peppy/osu-stable-reference/blob/e53980dd76857ee899f66ce519ba1597e7874f28/osu!/GameModes/Play/Rulesets/Taiko/TaikoMascot.cs#L34)
+                animation.Scale = new Vector2(0.6f);
             });
 
             RelativeSizeAxes = Axes.Both;
@@ -73,7 +74,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             }
         }
 
-        private class ManualMascotTextureAnimation : TextureAnimation
+        private partial class ManualMascotTextureAnimation : TextureAnimation
         {
             private readonly TaikoMascotAnimationState state;
 
@@ -103,7 +104,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             }
         }
 
-        private class ClearMascotTextureAnimation : TextureAnimation
+        private partial class ClearMascotTextureAnimation : TextureAnimation
         {
             private const float clear_animation_speed = 1000 / 10f;
 

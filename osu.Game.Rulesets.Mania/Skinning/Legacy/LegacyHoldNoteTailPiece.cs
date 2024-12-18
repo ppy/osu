@@ -8,7 +8,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 {
-    public class LegacyHoldNoteTailPiece : LegacyNotePiece
+    public partial class LegacyHoldNoteTailPiece : LegacyNotePiece
     {
         protected override void OnDirectionChanged(ValueChangedEvent<ScrollingDirection> direction)
         {

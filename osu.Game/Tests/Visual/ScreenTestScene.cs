@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -14,13 +12,14 @@ using osu.Framework.Testing;
 using osu.Game.Graphics;
 using osu.Game.Overlays;
 using osu.Game.Screens;
+using osu.Game.Screens.Footer;
 
 namespace osu.Game.Tests.Visual
 {
     /// <summary>
     /// A test case which can be used to test a screen (that relies on OnEntering being called to execute startup instructions).
     /// </summary>
-    public abstract class ScreenTestScene : OsuManualInputManagerTestScene, IOverlayManager
+    public abstract partial class ScreenTestScene : OsuManualInputManagerTestScene, IOverlayManager
     {
         protected readonly OsuScreenStack Stack;
 
@@ -31,6 +30,9 @@ namespace osu.Game.Tests.Visual
 
         [Cached(typeof(IDialogOverlay))]
         protected DialogOverlay DialogOverlay { get; private set; }
+
+        [Cached]
+        private ScreenFooter footer;
 
         protected ScreenTestScene()
         {
@@ -46,7 +48,8 @@ namespace osu.Game.Tests.Visual
                 {
                     RelativeSizeAxes = Axes.Both,
                     Child = DialogOverlay = new DialogOverlay()
-                }
+                },
+                footer = new ScreenFooter(),
             });
 
             Stack.ScreenPushed += (_, newScreen) => Logger.Log($"{nameof(ScreenTestScene)} screen changed → {newScreen}");

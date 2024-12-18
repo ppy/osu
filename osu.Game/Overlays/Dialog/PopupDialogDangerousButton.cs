@@ -10,13 +10,12 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
-using osu.Game.Audio.Effects;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Dialog
 {
-    public class PopupDialogDangerousButton : PopupDialogButton
+    public partial class PopupDialogDangerousButton : PopupDialogButton
     {
         private Box progressBox;
         private DangerousConfirmContainer confirmContainer;
@@ -46,7 +45,7 @@ namespace osu.Game.Overlays.Dialog
             confirmContainer.Progress.BindValueChanged(progress => progressBox.Width = (float)progress.NewValue, true);
         }
 
-        private class DangerousConfirmContainer : HoldToConfirmContainer
+        private partial class DangerousConfirmContainer : HoldToConfirmContainer
         {
             public DangerousConfirmContainer()
                 : base(isDangerousAction: true)
@@ -56,15 +55,13 @@ namespace osu.Game.Overlays.Dialog
             private Sample tickSample;
             private Sample confirmSample;
             private double lastTickPlaybackTime;
-            private AudioFilter lowPassFilter = null!;
+            private bool mouseDown;
 
             [BackgroundDependencyLoader]
             private void load(AudioManager audio)
             {
                 tickSample = audio.Samples.Get(@"UI/dialog-dangerous-tick");
                 confirmSample = audio.Samples.Get(@"UI/dialog-dangerous-select");
-
-                AddInternal(lowPassFilter = new AudioFilter(audio.SampleMixer));
             }
 
             protected override void LoadComplete()
@@ -75,7 +72,6 @@ namespace osu.Game.Overlays.Dialog
 
             protected override void Confirm()
             {
-                lowPassFilter.CutoffTo(AudioFilter.MAX_LOWPASS_CUTOFF);
                 confirmSample?.Play();
                 base.Confirm();
             }
@@ -83,6 +79,7 @@ namespace osu.Game.Overlays.Dialog
             protected override bool OnMouseDown(MouseDownEvent e)
             {
                 BeginConfirm();
+                mouseDown = true;
                 return true;
             }
 
@@ -90,23 +87,40 @@ namespace osu.Game.Overlays.Dialog
             {
                 if (!e.HasAnyButtonPressed)
                 {
-                    lowPassFilter.CutoffTo(AudioFilter.MAX_LOWPASS_CUTOFF);
                     AbortConfirm();
+                    mouseDown = false;
                 }
+            }
+
+            protected override bool OnHover(HoverEvent e)
+            {
+                if (mouseDown)
+                    BeginConfirm();
+
+                return base.OnHover(e);
+            }
+
+            protected override void OnHoverLost(HoverLostEvent e)
+            {
+                base.OnHoverLost(e);
+
+                if (!mouseDown) return;
+
+                AbortConfirm();
             }
 
             private void progressChanged(ValueChangedEvent<double> progress)
             {
-                if (progress.NewValue < progress.OldValue) return;
+                if (progress.NewValue < progress.OldValue)
+                    return;
 
-                if (Clock.CurrentTime - lastTickPlaybackTime < 30) return;
-
-                lowPassFilter.CutoffTo((int)(progress.NewValue * AudioFilter.MAX_LOWPASS_CUTOFF * 0.5));
+                if (Clock.CurrentTime - lastTickPlaybackTime < 40)
+                    return;
 
                 var channel = tickSample.GetChannel();
 
-                channel.Frequency.Value = 1 + progress.NewValue * 0.5f;
-                channel.Volume.Value = 0.5f + progress.NewValue / 2f;
+                channel.Frequency.Value = 1 + progress.NewValue;
+                channel.Volume.Value = 0.1f + progress.NewValue / 2f;
 
                 channel.Play();
 

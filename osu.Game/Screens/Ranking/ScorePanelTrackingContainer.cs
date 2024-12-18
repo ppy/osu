@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System;
 using osu.Framework.Graphics.Containers;
@@ -11,7 +9,7 @@ namespace osu.Game.Screens.Ranking
     /// <summary>
     /// A <see cref="CompositeDrawable"/> which tracks the size of a <see cref="ScorePanel"/>, to which the <see cref="ScorePanel"/> can be added or removed.
     /// </summary>
-    public class ScorePanelTrackingContainer : CompositeDrawable
+    public partial class ScorePanelTrackingContainer : CompositeDrawable
     {
         /// <summary>
         /// The <see cref="ScorePanel"/> that created this <see cref="ScorePanelTrackingContainer"/>.

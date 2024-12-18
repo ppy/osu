@@ -12,7 +12,7 @@ namespace osu.Game.Skinning
     /// <summary>
     /// A drawable which can be skinned via an <see cref="ISkinSource"/>.
     /// </summary>
-    public class SkinnableDrawable : SkinReloadableDrawable
+    public partial class SkinnableDrawable : SkinReloadableDrawable
     {
         /// <summary>
         /// The displayed component.

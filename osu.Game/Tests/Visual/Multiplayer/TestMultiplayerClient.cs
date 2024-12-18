@@ -23,7 +23,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
     /// <summary>
     /// A <see cref="MultiplayerClient"/> for use in multiplayer test scenes. Should generally not be used by itself outside of a <see cref="MultiplayerTestScene"/>.
     /// </summary>
-    public class TestMultiplayerClient : MultiplayerClient
+    public partial class TestMultiplayerClient : MultiplayerClient
     {
         public override IBindable<bool> IsConnected => isConnected;
         private readonly Bindable<bool> isConnected = new Bindable<bool>(true);
@@ -109,8 +109,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     // the "best" team is the one with the least users on it.
                     int bestTeam = teamVersus.Teams
                                              .Select(team => (teamID: team.ID, userCount: ServerRoom.Users.Count(u => (u.MatchState as TeamVersusUserState)?.TeamID == team.ID)))
-                                             .OrderBy(pair => pair.userCount)
-                                             .First().teamID;
+                                             .MinBy(pair => pair.userCount).teamID;
 
                     user.MatchState = new TeamVersusUserState { TeamID = bestTeam };
                     ((IMultiplayerClient)this).MatchUserStateChanged(clone(user.UserID), clone(user.MatchState)).WaitSafely();
@@ -209,12 +208,15 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         protected override async Task<MultiplayerRoom> JoinRoom(long roomId, string? password = null)
         {
+            if (RoomJoined || ServerAPIRoom != null)
+                throw new InvalidOperationException("Already joined a room");
+
             roomId = clone(roomId);
             password = clone(password);
 
-            ServerAPIRoom = roomManager.ServerSideRooms.Single(r => r.RoomID.Value == roomId);
+            ServerAPIRoom = roomManager.ServerSideRooms.Single(r => r.RoomID == roomId);
 
-            if (password != ServerAPIRoom.Password.Value)
+            if (password != ServerAPIRoom.Password)
                 throw new InvalidOperationException("Invalid password.");
 
             lastPlaylistItemId = ServerAPIRoom.Playlist.Max(item => item.ID);
@@ -228,13 +230,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 Settings =
                 {
-                    Name = ServerAPIRoom.Name.Value,
-                    MatchType = ServerAPIRoom.Type.Value,
-                    Password = password,
-                    QueueMode = ServerAPIRoom.QueueMode.Value,
-                    AutoStartDuration = ServerAPIRoom.AutoStartDuration.Value
+                    Name = ServerAPIRoom.Name,
+                    MatchType = ServerAPIRoom.Type,
+                    Password = password ?? string.Empty,
+                    QueueMode = ServerAPIRoom.QueueMode,
+                    AutoStartDuration = ServerAPIRoom.AutoStartDuration
                 },
-                Playlist = ServerAPIRoom.Playlist.Select(item => new MultiplayerPlaylistItem(item)).ToList(),
+                Playlist = ServerAPIRoom.Playlist.Select(CreateMultiplayerPlaylistItem).ToList(),
                 Users = { localUser },
                 Host = localUser
             };
@@ -261,6 +263,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
         protected override Task LeaveRoomInternal()
         {
             RoomJoined = false;
+            ServerAPIRoom = null;
+            ServerRoom = null;
+            return Task.CompletedTask;
+        }
+
+        public override Task InvitePlayer(int userId)
+        {
             return Task.CompletedTask;
         }
 
@@ -392,6 +401,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
             return Task.CompletedTask;
         }
 
+        public override async Task AbortMatch()
+        {
+            ChangeUserState(api.LocalUser.Value.Id, MultiplayerUserState.Idle);
+            await ((IMultiplayerClient)this).GameplayAborted(GameplayAbortReason.HostAbortedTheMatch).ConfigureAwait(false);
+        }
+
         public async Task AddUserPlaylistItem(int userId, MultiplayerPlaylistItem item)
         {
             Debug.Assert(ServerRoom != null);
@@ -432,7 +447,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             item.PlaylistOrder = existingItem.PlaylistOrder;
 
             ServerRoom.Playlist[ServerRoom.Playlist.IndexOf(existingItem)] = item;
-            ServerAPIRoom.Playlist[ServerAPIRoom.Playlist.IndexOf(ServerAPIRoom.Playlist.Single(i => i.ID == item.ID))] = new PlaylistItem(item);
+            ServerAPIRoom.Playlist = ServerAPIRoom.Playlist.Select((pi, i) => pi.ID == item.ID ? new PlaylistItem(item) : ServerAPIRoom.Playlist[i]).ToArray();
 
             await ((IMultiplayerClient)this).PlaylistItemChanged(clone(item)).ConfigureAwait(false);
         }
@@ -459,7 +474,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 throw new InvalidOperationException("Attempted to remove an item which has already been played.");
 
             ServerRoom.Playlist.Remove(item);
-            ServerAPIRoom.Playlist.RemoveAll(i => i.ID == item.ID);
+            ServerAPIRoom.Playlist = ServerAPIRoom.Playlist.Where(i => i.ID != item.ID).ToArray();
             await ((IMultiplayerClient)this).PlaylistItemRemoved(clone(playlistItemId)).ConfigureAwait(false);
 
             await updateCurrentItem(ServerRoom).ConfigureAwait(false);
@@ -554,7 +569,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             item.ID = ++lastPlaylistItemId;
 
             ServerRoom.Playlist.Add(item);
-            ServerAPIRoom.Playlist.Add(new PlaylistItem(item));
+            ServerAPIRoom.Playlist = ServerAPIRoom.Playlist.Append(new PlaylistItem(item)).ToArray();
             await ((IMultiplayerClient)this).PlaylistItemAdded(clone(item)).ConfigureAwait(false);
 
             await updatePlaylistOrder(ServerRoom).ConfigureAwait(false);
@@ -636,8 +651,29 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private T clone<T>(T incoming)
         {
-            byte[]? serialized = MessagePackSerializer.Serialize(typeof(T), incoming, SignalRUnionWorkaroundResolver.OPTIONS);
+            byte[] serialized = MessagePackSerializer.Serialize(typeof(T), incoming, SignalRUnionWorkaroundResolver.OPTIONS);
             return MessagePackSerializer.Deserialize<T>(serialized, SignalRUnionWorkaroundResolver.OPTIONS);
+        }
+
+        public static MultiplayerPlaylistItem CreateMultiplayerPlaylistItem(PlaylistItem item) => new MultiplayerPlaylistItem
+        {
+            ID = item.ID,
+            OwnerID = item.OwnerID,
+            BeatmapID = item.Beatmap.OnlineID,
+            BeatmapChecksum = item.Beatmap.MD5Hash,
+            RulesetID = item.RulesetID,
+            RequiredMods = item.RequiredMods.ToArray(),
+            AllowedMods = item.AllowedMods.ToArray(),
+            Expired = item.Expired,
+            PlaylistOrder = item.PlaylistOrder ?? 0,
+            PlayedAt = item.PlayedAt,
+            StarRating = item.Beatmap.StarRating,
+        };
+
+        public override Task DisconnectInternal()
+        {
+            isConnected.Value = false;
+            return Task.CompletedTask;
         }
     }
 }

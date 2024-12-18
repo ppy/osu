@@ -18,7 +18,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
 {
-    public class StateDisplay : CompositeDrawable
+    public partial class StateDisplay : CompositeDrawable
     {
         private const double fade_time = 50;
 
@@ -152,6 +152,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
             {
                 default:
                     this.FadeOut(fade_time);
+                    break;
+
+                case DownloadState.Unknown:
+                    text.Text = "checking availability";
+                    icon.Icon = FontAwesome.Solid.Question;
+                    icon.Colour = colours.Orange0;
                     break;
 
                 case DownloadState.NotDownloaded:

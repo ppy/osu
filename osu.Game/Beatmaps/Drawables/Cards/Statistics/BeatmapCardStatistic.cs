@@ -19,7 +19,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Statistics
     /// <summary>
     /// A single statistic shown on a beatmap card.
     /// </summary>
-    public abstract class BeatmapCardStatistic : CompositeDrawable, IHasTooltip, IHasCustomTooltip
+    public abstract partial class BeatmapCardStatistic : CompositeDrawable, IHasTooltip, IHasCustomTooltip
     {
         protected IconUsage Icon
         {
@@ -46,21 +46,21 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Statistics
             {
                 AutoSizeAxes = Axes.Both,
                 Direction = FillDirection.Horizontal,
-                Spacing = new Vector2(5, 0),
+                Spacing = new Vector2(4, 0),
                 Children = new Drawable[]
                 {
                     spriteIcon = new SpriteIcon
                     {
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
-                        Size = new Vector2(10),
+                        Size = new Vector2(8),
                         Margin = new MarginPadding { Top = 1 }
                     },
                     spriteText = new OsuSpriteText
                     {
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
-                        Font = OsuFont.Default.With(size: 14)
+                        Font = OsuFont.Default.With(size: 11)
                     }
                 }
             };
@@ -74,7 +74,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Statistics
 
         #region Tooltip implementation
 
-        public virtual ITooltip GetCustomTooltip() => null;
+        public virtual ITooltip GetCustomTooltip() => null!;
         public virtual object TooltipContent => null;
 
         #endregion

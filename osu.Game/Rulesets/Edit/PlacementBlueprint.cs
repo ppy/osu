@@ -1,30 +1,20 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
-using System.Linq;
-using System.Threading;
-using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
-using osu.Game.Audio;
-using osu.Game.Beatmaps;
-using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Screens.Edit;
-using osu.Game.Screens.Edit.Compose;
-using osuTK;
 using osuTK.Input;
 
 namespace osu.Game.Rulesets.Edit
 {
     /// <summary>
-    /// A blueprint which governs the creation of a new <see cref="HitObject"/> to actualisation.
+    /// A blueprint which governs the placement of something.
     /// </summary>
-    public abstract class PlacementBlueprint : CompositeDrawable
+    public abstract partial class PlacementBlueprint : VisibilityContainer, IKeyBindingHandler<GlobalAction>
     {
         /// <summary>
         /// Whether the <see cref="HitObject"/> is currently mid-placement, but has not necessarily finished being placed.
@@ -32,63 +22,44 @@ namespace osu.Game.Rulesets.Edit
         public PlacementState PlacementActive { get; private set; }
 
         /// <summary>
-        /// The <see cref="HitObject"/> that is being placed.
+        /// Whether this blueprint is currently in a state that can be committed.
         /// </summary>
-        public readonly HitObject HitObject;
+        /// <remarks>
+        /// Override this with any preconditions that should be double-checked on committing.
+        /// If <c>false</c> is returned and a commit is attempted, the blueprint will be destroyed instead.
+        /// </remarks>
+        protected virtual bool IsValidForPlacement => true;
 
-        [Resolved(canBeNull: true)]
-        protected EditorClock EditorClock { get; private set; }
+        // the blueprint should still be considered for input even if it is hidden,
+        // especially when such input is the reason for making the blueprint become visible.
+        public override bool PropagatePositionalInputSubTree => true;
+        public override bool PropagateNonPositionalInputSubTree => true;
 
-        [Resolved]
-        private EditorBeatmap beatmap { get; set; }
-
-        private Bindable<double> startTimeBindable;
-
-        [Resolved]
-        private IPlacementHandler placementHandler { get; set; }
-
-        protected PlacementBlueprint(HitObject hitObject)
+        protected PlacementBlueprint()
         {
-            HitObject = hitObject;
-
-            // adding the default hit sample should be the case regardless of the ruleset.
-            HitObject.Samples.Add(new HitSampleInfo(HitSampleInfo.HIT_NORMAL));
-
             RelativeSizeAxes = Axes.Both;
 
-            // This is required to allow the blueprint's position to be updated via OnMouseMove/Handle
-            // on the same frame it is made visible via a PlacementState change.
+            // the blueprint should still be considered for input even if it is hidden,
+            // especially when such input is the reason for making the blueprint become visible.
             AlwaysPresent = true;
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            startTimeBindable = HitObject.StartTimeBindable.GetBoundCopy();
-            startTimeBindable.BindValueChanged(_ => ApplyDefaultsToHitObject(), true);
-        }
-
         /// <summary>
-        /// Signals that the placement of <see cref="HitObject"/> has started.
+        /// Signals that the placement has started.
         /// </summary>
-        /// <param name="commitStart">Whether this call is committing a value for HitObject.StartTime and continuing with further adjustments.</param>
-        protected void BeginPlacement(bool commitStart = false)
+        /// <param name="commitStart">Whether this call is committing a value and continuing with further adjustments.</param>
+        protected virtual void BeginPlacement(bool commitStart = false)
         {
-            var nearestSampleControlPoint = beatmap.HitObjects.LastOrDefault(h => h.GetEndTime() < HitObject.StartTime)?.SampleControlPoint?.DeepClone() as SampleControlPoint;
-
-            HitObject.SampleControlPoint = nearestSampleControlPoint ?? new SampleControlPoint();
-
-            placementHandler.BeginPlacement(HitObject);
             if (commitStart)
                 PlacementActive = PlacementState.Active;
         }
 
         /// <summary>
         /// Signals that the placement of <see cref="HitObject"/> has finished.
-        /// This will destroy this <see cref="PlacementBlueprint"/>, and add the HitObject.StartTime to the <see cref="Beatmap"/>.
+        /// This will destroy this <see cref="PlacementBlueprint"/>, and commit the changes.
         /// </summary>
-        /// <param name="commit">Whether the object should be committed.</param>
-        public void EndPlacement(bool commit)
+        /// <param name="commit">Whether the changes should be committed. Note that a commit may fail if <see cref="IsValidForPlacement"/> is <c>false</c>.</param>
+        public virtual void EndPlacement(bool commit)
         {
             switch (PlacementActive)
             {
@@ -101,9 +72,13 @@ namespace osu.Game.Rulesets.Edit
                     break;
             }
 
-            placementHandler.EndPlacement(HitObject, commit);
             PlacementActive = PlacementState.Finished;
         }
+
+        /// <summary>
+        /// Determines which objects to snap to for the snap result in <see cref="UpdateTimeAndPosition"/>.
+        /// </summary>
+        public virtual SnapType SnapType => SnapType.All;
 
         /// <summary>
         /// Updates the time and position of this <see cref="PlacementBlueprint"/> based on the provided snap information.
@@ -111,17 +86,27 @@ namespace osu.Game.Rulesets.Edit
         /// <param name="result">The snap result information.</param>
         public virtual void UpdateTimeAndPosition(SnapResult result)
         {
-            if (PlacementActive == PlacementState.Waiting)
-                HitObject.StartTime = result.Time ?? EditorClock?.CurrentTime ?? Time.Current;
         }
 
-        /// <summary>
-        /// Invokes <see cref="Objects.HitObject.ApplyDefaults(ControlPointInfo,IBeatmapDifficultyInfo,CancellationToken)"/>,
-        /// refreshing <see cref="Objects.HitObject.NestedHitObjects"/> and parameters for the <see cref="HitObject"/>.
-        /// </summary>
-        protected void ApplyDefaultsToHitObject() => HitObject.ApplyDefaults(beatmap.ControlPointInfo, beatmap.Difficulty);
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+        {
+            if (PlacementActive == PlacementState.Waiting)
+                return false;
 
-        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Parent?.ReceivePositionalInputAt(screenSpacePos) ?? false;
+            switch (e.Action)
+            {
+                case GlobalAction.Back:
+                    EndPlacement(false);
+                    return true;
+
+                default:
+                    return false;
+            }
+        }
+
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
+        {
+        }
 
         protected override bool Handle(UIEvent e)
         {
@@ -137,14 +122,15 @@ namespace osu.Game.Rulesets.Edit
 
                 case MouseButtonEvent mouse:
                     // placement blueprints should generally block mouse from reaching underlying components (ie. performing clicks on interface buttons).
-                    // for now, the one exception we want to allow is when using a non-main mouse button when shift is pressed, which is used to trigger object deletion
-                    // while in placement mode.
-                    return mouse.Button == MouseButton.Left || !mouse.ShiftPressed;
+                    return mouse.Button == MouseButton.Left || PlacementActive == PlacementState.Active;
 
                 default:
                     return false;
             }
         }
+
+        protected override void PopIn() => this.FadeIn();
+        protected override void PopOut() => this.FadeOut();
 
         public enum PlacementState
         {

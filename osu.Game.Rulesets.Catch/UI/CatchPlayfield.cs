@@ -1,21 +1,21 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osuTK;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
-    public class CatchPlayfield : ScrollingPlayfield
+    public partial class CatchPlayfield : ScrollingPlayfield
     {
         /// <summary>
         /// The width of the playfield.
@@ -38,9 +38,11 @@ namespace osu.Game.Rulesets.Catch.UI
             // only check the X position; handle all vertical space.
             base.ReceivePositionalInputAt(new Vector2(screenSpacePos.X, ScreenSpaceDrawQuad.Centre.Y));
 
-        internal Catcher Catcher { get; private set; }
+        internal Catcher Catcher { get; private set; } = null!;
 
-        internal CatcherArea CatcherArea { get; private set; }
+        internal CatcherArea CatcherArea { get; private set; } = null!;
+
+        public Container UnderlayElements { get; private set; } = null!;
 
         private readonly IBeatmapDifficultyInfo difficulty;
 
@@ -48,6 +50,8 @@ namespace osu.Game.Rulesets.Catch.UI
         {
             this.difficulty = difficulty;
         }
+
+        protected override GameplayCursorContainer CreateCursor() => new CatchCursorContainer();
 
         [BackgroundDependencyLoader]
         private void load()
@@ -61,6 +65,10 @@ namespace osu.Game.Rulesets.Catch.UI
 
             AddRangeInternal(new[]
             {
+                UnderlayElements = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                },
                 droppedObjectContainer,
                 Catcher.CreateProxiedContent(),
                 HitObjectContainer.CreateProxy(),
@@ -102,7 +110,7 @@ namespace osu.Game.Rulesets.Catch.UI
         private void onNewResult(DrawableHitObject judgedObject, JudgementResult result)
             => CatcherArea.OnNewResult((DrawableCatchHitObject)judgedObject, result);
 
-        private void onRevertResult(DrawableHitObject judgedObject, JudgementResult result)
-            => CatcherArea.OnRevertResult((DrawableCatchHitObject)judgedObject, result);
+        private void onRevertResult(JudgementResult result)
+            => CatcherArea.OnRevertResult(result);
     }
 }

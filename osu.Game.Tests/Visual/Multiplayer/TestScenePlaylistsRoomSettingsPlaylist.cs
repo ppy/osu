@@ -1,8 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -25,20 +24,20 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestScenePlaylistsRoomSettingsPlaylist : OnlinePlayTestScene
+    public partial class TestScenePlaylistsRoomSettingsPlaylist : OnlinePlayTestScene
     {
-        private TestPlaylist playlist;
+        private TestPlaylist playlist = null!;
 
         [Test]
         public void TestItemRemovedOnDeletion()
         {
-            PlaylistItem selectedItem = null;
+            PlaylistItem selectedItem = null!;
 
             createPlaylist();
 
             moveToItem(0);
             AddStep("click", () => InputManager.Click(MouseButton.Left));
-            AddStep("retrieve selection", () => selectedItem = playlist.SelectedItem.Value);
+            AddStep("retrieve selection", () => selectedItem = playlist.SelectedItem.Value!);
 
             moveToDeleteButton(0);
             AddStep("click delete button", () => InputManager.Click(MouseButton.Left));
@@ -46,10 +45,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddAssert("item removed", () => !playlist.Items.Contains(selectedItem));
         }
 
-        [Test]
-        public void TestNextItemSelectedAfterDeletion()
+        [TestCase(true)]
+        [TestCase(false)]
+        public void TestNextItemSelectedAfterDeletion(bool allowSelection)
         {
-            createPlaylist();
+            createPlaylist(p =>
+            {
+                p.AllowSelection = allowSelection;
+            });
 
             moveToItem(0);
             AddStep("click", () => InputManager.Click(MouseButton.Left));
@@ -57,7 +60,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             moveToDeleteButton(0);
             AddStep("click delete button", () => InputManager.Click(MouseButton.Left));
 
-            AddAssert("item 0 is selected", () => playlist.SelectedItem.Value == playlist.Items[0]);
+            AddAssert("item 0 is " + (allowSelection ? "selected" : "not selected"), () => playlist.SelectedItem.Value == (allowSelection ? playlist.Items[0] : null));
         }
 
         [Test]
@@ -117,7 +120,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             InputManager.MoveMouseTo(item.ChildrenOfType<DrawableRoomPlaylistItem.PlaylistRemoveButton>().ElementAt(0), offset);
         });
 
-        private void createPlaylist()
+        private void createPlaylist(Action<TestPlaylist>? setupPlaylist = null)
         {
             AddStep("create playlist", () =>
             {
@@ -154,12 +157,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         }
                     });
                 }
+
+                setupPlaylist?.Invoke(playlist);
             });
 
             AddUntilStep("wait for items to load", () => playlist.ItemMap.Values.All(i => i.IsLoaded));
         }
 
-        private class TestPlaylist : PlaylistsRoomSettingsPlaylist
+        private partial class TestPlaylist : PlaylistsRoomSettingsPlaylist
         {
             public new IReadOnlyDictionary<PlaylistItem, RearrangeableListItem<PlaylistItem>> ItemMap => base.ItemMap;
 

@@ -7,7 +7,7 @@ using osu.Game.Graphics;
 
 namespace osu.Game.Rulesets.Taiko.Skinning.Default
 {
-    public class ElongatedCirclePiece : CirclePiece
+    public partial class ElongatedCirclePiece : CirclePiece
     {
         public ElongatedCirclePiece()
         {
@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
         protected override void Update()
         {
             base.Update();
-            Width = Parent.DrawSize.X + DrawHeight;
+            Width = Parent!.DrawSize.X + DrawHeight;
         }
     }
 }

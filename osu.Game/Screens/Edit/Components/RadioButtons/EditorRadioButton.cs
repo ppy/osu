@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -19,12 +17,12 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Components.RadioButtons
 {
-    public class EditorRadioButton : OsuButton, IHasTooltip
+    public partial class EditorRadioButton : OsuButton, IHasTooltip
     {
         /// <summary>
         /// Invoked when this <see cref="EditorRadioButton"/> has been selected.
         /// </summary>
-        public Action<RadioButton> Selected;
+        public Action<RadioButton>? Selected;
 
         public readonly RadioButton Button;
 
@@ -33,10 +31,7 @@ namespace osu.Game.Screens.Edit.Components.RadioButtons
         private Color4 selectedBackgroundColour;
         private Color4 selectedIconColour;
 
-        private Drawable icon;
-
-        [Resolved(canBeNull: true)]
-        private EditorBeatmap editorBeatmap { get; set; }
+        private Drawable icon = null!;
 
         public EditorRadioButton(RadioButton button)
         {
@@ -78,8 +73,6 @@ namespace osu.Game.Screens.Edit.Components.RadioButtons
                     Selected?.Invoke(Button);
             };
 
-            editorBeatmap?.HasTiming.BindValueChanged(hasTiming => Button.Selected.Disabled = !hasTiming.NewValue, true);
-
             Button.Selected.BindDisabledChanged(disabled => Enabled.Value = !disabled, true);
             updateSelectionState();
         }
@@ -101,6 +94,6 @@ namespace osu.Game.Screens.Edit.Components.RadioButtons
             X = 40f
         };
 
-        public LocalisableString TooltipText => Enabled.Value ? string.Empty : "Add at least one timing point first!";
+        public LocalisableString TooltipText => Button.TooltipText;
     }
 }

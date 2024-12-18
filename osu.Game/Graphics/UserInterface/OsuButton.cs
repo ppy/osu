@@ -1,9 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -12,6 +11,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.Sprites;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
@@ -19,16 +19,12 @@ namespace osu.Game.Graphics.UserInterface
     /// <summary>
     /// A button with added default sound effects.
     /// </summary>
-    public class OsuButton : Button
+    public abstract partial class OsuButton : Button
     {
         public LocalisableString Text
         {
-            get => SpriteText?.Text ?? default;
-            set
-            {
-                if (SpriteText != null)
-                    SpriteText.Text = value;
-            }
+            get => SpriteText.Text;
+            set => SpriteText.Text = value;
         }
 
         private Color4? backgroundColour;
@@ -36,7 +32,7 @@ namespace osu.Game.Graphics.UserInterface
         /// <summary>
         /// Sets a custom background colour to this button, replacing the provided default.
         /// </summary>
-        public Color4 BackgroundColour
+        public virtual Color4 BackgroundColour
         {
             get => backgroundColour ?? defaultBackgroundColour;
             set
@@ -65,11 +61,19 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override Container<Drawable> Content { get; }
 
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
+            // base call is checked for cases when `OsuClickableContainer` has masking applied to it directly (ie. externally in object initialisation).
+            base.ReceivePositionalInputAt(screenSpacePos)
+            // Implementations often apply masking / edge rounding at a content level, so it's imperative to check that as well.
+            && Content.ReceivePositionalInputAt(screenSpacePos);
+
         protected Box Hover;
         protected Box Background;
         protected SpriteText SpriteText;
 
-        public OsuButton(HoverSampleSet? hoverSounds = HoverSampleSet.Button)
+        private readonly Box flashLayer;
+
+        protected OsuButton(HoverSampleSet? hoverSounds = HoverSampleSet.Button)
         {
             Height = 40;
 
@@ -87,6 +91,7 @@ namespace osu.Game.Graphics.UserInterface
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         RelativeSizeAxes = Axes.Both,
+                        Depth = float.MaxValue,
                     },
                     Hover = new Box
                     {
@@ -99,6 +104,14 @@ namespace osu.Game.Graphics.UserInterface
                         Depth = float.MinValue
                     },
                     SpriteText = CreateText(),
+                    flashLayer = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Blending = BlendingParameters.Additive,
+                        Depth = float.MinValue,
+                        Colour = Color4.White.Opacity(0.5f),
+                        Alpha = 0,
+                    },
                 }
             });
 
@@ -125,10 +138,12 @@ namespace osu.Game.Graphics.UserInterface
         protected override bool OnClick(ClickEvent e)
         {
             if (Enabled.Value)
-                Background.FlashColour(Color4.White, 800, Easing.OutQuint);
+                flashLayer.FadeOutFromOne(800, Easing.OutQuint);
 
             return base.OnClick(e);
         }
+
+        protected virtual float HoverLayerFinalAlpha => 0.1f;
 
         protected override bool OnHover(HoverEvent e)
         {
@@ -136,7 +151,7 @@ namespace osu.Game.Graphics.UserInterface
             {
                 Hover.FadeTo(0.2f, 40, Easing.OutQuint)
                      .Then()
-                     .FadeTo(0.1f, 800, Easing.OutQuint);
+                     .FadeTo(HoverLayerFinalAlpha, 800, Easing.OutQuint);
             }
 
             return base.OnHover(e);

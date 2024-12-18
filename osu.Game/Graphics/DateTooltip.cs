@@ -1,20 +1,19 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Localisation;
 using osu.Game.Graphics.Sprites;
 using osuTK;
 
 namespace osu.Game.Graphics
 {
-    public class DateTooltip : VisibilityContainer, ITooltip<DateTimeOffset>
+    public partial class DateTooltip : VisibilityContainer, ITooltip<DateTimeOffset>
     {
         private readonly OsuSpriteText dateText, timeText;
         private readonly Box background;
@@ -69,8 +68,8 @@ namespace osu.Game.Graphics
         {
             DateTimeOffset localDate = date.ToLocalTime();
 
-            dateText.Text = $"{localDate:d MMMM yyyy} ";
-            timeText.Text = $"{localDate:HH:mm:ss \"UTC\"z}";
+            dateText.Text = LocalisableString.Interpolate($"{localDate:d MMMM yyyy} ");
+            timeText.Text = LocalisableString.Interpolate($"{localDate:HH:mm:ss \"UTC\"z}");
         }
 
         public void Move(Vector2 pos) => Position = pos;

@@ -7,6 +7,8 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
+using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
@@ -15,9 +17,14 @@ using osu.Game.Audio;
 namespace osu.Game.Skinning
 {
     /// <summary>
-    /// A container which adds a local <see cref="ISkinSource"/> to the hierarchy.
+    /// A container which adds a provided <see cref="ISkin"/> to the DI skin lookup hierarchy.
     /// </summary>
-    public class SkinProvidingContainer : Container, ISkinSource
+    /// <remarks>
+    /// This container will expose an <see cref="ISkinSource"/> to its children.
+    /// The source will first consider the skin provided via the constructor (if any), then fallback
+    /// to any <see cref="ISkinSource"/> providers in the parent DI hierarchy.
+    /// </remarks>
+    public partial class SkinProvidingContainer : Container, ISkinSource
     {
         public event Action? SourceChanged;
 
@@ -156,17 +163,26 @@ namespace osu.Game.Skinning
             where TLookup : notnull
             where TValue : notnull
         {
-            foreach (var (_, lookupWrapper) in skinSources)
+            try
             {
-                IBindable<TValue>? bindable;
-                if ((bindable = lookupWrapper.GetConfig<TLookup, TValue>(lookup)) != null)
-                    return bindable;
+                Skin.LogLookupDebug(this, lookup, Skin.LookupDebugType.Enter);
+
+                foreach (var (_, lookupWrapper) in skinSources)
+                {
+                    IBindable<TValue>? bindable;
+                    if ((bindable = lookupWrapper.GetConfig<TLookup, TValue>(lookup)) != null)
+                        return bindable;
+                }
+
+                if (!AllowFallingBackToParent)
+                    return null;
+
+                return ParentSource?.GetConfig<TLookup, TValue>(lookup);
             }
-
-            if (!AllowFallingBackToParent)
-                return null;
-
-            return ParentSource?.GetConfig<TLookup, TValue>(lookup);
+            finally
+            {
+                Skin.LogLookupDebug(this, lookup, Skin.LookupDebugType.Exit);
+            }
         }
 
         /// <summary>
@@ -186,7 +202,10 @@ namespace osu.Game.Skinning
                         source.SourceChanged -= TriggerSourceChanged;
                 }
 
-                skinSources = sources.Select(skin => (skin, new DisableableSkinSource(skin, this))).ToArray();
+                skinSources = sources
+                              // Shouldn't be required after NRT is applied to all calling sources.
+                              .Where(skin => skin.IsNotNull())
+                              .Select(skin => (skin, new DisableableSkinSource(skin, this))).ToArray();
 
                 foreach (var skin in skinSources)
                 {
@@ -266,25 +285,36 @@ namespace osu.Game.Skinning
                 where TLookup : notnull
                 where TValue : notnull
             {
-                switch (lookup)
+                try
                 {
-                    case GlobalSkinColours:
-                    case SkinComboColourLookup:
-                    case SkinCustomColourLookup:
-                        if (provider.AllowColourLookup)
-                            return skin.GetConfig<TLookup, TValue>(lookup);
+                    Skin.LogLookupDebug(this, lookup, Skin.LookupDebugType.Enter);
 
-                        break;
+                    switch (lookup)
+                    {
+                        case GlobalSkinColours:
+                        case SkinComboColourLookup:
+                        case SkinCustomColourLookup:
+                            if (provider.AllowColourLookup)
+                                return skin.GetConfig<TLookup, TValue>(lookup);
 
-                    default:
-                        if (provider.AllowConfigurationLookup)
-                            return skin.GetConfig<TLookup, TValue>(lookup);
+                            break;
 
-                        break;
+                        default:
+                            if (provider.AllowConfigurationLookup)
+                                return skin.GetConfig<TLookup, TValue>(lookup);
+
+                            break;
+                    }
+
+                    return null;
                 }
-
-                return null;
+                finally
+                {
+                    Skin.LogLookupDebug(this, lookup, Skin.LookupDebugType.Exit);
+                }
             }
+
+            public override string ToString() => $"{GetType().ReadableName()} {{ Skin: {skin} }}";
         }
     }
 }

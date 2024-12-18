@@ -1,15 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
-using JetBrains.Annotations;
-using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -21,7 +17,7 @@ using osuTK.Input;
 
 namespace osu.Game.Screens.Ranking
 {
-    public class ScorePanelList : CompositeDrawable
+    public partial class ScorePanelList : CompositeDrawable
     {
         /// <summary>
         /// Normal spacing between all panels.
@@ -50,6 +46,8 @@ namespace osu.Game.Screens.Ranking
 
         public bool AllPanelsVisible => flow.All(p => p.IsPresent);
 
+        public bool IsEmpty => flow.Count == 0;
+
         /// <summary>
         /// The current scroll position.
         /// </summary>
@@ -63,17 +61,14 @@ namespace osu.Game.Screens.Ranking
         /// <summary>
         /// An action to be invoked if a <see cref="ScorePanel"/> is clicked while in an expanded state.
         /// </summary>
-        public Action PostExpandAction;
+        public Action? PostExpandAction;
 
-        public readonly Bindable<ScoreInfo> SelectedScore = new Bindable<ScoreInfo>();
-
-        [Resolved]
-        private ScoreManager scoreManager { get; set; }
+        public readonly Bindable<ScoreInfo?> SelectedScore = new Bindable<ScoreInfo?>();
 
         private readonly CancellationTokenSource loadCancellationSource = new CancellationTokenSource();
         private readonly Flow flow;
         private readonly Scroll scroll;
-        private ScorePanel expandedPanel;
+        private ScorePanel? expandedPanel;
 
         /// <summary>
         /// Creates a new <see cref="ScorePanelList"/>.
@@ -149,7 +144,7 @@ namespace osu.Game.Screens.Ranking
 
             var score = trackingContainer.Panel.Score;
 
-            flow.SetLayoutPosition(trackingContainer, scoreManager.GetTotalScore(score));
+            flow.SetLayoutPosition(trackingContainer, score.TotalScore);
 
             trackingContainer.Show();
 
@@ -176,7 +171,7 @@ namespace osu.Game.Screens.Ranking
         /// Brings a <see cref="ScoreInfo"/> to the centre of the screen and expands it.
         /// </summary>
         /// <param name="score">The <see cref="ScoreInfo"/> to present.</param>
-        private void selectedScoreChanged(ValueChangedEvent<ScoreInfo> score)
+        private void selectedScoreChanged(ValueChangedEvent<ScoreInfo?> score)
         {
             // avoid contracting panels unnecessarily when TriggerChange is fired manually.
             if (score.OldValue != null && !score.OldValue.Equals(score.NewValue))
@@ -319,27 +314,25 @@ namespace osu.Game.Screens.Ranking
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            loadCancellationSource?.Cancel();
+            loadCancellationSource.Cancel();
         }
 
-        private class Flow : FillFlowContainer<ScorePanelTrackingContainer>
+        private partial class Flow : FillFlowContainer<ScorePanelTrackingContainer>
         {
             public override IEnumerable<Drawable> FlowingChildren => applySorting(AliveInternalChildren);
 
             public int GetPanelIndex(ScoreInfo score) => applySorting(Children).TakeWhile(s => !s.Panel.Score.Equals(score)).Count();
 
-            [CanBeNull]
-            public ScoreInfo GetPreviousScore(ScoreInfo score) => applySorting(Children).TakeWhile(s => !s.Panel.Score.Equals(score)).LastOrDefault()?.Panel.Score;
+            public ScoreInfo? GetPreviousScore(ScoreInfo score) => applySorting(Children).TakeWhile(s => !s.Panel.Score.Equals(score)).LastOrDefault()?.Panel.Score;
 
-            [CanBeNull]
-            public ScoreInfo GetNextScore(ScoreInfo score) => applySorting(Children).SkipWhile(s => !s.Panel.Score.Equals(score)).ElementAtOrDefault(1)?.Panel.Score;
+            public ScoreInfo? GetNextScore(ScoreInfo score) => applySorting(Children).SkipWhile(s => !s.Panel.Score.Equals(score)).ElementAtOrDefault(1)?.Panel.Score;
 
             private IEnumerable<ScorePanelTrackingContainer> applySorting(IEnumerable<Drawable> drawables) => drawables.OfType<ScorePanelTrackingContainer>()
                                                                                                                        .OrderByDescending(GetLayoutPosition)
                                                                                                                        .ThenBy(s => s.Panel.Score.OnlineID);
         }
 
-        private class Scroll : OsuScrollContainer
+        private partial class Scroll : OsuScrollContainer
         {
             public new float Target => base.Target;
 

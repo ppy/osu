@@ -2,16 +2,19 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Game.Overlays.Dialog;
 
 namespace osu.Game.Overlays.Settings.Sections.Maintenance
 {
-    public class MassDeleteConfirmationDialog : DeleteConfirmationDialog
+    public partial class MassDeleteConfirmationDialog : DangerousActionDialog
     {
-        public MassDeleteConfirmationDialog(Action deleteAction)
+        public MassDeleteConfirmationDialog(Action deleteAction, LocalisableString deleteContent)
         {
-            BodyText = "Everything?";
-            DeleteAction = deleteAction;
+            BodyText = deleteContent;
+            Icon = FontAwesome.Solid.Trash;
+            DangerousAction = deleteAction;
         }
     }
 }

@@ -29,7 +29,10 @@ namespace osu.Game.Skinning
             invalidateCache();
             Debug.Assert(fileToStoragePathMapping != null);
 
-            realmSubscription = realm?.RegisterForNotifications(r => r.All<T>().Where(s => s.ID == source.ID), skinChanged);
+            // Required local for iOS. Will cause runtime crash if inlined.
+            Guid id = source.ID;
+
+            realmSubscription = realm?.RegisterForNotifications(r => r.All<T>().Where(s => s.ID == id), skinChanged);
         }
 
         protected override void Dispose(bool disposing)
@@ -38,7 +41,7 @@ namespace osu.Game.Skinning
             realmSubscription?.Dispose();
         }
 
-        private void skinChanged(IRealmCollection<T> sender, ChangeSet changes, Exception error) => invalidateCache();
+        private void skinChanged(IRealmCollection<T> sender, ChangeSet? changes) => invalidateCache();
 
         protected override IEnumerable<string> GetFilenames(string name)
         {
@@ -52,7 +55,7 @@ namespace osu.Game.Skinning
 
         private string? getPathForFile(string filename)
         {
-            if (fileToStoragePathMapping.Value.TryGetValue(filename.ToLowerInvariant(), out string path))
+            if (fileToStoragePathMapping.Value.TryGetValue(filename.ToLowerInvariant(), out string? path))
                 return path;
 
             return null;

@@ -12,6 +12,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Lists;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Chat;
+using osu.Game.Overlays.Chat.Listing;
 
 namespace osu.Game.Online.Chat
 {
@@ -86,6 +87,12 @@ namespace osu.Game.Online.Chat
         [JsonProperty(@"last_read_id")]
         public long? LastReadId;
 
+        /// <remarks>
+        /// Purposefully nullable for the sake of <see cref="ChannelListing.ChannelListingChannel"/>.
+        /// </remarks>
+        [JsonProperty(@"message_length_limit")]
+        public int? MessageLengthLimit;
+
         /// <summary>
         /// Signals if the current user joined this channel or not. Defaults to false.
         /// Note that this does not guarantee a join has completed. Check Id > 0 for confirmation.
@@ -97,6 +104,11 @@ namespace osu.Game.Online.Chat
         /// This is automatically cleared by the associated <see cref="DrawableChannel"/> after highlighting.
         /// </summary>
         public Bindable<Message> HighlightedMessage = new Bindable<Message>();
+
+        /// <summary>
+        /// The current text box message while in this <see cref="Channel"/>.
+        /// </summary>
+        public Bindable<string> TextBoxMessage = new Bindable<string>(string.Empty);
 
         [JsonConstructor]
         public Channel()
@@ -149,12 +161,26 @@ namespace osu.Game.Online.Chat
             Messages.AddRange(messages);
 
             long? maxMessageId = messages.Max(m => m.Id);
-            if (maxMessageId > LastMessageId)
+            if (LastMessageId == null || maxMessageId > LastMessageId)
                 LastMessageId = maxMessageId;
 
             purgeOldMessages();
 
             NewMessagesArrived?.Invoke(messages);
+        }
+
+        public void RemoveMessagesFromUser(int userId)
+        {
+            for (int i = 0; i < Messages.Count; i++)
+            {
+                var message = Messages[i];
+
+                if (message.SenderId == userId)
+                {
+                    Messages.RemoveAt(i--);
+                    MessageRemoved?.Invoke(message);
+                }
+            }
         }
 
         /// <summary>

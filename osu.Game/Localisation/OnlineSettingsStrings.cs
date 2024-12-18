@@ -55,9 +55,9 @@ namespace osu.Game.Localisation
         public static LocalisableString PreferNoVideo => new TranslatableString(getKey(@"prefer_no_video"), @"Prefer downloads without video");
 
         /// <summary>
-        /// "Automatically download beatmaps when spectating"
+        /// "Automatically download missing beatmaps"
         /// </summary>
-        public static LocalisableString AutomaticallyDownloadWhenSpectating => new TranslatableString(getKey(@"automatically_download_when_spectating"), @"Automatically download beatmaps when spectating");
+        public static LocalisableString AutomaticallyDownloadMissingBeatmaps => new TranslatableString(getKey(@"automatically_download_missing_beatmaps"), @"Automatically download missing beatmaps");
 
         /// <summary>
         /// "Show explicit content in search results"
@@ -78,6 +78,11 @@ namespace osu.Game.Localisation
         /// "Off"
         /// </summary>
         public static LocalisableString DiscordPresenceOff => new TranslatableString(getKey(@"discord_presence_off"), @"Off");
+
+        /// <summary>
+        /// "Hide country flags"
+        /// </summary>
+        public static LocalisableString HideCountryFlags => new TranslatableString(getKey(@"hide_country_flags"), @"Hide country flags");
 
         private static string getKey(string key) => $"{prefix}:{key}";
     }

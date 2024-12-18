@@ -1,0 +1,6 @@
+[Events]
+//Storyboard Layer 0 (Background)
+Animation,Background,Centre,"img.jpg",320,240,2,150,LoopForever
+ F,0,2000,,0,1
+ L,2000,10
+  F,18,0,1000,1,0

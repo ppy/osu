@@ -8,7 +8,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Taiko.Skinning.Argon
 {
-    public class RingPiece : CircularContainer
+    public partial class RingPiece : CircularContainer
     {
         private readonly float relativeBorderThickness;
 

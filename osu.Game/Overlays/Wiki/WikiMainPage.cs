@@ -15,7 +15,7 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Wiki
 {
-    public class WikiMainPage : FillFlowContainer
+    public partial class WikiMainPage : FillFlowContainer
     {
         public string Markdown;
 

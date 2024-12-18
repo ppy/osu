@@ -11,7 +11,7 @@ using osu.Game.Rulesets.Configuration;
 
 namespace osu.Game.Rulesets
 {
-    public class RulesetConfigCache : Component, IRulesetConfigCache
+    public partial class RulesetConfigCache : Component, IRulesetConfigCache
     {
         private readonly RealmAccess realm;
         private readonly RulesetStore rulesets;

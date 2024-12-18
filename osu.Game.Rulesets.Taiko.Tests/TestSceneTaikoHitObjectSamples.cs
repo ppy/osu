@@ -8,7 +8,7 @@ using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Rulesets.Taiko.Tests
 {
-    public class TestSceneTaikoHitObjectSamples : HitObjectSampleTest
+    public partial class TestSceneTaikoHitObjectSamples : HitObjectSampleTest
     {
         protected override Ruleset CreatePlayerRuleset() => new TaikoRuleset();
 

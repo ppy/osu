@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using Humanizer;
 using osu.Framework.Allocation;
@@ -23,17 +21,17 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Profile.Header
 {
-    public class BottomHeaderContainer : CompositeDrawable
+    public partial class BottomHeaderContainer : CompositeDrawable
     {
-        public readonly Bindable<APIUser> User = new Bindable<APIUser>();
+        public readonly Bindable<UserProfileData?> User = new Bindable<UserProfileData?>();
 
-        private LinkFlowContainer topLinkContainer;
-        private LinkFlowContainer bottomLinkContainer;
+        private LinkFlowContainer topLinkContainer = null!;
+        private LinkFlowContainer bottomLinkContainer = null!;
 
         private Color4 iconColour;
 
         [Resolved]
-        private IAPIProvider api { get; set; }
+        private IAPIProvider api { get; set; } = null!;
 
         public BottomHeaderContainer()
         {
@@ -57,7 +55,7 @@ namespace osu.Game.Overlays.Profile.Header
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Direction = FillDirection.Vertical,
-                    Padding = new MarginPadding { Horizontal = UserProfileOverlay.CONTENT_X_MARGIN, Vertical = 10 },
+                    Padding = new MarginPadding { Horizontal = WaveOverlayContainer.HORIZONTAL_PADDING, Vertical = 10 },
                     Spacing = new Vector2(0, 10),
                     Children = new Drawable[]
                     {
@@ -75,10 +73,10 @@ namespace osu.Game.Overlays.Profile.Header
                 }
             };
 
-            User.BindValueChanged(user => updateDisplay(user.NewValue));
+            User.BindValueChanged(user => updateDisplay(user.NewValue?.User));
         }
 
-        private void updateDisplay(APIUser user)
+        private void updateDisplay(APIUser? user)
         {
             topLinkContainer.Clear();
             bottomLinkContainer.Clear();
@@ -146,8 +144,8 @@ namespace osu.Game.Overlays.Profile.Header
 
             bool anyInfoAdded = false;
 
-            anyInfoAdded |= tryAddInfo(FontAwesome.Solid.MapMarker, user.Location);
-            anyInfoAdded |= tryAddInfo(OsuIcon.Heart, user.Interests);
+            anyInfoAdded |= tryAddInfo(FontAwesome.Solid.MapMarkerAlt, user.Location);
+            anyInfoAdded |= tryAddInfo(FontAwesome.Regular.Heart, user.Interests);
             anyInfoAdded |= tryAddInfo(FontAwesome.Solid.Suitcase, user.Occupation);
 
             if (anyInfoAdded)
@@ -164,7 +162,7 @@ namespace osu.Game.Overlays.Profile.Header
 
         private void addSpacer(OsuTextFlowContainer textFlow) => textFlow.AddArbitraryDrawable(new Container { Width = 15 });
 
-        private bool tryAddInfo(IconUsage icon, string content, string link = null)
+        private bool tryAddInfo(IconUsage icon, string content, string? link = null)
         {
             if (string.IsNullOrEmpty(content)) return false;
 
@@ -173,7 +171,7 @@ namespace osu.Game.Overlays.Profile.Header
 
             bottomLinkContainer.AddIcon(icon, text =>
             {
-                text.Font = text.Font.With(size: 10);
+                text.Font = text.Font.With(icon.Family, 10, icon.Weight);
                 text.Colour = iconColour;
             });
 

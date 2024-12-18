@@ -4,14 +4,18 @@
 using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Taiko.Mods;
 using osu.Game.Rulesets.Taiko.Objects;
+using osu.Game.Rulesets.Taiko.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Replays;
+using osu.Game.Rulesets.Taiko.Scoring;
 
 namespace osu.Game.Rulesets.Taiko.Tests.Judgements
 {
-    public class TestSceneHitJudgements : JudgementTest
+    public partial class TestSceneHitJudgements : JudgementTest
     {
         [Test]
         public void TestHitCentreHit()
@@ -30,6 +34,28 @@ namespace osu.Game.Rulesets.Taiko.Tests.Judgements
 
             AssertJudgementCount(1);
             AssertResult<Hit>(0, HitResult.Great);
+        }
+
+        [Test]
+        public void TestHitWithBothKeysOnSameFrameDoesNotFallThroughToNextObject()
+        {
+            PerformTest(new List<ReplayFrame>
+            {
+                new TaikoReplayFrame(0),
+                new TaikoReplayFrame(1000, TaikoAction.LeftCentre, TaikoAction.RightCentre),
+            }, CreateBeatmap(new Hit
+            {
+                Type = HitType.Centre,
+                StartTime = 1000,
+            }, new Hit
+            {
+                Type = HitType.Centre,
+                StartTime = 1020
+            }));
+
+            AssertJudgementCount(2);
+            AssertResult<Hit>(0, HitResult.Great);
+            AssertResult<Hit>(1, HitResult.Miss);
         }
 
         [Test]
@@ -156,6 +182,59 @@ namespace osu.Game.Rulesets.Taiko.Tests.Judgements
 
             AssertJudgementCount(1);
             AssertResult<Hit>(0, HitResult.Ok);
+        }
+
+        [Test]
+        public void TestStrongHitOneKeyWithHidden()
+        {
+            const double hit_time = 1000;
+
+            var beatmap = CreateBeatmap(new Hit
+            {
+                Type = HitType.Centre,
+                StartTime = hit_time,
+                IsStrong = true
+            });
+
+            var hitWindows = new TaikoHitWindows();
+            hitWindows.SetDifficulty(beatmap.Difficulty.OverallDifficulty);
+
+            PerformTest(new List<ReplayFrame>
+            {
+                new TaikoReplayFrame(0),
+                new TaikoReplayFrame(hit_time + hitWindows.WindowFor(HitResult.Ok) - 1, TaikoAction.LeftCentre),
+            }, beatmap, new Mod[] { new TaikoModHidden() });
+
+            AssertJudgementCount(2);
+            AssertResult<Hit>(0, HitResult.Ok);
+            AssertResult<Hit.StrongNestedHit>(0, HitResult.IgnoreMiss);
+        }
+
+        [Test]
+        public void TestStrongHitTwoKeysWithHidden()
+        {
+            const double hit_time = 1000;
+
+            var beatmap = CreateBeatmap(new Hit
+            {
+                Type = HitType.Centre,
+                StartTime = hit_time,
+                IsStrong = true
+            });
+
+            var hitWindows = new TaikoHitWindows();
+            hitWindows.SetDifficulty(beatmap.Difficulty.OverallDifficulty);
+
+            PerformTest(new List<ReplayFrame>
+            {
+                new TaikoReplayFrame(0),
+                new TaikoReplayFrame(hit_time + hitWindows.WindowFor(HitResult.Ok) - 1, TaikoAction.LeftCentre),
+                new TaikoReplayFrame(hit_time + hitWindows.WindowFor(HitResult.Ok) + DrawableHit.StrongNestedHit.SECOND_HIT_WINDOW - 2, TaikoAction.LeftCentre, TaikoAction.RightCentre),
+            }, beatmap, new Mod[] { new TaikoModHidden() });
+
+            AssertJudgementCount(2);
+            AssertResult<Hit>(0, HitResult.Ok);
+            AssertResult<Hit.StrongNestedHit>(0, HitResult.LargeBonus);
         }
     }
 }

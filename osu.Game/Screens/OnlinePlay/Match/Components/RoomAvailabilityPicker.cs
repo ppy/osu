@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
@@ -19,10 +17,10 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Match.Components
 {
-    public class RoomAvailabilityPicker : DisableableTabControl<RoomAvailability>
+    public partial class RoomAvailabilityPicker : DisableableTabControl<RoomAvailability>
     {
         protected override TabItem<RoomAvailability> CreateTabItem(RoomAvailability value) => new RoomAvailabilityPickerItem(value);
-        protected override Dropdown<RoomAvailability> CreateDropdown() => null;
+        protected override Dropdown<RoomAvailability>? CreateDropdown() => null;
 
         public RoomAvailabilityPicker()
         {
@@ -36,7 +34,7 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
             AddItem(RoomAvailability.InviteOnly);
         }
 
-        private class RoomAvailabilityPickerItem : DisableableTabItem
+        private partial class RoomAvailabilityPickerItem : DisableableTabItem
         {
             private const float transition_duration = 200;
 

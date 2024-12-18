@@ -16,7 +16,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.Skinning.Argon
 {
-    public class ArgonColumnBackground : CompositeDrawable, IKeyBindingHandler<ManiaAction>
+    public partial class ArgonColumnBackground : CompositeDrawable, IKeyBindingHandler<ManiaAction>
     {
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
 

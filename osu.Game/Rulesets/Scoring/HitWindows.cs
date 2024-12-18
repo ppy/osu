@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -38,7 +36,7 @@ namespace osu.Game.Rulesets.Scoring
         /// An empty <see cref="HitWindows"/> with only <see cref="HitResult.Miss"/> and <see cref="HitResult.Perfect"/>.
         /// No time values are provided (meaning instantaneous hit or miss).
         /// </summary>
-        public static HitWindows Empty => new EmptyHitWindows();
+        public static HitWindows Empty { get; } = new EmptyHitWindows();
 
         public HitWindows()
         {
@@ -184,7 +182,7 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         protected virtual DifficultyRange[] GetRanges() => base_ranges;
 
-        public class EmptyHitWindows : HitWindows
+        private class EmptyHitWindows : HitWindows
         {
             private static readonly DifficultyRange[] ranges =
             {

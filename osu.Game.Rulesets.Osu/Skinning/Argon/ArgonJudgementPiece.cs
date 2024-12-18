@@ -3,7 +3,6 @@
 
 using System;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -17,42 +16,24 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Argon
 {
-    public class ArgonJudgementPiece : CompositeDrawable, IAnimatableJudgement
+    public partial class ArgonJudgementPiece : TextJudgementPiece, IAnimatableJudgement
     {
-        protected readonly HitResult Result;
-
-        protected SpriteText JudgementText { get; private set; } = null!;
-
         private RingExplosion? ringExplosion;
 
         [Resolved]
         private OsuColour colours { get; set; } = null!;
 
         public ArgonJudgementPiece(HitResult result)
+            : base(result)
         {
-            Result = result;
+            AutoSizeAxes = Axes.Both;
+
             Origin = Anchor.Centre;
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            AutoSizeAxes = Axes.Both;
-
-            InternalChildren = new Drawable[]
-            {
-                JudgementText = new OsuSpriteText
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Text = Result.GetDescription().ToUpperInvariant(),
-                    Colour = colours.ForHitResult(Result),
-                    Blending = BlendingParameters.Additive,
-                    Spacing = new Vector2(5, 0),
-                    Font = OsuFont.Default.With(size: 20, weight: FontWeight.Bold),
-                },
-            };
-
             if (Result.IsHit())
             {
                 AddInternal(ringExplosion = new RingExplosion(Result)
@@ -61,6 +42,16 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                 });
             }
         }
+
+        protected override SpriteText CreateJudgementText() =>
+            new OsuSpriteText
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Blending = BlendingParameters.Additive,
+                Spacing = new Vector2(5, 0),
+                Font = OsuFont.Default.With(size: 20, weight: FontWeight.Bold),
+            };
 
         /// <summary>
         /// Plays the default animation for this judgement piece.
@@ -71,35 +62,43 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
         /// </remarks>
         public virtual void PlayAnimation()
         {
-            switch (Result)
+            if (Result == HitResult.IgnoreMiss || Result == HitResult.LargeTickMiss)
             {
-                default:
-                    JudgementText
-                        .FadeInFromZero(300, Easing.OutQuint)
-                        .ScaleTo(Vector2.One)
-                        .ScaleTo(new Vector2(1.2f), 1800, Easing.OutQuint);
-                    break;
+                this.RotateTo(-45);
+                this.ScaleTo(1.6f);
+                this.ScaleTo(1.2f, 100, Easing.In);
 
-                case HitResult.Miss:
-                    this.ScaleTo(1.6f);
-                    this.ScaleTo(1, 100, Easing.In);
-
-                    this.MoveTo(Vector2.Zero);
-                    this.MoveToOffset(new Vector2(0, 100), 800, Easing.InQuint);
-
-                    this.RotateTo(0);
-                    this.RotateTo(40, 800, Easing.InQuint);
-                    break;
+                this.FadeOutFromOne(400);
             }
+            else if (Result.IsMiss())
+            {
+                this.FadeOutFromOne(800);
 
-            this.FadeOutFromOne(800);
+                this.ScaleTo(1.6f);
+                this.ScaleTo(1, 100, Easing.In);
+
+                this.MoveTo(Vector2.Zero);
+                this.MoveToOffset(new Vector2(0, 100), 800, Easing.InQuint);
+
+                this.RotateTo(0);
+                this.RotateTo(40, 800, Easing.InQuint);
+            }
+            else
+            {
+                this.FadeOutFromOne(800);
+
+                JudgementText
+                    .FadeInFromZero(300, Easing.OutQuint)
+                    .ScaleTo(Vector2.One)
+                    .ScaleTo(new Vector2(1.2f), 1800, Easing.OutQuint);
+            }
 
             ringExplosion?.PlayAnimation();
         }
 
         public Drawable? GetAboveHitObjectsProxiedContent() => JudgementText.CreateProxy();
 
-        private class RingExplosion : CompositeDrawable
+        private partial class RingExplosion : CompositeDrawable
         {
             private readonly float travel = 52;
 

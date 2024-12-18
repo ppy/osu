@@ -17,21 +17,16 @@ using osu.Game.Rulesets.Objects.Pooling;
 
 namespace osu.Game.Rulesets.UI
 {
-    public class HitObjectContainer : PooledDrawableWithLifetimeContainer<HitObjectLifetimeEntry, DrawableHitObject>, IHitObjectContainer
+    public partial class HitObjectContainer : PooledDrawableWithLifetimeContainer<HitObjectLifetimeEntry, DrawableHitObject>, IHitObjectContainer
     {
         public IEnumerable<DrawableHitObject> Objects => InternalChildren.Cast<DrawableHitObject>().OrderBy(h => h.HitObject.StartTime);
 
-        public IEnumerable<DrawableHitObject> AliveObjects => AliveEntries.Select(pair => pair.Drawable).OrderBy(h => h.HitObject.StartTime);
+        public IEnumerable<DrawableHitObject> AliveObjects => AliveEntries.Values.OrderBy(h => h.HitObject.StartTime);
 
         /// <summary>
         /// Invoked when a <see cref="DrawableHitObject"/> is judged.
         /// </summary>
         public event Action<DrawableHitObject, JudgementResult> NewResult;
-
-        /// <summary>
-        /// Invoked when a <see cref="DrawableHitObject"/> judgement is reverted.
-        /// </summary>
-        public event Action<DrawableHitObject, JudgementResult> RevertResult;
 
         /// <summary>
         /// Invoked when a <see cref="HitObject"/> becomes used by a <see cref="DrawableHitObject"/>.
@@ -111,7 +106,6 @@ namespace osu.Game.Rulesets.UI
         private void addDrawable(DrawableHitObject drawable)
         {
             drawable.OnNewResult += onNewResult;
-            drawable.OnRevertResult += onRevertResult;
 
             bindStartTime(drawable);
             AddInternal(drawable);
@@ -120,7 +114,6 @@ namespace osu.Game.Rulesets.UI
         private void removeDrawable(DrawableHitObject drawable)
         {
             drawable.OnNewResult -= onNewResult;
-            drawable.OnRevertResult -= onRevertResult;
 
             unbindStartTime(drawable);
 
@@ -154,7 +147,6 @@ namespace osu.Game.Rulesets.UI
         #endregion
 
         private void onNewResult(DrawableHitObject d, JudgementResult r) => NewResult?.Invoke(d, r);
-        private void onRevertResult(DrawableHitObject d, JudgementResult r) => RevertResult?.Invoke(d, r);
 
         #region Comparator + StartTime tracking
 

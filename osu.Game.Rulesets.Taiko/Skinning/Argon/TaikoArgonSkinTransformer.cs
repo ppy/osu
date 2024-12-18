@@ -14,11 +14,15 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
         {
         }
 
-        public override Drawable? GetDrawableComponent(ISkinComponentLookup component)
+        public override Drawable? GetDrawableComponent(ISkinComponentLookup lookup)
         {
-            switch (component)
+            switch (lookup)
             {
-                case GameplaySkinComponentLookup<HitResult> resultComponent:
+                case SkinComponentLookup<HitResult> resultComponent:
+                    // This should eventually be moved to a skin setting, when supported.
+                    if (Skin is ArgonProSkin && resultComponent.Component >= HitResult.Great)
+                        return Drawable.Empty();
+
                     return new ArgonJudgementPiece(resultComponent.Component);
 
                 case TaikoSkinComponentLookup taikoComponent:
@@ -56,16 +60,22 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
                             // the drawable needs to expire as soon as possible to avoid accumulating empty drawables on the playfield.
                             return Drawable.Empty().With(d => d.Expire());
 
+                        case TaikoSkinComponents.DrumSamplePlayer:
+                            return new ArgonDrumSamplePlayer();
+
                         case TaikoSkinComponents.TaikoExplosionGreat:
                         case TaikoSkinComponents.TaikoExplosionMiss:
                         case TaikoSkinComponents.TaikoExplosionOk:
                             return new ArgonHitExplosion(taikoComponent.Component);
+
+                        case TaikoSkinComponents.Swell:
+                            return new ArgonSwellCirclePiece();
                     }
 
                     break;
             }
 
-            return base.GetDrawableComponent(component);
+            return base.GetDrawableComponent(lookup);
         }
     }
 }

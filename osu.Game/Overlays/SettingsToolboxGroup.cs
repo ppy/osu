@@ -4,7 +4,6 @@
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Caching;
-using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -20,7 +19,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
-    public class SettingsToolboxGroup : Container, IExpandable
+    public partial class SettingsToolboxGroup : Container, IExpandable
     {
         private readonly string title;
         public const int CONTAINER_WIDTH = 270;
@@ -126,7 +125,8 @@ namespace osu.Game.Overlays
         {
             base.LoadComplete();
 
-            Expanded.BindValueChanged(updateExpandedState, true);
+            Expanded.BindValueChanged(_ => updateExpandedState(true));
+            updateExpandedState(false);
 
             this.Delay(600).Schedule(updateFadeState);
         }
@@ -134,12 +134,14 @@ namespace osu.Game.Overlays
         protected override bool OnHover(HoverEvent e)
         {
             updateFadeState();
+            updateExpandedState(true);
             return false;
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
             updateFadeState();
+            updateExpandedState(true);
             base.OnHoverLost(e);
         }
 
@@ -148,34 +150,41 @@ namespace osu.Game.Overlays
             base.Update();
 
             if (!headerTextVisibilityCache.IsValid)
+            {
                 // These toolbox grouped may be contracted to only show icons.
                 // For now, let's hide the header to avoid text truncation weirdness in such cases.
                 headerText.FadeTo(headerText.DrawWidth < DrawWidth ? 1 : 0, 150, Easing.OutQuint);
+                headerTextVisibilityCache.Validate();
+            }
         }
 
         protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
         {
-            if (invalidation.HasFlagFast(Invalidation.DrawSize))
+            if (invalidation.HasFlag(Invalidation.DrawSize))
                 headerTextVisibilityCache.Invalidate();
 
             return base.OnInvalidate(invalidation, source);
         }
 
-        private void updateExpandedState(ValueChangedEvent<bool> expanded)
+        private void updateExpandedState(bool animate)
         {
             // clearing transforms is necessary to avoid a previous height transform
             // potentially continuing to get processed while content has changed to autosize.
             content.ClearTransforms();
 
-            if (expanded.NewValue)
+            if (Expanded.Value || IsHovered)
+            {
                 content.AutoSizeAxes = Axes.Y;
+                content.AutoSizeDuration = animate ? transition_duration : 0;
+                content.AutoSizeEasing = Easing.OutQuint;
+            }
             else
             {
                 content.AutoSizeAxes = Axes.None;
-                content.ResizeHeightTo(0, transition_duration, Easing.OutQuint);
+                content.ResizeHeightTo(0, animate ? transition_duration : 0, Easing.OutQuint);
             }
 
-            headerContent.FadeColour(expanded.NewValue ? Color4.White : OsuColour.Gray(0.5f), 200, Easing.OutQuint);
+            headerContent.FadeColour(Expanded.Value ? Color4.White : OsuColour.Gray(0.7f), 200, Easing.OutQuint);
         }
 
         private void updateFadeState()

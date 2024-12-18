@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using NUnit.Framework;
 using osu.Framework.Graphics;
@@ -12,7 +10,7 @@ using osu.Game.Tests.Visual.OnlinePlay;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneStarRatingRangeDisplay : OnlinePlayTestScene
+    public partial class TestSceneStarRatingRangeDisplay : OnlinePlayTestScene
     {
         public override void SetUpSteps()
         {
@@ -22,7 +20,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 SelectedRoom.Value = new Room();
 
-                Child = new StarRatingRangeDisplay
+                Child = new StarRatingRangeDisplay(SelectedRoom.Value)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre
@@ -35,11 +33,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("set playlist", () =>
             {
-                SelectedRoom.Value.Playlist.AddRange(new[]
-                {
+                SelectedRoom.Value!.Playlist =
+                [
                     new PlaylistItem(new BeatmapInfo { StarRating = min }),
                     new PlaylistItem(new BeatmapInfo { StarRating = max }),
-                });
+                ];
             });
         }
     }

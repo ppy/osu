@@ -1,10 +1,9 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
@@ -13,7 +12,7 @@ using osu.Game.Tournament.Models;
 
 namespace osu.Game.Tournament.Screens.Ladder.Components
 {
-    public class SettingsTeamDropdown : SettingsDropdown<TournamentTeam>
+    public partial class SettingsTeamDropdown : SettingsDropdown<TournamentTeam?>
     {
         public SettingsTeamDropdown(BindableList<TournamentTeam> teams)
         {
@@ -25,10 +24,14 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                 switch (args.Action)
                 {
                     case NotifyCollectionChangedAction.Add:
+                        Debug.Assert(args.NewItems != null);
+
                         args.NewItems.Cast<TournamentTeam>().ForEach(add);
                         break;
 
                     case NotifyCollectionChangedAction.Remove:
+                        Debug.Assert(args.OldItems != null);
+
                         args.OldItems.Cast<TournamentTeam>().ForEach(i => Control.RemoveDropdownItem(i));
                         break;
                 }

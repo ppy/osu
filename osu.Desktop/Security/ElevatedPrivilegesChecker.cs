@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Security.Principal;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -16,54 +15,20 @@ namespace osu.Desktop.Security
     /// <summary>
     /// Checks if the game is running with elevated privileges (as admin in Windows, root in Unix) and displays a warning notification if so.
     /// </summary>
-    public class ElevatedPrivilegesChecker : Component
+    public partial class ElevatedPrivilegesChecker : Component
     {
         [Resolved]
         private INotificationOverlay notifications { get; set; } = null!;
-
-        private bool elevated;
-
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            elevated = checkElevated();
-        }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            if (elevated)
+            if (Environment.IsPrivilegedProcess)
                 notifications.Post(new ElevatedPrivilegesNotification());
         }
 
-        private bool checkElevated()
-        {
-            try
-            {
-                switch (RuntimeInfo.OS)
-                {
-                    case RuntimeInfo.Platform.Windows:
-                        if (!OperatingSystem.IsWindows()) return false;
-
-                        var windowsIdentity = WindowsIdentity.GetCurrent();
-                        var windowsPrincipal = new WindowsPrincipal(windowsIdentity);
-
-                        return windowsPrincipal.IsInRole(WindowsBuiltInRole.Administrator);
-
-                    case RuntimeInfo.Platform.macOS:
-                    case RuntimeInfo.Platform.Linux:
-                        return Mono.Unix.Native.Syscall.geteuid() == 0;
-                }
-            }
-            catch
-            {
-            }
-
-            return false;
-        }
-
-        private class ElevatedPrivilegesNotification : SimpleNotification
+        private partial class ElevatedPrivilegesNotification : SimpleNotification
         {
             public override bool IsImportant => true;
 

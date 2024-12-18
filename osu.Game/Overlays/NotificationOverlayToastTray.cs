@@ -22,11 +22,16 @@ namespace osu.Game.Overlays
     /// <summary>
     /// A tray which attaches to the left of <see cref="NotificationOverlay"/> to show temporary toasts.
     /// </summary>
-    public class NotificationOverlayToastTray : CompositeDrawable
+    public partial class NotificationOverlayToastTray : CompositeDrawable
     {
         public override bool IsPresent => toastContentBackground.Height > 0 || toastFlow.Count > 0;
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => toastFlow.ReceivePositionalInputAt(screenSpacePos);
+
+        /// <summary>
+        /// All notifications currently being displayed by the toast tray.
+        /// </summary>
+        public IEnumerable<Notification> Notifications => toastFlow.Concat(InternalChildren.OfType<Notification>());
 
         public bool IsDisplayingToasts => toastFlow.Count > 0;
 
@@ -38,12 +43,7 @@ namespace osu.Game.Overlays
 
         public Action<Notification>? ForwardNotificationToPermanentStore { get; set; }
 
-        public int UnreadCount => allDisplayedNotifications.Count(n => !n.WasClosed && !n.Read);
-
-        /// <summary>
-        /// Notifications contained in the toast flow, or in a detached state while they animate during forwarding to the main overlay.
-        /// </summary>
-        private IEnumerable<Notification> allDisplayedNotifications => toastFlow.Concat(InternalChildren.OfType<Notification>());
+        public int UnreadCount => Notifications.Count(n => !n.WasClosed && !n.Read);
 
         private int runningDepth;
 
@@ -86,11 +86,7 @@ namespace osu.Game.Overlays
             };
         }
 
-        public void MarkAllRead()
-        {
-            toastFlow.Children.ForEach(n => n.Read = true);
-            InternalChildren.OfType<Notification>().ForEach(n => n.Read = true);
-        }
+        public void MarkAllRead() => Notifications.ForEach(n => n.Read = true);
 
         public void FlushAllToasts()
         {
@@ -157,8 +153,22 @@ namespace osu.Game.Overlays
         {
             base.Update();
 
-            float height = toastFlow.Count > 0 ? toastFlow.DrawHeight + 120 : 0;
-            float alpha = toastFlow.Count > 0 ? MathHelper.Clamp(toastFlow.DrawHeight / 41, 0, 1) * toastFlow.Children.Max(n => n.Alpha) : 0;
+            float height = 0;
+            float alpha = 0;
+
+            if (toastFlow.Count > 0)
+            {
+                float maxNotificationAlpha = 0;
+
+                foreach (var t in toastFlow)
+                {
+                    if (t.Alpha > maxNotificationAlpha)
+                        maxNotificationAlpha = t.Alpha;
+                }
+
+                height = toastFlow.DrawHeight + 120;
+                alpha = MathHelper.Clamp(toastFlow.DrawHeight / 41, 0, 1) * maxNotificationAlpha;
+            }
 
             toastContentBackground.Height = (float)Interpolation.DampContinuously(toastContentBackground.Height, height, 10, Clock.ElapsedFrameTime);
             toastContentBackground.Alpha = (float)Interpolation.DampContinuously(toastContentBackground.Alpha, alpha, 10, Clock.ElapsedFrameTime);

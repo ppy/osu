@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using Markdig.Syntax.Inlines;
 using osu.Framework.Allocation;
@@ -13,10 +11,10 @@ using osuTK;
 
 namespace osu.Game.Overlays.Wiki.Markdown
 {
-    public class WikiMarkdownImageBlock : FillFlowContainer
+    public partial class WikiMarkdownImageBlock : FillFlowContainer
     {
         [Resolved]
-        private IMarkdownTextFlowComponent parentFlowComponent { get; set; }
+        private IMarkdownTextFlowComponent parentFlowComponent { get; set; } = null!;
 
         private readonly LinkInline linkInline;
 
@@ -49,7 +47,7 @@ namespace osu.Game.Overlays.Wiki.Markdown
             textFlow.AddText(linkInline.Title);
         }
 
-        private class BlockMarkdownImage : WikiMarkdownImage
+        private partial class BlockMarkdownImage : WikiMarkdownImage
         {
             public BlockMarkdownImage(LinkInline linkInline)
                 : base(linkInline)
@@ -60,7 +58,7 @@ namespace osu.Game.Overlays.Wiki.Markdown
 
             protected override ImageContainer CreateImageContainer(string url) => new BlockImageContainer(url);
 
-            private class BlockImageContainer : ImageContainer
+            private partial class BlockImageContainer : ImageContainer
             {
                 public BlockImageContainer(string url)
                     : base(url)
@@ -71,7 +69,7 @@ namespace osu.Game.Overlays.Wiki.Markdown
 
                 protected override Sprite CreateImageSprite() => new ImageSprite();
 
-                private class ImageSprite : Sprite
+                private partial class ImageSprite : Sprite
                 {
                     public ImageSprite()
                     {
@@ -83,10 +81,10 @@ namespace osu.Game.Overlays.Wiki.Markdown
                     {
                         base.Update();
 
-                        if (Width > Parent.DrawWidth)
+                        if (Width > Parent!.DrawWidth)
                         {
                             float ratio = Height / Width;
-                            Width = Parent.DrawWidth;
+                            Width = Parent!.DrawWidth;
                             Height = ratio * Width;
                         }
                     }

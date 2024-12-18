@@ -1,35 +1,33 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using Android.Content.PM;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Game;
+using osu.Game.Screens.Play;
 
 namespace osu.Android
 {
-    public class GameplayScreenRotationLocker : Component
+    public partial class GameplayScreenRotationLocker : Component
     {
-        private Bindable<bool> localUserPlaying;
+        private IBindable<LocalUserPlayingState> localUserPlaying = null!;
 
         [Resolved]
-        private OsuGameActivity gameActivity { get; set; }
+        private OsuGameActivity gameActivity { get; set; } = null!;
 
         [BackgroundDependencyLoader]
-        private void load(OsuGame game)
+        private void load(ILocalUserPlayInfo localUserPlayInfo)
         {
-            localUserPlaying = game.LocalUserPlaying.GetBoundCopy();
+            localUserPlaying = localUserPlayInfo.PlayingState.GetBoundCopy();
             localUserPlaying.BindValueChanged(updateLock, true);
         }
 
-        private void updateLock(ValueChangedEvent<bool> userPlaying)
+        private void updateLock(ValueChangedEvent<LocalUserPlayingState> userPlaying)
         {
             gameActivity.RunOnUiThread(() =>
             {
-                gameActivity.RequestedOrientation = userPlaying.NewValue ? ScreenOrientation.Locked : gameActivity.DefaultOrientation;
+                gameActivity.RequestedOrientation = userPlaying.NewValue == LocalUserPlayingState.Playing ? ScreenOrientation.Locked : gameActivity.DefaultOrientation;
             });
         }
     }

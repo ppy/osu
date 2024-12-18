@@ -16,7 +16,6 @@ using osu.Game.Database;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Online.Notifications;
 using osu.Game.Overlays.Chat.Listing;
 
 namespace osu.Game.Online.Chat
@@ -24,7 +23,7 @@ namespace osu.Game.Online.Chat
     /// <summary>
     /// Manages everything channel related
     /// </summary>
-    public class ChannelManager : CompositeComponent, IChannelPostTarget
+    public partial class ChannelManager : CompositeComponent, IChannelPostTarget
     {
         /// <summary>
         /// The channels the player joins on startup
@@ -65,20 +64,22 @@ namespace osu.Game.Online.Chat
         public IBindableList<Channel> AvailableChannels => availableChannels;
 
         private readonly IAPIProvider api;
-        private readonly NotificationsClientConnector connector;
+        private readonly IChatClient chatClient;
 
         [Resolved]
         private UserLookupCache users { get; set; }
 
         private readonly IBindable<APIState> apiState = new Bindable<APIState>();
-        private bool channelsInitialised;
         private ScheduledDelegate scheduledAck;
+
+        private long? lastSilenceMessageId;
+        private uint? lastSilenceId;
 
         public ChannelManager(IAPIProvider api)
         {
             this.api = api;
 
-            connector = api.GetNotificationsConnector();
+            chatClient = api.GetChatClient();
 
             CurrentChannel.ValueChanged += currentChannelChanged;
         }
@@ -86,47 +87,14 @@ namespace osu.Game.Online.Chat
         [BackgroundDependencyLoader]
         private void load()
         {
-            connector.ChannelJoined += ch => Schedule(() => joinChannel(ch));
-
-            connector.ChannelParted += ch => Schedule(() => LeaveChannel(getChannel(ch)));
-
-            connector.NewMessages += msgs => Schedule(() => addMessages(msgs));
-
-            connector.PresenceReceived += () => Schedule(() =>
-            {
-                if (!channelsInitialised)
-                {
-                    channelsInitialised = true;
-                    // we want this to run after the first presence so we can see if the user is in any channels already.
-                    initializeChannels();
-                }
-            });
-
-            connector.Start();
+            chatClient.ChannelJoined += ch => Schedule(() => joinChannel(ch));
+            chatClient.ChannelParted += ch => Schedule(() => leaveChannel(getChannel(ch), false));
+            chatClient.NewMessages += msgs => Schedule(() => addMessages(msgs));
+            chatClient.PresenceReceived += () => Schedule(initializeChannels);
+            chatClient.RequestPresence();
 
             apiState.BindTo(api.State);
-            apiState.BindValueChanged(_ => performChatAckRequest(), true);
-        }
-
-        private void performChatAckRequest()
-        {
-            if (apiState.Value != APIState.Online)
-                return;
-
-            scheduledAck?.Cancel();
-
-            var req = new ChatAckRequest();
-            req.Success += _ => scheduleNextRequest();
-            req.Failure += _ => scheduleNextRequest();
-            api.Queue(req);
-
-            // Todo: Handle silences.
-
-            void scheduleNextRequest()
-            {
-                scheduledAck?.Cancel();
-                scheduledAck = Scheduler.AddDelayed(performChatAckRequest, 60000);
-            }
+            apiState.BindValueChanged(_ => SendAck(), true);
         }
 
         /// <summary>
@@ -136,8 +104,7 @@ namespace osu.Game.Online.Chat
         /// <param name="name"></param>
         public void OpenChannel(string name)
         {
-            if (name == null)
-                throw new ArgumentNullException(nameof(name));
+            ArgumentNullException.ThrowIfNull(name);
 
             CurrentChannel.Value = AvailableChannels.FirstOrDefault(c => c.Name == name) ?? throw new ChannelNotFoundException(name);
         }
@@ -148,8 +115,7 @@ namespace osu.Game.Online.Chat
         /// <param name="user">The user the private channel is opened with.</param>
         public void OpenPrivateChannel(APIUser user)
         {
-            if (user == null)
-                throw new ArgumentNullException(nameof(user));
+            ArgumentNullException.ThrowIfNull(user);
 
             if (user.Id == api.LocalUser.Value.Id)
                 return;
@@ -271,7 +237,7 @@ namespace osu.Game.Online.Chat
             string command = parameters[0];
             string content = parameters.Length == 2 ? parameters[1] : string.Empty;
 
-            switch (command)
+            switch (command.ToLowerInvariant())
             {
                 case "np":
                     AddInternal(new NowPlayingCommand(target));
@@ -349,10 +315,17 @@ namespace osu.Game.Online.Chat
 
             foreach (var group in messages.GroupBy(m => m.ChannelId))
                 channels.Find(c => c.Id == group.Key)?.AddNewMessages(group.ToArray());
+
+            lastSilenceMessageId ??= messages.LastOrDefault()?.Id;
         }
 
         private void initializeChannels()
         {
+            // This request is self-retrying until it succeeds.
+            // To avoid requests piling up when not logged in (ie. API is unavailable) exit early.
+            if (!api.IsLoggedIn)
+                return;
+
             var req = new ListChannelsRequest();
 
             bool joinDefaults = JoinedChannels.Count == 0;
@@ -368,10 +341,11 @@ namespace osu.Game.Online.Chat
                         joinChannel(ch);
                 }
             };
+
             req.Failure += error =>
             {
                 Logger.Error(error, "Fetching channel list failed");
-                initializeChannels();
+                Scheduler.AddDelayed(initializeChannels, 60000);
             };
 
             api.Queue(req);
@@ -396,6 +370,44 @@ namespace osu.Game.Online.Chat
             };
 
             api.Queue(fetchInitialMsgReq);
+        }
+
+        /// <summary>
+        /// Sends an acknowledgement request to the API.
+        /// This marks the user as online to receive messages from public channels, while also returning a list of silenced users.
+        /// It needs to be called at least once every 10 minutes to remain visibly marked as online.
+        /// </summary>
+        public void SendAck()
+        {
+            if (apiState.Value != APIState.Online)
+                return;
+
+            var req = new ChatAckRequest
+            {
+                SinceMessageId = lastSilenceMessageId,
+                SinceSilenceId = lastSilenceId
+            };
+
+            req.Failure += _ => scheduleNextRequest();
+            req.Success += ack =>
+            {
+                foreach (var silence in ack.Silences)
+                {
+                    foreach (var channel in JoinedChannels)
+                        channel.RemoveMessagesFromUser(silence.UserId);
+                    lastSilenceId = Math.Max(lastSilenceId ?? 0, silence.Id);
+                }
+
+                scheduleNextRequest();
+            };
+
+            api.Queue(req);
+
+            void scheduleNextRequest()
+            {
+                scheduledAck?.Cancel();
+                scheduledAck = Scheduler.AddDelayed(SendAck, 60000);
+            }
         }
 
         /// <summary>
@@ -507,6 +519,10 @@ namespace osu.Game.Online.Chat
                         {
                             Logger.Log($"Joined public channel {channel}");
                             joinChannel(channel, fetchInitialMessages);
+
+                            // Required after joining public channels to mark the user as online in them.
+                            // Todo: Temporary workaround for https://github.com/ppy/osu-web/issues/9602
+                            SendAck();
                         };
                         req.Failure += e =>
                         {
@@ -532,7 +548,9 @@ namespace osu.Game.Online.Chat
         /// Leave the specified channel. Can be called from any thread.
         /// </summary>
         /// <param name="channel">The channel to leave.</param>
-        public void LeaveChannel(Channel channel) => Schedule(() =>
+        public void LeaveChannel(Channel channel) => Schedule(() => leaveChannel(channel, true));
+
+        private void leaveChannel(Channel channel, bool sendLeaveRequest)
         {
             if (channel == null) return;
 
@@ -555,10 +573,11 @@ namespace osu.Game.Online.Chat
 
             if (channel.Joined.Value)
             {
-                api.Queue(new LeaveChannelRequest(channel));
+                if (sendLeaveRequest)
+                    api.Queue(new LeaveChannelRequest(channel));
                 channel.Joined.Value = false;
             }
-        });
+        }
 
         /// <summary>
         /// Opens the most recently closed channel that has not already been reopened,
@@ -626,7 +645,7 @@ namespace osu.Game.Online.Chat
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            connector?.Dispose();
+            chatClient?.Dispose();
         }
     }
 

@@ -11,7 +11,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
     /// <summary>
     /// A <see cref="DragBox"/> that scrolls along with the scrolling playfield.
     /// </summary>
-    public class ScrollingDragBox : DragBox
+    public partial class ScrollingDragBox : DragBox
     {
         public double MinTime { get; private set; }
 

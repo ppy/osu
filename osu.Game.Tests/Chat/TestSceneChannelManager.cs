@@ -18,11 +18,12 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Tests.Chat
 {
     [HeadlessTest]
-    public class TestSceneChannelManager : OsuTestScene
+    public partial class TestSceneChannelManager : OsuTestScene
     {
         private ChannelManager channelManager;
         private int currentMessageId;
         private List<Message> sentMessages;
+        private List<int> silencedUserIds;
 
         [SetUp]
         public void Setup() => Schedule(() =>
@@ -39,6 +40,7 @@ namespace osu.Game.Tests.Chat
             {
                 currentMessageId = 0;
                 sentMessages = new List<Message>();
+                silencedUserIds = new List<int>();
 
                 ((DummyAPIAccess)API).HandleRequest = req =>
                 {
@@ -54,6 +56,11 @@ namespace osu.Game.Tests.Chat
 
                         case MarkChannelAsReadRequest markRead:
                             handleMarkChannelAsReadRequest(markRead);
+                            return true;
+
+                        case ChatAckRequest ack:
+                            ack.TriggerSuccess(new ChatAckResponse { Silences = silencedUserIds.Select(u => new ChatSilence { UserId = u }).ToArray() });
+                            silencedUserIds.Clear();
                             return true;
 
                         case GetUpdatesRequest updatesRequest:
@@ -103,7 +110,7 @@ namespace osu.Game.Tests.Chat
             });
 
             AddStep("post message", () => channelManager.PostMessage("Something interesting"));
-            AddUntilStep("message postesd", () => !channel.Messages.Any(m => m is LocalMessage));
+            AddUntilStep("message posted", () => !channel.Messages.Any(m => m is LocalMessage));
 
             AddStep("post /help command", () => channelManager.PostCommand("help", channel));
             AddStep("post /me command with no action", () => channelManager.PostCommand("me", channel));
@@ -113,6 +120,45 @@ namespace osu.Game.Tests.Chat
 
             AddStep("mark channel as read", () => channelManager.MarkChannelAsRead(channel));
             AddAssert("channel's last read ID is set to the latest message", () => channel.LastReadId == sentMessages.Last().Id);
+        }
+
+        [Test]
+        public void TestSilencedUsersAreRemoved()
+        {
+            Channel channel = null;
+
+            AddStep("join channel and select it", () =>
+            {
+                channelManager.JoinChannel(channel = createChannel(1, ChannelType.Public));
+                channelManager.CurrentChannel.Value = channel;
+            });
+
+            AddStep("post message", () => channelManager.PostMessage("Definitely something bad"));
+
+            AddStep("mark user as silenced and send ack request", () =>
+            {
+                silencedUserIds.Add(API.LocalUser.Value.OnlineID);
+                channelManager.SendAck();
+            });
+
+            AddAssert("channel has no more messages", () => channel.Messages, () => Is.Empty);
+        }
+
+        [Test]
+        public void TestCommandNameCaseInsensitivity()
+        {
+            Channel channel = null;
+
+            AddStep("join channel and select it", () =>
+            {
+                channelManager.JoinChannel(channel = createChannel(1, ChannelType.Public));
+                channelManager.CurrentChannel.Value = channel;
+            });
+
+            AddStep("post /me command", () => channelManager.PostCommand("ME DANCES"));
+            AddUntilStep("/me command received", () => channel.Messages.Last().Content.Contains("DANCES"));
+            AddStep("post /help command", () => channelManager.PostCommand("HeLp"));
+            AddUntilStep("/help command received", () => channel.Messages.Last().Content.Contains("Supported commands"));
         }
 
         private void handlePostMessageRequest(PostMessageRequest request)
@@ -154,7 +200,7 @@ namespace osu.Game.Tests.Chat
             LastMessageId = 0,
         };
 
-        private class ChannelManagerContainer : CompositeDrawable
+        private partial class ChannelManagerContainer : CompositeDrawable
         {
             [Cached]
             public ChannelManager ChannelManager { get; }

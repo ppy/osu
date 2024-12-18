@@ -9,7 +9,7 @@ using osu.Game.Graphics;
 
 namespace osu.Game.Beatmaps.Drawables.Cards.Statistics
 {
-    public class BeatmapCardDateStatistic : BeatmapCardStatistic
+    public partial class BeatmapCardDateStatistic : BeatmapCardStatistic
     {
         private readonly DateTimeOffset dateTime;
 

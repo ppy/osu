@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System;
 using osu.Framework.Extensions.Color4Extensions;
@@ -22,7 +20,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
 {
-    public class TopScoreUserSection : CompositeDrawable
+    public partial class TopScoreUserSection : CompositeDrawable
     {
         private readonly SpriteText rankText;
         private readonly UpdateableRank rank;
@@ -120,7 +118,6 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                                 Origin = Anchor.CentreLeft,
                                 Size = new Vector2(19, 14),
                                 Margin = new MarginPadding { Top = 3 }, // makes spacing look more even
-                                ShowPlaceholderOnUnknown = false,
                             },
                         }
                     }

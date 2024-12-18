@@ -11,7 +11,6 @@ namespace osu.Game.Rulesets.Osu.Mods
     {
         public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[]
         {
-            typeof(OsuModAutopilot),
             typeof(OsuModTargetPractice),
         }).ToArray();
     }

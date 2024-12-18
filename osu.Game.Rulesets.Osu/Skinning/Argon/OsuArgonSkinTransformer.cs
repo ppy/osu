@@ -18,8 +18,22 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
         {
             switch (lookup)
             {
-                case GameplaySkinComponentLookup<HitResult> resultComponent:
-                    return new ArgonJudgementPiece(resultComponent.Component);
+                case SkinComponentLookup<HitResult> resultComponent:
+                    HitResult result = resultComponent.Component;
+
+                    // This should eventually be moved to a skin setting, when supported.
+                    if (Skin is ArgonProSkin && (result == HitResult.Great || result == HitResult.Perfect))
+                        return Drawable.Empty();
+
+                    switch (result)
+                    {
+                        case HitResult.IgnoreMiss:
+                        case HitResult.LargeTickMiss:
+                            return new ArgonJudgementPieceSliderTickMiss(result);
+
+                        default:
+                            return new ArgonJudgementPiece(result);
+                    }
 
                 case OsuSkinComponentLookup osuComponent:
                     // TODO: Once everything is finalised, consider throwing UnsupportedSkinComponentException on missing entries.

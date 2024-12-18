@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -15,7 +13,7 @@ using osu.Game.Rulesets.Catch.Objects.Drawables;
 namespace osu.Game.Rulesets.Catch.Tests
 {
     [TestFixture]
-    public class TestSceneFruitObjects : CatchSkinnableTestScene
+    public partial class TestSceneFruitObjects : CatchSkinnableTestScene
     {
         protected override void LoadComplete()
         {
@@ -58,7 +56,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         private Drawable createDrawableTinyDroplet() => new TestDrawableCatchHitObjectSpecimen(new DrawableTinyDroplet(new TinyDroplet()));
     }
 
-    public class TestDrawableCatchHitObjectSpecimen : CompositeDrawable
+    public partial class TestDrawableCatchHitObjectSpecimen : CompositeDrawable
     {
         public readonly ManualClock ManualClock;
 

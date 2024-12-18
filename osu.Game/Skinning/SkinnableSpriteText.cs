@@ -7,7 +7,7 @@ using osu.Framework.Localisation;
 
 namespace osu.Game.Skinning
 {
-    public class SkinnableSpriteText : SkinnableDrawable, IHasText
+    public partial class SkinnableSpriteText : SkinnableDrawable, IHasText
     {
         public SkinnableSpriteText(ISkinComponentLookup lookup, Func<ISkinComponentLookup, SpriteText> defaultImplementation, ConfineMode confineMode = ConfineMode.NoScaling)
             : base(lookup, defaultImplementation, confineMode)

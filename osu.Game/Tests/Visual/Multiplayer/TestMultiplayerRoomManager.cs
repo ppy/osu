@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using osu.Game.Online.API.Requests.Responses;
@@ -17,7 +15,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
     /// A <see cref="RoomManager"/> for use in multiplayer test scenes.
     /// Should generally not be used by itself outside of a <see cref="MultiplayerTestScene"/>.
     /// </summary>
-    public class TestMultiplayerRoomManager : MultiplayerRoomManager
+    public partial class TestMultiplayerRoomManager : MultiplayerRoomManager
     {
         private readonly TestRoomRequestsHandler requestsHandler;
 
@@ -28,10 +26,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         public IReadOnlyList<Room> ServerSideRooms => requestsHandler.ServerSideRooms;
 
-        public override void CreateRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null)
+        public override void CreateRoom(Room room, Action<Room>? onSuccess = null, Action<string>? onError = null)
             => base.CreateRoom(room, r => onSuccess?.Invoke(r), onError);
 
-        public override void JoinRoom(Room room, string password = null, Action<Room> onSuccess = null, Action<string> onError = null)
+        public override void JoinRoom(Room room, string? password = null, Action<Room>? onSuccess = null, Action<string>? onError = null)
             => base.JoinRoom(room, password, r => onSuccess?.Invoke(r), onError);
 
         /// <summary>

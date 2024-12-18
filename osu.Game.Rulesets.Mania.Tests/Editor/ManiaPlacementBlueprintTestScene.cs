@@ -21,7 +21,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.Tests.Editor
 {
-    public abstract class ManiaPlacementBlueprintTestScene : PlacementBlueprintTestScene
+    public abstract partial class ManiaPlacementBlueprintTestScene : PlacementBlueprintTestScene
     {
         private readonly Column column;
 
@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
             });
         }
 
-        protected override SnapResult SnapForBlueprint(PlacementBlueprint blueprint)
+        protected override SnapResult SnapForBlueprint(HitObjectPlacementBlueprint blueprint)
         {
             double time = column.TimeAtScreenSpacePosition(InputManager.CurrentState.Mouse.Position);
             var pos = column.ScreenSpacePositionAtTime(time);

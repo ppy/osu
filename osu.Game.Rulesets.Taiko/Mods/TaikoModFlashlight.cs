@@ -12,7 +12,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.Mods
 {
-    public class TaikoModFlashlight : ModFlashlight<TaikoHitObject>
+    public partial class TaikoModFlashlight : ModFlashlight<TaikoHitObject>
     {
         public override double ScoreMultiplier => UsesDefaultConfiguration ? 1.12 : 1;
 
@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
             base.ApplyToDrawableRuleset(drawableRuleset);
         }
 
-        public class TaikoFlashlight : Flashlight
+        public partial class TaikoFlashlight : Flashlight
         {
             private readonly LayoutValue flashlightProperties = new LayoutValue(Invalidation.RequiredParentSizeToFit | Invalidation.DrawInfo);
             private readonly TaikoPlayfield taikoPlayfield;
@@ -63,7 +63,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
             /// </param>
             private Vector2 adjustSizeForPlayfieldAspectRatio(float size)
             {
-                return new Vector2(0, size * taikoPlayfield.DrawHeight / TaikoPlayfield.DEFAULT_HEIGHT);
+                return new Vector2(0, size * taikoPlayfield.Parent!.Scale.Y);
             }
 
             protected override void UpdateFlashlightSize(float size)

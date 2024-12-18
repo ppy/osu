@@ -18,7 +18,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.UI
 {
-    public abstract class ReplayRecorder<T> : ReplayRecorder, IKeyBindingHandler<T>
+    public abstract partial class ReplayRecorder<T> : ReplayRecorder, IKeyBindingHandler<T>
         where T : struct
     {
         private readonly Score target;
@@ -94,7 +94,7 @@ namespace osu.Game.Rulesets.UI
         protected abstract ReplayFrame HandleFrame(Vector2 mousePosition, List<T> actions, ReplayFrame previousFrame);
     }
 
-    public abstract class ReplayRecorder : Component
+    public abstract partial class ReplayRecorder : Component
     {
         public Func<Vector2, Vector2> ScreenSpaceToGamefield;
     }

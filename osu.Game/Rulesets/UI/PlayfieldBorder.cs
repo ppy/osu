@@ -1,13 +1,14 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Linq;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Platform;
+using osu.Game.Extensions;
 using osuTK;
 using osuTK.Graphics;
 
@@ -16,7 +17,7 @@ namespace osu.Game.Rulesets.UI
     /// <summary>
     /// Provides a border around the playfield.
     /// </summary>
-    public class PlayfieldBorder : CompositeDrawable
+    public partial class PlayfieldBorder : CompositeDrawable
     {
         public Bindable<PlayfieldBorderStyle> PlayfieldBorderStyle { get; } = new Bindable<PlayfieldBorderStyle>();
 
@@ -74,6 +75,12 @@ namespace osu.Game.Rulesets.UI
             };
         }
 
+        [BackgroundDependencyLoader]
+        private void load(GameHost host)
+        {
+            this.ApplyGameWideClock(host);
+        }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -108,7 +115,7 @@ namespace osu.Game.Rulesets.UI
             }
         }
 
-        private class Line : Box
+        private partial class Line : Box
         {
             private readonly Direction direction;
 

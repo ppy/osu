@@ -10,6 +10,7 @@ using System.Threading;
 using JetBrains.Annotations;
 using osu.Framework.Audio.Track;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Lists;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Timing;
@@ -107,18 +108,26 @@ namespace osu.Game.Rulesets.Difficulty
 
             var skills = CreateSkills(Beatmap, playableMods, clockRate);
             var progressiveBeatmap = new ProgressiveCalculationBeatmap(Beatmap);
+            var difficultyObjects = getDifficultyHitObjects().ToArray();
 
-            foreach (var hitObject in getDifficultyHitObjects())
+            int currentIndex = 0;
+
+            foreach (var obj in Beatmap.HitObjects)
             {
-                progressiveBeatmap.HitObjects.Add(hitObject.BaseObject);
+                progressiveBeatmap.HitObjects.Add(obj);
 
-                foreach (var skill in skills)
+                while (currentIndex < difficultyObjects.Length && difficultyObjects[currentIndex].BaseObject.GetEndTime() <= obj.GetEndTime())
                 {
-                    cancellationToken.ThrowIfCancellationRequested();
-                    skill.Process(hitObject);
+                    foreach (var skill in skills)
+                    {
+                        cancellationToken.ThrowIfCancellationRequested();
+                        skill.Process(difficultyObjects[currentIndex]);
+                    }
+
+                    currentIndex++;
                 }
 
-                attribs.Add(new TimedDifficultyAttributes(hitObject.EndTime * clockRate, CreateDifficultyAttributes(progressiveBeatmap, playableMods, skills, clockRate)));
+                attribs.Add(new TimedDifficultyAttributes(obj.GetEndTime(), CreateDifficultyAttributes(progressiveBeatmap, playableMods, skills, clockRate)));
             }
 
             return attribs;
@@ -137,7 +146,7 @@ namespace osu.Game.Rulesets.Difficulty
 
             foreach (var combination in CreateDifficultyAdjustmentModCombinations())
             {
-                Mod classicMod = rulesetInstance.CreateAllMods().SingleOrDefault(m => m is ModClassic);
+                Mod classicMod = rulesetInstance.CreateMod<ModClassic>();
 
                 var finalCombination = ModUtils.FlattenMod(combination);
                 if (classicMod != null)
@@ -319,11 +328,96 @@ namespace osu.Game.Rulesets.Difficulty
                 set => baseBeatmap.Difficulty = value;
             }
 
-            public List<BreakPeriod> Breaks => baseBeatmap.Breaks;
+            public SortedList<BreakPeriod> Breaks
+            {
+                get => baseBeatmap.Breaks;
+                set => baseBeatmap.Breaks = value;
+            }
+
+            public List<string> UnhandledEventLines => baseBeatmap.UnhandledEventLines;
+
             public double TotalBreakTime => baseBeatmap.TotalBreakTime;
             public IEnumerable<BeatmapStatistic> GetStatistics() => baseBeatmap.GetStatistics();
             public double GetMostCommonBeatLength() => baseBeatmap.GetMostCommonBeatLength();
             public IBeatmap Clone() => new ProgressiveCalculationBeatmap(baseBeatmap.Clone());
+
+            public double AudioLeadIn
+            {
+                get => baseBeatmap.AudioLeadIn;
+                set => baseBeatmap.AudioLeadIn = value;
+            }
+
+            public float StackLeniency
+            {
+                get => baseBeatmap.StackLeniency;
+                set => baseBeatmap.StackLeniency = value;
+            }
+
+            public bool SpecialStyle
+            {
+                get => baseBeatmap.SpecialStyle;
+                set => baseBeatmap.SpecialStyle = value;
+            }
+
+            public bool LetterboxInBreaks
+            {
+                get => baseBeatmap.LetterboxInBreaks;
+                set => baseBeatmap.LetterboxInBreaks = value;
+            }
+
+            public bool WidescreenStoryboard
+            {
+                get => baseBeatmap.WidescreenStoryboard;
+                set => baseBeatmap.WidescreenStoryboard = value;
+            }
+
+            public bool EpilepsyWarning
+            {
+                get => baseBeatmap.EpilepsyWarning;
+                set => baseBeatmap.EpilepsyWarning = value;
+            }
+
+            public bool SamplesMatchPlaybackRate
+            {
+                get => baseBeatmap.SamplesMatchPlaybackRate;
+                set => baseBeatmap.SamplesMatchPlaybackRate = value;
+            }
+
+            public double DistanceSpacing
+            {
+                get => baseBeatmap.DistanceSpacing;
+                set => baseBeatmap.DistanceSpacing = value;
+            }
+
+            public int GridSize
+            {
+                get => baseBeatmap.GridSize;
+                set => baseBeatmap.GridSize = value;
+            }
+
+            public double TimelineZoom
+            {
+                get => baseBeatmap.TimelineZoom;
+                set => baseBeatmap.TimelineZoom = value;
+            }
+
+            public CountdownType Countdown
+            {
+                get => baseBeatmap.Countdown;
+                set => baseBeatmap.Countdown = value;
+            }
+
+            public int CountdownOffset
+            {
+                get => baseBeatmap.CountdownOffset;
+                set => baseBeatmap.CountdownOffset = value;
+            }
+
+            public int[] Bookmarks
+            {
+                get => baseBeatmap.Bookmarks;
+                set => baseBeatmap.Bookmarks = value;
+            }
 
             #endregion
         }

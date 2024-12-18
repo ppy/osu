@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
     /// Legacy skinned spinner with two main spinning layers, one fixed overlay and one final spinning overlay.
     /// No background layer.
     /// </summary>
-    public class LegacyNewStyleSpinner : LegacySpinner
+    public partial class LegacyNewStyleSpinner : LegacySpinner
     {
         private Sprite glow = null!;
         private Sprite discBottom = null!;
@@ -63,17 +63,17 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         Origin = Anchor.Centre,
                         Texture = source.GetTexture("spinner-top"),
                     },
-                    fixedMiddle = new Sprite
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Texture = source.GetTexture("spinner-middle"),
-                    },
                     spinningMiddle = new Sprite
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Texture = source.GetTexture("spinner-middle2"),
+                    },
+                    fixedMiddle = new Sprite
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Texture = source.GetTexture("spinner-middle"),
                     },
                 }
             });
@@ -135,7 +135,11 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         protected override void Update()
         {
             base.Update();
-            spinningMiddle.Rotation = discTop.Rotation = DrawableSpinner.RotationTracker.Rotation;
+
+            float turnRatio = spinningMiddle.Texture != null ? 0.5f : 1;
+            discTop.Rotation = DrawableSpinner.RotationTracker.Rotation * turnRatio;
+            spinningMiddle.Rotation = DrawableSpinner.RotationTracker.Rotation;
+
             discBottom.Rotation = discTop.Rotation / 3;
 
             glow.Alpha = DrawableSpinner.Progress;

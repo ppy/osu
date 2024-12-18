@@ -4,6 +4,8 @@
 #nullable disable
 
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
@@ -16,7 +18,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
-    public abstract class OverlayTabControl<T> : OsuTabControl<T>
+    public abstract partial class OverlayTabControl<T> : OsuTabControl<T>
     {
         private readonly Box bar;
 
@@ -58,7 +60,7 @@ namespace osu.Game.Overlays
 
         protected override TabItem<T> CreateTabItem(T value) => new OverlayTabItem(value);
 
-        protected class OverlayTabItem : TabItem<T>, IHasAccentColour
+        protected partial class OverlayTabItem : TabItem<T>, IHasAccentColour
         {
             protected readonly ExpandingBar Bar;
             protected readonly OsuSpriteText Text;
@@ -79,6 +81,8 @@ namespace osu.Game.Overlays
                     updateState();
                 }
             }
+
+            private Sample selectSample = null!;
 
             public OverlayTabItem(T value)
                 : base(value)
@@ -101,8 +105,14 @@ namespace osu.Game.Overlays
                         ExpandedSize = 5f,
                         CollapsedSize = 0
                     },
-                    new HoverClickSounds(HoverSampleSet.TabSelect)
+                    new HoverSounds(HoverSampleSet.TabSelect)
                 };
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(AudioManager audio)
+            {
+                selectSample = audio.Samples.Get(@"UI/tabselect-select");
             }
 
             protected override bool OnHover(HoverEvent e)
@@ -135,6 +145,8 @@ namespace osu.Game.Overlays
                 UnhoverAction();
                 Text.Font = Text.Font.With(weight: FontWeight.Medium);
             }
+
+            protected override void OnActivatedByUser() => selectSample.Play();
 
             private void updateState()
             {

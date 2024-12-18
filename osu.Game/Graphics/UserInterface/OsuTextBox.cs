@@ -24,7 +24,7 @@ using osuTK;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class OsuTextBox : BasicTextBox
+    public partial class OsuTextBox : BasicTextBox
     {
         /// <summary>
         /// Whether to allow playing a different samples based on the type of character.
@@ -63,6 +63,11 @@ namespace osu.Game.Graphics.UserInterface
 
         private Dictionary<FeedbackSampleType, Sample?[]> sampleMap = new Dictionary<FeedbackSampleType, Sample?[]>();
 
+        /// <summary>
+        /// Whether all text should be selected when the <see cref="OsuTextBox"/> gains focus.
+        /// </summary>
+        public bool SelectAllOnFocus { get; set; }
+
         public OsuTextBox()
         {
             Height = 40;
@@ -86,6 +91,7 @@ namespace osu.Game.Graphics.UserInterface
 
             Placeholder.Colour = colourProvider?.Foreground1 ?? new Color4(180, 180, 180, 255);
 
+            // Note that `KeyBindingRow` uses similar logic for input feedback, so remember to update there if changing here.
             var textAddedSamples = new Sample?[4];
             for (int i = 0; i < textAddedSamples.Length; i++)
                 textAddedSamples[i] = audio.Samples.Get($@"Keyboard/key-press-{1 + i}");
@@ -250,13 +256,20 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override void OnFocus(FocusEvent e)
         {
-            BorderThickness = 3;
+            if (Masking)
+                BorderThickness = 3;
+
             base.OnFocus(e);
+
+            // we may become focused from an ongoing drag operation, we don't want to overwrite selection in that case.
+            if (SelectAllOnFocus && string.IsNullOrEmpty(SelectedText))
+                SelectAll();
         }
 
         protected override void OnFocusLost(FocusLostEvent e)
         {
-            BorderThickness = 0;
+            if (Masking)
+                BorderThickness = 0;
 
             base.OnFocusLost(e);
         }
@@ -264,7 +277,7 @@ namespace osu.Game.Graphics.UserInterface
         protected override Drawable GetDrawableCharacter(char c) => new FallingDownContainer
         {
             AutoSizeAxes = Axes.Both,
-            Child = new OsuSpriteText { Text = c.ToString(), Font = OsuFont.GetFont(size: CalculatedTextSize) },
+            Child = new OsuSpriteText { Text = c.ToString(), Font = OsuFont.GetFont(size: FontSize) },
         };
 
         protected override Caret CreateCaret() => caret = new OsuCaret
@@ -277,7 +290,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             var samples = sampleMap[feedbackSampleType];
 
-            if (samples == null || samples.Length == 0)
+            if (samples.Length == 0)
                 return null;
 
             return samples[RNG.Next(0, samples.Length)]?.GetChannel();
@@ -302,7 +315,7 @@ namespace osu.Game.Graphics.UserInterface
             sampleLastPlaybackTime = Time.Current;
         });
 
-        private class OsuCaret : Caret
+        private partial class OsuCaret : Caret
         {
             private const float caret_move_time = 60;
 
@@ -310,18 +323,16 @@ namespace osu.Game.Graphics.UserInterface
 
             public OsuCaret()
             {
-                RelativeSizeAxes = Axes.Y;
-                Size = new Vector2(1, 0.9f);
-
                 Colour = Color4.Transparent;
-                Anchor = Anchor.CentreLeft;
-                Origin = Anchor.CentreLeft;
 
-                Masking = true;
-                CornerRadius = 1;
                 InternalChild = beatSync = new CaretBeatSyncedContainer
                 {
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                    Masking = true,
+                    CornerRadius = 1f,
                     RelativeSizeAxes = Axes.Both,
+                    Height = 0.9f,
                 };
             }
 
@@ -349,7 +360,7 @@ namespace osu.Game.Graphics.UserInterface
                 }
             }
 
-            private class CaretBeatSyncedContainer : BeatSyncedContainer
+            private partial class CaretBeatSyncedContainer : BeatSyncedContainer
             {
                 private bool hasSelection;
 

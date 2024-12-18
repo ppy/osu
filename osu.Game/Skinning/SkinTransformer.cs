@@ -10,6 +10,13 @@ using osu.Game.Audio;
 
 namespace osu.Game.Skinning
 {
+    /// <summary>
+    /// A default skin transformer, which falls back to the provided skin by default.
+    /// </summary>
+    /// <remarks>
+    /// Implementations of skin transformers should generally derive this class and override
+    /// individual lookup methods, modifying the lookup flow as required.
+    /// </remarks>
     public abstract class SkinTransformer : ISkinTransformer
     {
         public ISkin Skin { get; }
@@ -27,6 +34,19 @@ namespace osu.Game.Skinning
 
         public virtual ISample? GetSample(ISampleInfo sampleInfo) => Skin.GetSample(sampleInfo);
 
-        public virtual IBindable<TValue>? GetConfig<TLookup, TValue>(TLookup lookup) where TLookup : notnull where TValue : notnull => Skin.GetConfig<TLookup, TValue>(lookup);
+        public virtual IBindable<TValue>? GetConfig<TLookup, TValue>(TLookup lookup) where TLookup : notnull where TValue : notnull
+        {
+            try
+            {
+                Skinning.Skin.LogLookupDebug(this, lookup, Skinning.Skin.LookupDebugType.Enter);
+                return Skin.GetConfig<TLookup, TValue>(lookup);
+            }
+            finally
+            {
+                Skinning.Skin.LogLookupDebug(this, lookup, Skinning.Skin.LookupDebugType.Exit);
+            }
+        }
+
+        public override string ToString() => $"{nameof(SkinTransformer)} {{ Skin: {Skin} }}";
     }
 }

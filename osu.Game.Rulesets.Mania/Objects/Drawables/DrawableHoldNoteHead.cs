@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
     /// <summary>
     /// The head of a <see cref="DrawableHoldNote"/>.
     /// </summary>
-    public class DrawableHoldNoteHead : DrawableNote
+    public partial class DrawableHoldNoteHead : DrawableNote
     {
         protected override ManiaSkinComponents Component => ManiaSkinComponents.HoldNoteHead;
 

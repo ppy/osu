@@ -7,9 +7,9 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -17,6 +17,8 @@ using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
+using osu.Game.Graphics;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Edit.Tools;
@@ -40,12 +42,15 @@ namespace osu.Game.Rulesets.Edit
     /// Responsible for providing snapping and generally gluing components together.
     /// </summary>
     /// <typeparam name="TObject">The base type of supported objects.</typeparam>
-    public abstract class HitObjectComposer<TObject> : HitObjectComposer, IPlacementHandler
+    public abstract partial class HitObjectComposer<TObject> : HitObjectComposer, IPlacementHandler
         where TObject : HitObject
     {
-        protected IRulesetConfigManager Config { get; private set; }
+        /// <summary>
+        /// Whether the playfield should be centered horizontally. Should be disabled for playfields which span the full horizontal width.
+        /// </summary>
+        protected virtual bool ApplyHorizontalCentering => true;
 
-        protected readonly Ruleset Ruleset;
+        protected IRulesetConfigManager Config { get; private set; }
 
         // Provides `Playfield`
         private DependencyContainer dependencies;
@@ -59,36 +64,60 @@ namespace osu.Game.Rulesets.Edit
         [Resolved]
         protected IBeatSnapProvider BeatSnapProvider { get; private set; }
 
-        protected ComposeBlueprintContainer BlueprintContainer { get; private set; }
+        [Resolved]
+        private OverlayColourProvider colourProvider { get; set; }
+
+        public override ComposeBlueprintContainer BlueprintContainer => blueprintContainer;
+        private ComposeBlueprintContainer blueprintContainer;
+
+        protected ExpandingToolboxContainer LeftToolbox { get; private set; }
+
+        protected ExpandingToolboxContainer RightToolbox { get; private set; }
 
         private DrawableEditorRulesetWrapper<TObject> drawableRulesetWrapper;
 
         protected readonly Container LayerBelowRuleset = new Container { RelativeSizeAxes = Axes.Both };
 
-        private InputManager inputManager;
+        protected InputManager InputManager { get; private set; }
+
+        private Box leftToolboxBackground;
+        private Box rightToolboxBackground;
 
         private EditorRadioButtonCollection toolboxCollection;
-
         private FillFlowContainer togglesCollection;
+        private FillFlowContainer sampleBankTogglesCollection;
 
         private IBindable<bool> hasTiming;
+        private Bindable<bool> autoSeekOnPlacement;
+        private readonly Bindable<bool> composerFocusMode = new Bindable<bool>();
+
+        [CanBeNull]
+        private RadioButton lastTool;
+
+        protected DrawableRuleset<TObject> DrawableRuleset { get; private set; }
 
         protected HitObjectComposer(Ruleset ruleset)
+            : base(ruleset)
         {
-            Ruleset = ruleset;
         }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
             dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
-        [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
+        [BackgroundDependencyLoader(true)]
+        private void load(OsuConfigManager config, [CanBeNull] Editor editor)
         {
+            autoSeekOnPlacement = config.GetBindable<bool>(OsuSetting.EditorAutoSeekOnPlacement);
+
+            if (editor != null)
+                composerFocusMode.BindTo(editor.ComposerFocusMode);
+
             Config = Dependencies.Get<IRulesetConfigCache>().GetConfigFor(Ruleset);
 
             try
             {
-                drawableRulesetWrapper = new DrawableEditorRulesetWrapper<TObject>(CreateDrawableRuleset(Ruleset, EditorBeatmap.PlayableBeatmap, new[] { Ruleset.GetAutoplayMod() }))
+                DrawableRuleset = CreateDrawableRuleset(Ruleset, EditorBeatmap.PlayableBeatmap, new[] { Ruleset.GetAutoplayMod() });
+                drawableRulesetWrapper = new DrawableEditorRulesetWrapper<TObject>(DrawableRuleset)
                 {
                     Clock = EditorClock,
                     ProcessCustomClock = false
@@ -100,14 +129,17 @@ namespace osu.Game.Rulesets.Edit
                 return;
             }
 
+            if (DrawableRuleset is IDrawableScrollingRuleset scrollingRuleset)
+                dependencies.CacheAs(scrollingRuleset.ScrollingInfo);
+
             dependencies.CacheAs(Playfield);
 
-            InternalChildren = new Drawable[]
+            InternalChildren = new[]
             {
                 PlayfieldContentContainer = new Container
                 {
-                    Name = "Content",
-                    RelativeSizeAxes = Axes.Both,
+                    Name = "Playfield content",
+                    RelativeSizeAxes = Axes.Y,
                     Children = new Drawable[]
                     {
                         // layers below playfield
@@ -115,7 +147,7 @@ namespace osu.Game.Rulesets.Edit
                         drawableRulesetWrapper,
                         // layers above playfield
                         drawableRulesetWrapper.CreatePlayfieldAdjustmentContainer()
-                                              .WithChild(BlueprintContainer = CreateBlueprintContainer())
+                                              .WithChild(blueprintContainer = CreateBlueprintContainer())
                     }
                 },
                 new Container
@@ -124,12 +156,12 @@ namespace osu.Game.Rulesets.Edit
                     AutoSizeAxes = Axes.X,
                     Children = new Drawable[]
                     {
-                        new Box
+                        leftToolboxBackground = new Box
                         {
                             Colour = colourProvider.Background5,
                             RelativeSizeAxes = Axes.Both,
                         },
-                        new ExpandingToolboxContainer(60, 200)
+                        LeftToolbox = new ExpandingToolboxContainer(TOOLBOX_CONTRACTED_SIZE_LEFT, 200)
                         {
                             Children = new Drawable[]
                             {
@@ -146,22 +178,103 @@ namespace osu.Game.Rulesets.Edit
                                         Direction = FillDirection.Vertical,
                                         Spacing = new Vector2(0, 5),
                                     },
-                                }
+                                },
+                                new EditorToolboxGroup("bank (Shift/Alt-Q~R)")
+                                {
+                                    Child = new FillFlowContainer
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        AutoSizeAxes = Axes.Y,
+                                        Direction = FillDirection.Vertical,
+                                        Spacing = new Vector2(0, 5),
+                                        Children = new Drawable[]
+                                        {
+                                            new Container
+                                            {
+                                                RelativeSizeAxes = Axes.X,
+                                                AutoSizeAxes = Axes.Y,
+                                                Children = new Drawable[]
+                                                {
+                                                    new ExpandableSpriteText
+                                                    {
+                                                        Text = "Normal",
+                                                        AlwaysPresent = true,
+                                                        AllowMultiline = false,
+                                                        RelativePositionAxes = Axes.X,
+                                                        X = 0.25f,
+                                                        Origin = Anchor.TopCentre,
+                                                        Anchor = Anchor.TopLeft,
+                                                        Font = OsuFont.GetFont(weight: FontWeight.Regular, size: 17),
+                                                    },
+                                                    new ExpandableSpriteText
+                                                    {
+                                                        Text = "Addition",
+                                                        AlwaysPresent = true,
+                                                        AllowMultiline = false,
+                                                        RelativePositionAxes = Axes.X,
+                                                        X = 0.75f,
+                                                        Origin = Anchor.TopCentre,
+                                                        Anchor = Anchor.TopLeft,
+                                                        Font = OsuFont.GetFont(weight: FontWeight.Regular, size: 17),
+                                                    },
+                                                }
+                                            },
+                                            sampleBankTogglesCollection = new FillFlowContainer
+                                            {
+                                                RelativeSizeAxes = Axes.X,
+                                                AutoSizeAxes = Axes.Y,
+                                                Direction = FillDirection.Vertical,
+                                                Spacing = new Vector2(0, 5),
+                                            },
+                                        }
+                                    }
+                                },
                             }
                         },
                     }
                 },
+                new Container
+                {
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight,
+                    RelativeSizeAxes = Axes.Y,
+                    AutoSizeAxes = Axes.X,
+                    Children = new Drawable[]
+                    {
+                        rightToolboxBackground = new Box
+                        {
+                            Colour = colourProvider.Background5,
+                            RelativeSizeAxes = Axes.Both,
+                        },
+                        RightToolbox = new ExpandingToolboxContainer(TOOLBOX_CONTRACTED_SIZE_RIGHT, 250)
+                        {
+                            Child = new EditorToolboxGroup("inspector")
+                            {
+                                Child = CreateHitObjectInspector()
+                            },
+                        }
+                    }
+                },
             };
 
-            toolboxCollection.Items = CompositionTools
-                                      .Prepend(new SelectTool())
-                                      .Select(t => new RadioButton(t.Name, () => toolSelected(t), t.CreateIcon))
+            toolboxCollection.Items = (CompositionTools.Prepend(new SelectTool()))
+                                      .Select(t => new HitObjectCompositionToolButton(t, () => toolSelected(t)))
                                       .ToList();
+
+            foreach (var item in toolboxCollection.Items)
+            {
+                item.Selected.DisabledChanged += isDisabled =>
+                {
+                    item.TooltipText = isDisabled ? "Add at least one timing point first!" : ((HitObjectCompositionToolButton)item).TooltipText;
+                };
+            }
 
             TernaryStates = CreateTernaryButtons().ToArray();
             togglesCollection.AddRange(TernaryStates.Select(b => new DrawableTernaryButton(b)));
 
-            setSelectTool();
+            sampleBankTogglesCollection.AddRange(BlueprintContainer.SampleBankTernaryStates.Zip(BlueprintContainer.SampleAdditionBankTernaryStates).Select(b => new SampleBankTernaryButton(b.First, b.Second)));
+
+            SetSelectTool();
 
             EditorBeatmap.SelectedHitObjects.CollectionChanged += selectionChanged;
         }
@@ -179,22 +292,72 @@ namespace osu.Game.Rulesets.Edit
         {
             base.LoadComplete();
 
-            inputManager = GetContainingInputManager();
+            InputManager = GetContainingInputManager();
 
             hasTiming = EditorBeatmap.HasTiming.GetBoundCopy();
             hasTiming.BindValueChanged(timing =>
             {
                 // it's important this is performed before the similar code in EditorRadioButton disables the button.
                 if (!timing.NewValue)
-                    setSelectTool();
+                    SetSelectTool();
             });
+
+            EditorBeatmap.HasTiming.BindValueChanged(hasTiming =>
+            {
+                foreach (var item in toolboxCollection.Items)
+                {
+                    item.Selected.Disabled = !hasTiming.NewValue;
+                }
+            }, true);
+
+            composerFocusMode.BindValueChanged(_ =>
+            {
+                // Transforms should be kept in sync with other usages of composer focus mode.
+                if (!composerFocusMode.Value)
+                {
+                    leftToolboxBackground.FadeIn(750, Easing.OutQuint);
+                    rightToolboxBackground.FadeIn(750, Easing.OutQuint);
+                }
+                else
+                {
+                    leftToolboxBackground.Delay(600).FadeTo(0.5f, 4000, Easing.OutQuint);
+                    rightToolboxBackground.Delay(600).FadeTo(0.5f, 4000, Easing.OutQuint);
+                }
+            }, true);
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (ApplyHorizontalCentering)
+            {
+                PlayfieldContentContainer.Anchor = Anchor.Centre;
+                PlayfieldContentContainer.Origin = Anchor.Centre;
+
+                // Ensure that the playfield is always centered but also doesn't get cut off by toolboxes.
+                PlayfieldContentContainer.Width = Math.Max(1024, DrawWidth) - TOOLBOX_CONTRACTED_SIZE_RIGHT * 2;
+                PlayfieldContentContainer.X = 0;
+            }
+            else
+            {
+                PlayfieldContentContainer.Anchor = Anchor.CentreLeft;
+                PlayfieldContentContainer.Origin = Anchor.CentreLeft;
+
+                PlayfieldContentContainer.Width = Math.Max(1024, DrawWidth);
+                PlayfieldContentContainer.X = LeftToolbox.DrawWidth;
+            }
+
+            composerFocusMode.Value = PlayfieldContentContainer.Contains(InputManager.CurrentState.Mouse.Position)
+                                      && !LeftToolbox.Contains(InputManager.CurrentState.Mouse.Position)
+                                      && !RightToolbox.Contains(InputManager.CurrentState.Mouse.Position);
         }
 
         public override Playfield Playfield => drawableRulesetWrapper.Playfield;
 
         public override IEnumerable<DrawableHitObject> HitObjects => drawableRulesetWrapper.Playfield.AllHitObjects;
 
-        public override bool CursorInPlacementArea => drawableRulesetWrapper.Playfield.ReceivePositionalInputAt(inputManager.CurrentState.Mouse.Position);
+        public override bool CursorInPlacementArea => drawableRulesetWrapper.Playfield.ReceivePositionalInputAt(InputManager.CurrentState.Mouse.Position);
 
         /// <summary>
         /// Defines all available composition tools, listed on the left side of the editor screen as button controls.
@@ -203,7 +366,7 @@ namespace osu.Game.Rulesets.Edit
         /// <remarks>
         /// A "select" tool is automatically added as the first tool.
         /// </remarks>
-        protected abstract IReadOnlyList<HitObjectCompositionTool> CompositionTools { get; }
+        protected abstract IReadOnlyList<CompositionTool> CompositionTools { get; }
 
         /// <summary>
         /// A collection of states which will be displayed to the user in the toolbox.
@@ -213,12 +376,14 @@ namespace osu.Game.Rulesets.Edit
         /// <summary>
         /// Create all ternary states required to be displayed to the user.
         /// </summary>
-        protected virtual IEnumerable<TernaryButton> CreateTernaryButtons() => BlueprintContainer.TernaryStates;
+        protected virtual IEnumerable<TernaryButton> CreateTernaryButtons() => BlueprintContainer.MainTernaryStates;
 
         /// <summary>
         /// Construct a relevant blueprint container. This will manage hitobject selection/placement input handling and display logic.
         /// </summary>
         protected virtual ComposeBlueprintContainer CreateBlueprintContainer() => new ComposeBlueprintContainer(this);
+
+        protected virtual Drawable CreateHitObjectInspector() => new HitObjectInspector();
 
         /// <summary>
         /// Construct a drawable ruleset for the provided ruleset.
@@ -231,17 +396,17 @@ namespace osu.Game.Rulesets.Edit
         /// <param name="beatmap">The loaded beatmap.</param>
         /// <param name="mods">The mods to be applied.</param>
         /// <returns>An editor-relevant <see cref="DrawableRuleset{TObject}"/>.</returns>
-        protected virtual DrawableRuleset<TObject> CreateDrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
+        protected virtual DrawableRuleset<TObject> CreateDrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods)
             => (DrawableRuleset<TObject>)ruleset.CreateDrawableRulesetWith(beatmap, mods);
 
         #region Tool selection logic
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
-            if (e.ControlPressed || e.AltPressed || e.SuperPressed || e.ShiftPressed)
+            if (e.ControlPressed || e.SuperPressed)
                 return false;
 
-            if (checkLeftToggleFromKey(e.Key, out int leftIndex))
+            if (checkToolboxMappingFromKey(e.Key, out int leftIndex))
             {
                 var item = toolboxCollection.Items.ElementAtOrDefault(leftIndex);
 
@@ -253,21 +418,35 @@ namespace osu.Game.Rulesets.Edit
                 }
             }
 
-            if (checkRightToggleFromKey(e.Key, out int rightIndex))
+            if (checkToggleMappingFromKey(e.Key, out int rightIndex))
             {
-                var item = togglesCollection.ElementAtOrDefault(rightIndex);
-
-                if (item is DrawableTernaryButton button)
+                if (e.ShiftPressed || e.AltPressed)
                 {
-                    button.Button.Toggle();
-                    return true;
+                    if (sampleBankTogglesCollection.ElementAtOrDefault(rightIndex) is SampleBankTernaryButton sampleBankTernaryButton)
+                    {
+                        if (e.ShiftPressed)
+                            sampleBankTernaryButton.NormalButton.Toggle();
+
+                        if (e.AltPressed)
+                            sampleBankTernaryButton.AdditionsButton.Toggle();
+
+                        return true;
+                    }
+                }
+                else
+                {
+                    if (togglesCollection.ElementAtOrDefault(rightIndex) is DrawableTernaryButton button)
+                    {
+                        button.Button.Toggle();
+                        return true;
+                    }
                 }
             }
 
             return base.OnKeyDown(e);
         }
 
-        private bool checkLeftToggleFromKey(Key key, out int index)
+        private bool checkToolboxMappingFromKey(Key key, out int index)
         {
             if (key < Key.Number1 || key > Key.Number9)
             {
@@ -279,7 +458,7 @@ namespace osu.Game.Rulesets.Edit
             return true;
         }
 
-        private bool checkRightToggleFromKey(Key key, out int index)
+        private bool checkToggleMappingFromKey(Key key, out int index)
         {
             switch (key)
             {
@@ -336,14 +515,18 @@ namespace osu.Game.Rulesets.Edit
             if (EditorBeatmap.SelectedHitObjects.Any())
             {
                 // ensure in selection mode if a selection is made.
-                setSelectTool();
+                SetSelectTool();
             }
         }
 
-        private void setSelectTool() => toolboxCollection.Items.First().Select();
+        public void SetSelectTool() => toolboxCollection.Items.First().Select();
 
-        private void toolSelected(HitObjectCompositionTool tool)
+        public void SetLastTool() => (lastTool ?? toolboxCollection.Items.First()).Select();
+
+        private void toolSelected(CompositionTool tool)
         {
+            lastTool = toolboxCollection.Items.OfType<HitObjectCompositionToolButton>().FirstOrDefault(i => i.Tool == BlueprintContainer.CurrentTool);
+
             BlueprintContainer.CurrentTool = tool;
 
             if (!(tool is SelectTool))
@@ -354,22 +537,23 @@ namespace osu.Game.Rulesets.Edit
 
         #region IPlacementHandler
 
-        public void BeginPlacement(HitObject hitObject)
+        public void ShowPlacement(HitObject hitObject)
         {
             EditorBeatmap.PlacementObject.Value = hitObject;
         }
 
-        public void EndPlacement(HitObject hitObject, bool commit)
+        public void HidePlacement()
         {
             EditorBeatmap.PlacementObject.Value = null;
+        }
 
-            if (commit)
-            {
-                EditorBeatmap.Add(hitObject);
+        public void CommitPlacement(HitObject hitObject)
+        {
+            EditorBeatmap.PlacementObject.Value = null;
+            EditorBeatmap.Add(hitObject);
 
-                if (EditorClock.CurrentTime < hitObject.StartTime)
-                    EditorClock.SeekSmoothlyTo(hitObject.StartTime);
-            }
+            if (autoSeekOnPlacement.Value && EditorClock.CurrentTime < hitObject.StartTime)
+                EditorClock.SeekSmoothlyTo(hitObject.StartTime);
         }
 
         public void Delete(HitObject hitObject) => EditorBeatmap.Remove(hitObject);
@@ -392,7 +576,7 @@ namespace osu.Game.Rulesets.Edit
             var playfield = PlayfieldAtScreenSpacePosition(screenSpacePosition);
             double? targetTime = null;
 
-            if (snapType.HasFlagFast(SnapType.Grids))
+            if (snapType.HasFlag(SnapType.GlobalGrids))
             {
                 if (playfield is ScrollingPlayfield scrollingPlayfield)
                 {
@@ -417,10 +601,16 @@ namespace osu.Game.Rulesets.Edit
     /// Generally used to access certain methods without requiring a generic type for <see cref="HitObjectComposer{T}" />.
     /// </summary>
     [Cached]
-    public abstract class HitObjectComposer : CompositeDrawable, IPositionSnapProvider
+    public abstract partial class HitObjectComposer : CompositeDrawable, IPositionSnapProvider
     {
-        protected HitObjectComposer()
+        public const float TOOLBOX_CONTRACTED_SIZE_LEFT = 60;
+        public const float TOOLBOX_CONTRACTED_SIZE_RIGHT = 120;
+
+        public readonly Ruleset Ruleset;
+
+        protected HitObjectComposer(Ruleset ruleset)
         {
+            Ruleset = ruleset;
             RelativeSizeAxes = Axes.Both;
         }
 
@@ -428,6 +618,8 @@ namespace osu.Game.Rulesets.Edit
         /// The target ruleset's playfield.
         /// </summary>
         public abstract Playfield Playfield { get; }
+
+        public abstract ComposeBlueprintContainer BlueprintContainer { get; }
 
         /// <summary>
         /// All <see cref="DrawableHitObject"/>s in currently loaded beatmap.
@@ -439,7 +631,19 @@ namespace osu.Game.Rulesets.Edit
         /// </summary>
         public abstract bool CursorInPlacementArea { get; }
 
+        /// <summary>
+        /// Returns a string representing the current selection.
+        /// The inverse method to <see cref="SelectFromTimestamp"/>.
+        /// </summary>
         public virtual string ConvertSelectionToString() => string.Empty;
+
+        /// <summary>
+        /// Selects objects based on the supplied <paramref name="timestamp"/> and <paramref name="objectDescription"/>.
+        /// The inverse method to <see cref="ConvertSelectionToString"/>.
+        /// </summary>
+        /// <param name="timestamp">The time instant to seek to, in milliseconds.</param>
+        /// <param name="objectDescription">The ruleset-specific description of objects to select at the given timestamp.</param>
+        public virtual void SelectFromTimestamp(double timestamp, string objectDescription) { }
 
         #region IPositionSnapProvider
 

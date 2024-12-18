@@ -9,7 +9,7 @@ using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Overlays.Dashboard.Friends
 {
-    public class FriendOnlineStreamControl : OverlayStreamControl<FriendStream>
+    public partial class FriendOnlineStreamControl : OverlayStreamControl<FriendStream>
     {
         protected override OverlayStreamItem<FriendStream> CreateStreamItem(FriendStream value) => new FriendsOnlineStatusItem(value);
 

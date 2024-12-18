@@ -18,7 +18,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Default
 {
-    public class DefaultSpinnerDisc : CompositeDrawable
+    public partial class DefaultSpinnerDisc : CompositeDrawable
     {
         private DrawableSpinner drawableSpinner = null!;
 
@@ -200,7 +200,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
         {
             get
             {
-                int rotations = (int)(drawableSpinner.Result.RateAdjustedRotation / 360);
+                int rotations = (int)(drawableSpinner.Result.TotalRotation / 360);
 
                 if (wholeRotationCount == rotations) return false;
 

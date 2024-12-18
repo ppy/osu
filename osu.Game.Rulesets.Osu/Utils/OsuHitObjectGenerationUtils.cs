@@ -1,11 +1,8 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System;
 using System.Linq;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Beatmaps;
@@ -112,44 +109,43 @@ namespace osu.Game.Rulesets.Osu.Utils
         /// Reflects the position of the <see cref="OsuHitObject"/> in the playfield horizontally.
         /// </summary>
         /// <param name="osuObject">The object to reflect.</param>
-        public static void ReflectHorizontally(OsuHitObject osuObject)
+        public static void ReflectHorizontallyAlongPlayfield(OsuHitObject osuObject)
         {
             osuObject.Position = new Vector2(OsuPlayfield.BASE_SIZE.X - osuObject.X, osuObject.Position.Y);
 
-            if (!(osuObject is Slider slider))
+            if (osuObject is not Slider slider)
                 return;
 
-            // No need to update the head and tail circles, since slider handles that when the new slider path is set
-            slider.NestedHitObjects.OfType<SliderTick>().ForEach(h => h.Position = new Vector2(OsuPlayfield.BASE_SIZE.X - h.Position.X, h.Position.Y));
-            slider.NestedHitObjects.OfType<SliderRepeat>().ForEach(h => h.Position = new Vector2(OsuPlayfield.BASE_SIZE.X - h.Position.X, h.Position.Y));
+            static void reflectControlPoint(PathControlPoint point) => point.Position = new Vector2(-point.Position.X, point.Position.Y);
 
-            var controlPoints = slider.Path.ControlPoints.Select(p => new PathControlPoint(p.Position, p.Type)).ToArray();
-            foreach (var point in controlPoints)
-                point.Position = new Vector2(-point.Position.X, point.Position.Y);
-
-            slider.Path = new SliderPath(controlPoints, slider.Path.ExpectedDistance.Value);
+            modifySlider(slider, reflectControlPoint);
         }
 
         /// <summary>
         /// Reflects the position of the <see cref="OsuHitObject"/> in the playfield vertically.
         /// </summary>
         /// <param name="osuObject">The object to reflect.</param>
-        public static void ReflectVertically(OsuHitObject osuObject)
+        public static void ReflectVerticallyAlongPlayfield(OsuHitObject osuObject)
         {
             osuObject.Position = new Vector2(osuObject.Position.X, OsuPlayfield.BASE_SIZE.Y - osuObject.Y);
 
-            if (!(osuObject is Slider slider))
+            if (osuObject is not Slider slider)
                 return;
 
-            // No need to update the head and tail circles, since slider handles that when the new slider path is set
-            slider.NestedHitObjects.OfType<SliderTick>().ForEach(h => h.Position = new Vector2(h.Position.X, OsuPlayfield.BASE_SIZE.Y - h.Position.Y));
-            slider.NestedHitObjects.OfType<SliderRepeat>().ForEach(h => h.Position = new Vector2(h.Position.X, OsuPlayfield.BASE_SIZE.Y - h.Position.Y));
+            static void reflectControlPoint(PathControlPoint point) => point.Position = new Vector2(point.Position.X, -point.Position.Y);
 
-            var controlPoints = slider.Path.ControlPoints.Select(p => new PathControlPoint(p.Position, p.Type)).ToArray();
-            foreach (var point in controlPoints)
-                point.Position = new Vector2(point.Position.X, -point.Position.Y);
+            modifySlider(slider, reflectControlPoint);
+        }
 
-            slider.Path = new SliderPath(controlPoints, slider.Path.ExpectedDistance.Value);
+        /// <summary>
+        /// Flips the position of the <see cref="Slider"/> around its start position horizontally.
+        /// </summary>
+        /// <param name="slider">The slider to be flipped.</param>
+        public static void FlipSliderInPlaceHorizontally(Slider slider)
+        {
+            static void flipControlPoint(PathControlPoint point) => point.Position = new Vector2(-point.Position.X, point.Position.Y);
+
+            modifySlider(slider, flipControlPoint);
         }
 
         /// <summary>
@@ -159,15 +155,16 @@ namespace osu.Game.Rulesets.Osu.Utils
         /// <param name="rotation">The angle, measured in radians, to rotate the slider by.</param>
         public static void RotateSlider(Slider slider, float rotation)
         {
-            void rotateNestedObject(OsuHitObject nested) => nested.Position = rotateVector(nested.Position - slider.Position, rotation) + slider.Position;
+            void rotateControlPoint(PathControlPoint point) => point.Position = rotateVector(point.Position, rotation);
 
-            // No need to update the head and tail circles, since slider handles that when the new slider path is set
-            slider.NestedHitObjects.OfType<SliderTick>().ForEach(rotateNestedObject);
-            slider.NestedHitObjects.OfType<SliderRepeat>().ForEach(rotateNestedObject);
+            modifySlider(slider, rotateControlPoint);
+        }
 
+        private static void modifySlider(Slider slider, Action<PathControlPoint> modifyControlPoint)
+        {
             var controlPoints = slider.Path.ControlPoints.Select(p => new PathControlPoint(p.Position, p.Type)).ToArray();
             foreach (var point in controlPoints)
-                point.Position = rotateVector(point.Position, rotation);
+                modifyControlPoint(point);
 
             slider.Path = new SliderPath(controlPoints, slider.Path.ExpectedDistance.Value);
         }

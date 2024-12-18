@@ -18,12 +18,21 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
-    public abstract class DrawableTaikoHitObject : DrawableHitObject<TaikoHitObject>, IKeyBindingHandler<TaikoAction>
+    public abstract partial class DrawableTaikoHitObject : DrawableHitObject<TaikoHitObject>, IKeyBindingHandler<TaikoAction>
     {
         protected readonly Container Content;
         private readonly Container proxiedContent;
 
         private readonly Container nonProxiedContent;
+
+        /// <summary>
+        /// Whether the location of the hit should be snapped to the hit target before animating.
+        /// </summary>
+        /// <remarks>
+        /// This is how osu-stable worked, but notably is not how TnT works.
+        /// Not snapping results in less visual feedback on hit accuracy.
+        /// </remarks>
+        public bool SnapJudgementLocation { get; set; }
 
         protected DrawableTaikoHitObject([CanBeNull] TaikoHitObject hitObject)
             : base(hitObject)
@@ -105,20 +114,22 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             }
         }
 
-        private class ProxiedContentContainer : Container
+        private partial class ProxiedContentContainer : Container
         {
             public override bool RemoveWhenNotAlive => false;
         }
+
+        // osu!taiko hitsounds are managed by the drum (see DrumSampleTriggerSource).
+        public sealed override IEnumerable<HitSampleInfo> GetSamples() => Enumerable.Empty<HitSampleInfo>();
     }
 
-    public abstract class DrawableTaikoHitObject<TObject> : DrawableTaikoHitObject
+    public abstract partial class DrawableTaikoHitObject<TObject> : DrawableTaikoHitObject
         where TObject : TaikoHitObject
     {
         public override Vector2 OriginPosition => new Vector2(DrawHeight / 2);
 
         public new TObject HitObject => (TObject)base.HitObject;
 
-        protected Vector2 BaseSize;
         protected SkinnableDrawable MainPiece;
 
         protected DrawableTaikoHitObject([CanBeNull] TObject hitObject)
@@ -140,16 +151,11 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         protected virtual void RecreatePieces()
         {
-            Size = BaseSize = new Vector2(TaikoHitObject.DEFAULT_SIZE);
-
             if (MainPiece != null)
                 Content.Remove(MainPiece, true);
 
             Content.Add(MainPiece = CreateMainPiece());
         }
-
-        // Most osu!taiko hitsounds are managed by the drum (see DrumSampleMapping).
-        public override IEnumerable<HitSampleInfo> GetSamples() => Enumerable.Empty<HitSampleInfo>();
 
         protected abstract SkinnableDrawable CreateMainPiece();
     }

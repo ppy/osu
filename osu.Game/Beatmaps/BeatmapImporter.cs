@@ -12,7 +12,6 @@ using osu.Framework.Extensions;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
-using osu.Framework.Testing;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Collections;
 using osu.Game.Database;
@@ -21,6 +20,7 @@ using osu.Game.IO;
 using osu.Game.IO.Archives;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Objects.Types;
 using Realms;
 
 namespace osu.Game.Beatmaps
@@ -28,14 +28,13 @@ namespace osu.Game.Beatmaps
     /// <summary>
     /// Handles the storage and retrieval of Beatmaps/WorkingBeatmaps.
     /// </summary>
-    [ExcludeFromDynamicCompile]
     public class BeatmapImporter : RealmArchiveModelImporter<BeatmapSetInfo>
     {
-        public override IEnumerable<string> HandledExtensions => new[] { ".osz" };
+        public override IEnumerable<string> HandledExtensions => new[] { ".osz", ".olz" };
 
         protected override string[] HashableFileTypes => new[] { ".osu" };
 
-        public Action<(BeatmapSetInfo beatmapSet, bool isBatch)>? ProcessBeatmap { private get; set; }
+        public ProcessBeatmapDelegate? ProcessBeatmap { private get; set; }
 
         public BeatmapImporter(Storage storage, RealmAccess realm)
             : base(storage, realm)
@@ -44,7 +43,11 @@ namespace osu.Game.Beatmaps
 
         public override async Task<Live<BeatmapSetInfo>?> ImportAsUpdate(ProgressNotification notification, ImportTask importTask, BeatmapSetInfo original)
         {
-            var imported = await Import(notification, importTask);
+            var originalDateAdded = original.DateAdded;
+
+            Guid originalId = original.ID;
+
+            var imported = await Import(notification, new[] { importTask }).ConfigureAwait(false);
 
             if (!imported.Any())
                 return null;
@@ -54,12 +57,15 @@ namespace osu.Game.Beatmaps
             var first = imported.First();
 
             // If there were no changes, ensure we don't accidentally nuke ourselves.
-            if (first.ID == original.ID)
+            if (first.ID == originalId)
             {
-                first.PerformRead(s =>
+                first.PerformWrite(s =>
                 {
+                    // Transfer local values which should be persisted across a beatmap update.
+                    s.DateAdded = originalDateAdded;
+
                     // Re-run processing even in this case. We might have outdated metadata.
-                    ProcessBeatmap?.Invoke((s, false));
+                    ProcessBeatmap?.Invoke(s, MetadataLookupScope.OnlineFirst);
                 });
                 return first;
             }
@@ -70,14 +76,15 @@ namespace osu.Game.Beatmaps
 
                 Logger.Log($"Beatmap \"{updated}\" update completed successfully", LoggingTarget.Database);
 
-                original = realm.Find<BeatmapSetInfo>(original.ID);
+                // Re-fetch as we are likely on a different thread.
+                original = realm!.Find<BeatmapSetInfo>(originalId)!;
 
                 // Generally the import process will do this for us if the OnlineIDs match,
                 // but that isn't a guarantee (ie. if the .osu file doesn't have OnlineIDs populated).
                 original.DeletePending = true;
 
                 // Transfer local values which should be persisted across a beatmap update.
-                updated.DateAdded = original.DateAdded;
+                updated.DateAdded = originalDateAdded;
 
                 transferCollectionReferences(realm, original, updated);
 
@@ -147,12 +154,14 @@ namespace osu.Game.Beatmaps
             }
         }
 
-        protected override bool ShouldDeleteArchive(string path) => Path.GetExtension(path).ToLowerInvariant() == ".osz";
+        protected override bool ShouldDeleteArchive(string path) => HandledExtensions.Contains(Path.GetExtension(path).ToLowerInvariant());
 
         protected override void Populate(BeatmapSetInfo beatmapSet, ArchiveReader? archive, Realm realm, CancellationToken cancellationToken = default)
         {
             if (archive != null)
                 beatmapSet.Beatmaps.AddRange(createBeatmapDifficulties(beatmapSet, realm));
+
+            beatmapSet.DateAdded = getDateAdded(archive);
 
             foreach (BeatmapInfo b in beatmapSet.Beatmaps)
             {
@@ -189,8 +198,11 @@ namespace osu.Game.Beatmaps
 
             if (beatmapSet.OnlineID > 0)
             {
+                // Required local for iOS. Will cause runtime crash if inlined.
+                int onlineId = beatmapSet.OnlineID;
+
                 // OnlineID should really be unique, but to avoid catastrophic failure let's iterate just to be sure.
-                foreach (var existingSetWithSameOnlineID in realm.All<BeatmapSetInfo>().Where(b => b.OnlineID == beatmapSet.OnlineID))
+                foreach (var existingSetWithSameOnlineID in realm.All<BeatmapSetInfo>().Where(b => b.OnlineID == onlineId))
                 {
                     existingSetWithSameOnlineID.DeletePending = true;
                     existingSetWithSameOnlineID.OnlineID = -1;
@@ -203,10 +215,18 @@ namespace osu.Game.Beatmaps
             }
         }
 
-        protected override void PostImport(BeatmapSetInfo model, Realm realm, bool batchImport)
+        protected override void PostImport(BeatmapSetInfo model, Realm realm, ImportParameters parameters)
         {
-            base.PostImport(model, realm, batchImport);
-            ProcessBeatmap?.Invoke((model, batchImport));
+            base.PostImport(model, realm, parameters);
+
+            // Scores are stored separately from beatmaps, and persist even when a beatmap is modified or deleted.
+            // Let's reattach any matching scores that exist in the database, based on hash.
+            foreach (BeatmapInfo beatmap in model.Beatmaps)
+            {
+                beatmap.UpdateLocalScores(realm);
+            }
+
+            ProcessBeatmap?.Invoke(model, parameters.Batch ? MetadataLookupScope.LocalCacheFirst : MetadataLookupScope.OnlineFirst);
         }
 
         private void validateOnlineIds(BeatmapSetInfo beatmapSet, Realm realm)
@@ -257,8 +277,8 @@ namespace osu.Game.Beatmaps
             if (!base.CanReuseExisting(existing, import))
                 return false;
 
-            var existingIds = existing.Beatmaps.Select(b => b.OnlineID).OrderBy(i => i);
-            var importIds = import.Beatmaps.Select(b => b.OnlineID).OrderBy(i => i);
+            var existingIds = existing.Beatmaps.Select(b => b.OnlineID).Order();
+            var importIds = import.Beatmaps.Select(b => b.OnlineID).Order();
 
             // force re-import if we are not in a sane state.
             return existing.OnlineID == import.OnlineID && existingIds.SequenceEqual(importIds);
@@ -266,13 +286,16 @@ namespace osu.Game.Beatmaps
 
         protected override void UndeleteForReuse(BeatmapSetInfo existing)
         {
+            if (!existing.DeletePending)
+                return;
+
             base.UndeleteForReuse(existing);
             existing.DateAdded = DateTimeOffset.UtcNow;
         }
 
         public override string HumanisedModelName => "beatmap";
 
-        protected override BeatmapSetInfo? CreateModel(ArchiveReader reader)
+        protected override BeatmapSetInfo? CreateModel(ArchiveReader reader, ImportParameters parameters)
         {
             // let's make sure there are actually .osu files to import.
             string? mapName = reader.Filenames.FirstOrDefault(f => f.EndsWith(".osu", StringComparison.OrdinalIgnoreCase));
@@ -299,9 +322,34 @@ namespace osu.Game.Beatmaps
             return new BeatmapSetInfo
             {
                 OnlineID = beatmap.BeatmapInfo.BeatmapSet?.OnlineID ?? -1,
-                // Metadata = beatmap.Metadata,
-                DateAdded = DateTimeOffset.UtcNow
             };
+        }
+
+        /// <summary>
+        /// Determine the date a given beatmapset has been added to the game.
+        /// For legacy imports, we can use the oldest file write time for any `.osu` file in the directory.
+        /// For any other import types, use "now".
+        /// </summary>
+        private DateTimeOffset getDateAdded(ArchiveReader? reader)
+        {
+            DateTimeOffset dateAdded = DateTimeOffset.UtcNow;
+
+            if (reader is DirectoryArchiveReader legacyReader)
+            {
+                var beatmaps = reader.Filenames.Where(f => f.EndsWith(".osu", StringComparison.OrdinalIgnoreCase));
+
+                dateAdded = File.GetLastWriteTimeUtc(legacyReader.GetFullPath(beatmaps.First()));
+
+                foreach (string beatmapName in beatmaps)
+                {
+                    var currentDateAdded = File.GetLastWriteTimeUtc(legacyReader.GetFullPath(beatmapName));
+
+                    if (currentDateAdded < dateAdded)
+                        dateAdded = currentDateAdded;
+                }
+            }
+
+            return dateAdded;
         }
 
         /// <summary>
@@ -354,7 +402,7 @@ namespace osu.Game.Beatmaps
                         OverallDifficulty = decodedDifficulty.OverallDifficulty,
                         ApproachRate = decodedDifficulty.ApproachRate,
                         SliderMultiplier = decodedDifficulty.SliderMultiplier,
-                        SliderTickRate = decodedDifficulty.SliderTickRate,
+                        SliderTickRate = decodedDifficulty.SliderTickRate
                     };
 
                     var metadata = new BeatmapMetadata
@@ -380,23 +428,18 @@ namespace osu.Game.Beatmaps
                         Hash = hash,
                         DifficultyName = decodedInfo.DifficultyName,
                         OnlineID = decodedInfo.OnlineID,
-                        AudioLeadIn = decodedInfo.AudioLeadIn,
-                        StackLeniency = decodedInfo.StackLeniency,
-                        SpecialStyle = decodedInfo.SpecialStyle,
-                        LetterboxInBreaks = decodedInfo.LetterboxInBreaks,
-                        WidescreenStoryboard = decodedInfo.WidescreenStoryboard,
-                        EpilepsyWarning = decodedInfo.EpilepsyWarning,
-                        SamplesMatchPlaybackRate = decodedInfo.SamplesMatchPlaybackRate,
-                        DistanceSpacing = decodedInfo.DistanceSpacing,
                         BeatDivisor = decodedInfo.BeatDivisor,
-                        GridSize = decodedInfo.GridSize,
-                        TimelineZoom = decodedInfo.TimelineZoom,
                         MD5Hash = memoryStream.ComputeMD5Hash(),
+                        EndTimeObjectCount = decoded.HitObjects.Count(h => h is IHasDuration),
+                        TotalObjectCount = decoded.HitObjects.Count
                     };
 
                     beatmaps.Add(beatmap);
                 }
             }
+
+            if (!beatmaps.Any())
+                throw new ArgumentException("No valid beatmap files found in the beatmap archive.");
 
             return beatmaps;
         }

@@ -2,10 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using JetBrains.Annotations;
 
 namespace osu.Game.Localisation
 {
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
     public enum Language
     {
@@ -22,6 +24,9 @@ namespace osu.Game.Localisation
         [Description(@"Български")]
         bg,
 
+        [Description(@"Català")]
+        ca,
+
         [Description(@"Česky")]
         cs,
 
@@ -37,11 +42,26 @@ namespace osu.Game.Localisation
         [Description(@"español")]
         es,
 
+        // TODO: Requires Arabic glyphs to be added to resources (and possibly also RTL support).
+        // [Description(@"فارسی")]
+        // fa_ir,
+
         [Description(@"Suomi")]
         fi,
 
+        // TODO: Doesn't work as appropriate satellite assemblies aren't copied from resources (see: https://github.com/ppy/osu/discussions/18851#discussioncomment-3042170)
+        // [Description(@"Filipino")]
+        // fil,
+
         [Description(@"français")]
         fr,
+
+        // TODO: Requires Hebrew glyphs to be added to resources (and possibly also RTL support).
+        // [Description(@"עברית")]
+        // he,
+
+        [Description(@"Hrvatski")]
+        hr_hr,
 
         [Description(@"Magyar")]
         hu,
@@ -57,6 +77,15 @@ namespace osu.Game.Localisation
 
         [Description(@"한국어")]
         ko,
+
+        [Description(@"Lietuvių")]
+        lt,
+
+        [Description(@"Latviešu")]
+        lv_lv,
+
+        [Description(@"Melayu")]
+        ms_my,
 
         [Description(@"Nederlands")]
         nl,
@@ -79,11 +108,27 @@ namespace osu.Game.Localisation
         [Description(@"Русский")]
         ru,
 
+        // TODO: Requires Sinhala glyphs to be added to resources.
+        // Additionally, no translations available yet.
+        // [Description(@"සිංහල")]
+        // si_lk,
+
         [Description(@"Slovenčina")]
         sk,
 
+        [Description(@"Slovenščina")]
+        sl,
+
+        [Description(@"Српски")]
+        sr,
+
         [Description(@"Svenska")]
         sv,
+
+        // Tajik has no associated localisations yet, and is not supported on Windows versions <10.
+        // TODO: update language mapping in osu-resources to redirect tg-TJ to tg-Cyrl-TJ (which is supported on earlier Windows versions)
+        // [Description(@"Тоҷикӣ")]
+        // tg_tj,
 
         [Description(@"ไทย")]
         th,

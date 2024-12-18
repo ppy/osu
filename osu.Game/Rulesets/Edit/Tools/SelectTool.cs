@@ -5,18 +5,19 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Graphics;
 
 namespace osu.Game.Rulesets.Edit.Tools
 {
-    public class SelectTool : HitObjectCompositionTool
+    public class SelectTool : CompositionTool
     {
         public SelectTool()
             : base("Select")
         {
         }
 
-        public override Drawable CreateIcon() => new SpriteIcon { Icon = FontAwesome.Solid.MousePointer };
+        public override Drawable CreateIcon() => new SpriteIcon { Icon = OsuIcon.EditorSelect };
 
-        public override PlacementBlueprint CreatePlacementBlueprint() => null;
+        public override HitObjectPlacementBlueprint CreatePlacementBlueprint() => null;
     }
 }

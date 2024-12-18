@@ -25,14 +25,14 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
     /// for a usage example.
     /// </para>
     /// </summary>
-    public abstract class CirclePiece : BeatSyncedContainer, IHasAccentColour
+    public abstract partial class CirclePiece : BeatSyncedContainer, IHasAccentColour
     {
         public const float SYMBOL_SIZE = TaikoHitObject.DEFAULT_SIZE;
         public const float SYMBOL_BORDER = 8;
 
         private const double pre_beat_transition_time = 80;
 
-        private const float flash_opacity = 0.3f;
+        private const float kiai_flash_opacity = 0.15f;
 
         [Resolved]
         private DrawableHitObject drawableHitObject { get; set; } = null!;
@@ -153,12 +153,15 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
             updateStateTransforms(drawableHitObject, drawableHitObject.State.Value);
         }
 
-        private void updateStateTransforms(DrawableHitObject drawableHitObject, ArmedState state)
+        private void updateStateTransforms(DrawableHitObject h, ArmedState state)
         {
+            if (h.HitObject is not Hit)
+                return;
+
             switch (state)
             {
                 case ArmedState.Hit:
-                    using (BeginAbsoluteSequence(drawableHitObject.HitStateUpdateTime))
+                    using (BeginAbsoluteSequence(h.HitStateUpdateTime))
                         flashBox.FadeTo(0.9f).FadeOut(300);
                     break;
             }
@@ -184,7 +187,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
             if (drawableHitObject.State.Value == ArmedState.Idle)
             {
                 flashBox
-                    .FadeTo(flash_opacity)
+                    .FadeTo(kiai_flash_opacity)
                     .Then()
                     .FadeOut(timingPoint.BeatLength * 0.75, Easing.OutSine);
             }

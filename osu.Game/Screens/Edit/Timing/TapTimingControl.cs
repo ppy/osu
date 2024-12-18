@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
@@ -18,13 +19,16 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.Timing
 {
-    public class TapTimingControl : CompositeDrawable
+    public partial class TapTimingControl : CompositeDrawable
     {
         [Resolved]
         private EditorClock editorClock { get; set; } = null!;
 
         [Resolved]
         private EditorBeatmap beatmap { get; set; } = null!;
+
+        [Resolved]
+        private OsuConfigManager configManager { get; set; } = null!;
 
         [Resolved]
         private Bindable<ControlPointGroup> selectedGroup { get; set; } = null!;
@@ -65,35 +69,28 @@ namespace osu.Game.Screens.Edit.Timing
                     {
                         new Drawable[]
                         {
-                            new Container
+                            new GridContainer
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 Padding = new MarginPadding(padding),
-                                Children = new Drawable[]
+                                ColumnDimensions = new[]
                                 {
-                                    new GridContainer
+                                    new Dimension(GridSizeMode.AutoSize),
+                                    new Dimension()
+                                },
+                                Content = new[]
+                                {
+                                    new Drawable[]
                                     {
-                                        RelativeSizeAxes = Axes.Both,
-                                        ColumnDimensions = new[]
+                                        metronome = new MetronomeDisplay
                                         {
-                                            new Dimension(GridSizeMode.AutoSize),
-                                            new Dimension()
+                                            Anchor = Anchor.CentreLeft,
+                                            Origin = Anchor.CentreLeft,
                                         },
-                                        Content = new[]
-                                        {
-                                            new Drawable[]
-                                            {
-                                                metronome = new MetronomeDisplay
-                                                {
-                                                    Anchor = Anchor.CentreLeft,
-                                                    Origin = Anchor.CentreLeft,
-                                                },
-                                                new WaveformComparisonDisplay(),
-                                            }
-                                        },
+                                        new WaveformComparisonDisplay()
                                     }
-                                }
-                            },
+                                },
+                            }
                         },
                         new Drawable[]
                         {
@@ -183,32 +180,51 @@ namespace osu.Game.Screens.Edit.Timing
 
         private void start()
         {
+            if (selectedGroup.Value == null)
+                return;
+
             editorClock.Seek(selectedGroup.Value.Time);
             editorClock.Start();
         }
 
         private void reset()
         {
+            if (selectedGroup.Value == null)
+                return;
+
             editorClock.Stop();
             editorClock.Seek(selectedGroup.Value.Time);
         }
 
         private void adjustOffset(double adjust)
         {
+            if (selectedGroup.Value == null)
+                return;
+
             bool wasAtStart = editorClock.CurrentTimeAccurate == selectedGroup.Value.Time;
 
             // VERY TEMPORARY
             var currentGroupItems = selectedGroup.Value.ControlPoints.ToArray();
 
+            beatmap.BeginChange();
             beatmap.ControlPointInfo.RemoveGroup(selectedGroup.Value);
 
             double newOffset = selectedGroup.Value.Time + adjust;
 
             foreach (var cp in currentGroupItems)
+            {
+                if (cp is TimingControlPoint tp)
+                {
+                    TimingSectionAdjustments.AdjustHitObjectOffset(beatmap, tp, adjust);
+                    beatmap.UpdateAllHitObjects();
+                }
+
                 beatmap.ControlPointInfo.Add(newOffset, cp);
+            }
 
             // the control point might not necessarily exist yet, if currentGroupItems was empty.
             selectedGroup.Value = beatmap.ControlPointInfo.GroupAt(newOffset, true);
+            beatmap.EndChange();
 
             if (!editorClock.IsRunning && wasAtStart)
                 editorClock.Seek(newOffset);
@@ -216,15 +232,24 @@ namespace osu.Game.Screens.Edit.Timing
 
         private void adjustBpm(double adjust)
         {
-            var timing = selectedGroup.Value.ControlPoints.OfType<TimingControlPoint>().FirstOrDefault();
+            var timing = selectedGroup.Value?.ControlPoints.OfType<TimingControlPoint>().FirstOrDefault();
 
             if (timing == null)
                 return;
 
+            double oldBeatLength = timing.BeatLength;
             timing.BeatLength = 60000 / (timing.BPM + adjust);
+
+            if (configManager.Get<bool>(OsuSetting.EditorAdjustExistingObjectsOnTimingChanges))
+            {
+                beatmap.BeginChange();
+                TimingSectionAdjustments.SetHitObjectBPM(beatmap, timing, oldBeatLength);
+                beatmap.UpdateAllHitObjects();
+                beatmap.EndChange();
+            }
         }
 
-        private class InlineButton : OsuButton
+        private partial class InlineButton : OsuButton
         {
             private readonly IconUsage icon;
             private readonly Anchor anchor;

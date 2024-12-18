@@ -20,7 +20,7 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Tests.Skins
 {
     [HeadlessTest]
-    public class TestSceneSkinProvidingContainer : OsuTestScene
+    public partial class TestSceneSkinProvidingContainer : OsuTestScene
     {
         [Resolved]
         private IRenderer renderer { get; set; }
@@ -59,7 +59,7 @@ namespace osu.Game.Tests.Skins
             });
         }
 
-        private class TestSkinProvidingContainer : SkinProvidingContainer
+        private partial class TestSkinProvidingContainer : SkinProvidingContainer
         {
             private readonly IEnumerable<ISkin> sources;
 

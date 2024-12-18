@@ -23,7 +23,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
-    public class LegacyCursorParticles : CompositeDrawable, IKeyBindingHandler<OsuAction>
+    public partial class LegacyCursorParticles : CompositeDrawable, IKeyBindingHandler<OsuAction>
     {
         public bool Active => breakSpewer.Active.Value || kiaiSpewer.Active.Value;
 
@@ -140,7 +140,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 breakSpewer.Direction = SpewDirection.None;
         }
 
-        private class LegacyCursorParticleSpewer : ParticleSpewer, IRequireHighFrequencyMousePosition
+        private partial class LegacyCursorParticleSpewer : ParticleSpewer, IRequireHighFrequencyMousePosition
         {
             private const int particle_duration_min = 300;
             private const int particle_duration_max = 1000;

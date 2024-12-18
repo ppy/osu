@@ -27,7 +27,7 @@ namespace osu.Game.Tests.Skins
 {
     [TestFixture]
     [HeadlessTest]
-    public class TestSceneSkinConfigurationLookup : OsuTestScene
+    public partial class TestSceneSkinConfigurationLookup : OsuTestScene
     {
         private UserSkinSource userSource;
         private BeatmapSkinSource beatmapSource;
@@ -211,7 +211,7 @@ namespace osu.Game.Tests.Skins
             }
         }
 
-        public class SkinRequester : Drawable, ISkin
+        public partial class SkinRequester : Drawable, ISkin
         {
             private ISkinSource skin;
 

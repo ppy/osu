@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System;
 using System.Collections.Generic;
@@ -18,7 +16,7 @@ namespace osu.Game.Graphics
     /// <summary>
     /// An explosion of textured particles based on how osu-stable randomises the explosion pattern.
     /// </summary>
-    public class ParticleExplosion : Sprite
+    public partial class ParticleExplosion : Sprite
     {
         private readonly int particleCount;
         private readonly double duration;

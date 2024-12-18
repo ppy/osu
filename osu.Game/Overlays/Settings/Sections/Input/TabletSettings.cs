@@ -3,7 +3,8 @@
 
 #nullable disable
 
-using System;
+using System.Collections.Generic;
+using System.Linq;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -22,8 +23,10 @@ using osu.Game.Online.Chat;
 
 namespace osu.Game.Overlays.Settings.Sections.Input
 {
-    public class TabletSettings : SettingsSubsection
+    public partial class TabletSettings : SettingsSubsection
     {
+        public override IEnumerable<LocalisableString> FilterTerms => base.FilterTerms.Concat(new LocalisableString[] { "area" });
+
         public TabletAreaSelection AreaSelection { get; private set; }
 
         private readonly ITabletHandler tabletHandler;
@@ -46,9 +49,9 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         private GameHost host { get; set; }
 
         /// <summary>
-        /// Based on ultrawide monitor configurations.
+        /// Based on ultrawide monitor configurations, plus a bit of lenience for users which are intentionally aiming for higher horizontal velocity.
         /// </summary>
-        private const float largest_feasible_aspect_ratio = 21f / 9;
+        private const float largest_feasible_aspect_ratio = 23f / 9;
 
         private readonly BindableNumber<float> aspectRatio = new BindableFloat(1)
         {
@@ -111,9 +114,10 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                             if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows || RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
                             {
                                 t.NewLine();
-                                var formattedSource = MessageFormatter.FormatText(localisation.GetLocalisedBindableString(TabletSettingsStrings.NoTabletDetectedDescription(RuntimeInfo.OS == RuntimeInfo.Platform.Windows
-                                    ? @"https://opentabletdriver.net/Wiki/FAQ/Windows"
-                                    : @"https://opentabletdriver.net/Wiki/FAQ/Linux")).Value);
+                                var formattedSource = MessageFormatter.FormatText(localisation.GetLocalisedString(TabletSettingsStrings.NoTabletDetectedDescription(
+                                    RuntimeInfo.OS == RuntimeInfo.Platform.Windows
+                                        ? @"https://opentabletdriver.net/Wiki/FAQ/Windows"
+                                        : @"https://opentabletdriver.net/Wiki/FAQ/Linux")));
                                 t.AddLinks(formattedSource.Text, formattedSource.Links);
                             }
                         }),
@@ -143,6 +147,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                                 areaOffset.SetDefault();
                                 areaSize.SetDefault();
                             },
+                            CanBeShown = { BindTarget = enabled }
                         },
                         new SettingsButton
                         {
@@ -150,25 +155,29 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                             Action = () =>
                             {
                                 forceAspectRatio((float)host.Window.ClientSize.Width / host.Window.ClientSize.Height);
-                            }
+                            },
+                            CanBeShown = { BindTarget = enabled }
                         },
                         new SettingsSlider<float>
                         {
                             TransferValueOnCommit = true,
                             LabelText = TabletSettingsStrings.XOffset,
-                            Current = offsetX
+                            Current = offsetX,
+                            CanBeShown = { BindTarget = enabled }
                         },
                         new SettingsSlider<float>
                         {
                             TransferValueOnCommit = true,
                             LabelText = TabletSettingsStrings.YOffset,
-                            Current = offsetY
+                            Current = offsetY,
+                            CanBeShown = { BindTarget = enabled }
                         },
                         new SettingsSlider<float>
                         {
                             TransferValueOnCommit = true,
                             LabelText = TabletSettingsStrings.Rotation,
-                            Current = rotation
+                            Current = rotation,
+                            CanBeShown = { BindTarget = enabled }
                         },
                         new RotationPresetButtons(tabletHandler)
                         {
@@ -181,24 +190,28 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                         {
                             TransferValueOnCommit = true,
                             LabelText = TabletSettingsStrings.AspectRatio,
-                            Current = aspectRatio
+                            Current = aspectRatio,
+                            CanBeShown = { BindTarget = enabled }
                         },
                         new SettingsCheckbox
                         {
                             LabelText = TabletSettingsStrings.LockAspectRatio,
-                            Current = aspectLock
+                            Current = aspectLock,
+                            CanBeShown = { BindTarget = enabled }
                         },
                         new SettingsSlider<float>
                         {
                             TransferValueOnCommit = true,
                             LabelText = CommonStrings.Width,
-                            Current = sizeX
+                            Current = sizeX,
+                            CanBeShown = { BindTarget = enabled }
                         },
                         new SettingsSlider<float>
                         {
                             TransferValueOnCommit = true,
                             LabelText = CommonStrings.Height,
-                            Current = sizeY
+                            Current = sizeY,
+                            CanBeShown = { BindTarget = enabled }
                         },
                     }
                 },
@@ -274,6 +287,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 sizeY.Default = sizeY.MaxValue = tab.Size.Y;
 
                 areaSize.Default = new Vector2(sizeX.Default, sizeY.Default);
+                areaOffset.Default = new Vector2(offsetX.Default, offsetY.Default);
             }), true);
         }
 
@@ -325,7 +339,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         {
             aspectLock.Value = false;
 
-            int proposedHeight = getHeight(sizeX.Value, aspectRatio);
+            float proposedHeight = getHeight(sizeX.Value, aspectRatio);
 
             if (proposedHeight < sizeY.MaxValue)
                 sizeY.Value = proposedHeight;
@@ -342,8 +356,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         private float currentAspectRatio => sizeX.Value / sizeY.Value;
 
-        private static int getHeight(float width, float aspectRatio) => (int)Math.Round(width / aspectRatio);
+        private static float getHeight(float width, float aspectRatio) => width / aspectRatio;
 
-        private static int getWidth(float height, float aspectRatio) => (int)Math.Round(height * aspectRatio);
+        private static float getWidth(float height, float aspectRatio) => height * aspectRatio;
     }
 }

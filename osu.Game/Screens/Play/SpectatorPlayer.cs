@@ -1,10 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
-using System.Diagnostics;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
@@ -18,16 +16,24 @@ using osu.Game.Screens.Ranking;
 
 namespace osu.Game.Screens.Play
 {
-    public abstract class SpectatorPlayer : Player
+    public abstract partial class SpectatorPlayer : Player
     {
         [Resolved]
-        protected SpectatorClient SpectatorClient { get; private set; }
+        protected SpectatorClient SpectatorClient { get; private set; } = null!;
 
         private readonly Score score;
 
-        protected override bool CheckModsAllowFailure() => false; // todo: better support starting mid-way through beatmap
+        protected override bool CheckModsAllowFailure()
+        {
+            if (!allowFail)
+                return false;
 
-        protected SpectatorPlayer(Score score, PlayerConfiguration configuration = null)
+            return base.CheckModsAllowFailure();
+        }
+
+        private bool allowFail;
+
+        protected SpectatorPlayer(Score score, PlayerConfiguration? configuration = null)
             : base(configuration)
         {
             this.score = score;
@@ -60,6 +66,12 @@ namespace osu.Game.Screens.Play
             }, true);
         }
 
+        /// <summary>
+        /// Should be called when it is apparent that the player being spectated has failed.
+        /// This will subsequently stop blocking the fail screen from displaying (usually done out of safety).
+        /// </summary>
+        public void AllowFail() => allowFail = true;
+
         protected override void StartGameplay()
         {
             base.StartGameplay();
@@ -84,8 +96,7 @@ namespace osu.Game.Screens.Play
 
             foreach (var frame in bundle.Frames)
             {
-                IConvertibleReplayFrame convertibleFrame = GameplayState.Ruleset.CreateConvertibleReplayFrame();
-                Debug.Assert(convertibleFrame != null);
+                IConvertibleReplayFrame convertibleFrame = GameplayState.Ruleset.CreateConvertibleReplayFrame()!;
                 convertibleFrame.FromLegacy(frame, GameplayState.Beatmap);
 
                 var convertedFrame = (ReplayFrame)convertibleFrame;
@@ -120,7 +131,7 @@ namespace osu.Game.Screens.Play
         {
             base.Dispose(isDisposing);
 
-            if (SpectatorClient != null)
+            if (SpectatorClient.IsNotNull())
                 SpectatorClient.OnNewFrames -= userSentFrames;
         }
     }

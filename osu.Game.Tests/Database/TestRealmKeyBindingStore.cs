@@ -20,7 +20,7 @@ using Realms;
 namespace osu.Game.Tests.Database
 {
     [TestFixture]
-    public class TestRealmKeyBindingStore
+    public partial class TestRealmKeyBindingStore
     {
         private NativeStorage storage;
 
@@ -104,7 +104,7 @@ namespace osu.Game.Tests.Database
 
                 realm.Run(innerRealm =>
                 {
-                    var binding = innerRealm.ResolveReference(tsr);
+                    var binding = innerRealm.ResolveReference(tsr)!;
                     innerRealm.Write(() => binding.KeyCombination = new KeyCombination(InputKey.BackSpace));
                 });
 
@@ -123,7 +123,7 @@ namespace osu.Game.Tests.Database
             storage.DeleteDirectory(string.Empty);
         }
 
-        public class TestKeyBindingContainer : KeyBindingContainer
+        public partial class TestKeyBindingContainer : KeyBindingContainer
         {
             public override IEnumerable<IKeyBinding> DefaultKeyBindings =>
                 new[]

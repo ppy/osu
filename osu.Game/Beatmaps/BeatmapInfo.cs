@@ -6,15 +6,12 @@ using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
-using osu.Framework.Testing;
-using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Collections;
 using osu.Game.Database;
 using osu.Game.Models;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.BeatmapSet.Scores;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Edit;
 using osu.Game.Scoring;
 using Realms;
 
@@ -27,7 +24,6 @@ namespace osu.Game.Beatmaps
     /// <remarks>
     /// There are some legacy fields in this model which are not persisted to realm. These are isolated in a code region within the class and should eventually be migrated to `Beatmap`.
     /// </remarks>
-    [ExcludeFromDynamicCompile]
     [Serializable]
     [MapTo("Beatmap")]
     public class BeatmapInfo : RealmObject, IHasGuidPrimaryKey, IBeatmapInfo, IEquatable<BeatmapInfo>
@@ -64,7 +60,7 @@ namespace osu.Game.Beatmaps
         }
 
         [UsedImplicitly]
-        private BeatmapInfo()
+        protected BeatmapInfo()
         {
         }
 
@@ -122,6 +118,10 @@ namespace osu.Game.Beatmaps
         [JsonIgnore]
         public bool Hidden { get; set; }
 
+        public int EndTimeObjectCount { get; set; } = -1;
+
+        public int TotalObjectCount { get; set; } = -1;
+
         /// <summary>
         /// Reset any fetched online linking information (and history).
         /// </summary>
@@ -134,54 +134,17 @@ namespace osu.Game.Beatmaps
                 Status = BeatmapOnlineStatus.None;
         }
 
-        #region Properties we may not want persisted (but also maybe no harm?)
-
-        public double AudioLeadIn { get; set; }
-
-        public float StackLeniency { get; set; } = 0.7f;
-
-        public bool SpecialStyle { get; set; }
-
-        public bool LetterboxInBreaks { get; set; }
-
-        public bool WidescreenStoryboard { get; set; } = true;
-
-        public bool EpilepsyWarning { get; set; }
-
-        public bool SamplesMatchPlaybackRate { get; set; } = true;
-
         /// <summary>
         /// The time at which this beatmap was last played by the local user.
         /// </summary>
         public DateTimeOffset? LastPlayed { get; set; }
 
-        /// <summary>
-        /// The ratio of distance travelled per time unit.
-        /// Generally used to decouple the spacing between hit objects from the enforced "velocity" of the beatmap (see <see cref="DifficultyControlPoint.SliderVelocity"/>).
-        /// </summary>
-        /// <remarks>
-        /// The most common method of understanding is that at a default value of 1.0, the time-to-distance ratio will match the slider velocity of the beatmap
-        /// at the current point in time. Increasing this value will make hit objects more spaced apart when compared to the cursor movement required to track a slider.
-        ///
-        /// This is only a hint property, used by the editor in <see cref="IDistanceSnapProvider"/> implementations. It does not directly affect the beatmap or gameplay.
-        /// </remarks>
-        public double DistanceSpacing { get; set; } = 1.0;
-
-        public int BeatDivisor { get; set; }
-
-        public int GridSize { get; set; }
-
-        public double TimelineZoom { get; set; } = 1.0;
-
-        [Ignored]
-        public CountdownType Countdown { get; set; } = CountdownType.Normal;
+        public int BeatDivisor { get; set; } = 4;
 
         /// <summary>
-        /// The number of beats to move the countdown backwards (compared to its default location).
+        /// The time in milliseconds when last exiting the editor with this beatmap loaded.
         /// </summary>
-        public int CountdownOffset { get; set; }
-
-        #endregion
+        public double? EditorTimestamp { get; set; }
 
         public bool Equals(BeatmapInfo? other)
         {
@@ -231,6 +194,22 @@ namespace osu.Game.Beatmaps
             }
         }
 
+        /// <summary>
+        /// Local scores are retained separate from a beatmap's lifetime, matched via <see cref="ScoreInfo.BeatmapHash"/>.
+        /// Therefore we need to detach / reattach scores when a beatmap is edited or imported.
+        /// </summary>
+        /// <param name="realm">A realm instance in an active write transaction.</param>
+        public void UpdateLocalScores(Realm realm)
+        {
+            // first disassociate any scores which are already attached and no longer valid.
+            foreach (var score in Scores)
+                score.BeatmapInfo = null;
+
+            // then attach any scores which match the new hash.
+            foreach (var score in realm.All<ScoreInfo>().Where(s => s.BeatmapHash == Hash))
+                score.BeatmapInfo = this;
+        }
+
         IBeatmapMetadataInfo IBeatmapInfo.Metadata => Metadata;
         IBeatmapSetInfo? IBeatmapInfo.BeatmapSet => BeatmapSet;
         IRulesetInfo IBeatmapInfo.Ruleset => Ruleset;
@@ -251,9 +230,6 @@ namespace osu.Game.Beatmaps
         [Ignored]
         [Obsolete("Use ScoreManager.GetMaximumAchievableComboAsync instead.")]
         public int? MaxCombo { get; set; }
-
-        [Ignored]
-        public int[] Bookmarks { get; set; } = Array.Empty<int>();
 
         public int BeatmapVersion;
 

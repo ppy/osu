@@ -4,24 +4,33 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Text;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Collections;
 using osu.Game.Database;
 using osu.Game.Overlays.Dialog;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Catch;
+using osu.Game.Rulesets.Catch.Objects;
+using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.UI;
+using osu.Game.Rulesets.Taiko;
+using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Screens.Edit;
+using osu.Game.Screens.Edit.Compose.Components.Timeline;
 using osu.Game.Screens.Edit.Setup;
+using osu.Game.Skinning;
 using osu.Game.Storyboards;
 using osu.Game.Tests.Resources;
 using osuTK;
@@ -31,7 +40,7 @@ using SharpCompress.Archives.Zip;
 
 namespace osu.Game.Tests.Visual.Editing
 {
-    public class TestSceneEditorBeatmapCreation : EditorTestScene
+    public partial class TestSceneEditorBeatmapCreation : EditorTestScene
     {
         protected override Ruleset CreateEditorRuleset() => new OsuRuleset();
 
@@ -39,6 +48,9 @@ namespace osu.Game.Tests.Visual.Editing
 
         [Resolved]
         private BeatmapManager beatmapManager { get; set; } = null!;
+
+        [Resolved]
+        private RealmAccess realm { get; set; } = null!;
 
         private Guid currentBeatmapSetID => EditorBeatmap.BeatmapInfo.BeatmapSet?.ID ?? Guid.Empty;
 
@@ -85,64 +97,19 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
-        [FlakyTest]
-        /*
-         * Fail rate around 1.2%.
-         *
-         * Failing with realm refetch occasionally being null.
-         * My only guess is that the WorkingBeatmap at SetupScreen is dummy instead of the true one.
-         * If it's something else, we have larger issues with realm, but I don't think that's the case.
-         *
-         * at osu.Framework.Logging.ThrowingTraceListener.Fail(String message1, String message2)
-         * at System.Diagnostics.TraceInternal.Fail(String message, String detailMessage)
-         * at System.Diagnostics.TraceInternal.TraceProvider.Fail(String message, String detailMessage)
-         * at System.Diagnostics.Debug.Fail(String message, String detailMessage)
-         * at osu.Game.Database.ModelManager`1.<>c__DisplayClass8_0.<performFileOperation>b__0(Realm realm) ModelManager.cs:line 50
-         * at osu.Game.Database.RealmExtensions.Write(Realm realm, Action`1 function) RealmExtensions.cs:line 14
-         * at osu.Game.Database.ModelManager`1.performFileOperation(TModel item, Action`1 operation) ModelManager.cs:line 47
-         * at osu.Game.Database.ModelManager`1.AddFile(TModel item, Stream contents, String filename) ModelManager.cs:line 37
-         * at osu.Game.Screens.Edit.Setup.ResourcesSection.ChangeAudioTrack(FileInfo source) ResourcesSection.cs:line 115
-         * at osu.Game.Tests.Visual.Editing.TestSceneEditorBeatmapCreation.<TestAddAudioTrack>b__11_0() TestSceneEditorBeatmapCreation.cs:line 101
-         */
         public void TestAddAudioTrack()
         {
+            AddStep("enter compose mode", () => InputManager.Key(Key.F1));
+            AddUntilStep("wait for timeline load", () => Editor.ChildrenOfType<Timeline>().FirstOrDefault()?.IsLoaded == true);
+
+            AddStep("enter setup mode", () => Editor.Mode.Value = EditorScreenMode.SongSetup);
             AddAssert("track is virtual", () => Beatmap.Value.Track is TrackVirtual);
-
-            AddAssert("switch track to real track", () =>
-            {
-                var setup = Editor.ChildrenOfType<SetupScreen>().First();
-
-                string temp = TestResources.GetTestBeatmapForImport();
-
-                string extractedFolder = $"{temp}_extracted";
-                Directory.CreateDirectory(extractedFolder);
-
-                try
-                {
-                    using (var zip = ZipArchive.Open(temp))
-                        zip.WriteToDirectory(extractedFolder);
-
-                    bool success = setup.ChildrenOfType<ResourcesSection>().First().ChangeAudioTrack(new FileInfo(Path.Combine(extractedFolder, "03. Renatus - Soleily 192kbps.mp3")));
-
-                    // ensure audio file is copied to beatmap as "audio.mp3" rather than original filename.
-                    Assert.That(Beatmap.Value.Metadata.AudioFile == "audio.mp3");
-
-                    return success;
-                }
-                finally
-                {
-                    File.Delete(temp);
-                    Directory.Delete(extractedFolder, true);
-                }
-            });
+            AddAssert("switch track to real track", () => setAudio(applyToAllDifficulties: true, expected: "audio.mp3"));
 
             AddAssert("track is not virtual", () => Beatmap.Value.Track is not TrackVirtual);
-            AddAssert("track length changed", () => Beatmap.Value.Track.Length > 60000);
+            AddUntilStep("track length changed", () => Beatmap.Value.Track.Length > 60000);
 
             AddStep("test play", () => Editor.TestGameplay());
-
-            AddUntilStep("wait for dialog", () => DialogOverlay.CurrentDialog != null);
-            AddStep("confirm save", () => InputManager.Key(Key.Number1));
 
             AddUntilStep("wait for return to editor", () => Editor.IsCurrentScreen());
 
@@ -162,6 +129,7 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddStep("set unique difficulty name", () => EditorBeatmap.BeatmapInfo.DifficultyName = firstDifficultyName);
             AddStep("add timing point", () => EditorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = 1000 }));
+            AddStep("add effect point", () => EditorBeatmap.ControlPointInfo.Add(500, new EffectControlPoint { KiaiMode = true }));
             AddStep("add hitobjects", () => EditorBeatmap.AddRange(new[]
             {
                 new HitCircle
@@ -194,7 +162,7 @@ namespace osu.Game.Tests.Visual.Editing
             if (sameRuleset)
             {
                 AddUntilStep("wait for dialog", () => DialogOverlay.CurrentDialog is CreateNewDifficultyDialog);
-                AddStep("confirm creation with no objects", () => DialogOverlay.CurrentDialog.PerformOkAction());
+                AddStep("confirm creation with no objects", () => DialogOverlay.CurrentDialog!.PerformOkAction());
             }
 
             AddUntilStep("wait for created", () =>
@@ -207,6 +175,11 @@ namespace osu.Game.Tests.Visual.Editing
             {
                 var timingPoint = EditorBeatmap.ControlPointInfo.TimingPoints.Single();
                 return timingPoint.Time == 0 && timingPoint.BeatLength == 1000;
+            });
+            AddAssert("created difficulty has effect points", () =>
+            {
+                var effectPoint = EditorBeatmap.ControlPointInfo.EffectPoints.Single();
+                return effectPoint.Time == 500 && effectPoint.KiaiMode && effectPoint.ScrollSpeedBindable.IsDefault;
             });
             AddAssert("created difficulty has no objects", () => EditorBeatmap.HitObjects.Count == 0);
 
@@ -222,7 +195,113 @@ namespace osu.Game.Tests.Visual.Editing
                 return beatmap != null
                        && beatmap.DifficultyName == secondDifficultyName
                        && set != null
-                       && set.PerformRead(s => s.Beatmaps.Count == 2 && s.Beatmaps.Any(b => b.DifficultyName == secondDifficultyName) && s.Beatmaps.All(b => s.Status == BeatmapOnlineStatus.LocallyModified));
+                       && set.PerformRead(s =>
+                           s.Beatmaps.Count == 2 && s.Beatmaps.Any(b => b.DifficultyName == secondDifficultyName) && s.Beatmaps.All(b => s.Status == BeatmapOnlineStatus.LocallyModified));
+            });
+        }
+
+        [Test]
+        public void TestCreateNewDifficultyWithScrollSpeed_SameRuleset()
+        {
+            string previousDifficultyName = null!;
+
+            AddStep("set unique difficulty name", () => EditorBeatmap.BeatmapInfo.DifficultyName = previousDifficultyName = Guid.NewGuid().ToString());
+            AddStep("save beatmap", () => Editor.Save());
+            AddStep("create new difficulty", () => Editor.CreateNewDifficulty(new ManiaRuleset().RulesetInfo));
+
+            AddUntilStep("wait for created", () =>
+            {
+                string? difficultyName = Editor.ChildrenOfType<EditorBeatmap>().SingleOrDefault()?.BeatmapInfo.DifficultyName;
+                return difficultyName != null && difficultyName != previousDifficultyName;
+            });
+
+            AddStep("set unique difficulty name", () => EditorBeatmap.BeatmapInfo.DifficultyName = previousDifficultyName = Guid.NewGuid().ToString());
+            AddStep("add timing point", () => EditorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = 1000 }));
+            AddStep("add effect points", () =>
+            {
+                EditorBeatmap.ControlPointInfo.Add(250, new EffectControlPoint { KiaiMode = false, ScrollSpeed = 0.05 });
+                EditorBeatmap.ControlPointInfo.Add(500, new EffectControlPoint { KiaiMode = true, ScrollSpeed = 0.1 });
+                EditorBeatmap.ControlPointInfo.Add(750, new EffectControlPoint { KiaiMode = true, ScrollSpeed = 0.15 });
+                EditorBeatmap.ControlPointInfo.Add(1000, new EffectControlPoint { KiaiMode = false, ScrollSpeed = 0.2 });
+                EditorBeatmap.ControlPointInfo.Add(1500, new EffectControlPoint { KiaiMode = false, ScrollSpeed = 0.3 });
+            });
+
+            AddStep("save beatmap", () => Editor.Save());
+
+            AddStep("create new difficulty", () => Editor.CreateNewDifficulty(new ManiaRuleset().RulesetInfo));
+
+            AddUntilStep("wait for dialog", () => DialogOverlay.CurrentDialog is CreateNewDifficultyDialog);
+            AddStep("confirm creation with no objects", () => DialogOverlay.CurrentDialog!.PerformOkAction());
+
+            AddUntilStep("wait for created", () =>
+            {
+                string? difficultyName = Editor.ChildrenOfType<EditorBeatmap>().SingleOrDefault()?.BeatmapInfo.DifficultyName;
+                return difficultyName != null && difficultyName != previousDifficultyName;
+            });
+
+            AddAssert("created difficulty has timing point", () =>
+            {
+                var timingPoint = EditorBeatmap.ControlPointInfo.TimingPoints.Single();
+                return timingPoint.Time == 0 && timingPoint.BeatLength == 1000;
+            });
+
+            AddAssert("created difficulty has effect points", () =>
+            {
+                return EditorBeatmap.ControlPointInfo.EffectPoints.SequenceEqual(new[]
+                {
+                    new EffectControlPoint { Time = 250, KiaiMode = false, ScrollSpeed = 0.05 },
+                    new EffectControlPoint { Time = 500, KiaiMode = true, ScrollSpeed = 0.1 },
+                    new EffectControlPoint { Time = 750, KiaiMode = true, ScrollSpeed = 0.15 },
+                    new EffectControlPoint { Time = 1000, KiaiMode = false, ScrollSpeed = 0.2 },
+                    new EffectControlPoint { Time = 1500, KiaiMode = false, ScrollSpeed = 0.3 },
+                });
+            });
+        }
+
+        [Test]
+        public void TestCreateNewDifficultyWithScrollSpeed_DifferentRuleset()
+        {
+            string firstDifficultyName = Guid.NewGuid().ToString();
+
+            AddStep("save beatmap", () => Editor.Save());
+            AddStep("create new difficulty", () => Editor.CreateNewDifficulty(new ManiaRuleset().RulesetInfo));
+
+            AddStep("set unique difficulty name", () => EditorBeatmap.BeatmapInfo.DifficultyName = firstDifficultyName);
+            AddStep("add timing point", () => EditorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = 1000 }));
+            AddStep("add effect points", () =>
+            {
+                EditorBeatmap.ControlPointInfo.Add(250, new EffectControlPoint { KiaiMode = false, ScrollSpeed = 0.05 });
+                EditorBeatmap.ControlPointInfo.Add(500, new EffectControlPoint { KiaiMode = true, ScrollSpeed = 0.1 });
+                EditorBeatmap.ControlPointInfo.Add(750, new EffectControlPoint { KiaiMode = true, ScrollSpeed = 0.15 });
+                EditorBeatmap.ControlPointInfo.Add(1000, new EffectControlPoint { KiaiMode = false, ScrollSpeed = 0.2 });
+                EditorBeatmap.ControlPointInfo.Add(1500, new EffectControlPoint { KiaiMode = false, ScrollSpeed = 0.3 });
+            });
+
+            AddStep("save beatmap", () => Editor.Save());
+
+            AddStep("create new difficulty", () => Editor.CreateNewDifficulty(new TaikoRuleset().RulesetInfo));
+
+            AddUntilStep("wait for created", () =>
+            {
+                string? difficultyName = Editor.ChildrenOfType<EditorBeatmap>().SingleOrDefault()?.BeatmapInfo.DifficultyName;
+                return difficultyName != null && difficultyName != firstDifficultyName;
+            });
+
+            AddAssert("created difficulty has timing point", () =>
+            {
+                var timingPoint = EditorBeatmap.ControlPointInfo.TimingPoints.Single();
+                return timingPoint.Time == 0 && timingPoint.BeatLength == 1000;
+            });
+
+            AddAssert("created difficulty has effect points", () =>
+            {
+                // since this difficulty is on another ruleset, scroll speed specifications are completely reset,
+                // therefore discarding some effect points in the process due to being redundant.
+                return EditorBeatmap.ControlPointInfo.EffectPoints.SequenceEqual(new[]
+                {
+                    new EffectControlPoint { Time = 500, KiaiMode = true },
+                    new EffectControlPoint { Time = 1000, KiaiMode = false },
+                });
             });
         }
 
@@ -280,7 +359,7 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("create new difficulty", () => Editor.CreateNewDifficulty(new OsuRuleset().RulesetInfo));
 
             AddUntilStep("wait for dialog", () => DialogOverlay.CurrentDialog is CreateNewDifficultyDialog);
-            AddStep("confirm creation as a copy", () => DialogOverlay.CurrentDialog.Buttons.ElementAt(1).TriggerClick());
+            AddStep("confirm creation as a copy", () => DialogOverlay.CurrentDialog!.Buttons.ElementAt(1).TriggerClick());
 
             AddUntilStep("wait for created", () =>
             {
@@ -326,6 +405,56 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
+        public void TestCopyDifficultyDoesNotChangeCollections()
+        {
+            string originalDifficultyName = Guid.NewGuid().ToString();
+
+            AddStep("set unique difficulty name", () => EditorBeatmap.BeatmapInfo.DifficultyName = originalDifficultyName);
+            AddStep("save beatmap", () => Editor.Save());
+
+            string originalMd5 = string.Empty;
+            BeatmapCollection collection = null!;
+
+            AddStep("setup a collection with original beatmap", () =>
+            {
+                collection = new BeatmapCollection("test copy");
+                collection.BeatmapMD5Hashes.Add(originalMd5 = EditorBeatmap.BeatmapInfo.MD5Hash);
+
+                realm.Write(r =>
+                {
+                    r.Add(collection);
+                });
+            });
+
+            AddAssert("collection contains original beatmap", () =>
+                !string.IsNullOrEmpty(originalMd5) && collection.BeatmapMD5Hashes.Contains(originalMd5));
+
+            AddStep("create new difficulty", () => Editor.CreateNewDifficulty(new OsuRuleset().RulesetInfo));
+
+            AddUntilStep("wait for dialog", () => DialogOverlay.CurrentDialog is CreateNewDifficultyDialog);
+            AddStep("confirm creation as a copy", () => DialogOverlay.CurrentDialog!.Buttons.ElementAt(1).TriggerClick());
+
+            AddUntilStep("wait for created", () =>
+            {
+                string? difficultyName = Editor.ChildrenOfType<EditorBeatmap>().SingleOrDefault()?.BeatmapInfo.DifficultyName;
+                return difficultyName != null && difficultyName != originalDifficultyName;
+            });
+
+            AddStep("save without changes", () => Editor.Save());
+
+            AddAssert("collection still points to old beatmap", () => !collection.BeatmapMD5Hashes.Contains(EditorBeatmap.BeatmapInfo.MD5Hash)
+                                                                      && collection.BeatmapMD5Hashes.Contains(originalMd5));
+
+            AddStep("clean up collection", () =>
+            {
+                realm.Write(r =>
+                {
+                    r.Remove(collection);
+                });
+            });
+        }
+
+        [Test]
         public void TestCreateMultipleNewDifficultiesSucceeds()
         {
             Guid setId = Guid.Empty;
@@ -341,7 +470,7 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddStep("try to create new difficulty", () => Editor.CreateNewDifficulty(new OsuRuleset().RulesetInfo));
             AddUntilStep("wait for dialog", () => DialogOverlay.CurrentDialog is CreateNewDifficultyDialog);
-            AddStep("confirm creation with no objects", () => DialogOverlay.CurrentDialog.PerformOkAction());
+            AddStep("confirm creation with no objects", () => DialogOverlay.CurrentDialog!.PerformOkAction());
 
             AddUntilStep("wait for created", () =>
             {
@@ -376,7 +505,7 @@ namespace osu.Game.Tests.Visual.Editing
             if (sameRuleset)
             {
                 AddUntilStep("wait for dialog", () => DialogOverlay.CurrentDialog is CreateNewDifficultyDialog);
-                AddStep("confirm creation with no objects", () => DialogOverlay.CurrentDialog.PerformOkAction());
+                AddStep("confirm creation with no objects", () => DialogOverlay.CurrentDialog!.PerformOkAction());
             }
 
             AddUntilStep("wait for created", () =>
@@ -394,6 +523,321 @@ namespace osu.Game.Tests.Visual.Editing
                 // what we want to check is that both difficulties do not use the same file.
                 return set != null && set.PerformRead(s => s.Beatmaps.Count == 2 && s.Files.Count == 2);
             });
+        }
+
+        [Test]
+        public void TestExitBlockedWhenSavingBeatmapWithSameNamedDifficulties()
+        {
+            Guid setId = Guid.Empty;
+            const string duplicate_difficulty_name = "duplicate";
+
+            AddStep("retrieve set ID", () => setId = EditorBeatmap.BeatmapInfo.BeatmapSet!.ID);
+            AddStep("set difficulty name", () => EditorBeatmap.BeatmapInfo.DifficultyName = duplicate_difficulty_name);
+            AddStep("save beatmap", () => Editor.Save());
+            AddAssert("new beatmap persisted", () =>
+            {
+                var set = beatmapManager.QueryBeatmapSet(s => s.ID == setId);
+                return set != null && set.PerformRead(s => s.Beatmaps.Count == 1 && s.Files.Count == 1);
+            });
+
+            AddStep("create new difficulty", () => Editor.CreateNewDifficulty(new CatchRuleset().RulesetInfo));
+
+            AddUntilStep("wait for created", () =>
+            {
+                string? difficultyName = Editor.ChildrenOfType<EditorBeatmap>().SingleOrDefault()?.BeatmapInfo.DifficultyName;
+                return difficultyName != null && difficultyName != duplicate_difficulty_name;
+            });
+            AddUntilStep("wait for editor load", () => Editor.IsLoaded && DialogOverlay.IsLoaded);
+
+            AddStep("add hitobjects", () => EditorBeatmap.AddRange(new[]
+            {
+                new Fruit
+                {
+                    StartTime = 0
+                },
+                new Fruit
+                {
+                    StartTime = 1000
+                }
+            }));
+
+            AddStep("set difficulty name", () => EditorBeatmap.BeatmapInfo.DifficultyName = duplicate_difficulty_name);
+            AddUntilStep("wait for has unsaved changes", () => Editor.HasUnsavedChanges);
+
+            AddStep("exit", () => Editor.Exit());
+            AddUntilStep("wait for dialog", () => DialogOverlay.CurrentDialog is PromptForSaveDialog);
+            AddStep("attempt to save", () => DialogOverlay.CurrentDialog!.PerformOkAction());
+            AddAssert("editor is still current", () => Editor.IsCurrentScreen());
+        }
+
+        [Test]
+        public void TestCreateNewDifficultyForInconvertibleRuleset()
+        {
+            Guid setId = Guid.Empty;
+
+            AddStep("retrieve set ID", () => setId = EditorBeatmap.BeatmapInfo.BeatmapSet!.ID);
+            AddStep("save beatmap", () => Editor.Save());
+            AddStep("try to create new taiko difficulty", () => Editor.CreateNewDifficulty(new TaikoRuleset().RulesetInfo));
+
+            AddUntilStep("wait for created", () =>
+            {
+                string? difficultyName = Editor.ChildrenOfType<EditorBeatmap>().SingleOrDefault()?.BeatmapInfo.DifficultyName;
+                return difficultyName != null && difficultyName == "New Difficulty";
+            });
+            AddAssert("new difficulty persisted", () =>
+            {
+                var set = beatmapManager.QueryBeatmapSet(s => s.ID == setId);
+                return set != null && set.PerformRead(s => s.Beatmaps.Count == 2 && s.Files.Count == 2);
+            });
+
+            AddStep("add timing point", () => EditorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = 1000 }));
+            AddStep("add hitobjects", () => EditorBeatmap.AddRange(new[]
+            {
+                new Hit
+                {
+                    StartTime = 0
+                },
+                new Hit
+                {
+                    StartTime = 1000
+                }
+            }));
+            AddStep("save beatmap", () => Editor.Save());
+            AddStep("try to create new catch difficulty", () => Editor.CreateNewDifficulty(new CatchRuleset().RulesetInfo));
+
+            AddUntilStep("wait for created", () =>
+            {
+                string? difficultyName = Editor.ChildrenOfType<EditorBeatmap>().SingleOrDefault()?.BeatmapInfo.DifficultyName;
+                return difficultyName != null && difficultyName == "New Difficulty (1)";
+            });
+            AddAssert("new difficulty persisted", () =>
+            {
+                var set = beatmapManager.QueryBeatmapSet(s => s.ID == setId);
+                return set != null && set.PerformRead(s => s.Beatmaps.Count == 3 && s.Files.Count == 3);
+            });
+        }
+
+        [Test]
+        public void TestSingleBackgroundFile()
+        {
+            AddStep("enter setup mode", () => Editor.Mode.Value = EditorScreenMode.SongSetup);
+            AddAssert("set background", () => setBackground(applyToAllDifficulties: true, expected: "bg.jpg"));
+
+            createNewDifficulty();
+            createNewDifficulty();
+
+            switchToDifficulty(1);
+
+            AddAssert("set background on second diff only", () => setBackground(applyToAllDifficulties: false, expected: "bg (1).jpg"));
+            AddAssert("file added", () => Beatmap.Value.BeatmapSetInfo.Files.Any(f => f.Filename == "bg (1).jpg"));
+
+            switchToDifficulty(0);
+
+            AddAssert("set background on first diff only", () => setBackground(applyToAllDifficulties: false, expected: "bg (2).jpg"));
+            AddAssert("file added", () => Beatmap.Value.BeatmapSetInfo.Files.Any(f => f.Filename == "bg (2).jpg"));
+
+            AddAssert("set background on all diff", () => setBackground(applyToAllDifficulties: true, expected: "bg.jpg"));
+            AddAssert("all diff uses one background", () => Beatmap.Value.BeatmapSetInfo.Beatmaps.All(b => b.Metadata.BackgroundFile == "bg.jpg"));
+            AddAssert("file added", () => Beatmap.Value.BeatmapSetInfo.Files.Any(f => f.Filename == "bg.jpg"));
+            AddAssert("other files removed", () => !Beatmap.Value.BeatmapSetInfo.Files.Any(f => f.Filename == "bg (1).jpg" || f.Filename == "bg (2).jpg"));
+        }
+
+        [Test]
+        public void TestBackgroundFileChangesPreserveOnEncode()
+        {
+            AddStep("enter setup mode", () => Editor.Mode.Value = EditorScreenMode.SongSetup);
+            AddAssert("set background", () => setBackground(applyToAllDifficulties: true, expected: "bg.jpg"));
+
+            createNewDifficulty();
+            createNewDifficulty();
+
+            switchToDifficulty(0);
+
+            AddAssert("set different background on all diff", () => setBackgroundDifferentExtension(applyToAllDifficulties: true, expected: "bg.jpeg"));
+            AddAssert("all diff uses one background", () => Beatmap.Value.BeatmapSetInfo.Beatmaps.All(b => b.Metadata.BackgroundFile == "bg.jpeg"));
+            AddAssert("all diff encode same background", () =>
+            {
+                return Beatmap.Value.BeatmapSetInfo.Beatmaps.All(b =>
+                {
+                    var files = new RealmFileStore(Realm, Dependencies.Get<GameHost>().Storage);
+                    using var store = new RealmBackedResourceStore<BeatmapSetInfo>(b.BeatmapSet!.ToLive(Realm), files.Store, Realm);
+                    string[] osu = Encoding.UTF8.GetString(store.Get(b.File!.Filename)).Split(Environment.NewLine);
+                    Assert.That(osu, Does.Contain("0,0,\"bg.jpeg\",0,0"));
+                    return true;
+                });
+            });
+        }
+
+        [Test]
+        public void TestSingleAudioFile()
+        {
+            AddStep("enter setup mode", () => Editor.Mode.Value = EditorScreenMode.SongSetup);
+            AddAssert("set audio", () => setAudio(applyToAllDifficulties: true, expected: "audio.mp3"));
+
+            createNewDifficulty();
+            createNewDifficulty();
+
+            switchToDifficulty(1);
+
+            AddAssert("set audio on second diff only", () => setAudio(applyToAllDifficulties: false, expected: "audio (1).mp3"));
+            AddAssert("file added", () => Beatmap.Value.BeatmapSetInfo.Files.Any(f => f.Filename == "audio (1).mp3"));
+
+            switchToDifficulty(0);
+
+            AddAssert("set audio on first diff only", () => setAudio(applyToAllDifficulties: false, expected: "audio (2).mp3"));
+            AddAssert("file added", () => Beatmap.Value.BeatmapSetInfo.Files.Any(f => f.Filename == "audio (2).mp3"));
+
+            AddAssert("set audio on all diff", () => setAudio(applyToAllDifficulties: true, expected: "audio.mp3"));
+            AddAssert("all diff uses one audio", () => Beatmap.Value.BeatmapSetInfo.Beatmaps.All(b => b.Metadata.AudioFile == "audio.mp3"));
+            AddAssert("file added", () => Beatmap.Value.BeatmapSetInfo.Files.Any(f => f.Filename == "audio.mp3"));
+            AddAssert("other files removed", () => !Beatmap.Value.BeatmapSetInfo.Files.Any(f => f.Filename == "audio (1).mp3" || f.Filename == "audio (2).mp3"));
+        }
+
+        [Test]
+        public void TestMultipleBackgroundFiles()
+        {
+            AddStep("enter setup mode", () => Editor.Mode.Value = EditorScreenMode.SongSetup);
+            AddAssert("set background", () => setBackground(applyToAllDifficulties: false, expected: "bg.jpg"));
+
+            createNewDifficulty();
+
+            AddAssert("new difficulty uses same background", () => Beatmap.Value.Metadata.BackgroundFile == "bg.jpg");
+            AddAssert("set background", () => setBackground(applyToAllDifficulties: false, expected: "bg (1).jpg"));
+            AddAssert("new difficulty uses new background", () => Beatmap.Value.Metadata.BackgroundFile == "bg (1).jpg");
+
+            switchToDifficulty(0);
+
+            AddAssert("old difficulty uses old background", () => Beatmap.Value.Metadata.BackgroundFile == "bg.jpg");
+            AddAssert("old background not removed", () => Beatmap.Value.BeatmapSetInfo.Files.Any(f => f.Filename == "bg.jpg"));
+            AddStep("set background", () => setBackground(applyToAllDifficulties: false, expected: "bg.jpg"));
+            AddAssert("other background not removed", () => Beatmap.Value.BeatmapSetInfo.Files.Any(f => f.Filename == "bg (1).jpg"));
+        }
+
+        [Test]
+        public void TestMultipleAudioFiles()
+        {
+            AddStep("enter setup mode", () => Editor.Mode.Value = EditorScreenMode.SongSetup);
+            AddAssert("set audio", () => setAudio(applyToAllDifficulties: false, expected: "audio.mp3"));
+
+            createNewDifficulty();
+
+            AddAssert("new difficulty uses same audio", () => Beatmap.Value.Metadata.AudioFile == "audio.mp3");
+            AddStep("enter setup mode", () => Editor.Mode.Value = EditorScreenMode.SongSetup);
+            AddUntilStep("wait for load", () => Editor.ChildrenOfType<SetupScreen>().Any());
+            AddAssert("set audio", () => setAudio(applyToAllDifficulties: false, expected: "audio (1).mp3"));
+            AddAssert("new difficulty uses new audio", () => Beatmap.Value.Metadata.AudioFile == "audio (1).mp3");
+
+            switchToDifficulty(0);
+
+            AddAssert("old difficulty uses old audio", () => Beatmap.Value.Metadata.AudioFile == "audio.mp3");
+            AddAssert("old audio not removed", () => Beatmap.Value.BeatmapSetInfo.Files.Any(f => f.Filename == "audio.mp3"));
+            AddStep("set audio", () => setAudio(applyToAllDifficulties: false, expected: "audio.mp3"));
+            AddAssert("other audio not removed", () => Beatmap.Value.BeatmapSetInfo.Files.Any(f => f.Filename == "audio (1).mp3"));
+        }
+
+        private void createNewDifficulty()
+        {
+            string? currentDifficulty = null;
+
+            AddStep("save", () => Editor.Save());
+            AddStep("create new difficulty", () =>
+            {
+                currentDifficulty = EditorBeatmap.BeatmapInfo.DifficultyName;
+                Editor.CreateNewDifficulty(new OsuRuleset().RulesetInfo);
+            });
+
+            AddUntilStep("wait for dialog", () => DialogOverlay.CurrentDialog is CreateNewDifficultyDialog);
+            AddStep("confirm creation with no objects", () => DialogOverlay.CurrentDialog!.PerformOkAction());
+            AddUntilStep("wait for created", () =>
+            {
+                string? difficultyName = Editor.ChildrenOfType<EditorBeatmap>().SingleOrDefault()?.BeatmapInfo.DifficultyName;
+                return difficultyName != null && difficultyName != currentDifficulty;
+            });
+
+            AddUntilStep("wait for editor load", () => Editor.IsLoaded);
+            AddStep("enter setup mode", () => Editor.Mode.Value = EditorScreenMode.SongSetup);
+            AddUntilStep("wait for load", () => Editor.ChildrenOfType<SetupScreen>().Any());
+        }
+
+        private void switchToDifficulty(int index)
+        {
+            AddStep("save", () => Editor.Save());
+            AddStep($"switch to difficulty #{index + 1}", () =>
+                Editor.SwitchToDifficulty(Beatmap.Value.BeatmapSetInfo.Beatmaps.ElementAt(index)));
+
+            AddUntilStep("wait for editor load", () => Editor.IsLoaded);
+            AddStep("enter setup mode", () => Editor.Mode.Value = EditorScreenMode.SongSetup);
+            AddUntilStep("wait for load", () => Editor.ChildrenOfType<SetupScreen>().Any());
+        }
+
+        private bool setBackground(bool applyToAllDifficulties, string expected)
+        {
+            var setup = Editor.ChildrenOfType<SetupScreen>().First();
+
+            return setFile(TestResources.GetQuickTestBeatmapForImport(), extractedFolder =>
+            {
+                bool success = setup.ChildrenOfType<ResourcesSection>().First().ChangeBackgroundImage(
+                    new FileInfo(Path.Combine(extractedFolder, @"machinetop_background.jpg")),
+                    applyToAllDifficulties);
+
+                Assert.That(Beatmap.Value.Metadata.BackgroundFile, Is.EqualTo(expected));
+                return success;
+            });
+        }
+
+        private bool setBackgroundDifferentExtension(bool applyToAllDifficulties, string expected)
+        {
+            var setup = Editor.ChildrenOfType<SetupScreen>().First();
+
+            return setFile(TestResources.GetQuickTestBeatmapForImport(), extractedFolder =>
+            {
+                File.Move(
+                    Path.Combine(extractedFolder, @"machinetop_background.jpg"),
+                    Path.Combine(extractedFolder, @"machinetop_background.jpeg"));
+
+                bool success = setup.ChildrenOfType<ResourcesSection>().First().ChangeBackgroundImage(
+                    new FileInfo(Path.Combine(extractedFolder, @"machinetop_background.jpeg")),
+                    applyToAllDifficulties);
+
+                Assert.That(Beatmap.Value.Metadata.BackgroundFile, Is.EqualTo(expected));
+                return success;
+            });
+        }
+
+        private bool setAudio(bool applyToAllDifficulties, string expected)
+        {
+            var setup = Editor.ChildrenOfType<SetupScreen>().First();
+
+            return setFile(TestResources.GetTestBeatmapForImport(), extractedFolder =>
+            {
+                bool success = setup.ChildrenOfType<ResourcesSection>().First().ChangeAudioTrack(
+                    new FileInfo(Path.Combine(extractedFolder, "03. Renatus - Soleily 192kbps.mp3")),
+                    applyToAllDifficulties);
+
+                Assert.That(Beatmap.Value.Metadata.AudioFile, Is.EqualTo(expected));
+                return success;
+            });
+        }
+
+        private bool setFile(string archivePath, Func<string, bool> func)
+        {
+            string temp = archivePath;
+
+            string extractedFolder = $"{temp}_extracted";
+            Directory.CreateDirectory(extractedFolder);
+
+            try
+            {
+                using (var zip = ZipArchive.Open(temp))
+                    zip.WriteToDirectory(extractedFolder);
+
+                return func(extractedFolder);
+            }
+            finally
+            {
+                File.Delete(temp);
+                Directory.Delete(extractedFolder, true);
+            }
         }
     }
 }

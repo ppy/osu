@@ -1,63 +1,57 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
+using System.ComponentModel;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
-using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
+using osu.Game.Online.Rooms;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 {
-    public class RoomSpecialCategoryPill : OnlinePlayComposite
+    public partial class RoomSpecialCategoryPill : OnlinePlayPill
     {
-        private SpriteText text;
-        private PillContainer pill;
+        private readonly Room room;
 
         [Resolved]
-        private OsuColour colours { get; set; }
+        private OsuColour colours { get; set; } = null!;
 
-        public RoomSpecialCategoryPill()
-        {
-            AutoSizeAxes = Axes.Both;
-        }
+        protected override FontUsage Font => base.Font.With(weight: FontWeight.SemiBold);
 
-        [BackgroundDependencyLoader]
-        private void load()
+        public RoomSpecialCategoryPill(Room room)
         {
-            InternalChild = pill = new PillContainer
-            {
-                Background =
-                {
-                    Colour = colours.Pink,
-                    Alpha = 1
-                },
-                Child = text = new OsuSpriteText
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Font = OsuFont.GetFont(weight: FontWeight.SemiBold, size: 12),
-                    Colour = Color4.Black
-                }
-            };
+            this.room = room;
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            Category.BindValueChanged(c =>
-            {
-                text.Text = c.NewValue.GetLocalisableDescription();
+            Pill.Background.Alpha = 1;
+            TextFlow.Colour = Color4.Black;
 
-                var backgroundColour = colours.ForRoomCategory(Category.Value);
-                if (backgroundColour != null)
-                    pill.Background.Colour = backgroundColour.Value;
-            }, true);
+            room.PropertyChanged += onRoomPropertyChanged;
+            updateRoomCategory();
+        }
+
+        private void onRoomPropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(Room.Category))
+                updateRoomCategory();
+        }
+
+        private void updateRoomCategory()
+        {
+            TextFlow.Text = room.Category.GetLocalisableDescription();
+            Pill.Background.Colour = colours.ForRoomCategory(room.Category) ?? colours.Pink;
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            room.PropertyChanged -= onRoomPropertyChanged;
         }
     }
 }

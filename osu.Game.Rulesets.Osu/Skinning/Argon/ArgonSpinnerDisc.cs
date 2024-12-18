@@ -18,7 +18,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Argon
 {
-    public class ArgonSpinnerDisc : CompositeDrawable
+    public partial class ArgonSpinnerDisc : CompositeDrawable
     {
         private const float initial_scale = 1f;
         private const float idle_alpha = 0.2f;
@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
         {
             get
             {
-                int rotations = (int)(drawableSpinner.Result.RateAdjustedRotation / 360);
+                int rotations = (int)(drawableSpinner.Result.TotalRotation / 360);
 
                 if (wholeRotationCount == rotations) return false;
 

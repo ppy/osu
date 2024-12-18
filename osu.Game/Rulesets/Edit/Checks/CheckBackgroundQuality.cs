@@ -33,11 +33,11 @@ namespace osu.Game.Rulesets.Edit.Checks
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
-            string? backgroundFile = context.Beatmap.Metadata?.BackgroundFile;
-            if (backgroundFile == null)
+            string backgroundFile = context.Beatmap.Metadata.BackgroundFile;
+            if (string.IsNullOrEmpty(backgroundFile))
                 yield break;
 
-            var texture = context.WorkingBeatmap.Background;
+            var texture = context.WorkingBeatmap.GetBackground();
             if (texture == null)
                 yield break;
 

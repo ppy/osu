@@ -1,9 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
+using System.Collections.Generic;
 using System.Threading;
+using osu.Game.Audio;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Types;
 
@@ -23,28 +23,30 @@ namespace osu.Game.Rulesets.Catch.Objects
 
         private void createBananas(CancellationToken cancellationToken)
         {
-            double spacing = Duration;
+            // Int truncation added to match osu!stable.
+            int startTime = (int)StartTime;
+            int endTime = (int)EndTime;
+            float spacing = (float)(EndTime - StartTime);
             while (spacing > 100)
                 spacing /= 2;
 
             if (spacing <= 0)
                 return;
 
-            double time = StartTime;
-            int i = 0;
+            int count = 0;
 
-            while (time <= EndTime)
+            for (float time = startTime; time <= endTime; time += spacing)
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
                 AddNested(new Banana
                 {
                     StartTime = time,
-                    BananaIndex = i,
+                    BananaIndex = count,
+                    Samples = new List<HitSampleInfo> { new Banana.BananaHitSampleInfo(CreateHitSampleInfo().Volume) }
                 });
 
-                time += spacing;
-                i++;
+                count++;
             }
         }
 

@@ -16,7 +16,7 @@ using osuTK;
 
 namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
 {
-    public class PlayButton : OsuHoverContainer
+    public partial class PlayButton : OsuHoverContainer
     {
         public IBindable<double> Progress => progress;
         private readonly BindableDouble progress = new BindableDouble();
@@ -78,6 +78,8 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
         protected override void Update()
         {
             base.Update();
+
+            icon.Scale = new Vector2(DrawWidth / (BeatmapCardNormal.HEIGHT - BeatmapCard.CORNER_RADIUS));
 
             if (Playing.Value && previewTrack != null && previewTrack.TrackLoaded)
                 progress.Value = previewTrack.CurrentTime / previewTrack.Length;

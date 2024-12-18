@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System.Collections.Generic;
 using osu.Framework.Graphics;
@@ -15,7 +13,7 @@ using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneMatchLeaderboard : OnlinePlayTestScene
+    public partial class TestSceneMatchLeaderboard : OnlinePlayTestScene
     {
         public override void SetUpSteps()
         {
@@ -63,9 +61,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("create leaderboard", () =>
             {
-                SelectedRoom.Value = new Room { RoomID = { Value = 3 } };
+                SelectedRoom.Value = new Room { RoomID = 3 };
 
-                Child = new MatchLeaderboard
+                Child = new MatchLeaderboard(SelectedRoom.Value)
                 {
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,

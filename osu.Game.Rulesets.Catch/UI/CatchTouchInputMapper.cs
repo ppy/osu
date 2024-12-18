@@ -11,11 +11,10 @@ using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osuTK;
-using osuTK.Input;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
-    public class CatchTouchInputMapper : VisibilityContainer
+    public partial class CatchTouchInputMapper : VisibilityContainer
     {
         public override bool PropagatePositionalInputSubTree => true;
         public override bool PropagateNonPositionalInputSubTree => true;
@@ -35,6 +34,8 @@ namespace osu.Game.Rulesets.Catch.UI
         private void load(CatchInputManager catchInputManager, OsuColour colours)
         {
             const float width = 0.15f;
+            // Ratio between normal move area height and total input height
+            const float normal_area_height_ratio = 0.45f;
 
             keyBindingContainer = catchInputManager.KeyBindingContainer;
 
@@ -54,18 +55,18 @@ namespace osu.Game.Rulesets.Catch.UI
                             Width = width,
                             Children = new Drawable[]
                             {
-                                leftDashBox = new InputArea(TouchCatchAction.DashLeft, trackedActionSources)
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Width = 0.5f,
-                                },
                                 leftBox = new InputArea(TouchCatchAction.MoveLeft, trackedActionSources)
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Width = 0.5f,
+                                    Height = normal_area_height_ratio,
                                     Colour = colours.Gray9,
-                                    Anchor = Anchor.TopRight,
-                                    Origin = Anchor.TopRight,
+                                    Anchor = Anchor.BottomRight,
+                                    Origin = Anchor.BottomRight,
+                                },
+                                leftDashBox = new InputArea(TouchCatchAction.DashLeft, trackedActionSources)
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Height = 1 - normal_area_height_ratio,
                                 },
                             }
                         },
@@ -80,15 +81,15 @@ namespace osu.Game.Rulesets.Catch.UI
                                 rightBox = new InputArea(TouchCatchAction.MoveRight, trackedActionSources)
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Width = 0.5f,
+                                    Height = normal_area_height_ratio,
                                     Colour = colours.Gray9,
+                                    Anchor = Anchor.BottomRight,
+                                    Origin = Anchor.BottomRight,
                                 },
                                 rightDashBox = new InputArea(TouchCatchAction.DashRight, trackedActionSources)
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Width = 0.5f,
-                                    Anchor = Anchor.TopRight,
-                                    Origin = Anchor.TopRight,
+                                    Height = 1 - normal_area_height_ratio,
                                 },
                             }
                         },
@@ -104,39 +105,15 @@ namespace osu.Game.Rulesets.Catch.UI
             return false;
         }
 
-        protected override bool OnMouseDown(MouseDownEvent e)
-        {
-            return updateAction(e.Button, getTouchCatchActionFromInput(e.ScreenSpaceMousePosition));
-        }
-
         protected override bool OnTouchDown(TouchDownEvent e)
         {
             return updateAction(e.Touch.Source, getTouchCatchActionFromInput(e.ScreenSpaceTouch.Position));
-        }
-
-        protected override bool OnMouseMove(MouseMoveEvent e)
-        {
-            Show();
-
-            TouchCatchAction? action = getTouchCatchActionFromInput(e.ScreenSpaceMousePosition);
-
-            // multiple mouse buttons may be pressed and handling the same action.
-            foreach (MouseButton button in e.PressedButtons)
-                updateAction(button, action);
-
-            return false;
         }
 
         protected override void OnTouchMove(TouchMoveEvent e)
         {
             updateAction(e.Touch.Source, getTouchCatchActionFromInput(e.ScreenSpaceTouch.Position));
             base.OnTouchMove(e);
-        }
-
-        protected override void OnMouseUp(MouseUpEvent e)
-        {
-            updateAction(e.Button, null);
-            base.OnMouseUp(e);
         }
 
         protected override void OnTouchUp(TouchUpEvent e)
@@ -203,7 +180,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
         protected override void PopOut() => mainContent.FadeOut(300, Easing.OutQuint);
 
-        private class InputArea : CompositeDrawable, IKeyBindingHandler<CatchAction>
+        private partial class InputArea : CompositeDrawable, IKeyBindingHandler<CatchAction>
         {
             private readonly TouchCatchAction handledAction;
 

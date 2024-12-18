@@ -18,7 +18,7 @@ using osuTK;
 
 namespace osu.Game.Graphics.Cursor
 {
-    public class MenuCursorContainer : CursorContainer
+    public partial class MenuCursorContainer : CursorContainer
     {
         private readonly IBindable<bool> screenshotCursorVisibility = new Bindable<bool>(true);
         public override bool IsPresent => screenshotCursorVisibility.Value && base.IsPresent;
@@ -157,7 +157,7 @@ namespace osu.Game.Graphics.Cursor
                 if (dragRotationState == DragRotationState.Rotating && distance > 0)
                 {
                     Vector2 offset = e.MousePosition - positionMouseDown;
-                    float degrees = MathUtils.RadiansToDegrees(MathF.Atan2(-offset.X, offset.Y)) + 24.3f;
+                    float degrees = float.RadiansToDegrees(MathF.Atan2(-offset.X, offset.Y)) + 24.3f;
 
                     // Always rotate in the direction of least distance
                     float diff = (degrees - activeCursor.Rotation) % 360;
@@ -220,12 +220,16 @@ namespace osu.Game.Graphics.Cursor
         {
             activeCursor.FadeTo(1, 250, Easing.OutQuint);
             activeCursor.ScaleTo(1, 400, Easing.OutQuint);
+            activeCursor.RotateTo(0, 400, Easing.OutQuint);
+            dragRotationState = DragRotationState.NotDragging;
         }
 
         protected override void PopOut()
         {
             activeCursor.FadeTo(0, 250, Easing.OutQuint);
             activeCursor.ScaleTo(0.6f, 250, Easing.In);
+            activeCursor.RotateTo(0, 400, Easing.OutQuint);
+            dragRotationState = DragRotationState.NotDragging;
         }
 
         private void playTapSample(double baseFrequency = 1f)
@@ -234,14 +238,14 @@ namespace osu.Game.Graphics.Cursor
             SampleChannel channel = tapSample.GetChannel();
 
             // Scale to [-0.75, 0.75] so that the sample isn't fully panned left or right (sounds weird)
-            channel.Balance.Value = ((activeCursor.X / DrawWidth) * 2 - 1) * 0.75;
+            channel.Balance.Value = ((activeCursor.X / DrawWidth) * 2 - 1) * OsuGameBase.SFX_STEREO_STRENGTH;
             channel.Frequency.Value = baseFrequency - (random_range / 2f) + RNG.NextDouble(random_range);
             channel.Volume.Value = baseFrequency;
 
             channel.Play();
         }
 
-        public class Cursor : Container
+        public partial class Cursor : Container
         {
             private Container cursorContainer = null!;
             private Bindable<float> cursorScale = null!;
@@ -284,7 +288,7 @@ namespace osu.Game.Graphics.Cursor
             }
         }
 
-        private class MouseInputDetector : Component
+        private partial class MouseInputDetector : Component
         {
             /// <summary>
             /// Whether the last input applied to the game is sourced from mouse.

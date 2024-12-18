@@ -12,7 +12,7 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Input
 {
-    public class JoystickSettings : SettingsSubsection
+    public partial class JoystickSettings : SettingsSubsection
     {
         protected override LocalisableString Header => JoystickSettingsStrings.JoystickGamepad;
 

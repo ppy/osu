@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System;
 using System.Collections.Generic;
@@ -156,7 +154,7 @@ namespace osu.Game.Rulesets.Catch.Tests
                     } while (rng.Next(2) != 0);
 
                     int length = sliderPath.ControlPoints.Count - start + 1;
-                    sliderPath.ControlPoints[start].Type = length <= 2 ? PathType.Linear : length == 3 ? PathType.PerfectCurve : PathType.Bezier;
+                    sliderPath.ControlPoints[start].Type = length <= 2 ? PathType.LINEAR : length == 3 ? PathType.PERFECT_CURVE : PathType.BEZIER;
                 } while (rng.Next(3) != 0);
 
                 if (rng.Next(5) == 0)
@@ -217,7 +215,7 @@ namespace osu.Game.Rulesets.Catch.Tests
 
                 foreach (var point in sliderPath.ControlPoints)
                 {
-                    Assert.That(point.Type, Is.EqualTo(PathType.Linear).Or.Null);
+                    Assert.That(point.Type, Is.EqualTo(PathType.LINEAR).Or.Null);
                     Assert.That(sliderStartY + point.Position.Y, Is.InRange(0, JuiceStreamPath.OSU_PLAYFIELD_HEIGHT));
                 }
 

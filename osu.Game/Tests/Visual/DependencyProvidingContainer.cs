@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System;
 using osu.Framework.Allocation;
@@ -15,13 +13,12 @@ namespace osu.Game.Tests.Visual
     /// <remarks>
     /// The <see cref="CachedDependencies"/> must be set while this <see cref="DependencyProvidingContainer"/> is not loaded.
     /// </remarks>
-    public class DependencyProvidingContainer : Container
+    public partial class DependencyProvidingContainer : Container
     {
         /// <summary>
         /// The dependencies provided to the children.
         /// </summary>
-        // TODO: should be an init-only property when C# 9
-        public (Type, object)[] CachedDependencies { get; set; } = Array.Empty<(Type, object)>();
+        public (Type, object)[] CachedDependencies { get; init; } = Array.Empty<(Type, object)>();
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {

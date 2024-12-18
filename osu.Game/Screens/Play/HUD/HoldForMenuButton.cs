@@ -16,6 +16,7 @@ using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -25,11 +26,15 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public class HoldForMenuButton : FillFlowContainer
+    public partial class HoldForMenuButton : FillFlowContainer
     {
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
+        public override bool PropagatePositionalInputSubTree => alwaysShow.Value || touchActive.Value;
+
         public readonly Bindable<bool> IsPaused = new Bindable<bool>();
+
+        public readonly Bindable<bool> ReplayLoaded = new Bindable<bool>();
 
         private HoldButton button;
 
@@ -37,15 +42,19 @@ namespace osu.Game.Screens.Play.HUD
 
         private OsuSpriteText text;
 
+        private Bindable<bool> alwaysShow;
+
         public HoldForMenuButton()
         {
             Direction = FillDirection.Horizontal;
             Spacing = new Vector2(20, 0);
             Margin = new MarginPadding(10);
+
+            AlwaysPresent = true;
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(Player player)
+        private void load(Player player, OsuConfigManager config)
         {
             Children = new Drawable[]
             {
@@ -60,11 +69,20 @@ namespace osu.Game.Screens.Play.HUD
                     HoverGained = () => text.FadeIn(500, Easing.OutQuint),
                     HoverLost = () => text.FadeOut(500, Easing.OutQuint),
                     IsPaused = { BindTarget = IsPaused },
+                    ReplayLoaded = { BindTarget = ReplayLoaded },
                     Action = () => Action(),
                 }
             };
+
             AutoSizeAxes = Axes.Both;
+
+            alwaysShow = config.GetBindable<bool>(OsuSetting.AlwaysShowHoldForMenuButton);
         }
+
+        [Resolved]
+        private SessionStatics sessionStatics { get; set; }
+
+        private Bindable<bool> touchActive;
 
         protected override void LoadComplete()
         {
@@ -75,7 +93,20 @@ namespace osu.Game.Screens.Play.HUD
                     : "press for menu";
             }, true);
 
-            text.FadeInFromZero(500, Easing.OutQuint).Delay(1500).FadeOut(500, Easing.OutQuint);
+            touchActive = sessionStatics.GetBindable<bool>(Static.TouchInputActive);
+
+            if (touchActive.Value)
+            {
+                Alpha = 1f;
+                text.FadeInFromZero(500, Easing.OutQuint)
+                    .Delay(1500)
+                    .FadeOut(500, Easing.OutQuint);
+            }
+            else
+            {
+                Alpha = 0;
+                text.Alpha = 0f;
+            }
 
             base.LoadComplete();
         }
@@ -84,7 +115,7 @@ namespace osu.Game.Screens.Play.HUD
 
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
-            positionalAdjust = Vector2.Distance(e.MousePosition, button.ToSpaceOfOtherDrawable(button.DrawRectangle.Centre, Parent)) / 100;
+            positionalAdjust = Vector2.Distance(e.MousePosition, button.ToSpaceOfOtherDrawable(button.DrawRectangle.Centre, Parent!)) / 100;
             return base.OnMouseMove(e);
         }
 
@@ -92,23 +123,34 @@ namespace osu.Game.Screens.Play.HUD
         {
             base.Update();
 
+            // While the button is hovered or still animating, keep fully visible.
             if (text.Alpha > 0 || button.Progress.Value > 0 || button.IsHovered)
                 Alpha = 1;
-            else
+            // When touch input is detected, keep visible at a constant opacity.
+            else if (touchActive.Value)
+                Alpha = 0.5f;
+            // Otherwise, if the user chooses, show it when the mouse is nearby.
+            else if (alwaysShow.Value)
             {
+                float minAlpha = touchActive.Value ? .08f : 0;
+
                 Alpha = Interpolation.ValueAt(
                     Math.Clamp(Clock.ElapsedFrameTime, 0, 200),
-                    Alpha, Math.Clamp(1 - positionalAdjust, 0.04f, 1), 0, 200, Easing.OutQuint);
+                    Alpha, Math.Clamp(1 - positionalAdjust, minAlpha, 1), 0, 200, Easing.OutQuint);
             }
+            else
+                Alpha = 0;
         }
 
-        private class HoldButton : HoldToConfirmContainer, IKeyBindingHandler<GlobalAction>
+        private partial class HoldButton : HoldToConfirmContainer, IKeyBindingHandler<GlobalAction>
         {
             private SpriteIcon icon;
             private CircularProgress circularProgress;
             private Circle overlayCircle;
 
             public readonly Bindable<bool> IsPaused = new Bindable<bool>();
+
+            public readonly Bindable<bool> ReplayLoaded = new Bindable<bool>();
 
             protected override bool AllowMultipleFires => true;
 
@@ -120,14 +162,18 @@ namespace osu.Game.Screens.Play.HUD
             private bool pendingAnimation;
             private ScheduledDelegate shakeOperation;
 
+            private Bindable<bool> alwaysRequireHold;
+
             public HoldButton(bool isDangerousAction)
                 : base(isDangerousAction)
             {
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            private void load(OsuColour colours, OsuConfigManager config)
             {
+                alwaysRequireHold = config.GetBindable<bool>(OsuSetting.AlwaysRequireHoldingForPause);
+
                 Size = new Vector2(60);
 
                 Child = new CircularContainer
@@ -169,9 +215,14 @@ namespace osu.Game.Screens.Play.HUD
                 bind();
             }
 
+            protected override void Update()
+            {
+                base.Update();
+                circularProgress.Progress = Progress.Value;
+            }
+
             private void bind()
             {
-                ((IBindable<double>)circularProgress.Current).BindTo(Progress);
                 Progress.ValueChanged += progress =>
                 {
                     icon.Scale = new Vector2(1 + (float)progress.NewValue * 0.2f);
@@ -251,9 +302,28 @@ namespace osu.Game.Screens.Play.HUD
                 switch (e.Action)
                 {
                     case GlobalAction.Back:
-                    case GlobalAction.PauseGameplay: // in the future this behaviour will differ for replays etc.
                         if (!pendingAnimation)
-                            BeginConfirm();
+                        {
+                            if (IsDangerousAction || alwaysRequireHold.Value)
+                                BeginConfirm();
+                            else
+                                Confirm();
+                        }
+
+                        return true;
+
+                    case GlobalAction.PauseGameplay:
+                        // handled by replay player
+                        if (ReplayLoaded.Value) return false;
+
+                        if (!pendingAnimation)
+                        {
+                            if (IsDangerousAction || alwaysRequireHold.Value)
+                                BeginConfirm();
+                            else
+                                Confirm();
+                        }
+
                         return true;
                 }
 
@@ -265,7 +335,12 @@ namespace osu.Game.Screens.Play.HUD
                 switch (e.Action)
                 {
                     case GlobalAction.Back:
+                        AbortConfirm();
+                        break;
+
                     case GlobalAction.PauseGameplay:
+                        if (ReplayLoaded.Value) return;
+
                         AbortConfirm();
                         break;
                 }

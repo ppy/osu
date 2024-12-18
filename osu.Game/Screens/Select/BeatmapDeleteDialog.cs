@@ -7,20 +7,20 @@ using osu.Game.Overlays.Dialog;
 
 namespace osu.Game.Screens.Select
 {
-    public class BeatmapDeleteDialog : DeleteConfirmationDialog
+    public partial class BeatmapDeleteDialog : DeletionDialog
     {
         private readonly BeatmapSetInfo beatmapSet;
 
         public BeatmapDeleteDialog(BeatmapSetInfo beatmapSet)
         {
             this.beatmapSet = beatmapSet;
-            BodyText = $@"{beatmapSet.Metadata.Artist} - {beatmapSet.Metadata.Title}";
+            BodyText = beatmapSet.Metadata.GetDisplayTitleRomanisable(false);
         }
 
         [BackgroundDependencyLoader]
         private void load(BeatmapManager beatmapManager)
         {
-            DeleteAction = () => beatmapManager.Delete(beatmapSet);
+            DangerousAction = () => beatmapManager.Delete(beatmapSet);
         }
     }
 }

@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -21,18 +19,17 @@ using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Spectator;
 using osu.Game.Replays.Legacy;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Scoring;
 using osu.Game.Screens.Play.HUD;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public abstract class MultiplayerGameplayLeaderboardTestScene : OsuTestScene
+    public abstract partial class MultiplayerGameplayLeaderboardTestScene : OsuTestScene
     {
         protected const int TOTAL_USERS = 16;
 
         protected readonly BindableList<MultiplayerRoomUser> MultiplayerUsers = new BindableList<MultiplayerRoomUser>();
 
-        protected MultiplayerGameplayLeaderboard Leaderboard { get; private set; }
+        protected MultiplayerGameplayLeaderboard? Leaderboard { get; private set; }
 
         protected virtual MultiplayerRoomUser CreateUser(int userId) => new MultiplayerRoomUser(userId);
 
@@ -41,7 +38,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private readonly BindableList<int> multiplayerUserIds = new BindableList<int>();
         private readonly BindableDictionary<int, SpectatorState> watchedUserStates = new BindableDictionary<int, SpectatorState>();
 
-        private OsuConfigManager config;
+        private OsuConfigManager config = null!;
 
         private readonly Mock<SpectatorClient> spectatorClient = new Mock<SpectatorClient>();
         private readonly Mock<MultiplayerClient> multiplayerClient = new Mock<MultiplayerClient>();
@@ -117,11 +114,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         BeatmapID = 0,
                         RulesetID = 0,
                         Mods = user.Mods,
-                        MaximumScoringValues = new ScoringValues
+                        MaximumStatistics = new Dictionary<HitResult, int>
                         {
-                            BaseScore = 10000,
-                            MaxCombo = 1000,
-                            CountBasicHitObjects = 1000
+                            { HitResult.Perfect, 100 }
                         }
                     };
                 }
@@ -136,7 +131,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 LoadComponentAsync(Leaderboard = CreateLeaderboard(), Add);
             });
 
-            AddUntilStep("wait for load", () => Leaderboard.IsLoaded);
+            AddUntilStep("wait for load", () => Leaderboard!.IsLoaded);
 
             AddStep("check watch requests were sent", () =>
             {
@@ -149,7 +144,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public void TestScoreUpdates()
         {
             AddRepeatStep("update state", UpdateUserStatesRandomly, 100);
-            AddToggleStep("switch compact mode", expanded => Leaderboard.Expanded.Value = expanded);
+            AddToggleStep("switch compact mode", expanded => Leaderboard!.Expanded.Value = expanded);
         }
 
         [Test]
@@ -190,15 +185,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                 if (!lastHeaders.TryGetValue(userId, out var header))
                 {
-                    lastHeaders[userId] = header = new FrameHeader(new ScoreInfo
+                    lastHeaders[userId] = header = new FrameHeader(0, 0, 0, 0, new Dictionary<HitResult, int>
                     {
-                        Statistics = new Dictionary<HitResult, int>
-                        {
-                            [HitResult.Miss] = 0,
-                            [HitResult.Meh] = 0,
-                            [HitResult.Great] = 0
-                        }
-                    });
+                        [HitResult.Miss] = 0,
+                        [HitResult.Meh] = 0,
+                        [HitResult.Great] = 0
+                    }, new ScoreProcessorStatistics(), DateTimeOffset.Now);
                 }
 
                 switch (RNG.Next(0, 3))

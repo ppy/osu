@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Containers;
@@ -22,7 +21,7 @@ namespace osu.Game.Graphics.Containers
     ///
     /// This container will also trigger beat events when the beat matching clock is paused at <see cref="TimingControlPoint.DEFAULT"/>'s BPM.
     /// </remarks>
-    public class BeatSyncedContainer : Container
+    public partial class BeatSyncedContainer : Container
     {
         private int lastBeat;
 
@@ -86,15 +85,22 @@ namespace osu.Game.Graphics.Containers
             TimingControlPoint timingPoint;
             EffectControlPoint effectPoint;
 
-            IsBeatSyncedWithTrack = BeatSyncSource.CheckBeatSyncAvailable() && BeatSyncSource.Clock?.IsRunning == true;
+            IsBeatSyncedWithTrack = BeatSyncSource.Clock.IsRunning;
 
             double currentTrackTime;
 
             if (IsBeatSyncedWithTrack)
             {
-                Debug.Assert(BeatSyncSource.Clock != null);
+                double early = EarlyActivationMilliseconds;
 
-                currentTrackTime = BeatSyncSource.Clock.CurrentTime + EarlyActivationMilliseconds;
+                // In the case of gameplay, we are usually within a hierarchy with the correct rate applied to our `Drawable.Clock`.
+                // This means that the amount of early adjustment is adjusted in line with audio track rate changes.
+                // But other cases like the osu! logo at the main menu won't correctly have this rate information.
+                // We can adjust here to ensure the applied early activation always matches expectations.
+                if (Clock.Rate > 0)
+                    early *= BeatSyncSource.Clock.Rate / Clock.Rate;
+
+                currentTrackTime = BeatSyncSource.Clock.CurrentTime + early;
 
                 timingPoint = BeatSyncSource.ControlPoints?.TimingPointAt(currentTrackTime) ?? TimingControlPoint.DEFAULT;
                 effectPoint = BeatSyncSource.ControlPoints?.EffectPointAt(currentTrackTime) ?? EffectControlPoint.DEFAULT;
@@ -114,7 +120,7 @@ namespace osu.Game.Graphics.Containers
             while (beatLength < MinimumBeatLength)
                 beatLength *= 2;
 
-            int beatIndex = (int)((currentTrackTime - timingPoint.Time) / beatLength) - (effectPoint.OmitFirstBarLine ? 1 : 0);
+            int beatIndex = (int)((currentTrackTime - timingPoint.Time) / beatLength) - (timingPoint.OmitFirstBarLine ? 1 : 0);
 
             // The beats before the start of the first control point are off by 1, this should do the trick
             if (currentTrackTime < timingPoint.Time)

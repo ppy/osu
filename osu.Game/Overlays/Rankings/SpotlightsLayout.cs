@@ -21,7 +21,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Rankings
 {
-    public class SpotlightsLayout : CompositeDrawable
+    public partial class SpotlightsLayout : CompositeDrawable
     {
         public readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
 

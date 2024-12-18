@@ -1,8 +1,8 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
+using System;
+using System.ComponentModel;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -10,17 +10,24 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Utils;
 using osu.Game.Rulesets.UI.Scrolling;
 using osuTK;
 using osuTK.Graphics;
+using Container = osu.Framework.Graphics.Containers.Container;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
     /// <summary>
-    /// A <see cref="Container"/> that has its contents partially hidden by an adjustable "cover". This is intended to be used in a playfield.
+    /// A <see cref="Framework.Graphics.Containers.Container"/> that has its contents partially hidden by an adjustable "cover". This is intended to be used in a playfield.
     /// </summary>
-    public class PlayfieldCoveringWrapper : CompositeDrawable
+    public partial class PlayfieldCoveringWrapper : CompositeDrawable
     {
+        /// <summary>
+        /// The relative area that should be completely covered. This does not include the fade.
+        /// </summary>
+        public readonly BindableFloat Coverage = new BindableFloat();
+
         /// <summary>
         /// The complete cover, including gradient and fill.
         /// </summary>
@@ -37,6 +44,8 @@ namespace osu.Game.Rulesets.Mania.UI
         private readonly Box filled;
 
         private readonly IBindable<ScrollingDirection> scrollDirection = new Bindable<ScrollingDirection>();
+
+        private float currentCoverageHeight;
 
         public PlayfieldCoveringWrapper(Drawable content)
         {
@@ -96,20 +105,45 @@ namespace osu.Game.Rulesets.Mania.UI
             scrollDirection.BindValueChanged(onScrollDirectionChanged, true);
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            updateCoverSize(true);
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+            updateCoverSize(false);
+        }
+
+        private void updateCoverSize(bool instant)
+        {
+            float targetCoverage;
+            float targetAlpha;
+
+            if (instant)
+            {
+                targetCoverage = Coverage.Value;
+                targetAlpha = Coverage.Value > 0 ? 1 : 0;
+            }
+            else
+            {
+                targetCoverage = (float)Interpolation.DampContinuously(currentCoverageHeight, Coverage.Value, 25, Math.Abs(Time.Elapsed));
+                targetAlpha = (float)Interpolation.DampContinuously(gradient.Alpha, Coverage.Value > 0 ? 1 : 0, 25, Math.Abs(Time.Elapsed));
+            }
+
+            filled.Height = GetHeight(targetCoverage);
+            gradient.Y = -GetHeight(targetCoverage);
+            gradient.Alpha = targetAlpha;
+
+            currentCoverageHeight = targetCoverage;
+        }
+
+        protected virtual float GetHeight(float coverage) => coverage;
+
         private void onScrollDirectionChanged(ValueChangedEvent<ScrollingDirection> direction)
             => cover.Rotation = direction.NewValue == ScrollingDirection.Up ? 0 : 180f;
-
-        /// <summary>
-        /// The relative area that should be completely covered. This does not include the fade.
-        /// </summary>
-        public float Coverage
-        {
-            set
-            {
-                filled.Height = value;
-                gradient.Y = -value;
-            }
-        }
 
         /// <summary>
         /// The direction in which the cover expands.
@@ -125,11 +159,13 @@ namespace osu.Game.Rulesets.Mania.UI
         /// <summary>
         /// The cover expands along the scrolling direction.
         /// </summary>
+        [Description("Along scroll")]
         AlongScroll,
 
         /// <summary>
         /// The cover expands against the scrolling direction.
         /// </summary>
+        [Description("Against scroll")]
         AgainstScroll
     }
 }

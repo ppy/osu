@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using osu.Framework.Bindables;
 using osu.Game.Database;
@@ -18,7 +16,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
         /// <summary>
         /// The cached <see cref="Room"/>.
         /// </summary>
-        Bindable<Room> SelectedRoom { get; }
+        Bindable<Room?> SelectedRoom { get; }
 
         /// <summary>
         /// The cached <see cref="IRoomManager"/>

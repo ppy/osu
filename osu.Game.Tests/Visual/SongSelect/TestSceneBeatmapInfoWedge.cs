@@ -1,11 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using JetBrains.Annotations;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -14,13 +12,14 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Extensions;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Legacy;
-using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Taiko;
@@ -30,17 +29,13 @@ using osuTK;
 namespace osu.Game.Tests.Visual.SongSelect
 {
     [TestFixture]
-    public class TestSceneBeatmapInfoWedge : OsuTestScene
+    public partial class TestSceneBeatmapInfoWedge : OsuTestScene
     {
-        private RulesetStore rulesets;
-        private TestBeatmapInfoWedge infoWedge;
-        private readonly List<IBeatmap> beatmaps = new List<IBeatmap>();
+        [Resolved]
+        private RulesetStore rulesets { get; set; } = null!;
 
-        [BackgroundDependencyLoader]
-        private void load(RulesetStore rulesets)
-        {
-            this.rulesets = rulesets;
-        }
+        private TestBeatmapInfoWedge infoWedge = null!;
+        private readonly List<IBeatmap> beatmaps = new List<IBeatmap>();
 
         protected override void LoadComplete()
         {
@@ -153,7 +148,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             IBeatmap beatmap = createTestBeatmap(new OsuRuleset().RulesetInfo);
             beatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = 60 * 1000 / bpm });
 
-            OsuModDoubleTime doubleTime = null;
+            OsuModDoubleTime doubleTime = null!;
 
             selectBeatmap(beatmap);
             checkDisplayedBPM($"{bpm}");
@@ -170,7 +165,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         [TestCase(120, 120.4, null, "120")]
         [TestCase(120, 120.6, "DT", "180-182 (mostly 180)")]
         [TestCase(120, 120.4, "DT", "180")]
-        public void TestVaryingBPM(double commonBpm, double otherBpm, string mod, string expectedDisplay)
+        public void TestVaryingBPM(double commonBpm, double otherBpm, string? mod, string expectedDisplay)
         {
             IBeatmap beatmap = createTestBeatmap(new OsuRuleset().RulesetInfo);
             beatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = 60 * 1000 / commonBpm });
@@ -188,14 +183,45 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             AddUntilStep($"displayed bpm is {target}", () =>
             {
-                var label = infoWedge.DisplayedContent.ChildrenOfType<BeatmapInfoWedge.WedgeInfoText.InfoLabel>().Single(l => l.Statistic.Name == "BPM");
+                var label = infoWedge.DisplayedContent.ChildrenOfType<BeatmapInfoWedge.WedgeInfoText.InfoLabel>().Single(l => l.Statistic.Name == BeatmapsetsStrings.ShowStatsBpm);
                 return label.Statistic.Content == target;
+            });
+        }
+
+        [TestCase]
+        public void TestLengthUpdates()
+        {
+            IBeatmap beatmap = createTestBeatmap(new OsuRuleset().RulesetInfo);
+            double drain = beatmap.CalculateDrainLength();
+            beatmap.BeatmapInfo.Length = drain;
+
+            OsuModDoubleTime doubleTime = null!;
+
+            selectBeatmap(beatmap);
+            checkDisplayedLength(drain);
+
+            AddStep("select DT", () => SelectedMods.Value = new[] { doubleTime = new OsuModDoubleTime() });
+            checkDisplayedLength(Math.Round(drain / 1.5f));
+
+            AddStep("change DT rate", () => doubleTime.SpeedChange.Value = 2);
+            checkDisplayedLength(Math.Round(drain / 2));
+        }
+
+        private void checkDisplayedLength(double drain)
+        {
+            var displayedLength = drain.ToFormattedDuration();
+
+            AddUntilStep($"check map drain ({displayedLength})", () =>
+            {
+                var label = infoWedge.DisplayedContent.ChildrenOfType<BeatmapInfoWedge.WedgeInfoText.InfoLabel>()
+                                     .Single(l => l.Statistic.Name == BeatmapsetsStrings.ShowStatsTotalLength(displayedLength));
+                return label.Statistic.Content == displayedLength.ToString();
             });
         }
 
         private void setRuleset(RulesetInfo rulesetInfo)
         {
-            Container containerBefore = null;
+            Container? containerBefore = null;
 
             AddStep("set ruleset", () =>
             {
@@ -209,9 +235,9 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddUntilStep("wait for async load", () => infoWedge.DisplayedContent != containerBefore);
         }
 
-        private void selectBeatmap([CanBeNull] IBeatmap b)
+        private void selectBeatmap(IBeatmap? b)
         {
-            Container containerBefore = null;
+            Container? containerBefore = null;
 
             AddStep($"select {b?.Metadata.Title ?? "null"} beatmap", () =>
             {
@@ -267,18 +293,13 @@ namespace osu.Game.Tests.Visual.SongSelect
             };
         }
 
-        private class TestBeatmapInfoWedge : BeatmapInfoWedge
+        private partial class TestBeatmapInfoWedge : BeatmapInfoWedge
         {
             public new Container DisplayedContent => base.DisplayedContent;
 
             public new WedgeInfoText Info => base.Info;
         }
 
-        private class TestHitObject : ConvertHitObject, IHasPosition
-        {
-            public float X => 0;
-            public float Y => 0;
-            public Vector2 Position { get; } = Vector2.Zero;
-        }
+        private class TestHitObject : ConvertHitObject;
     }
 }

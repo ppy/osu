@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override LocalisableString Description => "Burn the notes into your memory.";
 
         //Alters the transforms of the approach circles, breaking the effects of these mods.
-        public override Type[] IncompatibleMods => new[] { typeof(OsuModApproachDifferent) };
+        public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(OsuModApproachDifferent), typeof(OsuModTransform), typeof(OsuModDepth) }).ToArray();
 
         public override ModType Type => ModType.Fun;
 
@@ -56,6 +56,8 @@ namespace osu.Game.Rulesets.Osu.Mods
                 {
                     switch (nested)
                     {
+                        //Freezing the SliderTicks doesnt play well with snaking sliders
+                        case SliderTick:
                         //SliderRepeat wont layer correctly if preempt is changed.
                         case SliderRepeat:
                             break;

@@ -14,7 +14,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Beatmaps.Drawables.Cards
 {
-    public class CollapsibleButtonContainer : Container
+    public partial class CollapsibleButtonContainer : Container
     {
         public Bindable<bool> ShowDetails = new Bindable<bool>();
         public Bindable<BeatmapSetFavouriteState> FavouriteState = new Bindable<BeatmapSetFavouriteState>();
@@ -77,7 +77,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                 downloadTracker,
                 background = new Container
                 {
-                    RelativeSizeAxes = Axes.Both,
+                    RelativeSizeAxes = Axes.Y,
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
                     Child = new Box
@@ -165,9 +165,13 @@ namespace osu.Game.Beatmaps.Drawables.Cards
 
         private void updateState()
         {
-            float targetWidth = Width - (ShowDetails.Value ? ButtonsExpandedWidth : ButtonsCollapsedWidth);
+            float buttonAreaWidth = ShowDetails.Value ? ButtonsExpandedWidth : ButtonsCollapsedWidth;
+            float mainAreaWidth = Width - buttonAreaWidth;
 
-            mainArea.ResizeWidthTo(targetWidth, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
+            mainArea.ResizeWidthTo(mainAreaWidth, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
+
+            // By limiting the width we avoid this box showing up as an outline around the drawables that are on top of it.
+            background.ResizeWidthTo(buttonAreaWidth + BeatmapCard.CORNER_RADIUS, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
 
             background.FadeColour(downloadTracker.State.Value == DownloadState.LocallyAvailable ? colours.Lime0 : colourProvider.Background3, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
             buttons.FadeTo(ShowDetails.Value ? 1 : 0, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);

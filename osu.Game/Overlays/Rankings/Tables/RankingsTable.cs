@@ -20,10 +20,9 @@ using osu.Framework.Localisation;
 
 namespace osu.Game.Overlays.Rankings.Tables
 {
-    public abstract class RankingsTable<TModel> : TableContainer
+    public abstract partial class RankingsTable<TModel> : TableContainer
     {
         protected const int TEXT_SIZE = 12;
-        private const float horizontal_inset = 20;
         private const float row_height = 32;
         private const float row_spacing = 3;
         private const int items_per_page = 50;
@@ -39,7 +38,7 @@ namespace osu.Game.Overlays.Rankings.Tables
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
-            Padding = new MarginPadding { Horizontal = horizontal_inset };
+            Padding = new MarginPadding { Horizontal = WaveOverlayContainer.HORIZONTAL_PADDING };
             RowSize = new Dimension(GridSizeMode.Absolute, row_height + row_spacing);
         }
 
@@ -100,7 +99,6 @@ namespace osu.Game.Overlays.Rankings.Tables
                 new UpdateableFlag(GetCountryCode(item))
                 {
                     Size = new Vector2(28, 20),
-                    ShowPlaceholderOnUnknown = false,
                 },
                 CreateFlagContent(item)
             }
@@ -119,7 +117,7 @@ namespace osu.Game.Overlays.Rankings.Tables
             public virtual HeaderText CreateHeaderText() => new HeaderText(Header, Highlighted);
         }
 
-        protected class HeaderText : OsuSpriteText
+        protected partial class HeaderText : OsuSpriteText
         {
             private readonly bool isHighlighted;
 
@@ -140,7 +138,7 @@ namespace osu.Game.Overlays.Rankings.Tables
             }
         }
 
-        protected class RowText : OsuSpriteText
+        protected partial class RowText : OsuSpriteText
         {
             public RowText()
             {
@@ -149,7 +147,7 @@ namespace osu.Game.Overlays.Rankings.Tables
             }
         }
 
-        protected class ColouredRowText : RowText
+        protected partial class ColouredRowText : RowText
         {
             [BackgroundDependencyLoader]
             private void load(OverlayColourProvider colourProvider)

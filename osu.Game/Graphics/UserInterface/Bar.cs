@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osuTK;
 using osuTK.Graphics;
@@ -12,7 +10,7 @@ using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class Bar : Container, IHasAccentColour
+    public partial class Bar : Container, IHasAccentColour
     {
         private readonly Box background;
         private readonly Box bar;
@@ -109,15 +107,11 @@ namespace osu.Game.Graphics.UserInterface
         }
     }
 
-    [Flags]
     public enum BarDirection
     {
-        LeftToRight = 1,
-        RightToLeft = 1 << 1,
-        TopToBottom = 1 << 2,
-        BottomToTop = 1 << 3,
-
-        Vertical = TopToBottom | BottomToTop,
-        Horizontal = LeftToRight | RightToLeft,
+        LeftToRight,
+        RightToLeft,
+        TopToBottom,
+        BottomToTop
     }
 }

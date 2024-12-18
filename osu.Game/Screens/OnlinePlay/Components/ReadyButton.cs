@@ -1,19 +1,17 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Localisation;
-using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Online;
 using osu.Game.Online.Rooms;
 
 namespace osu.Game.Screens.OnlinePlay.Components
 {
-    public abstract class ReadyButton : TriangleButton, IHasTooltip
+    public abstract partial class ReadyButton : RoundedButton, IHasTooltip
     {
         public new readonly BindableBool Enabled = new BindableBool();
 
@@ -23,8 +21,8 @@ namespace osu.Game.Screens.OnlinePlay.Components
         private void load(OnlinePlayBeatmapAvailabilityTracker beatmapTracker)
         {
             availability.BindTo(beatmapTracker.Availability);
-
             availability.BindValueChanged(_ => updateState());
+
             Enabled.BindValueChanged(_ => updateState(), true);
         }
 
@@ -35,7 +33,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
         {
             get
             {
-                if (Enabled.Value)
+                if (base.Enabled.Value)
                     return string.Empty;
 
                 if (availability.Value.State != DownloadState.LocallyAvailable)

@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Utils;
 
 namespace osu.Game.Audio
@@ -19,10 +20,25 @@ namespace osu.Game.Audio
         public const string HIT_FINISH = @"hitfinish";
         public const string HIT_CLAP = @"hitclap";
 
+        public const string BANK_NORMAL = @"normal";
+        public const string BANK_SOFT = @"soft";
+        public const string BANK_DRUM = @"drum";
+
+        // new sample used exclusively by taiko for now.
+        public const string HIT_FLOURISH = "hitflourish";
+
+        // new bank used exclusively by taiko for now.
+        public const string BANK_STRONG = @"strong";
+
         /// <summary>
         /// All valid sample addition constants.
         /// </summary>
         public static IEnumerable<string> AllAdditions => new[] { HIT_WHISTLE, HIT_FINISH, HIT_CLAP };
+
+        /// <summary>
+        /// All valid bank constants.
+        /// </summary>
+        public static IEnumerable<string> AllBanks => new[] { BANK_NORMAL, BANK_SOFT, BANK_DRUM };
 
         /// <summary>
         /// The name of the sample to load.
@@ -32,7 +48,7 @@ namespace osu.Game.Audio
         /// <summary>
         /// The bank to load the sample from.
         /// </summary>
-        public readonly string? Bank;
+        public readonly string Bank;
 
         /// <summary>
         /// An optional suffix to provide priority lookup. Falls back to non-suffixed <see cref="Name"/>.
@@ -44,12 +60,18 @@ namespace osu.Game.Audio
         /// </summary>
         public int Volume { get; }
 
-        public HitSampleInfo(string name, string? bank = null, string? suffix = null, int volume = 0)
+        /// <summary>
+        /// Whether this sample should automatically assign the bank of the normal sample whenever it is set in the editor.
+        /// </summary>
+        public bool EditorAutoBank { get; }
+
+        public HitSampleInfo(string name, string bank = SampleControlPoint.DEFAULT_BANK, string? suffix = null, int volume = 100, bool editorAutoBank = true)
         {
             Name = name;
             Bank = bank;
             Suffix = suffix;
             Volume = volume;
+            EditorAutoBank = editorAutoBank;
         }
 
         /// <summary>
@@ -64,6 +86,8 @@ namespace osu.Game.Audio
                     yield return $"Gameplay/{Bank}-{Name}{Suffix}";
 
                 yield return $"Gameplay/{Bank}-{Name}";
+
+                yield return $"Gameplay/{Name}";
             }
         }
 
@@ -74,11 +98,12 @@ namespace osu.Game.Audio
         /// <param name="newBank">An optional new sample bank.</param>
         /// <param name="newSuffix">An optional new lookup suffix.</param>
         /// <param name="newVolume">An optional new volume.</param>
+        /// <param name="newEditorAutoBank">An optional new editor auto bank flag.</param>
         /// <returns>The new <see cref="HitSampleInfo"/>.</returns>
-        public virtual HitSampleInfo With(Optional<string> newName = default, Optional<string?> newBank = default, Optional<string?> newSuffix = default, Optional<int> newVolume = default)
-            => new HitSampleInfo(newName.GetOr(Name), newBank.GetOr(Bank), newSuffix.GetOr(Suffix), newVolume.GetOr(Volume));
+        public virtual HitSampleInfo With(Optional<string> newName = default, Optional<string> newBank = default, Optional<string?> newSuffix = default, Optional<int> newVolume = default, Optional<bool> newEditorAutoBank = default)
+            => new HitSampleInfo(newName.GetOr(Name), newBank.GetOr(Bank), newSuffix.GetOr(Suffix), newVolume.GetOr(Volume), newEditorAutoBank.GetOr(EditorAutoBank));
 
-        public bool Equals(HitSampleInfo? other)
+        public virtual bool Equals(HitSampleInfo? other)
             => other != null && Name == other.Name && Bank == other.Bank && Suffix == other.Suffix;
 
         public override bool Equals(object? obj)

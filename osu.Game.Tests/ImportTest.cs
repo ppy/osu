@@ -1,9 +1,8 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
@@ -11,11 +10,12 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Platform;
 using osu.Game.Database;
+using osu.Game.Online.API;
 using osu.Game.Tests.Resources;
 
 namespace osu.Game.Tests
 {
-    public abstract class ImportTest
+    public abstract partial class ImportTest
     {
         protected virtual TestOsuGameBase LoadOsuIntoHost(GameHost host, bool withBeatmap = false)
         {
@@ -45,15 +45,18 @@ namespace osu.Game.Tests
             Assert.IsTrue(task.Wait(timeout), failureMessage);
         }
 
-        public class TestOsuGameBase : OsuGameBase
+        public partial class TestOsuGameBase : OsuGameBase
         {
             public RealmAccess Realm => Dependencies.Get<RealmAccess>();
+            public new IAPIProvider API => base.API;
 
             private readonly bool withBeatmap;
 
             public TestOsuGameBase(bool withBeatmap)
             {
                 this.withBeatmap = withBeatmap;
+
+                base.API = new DummyAPIAccess();
             }
 
             [BackgroundDependencyLoader]
@@ -62,6 +65,10 @@ namespace osu.Game.Tests
                 // Beatmap must be imported before the collection manager is loaded.
                 if (withBeatmap)
                     BeatmapManager.Import(TestResources.GetTestBeatmapForImport()).WaitSafely();
+
+                // the logic for setting the initial ruleset exists in OsuGame rather than OsuGameBase.
+                // the ruleset bindable is not meant to be nullable, so assign any ruleset in here.
+                Ruleset.Value = RulesetStore.AvailableRulesets.First();
             }
         }
     }

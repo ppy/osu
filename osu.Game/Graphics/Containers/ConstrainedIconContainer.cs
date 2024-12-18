@@ -1,12 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Effects;
 using osuTK;
 
 namespace osu.Game.Graphics.Containers
@@ -14,24 +11,12 @@ namespace osu.Game.Graphics.Containers
     /// <summary>
     /// Display an icon that is forced to scale to the size of this container.
     /// </summary>
-    public class ConstrainedIconContainer : CompositeDrawable
+    public partial class ConstrainedIconContainer : CompositeDrawable
     {
         public Drawable Icon
         {
             get => InternalChild;
-
             set => InternalChild = value;
-        }
-
-        /// <summary>
-        /// Determines an edge effect of this <see cref="Container"/>.
-        /// Edge effects are e.g. glow or a shadow.
-        /// Only has an effect when <see cref="CompositeDrawable.Masking"/> is true.
-        /// </summary>
-        public new EdgeEffectParameters EdgeEffect
-        {
-            get => base.EdgeEffect;
-            set => base.EdgeEffect = value;
         }
 
         protected override void Update()
@@ -50,11 +35,6 @@ namespace osu.Game.Graphics.Containers
                 InternalChild.Anchor = Anchor.Centre;
                 InternalChild.Origin = Anchor.Centre;
             }
-        }
-
-        public ConstrainedIconContainer()
-        {
-            Masking = true;
         }
     }
 }

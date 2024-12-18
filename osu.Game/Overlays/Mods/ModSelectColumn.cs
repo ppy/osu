@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -8,14 +9,17 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
+using System.Linq;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Sprites;
 using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Mods
 {
-    public abstract class ModSelectColumn : CompositeDrawable, IHasAccentColour
+    public abstract partial class ModSelectColumn : CompositeDrawable, IHasAccentColour
     {
         public readonly Container TopLevelContent;
 
@@ -27,7 +31,14 @@ namespace osu.Game.Overlays.Mods
         public Color4 AccentColour
         {
             get => headerBackground.Colour;
-            set => headerBackground.Colour = value;
+            set
+            {
+                headerBackground.Colour = value;
+
+                var hsv = new Colour4(value.R, value.G, value.B, 1f).ToHSV();
+                var trianglesColour = Colour4.FromHSV(hsv.X, hsv.Y + 0.2f, hsv.Z - 0.1f);
+                triangles.Colour = ColourInfo.GradientVertical(trianglesColour, value);
+            }
         }
 
         /// <summary>
@@ -35,23 +46,31 @@ namespace osu.Game.Overlays.Mods
         /// </summary>
         public readonly Bindable<bool> Active = new BindableBool(true);
 
+        public string SearchTerm
+        {
+            set => ItemsFlow.SearchTerm = value;
+        }
+
         protected override bool ReceivePositionalInputAtSubTree(Vector2 screenSpacePos) => base.ReceivePositionalInputAtSubTree(screenSpacePos) && Active.Value;
 
         protected readonly Container ControlContainer;
-        protected readonly FillFlowContainer ItemsFlow;
+        protected readonly ModSearchContainer ItemsFlow;
 
         private readonly TextFlowContainer headerText;
         private readonly Box headerBackground;
         private readonly Container contentContainer;
         private readonly Box contentBackground;
+        private readonly TrianglesV2 triangles;
 
         private const float header_height = 42;
 
+        protected const float WIDTH = 320;
+
         protected ModSelectColumn()
         {
-            Width = 320;
+            Width = WIDTH;
             RelativeSizeAxes = Axes.Y;
-            Shear = new Vector2(ShearedOverlayContainer.SHEAR, 0);
+            Shear = new Vector2(OsuGame.SHEAR, 0);
 
             InternalChildren = new Drawable[]
             {
@@ -73,6 +92,14 @@ namespace osu.Game.Overlays.Mods
                                     RelativeSizeAxes = Axes.X,
                                     Height = header_height + ModSelectPanel.CORNER_RADIUS
                                 },
+                                triangles = new TrianglesV2
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    Height = header_height,
+                                    Shear = new Vector2(-OsuGame.SHEAR, 0),
+                                    Velocity = 0.7f,
+                                    ClampAxes = Axes.Y
+                                },
                                 headerText = new OsuTextFlowContainer(t =>
                                 {
                                     t.Font = OsuFont.TorusAlternate.With(size: 17);
@@ -84,7 +111,7 @@ namespace osu.Game.Overlays.Mods
                                     AutoSizeAxes = Axes.Y,
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
-                                    Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0),
+                                    Shear = new Vector2(-OsuGame.SHEAR, 0),
                                     Padding = new MarginPadding
                                     {
                                         Horizontal = 17,
@@ -111,6 +138,7 @@ namespace osu.Game.Overlays.Mods
                                     },
                                     new GridContainer
                                     {
+                                        Padding = new MarginPadding { Top = 1, Bottom = 3 },
                                         RelativeSizeAxes = Axes.Both,
                                         RowDimensions = new[]
                                         {
@@ -134,7 +162,7 @@ namespace osu.Game.Overlays.Mods
                                                     RelativeSizeAxes = Axes.Both,
                                                     ClampExtension = 100,
                                                     ScrollbarOverlapsContent = false,
-                                                    Child = ItemsFlow = new FillFlowContainer
+                                                    Child = ItemsFlow = new ModSearchContainer
                                                     {
                                                         RelativeSizeAxes = Axes.X,
                                                         AutoSizeAxes = Axes.Y,
@@ -157,17 +185,15 @@ namespace osu.Game.Overlays.Mods
         {
             headerText.Clear();
 
-            int wordIndex = 0;
+            ITextPart part = headerText.AddText(text);
+            part.DrawablePartsRecreated += applySemiBoldToFirstWord;
+            applySemiBoldToFirstWord(part.Drawables);
 
-            ITextPart part = headerText.AddText(text, t =>
+            void applySemiBoldToFirstWord(IEnumerable<Drawable> d)
             {
-                if (wordIndex == 0)
-                    t.Font = t.Font.With(weight: FontWeight.SemiBold);
-                wordIndex += 1;
-            });
-
-            // Reset the index so that if the parts are refreshed (e.g. through changes in localisation) the correct word is re-emboldened.
-            part.DrawablePartsRecreated += _ => wordIndex = 0;
+                if (d.FirstOrDefault() is OsuSpriteText firstWord)
+                    firstWord.Font = firstWord.Font.With(weight: FontWeight.SemiBold);
+            }
         }
 
         [BackgroundDependencyLoader]

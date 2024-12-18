@@ -21,7 +21,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
-    public class TestSceneFollowPoints : OsuTestScene
+    public partial class TestSceneFollowPoints : OsuTestScene
     {
         private Container<DrawableOsuHitObject> hitObjectContainer;
         private FollowPointRenderer followPointRenderer;
@@ -183,7 +183,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                             break;
                     }
 
-                    hitObjectContainer.Add(drawableObject);
+                    hitObjectContainer.Add(drawableObject!);
                     followPointRenderer.AddFollowPoints(objects[i]);
                 }
             });
@@ -278,7 +278,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private FollowPointConnection getGroup(int index) => followPointRenderer.ChildrenOfType<FollowPointConnection>().Single(c => c.Entry == getEntry(index));
 
-        private class TestHitObjectContainer : Container<DrawableOsuHitObject>
+        private partial class TestHitObjectContainer : Container<DrawableOsuHitObject>
         {
             protected override int Compare(Drawable x, Drawable y)
             {

@@ -14,7 +14,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Edit
 {
-    public abstract class HitObjectSelectionBlueprint : SelectionBlueprint<HitObject>
+    public abstract partial class HitObjectSelectionBlueprint : SelectionBlueprint<HitObject>
     {
         /// <summary>
         /// The <see cref="DrawableHitObject"/> which this <see cref="HitObjectSelectionBlueprint"/> applies to.
@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Edit
         public override Quad SelectionQuad => DrawableObject.ScreenSpaceDrawQuad;
     }
 
-    public abstract class HitObjectSelectionBlueprint<T> : HitObjectSelectionBlueprint
+    public abstract partial class HitObjectSelectionBlueprint<T> : HitObjectSelectionBlueprint
         where T : HitObject
     {
         public T HitObject => (T)Item;

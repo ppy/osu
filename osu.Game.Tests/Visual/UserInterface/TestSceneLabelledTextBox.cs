@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -12,7 +10,7 @@ using osu.Game.Graphics.UserInterfaceV2;
 namespace osu.Game.Tests.Visual.UserInterface
 {
     [TestFixture]
-    public class TestSceneLabelledTextBox : OsuTestScene
+    public partial class TestSceneLabelledTextBox : OsuTestScene
     {
         [TestCase(false)]
         [TestCase(true)]

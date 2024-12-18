@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Newtonsoft.Json;
 using osu.Game.Graphics;
 using osu.Game.Utils;
@@ -9,14 +10,35 @@ using osuTK.Graphics;
 
 namespace osu.Game.Beatmaps.ControlPoints
 {
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
     public abstract class ControlPoint : IComparable<ControlPoint>, IDeepCloneable<ControlPoint>, IEquatable<ControlPoint>, IControlPoint
     {
+        /// <summary>
+        /// Invoked when any of this <see cref="ControlPoint"/>'s properties have changed.
+        /// </summary>
+        public event Action<ControlPoint>? Changed;
+
+        protected void RaiseChanged() => Changed?.Invoke(this);
+
+        private double time;
+
         [JsonIgnore]
-        public double Time { get; set; }
+        public double Time
+        {
+            get => time;
+            set
+            {
+                if (time == value)
+                    return;
+
+                time = value;
+                RaiseChanged();
+            }
+        }
 
         public void AttachGroup(ControlPointGroup pointGroup) => Time = pointGroup.Time;
 
-        public int CompareTo(ControlPoint other) => Time.CompareTo(other.Time);
+        public int CompareTo(ControlPoint? other) => Time.CompareTo(other?.Time);
 
         public virtual Color4 GetRepresentingColour(OsuColour colours) => colours.Yellow;
 
@@ -32,7 +54,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// </summary>
         public ControlPoint DeepClone()
         {
-            var copy = (ControlPoint)Activator.CreateInstance(GetType());
+            var copy = (ControlPoint)Activator.CreateInstance(GetType())!;
 
             copy.CopyFrom(this);
 

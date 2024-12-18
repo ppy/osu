@@ -10,12 +10,16 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Skinning.Argon
 {
-    public class ArgonCatcher : CompositeDrawable
+    public partial class ArgonCatcher : CompositeDrawable
     {
         [BackgroundDependencyLoader]
         private void load()
         {
-            RelativeSizeAxes = Axes.Both;
+            Anchor = Anchor.TopCentre;
+            Origin = Anchor.Centre;
+
+            RelativeSizeAxes = Axes.X;
+            AutoSizeAxes = Axes.Y;
 
             InternalChildren = new Drawable[]
             {

@@ -24,7 +24,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneSkinnableDrawable : OsuTestScene
+    public partial class TestSceneSkinnableDrawable : OsuTestScene
     {
         [Test]
         public void TestConfineScaleDown()
@@ -160,7 +160,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("consumer using base source", () => consumer.Drawable is BaseSourceBox);
         }
 
-        private class SwitchableSkinProvidingContainer : SkinProvidingContainer
+        private partial class SwitchableSkinProvidingContainer : SkinProvidingContainer
         {
             private bool allow = true;
 
@@ -178,7 +178,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             }
         }
 
-        private class ExposedSkinnableDrawable : SkinnableDrawable
+        private partial class ExposedSkinnableDrawable : SkinnableDrawable
         {
             public new Drawable Drawable => base.Drawable;
 
@@ -188,7 +188,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             }
         }
 
-        private class DefaultBox : DrawWidthBox
+        private partial class DefaultBox : DrawWidthBox
         {
             public DefaultBox()
             {
@@ -196,7 +196,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             }
         }
 
-        private class DrawWidthBox : Container
+        private partial class DrawWidthBox : Container
         {
             private readonly OsuSpriteText text;
 
@@ -224,7 +224,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             }
         }
 
-        private class NamedBox : Container
+        private partial class NamedBox : Container
         {
             public NamedBox(string name)
             {
@@ -246,7 +246,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             }
         }
 
-        private class SkinConsumer : SkinnableDrawable
+        private partial class SkinConsumer : SkinnableDrawable
         {
             public new Drawable Drawable => base.Drawable;
             public int SkinChangedCount { get; private set; }
@@ -263,7 +263,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             }
         }
 
-        private class BaseSourceBox : NamedBox
+        private partial class BaseSourceBox : NamedBox
         {
             public BaseSourceBox()
                 : base("Base Source")
@@ -271,7 +271,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             }
         }
 
-        private class SecondarySourceBox : NamedBox
+        private partial class SecondarySourceBox : NamedBox
         {
             public SecondarySourceBox()
                 : base("Secondary Source")
@@ -316,7 +316,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Cached(typeof(ISkinSource))]
-        private class SkinSourceContainer : Container, ISkinSource
+        private partial class SkinSourceContainer : Container, ISkinSource
         {
             public Drawable GetDrawableComponent(ISkinComponentLookup componentLookupName) => new BaseSourceBox();
 

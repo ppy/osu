@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -14,14 +12,14 @@ using osu.Game.Tournament.Models;
 
 namespace osu.Game.Tournament.Tests.Components
 {
-    public class TestSceneTournamentBeatmapPanel : TournamentTestScene
+    public partial class TestSceneTournamentBeatmapPanel : TournamentTestScene
     {
         /// <remarks>
         /// Warning: the below API instance is actually the online API, rather than the dummy API provided by the test.
         /// It cannot be trivially replaced because setting <see cref="OsuTestScene.UseOnlineAPI"/> to <see langword="true"/> causes <see cref="OsuTestScene.API"/> to no longer be usable.
         /// </remarks>
         [Resolved]
-        private IAPIProvider api { get; set; }
+        private IAPIProvider api { get; set; } = null!;
 
         [BackgroundDependencyLoader]
         private void load()

@@ -8,7 +8,7 @@ namespace osu.Game.Skinning
     /// <summary>
     /// Provides pooled samples to be used by <see cref="SkinnableSound"/>s.
     /// </summary>
-    internal interface IPooledSampleProvider
+    public interface IPooledSampleProvider
     {
         /// <summary>
         /// Retrieves a <see cref="PoolableSkinnableSample"/> from a pool.

@@ -1,10 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -19,19 +18,19 @@ using osu.Game.Rulesets;
 
 namespace osu.Game.Overlays.Profile.Sections.Recent
 {
-    public class DrawableRecentActivity : CompositeDrawable
+    public partial class DrawableRecentActivity : CompositeDrawable
     {
         private const int font_size = 14;
 
         [Resolved]
-        private IAPIProvider api { get; set; }
+        private IAPIProvider api { get; set; } = null!;
 
         [Resolved]
-        private IRulesetStore rulesets { get; set; }
+        private IRulesetStore rulesets { get; set; } = null!;
 
         private readonly APIRecentActivity activity;
 
-        private LinkFlowContainer content;
+        private LinkFlowContainer content = null!;
 
         public DrawableRecentActivity(APIRecentActivity activity)
         {
@@ -216,15 +215,15 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
             rulesets.AvailableRulesets.FirstOrDefault(r => r.ShortName == activity.Mode)?.Name ?? activity.Mode;
 
         private void addUserLink()
-            => content.AddLink(activity.User?.Username, LinkAction.OpenUserProfile, getLinkArgument(activity.User?.Url), creationParameters: t => t.Font = getLinkFont(FontWeight.Bold));
+            => content.AddLink(activity.User.AsNonNull().Username, LinkAction.OpenUserProfile, getLinkArgument(activity.User.AsNonNull().Url), creationParameters: t => t.Font = getLinkFont(FontWeight.Bold));
 
         private void addBeatmapLink()
-            => content.AddLink(activity.Beatmap?.Title, LinkAction.OpenBeatmap, getLinkArgument(activity.Beatmap?.Url), creationParameters: t => t.Font = getLinkFont());
+            => content.AddLink(activity.Beatmap.AsNonNull().Title, LinkAction.OpenBeatmap, getLinkArgument(activity.Beatmap.AsNonNull().Url), creationParameters: t => t.Font = getLinkFont());
 
         private void addBeatmapsetLink()
-            => content.AddLink(activity.Beatmapset?.Title, LinkAction.OpenBeatmapSet, getLinkArgument(activity.Beatmapset?.Url), creationParameters: t => t.Font = getLinkFont());
+            => content.AddLink(activity.Beatmapset.AsNonNull().Title, LinkAction.OpenBeatmapSet, getLinkArgument(activity.Beatmapset.AsNonNull().Url), creationParameters: t => t.Font = getLinkFont());
 
-        private string getLinkArgument(string url) => MessageFormatter.GetLinkDetails($"{api.APIEndpointUrl}{url}").Argument.ToString();
+        private object getLinkArgument(string url) => MessageFormatter.GetLinkDetails($"{api.WebsiteRootUrl}{url}").Argument.AsNonNull();
 
         private FontUsage getLinkFont(FontWeight fontWeight = FontWeight.Regular)
             => OsuFont.GetFont(size: font_size, weight: fontWeight, italics: true);

@@ -10,7 +10,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.Skinning.Default
 {
-    public class CentreHitCirclePiece : CirclePiece
+    public partial class CentreHitCirclePiece : CirclePiece
     {
         public CentreHitCirclePiece()
         {
@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
         /// <summary>
         /// The symbol used for centre hit pieces.
         /// </summary>
-        public class CentreHitSymbolPiece : Container
+        public partial class CentreHitSymbolPiece : Container
         {
             public CentreHitSymbolPiece()
             {

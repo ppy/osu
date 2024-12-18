@@ -17,7 +17,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.UI.Components
 {
-    public class DefaultColumnBackground : CompositeDrawable, IKeyBindingHandler<ManiaAction>
+    public partial class DefaultColumnBackground : CompositeDrawable, IKeyBindingHandler<ManiaAction>
     {
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
 

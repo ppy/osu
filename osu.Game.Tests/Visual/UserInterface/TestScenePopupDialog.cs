@@ -1,10 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using NUnit.Framework;
-using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Testing;
 using osu.Game.Overlays.Dialog;
@@ -13,26 +10,27 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestScenePopupDialog : OsuManualInputManagerTestScene
+    public partial class TestScenePopupDialog : OsuManualInputManagerTestScene
     {
-        private TestPopupDialog dialog;
+        private TestPopupDialog dialog = null!;
 
         [SetUpSteps]
         public void SetUpSteps()
         {
             AddStep("new popup", () =>
             {
-                Add(dialog = new TestPopupDialog
+                Child = dialog = new TestPopupDialog
                 {
-                    RelativeSizeAxes = Axes.Both,
                     State = { Value = Framework.Graphics.Containers.Visibility.Visible },
-                });
+                };
             });
         }
 
         [Test]
         public void TestDangerousButton([Values(false, true)] bool atEdge)
         {
+            AddStep("finish transforms", () => dialog.FinishTransforms(true));
+
             if (atEdge)
             {
                 AddStep("move mouse to button edge", () =>
@@ -52,7 +50,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("release button", () => InputManager.ReleaseButton(MouseButton.Left));
         }
 
-        private class TestPopupDialog : PopupDialog
+        private partial class TestPopupDialog : PopupDialog
         {
             public PopupDialogDangerousButton DangerousButton { get; }
 

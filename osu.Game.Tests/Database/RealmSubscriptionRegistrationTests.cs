@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -42,7 +41,7 @@ namespace osu.Game.Tests.Database
                 Assert.That(lastChanges?.ModifiedIndices, Is.Empty);
                 Assert.That(lastChanges?.NewModifiedIndices, Is.Empty);
 
-                realm.Write(r => r.All<BeatmapSetInfo>().First().Beatmaps.First().CountdownOffset = 5);
+                realm.Write(r => r.All<BeatmapSetInfo>().First().Beatmaps.First().EditorTimestamp = 5);
                 realm.Run(r => r.Refresh());
 
                 Assert.That(collectionChanges, Is.EqualTo(1));
@@ -54,7 +53,7 @@ namespace osu.Game.Tests.Database
                 registration.Dispose();
             });
 
-            void onChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet? changes, Exception error)
+            void onChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet? changes)
             {
                 lastChanges = changes;
 
@@ -69,6 +68,35 @@ namespace osu.Game.Tests.Database
                 {
                     Interlocked.Increment(ref propertyChanges);
                 }
+            }
+        }
+
+        [Test]
+        public void TestSubscriptionInitialChangeSetNull()
+        {
+            ChangeSet? firstChanges = null;
+            int receivedChangesCount = 0;
+
+            RunTestWithRealm((realm, _) =>
+            {
+                var registration = realm.RegisterForNotifications(r => r.All<BeatmapSetInfo>(), onChanged);
+
+                realm.WriteAsync(r => r.Add(TestResources.CreateTestBeatmapSetInfo())).WaitSafely();
+
+                realm.Run(r => r.Refresh());
+
+                Assert.That(receivedChangesCount, Is.EqualTo(1));
+                Assert.That(firstChanges, Is.Null);
+
+                registration.Dispose();
+            });
+
+            void onChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet? changes)
+            {
+                if (receivedChangesCount == 0)
+                    firstChanges = changes;
+
+                receivedChangesCount++;
             }
         }
 
@@ -92,7 +120,7 @@ namespace osu.Game.Tests.Database
                 registration.Dispose();
             });
 
-            void onChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet? changes, Exception error) => lastChanges = changes;
+            void onChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet? changes) => lastChanges = changes;
         }
 
         [Test]
@@ -185,7 +213,7 @@ namespace osu.Game.Tests.Database
                 }
             });
 
-            void onChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet? changes, Exception error)
+            void onChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet? changes)
             {
                 if (changes == null)
                     resolvedItems = sender;

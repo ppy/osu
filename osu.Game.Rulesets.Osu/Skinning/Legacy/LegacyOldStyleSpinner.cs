@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
     /// <summary>
     /// Legacy skinned spinner with one main spinning layer and a background layer.
     /// </summary>
-    public class LegacyOldStyleSpinner : LegacySpinner
+    public partial class LegacyOldStyleSpinner : LegacySpinner
     {
         private Sprite disc = null!;
         private Sprite metreSprite = null!;
@@ -92,8 +92,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimePreempt))
                 this.FadeOut();
 
-            using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimeFadeIn / 2))
-                this.FadeInFromZero(spinner.TimeFadeIn / 2);
+            using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimeFadeIn))
+                this.FadeInFromZero(spinner.TimeFadeIn);
         }
 
         protected override void Update()

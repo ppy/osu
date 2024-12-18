@@ -1,37 +1,39 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osuTK;
 
 namespace osu.Game.Screens.Edit.Timing
 {
-    internal class GroupSection : CompositeDrawable
+    internal partial class GroupSection : CompositeDrawable
     {
-        private LabelledTextBox textBox;
+        private LabelledTextBox textBox = null!;
 
-        private OsuButton button;
-
-        [Resolved]
-        protected Bindable<ControlPointGroup> SelectedGroup { get; private set; }
+        private OsuButton button = null!;
 
         [Resolved]
-        protected EditorBeatmap Beatmap { get; private set; }
+        protected Bindable<ControlPointGroup> SelectedGroup { get; private set; } = null!;
 
         [Resolved]
-        private EditorClock clock { get; set; }
+        protected EditorBeatmap Beatmap { get; private set; } = null!;
 
-        [Resolved(canBeNull: true)]
-        private IEditorChangeHandler changeHandler { get; set; }
+        [Resolved]
+        private OsuConfigManager configManager { get; set; } = null!;
+
+        [Resolved]
+        private EditorClock clock { get; set; } = null!;
+
+        [Resolved]
+        private IEditorChangeHandler? changeHandler { get; set; }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -53,7 +55,8 @@ namespace osu.Game.Screens.Edit.Timing
                     {
                         textBox = new LabelledTextBox
                         {
-                            Label = "Time"
+                            Label = "Time",
+                            SelectAllOnFocus = true,
                         },
                         button = new RoundedButton
                         {
@@ -111,7 +114,16 @@ namespace osu.Game.Screens.Edit.Timing
             Beatmap.ControlPointInfo.RemoveGroup(SelectedGroup.Value);
 
             foreach (var cp in currentGroupItems)
+            {
+                // Only adjust hit object offsets if the group contains a timing control point
+                if (cp is TimingControlPoint tp && configManager.Get<bool>(OsuSetting.EditorAdjustExistingObjectsOnTimingChanges))
+                {
+                    TimingSectionAdjustments.AdjustHitObjectOffset(Beatmap, tp, time - SelectedGroup.Value.Time);
+                    Beatmap.UpdateAllHitObjects();
+                }
+
                 Beatmap.ControlPointInfo.Add(time, cp);
+            }
 
             // the control point might not necessarily exist yet, if currentGroupItems was empty.
             SelectedGroup.Value = Beatmap.ControlPointInfo.GroupAt(time, true);

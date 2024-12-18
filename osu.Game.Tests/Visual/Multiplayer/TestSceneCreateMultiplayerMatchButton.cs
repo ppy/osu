@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using NUnit.Framework;
 using osu.Framework.Graphics;
@@ -10,9 +8,9 @@ using osu.Game.Screens.OnlinePlay.Multiplayer;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneCreateMultiplayerMatchButton : MultiplayerTestScene
+    public partial class TestSceneCreateMultiplayerMatchButton : MultiplayerTestScene
     {
-        private CreateMultiplayerMatchButton button;
+        private CreateMultiplayerMatchButton button = null!;
 
         public override void SetUpSteps()
         {
@@ -29,7 +27,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestButtonEnableStateChanges()
         {
-            IDisposable joiningRoomOperation = null;
+            IDisposable joiningRoomOperation = null!;
 
             assertButtonEnableState(true);
 

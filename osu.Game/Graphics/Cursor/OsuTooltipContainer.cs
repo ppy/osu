@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
@@ -12,11 +10,11 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
-using osu.Game.Graphics.Sprites;
+using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Graphics.Cursor
 {
-    public class OsuTooltipContainer : TooltipContainer
+    public partial class OsuTooltipContainer : TooltipContainer
     {
         protected override ITooltip CreateTooltip() => new OsuTooltip();
 
@@ -27,17 +25,22 @@ namespace osu.Game.Graphics.Cursor
 
         protected override double AppearDelay => (1 - CurrentTooltip.Alpha) * base.AppearDelay; // reduce appear delay if the tooltip is already partly visible.
 
-        public class OsuTooltip : Tooltip
+        public partial class OsuTooltip : Tooltip
         {
+            private const float max_width = 500;
+
             private readonly Box background;
-            private readonly OsuSpriteText text;
+            private readonly TextFlowContainer text;
             private bool instantMovement = true;
 
-            public override void SetContent(LocalisableString contentString)
-            {
-                if (contentString == text.Text) return;
+            private LocalisableString lastContent;
 
-                text.Text = contentString;
+            public override void SetContent(LocalisableString content)
+            {
+                if (content.Equals(lastContent))
+                    return;
+
+                text.Text = content;
 
                 if (IsPresent)
                 {
@@ -46,6 +49,8 @@ namespace osu.Game.Graphics.Cursor
                 }
                 else
                     AutoSizeDuration = 0;
+
+                lastContent = content;
             }
 
             public OsuTooltip()
@@ -67,10 +72,14 @@ namespace osu.Game.Graphics.Cursor
                         RelativeSizeAxes = Axes.Both,
                         Alpha = 0.9f,
                     },
-                    text = new OsuSpriteText
+                    text = new TextFlowContainer(f =>
                     {
-                        Padding = new MarginPadding(5),
-                        Font = OsuFont.GetFont(weight: FontWeight.Regular)
+                        f.Font = OsuFont.GetFont(weight: FontWeight.Regular);
+                    })
+                    {
+                        Margin = new MarginPadding(5),
+                        AutoSizeAxes = Axes.Both,
+                        MaximumSize = new Vector2(max_width, float.PositiveInfinity),
                     }
                 };
             }

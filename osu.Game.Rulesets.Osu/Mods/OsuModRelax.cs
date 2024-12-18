@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -10,6 +10,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
+using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play;
@@ -17,7 +18,7 @@ using static osu.Game.Input.Handlers.ReplayInputHandler;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModRelax : ModRelax, IUpdatableByPlayfield, IApplicableToDrawableRuleset<OsuHitObject>, IApplicableToPlayer
+    public class OsuModRelax : ModRelax, IUpdatableByPlayfield, IApplicableToDrawableRuleset<OsuHitObject>, IApplicableToPlayer, IHasNoTimedInputs
     {
         public override LocalisableString Description => @"You don't need to click. Give your clicking/tapping fingers a break from the heat of things.";
 
@@ -37,12 +38,18 @@ namespace osu.Game.Rulesets.Osu.Mods
         private ReplayState<OsuAction> state = null!;
         private double lastStateChangeTime;
 
+        private DrawableOsuRuleset ruleset = null!;
+        private IPressHandler pressHandler = null!;
+
         private bool hasReplay;
+        private bool legacyReplay;
 
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
+            ruleset = (DrawableOsuRuleset)drawableRuleset;
+
             // grab the input manager for future use.
-            osuInputManager = (OsuInputManager)drawableRuleset.KeyBindingInputManager;
+            osuInputManager = ruleset.KeyBindingInputManager;
         }
 
         public void ApplyToPlayer(Player player)
@@ -50,15 +57,22 @@ namespace osu.Game.Rulesets.Osu.Mods
             if (osuInputManager.ReplayInputHandler != null)
             {
                 hasReplay = true;
+
+                Debug.Assert(ruleset.ReplayScore != null);
+                legacyReplay = ruleset.ReplayScore.ScoreInfo.IsLegacyScore;
+
+                pressHandler = legacyReplay ? new LegacyReplayPressHandler(this) : new PressHandler(this);
+
                 return;
             }
 
+            pressHandler = new PressHandler(this);
             osuInputManager.AllowGameplayInputs = false;
         }
 
         public void Update(Playfield playfield)
         {
-            if (hasReplay)
+            if (hasReplay && !legacyReplay)
                 return;
 
             bool requiresHold = false;
@@ -87,7 +101,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                         if (!slider.HeadCircle.IsHit)
                             handleHitCircle(slider.HeadCircle);
 
-                        requiresHold |= slider.Ball.IsHovered || h.IsHovered;
+                        requiresHold |= slider.SliderInputManager.IsMouseInFollowArea(slider.Tracking.Value);
                         break;
 
                     case DrawableSpinner spinner:
@@ -131,11 +145,62 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                 if (down)
                 {
-                    state.PressedActions.Add(wasLeft ? OsuAction.LeftButton : OsuAction.RightButton);
+                    pressHandler.HandlePress(wasLeft);
                     wasLeft = !wasLeft;
                 }
+                else
+                {
+                    pressHandler.HandleRelease(wasLeft);
+                }
+            }
+        }
 
-                state.Apply(osuInputManager.CurrentState, osuInputManager);
+        private interface IPressHandler
+        {
+            void HandlePress(bool wasLeft);
+            void HandleRelease(bool wasLeft);
+        }
+
+        private class PressHandler : IPressHandler
+        {
+            private readonly OsuModRelax mod;
+
+            public PressHandler(OsuModRelax mod)
+            {
+                this.mod = mod;
+            }
+
+            public void HandlePress(bool wasLeft)
+            {
+                mod.state.PressedActions.Add(wasLeft ? OsuAction.LeftButton : OsuAction.RightButton);
+                mod.state.Apply(mod.osuInputManager.CurrentState, mod.osuInputManager);
+            }
+
+            public void HandleRelease(bool wasLeft)
+            {
+                mod.state.Apply(mod.osuInputManager.CurrentState, mod.osuInputManager);
+            }
+        }
+
+        // legacy replays do not contain key-presses with Relax mod, so they need to be triggered by themselves.
+        private class LegacyReplayPressHandler : IPressHandler
+        {
+            private readonly OsuModRelax mod;
+
+            public LegacyReplayPressHandler(OsuModRelax mod)
+            {
+                this.mod = mod;
+            }
+
+            public void HandlePress(bool wasLeft)
+            {
+                mod.osuInputManager.KeyBindingContainer.TriggerPressed(wasLeft ? OsuAction.LeftButton : OsuAction.RightButton);
+            }
+
+            public void HandleRelease(bool wasLeft)
+            {
+                // this intentionally releases right when `wasLeft` is true because `wasLeft` is set at point of press and not at point of release
+                mod.osuInputManager.KeyBindingContainer.TriggerReleased(wasLeft ? OsuAction.RightButton : OsuAction.LeftButton);
             }
         }
     }

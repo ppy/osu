@@ -14,7 +14,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning
 {
-    public abstract class SliderBody : CompositeDrawable
+    public abstract partial class SliderBody : CompositeDrawable
     {
         private DrawableSliderPath path;
 
@@ -30,6 +30,11 @@ namespace osu.Game.Rulesets.Osu.Skinning
         /// Offset in absolute coordinates from the start of the curve.
         /// </summary>
         public virtual Vector2 PathOffset => path.PositionInBoundingBox(path.Vertices[0]);
+
+        /// <summary>
+        /// Offset in absolute coordinates from the end of the curve.
+        /// </summary>
+        public virtual Vector2 PathEndOffset => path.PositionInBoundingBox(path.Vertices[^1]);
 
         /// <summary>
         /// Used to colour the path.
@@ -107,7 +112,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
         protected virtual DrawableSliderPath CreateSliderPath() => new DefaultDrawableSliderPath();
 
-        private class DefaultDrawableSliderPath : DrawableSliderPath
+        private partial class DefaultDrawableSliderPath : DrawableSliderPath
         {
             private const float opacity_at_centre = 0.3f;
             private const float opacity_at_edge = 0.8f;

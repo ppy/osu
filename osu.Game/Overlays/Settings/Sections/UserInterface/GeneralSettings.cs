@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
@@ -12,9 +10,9 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.UserInterface
 {
-    public class GeneralSettings : SettingsSubsection
+    public partial class GeneralSettings : SettingsSubsection
     {
-        protected override LocalisableString Header => UserInterfaceStrings.GeneralHeader;
+        protected override LocalisableString Header => CommonStrings.General;
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)

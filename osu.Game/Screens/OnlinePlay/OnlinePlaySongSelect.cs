@@ -24,16 +24,13 @@ using osu.Game.Utils;
 
 namespace osu.Game.Screens.OnlinePlay
 {
-    public abstract class OnlinePlaySongSelect : SongSelect, IOnlinePlaySubScreen
+    public abstract partial class OnlinePlaySongSelect : SongSelect, IOnlinePlaySubScreen
     {
         public string ShortTitle => "song selection";
 
         public override string Title => ShortTitle.Humanize();
 
         public override bool AllowEditing => false;
-
-        [Resolved(typeof(Room), nameof(Room.Playlist))]
-        protected BindableList<PlaylistItem> Playlist { get; private set; } = null!;
 
         [Resolved]
         private RulesetStore rulesets { get; set; } = null!;
@@ -173,11 +170,14 @@ namespace osu.Game.Screens.OnlinePlay
             IsValidMod = IsValidMod
         };
 
-        protected override IEnumerable<(FooterButton, OverlayContainer)> CreateFooterButtons()
+        protected override IEnumerable<(FooterButton, OverlayContainer?)> CreateSongSelectFooterButtons()
         {
-            var buttons = base.CreateFooterButtons().ToList();
-            buttons.Insert(buttons.FindIndex(b => b.Item1 is FooterButtonMods) + 1, (new FooterButtonFreeMods { Current = FreeMods }, freeModSelectOverlay));
-            return buttons;
+            var baseButtons = base.CreateSongSelectFooterButtons().ToList();
+            var freeModsButton = new FooterButtonFreeMods(freeModSelectOverlay) { Current = FreeMods };
+
+            baseButtons.Insert(baseButtons.FindIndex(b => b.Item1 is FooterButtonMods) + 1, (freeModsButton, freeModSelectOverlay));
+
+            return baseButtons;
         }
 
         /// <summary>

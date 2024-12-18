@@ -2,6 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -14,12 +16,14 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Argon
 {
-    public class ArgonSliderBall : CircularContainer
+    public partial class ArgonSliderBall : CircularContainer
     {
         private readonly Box fill;
         private readonly SpriteIcon icon;
 
         private readonly Vector2 defaultIconScale = new Vector2(0.6f, 0.8f);
+
+        private readonly IBindable<Color4> accentColour = new Bindable<Color4>();
 
         [Resolved(canBeNull: true)]
         private DrawableHitObject? parentObject { get; set; }
@@ -37,7 +41,6 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
             {
                 fill = new Box
                 {
-                    Colour = ColourInfo.GradientVertical(Colour4.FromHex("FC618F"), Colour4.FromHex("BB1A41")),
                     RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -53,9 +56,21 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
             };
         }
 
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            if (parentObject != null)
+                accentColour.BindTo(parentObject.AccentColour);
+        }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            accentColour.BindValueChanged(colour =>
+            {
+                fill.Colour = ColourInfo.GradientVertical(colour.NewValue, colour.NewValue.Darken(0.5f));
+            }, true);
 
             if (parentObject != null)
             {
@@ -83,7 +98,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
 
             using (BeginAbsoluteSequence(drawableObject.HitStateUpdateTime))
             {
-                this.FadeOut(duration, Easing.OutQuint);
+                // intentionally pile on an extra FadeOut to make it happen much faster
+                this.FadeOut(duration / 4, Easing.OutQuint);
                 icon.ScaleTo(defaultIconScale * icon_scale, duration, Easing.OutQuint);
             }
         }
@@ -93,7 +109,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
             base.Update();
 
             //undo rotation on layers which should not be rotated.
-            float appliedRotation = Parent.Rotation;
+            float appliedRotation = Parent!.Rotation;
 
             fill.Rotation = -appliedRotation;
         }

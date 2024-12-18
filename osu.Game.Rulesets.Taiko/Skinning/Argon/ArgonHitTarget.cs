@@ -10,7 +10,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Taiko.Skinning.Argon
 {
-    public class ArgonHitTarget : CompositeDrawable
+    public partial class ArgonHitTarget : CompositeDrawable
     {
         /// <summary>
         /// Thickness of all drawn line pieces.

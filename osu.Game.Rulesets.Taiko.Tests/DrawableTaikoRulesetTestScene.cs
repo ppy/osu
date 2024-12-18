@@ -16,7 +16,7 @@ using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Taiko.Tests
 {
-    public abstract class DrawableTaikoRulesetTestScene : OsuTestScene
+    public abstract partial class DrawableTaikoRulesetTestScene : OsuTestScene
     {
         protected const int DEFAULT_PLAYFIELD_CONTAINER_HEIGHT = 768;
 

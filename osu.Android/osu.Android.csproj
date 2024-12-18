@@ -1,73 +1,22 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\osu.Android.props" />
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{D1D5F9A8-B40B-40E6-B02F-482D03346D3D}</ProjectGuid>
-    <ProjectTypeGuids>{EFBA0AD7-5A72-4C68-AF49-83D382785DCF};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <TemplateGuid>{122416d6-6b49-4ee2-a1e8-b825f31c79fe}</TemplateGuid>
+    <TargetFramework>net8.0-android</TargetFramework>
+    <OutputType>Exe</OutputType>
     <RootNamespace>osu.Android</RootNamespace>
     <AssemblyName>osu.Android</AssemblyName>
-    <AndroidManifest>Properties\AndroidManifest.xml</AndroidManifest>
-    <AndroidSupportedAbis>armeabi-v7a;x86;arm64-v8a</AndroidSupportedAbis>
-    <EnableLLVM>false</EnableLLVM> <!-- This currently causes random lockups during gameplay. https://github.com/mono/mono/issues/18973 -->
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <MandroidI18n>cjk;mideast;other;rare;west</MandroidI18n>
-    <AndroidDexTool>d8</AndroidDexTool>
-    <AndroidLinkTool>r8</AndroidLinkTool>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <AndroidLinkMode>None</AndroidLinkMode>
-    <MandroidI18n>cjk;mideast;other;rare;west</MandroidI18n>
-    <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
+    <Version>0.0.0</Version>
+    <ApplicationVersion Condition=" '$(ApplicationVersion)' == '' ">1</ApplicationVersion>
+    <ApplicationDisplayVersion Condition=" '$(ApplicationDisplayVersion)' == '' ">$(Version)</ApplicationDisplayVersion>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="AndroidJoystickSettings.cs" />
-    <Compile Include="AndroidMouseSettings.cs" />
-    <Compile Include="GameplayScreenRotationLocker.cs" />
-    <Compile Include="OsuGameActivity.cs" />
-    <Compile Include="OsuGameAndroid.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
+    <ProjectReference Include="..\osu.Game.Rulesets.Catch\osu.Game.Rulesets.Catch.csproj" />
+    <ProjectReference Include="..\osu.Game.Rulesets.Mania\osu.Game.Rulesets.Mania.csproj" />
+    <ProjectReference Include="..\osu.Game.Rulesets.Osu\osu.Game.Rulesets.Osu.csproj" />
+    <ProjectReference Include="..\osu.Game.Rulesets.Taiko\osu.Game.Rulesets.Taiko.csproj" />
+    <ProjectReference Include="..\osu.Game\osu.Game.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Properties\AndroidManifest.xml" />
+    <PackageReference Include="Microsoft.Maui.Essentials" Version="8.0.3" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\osu.Game.Rulesets.Catch\osu.Game.Rulesets.Catch.csproj">
-      <Project>{58f6c80c-1253-4a0e-a465-b8c85ebeadf3}</Project>
-      <Name>osu.Game.Rulesets.Catch</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\osu.Game.Rulesets.Mania\osu.Game.Rulesets.Mania.csproj">
-      <Project>{48f4582b-7687-4621-9cbe-5c24197cb536}</Project>
-      <Name>osu.Game.Rulesets.Mania</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\osu.Game.Rulesets.Osu\osu.Game.Rulesets.Osu.csproj">
-      <Project>{c92a607b-1fdd-4954-9f92-03ff547d9080}</Project>
-      <Name>osu.Game.Rulesets.Osu</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\osu.Game.Rulesets.Taiko\osu.Game.Rulesets.Taiko.csproj">
-      <Project>{f167e17a-7de6-4af5-b920-a5112296c695}</Project>
-      <Name>osu.Game.Rulesets.Taiko</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\osu.Game\osu.Game.csproj">
-      <Project>{2a66dd92-adb1-4994-89e2-c94e04acda0d}</Project>
-      <Name>osu.Game</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <AndroidResource Include="Resources\drawable\lazer.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="System.Formats.Asn1">
-      <Version>5.0.0</Version>
-    </PackageReference>
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Xamarin.Essentials" Version="1.7.0" />
-  </ItemGroup>
-  <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
 </Project>

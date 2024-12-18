@@ -7,7 +7,7 @@ using osu.Game.Rulesets.Catch.Objects;
 
 namespace osu.Game.Rulesets.Catch.Skinning.Default
 {
-    internal class FruitPiece : CatchHitObjectPiece
+    internal partial class FruitPiece : CatchHitObjectPiece
     {
         /// <summary>
         /// Because we're adding a border around the fruit, we need to scale down some.

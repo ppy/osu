@@ -23,7 +23,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneMultiplayerParticipantsList : MultiplayerTestScene
+    public partial class TestSceneMultiplayerParticipantsList : MultiplayerTestScene
     {
         [SetUpSteps]
         public void SetupSteps()
@@ -107,6 +107,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestBeatmapDownloadingStates()
         {
+            AddStep("set to unknown", () => MultiplayerClient.ChangeBeatmapAvailability(BeatmapAvailability.Unknown()));
             AddStep("set to no map", () => MultiplayerClient.ChangeBeatmapAvailability(BeatmapAvailability.NotDownloaded()));
             AddStep("set to downloading map", () => MultiplayerClient.ChangeBeatmapAvailability(BeatmapAvailability.Downloading(0)));
 
@@ -197,7 +198,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("make second user host", () => MultiplayerClient.TransferHost(3));
 
-            AddUntilStep("kick buttons not visible", () => this.ChildrenOfType<ParticipantPanel.KickButton>().Count(d => d.IsPresent) == 0);
+            AddUntilStep("kick buttons not visible", () => !this.ChildrenOfType<ParticipantPanel.KickButton>().Any(d => d.IsPresent));
 
             AddStep("make local user host again", () => MultiplayerClient.TransferHost(API.LocalUser.Value.Id));
 
@@ -382,6 +383,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
 
             AddUntilStep("wait for list to load", () => participantsList?.IsLoaded == true);
+
+            AddStep("set beatmap available", () => MultiplayerClient.ChangeBeatmapAvailability(BeatmapAvailability.LocallyAvailable()));
         }
 
         private void checkProgressBarVisibility(bool visible) =>

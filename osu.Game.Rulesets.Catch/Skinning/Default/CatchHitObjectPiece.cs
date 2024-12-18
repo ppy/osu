@@ -11,7 +11,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Skinning.Default
 {
-    public abstract class CatchHitObjectPiece : CompositeDrawable
+    public abstract partial class CatchHitObjectPiece : CompositeDrawable
     {
         public readonly Bindable<Color4> AccentColour = new Bindable<Color4>();
         public readonly Bindable<bool> HyperDash = new Bindable<bool>();

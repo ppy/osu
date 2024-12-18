@@ -6,6 +6,8 @@ using System.Linq;
 using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.Models;
+using osu.Game.Online.API;
+using osu.Game.Rulesets;
 
 namespace osu.Game.Beatmaps
 {
@@ -29,5 +31,19 @@ namespace osu.Game.Beatmaps
         /// <param name="filename">The name of the file to get the storage path of.</param>
         public static RealmNamedFileUsage? GetFile(this IHasRealmFiles model, string filename) =>
             model.Files.SingleOrDefault(f => string.Equals(f.Filename, filename, StringComparison.OrdinalIgnoreCase));
+
+        /// <summary>
+        /// Get the beatmapset info page URL, or <c>null</c> if unavailable.
+        /// </summary>
+        public static string? GetOnlineURL(this IBeatmapSetInfo beatmapSetInfo, IAPIProvider api, IRulesetInfo? ruleset = null)
+        {
+            if (beatmapSetInfo.OnlineID <= 0)
+                return null;
+
+            if (ruleset != null)
+                return $@"{api.WebsiteRootUrl}/beatmapsets/{beatmapSetInfo.OnlineID}#{ruleset.ShortName}";
+
+            return $@"{api.WebsiteRootUrl}/beatmapsets/{beatmapSetInfo.OnlineID}";
+        }
     }
 }

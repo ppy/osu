@@ -1,11 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.IO.Stores;
+using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.IO;
@@ -22,22 +21,42 @@ namespace osu.Game.Database
         {
             // make sure the directory exists
             if (!storage.ExistsDirectory(string.Empty))
-                yield break;
+                return Array.Empty<string>();
 
-            foreach (string directory in storage.GetDirectories(string.Empty))
+            List<string> paths = new List<string>();
+
+            try
             {
-                var directoryStorage = storage.GetStorageForDirectory(directory);
-
-                if (!directoryStorage.GetFiles(string.Empty).ExcludeSystemFileNames().Any())
+                foreach (string directory in storage.GetDirectories(string.Empty))
                 {
-                    // if a directory doesn't contain files, attempt looking for beatmaps inside of that directory.
-                    // this is a special behaviour in stable for beatmaps only, see https://github.com/ppy/osu/issues/18615.
-                    foreach (string subDirectory in GetStableImportPaths(directoryStorage))
-                        yield return subDirectory;
+                    var directoryStorage = storage.GetStorageForDirectory(directory);
+
+                    try
+                    {
+                        if (!directoryStorage.GetFiles(string.Empty, "*.osu").Any())
+                        {
+                            // if a directory doesn't contain any beatmap files, look for further nested beatmap directories.
+                            // this is a special behaviour in stable for beatmaps only, see https://github.com/ppy/osu/issues/18615.
+                            foreach (string subDirectory in GetStableImportPaths(directoryStorage))
+                                paths.Add(subDirectory);
+                        }
+                        else
+                            paths.Add(storage.GetFullPath(directory));
+                    }
+                    catch (Exception e)
+                    {
+                        // Catch any errors when enumerating files
+                        Logger.Log($"Error when enumerating files in {directoryStorage.GetFullPath(string.Empty)}: {e}");
+                    }
                 }
-                else
-                    yield return storage.GetFullPath(directory);
             }
+            catch (Exception e)
+            {
+                // Catch any errors when enumerating directories
+                Logger.Log($"Error when enumerating directories in {storage.GetFullPath(string.Empty)}: {e}");
+            }
+
+            return paths;
         }
 
         public LegacyBeatmapImporter(IModelImporter<BeatmapSetInfo> importer)

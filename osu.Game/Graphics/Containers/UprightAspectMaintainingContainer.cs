@@ -12,7 +12,7 @@ namespace osu.Game.Graphics.Containers
     /// <summary>
     /// A container that reverts any rotation (and optionally scale) applied by its direct parent.
     /// </summary>
-    public class UprightAspectMaintainingContainer : Container
+    public partial class UprightAspectMaintainingContainer : Container
     {
         /// <summary>
         /// Controls how much this container scales compared to its parent (default is 1.0f).
@@ -48,7 +48,7 @@ namespace osu.Game.Graphics.Containers
         private void keepUprightAndUnstretched()
         {
             // Decomposes the inverse of the parent DrawInfo.Matrix into rotation, shear and scale.
-            var parentMatrix = Parent.DrawInfo.Matrix;
+            var parentMatrix = Parent!.DrawInfo.Matrix;
 
             // Remove Translation.>
             parentMatrix.M31 = 0.0f;

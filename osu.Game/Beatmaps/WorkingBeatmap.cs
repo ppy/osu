@@ -16,7 +16,6 @@ using osu.Framework.Audio.Track;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Logging;
-using osu.Framework.Testing;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
@@ -25,7 +24,6 @@ using osu.Game.Storyboards;
 
 namespace osu.Game.Beatmaps
 {
-    [ExcludeFromDynamicCompile]
     public abstract class WorkingBeatmap : IWorkingBeatmap
     {
         public readonly BeatmapInfo BeatmapInfo;
@@ -34,11 +32,7 @@ namespace osu.Game.Beatmaps
         // TODO: remove once the fallback lookup is not required (and access via `working.BeatmapInfo.Metadata` directly).
         public BeatmapMetadata Metadata => BeatmapInfo.Metadata;
 
-        public Waveform Waveform => waveform.Value;
-
         public Storyboard Storyboard => storyboard.Value;
-
-        public Texture Background => GetBackground(); // Texture uses ref counting, so we want to return a new instance every usage.
 
         public ISkin Skin => skin.Value;
 
@@ -48,10 +42,11 @@ namespace osu.Game.Beatmaps
 
         private readonly object beatmapFetchLock = new object();
 
-        private readonly Lazy<Waveform> waveform;
         private readonly Lazy<Storyboard> storyboard;
         private readonly Lazy<ISkin> skin;
+
         private Track track; // track is not Lazy as we allow transferring and loading multiple times.
+        private Waveform waveform; // waveform is also not Lazy as the track may change.
 
         protected WorkingBeatmap(BeatmapInfo beatmapInfo, AudioManager audioManager)
         {
@@ -60,7 +55,6 @@ namespace osu.Game.Beatmaps
             BeatmapInfo = beatmapInfo;
             BeatmapSetInfo = beatmapInfo.BeatmapSet ?? new BeatmapSetInfo();
 
-            waveform = new Lazy<Waveform>(GetWaveform);
             storyboard = new Lazy<Storyboard>(GetStoryboard);
             skin = new Lazy<ISkin>(GetSkin);
         }
@@ -68,10 +62,16 @@ namespace osu.Game.Beatmaps
         #region Resource getters
 
         protected virtual Waveform GetWaveform() => new Waveform(null);
-        protected virtual Storyboard GetStoryboard() => new Storyboard { BeatmapInfo = BeatmapInfo };
+
+        protected virtual Storyboard GetStoryboard() => new Storyboard
+        {
+            BeatmapInfo = BeatmapInfo,
+            Beatmap = Beatmap,
+        };
 
         protected abstract IBeatmap GetBeatmap();
-        protected abstract Texture GetBackground();
+        public abstract Texture GetBackground();
+        public virtual Texture GetPanelBackground() => GetBackground();
         protected abstract Track GetBeatmapTrack();
 
         /// <summary>
@@ -108,7 +108,16 @@ namespace osu.Game.Beatmaps
 
         public virtual bool TrackLoaded => track != null;
 
-        public Track LoadTrack() => track = GetBeatmapTrack() ?? GetVirtualTrack(1000);
+        public Track LoadTrack()
+        {
+            track = GetBeatmapTrack() ?? GetVirtualTrack(1000);
+
+            // the track may have changed, recycle the current waveform.
+            waveform?.Dispose();
+            waveform = null;
+
+            return track;
+        }
 
         public void PrepareTrackForPreview(bool looping, double offsetFromPreviewPoint = 0)
         {
@@ -171,9 +180,22 @@ namespace osu.Game.Beatmaps
 
         #endregion
 
+        #region Waveform
+
+        public Waveform Waveform => waveform ??= GetWaveform();
+
+        #endregion
+
         #region Beatmap
 
-        public virtual bool BeatmapLoaded => beatmapLoadTask?.IsCompleted ?? false;
+        public virtual bool BeatmapLoaded
+        {
+            get
+            {
+                lock (beatmapFetchLock)
+                    return beatmapLoadTask?.IsCompleted ?? false;
+            }
+        }
 
         public IBeatmap Beatmap
         {

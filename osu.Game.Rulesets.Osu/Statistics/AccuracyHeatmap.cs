@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Diagnostics;
 using System.Linq;
@@ -11,8 +9,12 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
+using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Scoring;
 using osuTK;
@@ -20,7 +22,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Statistics
 {
-    public class AccuracyHeatmap : CompositeDrawable
+    public partial class AccuracyHeatmap : CompositeDrawable
     {
         /// <summary>
         /// Size of the inner circle containing the "hit" points, relative to the size of this <see cref="AccuracyHeatmap"/>.
@@ -36,8 +38,8 @@ namespace osu.Game.Rulesets.Osu.Statistics
 
         private const float rotation = 45;
 
-        private BufferedContainer bufferedGrid;
-        private GridContainer pointGrid;
+        private BufferedContainer bufferedGrid = null!;
+        private GridContainer pointGrid = null!;
 
         private readonly ScoreInfo score;
         private readonly IBeatmap playableBeatmap;
@@ -58,6 +60,8 @@ namespace osu.Game.Rulesets.Osu.Statistics
         [BackgroundDependencyLoader]
         private void load()
         {
+            const float line_extension = 0.2f;
+
             InternalChild = new Container
             {
                 Anchor = Anchor.Centre,
@@ -66,76 +70,103 @@ namespace osu.Game.Rulesets.Osu.Statistics
                 FillMode = FillMode.Fit,
                 Children = new Drawable[]
                 {
-                    new CircularContainer
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        RelativeSizeAxes = Axes.Both,
-                        Size = new Vector2(inner_portion),
-                        Masking = true,
-                        BorderThickness = line_thickness,
-                        BorderColour = Color4.White,
-                        Child = new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = Color4Extensions.FromHex("#202624")
-                        }
-                    },
                     new Container
                     {
                         RelativeSizeAxes = Axes.Both,
                         Children = new Drawable[]
                         {
+                            new CircularContainer
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                RelativeSizeAxes = Axes.Both,
+                                Size = new Vector2(inner_portion),
+                                Masking = true,
+                                BorderThickness = line_thickness,
+                                BorderColour = Color4.White,
+                                Child = new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Colour = Color4Extensions.FromHex("#202624")
+                                }
+                            },
                             new Container
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 Padding = new MarginPadding(1),
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Rotation = rotation,
                                 Child = new Container
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Masking = true,
                                     Children = new Drawable[]
                                     {
-                                        new Box
+                                        new Circle
                                         {
                                             Anchor = Anchor.Centre,
                                             Origin = Anchor.Centre,
-                                            EdgeSmoothness = new Vector2(1),
                                             RelativeSizeAxes = Axes.Y,
-                                            Height = 2, // We're rotating along a diagonal - we don't really care how big this is.
-                                            Width = line_thickness / 2,
+                                            Width = line_thickness,
+                                            Height = inner_portion + line_extension,
+                                            Rotation = -rotation * 2,
+                                            Alpha = 0.6f,
+                                        },
+                                        new Circle
+                                        {
+                                            Anchor = Anchor.Centre,
+                                            Origin = Anchor.Centre,
+                                            RelativeSizeAxes = Axes.Y,
+                                            Width = line_thickness,
+                                            Height = inner_portion + line_extension,
+                                        },
+                                        new OsuSpriteText
+                                        {
+                                            Text = "Overshoot",
+                                            Font = OsuFont.GetFont(size: 12),
+                                            Anchor = Anchor.Centre,
+                                            Origin = Anchor.BottomLeft,
+                                            Padding = new MarginPadding(2),
                                             Rotation = -rotation,
-                                            Alpha = 0.3f,
+                                            RelativePositionAxes = Axes.Both,
+                                            Y = -(inner_portion + line_extension) / 2,
                                         },
-                                        new Box
+                                        new OsuSpriteText
+                                        {
+                                            Text = "Undershoot",
+                                            Font = OsuFont.GetFont(size: 12),
+                                            Anchor = Anchor.Centre,
+                                            Origin = Anchor.TopRight,
+                                            Rotation = -rotation,
+                                            Padding = new MarginPadding(2),
+                                            RelativePositionAxes = Axes.Both,
+                                            Y = (inner_portion + line_extension) / 2,
+                                        },
+                                        new Circle
                                         {
                                             Anchor = Anchor.Centre,
-                                            Origin = Anchor.Centre,
-                                            EdgeSmoothness = new Vector2(1),
-                                            RelativeSizeAxes = Axes.Y,
-                                            Height = 2, // We're rotating along a diagonal - we don't really care how big this is.
-                                            Width = line_thickness / 2, // adjust for edgesmoothness
-                                            Rotation = rotation
+                                            Origin = Anchor.TopCentre,
+                                            RelativePositionAxes = Axes.Both,
+                                            Y = -(inner_portion + line_extension) / 2,
+                                            Margin = new MarginPadding(-line_thickness / 2),
+                                            Width = line_thickness,
+                                            Height = 10,
+                                            Rotation = 45,
                                         },
+                                        new Circle
+                                        {
+                                            Anchor = Anchor.Centre,
+                                            Origin = Anchor.TopCentre,
+                                            RelativePositionAxes = Axes.Both,
+                                            Y = -(inner_portion + line_extension) / 2,
+                                            Margin = new MarginPadding(-line_thickness / 2),
+                                            Width = line_thickness,
+                                            Height = 10,
+                                            Rotation = -45,
+                                        }
                                     }
                                 },
                             },
-                            new Box
-                            {
-                                Anchor = Anchor.TopRight,
-                                Origin = Anchor.TopRight,
-                                Width = 10,
-                                EdgeSmoothness = new Vector2(1),
-                                Height = line_thickness / 2, // adjust for edgesmoothness
-                            },
-                            new Box
-                            {
-                                Anchor = Anchor.TopRight,
-                                Origin = Anchor.TopRight,
-                                EdgeSmoothness = new Vector2(1),
-                                Width = line_thickness / 2, // adjust for edgesmoothness
-                                Height = 10,
-                            }
                         }
                     },
                     bufferedGrid = new BufferedContainer(cachedFrameBuffer: true)
@@ -161,16 +192,22 @@ namespace osu.Game.Rulesets.Osu.Statistics
 
                 for (int c = 0; c < points_per_dimension; c++)
                 {
-                    HitPointType pointType = Vector2.Distance(new Vector2(c, r), centre) <= innerRadius
-                        ? HitPointType.Hit
-                        : HitPointType.Miss;
+                    bool isHit = Vector2.Distance(new Vector2(c + 0.5f, r + 0.5f), centre) <= innerRadius;
 
-                    var point = new HitPoint(pointType, this)
+                    if (isHit)
                     {
-                        BaseColour = pointType == HitPointType.Hit ? new Color4(102, 255, 204, 255) : new Color4(255, 102, 102, 255)
-                    };
-
-                    points[r][c] = point;
+                        points[r][c] = new HitPoint(this)
+                        {
+                            BaseColour = new Color4(102, 255, 204, 255)
+                        };
+                    }
+                    else
+                    {
+                        points[r][c] = new MissPoint
+                        {
+                            BaseColour = new Color4(255, 102, 102, 255)
+                        };
+                    }
                 }
             }
 
@@ -179,8 +216,7 @@ namespace osu.Game.Rulesets.Osu.Statistics
             if (score.HitEvents.Count == 0)
                 return;
 
-            // Todo: This should probably not be done like this.
-            float radius = OsuHitObject.OBJECT_RADIUS * (1.0f - 0.7f * (playableBeatmap.Difficulty.CircleSize - 5) / 5) / 2;
+            float radius = OsuHitObject.OBJECT_RADIUS * LegacyRulesetExtensions.CalculateScaleFromCircleSize(playableBeatmap.Difficulty.CircleSize, true);
 
             foreach (var e in score.HitEvents.Where(e => e.HitObject is HitCircle && !(e.HitObject is SliderTailCircle)))
             {
@@ -217,44 +253,35 @@ namespace osu.Game.Rulesets.Osu.Statistics
             // Likewise sin(pi/2)=1 and sin(3pi/2)=-1, whereas we actually want these values to appear on the bottom/top respectively, so the y-coordinate also needs to be inverted.
             //
             // We also need to apply the anti-clockwise rotation.
-            double rotatedAngle = finalAngle - MathUtils.DegreesToRadians(rotation);
+            double rotatedAngle = finalAngle - float.DegreesToRadians(rotation);
             var rotatedCoordinate = -1 * new Vector2((float)Math.Cos(rotatedAngle), (float)Math.Sin(rotatedAngle));
 
             Vector2 localCentre = new Vector2(points_per_dimension - 1) / 2;
-            float localRadius = localCentre.X * inner_portion * normalisedDistance; // The radius inside the inner portion which of the heatmap which the closest point lies.
+            float localRadius = localCentre.X * inner_portion * normalisedDistance;
             Vector2 localPoint = localCentre + localRadius * rotatedCoordinate;
 
             // Find the most relevant hit point.
-            int r = Math.Clamp((int)Math.Round(localPoint.Y), 0, points_per_dimension - 1);
-            int c = Math.Clamp((int)Math.Round(localPoint.X), 0, points_per_dimension - 1);
+            int r = (int)Math.Round(localPoint.Y);
+            int c = (int)Math.Round(localPoint.X);
 
-            PeakValue = Math.Max(PeakValue, ((HitPoint)pointGrid.Content[r][c]).Increment());
+            if (r < 0 || r >= points_per_dimension || c < 0 || c >= points_per_dimension)
+                return;
+
+            PeakValue = Math.Max(PeakValue, ((GridPoint)pointGrid.Content[r][c]).Increment());
 
             bufferedGrid.ForceRedraw();
         }
 
-        private class HitPoint : Circle
+        private abstract partial class GridPoint : CompositeDrawable
         {
             /// <summary>
             /// The base colour which will be lightened/darkened depending on the value of this <see cref="HitPoint"/>.
             /// </summary>
             public Color4 BaseColour;
 
-            private readonly HitPointType pointType;
-            private readonly AccuracyHeatmap heatmap;
+            public override bool IsPresent => Count > 0;
 
-            public override bool IsPresent => count > 0;
-
-            public HitPoint(HitPointType pointType, AccuracyHeatmap heatmap)
-            {
-                this.pointType = pointType;
-                this.heatmap = heatmap;
-
-                RelativeSizeAxes = Axes.Both;
-                Alpha = 1;
-            }
-
-            private int count;
+            protected int Count { get; private set; }
 
             /// <summary>
             /// Increment the value of this point by one.
@@ -262,7 +289,41 @@ namespace osu.Game.Rulesets.Osu.Statistics
             /// <returns>The value after incrementing.</returns>
             public int Increment()
             {
-                return ++count;
+                return ++Count;
+            }
+        }
+
+        private partial class MissPoint : GridPoint
+        {
+            public MissPoint()
+            {
+                RelativeSizeAxes = Axes.Both;
+
+                InternalChild = new SpriteIcon
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Icon = FontAwesome.Solid.Times
+                };
+            }
+
+            protected override void Update()
+            {
+                Alpha = 0.8f;
+                Colour = BaseColour;
+            }
+        }
+
+        private partial class HitPoint : GridPoint
+        {
+            private readonly AccuracyHeatmap heatmap;
+
+            public HitPoint(AccuracyHeatmap heatmap)
+            {
+                this.heatmap = heatmap;
+
+                RelativeSizeAxes = Axes.Both;
+
+                InternalChild = new Circle { RelativeSizeAxes = Axes.Both };
             }
 
             protected override void Update()
@@ -278,10 +339,10 @@ namespace osu.Game.Rulesets.Osu.Statistics
                 float amount = 0;
 
                 // give some amount of alpha regardless of relative count
-                amount += non_relative_portion * Math.Min(1, count / 10f);
+                amount += non_relative_portion * Math.Min(1, Count / 10f);
 
                 // add relative portion
-                amount += (1 - non_relative_portion) * (count / heatmap.PeakValue);
+                amount += (1 - non_relative_portion) * (Count / heatmap.PeakValue);
 
                 // apply easing
                 amount = (float)Interpolation.ApplyEasing(Easing.OutQuint, Math.Min(1, amount));
@@ -289,15 +350,8 @@ namespace osu.Game.Rulesets.Osu.Statistics
                 Debug.Assert(amount <= 1);
 
                 Alpha = Math.Min(amount / lighten_cutoff, 1);
-                if (pointType == HitPointType.Hit)
-                    Colour = BaseColour.Lighten(Math.Max(0, amount - lighten_cutoff));
+                Colour = BaseColour.Lighten(Math.Max(0, amount - lighten_cutoff));
             }
-        }
-
-        private enum HitPointType
-        {
-            Hit,
-            Miss
         }
     }
 }

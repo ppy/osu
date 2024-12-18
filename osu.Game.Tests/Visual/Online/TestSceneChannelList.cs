@@ -9,18 +9,18 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
-using osu.Framework.Utils;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Chat.ChannelList;
 using osu.Game.Overlays.Chat.Listing;
+using osu.Game.Tests.Resources;
 
 namespace osu.Game.Tests.Visual.Online
 {
     [TestFixture]
-    public class TestSceneChannelList : OsuTestScene
+    public partial class TestSceneChannelList : OsuTestScene
     {
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Pink);
@@ -160,7 +160,7 @@ namespace osu.Game.Tests.Visual.Online
 
         private Channel createRandomPublicChannel()
         {
-            int id = RNG.Next(0, 10000);
+            int id = TestResources.GetNextTestID();
             return new Channel
             {
                 Name = $"#channel-{id}",
@@ -171,7 +171,7 @@ namespace osu.Game.Tests.Visual.Online
 
         private Channel createRandomPrivateChannel()
         {
-            int id = RNG.Next(0, 10000);
+            int id = TestResources.GetNextTestID();
             return new Channel(new APIUser
             {
                 Id = id,
@@ -181,7 +181,7 @@ namespace osu.Game.Tests.Visual.Online
 
         private Channel createRandomAnnounceChannel()
         {
-            int id = RNG.Next(0, 10000);
+            int id = TestResources.GetNextTestID();
             return new Channel
             {
                 Name = $"Announce {id}",

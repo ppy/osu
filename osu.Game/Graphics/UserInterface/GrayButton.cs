@@ -11,7 +11,7 @@ using osuTK;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class GrayButton : OsuAnimatedButton
+    public partial class GrayButton : OsuAnimatedButton
     {
         protected SpriteIcon Icon { get; private set; }
         protected Box Background { get; private set; }

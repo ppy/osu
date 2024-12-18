@@ -62,6 +62,8 @@ namespace osu.Game.Rulesets.Taiko.Mods
                         hitObject.LifetimeEnd = state == ArmedState.Idle || !hitObject.AllJudged
                             ? hitObject.HitObject.GetEndTime() + hitObject.HitObject.HitWindows.WindowFor(HitResult.Miss)
                             : hitObject.HitStateUpdateTime;
+                        // extend the lifetime end of the object in order to allow its nested strong hit (if any) to be judged.
+                        hitObject.LifetimeEnd += DrawableHit.StrongNestedHit.SECOND_HIT_WINDOW;
                     }
 
                     break;

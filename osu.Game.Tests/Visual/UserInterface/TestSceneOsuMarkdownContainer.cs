@@ -13,7 +13,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneOsuMarkdownContainer : OsuTestScene
+    public partial class TestSceneOsuMarkdownContainer : OsuTestScene
     {
         private OsuMarkdownContainer markdownContainer;
 

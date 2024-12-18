@@ -5,7 +5,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Mania
 {
-    public class ManiaSkinComponentLookup : GameplaySkinComponentLookup<ManiaSkinComponents>
+    public class ManiaSkinComponentLookup : SkinComponentLookup<ManiaSkinComponents>
     {
         /// <summary>
         /// Creates a new <see cref="ManiaSkinComponentLookup"/>.
@@ -15,10 +15,6 @@ namespace osu.Game.Rulesets.Mania
             : base(component)
         {
         }
-
-        protected override string RulesetPrefix => ManiaRuleset.SHORT_NAME;
-
-        protected override string ComponentName => Component.ToString().ToLowerInvariant();
     }
 
     public enum ManiaSkinComponents
@@ -33,5 +29,6 @@ namespace osu.Game.Rulesets.Mania
         HitExplosion,
         StageBackground,
         StageForeground,
+        BarLine
     }
 }

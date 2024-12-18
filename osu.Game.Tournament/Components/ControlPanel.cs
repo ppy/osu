@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -16,7 +14,7 @@ namespace osu.Game.Tournament.Components
     /// An element anchored to the right-hand area of a screen that provides streamer level controls.
     /// Should be off-screen.
     /// </summary>
-    public class ControlPanel : Container
+    public partial class ControlPanel : Container
     {
         private readonly FillFlowContainer buttons;
 
@@ -57,7 +55,7 @@ namespace osu.Game.Tournament.Components
             };
         }
 
-        public class Spacer : CompositeDrawable
+        public partial class Spacer : CompositeDrawable
         {
             public Spacer(float height = 20)
             {

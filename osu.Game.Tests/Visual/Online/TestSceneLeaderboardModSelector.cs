@@ -20,7 +20,7 @@ using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneLeaderboardModSelector : OsuTestScene
+    public partial class TestSceneLeaderboardModSelector : OsuTestScene
     {
         public TestSceneLeaderboardModSelector()
         {

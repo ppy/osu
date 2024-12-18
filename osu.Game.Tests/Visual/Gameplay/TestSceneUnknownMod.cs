@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using NUnit.Framework;
 using osu.Game.Rulesets;
@@ -10,7 +8,7 @@ using osu.Game.Rulesets.Osu;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneUnknownMod : ModTestScene
+    public partial class TestSceneUnknownMod : ModTestScene
     {
         protected override Ruleset CreatePlayerRuleset() => new OsuRuleset();
 
@@ -22,7 +20,6 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             CreateModTest(new ModTestData
             {
-                Beatmap = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo).Beatmap,
                 Mod = new UnknownMod("WNG"),
                 PassCondition = () => Player.IsLoaded && !Player.LoadedBeatmapSuccessfully
             });

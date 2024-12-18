@@ -1,206 +1,196 @@
-# Listens for new PR comments containing !pp check [id], and runs a diffcalc comparison against master.
-# Usage:
-#   !pp check 0        | Runs only the osu! ruleset.
-#   !pp check 0 2      | Runs only the osu! and catch rulesets.
+# ## Description
 #
+# Uses [diffcalc-sheet-generator](https://github.com/smoogipoo/diffcalc-sheet-generator) to run two builds of osu and generate an SR/PP/Score comparison spreadsheet.
+#
+# ## Requirements
+#
+# Self-hosted runner with installed:
+# - `docker >= 20.10.16`
+# - `docker-compose >= 2.5.1`
+# - `lbzip2`
+# - `jq`
+#
+# ## Usage
+#
+# The workflow can be run in two ways:
+# 1. Via workflow dispatch.
+# 2. By an owner of the repository posting a pull request or issue comment containing `!diffcalc`.
+# For pull requests, the workflow will assume the pull request as the target to compare against (i.e. the `OSU_B` variable).
+# Any lines in the comment of the form `KEY=VALUE` are treated as variables for the generator.
+#
+# ## Google Service Account
+#
+# Spreadsheets are uploaded to a Google Service Account, and exposed with read-only permissions to the wider audience.
+#
+# 1. Create a project at https://console.cloud.google.com
+# 2. Enable the `Google Sheets` and `Google Drive` APIs.
+# 3. Create a Service Account
+# 4. Generate a key in the JSON format.
+# 5. Encode the key as base64 and store as an **actions secret** with name **`DIFFCALC_GOOGLE_CREDENTIALS`**
+#
+# ## Environment variables
+#
+# The default environment may be configured via **actions variables**.
+#
+# Refer to [the sample environment](https://github.com/smoogipoo/diffcalc-sheet-generator/blob/master/.env.sample), and prefix each variable with `DIFFCALC_` (e.g. `DIFFCALC_THREADS`, `DIFFCALC_INNODB_BUFFER_SIZE`, etc...).
 
-name: Difficulty Calculation
+name: Run difficulty calculation comparison
+
+run-name: "${{ github.event_name == 'workflow_dispatch' && format('Manual run: {0}', inputs.osu-b) || 'Automatic comment trigger' }}"
+
 on:
   issue_comment:
     types: [ created ]
+  workflow_dispatch:
+    inputs:
+      osu-b:
+        description: "The target build of ppy/osu"
+        type: string
+        required: true
+      ruleset:
+        description: "The ruleset to process"
+        type: choice
+        required: true
+        options:
+          - osu
+          - taiko
+          - catch
+          - mania
+      converts:
+        description: "Include converted beatmaps"
+        type: boolean
+        required: false
+        default: true
+      ranked-only:
+        description: "Only ranked beatmaps"
+        type: boolean
+        required: false
+        default: true
+      generators:
+        description: "Comma-separated list of generators (available: [sr, pp, score])"
+        type: string
+        required: false
+        default: 'pp,sr'
+      osu-a:
+        description: "The source build of ppy/osu"
+        type: string
+        required: false
+        default: 'latest'
+      difficulty-calculator-a:
+        description: "The source build of ppy/osu-difficulty-calculator"
+        type: string
+        required: false
+        default: 'latest'
+      difficulty-calculator-b:
+        description: "The target build of ppy/osu-difficulty-calculator"
+        type: string
+        required: false
+        default: 'latest'
+      score-processor-a:
+        description: "The source build of ppy/osu-queue-score-statistics"
+        type: string
+        required: false
+        default: 'latest'
+      score-processor-b:
+        description: "The target build of ppy/osu-queue-score-statistics"
+        type: string
+        required: false
+        default: 'latest'
+
+permissions:
+  pull-requests: write
 
 env:
-  CONCURRENCY: 4
-  ALLOW_DOWNLOAD: 1
-  SAVE_DOWNLOADED: 1
-  SKIP_INSERT_ATTRIBUTES: 1
+  EXECUTION_ID: execution-${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}
+
+defaults:
+  run:
+    shell: bash -euo pipefail {0}
 
 jobs:
-  metadata:
-    name: Check for requests
-    runs-on: self-hosted
-    if: github.event.issue.pull_request && contains(github.event.comment.body, '!pp check') && (github.event.comment.author_association == 'MEMBER' || github.event.comment.author_association == 'OWNER')
-    outputs:
-      matrix: ${{ steps.generate-matrix.outputs.matrix }}
-      continue: ${{ steps.generate-matrix.outputs.continue }}
+  check-permissions:
+    name: Check permissions
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'workflow_dispatch' || contains(github.event.comment.body, '!diffcalc') }}
     steps:
-      - name: Construct build matrix
-        id: generate-matrix
+      - name: Check permissions
         run: |
-          if [[ "${{ github.event.comment.body }}" =~ "osu" ]] ; then
-            MATRIX_PROJECTS_JSON+='{ "name": "osu", "id": 0 },'
-          fi
-          if [[ "${{ github.event.comment.body }}" =~ "taiko" ]] ; then
-            MATRIX_PROJECTS_JSON+='{ "name": "taiko", "id": 1 },'
-          fi
-          if [[ "${{ github.event.comment.body }}" =~ "catch" ]] ; then
-            MATRIX_PROJECTS_JSON+='{ "name": "catch", "id": 2 },'
-          fi
-          if [[ "${{ github.event.comment.body }}" =~ "mania" ]] ; then
-            MATRIX_PROJECTS_JSON+='{ "name": "mania", "id": 3 },'
-          fi
+          ALLOWED_USERS=(smoogipoo peppy bdach frenzibyte tsunyoku stanriders)
+          for i in "${ALLOWED_USERS[@]}"; do
+              if [[ "${{ github.actor }}" == "$i" ]]; then
+                  exit 0
+              fi
+          done
+          exit 1
 
-          if [[ "${MATRIX_PROJECTS_JSON}" != "" ]]; then
-            MATRIX_JSON="{ \"ruleset\": [ ${MATRIX_PROJECTS_JSON} ] }"
-            echo "${MATRIX_JSON}"
-            CONTINUE="yes"
-          else
-            CONTINUE="no"
-          fi
+  run-diffcalc:
+    name: Run spreadsheet generator
+    needs: check-permissions
+    uses: ./.github/workflows/_diffcalc_processor.yml
+    with:
+      # Can't reference env... Why GitHub, WHY?
+      id: execution-${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}
+      head-sha: https://github.com/${{ github.repository }}/commit/${{ github.event.pull_request.head.sha || github.sha }}
+      pr-url: ${{ github.event.issue.pull_request.html_url || '' }}
+      pr-text: ${{ github.event.comment.body || '' }}
+      dispatch-inputs: ${{ (github.event.type == 'workflow_dispatch' && toJSON(inputs)) || '' }}
+    secrets:
+      DIFFCALC_GOOGLE_CREDENTIALS: ${{ secrets.DIFFCALC_GOOGLE_CREDENTIALS }}
 
-          echo "::set-output name=continue::${CONTINUE}"
-          echo "::set-output name=matrix::${MATRIX_JSON}"
-  diffcalc:
-    name: Run
-    runs-on: self-hosted
-    timeout-minutes: 1440
-    if: needs.metadata.outputs.continue == 'yes'
-    needs: metadata
-    strategy:
-      matrix: ${{ fromJson(needs.metadata.outputs.matrix) }}
+  create-comment:
+    name: Create PR comment
+    needs: check-permissions
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'issue_comment' && github.event.issue.pull_request }}
     steps:
-      - name: Verify MySQL connection from host
-        run: |
-          mysql -e "SHOW DATABASES"
-
-      - name: Drop previous databases
-        run: |
-          for db in osu_master osu_pr
-          do
-            mysql -e "DROP DATABASE IF EXISTS $db"
-          done
-
-      - name: Create directory structure
-        run: |
-          mkdir -p $GITHUB_WORKSPACE/master/
-          mkdir -p $GITHUB_WORKSPACE/pr/
-
-      - name: Get upstream branch # https://akaimo.hatenablog.jp/entry/2020/05/16/101251
-        id: upstreambranch
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          echo "::set-output name=branchname::$(curl -H "Authorization: token ${GITHUB_TOKEN}" ${{ github.event.issue.pull_request.url }} | jq '.head.ref' | sed 's/\"//g')"
-          echo "::set-output name=repo::$(curl -H "Authorization: token ${GITHUB_TOKEN}" ${{ github.event.issue.pull_request.url }} | jq '.head.repo.full_name' | sed 's/\"//g')"
-
-      # Checkout osu
-      - name: Checkout osu (master)
-        uses: actions/checkout@v2
+      - name: Create comment
+        uses: thollander/actions-comment-pull-request@fabd468d3a1a0b97feee5f6b9e499eab0dd903f6 # v2.5.0
         with:
-          path: 'master/osu'
-      - name: Checkout osu (pr)
-        uses: actions/checkout@v2
+          comment_tag: ${{ env.EXECUTION_ID }}
+          message: |
+            Difficulty calculation queued -- please wait! (${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+
+            *This comment will update on completion*
+
+  output-cli:
+    name: Info
+    needs: run-diffcalc
+    runs-on: ubuntu-latest
+    steps:
+      - name: Output info
+        run: |
+          echo "Target: ${{ needs.run-diffcalc.outputs.target }}"
+          echo "Spreadsheet: ${{ needs.run-diffcalc.outputs.sheet }}"
+
+  update-comment:
+    name: Update PR comment
+    needs: [ create-comment, run-diffcalc ]
+    runs-on: ubuntu-latest
+    if: ${{ always() && needs.create-comment.result == 'success' }}
+    steps:
+      - name: Update comment on success
+        if: ${{ needs.run-diffcalc.result == 'success' }}
+        uses: thollander/actions-comment-pull-request@fabd468d3a1a0b97feee5f6b9e499eab0dd903f6 # v2.5.0
         with:
-          path: 'pr/osu'
-          repository: ${{ steps.upstreambranch.outputs.repo }}
-          ref: ${{ steps.upstreambranch.outputs.branchname }}
+          comment_tag: ${{ env.EXECUTION_ID }}
+          mode: recreate
+          message: |
+            Target: ${{ needs.run-diffcalc.outputs.target }}
+            Spreadsheet: ${{ needs.run-diffcalc.outputs.sheet }}
 
-      - name: Checkout osu-difficulty-calculator (master)
-        uses: actions/checkout@v2
+      - name: Update comment on failure
+        if: ${{ needs.run-diffcalc.result == 'failure' }}
+        uses: thollander/actions-comment-pull-request@fabd468d3a1a0b97feee5f6b9e499eab0dd903f6 # v2.5.0
         with:
-          repository: ppy/osu-difficulty-calculator
-          path: 'master/osu-difficulty-calculator'
-      - name: Checkout osu-difficulty-calculator (pr)
-        uses: actions/checkout@v2
+          comment_tag: ${{ env.EXECUTION_ID }}
+          mode: recreate
+          message: |
+            Difficulty calculation failed: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+      - name: Update comment on cancellation
+        if: ${{ needs.run-diffcalc.result == 'cancelled' }}
+        uses: thollander/actions-comment-pull-request@fabd468d3a1a0b97feee5f6b9e499eab0dd903f6 # v2.5.0
         with:
-          repository: ppy/osu-difficulty-calculator
-          path: 'pr/osu-difficulty-calculator'
-
-      - name: Install .NET 5.0.x
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: "5.0.x"
-
-      # Sanity checks to make sure diffcalc is not run when incompatible.
-      - name: Build diffcalc (master)
-        run: |
-          cd $GITHUB_WORKSPACE/master/osu-difficulty-calculator
-          ./UseLocalOsu.sh
-          dotnet build
-      - name: Build diffcalc (pr)
-        run: |
-          cd $GITHUB_WORKSPACE/pr/osu-difficulty-calculator
-          ./UseLocalOsu.sh
-          dotnet build
-
-      - name: Download + import data
-        run: |
-          PERFORMANCE_DATA_NAME=$(curl https://data.ppy.sh/ | grep performance_${{ matrix.ruleset.name }}_top_1000 | tail -1 | awk -F "\"" '{print $2}' | sed 's/\.tar\.bz2//g')
-          BEATMAPS_DATA_NAME=$(curl https://data.ppy.sh/ | grep osu_files | tail -1 | awk -F "\"" '{print $2}' | sed 's/\.tar\.bz2//g')
-
-          # Set env variable for further steps.
-          echo "BEATMAPS_PATH=$GITHUB_WORKSPACE/$BEATMAPS_DATA_NAME" >> $GITHUB_ENV
-
-          cd $GITHUB_WORKSPACE
-
-          echo "Downloading database dump $PERFORMANCE_DATA_NAME.."
-          wget -q -nc https://data.ppy.sh/$PERFORMANCE_DATA_NAME.tar.bz2
-          echo "Extracting.."
-          tar -xf $PERFORMANCE_DATA_NAME.tar.bz2
-
-          echo "Downloading beatmap dump $BEATMAPS_DATA_NAME.."
-          wget -q -nc https://data.ppy.sh/$BEATMAPS_DATA_NAME.tar.bz2
-          echo "Extracting.."
-          tar -xf $BEATMAPS_DATA_NAME.tar.bz2
-
-          cd $PERFORMANCE_DATA_NAME
-
-          for db in osu_master osu_pr
-          do
-            echo "Setting up database $db.."
-
-            mysql -e "CREATE DATABASE $db"
-
-            echo "Importing beatmaps.."
-            cat osu_beatmaps.sql | mysql $db
-            echo "Importing beatmapsets.."
-            cat osu_beatmapsets.sql | mysql $db
-
-            echo "Creating table structure.."
-            mysql $db -e 'CREATE TABLE `osu_beatmap_difficulty` (
-                `beatmap_id` int unsigned NOT NULL,
-                `mode` tinyint NOT NULL DEFAULT 0,
-                `mods` int unsigned NOT NULL,
-                `diff_unified` float NOT NULL,
-                `last_update` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                PRIMARY KEY (`beatmap_id`,`mode`,`mods`),
-                KEY `diff_sort` (`mode`,`mods`,`diff_unified`)
-              ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;'
-          done
-
-      - name: Run diffcalc (master)
-        env:
-          DB_NAME: osu_master
-        run: |
-          cd $GITHUB_WORKSPACE/master/osu-difficulty-calculator/osu.Server.DifficultyCalculator
-          dotnet run -c:Release -- all -m ${{ matrix.ruleset.id }} -ac -c ${{ env.CONCURRENCY }}
-      - name: Run diffcalc (pr)
-        env:
-          DB_NAME: osu_pr
-        run: |
-          cd $GITHUB_WORKSPACE/pr/osu-difficulty-calculator/osu.Server.DifficultyCalculator
-          dotnet run -c:Release -- all -m ${{ matrix.ruleset.id }} -ac -c ${{ env.CONCURRENCY }}
-
-      - name: Print diffs
-        run: |
-          mysql -e "
-            SELECT
-              m.beatmap_id,
-              m.mods,
-              b.filename,
-              m.diff_unified as 'sr_master',
-              p.diff_unified as 'sr_pr',
-              (p.diff_unified - m.diff_unified) as 'diff'
-            FROM osu_master.osu_beatmap_difficulty m
-            JOIN osu_pr.osu_beatmap_difficulty p
-              ON m.beatmap_id = p.beatmap_id
-              AND m.mode = p.mode
-              AND m.mods = p.mods
-            JOIN osu_pr.osu_beatmaps b
-              ON b.beatmap_id = p.beatmap_id
-            WHERE abs(m.diff_unified - p.diff_unified) > 0.1
-            ORDER BY abs(m.diff_unified - p.diff_unified)
-              DESC
-            LIMIT 10000;"
-
-      # Todo: Run ppcalc
+          comment_tag: ${{ env.EXECUTION_ID }}
+          mode: delete
+          message: '.' # Appears to be required by this action for non-error status code.

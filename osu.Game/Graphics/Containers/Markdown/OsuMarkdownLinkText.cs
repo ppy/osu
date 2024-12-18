@@ -14,7 +14,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Graphics.Containers.Markdown
 {
-    public class OsuMarkdownLinkText : MarkdownLinkText
+    public partial class OsuMarkdownLinkText : MarkdownLinkText
     {
         [Resolved(canBeNull: true)]
         private ILinkHandler linkHandler { get; set; }
@@ -54,7 +54,7 @@ namespace osu.Game.Graphics.Containers.Markdown
 
         protected override void OnLinkPressed() => linkHandler?.HandleLink(Url);
 
-        private class OsuMarkdownLinkCompiler : DrawableLinkCompiler
+        private partial class OsuMarkdownLinkCompiler : DrawableLinkCompiler
         {
             public OsuMarkdownLinkCompiler(IEnumerable<Drawable> parts)
                 : base(parts)

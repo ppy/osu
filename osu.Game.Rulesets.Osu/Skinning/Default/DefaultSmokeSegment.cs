@@ -6,7 +6,7 @@ using osu.Framework.Graphics.Textures;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Default
 {
-    public class DefaultSmokeSegment : SmokeSegment
+    public partial class DefaultSmokeSegment : SmokeSegment
     {
         [BackgroundDependencyLoader]
         private void load(TextureStore textures)

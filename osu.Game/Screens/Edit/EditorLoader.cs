@@ -25,7 +25,7 @@ namespace osu.Game.Screens.Edit
     /// Transition screen for the editor.
     /// Used to avoid backing out to main menu/song select when switching difficulties from within the editor.
     /// </summary>
-    public class EditorLoader : ScreenWithBeatmapBackground
+    public partial class EditorLoader : ScreenWithBeatmapBackground
     {
         /// <summary>
         /// The stored state from the last editor opened.
@@ -36,11 +36,13 @@ namespace osu.Game.Screens.Edit
 
         public override float BackgroundParallaxAmount => 0.1f;
 
-        public override bool AllowBackButton => false;
+        public override bool AllowUserExit => false;
 
         public override bool HideOverlaysOnEnter => true;
 
         public override bool DisallowExternalBeatmapRulesetChanges => true;
+
+        public override bool? AllowGlobalTrackControl => false;
 
         [Resolved]
         private BeatmapManager beatmapManager { get; set; }
@@ -119,7 +121,11 @@ namespace osu.Game.Screens.Edit
 
             scheduledDifficultySwitch = Schedule(() =>
             {
-                Beatmap.Value = nextBeatmap.Invoke();
+                var workingBeatmap = nextBeatmap.Invoke();
+
+                Ruleset.Value = workingBeatmap.BeatmapInfo.Ruleset;
+                Beatmap.Value = workingBeatmap;
+
                 state = editorState;
 
                 // This screen is a weird exception to the rule that nothing after song select changes the global beatmap.

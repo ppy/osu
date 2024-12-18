@@ -26,7 +26,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Beatmaps
 {
-    public class TestSceneBeatmapCard : OsuManualInputManagerTestScene
+    public partial class TestSceneBeatmapCard : OsuManualInputManagerTestScene
     {
         /// <summary>
         /// All cards on this scene use a common online ID to ensure that map download, preview tracks, etc. can be tested manually with online sources.
@@ -258,6 +258,12 @@ namespace osu.Game.Tests.Visual.Beatmaps
         {
             foreach (var scheme in Enum.GetValues(typeof(OverlayColourScheme)).Cast<OverlayColourScheme>())
                 AddStep($"set {scheme} scheme", () => Child = createContent(scheme, creationFunc));
+        }
+
+        [Test]
+        public void TestNano()
+        {
+            createTestCase(beatmapSetInfo => new BeatmapCardNano(beatmapSetInfo));
         }
 
         [Test]

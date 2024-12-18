@@ -12,14 +12,8 @@ namespace osu.Game.Rulesets.Taiko.UI
     /// <summary>
     /// A component of the playfield that captures input and displays input as a drum.
     /// </summary>
-    internal class InputDrum : Container
+    internal partial class InputDrum : Container
     {
-        public InputDrum()
-        {
-            AutoSizeAxes = Axes.X;
-            RelativeSizeAxes = Axes.Y;
-        }
-
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -27,8 +21,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             {
                 new SkinnableDrawable(new TaikoSkinComponentLookup(TaikoSkinComponents.InputDrum), _ => new DefaultInputDrum())
                 {
-                    RelativeSizeAxes = Axes.Y,
-                    AutoSizeAxes = Axes.X,
+                    RelativeSizeAxes = Axes.Both,
                 },
             };
         }

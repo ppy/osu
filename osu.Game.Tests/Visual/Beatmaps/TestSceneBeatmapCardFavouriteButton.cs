@@ -19,7 +19,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Beatmaps
 {
-    public class TestSceneBeatmapCardFavouriteButton : OsuManualInputManagerTestScene
+    public partial class TestSceneBeatmapCardFavouriteButton : OsuManualInputManagerTestScene
     {
         private DummyAPIAccess dummyAPI => (DummyAPIAccess)API;
 

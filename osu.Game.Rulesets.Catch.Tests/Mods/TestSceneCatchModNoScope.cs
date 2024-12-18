@@ -14,9 +14,39 @@ using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Catch.Tests.Mods
 {
-    public class TestSceneCatchModNoScope : ModTestScene
+    public partial class TestSceneCatchModNoScope : ModTestScene
     {
         protected override Ruleset CreatePlayerRuleset() => new CatchRuleset();
+
+        [Test]
+        public void TestAlwaysHidden()
+        {
+            CreateModTest(new ModTestData
+            {
+                Mod = new CatchModNoScope
+                {
+                    HiddenComboCount = { Value = 0 },
+                },
+                Autoplay = true,
+                PassCondition = () => Player.ScoreProcessor.Combo.Value == 2,
+                CreateBeatmap = () => new Beatmap
+                {
+                    HitObjects = new List<HitObject>
+                    {
+                        new Fruit
+                        {
+                            X = CatchPlayfield.CENTER_X * 0.5f,
+                            StartTime = 1000,
+                        },
+                        new Fruit
+                        {
+                            X = CatchPlayfield.CENTER_X * 1.5f,
+                            StartTime = 2000,
+                        }
+                    }
+                }
+            });
+        }
 
         [Test]
         public void TestVisibleDuringBreak()
@@ -29,7 +59,7 @@ namespace osu.Game.Rulesets.Catch.Tests.Mods
                 },
                 Autoplay = true,
                 PassCondition = () => true,
-                Beatmap = new Beatmap
+                CreateBeatmap = () => new Beatmap
                 {
                     HitObjects = new List<HitObject>
                     {
@@ -44,7 +74,7 @@ namespace osu.Game.Rulesets.Catch.Tests.Mods
                             StartTime = 5000,
                         }
                     },
-                    Breaks = new List<BreakPeriod>
+                    Breaks =
                     {
                         new BreakPeriod(2000, 4000),
                     }
@@ -69,7 +99,7 @@ namespace osu.Game.Rulesets.Catch.Tests.Mods
                 },
                 Autoplay = true,
                 PassCondition = () => true,
-                Beatmap = new Beatmap
+                CreateBeatmap = () => new Beatmap
                 {
                     HitObjects = new List<HitObject>
                     {

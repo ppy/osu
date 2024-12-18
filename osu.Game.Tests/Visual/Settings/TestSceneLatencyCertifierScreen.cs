@@ -10,7 +10,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Settings
 {
-    public class TestSceneLatencyCertifierScreen : ScreenTestScene
+    public partial class TestSceneLatencyCertifierScreen : ScreenTestScene
     {
         private LatencyCertifierScreen latencyCertifier = null!;
 

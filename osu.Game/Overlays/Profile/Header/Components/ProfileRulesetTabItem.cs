@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
@@ -14,7 +12,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {
-    public class ProfileRulesetTabItem : OverlayRulesetTabItem
+    public partial class ProfileRulesetTabItem : OverlayRulesetTabItem
     {
         private bool isDefault;
 
@@ -50,7 +48,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
             Add(icon = new DefaultRulesetIcon { Alpha = 0 });
         }
 
-        public class DefaultRulesetIcon : SpriteIcon, IHasTooltip
+        public partial class DefaultRulesetIcon : SpriteIcon, IHasTooltip
         {
             public LocalisableString TooltipText => UsersStrings.ShowEditDefaultPlaymodeIsDefaultTooltip;
 

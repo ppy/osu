@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -18,7 +16,7 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Rulesets.Taiko.Tests.Skinning
 {
     [TestFixture]
-    public class TestSceneDrawableBarLine : TaikoSkinnableTestScene
+    public partial class TestSceneDrawableBarLine : TaikoSkinnableTestScene
     {
         [Cached(typeof(IScrollingInfo))]
         private ScrollingTestContainer.TestScrollingInfo info = new ScrollingTestContainer.TestScrollingInfo

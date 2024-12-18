@@ -19,7 +19,7 @@ using osuTK;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class FPSCounter : VisibilityContainer, IHasCustomTooltip
+    public partial class FPSCounter : VisibilityContainer, IHasCustomTooltip
     {
         private OsuSpriteText counterUpdateFrameTime = null!;
         private OsuSpriteText counterDrawFPS = null!;
@@ -167,9 +167,12 @@ namespace osu.Game.Graphics.UserInterface
         {
             base.Update();
 
+            double elapsedDrawFrameTime = drawClock.ElapsedFrameTime;
+            double elapsedUpdateFrameTime = updateClock.ElapsedFrameTime;
+
             // If the game goes into a suspended state (ie. debugger attached or backgrounded on a mobile device)
             // we want to ignore really long periods of no processing.
-            if (updateClock.ElapsedFrameTime > 10000)
+            if (elapsedUpdateFrameTime > 10000)
                 return;
 
             mainContent.Width = Math.Max(mainContent.Width, counters.DrawWidth);
@@ -178,17 +181,17 @@ namespace osu.Game.Graphics.UserInterface
             // frame limiter (we want to show the FPS as it's changing, even if it isn't an outlier).
             bool aimRatesChanged = updateAimFPS();
 
-            bool hasUpdateSpike = displayedFrameTime < spike_time_ms && updateClock.ElapsedFrameTime > spike_time_ms;
+            bool hasUpdateSpike = displayedFrameTime < spike_time_ms && elapsedUpdateFrameTime > spike_time_ms;
             // use elapsed frame time rather then FramesPerSecond to better catch stutter frames.
-            bool hasDrawSpike = displayedFpsCount > (1000 / spike_time_ms) && drawClock.ElapsedFrameTime > spike_time_ms;
+            bool hasDrawSpike = displayedFpsCount > (1000 / spike_time_ms) && elapsedDrawFrameTime > spike_time_ms;
 
             const float damp_time = 100;
 
-            displayedFrameTime = Interpolation.DampContinuously(displayedFrameTime, updateClock.ElapsedFrameTime, hasUpdateSpike ? 0 : damp_time, updateClock.ElapsedFrameTime);
+            displayedFrameTime = Interpolation.DampContinuously(displayedFrameTime, elapsedUpdateFrameTime, hasUpdateSpike ? 0 : damp_time, elapsedUpdateFrameTime);
 
             if (hasDrawSpike)
                 // show spike time using raw elapsed value, to account for `FramesPerSecond` being so averaged spike frames don't show.
-                displayedFpsCount = 1000 / drawClock.ElapsedFrameTime;
+                displayedFpsCount = 1000 / elapsedDrawFrameTime;
             else
                 displayedFpsCount = Interpolation.DampContinuously(displayedFpsCount, drawClock.FramesPerSecond, damp_time, Time.Elapsed);
 
@@ -210,7 +213,7 @@ namespace osu.Game.Graphics.UserInterface
                 requestDisplay();
             else if (isDisplayed && Time.Current - lastDisplayRequiredTime > 2000 && !IsHovered)
             {
-                mainContent.FadeTo(0, 300, Easing.OutQuint);
+                mainContent.FadeTo(0.7f, 300, Easing.OutQuint);
                 isDisplayed = false;
             }
         }

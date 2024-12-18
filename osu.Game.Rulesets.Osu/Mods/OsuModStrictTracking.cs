@@ -19,7 +19,7 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModStrictTracking : Mod, IApplicableAfterBeatmapConversion, IApplicableToDrawableHitObject, IApplicableToDrawableRuleset<OsuHitObject>
+    public partial class OsuModStrictTracking : Mod, IApplicableAfterBeatmapConversion, IApplicableToDrawableHitObject, IApplicableToDrawableRuleset<OsuHitObject>
     {
         public override string Name => @"Strict Tracking";
         public override string Acronym => @"ST";
@@ -35,6 +35,9 @@ namespace osu.Game.Rulesets.Osu.Mods
                 slider.Tracking.ValueChanged += e =>
                 {
                     if (e.NewValue || slider.Judged) return;
+
+                    if (slider.Time.Current < slider.HitObject.StartTime)
+                        return;
 
                     var tail = slider.NestedHitObjects.OfType<StrictTrackingDrawableSliderTail>().First();
 
@@ -79,7 +82,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             public override Judgement CreateJudgement() => new OsuJudgement();
         }
 
-        private class StrictTrackingDrawableSliderTail : DrawableSliderTail
+        private partial class StrictTrackingDrawableSliderTail : DrawableSliderTail
         {
             public override bool DisplayResult => true;
         }
@@ -96,13 +99,13 @@ namespace osu.Game.Rulesets.Osu.Mods
                 Position = original.Position;
                 NewCombo = original.NewCombo;
                 ComboOffset = original.ComboOffset;
-                LegacyLastTickOffset = original.LegacyLastTickOffset;
                 TickDistanceMultiplier = original.TickDistanceMultiplier;
+                SliderVelocityMultiplier = original.SliderVelocityMultiplier;
             }
 
             protected override void CreateNestedHitObjects(CancellationToken cancellationToken)
             {
-                var sliderEvents = SliderEventGenerator.Generate(StartTime, SpanDuration, Velocity, TickDistance, Path.Distance, this.SpanCount(), LegacyLastTickOffset, cancellationToken);
+                var sliderEvents = SliderEventGenerator.Generate(StartTime, SpanDuration, Velocity, TickDistance, Path.Distance, this.SpanCount(), cancellationToken);
 
                 foreach (var e in sliderEvents)
                 {
@@ -117,6 +120,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                                 Position = Position + Path.PositionAt(e.PathProgress),
                                 StackHeight = StackHeight,
                                 Scale = Scale,
+                                PathProgress = e.PathProgress,
                             });
                             break;
 
@@ -129,7 +133,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                             });
                             break;
 
-                        case SliderEventType.LegacyLastTick:
+                        case SliderEventType.Tail:
                             AddNested(TailCircle = new StrictTrackingSliderTailCircle(this)
                             {
                                 RepeatIndex = e.SpanIndex,
@@ -147,6 +151,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                                 Position = Position + Path.PositionAt(e.PathProgress),
                                 StackHeight = StackHeight,
                                 Scale = Scale,
+                                PathProgress = e.PathProgress,
                             });
                             break;
                     }

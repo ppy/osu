@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +13,7 @@ using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays.Mods;
@@ -31,31 +30,36 @@ using osu.Game.Tests.Resources;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneMultiplayerMatchSongSelect : MultiplayerTestScene
+    public partial class TestSceneMultiplayerMatchSongSelect : MultiplayerTestScene
     {
-        private BeatmapManager manager;
-        private RulesetStore rulesets;
+        private BeatmapManager manager = null!;
+        private RulesetStore rulesets = null!;
 
-        private IList<BeatmapInfo> beatmaps => importedBeatmapSet?.PerformRead(s => s.Beatmaps) ?? new List<BeatmapInfo>();
+        private IList<BeatmapInfo> beatmaps => importedBeatmapSet.PerformRead(s => s.Beatmaps);
 
-        private TestMultiplayerMatchSongSelect songSelect;
+        private TestMultiplayerMatchSongSelect songSelect = null!;
+        private Live<BeatmapSetInfo> importedBeatmapSet = null!;
 
-        private Live<BeatmapSetInfo> importedBeatmapSet;
+        [Resolved]
+        private OsuConfigManager configManager { get; set; } = null!;
 
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
         {
+            BeatmapStore beatmapStore;
+
             Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
             Dependencies.Cache(manager = new BeatmapManager(LocalStorage, Realm, null, audio, Resources, host, Beatmap.Default));
+            Dependencies.CacheAs(beatmapStore = new RealmDetachedBeatmapStore());
             Dependencies.Cache(Realm);
 
-            importedBeatmapSet = manager.Import(TestResources.CreateTestBeatmapSetInfo(8, rulesets.AvailableRulesets.ToArray()));
+            importedBeatmapSet = manager.Import(TestResources.CreateTestBeatmapSetInfo(8, rulesets.AvailableRulesets.ToArray()))!;
+
+            Add(beatmapStore);
         }
 
-        public override void SetUpSteps()
+        private void setUp()
         {
-            base.SetUpSteps();
-
             AddStep("reset", () =>
             {
                 Ruleset.Value = new OsuRuleset().RulesetInfo;
@@ -63,14 +67,26 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 SelectedMods.SetDefault();
             });
 
-            AddStep("create song select", () => LoadScreen(songSelect = new TestMultiplayerMatchSongSelect(SelectedRoom.Value)));
+            AddStep("create song select", () => LoadScreen(songSelect = new TestMultiplayerMatchSongSelect(SelectedRoom.Value!)));
             AddUntilStep("wait for present", () => songSelect.IsCurrentScreen() && songSelect.BeatmapSetsLoaded);
+        }
+
+        [Test]
+        public void TestSelectFreeMods()
+        {
+            setUp();
+
+            AddStep("set some freemods", () => songSelect.FreeMods.Value = new OsuRuleset().GetModsFor(ModType.Fun).ToArray());
+            AddStep("set all freemods", () => songSelect.FreeMods.Value = new OsuRuleset().CreateAllMods().ToArray());
+            AddStep("set no freemods", () => songSelect.FreeMods.Value = Array.Empty<Mod>());
         }
 
         [Test]
         public void TestBeatmapConfirmed()
         {
-            BeatmapInfo selectedBeatmap = null;
+            BeatmapInfo selectedBeatmap = null!;
+
+            setUp();
 
             AddStep("change ruleset", () => Ruleset.Value = new TaikoRuleset().RulesetInfo);
             AddStep("select beatmap",
@@ -94,25 +110,56 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [TestCase(typeof(OsuModHidden), typeof(OsuModTraceable))] // Incompatible.
         public void TestAllowedModDeselectedWhenRequired(Type allowedMod, Type requiredMod)
         {
-            AddStep($"select {allowedMod.ReadableName()} as allowed", () => songSelect.FreeMods.Value = new[] { (Mod)Activator.CreateInstance(allowedMod) });
-            AddStep($"select {requiredMod.ReadableName()} as required", () => songSelect.Mods.Value = new[] { (Mod)Activator.CreateInstance(requiredMod) });
+            setUp();
+
+            AddStep("change ruleset", () => Ruleset.Value = new OsuRuleset().RulesetInfo);
+            AddStep($"select {allowedMod.ReadableName()} as allowed", () => songSelect.FreeMods.Value = new[] { (Mod)Activator.CreateInstance(allowedMod)! });
+            AddStep($"select {requiredMod.ReadableName()} as required", () => songSelect.Mods.Value = new[] { (Mod)Activator.CreateInstance(requiredMod)! });
 
             AddAssert("freemods empty", () => songSelect.FreeMods.Value.Count == 0);
-            assertHasFreeModButton(allowedMod, false);
-            assertHasFreeModButton(requiredMod, false);
+
+            // A previous test's mod overlay could still be fading out.
+            AddUntilStep("wait for only one freemod overlay", () => this.ChildrenOfType<FreeModSelectOverlay>().Count() == 1);
+
+            assertFreeModNotShown(allowedMod);
+            assertFreeModNotShown(requiredMod);
         }
 
-        private void assertHasFreeModButton(Type type, bool hasButton = true)
+        [Test]
+        public void TestChangeRulesetImmediatelyAfterLoadComplete()
         {
-            AddAssert($"{type.ReadableName()} {(hasButton ? "displayed" : "not displayed")} in freemod overlay",
+            AddStep("reset", () =>
+            {
+                configManager.SetValue(OsuSetting.ShowConvertedBeatmaps, false);
+                Beatmap.SetDefault();
+                SelectedMods.SetDefault();
+            });
+
+            AddStep("create song select", () =>
+            {
+                SelectedRoom.Value!.Playlist.Single().RulesetID = 2;
+                songSelect = new TestMultiplayerMatchSongSelect(SelectedRoom.Value, SelectedRoom.Value.Playlist.Single());
+                songSelect.OnLoadComplete += _ => Ruleset.Value = new TaikoRuleset().RulesetInfo;
+                LoadScreen(songSelect);
+            });
+            AddUntilStep("wait for present", () => songSelect.IsCurrentScreen() && songSelect.BeatmapSetsLoaded);
+
+            AddStep("confirm selection", () => songSelect.FinaliseSelection());
+            AddAssert("beatmap is taiko", () => Beatmap.Value.BeatmapInfo.Ruleset.OnlineID, () => Is.EqualTo(1));
+            AddAssert("ruleset is taiko", () => Ruleset.Value.OnlineID, () => Is.EqualTo(1));
+        }
+
+        private void assertFreeModNotShown(Type type)
+        {
+            AddAssert($"{type.ReadableName()} not displayed in freemod overlay",
                 () => this.ChildrenOfType<FreeModSelectOverlay>()
                           .Single()
                           .ChildrenOfType<ModPanel>()
-                          .Where(panel => !panel.Filtered.Value)
+                          .Where(panel => panel.Visible)
                           .All(b => b.Mod.GetType() != type));
         }
 
-        private class TestMultiplayerMatchSongSelect : MultiplayerMatchSongSelect
+        private partial class TestMultiplayerMatchSongSelect : MultiplayerMatchSongSelect
         {
             public new Bindable<IReadOnlyList<Mod>> Mods => base.Mods;
 
@@ -120,8 +167,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             public new BeatmapCarousel Carousel => base.Carousel;
 
-            public TestMultiplayerMatchSongSelect(Room room)
-                : base(room)
+            public TestMultiplayerMatchSongSelect(Room room, PlaylistItem? itemToEdit = null)
+                : base(room, itemToEdit)
             {
             }
         }

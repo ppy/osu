@@ -19,7 +19,7 @@ using Realms;
 
 namespace osu.Game.Screens.Select.Carousel
 {
-    public class TopLocalRank : CompositeDrawable
+    public partial class TopLocalRank : CompositeDrawable
     {
         private readonly BeatmapInfo beatmapInfo;
 
@@ -28,9 +28,6 @@ namespace osu.Game.Screens.Select.Carousel
 
         [Resolved]
         private RealmAccess realm { get; set; } = null!;
-
-        [Resolved]
-        private ScoreManager scoreManager { get; set; } = null!;
 
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
@@ -65,20 +62,20 @@ namespace osu.Game.Screens.Select.Carousel
                         r.All<ScoreInfo>()
                          .Filter($"{nameof(ScoreInfo.User)}.{nameof(RealmUser.OnlineID)} == $0"
                                  + $" && {nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.ID)} == $1"
+                                 + $" && {nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.Hash)} == {nameof(ScoreInfo.BeatmapHash)}"
                                  + $" && {nameof(ScoreInfo.Ruleset)}.{nameof(RulesetInfo.ShortName)} == $2"
                                  + $" && {nameof(ScoreInfo.DeletePending)} == false", api.LocalUser.Value.Id, beatmapInfo.ID, ruleset.Value.ShortName),
                     localScoresChanged);
             }, true);
 
-            void localScoresChanged(IRealmCollection<ScoreInfo> sender, ChangeSet? changes, Exception _)
+            void localScoresChanged(IRealmCollection<ScoreInfo> sender, ChangeSet? changes)
             {
                 // This subscription may fire from changes to linked beatmaps, which we don't care about.
                 // It's currently not possible for a score to be modified after insertion, so we can safely ignore callbacks with only modifications.
                 if (changes?.HasCollectionChanges() == false)
                     return;
 
-                ScoreInfo? topScore = scoreManager.OrderByTotalScore(sender.Detach()).FirstOrDefault();
-
+                ScoreInfo? topScore = sender.MaxBy(info => (info.TotalScore, -info.Date.UtcDateTime.Ticks));
                 updateable.Rank = topScore?.Rank;
                 updateable.Alpha = topScore != null ? 1 : 0;
             }

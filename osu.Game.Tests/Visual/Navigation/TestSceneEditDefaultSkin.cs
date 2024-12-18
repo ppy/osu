@@ -1,19 +1,17 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Testing;
 using osu.Game.Overlays.Settings.Sections;
+using osu.Game.Overlays.SkinEditor;
 using osu.Game.Skinning;
-using osu.Game.Skinning.Editor;
 
 namespace osu.Game.Tests.Visual.Navigation
 {
-    public class TestSceneEditDefaultSkin : OsuGameTestScene
+    public partial class TestSceneEditDefaultSkin : OsuGameTestScene
     {
         private SkinManager skinManager => Game.Dependencies.Get<SkinManager>();
         private SkinEditorOverlay skinEditor => Game.Dependencies.Get<SkinEditorOverlay>();

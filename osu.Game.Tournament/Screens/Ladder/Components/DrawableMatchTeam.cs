@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -24,24 +22,24 @@ using osuTK.Input;
 
 namespace osu.Game.Tournament.Screens.Ladder.Components
 {
-    public class DrawableMatchTeam : DrawableTournamentTeam, IHasContextMenu
+    public partial class DrawableMatchTeam : DrawableTournamentTeam, IHasContextMenu
     {
         private readonly TournamentMatch match;
         private readonly bool losers;
-        private TournamentSpriteText scoreText;
-        private Box background;
-        private Box backgroundRight;
+        private TournamentSpriteText scoreText = null!;
+        private Box background = null!;
+        private Box backgroundRight = null!;
 
         private readonly Bindable<int?> score = new Bindable<int?>();
         private readonly BindableBool completed = new BindableBool();
 
         private Color4 colourWinner;
 
-        private readonly Func<bool> isWinner;
-        private LadderEditorScreen ladderEditor;
+        private readonly Func<bool>? isWinner;
+        private LadderEditorScreen ladderEditor = null!;
 
-        [Resolved(canBeNull: true)]
-        private LadderInfo ladderInfo { get; set; }
+        [Resolved]
+        private LadderInfo? ladderInfo { get; set; }
 
         private void setCurrent()
         {
@@ -55,10 +53,10 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             ladderInfo.CurrentMatch.Value.Current.Value = true;
         }
 
-        [Resolved(CanBeNull = true)]
-        private LadderEditorInfo editorInfo { get; set; }
+        [Resolved]
+        private LadderEditorInfo? editorInfo { get; set; }
 
-        public DrawableMatchTeam(TournamentTeam team, TournamentMatch match, bool losers)
+        public DrawableMatchTeam(TournamentTeam? team, TournamentMatch match, bool losers)
             : base(team)
         {
             this.match = match;
@@ -72,14 +70,11 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             AcronymText.Padding = new MarginPadding { Left = 50 };
             AcronymText.Font = OsuFont.Torus.With(size: 22, weight: FontWeight.Bold);
 
-            if (match != null)
-            {
-                isWinner = () => match.Winner == Team;
+            isWinner = () => match.Winner == Team;
 
-                completed.BindTo(match.Completed);
-                if (team != null)
-                    score.BindTo(team == match.Team1.Value ? match.Team1Score : match.Team2Score);
-            }
+            completed.BindTo(match.Completed);
+            if (team != null)
+                score.BindTo(team == match.Team1.Value ? match.Team1Score : match.Team2Score);
         }
 
         [BackgroundDependencyLoader(true)]

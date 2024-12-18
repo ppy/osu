@@ -1,54 +1,80 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
-using osu.Framework.Graphics.Containers;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Graphics.Sprites;
-using osuTK.Graphics;
 using osu.Game.Graphics.UserInterface;
-using System.Collections.Generic;
-using System;
+using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Resources.Localisation.Web;
 using osuTK;
-using osu.Framework.Bindables;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Comments
 {
-    public abstract class CommentEditor : CompositeDrawable
+    public abstract partial class CommentEditor : CompositeDrawable
     {
+        public Bindable<CommentableMeta?> CommentableMeta { get; set; } = new Bindable<CommentableMeta?>();
+
         private const int side_padding = 8;
 
-        public Action<string> OnCommit;
+        protected abstract LocalisableString FooterText { get; }
 
-        public bool IsLoading
+        protected FillFlowContainer ButtonsContainer { get; private set; } = null!;
+
+        protected readonly Bindable<string> Current = new Bindable<string>(string.Empty);
+
+        private RoundedButton commitButton = null!;
+        private RoundedButton logInButton = null!;
+        private LoadingSpinner loadingSpinner = null!;
+
+        protected TextBox TextBox { get; private set; } = null!;
+
+        [Resolved]
+        protected IAPIProvider API { get; private set; } = null!;
+
+        [Resolved]
+        private LoginOverlay? loginOverlay { get; set; }
+
+        private readonly IBindable<APIState> apiState = new Bindable<APIState>();
+
+        /// <summary>
+        /// Returns the text content of the main action button.
+        /// When <paramref name="isLoggedIn"/> is <see langword="true"/>, the text will apply to a button that posts a comment.
+        /// When <paramref name="isLoggedIn"/> is <see langword="false"/>, the text will apply to a button that directs the user to the login overlay.
+        /// </summary>
+        protected abstract LocalisableString GetButtonText(bool isLoggedIn);
+
+        /// <summary>
+        /// Returns the placeholder text for the comment box.
+        /// </summary>
+        protected abstract LocalisableString GetPlaceholderText();
+
+        protected bool ShowLoadingSpinner
         {
-            get => commitButton.IsLoading;
-            set => commitButton.IsLoading = value;
+            set
+            {
+                if (value)
+                    loadingSpinner.Show();
+                else
+                    loadingSpinner.Hide();
+
+                updateState();
+            }
         }
-
-        protected abstract string FooterText { get; }
-
-        protected abstract string CommitButtonText { get; }
-
-        protected abstract string TextBoxPlaceholder { get; }
-
-        protected FillFlowContainer ButtonsContainer { get; private set; }
-
-        protected readonly Bindable<string> Current = new Bindable<string>();
-
-        private CommitButton commitButton;
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
         {
-            EditorTextBox textBox;
-
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             Masking = true;
@@ -70,16 +96,15 @@ namespace osu.Game.Overlays.Comments
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
-                        textBox = new EditorTextBox
+                        TextBox = new EditorTextBox
                         {
                             Height = 40,
                             RelativeSizeAxes = Axes.X,
-                            PlaceholderText = TextBoxPlaceholder,
                             Current = Current
                         },
                         new Container
                         {
-                            Name = "Footer",
+                            Name = @"Footer",
                             RelativeSizeAxes = Axes.X,
                             Height = 35,
                             Padding = new MarginPadding { Horizontal = side_padding },
@@ -92,54 +117,120 @@ namespace osu.Game.Overlays.Comments
                                     Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
                                     Text = FooterText
                                 },
-                                ButtonsContainer = new FillFlowContainer
+                                new FillFlowContainer
                                 {
-                                    Name = "Buttons",
                                     Anchor = Anchor.CentreRight,
                                     Origin = Anchor.CentreRight,
                                     AutoSizeAxes = Axes.Both,
                                     Direction = FillDirection.Horizontal,
                                     Spacing = new Vector2(5, 0),
-                                    Child = commitButton = new CommitButton(CommitButtonText)
+                                    Children = new Drawable[]
                                     {
-                                        Anchor = Anchor.CentreRight,
-                                        Origin = Anchor.CentreRight,
-                                        Action = () =>
+                                        ButtonsContainer = new FillFlowContainer
                                         {
-                                            OnCommit?.Invoke(Current.Value);
-                                            Current.Value = string.Empty;
-                                        }
+                                            Name = @"Buttons",
+                                            Anchor = Anchor.CentreRight,
+                                            Origin = Anchor.CentreRight,
+                                            AutoSizeAxes = Axes.Both,
+                                            Direction = FillDirection.Horizontal,
+                                            Spacing = new Vector2(5, 0),
+                                            Children = new Drawable[]
+                                            {
+                                                commitButton = new EditorButton
+                                                {
+                                                    Action = () => OnCommit(Current.Value),
+                                                    Text = GetButtonText(true)
+                                                },
+                                                logInButton = new EditorButton
+                                                {
+                                                    Width = 100,
+                                                    Action = () => loginOverlay?.Show(),
+                                                    Text = GetButtonText(false)
+                                                }
+                                            }
+                                        },
+                                        loadingSpinner = new LoadingSpinner
+                                        {
+                                            Anchor = Anchor.CentreRight,
+                                            Origin = Anchor.CentreRight,
+                                            Size = new Vector2(18),
+                                        },
                                     }
-                                }
+                                },
                             }
                         }
                     }
                 }
             });
 
-            textBox.OnCommit += (_, _) =>
-            {
-                if (commitButton.IsBlocked.Value)
-                    return;
-
-                commitButton.TriggerClick();
-            };
+            TextBox.OnCommit += (_, _) => commitButton.TriggerClick();
+            apiState.BindTo(API.State);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
-            Current.BindValueChanged(text => commitButton.IsBlocked.Value = string.IsNullOrEmpty(text.NewValue), true);
+            Current.BindValueChanged(_ => updateState());
+            apiState.BindValueChanged(_ => Scheduler.AddOnce(updateState));
+            CommentableMeta.BindValueChanged(_ => Scheduler.AddOnce(updateState));
+            updateState();
         }
 
-        private class EditorTextBox : BasicTextBox
+        protected abstract void OnCommit(string text);
+
+        private void updateState()
+        {
+            bool isOnline = apiState.Value > APIState.Offline;
+            LocalisableString? canNewCommentReason = CommentEditor.canNewCommentReason(CommentableMeta.Value);
+            bool commentsDisabled = canNewCommentReason != null;
+            bool canComment = isOnline && !commentsDisabled;
+
+            if (!isOnline)
+                TextBox.PlaceholderText = AuthorizationStrings.RequireLogin;
+            else if (canNewCommentReason != null)
+                TextBox.PlaceholderText = canNewCommentReason.Value;
+            else
+                TextBox.PlaceholderText = GetPlaceholderText();
+            TextBox.ReadOnly = !canComment;
+
+            if (isOnline)
+            {
+                commitButton.Show();
+                commitButton.Enabled.Value = !commentsDisabled && loadingSpinner.State.Value == Visibility.Hidden && !string.IsNullOrEmpty(Current.Value);
+                logInButton.Hide();
+            }
+            else
+            {
+                commitButton.Hide();
+                logInButton.Show();
+            }
+        }
+
+        // https://github.com/ppy/osu-web/blob/83816dbe24ad2927273cba968f2fcd2694a121a9/resources/js/components/comment-editor.tsx#L54-L60
+        // careful here, logic is VERY finicky.
+        private static LocalisableString? canNewCommentReason(CommentableMeta? meta)
+        {
+            if (meta == null)
+                return null;
+
+            if (meta.CurrentUserAttributes != null)
+            {
+                if (meta.CurrentUserAttributes.Value.CanNewCommentReason is string reason)
+                    return reason;
+
+                return null;
+            }
+
+            return AuthorizationStrings.CommentStoreDisabled;
+        }
+
+        private partial class EditorTextBox : OsuTextBox
         {
             protected override float LeftRightPadding => side_padding;
 
             protected override Color4 SelectionColour => Color4.Gray;
 
-            private OsuSpriteText placeholder;
+            private OsuSpriteText placeholder = null!;
 
             public EditorTextBox()
             {
@@ -159,92 +250,24 @@ namespace osu.Game.Overlays.Comments
             {
                 Font = OsuFont.GetFont(weight: FontWeight.Regular),
             };
-
-            protected override Drawable GetDrawableCharacter(char c) => new FallingDownContainer
-            {
-                AutoSizeAxes = Axes.Both,
-                Child = new OsuSpriteText { Text = c.ToString(), Font = OsuFont.GetFont(size: CalculatedTextSize) },
-            };
         }
 
-        private class CommitButton : LoadingButton
+        protected partial class EditorButton : RoundedButton
         {
-            private const int duration = 200;
-
-            public readonly BindableBool IsBlocked = new BindableBool();
-
-            public override bool PropagatePositionalInputSubTree => !IsBlocked.Value && base.PropagatePositionalInputSubTree;
-
-            protected override IEnumerable<Drawable> EffectTargets => new[] { background };
-
-            private readonly string text;
-
-            [Resolved]
-            private OverlayColourProvider colourProvider { get; set; }
-
-            private OsuSpriteText drawableText;
-            private Box background;
-            private Box blockedBackground;
-
-            public CommitButton(string text)
+            public EditorButton()
             {
-                this.text = text;
-
-                AutoSizeAxes = Axes.Both;
-                LoadingAnimationSize = new Vector2(10);
+                Width = 80;
+                Height = 25;
+                Anchor = Anchor.CentreRight;
+                Origin = Anchor.CentreRight;
             }
 
-            [BackgroundDependencyLoader]
-            private void load()
+            protected override SpriteText CreateText()
             {
-                IdleColour = colourProvider.Light4;
-                HoverColour = colourProvider.Light3;
-                blockedBackground.Colour = colourProvider.Background5;
+                var t = base.CreateText();
+                t.Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 12);
+                return t;
             }
-
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-                IsBlocked.BindValueChanged(onBlockedStateChanged, true);
-            }
-
-            private void onBlockedStateChanged(ValueChangedEvent<bool> isBlocked)
-            {
-                drawableText.FadeColour(isBlocked.NewValue ? colourProvider.Foreground1 : Color4.White, duration, Easing.OutQuint);
-                background.FadeTo(isBlocked.NewValue ? 0 : 1, duration, Easing.OutQuint);
-            }
-
-            protected override Drawable CreateContent() => new CircularContainer
-            {
-                Masking = true,
-                Height = 25,
-                AutoSizeAxes = Axes.X,
-                Children = new Drawable[]
-                {
-                    blockedBackground = new Box
-                    {
-                        RelativeSizeAxes = Axes.Both
-                    },
-                    background = new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Alpha = 0
-                    },
-                    drawableText = new OsuSpriteText
-                    {
-                        AlwaysPresent = true,
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
-                        Margin = new MarginPadding { Horizontal = 20 },
-                        Text = text,
-                    }
-                }
-            };
-
-            protected override void OnLoadStarted() => drawableText.FadeOut(duration, Easing.OutQuint);
-
-            protected override void OnLoadFinished() => drawableText.FadeIn(duration, Easing.OutQuint);
         }
     }
 }

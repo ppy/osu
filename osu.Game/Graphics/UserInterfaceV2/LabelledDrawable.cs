@@ -13,7 +13,7 @@ using osuTK;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
-    public abstract class LabelledDrawable<T> : CompositeDrawable
+    public abstract partial class LabelledDrawable<T> : CompositeDrawable
         where T : Drawable
     {
         private float? fixedLabelWidth;
@@ -152,7 +152,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
         [BackgroundDependencyLoader(true)]
         private void load(OverlayColourProvider? colourProvider, OsuColour osuColour)
         {
-            background.Colour = colourProvider?.Background5 ?? Color4Extensions.FromHex(@"1c2125");
+            background.Colour = colourProvider?.Background4 ?? Color4Extensions.FromHex(@"1c2125");
             descriptionText.Colour = osuColour.Yellow;
         }
 

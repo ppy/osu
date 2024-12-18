@@ -10,7 +10,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Edit
 {
-    public class CatchEditorPlayfieldAdjustmentContainer : PlayfieldAdjustmentContainer
+    public partial class CatchEditorPlayfieldAdjustmentContainer : PlayfieldAdjustmentContainer
     {
         protected override Container<Drawable> Content => content;
         private readonly Container content;
@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Catch.Edit
             };
         }
 
-        private class ScalingContainer : Container
+        private partial class ScalingContainer : Container
         {
             public ScalingContainer()
             {
@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Catch.Edit
             {
                 base.Update();
 
-                Scale = new Vector2(Math.Min(Parent.ChildSize.X / CatchPlayfield.WIDTH, Parent.ChildSize.Y / CatchPlayfield.HEIGHT));
+                Scale = new Vector2(Math.Min(Parent!.ChildSize.X / CatchPlayfield.WIDTH, Parent!.ChildSize.Y / CatchPlayfield.HEIGHT));
                 Height = 1 / Scale.Y;
             }
         }

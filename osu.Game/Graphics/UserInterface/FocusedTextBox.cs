@@ -15,7 +15,7 @@ namespace osu.Game.Graphics.UserInterface
     /// <summary>
     /// A textbox which holds focus eagerly.
     /// </summary>
-    public class FocusedTextBox : OsuTextBox, IKeyBindingHandler<GlobalAction>
+    public partial class FocusedTextBox : OsuTextBox, IKeyBindingHandler<GlobalAction>
     {
         private bool focus;
 
@@ -31,7 +31,7 @@ namespace osu.Game.Graphics.UserInterface
             if (!allowImmediateFocus)
                 return;
 
-            Scheduler.Add(() => GetContainingInputManager().ChangeFocus(this));
+            Scheduler.Add(() => GetContainingFocusManager()!.ChangeFocus(this));
         }
 
         public new void KillFocus() => base.KillFocus();

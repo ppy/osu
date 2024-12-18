@@ -48,7 +48,7 @@ namespace osu.Game.Overlays.Mods.Input
             if (index < 0)
                 return false;
 
-            var modState = availableMods.Where(modState => !modState.Filtered.Value).ElementAtOrDefault(index);
+            var modState = availableMods.Where(modState => modState.Visible).ElementAtOrDefault(index);
             if (modState == null)
                 return false;
 
