@@ -78,14 +78,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double flashlightARPerformance = Math.Pow(Math.Pow(flashlightPerformance, FL_SUM_POWER) + Math.Pow(readingARPerformance, FL_SUM_POWER), 1.0 / FL_SUM_POWER);
 
-            double preempt = IBeatmapDifficultyInfo.DifficultyRange(beatmap.Difficulty.ApproachRate, 1800, 1200, 450) / clockRate;
-
-            double drainRate = beatmap.Difficulty.DrainRate;
-
-            int hitCirclesCount = beatmap.HitObjects.Count(h => h is HitCircle);
-            int sliderCount = beatmap.HitObjects.Count(h => h is Slider);
-            int spinnerCount = beatmap.HitObjects.Count(h => h is Spinner);
-
             double cognitionPerformance = flashlightARPerformance;
             double mechanicalPerformance = Math.Pow(Math.Pow(aimPerformance, SUM_POWER) + Math.Pow(speedPerformance, SUM_POWER), 1.0 / SUM_POWER);
 
@@ -97,6 +89,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double starRating = basePerformance > 0.00001
                 ? Math.Cbrt(OsuPerformanceCalculator.PERFORMANCE_BASE_MULTIPLIER) * 0.027 * (Math.Cbrt(100000 / Math.Pow(2, 1 / 1.1) * basePerformance) + 4)
                 : 0;
+
+            double preempt = IBeatmapDifficultyInfo.DifficultyRange(beatmap.Difficulty.ApproachRate, 1800, 1200, 450) / clockRate;
+            double drainRate = beatmap.Difficulty.DrainRate;
+
+            int hitCirclesCount = beatmap.HitObjects.Count(h => h is HitCircle);
+            int sliderCount = beatmap.HitObjects.Count(h => h is Slider);
+            int spinnerCount = beatmap.HitObjects.Count(h => h is Spinner);
 
             HitWindows hitWindows = new OsuHitWindows();
             hitWindows.SetDifficulty(beatmap.Difficulty.OverallDifficulty);
@@ -122,7 +121,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 MaxCombo = beatmap.GetMaxCombo(),
                 HitCircleCount = hitCirclesCount,
                 SliderCount = sliderCount,
-                SpinnerCount = spinnerCount
+                SpinnerCount = spinnerCount,
             };
 
             return attributes;

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Rulesets.Difficulty;
+using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Osu.Difficulty.Skills;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Scoring;
@@ -150,13 +151,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             };
         }
 
-        public static double CalculateDefaultLengthBonus(int objectsCount) => 0.95 + 0.4 * Math.Min(1.0, objectsCount / 2000.0) + (objectsCount > 2000 ? Math.Log10(objectsCount / 2000.0) * 0.5 : 0.0);
-
         private double computeAimValue(ScoreInfo score, OsuDifficultyAttributes attributes)
         {
             double aimValue = OsuStrainSkill.DifficultyToPerformance(attributes.AimDifficulty);
 
-            double lengthBonus = CalculateDefaultLengthBonus(totalHits);
+            double lengthBonus = 0.95 + 0.4 * Math.Min(1.0, totalHits / 2000.0) +
+                                 (totalHits > 2000 ? Math.Log10(totalHits / 2000.0) * 0.5 : 0.0);
             aimValue *= lengthBonus;
 
             if (effectiveMissCount > 0)
@@ -217,7 +217,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double speedValue = OsuStrainSkill.DifficultyToPerformance(attributes.SpeedDifficulty);
 
-            double lengthBonus = CalculateDefaultLengthBonus(totalHits);
+            double lengthBonus = 0.95 + 0.4 * Math.Min(1.0, totalHits / 2000.0) +
+                                 (totalHits > 2000 ? Math.Log10(totalHits / 2000.0) * 0.5 : 0.0);
             speedValue *= lengthBonus;
 
             if (effectiveMissCount > 0)
@@ -234,7 +235,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 // Increasing the speed value by object count for Blinds isn't ideal, so the minimum buff is given.
                 speedValue *= 1.12;
             }
-            else if (score.Mods.Any(m => m is OsuModHidden || m is OsuModTraceable)) 
+            else if (score.Mods.Any(m => m is OsuModHidden || m is OsuModTraceable))
             {
                 // We want to give more reward for lower AR when it comes to aim and HD. This nerfs high AR and buffs lower AR.
                 speedValue *= 1.0 + 0.04 * (12.0 - attributes.ApproachRate);
@@ -264,7 +265,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // This percentage only considers HitCircles of any value - in this part of the calculation we focus on hitting the timing hit window.
             double betterAccuracyPercentage;
             int amountHitObjectsWithAccuracy = attributes.HitCircleCount;
-
             if (!usingClassicSliderAccuracy)
                 amountHitObjectsWithAccuracy += attributes.SliderCount;
 
@@ -294,7 +294,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 accuracyValue *= 1.02;
 
             // Visual indication bonus
-            double visualBonus = 0.1 * logistic(8.0 - attributes.ApproachRate);
+            double visualBonus = 0.1 * DifficultyCalculationUtils.Logistic(attributes.ApproachRate - 8.0);
 
             // Buff if OD is way lower than AR
             double ARODDelta = Math.Max(0, attributes.OverallDifficulty - attributes.ApproachRate);
@@ -362,7 +362,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double ratio = cognitionPerformance / capPerformance;
             if (ratio > 50) return capPerformance;
 
-            ratio = softmin(ratio * 10, 10, 5) / 10;
+            ratio = DifficultyCalculationUtils.Softmin(ratio * 10, 10, 5) / 10; 
             return ratio * capPerformance;
         }
 
@@ -372,10 +372,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private double calculateMissPenalty(double missCount, double difficultStrainCount) => 0.96 / ((missCount / (4 * Math.Pow(Math.Log(difficultStrainCount), 0.94))) + 1);
 
         private double getComboScalingFactor(OsuDifficultyAttributes attributes) => attributes.MaxCombo <= 0 ? 1.0 : Math.Min(Math.Pow(scoreMaxCombo, 0.8) / Math.Pow(attributes.MaxCombo, 0.8), 1.0);
-
-        private static double softmin(double a, double b, double power = Math.E) => a * b / Math.Log(Math.Pow(power, a) + Math.Pow(power, b), power);
-
-        private static double logistic(double x) => 1 / (1 + Math.Exp(-x));
 
         private int totalHits => countGreat + countOk + countMeh + countMiss;
         private int totalImperfectHits => countOk + countMeh + countMiss;

@@ -6,8 +6,8 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Osu.Difficulty.Evaluators;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
@@ -272,7 +272,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
         private static double getTimeDifference(double timeA, double timeB)
         {
-            double similarity = Math.Min(timeA, timeB) / Math.Max(timeA, timeB);
+            double similarity = DifficultyCalculationUtils.GetRatio(timeA, timeB);
             if (Math.Max(timeA, timeB) == 0) similarity = 1;
 
             if (similarity < 0.75) return 1.0;

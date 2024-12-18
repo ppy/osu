@@ -46,5 +46,9 @@ namespace osu.Game.Rulesets.Difficulty.Utils
         /// <param name="exponent">Exponent</param>
         /// <returns>The output of logistic function</returns>
         public static double Logistic(double exponent, double maxValue = 1) => maxValue / (1 + Math.Exp(exponent));
+
+        public static double Softmin(double a, double b, double power = Math.E) => a * b / Math.Log(Math.Pow(power, a) + Math.Pow(power, b), power);
+
+        public static double GetRatio(double a, double b) => Math.Min(a, b) / Math.Max(a, b);
     }
 }

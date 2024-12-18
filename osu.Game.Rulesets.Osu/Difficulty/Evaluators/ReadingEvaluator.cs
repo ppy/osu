@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
 
@@ -40,7 +41,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double loopDifficulty = currObj.OpacityAt(loopObj.BaseObject.StartTime, false);
 
                 // Small distances means objects may be cheesed, so it doesn't matter whether they are arranged confusingly.
-                if (applyDistanceNerf) loopDifficulty *= (logistic((loopObj.LazyJumpDistance - 80) / 10) + 0.2) / 1.2;
+                if (applyDistanceNerf) loopDifficulty *= (DifficultyCalculationUtils.Logistic(-(loopObj.LazyJumpDistance - 80) / 10) + 0.2) / 1.2;
 
                 // Additional buff for long sliderbodies. OVERBUFFED ON PURPOSE
                 if (applySliderbodyDensity && loopObj.BaseObject is Slider slider)
@@ -72,7 +73,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 if (loopObj.StrainTime > prevObj0.StrainTime)
                 {
                     // Get rhythm similarity: 1 on same rhythms, 0.5 on 1/4 to 1/2
-                    double rhythmSimilarity = 1 - getRhythmDifference(loopObj.StrainTime, prevObj0.StrainTime);
+                    double rhythmSimilarity = DifficultyCalculationUtils.GetRatio(loopObj.StrainTime, prevObj0.StrainTime);
 
                     // Make differentiation going from 1/4 to 1/2 and bigger difference
                     // To 1/3 to 1/2 and smaller difference
@@ -217,7 +218,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             }
 
             // Rhythm difference punishment for velocity and angle bonuses
-            double rhythmSimilarity = 1 - getRhythmDifference(osuCurrObj.StrainTime, osuLastObj.StrainTime);
+            double rhythmSimilarity = DifficultyCalculationUtils.GetRatio(osuCurrObj.StrainTime, osuLastObj.StrainTime);
 
             // Make differentiation going from 1/4 to 1/2 and bigger difference
             // To 1/3 to 1/2 and smaller difference
@@ -227,9 +228,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             return velocityChangeFactor * rhythmSimilarity;
         }
 
+        // This factor nerfs AR below 0 as extra safety measure
         private static double getTimeNerfFactor(double deltaTime) => Math.Clamp(2 - deltaTime / (reading_window_size / 2), 0, 1);
-        private static double getRhythmDifference(double t1, double t2) => 1 - Math.Min(t1, t2) / Math.Max(t1, t2);
-        private static double logistic(double x) => 1.0 / (1 + Math.Exp(-x));
 
         // Finds the overlapness of the last object for which StartTime lower than target
         private static double boundBinarySearch(List<OsuDifficultyHitObject.ReadingObject> arr, double target)
