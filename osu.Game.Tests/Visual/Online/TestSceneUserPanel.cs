@@ -48,6 +48,9 @@ namespace osu.Game.Tests.Visual.Online
             Clear();
             Add(statisticsProvider);
 
+            // LoginOverlay width (360) - LoginPanel padding (20 on each side)
+            const int user_rank_panel_width = 320;
+
             Add(new FillFlowContainer
             {
                 Anchor = Anchor.Centre,
@@ -103,7 +106,7 @@ namespace osu.Game.Tests.Visual.Online
                         CountryCode = CountryCode.JP,
                         CoverUrl = @"https://assets.ppy.sh/user-cover-presets/1/df28696b58541a9e67f6755918951d542d93bdf1da41720fcca2fd2c1ea8cf51.jpeg",
                         Statistics = new UserStatistics { GlobalRank = 12345, CountryRank = 1234 }
-                    }) { Width = 360 },
+                    }) { Width = user_rank_panel_width },
                     new UserRankPanel(new APIUser
                     {
                         Username = @"peppy",
@@ -112,7 +115,7 @@ namespace osu.Game.Tests.Visual.Online
                         CountryCode = CountryCode.AU,
                         CoverUrl = @"https://assets.ppy.sh/user-profile-covers/8195163/4a8e2ad5a02a2642b631438cfa6c6bd7e2f9db289be881cb27df18331f64144c.jpeg",
                         Statistics = new UserStatistics { GlobalRank = null, CountryRank = null }
-                    }) { Width = 360 }
+                    }) { Width = user_rank_panel_width }
                 }
             });
 
@@ -176,12 +179,24 @@ namespace osu.Game.Tests.Visual.Online
                     PP = RNG.Next(0, 30000)
                 }, Ruleset.Value);
             });
+            AddStep("set statistics to something small", () =>
+            {
+                statisticsProvider.UpdateStatistics(new UserStatistics
+                {
+                    GlobalRank = RNG.Next(1, 1000),
+                    CountryRank = RNG.Next(1, 100),
+                    PlayTime = RNG.Next(1_000, 100_000),
+                    PP = RNG.Next(0, 1000)
+                }, Ruleset.Value);
+            });
             AddStep("set statistics to something big", () =>
             {
                 statisticsProvider.UpdateStatistics(new UserStatistics
                 {
                     GlobalRank = RNG.Next(1_000_000, 100_000_000),
-                    CountryRank = RNG.Next(1_000_000, 100_000_000)
+                    CountryRank = RNG.Next(1_000_000, 100_000_000),
+                    PlayTime = RNG.Next(10_000_000, 1_000_000_000),
+                    PP = RNG.Next(10000, 100000)
                 }, Ruleset.Value);
             });
             AddStep("set statistics to empty", () => statisticsProvider.UpdateStatistics(new UserStatistics(), Ruleset.Value));
