@@ -362,7 +362,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double ratio = cognitionPerformance / capPerformance;
             if (ratio > 50) return capPerformance;
 
-            ratio = DifficultyCalculationUtils.Softmin(ratio * 10, 10, 5) / 10; 
+            ratio = DifficultyCalculationUtils.Softmin(ratio * 10, 10, 5) / 10;
             return ratio * capPerformance;
         }
 
