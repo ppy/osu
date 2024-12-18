@@ -43,13 +43,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double speedNotes = skills.OfType<Speed>().First().RelevantNoteCount();
 
             double flashlightRating = Math.Sqrt(skills.OfType<Flashlight>().First().DifficultyValue()) * difficulty_multiplier;
-            double readingLowARRating = Math.Sqrt(skills.OfType<ReadingLowAR>().First().DifficultyValue()) * difficulty_multiplier;
+            double readingLowARRating = Math.Sqrt(skills.OfType<ReadingLowAr>().First().DifficultyValue()) * difficulty_multiplier;
 
             double sliderFactor = aimRating > 0 ? aimRatingNoSliders / aimRating : 1;
 
             double aimDifficultyStrainCount = skills.OfType<Aim>().First().CountTopWeightedStrains();
             double speedDifficultyStrainCount = skills.OfType<Speed>().First().CountTopWeightedStrains();
-            double lowArDifficultyStrainCount = skills.OfType<ReadingLowAR>().First().CountTopWeightedStrains();
+            double lowArDifficultyStrainCount = skills.OfType<ReadingLowAr>().First().CountTopWeightedStrains();
 
             if (mods.Any(m => m is OsuModTouchDevice))
             {
@@ -70,15 +70,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double speedPerformance = OsuStrainSkill.DifficultyToPerformance(speedRating);
 
             // Cognition
-            double readingLowARPerformance = ReadingLowAR.DifficultyToPerformance(readingLowARRating);
-            double readingARPerformance = readingLowARPerformance;
+            double readingLowArPerformance = ReadingLowAr.DifficultyToPerformance(readingLowARRating);
+            double readingArPerformance = readingLowArPerformance;
 
             double potentialFlashlightPerformance = Flashlight.DifficultyToPerformance(flashlightRating);
             double flashlightPerformance = mods.Any(h => h is OsuModFlashlight) ? potentialFlashlightPerformance : 0;
 
-            double flashlightARPerformance = Math.Pow(Math.Pow(flashlightPerformance, FL_SUM_POWER) + Math.Pow(readingARPerformance, FL_SUM_POWER), 1.0 / FL_SUM_POWER);
+            double flashlightArPerformance = Math.Pow(Math.Pow(flashlightPerformance, FL_SUM_POWER) + Math.Pow(readingArPerformance, FL_SUM_POWER), 1.0 / FL_SUM_POWER);
 
-            double cognitionPerformance = flashlightARPerformance;
+            double cognitionPerformance = flashlightArPerformance;
             double mechanicalPerformance = Math.Pow(Math.Pow(aimPerformance, SUM_POWER) + Math.Pow(speedPerformance, SUM_POWER), 1.0 / SUM_POWER);
 
             // Limit cognition by full memorisation difficulty, what is assumed to be mechanicalPerformance + flashlightPerformance
@@ -109,7 +109,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 AimDifficulty = aimRating,
                 SpeedDifficulty = speedRating,
                 SpeedNoteCount = speedNotes,
-                ReadingDifficultyLowAR = readingLowARRating,
+                ReadingDifficultyLowAr = readingLowARRating,
                 FlashlightDifficulty = flashlightRating,
                 SliderFactor = sliderFactor,
                 AimDifficultStrainCount = aimDifficultyStrainCount,
@@ -150,7 +150,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 new Aim(mods, false),
                 new Speed(mods),
                 new Flashlight(mods),
-                new ReadingLowAR(mods),
+                new ReadingLowAr(mods),
             };
 
             return skills.ToArray();

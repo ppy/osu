@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         /// The difficulty corresponding to the reading skill. Low AR branch.
         /// </summary>
         [JsonProperty("reading_low_ar_difficulty")]
-        public double ReadingDifficultyLowAR { get; set; }
+        public double ReadingDifficultyLowAr { get; set; }
 
         /// <summary>
         /// The difficulty corresponding to the flashlight skill.

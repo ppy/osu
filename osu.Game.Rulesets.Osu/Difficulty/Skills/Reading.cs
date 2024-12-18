@@ -12,12 +12,12 @@ using osu.Game.Rulesets.Osu.Difficulty.Evaluators;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
-    public class ReadingLowAR : StrainSkill
+    public class ReadingLowAr : StrainSkill
     {
         private double skillMultiplier => 1.22;
         private double aimComponentMultiplier => 0.4;
 
-        public ReadingLowAR(Mod[] mods)
+        public ReadingLowAr(Mod[] mods)
             : base(mods)
         {
         }
@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private double strainDecayBase => 0.15;
         private double strainDecay(double ms) => Math.Pow(strainDecayBase, ms / 1000);
 
-        private double currentDensityAimStrain = 0;
+        private double currentDensityAimStrain;
 
         protected override double StrainValueAt(DifficultyHitObject current)
         {
@@ -43,6 +43,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double reducedNoteCount => 5;
         private double reducedNoteBaseline => 0.7;
+
         public override double DifficultyValue()
         {
             // Sections with 0 difficulty are excluded to avoid worst-case time complexity of the following sort (e.g. /b/2351871).
@@ -70,6 +71,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             return difficulty;
         }
+
         public static double DifficultyToPerformance(double difficulty) => Math.Max(
             Math.Max(Math.Pow(difficulty, 1.5) * 20, Math.Pow(difficulty, 2) * 17.0),
             Math.Max(Math.Pow(difficulty, 3) * 10.5, Math.Pow(difficulty, 4) * 6.00));

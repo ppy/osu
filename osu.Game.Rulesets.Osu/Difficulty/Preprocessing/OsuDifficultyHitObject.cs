@@ -189,7 +189,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
                 // Overlapness between current and prev to make streams have 0 buff
                 double instantOverlapness = 0;
-                prevObject.OverlapValues?.TryGetValue(loopObj.Index, out instantOverlapness);
+                prevObject.OverlapValues.TryGetValue(loopObj.Index, out instantOverlapness);
 
                 // Nerf overlaps on wide angles
                 double angleFactor = 1;
@@ -230,6 +230,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                             if (cumulativeTimeWithoutCurrent >= cumulativeTimeWithCurrent)
                                 break;
                         }
+
                         cumulativeTimeWithCurrent += historicTimes[i];
                     }
 
@@ -284,9 +285,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         private static double getAngleSimilarity(double angle1, double angle2)
         {
             double difference = Math.Abs(angle1 - angle2);
-            double threeshold = Math.PI / 12;
+            const double threeshold = Math.PI / 12;
 
             if (difference > threeshold) return 0;
+
             return 1 - difference / threeshold;
         }
 
@@ -297,18 +299,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             double distance = Vector2.Distance(odho1.StackedPosition, odho2.StackedPosition); // Distance func is kinda slow for some reason
             double radius = odho1.BaseObject.Radius;
 
-            double distance_sqr = distance * distance;
-            double radius_sqr = radius * radius;
+            double distanceSqr = distance * distance;
+            double radiusSqr = radius * radius;
 
             if (distance > radius * 2)
                 return 0;
 
-            double s1 = Math.Acos(distance / (2 * radius)) * radius_sqr; // Area of sector
-            double s2 = distance * Math.Sqrt(radius_sqr - distance_sqr / 4) / 2; // Area of triangle
+            double s1 = Math.Acos(distance / (2 * radius)) * radiusSqr; // Area of sector
+            double s2 = distance * Math.Sqrt(radiusSqr - distanceSqr / 4) / 2; // Area of triangle
 
-            double overlappingAreaNormalized = (s1 - s2) * 2 / (Math.PI * radius_sqr);
+            double overlappingAreaNormalized = (s1 - s2) * 2 / (Math.PI * radiusSqr);
 
-            // don't ask me how i get this value, looks oddly similar to PI - 3
+            // Don't ask me how I got this value, looks oddly similar to PI - 3
             const double stack_distance_ratio = 0.1414213562373;
 
             double perfectStackBuff = (stack_distance_ratio - distance / radius) / stack_distance_ratio; // scale from 0 on normal stack to 1 on perfect stack
@@ -397,21 +399,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             OsuDifficultyHitObject? prevObj5 = (OsuDifficultyHitObject?)Previous(5);
 
             // 3-3 repeat
-            double similarity3_1 = getGeneralSimilarity(this, prevObj2);
-            double similarity3_2 = getGeneralSimilarity(prevObj0, prevObj3);
-            double similarity3_3 = getGeneralSimilarity(prevObj1, prevObj4);
+            double similarityBy3 = getGeneralSimilarity(this, prevObj2) * getGeneralSimilarity(prevObj0, prevObj3) * getGeneralSimilarity(prevObj1, prevObj4);
 
-            double similarity3_total = similarity3_1 * similarity3_2 * similarity3_3;
-
-            // 4-4 repeat
-            double similarity4_1 = getGeneralSimilarity(this, prevObj3);
-            double similarity4_2 = getGeneralSimilarity(prevObj0, prevObj4);
-            double similarity4_3 = getGeneralSimilarity(prevObj1, prevObj5);
-
-            double similarity4_total = similarity4_1 * similarity4_2 * similarity4_3;
+            // 4-4 repeat, only first 3 are checked, this is enough
+            double similarityBy4 = getGeneralSimilarity(this, prevObj3) * getGeneralSimilarity(prevObj0, prevObj4) * getGeneralSimilarity(prevObj1, prevObj5);
 
             // Bandaid to fix Rubik's Cube +EZ
             double wideness = 0;
+
             if (Angle!.Value > Math.PI * 0.5)
             {
                 // Goes from 0 to 1 as angle increasing from 90 degrees to 180
@@ -429,7 +424,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             double predictability = Math.Cos(Math.Min(Math.PI / 2, 6 * adjustedAngleDifference)) * rhythmFactor;
 
             // Punish for big pattern similarity
-            return 1 - (1 - predictability) * (1 - Math.Max(similarity3_total, similarity4_total));
+            return 1 - (1 - predictability) * (1 - Math.Max(similarityBy3, similarityBy4));
         }
 
         private double getGeneralSimilarity(OsuDifficultyHitObject? o1, OsuDifficultyHitObject? o2)
@@ -439,7 +434,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             if (o1.AngleSigned == null || o2.AngleSigned == null)
                 return o1.AngleSigned == o2.AngleSigned ? 1 : 0;
-
 
             double timeSimilarity = 1 - getTimeDifference(o1.StrainTime, o2.StrainTime);
 

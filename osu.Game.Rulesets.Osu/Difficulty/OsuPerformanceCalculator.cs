@@ -111,34 +111,31 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 effectiveMissCount = Math.Min(effectiveMissCount + countOk * okMultiplier + countMeh * mehMultiplier, totalHits);
             }
 
-            double power = OsuDifficultyCalculator.SUM_POWER;
+            const double power = OsuDifficultyCalculator.SUM_POWER;
 
             double aimValue = computeAimValue(score, osuAttributes);
             double speedValue = computeSpeedValue(score, osuAttributes);
             double mechanicalValue = Math.Pow(Math.Pow(aimValue, power) + Math.Pow(speedValue, power), 1.0 / power);
 
             // Cognition
-
-            double lowARValue = computeReadingLowARValue(score, osuAttributes);
-
-            double readingARValue = lowARValue;
+            double lowArValue = computeReadingLowArValue(score, osuAttributes);
 
             double flashlightValue = computeFlashlightValue(score, osuAttributes);
 
             // Reduce AR reading bonus if FL is present
-            double flPower = OsuDifficultyCalculator.FL_SUM_POWER;
-            double flashlightARValue = score.Mods.Any(h => h is OsuModFlashlight) ?
-                Math.Pow(Math.Pow(flashlightValue, flPower) + Math.Pow(readingARValue, flPower), 1.0 / flPower) : readingARValue;
+            const double fl_power = OsuDifficultyCalculator.FL_SUM_POWER;
 
-            double cognitionValue = flashlightARValue;
+            double flashlightArValue = score.Mods.Any(h => h is OsuModFlashlight)
+                ? Math.Pow(Math.Pow(flashlightValue, fl_power) + Math.Pow(lowArValue, fl_power), 1.0 / fl_power)
+                : lowArValue;
+
+            double cognitionValue = flashlightArValue;
             cognitionValue = AdjustCognitionPerformance(cognitionValue, mechanicalValue, flashlightValue);
 
             double accuracyValue = computeAccuracyValue(score, osuAttributes);
 
             // Add cognition value without LP-sum cuz otherwise it makes balancing harder
-            double totalValue =
-                (Math.Pow(Math.Pow(mechanicalValue, power) + Math.Pow(accuracyValue, power), 1.0 / power)
-                + cognitionValue) * multiplier;
+            double totalValue = (Math.Pow(Math.Pow(mechanicalValue, power) + Math.Pow(accuracyValue, power), 1.0 / power) + cognitionValue) * multiplier;
 
             return new OsuPerformanceAttributes
             {
@@ -297,10 +294,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double visualBonus = 0.1 * DifficultyCalculationUtils.Logistic(attributes.ApproachRate - 8.0);
 
             // Buff if OD is way lower than AR
-            double ARODDelta = Math.Max(0, attributes.OverallDifficulty - attributes.ApproachRate);
+            double ArOdDelta = Math.Max(0, attributes.OverallDifficulty - attributes.ApproachRate);
 
             // This one is goes from 0.0 on delta=0 to 1.0 somewhere around delta=3.4
-            double deltaBonus = (1 - Math.Pow(0.95, Math.Pow(ARODDelta, 4)));
+            double deltaBonus = (1 - Math.Pow(0.95, Math.Pow(ArOdDelta, 4)));
 
             // Nerf delta bonus on OD lower than 10 and 9
             if (attributes.OverallDifficulty < 10)
@@ -335,9 +332,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return flashlightValue;
         }
 
-        private double computeReadingLowARValue(ScoreInfo score, OsuDifficultyAttributes attributes)
+        private double computeReadingLowArValue(ScoreInfo score, OsuDifficultyAttributes attributes)
         {
-            double readingValue = ReadingLowAR.DifficultyToPerformance(attributes.ReadingDifficultyLowAR);
+            double readingValue = ReadingLowAr.DifficultyToPerformance(attributes.ReadingDifficultyLowAr);
 
             // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
             if (effectiveMissCount > 0)

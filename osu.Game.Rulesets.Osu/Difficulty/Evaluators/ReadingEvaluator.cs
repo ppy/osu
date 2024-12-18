@@ -31,6 +31,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             OsuDifficultyHitObject prevObj0 = currObj;
 
             var readingObjects = currObj.ReadingObjects;
+
             for (int i = 0; i < readingObjects.Count; i++)
             {
                 var loopObj = readingObjects[i].HitObject;
@@ -40,10 +41,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                 double loopDifficulty = currObj.OpacityAt(loopObj.BaseObject.StartTime, false);
 
-                // Small distances means objects may be cheesed, so it doesn't matter whether they are arranged confusingly.
+                // Small distances means objects may be cheesed, so it doesn't matter whether they are arranged confusingly
                 if (applyDistanceNerf) loopDifficulty *= (DifficultyCalculationUtils.Logistic(-(loopObj.LazyJumpDistance - 80) / 10) + 0.2) / 1.2;
 
-                // Additional buff for long sliderbodies. OVERBUFFED ON PURPOSE
+                // Additional buff for long sliderbodies
                 if (applySliderbodyDensity && loopObj.BaseObject is Slider slider)
                 {
                     // In radiuses, with minimal of 1
@@ -144,7 +145,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     var easierObject = sortedDifficulties[j];
 
                     // Get the overlap value
-                    double overlapValue = 0;
+                    double overlapValue;
 
                     // OverlapValues dict only contains prev objects, so be sure to use right object
                     if (harderObject.HitObject.Index > easierObject.HitObject.Index)
@@ -171,6 +172,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             return overlap_multiplier * Math.Max(0, screenOverlapDifficulty);
         }
+
         public static double EvaluateDifficultyOf(DifficultyHitObject current)
         {
             if (current.BaseObject is Spinner || current.Index == 0)
@@ -191,43 +193,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             return Math.Max(0, Math.Pow(difficulty, 1.37) - 1);
         }
 
-        // Returns value from 0 to 1, where 0 is very predictable and 1 is very unpredictable
-        public static double EvaluateInpredictabilityOf(DifficultyHitObject current)
-        {
-            if (current.BaseObject is Spinner || current.Index == 0 || current.Previous(0).BaseObject is Spinner)
-                return 0;
-
-            var osuCurrObj = (OsuDifficultyHitObject)current;
-            var osuLastObj = (OsuDifficultyHitObject)current.Previous(0);
-
-            double currVelocity = osuCurrObj.LazyJumpDistance / osuCurrObj.StrainTime;
-            double prevVelocity = osuLastObj.LazyJumpDistance / osuLastObj.StrainTime;
-
-            double velocityChangeFactor = 0;
-
-            // https://www.desmos.com/calculator/kqxmqc8pkg
-            if (currVelocity > 0 || prevVelocity > 0)
-            {
-                double velocityChange = Math.Max(0,
-                Math.Min(
-                    Math.Abs(prevVelocity - currVelocity) - 0.5 * Math.Min(currVelocity, prevVelocity),
-                    Math.Max(((OsuHitObject)osuCurrObj.BaseObject).Radius / Math.Max(osuCurrObj.StrainTime, osuLastObj.StrainTime), Math.Min(currVelocity, prevVelocity))
-                    )); // Stealed from xexxar
-                velocityChangeFactor = velocityChange / Math.Max(currVelocity, prevVelocity); // maxiumum is 0.4
-                velocityChangeFactor /= 0.4;
-            }
-
-            // Rhythm difference punishment for velocity and angle bonuses
-            double rhythmSimilarity = DifficultyCalculationUtils.GetRatio(osuCurrObj.StrainTime, osuLastObj.StrainTime);
-
-            // Make differentiation going from 1/4 to 1/2 and bigger difference
-            // To 1/3 to 1/2 and smaller difference
-            rhythmSimilarity = Math.Clamp(rhythmSimilarity, 0.5, 0.75);
-            rhythmSimilarity = 4 * (rhythmSimilarity - 0.5);
-
-            return velocityChangeFactor * rhythmSimilarity;
-        }
-
         // This factor nerfs AR below 0 as extra safety measure
         private static double getTimeNerfFactor(double deltaTime) => Math.Clamp(2 - deltaTime / (reading_window_size / 2), 0, 1);
 
@@ -235,14 +200,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         private static double boundBinarySearch(List<OsuDifficultyHitObject.ReadingObject> arr, double target)
         {
             int low = 0;
-            int mid;
             int high = arr.Count;
 
             int result = -1;
 
             while (low < high)
             {
-                mid = low + (high - low) / 2;
+                int mid = low + (high - low) / 2;
 
                 if (arr[mid].HitObject.StartTime >= target)
                 {
@@ -253,6 +217,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             }
 
             if (result == -1) return 0;
+
             return arr[result].Overlapness;
         }
     }
