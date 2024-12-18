@@ -4,7 +4,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
@@ -33,6 +35,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// Milliseconds elapsed since the start time of the previous <see cref="OsuDifficultyHitObject"/>, with a minimum of 25ms.
         /// </summary>
         public readonly double StrainTime;
+
+        /// <summary>
+        /// Saved version of <see cref="OsuHitObject.StackedPosition"/> to decrease overhead.
+        /// </summary>
+        public readonly Vector2 StackedPosition;
 
         /// <summary>
         /// Normalised distance from the "lazy" end position of the previous <see cref="OsuDifficultyHitObject"/> to the start position of this <see cref="OsuDifficultyHitObject"/>.
@@ -78,13 +85,41 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// <summary>
         /// Angle the player has to take to hit this <see cref="OsuDifficultyHitObject"/>.
         /// Calculated as the angle between the circles (current-2, current-1, current).
+        /// Ranges from 0 to PI
         /// </summary>
         public double? Angle { get; private set; }
+
+        /// <summary>
+        /// Signed version of the Angle.
+        /// Potentially should be used for more accurate angle bonuses
+        /// Ranges from -PI to PI
+        /// </summary>
+        public double? AngleSigned { get; private set; }
 
         /// <summary>
         /// Retrieves the full hit window for a Great <see cref="HitResult"/>.
         /// </summary>
         public double HitWindowGreat { get; private set; }
+
+        /// <summary>
+        /// Predictabiliy of the angle. Gives high values only in exceptionally repetitive patterns.
+        /// </summary>
+        public double AnglePredictability { get; private set; }
+
+        /// <summary>
+        /// Objects that was visible after the note was hit together with cumulative overlapping difficulty. Saved for optimization to avoid O(x^4) time complexity.
+        /// </summary>
+        public IList<ReadingObject> ReadingObjects { get; private set; }
+
+        /// <summary>
+        /// NON ZERO overlap values for each visible object on the moment this object appeared. Key is <see cref="DifficultyHitObject.Index"/>. Saved for optimization.
+        /// </summary>
+        public IDictionary<int, double> OverlapValues { get; private set; }
+
+        /// <summary>
+        /// Time in ms between appearence of this <see cref="OsuDifficultyHitObject"/> and moment to click on it.
+        /// </summary>
+        public readonly double Preempt;
 
         private readonly OsuHitObject? lastLastObject;
         private readonly OsuHitObject lastObject;
@@ -92,8 +127,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         public OsuDifficultyHitObject(HitObject hitObject, HitObject lastObject, HitObject? lastLastObject, double clockRate, List<DifficultyHitObject> objects, int index)
             : base(hitObject, lastObject, clockRate, objects, index)
         {
-            this.lastLastObject = lastLastObject as OsuHitObject;
+            OsuHitObject currObject = (OsuHitObject)hitObject;
             this.lastObject = (OsuHitObject)lastObject;
+            this.lastLastObject = lastLastObject as OsuHitObject;
+
+            StackedPosition = currObject.StackedPosition;
+            Preempt = BaseObject.TimePreempt / clockRate;
 
             // Capped to 25ms to prevent difficulty calculation breaking from simultaneous objects.
             StrainTime = Math.Max(DeltaTime, MIN_DELTA_TIME);
@@ -108,11 +147,309 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             }
 
             setDistances(clockRate);
+
+            AnglePredictability = CalculateAnglePredictability();
+
+            (ReadingObjects, OverlapValues) = getReadingObjects();
+        }
+
+        private (IList<ReadingObject>, IDictionary<int, double>) getReadingObjects()
+        {
+            double totalOverlapnessDifficulty = 0;
+            double currentTime = DeltaTime;
+            List<double> historicTimes = [];
+            List<double> historicAngles = [];
+
+            OsuDifficultyHitObject prevObject = this;
+
+            // The fastest way to do it I've seen so far. Still - one of the slowest parts of the reading calc
+            var visibleObjects = retrieveCurrentVisibleObjects(this);
+
+            var readingObjects = new List<ReadingObject>(visibleObjects.Count);
+            OverlapValues = new Dictionary<int, double>();
+
+            for (int loopIndex = 0; loopIndex < visibleObjects.Count; loopIndex++)
+            {
+                var loopObj = visibleObjects[loopIndex];
+
+                // Overlapness with this object
+                double currentOverlapness = calculateOverlapness(this, loopObj);
+
+                // Save it for future use. Saving only non-zero to make it faster
+                if (currentOverlapness > 0) OverlapValues[loopObj.Index] = currentOverlapness;
+
+                if (prevObject.Angle.IsNull())
+                {
+                    currentTime += prevObject.DeltaTime;
+                    continue;
+                }
+
+                // Previous angle because order is reversed;
+                double angle = (double)prevObject.Angle;
+
+                // Overlapness between current and prev to make streams have 0 buff
+                prevObject.OverlapValues.TryGetValue(loopObj.Index, out double instantOverlapness);
+
+                // Nerf overlaps on wide angles
+                double angleFactor = 1;
+                angleFactor += (-Math.Cos(angle) + 1) / 2; // =2 for wide angles, =1 for acute angles
+                instantOverlapness = Math.Min(1, (0.5 + instantOverlapness) * angleFactor); // wide angles are more predictable
+
+                currentOverlapness *= (1 - instantOverlapness) * 2; // wide angles will have close-to-zero buff
+
+                // Control overlap repetitivness
+                if (currentOverlapness > 0)
+                {
+                    currentOverlapness *= getOpacitiyMultiplier(loopObj); // Increase stability by using opacity
+
+                    double currentMinOverlapness = currentOverlapness;
+                    double cumulativeTimeWithCurrent = currentTime;
+
+                    // For every cumulative time with current
+                    for (int i = historicTimes.Count - 1; i >= 0; i--)
+                    {
+                        double cumulativeTimeWithoutCurrent = 0;
+
+                        // Get every possible cumulative time without current
+                        for (int j = i; j >= 0; j--)
+                        {
+                            cumulativeTimeWithoutCurrent += historicTimes[j];
+
+                            // Check how similar cumulative times are
+                            double potentialMinOverlapness = currentOverlapness * getTimeDifference(cumulativeTimeWithCurrent, cumulativeTimeWithoutCurrent);
+                            potentialMinOverlapness *= 1 - getAngleSimilarity(angle, historicAngles[j]) * (1 - getTimeDifference(loopObj.StrainTime, prevObject.StrainTime));
+                            currentMinOverlapness = Math.Min(currentMinOverlapness, potentialMinOverlapness);
+
+                            // Check how similar current time with cumulative time
+                            potentialMinOverlapness = currentOverlapness * getTimeDifference(currentTime, cumulativeTimeWithoutCurrent);
+                            potentialMinOverlapness *= 1 - getAngleSimilarity(angle, historicAngles[j]) * (1 - getTimeDifference(loopObj.StrainTime, prevObject.StrainTime));
+                            currentMinOverlapness = Math.Min(currentMinOverlapness, potentialMinOverlapness);
+
+                            // Starting from this point - we will never have better match, so stop searching
+                            if (cumulativeTimeWithoutCurrent >= cumulativeTimeWithCurrent)
+                                break;
+                        }
+
+                        cumulativeTimeWithCurrent += historicTimes[i];
+                    }
+
+                    currentOverlapness = currentMinOverlapness;
+
+                    historicTimes.Add(currentTime);
+                    historicAngles.Add(angle);
+
+                    currentTime = prevObject.DeltaTime;
+                }
+                else
+                {
+                    currentTime += prevObject.DeltaTime;
+                }
+
+                totalOverlapnessDifficulty += currentOverlapness;
+
+                ReadingObject newObj = new ReadingObject(loopObj, totalOverlapnessDifficulty);
+                readingObjects.Add(newObj);
+                prevObject = loopObj;
+            }
+
+            return (readingObjects, OverlapValues);
+        }
+
+        private double getOpacitiyMultiplier(OsuDifficultyHitObject loopObj)
+        {
+            const double threshold = 0.3;
+
+            // Get raw opacity
+            double opacity = OpacityAt(loopObj.BaseObject.StartTime, false);
+
+            opacity = Math.Min(1, opacity + threshold); // object with opacity 0.7 are still perfectly visible
+            opacity -= threshold; // return opacity 0 objects back to 0
+            opacity /= 1 - threshold; // fix scaling to be 0-1 again
+            opacity = Math.Sqrt(opacity); // change curve
+
+            return opacity;
+        }
+
+        private static double getTimeDifference(double timeA, double timeB)
+        {
+            double similarity = DifficultyCalculationUtils.GetRatio(timeA, timeB);
+            if (Math.Max(timeA, timeB) == 0) similarity = 1;
+
+            if (similarity < 0.75) return 1.0;
+            if (similarity > 0.9) return 0.0;
+
+            return (Math.Cos((similarity - 0.75) * Math.PI / 0.15) + 1) / 2; // drops from 1 to 0 as similarity increase from 0.75 to 0.9
+        }
+
+        private static double getAngleSimilarity(double angle1, double angle2)
+        {
+            double difference = Math.Abs(angle1 - angle2);
+            const double threeshold = Math.PI / 12;
+
+            if (difference > threeshold) return 0;
+
+            return 1 - difference / threeshold;
+        }
+
+        private static double calculateOverlapness(OsuDifficultyHitObject odho1, OsuDifficultyHitObject odho2)
+        {
+            const double area_coef = 0.85;
+
+            double distance = Vector2.Distance(odho1.StackedPosition, odho2.StackedPosition); // Distance func is kinda slow for some reason
+            double radius = odho1.BaseObject.Radius;
+
+            double distanceSqr = distance * distance;
+            double radiusSqr = radius * radius;
+
+            if (distance > radius * 2)
+                return 0;
+
+            double s1 = Math.Acos(distance / (2 * radius)) * radiusSqr; // Area of sector
+            double s2 = distance * Math.Sqrt(radiusSqr - distanceSqr / 4) / 2; // Area of triangle
+
+            double overlappingAreaNormalized = (s1 - s2) * 2 / (Math.PI * radiusSqr);
+
+            // Don't ask me how I got this value, looks oddly similar to PI - 3
+            const double stack_distance_ratio = 0.1414213562373;
+
+            double perfectStackBuff = (stack_distance_ratio - distance / radius) / stack_distance_ratio; // scale from 0 on normal stack to 1 on perfect stack
+            perfectStackBuff = Math.Max(perfectStackBuff, 0); // can't be negative
+
+            return overlappingAreaNormalized * area_coef + perfectStackBuff * (1 - area_coef);
+        }
+
+        private static List<OsuDifficultyHitObject> retrieveCurrentVisibleObjects(OsuDifficultyHitObject current)
+        {
+            var visibleObjects = new List<OsuDifficultyHitObject>();
+
+            for (int i = 0; i < current.Index; i++)
+            {
+                OsuDifficultyHitObject hitObject = (OsuDifficultyHitObject)current.Previous(i);
+
+                if (hitObject.IsNull() ||
+                    hitObject.StartTime < current.StartTime - current.Preempt)
+                    break;
+
+                visibleObjects.Add(hitObject);
+            }
+
+            return visibleObjects;
+        }
+
+        public double CalculateAnglePredictability()
+        {
+            OsuDifficultyHitObject? prevObj0 = (OsuDifficultyHitObject?)Previous(0);
+            OsuDifficultyHitObject? prevObj1 = (OsuDifficultyHitObject?)Previous(1);
+            OsuDifficultyHitObject? prevObj2 = (OsuDifficultyHitObject?)Previous(2);
+
+            if (Angle.IsNull() || prevObj0.IsNull() || prevObj0.Angle.IsNull())
+                return 1.0;
+
+            double angleDifference = Math.Abs(prevObj0.Angle.Value - Angle.Value);
+
+            // Assume that very low spacing difference means that angles don't matter
+            if (prevObj0.LazyJumpDistance < NORMALISED_RADIUS)
+                angleDifference *= Math.Pow(prevObj0.LazyJumpDistance / NORMALISED_RADIUS, 2);
+            if (LazyJumpDistance < NORMALISED_RADIUS)
+                angleDifference *= Math.Pow(LazyJumpDistance / NORMALISED_RADIUS, 2);
+
+            // Now research previous angles
+            double angleDifferencePrev = 0;
+
+            // How close the smallest angle of curr and prev is to 0
+            double zeroAngleFactor = 1.0;
+
+            // Nerf alternating angles case
+            if (prevObj1.IsNotNull() && prevObj2.IsNotNull() && prevObj1.Angle.IsNotNull())
+            {
+                angleDifferencePrev = Math.Abs(prevObj1.Angle.Value - Angle.Value);
+                zeroAngleFactor = Math.Pow(1 - Math.Min(Angle.Value, prevObj0.Angle.Value) / Math.PI, 10);
+            }
+
+            // Will be close to 1 if angleDifferencePrev is close to 0
+            double rescaleFactor = Math.Pow(1 - angleDifferencePrev / Math.PI, 5);
+
+            // 0 on different rhythm, 1 on same rhythm
+            double rhythmFactor = 1 - getTimeDifference(StrainTime, prevObj0.StrainTime);
+
+            if (prevObj1.IsNotNull())
+                rhythmFactor *= 1 - getTimeDifference(prevObj0.StrainTime, prevObj1.StrainTime);
+            if (prevObj1.IsNotNull() && prevObj2.IsNotNull())
+                rhythmFactor *= 1 - getTimeDifference(prevObj1.StrainTime, prevObj2.StrainTime);
+
+            // Get the base - how much alternating difference is lower than current difference
+            double prevAngleAdjust = Math.Max(angleDifference - angleDifferencePrev, 0);
+
+            // Don't apply the nerf when angleDifferencePrev is too high
+            prevAngleAdjust *= rescaleFactor;
+
+            // Don't apply the nerf if rhythm is changing
+            prevAngleAdjust *= rhythmFactor;
+
+            // Don't apply the nerf if neither of previous angles isn't close to 0
+            prevAngleAdjust *= zeroAngleFactor;
+
+            angleDifference -= prevAngleAdjust;
+
+            // Explicit nerf for same pattern repeating
+            OsuDifficultyHitObject? prevObj3 = (OsuDifficultyHitObject?)Previous(3);
+            OsuDifficultyHitObject? prevObj4 = (OsuDifficultyHitObject?)Previous(4);
+            OsuDifficultyHitObject? prevObj5 = (OsuDifficultyHitObject?)Previous(5);
+
+            // 3-3 repeat
+            double similarityBy3 = getGeneralSimilarity(this, prevObj2) * getGeneralSimilarity(prevObj0, prevObj3) * getGeneralSimilarity(prevObj1, prevObj4);
+
+            // 4-4 repeat, only first 3 are checked, this is enough
+            double similarityBy4 = getGeneralSimilarity(this, prevObj3) * getGeneralSimilarity(prevObj0, prevObj4) * getGeneralSimilarity(prevObj1, prevObj5);
+
+            // Bandaid to fix Rubik's Cube +EZ
+            double wideness = 0;
+
+            if (Angle!.Value > Math.PI * 0.5)
+            {
+                // Goes from 0 to 1 as angle increasing from 90 degrees to 180
+                wideness = (Angle.Value / Math.PI - 0.5) * 2;
+
+                // Transform into cubic scaling
+                wideness = 1 - Math.Pow(1 - wideness, 3);
+            }
+
+            // Angle difference will be considered as 2 times lower if angle is wide
+            angleDifference /= 1 + wideness;
+
+            // Angle difference more than 15 degrees gets no penalty
+            double adjustedAngleDifference = Math.Min(Math.PI / 12, angleDifference);
+            double predictability = Math.Cos(Math.Min(Math.PI / 2, 6 * adjustedAngleDifference)) * rhythmFactor;
+
+            // Punish for big pattern similarity
+            return 1 - (1 - predictability) * (1 - Math.Max(similarityBy3, similarityBy4));
+        }
+
+        private double getGeneralSimilarity(OsuDifficultyHitObject? o1, OsuDifficultyHitObject? o2)
+        {
+            if (o1 == null || o2 == null)
+                return 1;
+
+            if (o1.AngleSigned == null || o2.AngleSigned == null)
+                return o1.AngleSigned == o2.AngleSigned ? 1 : 0;
+
+            double timeSimilarity = 1 - getTimeDifference(o1.StrainTime, o2.StrainTime);
+
+            double angleDelta = Math.Abs((double)o1.AngleSigned - (double)o2.AngleSigned);
+            angleDelta = Math.Clamp(angleDelta - 0.1, 0, 0.15);
+            double angleSimilarity = 1 - angleDelta / 0.15;
+
+            double distanceDelta = Math.Abs(o1.LazyJumpDistance - o2.LazyJumpDistance) / NORMALISED_RADIUS;
+            double distanceSimilarity = 1 / Math.Max(1, distanceDelta);
+
+            return timeSimilarity * angleSimilarity * distanceSimilarity;
         }
 
         public double OpacityAt(double time, bool hidden)
         {
-            if (time > BaseObject.StartTime)
+            var baseObject = BaseObject;
+
+            if (time > baseObject.StartTime)
             {
                 // Consider a hitobject as being invisible when its start time is passed.
                 // In reality the hitobject will be visible beyond its start time up until its hittable window has passed,
@@ -120,14 +457,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 return 0.0;
             }
 
-            double fadeInStartTime = BaseObject.StartTime - BaseObject.TimePreempt;
-            double fadeInDuration = BaseObject.TimeFadeIn;
+            double fadeInStartTime = baseObject.StartTime - baseObject.TimePreempt;
+            double fadeInDuration = baseObject.TimeFadeInRaw;
 
             if (hidden)
             {
                 // Taken from OsuModHidden.
-                double fadeOutStartTime = BaseObject.StartTime - BaseObject.TimePreempt + BaseObject.TimeFadeIn;
-                double fadeOutDuration = BaseObject.TimePreempt * OsuModHidden.FADE_OUT_DURATION_MULTIPLIER;
+                double fadeOutStartTime = baseObject.StartTime - baseObject.TimePreempt + baseObject.TimeFadeInRaw;
+                double fadeOutDuration = baseObject.TimePreempt * OsuModHidden.FADE_OUT_DURATION_MULTIPLIER;
 
                 return Math.Min
                 (
@@ -227,7 +564,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 float dot = Vector2.Dot(v1, v2);
                 float det = v1.X * v2.Y - v1.Y * v2.X;
 
-                Angle = Math.Abs(Math.Atan2(det, dot));
+                AngleSigned = Math.Atan2(det, dot);
+                Angle = Math.Abs(AngleSigned.Value);
             }
         }
 
@@ -347,6 +685,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             }
 
             return pos;
+        }
+
+        public struct ReadingObject
+        {
+            public OsuDifficultyHitObject HitObject;
+            public double Overlapness;
+
+            public ReadingObject(OsuDifficultyHitObject hitObject, double overlapness)
+            {
+                HitObject = hitObject;
+                Overlapness = overlapness;
+            }
         }
     }
 }
