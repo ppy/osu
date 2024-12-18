@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -24,11 +25,19 @@ namespace osu.Game.Screens.OnlinePlay
             set => current.Current = value;
         }
 
+        public new Action Action { set => throw new NotSupportedException("The click action is handled by the button itself."); }
+
         private OsuSpriteText text = null!;
         private Circle circle = null!;
 
         [Resolved]
         private OsuColour colours { get; set; } = null!;
+
+        public FooterButtonFreePlay()
+        {
+            // Overwrite any external behaviour as we delegate the main toggle action to a sub-button.
+            base.Action = () => current.Value = !current.Value;
+        }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -70,9 +79,6 @@ namespace osu.Game.Screens.OnlinePlay
             base.LoadComplete();
 
             Current.BindValueChanged(_ => updateDisplay(), true);
-
-            // Overwrite any external behaviour as we delegate the main toggle action to a sub-button.
-            Action = () => current.Value = !current.Value;
         }
 
         private void updateDisplay()
