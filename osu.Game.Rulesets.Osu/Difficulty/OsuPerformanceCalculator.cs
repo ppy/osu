@@ -139,20 +139,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 (Math.Pow(Math.Pow(mechanicalValue, power) + Math.Pow(accuracyValue, power), 1.0 / power)
                 + cognitionValue) * multiplier;
 
-            // Fancy stuff for better visual display of FL pp
-
-            // Calculate reading difficulty as there was no FL in the first place
-            double visualCognitionValue = AdjustCognitionPerformance(readingARValue, mechanicalValue, flashlightValue);
-
-            double visualFlashlightValue = cognitionValue - visualCognitionValue;
-
             return new OsuPerformanceAttributes
             {
                 Aim = aimValue,
                 Speed = speedValue,
                 Accuracy = accuracyValue,
-                Flashlight = visualFlashlightValue,
-                Reading = visualCognitionValue,
+                Cognition = cognitionValue,
                 EffectiveMissCount = effectiveMissCount,
                 Total = totalValue
             };
