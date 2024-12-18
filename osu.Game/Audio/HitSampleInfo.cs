@@ -60,12 +60,18 @@ namespace osu.Game.Audio
         /// </summary>
         public int Volume { get; }
 
-        public HitSampleInfo(string name, string bank = SampleControlPoint.DEFAULT_BANK, string? suffix = null, int volume = 100)
+        /// <summary>
+        /// Whether this sample should automatically assign the bank of the normal sample whenever it is set in the editor.
+        /// </summary>
+        public bool EditorAutoBank { get; }
+
+        public HitSampleInfo(string name, string bank = SampleControlPoint.DEFAULT_BANK, string? suffix = null, int volume = 100, bool editorAutoBank = true)
         {
             Name = name;
             Bank = bank;
             Suffix = suffix;
             Volume = volume;
+            EditorAutoBank = editorAutoBank;
         }
 
         /// <summary>
@@ -80,6 +86,8 @@ namespace osu.Game.Audio
                     yield return $"Gameplay/{Bank}-{Name}{Suffix}";
 
                 yield return $"Gameplay/{Bank}-{Name}";
+
+                yield return $"Gameplay/{Name}";
             }
         }
 
@@ -90,11 +98,12 @@ namespace osu.Game.Audio
         /// <param name="newBank">An optional new sample bank.</param>
         /// <param name="newSuffix">An optional new lookup suffix.</param>
         /// <param name="newVolume">An optional new volume.</param>
+        /// <param name="newEditorAutoBank">An optional new editor auto bank flag.</param>
         /// <returns>The new <see cref="HitSampleInfo"/>.</returns>
-        public virtual HitSampleInfo With(Optional<string> newName = default, Optional<string> newBank = default, Optional<string?> newSuffix = default, Optional<int> newVolume = default)
-            => new HitSampleInfo(newName.GetOr(Name), newBank.GetOr(Bank), newSuffix.GetOr(Suffix), newVolume.GetOr(Volume));
+        public virtual HitSampleInfo With(Optional<string> newName = default, Optional<string> newBank = default, Optional<string?> newSuffix = default, Optional<int> newVolume = default, Optional<bool> newEditorAutoBank = default)
+            => new HitSampleInfo(newName.GetOr(Name), newBank.GetOr(Bank), newSuffix.GetOr(Suffix), newVolume.GetOr(Volume), newEditorAutoBank.GetOr(EditorAutoBank));
 
-        public bool Equals(HitSampleInfo? other)
+        public virtual bool Equals(HitSampleInfo? other)
             => other != null && Name == other.Name && Bank == other.Bank && Suffix == other.Suffix;
 
         public override bool Equals(object? obj)

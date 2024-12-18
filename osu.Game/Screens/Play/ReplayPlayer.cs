@@ -34,10 +34,12 @@ namespace osu.Game.Screens.Play
 
         protected override UserActivity InitialActivity => new UserActivity.WatchingReplay(Score.ScoreInfo);
 
+        private bool isAutoplayPlayback => GameplayState.Mods.OfType<ModAutoplay>().Any();
+
         // Disallow replays from failing. (see https://github.com/ppy/osu/issues/6108)
         protected override bool CheckModsAllowFailure()
         {
-            if (!replayIsFailedScore && !GameplayState.Mods.OfType<ModAutoplay>().Any())
+            if (!replayIsFailedScore && !isAutoplayPlayback)
                 return false;
 
             return base.CheckModsAllowFailure();
@@ -54,6 +56,16 @@ namespace osu.Game.Screens.Play
         {
             this.createScore = createScore;
         }
+
+        /// <summary>
+        /// Add a settings group to the HUD overlay. Intended to be used by rulesets to add replay-specific settings.
+        /// </summary>
+        /// <param name="settings">The settings group to be shown.</param>
+        public void AddSettings(PlayerSettingsGroup settings) => Schedule(() =>
+        {
+            settings.Expanded.Value = false;
+            HUDOverlay.PlayerSettingsOverlay.Add(settings);
+        });
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
@@ -92,7 +104,12 @@ namespace osu.Game.Screens.Play
                 Scores = { BindTarget = LeaderboardScores }
             };
 
-        protected override ResultsScreen CreateResults(ScoreInfo score) => new SoloResultsScreen(score, false);
+        protected override ResultsScreen CreateResults(ScoreInfo score) => new SoloResultsScreen(score)
+        {
+            // Only show the relevant button otherwise things look silly.
+            AllowWatchingReplay = !isAutoplayPlayback,
+            AllowRetry = isAutoplayPlayback,
+        };
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {

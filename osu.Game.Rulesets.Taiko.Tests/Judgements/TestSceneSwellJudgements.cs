@@ -86,6 +86,42 @@ namespace osu.Game.Rulesets.Taiko.Tests.Judgements
         }
 
         [Test]
+        public void TestAlternatingIsRequired()
+        {
+            const double hit_time = 1000;
+
+            Swell swell = new Swell
+            {
+                StartTime = hit_time,
+                Duration = 1000,
+                RequiredHits = 10
+            };
+
+            List<ReplayFrame> frames = new List<ReplayFrame>
+            {
+                new TaikoReplayFrame(0),
+                new TaikoReplayFrame(2001),
+            };
+
+            for (int i = 0; i < swell.RequiredHits; i++)
+            {
+                double frameTime = 1000 + i * 50;
+                frames.Add(new TaikoReplayFrame(frameTime, TaikoAction.LeftCentre));
+                frames.Add(new TaikoReplayFrame(frameTime + 10));
+            }
+
+            PerformTest(frames, CreateBeatmap(swell));
+
+            AssertJudgementCount(11);
+
+            AssertResult<SwellTick>(0, HitResult.IgnoreHit);
+            for (int i = 1; i < swell.RequiredHits; i++)
+                AssertResult<SwellTick>(i, HitResult.IgnoreMiss);
+
+            AssertResult<Swell>(0, HitResult.IgnoreMiss);
+        }
+
+        [Test]
         public void TestHitNoneSwell()
         {
             const double hit_time = 1000;

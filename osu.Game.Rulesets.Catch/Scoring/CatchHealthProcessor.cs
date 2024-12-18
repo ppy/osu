@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Catch.Objects;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
 
@@ -20,6 +21,23 @@ namespace osu.Game.Rulesets.Catch.Scoring
         protected override IEnumerable<HitObject> EnumerateTopLevelHitObjects() => EnumerateHitObjects(Beatmap).Where(h => h is Fruit || h is Droplet || h is Banana);
 
         protected override IEnumerable<HitObject> EnumerateNestedHitObjects(HitObject hitObject) => Enumerable.Empty<HitObject>();
+
+        protected override bool CheckDefaultFailCondition(JudgementResult result)
+        {
+            // matches stable.
+            // see: https://github.com/peppy/osu-stable-reference/blob/46cd3a10af7cc6cc96f4eba92ef1812dc8c3a27e/osu!/GameModes/Play/Rulesets/Ruleset.cs#L967
+            // the above early-return skips the failure check at the end of the same method:
+            // https://github.com/peppy/osu-stable-reference/blob/46cd3a10af7cc6cc96f4eba92ef1812dc8c3a27e/osu!/GameModes/Play/Rulesets/Ruleset.cs#L1232
+            // making it impossible to fail on a tiny droplet regardless of result.
+            if (result.Type == HitResult.SmallTickMiss)
+                return false;
+
+            // on stable, banana showers don't exist as concrete objects themselves, so they can't cause a fail.
+            if (result.HitObject is BananaShower)
+                return false;
+
+            return base.CheckDefaultFailCondition(result);
+        }
 
         protected override double GetHealthIncreaseFor(HitObject hitObject, HitResult result)
         {

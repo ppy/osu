@@ -1,13 +1,14 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
+using osu.Framework.Allocation;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.UI;
+using osu.Game.Screens.Edit;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Edit
@@ -25,11 +26,31 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         private partial class OsuEditorPlayfield : OsuPlayfield
         {
-            protected override GameplayCursorContainer CreateCursor() => null;
+            [Resolved]
+            private EditorBeatmap editorBeatmap { get; set; } = null!;
+
+            protected override GameplayCursorContainer? CreateCursor() => null;
 
             public OsuEditorPlayfield()
             {
                 HitPolicy = new AnyOrderHitPolicy();
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                editorBeatmap.BeatmapReprocessed += onBeatmapReprocessed;
+            }
+
+            private void onBeatmapReprocessed() => ApplyCircleSizeToPlayfieldBorder(editorBeatmap);
+
+            protected override void Dispose(bool isDisposing)
+            {
+                base.Dispose(isDisposing);
+
+                if (editorBeatmap.IsNotNull())
+                    editorBeatmap.BeatmapReprocessed -= onBeatmapReprocessed;
             }
         }
     }

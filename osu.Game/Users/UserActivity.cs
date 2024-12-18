@@ -41,6 +41,12 @@ namespace osu.Game.Users
 
         public virtual Color4 GetAppropriateColour(OsuColour colours) => colours.GreenDarker;
 
+        /// <summary>
+        /// Returns the ID of the beatmap involved in this activity, if applicable and/or available.
+        /// </summary>
+        /// <param name="hideIdentifiableInformation"></param>
+        public virtual int? GetBeatmapID(bool hideIdentifiableInformation = false) => null;
+
         [MessagePackObject]
         public class ChoosingBeatmap : UserActivity
         {
@@ -76,6 +82,7 @@ namespace osu.Game.Users
 
             public override string GetStatus(bool hideIdentifiableInformation = false) => RulesetPlayingVerb;
             public override string GetDetails(bool hideIdentifiableInformation = false) => BeatmapDisplayTitle;
+            public override int? GetBeatmapID(bool hideIdentifiableInformation = false) => BeatmapID;
         }
 
         [MessagePackObject]
@@ -119,10 +126,10 @@ namespace osu.Game.Users
         }
 
         [MessagePackObject]
-        public class TestingBeatmap : InGame
+        public class TestingBeatmap : EditingBeatmap
         {
-            public TestingBeatmap(IBeatmapInfo beatmapInfo, IRulesetInfo ruleset)
-                : base(beatmapInfo, ruleset)
+            public TestingBeatmap(IBeatmapInfo beatmapInfo)
+                : base(beatmapInfo)
             {
             }
 
@@ -151,7 +158,16 @@ namespace osu.Game.Users
             public EditingBeatmap() { }
 
             public override string GetStatus(bool hideIdentifiableInformation = false) => @"Editing a beatmap";
-            public override string GetDetails(bool hideIdentifiableInformation = false) => BeatmapDisplayTitle;
+
+            public override string GetDetails(bool hideIdentifiableInformation = false) => hideIdentifiableInformation
+                // For now let's assume that showing the beatmap a user is editing could reveal unwanted information.
+                ? string.Empty
+                : BeatmapDisplayTitle;
+
+            public override int? GetBeatmapID(bool hideIdentifiableInformation = false) => hideIdentifiableInformation
+                // For now let's assume that showing the beatmap a user is editing could reveal unwanted information.
+                ? null
+                : BeatmapID;
         }
 
         [MessagePackObject]
@@ -244,8 +260,8 @@ namespace osu.Game.Users
 
             public InLobby(Room room)
             {
-                RoomID = room.RoomID.Value ?? -1;
-                RoomName = room.Name.Value;
+                RoomID = room.RoomID ?? -1;
+                RoomName = room.Name;
             }
 
             [SerializationConstructor]

@@ -21,8 +21,10 @@ namespace osu.Game.Screens.Menu
         [BackgroundDependencyLoader]
         private void load()
         {
-            InternalChild = spewer = new StarFountainSpewer();
+            InternalChild = spewer = CreateSpewer();
         }
+
+        protected virtual StarFountainSpewer CreateSpewer() => new StarFountainSpewer();
 
         public void Shoot(int direction) => spewer.Shoot(direction);
 
@@ -38,17 +40,23 @@ namespace osu.Game.Screens.Menu
             private const int particle_duration_max = 1000;
 
             private double? lastShootTime;
-            private int lastShootDirection;
+
+            protected int LastShootDirection { get; private set; }
 
             protected override float ParticleGravity => 800;
 
-            private const double shoot_duration = 800;
+            protected virtual double ShootDuration => 800;
 
             [Resolved]
             private ISkinSource skin { get; set; } = null!;
 
             public StarFountainSpewer()
-                : base(null, 240, particle_duration_max)
+                : this(240)
+            {
+            }
+
+            protected StarFountainSpewer(int perSecond)
+                : base(null, perSecond, particle_duration_max)
             {
             }
 
@@ -67,16 +75,16 @@ namespace osu.Game.Screens.Menu
                     StartAngle = getRandomVariance(4),
                     EndAngle = getRandomVariance(2),
                     EndScale = 2.2f + getRandomVariance(0.4f),
-                    Velocity = new Vector2(getCurrentAngle(), -1400 + getRandomVariance(100)),
+                    Velocity = new Vector2(GetCurrentAngle(), -1400 + getRandomVariance(100)),
                 };
             }
 
-            private float getCurrentAngle()
+            protected virtual float GetCurrentAngle()
             {
-                const float x_velocity_from_direction = 500;
                 const float x_velocity_random_variance = 60;
+                const float x_velocity_from_direction = 500;
 
-                return lastShootDirection * x_velocity_from_direction * (float)(1 - 2 * (Clock.CurrentTime - lastShootTime!.Value) / shoot_duration) + getRandomVariance(x_velocity_random_variance);
+                return LastShootDirection * x_velocity_from_direction * (float)(1 - 2 * (Clock.CurrentTime - lastShootTime!.Value) / ShootDuration) + getRandomVariance(x_velocity_random_variance);
             }
 
             private ScheduledDelegate? deactivateDelegate;
@@ -86,10 +94,10 @@ namespace osu.Game.Screens.Menu
                 Active.Value = true;
 
                 deactivateDelegate?.Cancel();
-                deactivateDelegate = Scheduler.AddDelayed(() => Active.Value = false, shoot_duration);
+                deactivateDelegate = Scheduler.AddDelayed(() => Active.Value = false, ShootDuration);
 
                 lastShootTime = Clock.CurrentTime;
-                lastShootDirection = direction;
+                LastShootDirection = direction;
             }
 
             private static float getRandomVariance(float variance) => RNG.NextSingle(-variance, variance);

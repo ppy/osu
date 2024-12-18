@@ -35,8 +35,7 @@ namespace osu.Game.Utils
         /// <param name="capacity">The number of items the queue can hold.</param>
         public LimitedCapacityQueue(int capacity)
         {
-            if (capacity < 0)
-                throw new ArgumentOutOfRangeException(nameof(capacity));
+            ArgumentOutOfRangeException.ThrowIfNegative(capacity);
 
             this.capacity = capacity;
             array = new T[capacity];

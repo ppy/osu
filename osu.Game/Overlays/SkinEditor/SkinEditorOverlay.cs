@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Layout;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
@@ -30,7 +31,6 @@ using osu.Game.Screens.Play;
 using osu.Game.Screens.Select;
 using osu.Game.Users;
 using osu.Game.Utils;
-using osuTK;
 
 namespace osu.Game.Overlays.SkinEditor
 {
@@ -70,12 +70,14 @@ namespace osu.Game.Overlays.SkinEditor
         private OsuScreen? lastTargetScreen;
         private InvokeOnDisposal? nestedInputManagerDisable;
 
-        private Vector2 lastDrawSize;
+        private readonly LayoutValue drawSizeLayout;
 
         public SkinEditorOverlay(ScalingContainer scalingContainer)
         {
             this.scalingContainer = scalingContainer;
             RelativeSizeAxes = Axes.Both;
+
+            AddLayout(drawSizeLayout = new LayoutValue(Invalidation.DrawSize));
         }
 
         [BackgroundDependencyLoader]
@@ -103,13 +105,14 @@ namespace osu.Game.Overlays.SkinEditor
         {
             globallyDisableBeatmapSkinSetting();
 
-            if (lastTargetScreen is MainMenu)
-                PresentGameplay();
-
             if (skinEditor != null)
             {
                 disableNestedInputManagers();
                 skinEditor.Show();
+
+                if (lastTargetScreen is MainMenu)
+                    PresentGameplay();
+
                 return;
             }
 
@@ -125,6 +128,9 @@ namespace osu.Game.Overlays.SkinEditor
                     return;
 
                 AddInternal(editor);
+
+                if (lastTargetScreen is MainMenu)
+                    PresentGameplay();
 
                 Debug.Assert(lastTargetScreen != null);
 
@@ -195,10 +201,10 @@ namespace osu.Game.Overlays.SkinEditor
         {
             base.Update();
 
-            if (game.DrawSize != lastDrawSize)
+            if (!drawSizeLayout.IsValid)
             {
-                lastDrawSize = game.DrawSize;
                 updateScreenSizing();
+                drawSizeLayout.Validate();
             }
         }
 
@@ -270,7 +276,7 @@ namespace osu.Game.Overlays.SkinEditor
 
             Debug.Assert(skinEditor != null);
 
-            if (!target.IsLoaded)
+            if (!target.IsLoaded || !skinEditor.IsLoaded)
             {
                 Scheduler.AddOnce(setTarget, target);
                 return;
@@ -350,7 +356,7 @@ namespace osu.Game.Overlays.SkinEditor
                 base.LoadComplete();
 
                 if (!LoadedBeatmapSuccessfully)
-                    Scheduler.AddDelayed(this.Exit, 3000);
+                    Scheduler.AddDelayed(this.Exit, 1000);
             }
 
             protected override void Update()

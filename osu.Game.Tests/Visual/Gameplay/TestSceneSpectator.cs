@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -12,6 +10,7 @@ using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
+using osu.Game.Localisation;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Spectator;
 using osu.Game.Rulesets.Osu;
@@ -20,6 +19,7 @@ using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
 using osu.Game.Screens;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Play.HUD.JudgementCounter;
 using osu.Game.Tests.Beatmaps.IO;
 using osu.Game.Tests.Gameplay;
 using osu.Game.Tests.Visual.Multiplayer;
@@ -39,13 +39,13 @@ namespace osu.Game.Tests.Visual.Gameplay
         protected override bool UseOnlineAPI => true;
 
         [Resolved]
-        private OsuGameBase game { get; set; }
+        private OsuGameBase game { get; set; } = null!;
 
         private TestSpectatorClient spectatorClient => dependenciesScreen.SpectatorClient;
-        private DependenciesScreen dependenciesScreen;
-        private SoloSpectatorScreen spectatorScreen;
+        private DependenciesScreen dependenciesScreen = null!;
+        private SoloSpectatorScreen spectatorScreen = null!;
 
-        private BeatmapSetInfo importedBeatmap;
+        private BeatmapSetInfo importedBeatmap = null!;
         private int importedBeatmapId;
 
         [SetUpSteps]
@@ -168,14 +168,16 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void TestSpectatingDuringGameplay()
         {
             start();
-            sendFrames(300);
+            sendFrames(300, initialResultCount: 100);
 
             loadSpectatingScreen();
             waitForPlayerCurrent();
 
-            sendFrames(300);
+            sendFrames(300, initialResultCount: 100);
 
             AddUntilStep("playing from correct point in time", () => player.ChildrenOfType<DrawableRuleset>().First().FrameStableClock.CurrentTime, () => Is.GreaterThan(30000));
+            AddAssert("check judgement counts are correct", () => player.ChildrenOfType<JudgementCountController>().Single().Counters.Sum(c => c.ResultCount.Value),
+                () => Is.GreaterThanOrEqualTo(100));
         }
 
         [Test]
@@ -188,7 +190,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             waitForPlayerCurrent();
 
-            Player lastPlayer = null;
+            Player lastPlayer = null!;
             AddStep("store first player", () => lastPlayer = player);
 
             start();
@@ -214,6 +216,11 @@ namespace osu.Game.Tests.Visual.Gameplay
             checkPaused(false); // Should continue playing until out of frames
             checkPaused(true); // And eventually stop after running out of frames and fail.
             // Todo: Should check for + display a failed message.
+
+            AddAssert("fail overlay present", () => player.ChildrenOfType<FailOverlay>().Single().IsPresent);
+            AddAssert("overlay can only quit", () => player.ChildrenOfType<FailOverlay>().Single().Buttons.Single().Text == GameplayMenuOverlayStrings.Quit);
+            AddStep("press quit button", () => player.ChildrenOfType<FailOverlay>().Single().Buttons.Single().TriggerClick());
+            AddAssert("player exited", () => Stack.CurrentScreen is SoloSpectatorScreen);
         }
 
         [Test]
@@ -278,7 +285,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestFinalFrameInBundleHasHeader()
         {
-            FrameDataBundle lastBundle = null;
+            FrameDataBundle? lastBundle = null;
 
             AddStep("bind to client", () => spectatorClient.OnNewFrames += (_, bundle) => lastBundle = bundle);
 
@@ -287,8 +294,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             finish();
 
             AddUntilStep("bundle received", () => lastBundle != null);
-            AddAssert("first frame does not have header", () => lastBundle.Frames[0].Header == null);
-            AddAssert("last frame has header", () => lastBundle.Frames[^1].Header != null);
+            AddAssert("first frame does not have header", () => lastBundle?.Frames[0].Header == null);
+            AddAssert("last frame has header", () => lastBundle?.Frames[^1].Header != null);
         }
 
         [Test]
@@ -383,7 +390,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         private OsuFramedReplayInputHandler replayHandler =>
-            (OsuFramedReplayInputHandler)Stack.ChildrenOfType<OsuInputManager>().First().ReplayInputHandler;
+            (OsuFramedReplayInputHandler)Stack.ChildrenOfType<OsuInputManager>().First().ReplayInputHandler!;
 
         private Player player => this.ChildrenOfType<Player>().Single();
 
@@ -401,9 +408,9 @@ namespace osu.Game.Tests.Visual.Gameplay
         private void checkPaused(bool state) =>
             AddUntilStep($"game is {(state ? "paused" : "playing")}", () => player.ChildrenOfType<DrawableRuleset>().First().IsPaused.Value == state);
 
-        private void sendFrames(int count = 10, double startTime = 0)
+        private void sendFrames(int count = 10, double startTime = 0, int initialResultCount = 0)
         {
-            AddStep("send frames", () => spectatorClient.SendFramesFromUser(streamingUser.Id, count, startTime));
+            AddStep("send frames", () => spectatorClient.SendFramesFromUser(streamingUser.Id, count, startTime, initialResultCount));
         }
 
         private void loadSpectatingScreen()

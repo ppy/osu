@@ -269,6 +269,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
                 drawableRuleset = (TestDrawablePoolingRuleset)ruleset.CreateDrawableRulesetWith(CreateWorkingBeatmap(beatmap).GetPlayableBeatmap(ruleset.RulesetInfo));
                 drawableRuleset.FrameStablePlayback = true;
+                drawableRuleset.AllowBackwardsSeeks = true;
                 drawableRuleset.PoolSize = poolSize;
 
                 Child = new Container

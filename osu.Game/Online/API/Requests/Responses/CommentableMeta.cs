@@ -24,5 +24,14 @@ namespace osu.Game.Online.API.Requests.Responses
 
         [JsonProperty("url")]
         public string Url { get; set; } = string.Empty;
+
+        [JsonProperty("current_user_attributes")]
+        public CommentableCurrentUserAttributes? CurrentUserAttributes { get; set; }
+
+        public struct CommentableCurrentUserAttributes
+        {
+            [JsonProperty("can_new_comment_reason")]
+            public string? CanNewCommentReason { get; set; }
+        }
     }
 }

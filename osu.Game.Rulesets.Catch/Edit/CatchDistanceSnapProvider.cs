@@ -10,7 +10,7 @@ namespace osu.Game.Rulesets.Catch.Edit
 {
     public partial class CatchDistanceSnapProvider : ComposerDistanceSnapProvider
     {
-        protected override double ReadCurrentDistanceSnap(HitObject before, HitObject after)
+        public override double ReadCurrentDistanceSnap(HitObject before, HitObject after)
         {
             // osu!catch's distance snap implementation is limited, in that a custom spacing cannot be specified.
             // Therefore this functionality is not currently used.
@@ -18,7 +18,9 @@ namespace osu.Game.Rulesets.Catch.Edit
             // The implementation below is probably correct but should be checked if/when exposed via controls.
 
             float expectedDistance = DurationToDistance(before, after.StartTime - before.GetEndTime());
-            float actualDistance = Math.Abs(((CatchHitObject)before).EffectiveX - ((CatchHitObject)after).EffectiveX);
+
+            float previousEndX = (before as JuiceStream)?.EndX ?? ((CatchHitObject)before).EffectiveX;
+            float actualDistance = Math.Abs(previousEndX - ((CatchHitObject)after).EffectiveX);
 
             return actualDistance / expectedDistance;
         }

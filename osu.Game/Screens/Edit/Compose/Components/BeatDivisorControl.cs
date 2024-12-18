@@ -150,7 +150,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                         {
                             new TextFlowContainer(s => s.Font = s.Font.With(size: 14))
                             {
-                                Padding = new MarginPadding { Horizontal = 15, Vertical = 8 },
+                                Padding = new MarginPadding { Horizontal = 15, Vertical = 2 },
                                 Text = "beat snap",
                                 RelativeSizeAxes = Axes.X,
                                 TextAnchor = Anchor.TopCentre,
@@ -159,7 +159,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     },
                     RowDimensions = new[]
                     {
-                        new Dimension(GridSizeMode.Absolute, 30),
+                        new Dimension(GridSizeMode.Absolute, 40),
                         new Dimension(GridSizeMode.Absolute, 20),
                         new Dimension(GridSizeMode.Absolute, 15)
                     }
@@ -330,13 +330,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             private void setPresetsFromTextBoxEntry()
             {
-                if (!int.TryParse(divisorTextBox.Text, out int divisor) || divisor < 1 || divisor > 64)
+                if (!int.TryParse(divisorTextBox.Text, out int divisor) || !BeatDivisor.SetArbitraryDivisor(divisor))
                 {
+                    // the text either didn't parse as a divisor, or the divisor was not set due to being out of range.
+                    // force a state update to reset the text box's value to the last sane value.
                     updateState();
                     return;
                 }
-
-                BeatDivisor.SetArbitraryDivisor(divisor);
 
                 this.HidePopover();
             }
@@ -526,7 +526,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     AlwaysDisplayed = alwaysDisplayed;
                     Divisor = divisor;
 
-                    Size = new Vector2(6f, 12) * BindableBeatDivisor.GetSize(divisor);
+                    Size = new Vector2(4, 18) * BindableBeatDivisor.GetSize(divisor);
                     Alpha = alwaysDisplayed ? 1 : 0;
 
                     InternalChild = new Box { RelativeSizeAxes = Axes.Both };
@@ -580,7 +580,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 base.LoadComplete();
 
-                GetContainingInputManager().ChangeFocus(this);
+                GetContainingFocusManager()!.ChangeFocus(this);
                 SelectAll();
             }
         }

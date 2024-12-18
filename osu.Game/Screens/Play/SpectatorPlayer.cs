@@ -1,10 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
-using System.Diagnostics;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
@@ -21,11 +19,9 @@ namespace osu.Game.Screens.Play
     public abstract partial class SpectatorPlayer : Player
     {
         [Resolved]
-        protected SpectatorClient SpectatorClient { get; private set; }
+        protected SpectatorClient SpectatorClient { get; private set; } = null!;
 
         private readonly Score score;
-
-        public override bool AllowBackButton => true;
 
         protected override bool CheckModsAllowFailure()
         {
@@ -37,7 +33,7 @@ namespace osu.Game.Screens.Play
 
         private bool allowFail;
 
-        protected SpectatorPlayer(Score score, PlayerConfiguration configuration = null)
+        protected SpectatorPlayer(Score score, PlayerConfiguration? configuration = null)
             : base(configuration)
         {
             this.score = score;
@@ -100,8 +96,7 @@ namespace osu.Game.Screens.Play
 
             foreach (var frame in bundle.Frames)
             {
-                IConvertibleReplayFrame convertibleFrame = GameplayState.Ruleset.CreateConvertibleReplayFrame();
-                Debug.Assert(convertibleFrame != null);
+                IConvertibleReplayFrame convertibleFrame = GameplayState.Ruleset.CreateConvertibleReplayFrame()!;
                 convertibleFrame.FromLegacy(frame, GameplayState.Beatmap);
 
                 var convertedFrame = (ReplayFrame)convertibleFrame;
@@ -136,7 +131,7 @@ namespace osu.Game.Screens.Play
         {
             base.Dispose(isDisposing);
 
-            if (SpectatorClient != null)
+            if (SpectatorClient.IsNotNull())
                 SpectatorClient.OnNewFrames -= userSentFrames;
         }
     }

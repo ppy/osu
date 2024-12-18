@@ -11,10 +11,11 @@ using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ListExtensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Primitives;
+using osu.Framework.Lists;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Audio;
@@ -65,7 +66,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         public virtual IEnumerable<HitSampleInfo> GetSamples() => HitObject.Samples;
 
         private readonly List<DrawableHitObject> nestedHitObjects = new List<DrawableHitObject>();
-        public IReadOnlyList<DrawableHitObject> NestedHitObjects => nestedHitObjects;
+        public SlimReadOnlyListWrapper<DrawableHitObject> NestedHitObjects => nestedHitObjects.AsSlimReadOnly();
 
         /// <summary>
         /// Whether this object should handle any user input events.
@@ -313,11 +314,11 @@ namespace osu.Game.Rulesets.Objects.Drawables
         private void updateStateFromResult()
         {
             if (Result.IsHit)
-                updateState(ArmedState.Hit, true);
+                UpdateState(ArmedState.Hit, true);
             else if (Result.HasResult)
-                updateState(ArmedState.Miss, true);
+                UpdateState(ArmedState.Miss, true);
             else
-                updateState(ArmedState.Idle, true);
+                UpdateState(ArmedState.Idle, true);
         }
 
         protected sealed override void OnFree(HitObjectLifetimeEntry entry)
@@ -401,7 +402,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         private void onRevertResult()
         {
-            updateState(ArmedState.Idle);
+            UpdateState(ArmedState.Idle);
             OnRevertResult?.Invoke(this, Result);
         }
 
@@ -420,7 +421,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             if (Result is not null)
             {
                 Result.TimeOffset = 0;
-                updateState(State.Value, true);
+                UpdateState(State.Value, true);
             }
 
             DefaultsApplied?.Invoke(this);
@@ -460,7 +461,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             throw new InvalidOperationException(
                 $"Should never clear a {nameof(DrawableHitObject)} as the base implementation adds components. If attempting to use {nameof(InternalChild)} or {nameof(InternalChildren)}, using {nameof(AddInternal)} or {nameof(AddRangeInternal)} instead.");
 
-        private void updateState(ArmedState newState, bool force = false)
+        protected void UpdateState(ArmedState newState, bool force = false)
         {
             if (State.Value == newState && !force)
                 return;
@@ -505,7 +506,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <summary>
         /// Reapplies the current <see cref="ArmedState"/>.
         /// </summary>
-        public void RefreshStateTransforms() => updateState(State.Value, true);
+        public void RefreshStateTransforms() => UpdateState(State.Value, true);
 
         /// <summary>
         /// Apply (generally fade-in) transforms leading into the <see cref="HitObject"/> start time.
@@ -564,7 +565,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             ApplySkin(CurrentSkin, true);
 
             if (IsLoaded)
-                updateState(State.Value, true);
+                UpdateState(State.Value, true);
         }
 
         protected void UpdateComboColour()
@@ -630,7 +631,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         #endregion
 
-        public override bool UpdateSubTreeMasking(Drawable source, RectangleF maskingBounds) => false;
+        public override bool UpdateSubTreeMasking() => false;
 
         protected override void UpdateAfterChildren()
         {
@@ -724,7 +725,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             Result.GameplayRate = (Clock as IGameplayClock)?.GetTrueGameplayRate() ?? Clock.Rate;
 
             if (Result.HasResult)
-                updateState(Result.IsHit ? ArmedState.Hit : ArmedState.Miss);
+                UpdateState(Result.IsHit ? ArmedState.Hit : ArmedState.Miss);
 
             OnNewResult?.Invoke(this, Result);
         }

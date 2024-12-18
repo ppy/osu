@@ -4,24 +4,17 @@
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
-using osu.Framework.Utils;
 using osuTK;
 
 namespace osu.Game.Graphics.Sprites
 {
-    public partial class GlowingSpriteText : BufferedContainer, IHasText
+    public partial class GlowingSpriteText : GlowingDrawable, IHasText
     {
         private const float blur_sigma = 3f;
 
-        // Inflate draw quad to prevent glow from trimming at the edges.
-        // Padding won't suffice since it will affect text position in cases when it's not centered.
-        protected override Quad ComputeScreenSpaceDrawQuad() => base.ComputeScreenSpaceDrawQuad().AABBFloat.Inflate(Blur.KernelSize(blur_sigma));
-
-        private readonly OsuSpriteText text;
+        private OsuSpriteText text = null!;
 
         public LocalisableString Text
         {
@@ -47,16 +40,6 @@ namespace osu.Game.Graphics.Sprites
             set => text.Colour = value;
         }
 
-        public ColourInfo GlowColour
-        {
-            get => EffectColour;
-            set
-            {
-                EffectColour = value;
-                BackgroundColour = value.MultiplyAlpha(0f);
-            }
-        }
-
         public Vector2 Spacing
         {
             get => text.Spacing;
@@ -76,20 +59,16 @@ namespace osu.Game.Graphics.Sprites
         }
 
         public GlowingSpriteText()
-            : base(cachedFrameBuffer: true)
         {
-            AutoSizeAxes = Axes.Both;
             BlurSigma = new Vector2(blur_sigma);
-            RedrawOnScale = false;
-            DrawOriginal = true;
             EffectBlending = BlendingParameters.Additive;
-            EffectPlacement = EffectPlacement.InFront;
-            Child = text = new OsuSpriteText
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Shadow = false,
-            };
         }
+
+        protected override Drawable CreateDrawable() => text = new OsuSpriteText
+        {
+            Anchor = Anchor.Centre,
+            Origin = Anchor.Centre,
+            Shadow = false,
+        };
     }
 }

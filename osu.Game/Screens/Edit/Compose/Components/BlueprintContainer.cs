@@ -32,7 +32,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
     {
         protected DragBox DragBox { get; private set; }
 
-        public Container<SelectionBlueprint<T>> SelectionBlueprints { get; private set; }
+        public SelectionBlueprintContainer SelectionBlueprints { get; private set; }
+
+        public partial class SelectionBlueprintContainer : Container<SelectionBlueprint<T>>
+        {
+            public new virtual void ChangeChildDepth(SelectionBlueprint<T> child, float newDepth) => base.ChangeChildDepth(child, newDepth);
+        }
 
         public SelectionHandler<T> SelectionHandler { get; private set; }
 
@@ -95,7 +100,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             });
         }
 
-        protected virtual Container<SelectionBlueprint<T>> CreateSelectionBlueprintContainer() => new Container<SelectionBlueprint<T>> { RelativeSizeAxes = Axes.Both };
+        protected virtual SelectionBlueprintContainer CreateSelectionBlueprintContainer() => new SelectionBlueprintContainer { RelativeSizeAxes = Axes.Both };
 
         /// <summary>
         /// Creates a <see cref="Components.SelectionHandler{T}"/> which outlines items and handles movement of selections.
@@ -196,6 +201,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             DragBox.HandleDrag(e);
             DragBox.Show();
+
+            selectionBeforeDrag.Clear();
+            if (e.ControlPressed)
+                selectionBeforeDrag.UnionWith(SelectedItems);
+
             return true;
         }
 
@@ -217,6 +227,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             }
 
             DragBox.Hide();
+            selectionBeforeDrag.Clear();
         }
 
         protected override void Update()
@@ -227,7 +238,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 lastDragEvent.Target = this;
                 DragBox.HandleDrag(lastDragEvent);
-                UpdateSelectionFromDragBox();
+                UpdateSelectionFromDragBox(selectionBeforeDrag);
             }
         }
 
@@ -422,27 +433,32 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// Finishes the current blueprint selection.
         /// </summary>
         /// <param name="e">The mouse event which triggered end of selection.</param>
-        /// <returns>Whether a click selection was active.</returns>
+        /// <returns>
+        /// Whether the mouse event is considered to be fully handled.
+        /// If the return value is <see langword="false"/>, the standard click / mouse up action will follow.
+        /// </returns>
         private bool endClickSelection(MouseButtonEvent e)
         {
             // If already handled a selection, double-click, or drag, we don't want to perform a mouse up / click action.
-            if (clickSelectionHandled || doubleClickHandled || isDraggingBlueprint) return true;
+            if (clickSelectionHandled || doubleClickHandled || isDraggingBlueprint || wasDragStarted) return true;
 
             if (e.Button != MouseButton.Left) return false;
 
             if (e.ControlPressed)
             {
-                // if a selection didn't occur, we may want to trigger a deselection.
-
                 // Iterate from the top of the input stack (blueprints closest to the front of the screen first).
                 // Priority is given to already-selected blueprints.
                 foreach (SelectionBlueprint<T> blueprint in SelectionBlueprints.AliveChildren.Where(b => b.IsHovered).OrderByDescending(b => b.IsSelected))
                     return clickSelectionHandled = SelectionHandler.MouseUpSelectionRequested(blueprint, e);
 
-                return false;
+                // can only be reached if there are no hovered blueprints.
+                // in that case, we still want to suppress mouse up / click handling, because when control is pressed,
+                // it is presumed we want to add to existing selection, not remove from it
+                // (unless explicitly control-clicking a selected object, which is handled above).
+                return true;
             }
 
-            if (!wasDragStarted && selectedBlueprintAlreadySelectedOnMouseDown && SelectedItems.Count == 1)
+            if (selectedBlueprintAlreadySelectedOnMouseDown && SelectedItems.Count == 1)
             {
                 // If a click occurred and was handled by the currently selected blueprint but didn't result in a drag,
                 // cycle between other blueprints which are also under the cursor.
@@ -472,7 +488,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <summary>
         /// Select all blueprints in a selection area specified by <see cref="DragBox"/>.
         /// </summary>
-        protected virtual void UpdateSelectionFromDragBox()
+        protected virtual void UpdateSelectionFromDragBox(HashSet<T> selectionBeforeDrag)
         {
             var quad = DragBox.Box.ScreenSpaceDrawQuad;
 
@@ -482,7 +498,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 {
                     case SelectionState.Selected:
                         // Selection is preserved even after blueprint becomes dead.
-                        if (!quad.Contains(blueprint.ScreenSpaceSelectionPoint))
+                        if (!quad.Contains(blueprint.ScreenSpaceSelectionPoint) && !selectionBeforeDrag.Contains(blueprint.Item))
                             blueprint.Deselect();
                         break;
 
@@ -512,7 +528,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected virtual void OnBlueprintDeselected(SelectionBlueprint<T> blueprint)
         {
-            SelectionBlueprints.ChangeChildDepth(blueprint, 0);
+            if (SelectionBlueprints.Contains(blueprint))
+                SelectionBlueprints.ChangeChildDepth(blueprint, 0);
+
             SelectionHandler.HandleDeselected(blueprint);
         }
 
@@ -532,6 +550,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// Whether a drag operation was started at all.
         /// </summary>
         private bool wasDragStarted;
+
+        private readonly HashSet<T> selectionBeforeDrag = new HashSet<T>();
 
         /// <summary>
         /// Attempts to begin the movement of any selected blueprints.

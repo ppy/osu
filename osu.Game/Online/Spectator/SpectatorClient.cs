@@ -248,6 +248,9 @@ namespace osu.Game.Online.Spectator
 
                 isPlaying = false;
                 currentBeatmap = null;
+                currentScore = null;
+                currentScoreProcessor = null;
+                currentScoreToken = null;
 
                 if (state.HasPassed)
                     currentState.State = SpectatedUserState.Passed;

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -13,6 +14,7 @@ using osu.Game.Overlays;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterface;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Localisation;
 using osu.Framework.Screens;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API;
@@ -28,7 +30,7 @@ using osuTK;
 
 namespace osu.Game.Users
 {
-    public abstract partial class UserPanel : OsuClickableContainer, IHasContextMenu
+    public abstract partial class UserPanel : OsuClickableContainer, IHasContextMenu, IFilterable
     {
         public readonly APIUser User;
 
@@ -162,5 +164,20 @@ namespace osu.Game.Users
                 return items.ToArray();
             }
         }
+
+        public IEnumerable<LocalisableString> FilterTerms => [User.Username];
+
+        public bool MatchingFilter
+        {
+            set
+            {
+                if (value)
+                    Show();
+                else
+                    Hide();
+            }
+        }
+
+        public bool FilteringActive { get; set; }
     }
 }

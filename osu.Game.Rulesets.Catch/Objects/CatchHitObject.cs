@@ -15,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Objects
 {
-    public abstract class CatchHitObject : HitObject, IHasPosition, IHasComboInformation
+    public abstract class CatchHitObject : HitObject, IHasPosition, IHasComboInformation, IHasTimePreempt
     {
         public const float OBJECT_RADIUS = 64;
 

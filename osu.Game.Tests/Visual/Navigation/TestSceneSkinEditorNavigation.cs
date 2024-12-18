@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -22,6 +23,7 @@ using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Play.HUD.HitErrorMeters;
 using osu.Game.Skinning;
 using osu.Game.Tests.Beatmaps.IO;
@@ -212,6 +214,33 @@ namespace osu.Game.Tests.Visual.Navigation
         }
 
         [Test]
+        public void TestGameplaySettingsDoesNotExpandWhenSkinOverlayPresent()
+        {
+            advanceToSongSelect();
+            openSkinEditor();
+            AddStep("select autoplay", () => Game.SelectedMods.Value = new Mod[] { new OsuModAutoplay() });
+            AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).WaitSafely());
+            AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
+            switchToGameplayScene();
+
+            AddUntilStep("wait for settings", () => getPlayerSettingsOverlay() != null);
+            AddAssert("settings not visible", () => getPlayerSettingsOverlay().DrawWidth, () => Is.EqualTo(0));
+
+            AddStep("move cursor to right of screen", () => InputManager.MoveMouseTo(InputManager.ScreenSpaceDrawQuad.TopRight));
+            AddAssert("settings not visible", () => getPlayerSettingsOverlay().DrawWidth, () => Is.EqualTo(0));
+
+            toggleSkinEditor();
+
+            AddStep("move cursor slightly", () => InputManager.MoveMouseTo(InputManager.ScreenSpaceDrawQuad.TopRight + new Vector2(1)));
+            AddUntilStep("settings visible", () => getPlayerSettingsOverlay().DrawWidth, () => Is.GreaterThan(0));
+
+            AddStep("move cursor to right of screen too far", () => InputManager.MoveMouseTo(InputManager.ScreenSpaceDrawQuad.TopRight + new Vector2(10240, 0)));
+            AddUntilStep("settings not visible", () => getPlayerSettingsOverlay().DrawWidth, () => Is.EqualTo(0));
+
+            PlayerSettingsOverlay getPlayerSettingsOverlay() => ((Player)Game.ScreenStack.CurrentScreen).ChildrenOfType<PlayerSettingsOverlay>().SingleOrDefault();
+        }
+
+        [Test]
         public void TestCinemaModRemovedOnEnteringGameplay()
         {
             advanceToSongSelect();
@@ -319,6 +348,30 @@ namespace osu.Game.Tests.Visual.Navigation
 
             toggleSkinEditor();
             AddUntilStep("nested input disabled", () => ((Player)Game.ScreenStack.CurrentScreen).ChildrenOfType<PassThroughInputManager>().All(manager => !manager.UseParentInput));
+        }
+
+        [Test]
+        public void TestSkinSavesOnChange()
+        {
+            advanceToSongSelect();
+            openSkinEditor();
+
+            Guid editedSkinId = Guid.Empty;
+            AddStep("save skin id", () => editedSkinId = Game.Dependencies.Get<SkinManager>().CurrentSkinInfo.Value.ID);
+            AddStep("add skinnable component", () =>
+            {
+                skinEditor.ChildrenOfType<SkinComponentToolbox.ToolboxComponentButton>().First().TriggerClick();
+            });
+
+            AddStep("change to triangles skin", () => Game.Dependencies.Get<SkinManager>().SetSkinFromConfiguration(SkinInfo.TRIANGLES_SKIN.ToString()));
+            AddUntilStep("components loaded", () => Game.ChildrenOfType<SkinnableContainer>().All(c => c.ComponentsLoaded));
+            // sort of implicitly relies on song select not being skinnable.
+            // TODO: revisit if the above ever changes
+            AddUntilStep("skin changed", () => !skinEditor.ChildrenOfType<SkinBlueprint>().Any());
+
+            AddStep("change back to modified skin", () => Game.Dependencies.Get<SkinManager>().SetSkinFromConfiguration(editedSkinId.ToString()));
+            AddUntilStep("components loaded", () => Game.ChildrenOfType<SkinnableContainer>().All(c => c.ComponentsLoaded));
+            AddUntilStep("changes saved", () => skinEditor.ChildrenOfType<SkinBlueprint>().Any());
         }
 
         private void advanceToSongSelect()
