@@ -1143,7 +1143,7 @@ namespace osu.Game
             loadComponentSingleFile(new MedalOverlay(), topMostOverlayContent.Add);
 
             loadComponentSingleFile(new BackgroundDataStoreProcessor(), Add);
-            loadComponentSingleFile(new DetachedBeatmapStore(), Add, true);
+            loadComponentSingleFile<BeatmapStore>(new RealmDetachedBeatmapStore(), Add, true);
 
             Add(externalLinkOpener = new ExternalLinkOpener());
             Add(new MusicKeyBindingHandler());

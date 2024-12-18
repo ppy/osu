@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Online.Rooms;
+using osu.Game.Localisation;
 
 namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 {
@@ -35,8 +36,10 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             Pill.Background.Alpha = 1;
 
             room.PropertyChanged += onRoomPropertyChanged;
-            updateDisplay();
 
+            // Timed update required to track rooms which have hit the end time, see `HasEnded`.
+            Scheduler.AddDelayed(updateDisplay, 1000, true);
+            updateDisplay();
             FinishTransforms(true);
         }
 
@@ -46,6 +49,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             {
                 case nameof(Room.Status):
                 case nameof(Room.EndDate):
+                case nameof(Room.HasPassword):
                     updateDisplay();
                     break;
             }
@@ -53,8 +57,23 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
         private void updateDisplay()
         {
-            Pill.Background.FadeColour(room.Status.GetAppropriateColour(colours), 100);
-            TextFlow.Text = room.Status.Message;
+            Pill.Background.FadeColour(colours.ForRoomStatus(room), 100);
+
+            if (room.HasEnded)
+                TextFlow.Text = RoomStatusPillStrings.Ended;
+            else
+            {
+                switch (room.Status)
+                {
+                    case RoomStatus.Playing:
+                        TextFlow.Text = RoomStatusPillStrings.Playing;
+                        break;
+
+                    default:
+                        TextFlow.Text = room.HasPassword ? RoomStatusPillStrings.OpenPrivate : RoomStatusPillStrings.Open;
+                        break;
+                }
+            }
         }
 
         protected override void Dispose(bool isDisposing)
