@@ -188,8 +188,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 double angle = (double)prevObject.Angle;
 
                 // Overlapness between current and prev to make streams have 0 buff
-                double instantOverlapness = 0;
-                prevObject.OverlapValues.TryGetValue(loopObj.Index, out instantOverlapness);
+                prevObject.OverlapValues.TryGetValue(loopObj.Index, out double instantOverlapness);
 
                 // Nerf overlaps on wide angles
                 double angleFactor = 1;
@@ -321,7 +320,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
         private static List<OsuDifficultyHitObject> retrieveCurrentVisibleObjects(OsuDifficultyHitObject current)
         {
-
             var visibleObjects = new List<OsuDifficultyHitObject>();
 
             for (int i = 0; i < current.Index; i++)

@@ -294,10 +294,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double visualBonus = 0.1 * DifficultyCalculationUtils.Logistic(attributes.ApproachRate - 8.0);
 
             // Buff if OD is way lower than AR
-            double ArOdDelta = Math.Max(0, attributes.OverallDifficulty - attributes.ApproachRate);
+            double arOdDelta = Math.Max(0, attributes.OverallDifficulty - attributes.ApproachRate);
 
             // This one is goes from 0.0 on delta=0 to 1.0 somewhere around delta=3.4
-            double deltaBonus = (1 - Math.Pow(0.95, Math.Pow(ArOdDelta, 4)));
+            double deltaBonus = (1 - Math.Pow(0.95, Math.Pow(arOdDelta, 4)));
 
             // Nerf delta bonus on OD lower than 10 and 9
             if (attributes.OverallDifficulty < 10)

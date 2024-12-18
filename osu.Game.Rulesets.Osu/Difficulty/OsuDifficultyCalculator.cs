@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double speedNotes = skills.OfType<Speed>().First().RelevantNoteCount();
 
             double flashlightRating = Math.Sqrt(skills.OfType<Flashlight>().First().DifficultyValue()) * difficulty_multiplier;
-            double readingLowARRating = Math.Sqrt(skills.OfType<ReadingLowAr>().First().DifficultyValue()) * difficulty_multiplier;
+            double readingLowArRating = Math.Sqrt(skills.OfType<ReadingLowAr>().First().DifficultyValue()) * difficulty_multiplier;
 
             double sliderFactor = aimRating > 0 ? aimRatingNoSliders / aimRating : 1;
 
@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             {
                 aimRating = Math.Pow(aimRating, 0.8);
                 flashlightRating = Math.Pow(flashlightRating, 0.8);
-                readingLowARRating = Math.Pow(readingLowARRating, 0.9);
+                readingLowArRating = Math.Pow(readingLowArRating, 0.9);
             }
 
             if (mods.Any(h => h is OsuModRelax))
@@ -63,14 +63,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 aimRating *= 0.9;
                 speedRating = 0.0;
                 flashlightRating *= 0.7;
-                readingLowARRating *= 0.95;
+                readingLowArRating *= 0.95;
             }
 
             double aimPerformance = OsuStrainSkill.DifficultyToPerformance(aimRating);
             double speedPerformance = OsuStrainSkill.DifficultyToPerformance(speedRating);
 
             // Cognition
-            double readingLowArPerformance = ReadingLowAr.DifficultyToPerformance(readingLowARRating);
+            double readingLowArPerformance = ReadingLowAr.DifficultyToPerformance(readingLowArRating);
             double readingArPerformance = readingLowArPerformance;
 
             double potentialFlashlightPerformance = Flashlight.DifficultyToPerformance(flashlightRating);
@@ -109,7 +109,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 AimDifficulty = aimRating,
                 SpeedDifficulty = speedRating,
                 SpeedNoteCount = speedNotes,
-                ReadingDifficultyLowAr = readingLowARRating,
+                ReadingDifficultyLowAr = readingLowArRating,
                 FlashlightDifficulty = flashlightRating,
                 SliderFactor = sliderFactor,
                 AimDifficultStrainCount = aimDifficultyStrainCount,
