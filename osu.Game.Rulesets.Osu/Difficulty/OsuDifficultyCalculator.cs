@@ -65,7 +65,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             }
             else if (mods.Any(h => h is OsuModAutopilot))
             {
-                speedRating *= 0.9;
+                speedRating *= 0.5;
                 aimRating = 0.0;
                 flashlightRating *= 0.4;
             }
