@@ -66,10 +66,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             if (consistentTopStrain == 0)
                 return 0.0;
 
-            //Being consistently difficult for 1000 notes should be worth more than being consistently difficult for 100.
+            // Being consistently difficult for 1000 notes should be worth more than being consistently difficult for 100.
             double totalStrains = ObjectStrains.Count;
             double lengthFactor = 0.74 * Math.Pow(0.9987, totalStrains);
-            //// Use a weighted sum of all strains. Constants are arbitrary and give nice values
+            // Use a weighted sum of all strains. Constants are arbitrary and give nice values
             return ObjectStrains.Sum(s => (1.1 - lengthFactor) / (1 + Math.Exp(-10 * (s / consistentTopStrain - 0.88 - lengthFactor / 4.0))));
         }
 
