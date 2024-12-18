@@ -34,9 +34,11 @@
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>We don't really use the camera.</string>
+	<string>We don't use the camera.</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>We don't really use the microphone.</string>
+	<string>We don't use the microphone.</string>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>We don't use Bluetooth.</string>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationLandscapeRight</string>
