@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 {
     public class OsuDifficultyCalculator : DifficultyCalculator
     {
-        private const double difficulty_multiplier = 0.0675;
+        private const double difficulty_multiplier = 0.0655;
 
         public override int Version => 20241007;
 
@@ -68,19 +68,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double aimNoSlidersRelevantObjectCount = ((OsuStrainSkill)skills[1]).CountRelevantObjects();
             double speedRelevantObjectCount = ((OsuStrainSkill)skills[2]).CountRelevantObjects();
 
-            double aimLengthBonus = aimRelevantObjectCount < 25
-                ? 0.8 + aimRelevantObjectCount / 150.0
-                : 0.9 + Math.Min(1.5, aimRelevantObjectCount / 375.0) +
-                  (aimRelevantObjectCount > 562.5 ? Math.Log10(aimRelevantObjectCount / 562.5) : 0);
+            double aimLengthBonus = 1.0 + Math.Min(1.8, aimRelevantObjectCount / 300.0) +
+                                    (aimRelevantObjectCount > 540.0 ? Math.Log10(aimRelevantObjectCount / 540.0) : 0);
             aimRating *= Math.Cbrt(aimLengthBonus);
-            double aimNoSlidersLengthBonus = aimNoSlidersRelevantObjectCount < 25
-                ? 0.8 + aimNoSlidersRelevantObjectCount / 150.0
-                : 0.9 + Math.Min(1.5, aimNoSlidersRelevantObjectCount / 375.0) +
-                  (aimNoSlidersRelevantObjectCount > 562.5 ? Math.Log10(aimNoSlidersRelevantObjectCount / 562.5) : 0);
+
+            double aimNoSlidersLengthBonus = 1.0 + Math.Min(1.8, aimNoSlidersRelevantObjectCount / 300.0) +
+                                             (aimNoSlidersRelevantObjectCount > 540.0 ? Math.Log10(aimNoSlidersRelevantObjectCount / 540.0) : 0);
             aimRatingNoSliders *= Math.Cbrt(aimNoSlidersLengthBonus);
 
-            double speedLengthBonus = 0.9 + 0.5 * Math.Min(1.0, speedRelevantObjectCount / 500.0) +
-                                      (speedRelevantObjectCount > 500 ? Math.Log10(speedRelevantObjectCount / 500.0) * 0.3 : 0.0);
+            double speedLengthBonus = 1.0 + 0.45 * Math.Min(0.8, speedRelevantObjectCount / 500.0) +
+                                      (speedRelevantObjectCount > 400 ? 0.2 * Math.Log10(speedRelevantObjectCount / 400.0) : 0.0);
             speedRating *= Math.Cbrt(speedLengthBonus);
 
             double sliderFactor = aimRating > 0 ? aimRatingNoSliders / aimRating : 1;
