@@ -159,8 +159,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 aimValue *= 1.3 + (totalHits * (0.0016 / (1 + 2 * effectiveMissCount)) * Math.Pow(accuracy, 16)) * (1 - 0.003 * attributes.DrainRate * attributes.DrainRate);
             else if (score.Mods.Any(m => m is OsuModHidden || m is OsuModTraceable))
             {
-                // We want to give more reward for lower AR when it comes to aim and HD. This nerfs high AR and buffs lower AR.
-                aimValue *= 1.0 + 0.04 * (12.0 - attributes.ApproachRate);
+                aimValue *= 1.0 + 1.02 * calculateReadingModBonus(score, attributes) * (0.5 + 0.5 * Math.Pow(attributes.SliderFactor, 3));
             }
 
             // We assume 15% of sliders in a map are difficult since there's no way to tell from the performance calculator.
@@ -221,8 +220,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             }
             else if (score.Mods.Any(m => m is OsuModHidden || m is OsuModTraceable))
             {
-                // We want to give more reward for lower AR when it comes to aim and HD. This nerfs high AR and buffs lower AR.
-                speedValue *= 1.0 + 0.04 * (12.0 - attributes.ApproachRate);
+                speedValue *= 1.0 + calculateReadingModBonus(score, attributes);
             }
 
             // Calculate accuracy assuming the worst case scenario
@@ -303,6 +301,27 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             flashlightValue *= 0.98 + Math.Pow(attributes.OverallDifficulty, 2) / 2500;
 
             return flashlightValue;
+        }
+
+        private double calculateReadingModBonus(ScoreInfo score, OsuDifficultyAttributes attributes)
+        {
+            bool isFullyHidden = score.Mods.OfType<OsuModHidden>().Any(m => !m.OnlyFadeApproachCircles.Value);
+
+            if (attributes.ApproachRate >= 7)
+            {
+                // Normal curve for AR > 7, rewarding lower AR
+                return 0.04 * (12.0 - attributes.ApproachRate);
+            }
+            else if (attributes.ApproachRate >= 2)
+            {
+                // For fully hidden notes - add additional reward for extra low AR
+                return 0.2 + (isFullyHidden ? 0.06 : 0.04) * (7.0 - attributes.ApproachRate);
+            }
+            else
+            {
+                // Max bonus is 0.7 for fully hidden and 0.55 for half-hidden or traceable
+                return (isFullyHidden ? 0.5 : 0.4) + (isFullyHidden ? 0.2 : 0.15) * (1 - Math.Pow(1.5, attributes.ApproachRate - 2));
+            }
         }
 
         // Miss penalty assumes that a player will miss on the hardest parts of a map,
