@@ -207,7 +207,7 @@ namespace osu.Game.Screens.Menu
                         Text = NotificationsStrings.AudioPlaybackIssue
                     });
                 }
-            }, 5000);
+            }, 8000);
         }
 
         public override void OnResuming(ScreenTransitionEvent e)
