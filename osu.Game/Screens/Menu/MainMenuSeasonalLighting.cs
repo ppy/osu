@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -137,9 +136,9 @@ namespace osu.Game.Screens.Menu
                     .FadeInFromZero(150)
                     .Then()
                     .FadeOutFromOne(1000, Easing.In);
-
-                light.Expire();
             }
+
+            light.Expire();
         }
 
         public partial class Light : CompositeDrawable
