@@ -113,9 +113,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 // For maps with relax, multiple inputs are more likely to be abused.
                 if (isRelax)
                     starRating *= 0.60;
-
                 // For maps with either relax or low colour variance and high stamina requirement, multiple inputs are more likely to be abused.
-                if (colourRating < 2 && staminaRating > 8)
+                else if (colourRating < 2 && staminaRating > 8)
                     starRating *= 0.80;
             }
 
