@@ -9,6 +9,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Skinning;
+using osu.Game.Localisation;
+using osu.Game.Localisation.SkinComponents;
 
 namespace osu.Game.Screens.Play.HUD
 {
@@ -22,11 +24,11 @@ namespace osu.Game.Screens.Play.HUD
         [Resolved]
         private Bindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
 
-        [SettingSource("Show extended info", "Whether to show extended information for each mod.")]
+        [SettingSource(typeof(SkinnableModDisplayStrings), nameof(SkinnableModDisplayStrings.ShowExtendedInformation), nameof(SkinnableModDisplayStrings.ShowExtendedInformationDescription))]
         public Bindable<bool> ShowExtendedInformation { get; } = new Bindable<bool>(true);
 
-        [SettingSource("Expansion mode", "How the mod display expands when interacted with.")]
-        public Bindable<ExpansionMode> ExpansionModeSetting { get; } = new Bindable<ExpansionMode>(ExpansionMode.ExpandOnHover);
+        [SettingSource(typeof(SkinnableModDisplayStrings), nameof(SkinnableModDisplayStrings.ExpansionMode), nameof(SkinnableModDisplayStrings.ExpansionModeDescription))]
+        public Bindable<ExpansionMode> ExpansionModeSetting { get; } = new Bindable<ExpansionMode>();
 
         [BackgroundDependencyLoader]
         private void load()
