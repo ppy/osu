@@ -15,9 +15,12 @@ using osu.Game.Overlays.Rankings.Tables;
 
 namespace osu.Game.Overlays
 {
-    public partial class RankingsOverlay : TabbableOnlineOverlay<RankingsOverlayHeader, RankingsScope>
+    public partial class RankingsOverlay : PageableTabbleOnlineOverlay<RankingsOverlayHeader, RankingsScope>
     {
         protected Bindable<CountryCode> Country => Header.Country;
+
+        // First page is 0, need to apply +1 to get the right data actually.
+        private int currentPage => Header.CurrentPage.Value + 1;
 
         private APIRequest lastRequest;
 
@@ -45,7 +48,11 @@ namespace osu.Game.Overlays
             {
                 // if a country is requested, force performance scope.
                 if (!Country.IsDefault)
+                {
                     Header.Current.Value = RankingsScope.Performance;
+                    Header.HidePageSelector();
+                }
+                else Header.ShowPageSelector();
 
                 Scheduler.AddOnce(triggerTabChanged);
             });
@@ -83,7 +90,10 @@ namespace osu.Game.Overlays
 
         private void triggerTabChanged() => base.OnTabChanged(Header.Current.Value);
 
-        protected override RankingsOverlayHeader CreateHeader() => new RankingsOverlayHeader();
+        protected override RankingsOverlayHeader CreateHeader() => new RankingsOverlayHeader
+        {
+            AvailablesPages = { Value = 200 }
+        };
 
         public void ShowCountry(CountryCode requested)
         {
@@ -128,16 +138,16 @@ namespace osu.Game.Overlays
             switch (Header.Current.Value)
             {
                 case RankingsScope.Performance:
-                    return new GetUserRankingsRequest(ruleset.Value, countryCode: Country.Value);
+                    return new GetUserRankingsRequest(ruleset.Value, page: currentPage, countryCode: Country.Value);
 
                 case RankingsScope.Country:
-                    return new GetCountryRankingsRequest(ruleset.Value);
+                    return new GetCountryRankingsRequest(ruleset.Value, page: currentPage);
 
                 case RankingsScope.Score:
-                    return new GetUserRankingsRequest(ruleset.Value, UserRankingsType.Score);
+                    return new GetUserRankingsRequest(ruleset.Value, UserRankingsType.Score, page: currentPage);
 
                 case RankingsScope.Kudosu:
-                    return new GetKudosuRankingsRequest();
+                    return new GetKudosuRankingsRequest(page: currentPage);
             }
 
             return null;
@@ -154,10 +164,10 @@ namespace osu.Game.Overlays
                     switch (userRequest.Type)
                     {
                         case UserRankingsType.Performance:
-                            return new PerformanceTable(1, userRequest.Response.Users);
+                            return new PerformanceTable(currentPage, userRequest.Response.Users);
 
                         case UserRankingsType.Score:
-                            return new ScoresTable(1, userRequest.Response.Users);
+                            return new ScoresTable(currentPage, userRequest.Response.Users);
                     }
 
                     return null;
@@ -167,14 +177,14 @@ namespace osu.Game.Overlays
                     if (countryRequest.Response == null)
                         return null;
 
-                    return new CountriesTable(1, countryRequest.Response.Countries);
+                    return new CountriesTable(currentPage, countryRequest.Response.Countries);
                 }
 
                 case GetKudosuRankingsRequest kudosuRequest:
                     if (kudosuRequest.Response == null)
                         return null;
 
-                    return new KudosuTable(1, kudosuRequest.Response.Users);
+                    return new KudosuTable(currentPage, kudosuRequest.Response.Users);
             }
 
             return null;

@@ -59,14 +59,24 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("Show US", () => rankingsOverlay.ShowCountry(CountryCode.US));
         }
 
+        [Test]
+        public void TestPageSelection()
+        {
+            AddStep("Set score to performance", () => scope.Value = RankingsScope.Performance);
+            AddStep("Move to next page", () => rankingsOverlay.Header.CurrentPage.Value += 1);
+            AddStep("Switch to another scope", () => scope.Value = RankingsScope.Score);
+            AddAssert("Check page is first one", () => rankingsOverlay.Header.CurrentPage.Value == 0);
+        }
+
         private void loadRankingsOverlay()
         {
             Child = rankingsOverlay = new TestRankingsOverlay
             {
-                Country = { BindTarget = countryBindable },
-                Header = { Current = { BindTarget = scope } },
                 State = { Value = Visibility.Visible },
             };
+
+            countryBindable.BindTo(rankingsOverlay.Country);
+            scope.BindTo(rankingsOverlay.Header.Current);
         }
 
         private partial class TestRankingsOverlay : RankingsOverlay
