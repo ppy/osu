@@ -56,8 +56,26 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             // Max distance bonus is 1 * `distance_multiplier` at single_spacing_threshold
             double distanceBonus = Math.Pow(distance / single_spacing_threshold, 3.95) * distance_multiplier;
 
+            double sliderStreamBonus = 1;
+
+            if (osuCurrObj.BaseObject is Slider slider && osuPrevObj?.BaseObject is Slider)
+            {
+                double sliderStreamFactor = 0.25;
+
+                // If slider was slower than notes before - punish it
+                if (osuCurrObj.StrainTime > osuPrevObj.StrainTime)
+                    sliderStreamFactor *= AimEvaluator.CalcRhythmDifferenceMultiplier(osuCurrObj.StrainTime, osuPrevObj.StrainTime);
+
+                // Punish too short sliders to prevent cheesing (cheesing is still possible, but it's very rare)
+                double sliderLength = slider.Velocity * slider.SpanDuration;
+                if (sliderLength < slider.Radius)
+                    sliderStreamFactor *= sliderLength / slider.Radius;
+
+                sliderStreamBonus += sliderStreamFactor;
+            }
+
             // Base difficulty with all bonuses
-            double difficulty = (1 + speedBonus + distanceBonus) * 1000 / strainTime;
+            double difficulty = (1 + speedBonus + distanceBonus) * sliderStreamBonus * 1000 / strainTime;
 
             // Apply penalty if there's doubletappable doubles
             return difficulty * doubletapness;
