@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.Containers;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Menu
 {
@@ -36,6 +37,8 @@ namespace osu.Game.Screens.Menu
                     X = -250,
                 },
             };
+
+            Colour = SeasonalUI.ENABLED ? SeasonalUI.AMBIENT_COLOUR_2 : Color4.White;
         }
 
         private bool isTriggered;
