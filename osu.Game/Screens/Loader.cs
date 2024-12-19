@@ -37,6 +37,9 @@ namespace osu.Game.Screens
 
         private IntroScreen getIntroSequence()
         {
+            if (SeasonalUI.ENABLED)
+                return new IntroChristmas(createMainMenu);
+
             if (introSequence == IntroSequence.Random)
                 introSequence = (IntroSequence)RNG.Next(0, (int)IntroSequence.Random);
 
