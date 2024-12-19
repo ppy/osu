@@ -87,10 +87,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
             bool isRelax = mods.Any(h => h is TaikoModRelax);
 
-            Rhythm rhythm = (Rhythm)skills.First(x => x is Rhythm);
-            Colour colour = (Colour)skills.First(x => x is Colour);
-            Stamina stamina = (Stamina)skills.First(x => x is Stamina);
-            Stamina singleColourStamina = (Stamina)skills.Last(x => x is Stamina);
+            Rhythm rhythm = skills.OfType<Rhythm>().Single();
+            Colour colour = skills.OfType<Colour>().Single();
+            Stamina stamina = skills.OfType<Stamina>().Single(s => !s.MonoColour);
+            Stamina singleColourStamina = skills.OfType<Stamina>().Single(s => s.MonoColour);
 
             double rhythmRating = rhythm.DifficultyValue() * rhythm_skill_multiplier;
             double colourRating = colour.DifficultyValue() * colour_skill_multiplier;
