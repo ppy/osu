@@ -271,8 +271,16 @@ namespace osu.Game.Screens.Menu
         private void load(TextureStore textures, AudioManager audio)
         {
             sampleClick = audio.Samples.Get(@"Menu/osu-logo-select");
-            sampleBeat = audio.Samples.Get(@"Menu/osu-logo-heartbeat");
-            sampleDownbeat = audio.Samples.Get(@"Menu/osu-logo-downbeat");
+
+            if (SeasonalUI.ENABLED)
+            {
+                sampleDownbeat = sampleBeat = audio.Samples.Get(@"Menu/osu-logo-heartbeat-bell");
+            }
+            else
+            {
+                sampleBeat = audio.Samples.Get(@"Menu/osu-logo-heartbeat");
+                sampleDownbeat = audio.Samples.Get(@"Menu/osu-logo-downbeat");
+            }
 
             logo.Texture = textures.Get(@"Menu/logo");
             ripple.Texture = textures.Get(@"Menu/logo");
@@ -303,7 +311,10 @@ namespace osu.Game.Screens.Menu
                     else
                     {
                         var channel = sampleBeat.GetChannel();
-                        channel.Frequency.Value = 0.95 + RNG.NextDouble(0.1);
+                        if (SeasonalUI.ENABLED)
+                            channel.Frequency.Value = 0.99 + RNG.NextDouble(0.02);
+                        else
+                            channel.Frequency.Value = 0.95 + RNG.NextDouble(0.1);
                         channel.Play();
                     }
                 });
