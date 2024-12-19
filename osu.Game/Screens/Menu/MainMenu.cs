@@ -124,6 +124,7 @@ namespace osu.Game.Screens.Menu
 
             AddRangeInternal(new[]
             {
+                SeasonalUI.ENABLED ? new MainMenuSeasonalLighting() : Empty(),
                 buttonsContainer = new ParallaxContainer
                 {
                     ParallaxAmount = 0.01f,
@@ -166,7 +167,8 @@ namespace osu.Game.Screens.Menu
                     Origin = Anchor.TopRight,
                     Margin = new MarginPadding { Right = 15, Top = 5 }
                 },
-                new KiaiMenuFountains(),
+                // For now, this is too much alongside the seasonal lighting.
+                SeasonalUI.ENABLED ? Empty() : new KiaiMenuFountains(),
                 bottomElementsFlow = new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Both,
