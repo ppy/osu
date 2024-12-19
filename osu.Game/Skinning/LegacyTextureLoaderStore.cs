@@ -80,7 +80,7 @@ namespace osu.Game.Skinning
             // which matches mode BT.601 (https://en.wikipedia.org/wiki/Grayscale#Luma_coding_in_video_systems)
             image.Mutate(i => i.Grayscale(GrayscaleMode.Bt601));
 
-            return new TextureUpload(image);
+            return new TextureUpload(PremultipliedImage.FromStraight(image));
         }
 
         public Stream? GetStream(string name) => wrappedStore?.GetStream(name);
