@@ -122,6 +122,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 sliderBonus = osuLastObj.TravelDistance / osuLastObj.TravelTime;
             }
 
+            double currFlowBonus = SpeedEvaluator.CalculateDistanceBonus(osuCurrObj, osuLastObj);
+            double prevFlowBonus = SpeedEvaluator.CalculateDistanceBonus(osuLastObj, osuLastLastObj);
+            double flowBonus = Math.Max(prevFlowBonus, currFlowBonus);
+
+            // Part of the aiming difficulty for this object is accounted for in the speed evaluator, so reduce aim difficulty here
+            if (flowBonus < 1)
+            {
+                aimStrain *= 0.5 + 0.5 * Math.Sqrt(flowBonus);
+            }
+
             // Add in acute angle bonus or wide angle bonus + velocity change bonus, whichever is larger.
             aimStrain += Math.Max(acuteAngleBonus * acute_angle_multiplier, wideAngleBonus * wide_angle_multiplier + velocityChangeBonus * velocity_change_multiplier);
 
