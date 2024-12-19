@@ -29,6 +29,8 @@ namespace osu.Game.Users
 
         private ProfileValueDisplay globalRankDisplay = null!;
         private ProfileValueDisplay countryRankDisplay = null!;
+        private ProfileValueDisplay ppDisplay = null!;
+        private TotalPlayTime playtimeDisplay = null!;
         private LoadingLayer loadingLayer = null!;
 
         public UserRankPanel(APIUser user)
@@ -73,6 +75,8 @@ namespace osu.Game.Users
             loadingLayer.State.Value = statistics == null ? Visibility.Visible : Visibility.Hidden;
             globalRankDisplay.Content = statistics?.GlobalRank?.ToLocalisableString("\\##,##0") ?? "-";
             countryRankDisplay.Content = statistics?.CountryRank?.ToLocalisableString("\\##,##0") ?? "-";
+            ppDisplay.Content = statistics?.PP?.ToLocalisableString("#,##0") ?? "0";
+            playtimeDisplay.UserStatistics.Value = statistics;
         }
 
         protected override Drawable CreateLayout()
@@ -181,7 +185,7 @@ namespace osu.Game.Users
                             new Dimension(),
                             new Dimension()
                         },
-                        RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
+                        RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize), new Dimension(GridSizeMode.AutoSize) },
                         Content = new[]
                         {
                             new Drawable[]
@@ -189,14 +193,23 @@ namespace osu.Game.Users
                                 globalRankDisplay = new ProfileValueDisplay(true)
                                 {
                                     Title = UsersStrings.ShowRankGlobalSimple,
+                                    Margin = new MarginPadding { Bottom = padding }
                                     // TODO: implement highest rank tooltip
                                     // `RankHighest` resides in `APIUser`, but `api.LocalUser` doesn't update
                                     // maybe move to `UserStatistics` in api, so `UserStatisticsWatcher` can update the value
                                 },
                                 countryRankDisplay = new ProfileValueDisplay(true)
                                 {
-                                    Title = UsersStrings.ShowRankCountrySimple,
+                                    Title = UsersStrings.ShowRankCountrySimple
                                 }
+                            },
+                            new Drawable[]
+                            {
+                                ppDisplay = new ProfileValueDisplay
+                                {
+                                    Title = "pp"
+                                },
+                                playtimeDisplay = new TotalPlayTime()
                             }
                         }
                     },
