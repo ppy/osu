@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         private const double colour_skill_multiplier = 0.375 * difficulty_multiplier;
         private const double stamina_skill_multiplier = 0.375 * difficulty_multiplier;
 
-        public override int Version => 20241115;
+        public override int Version => 20241007;
 
         public TaikoDifficultyCalculator(IRulesetInfo ruleset, IWorkingBeatmap beatmap)
             : base(ruleset, beatmap)
@@ -87,19 +87,19 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
             bool isRelax = mods.Any(h => h is TaikoModRelax);
 
-            Colour colour = (Colour)skills.First(x => x is Colour);
             Rhythm rhythm = (Rhythm)skills.First(x => x is Rhythm);
+            Colour colour = (Colour)skills.First(x => x is Colour);
             Stamina stamina = (Stamina)skills.First(x => x is Stamina);
             Stamina singleColourStamina = (Stamina)skills.Last(x => x is Stamina);
 
-            double colourRating = colour.DifficultyValue() * colour_skill_multiplier;
             double rhythmRating = rhythm.DifficultyValue() * rhythm_skill_multiplier;
+            double colourRating = colour.DifficultyValue() * colour_skill_multiplier;
             double staminaRating = stamina.DifficultyValue() * stamina_skill_multiplier;
             double monoStaminaRating = singleColourStamina.DifficultyValue() * stamina_skill_multiplier;
             double monoStaminaFactor = staminaRating == 0 ? 1 : Math.Pow(monoStaminaRating / staminaRating, 5);
 
-            double colourDifficultStrains = colour.CountTopWeightedStrains();
             double rhythmDifficultStrains = rhythm.CountTopWeightedStrains();
+            double colourDifficultStrains = colour.CountTopWeightedStrains();
             double staminaDifficultStrains = stamina.CountTopWeightedStrains();
 
             double combinedRating = combinedDifficultyValue(rhythm, colour, stamina, isRelax);
@@ -108,11 +108,15 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             // Converts are penalised outside the scope of difficulty calculation, as our assumptions surrounding standard play-styles becomes out-of-scope.
             if (beatmap.BeatmapInfo.Ruleset.OnlineID == 0)
             {
+                starRating *= 0.925;
+
                 // For maps with relax, multiple inputs are more likely to be abused.
                 if (isRelax)
                     starRating *= 0.60;
 
-                starRating *= 0.925;
+                // For maps with either relax or low colour variance and high stamina requirement, multiple inputs are more likely to be abused.
+                if (colourRating < 2 && staminaRating > 8)
+                    starRating *= 0.80;
             }
 
             HitWindows hitWindows = new TaikoHitWindows();
@@ -122,10 +126,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             {
                 StarRating = starRating,
                 Mods = mods,
-                StaminaDifficulty = staminaRating,
-                MonoStaminaFactor = monoStaminaFactor,
                 RhythmDifficulty = rhythmRating,
                 ColourDifficulty = colourRating,
+                StaminaDifficulty = staminaRating,
+                MonoStaminaFactor = monoStaminaFactor,
                 StaminaTopStrains = staminaDifficultStrains,
                 RhythmTopStrains = rhythmDifficultStrains,
                 ColourTopStrains = colourDifficultStrains,
@@ -154,8 +158,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
             for (int i = 0; i < colourPeaks.Count; i++)
             {
-                double colourPeak = colourPeaks[i] * colour_skill_multiplier;
                 double rhythmPeak = rhythmPeaks[i] * rhythm_skill_multiplier;
+                double colourPeak = colourPeaks[i] * colour_skill_multiplier;
                 double staminaPeak = staminaPeaks[i] * stamina_skill_multiplier;
 
                 if (isRelax)
