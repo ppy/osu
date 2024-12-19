@@ -17,6 +17,12 @@ namespace osu.iOS
     {
         public override Version AssemblyVersion => new Version(NSBundle.MainBundle.InfoDictionary["CFBundleVersion"].ToString());
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            LoadComponentAsync(new IOSScreenRotationLocker(), Add);
+        }
+
         protected override UpdateManager CreateUpdateManager() => new MobileUpdateNotifier();
 
         protected override BatteryInfo CreateBatteryInfo() => new IOSBatteryInfo();
