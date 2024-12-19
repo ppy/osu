@@ -76,6 +76,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             base.OnDragEnd(e);
         }
 
+        protected override bool OnMouseDown(MouseDownEvent e) => true;
+
+        protected override bool OnClick(ClickEvent e) => true;
+
         private void updateState()
         {
             Colour = IsHovered || IsDragged ? colours.Red : colours.Yellow;
