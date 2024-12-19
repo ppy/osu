@@ -63,6 +63,16 @@ namespace osu.Game.Rulesets.Edit
 
         protected override bool OnMouseDown(MouseDownEvent e) => true;
 
-        protected override bool OnClick(ClickEvent e) => true;
+        protected override bool OnClick(ClickEvent e)
+        {
+            base.OnClick(e);
+
+            if (contractSidebars.Value && !Expanded.Value)
+            {
+                Expanded.Value = true;
+            }
+
+            return true;
+        }
     }
 }
