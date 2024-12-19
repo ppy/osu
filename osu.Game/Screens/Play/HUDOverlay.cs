@@ -249,10 +249,7 @@ namespace osu.Game.Screens.Play
             }, true);
 
             ModDisplay.ExpansionMode = ExpansionMode.AlwaysExpanded;
-            Scheduler.AddDelayed(() =>
-            {
-                ModDisplay.ExpansionMode = ExpansionMode.ExpandOnHover;
-            }, 1200);
+            Scheduler.AddDelayed(() => ModDisplay.ExpansionMode = ExpansionMode.ExpandOnHover, 1200);
         }
 
         protected override void Update()
