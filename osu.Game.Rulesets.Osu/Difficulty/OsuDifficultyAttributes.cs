@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Difficulty
 {
@@ -18,6 +19,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         /// </summary>
         [JsonProperty("aim_difficulty")]
         public double AimDifficulty { get; set; }
+
+        /// <summary>
+        /// The number of <see cref="Slider"/>s weighted by difficulty.
+        /// </summary>
+        [JsonProperty("aim_difficult_slider_count")]
+        public double AimDifficultSliderCount { get; set; }
 
         /// <summary>
         /// The difficulty corresponding to the speed skill.
