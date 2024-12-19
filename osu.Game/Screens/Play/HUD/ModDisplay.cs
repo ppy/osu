@@ -33,12 +33,7 @@ namespace osu.Game.Screens.Play.HUD
                 expansionMode = value;
 
                 if (IsLoaded)
-                {
-                    if (expansionMode == ExpansionMode.AlwaysExpanded || (expansionMode == ExpansionMode.ExpandOnHover && IsHovered))
-                        expand();
-                    else if (expansionMode == ExpansionMode.AlwaysContracted || (expansionMode == ExpansionMode.ExpandOnHover && !IsHovered))
-                        contract();
-                }
+                    updateExpansionMode();
             }
         }
 
@@ -88,24 +83,7 @@ namespace osu.Game.Screens.Play.HUD
             base.LoadComplete();
 
             Current.BindValueChanged(updateDisplay, true);
-
-            switch (expansionMode)
-            {
-                case ExpansionMode.AlwaysExpanded:
-                    expand(0);
-                    break;
-
-                case ExpansionMode.AlwaysContracted:
-                    contract(0);
-                    break;
-
-                case ExpansionMode.ExpandOnHover:
-                    if (IsHovered)
-                        expand(0);
-                    else
-                        contract(0);
-                    break;
-            }
+            updateExpansionMode(0);
         }
 
         private void updateDisplay(ValueChangedEvent<IReadOnlyList<Mod>> mods)
@@ -114,6 +92,27 @@ namespace osu.Game.Screens.Play.HUD
 
             foreach (Mod mod in mods.NewValue.AsOrdered())
                 iconsContainer.Add(new ModIcon(mod, showExtendedInformation: showExtendedInformation) { Scale = new Vector2(0.6f) });
+        }
+
+        private void updateExpansionMode(double duration = 500)
+        {
+            switch (expansionMode)
+            {
+                case ExpansionMode.AlwaysExpanded:
+                    expand(duration);
+                    break;
+
+                case ExpansionMode.AlwaysContracted:
+                    contract(duration);
+                    break;
+
+                case ExpansionMode.ExpandOnHover:
+                    if (IsHovered)
+                        expand(duration);
+                    else
+                        contract(duration);
+                    break;
+            }
         }
 
         private void expand(double duration = 500)
