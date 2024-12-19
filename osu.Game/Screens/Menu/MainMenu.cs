@@ -28,6 +28,7 @@ using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Dialog;
 using osu.Game.Overlays.SkinEditor;
+using osu.Game.Overlays.Volume;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Edit;
@@ -124,6 +125,7 @@ namespace osu.Game.Screens.Menu
 
             AddRangeInternal(new[]
             {
+                new GlobalScrollAdjustsVolume(),
                 buttonsContainer = new ParallaxContainer
                 {
                     ParallaxAmount = 0.01f,
