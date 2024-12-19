@@ -133,6 +133,11 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
             const double z = 2.32634787404; // 99% critical value for the normal distribution (one-tailed).
 
+            double? deviationGreatWindow = calcDeviationGreatWindow();
+            double? deviationGoodWindow = calcDeviationGoodWindow();
+
+            return deviationGreatWindow is null ? deviationGoodWindow : Math.Min(deviationGreatWindow.Value, deviationGoodWindow!.Value);
+
             // The upper bound on deviation, calculated with the ratio of 300s to objects, and the great hit window.
             double? calcDeviationGreatWindow()
             {
@@ -167,14 +172,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 // We can be 99% confident that the deviation is not higher than:
                 return h100 / (Math.Sqrt(2) * SpecialFunctions.ErfInv(pLowerBound));
             }
-
-            double? deviationGreatWindow = calcDeviationGreatWindow();
-            double? deviationGoodWindow = calcDeviationGoodWindow();
-
-            if (deviationGreatWindow is null)
-                return deviationGoodWindow;
-
-            return Math.Min(deviationGreatWindow.Value, deviationGoodWindow!.Value);
         }
 
         private int totalHits => countGreat + countOk + countMeh + countMiss;
