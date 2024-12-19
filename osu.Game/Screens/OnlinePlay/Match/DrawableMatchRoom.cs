@@ -3,6 +3,7 @@
 
 using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -37,6 +38,10 @@ namespace osu.Game.Screens.OnlinePlay.Match
             : base(room)
         {
             this.allowEdit = allowEdit;
+
+            // Roslyn sees required non-nullable property as nullable in constructor,
+            // as it can't see the implementation provides a fallback.
+            Debug.Assert(SelectedItem != null);
 
             base.SelectedItem.BindTo(SelectedItem);
         }
