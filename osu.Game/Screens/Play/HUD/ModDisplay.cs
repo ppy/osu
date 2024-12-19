@@ -8,7 +8,10 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Graphics.Containers;
+using osu.Game.Localisation;
+using osu.Game.Localisation.SkinComponents;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
 using osuTK;
@@ -145,16 +148,19 @@ namespace osu.Game.Screens.Play.HUD
         /// <summary>
         /// The <see cref="ModDisplay"/> will expand only when hovered.
         /// </summary>
+        [LocalisableDescription(typeof(SkinnableModDisplayStrings), nameof(SkinnableModDisplayStrings.ExpandOnHover))]
         ExpandOnHover,
 
         /// <summary>
         /// The <see cref="ModDisplay"/> will always be expanded.
         /// </summary>
+        [LocalisableDescription(typeof(SkinnableModDisplayStrings), nameof(SkinnableModDisplayStrings.AlwaysExpanded))]
         AlwaysExpanded,
 
         /// <summary>
         /// The <see cref="ModDisplay"/> will always be contracted.
         /// </summary>
+        [LocalisableDescription(typeof(SkinnableModDisplayStrings), nameof(SkinnableModDisplayStrings.AlwaysContracted))]
         AlwaysContracted,
     }
 }
