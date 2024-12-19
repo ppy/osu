@@ -3,12 +3,12 @@
 
 #nullable disable
 
-using osuTK.Graphics;
-using osu.Game.Skinning;
-using osu.Game.Online.API;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Skinning;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Menu
 {
@@ -29,7 +29,9 @@ namespace osu.Game.Screens.Menu
 
         private void updateColour()
         {
-            if (user.Value?.IsSupporter ?? false)
+            if (SeasonalUI.ENABLED)
+                Colour = SeasonalUI.AMBIENT_COLOUR_1;
+            else if (user.Value?.IsSupporter ?? false)
                 Colour = skin.Value.GetConfig<GlobalSkinColours, Color4>(GlobalSkinColours.MenuGlow)?.Value ?? Color4.White;
             else
                 Colour = Color4.White;
