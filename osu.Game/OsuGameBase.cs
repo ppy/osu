@@ -41,6 +41,7 @@ using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Cursor;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.IO;
@@ -382,6 +383,10 @@ namespace osu.Game
             base.Content.Add(beatmapClock);
 
             GlobalActionContainer globalBindings;
+
+            OsuMenuSamples menuSamples;
+            dependencies.Cache(menuSamples = new OsuMenuSamples());
+            base.Content.Add(menuSamples);
 
             base.Content.Add(SafeAreaContainer = new SafeAreaContainer
             {
