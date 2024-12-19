@@ -35,8 +35,6 @@ namespace osu.Game.Screens.Play
     {
         public const float FADE_DURATION = 300;
 
-        private const float mods_fade_duration = 1000;
-
         public const Easing FADE_EASING = Easing.OutQuint;
 
         /// <summary>
@@ -238,7 +236,7 @@ namespace osu.Game.Screens.Play
             {
                 if (e.NewValue)
                 {
-                    ModDisplay.FadeIn(200);
+                    ModDisplay.FadeIn(1000, FADE_EASING);
                     InputCountController.Margin = new MarginPadding(10) { Bottom = 30 };
                 }
                 else
@@ -255,8 +253,6 @@ namespace osu.Game.Screens.Play
             {
                 ModDisplay.ExpansionMode = ExpansionMode.ExpandOnHover;
             }, 1200);
-
-            ModDisplay.FadeInFromZero(mods_fade_duration, FADE_EASING);
         }
 
         protected override void Update()
