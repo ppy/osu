@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         {
         }
 
-        protected override PerformanceAttributes CreatePerformanceAttributes(ScoreInfo score, DifficultyAttributes attributes)
+        protected override IPerformanceAttributes CreatePerformanceAttributes(ScoreInfo score, IDifficultyAttributes attributes)
         {
             var maniaAttributes = (ManiaDifficultyAttributes)attributes;
 

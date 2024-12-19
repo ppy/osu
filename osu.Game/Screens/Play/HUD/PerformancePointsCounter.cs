@@ -106,7 +106,7 @@ namespace osu.Game.Screens.Play.HUD
         }
 
         [CanBeNull]
-        private DifficultyAttributes getAttributeAtTime(JudgementResult judgement)
+        private IDifficultyAttributes getAttributeAtTime(JudgementResult judgement)
         {
             if (timedAttributes == null || timedAttributes.Count == 0)
                 return null;

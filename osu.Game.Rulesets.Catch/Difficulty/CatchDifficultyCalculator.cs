@@ -30,10 +30,10 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         {
         }
 
-        protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
+        protected override IDifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
         {
             if (beatmap.HitObjects.Count == 0)
-                return new CatchDifficultyAttributes { Mods = mods };
+                return new CatchDifficultyAttributes();
 
             // this is the same as osu!, so there's potential to share the implementation... maybe
             double preempt = IBeatmapDifficultyInfo.DifficultyRange(beatmap.Difficulty.ApproachRate, 1800, 1200, 450) / clockRate;
@@ -41,7 +41,6 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             CatchDifficultyAttributes attributes = new CatchDifficultyAttributes
             {
                 StarRating = Math.Sqrt(skills[0].DifficultyValue()) * difficulty_multiplier,
-                Mods = mods,
                 ApproachRate = preempt > 1200.0 ? -(preempt - 1800.0) / 120.0 : -(preempt - 1200.0) / 150.0 + 5.0,
                 MaxCombo = beatmap.GetMaxCombo(),
             };
