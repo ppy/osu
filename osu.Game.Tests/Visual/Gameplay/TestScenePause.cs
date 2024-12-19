@@ -208,6 +208,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
+        [Ignore("Fails on github runners if they happen to skip too far forward in time.")]
         public void TestUserPauseDuringCooldownTooSoon()
         {
             AddStep("seek to gameplay", () => Player.GameplayClockContainer.Seek(0));
