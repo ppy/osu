@@ -19,6 +19,8 @@ namespace osu.Game.Seasonal
 
         private bool hasHat;
 
+        protected override MenuLogoVisualisation CreateMenuLogoVisualisation() => new SeasonalMenuLogoVisualisation();
+
         [BackgroundDependencyLoader]
         private void load(TextureStore textures, AudioManager audio)
         {

@@ -53,6 +53,8 @@ namespace osu.Game.Screens.Menu
         private Sample sampleClick;
         private SampleChannel sampleClickChannel;
 
+        protected virtual MenuLogoVisualisation CreateMenuLogoVisualisation() => new MenuLogoVisualisation();
+
         protected virtual double BeatSampleVariance => 0.1;
 
         protected Sample SampleBeat;
@@ -153,14 +155,14 @@ namespace osu.Game.Screens.Menu
                                             AutoSizeAxes = Axes.Both,
                                             Children = new Drawable[]
                                             {
-                                                visualizer = new MenuLogoVisualisation
+                                                visualizer = CreateMenuLogoVisualisation().With(v =>
                                                 {
-                                                    RelativeSizeAxes = Axes.Both,
-                                                    Origin = Anchor.Centre,
-                                                    Anchor = Anchor.Centre,
-                                                    Alpha = visualizer_default_alpha,
-                                                    Size = SCALE_ADJUST
-                                                },
+                                                    v.RelativeSizeAxes = Axes.Both;
+                                                    v.Origin = Anchor.Centre;
+                                                    v.Anchor = Anchor.Centre;
+                                                    v.Alpha = visualizer_default_alpha;
+                                                    v.Size = SCALE_ADJUST;
+                                                }),
                                                 LogoElements = new Container
                                                 {
                                                     AutoSizeAxes = Axes.Both,
