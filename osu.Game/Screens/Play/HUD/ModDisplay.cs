@@ -10,7 +10,6 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.Containers;
-using osu.Game.Localisation;
 using osu.Game.Localisation.SkinComponents;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
