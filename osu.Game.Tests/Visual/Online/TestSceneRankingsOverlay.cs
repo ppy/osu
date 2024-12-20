@@ -66,6 +66,9 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("Move to next page", () => rankingsOverlay.Header.CurrentPage.Value += 1);
             AddStep("Switch to another scope", () => scope.Value = RankingsScope.Score);
             AddAssert("Check page is first one", () => rankingsOverlay.Header.CurrentPage.Value == 0);
+            AddStep("Move to next page", () => rankingsOverlay.Header.CurrentPage.Value += 1);
+            AddStep("Switch to another ruleset", () => rankingsOverlay.Header.Ruleset.Value = new ManiaRuleset().RulesetInfo);
+            AddAssert("Check page is first one", () => rankingsOverlay.Header.CurrentPage.Value == 0);
         }
 
         private void loadRankingsOverlay()
