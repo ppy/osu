@@ -7,11 +7,10 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Configuration;
-using osu.Game.Rulesets.Mods;
-using osu.Game.Skinning;
 using osu.Game.Localisation.SkinComponents;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
-using osuTK;
+using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Play.HUD
 {
