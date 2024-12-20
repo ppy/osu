@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -31,6 +30,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         private MultiplayerClient client { get; set; } = null!;
 
         private Dropdown<RoomPermissionsFilter> roomAccessTypeDropdown = null!;
+        private OsuCheckbox showInProgress = null!;
 
         public override void OnResuming(ScreenTransitionEvent e)
         {
@@ -47,7 +47,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         protected override IEnumerable<Drawable> CreateFilterControls()
         {
-            roomAccessTypeDropdown = new SlimEnumDropdown<RoomPermissionsFilter>
+            foreach (var control in base.CreateFilterControls())
+                yield return control;
+
+            yield return roomAccessTypeDropdown = new SlimEnumDropdown<RoomPermissionsFilter>
             {
                 RelativeSizeAxes = Axes.None,
                 Current = Config.GetBindable<RoomPermissionsFilter>(OsuSetting.MultiplayerRoomFilter),
@@ -56,7 +59,17 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             roomAccessTypeDropdown.Current.BindValueChanged(_ => UpdateFilter());
 
-            return base.CreateFilterControls().Append(roomAccessTypeDropdown);
+            yield return showInProgress = new OsuCheckbox
+            {
+                LabelText = "Show in-progress rooms",
+                RelativeSizeAxes = Axes.None,
+                Width = 220,
+                Padding = new MarginPadding { Vertical = 5, },
+                Current = Config.GetBindable<bool>(OsuSetting.MultiplayerShowInProgressFilter),
+            };
+
+            showInProgress.Current.BindValueChanged(_ => UpdateFilter());
+            StatusDropdown.Current.BindValueChanged(_ => showInProgress.Alpha = StatusDropdown.Current.Value == RoomModeFilter.Open ? 1 : 0, true);
         }
 
         protected override FilterCriteria CreateFilterCriteria()
@@ -64,6 +77,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             var criteria = base.CreateFilterCriteria();
             criteria.Category = @"realtime";
             criteria.Permissions = roomAccessTypeDropdown.Current.Value;
+            criteria.Status = showInProgress.Current.Value && criteria.Mode == RoomModeFilter.Open ? null : RoomStatusFilter.Idle;
             return criteria;
         }
 
