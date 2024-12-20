@@ -10,6 +10,8 @@ using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Skinning;
 using osu.Game.Localisation.SkinComponents;
+using osu.Game.Rulesets.UI;
+using osuTK;
 
 namespace osu.Game.Screens.Play.HUD
 {
@@ -32,7 +34,13 @@ namespace osu.Game.Screens.Play.HUD
         [BackgroundDependencyLoader]
         private void load()
         {
-            InternalChild = modDisplay = new ModDisplay();
+            InternalChildren = new Drawable[]
+            {
+                // Provide a minimum autosize.
+                new Container { Size = ModIcon.MOD_ICON_SIZE * ModDisplay.MOD_ICON_SCALE },
+                modDisplay = new ModDisplay(),
+            };
+
             modDisplay.Current = mods;
             AutoSizeAxes = Axes.Both;
         }
