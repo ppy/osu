@@ -12,6 +12,7 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
+using osu.Framework.Development;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
@@ -200,7 +201,7 @@ namespace osu.Game.Screens.Menu
                 PrepareMenuLoad();
                 LoadMenu();
 
-                if (!Debugger.IsAttached)
+                if (!Debugger.IsAttached && !DebugUtils.IsNUnitRunning)
                 {
                     notifications.Post(new SimpleErrorNotification
                     {

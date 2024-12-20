@@ -7,6 +7,7 @@ using osu.Framework.Input;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Edit;
@@ -29,7 +30,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
         private Slider? slider => editorBeatmap.HitObjects.OfType<Slider>().FirstOrDefault();
 
-        private TimelineHitObjectBlueprint blueprint => editor.ChildrenOfType<TimelineHitObjectBlueprint>().FirstOrDefault()!;
+        private TimelineHitObjectBlueprint blueprint => editor.ChildrenOfType<TimelineHitObjectBlueprint>().FirstOrDefault(b => b.Item.GetEndTime() != b.Item.StartTime)!;
 
         private DifficultyPointPiece difficultyPointPiece => blueprint.ChildrenOfType<DifficultyPointPiece>().First();
 
