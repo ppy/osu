@@ -15,6 +15,7 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Seasonal;
 using osuTK;
 using osuTK.Graphics;
 
@@ -302,7 +303,7 @@ namespace osu.Game.Screens.Menu
                         float x = 0.5f + 0.5f * randomRadius * (float)Math.Cos(angle);
                         float y = 0.5f + 0.5f * randomRadius * (float)Math.Sin(angle);
 
-                        Color4 christmasColour = RNG.NextBool() ? SeasonalUI.PRIMARY_COLOUR_1 : SeasonalUI.PRIMARY_COLOUR_2;
+                        Color4 christmasColour = RNG.NextBool() ? SeasonalUIConfig.PRIMARY_COLOUR_1 : SeasonalUIConfig.PRIMARY_COLOUR_2;
 
                         Drawable triangle = new Triangle
                         {

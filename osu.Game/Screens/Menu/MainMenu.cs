@@ -35,6 +35,7 @@ using osu.Game.Screens.OnlinePlay.DailyChallenge;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.OnlinePlay.Playlists;
 using osu.Game.Screens.Select;
+using osu.Game.Seasonal;
 using osuTK;
 using osuTK.Graphics;
 
@@ -124,7 +125,7 @@ namespace osu.Game.Screens.Menu
 
             AddRangeInternal(new[]
             {
-                SeasonalUI.ENABLED ? new MainMenuSeasonalLighting() : Empty(),
+                SeasonalUIConfig.ENABLED ? new MainMenuSeasonalLighting() : Empty(),
                 buttonsContainer = new ParallaxContainer
                 {
                     ParallaxAmount = 0.01f,
@@ -168,7 +169,7 @@ namespace osu.Game.Screens.Menu
                     Margin = new MarginPadding { Right = 15, Top = 5 }
                 },
                 // For now, this is too much alongside the seasonal lighting.
-                SeasonalUI.ENABLED ? Empty() : new KiaiMenuFountains(),
+                SeasonalUIConfig.ENABLED ? Empty() : new KiaiMenuFountains(),
                 bottomElementsFlow = new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Both,

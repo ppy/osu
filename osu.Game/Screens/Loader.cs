@@ -15,6 +15,7 @@ using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Seasonal;
 using IntroSequence = osu.Game.Configuration.IntroSequence;
 
 namespace osu.Game.Screens
@@ -37,7 +38,7 @@ namespace osu.Game.Screens
 
         private IntroScreen getIntroSequence()
         {
-            if (SeasonalUI.ENABLED)
+            if (SeasonalUIConfig.ENABLED)
                 return new IntroChristmas(createMainMenu);
 
             if (introSequence == IntroSequence.Random)
