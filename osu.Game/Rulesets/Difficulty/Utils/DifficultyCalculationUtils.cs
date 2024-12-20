@@ -55,5 +55,29 @@ namespace osu.Game.Rulesets.Difficulty.Utils
         /// <param name="values">The coefficients of the vector.</param>
         /// <returns>The <i>p</i>-norm of the vector.</returns>
         public static double Norm(double p, params double[] values) => Math.Pow(values.Sum(x => Math.Pow(x, p)), 1 / p);
+
+        /// <summary>
+        /// Smootherstep function (https://en.wikipedia.org/wiki/Smoothstep#Variations)
+        /// </summary>
+        /// <param name="x">Value to calculate the function for</param>
+        /// <param name="start">Value at which function returns 0</param>
+        /// <param name="end">Value at which function returns 1</param>
+        public static double Smootherstep(double x, double start, double end)
+        {
+            x = Math.Clamp((x - start) / (end - start), 0.0, 1.0);
+
+            return x * x * x * (x * (6.0 * x - 15.0) + 10.0);
+        }
+
+        /// <summary>
+        /// Reverse linear interpolation function (https://en.wikipedia.org/wiki/Linear_interpolation)
+        /// </summary>
+        /// <param name="x">Value to calculate the function for</param>
+        /// <param name="start">Value at which function returns 0</param>
+        /// <param name="end">Value at which function returns 1</param>
+        public static double ReverseLerp(double x, double start, double end)
+        {
+            return Math.Clamp((x - start) / (end - start), 0.0, 1.0);
+        }
     }
 }
