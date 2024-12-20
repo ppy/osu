@@ -12,12 +12,15 @@ using osu.Game.Utils;
 
 namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 {
-    internal class EndTimeObjectPatternGenerator : PatternGenerator
+    /// <summary>
+    /// Converter for legacy "Spinner" hit objects.
+    /// </summary>
+    internal class SpinnerPatternGenerator : LegacyPatternGenerator
     {
         private readonly int endTime;
         private readonly PatternType convertType;
 
-        public EndTimeObjectPatternGenerator(LegacyRandom random, HitObject hitObject, IBeatmap beatmap, int totalColumns, Pattern previousPattern)
+        public SpinnerPatternGenerator(LegacyRandom random, HitObject hitObject, IBeatmap beatmap, int totalColumns, Pattern previousPattern)
             : base(random, hitObject, beatmap, previousPattern, totalColumns)
         {
             endTime = (int)((HitObject as IHasDuration)?.EndTime ?? 0);
