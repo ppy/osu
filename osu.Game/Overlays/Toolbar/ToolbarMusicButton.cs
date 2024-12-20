@@ -77,7 +77,7 @@ namespace osu.Game.Overlays.Toolbar
         {
             base.LoadComplete();
 
-            globalVolume = audio.Volume.GetBoundCopy();
+            globalVolume = audio.Volume.Scaled.GetBoundCopy();
             globalVolume.BindValueChanged(v => volumeBar.ResizeHeightTo((float)v.NewValue, 200, Easing.OutQuint), true);
         }
 

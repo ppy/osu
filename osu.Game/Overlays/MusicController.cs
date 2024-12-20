@@ -81,7 +81,7 @@ namespace osu.Game.Overlays
         {
             AddInternal(audioDuckFilter = new AudioFilter(audio.TrackMixer));
             audio.Tracks.AddAdjustment(AdjustableProperty.Volume, audioDuckVolume);
-            sampleVolume = audio.VolumeSample.GetBoundCopy();
+            sampleVolume = audio.VolumeSample.Scaled.GetBoundCopy();
 
             configManager.BindWith(OsuSetting.RandomSelectAlgorithm, randomSelectAlgorithm);
         }
