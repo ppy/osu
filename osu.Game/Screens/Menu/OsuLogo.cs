@@ -163,7 +163,7 @@ namespace osu.Game.Screens.Menu
                                                 new Container
                                                 {
                                                     AutoSizeAxes = Axes.Both,
-                                                    Children = new Drawable[]
+                                                    Children = new[]
                                                     {
                                                         logoContainer = new CircularContainer
                                                         {
