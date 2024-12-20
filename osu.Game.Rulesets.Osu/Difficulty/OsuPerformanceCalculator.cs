@@ -135,12 +135,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double computeAimValue(ScoreInfo score, OsuDifficultyAttributes attributes)
         {
-            var aimDifficulty = attributes.AimDifficulty;
+            double aimDifficulty = attributes.AimDifficulty;
 
-            // We assume 15% of sliders in a map are difficult since there's no way to tell from the performance calculator.
-            double estimateDifficultSliders = attributes.AimDifficultSliderCount;
-
-            if (attributes.SliderCount > 0)
+            if (attributes.SliderCount > 0 && attributes.AimDifficultSliderCount > 0)
             {
                 double estimateImproperlyFollowedDifficultSliders;
 
@@ -148,16 +145,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 {
                     // When the score is considered classic (regardless if it was made on old client or not) we consider all missing combo to be dropped difficult sliders
                     int maximumPossibleDroppedSliders = totalImperfectHits;
-                    estimateImproperlyFollowedDifficultSliders = Math.Clamp(Math.Min(maximumPossibleDroppedSliders, attributes.MaxCombo - scoreMaxCombo), 0, estimateDifficultSliders);
+                    estimateImproperlyFollowedDifficultSliders = Math.Clamp(Math.Min(maximumPossibleDroppedSliders, attributes.MaxCombo - scoreMaxCombo), 0, attributes.AimDifficultSliderCount);
                 }
                 else
                 {
                     // We add tick misses here since they too mean that the player didn't follow the slider properly
                     // We however aren't adding misses here because missing slider heads has a harsh penalty by itself and doesn't mean that the rest of the slider wasn't followed properly
-                    estimateImproperlyFollowedDifficultSliders = Math.Min(countSliderEndsDropped + countSliderTickMiss, estimateDifficultSliders);
+                    estimateImproperlyFollowedDifficultSliders = Math.Min(countSliderEndsDropped + countSliderTickMiss, attributes.AimDifficultSliderCount);
                 }
 
-                double sliderNerfFactor = (1 - attributes.SliderFactor) * Math.Pow(1 - estimateImproperlyFollowedDifficultSliders / estimateDifficultSliders, 3) + attributes.SliderFactor;
+                double sliderNerfFactor = (1 - attributes.SliderFactor) * Math.Pow(1 - estimateImproperlyFollowedDifficultSliders / attributes.AimDifficultSliderCount, 3) + attributes.SliderFactor;
                 aimDifficulty *= sliderNerfFactor;
             }
 
@@ -188,7 +185,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 // We want to give more reward for lower AR when it comes to aim and HD. This nerfs high AR and buffs lower AR.
                 aimValue *= 1.0 + 0.04 * (12.0 - attributes.ApproachRate);
             }
-
 
             aimValue *= accuracy;
             // It is important to consider accuracy difficulty when scaling with accuracy.
