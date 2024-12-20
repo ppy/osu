@@ -6,7 +6,6 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
-using osu.Game.Screens.Menu;
 using osu.Game.Seasonal;
 
 namespace osu.Game.Tests.Visual.Menus

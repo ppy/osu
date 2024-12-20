@@ -15,11 +15,11 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Seasonal;
+using osu.Game.Screens.Menu;
 using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Game.Screens.Menu
+namespace osu.Game.Seasonal
 {
     public partial class IntroChristmas : IntroScreen
     {
