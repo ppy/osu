@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -43,6 +44,9 @@ namespace osu.Game.Screens.Play.HUD
 
         private InputManager inputManager = null!;
 
+        [Resolved]
+        private HUDOverlay? hudOverlay { get; set; }
+
         public PlayerSettingsOverlay()
             : base(0, EXPANDED_WIDTH)
         {
@@ -62,6 +66,11 @@ namespace osu.Game.Screens.Play.HUD
                 }
             });
 
+            // For future consideration, this icon should probably not exist.
+            //
+            // If we remove it, the following needs attention:
+            // - Mobile support (swipe from side of screen?)
+            // - Consolidating this overlay with the one at player loader (to have the animation hint at its presence)
             AddInternal(button = new IconButton
             {
                 Icon = FontAwesome.Solid.Cog,
@@ -98,6 +107,9 @@ namespace osu.Game.Screens.Play.HUD
         protected override void Update()
         {
             base.Update();
+
+            if (hudOverlay != null)
+                button.Y = ToLocalSpace(hudOverlay.TopRightElements.ScreenSpaceDrawQuad.BottomRight).Y;
 
             // Only check expanded if already expanded.
             // This is because if we are always checking, it would bypass blocking overlays.
