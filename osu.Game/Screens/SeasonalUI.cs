@@ -10,12 +10,12 @@ namespace osu.Game.Screens
     {
         public static readonly bool ENABLED = true;
 
-        public static readonly Color4 PRIMARY_COLOUR_1 = Color4Extensions.FromHex("D32F2F");
+        public static readonly Color4 PRIMARY_COLOUR_1 = Color4Extensions.FromHex(@"D32F2F");
 
-        public static readonly Color4 PRIMARY_COLOUR_2 = Color4Extensions.FromHex("388E3C");
+        public static readonly Color4 PRIMARY_COLOUR_2 = Color4Extensions.FromHex(@"388E3C");
 
-        public static readonly Color4 AMBIENT_COLOUR_1 = Color4Extensions.FromHex("FFC");
+        public static readonly Color4 AMBIENT_COLOUR_1 = Color4Extensions.FromHex(@"FFFFCC");
 
-        public static readonly Color4 AMBIENT_COLOUR_2 = Color4Extensions.FromHex("FFE4B5");
+        public static readonly Color4 AMBIENT_COLOUR_2 = Color4Extensions.FromHex(@"FFE4B5");
     }
 }

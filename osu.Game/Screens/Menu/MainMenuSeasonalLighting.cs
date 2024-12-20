@@ -31,11 +31,13 @@ namespace osu.Game.Screens.Menu
 
         private List<HitObject> hitObjects = null!;
 
-        [Resolved]
-        private RulesetStore rulesets { get; set; } = null!;
+        private RulesetInfo? osuRuleset;
+
+        private int? lastObjectIndex;
 
         public MainMenuSeasonalLighting()
         {
+            // match beatmap playfield
             RelativeChildSize = new Vector2(512, 384);
 
             RelativeSizeAxes = Axes.X;
@@ -45,22 +47,36 @@ namespace osu.Game.Screens.Menu
         }
 
         [BackgroundDependencyLoader]
-        private void load(IBindable<WorkingBeatmap> working)
+        private void load(IBindable<WorkingBeatmap> working, RulesetStore rulesets)
         {
             this.working = working.GetBoundCopy();
             this.working.BindValueChanged(_ => Scheduler.AddOnce(updateBeatmap), true);
+
+            // operate in osu! ruleset to keep things simple for now.
+            osuRuleset = rulesets.GetRuleset(0);
         }
 
         private void updateBeatmap()
         {
             lastObjectIndex = null;
+
+            if (osuRuleset == null)
+            {
+                beatmapClock = new InterpolatingFramedClock(Clock);
+                hitObjects = new List<HitObject>();
+                return;
+            }
+
+            // Intentionally maintain separately so the lighting is not in audio clock space (it shouldn't rewind etc.)
             beatmapClock = new InterpolatingFramedClock(new FramedClock(working.Value.Track));
-            hitObjects = working.Value.GetPlayableBeatmap(rulesets.GetRuleset(0)).HitObjects.SelectMany(h => h.NestedHitObjects.Prepend(h))
+
+            hitObjects = working.Value
+                                .GetPlayableBeatmap(osuRuleset)
+                                .HitObjects
+                                .SelectMany(h => h.NestedHitObjects.Prepend(h))
                                 .OrderBy(h => h.StartTime)
                                 .ToList();
         }
-
-        private int? lastObjectIndex;
 
         protected override void Update()
         {
@@ -116,19 +132,19 @@ namespace osu.Game.Screens.Menu
             }
             else
             {
-                // default green
+                // default are green
                 Color4 col = SeasonalUI.PRIMARY_COLOUR_2;
 
-                // whistle red
+                // whistles are red
                 if (h.Samples.Any(s => s.Name == HitSampleInfo.HIT_WHISTLE))
                     col = SeasonalUI.PRIMARY_COLOUR_1;
-                // clap is third colour
+                // clap is third ambient (yellow) colour
                 else if (h.Samples.Any(s => s.Name == HitSampleInfo.HIT_CLAP))
                     col = SeasonalUI.AMBIENT_COLOUR_1;
 
                 light.Colour = col;
 
-                // finish larger lighting
+                // finish results in larger lighting
                 if (h.Samples.Any(s => s.Name == HitSampleInfo.HIT_FINISH))
                     light.Scale = new Vector2(3);
 
@@ -141,7 +157,7 @@ namespace osu.Game.Screens.Menu
             light.Expire();
         }
 
-        public partial class Light : CompositeDrawable
+        private partial class Light : CompositeDrawable
         {
             private readonly Circle circle;
 

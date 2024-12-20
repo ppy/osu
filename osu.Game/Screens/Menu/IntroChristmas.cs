@@ -22,7 +22,10 @@ namespace osu.Game.Screens.Menu
 {
     public partial class IntroChristmas : IntroScreen
     {
-        protected override string BeatmapHash => "7e26183e72a496f672c3a21292e6b469fdecd084d31c259ea10a31df5b46cd77";
+        // nekodex - circle the halls
+        public const string CHRISTMAS_BEATMAP_SET_HASH = "7e26183e72a496f672c3a21292e6b469fdecd084d31c259ea10a31df5b46cd77";
+
+        protected override string BeatmapHash => CHRISTMAS_BEATMAP_SET_HASH;
 
         protected override string BeatmapFile => "christmas2024.osz";
 

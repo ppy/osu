@@ -6,7 +6,6 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
-using osu.Game.Database;
 using osu.Game.Screens.Menu;
 
 namespace osu.Game.Tests.Visual.Menus
@@ -16,15 +15,12 @@ namespace osu.Game.Tests.Visual.Menus
         [Resolved]
         private BeatmapManager beatmaps { get; set; } = null!;
 
-        [Resolved]
-        private RealmAccess realm { get; set; } = null!;
-
         [SetUpSteps]
         public void SetUpSteps()
         {
             AddStep("prepare beatmap", () =>
             {
-                var setInfo = beatmaps.QueryBeatmapSet(b => b.Protected && b.Hash == "7e26183e72a496f672c3a21292e6b469fdecd084d31c259ea10a31df5b46cd77");
+                var setInfo = beatmaps.QueryBeatmapSet(b => b.Protected && b.Hash == IntroChristmas.CHRISTMAS_BEATMAP_SET_HASH);
 
                 Beatmap.Value = beatmaps.GetWorkingBeatmap(setInfo!.Value.Beatmaps.First());
             });
