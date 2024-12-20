@@ -57,11 +57,22 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         [BackgroundDependencyLoader]
         private void load()
         {
+            const string base_lookup = @"hitcircle";
+
             var drawableOsuObject = (DrawableOsuHitObject?)drawableObject;
+
+            // As a precondition, ensure that any prefix lookups are run against the skin which is providing "hitcircle".
+            // This is to correctly handle a case such as:
+            //
+            // - Beatmap provides `hitcircle`
+            // - User skin provides `sliderstartcircle`
+            //
+            // In such a case, the `hitcircle` should be used for slider start circles rather than the user's skin override.
+            var provider = skin.FindProvider(s => s.GetTexture(base_lookup) != null) ?? skin;
 
             // if a base texture for the specified prefix exists, continue using it for subsequent lookups.
             // otherwise fall back to the default prefix "hitcircle".
-            string circleName = (priorityLookupPrefix != null && skin.GetTexture(priorityLookupPrefix) != null) ? priorityLookupPrefix : @"hitcircle";
+            string circleName = (priorityLookupPrefix != null && provider.GetTexture(priorityLookupPrefix) != null) ? priorityLookupPrefix : base_lookup;
 
             Vector2 maxSize = OsuHitObject.OBJECT_DIMENSIONS * 2;
 
@@ -70,7 +81,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             // expected behaviour in this scenario is not showing the overlay, rather than using hitcircleoverlay.png.
             InternalChildren = new[]
             {
-                CircleSprite = new LegacyKiaiFlashingDrawable(() => new Sprite { Texture = skin.GetTexture(circleName)?.WithMaximumSize(maxSize) })
+                CircleSprite = new LegacyKiaiFlashingDrawable(() => new Sprite { Texture = provider.GetTexture(circleName)?.WithMaximumSize(maxSize) })
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -79,7 +90,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Child = OverlaySprite = new LegacyKiaiFlashingDrawable(() => new Sprite { Texture = skin.GetTexture(@$"{circleName}overlay")?.WithMaximumSize(maxSize) })
+                    Child = OverlaySprite = new LegacyKiaiFlashingDrawable(() => new Sprite { Texture = provider.GetTexture(@$"{circleName}overlay")?.WithMaximumSize(maxSize) })
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,

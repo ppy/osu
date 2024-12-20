@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -19,9 +17,9 @@ using osu.Game.Utils;
 namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 {
     /// <summary>
-    /// A pattern generator for IHasDistance hit objects.
+    /// Converter for legacy "Slider" hit objects.
     /// </summary>
-    internal class PathObjectPatternGenerator : PatternGenerator
+    internal class SliderPatternGenerator : LegacyPatternGenerator
     {
         public readonly int StartTime;
         public readonly int EndTime;
@@ -30,7 +28,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 
         private PatternType convertType;
 
-        public PathObjectPatternGenerator(LegacyRandom random, HitObject hitObject, IBeatmap beatmap, int totalColumns, Pattern previousPattern)
+        public SliderPatternGenerator(LegacyRandom random, HitObject hitObject, IBeatmap beatmap, int totalColumns, Pattern previousPattern)
             : base(random, hitObject, beatmap, previousPattern, totalColumns)
         {
             convertType = PatternType.None;
@@ -484,9 +482,9 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
         /// Retrieves the list of node samples that occur at time greater than or equal to <paramref name="time"/>.
         /// </summary>
         /// <param name="time">The time to retrieve node samples at.</param>
-        private IList<IList<HitSampleInfo>> nodeSamplesAt(int time)
+        private IList<IList<HitSampleInfo>>? nodeSamplesAt(int time)
         {
-            if (!(HitObject is IHasPathWithRepeats curveData))
+            if (HitObject is not IHasPathWithRepeats curveData)
                 return null;
 
             int index = SegmentDuration == 0 ? 0 : (time - StartTime) / SegmentDuration;

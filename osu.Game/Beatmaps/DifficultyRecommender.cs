@@ -1,12 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
@@ -23,10 +20,12 @@ namespace osu.Game.Beatmaps
     /// </summary>
     public partial class DifficultyRecommender : Component
     {
+        public event Action? StarRatingUpdated;
+
         private readonly LocalUserStatisticsProvider statisticsProvider;
 
         [Resolved]
-        private Bindable<RulesetInfo> gameRuleset { get; set; }
+        private Bindable<RulesetInfo> gameRuleset { get; set; } = null!;
 
         [Resolved]
         private RulesetStore rulesets { get; set; } = null!;
@@ -78,9 +77,17 @@ namespace osu.Game.Beatmaps
 
         private void updateMapping(RulesetInfo ruleset, UserStatistics statistics)
         {
-            // algorithm taken from https://github.com/ppy/osu-web/blob/e6e2825516449e3d0f3f5e1852c6bdd3428c3437/app/Models/User.php#L1505
-            recommendedDifficultyMapping[ruleset.ShortName] = Math.Pow((double)(statistics.PP ?? 0), 0.4) * 0.195;
+            // algorithm taken from https://github.com/ppy/osu-web/blob/027026fccc91525e39cee5d2f369f1b343eb1bf1/app/Models/UserStatistics/Model.php#L93-L94
+            recommendedDifficultyMapping[ruleset.ShortName] =
+                ruleset.ShortName == @"taiko"
+                    ? Math.Pow((double)(statistics.PP ?? 0), 0.35) * 0.27
+                    : Math.Pow((double)(statistics.PP ?? 0), 0.4) * 0.195;
+
+            StarRatingUpdated?.Invoke();
         }
+
+        public double? GetRecommendedStarRatingFor(RulesetInfo ruleset)
+            => recommendedDifficultyMapping.TryGetValue(ruleset.ShortName, out double starRating) ? starRating : null;
 
         /// <summary>
         /// Find the recommended difficulty from a selection of available difficulties for the current local user.
@@ -90,15 +97,14 @@ namespace osu.Game.Beatmaps
         /// </remarks>
         /// <param name="beatmaps">A collection of beatmaps to select a difficulty from.</param>
         /// <returns>The recommended difficulty, or null if a recommendation could not be provided.</returns>
-        [CanBeNull]
-        public BeatmapInfo GetRecommendedBeatmap(IEnumerable<BeatmapInfo> beatmaps)
+        public BeatmapInfo? GetRecommendedBeatmap(IEnumerable<BeatmapInfo> beatmaps)
         {
             foreach (string r in orderedRulesets)
             {
                 if (!recommendedDifficultyMapping.TryGetValue(r, out double recommendation))
                     continue;
 
-                BeatmapInfo beatmapInfo = beatmaps.Where(b => b.Ruleset.ShortName.Equals(r, StringComparison.Ordinal)).MinBy(b =>
+                BeatmapInfo? beatmapInfo = beatmaps.Where(b => b.Ruleset.ShortName.Equals(r, StringComparison.Ordinal)).MinBy(b =>
                 {
                     double difference = b.StarRating - recommendation;
                     return difference >= 0 ? difference * 2 : difference * -1; // prefer easier over harder
