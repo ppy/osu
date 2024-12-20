@@ -33,8 +33,5 @@ namespace osu.Game.Overlays.Volume
             // forward any unhandled mouse scroll events to the volume control.
             return volumeOverlay?.Adjust(GlobalAction.IncreaseVolume, e.ScrollDelta.Y, e.IsPrecise) ?? false;
         }
-
-        public bool OnScroll(KeyBindingScrollEvent<GlobalAction> e) =>
-            volumeOverlay?.Adjust(e.Action, e.ScrollAmount, e.IsPrecise) ?? false;
     }
 }
