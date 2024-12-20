@@ -23,6 +23,7 @@ using osu.Game.Database;
 using osu.Game.IO;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Play.HUD;
+using osuTK;
 
 namespace osu.Game.Skinning
 {
@@ -277,6 +278,10 @@ namespace osu.Game.Skinning
 
         private void applyMigration(SkinLayoutInfo layout, GlobalSkinnableContainers target, int version)
         {
+            Debug.Assert(resources != null);
+
+            bool isLegacySkin = SkinInfo.PerformRead(s => s.GetInstanceType().IsAssignableTo(typeof(LegacySkin)));
+
             switch (version)
             {
                 case 1:
@@ -284,14 +289,13 @@ namespace osu.Game.Skinning
                     // Combo counters were moved out of the global HUD components into per-ruleset.
                     // This is to allow some rulesets to customise further (ie. mania and catch moving the combo to within their play area).
                     if (target != GlobalSkinnableContainers.MainHUDComponents ||
-                        !layout.TryGetDrawableInfo(null, out var globalHUDComponents) ||
-                        resources == null)
+                        !layout.TryGetDrawableInfo(null, out var globalHUDComponents))
                         break;
 
                     var comboCounters = globalHUDComponents.Where(c =>
-                        c.Type.Name == nameof(LegacyDefaultComboCounter) ||
-                        c.Type.Name == nameof(DefaultComboCounter) ||
-                        c.Type.Name == nameof(ArgonComboCounter)).ToArray();
+                        c.Type == typeof(LegacyDefaultComboCounter) ||
+                        c.Type == typeof(DefaultComboCounter) ||
+                        c.Type == typeof(ArgonComboCounter)).ToArray();
 
                     layout.Update(null, globalHUDComponents.Except(comboCounters).ToArray());
 
@@ -304,6 +308,77 @@ namespace osu.Game.Skinning
                                 : comboCounters);
                         }
                     });
+
+                    break;
+                }
+
+                case 2:
+                {
+                    // Health displays are moved out of the global HUD components and into per-ruleset,
+                    // except for osu!mania, wherein the health display is moved to the Playfield target.
+                    switch (target)
+                    {
+                        case GlobalSkinnableContainers.MainHUDComponents:
+                            if (!isLegacySkin || !layout.TryGetDrawableInfo(null, out var globalHUDComponents))
+                                break;
+
+                            var healthDisplays = globalHUDComponents.Where(c => c.Type == typeof(LegacyHealthDisplay)).ToArray();
+                            layout.Update(null, globalHUDComponents.Except(healthDisplays).ToArray());
+
+                            resources.RealmAccess.Run(r =>
+                            {
+                                foreach (var ruleset in r.All<RulesetInfo>())
+                                {
+                                    // for mania, the health display is moved from MainHUDComponents to Playfield.
+                                    if (ruleset.ShortName == @"mania")
+                                        continue;
+
+                                    layout.Update(ruleset, layout.TryGetDrawableInfo(ruleset, out var rulesetHUDComponents)
+                                        ? rulesetHUDComponents.Concat(healthDisplays).ToArray()
+                                        : healthDisplays);
+                                }
+                            });
+
+                            break;
+
+                        case GlobalSkinnableContainers.Playfield:
+                            if (!isLegacySkin)
+                            {
+                                // One may argue that if a LegacyHealthDisplay exists in a non-legacy skin,
+                                // then it should be swapped with the mania variant similar to legacy skins.
+                                // This is not simple to achieve as we have to be aware of the presence of
+                                // the health display in the HUD layout while migrating the Playfield layout,
+                                // which is impossible with the current structure of skin layout migration.
+                                // Instead, don't touch any non-legacy skin and call it a day.
+                                break;
+                            }
+
+                            resources.RealmAccess.Run(r =>
+                            {
+                                var maniaRuleset = r.Find<RulesetInfo>(@"mania");
+
+                                if (!layout.TryGetDrawableInfo(maniaRuleset, out var maniaPlayfieldComponents))
+                                    maniaPlayfieldComponents = Array.Empty<SerialisedDrawableInfo>();
+
+                                if (maniaPlayfieldComponents.Any(c => c.Type == typeof(LegacyHealthDisplay)))
+                                {
+                                    // if the skin already has a health display in the playfield target,
+                                    // let's just let it be rather than force a health display through.
+                                    return;
+                                }
+
+                                layout.Update(maniaRuleset, maniaPlayfieldComponents.Append(new LegacyHealthDisplay
+                                {
+                                    Rotation = -90f,
+                                    Anchor = Anchor.BottomRight,
+                                    Origin = Anchor.TopLeft,
+                                    X = 1,
+                                    Scale = new Vector2(0.7f),
+                                }.CreateSerialisedInfo()).ToArray());
+                            });
+
+                            break;
+                    }
 
                     break;
                 }

@@ -26,9 +26,10 @@ namespace osu.Game.Skinning
         /// <list type="bullet">
         /// <item><description>0: Initial version of all skin layouts.</description></item>
         /// <item><description>1: Moves existing combo counters from global to per-ruleset HUD targets.</description></item>
+        /// <item><description>2: Moves existing legacy health bars from global to per-ruleset HUD targets, and to playfield target on mania.</description></item>
         /// </list>
         /// </remarks>
-        public const int LATEST_VERSION = 1;
+        public const int LATEST_VERSION = 2;
 
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
         public int Version = LATEST_VERSION;
