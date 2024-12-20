@@ -22,6 +22,8 @@ namespace osu.Game.Screens.Play.HUD
     /// </summary>
     public partial class ModDisplay : CompositeDrawable, IHasCurrentValue<IReadOnlyList<Mod>>
     {
+        public const float MOD_ICON_SCALE = 0.6f;
+
         private ExpansionMode expansionMode = ExpansionMode.ExpandOnHover;
 
         public ExpansionMode ExpansionMode
@@ -93,7 +95,7 @@ namespace osu.Game.Screens.Play.HUD
             iconsContainer.Clear();
 
             foreach (Mod mod in mods.NewValue.AsOrdered())
-                iconsContainer.Add(new ModIcon(mod, showExtendedInformation: showExtendedInformation) { Scale = new Vector2(0.6f) });
+                iconsContainer.Add(new ModIcon(mod, showExtendedInformation: showExtendedInformation) { Scale = new Vector2(MOD_ICON_SCALE) });
         }
 
         private void updateExpansionMode(double duration = 500)
