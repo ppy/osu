@@ -6,6 +6,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Development;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shaders;
@@ -38,7 +39,9 @@ namespace osu.Game.Screens
 
         private IntroScreen getIntroSequence()
         {
-            if (SeasonalUIConfig.ENABLED)
+            // Headless tests run too fast to load non-circles intros correctly.
+            // They will hit the "audio can't play" notification and cause random test failures.
+            if (SeasonalUIConfig.ENABLED && !DebugUtils.IsNUnitRunning)
                 return new IntroChristmas(createMainMenu);
 
             if (introSequence == IntroSequence.Random)
