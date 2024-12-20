@@ -15,7 +15,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input.Events;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
@@ -87,8 +86,6 @@ namespace osu.Game.Screens.Play
 
         private bool isRestarting;
         private bool skipExitTransition;
-
-        private Bindable<bool> mouseWheelDisabled;
 
         private readonly Bindable<bool> storyboardReplacesBackground = new Bindable<bool>();
 
@@ -228,8 +225,6 @@ namespace osu.Game.Screens.Play
                 return;
             }
 
-            mouseWheelDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableWheel);
-
             if (game != null)
                 gameActive.BindTo(game.IsActive);
 
@@ -251,7 +246,10 @@ namespace osu.Game.Screens.Play
 
             dependencies.CacheAs(HealthProcessor);
 
-            InternalChild = GameplayClockContainer = CreateGameplayClockContainer(Beatmap.Value, DrawableRuleset.GameplayStartTime);
+            InternalChildren = new Drawable[]
+            {
+                GameplayClockContainer = CreateGameplayClockContainer(Beatmap.Value, DrawableRuleset.GameplayStartTime),
+            };
 
             AddInternal(screenSuspension = new ScreenSuspensionHandler(GameplayClockContainer));
 
@@ -266,6 +264,7 @@ namespace osu.Game.Screens.Play
             dependencies.CacheAs(GameplayState = new GameplayState(playableBeatmap, ruleset, gameplayMods, Score, ScoreProcessor, HealthProcessor, Beatmap.Value.Storyboard));
 
             var rulesetSkinProvider = new RulesetSkinProvidingContainer(ruleset, playableBeatmap, Beatmap.Value.Skin);
+            GameplayClockContainer.Add(new GameplayScrollWheelHandling());
 
             // load the skinning hierarchy first.
             // this is intentionally done in two stages to ensure things are in a loaded state before exposing the ruleset to skin sources.
@@ -894,16 +893,6 @@ namespace osu.Game.Screens.Play
             });
         }
 
-        protected override bool OnScroll(ScrollEvent e)
-        {
-            // During pause, allow global volume adjust regardless of settings.
-            if (GameplayClockContainer.IsPaused.Value)
-                return false;
-
-            // Block global volume adjust if the user has asked for it (special case when holding "Alt").
-            return mouseWheelDisabled.Value && !e.AltPressed;
-        }
-
         #region Gameplay leaderboard
 
         protected readonly Bindable<bool> LeaderboardExpandedState = new BindableBool();
@@ -1032,7 +1021,7 @@ namespace osu.Game.Screens.Play
         private double? lastPauseActionTime;
 
         protected bool PauseCooldownActive =>
-            lastPauseActionTime.HasValue && GameplayClockContainer.CurrentTime < lastPauseActionTime + PauseCooldownDuration;
+            PlayingState.Value == LocalUserPlayingState.Playing && lastPauseActionTime.HasValue && GameplayClockContainer.CurrentTime < lastPauseActionTime + PauseCooldownDuration;
 
         /// <summary>
         /// A set of conditionals which defines whether the current game state and configuration allows for
