@@ -62,13 +62,18 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestPageSelection()
         {
-            AddStep("Set score to performance", () => scope.Value = RankingsScope.Performance);
+            AddStep("Set scope to performance", () => scope.Value = RankingsScope.Performance);
             AddStep("Move to next page", () => rankingsOverlay.Header.CurrentPage.Value += 1);
             AddStep("Switch to another scope", () => scope.Value = RankingsScope.Score);
             AddAssert("Check page is first one", () => rankingsOverlay.Header.CurrentPage.Value == 0);
             AddStep("Move to next page", () => rankingsOverlay.Header.CurrentPage.Value += 1);
             AddStep("Switch to another ruleset", () => rankingsOverlay.Header.Ruleset.Value = new ManiaRuleset().RulesetInfo);
             AddAssert("Check page is first one", () => rankingsOverlay.Header.CurrentPage.Value == 0);
+
+            AddStep("Set scope to kudosu", () => scope.Value = RankingsScope.Kudosu);
+            AddAssert("Check available pages is 20", () => rankingsOverlay.Header.AvailablesPages.Value == 20);
+            AddStep("Set scope to performance", () => scope.Value = RankingsScope.Performance);
+            AddAssert("Check available pages is 200", () => rankingsOverlay.Header.AvailablesPages.Value == 200);
         }
 
         private void loadRankingsOverlay()

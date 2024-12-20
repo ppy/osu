@@ -86,6 +86,9 @@ namespace osu.Game.Overlays
             if (Header.Current.Value != RankingsScope.Performance)
                 Country.SetDefault();
 
+            // Kudosu scope have only 20 fetchable pages.
+            Header.AvailablesPages.Value = tab == RankingsScope.Kudosu ? 20 : 200;
+
             // Hide page selection for spotlights scope
             Header.ShowPageSelector(tab != RankingsScope.Spotlights);
 
