@@ -9,7 +9,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Skinning;
-using osu.Game.Localisation;
 using osu.Game.Localisation.SkinComponents;
 
 namespace osu.Game.Screens.Play.HUD
