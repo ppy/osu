@@ -15,7 +15,7 @@ namespace osu.Game.Screens.Play
     /// - If the user has mouse wheel disabled, only allow during break time or when holding alt. Also block scroll from parent handling.
     /// - Otherwise always allow, as per <see cref="GlobalScrollAdjustsVolume"/> implementation.
     /// </summary>
-    internal class GameplayScrollWheelHandling : GlobalScrollAdjustsVolume
+    internal partial class GameplayScrollWheelHandling : GlobalScrollAdjustsVolume
     {
         private Bindable<bool> mouseWheelDisabled = null!;
 
