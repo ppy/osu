@@ -161,7 +161,7 @@ namespace osu.Game.Screens.Menu
                     }
                 },
                 logoTarget = new Container { RelativeSizeAxes = Axes.Both, },
-                sideFlashes = new MenuSideFlashes(),
+                sideFlashes = SeasonalUIConfig.ENABLED ? new SeasonalMenuSideFlashes() : new MenuSideFlashes(),
                 songTicker = new SongTicker
                 {
                     Anchor = Anchor.TopRight,
