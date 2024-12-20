@@ -32,8 +32,12 @@ namespace osu.Game.Overlays
                 });
         }
 
-        public void ShowPageSelector() => pageSelector.Show();
-
-        public void HidePageSelector() => pageSelector.Hide();
+        public void ShowPageSelector(bool visible)
+        {
+            if (visible)
+                pageSelector.Show();
+            else
+                pageSelector.Hide();
+        }
     }
 }

@@ -50,9 +50,10 @@ namespace osu.Game.Overlays
                 if (!Country.IsDefault)
                 {
                     Header.Current.Value = RankingsScope.Performance;
-                    Header.HidePageSelector();
                 }
-                else Header.ShowPageSelector();
+
+                // Hide page selection with country filter
+                Header.ShowPageSelector(Country.IsDefault);
 
                 Scheduler.AddOnce(triggerTabChanged);
             });
@@ -86,11 +87,7 @@ namespace osu.Game.Overlays
                 Country.SetDefault();
 
             // Hide page selection for spotlights scope
-            if (tab == RankingsScope.Spotlights)
-            {
-                Header.HidePageSelector();
-            }
-            else Header.ShowPageSelector();
+            Header.ShowPageSelector(tab != RankingsScope.Spotlights);
 
             Scheduler.AddOnce(triggerTabChanged);
         }
