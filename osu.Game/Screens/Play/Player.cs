@@ -15,7 +15,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input.Events;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
@@ -28,7 +27,6 @@ using osu.Game.Graphics.Containers;
 using osu.Game.IO.Archives;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
-using osu.Game.Overlays.Volume;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
@@ -88,8 +86,6 @@ namespace osu.Game.Screens.Play
 
         private bool isRestarting;
         private bool skipExitTransition;
-
-        private Bindable<bool> mouseWheelDisabled;
 
         private readonly Bindable<bool> storyboardReplacesBackground = new Bindable<bool>();
 
@@ -229,8 +225,6 @@ namespace osu.Game.Screens.Play
                 return;
             }
 
-            mouseWheelDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableWheel);
-
             if (game != null)
                 gameActive.BindTo(game.IsActive);
 
@@ -254,7 +248,6 @@ namespace osu.Game.Screens.Play
 
             InternalChildren = new Drawable[]
             {
-                new GlobalScrollAdjustsVolume(),
                 GameplayClockContainer = CreateGameplayClockContainer(Beatmap.Value, DrawableRuleset.GameplayStartTime),
             };
 
@@ -271,6 +264,7 @@ namespace osu.Game.Screens.Play
             dependencies.CacheAs(GameplayState = new GameplayState(playableBeatmap, ruleset, gameplayMods, Score, ScoreProcessor, HealthProcessor, Beatmap.Value.Storyboard));
 
             var rulesetSkinProvider = new RulesetSkinProvidingContainer(ruleset, playableBeatmap, Beatmap.Value.Skin);
+            GameplayClockContainer.Add(new GameplayScrollWheelHandling());
 
             // load the skinning hierarchy first.
             // this is intentionally done in two stages to ensure things are in a loaded state before exposing the ruleset to skin sources.
@@ -897,16 +891,6 @@ namespace osu.Game.Screens.Play
 
                 return scoreCopy.ScoreInfo;
             });
-        }
-
-        protected override bool OnScroll(ScrollEvent e)
-        {
-            // During pause, allow global volume adjust regardless of settings.
-            if (GameplayClockContainer.IsPaused.Value)
-                return false;
-
-            // Block global volume adjust if the user has asked for it (special case when holding "Alt").
-            return mouseWheelDisabled.Value && !e.AltPressed;
         }
 
         #region Gameplay leaderboard
