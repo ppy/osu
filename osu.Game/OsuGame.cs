@@ -1433,7 +1433,7 @@ namespace osu.Game
                 case GlobalAction.NextVolumeMeter:
                 case GlobalAction.PreviousVolumeMeter:
 
-                    if (!e.Repeat)
+                    if (e.Repeat)
                         return true;
 
                     return volume.Adjust(e.Action);
