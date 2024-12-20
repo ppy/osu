@@ -18,6 +18,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Seasonal;
 using osu.Game.Skinning;
 using osuTK.Graphics;
 
@@ -68,7 +69,7 @@ namespace osu.Game.Screens.Menu
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
                     RelativeSizeAxes = Axes.Y,
-                    Width = box_width * (SeasonalUI.ENABLED ? 4 : 2),
+                    Width = box_width * (SeasonalUIConfig.ENABLED ? 4 : 2),
                     Height = 1.5f,
                     // align off-screen to make sure our edges don't become visible during parallax.
                     X = -box_width,
@@ -80,7 +81,7 @@ namespace osu.Game.Screens.Menu
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
                     RelativeSizeAxes = Axes.Y,
-                    Width = box_width * (SeasonalUI.ENABLED ? 4 : 2),
+                    Width = box_width * (SeasonalUIConfig.ENABLED ? 4 : 2),
                     Height = 1.5f,
                     X = box_width,
                     Alpha = 0,
@@ -105,7 +106,7 @@ namespace osu.Game.Screens.Menu
 
         private void flash(Drawable d, double beatLength, bool kiai, ChannelAmplitudes amplitudes)
         {
-            if (SeasonalUI.ENABLED)
+            if (SeasonalUIConfig.ENABLED)
                 updateColour();
 
             d.FadeTo(Math.Clamp(0.1f + ((ReferenceEquals(d, leftBox) ? amplitudes.LeftChannel : amplitudes.RightChannel) - amplitude_dead_zone) / (kiai ? kiai_multiplier : alpha_multiplier), 0.1f, 1),
@@ -118,8 +119,8 @@ namespace osu.Game.Screens.Menu
         {
             Color4 baseColour = colours.Blue;
 
-            if (SeasonalUI.ENABLED)
-                baseColour = RNG.NextBool() ? SeasonalUI.PRIMARY_COLOUR_1 : SeasonalUI.PRIMARY_COLOUR_2;
+            if (SeasonalUIConfig.ENABLED)
+                baseColour = RNG.NextBool() ? SeasonalUIConfig.PRIMARY_COLOUR_1 : SeasonalUIConfig.PRIMARY_COLOUR_2;
             else if (user.Value?.IsSupporter ?? false)
                 baseColour = skin.Value.GetConfig<GlobalSkinColours, Color4>(GlobalSkinColours.MenuGlow)?.Value ?? baseColour;
 

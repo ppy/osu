@@ -4,9 +4,12 @@
 using osu.Framework.Extensions.Color4Extensions;
 using osuTK.Graphics;
 
-namespace osu.Game.Screens
+namespace osu.Game.Seasonal
 {
-    public static class SeasonalUI
+    /// <summary>
+    /// General configuration setting for seasonal event adjustments to the game.
+    /// </summary>
+    public static class SeasonalUIConfig
     {
         public static readonly bool ENABLED = true;
 

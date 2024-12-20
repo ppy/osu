@@ -4,7 +4,6 @@
 #nullable disable
 
 using System;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -54,8 +53,10 @@ namespace osu.Game.Screens.Menu
         private Sample sampleClick;
         private SampleChannel sampleClickChannel;
 
-        private Sample sampleBeat;
-        private Sample sampleDownbeat;
+        protected virtual double BeatSampleVariance => 0.1;
+
+        protected Sample SampleBeat;
+        protected Sample SampleDownbeat;
 
         private readonly Container colourAndTriangles;
         private readonly TrianglesV2 triangles;
@@ -160,10 +161,10 @@ namespace osu.Game.Screens.Menu
                                                     Alpha = visualizer_default_alpha,
                                                     Size = SCALE_ADJUST
                                                 },
-                                                new Container
+                                                LogoElements = new Container
                                                 {
                                                     AutoSizeAxes = Axes.Both,
-                                                    Children = new[]
+                                                    Children = new Drawable[]
                                                     {
                                                         logoContainer = new CircularContainer
                                                         {
@@ -212,15 +213,6 @@ namespace osu.Game.Screens.Menu
                                                             Anchor = Anchor.Centre,
                                                             Origin = Anchor.Centre,
                                                         },
-                                                        SeasonalUI.ENABLED
-                                                            ? hat = new Sprite
-                                                            {
-                                                                BypassAutoSizeAxes = Axes.Both,
-                                                                Alpha = 0,
-                                                                Origin = Anchor.BottomCentre,
-                                                                Scale = new Vector2(-1, 1),
-                                                            }
-                                                            : Empty(),
                                                     }
                                                 },
                                                 impactContainer = new CircularContainer
@@ -253,6 +245,8 @@ namespace osu.Game.Screens.Menu
             };
         }
 
+        public Container LogoElements { get; private set; }
+
         /// <summary>
         /// Schedule a new external animation. Handled queueing and finishing previous animations in a sane way.
         /// </summary>
@@ -282,20 +276,11 @@ namespace osu.Game.Screens.Menu
         {
             sampleClick = audio.Samples.Get(@"Menu/osu-logo-select");
 
-            if (SeasonalUI.ENABLED)
-            {
-                sampleDownbeat = sampleBeat = audio.Samples.Get(@"Menu/osu-logo-heartbeat-bell");
-            }
-            else
-            {
-                sampleBeat = audio.Samples.Get(@"Menu/osu-logo-heartbeat");
-                sampleDownbeat = audio.Samples.Get(@"Menu/osu-logo-downbeat");
-            }
+            SampleBeat = audio.Samples.Get(@"Menu/osu-logo-heartbeat");
+            SampleDownbeat = audio.Samples.Get(@"Menu/osu-logo-downbeat");
 
             logo.Texture = textures.Get(@"Menu/logo");
             ripple.Texture = textures.Get(@"Menu/logo");
-            if (hat != null)
-                hat.Texture = textures.Get(@"Menu/hat");
         }
 
         private int lastBeatIndex;
@@ -318,15 +303,13 @@ namespace osu.Game.Screens.Menu
                 {
                     if (beatIndex % timingPoint.TimeSignature.Numerator == 0)
                     {
-                        sampleDownbeat?.Play();
+                        SampleDownbeat?.Play();
                     }
                     else
                     {
-                        var channel = sampleBeat.GetChannel();
-                        if (SeasonalUI.ENABLED)
-                            channel.Frequency.Value = 0.99 + RNG.NextDouble(0.02);
-                        else
-                            channel.Frequency.Value = 0.95 + RNG.NextDouble(0.1);
+                        var channel = SampleBeat.GetChannel();
+
+                        channel.Frequency.Value = 1 - BeatSampleVariance / 2 + RNG.NextDouble(BeatSampleVariance);
                         channel.Play();
                     }
                 });
@@ -381,9 +364,6 @@ namespace osu.Game.Screens.Menu
 
             const float scale_adjust_cutoff = 0.4f;
 
-            if (SeasonalUI.ENABLED)
-                updateHat();
-
             if (musicController.CurrentTrack.IsRunning)
             {
                 float maxAmplitude = lastBeatIndex >= 0 ? musicController.CurrentTrack.CurrentAmplitudes.Maximum : 0;
@@ -394,38 +374,6 @@ namespace osu.Game.Screens.Menu
             else
             {
                 triangles.Velocity = (float)Interpolation.Damp(triangles.Velocity, triangles_paused_velocity, 0.9f, Time.Elapsed);
-            }
-        }
-
-        private bool hasHat;
-
-        private void updateHat()
-        {
-            if (hat == null)
-                return;
-
-            bool shouldHat = DrawWidth * Scale.X < 400;
-
-            if (shouldHat != hasHat)
-            {
-                hasHat = shouldHat;
-
-                if (hasHat)
-                {
-                    hat.Delay(400)
-                       .Then()
-                       .MoveTo(new Vector2(120, 160))
-                       .RotateTo(0)
-                       .RotateTo(-20, 500, Easing.OutQuint)
-                       .FadeIn(250, Easing.OutQuint);
-                }
-                else
-                {
-                    hat.Delay(100)
-                       .Then()
-                       .MoveToOffset(new Vector2(0, -5), 500, Easing.OutQuint)
-                       .FadeOut(500, Easing.OutQuint);
-                }
             }
         }
 
@@ -505,9 +453,6 @@ namespace osu.Game.Screens.Menu
         private Container defaultProxyTarget;
         private Container currentProxyTarget;
         private Drawable proxy;
-
-        [CanBeNull]
-        private readonly Sprite hat;
 
         public void StopSamplePlayback() => sampleClickChannel?.Stop();
 

@@ -21,7 +21,7 @@ using osu.Game.Rulesets.Objects.Types;
 using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Game.Screens.Menu
+namespace osu.Game.Seasonal
 {
     public partial class MainMenuSeasonalLighting : CompositeDrawable
     {
@@ -121,7 +121,7 @@ namespace osu.Game.Screens.Menu
 
             if (h.GetType().Name.Contains("Tick"))
             {
-                light.Colour = SeasonalUI.AMBIENT_COLOUR_1;
+                light.Colour = SeasonalUIConfig.AMBIENT_COLOUR_1;
                 light.Scale = new Vector2(0.5f);
                 light
                     .FadeInFromZero(250)
@@ -133,14 +133,14 @@ namespace osu.Game.Screens.Menu
             else
             {
                 // default are green
-                Color4 col = SeasonalUI.PRIMARY_COLOUR_2;
+                Color4 col = SeasonalUIConfig.PRIMARY_COLOUR_2;
 
                 // whistles are red
                 if (h.Samples.Any(s => s.Name == HitSampleInfo.HIT_WHISTLE))
-                    col = SeasonalUI.PRIMARY_COLOUR_1;
+                    col = SeasonalUIConfig.PRIMARY_COLOUR_1;
                 // clap is third ambient (yellow) colour
                 else if (h.Samples.Any(s => s.Name == HitSampleInfo.HIT_CLAP))
-                    col = SeasonalUI.AMBIENT_COLOUR_1;
+                    col = SeasonalUIConfig.AMBIENT_COLOUR_1;
 
                 light.Colour = col;
 
@@ -184,12 +184,12 @@ namespace osu.Game.Screens.Menu
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Size = new Vector2(12),
-                        Colour = SeasonalUI.AMBIENT_COLOUR_1,
+                        Colour = SeasonalUIConfig.AMBIENT_COLOUR_1,
                         Blending = BlendingParameters.Additive,
                         EdgeEffect = new EdgeEffectParameters
                         {
                             Type = EdgeEffectType.Glow,
-                            Colour = SeasonalUI.AMBIENT_COLOUR_2,
+                            Colour = SeasonalUIConfig.AMBIENT_COLOUR_2,
                             Radius = 80,
                         }
                     }
