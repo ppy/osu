@@ -87,9 +87,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             if (score.Mods.Any(m => m is ModHidden))
                 difficultyValue *= 1.025;
 
-            if (score.Mods.Any(m => m is ModHardRock))
-                difficultyValue *= 1.10;
-
             if (score.Mods.Any(m => m is ModFlashlight<TaikoHitObject>))
                 difficultyValue *= Math.Max(1, 1.050 - Math.Min(attributes.MonoStaminaFactor / 50, 1) * lengthBonus);
 
