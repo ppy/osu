@@ -76,8 +76,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         [BackgroundDependencyLoader]
         private void load()
         {
-            FillFlowContainer leaderboardFlow;
             Container scoreDisplayContainer;
+            FillFlowContainer leaderboardFlow;
+            PlayerSettingsOverlay playerSettingsOverlay;
 
             InternalChildren = new Drawable[]
             {
@@ -127,7 +128,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                 {
                     ReadyToStart = performInitialSeek,
                 },
-                new PlayerSettingsOverlay()
+                playerSettingsOverlay = new PlayerSettingsOverlay()
             };
 
             for (int i = 0; i < Users.Count; i++)
@@ -157,6 +158,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             {
                 Expanded = { Value = true },
             }, chat => leaderboardFlow.Insert(1, chat));
+
+            var replayAnalysisSettings = Ruleset.Value.CreateInstance().CreateReplayAnalysisSettings();
+            if (replayAnalysisSettings != null)
+                playerSettingsOverlay.Add(replayAnalysisSettings);
         }
 
         protected override void LoadComplete()
