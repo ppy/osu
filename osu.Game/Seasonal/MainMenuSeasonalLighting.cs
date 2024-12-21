@@ -49,11 +49,11 @@ namespace osu.Game.Seasonal
         [BackgroundDependencyLoader]
         private void load(IBindable<WorkingBeatmap> working, RulesetStore rulesets)
         {
-            this.working = working.GetBoundCopy();
-            this.working.BindValueChanged(_ => Scheduler.AddOnce(updateBeatmap), true);
-
             // operate in osu! ruleset to keep things simple for now.
             osuRuleset = rulesets.GetRuleset(0);
+
+            this.working = working.GetBoundCopy();
+            this.working.BindValueChanged(_ => Scheduler.AddOnce(updateBeatmap), true);
         }
 
         private void updateBeatmap()
