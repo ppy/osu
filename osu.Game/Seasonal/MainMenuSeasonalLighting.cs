@@ -27,7 +27,7 @@ namespace osu.Game.Seasonal
     {
         private IBindable<WorkingBeatmap> working = null!;
 
-        private InterpolatingFramedClock beatmapClock = null!;
+        private InterpolatingFramedClock? beatmapClock;
 
         private List<HitObject> hitObjects = null!;
 
@@ -81,6 +81,9 @@ namespace osu.Game.Seasonal
         protected override void Update()
         {
             base.Update();
+
+            if (osuRuleset == null || beatmapClock == null)
+                return;
 
             Height = DrawWidth / 16 * 10;
 
