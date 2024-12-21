@@ -245,8 +245,8 @@ namespace osu.Game.Database
             var scoreProcessor = ruleset.CreateScoreProcessor();
 
             // warning: ordering is important here - both total score and ranks are dependent on accuracy!
-            score.Accuracy = computeAccuracy(score, scoreProcessor);
-            score.Rank = computeRank(score, scoreProcessor);
+            score.Accuracy = ComputeAccuracy(score, scoreProcessor);
+            score.Rank = ComputeRank(score, scoreProcessor);
             (score.TotalScoreWithoutMods, score.TotalScore) = convertFromLegacyTotalScore(score, ruleset, beatmap);
         }
 
@@ -269,8 +269,8 @@ namespace osu.Game.Database
             var scoreProcessor = ruleset.CreateScoreProcessor();
 
             // warning: ordering is important here - both total score and ranks are dependent on accuracy!
-            score.Accuracy = computeAccuracy(score, scoreProcessor);
-            score.Rank = computeRank(score, scoreProcessor);
+            score.Accuracy = ComputeAccuracy(score, scoreProcessor);
+            score.Rank = ComputeRank(score, scoreProcessor);
             (score.TotalScoreWithoutMods, score.TotalScore) = convertFromLegacyTotalScore(score, ruleset, difficulty, attributes);
         }
 
@@ -313,7 +313,8 @@ namespace osu.Game.Database
         /// <param name="difficulty">The beatmap difficulty.</param>
         /// <param name="attributes">The legacy scoring attributes for the beatmap which the score was set on.</param>
         /// <returns>The standardised total score.</returns>
-        private static (long withoutMods, long withMods) convertFromLegacyTotalScore(ScoreInfo score, Ruleset ruleset, LegacyBeatmapConversionDifficultyInfo difficulty, LegacyScoreAttributes attributes)
+        private static (long withoutMods, long withMods) convertFromLegacyTotalScore(ScoreInfo score, Ruleset ruleset, LegacyBeatmapConversionDifficultyInfo difficulty,
+                                                                                     LegacyScoreAttributes attributes)
         {
             if (!score.IsLegacyScore)
                 return (score.TotalScoreWithoutMods, score.TotalScore);
@@ -620,24 +621,31 @@ namespace osu.Game.Database
             }
         }
 
-        private static double computeAccuracy(ScoreInfo scoreInfo, ScoreProcessor scoreProcessor)
+        public static double ComputeAccuracy(ScoreInfo scoreInfo, ScoreProcessor scoreProcessor)
+            => ComputeAccuracy(scoreInfo.Statistics, scoreInfo.MaximumStatistics, scoreProcessor);
+
+        public static double ComputeAccuracy(IReadOnlyDictionary<HitResult, int> statistics, IReadOnlyDictionary<HitResult, int> maximumStatistics, ScoreProcessor scoreProcessor)
         {
-            int baseScore = scoreInfo.Statistics.Where(kvp => kvp.Key.AffectsAccuracy())
-                                     .Sum(kvp => kvp.Value * scoreProcessor.GetBaseScoreForResult(kvp.Key));
-            int maxBaseScore = scoreInfo.MaximumStatistics.Where(kvp => kvp.Key.AffectsAccuracy())
-                                        .Sum(kvp => kvp.Value * scoreProcessor.GetBaseScoreForResult(kvp.Key));
+            int baseScore = statistics.Where(kvp => kvp.Key.AffectsAccuracy())
+                                      .Sum(kvp => kvp.Value * scoreProcessor.GetBaseScoreForResult(kvp.Key));
+            int maxBaseScore = maximumStatistics.Where(kvp => kvp.Key.AffectsAccuracy())
+                                                .Sum(kvp => kvp.Value * scoreProcessor.GetBaseScoreForResult(kvp.Key));
 
             return maxBaseScore == 0 ? 1 : baseScore / (double)maxBaseScore;
         }
 
-        public static ScoreRank ComputeRank(ScoreInfo scoreInfo) => computeRank(scoreInfo, scoreInfo.Ruleset.CreateInstance().CreateScoreProcessor());
+        public static ScoreRank ComputeRank(ScoreInfo scoreInfo) =>
+            ComputeRank(scoreInfo.Accuracy, scoreInfo.Statistics, scoreInfo.Mods, scoreInfo.Ruleset.CreateInstance().CreateScoreProcessor());
 
-        private static ScoreRank computeRank(ScoreInfo scoreInfo, ScoreProcessor scoreProcessor)
+        public static ScoreRank ComputeRank(ScoreInfo scoreInfo, ScoreProcessor processor) =>
+            ComputeRank(scoreInfo.Accuracy, scoreInfo.Statistics, scoreInfo.Mods, processor);
+
+        public static ScoreRank ComputeRank(double accuracy, IReadOnlyDictionary<HitResult, int> statistics, IList<Mod> mods, ScoreProcessor scoreProcessor)
         {
-            var rank = scoreProcessor.RankFromScore(scoreInfo.Accuracy, scoreInfo.Statistics);
+            var rank = scoreProcessor.RankFromScore(accuracy, statistics);
 
-            foreach (var mod in scoreInfo.Mods.OfType<IApplicableToScoreProcessor>())
-                rank = mod.AdjustRank(rank, scoreInfo.Accuracy);
+            foreach (var mod in mods.OfType<IApplicableToScoreProcessor>())
+                rank = mod.AdjustRank(rank, accuracy);
 
             return rank;
         }

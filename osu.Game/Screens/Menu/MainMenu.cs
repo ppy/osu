@@ -48,7 +48,7 @@ namespace osu.Game.Screens.Menu
 
         public override bool HideOverlaysOnEnter => Buttons == null || Buttons.State == ButtonSystemState.Initial;
 
-        public override bool AllowBackButton => false;
+        public override bool AllowUserExit => false;
 
         public override bool AllowExternalScreenChange => true;
 
@@ -78,9 +78,6 @@ namespace osu.Game.Screens.Menu
 
         [Resolved(canBeNull: true)]
         private IDialogOverlay dialogOverlay { get; set; }
-
-        [Resolved(canBeNull: true)]
-        private VersionManager versionManager { get; set; }
 
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenDefault();
 
@@ -292,16 +289,6 @@ namespace osu.Game.Screens.Menu
 
                 return originalAction.Invoke();
             }
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-
-            bottomElementsFlow.Margin = new MarginPadding
-            {
-                Bottom = (versionManager?.DrawHeight + 5) ?? 0
-            };
         }
 
         protected override void LogoSuspending(OsuLogo logo)

@@ -55,6 +55,8 @@ namespace osu.Game.Screens.Ranking
         [Resolved]
         private Player? player { get; set; }
 
+        private bool skipExitTransition;
+
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
 
@@ -184,6 +186,8 @@ namespace osu.Game.Screens.Ranking
                 Scheduler.AddDelayed(() => OverlayActivationMode.Value = OverlayActivation.All, shouldFlair ? AccuracyCircle.TOTAL_DURATION + 1000 : 0);
             }
 
+            bool allowHotkeyRetry = false;
+
             if (AllowWatchingReplay)
             {
                 buttons.Add(new ReplayDownloadButton(SelectedScore.Value)
@@ -191,18 +195,29 @@ namespace osu.Game.Screens.Ranking
                     Score = { BindTarget = SelectedScore },
                     Width = 300
                 });
+
+                // for simplicity, only allow this when coming from a replay player where we know the replay is ready to be played.
+                //
+                // if we show it in all cases, consider the case where a user comes from song select and potentially has to download
+                // the replay before it can be played back. it wouldn't flow well with the quick retry in such a case.
+                allowHotkeyRetry = player is ReplayPlayer;
             }
 
             if (player != null && AllowRetry)
             {
                 buttons.Add(new RetryButton { Width = 300 });
+                allowHotkeyRetry = true;
+            }
 
+            if (allowHotkeyRetry)
+            {
                 AddInternal(new HotkeyRetryOverlay
                 {
                     Action = () =>
                     {
                         if (!this.IsCurrentScreen()) return;
 
+                        skipExitTransition = true;
                         player?.Restart(true);
                     },
                 });
@@ -313,7 +328,8 @@ namespace osu.Game.Screens.Ranking
             // HitObject references from HitEvent.
             Score?.HitEvents.Clear();
 
-            this.FadeOut(100);
+            if (!skipExitTransition)
+                this.FadeOut(100);
             return false;
         }
 
