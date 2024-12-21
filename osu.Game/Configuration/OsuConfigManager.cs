@@ -57,6 +57,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.ChatDisplayHeight, ChatOverlay.DEFAULT_HEIGHT, 0.2f, 1f, 0.01f);
 
             SetDefault(OsuSetting.BeatmapListingCardSize, BeatmapCardSize.Normal);
+            SetDefault(OsuSetting.BeatmapListingFeaturedArtistFilter, true);
 
             SetDefault(OsuSetting.ProfileCoverExpanded, true);
 
@@ -450,5 +451,6 @@ namespace osu.Game.Configuration
         EditorAdjustExistingObjectsOnTimingChanges,
         AlwaysRequireHoldingForPause,
         MultiplayerShowInProgressFilter,
+        BeatmapListingFeaturedArtistFilter,
     }
 }

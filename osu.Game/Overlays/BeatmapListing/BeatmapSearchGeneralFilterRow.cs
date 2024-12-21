@@ -126,6 +126,9 @@ namespace osu.Game.Overlays.BeatmapListing
             private OsuColour colours { get; set; } = null!;
 
             [Resolved]
+            private OsuConfigManager config { get; set; } = null!;
+
+            [Resolved]
             private SessionStatics sessionStatics { get; set; } = null!;
 
             [Resolved]
@@ -135,7 +138,12 @@ namespace osu.Game.Overlays.BeatmapListing
             {
                 base.LoadComplete();
 
+                config.BindWith(OsuSetting.BeatmapListingFeaturedArtistFilter, Active);
                 disclaimerShown = sessionStatics.GetBindable<bool>(Static.FeaturedArtistDisclaimerShownOnce);
+
+                // no need to show the disclaimer if the user already had it toggled off in config.
+                if (!Active.Value)
+                    disclaimerShown.Value = true;
             }
 
             protected override Color4 ColourNormal => colours.Orange1;
