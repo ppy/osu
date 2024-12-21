@@ -126,6 +126,8 @@ namespace osu.Game
 
         private SkinEditorOverlay skinEditor;
 
+        private ExternalEditOverlay externalEditOverlay;
+
         private Container overlayContent;
 
         private Container rightFloatingOverlayContent;
@@ -1118,6 +1120,7 @@ namespace osu.Game
             loadComponentSingleFile(beatmapSetOverlay = new BeatmapSetOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(wikiOverlay = new WikiOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(skinEditor = new SkinEditorOverlay(ScreenContainer), overlayContent.Add, true);
+            loadComponentSingleFile(externalEditOverlay = new ExternalEditOverlay(), overlayContent.Add, true);
 
             loadComponentSingleFile(new LoginOverlay
             {
@@ -1166,6 +1169,17 @@ namespace osu.Game
                         showOverlayAboveOthers(overlay, informationalOverlays);
                 };
             }
+
+            Settings.State.ValueChanged += state =>
+            {
+                if (state.NewValue == Visibility.Hidden)
+                    return;
+
+                if (externalEditOverlay.State.Value == Visibility.Visible)
+                {
+                    Scheduler.Add(() => Settings.Hide());
+                }
+            };
 
             // ensure only one of these overlays are open at once.
             var singleDisplayOverlays = new OverlayContainer[] { chatOverlay, news, dashboard, beatmapListing, changelogOverlay, rankingsOverlay, wikiOverlay };
@@ -1467,7 +1481,7 @@ namespace osu.Game
                     // Don't allow random skin selection while in the skin editor.
                     // This is mainly to stop many "osu! default (modified)" skins being created via the SkinManager.EnsureMutableSkin() path.
                     // If people want this to work we can potentially avoid selecting default skins when the editor is open, or allow a maximum of one mutable skin somehow.
-                    if (skinEditor.State.Value == Visibility.Visible)
+                    if (skinEditor.State.Value == Visibility.Visible || externalEditOverlay.State.Value == Visibility.Visible)
                         return false;
 
                     SkinManager.SelectRandomSkin();
