@@ -191,6 +191,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 double lastTravelTime = Math.Max(lastSlider.LazyTravelTime / clockRate, MIN_DELTA_TIME);
                 MinimumJumpTime = Math.Max(StrainTime - lastTravelTime, MIN_DELTA_TIME);
 
+                if (BaseObject is Slider)
+                {
+                    // Jumping slider->slider gives extra timing leniency
+                    MinimumJumpTime += HitWindowGreat / 2;
+                }
+
                 //
                 // There are two types of slider-to-object patterns to consider in order to better approximate the real movement a player will take to jump between the hitobjects.
                 //
@@ -214,7 +220,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 //
 
                 float tailJumpDistance = Vector2.Subtract(lastSlider.TailCircle.StackedPosition, BaseObject.StackedPosition).Length * scalingFactor;
-                MinimumJumpDistance = Math.Max(0, Math.Min(LazyJumpDistance - (maximum_slider_radius - assumed_slider_radius), tailJumpDistance - maximum_slider_radius));
+                MinimumJumpDistance = Math.Max(0, Math.Min(LazyJumpDistance, tailJumpDistance));
             }
 
             if (lastLastObject != null && !(lastLastObject is Spinner))
