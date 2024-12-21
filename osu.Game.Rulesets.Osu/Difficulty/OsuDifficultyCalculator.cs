@@ -50,6 +50,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             var flashlight = skills.OfType<Flashlight>().SingleOrDefault();
             double flashlightRating = flashlight == null ? 0.0 : Math.Sqrt(flashlight.DifficultyValue()) * difficulty_multiplier;
+            
+            double aimDifficultyStrainCount = aim.CountTopWeightedStrains();
+            double speedDifficultyStrainCount = speed.CountTopWeightedStrains();
+            (double hitCircles, double sliders) aimTypedDifficultyStrainCount = aim.CountTypedTopWeightedStrains();
+            (double hitCircles, double sliders) speedTypedDifficultyStrainCount = speed.CountTypedTopWeightedStrains();
+
+            double aimTopWeightedSliderFactor = aimTypedDifficultyStrainCount.sliders / aimTypedDifficultyStrainCount.hitCircles;
+            double speedTopWeightedSliderFactor = speedTypedDifficultyStrainCount.sliders / speedTypedDifficultyStrainCount.hitCircles;
 
             if (mods.Any(m => m is OsuModTouchDevice))
             {
@@ -106,6 +114,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 SliderFactor = sliderFactor,
                 AimDifficultStrainCount = aimDifficultyStrainCount,
                 SpeedDifficultStrainCount = speedDifficultyStrainCount,
+                AimTopWeightedSliderFactor = aimTopWeightedSliderFactor,
+                SpeedTopWeightedSliderFactor = speedTopWeightedSliderFactor,
                 DrainRate = drainRate,
                 MaxCombo = beatmap.GetMaxCombo(),
                 HitCircleCount = hitCirclesCount,

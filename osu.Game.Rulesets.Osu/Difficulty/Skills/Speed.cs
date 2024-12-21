@@ -6,6 +6,7 @@ using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Evaluators;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Osu.Objects;
 using System.Linq;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
@@ -40,6 +41,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             currentRhythm = RhythmEvaluator.EvaluateDifficultyOf(current);
 
             double totalStrain = currentStrain * currentRhythm;
+            typedObjectStrains.Add((totalStrain, current.BaseObject is Slider));
 
             return totalStrain;
         }
