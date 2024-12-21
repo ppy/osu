@@ -45,6 +45,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 sliderStrains.Add(currentStrain);
             }
 
+            typedObjectStrains.Add((currentStrain, current.BaseObject is Slider));
+
             return currentStrain;
         }
 
