@@ -178,12 +178,13 @@ namespace osu.Game.Overlays.Settings.Sections
                 public Action<string> Rename { get; init; }
 
                 private readonly FocusedTextBox textBox;
-                private readonly RoundedButton renameButton;
 
                 public RenameSkinPopover()
                 {
                     AutoSizeAxes = Axes.Both;
                     Origin = Anchor.TopCentre;
+
+                    RoundedButton renameButton;
 
                     Child = new FillFlowContainer
                     {
@@ -198,6 +199,7 @@ namespace osu.Game.Overlays.Settings.Sections
                                 PlaceholderText = @"Skin name",
                                 FontSize = OsuFont.DEFAULT_FONT_SIZE,
                                 RelativeSizeAxes = Axes.X,
+                                SelectAllOnFocus = true,
                             },
                             renameButton = new RoundedButton
                             {
@@ -230,7 +232,6 @@ namespace osu.Game.Overlays.Settings.Sections
                 }
             }
         }
-
 
         public partial class ExportSkinButton : SettingsButton
         {
