@@ -28,6 +28,7 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Screens.Edit;
+using osu.Game.Screens.Edit.Changes;
 using osu.Game.Screens.Edit.Components.RadioButtons;
 using osu.Game.Screens.Edit.Components.TernaryButtons;
 using osu.Game.Screens.Edit.Compose;
@@ -66,6 +67,9 @@ namespace osu.Game.Rulesets.Edit
 
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; }
+
+        [Resolved(canBeNull: true)]
+        private NewBeatmapEditorChangeHandler changeHandler { get; set; }
 
         public override ComposeBlueprintContainer BlueprintContainer => blueprintContainer;
         private ComposeBlueprintContainer blueprintContainer;
@@ -272,7 +276,8 @@ namespace osu.Game.Rulesets.Edit
             TernaryStates = CreateTernaryButtons().ToArray();
             togglesCollection.AddRange(TernaryStates.Select(b => new DrawableTernaryButton(b)));
 
-            sampleBankTogglesCollection.AddRange(BlueprintContainer.SampleBankTernaryStates.Zip(BlueprintContainer.SampleAdditionBankTernaryStates).Select(b => new SampleBankTernaryButton(b.First, b.Second)));
+            sampleBankTogglesCollection.AddRange(BlueprintContainer.SampleBankTernaryStates.Zip(BlueprintContainer.SampleAdditionBankTernaryStates)
+                                                                   .Select(b => new SampleBankTernaryButton(b.First, b.Second)));
 
             SetSelectTool();
 
@@ -550,13 +555,13 @@ namespace osu.Game.Rulesets.Edit
         public void CommitPlacement(HitObject hitObject)
         {
             EditorBeatmap.PlacementObject.Value = null;
-            EditorBeatmap.Add(hitObject);
+            new AddHitObjectChange(EditorBeatmap, hitObject).Apply(changeHandler);
 
             if (autoSeekOnPlacement.Value && EditorClock.CurrentTime < hitObject.StartTime)
                 EditorClock.SeekSmoothlyTo(hitObject.StartTime);
         }
 
-        public void Delete(HitObject hitObject) => EditorBeatmap.Remove(hitObject);
+        public void Delete(HitObject hitObject) => new RemoveHitObjectChange(EditorBeatmap, hitObject).Apply(changeHandler);
 
         #endregion
 
