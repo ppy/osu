@@ -212,7 +212,13 @@ namespace osu.Game.Overlays.Settings.Sections
                     };
 
                     renameButton.Action += rename;
-                    textBox.OnCommit += delegate (TextBox _, bool _) { rename(); };
+
+                    void onTextboxCommit(TextBox sender, bool newText)
+                    {
+                        rename();
+                    }
+
+                    textBox.OnCommit += onTextboxCommit;
                 }
 
                 protected override void PopIn()
