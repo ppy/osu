@@ -9,17 +9,23 @@ using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
 using osu.Game.Overlays.SkinEditor;
 using osu.Game.Screens.Select;
 using osu.Game.Skinning;
+using osuTK;
 using Realms;
 
 namespace osu.Game.Overlays.Settings.Sections
@@ -69,6 +75,7 @@ namespace osu.Game.Overlays.Settings.Sections
                     Text = SkinSettingsStrings.SkinLayoutEditor,
                     Action = () => skinEditor?.ToggleVisibility(),
                 },
+                new RenameSkinButton(),
                 new ExportSkinButton(),
                 new DeleteSkinButton(),
             };
@@ -135,6 +142,95 @@ namespace osu.Game.Overlays.Settings.Sections
                 protected override LocalisableString GenerateItemText(Live<SkinInfo> item) => item.ToString();
             }
         }
+
+        public partial class RenameSkinButton : SettingsButton, IHasPopover
+        {
+            [Resolved]
+            private SkinManager skins { get; set; }
+
+            private Bindable<Skin> currentSkin;
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                Text = SkinSettingsStrings.RenameSkinButton;
+                Action = this.ShowPopover;
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                currentSkin = skins.CurrentSkin.GetBoundCopy();
+                currentSkin.BindValueChanged(skin => Enabled.Value = skin.NewValue.SkinInfo.PerformRead(s => !s.Protected), true);
+            }
+
+            public Popover GetPopover()
+            {
+                return new RenameSkinPopover();
+            }
+
+            public partial class RenameSkinPopover : OsuPopover
+            {
+                [Resolved]
+                private SkinManager skins { get; set; }
+
+                public Action<string> Rename { get; init; }
+
+                private readonly FocusedTextBox textBox;
+                private readonly RoundedButton renameButton;
+
+                public RenameSkinPopover()
+                {
+                    AutoSizeAxes = Axes.Both;
+                    Origin = Anchor.TopCentre;
+
+                    Child = new FillFlowContainer
+                    {
+                        Direction = FillDirection.Vertical,
+                        AutoSizeAxes = Axes.Y,
+                        Width = 250,
+                        Spacing = new Vector2(10f),
+                        Children = new Drawable[]
+                        {
+                            textBox = new FocusedTextBox
+                            {
+                                PlaceholderText = @"Skin name",
+                                FontSize = OsuFont.DEFAULT_FONT_SIZE,
+                                RelativeSizeAxes = Axes.X,
+                            },
+                            renameButton = new RoundedButton
+                            {
+                                Height = 40,
+                                RelativeSizeAxes = Axes.X,
+                                MatchingFilter = true,
+                                Text = SkinSettingsStrings.RenameSkinButton,
+                            }
+                        }
+                    };
+
+                    renameButton.Action += rename;
+                    textBox.OnCommit += delegate (TextBox _, bool _) { rename(); };
+                }
+
+                protected override void PopIn()
+                {
+                    textBox.Text = skins.CurrentSkinInfo.Value.Value.Name;
+                    textBox.TakeFocus();
+                    base.PopIn();
+                }
+
+                private void rename()
+                {
+                    skins.CurrentSkinInfo.Value.PerformWrite(skin =>
+                    {
+                        skin.Name = textBox.Text;
+                        PopOut();
+                    });
+                }
+            }
+        }
+
 
         public partial class ExportSkinButton : SettingsButton
         {

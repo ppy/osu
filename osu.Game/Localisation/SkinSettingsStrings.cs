@@ -55,6 +55,11 @@ namespace osu.Game.Localisation
         public static LocalisableString BeatmapHitsounds => new TranslatableString(getKey(@"beatmap_hitsounds"), @"Beatmap hitsounds");
 
         /// <summary>
+        /// "Rename selected skin"
+        /// </summary>
+        public static LocalisableString RenameSkinButton = new TranslatableString(getKey(@"rename_skin_button"), @"Rename selected skin");
+
+        /// <summary>
         /// "Export selected skin"
         /// </summary>
         public static LocalisableString ExportSkinButton => new TranslatableString(getKey(@"export_skin_button"), @"Export selected skin");
