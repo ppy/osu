@@ -78,6 +78,9 @@ namespace osu.Game.Overlays.Toolbar
         {
             Width = showRuntime || !use24HourDisplay ? 66 : 45; // Allows for space for game time up to 99 days (in the padding area since this is quite rare).
 
+            realTime.Anchor = showRuntime ? Anchor.TopLeft : Anchor.Centre;
+            realTime.Origin = showRuntime ? Anchor.TopLeft : Anchor.Centre;
+
             gameTime.FadeTo(showRuntime ? 1 : 0);
         }
     }
