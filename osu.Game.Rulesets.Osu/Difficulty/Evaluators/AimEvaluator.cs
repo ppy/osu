@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
     public static class AimEvaluator
     {
         private const double wide_angle_multiplier = 1.5;
-        private const double acute_angle_multiplier = 2.0;
+        private const double acute_angle_multiplier = 2.25;
         private const double slider_multiplier = 1.35;
         private const double velocity_change_multiplier = 0.75;
         private const double wiggle_multiplier = 1.02;
@@ -91,10 +91,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     // Penalize wide angles if they're repeated, reducing the penalty as the lastAngle gets more acute.
                     wideAngleBonus *= angleBonus * (1 - Math.Min(wideAngleBonus, Math.Pow(calcWideAngleBonus(lastAngle), 3)));
                     // Penalize acute angles if they're repeated, reducing the penalty as the lastLastAngle gets more obtuse.
-                    acuteAngleBonus *= 0.09 + 0.91 * (1 - Math.Min(acuteAngleBonus, Math.Pow(calcAcuteAngleBonus(lastLastAngle), 3)));
+                    acuteAngleBonus *= 0.05 + 0.95 * (1 - Math.Min(acuteAngleBonus, Math.Pow(calcAcuteAngleBonus(lastLastAngle), 3)));
 
-                    // Apply wiggle bonus for jumps that are [radius, 2*diameter] in distance, with < 110 angle and bpm > 150
-                    // https://www.desmos.com/calculator/iis7lgbppe
+                    // Apply wiggle bonus for jumps that are [radius, 3*diameter] in distance, with < 110 angle
+                    // https://www.desmos.com/calculator/dp0v0nvowc
                     wiggleBonus = angleBonus
                                   * DifficultyCalculationUtils.Smootherstep(osuCurrObj.LazyJumpDistance, radius, diameter)
                                   * Math.Pow(DifficultyCalculationUtils.ReverseLerp(osuCurrObj.LazyJumpDistance, diameter * 3, diameter), 1.8)
