@@ -85,7 +85,7 @@ namespace osu.Game.Beatmaps
 
             image.Mutate(i => i.Crop(cropRectangle));
 
-            return new TextureUpload(image);
+            return new TextureUpload(PremultipliedImage.FromStraight(image));
         }
 
         public Stream? GetStream(string name) => textureStore?.GetStream(name);

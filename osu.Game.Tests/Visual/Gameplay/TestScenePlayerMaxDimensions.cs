@@ -127,7 +127,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     textureUpload.Dispose();
 
                     image.Mutate(i => i.Resize(new Size(textureUpload.Width, textureUpload.Height) * scale_factor));
-                    return new TextureUpload(image);
+                    return new TextureUpload(PremultipliedImage.FromStraight(image));
                 }
 
                 public Stream? GetStream(string name) => textureStore?.GetStream(name);
