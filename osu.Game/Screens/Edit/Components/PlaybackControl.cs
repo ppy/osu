@@ -26,7 +26,7 @@ namespace osu.Game.Screens.Edit.Components
     public partial class PlaybackControl : BottomBarContainer
     {
         private IconButton playButton = null!;
-        private Bindable<bool> adjustPitch = new Bindable<bool>(false);
+        private readonly Bindable<bool> adjustPitch = new Bindable<bool>(false);
 
         [Resolved]
         private EditorClock editorClock { get; set; } = null!;
