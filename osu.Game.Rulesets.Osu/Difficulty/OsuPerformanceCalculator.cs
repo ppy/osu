@@ -77,13 +77,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 }
                 else
                 {
-                    double fullComboThreshold = attributes.MaxCombo - countSliderEndsDropped;
-
-                    if (scoreMaxCombo < fullComboThreshold)
-                        effectiveMissCount = fullComboThreshold / Math.Max(1.0, scoreMaxCombo);
-
-                    // Combine regular misses with tick misses since tick misses break combo as well
-                    effectiveMissCount = Math.Min(effectiveMissCount, countSliderTickMiss + countMiss);
+                    // In lazer we have exact amount of misses, no need to estimate anything.
+                    effectiveMissCount = countMiss;
                 }
             }
 
