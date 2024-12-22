@@ -74,7 +74,7 @@ namespace osu.Game.Storyboards.Drawables
             RelativeSizeAxes = Axes.Both,
             Anchor = Anchor.Centre,
             Origin = Anchor.Centre,
-            DimColour = Colour4.Red,
+            // DimColour = Colour4.Red,
         };
 
         public override bool RemoveWhenNotAlive => false;

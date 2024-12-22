@@ -138,7 +138,7 @@ namespace osu.Game.Screens.Backgrounds
             return base.Equals(other) && beatmap == otherBeatmapBackground.Beatmap;
         }
 
-        public partial class DimmableBackground : UserDimContainer
+        public partial class DimmableBackground : UserDimContainer, IColouredDimmable
         {
             /// <summary>
             /// The amount of blur to be applied to the background in addition to user-specified blur.
@@ -161,7 +161,6 @@ namespace osu.Game.Screens.Backgrounds
 
                     base.Add(background = value);
 
-                    background.DimColour = DimColour;
                     background.BlurTo(blurTarget, 0, Easing.OutQuint);
                 }
             }
@@ -203,11 +202,6 @@ namespace osu.Game.Screens.Backgrounds
                 userDimColour.ValueChanged += _ => UpdateVisuals();
                 BlurAmount.ValueChanged += _ => UpdateVisuals();
                 StoryboardReplacesBackground.ValueChanged += _ => UpdateVisuals();
-
-                if (background != null)
-                {
-                    background.DimColour = DimColour;
-                }
             }
 
             protected override float DimLevel
@@ -233,11 +227,28 @@ namespace osu.Game.Screens.Backgrounds
                 }
             }
 
+            private Colour4 colourOffset;
+
+            protected Colour4 ColourOffset
+            {
+                get => colourOffset;
+                set
+                {
+                    if (value.Equals(colourOffset))
+                        return;
+
+                    colourOffset = value;
+                    Invalidate(Invalidation.Colour);
+                }
+            }
+
+            public Colour4 DrawColourOffset => ColourOffset * DrawColourInfo.Colour;
+
             protected override void UpdateVisuals()
             {
                 base.UpdateVisuals();
 
-                background?.TransformTo(nameof(BeatmapBackground.DimColour), DimColour, BACKGROUND_FADE_DURATION, Easing.OutQuint);
+                this.TransformTo(nameof(ColourOffset), DimColour, BACKGROUND_FADE_DURATION, Easing.OutQuint);
 
                 Background?.BlurTo(blurTarget, BACKGROUND_FADE_DURATION, Easing.OutQuint);
             }
