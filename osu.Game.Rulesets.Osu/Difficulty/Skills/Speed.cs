@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             currentRhythm = RhythmEvaluator.EvaluateDifficultyOf(current);
 
             double totalStrain = currentStrain * currentRhythm;
-            typedObjectStrains.Add((totalStrain, current.BaseObject is Slider));
+            TypedObjectStrains.Add((totalStrain, current.BaseObject is Slider));
 
             return totalStrain;
         }

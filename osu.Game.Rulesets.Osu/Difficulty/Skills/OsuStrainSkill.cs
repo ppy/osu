@@ -22,7 +22,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// The baseline multiplier applied to the section with the biggest strain.
         /// </summary>
         protected virtual double ReducedStrainBaseline => 0.75;
-        protected List<(double difficulty, bool isSlider)> typedObjectStrains = new List<(double, bool)>();
+
+        protected List<(double difficulty, bool isSlider)> TypedObjectStrains = new List<(double, bool)>();
 
         protected OsuStrainSkill(Mod[] mods)
             : base(mods)
@@ -57,23 +58,23 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             return difficulty;
         }
-        public (double hitCircles, double sliders) CountTypedTopWeightedStrains()
+
+        public double CalculateTopWeightedSliderFactor()
         {
-            if (typedObjectStrains.Count == 0)
-                return (0.0, 0.0);
+            if (TypedObjectStrains.Count == 0)
+                return 0;
 
             double consistentTopStrain = DifficultyValue() / 10; // What would the top strain be if all strain values were identical
-            List<double> sliderStrains = typedObjectStrains.Where(typedObjectStrain =>  typedObjectStrain.isSlider).Select(typedObjectStrain => typedObjectStrain.difficulty).ToList();
-            List<double> circleStrains = typedObjectStrains.Where(typedObjectStrain => !typedObjectStrain.isSlider).Select(typedObjectStrain => typedObjectStrain.difficulty).ToList();
-
+            List<double> sliderStrains = TypedObjectStrains.Where(typedObjectStrain => typedObjectStrain.isSlider).Select(typedObjectStrain => typedObjectStrain.difficulty).ToList();
+            List<double> circleStrains = TypedObjectStrains.Where(typedObjectStrain => !typedObjectStrain.isSlider).Select(typedObjectStrain => typedObjectStrain.difficulty).ToList();
 
             if (consistentTopStrain == 0)
-                return (circleStrains.Count, sliderStrains.Count);
+                return (double)sliderStrains.Count / circleStrains.Count;
 
             // Use a weighted sum of all strains. Constants are arbitrary and give nice values
             double sliderObjects = sliderStrains.Sum(s => 1.1 / (1 + Math.Exp(-10 * (s / consistentTopStrain - 0.88))));
             double circleObjects = circleStrains.Sum(s => 1.1 / (1 + Math.Exp(-10 * (s / consistentTopStrain - 0.88))));
-            return (circleObjects, sliderObjects);
+            return sliderObjects / circleObjects;
         }
 
         public static double DifficultyToPerformance(double difficulty) => Math.Pow(5.0 * Math.Max(1.0, difficulty / 0.0675) - 4.0, 3.0) / 100000.0;

@@ -211,6 +211,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 double estimatedSliderbreaks = Math.Min(countMeh + countOk, countMiss * attributes.AimTopWeightedSliderFactor);
                 aimValue *= calculateMissPenalty(effectiveMissCount + (usingClassicSliderAccuracy ? estimatedSliderbreaks : 0), attributes.AimDifficultStrainCount);
             }
+
             double approachRateFactor = 0.0;
             if (approachRate > 10.33)
                 approachRateFactor = 0.3 * (approachRate - 10.33);
