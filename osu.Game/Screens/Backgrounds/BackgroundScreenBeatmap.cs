@@ -176,7 +176,7 @@ namespace osu.Game.Screens.Backgrounds
                 ArgumentNullException.ThrowIfNull(drawable);
 
                 if (drawable is Background)
-                    throw new InvalidOperationException($"Use {nameof(Background)} to set a background.");
+                    throw new InvalidOperationException($"Use {nameof(BeatmapBackground)} to set a background.");
 
                 base.Add(drawable);
             }
