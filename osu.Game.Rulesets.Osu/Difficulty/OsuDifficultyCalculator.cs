@@ -90,6 +90,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double aimDifficultyStrainCount = ((OsuStrainSkill)skills[0]).CountTopWeightedStrains();
             double speedDifficultyStrainCount = ((OsuStrainSkill)skills[2]).CountTopWeightedStrains();
 
+            double aimTopWeightedSliderFactor = ((OsuStrainSkill)skills[0]).CalculateTopWeightedSliderFactor();
+            double speedTopWeightedSliderFactor = ((OsuStrainSkill)skills[2]).CalculateTopWeightedSliderFactor();
+
             if (mods.Any(m => m is OsuModTouchDevice))
             {
                 aimRating = Math.Pow(aimRating, 0.8);

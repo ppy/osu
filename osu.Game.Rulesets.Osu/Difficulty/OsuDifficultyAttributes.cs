@@ -52,8 +52,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         /// </summary>
         [JsonProperty("slider_factor")]
         public double SliderFactor { get; set; }
+
+        /// <summary>
+        /// Describes how much of <see cref="AimDifficultStrainCount"/> is contributed to by hitcircles or sliders
+        /// A value closer to 0.0 indicates most of <see cref="AimDifficultStrainCount"/> is contributed by hitcircles
+        /// A value closer to Infinity indicates most of <see cref="AimDifficultStrainCount"/> is contributed by sliders
+        /// </summary>
         [JsonProperty("aim_top_weighted_slider_factor")]
         public double AimTopWeightedSliderFactor { get; set; }
+
+        /// <summary>
+        /// Describes how much of <see cref="SpeedDifficultStrainCount"/> is contributed to by hitcircles or sliders
+        /// A value closer to 0.0 indicates most of <see cref="SpeedDifficultStrainCount"/> is contributed by hitcircles
+        /// A value closer to Infinity indicates most of <see cref="SpeedDifficultStrainCount"/> is contributed by sliders
+        /// </summary>
         [JsonProperty("speed_top_weighted_slider_factor")]
         public double SpeedTopWeightedSliderFactor { get; set; }
 
