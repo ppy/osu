@@ -220,6 +220,12 @@ namespace osu.Game
 
         private readonly List<OverlayContainer> visibleBlockingOverlays = new List<OverlayContainer>();
 
+        /// <summary>
+        /// Whether the game should be limited from providing access to download non-featured-artist beatmaps.
+        /// This only affects the "featured artists" filter in the beatmap listing overlay.
+        /// </summary>
+        public bool LimitedToFeaturedArtists => RuntimeInfo.OS == RuntimeInfo.Platform.iOS && true;
+
         public OsuGame(string[] args = null)
         {
             this.args = args;

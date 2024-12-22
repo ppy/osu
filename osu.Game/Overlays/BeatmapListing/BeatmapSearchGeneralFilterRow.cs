@@ -126,6 +126,9 @@ namespace osu.Game.Overlays.BeatmapListing
             private OsuColour colours { get; set; } = null!;
 
             [Resolved]
+            private OsuGame game { get; set; } = null!;
+
+            [Resolved]
             private OsuConfigManager config { get; set; } = null!;
 
             [Resolved]
@@ -144,6 +147,12 @@ namespace osu.Game.Overlays.BeatmapListing
                 // no need to show the disclaimer if the user already had it toggled off in config.
                 if (!Active.Value)
                     disclaimerShown.Value = true;
+
+                if (game.LimitedToFeaturedArtists)
+                {
+                    Enabled.Value = false;
+                    Active.Disabled = true;
+                }
             }
 
             protected override Color4 ColourNormal => colours.Orange1;
@@ -151,6 +160,9 @@ namespace osu.Game.Overlays.BeatmapListing
 
             protected override bool OnClick(ClickEvent e)
             {
+                if (!Enabled.Value)
+                    return true;
+
                 if (!disclaimerShown.Value && dialogOverlay != null)
                 {
                     dialogOverlay.Push(new FeaturedArtistConfirmDialog(() =>
