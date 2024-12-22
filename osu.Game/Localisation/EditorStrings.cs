@@ -85,6 +85,11 @@ namespace osu.Game.Localisation
         public static LocalisableString DesignScreen => new TranslatableString(getKey(@"design_screen"), @"design");
 
         /// <summary>
+        /// "audio"
+        /// </summary>
+        public static LocalisableString AudioScreen => new TranslatableString(getKey(@"audio_screen"), @"audio");
+
+        /// <summary>
         /// "timing"
         /// </summary>
         public static LocalisableString TimingScreen => new TranslatableString(getKey(@"timing_screen"), @"timing");

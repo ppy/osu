@@ -17,6 +17,9 @@ namespace osu.Game.Screens.Edit
         [LocalisableDescription(typeof(EditorStrings), nameof(EditorStrings.DesignScreen))]
         Design,
 
+        [LocalisableDescription(typeof(EditorStrings), nameof(EditorStrings.AudioScreen))]
+        Audio,
+
         [LocalisableDescription(typeof(EditorStrings), nameof(EditorStrings.TimingScreen))]
         Timing,
 

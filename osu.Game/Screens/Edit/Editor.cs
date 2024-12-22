@@ -45,6 +45,7 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Screens.Edit.Audio;
 using osu.Game.Screens.Edit.Components.Menus;
 using osu.Game.Screens.Edit.Compose;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
@@ -1091,6 +1092,10 @@ namespace osu.Game.Screens.Edit
 
                     case EditorScreenMode.Verify:
                         currentScreen = new VerifyScreen();
+                        break;
+
+                    case EditorScreenMode.Audio:
+                        currentScreen = new AudioScreen();
                         break;
 
                     default:
