@@ -175,7 +175,6 @@ namespace osu.Game.Overlays.Volume
                                     {
                                         Colour = meterColour,
                                         BlurSigma = new Vector2(blur_amount),
-                                        Strength = 5,
                                         PadExtent = true
                                     }),
                                 },
@@ -261,7 +260,7 @@ namespace osu.Game.Overlays.Volume
                 if (displayVolume >= 0.995f)
                 {
                     text.Text = "MAX";
-                    maxGlow.EffectColour = meterColour.Opacity(2f);
+                    maxGlow.EffectColour = meterColour.Opacity(1.25f);
                 }
                 else
                 {
