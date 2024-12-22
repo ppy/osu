@@ -73,7 +73,12 @@ namespace osu.Game.Overlays.BeatmapListing
             private void currentChanged(object? sender, NotifyCollectionChangedEventArgs e)
             {
                 foreach (var c in Children)
-                    c.Active.Value = Current.Contains(c.Value);
+                {
+                    if (!c.Active.Disabled)
+                        c.Active.Value = Current.Contains(c.Value);
+                    else if (c.Active.Value != Current.Contains(c.Value))
+                        throw new InvalidOperationException($"Expected filter {c.Value} to be set to {Current.Contains(c.Value)}, but was {c.Active.Value}");
+                }
             }
 
             /// <summary>
@@ -100,8 +105,9 @@ namespace osu.Game.Overlays.BeatmapListing
 
         protected partial class MultipleSelectionFilterTabItem : FilterTabItem<T>
         {
-            private Drawable activeContent = null!;
+            private Container activeContent = null!;
             private Circle background = null!;
+            private SpriteIcon icon = null!;
 
             public MultipleSelectionFilterTabItem(T value)
                 : base(value)
@@ -123,7 +129,6 @@ namespace osu.Game.Overlays.BeatmapListing
                     Alpha = 0,
                     Padding = new MarginPadding
                     {
-                        Left = -16,
                         Right = -4,
                         Vertical = -2
                     },
@@ -134,8 +139,9 @@ namespace osu.Game.Overlays.BeatmapListing
                             Colour = Color4.White,
                             RelativeSizeAxes = Axes.Both,
                         },
-                        new SpriteIcon
+                        icon = new SpriteIcon
                         {
+                            Alpha = 0f,
                             Icon = FontAwesome.Solid.TimesCircle,
                             Size = new Vector2(10),
                             Colour = ColourProvider.Background4,
@@ -160,13 +166,26 @@ namespace osu.Game.Overlays.BeatmapListing
             {
                 Color4 colour = Active.Value ? ColourActive : ColourNormal;
 
-                if (IsHovered)
+                if (!Enabled.Value)
+                    colour = colour.Darken(1f);
+                else if (IsHovered)
                     colour = Active.Value ? colour.Darken(0.2f) : colour.Lighten(0.2f);
 
                 if (Active.Value)
                 {
-                    // This just allows enough spacing for adjacent tab items to show the "x".
-                    Padding = new MarginPadding { Left = 12 };
+                    if (Enabled.Value)
+                    {
+                        // This just allows enough spacing for adjacent tab items to show the "x".
+                        Padding = new MarginPadding { Left = 12 };
+                        activeContent.Padding = activeContent.Padding with { Left = -16 };
+                        icon.Show();
+                    }
+                    else
+                    {
+                        Padding = new MarginPadding();
+                        activeContent.Padding = activeContent.Padding with { Left = -6 };
+                        icon.Hide();
+                    }
 
                     activeContent.FadeIn(200, Easing.OutQuint);
                     background.FadeColour(colour, 200, Easing.OutQuint);
