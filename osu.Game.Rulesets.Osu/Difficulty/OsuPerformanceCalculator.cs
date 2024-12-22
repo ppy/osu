@@ -4,10 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Audio.Track;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Rulesets.Difficulty;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Skills;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Scoring;
@@ -44,9 +41,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         /// </summary>
         private double effectiveMissCount;
 
-        private double hitWindowGreat;
-        private double hitWindowOk;
-        private double hitWindowMeh;
         private double? speedDeviation;
 
         public OsuPerformanceCalculator()
@@ -118,12 +112,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 // As we're adding Oks and Mehs to an approximated number of combo breaks the result can be higher than total hits in specific scenarios (which breaks some calculations) so we need to clamp it.
                 effectiveMissCount = Math.Min(effectiveMissCount + countOk * okMultiplier + countMeh * mehMultiplier, totalHits);
             }
-
-            double clockRate = getClockRate(score);
-
-            hitWindowGreat = 80 - 6 * osuAttributes.OverallDifficulty;
-            hitWindowOk = (140 - 8 * ((80 - hitWindowGreat * clockRate) / 6)) / clockRate;
-            hitWindowMeh = (200 - 10 * ((80 - hitWindowGreat * clockRate) / 6)) / clockRate;
 
             speedDeviation = calculateSpeedDeviation(osuAttributes);
 
@@ -342,7 +330,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double relevantCountOk = Math.Min(countOk, speedNoteCount - relevantCountMiss - relevantCountMeh);
             double relevantCountGreat = Math.Max(0, speedNoteCount - relevantCountMiss - relevantCountMeh - relevantCountOk);
 
-            return calculateDeviation(relevantCountGreat, relevantCountOk, relevantCountMeh, relevantCountMiss);
+            return calculateDeviation(attributes, relevantCountGreat, relevantCountOk, relevantCountMeh, relevantCountMiss);
         }
 
         /// <summary>
@@ -351,12 +339,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         /// will always return the same deviation. Misses are ignored because they are usually due to misaiming.
         /// Greats and oks are assumed to follow a normal distribution, whereas mehs are assumed to follow a uniform distribution.
         /// </summary>
-        private double? calculateDeviation(double relevantCountGreat, double relevantCountOk, double relevantCountMeh, double relevantCountMiss)
+        private double? calculateDeviation(OsuDifficultyAttributes attributes, double relevantCountGreat, double relevantCountOk, double relevantCountMeh, double relevantCountMiss)
         {
             if (relevantCountGreat + relevantCountOk + relevantCountMeh <= 0)
                 return null;
 
             double objectCount = relevantCountGreat + relevantCountOk + relevantCountMeh + relevantCountMiss;
+
+            double hitWindowGreat = attributes.GreatHitWindow;
+            double hitWindowOk = attributes.OkHitWindow;
+            double hitWindowMeh = attributes.MehHitWindow;
 
             // The probability that a player hits a circle is unknown, but we can estimate it to be
             // the number of greats on circles divided by the number of circles, and then add one
@@ -418,13 +410,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             adjustedSpeedValue = double.Lerp(adjustedSpeedValue, speedValue, lerp);
 
             return adjustedSpeedValue / speedValue;
-        }
-
-        private static double getClockRate(ScoreInfo score)
-        {
-            var track = new TrackVirtual(1);
-            score.Mods.OfType<IApplicableToTrack>().ForEach(m => m.ApplyToTrack(track));
-            return track.Rate;
         }
 
         // Miss penalty assumes that a player will miss on the hardest parts of a map,
