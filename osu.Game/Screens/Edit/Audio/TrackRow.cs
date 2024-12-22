@@ -2,19 +2,18 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Screens.Edit.Audio
 {
-    public partial class AudioScreen : EditorScreenWithTimeline
+    public partial class TrackRow : Container
     {
-        public AudioScreen()
-            : base(EditorScreenMode.Audio)
-        {
-        }
+        private const int row_height = 40;
 
-        protected override Drawable CreateMainContent()
+        public TrackRow()
         {
-            return new HitSoundTable();
+            RelativeSizeAxes = Axes.X;
+            Height = row_height;
         }
     }
 }
