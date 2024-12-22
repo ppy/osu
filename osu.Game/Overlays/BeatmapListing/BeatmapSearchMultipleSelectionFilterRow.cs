@@ -183,7 +183,7 @@ namespace osu.Game.Overlays.BeatmapListing
                     else
                     {
                         Padding = new MarginPadding();
-                        activeContent.Padding = activeContent.Padding with { Left = -6 };
+                        activeContent.Padding = activeContent.Padding with { Left = -4 };
                         icon.Hide();
                     }
 
