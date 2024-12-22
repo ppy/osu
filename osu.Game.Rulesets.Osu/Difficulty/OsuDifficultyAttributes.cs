@@ -62,45 +62,30 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         /// <summary>
         /// The perceived approach rate inclusive of rate-adjusting mods (DT/HT/etc).
         /// </summary>
-        /// <remarks>
-        /// Rate-adjusting mods don't directly affect the approach rate difficulty value, but have a perceived effect as a result of adjusting audio timing.
-        /// </remarks>
         [JsonProperty("approach_rate")]
         public double ApproachRate { get; set; }
 
         /// <summary>
         /// The perceived overall difficulty inclusive of rate-adjusting mods (DT/HT/etc).
         /// </summary>
-        /// <remarks>
-        /// Rate-adjusting mods don't directly affect the overall difficulty value, but have a perceived effect as a result of adjusting audio timing.
-        /// </remarks>
         [JsonProperty("overall_difficulty")]
         public double OverallDifficulty { get; set; }
 
         /// <summary>
         /// The perceived hit window for a GREAT hit inclusive of rate-adjusting mods (DT/HT/etc).
         /// </summary>
-        /// <remarks>
-        /// Rate-adjusting mods don't directly affect the hit window, but have a perceived effect as a result of adjusting audio timing.
-        /// </remarks>
         [JsonProperty("great_hit_window")]
         public double GreatHitWindow { get; set; }
 
         /// <summary>
         /// The perceived hit window for an OK hit inclusive of rate-adjusting mods (DT/HT/etc).
         /// </summary>
-        /// <remarks>
-        /// Rate-adjusting mods don't directly affect the hit window, but have a perceived effect as a result of adjusting audio timing.
-        /// </remarks>
         [JsonProperty("ok_hit_window")]
         public double OkHitWindow { get; set; }
 
         /// <summary>
         /// The perceived hit window for a MEH hit inclusive of rate-adjusting mods (DT/HT/etc).
         /// </summary>
-        /// <remarks>
-        /// Rate-adjusting mods don't directly affect the hit window, but have a perceived effect as a result of adjusting audio timing.
-        /// </remarks>
         [JsonProperty("meh_hit_window")]
         public double MehHitWindow { get; set; }
 
