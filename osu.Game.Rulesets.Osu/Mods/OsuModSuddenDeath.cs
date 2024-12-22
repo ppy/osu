@@ -3,7 +3,12 @@
 
 using System;
 using System.Linq;
+using osu.Framework.Bindables;
+using osu.Game.Configuration;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
@@ -13,5 +18,16 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             typeof(OsuModTargetPractice),
         }).ToArray();
+
+        [SettingSource("Fail on slider tail miss", "Fail when missing on the end of a slider")]
+        public BindableBool SliderTailMiss { get; } = new BindableBool();
+
+        protected override bool FailCondition(HealthProcessor healthProcessor, JudgementResult result)
+        {
+            if (SliderTailMiss.Value && result.HitObject is SliderTailCircle && result.Type == HitResult.IgnoreMiss)
+                return true;
+
+            return result.Type.AffectsCombo() && !result.IsHit;
+        }
     }
 }
