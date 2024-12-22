@@ -224,7 +224,7 @@ namespace osu.Game
         /// Whether the game should be limited from providing access to download non-featured-artist beatmaps.
         /// This only affects the "featured artists" filter in the beatmap listing overlay.
         /// </summary>
-        public bool LimitedToFeaturedArtists => RuntimeInfo.OS == RuntimeInfo.Platform.iOS && true;
+        public bool LimitedToFeaturedArtists => RuntimeInfo.OS == RuntimeInfo.Platform.iOS;
 
         public OsuGame(string[] args = null)
         {
