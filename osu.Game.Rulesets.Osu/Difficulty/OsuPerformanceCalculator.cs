@@ -61,25 +61,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             countSliderTickMiss = score.Statistics.GetValueOrDefault(HitResult.LargeTickMiss);
             effectiveMissCount = countMiss;
 
-            if (osuAttributes.SliderCount > 0)
+            if (usingClassicSliderAccuracy && osuAttributes.SliderCount > 0)
             {
-                if (usingClassicSliderAccuracy)
-                {
-                    // Consider that full combo is maximum combo minus dropped slider tails since they don't contribute to combo but also don't break it
-                    // In classic scores we can't know the amount of dropped sliders so we estimate to 10% of all sliders on the map
-                    double fullComboThreshold = attributes.MaxCombo - 0.1 * osuAttributes.SliderCount;
+                // Consider that full combo is maximum combo minus dropped slider tails since they don't contribute to combo but also don't break it
+                // In classic scores we can't know the amount of dropped sliders so we estimate to 10% of all sliders on the map
+                double fullComboThreshold = attributes.MaxCombo - 0.1 * osuAttributes.SliderCount;
 
-                    if (scoreMaxCombo < fullComboThreshold)
-                        effectiveMissCount = fullComboThreshold / Math.Max(1.0, scoreMaxCombo);
+                if (scoreMaxCombo < fullComboThreshold)
+                    effectiveMissCount = fullComboThreshold / Math.Max(1.0, scoreMaxCombo);
 
-                    // In classic scores there can't be more misses than a sum of all non-perfect judgements
-                    effectiveMissCount = Math.Min(effectiveMissCount, totalImperfectHits);
-                }
-                else
-                {
-                    // In lazer we have exact amount of misses, no need to estimate anything.
-                    effectiveMissCount = countMiss;
-                }
+                // In classic scores there can't be more misses than a sum of all non-perfect judgements
+                effectiveMissCount = Math.Min(effectiveMissCount, totalImperfectHits);
             }
 
             effectiveMissCount = Math.Max(countMiss, effectiveMissCount);
