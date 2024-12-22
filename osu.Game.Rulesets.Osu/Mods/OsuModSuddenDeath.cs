@@ -22,7 +22,12 @@ namespace osu.Game.Rulesets.Osu.Mods
         [SettingSource("Fail when missing on a slider tail")]
         public BindableBool SliderTailMiss { get; } = new BindableBool();
 
-        protected override bool FailCondition(HealthProcessor healthProcessor, JudgementResult result) =>
-            (SliderTailMiss.Value && result.HitObject is SliderTailCircle && result.Type == HitResult.IgnoreMiss) || base.FailCondition(healthProcessor, result);
+        protected override bool FailCondition(HealthProcessor healthProcessor, JudgementResult result)
+        {
+            if (SliderTailMiss.Value && result.HitObject is SliderTailCircle && result.Type == HitResult.IgnoreMiss)
+                return true;
+
+            return base.FailCondition(healthProcessor, result);
+        }
     }
 }
