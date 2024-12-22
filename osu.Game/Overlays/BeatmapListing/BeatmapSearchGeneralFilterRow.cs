@@ -148,7 +148,7 @@ namespace osu.Game.Overlays.BeatmapListing
                 if (!Active.Value)
                     disclaimerShown.Value = true;
 
-                if (game.LimitedToFeaturedArtists)
+                if (game.HideUnlicensedContent)
                 {
                     Enabled.Value = false;
                     Active.Disabled = true;
