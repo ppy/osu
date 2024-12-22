@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             typeof(OsuModTargetPractice),
         }).ToArray();
 
-        [SettingSource("PFC mode", "Fail when missing on a slider tail")]
+        [SettingSource("Fail when missing on a slider tail")]
         public BindableBool SliderTailMiss { get; } = new BindableBool();
 
         protected override bool FailCondition(HealthProcessor healthProcessor, JudgementResult result)
