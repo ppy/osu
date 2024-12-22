@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -8,6 +10,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Audio;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
+using osu.Game.Screens.Edit.Compose.Components.Timeline;
 using osuTK;
 
 namespace osu.Game.Screens.Edit.Audio
@@ -15,8 +18,9 @@ namespace osu.Game.Screens.Edit.Audio
     public partial class HitSoundTable : CompositeDrawable
     {
 
-        private const int bank_column_width = 300;
+        private const int bank_column_width = 200;
         private const int header_height = 25;
+        private const int row_height = 40;
 
         private FillFlowContainer trackContainer = null!;
 
@@ -71,21 +75,29 @@ namespace osu.Game.Screens.Edit.Audio
                         Spacing = new Vector2(2f),
                     }
                 },
+                new CentreMarker
+                {
+                    Margin = new MarginPadding { Right = 155 },
+                }
             };
 
             trackContainer.Add(createBankHeader("Normal"));
-
-            foreach (string bank in HitSampleInfo.AllBanks)
+            trackContainer.Add(new FillFlowContainer
             {
-                trackContainer.Add(createTrackRow(bank));
-            }
+                Direction = FillDirection.Horizontal,
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                Children = [createTracksLabel(HitSampleInfo.AllBanks.ToList()), new TrackRow(HitSampleInfo.AllBanks.ToArray())],
+            });
 
             trackContainer.Add(createBankHeader("Addition"));
-
-            foreach (string bank in HitSampleInfo.AllAdditions)
+            trackContainer.Add(new FillFlowContainer
             {
-                trackContainer.Add(createTrackRow(bank));
-            }
+                Direction = FillDirection.Horizontal,
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                Children = [createTracksLabel(HitSampleInfo.AllAdditions.ToList()), new TrackRow(HitSampleInfo.AllAdditions.ToArray())],
+            });
         }
 
         private Drawable createBankHeader(string title)
@@ -113,29 +125,37 @@ namespace osu.Game.Screens.Edit.Audio
             };
         }
 
-        private Drawable createTrackRow(string bank)
+        private Drawable createTracksLabel(List<string> samples)
         {
-            return new Container
+            return new FillFlowContainer
             {
-                RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
-                Children = new Drawable[]
+                Width = bank_column_width,
+                Spacing = new Vector2(2f),
+                Children = samples.ConvertAll<Drawable>(sample =>
                 {
-                    new Box
+                    return new Container
                     {
-                        RelativeSizeAxes = Axes.Y,
-                        Colour = colours.Background2,
-                        Width = bank_column_width,
-                    },
-                    new OsuSpriteText
-                    {
-                        Text = bank,
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
-                        Padding = new MarginPadding { Left = 15 },
-                    },
-                    new TrackRow(),
-                }
+                        RelativeSizeAxes = Axes.X,
+                        Height = row_height,
+                        Children = new Drawable[]
+                        {
+                            new Box
+                            {
+                                RelativeSizeAxes = Axes.Y,
+                                Colour = colours.Background2,
+                                Width = bank_column_width,
+                            },
+                            new OsuSpriteText
+                            {
+                                Margin = new MarginPadding { Left = 10 },
+                                Origin = Anchor.CentreLeft,
+                                Anchor =  Anchor.CentreLeft,
+                                Text = sample
+                            }
+                        }
+                    };
+                }),
             };
         }
     }
