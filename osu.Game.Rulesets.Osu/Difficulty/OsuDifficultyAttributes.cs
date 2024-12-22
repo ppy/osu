@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Difficulty
 {
@@ -18,6 +19,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         /// </summary>
         [JsonProperty("aim_difficulty")]
         public double AimDifficulty { get; set; }
+
+        /// <summary>
+        /// The number of <see cref="Slider"/>s weighted by difficulty.
+        /// </summary>
+        [JsonProperty("aim_difficult_slider_count")]
+        public double AimDifficultSliderCount { get; set; }
 
         /// <summary>
         /// The difficulty corresponding to the speed skill.
@@ -109,6 +116,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             yield return (ATTRIB_ID_AIM_DIFFICULT_STRAIN_COUNT, AimDifficultStrainCount);
             yield return (ATTRIB_ID_SPEED_DIFFICULT_STRAIN_COUNT, SpeedDifficultStrainCount);
             yield return (ATTRIB_ID_SPEED_NOTE_COUNT, SpeedNoteCount);
+            yield return (ATTRIB_ID_AIM_DIFFICULT_SLIDER_COUNT, AimDifficultSliderCount);
         }
 
         public override void FromDatabaseAttributes(IReadOnlyDictionary<int, double> values, IBeatmapOnlineInfo onlineInfo)
@@ -125,6 +133,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             AimDifficultStrainCount = values[ATTRIB_ID_AIM_DIFFICULT_STRAIN_COUNT];
             SpeedDifficultStrainCount = values[ATTRIB_ID_SPEED_DIFFICULT_STRAIN_COUNT];
             SpeedNoteCount = values[ATTRIB_ID_SPEED_NOTE_COUNT];
+            AimDifficultSliderCount = values[ATTRIB_ID_AIM_DIFFICULT_SLIDER_COUNT];
             DrainRate = onlineInfo.DrainRate;
             HitCircleCount = onlineInfo.CircleCount;
             SliderCount = onlineInfo.SliderCount;

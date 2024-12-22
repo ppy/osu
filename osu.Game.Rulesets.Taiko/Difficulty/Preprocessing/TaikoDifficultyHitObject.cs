@@ -49,6 +49,16 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
         public readonly TaikoDifficultyHitObjectColour Colour;
 
         /// <summary>
+        /// The adjusted BPM of this hit object, based on its slider velocity and scroll speed.
+        /// </summary>
+        public double EffectiveBPM;
+
+        /// <summary>
+        /// The current slider velocity of this hit object.
+        /// </summary>
+        public double CurrentSliderVelocity;
+
+        /// <summary>
         /// Creates a new difficulty hit object.
         /// </summary>
         /// <param name="hitObject">The gameplay <see cref="HitObject"/> associated with this difficulty object.</param>
