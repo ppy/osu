@@ -107,7 +107,6 @@ namespace osu.Game.Overlays.BeatmapListing
         {
             private Container activeContent = null!;
             private Circle background = null!;
-            private SpriteIcon icon = null!;
 
             public MultipleSelectionFilterTabItem(T value)
                 : base(value)
@@ -129,6 +128,7 @@ namespace osu.Game.Overlays.BeatmapListing
                     Alpha = 0,
                     Padding = new MarginPadding
                     {
+                        Left = -16,
                         Right = -4,
                         Vertical = -2
                     },
@@ -139,9 +139,8 @@ namespace osu.Game.Overlays.BeatmapListing
                             Colour = Color4.White,
                             RelativeSizeAxes = Axes.Both,
                         },
-                        icon = new SpriteIcon
+                        new SpriteIcon
                         {
-                            Alpha = 0f,
                             Icon = FontAwesome.Solid.TimesCircle,
                             Size = new Vector2(10),
                             Colour = ColourProvider.Background4,
@@ -173,19 +172,8 @@ namespace osu.Game.Overlays.BeatmapListing
 
                 if (Active.Value)
                 {
-                    if (Enabled.Value)
-                    {
-                        // This just allows enough spacing for adjacent tab items to show the "x".
-                        Padding = new MarginPadding { Left = 12 };
-                        activeContent.Padding = activeContent.Padding with { Left = -16 };
-                        icon.Show();
-                    }
-                    else
-                    {
-                        Padding = new MarginPadding();
-                        activeContent.Padding = activeContent.Padding with { Left = -4 };
-                        icon.Hide();
-                    }
+                    // This just allows enough spacing for adjacent tab items to show the "x".
+                    Padding = new MarginPadding { Left = 12 };
 
                     activeContent.FadeIn(200, Easing.OutQuint);
                     background.FadeColour(colour, 200, Easing.OutQuint);
