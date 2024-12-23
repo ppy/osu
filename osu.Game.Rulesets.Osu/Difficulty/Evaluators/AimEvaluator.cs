@@ -92,8 +92,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     // Penalize acute angles if they're repeated, reducing the penalty as the lastAngle gets more obtuse.
                     acuteAngleBonus *= 0.03 + 0.97 * (1 - Math.Min(acuteAngleBonus, Math.Pow(calcAcuteAngleBonus(lastAngle), 3)));
 
-                    // Apply wiggle bonus for jumps that are [radius, 2*diameter] in distance, with < 110 angle and bpm > 150
-                    // https://www.desmos.com/calculator/iis7lgbppe
+                    // Apply wiggle bonus for jumps that are [radius, 3*diameter] in distance, with < 110 angle
+                    // https://www.desmos.com/calculator/dp0v0nvowc
                     wiggleBonus = angleBonus
                                   * DifficultyCalculationUtils.Smootherstep(osuCurrObj.LazyJumpDistance, radius, diameter)
                                   * Math.Pow(DifficultyCalculationUtils.ReverseLerp(osuCurrObj.LazyJumpDistance, diameter * 3, diameter), 1.8)
