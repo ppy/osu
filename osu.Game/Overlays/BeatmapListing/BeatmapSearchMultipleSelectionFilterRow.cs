@@ -76,8 +76,6 @@ namespace osu.Game.Overlays.BeatmapListing
                 {
                     if (!c.Active.Disabled)
                         c.Active.Value = Current.Contains(c.Value);
-                    else if (c.Active.Value != Current.Contains(c.Value))
-                        throw new InvalidOperationException($"Expected filter {c.Value} to be set to {Current.Contains(c.Value)}, but was {c.Active.Value}");
                 }
             }
 
