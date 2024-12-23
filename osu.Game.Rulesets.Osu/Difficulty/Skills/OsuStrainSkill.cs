@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// The number of strains sections, which the strain reduction will apply to.
         /// We assume that the first seconds of the map are always easier than calculated difficulty due to them being free to retry.
         /// </summary>
-        protected virtual int ReducedSectionCount => 30000 / SectionLength;
+        protected virtual int ReducedSectionCount => 60000 / SectionLength;
 
         /// <summary>
         /// The baseline multiplier applied to the section with the biggest strain.
