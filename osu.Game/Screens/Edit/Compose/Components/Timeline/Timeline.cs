@@ -127,8 +127,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 },
                 new Container
                 {
-                    RelativeSizeAxes = Axes.X,
-                    Height = timeline_height,
+                    RelativeSizeAxes = Axes.Both,
                     Children = new[]
                     {
                         waveform = new WaveformGraph
