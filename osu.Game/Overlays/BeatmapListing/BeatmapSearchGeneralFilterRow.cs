@@ -5,6 +5,7 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
@@ -113,7 +114,7 @@ namespace osu.Game.Overlays.BeatmapListing
             }
         }
 
-        private partial class FeaturedArtistsTabItem : MultipleSelectionFilterTabItem
+        private partial class FeaturedArtistsTabItem : MultipleSelectionFilterTabItem, IHasTooltip
         {
             private Bindable<bool> disclaimerShown = null!;
 
@@ -136,6 +137,8 @@ namespace osu.Game.Overlays.BeatmapListing
 
             [Resolved]
             private OsuGame? game { get; set; }
+
+            public LocalisableString TooltipText => !Enabled.Value ? BeatmapOverlayStrings.FeaturedArtistsDisabledTooltip : string.Empty;
 
             protected override void LoadComplete()
             {
