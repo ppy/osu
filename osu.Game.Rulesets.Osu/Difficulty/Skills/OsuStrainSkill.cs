@@ -13,10 +13,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     public abstract class OsuStrainSkill : StrainSkill
     {
         /// <summary>
-        /// The number of strains sections, which the strain reduction will apply to.
+        /// The duration strain reduction will apply to.
         /// We assume that the first seconds of the map are always easier than calculated difficulty due to them being free to retry.
         /// </summary>
-        protected virtual int ReducedSectionCount => 60000 / SectionLength;
+        protected virtual int ReducedDuration => 45;
 
         /// <summary>
         /// The baseline multiplier applied to the section with the biggest strain.
@@ -39,10 +39,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             List<double> strains = peaks.ToList();
 
-            // We are reducing the highest strains first to account for extreme difficulty spikes
-            for (int i = 0; i < Math.Min(strains.Count, ReducedSectionCount); i++)
+            double reducedSectionCount = ReducedDuration * 1000.0 / SectionLength;
+
+            for (int i = 0; i < Math.Min(strains.Count, reducedSectionCount); i++)
             {
-                double scale = Math.Log10(Interpolation.Lerp(1, 10, Math.Clamp((float)i / ReducedSectionCount, 0, 1)));
+                double scale = Math.Log10(Interpolation.Lerp(1, 10, Math.Clamp((float)i / reducedSectionCount, 0, 1)));
                 strains[i] *= Interpolation.Lerp(ReducedStrainBaseline, 1.0, scale);
             }
 
