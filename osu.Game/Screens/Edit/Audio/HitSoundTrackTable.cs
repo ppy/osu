@@ -21,7 +21,7 @@ namespace osu.Game.Screens.Edit.Audio
 
         private const int bank_column_width = 200;
         private const int header_height = 25;
-        private const int row_height = 40;
+        private const int row_height = 30;
 
         [Resolved]
         private OverlayColourProvider colours { get; set; } = null!;
@@ -79,7 +79,7 @@ namespace osu.Game.Screens.Edit.Audio
                     Child = new FillFlowContainer
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Spacing = new Vector2(2f),
+                        Spacing = new Vector2(1f),
                         Children = new[]
                         {
                             new Container()
@@ -87,17 +87,19 @@ namespace osu.Game.Screens.Edit.Audio
                                 Alpha = 0,
                                 Child = composer,
                             },
-                            createBankHeader("Normal"),
-                            createHitSoundTrackDisplay(HitSampleInfo.AllBanks.ToList()),
-                            createBankHeader("Addition"),
-                            createHitSoundTrackDisplay(HitSampleInfo.AllAdditions.ToList()),
+                            createBankHeader("Samples"),
+                            createHitSoundTrackDisplay(HitSampleInfo.AllAdditions.ToList(), HitSoundTrackMode.Sample),
+                            createBankHeader("Normal bank"),
+                            createHitSoundTrackDisplay(HitSampleInfo.AllBanks.ToList(), HitSoundTrackMode.NormalBank),
+                            createBankHeader("Addition bank"),
+                            createHitSoundTrackDisplay(HitSampleInfo.AllBanks.ToList(), HitSoundTrackMode.AdditionBank),
                         }
                     }
                 },
             };
         }
 
-        private Drawable createHitSoundTrackDisplay(List<string> samples)
+        private Drawable createHitSoundTrackDisplay(List<string> samples, HitSoundTrackMode mode)
         {
             return new Container
             {
@@ -108,12 +110,11 @@ namespace osu.Game.Screens.Edit.Audio
                         new EditorSkinProvidingContainer(editorBeatmap).WithChild(new Container
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Child = new SoundTrackObjectsDisplay
+                            Child = new SoundTrackObjectsDisplay(mode)
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
-                                Height = 0.75f,
                             },
                         })
                     ),
@@ -142,7 +143,7 @@ namespace osu.Game.Screens.Edit.Audio
                         Margin = new MarginPadding {Left = bank_column_width},
                         Anchor = Anchor.CentreLeft,
                         Height = 2,
-                        Colour = colours.Background1,
+                        Colour = colours.Background2,
                     },
                     new OsuSpriteText
                     {
