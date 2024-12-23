@@ -216,11 +216,11 @@ namespace osu.Game.Screens.Select
                                 },
                             }
                         },
-                        FilterControl = new FilterControl
+                        FilterControl = CreateFilterControl().With(d =>
                         {
-                            RelativeSizeAxes = Axes.X,
-                            Height = FilterControl.HEIGHT,
-                        },
+                            d.RelativeSizeAxes = Axes.X;
+                            d.Height = FilterControl.HEIGHT;
+                        }),
                         new GridContainer // used for max width implementation
                         {
                             RelativeSizeAxes = Axes.Both,
@@ -388,6 +388,8 @@ namespace osu.Game.Screens.Select
             sampleChangeBeatmap = audio.Samples.Get(@"SongSelect/select-expand");
             SampleConfirm = audio.Samples.Get(@"SongSelect/confirm-selection");
         }
+
+        protected virtual FilterControl CreateFilterControl() => new FilterControl();
 
         protected override void LoadComplete()
         {

@@ -124,13 +124,14 @@ namespace osu.Game.Online.Rooms
 
         #endregion
 
-        public PlaylistItem With(Optional<long> id = default, Optional<IBeatmapInfo> beatmap = default, Optional<ushort?> playlistOrder = default)
+        public PlaylistItem With(Optional<long> id = default, Optional<IBeatmapInfo> beatmap = default, Optional<ushort?> playlistOrder = default,
+                                 Optional<int> ruleset = default)
         {
             return new PlaylistItem(beatmap.GetOr(Beatmap))
             {
                 ID = id.GetOr(ID),
                 OwnerID = OwnerID,
-                RulesetID = RulesetID,
+                RulesetID = ruleset.GetOr(RulesetID),
                 Expired = Expired,
                 PlaylistOrder = playlistOrder.GetOr(PlaylistOrder),
                 PlayedAt = PlayedAt,

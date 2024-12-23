@@ -145,43 +145,66 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                             SelectedItem = SelectedItem
                                         }
                                     },
-                                    new[]
+                                    new Drawable[]
                                     {
-                                        UserModsSection = new FillFlowContainer
+                                        new Container
                                         {
                                             RelativeSizeAxes = Axes.X,
                                             AutoSizeAxes = Axes.Y,
                                             Margin = new MarginPadding { Top = 10 },
-                                            Alpha = 0,
-                                            Children = new Drawable[]
+                                            Children = new[]
                                             {
-                                                new OverlinedHeader("Extra mods"),
-                                                new FillFlowContainer
+                                                UserModsSection = new FillFlowContainer
                                                 {
-                                                    AutoSizeAxes = Axes.Both,
-                                                    Direction = FillDirection.Horizontal,
-                                                    Spacing = new Vector2(10, 0),
+                                                    RelativeSizeAxes = Axes.X,
+                                                    AutoSizeAxes = Axes.Y,
+                                                    Alpha = 0,
                                                     Children = new Drawable[]
                                                     {
-                                                        new UserModSelectButton
+                                                        new OverlinedHeader("Extra mods"),
+                                                        new FillFlowContainer
                                                         {
-                                                            Anchor = Anchor.CentreLeft,
-                                                            Origin = Anchor.CentreLeft,
-                                                            Width = 90,
-                                                            Text = "Select",
-                                                            Action = ShowUserModSelect,
-                                                        },
-                                                        new ModDisplay
-                                                        {
-                                                            Anchor = Anchor.CentreLeft,
-                                                            Origin = Anchor.CentreLeft,
-                                                            Current = UserMods,
-                                                            Scale = new Vector2(0.8f),
+                                                            AutoSizeAxes = Axes.Both,
+                                                            Direction = FillDirection.Horizontal,
+                                                            Spacing = new Vector2(10, 0),
+                                                            Children = new Drawable[]
+                                                            {
+                                                                new UserModSelectButton
+                                                                {
+                                                                    Anchor = Anchor.CentreLeft,
+                                                                    Origin = Anchor.CentreLeft,
+                                                                    Width = 90,
+                                                                    Text = "Select",
+                                                                    Action = ShowUserModSelect,
+                                                                },
+                                                                new ModDisplay
+                                                                {
+                                                                    Anchor = Anchor.CentreLeft,
+                                                                    Origin = Anchor.CentreLeft,
+                                                                    Current = UserMods,
+                                                                    Scale = new Vector2(0.8f),
+                                                                },
+                                                            }
                                                         },
                                                     }
                                                 },
+                                                UserDifficultySection = new FillFlowContainer
+                                                {
+                                                    RelativeSizeAxes = Axes.X,
+                                                    AutoSizeAxes = Axes.Y,
+                                                    Alpha = 0,
+                                                    Children = new Drawable[]
+                                                    {
+                                                        new OverlinedHeader("Difficulty"),
+                                                        UserStyleDisplayContainer = new Container<DrawableRoomPlaylistItem>
+                                                        {
+                                                            RelativeSizeAxes = Axes.X,
+                                                            AutoSizeAxes = Axes.Y
+                                                        }
+                                                    }
+                                                },
                                             }
-                                        },
+                                        }
                                     },
                                 },
                                 RowDimensions = new[]
@@ -240,14 +263,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         protected override void UpdateMods()
         {
-            if (SelectedItem.Value == null || client.LocalUser == null || !this.IsCurrentScreen())
+            if (GetGameplayItem() is not PlaylistItem item || client.LocalUser == null || !this.IsCurrentScreen())
                 return;
 
             // update local mods based on room's reported status for the local user (omitting the base call implementation).
             // this makes the server authoritative, and avoids the local user potentially setting mods that the server is not aware of (ie. if the match was started during the selection being changed).
-            var rulesetInstance = Rulesets.GetRuleset(SelectedItem.Value.RulesetID)?.CreateInstance();
+            var rulesetInstance = Rulesets.GetRuleset(item.RulesetID)?.CreateInstance();
             Debug.Assert(rulesetInstance != null);
-            Mods.Value = client.LocalUser.Mods.Select(m => m.ToMod(rulesetInstance)).Concat(SelectedItem.Value.RequiredMods.Select(m => m.ToMod(rulesetInstance))).ToList();
+            Mods.Value = client.LocalUser.Mods.Select(m => m.ToMod(rulesetInstance)).Concat(item.RequiredMods.Select(m => m.ToMod(rulesetInstance))).ToList();
         }
 
         [Resolved(canBeNull: true)]
