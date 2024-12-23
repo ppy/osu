@@ -5,10 +5,12 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Logging;
 using osu.Game.Audio;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
@@ -67,12 +69,57 @@ namespace osu.Game.Screens.Edit.Audio
                 Origin = Anchor.Centre,
                 Icon = OsuIcon.FilledCircle,
                 Enabled = { Value = true },
+                Action = () =>
+                {
+                    switch (mode)
+                    {
+                        case HitSoundTrackMode.Sample:
+                            toggleSample();
+                            break;
+                        case HitSoundTrackMode.NormalBank:
+                        case HitSoundTrackMode.AdditionBank:
+                            toggleBank();
+                            break;
+                    }
+                }
             };
 
             active.BindValueChanged(v =>
             {
                 Alpha = v.NewValue ? 1f : 0.1f;
             }, true);
+        }
+
+        private void toggleSample()
+        {
+            if (active.Value)
+                hitObject.SamplesBindable.Remove(hitObject.Samples.FirstOrDefault(s => s.Name == target));
+            else
+                hitObject.SamplesBindable.Add(new HitSampleInfo(target, hitObject.Samples.FirstOrDefault(s => s.Name != HitSampleInfo.HIT_NORMAL)?.Bank ?? HitSampleInfo.BANK_NORMAL));
+        }
+
+        private void toggleBank()
+        {
+            // If it's already active, then it can't be turn off by manual
+            if (active.Value)
+                return;
+
+            switch (mode)
+            {
+                case HitSoundTrackMode.NormalBank:
+                    var originalNormalBank = hitObject.Samples.First(s => s.Name == HitSampleInfo.HIT_NORMAL);
+                    hitObject.SamplesBindable.Add(originalNormalBank?.With(newBank: target));
+                    hitObject.SamplesBindable.Remove(originalNormalBank);
+                    break;
+                case HitSoundTrackMode.AdditionBank:
+                    foreach (var originSample in hitObject.Samples.Where(s => s.Name != HitSampleInfo.HIT_NORMAL).ToArray())
+                    {
+                        hitObject.SamplesBindable.Add(originSample?.With(newBank: target));
+                        hitObject.SamplesBindable.Remove(originSample);
+                    }
+                    break;
+
+            };
         }
 
         private void updateBankActiveState()
