@@ -126,9 +126,6 @@ namespace osu.Game.Overlays.BeatmapListing
             private OsuColour colours { get; set; } = null!;
 
             [Resolved]
-            private OsuGame game { get; set; } = null!;
-
-            [Resolved]
             private OsuConfigManager config { get; set; } = null!;
 
             [Resolved]
@@ -136,6 +133,9 @@ namespace osu.Game.Overlays.BeatmapListing
 
             [Resolved]
             private IDialogOverlay? dialogOverlay { get; set; }
+
+            [Resolved]
+            private OsuGame? game { get; set; }
 
             protected override void LoadComplete()
             {
@@ -148,7 +148,7 @@ namespace osu.Game.Overlays.BeatmapListing
                 if (!Active.Value)
                     disclaimerShown.Value = true;
 
-                if (game.HideUnlicensedContent)
+                if (game?.HideUnlicensedContent == true)
                 {
                     Enabled.Value = false;
                     Active.Disabled = true;
