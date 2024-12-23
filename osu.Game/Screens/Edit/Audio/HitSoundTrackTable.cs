@@ -13,13 +13,14 @@ using osu.Game.Overlays;
 using osuTK;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
+using Humanizer;
 
 namespace osu.Game.Screens.Edit.Audio
 {
     public partial class HitSoundTrackTable : CompositeDrawable
     {
 
-        private const int bank_column_width = 200;
+        private const int bank_column_width = 155;
         private const int header_height = 25;
         private const int row_height = 30;
 
@@ -148,7 +149,7 @@ namespace osu.Game.Screens.Edit.Audio
                     new OsuSpriteText
                     {
                         Margin = new MarginPadding {Left = 10, Vertical = header_height / 2},
-                        Text = title
+                        Text = title,
                     }
                 }
             };
@@ -180,7 +181,7 @@ namespace osu.Game.Screens.Edit.Audio
                                 Margin = new MarginPadding { Left = 10 },
                                 Origin = Anchor.CentreLeft,
                                 Anchor =  Anchor.CentreLeft,
-                                Text = sample
+                                Text = sample.Replace("hit", string.Empty).Titleize(),
                             }
                         }
                     };
