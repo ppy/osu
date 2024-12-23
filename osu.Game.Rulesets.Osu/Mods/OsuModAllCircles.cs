@@ -27,11 +27,9 @@ namespace osu.Game.Rulesets.Osu.Mods
             if (beatmap is not OsuBeatmap osuBeatmap)
                 return;
 
-
             for (int i = 0; i < osuBeatmap.HitObjects.Count; i++)
             {
-                OsuHitObject osuObject = osuBeatmap.HitObjects[i];
-                if (osuObject is not Slider slider)
+                if (osuBeatmap.HitObjects[i] is not Slider slider)
                     continue;
 
                 HitCircle newCircle = new HitCircle
