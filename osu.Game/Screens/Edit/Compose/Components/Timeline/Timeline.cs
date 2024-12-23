@@ -205,7 +205,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             if (editorClock.IsRunning)
                 scrollToTrackTime();
 
-            if (editorClock.TrackLength != trackLengthForZoom)
+            if (editorClock.TrackLength != trackLengthForZoom || editorBeatmap.TimelineZoom != Zoom / defaultTimelineZoom)
             {
                 defaultTimelineZoom = getZoomLevelForVisibleMilliseconds(6000);
 
