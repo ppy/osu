@@ -6,7 +6,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
 
@@ -24,10 +23,9 @@ namespace osu.Game.Screens.Edit.Audio
 
         protected override Drawable CreateTimelineContent()
         {
-            Ruleset ruleset = workingBeatmap.Value.BeatmapInfo.Ruleset.CreateInstance();
-            HitObjectComposer? composer = ruleset?.CreateHitObjectComposer();
+            HitObjectComposer? composer = workingBeatmap.Value.BeatmapInfo.Ruleset.CreateInstance()?.CreateHitObjectComposer();
 
-            if (composer == null || ruleset == null)
+            if (composer == null)
                 return base.CreateTimelineContent();
 
             return new EditorSkinProvidingContainer(EditorBeatmap).WithChild(new Container
