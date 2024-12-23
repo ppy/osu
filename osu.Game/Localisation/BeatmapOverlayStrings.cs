@@ -28,6 +28,11 @@ This includes content that may not be correctly licensed for osu! usage. Browse 
         /// </summary>
         public static LocalisableString UserContentConfirmButtonText => new TranslatableString(getKey(@"understood"), @"I understand");
 
+        /// <summary>
+        /// "Toggling this filter is disabled in this platform."
+        /// </summary>
+        public static LocalisableString FeaturedArtistsDisabledTooltip => new TranslatableString(getKey(@"featured_artists_disabled_tooltip"), @"Toggling this filter is disabled in this platform.");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
