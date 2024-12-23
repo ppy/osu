@@ -136,7 +136,7 @@ namespace osu.Game.Screens.Select
 
         private FooterButtonOptions beatmapOptionsButton = null!;
 
-        private readonly Bindable<RulesetInfo> decoupledRuleset = new Bindable<RulesetInfo>();
+        private readonly Bindable<RulesetInfo?> decoupledRuleset = new Bindable<RulesetInfo?>();
 
         private double audioFeedbackLastPlaybackTime;
 
@@ -429,7 +429,7 @@ namespace osu.Game.Screens.Select
 
             dependencies.CacheAs(this);
             dependencies.CacheAs(decoupledRuleset);
-            dependencies.CacheAs<IBindable<RulesetInfo>>(decoupledRuleset);
+            dependencies.CacheAs<IBindable<RulesetInfo?>>(decoupledRuleset);
 
             return dependencies;
         }
@@ -997,7 +997,7 @@ namespace osu.Game.Screens.Select
 
             selectedMods.BindValueChanged(_ =>
             {
-                if (decoupledRuleset.Value.Equals(rulesetNoDebounce))
+                if (decoupledRuleset.Value?.Equals(rulesetNoDebounce) ?? false)
                     advancedStats.Mods.Value = selectedMods.Value;
             }, true);
 

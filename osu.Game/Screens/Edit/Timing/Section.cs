@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -30,7 +31,7 @@ namespace osu.Game.Screens.Edit.Timing
         protected EditorBeatmap Beatmap { get; private set; } = null!;
 
         [Resolved]
-        protected Bindable<ControlPointGroup> SelectedGroup { get; private set; } = null!;
+        protected Bindable<ControlPointGroup?> SelectedGroup { get; private set; } = null!;
 
         [Resolved]
         protected IEditorChangeHandler? ChangeHandler { get; private set; }
@@ -103,12 +104,13 @@ namespace osu.Game.Screens.Edit.Timing
                     }
 
                     if (ControlPoint.Value == null)
-                        SelectedGroup.Value.Add(ControlPoint.Value = CreatePoint());
+                        SelectedGroup.Value.Add(ControlPoint.Value = CreatePointFrom(SelectedGroup.Value.Time));
                 }
                 else
                 {
                     if (ControlPoint.Value != null)
                     {
+                        Debug.Assert(SelectedGroup.Value != null);
                         SelectedGroup.Value.Remove(ControlPoint.Value);
                         ControlPoint.Value = null;
                     }
@@ -128,6 +130,6 @@ namespace osu.Game.Screens.Edit.Timing
 
         protected abstract void OnControlPointChanged(ValueChangedEvent<T?> point);
 
-        protected abstract T CreatePoint();
+        protected abstract T CreatePointFrom(double time);
     }
 }

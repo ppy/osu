@@ -32,7 +32,7 @@ namespace osu.Game.Overlays.Chat
         public void TextBoxKillFocus() => chatTextBox.KillFocus();
 
         [Resolved]
-        private Bindable<Channel> currentChannel { get; set; } = null!;
+        private Bindable<Channel?> currentChannel { get; set; } = null!;
 
         private Container chattingTextContainer = null!;
         private OsuSpriteText chattingText = null!;
@@ -138,7 +138,7 @@ namespace osu.Game.Overlays.Chat
 
             currentChannel.BindValueChanged(change =>
             {
-                Channel newChannel = change.NewValue;
+                Channel? newChannel = change.NewValue;
 
                 switch (newChannel?.Type)
                 {

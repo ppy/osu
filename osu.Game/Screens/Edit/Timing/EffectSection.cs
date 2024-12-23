@@ -81,9 +81,9 @@ namespace osu.Game.Screens.Edit.Timing
             effectPoint.ScrollSpeedBindable.Value = scrollSpeed.NewValue;
         }
 
-        protected override EffectControlPoint CreatePoint()
+        protected override EffectControlPoint CreatePointFrom(double time)
         {
-            var reference = Beatmap.ControlPointInfo.EffectPointAt(SelectedGroup.Value.Time);
+            var reference = Beatmap.ControlPointInfo.EffectPointAt(time);
 
             return new EffectControlPoint
             {
