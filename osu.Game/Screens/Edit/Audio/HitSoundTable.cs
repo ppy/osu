@@ -10,8 +10,9 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Audio;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
-using osu.Game.Screens.Edit.Compose.Components.Timeline;
 using osuTK;
+using osu.Framework.Bindables;
+using osu.Game.Beatmaps;
 
 namespace osu.Game.Screens.Edit.Audio
 {
@@ -22,15 +23,21 @@ namespace osu.Game.Screens.Edit.Audio
         private const int header_height = 25;
         private const int row_height = 40;
 
-        private FillFlowContainer trackContainer = null!;
+        [Resolved]
+        private OverlayColourProvider colours { get; set; } = null!;
 
         [Resolved]
-        OverlayColourProvider colours { get; set; } = null!;
+        private IBindable<WorkingBeatmap> workingBeatmap { get; set; } = null!;
+
+        [Resolved]
+        private EditorBeatmap editorBeatmap { get; set; } = null!;
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
             RelativeSizeAxes = Axes.Both;
+
+            var composer = workingBeatmap.Value.BeatmapInfo.Ruleset.CreateInstance().CreateHitObjectComposer();
 
             InternalChildren = new Drawable[]
             {
@@ -57,7 +64,7 @@ namespace osu.Game.Screens.Edit.Audio
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                         },
-                        new TableHeaderText("Enables")
+                        new TableHeaderText("Attributes")
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
@@ -69,35 +76,56 @@ namespace osu.Game.Screens.Edit.Audio
                 {
                     RelativeSizeAxes = Axes.Both,
                     Padding = new MarginPadding { Top = header_height },
-                    Child = trackContainer = new FillFlowContainer
+                    Child = new FillFlowContainer
                     {
                         RelativeSizeAxes = Axes.Both,
                         Spacing = new Vector2(2f),
+                        Children = new[]
+                        {
+                            new Container()
+                            {
+                                Alpha = 0,
+                                Child = composer,
+                            },
+                            createBankHeader("Normal"),
+                            createTrackDisplay(HitSampleInfo.AllBanks.ToList()),
+                            createBankHeader("Addition"),
+                            createTrackDisplay(HitSampleInfo.AllAdditions.ToList()),
+                        }
                     }
                 },
-                new CentreMarker
-                {
-                    Margin = new MarginPadding { Right = 155 },
-                }
             };
+        }
 
-            trackContainer.Add(createBankHeader("Normal"));
-            trackContainer.Add(new FillFlowContainer
+        private Drawable createTrackDisplay(List<string> sample)
+        {
+            return new Container
             {
-                Direction = FillDirection.Horizontal,
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
-                Children = [createTracksLabel(HitSampleInfo.AllBanks.ToList()), new TrackRow(HitSampleInfo.AllBanks.ToArray())],
-            });
-
-            trackContainer.Add(createBankHeader("Addition"));
-            trackContainer.Add(new FillFlowContainer
-            {
-                Direction = FillDirection.Horizontal,
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
-                Children = [createTracksLabel(HitSampleInfo.AllAdditions.ToList()), new TrackRow(HitSampleInfo.AllAdditions.ToArray())],
-            });
+                Children = new[] {
+                    new TrackTimeline(
+                        new EditorSkinProvidingContainer(editorBeatmap).WithChild(new Container
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Child = new TrackTicksDisplay
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Anchor = Anchor.CentreLeft,
+                                Origin = Anchor.CentreLeft,
+                                Height = 0.75f,
+                            },
+                        })
+                    ),
+                    new Box
+                    {
+                        Width = bank_column_width,
+                        RelativeSizeAxes = Axes.Y,
+                        Colour = colours.Background4
+                    },
+                    createTracksLabel(sample),
+                },
+            };
         }
 
         private Drawable createBankHeader(string title)
