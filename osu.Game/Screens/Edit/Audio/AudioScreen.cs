@@ -46,7 +46,7 @@ namespace osu.Game.Screens.Edit.Audio
         }
         protected override Drawable CreateMainContent()
         {
-            return new HitSoundTable();
+            return new HitSoundTrackTable();
         }
     }
 }

@@ -6,9 +6,9 @@ using osu.Game.Screens.Edit.Compose.Components.Timeline;
 
 namespace osu.Game.Screens.Edit.Audio
 {
-    public partial class TrackTimeline : Timeline
+    public partial class HitSoundTrackTimeline : Timeline
     {
-        public TrackTimeline(Drawable userContent) : base(userContent)
+        public HitSoundTrackTimeline(Drawable userContent) : base(userContent)
         {
         }
 

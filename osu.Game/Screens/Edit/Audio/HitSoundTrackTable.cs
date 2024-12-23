@@ -16,7 +16,7 @@ using osu.Game.Beatmaps;
 
 namespace osu.Game.Screens.Edit.Audio
 {
-    public partial class HitSoundTable : CompositeDrawable
+    public partial class HitSoundTrackTable : CompositeDrawable
     {
 
         private const int bank_column_width = 200;
@@ -88,27 +88,27 @@ namespace osu.Game.Screens.Edit.Audio
                                 Child = composer,
                             },
                             createBankHeader("Normal"),
-                            createTrackDisplay(HitSampleInfo.AllBanks.ToList()),
+                            createHitSoundTrackDisplay(HitSampleInfo.AllBanks.ToList()),
                             createBankHeader("Addition"),
-                            createTrackDisplay(HitSampleInfo.AllAdditions.ToList()),
+                            createHitSoundTrackDisplay(HitSampleInfo.AllAdditions.ToList()),
                         }
                     }
                 },
             };
         }
 
-        private Drawable createTrackDisplay(List<string> sample)
+        private Drawable createHitSoundTrackDisplay(List<string> samples)
         {
             return new Container
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
                 Children = new[] {
-                    new TrackTimeline(
+                    new HitSoundTrackTimeline(
                         new EditorSkinProvidingContainer(editorBeatmap).WithChild(new Container
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Child = new TrackTicksDisplay
+                            Child = new SoundTrackObjectsDisplay
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 Anchor = Anchor.CentreLeft,
@@ -123,7 +123,7 @@ namespace osu.Game.Screens.Edit.Audio
                         RelativeSizeAxes = Axes.Y,
                         Colour = colours.Background4
                     },
-                    createTracksLabel(sample),
+                    createHitSoundTracksLabel(samples),
                 },
             };
         }
@@ -153,7 +153,7 @@ namespace osu.Game.Screens.Edit.Audio
             };
         }
 
-        private Drawable createTracksLabel(List<string> samples)
+        private Drawable createHitSoundTracksLabel(List<string> samples)
         {
             return new FillFlowContainer
             {

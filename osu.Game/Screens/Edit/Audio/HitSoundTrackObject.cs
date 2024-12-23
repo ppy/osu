@@ -14,11 +14,10 @@ using osu.Game.Screens.Edit.Components.Timelines.Summary.Parts;
 
 namespace osu.Game.Screens.Edit.Audio
 {
-    public partial class TrackTick : GridContainer
+    public partial class HitSoundTrackObject : GridContainer
     {
         public HitObject HitObject;
-
-        public TrackTick(HitObject hitObject)
+        public HitSoundTrackObject(HitObject hitObject)
         {
             hitObject.StartTimeBindable.BindValueChanged(v =>
             {
@@ -41,20 +40,20 @@ namespace osu.Game.Screens.Edit.Audio
             {
                 new[]
                 {
-                    createTick(),
+                    createObject(),
                 },
                 new[]
                 {
-                    createTick(),
+                    createObject(),
                 },
                 new[]
                 {
-                    createTick(),
+                    createObject(),
                 },
             };
         }
 
-        private Drawable createTick()
+        private Drawable createObject()
         {
             return new Container
             {
@@ -70,7 +69,7 @@ namespace osu.Game.Screens.Edit.Audio
         }
     }
 
-    public partial class TrackTicksDisplay : TimelinePart<TrackTick>
+    public partial class SoundTrackObjectsDisplay : TimelinePart<HitSoundTrackObject>
     {
         [Resolved]
         private EditorBeatmap editorBeatmap { get; set; } = null!;
@@ -80,32 +79,21 @@ namespace osu.Game.Screens.Edit.Audio
             base.LoadComplete();
             editorBeatmap.HitObjectRemoved += (HitObject hitObject) =>
             {
-                Children.First(tick => tick.HitObject == hitObject).Expire();
+                Children.First(soundObject => soundObject.HitObject == hitObject).Expire();
             };
             editorBeatmap.HitObjectAdded += (HitObject hitObject) =>
             {
-                Add(new TrackTick(hitObject));
+                Add(new HitSoundTrackObject(hitObject));
             };
-            recreateTicks();
-        }
 
-        protected override void Update()
-        {
-            base.Update();
-        }
-
-        private void recreateTicks()
-        {
-            Clear();
-
-            List<TrackTick> ticks = [];
+            List<HitSoundTrackObject> objects = [];
 
             editorBeatmap.HitObjects.ForEach(hitObject =>
             {
-                ticks.Add(new TrackTick(hitObject));
+                objects.Add(new HitSoundTrackObject(hitObject));
             });
 
-            AddRange(ticks);
+            AddRange(objects);
         }
     }
 }
