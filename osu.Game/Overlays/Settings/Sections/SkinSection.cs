@@ -70,11 +70,6 @@ namespace osu.Game.Overlays.Settings.Sections
                     Current = skins.CurrentSkinInfo,
                     Keywords = new[] { @"skins" },
                 },
-                new SettingsButton
-                {
-                    Text = SkinSettingsStrings.SkinLayoutEditor,
-                    Action = () => skinEditor?.ToggleVisibility(),
-                },
                 new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.X,
@@ -89,6 +84,11 @@ namespace osu.Game.Overlays.Settings.Sections
                         new ExportSkinButton { Padding = new MarginPadding(), RelativeSizeAxes = Axes.None, Width = 120 },
                         new DeleteSkinButton { Padding = new MarginPadding(), RelativeSizeAxes = Axes.None, Width = 110 },
                     }
+                },
+                new SettingsButton
+                {
+                    Text = SkinSettingsStrings.SkinLayoutEditor,
+                    Action = () => skinEditor?.ToggleVisibility(),
                 },
             };
         }
