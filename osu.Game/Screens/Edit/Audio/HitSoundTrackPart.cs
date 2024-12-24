@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
@@ -14,7 +15,9 @@ using osu.Game.Audio;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Screens.Edit.Components.Timelines.Summary.Parts;
+using osu.Game.Screens.Edit.Compose.Components.Timeline;
 
 namespace osu.Game.Screens.Edit.Audio
 {
@@ -33,39 +36,30 @@ namespace osu.Game.Screens.Edit.Audio
 
     public partial class HitSoundTrackObjectToggle : Container
     {
+        private IconButton button;
+        private BindableList<HitSampleInfo> bindableSamples = null!;
+        private IList<HitSampleInfo> samples = null!;
+        private string target;
+        private Bindable<bool> active = new();
+
+        public Action<string>? Action;
+
         [Resolved]
         private EditorBeatmap editorBeatmap { get; set; } = null!;
 
-        private Bindable<bool> active = new Bindable<bool>();
-        private string target;
-        private HitObject hitObject;
-        private HitSoundTrackMode mode;
+        [Resolved]
+        private SoundTrackObjectsDisplay soundTrackObjectsDisplay { get; set; } = null!;
 
-        private IconButton button;
+        [Resolved]
+        private HitSoundTrackPart hitSoundTrackPart { get; set; } = null!;
 
-        public HitSoundTrackObjectToggle(HitObject hitObject, HitSoundTrackMode mode, string target)
+        public HitSoundTrackObjectToggle(string target)
         {
             this.target = target;
-            this.hitObject = hitObject;
-            this.mode = mode;
 
             AutoSizeAxes = Axes.Both;
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
-
-            hitObject.SamplesBindable.BindCollectionChanged((object? obj, NotifyCollectionChangedEventArgs e) =>
-            {
-                switch (mode)
-                {
-                    case HitSoundTrackMode.Sample:
-                        updateSampleActiveState();
-                        break;
-                    case HitSoundTrackMode.NormalBank:
-                    case HitSoundTrackMode.AdditionBank:
-                        updateBankActiveState();
-                        break;
-                }
-            }, true);
 
             Child = button = new IconButton
             {
@@ -73,111 +67,96 @@ namespace osu.Game.Screens.Edit.Audio
                 Origin = Anchor.Centre,
                 Icon = OsuIcon.FilledCircle,
                 Enabled = { Value = true },
-                Action = () =>
-                {
-                    switch (mode)
-                    {
-                        case HitSoundTrackMode.Sample:
-                            toggleSample();
-                            break;
-                        case HitSoundTrackMode.NormalBank:
-                        case HitSoundTrackMode.AdditionBank:
-                            toggleBank();
-                            break;
-                    }
-                }
+                Action = Toggle,
             };
 
             active.BindValueChanged(v =>
             {
-                button.FadeTo(v.NewValue ? 1f : 0.1f, 100);
+                button.Alpha = v.NewValue ? 1f : 0.1f;
             }, true);
         }
 
-        private void toggleSample()
+        protected override void LoadComplete()
         {
-            if (active.Value)
-                hitObject.SamplesBindable.Remove(hitObject.Samples.FirstOrDefault(s => s.Name == target));
-            else
-                hitObject.SamplesBindable.Add(new HitSampleInfo(target, hitObject.Samples.FirstOrDefault(s => s.Name != HitSampleInfo.HIT_NORMAL)?.Bank ?? HitSampleInfo.BANK_NORMAL));
+            base.LoadComplete();
+            bindableSamples = hitSoundTrackPart.HitObject.SamplesBindable;
 
-            editorBeatmap.UpdateAllHitObjects();
+            bindableSamples.BindCollectionChanged((object? obj, NotifyCollectionChangedEventArgs e) =>
+            {
+                samples = hitSoundTrackPart.HitObject.Samples;
+
+                switch (soundTrackObjectsDisplay.Mode)
+                {
+                    case HitSoundTrackMode.Sample:
+                        active.Value = samples.FirstOrDefault(sample => sample.Name == target) != null;
+                        break;
+                    case HitSoundTrackMode.NormalBank:
+                        active.Value = SamplePointPiece.GetBankValue(samples) == target;
+                        break;
+                    case HitSoundTrackMode.AdditionBank:
+                        active.Value = SamplePointPiece.GetAdditionBankValue(samples) == target;
+                        break;
+                }
+            }, true);
         }
 
-        private void toggleBank()
+        protected void Toggle()
         {
-            switch (mode)
+            editorBeatmap.BeginChange();
+
+            switch (soundTrackObjectsDisplay.Mode)
             {
+                case HitSoundTrackMode.Sample:
+                    if (active.Value)
+                        bindableSamples.RemoveAll(sample => sample.Name == target);
+                    else
+                        bindableSamples.Add(new HitSampleInfo(target));
+                    break;
                 case HitSoundTrackMode.NormalBank:
                     // If it's already active, then it can't be turn off by manual
                     if (active.Value)
                         return;
-                    var originalNormalBank = hitObject.Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL);
+                    var originalNormalBank = samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL);
                     if (originalNormalBank == null)
                         return;
-                    hitObject.SamplesBindable.Add(originalNormalBank.With(newBank: target));
-                    hitObject.SamplesBindable.Remove(originalNormalBank);
+                    bindableSamples.Add(originalNormalBank.With(newBank: target));
+                    bindableSamples.Remove(originalNormalBank);
                     break;
                 case HitSoundTrackMode.AdditionBank:
-                    foreach (var originSample in hitObject.Samples.Where(s => s.Name != HitSampleInfo.HIT_NORMAL))
+
+                    foreach (var originalSample in samples.Where(s => s.Name != HitSampleInfo.HIT_NORMAL))
                     {
-                        Scheduler.Add(delegate ()
+                        Scheduler.Add(() =>
                         {
-                            Logger.Log($"{originSample.Name} {originSample.Bank}");
                             if (active.Value)
-                                hitObject.SamplesBindable.Add(originSample?.With(newEditorAutoBank: true));
+                                bindableSamples.Add(originalSample.With(newEditorAutoBank: true));
                             else
-                                hitObject.SamplesBindable.Add(originSample?.With(newBank: target, newEditorAutoBank: false));
-                            hitObject.SamplesBindable.Remove(originSample);
+                                bindableSamples.Add(originalSample.With(newBank: target, newEditorAutoBank: false));
+                            bindableSamples.Remove(originalSample);
                         });
                     }
+
                     Scheduler.Update();
                     break;
-            };
-
-            editorBeatmap.UpdateAllHitObjects();
-        }
-
-        private void updateBankActiveState()
-        {
-            var sample = hitObject.Samples.Where(s => s.Bank == target);
-            if (sample != null)
-            {
-                switch (mode)
-                {
-                    case HitSoundTrackMode.NormalBank:
-                        active.Value = sample.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL)?.Bank == target;
-                        break;
-                    case HitSoundTrackMode.AdditionBank:
-                        var additionSample = sample.FirstOrDefault(s => s.Name != HitSampleInfo.HIT_NORMAL);
-                        active.Value = additionSample?.Bank == target && additionSample?.EditorAutoBank == false;
-                        break;
-                };
             }
-            else
-                active.Value = false;
-        }
 
-        private void updateSampleActiveState()
-        {
-            if (hitObject.Samples.FirstOrDefault(s => s.Name == target) != null)
-                active.Value = true;
-            else
-                active.Value = false;
+            editorBeatmap.Update(hitSoundTrackPart.HitObject);
+            editorBeatmap.EndChange();
         }
     }
 
-    public partial class HitSoundTrackPart : FillFlowContainer, IHasHitObjectAndParent
+
+    [Cached]
+    public partial class HitSoundTrackPart : FillFlowContainer
     {
-        public HitObject HitObject { get; set; }
-        public HitObject? HitObjectParent { get; set; } = null;
+        public HitObject HitObject;
 
-        public HitSoundTrackMode Mode;
+        [Resolved]
+        private SoundTrackObjectsDisplay soundTrackObjectsDisplay { get; set; } = null!;
 
-        public HitSoundTrackPart(HitObject hitObject, HitSoundTrackMode mode)
+        public HitSoundTrackPart(HitObject hitObject)
         {
             HitObject = hitObject;
-            Mode = mode;
 
             RelativePositionAxes = Axes.X;
             RelativeSizeAxes = Axes.Y;
@@ -192,42 +171,60 @@ namespace osu.Game.Screens.Edit.Audio
 
             HitObject.StartTimeBindable.BindValueChanged(v =>
             {
-                X = (float)v.NewValue;
+                X = (float)GetStartTime();
             }, true);
 
-            HitObjectParent?.StartTimeBindable.BindValueChanged(v =>
-            {
-                X = (float)HitObject.StartTime;
-            }, true);
+            string buildTarget(string sample, string bank) => soundTrackObjectsDisplay.Mode == HitSoundTrackMode.Sample ? sample : bank;
 
             Children = new[]
             {
-                new HitSoundTrackObjectToggle(HitObject, Mode, Mode == HitSoundTrackMode.Sample? HitSampleInfo.HIT_WHISTLE : HitSampleInfo.BANK_NORMAL),
-                new HitSoundTrackObjectToggle(HitObject, Mode, Mode == HitSoundTrackMode.Sample? HitSampleInfo.HIT_FINISH : HitSampleInfo.BANK_SOFT),
-                new HitSoundTrackObjectToggle(HitObject, Mode, Mode == HitSoundTrackMode.Sample? HitSampleInfo.HIT_CLAP : HitSampleInfo.BANK_DRUM)
+                new HitSoundTrackObjectToggle(buildTarget(HitSampleInfo.HIT_WHISTLE, HitSampleInfo.BANK_NORMAL)),
+                new HitSoundTrackObjectToggle(buildTarget(HitSampleInfo.HIT_FINISH, HitSampleInfo.BANK_SOFT)),
+                new HitSoundTrackObjectToggle(buildTarget(HitSampleInfo.HIT_CLAP, HitSampleInfo.BANK_DRUM)),
             };
+        }
+
+        protected virtual double GetStartTime()
+        {
+            return HitObject.StartTime;
         }
     }
 
+    public partial class NodeHitSoundTrackPart : HitSoundTrackPart
+    {
+        public IHasRepeats HasRepeat;
+        public int NodeIndex;
+
+        public NodeHitSoundTrackPart(HitObject hitObject, IHasRepeats hasRepeat, int nodeIndex) : base(hitObject)
+        {
+            HasRepeat = hasRepeat;
+            NodeIndex = nodeIndex;
+        }
+
+        protected override double GetStartTime()
+        {
+            return HitObject.StartTime + HasRepeat.Duration * NodeIndex / HasRepeat.SpanCount();
+        }
+    }
+
+    [Cached]
     public partial class SoundTrackObjectsDisplay : TimelinePart<HitSoundTrackPart>
     {
         [Resolved]
         private EditorBeatmap editorBeatmap { get; set; } = null!;
 
-        private HitSoundTrackMode mode;
+        public readonly HitSoundTrackMode Mode;
+
         public SoundTrackObjectsDisplay(HitSoundTrackMode mode)
         {
-            this.mode = mode;
+            Mode = mode;
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
             editorBeatmap.HitObjectRemoved += removeHitObjectFromTrack;
-            editorBeatmap.HitObjectAdded += (HitObject hitObject) =>
-            {
-                addHitObjectToTrack(hitObject);
-            };
+            editorBeatmap.HitObjectAdded += addHitObjectToTrack;
             editorBeatmap.HitObjectUpdated += (HitObject hitObject) =>
             {
                 if (hitObject.NestedHitObjects.Count < 1)
@@ -239,52 +236,34 @@ namespace osu.Game.Screens.Edit.Audio
 
             List<HitSoundTrackPart> objects = [];
 
-            editorBeatmap.HitObjects.ForEach(hitObject =>
-            {
-                addHitObjectToTrack(hitObject);
-            });
+            editorBeatmap.HitObjects.ForEach(addHitObjectToTrack);
 
             AddRange(objects);
         }
 
         private void removeHitObjectFromTrack(HitObject hitObject)
         {
-            if (hitObject.NestedHitObjects.Count < 1)
+            Children.Where(v =>
             {
-                objectFromHitObject<HitSoundTrackPart>(hitObject).ForEach(d => d.Expire());
-                return;
-            }
-
-            foreach (HitObject nestedHitObject in hitObject.NestedHitObjects)
-            {
-                objectFromHitObject<HitSoundTrackPart>(hitObject).ForEach(d => d.Expire());
-            }
-        }
-
-        private void addHitObjectToTrack(HitObject hitObject, HitObject? parent = null)
-        {
-            if (hitObject.NestedHitObjects.Count < 1)
-            {
-                Add(new HitSoundTrackPart(hitObject, mode) { HitObjectParent = parent });
-                return;
-            }
-
-            foreach (HitObject nestedHitObject in hitObject.NestedHitObjects)
-            {
-                addHitObjectToTrack(nestedHitObject, hitObject);
-            }
-        }
-
-        private IEnumerable<Drawable> objectFromHitObject<T>(HitObject hitObject) where T : Drawable, IHasHitObjectAndParent
-        {
-            return Children.Where(soundObject =>
-            {
-                if (soundObject is T hitSoundTrackObject)
-                {
-                    return hitSoundTrackObject.HitObject == hitObject || hitSoundTrackObject.HitObjectParent == hitObject;
-                }
+                if (v is HitSoundTrackPart hitSoundTrackPart)
+                    return hitSoundTrackPart.HitObject == hitObject;
                 return false;
-            });
+            }).ForEach(part => part.Expire());
+        }
+
+        private void addHitObjectToTrack(HitObject hitObject)
+        {
+            if (hitObject is IHasRepeats repeatedHitObject)
+            {
+                for (int i = 0; i < repeatedHitObject.NodeSamples.Count; i++)
+                {
+                    Add(new NodeHitSoundTrackPart(hitObject, repeatedHitObject, i));
+                }
+            }
+            else
+            {
+                Add(new HitSoundTrackPart(hitObject));
+            }
         }
     }
 }
