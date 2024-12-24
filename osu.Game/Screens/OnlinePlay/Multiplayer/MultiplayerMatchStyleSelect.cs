@@ -10,6 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Select;
@@ -67,16 +68,33 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         private partial class DifficultySelectFilterControl : FilterControl
         {
             private readonly PlaylistItem item;
+            private double itemLength;
 
             public DifficultySelectFilterControl(PlaylistItem item)
             {
                 this.item = item;
             }
 
+            [BackgroundDependencyLoader]
+            private void load(RealmAccess realm)
+            {
+                int beatmapId = item.Beatmap.OnlineID;
+                itemLength = realm.Run(r => r.All<BeatmapInfo>().FirstOrDefault(b => b.OnlineID == beatmapId)?.Length ?? 0);
+            }
+
             public override FilterCriteria CreateCriteria()
             {
                 var criteria = base.CreateCriteria();
+
+                // Must be from the same set as the playlist item.
                 criteria.BeatmapSetId = item.BeatmapSetId;
+
+                // Must be within 30s of the playlist item.
+                criteria.Length.Min = itemLength - 30000;
+                criteria.Length.Max = itemLength + 30000;
+                criteria.Length.IsLowerInclusive = true;
+                criteria.Length.IsUpperInclusive = true;
+
                 return criteria;
             }
         }

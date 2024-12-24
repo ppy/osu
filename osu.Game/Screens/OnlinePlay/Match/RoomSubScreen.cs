@@ -517,7 +517,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
             {
                 AllowReordering = false,
                 AllowEditing = true,
-                RequestEdit = openStyleSelection
+                RequestEdit = _ => openStyleSelection()
             };
         }
 
@@ -541,12 +541,12 @@ namespace osu.Game.Screens.OnlinePlay.Match
             return selectedItemWithOverride;
         }
 
-        private void openStyleSelection(PlaylistItem item)
+        private void openStyleSelection()
         {
-            if (!this.IsCurrentScreen())
+            if (SelectedItem.Value == null || !this.IsCurrentScreen())
                 return;
 
-            this.Push(new MultiplayerMatchStyleSelect(Room, item, (beatmap, ruleset) =>
+            this.Push(new MultiplayerMatchStyleSelect(Room, SelectedItem.Value, (beatmap, ruleset) =>
             {
                 if (SelectedItem.Value?.BeatmapSetId == null || SelectedItem.Value.BeatmapSetId != beatmap.BeatmapSet?.OnlineID)
                     return;
