@@ -65,8 +65,8 @@ namespace osu.Game.Screens.Edit.Audio
                 {
                     new Container
                     {
-                        Width = 0,
-                        Height = 0,
+                        Width = 1,
+                        Height = 1,
                         Child = composer,
                     },
                     new HitSoundTrackTable(),
