@@ -202,18 +202,20 @@ namespace osu.Game.Screens.Menu
                 holdToExitGameOverlay?.CreateProxy() ?? Empty()
             });
 
+            float baseDim = SeasonalUIConfig.ENABLED ? 0.84f : 1;
+
             Buttons.StateChanged += state =>
             {
                 switch (state)
                 {
                     case ButtonSystemState.Initial:
                     case ButtonSystemState.Exit:
-                        ApplyToBackground(b => b.FadeColour(Color4.White, 500, Easing.OutSine));
+                        ApplyToBackground(b => b.FadeColour(OsuColour.Gray(baseDim), 500, Easing.OutSine));
                         onlineMenuBanner.State.Value = Visibility.Hidden;
                         break;
 
                     default:
-                        ApplyToBackground(b => b.FadeColour(OsuColour.Gray(0.8f), 500, Easing.OutSine));
+                        ApplyToBackground(b => b.FadeColour(OsuColour.Gray(baseDim * 0.8f), 500, Easing.OutSine));
                         onlineMenuBanner.State.Value = Visibility.Visible;
                         break;
                 }
