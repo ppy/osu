@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// The duration strain reduction will apply to.
         /// We assume that the first seconds of the map are always easier than calculated difficulty due to them being free to retry.
         /// </summary>
-        protected virtual int ReducedDuration => 45;
+        protected virtual int ReducedDuration => 40;
 
         /// <summary>
         /// The baseline multiplier applied to the section with the biggest strain.
