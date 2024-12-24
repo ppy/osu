@@ -5,6 +5,7 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
@@ -113,7 +114,7 @@ namespace osu.Game.Overlays.BeatmapListing
             }
         }
 
-        private partial class FeaturedArtistsTabItem : MultipleSelectionFilterTabItem
+        private partial class FeaturedArtistsTabItem : MultipleSelectionFilterTabItem, IHasTooltip
         {
             private Bindable<bool> disclaimerShown = null!;
 
@@ -126,16 +127,35 @@ namespace osu.Game.Overlays.BeatmapListing
             private OsuColour colours { get; set; } = null!;
 
             [Resolved]
+            private OsuConfigManager config { get; set; } = null!;
+
+            [Resolved]
             private SessionStatics sessionStatics { get; set; } = null!;
 
             [Resolved]
             private IDialogOverlay? dialogOverlay { get; set; }
 
+            [Resolved]
+            private OsuGame? game { get; set; }
+
+            public LocalisableString TooltipText => BeatmapOverlayStrings.FeaturedArtistsTooltip;
+
             protected override void LoadComplete()
             {
                 base.LoadComplete();
 
+                config.BindWith(OsuSetting.BeatmapListingFeaturedArtistFilter, Active);
                 disclaimerShown = sessionStatics.GetBindable<bool>(Static.FeaturedArtistDisclaimerShownOnce);
+
+                // no need to show the disclaimer if the user already had it toggled off in config.
+                if (!Active.Value)
+                    disclaimerShown.Value = true;
+
+                if (game?.HideUnlicensedContent == true)
+                {
+                    Enabled.Value = false;
+                    Active.Disabled = true;
+                }
             }
 
             protected override Color4 ColourNormal => colours.Orange1;
@@ -143,6 +163,9 @@ namespace osu.Game.Overlays.BeatmapListing
 
             protected override bool OnClick(ClickEvent e)
             {
+                if (!Enabled.Value)
+                    return true;
+
                 if (!disclaimerShown.Value && dialogOverlay != null)
                 {
                     dialogOverlay.Push(new FeaturedArtistConfirmDialog(() =>
