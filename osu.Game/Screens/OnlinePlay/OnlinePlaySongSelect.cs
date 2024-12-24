@@ -206,7 +206,7 @@ namespace osu.Game.Screens.OnlinePlay
 
             baseButtons.InsertRange(baseButtons.FindIndex(b => b.Item1 is FooterButtonMods) + 1, new (FooterButton, OverlayContainer?)[]
             {
-                (freeModsFooterButton, freeModSelect),
+                (freeModsFooterButton, null),
                 (freeStyleButton, null)
             });
 
