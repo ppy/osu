@@ -41,6 +41,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         private JudgementPooler<DrawableTaikoJudgement> judgementPooler = null!;
         private readonly IDictionary<HitResult, HitExplosionPool> explosionPools = new Dictionary<HitResult, HitExplosionPool>();
+        private readonly IDictionary<HitType, KiaiHitExplosionPool> kiaiExplosionPools = new Dictionary<HitType, KiaiHitExplosionPool>();
 
         private ProxyContainer topLevelHitContainer = null!;
         private InputDrum inputDrum = null!;
@@ -201,6 +202,10 @@ namespace osu.Game.Rulesets.Taiko.UI
             foreach (var result in usableHitResults)
                 explosionPools.Add(result, new HitExplosionPool(result));
             AddRangeInternal(explosionPools.Values);
+
+            foreach (var type in Enum.GetValues<HitType>())
+                kiaiExplosionPools.Add(type, new KiaiHitExplosionPool(type));
+            AddRangeInternal(kiaiExplosionPools.Values);
         }
 
         protected override void LoadComplete()
@@ -300,7 +305,11 @@ namespace osu.Game.Rulesets.Taiko.UI
             {
                 case TaikoStrongJudgement:
                     if (result.IsHit)
+                    {
                         hitExplosionContainer.Children.FirstOrDefault(e => e.JudgedObject == ((DrawableStrongNestedHit)judgedObject).ParentHitObject)?.VisualiseSecondHit(result);
+                        if (result.HitObject.Kiai)
+                            kiaiExplosionContainer.Children.FirstOrDefault(e => e.JudgedObject == ((DrawableStrongNestedHit)judgedObject).ParentHitObject)?.VisualiseSecondHit(result);
+                    }
                     break;
 
                 case TaikoDrumRollTickJudgement:
@@ -336,8 +345,12 @@ namespace osu.Game.Rulesets.Taiko.UI
         {
             hitExplosionContainer.Add(explosionPools[result]
                 .Get(explosion => explosion.Apply(drawableObject)));
-            if (drawableObject.HitObject.Kiai)
-                kiaiExplosionContainer.Add(new KiaiHitExplosion(drawableObject, type));
+
+            //TODO: should we check `result.IsHit` ?
+            if (drawableObject.HitObject.Kiai && result.IsHit())
+                kiaiExplosionContainer.Add(
+                    kiaiExplosionPools[type].Get(
+                        explosion => explosion.Apply(drawableObject)));
         }
 
         private partial class ProxyContainer : LifetimeManagementContainer
