@@ -134,7 +134,6 @@ namespace osu.Desktop
             if (iconStream != null)
                 host.Window.SetIconFromStream(iconStream);
 
-            host.Window.CursorState |= CursorState.Hidden;
             host.Window.Title = Name;
         }
 
