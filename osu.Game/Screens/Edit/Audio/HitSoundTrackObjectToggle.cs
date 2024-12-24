@@ -8,16 +8,72 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Audio;
-using osu.Game.Graphics;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
+using osu.Game.Skinning;
+using osuTK.Graphics;
+using osu.Framework.Graphics.Shapes;
+using osu.Framework.Extensions.Color4Extensions;
+using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Edit.Audio
 {
+    public partial class HitSoundTrackObjectToggleButton : Container
+    {
+        private Bindable<Color4> colour = new();
+
+        private Circle circle;
+
+        public new Color4 Colour
+        {
+            get => colour.Value;
+            set
+            {
+                base.Colour = value;
+                colour.Value = value;
+            }
+        }
+
+        public Action Action { get; set; }
+
+        public HitSoundTrackObjectToggleButton()
+        {
+            Anchor = Anchor.Centre;
+            Origin = Anchor.Centre;
+            Child = new ClickableContainer
+            {
+                RelativeSizeAxes = Axes.Both,
+                Child = circle = new Circle
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Width = 15,
+                    Height = 15,
+                },
+                Action = () =>
+                {
+                    Action?.Invoke();
+                }
+            };
+
+            colour.BindValueChanged(v =>
+            {
+                circle.Masking = true;
+                circle.EdgeEffect = new EdgeEffectParameters
+                {
+                    Type = EdgeEffectType.Shadow,
+                    Colour = v.NewValue.Darken(0.2f),
+                    Radius = 10f,
+                };
+                circle.Colour = v.NewValue;
+            }, true);
+        }
+    }
+
     public partial class HitSoundTrackObjectToggle : Container
     {
         private IList<HitSampleInfo> samples = null!;
@@ -25,7 +81,7 @@ namespace osu.Game.Screens.Edit.Audio
 
         private string target;
 
-        private IconButton button;
+        private HitSoundTrackObjectToggleButton button;
         private Bindable<bool> active = new();
 
         public Action<string>? Action;
@@ -39,6 +95,12 @@ namespace osu.Game.Screens.Edit.Audio
         [Resolved]
         private HitSoundTrackPart hitSoundTrackPart { get; set; } = null!;
 
+        [Resolved]
+        private ISkinSource skin { get; set; } = null!;
+
+        [Resolved]
+        private OverlayColourProvider colourProvider { get; set; } = null!;
+
         public HitSoundTrackObjectToggle(string target)
         {
             this.target = target;
@@ -47,12 +109,12 @@ namespace osu.Game.Screens.Edit.Audio
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
-            Child = button = new IconButton
+            Child = button = new HitSoundTrackObjectToggleButton
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Icon = OsuIcon.FilledCircle,
-                Enabled = { Value = true },
+                Width = 30,
+                Height = 30,
                 Action = Toggle,
             };
 
@@ -71,9 +133,36 @@ namespace osu.Game.Screens.Edit.Audio
             {
                 if (updatedHitObject == hitObject)
                     UpdateActiveStateAndSample();
+                updateColour();
             };
 
+            if (hitObject is IHasDisplayColour displayColour)
+                displayColour.DisplayColour.GetBoundCopy().BindValueChanged(_ => updateColour(), true);
+
             hitObject.SamplesBindable.BindCollectionChanged((object? obj, NotifyCollectionChangedEventArgs e) => UpdateActiveStateAndSample(), true);
+            updateColour();
+        }
+
+        private void updateColour()
+        {
+            Color4 colour;
+
+            switch (hitObject)
+            {
+                case IHasDisplayColour displayColour:
+                    colour = displayColour.DisplayColour.Value;
+                    break;
+
+                case IHasComboInformation combo:
+                    colour = combo.GetComboColour(skin);
+                    break;
+
+                default:
+                    colour = colourProvider.Highlight1;
+                    break;
+            }
+
+            button.Colour = colour;
         }
 
         protected void UpdateActiveStateAndSample()
