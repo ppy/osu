@@ -67,6 +67,10 @@ namespace osu.Game.Online.Rooms
             set => Beatmap = new APIBeatmap { OnlineID = value };
         }
 
+        /// <summary>
+        /// A non-<c>null</c> value indicates "freestyle" mode where players are able to individually select
+        /// their own choice of beatmap (from the respective beatmap set) and ruleset to play in the room.
+        /// </summary>
         [JsonProperty("beatmapset_id")]
         public int? BeatmapSetId { get; set; }
 
