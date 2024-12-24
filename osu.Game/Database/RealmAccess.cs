@@ -95,6 +95,7 @@ namespace osu.Game.Database
         /// 42   2024-08-07    Update mania key bindings to reflect changes to ManiaAction
         /// 43   2024-10-14    Reset keybind for toggling FPS display to avoid conflict with "convert to stream" in the editor, if not already changed by user.
         /// 44   2024-11-22    Removed several properties from BeatmapInfo which did not need to be persisted to realm.
+        /// 45   2024-12-23    Change beat snap divisor adjust defaults to be Ctrl+Scroll instead of Ctrl+Shift+Scroll, if not already changed by user.
         /// </summary>
         private const int schema_version = 45;
 
