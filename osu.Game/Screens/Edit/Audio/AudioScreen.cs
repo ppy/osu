@@ -6,6 +6,8 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.Containers;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
 
@@ -21,12 +23,41 @@ namespace osu.Game.Screens.Edit.Audio
         {
         }
 
+        private HitObjectComposer composer = null!;
+        private Ruleset ruleset = null!;
+
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
+        {
+            var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+
+            ruleset = parent.Get<IBindable<WorkingBeatmap>>().Value.BeatmapInfo.Ruleset.CreateInstance();
+            composer = ruleset?.CreateHitObjectComposer()!;
+
+            // make the composer available to the timeline and other components in this screen.
+            if (composer != null)
+                dependencies.CacheAs(composer);
+
+            return dependencies;
+        }
+
         protected override Drawable CreateTimelineContent()
         {
-            HitObjectComposer? composer = workingBeatmap.Value.BeatmapInfo.Ruleset.CreateInstance()?.CreateHitObjectComposer();
-
-            if (composer == null)
+            if (composer == null || ruleset == null)
                 return base.CreateTimelineContent();
+
+            return new EditorSkinProvidingContainer(EditorBeatmap).WithChild(new Container
+            {
+                RelativeSizeAxes = Axes.Both,
+                Children = new Drawable[]
+                {
+                    new TimelineBlueprintContainer(composer),
+                }
+            });
+        }
+        protected override Drawable CreateMainContent()
+        {
+            if (composer == null || ruleset == null)
+                return Empty();
 
             return new EditorSkinProvidingContainer(EditorBeatmap).WithChild(new Container
             {
@@ -35,16 +66,13 @@ namespace osu.Game.Screens.Edit.Audio
                 {
                     new Container
                     {
-                        Alpha = 0,
+                        Width = 0,
+                        Height = 0,
                         Child = composer,
                     },
-                    new TimelineBlueprintContainer(composer),
+                    new HitSoundTrackTable(),
                 }
             });
-        }
-        protected override Drawable CreateMainContent()
-        {
-            return new HitSoundTrackTable();
         }
     }
 }

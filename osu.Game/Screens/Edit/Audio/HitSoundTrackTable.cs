@@ -14,6 +14,8 @@ using osuTK;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using Humanizer;
+using osu.Game.Rulesets.Edit;
+using osu.Framework.Input.Events;
 
 namespace osu.Game.Screens.Edit.Audio
 {
@@ -33,12 +35,16 @@ namespace osu.Game.Screens.Edit.Audio
         [Resolved]
         private EditorBeatmap editorBeatmap { get; set; } = null!;
 
+        [Resolved(CanBeNull = true)]
+        private HitObjectComposer composer { get; set; } = null!;
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
             RelativeSizeAxes = Axes.Both;
 
-            var composer = workingBeatmap.Value.BeatmapInfo.Ruleset.CreateInstance().CreateHitObjectComposer();
+            if (composer == null)
+                return;
 
             InternalChildren = new Drawable[]
             {
@@ -83,11 +89,6 @@ namespace osu.Game.Screens.Edit.Audio
                         Spacing = new Vector2(1f),
                         Children = new[]
                         {
-                            new Container()
-                            {
-                                Alpha = 0,
-                                Child = composer,
-                            },
                             createBankHeader("Samples"),
                             createHitSoundTrackDisplay(HitSampleInfo.AllAdditions.ToList(), HitSoundTrackMode.Sample),
                             createBankHeader("Normal bank"),

@@ -5,9 +5,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics.Transforms;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -138,7 +136,6 @@ namespace osu.Game.Screens.Edit.Audio
             };
 
             editorBeatmap.UpdateAllHitObjects();
-
         }
 
         private void updateBankActiveState()

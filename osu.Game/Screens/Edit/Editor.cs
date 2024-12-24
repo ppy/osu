@@ -1142,7 +1142,7 @@ namespace osu.Game.Screens.Edit
         private void updateSampleDisabledState()
         {
             bool shouldDisableSamples = clock.SeekingOrStopped.Value
-                                        || currentScreen is not ComposeScreen
+                                        || (currentScreen is not ComposeScreen && currentScreen is not AudioScreen)
                                         || editorBeatmap.UpdateInProgress.Value
                                         || dialogOverlay?.CurrentDialog != null;
 
