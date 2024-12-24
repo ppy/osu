@@ -68,6 +68,8 @@ namespace osu.Game.Screens.Play
 
         public override bool HideMenuCursorOnNonMouseInput => true;
 
+        public override bool RequiresPortraitOrientation => DrawableRuleset.RequiresPortraitOrientation;
+
         protected override OverlayActivation InitialOverlayActivationMode => OverlayActivation.UserTriggered;
 
         // We are managing our own adjustments (see OnEntering/OnExiting).

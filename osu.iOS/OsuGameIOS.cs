@@ -15,9 +15,21 @@ namespace osu.iOS
 {
     public partial class OsuGameIOS : OsuGame
     {
+        private readonly AppDelegate appDelegate;
         public override Version AssemblyVersion => new Version(NSBundle.MainBundle.InfoDictionary["CFBundleVersion"].ToString());
 
         public override bool HideUnlicensedContent => true;
+
+        public OsuGameIOS(AppDelegate appDelegate)
+        {
+            this.appDelegate = appDelegate;
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            Add(new IOSOrientationHandler(appDelegate));
+        }
 
         protected override UpdateManager CreateUpdateManager() => new MobileUpdateNotifier();
 
