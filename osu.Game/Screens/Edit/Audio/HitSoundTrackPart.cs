@@ -7,6 +7,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -34,10 +35,15 @@ namespace osu.Game.Screens.Edit.Audio
 
     public partial class HitSoundTrackObjectToggle : Container
     {
+        [Resolved]
+        private EditorBeatmap editorBeatmap { get; set; } = null!;
+
         private Bindable<bool> active = new Bindable<bool>();
         private string target;
         private HitObject hitObject;
         private HitSoundTrackMode mode;
+
+        private IconButton button;
 
         public HitSoundTrackObjectToggle(HitObject hitObject, HitSoundTrackMode mode, string target)
         {
@@ -63,7 +69,7 @@ namespace osu.Game.Screens.Edit.Audio
                 }
             }, true);
 
-            Child = new IconButton
+            Child = button = new IconButton
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -86,7 +92,7 @@ namespace osu.Game.Screens.Edit.Audio
 
             active.BindValueChanged(v =>
             {
-                Alpha = v.NewValue ? 1f : 0.1f;
+                button.FadeTo(v.NewValue ? 1f : 0.1f, 100);
             }, true);
         }
 
@@ -96,30 +102,43 @@ namespace osu.Game.Screens.Edit.Audio
                 hitObject.SamplesBindable.Remove(hitObject.Samples.FirstOrDefault(s => s.Name == target));
             else
                 hitObject.SamplesBindable.Add(new HitSampleInfo(target, hitObject.Samples.FirstOrDefault(s => s.Name != HitSampleInfo.HIT_NORMAL)?.Bank ?? HitSampleInfo.BANK_NORMAL));
+
+            editorBeatmap.UpdateAllHitObjects();
         }
 
         private void toggleBank()
         {
-            // If it's already active, then it can't be turn off by manual
-            if (active.Value)
-                return;
-
             switch (mode)
             {
                 case HitSoundTrackMode.NormalBank:
-                    var originalNormalBank = hitObject.Samples.First(s => s.Name == HitSampleInfo.HIT_NORMAL);
-                    hitObject.SamplesBindable.Add(originalNormalBank?.With(newBank: target));
+                    // If it's already active, then it can't be turn off by manual
+                    if (active.Value)
+                        return;
+                    var originalNormalBank = hitObject.Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL);
+                    if (originalNormalBank == null)
+                        return;
+                    hitObject.SamplesBindable.Add(originalNormalBank.With(newBank: target));
                     hitObject.SamplesBindable.Remove(originalNormalBank);
                     break;
                 case HitSoundTrackMode.AdditionBank:
-                    foreach (var originSample in hitObject.Samples.Where(s => s.Name != HitSampleInfo.HIT_NORMAL).ToArray())
+                    foreach (var originSample in hitObject.Samples.Where(s => s.Name != HitSampleInfo.HIT_NORMAL))
                     {
-                        hitObject.SamplesBindable.Add(originSample?.With(newBank: target));
-                        hitObject.SamplesBindable.Remove(originSample);
+                        Scheduler.Add(delegate ()
+                        {
+                            Logger.Log($"{originSample.Name} {originSample.Bank}");
+                            if (active.Value)
+                                hitObject.SamplesBindable.Add(originSample?.With(newEditorAutoBank: true));
+                            else
+                                hitObject.SamplesBindable.Add(originSample?.With(newBank: target, newEditorAutoBank: false));
+                            hitObject.SamplesBindable.Remove(originSample);
+                        });
                     }
+                    Scheduler.Update();
                     break;
-
             };
+
+            editorBeatmap.UpdateAllHitObjects();
+
         }
 
         private void updateBankActiveState()
@@ -133,7 +152,8 @@ namespace osu.Game.Screens.Edit.Audio
                         active.Value = sample.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL)?.Bank == target;
                         break;
                     case HitSoundTrackMode.AdditionBank:
-                        active.Value = sample.FirstOrDefault(s => s.Name != HitSampleInfo.HIT_NORMAL)?.Bank == target;
+                        var additionSample = sample.FirstOrDefault(s => s.Name != HitSampleInfo.HIT_NORMAL);
+                        active.Value = additionSample?.Bank == target && additionSample?.EditorAutoBank == false;
                         break;
                 };
             }
