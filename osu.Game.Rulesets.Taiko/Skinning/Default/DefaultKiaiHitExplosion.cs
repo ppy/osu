@@ -7,12 +7,14 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Objects;
+using osu.Game.Rulesets.Taiko.UI;
 using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.Skinning.Default
 {
-    public partial class DefaultKiaiHitExplosion : CircularContainer
+    public partial class DefaultKiaiHitExplosion : CircularContainer, IAnimatableHitExplosion
     {
         public override bool RemoveWhenNotAlive => true;
 
@@ -51,14 +53,16 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
             };
         }
 
-        protected override void LoadComplete()
+        public void Animate(DrawableHitObject _drawableHitObject)
         {
-            base.LoadComplete();
-
             this.ScaleTo(new Vector2(1, 3f), 500, Easing.OutQuint);
             this.FadeOut(250);
+        }
 
-            Expire(true);
+        public void AnimateSecondHit()
+        {
+            this.ScaleTo(new Vector2(TaikoStrongableHitObject.STRONG_SCALE, 3f), 500, Easing.OutQuint);
+            this.FadeOut(250);
         }
     }
 }
