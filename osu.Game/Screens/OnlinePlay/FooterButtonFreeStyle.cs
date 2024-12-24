@@ -15,7 +15,7 @@ using osu.Game.Screens.Select;
 
 namespace osu.Game.Screens.OnlinePlay
 {
-    public class FooterButtonFreePlay : FooterButton, IHasCurrentValue<bool>
+    public class FooterButtonFreeStyle : FooterButton, IHasCurrentValue<bool>
     {
         private readonly BindableWithCurrent<bool> current = new BindableWithCurrent<bool>();
 
@@ -33,7 +33,7 @@ namespace osu.Game.Screens.OnlinePlay
         [Resolved]
         private OsuColour colours { get; set; } = null!;
 
-        public FooterButtonFreePlay()
+        public FooterButtonFreeStyle()
         {
             // Overwrite any external behaviour as we delegate the main toggle action to a sub-button.
             base.Action = () => current.Value = !current.Value;
@@ -71,7 +71,7 @@ namespace osu.Game.Screens.OnlinePlay
 
             SelectedColour = colours.Yellow;
             DeselectedColour = SelectedColour.Opacity(0.5f);
-            Text = @"freeplay";
+            Text = @"freestyle";
         }
 
         protected override void LoadComplete()
