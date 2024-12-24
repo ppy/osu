@@ -15,7 +15,6 @@ using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using Humanizer;
 using osu.Game.Rulesets.Edit;
-using osu.Framework.Input.Events;
 
 namespace osu.Game.Screens.Edit.Audio
 {
@@ -108,18 +107,12 @@ namespace osu.Game.Screens.Edit.Audio
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
                 Children = new[] {
-                    new HitSoundTrackTimeline(
-                        new EditorSkinProvidingContainer(editorBeatmap).WithChild(new Container
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Child = new SoundTrackObjectsDisplay(mode)
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Anchor = Anchor.CentreLeft,
-                                Origin = Anchor.CentreLeft,
-                            },
-                        })
-                    ),
+                    new HitSoundTrackTimeline(new SoundTrackObjectsDisplay(mode)
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreLeft,
+                    }),
                     new Box
                     {
                         Width = bank_column_width,
