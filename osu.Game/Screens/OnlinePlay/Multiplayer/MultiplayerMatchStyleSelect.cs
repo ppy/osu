@@ -18,7 +18,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
-    public partial class MultiplayerMatchStyleSelect : SongSelect, IOnlinePlaySubScreen
+    public partial class MultiplayerMatchStyleSelect : SongSelect, IOnlinePlaySubScreen, IHandlePresentBeatmap
     {
         public string ShortTitle => "style selection";
 
@@ -63,6 +63,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             onSelect(Beatmap.Value.BeatmapInfo, Ruleset.Value);
             this.Exit();
             return true;
+        }
+
+        public void PresentBeatmap(WorkingBeatmap beatmap, RulesetInfo ruleset)
+        {
+            // This screen cannot present beatmaps.
         }
 
         private partial class DifficultySelectFilterControl : FilterControl
