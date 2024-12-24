@@ -175,6 +175,16 @@ namespace osu.Game
         public readonly IBindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>();
 
         /// <summary>
+        /// On mobile devices, this specifies whether the device should be set and locked to portrait orientation.
+        /// </summary>
+        /// <remarks>
+        /// Implementations can be viewed in mobile projects.
+        /// </remarks>
+        public IBindable<bool> RequiresPortraitOrientation => requiresPortraitOrientation;
+
+        private readonly Bindable<bool> requiresPortraitOrientation = new BindableBool();
+
+        /// <summary>
         /// Whether the back button is currently displayed.
         /// </summary>
         private readonly IBindable<bool> backButtonVisibility = new Bindable<bool>();
@@ -1622,6 +1632,8 @@ namespace osu.Game
                 API.Activity.BindTo(newOsuScreen.Activity);
 
                 GlobalCursorDisplay.MenuCursor.HideCursorOnNonMouseInput = newOsuScreen.HideMenuCursorOnNonMouseInput;
+
+                requiresPortraitOrientation.Value = newOsuScreen.RequiresPortraitOrientation;
 
                 if (newOsuScreen.HideOverlaysOnEnter)
                     CloseAllOverlays();

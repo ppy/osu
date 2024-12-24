@@ -47,6 +47,8 @@ namespace osu.Game.Screens
 
         public virtual bool HideMenuCursorOnNonMouseInput => false;
 
+        public virtual bool RequiresPortraitOrientation => false;
+
         /// <summary>
         /// The initial overlay activation mode to use when this screen is entered for the first time.
         /// </summary>
