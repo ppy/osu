@@ -181,7 +181,8 @@ namespace osu.Game.Rulesets.Taiko.UI
                 inputDrum,
             };
 
-            RegisterPool<Hit, DrawableHit>(50);
+            RegisterPool<HitRim, DrawableHitRim>(50);
+            RegisterPool<HitCenter, DrawableHitCenter>(50);
             RegisterPool<Hit.StrongNestedHit, DrawableHit.StrongNestedHit>(50);
 
             RegisterPool<DrumRoll, DrawableDrumRoll>(5);

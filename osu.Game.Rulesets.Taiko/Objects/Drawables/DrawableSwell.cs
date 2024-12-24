@@ -136,7 +136,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             targetRing.BorderColour = colours.YellowDark.Opacity(0.25f);
         }
 
-        protected override SkinnableDrawable CreateMainPiece() => new SkinnableDrawable(new TaikoSkinComponentLookup(TaikoSkinComponents.Swell),
+        protected override SkinnableDrawable OnLoadCreateMainPiece() => new SkinnableDrawable(new TaikoSkinComponentLookup(TaikoSkinComponents.Swell),
             _ => new SwellCirclePiece
             {
                 // to allow for rotation transform
@@ -144,9 +144,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 Origin = Anchor.Centre,
             });
 
-        protected override void RecreatePieces()
+        protected override void RestorePieceState()
         {
-            base.RecreatePieces();
             Size = baseSize = new Vector2(TaikoHitObject.DEFAULT_SIZE);
         }
 

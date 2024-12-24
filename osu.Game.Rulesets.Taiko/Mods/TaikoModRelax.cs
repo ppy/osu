@@ -18,14 +18,12 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
         public void ApplyToDrawableHitObject(DrawableHitObject drawable)
         {
-            var allActions = Enum.GetValues<TaikoAction>();
-
             drawable.HitObjectApplied += dho =>
             {
                 switch (dho)
                 {
                     case DrawableHit hit:
-                        hit.HitActions = allActions;
+                        hit.RelaxMod = true;
                         break;
 
                     case DrawableSwell swell:

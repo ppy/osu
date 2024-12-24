@@ -77,9 +77,9 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             OnNewResult += onNewResult;
         }
 
-        protected override void RecreatePieces()
+        protected override void RestorePieceState()
         {
-            base.RecreatePieces();
+            //base.RestorePieceState(); // TODO:STOP HERE
             updateColour();
             Height = HitObject.IsStrong ? TaikoStrongableHitObject.DEFAULT_STRONG_SIZE : TaikoHitObject.DEFAULT_SIZE;
         }
@@ -119,8 +119,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             return base.CreateNestedHitObject(hitObject);
         }
 
-        protected override SkinnableDrawable CreateMainPiece() => new SkinnableDrawable(new TaikoSkinComponentLookup(TaikoSkinComponents.DrumRollBody),
-            _ => new ElongatedCirclePiece());
+        protected override SkinnableDrawable OnLoadCreateMainPiece()
+            => new SkinnableDrawable(new TaikoSkinComponentLookup(TaikoSkinComponents.DrumRollBody), _ => new ElongatedCirclePiece());
 
         public override bool OnPressed(KeyBindingPressEvent<TaikoAction> e) => false;
 

@@ -78,7 +78,8 @@ namespace osu.Game.Rulesets.Taiko.Edit
             {
                 if (h is Hit taikoHit)
                 {
-                    taikoHit.Type = state ? HitType.Rim : HitType.Centre;
+                    // TODO: seems like we should to change type (and pass all fileds between them ://)
+                    taikoHit.ChangeType(state ? HitType.Rim : HitType.Centre);
                     EditorBeatmap.Update(h);
                 }
             });

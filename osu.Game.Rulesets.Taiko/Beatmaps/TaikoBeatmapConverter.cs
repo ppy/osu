@@ -119,11 +119,9 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
                         {
                             IList<HitSampleInfo> currentSamples = allSamples[i];
 
-                            yield return new Hit
-                            {
-                                StartTime = j,
-                                Samples = currentSamples,
-                            };
+                            Hit hit = Hit.CreateConcreteBySample(currentSamples);
+                            hit.StartTime = j;
+                            yield return hit;
 
                             i = (i + 1) % allSamples.Count;
 
@@ -161,12 +159,9 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
 
                 default:
                 {
-                    yield return new Hit
-                    {
-                        StartTime = obj.StartTime,
-                        Samples = samples,
-                    };
-
+                    Hit hit = Hit.CreateConcreteBySample(samples);
+                    hit.StartTime = obj.StartTime;
+                    yield return hit;
                     break;
                 }
             }

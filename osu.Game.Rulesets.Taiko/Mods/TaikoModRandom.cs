@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
             foreach (var obj in taikoBeatmap.HitObjects)
             {
                 if (obj is Hit hit)
-                    hit.Type = rng.Next(2) == 0 ? HitType.Centre : HitType.Rim;
+                    hit.ChangeType(rng.Next(2) == 0 ? HitType.Centre : HitType.Rim); // TODO: seems like we should to change type (and pass all fileds between them ://)
             }
         }
     }

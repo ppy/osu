@@ -7,7 +7,6 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -18,12 +17,17 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
-    public partial class DrawableHit : DrawableTaikoStrongableHitObject<Hit, Hit.StrongNestedHit>
+    public abstract partial class DrawableHit : DrawableTaikoStrongableHitObject<Hit, Hit.StrongNestedHit>
     {
         /// <summary>
         /// A list of keys which can result in hits for this HitObject.
         /// </summary>
-        public TaikoAction[] HitActions { get; internal set; }
+        public abstract TaikoAction[] HitActions { get; protected set; }
+
+        /// <summary>
+        /// When this is true any hit is valid.
+        /// </summary>
+        public bool RelaxMod = false;
 
         /// <summary>
         /// The action that caused this <see cref="DrawableHit"/> to be hit.
@@ -38,8 +42,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         private double? lastPressHandleTime;
 
-        private readonly Bindable<HitType> type = new Bindable<HitType>();
-
         public DrawableHit()
             : this(null)
         {
@@ -53,17 +55,11 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         protected override void OnApply()
         {
-            type.BindTo(HitObject.TypeBindable);
-            // this doesn't need to be run inline as RecreatePieces is called by the base call below.
-            type.BindValueChanged(_ => Scheduler.AddOnce(RecreatePieces));
-
             base.OnApply();
         }
 
-        protected override void RecreatePieces()
+        protected override void RestorePieceState()
         {
-            updateActionsFromType();
-            base.RecreatePieces();
             Size = new Vector2(HitObject.IsStrong ? TaikoStrongableHitObject.DEFAULT_STRONG_SIZE : TaikoHitObject.DEFAULT_SIZE);
         }
 
@@ -71,28 +67,13 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         {
             base.OnFree();
 
-            type.UnbindFrom(HitObject.TypeBindable);
-            type.UnbindEvents();
-
             UnproxyContent();
 
-            HitActions = null;
+            RelaxMod = false;
             HitAction = null;
             validActionPressed = false;
             lastPressHandleTime = null;
         }
-
-        private void updateActionsFromType()
-        {
-            HitActions =
-                HitObject.Type == HitType.Centre
-                    ? new[] { TaikoAction.LeftCentre, TaikoAction.RightCentre }
-                    : new[] { TaikoAction.LeftRim, TaikoAction.RightRim };
-        }
-
-        protected override SkinnableDrawable CreateMainPiece() => HitObject.Type == HitType.Centre
-            ? new SkinnableDrawable(new TaikoSkinComponentLookup(TaikoSkinComponents.CentreHit), _ => new CentreHitCirclePiece(), confineMode: ConfineMode.ScaleToFit)
-            : new SkinnableDrawable(new TaikoSkinComponentLookup(TaikoSkinComponents.RimHit), _ => new RimHitCirclePiece(), confineMode: ConfineMode.ScaleToFit);
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
@@ -115,6 +96,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 ApplyResult(result);
         }
 
+        public bool IsValidAction(TaikoAction action) => RelaxMod || HitActions.Contains(action);
+
         public override bool OnPressed(KeyBindingPressEvent<TaikoAction> e)
         {
             if (lastPressHandleTime == Time.Current)
@@ -122,7 +105,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             if (Judged)
                 return false;
 
-            validActionPressed = HitActions.Contains(e.Action);
+            validActionPressed = IsValidAction(e.Action);
 
             // Only count this as handled if the new judgement is a hit
             bool result = UpdateResult(true);
@@ -237,11 +220,47 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                     return false;
 
                 // Don't handle invalid hit action presses
-                if (!ParentHitObject.HitActions.Contains(e.Action))
+                if (!ParentHitObject.IsValidAction(e.Action))
                     return false;
 
                 return UpdateResult(true);
             }
         }
+    }
+
+    public partial class DrawableHitCenter : DrawableHit
+    {
+        public override TaikoAction[] HitActions { get; protected set; } = { TaikoAction.LeftCentre, TaikoAction.RightCentre };
+
+        /// <summary> This constructor exsits only to satisfy Pool where constraints </summary>
+        public DrawableHitCenter() : base(null) { }
+
+        public DrawableHitCenter([CanBeNull] Hit hit)
+            : base(hit)
+        {
+            if (hit != null && hit.Type != HitType.Centre)
+                throw new ArgumentException("hit must be `Centre`");
+        }
+
+        protected override SkinnableDrawable OnLoadCreateMainPiece()
+            => new SkinnableDrawable(new TaikoSkinComponentLookup(TaikoSkinComponents.CentreHit), _ => new CentreHitCirclePiece(), confineMode: ConfineMode.ScaleToFit);
+    }
+
+    public partial class DrawableHitRim : DrawableHit
+    {
+        public override TaikoAction[] HitActions { get; protected set; } = { TaikoAction.LeftRim, TaikoAction.RightRim };
+
+        /// <summary> This constructor exsits only to satisfy Pool where constraints </summary>
+        public DrawableHitRim() : base(null) { }
+
+        public DrawableHitRim([CanBeNull] Hit hit)
+            : base(hit)
+        {
+            if (hit != null && hit.Type != HitType.Rim)
+                throw new ArgumentException("hit must be `Rim`");
+        }
+        protected override SkinnableDrawable OnLoadCreateMainPiece()
+            => new SkinnableDrawable(new TaikoSkinComponentLookup(TaikoSkinComponents.RimHit), _ => new RimHitCirclePiece(), confineMode: ConfineMode.ScaleToFit);
+
     }
 }
