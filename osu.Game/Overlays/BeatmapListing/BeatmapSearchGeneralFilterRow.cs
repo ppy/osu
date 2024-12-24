@@ -138,7 +138,7 @@ namespace osu.Game.Overlays.BeatmapListing
             [Resolved]
             private OsuGame? game { get; set; }
 
-            public LocalisableString TooltipText => !Enabled.Value ? BeatmapOverlayStrings.FeaturedArtistsDisabledTooltip : string.Empty;
+            public LocalisableString TooltipText => BeatmapOverlayStrings.FeaturedArtistsTooltip;
 
             protected override void LoadComplete()
             {
