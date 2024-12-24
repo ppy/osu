@@ -75,9 +75,21 @@ namespace osu.Game.Overlays.Settings.Sections
                     Text = SkinSettingsStrings.SkinLayoutEditor,
                     Action = () => skinEditor?.ToggleVisibility(),
                 },
-                new RenameSkinButton(),
-                new ExportSkinButton(),
-                new DeleteSkinButton(),
+                new FillFlowContainer
+                {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Direction = FillDirection.Horizontal,
+                    Spacing = new Vector2(5, 0),
+                    Padding = new MarginPadding { Left = SettingsPanel.CONTENT_MARGINS, Right = SettingsPanel.CONTENT_MARGINS },
+                    Children = new Drawable[]
+                    {
+                        // This is all super-temporary until we move skin settings to their own panel / overlay.
+                        new RenameSkinButton { Padding = new MarginPadding(), RelativeSizeAxes = Axes.None, Width = 120 },
+                        new ExportSkinButton { Padding = new MarginPadding(), RelativeSizeAxes = Axes.None, Width = 120 },
+                        new DeleteSkinButton { Padding = new MarginPadding(), RelativeSizeAxes = Axes.None, Width = 110 },
+                    }
+                },
             };
         }
 
@@ -153,7 +165,7 @@ namespace osu.Game.Overlays.Settings.Sections
             [BackgroundDependencyLoader]
             private void load()
             {
-                Text = SkinSettingsStrings.RenameSkinButton;
+                Text = "Rename";
                 Action = this.ShowPopover;
             }
 
@@ -169,74 +181,6 @@ namespace osu.Game.Overlays.Settings.Sections
             {
                 return new RenameSkinPopover();
             }
-
-            public partial class RenameSkinPopover : OsuPopover
-            {
-                [Resolved]
-                private SkinManager skins { get; set; }
-
-                public Action<string> Rename { get; init; }
-
-                private readonly FocusedTextBox textBox;
-
-                public RenameSkinPopover()
-                {
-                    AutoSizeAxes = Axes.Both;
-                    Origin = Anchor.TopCentre;
-
-                    RoundedButton renameButton;
-
-                    Child = new FillFlowContainer
-                    {
-                        Direction = FillDirection.Vertical,
-                        AutoSizeAxes = Axes.Y,
-                        Width = 250,
-                        Spacing = new Vector2(10f),
-                        Children = new Drawable[]
-                        {
-                            textBox = new FocusedTextBox
-                            {
-                                PlaceholderText = @"Skin name",
-                                FontSize = OsuFont.DEFAULT_FONT_SIZE,
-                                RelativeSizeAxes = Axes.X,
-                                SelectAllOnFocus = true,
-                            },
-                            renameButton = new RoundedButton
-                            {
-                                Height = 40,
-                                RelativeSizeAxes = Axes.X,
-                                MatchingFilter = true,
-                                Text = SkinSettingsStrings.RenameSkinButton,
-                            }
-                        }
-                    };
-
-                    renameButton.Action += rename;
-
-                    void onTextboxCommit(TextBox sender, bool newText)
-                    {
-                        rename();
-                    }
-
-                    textBox.OnCommit += onTextboxCommit;
-                }
-
-                protected override void PopIn()
-                {
-                    textBox.Text = skins.CurrentSkinInfo.Value.Value.Name;
-                    textBox.TakeFocus();
-                    base.PopIn();
-                }
-
-                private void rename()
-                {
-                    skins.CurrentSkinInfo.Value.PerformWrite(skin =>
-                    {
-                        skin.Name = textBox.Text;
-                        PopOut();
-                    });
-                }
-            }
         }
 
         public partial class ExportSkinButton : SettingsButton
@@ -249,7 +193,7 @@ namespace osu.Game.Overlays.Settings.Sections
             [BackgroundDependencyLoader]
             private void load()
             {
-                Text = SkinSettingsStrings.ExportSkinButton;
+                Text = "Export";
                 Action = export;
             }
 
@@ -287,7 +231,7 @@ namespace osu.Game.Overlays.Settings.Sections
             [BackgroundDependencyLoader]
             private void load()
             {
-                Text = SkinSettingsStrings.DeleteSkinButton;
+                Text = "Delete";
                 Action = delete;
             }
 
@@ -303,6 +247,64 @@ namespace osu.Game.Overlays.Settings.Sections
             {
                 dialogOverlay?.Push(new SkinDeleteDialog(currentSkin.Value));
             }
+        }
+
+        public partial class RenameSkinPopover : OsuPopover
+        {
+            [Resolved]
+            private SkinManager skins { get; set; }
+
+            private readonly FocusedTextBox textBox;
+
+            public RenameSkinPopover()
+            {
+                AutoSizeAxes = Axes.Both;
+                Origin = Anchor.TopCentre;
+
+                RoundedButton renameButton;
+
+                Child = new FillFlowContainer
+                {
+                    Direction = FillDirection.Vertical,
+                    AutoSizeAxes = Axes.Y,
+                    Width = 250,
+                    Spacing = new Vector2(10f),
+                    Children = new Drawable[]
+                    {
+                        textBox = new FocusedTextBox
+                        {
+                            PlaceholderText = @"Skin name",
+                            FontSize = OsuFont.DEFAULT_FONT_SIZE,
+                            RelativeSizeAxes = Axes.X,
+                            SelectAllOnFocus = true,
+                        },
+                        renameButton = new RoundedButton
+                        {
+                            Height = 40,
+                            RelativeSizeAxes = Axes.X,
+                            MatchingFilter = true,
+                            Text = "Save",
+                        }
+                    }
+                };
+
+                renameButton.Action += rename;
+                textBox.OnCommit += (_, _) => rename();
+            }
+
+            protected override void PopIn()
+            {
+                textBox.Text = skins.CurrentSkinInfo.Value.Value.Name;
+                textBox.TakeFocus();
+
+                base.PopIn();
+            }
+
+            private void rename() => skins.CurrentSkinInfo.Value.PerformWrite(skin =>
+            {
+                skin.Name = textBox.Text;
+                PopOut();
+            });
         }
     }
 }
