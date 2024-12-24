@@ -15,7 +15,7 @@ using osu.Game.Screens.Select;
 
 namespace osu.Game.Screens.OnlinePlay
 {
-    public class FooterButtonFreeStyle : FooterButton, IHasCurrentValue<bool>
+    public partial class FooterButtonFreeStyle : FooterButton, IHasCurrentValue<bool>
     {
         private readonly BindableWithCurrent<bool> current = new BindableWithCurrent<bool>();
 
