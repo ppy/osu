@@ -19,12 +19,15 @@ using osuTK.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Game.Overlays;
+using osu.Framework.Input.Events;
 
 namespace osu.Game.Screens.Edit.Audio
 {
     public partial class HitSoundTrackObjectToggleButton : Container
     {
         private Bindable<Color4> colour = new();
+
+        public IBindable<bool>? Active;
 
         private Circle circle;
 
@@ -38,7 +41,7 @@ namespace osu.Game.Screens.Edit.Audio
             }
         }
 
-        public Action Action { get; set; }
+        public Action? Action { get; set; }
 
         public HitSoundTrackObjectToggleButton()
         {
@@ -51,6 +54,7 @@ namespace osu.Game.Screens.Edit.Audio
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
+                    Masking = true,
                     Width = 15,
                     Height = 15,
                 },
@@ -60,17 +64,38 @@ namespace osu.Game.Screens.Edit.Audio
                 }
             };
 
-            colour.BindValueChanged(v =>
+            colour.BindValueChanged(v => updateColour(), true);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            Active?.BindValueChanged(v => updateColour(), true);
+        }
+
+        private void updateColour()
+        {
+            circle.EdgeEffect = new EdgeEffectParameters
             {
-                circle.Masking = true;
-                circle.EdgeEffect = new EdgeEffectParameters
-                {
-                    Type = EdgeEffectType.Shadow,
-                    Colour = v.NewValue.Darken(0.2f),
-                    Radius = 10f,
-                };
-                circle.Colour = v.NewValue;
-            }, true);
+                Type = EdgeEffectType.Shadow,
+                Colour = Active?.Value == true ? colour.Value.Darken(0.2f) : Colour4.White,
+                Radius = Active?.Value == true ? 5f : 1f,
+                Hollow = true,
+            };
+            circle.FadeColour(Active?.Value == true ? colour.Value : Colour4.White);
+            circle.FadeTo(Active?.Value == true ? 1f : 0.1f);
+        }
+
+        protected override bool OnHover(HoverEvent e)
+        {
+            circle.ScaleTo(1.5f, 50);
+            return base.OnHover(e);
+        }
+
+        protected override void OnHoverLost(HoverLostEvent e)
+        {
+            circle.ScaleTo(1.0f, 50);
+            base.OnHoverLost(e);
         }
     }
 
@@ -80,9 +105,9 @@ namespace osu.Game.Screens.Edit.Audio
         private HitObject hitObject = null!;
 
         private string target;
+        private Bindable<bool> active = new(false);
 
         private HitSoundTrackObjectToggleButton button;
-        private Bindable<bool> active = new();
 
         public Action<string>? Action;
 
@@ -116,12 +141,8 @@ namespace osu.Game.Screens.Edit.Audio
                 Width = 30,
                 Height = 30,
                 Action = Toggle,
+                Active = active,
             };
-
-            active.BindValueChanged(v =>
-            {
-                button.Alpha = v.NewValue ? 1f : 0.1f;
-            }, true);
         }
 
         protected override void LoadComplete()
