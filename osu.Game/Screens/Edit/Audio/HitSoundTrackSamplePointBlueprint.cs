@@ -106,7 +106,7 @@ namespace osu.Game.Screens.Edit.Audio
             Colour.Value = colour;
         }
 
-        protected void UpdateWidthAndPosition()
+        public void UpdateWidthAndPosition()
         {
             Width = (float)GetWidth();
             X = (float)GetStartTime();

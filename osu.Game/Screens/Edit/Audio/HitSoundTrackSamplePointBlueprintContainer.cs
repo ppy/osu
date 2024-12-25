@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Rulesets.Objects;
@@ -26,14 +25,34 @@ namespace osu.Game.Screens.Edit.Audio
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
             editorBeatmap.HitObjectRemoved += removeHitObjectFromTrack;
             editorBeatmap.HitObjectAdded += addHitObjectToTrack;
+
             editorBeatmap.HitObjectUpdated += hitObject =>
             {
-                if (hitObject is IHasRepeats || hitObject is IHasDuration)
+                if (hitObject is IHasRepeats hasRepeats)
                 {
-                    removeHitObjectFromTrack(hitObject);
-                    addHitObjectToTrack(hitObject);
+                    int existsNodeSamplePoints = 0;
+                    Children.ForEach(v =>
+                    {
+                        if (v.HitObject != hitObject)
+                            return;
+
+                        if (v is NodeHitSoundTrackSamplePointBlueprint samplePoint)
+                        {
+                            if (hasRepeats.RepeatCount < samplePoint.NodeIndex - 1)
+                                samplePoint.Expire();
+                            else
+                                samplePoint.UpdateWidthAndPosition();
+
+                            existsNodeSamplePoints++;
+                        }
+                    });
+
+                    // hasRepeats.RepeatCount + 2 is because we only add the point between two ends
+                    for (int i = existsNodeSamplePoints; i < hasRepeats.RepeatCount + 2; i++)
+                        Add(new NodeHitSoundTrackSamplePointBlueprint(hitObject, hasRepeats, i));
                 }
             };
 
@@ -42,13 +61,13 @@ namespace osu.Game.Screens.Edit.Audio
 
         private void removeHitObjectFromTrack(HitObject hitObject)
         {
-            Children.Where(v =>
+            RemoveAll(v =>
             {
                 if (v is HitSoundTrackSamplePointBlueprint samplePoint)
                     return samplePoint.HitObject == hitObject;
 
                 return false;
-            }).ForEach(part => part.Expire());
+            }, true);
         }
 
         private void addHitObjectToTrack(HitObject hitObject)
