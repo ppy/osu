@@ -25,13 +25,13 @@ namespace osu.Game.Tests.Visual.Editing
             return this.ChildrenOfType<HitSoundTrackSamplePointBlueprintContainer>().First(c => c.Mode == mode);
         }
 
-        private void addSample(IList<HitSampleInfo> sample, Type blueprintType)
+        private void addSample(IList<HitSampleInfo> samples, Type blueprintType)
         {
             var samplePointBlueprint = getSpecificModeTrack(HitSoundTrackMode.Sample).Children.First(p => p.GetType() == blueprintType);
             var firstSamplePoint = samplePointBlueprint.Children.First();
             AddStep($"add {firstSamplePoint.Target} sample", () =>
             {
-                if (sample.Any(sample => sample.Name == firstSamplePoint.Target))
+                if (samples.Any(sample => sample.Name == firstSamplePoint.Target))
                     return;
 
                 InputManager.MoveMouseTo(firstSamplePoint);
@@ -83,9 +83,8 @@ namespace osu.Game.Tests.Visual.Editing
                 AddAssert($"checks is {point.Target} addition bank being added", () =>
                 {
                     if (samplePointBlueprint.HitObject is IHasRepeats repeats)
-                    {
                         return SamplePointPiece.GetAdditionBankValue(repeats.NodeSamples[0]) == point.Target;
-                    }
+
                     return false;
                 });
             });

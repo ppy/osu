@@ -5,7 +5,6 @@ using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
@@ -56,7 +55,7 @@ namespace osu.Game.Tests.Visual.Editing
                     Children = new Drawable[]
                     {
                         editorBeatmap,
-                        new AudioScreen()
+                        new AudioScreen
                         {
                             State =
                             {

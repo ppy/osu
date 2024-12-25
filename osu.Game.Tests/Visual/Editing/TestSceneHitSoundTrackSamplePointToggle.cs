@@ -62,9 +62,8 @@ namespace osu.Game.Tests.Visual.Editing
                 AddAssert($"checks is {point.Target} being added", () =>
                 {
                     if (samplePointBlueprint.HitObject is IHasRepeats repeats)
-                    {
                         return repeats.NodeSamples[1].Any(sample => sample.Name == point.Target);
-                    }
+
                     return false;
                 });
             });

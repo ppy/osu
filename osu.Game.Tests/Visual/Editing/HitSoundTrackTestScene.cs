@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-
 using System.Linq;
 using NUnit.Framework.Internal;
 using osu.Framework.Graphics;
@@ -11,7 +10,6 @@ using osu.Framework.Testing;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
-using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Audio;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
 using osuTK;
@@ -79,10 +77,11 @@ namespace osu.Game.Tests.Visual.Editing
                 EditorBeatmap.Add(new Slider
                 {
                     Position = new Vector2(128, 256),
-                    Path = new SliderPath(PathType.LINEAR, Enumerable
-                        .Repeat(0, repeatCount)
-                        .Select(i => new Vector2(random.NextFloat(128, 256), random.NextFloat(128, 256)))
-                        .ToArray()
+                    Path = new SliderPath(PathType.LINEAR,
+                        Enumerable
+                            .Repeat(0, repeatCount)
+                            .Select(_ => new Vector2(random.NextFloat(128, 256), random.NextFloat(128, 256)))
+                            .ToArray()
                     ),
                     RepeatCount = repeatCount - 2,
                     Scale = 0.5f,
@@ -100,9 +99,8 @@ namespace osu.Game.Tests.Visual.Editing
         public void AddSpinners(int count, float startTime = 1000)
         {
             int i = 0;
-            var random = Randomizer.CreateRandomizer();
 
-            AddRepeatStep($"add spinners", () =>
+            AddRepeatStep("add spinners", () =>
             {
                 EditorBeatmap.Add(new Spinner
                 {
@@ -118,6 +116,5 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("clear all hit objects", EditorBeatmap.Clear);
             AddSpinners(count, startTime);
         }
-
     }
 }

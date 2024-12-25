@@ -63,9 +63,8 @@ namespace osu.Game.Tests.Visual.Editing
                 AddAssert($"checks is {point.Target} bank being added", () =>
                 {
                     if (samplePointBlueprint.HitObject is IHasRepeats repeats)
-                    {
                         return SamplePointPiece.GetBankValue(repeats.NodeSamples[1]) == point.Target;
-                    }
+
                     return false;
                 });
             });

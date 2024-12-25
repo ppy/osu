@@ -1,10 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Linq;
 using NUnit.Framework;
-using NUnit.Framework.Internal;
 using osu.Framework.Testing;
 using osu.Game.Screens.Edit.Audio;
 
@@ -24,13 +22,13 @@ namespace osu.Game.Tests.Visual.Editing
             AddUntilStep("10 sample point blueprint generated", () => this.ChildrenOfType<HitSoundTrackSamplePointBlueprint>().Count() == 10);
 
             SetSpinners(10);
-            AddUntilStep("no sample point blueprint generated", () => !this.ChildrenOfType<HitSoundTrackSamplePointBlueprint>().Any(p => p.GetType() == typeof(HitSoundTrackSamplePointBlueprint)));
+            AddUntilStep("no sample point blueprint generated", () => this.ChildrenOfType<HitSoundTrackSamplePointBlueprint>().All(p => p.GetType() != typeof(HitSoundTrackSamplePointBlueprint)));
 
             SetSliders(10);
-            AddUntilStep("no sample point blueprint generated", () => !this.ChildrenOfType<HitSoundTrackSamplePointBlueprint>().Any(p => p.GetType() == typeof(HitSoundTrackSamplePointBlueprint)));
+            AddUntilStep("no sample point blueprint generated", () => this.ChildrenOfType<HitSoundTrackSamplePointBlueprint>().All(p => p.GetType() != typeof(HitSoundTrackSamplePointBlueprint)));
 
             SetSliders(10, 4);
-            AddUntilStep("no sample point blueprint generated", () => !this.ChildrenOfType<HitSoundTrackSamplePointBlueprint>().Any(p => p.GetType() == typeof(HitSoundTrackSamplePointBlueprint)));
+            AddUntilStep("no sample point blueprint generated", () => this.ChildrenOfType<HitSoundTrackSamplePointBlueprint>().All(p => p.GetType() != typeof(HitSoundTrackSamplePointBlueprint)));
         }
 
         [Test]
