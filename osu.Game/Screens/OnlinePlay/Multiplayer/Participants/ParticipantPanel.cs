@@ -228,7 +228,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                 userStyleDisplay.FadeOut(fade_time);
             }
 
-            if (User.BeatmapId == null && User.RulesetId == null)
+            if ((User.BeatmapId == null && User.RulesetId == null) || (User.BeatmapId == currentItem?.BeatmapID && User.RulesetId == currentItem?.RulesetID))
                 userStyleDisplay.Style = null;
             else
                 userStyleDisplay.Style = (User.BeatmapId ?? currentItem?.BeatmapID ?? 0, User.RulesetId ?? currentItem?.RulesetID ?? 0);
