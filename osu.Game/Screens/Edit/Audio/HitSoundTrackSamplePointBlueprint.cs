@@ -137,6 +137,14 @@ namespace osu.Game.Screens.Edit.Audio
             Width = CIRCLE_WIDTH;
         }
 
+        protected override void Update()
+        {
+            base.Update();
+
+            if (HasRepeat.RepeatCount < NodeIndex - 1)
+                Expire();
+        }
+
         protected override double GetStartTime()
         {
             return HitObject.StartTime + HasRepeat.Duration * NodeIndex / HasRepeat.SpanCount();
