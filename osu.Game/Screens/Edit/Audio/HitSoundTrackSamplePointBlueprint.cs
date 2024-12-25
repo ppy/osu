@@ -26,7 +26,7 @@ namespace osu.Game.Screens.Edit.Audio
     {
         public HitObject HitObject;
 
-        public new Bindable<Colour4> Colour = new();
+        public new Bindable<Colour4> Colour = new Bindable<Colour4>();
 
         protected const float CIRCLE_WIDTH = 15;
 
@@ -128,7 +128,8 @@ namespace osu.Game.Screens.Edit.Audio
         public IHasRepeats HasRepeat;
         public int NodeIndex;
 
-        public NodeHitSoundTrackSamplePointBlueprint(HitObject hitObject, IHasRepeats hasRepeat, int nodeIndex) : base(hitObject)
+        public NodeHitSoundTrackSamplePointBlueprint(HitObject hitObject, IHasRepeats hasRepeat, int nodeIndex)
+            : base(hitObject)
         {
             HasRepeat = hasRepeat;
             NodeIndex = nodeIndex;
@@ -149,7 +150,8 @@ namespace osu.Game.Screens.Edit.Audio
 
     public partial class ExtendableHitSoundTrackSamplePointBlueprint : HitSoundTrackSamplePointBlueprint
     {
-        public ExtendableHitSoundTrackSamplePointBlueprint(HitObject hitObject) : base(hitObject)
+        public ExtendableHitSoundTrackSamplePointBlueprint(HitObject hitObject)
+            : base(hitObject)
         {
             RelativeSizeAxes = Axes.Both;
         }
@@ -168,9 +170,8 @@ namespace osu.Game.Screens.Edit.Audio
         protected override double GetWidth()
         {
             if (HitObject is IHasDuration duration)
-            {
                 return duration.Duration + CIRCLE_WIDTH;
-            }
+
             return base.GetWidth();
         }
     }

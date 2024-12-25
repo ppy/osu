@@ -19,7 +19,7 @@ namespace osu.Game.Screens.Edit.Audio
         {
         }
 
-        private HitObjectComposer composer = null!;
+        private HitObjectComposer? composer;
         private Ruleset ruleset = null!;
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
@@ -27,7 +27,7 @@ namespace osu.Game.Screens.Edit.Audio
             var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
             ruleset = parent.Get<IBindable<WorkingBeatmap>>().Value.BeatmapInfo.Ruleset.CreateInstance();
-            composer = ruleset?.CreateHitObjectComposer()!;
+            composer = ruleset.CreateHitObjectComposer();
 
             // make the composer available to the timeline and other components in this screen.
             if (composer != null)
@@ -38,21 +38,19 @@ namespace osu.Game.Screens.Edit.Audio
 
         protected override Drawable CreateTimelineContent()
         {
-            if (composer == null || ruleset == null)
+            if (composer == null)
                 return base.CreateTimelineContent();
 
             return new EditorSkinProvidingContainer(EditorBeatmap).WithChild(new Container
             {
                 RelativeSizeAxes = Axes.Both,
-                Children = new Drawable[]
-                {
-                    new TimelineBlueprintContainer(composer),
-                }
+                Child = new TimelineBlueprintContainer(composer),
             });
         }
+
         protected override Drawable CreateMainContent()
         {
-            if (composer == null || ruleset == null)
+            if (composer == null)
                 return Empty();
 
             return new EditorSkinProvidingContainer(EditorBeatmap).WithChild(new Container

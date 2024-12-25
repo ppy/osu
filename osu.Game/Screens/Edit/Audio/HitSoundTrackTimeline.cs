@@ -9,7 +9,8 @@ namespace osu.Game.Screens.Edit.Audio
 {
     public partial class HitSoundTrackTimeline : Timeline
     {
-        public HitSoundTrackTimeline(Drawable userContent) : base(userContent)
+        public HitSoundTrackTimeline(Drawable userContent)
+            : base(userContent)
         {
         }
 
@@ -24,7 +25,9 @@ namespace osu.Game.Screens.Edit.Audio
         protected override void UpdateAfterAutoSize()
         {
             base.UpdateAfterAutoSize();
-            Height = Parent.DrawHeight;
+
+            if (Parent != null)
+                Height = Parent.DrawHeight;
         }
     }
 }

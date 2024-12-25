@@ -26,7 +26,7 @@ namespace osu.Game.Screens.Edit.Audio
         private OverlayColourProvider colours { get; set; } = null!;
 
         [Resolved(CanBeNull = true)]
-        private HitObjectComposer composer { get; set; } = null!;
+        private HitObjectComposer? composer { get; set; }
 
         protected override void LoadComplete()
         {
@@ -97,7 +97,8 @@ namespace osu.Game.Screens.Edit.Audio
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
-                Children = new[] {
+                Children = new[]
+                {
                     new HitSoundTrackTimeline(new HitSoundTrackSamplePointBlueprintContainer(mode)
                     {
                         RelativeSizeAxes = Axes.Both,
@@ -125,15 +126,15 @@ namespace osu.Game.Screens.Edit.Audio
                 {
                     new Box
                     {
-                        RelativeSizeAxes  = Axes.X,
-                        Margin = new MarginPadding {Left = bank_column_width},
+                        RelativeSizeAxes = Axes.X,
+                        Margin = new MarginPadding { Left = bank_column_width },
                         Anchor = Anchor.CentreLeft,
                         Height = 2,
                         Colour = colours.Background2,
                     },
                     new OsuSpriteText
                     {
-                        Margin = new MarginPadding {Left = 10, Vertical = header_height / 2},
+                        Margin = new MarginPadding { Left = 10, Vertical = header_height / 2f },
                         Text = title,
                     }
                 }
@@ -165,7 +166,7 @@ namespace osu.Game.Screens.Edit.Audio
                             {
                                 Margin = new MarginPadding { Left = 10 },
                                 Origin = Anchor.CentreLeft,
-                                Anchor =  Anchor.CentreLeft,
+                                Anchor = Anchor.CentreLeft,
                                 Text = sample.Replace("hit", string.Empty).Titleize(),
                             }
                         }

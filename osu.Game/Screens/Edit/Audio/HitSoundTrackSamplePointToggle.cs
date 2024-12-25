@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -23,7 +22,7 @@ namespace osu.Game.Screens.Edit.Audio
     {
         public IBindable<bool>? Active;
 
-        private Circle circle;
+        private readonly Circle circle;
 
         public new IBindable<Colour4> Colour = new Bindable<Colour4>();
 
@@ -42,7 +41,7 @@ namespace osu.Game.Screens.Edit.Audio
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            Colour?.BindValueChanged(v => updateColour(), true);
+            Colour.BindValueChanged(v => updateColour(), true);
             Active?.BindValueChanged(v => updateColour(), true);
         }
 
@@ -78,8 +77,8 @@ namespace osu.Game.Screens.Edit.Audio
         private IList<HitSampleInfo> samples = null!;
         private HitObject hitObject = null!;
 
-        private string target;
-        private Bindable<bool> active = new(false);
+        private readonly string target;
+        private readonly Bindable<bool> active = new Bindable<bool>(false);
 
         public Action<string>? Action;
 
@@ -119,13 +118,13 @@ namespace osu.Game.Screens.Edit.Audio
 
             hitObject = samplePoint.HitObject;
 
-            editorBeatmap.HitObjectUpdated += (HitObject updatedHitObject) =>
+            editorBeatmap.HitObjectUpdated += updatedHitObject =>
             {
                 if (updatedHitObject == hitObject)
                     UpdateActiveStateAndSample();
             };
 
-            hitObject.SamplesBindable.BindCollectionChanged((object? obj, NotifyCollectionChangedEventArgs e) => UpdateActiveStateAndSample(), true);
+            hitObject.SamplesBindable.BindCollectionChanged((obj, e) => UpdateActiveStateAndSample(), true);
         }
 
         protected void UpdateActiveStateAndSample()
@@ -140,9 +139,11 @@ namespace osu.Game.Screens.Edit.Audio
                 case HitSoundTrackMode.Sample:
                     active.Value = samples.FirstOrDefault(sample => sample.Name == target) != null;
                     break;
+
                 case HitSoundTrackMode.NormalBank:
                     active.Value = SamplePointPiece.GetBankValue(samples) == target;
                     break;
+
                 case HitSoundTrackMode.AdditionBank:
                     active.Value = SamplePointPiece.GetAdditionBankValue(samples) == target;
                     break;
@@ -152,18 +153,22 @@ namespace osu.Game.Screens.Edit.Audio
         protected void Toggle()
         {
             editorBeatmap.BeginChange();
+
             switch (samplePointsContainer.Mode)
             {
                 case HitSoundTrackMode.Sample:
                     setSample(samples);
                     break;
+
                 case HitSoundTrackMode.NormalBank:
                     setNormalBank(samples);
                     break;
+
                 case HitSoundTrackMode.AdditionBank:
                     setAdditionBank(samples);
                     break;
             }
+
             editorBeatmap.Update(hitObject);
             editorBeatmap.EndChange();
         }
@@ -175,19 +180,24 @@ namespace osu.Game.Screens.Edit.Audio
                 var targetSample = samples.FirstOrDefault(sample => sample.Name == target);
                 if (targetSample == null)
                     return;
+
                 samples.Remove(targetSample);
             }
             else
+            {
                 samples.Add(new HitSampleInfo(target, bank: SamplePointPiece.GetBankValue(samples) ?? HitSampleInfo.BANK_NORMAL));
+            }
         }
 
         private void setNormalBank(IList<HitSampleInfo> samples)
         {
             if (active.Value)
                 return;
+
             var originalNormalBank = samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL);
             if (originalNormalBank == null)
                 return;
+
             samples.Add(originalNormalBank.With(newBank: target));
             samples.Remove(originalNormalBank);
         }
@@ -202,6 +212,7 @@ namespace osu.Game.Screens.Edit.Audio
                         samples.Add(originalSample.With(newEditorAutoBank: true));
                     else
                         samples.Add(originalSample.With(newBank: target, newEditorAutoBank: false));
+
                     samples.Remove(originalSample);
                 });
             }
