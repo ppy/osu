@@ -31,7 +31,7 @@ namespace osu.Game.Screens.Edit.Audio
             editorBeatmap.HitObjectAdded += addHitObjectToTrack;
             editorBeatmap.HitObjectUpdated += (HitObject hitObject) =>
             {
-                if (hitObject.NestedHitObjects.Count < 1)
+                if (hitObject is IHasRepeats || hitObject is IHasDuration)
                 {
                     removeHitObjectFromTrack(hitObject);
                     addHitObjectToTrack(hitObject);
@@ -57,18 +57,19 @@ namespace osu.Game.Screens.Edit.Audio
 
         private void addHitObjectToTrack(HitObject hitObject)
         {
-            if (hitObject is IHasRepeats repeatedHitObject)
+            if (hitObject is IHasRepeats || hitObject is IHasDuration)
             {
-                Add(new ExtendableHitSoundTrackPart(hitObject));
-                for (int i = 0; i < repeatedHitObject.NodeSamples.Count; i++)
-                {
-                    Add(new NodeHitSoundTrackPart(hitObject, repeatedHitObject, i));
-                }
+                if (hitObject is IHasDuration)
+                    Add(new ExtendableHitSoundTrackPart(hitObject));
+
+                if (hitObject is IHasRepeats repeatedHitObject)
+                    for (int i = 0; i < repeatedHitObject.NodeSamples.Count; i++)
+                    {
+                        Add(new NodeHitSoundTrackPart(hitObject, repeatedHitObject, i));
+                    }
             }
             else
-            {
                 Add(new HitSoundTrackPart(hitObject));
-            }
         }
     }
 }

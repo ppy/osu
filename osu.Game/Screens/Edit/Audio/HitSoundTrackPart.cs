@@ -73,6 +73,11 @@ namespace osu.Game.Screens.Edit.Audio
             if (HitObject is IHasDisplayColour displayColour)
                 displayColour.DisplayColour.BindValueChanged(_ => updateColour(), true);
 
+            if (HitObject is IHasComboInformation comboInfo)
+                comboInfo.IndexInCurrentComboBindable.BindValueChanged(_ => updateColour(), true);
+
+            skin.SourceChanged += updateColour;
+
             updateColour();
         }
 
@@ -143,7 +148,6 @@ namespace osu.Game.Screens.Edit.Audio
         public ExtendableHitSoundTrackPart(HitObject hitObject) : base(hitObject)
         {
             RelativeSizeAxes = Axes.Both;
-            //Width = CIRCLE_WIDTH;
         }
 
         protected override void Update()
@@ -154,7 +158,7 @@ namespace osu.Game.Screens.Edit.Audio
 
         protected override double GetStartTime()
         {
-            return HitObject.StartTime + /*HasRepeat.Duration * NodeIndex / HasRepeat.SpanCount() +*/ Width / 2 - CIRCLE_WIDTH / 2;
+            return base.GetStartTime() + Width / 2 - CIRCLE_WIDTH / 2;
         }
 
         protected override double GetWidth()
@@ -163,7 +167,7 @@ namespace osu.Game.Screens.Edit.Audio
             {
                 return duration.Duration + CIRCLE_WIDTH;
             }
-            return CIRCLE_WIDTH;
+            return base.GetWidth();
         }
     }
 }
