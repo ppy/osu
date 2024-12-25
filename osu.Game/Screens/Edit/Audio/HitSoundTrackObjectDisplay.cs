@@ -59,6 +59,7 @@ namespace osu.Game.Screens.Edit.Audio
         {
             if (hitObject is IHasRepeats repeatedHitObject)
             {
+                Add(new ExtendableHitSoundTrackPart(hitObject));
                 for (int i = 0; i < repeatedHitObject.NodeSamples.Count; i++)
                 {
                     Add(new NodeHitSoundTrackPart(hitObject, repeatedHitObject, i));

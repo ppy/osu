@@ -14,62 +14,35 @@ using osu.Game.Audio;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
-using osu.Game.Skinning;
-using osuTK.Graphics;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Extensions.Color4Extensions;
-using osu.Game.Overlays;
 using osu.Framework.Input.Events;
 
 namespace osu.Game.Screens.Edit.Audio
 {
-    public partial class HitSoundTrackObjectToggleButton : Container
+    public partial class HitSoundTrackObjectToggleButton : ClickableContainer
     {
-        private Bindable<Color4> colour = new();
-
         public IBindable<bool>? Active;
 
         private Circle circle;
 
-        public new Color4 Colour
-        {
-            get => colour.Value;
-            set
-            {
-                base.Colour = value;
-                colour.Value = value;
-            }
-        }
-
-        public Action? Action { get; set; }
+        public new IBindable<Colour4> Colour = new Bindable<Colour4>();
 
         public HitSoundTrackObjectToggleButton()
         {
-            Anchor = Anchor.Centre;
-            Origin = Anchor.Centre;
-            Child = new ClickableContainer
+            RelativeSizeAxes = Axes.Both;
+            Child = circle = new Circle
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = circle = new Circle
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Masking = true,
-                    Width = 15,
-                    Height = 15,
-                },
-                Action = () =>
-                {
-                    Action?.Invoke();
-                }
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Masking = true,
             };
-
-            colour.BindValueChanged(v => updateColour(), true);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
+            Colour?.BindValueChanged(v => updateColour(), true);
             Active?.BindValueChanged(v => updateColour(), true);
         }
 
@@ -78,24 +51,25 @@ namespace osu.Game.Screens.Edit.Audio
             circle.EdgeEffect = new EdgeEffectParameters
             {
                 Type = EdgeEffectType.Shadow,
-                Colour = Active?.Value == true ? colour.Value.Darken(0.2f) : Colour4.White,
-                Radius = Active?.Value == true ? 5f : 1f,
+                Colour = Active?.Value == true ? Colour.Value.Darken(0.2f) : Colour4.Black.Opacity(0.2f),
+                Radius = Active?.Value == true ? 3f : 2f,
                 Hollow = true,
             };
-            circle.FadeColour(Active?.Value == true ? colour.Value : Colour4.White);
-            circle.FadeTo(Active?.Value == true ? 1f : 0.1f);
+            circle.FadeColour(Active?.Value == true ? Colour.Value : Colour.Value.Darken(0.8f));
+            circle.FadeTo(Active?.Value == true ? 1f : 0.5f);
         }
 
         protected override bool OnHover(HoverEvent e)
         {
-            circle.ScaleTo(1.5f, 50);
-            return base.OnHover(e);
+            circle.ResizeHeightTo(1.5f, 50);
+            base.OnHover(e);
+            return false;
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            circle.ScaleTo(1.0f, 50);
             base.OnHoverLost(e);
+            circle.ResizeHeightTo(1, 50);
         }
     }
 
@@ -106,8 +80,6 @@ namespace osu.Game.Screens.Edit.Audio
 
         private string target;
         private Bindable<bool> active = new(false);
-
-        private HitSoundTrackObjectToggleButton button;
 
         public Action<string>? Action;
 
@@ -120,70 +92,40 @@ namespace osu.Game.Screens.Edit.Audio
         [Resolved]
         private HitSoundTrackPart hitSoundTrackPart { get; set; } = null!;
 
-        [Resolved]
-        private ISkinSource skin { get; set; } = null!;
-
-        [Resolved]
-        private OverlayColourProvider colourProvider { get; set; } = null!;
-
         public HitSoundTrackObjectToggle(string target)
         {
             this.target = target;
 
-            AutoSizeAxes = Axes.Both;
-            Anchor = Anchor.Centre;
-            Origin = Anchor.Centre;
+            Anchor = Anchor.CentreLeft;
+            Origin = Anchor.CentreLeft;
+            RelativeSizeAxes = Axes.X;
 
-            Child = button = new HitSoundTrackObjectToggleButton
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Width = 30,
-                Height = 30,
-                Action = Toggle,
-                Active = active,
-            };
+            Height = 15;
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            Child = new HitSoundTrackObjectToggleButton
+            {
+                RelativeSizeAxes = Axes.Both,
+                Anchor = Anchor.CentreLeft,
+                Origin = Anchor.CentreLeft,
+                Action = Toggle,
+                Active = active,
+                Colour = hitSoundTrackPart.Colour,
+            };
+
             hitObject = hitSoundTrackPart.HitObject;
 
             editorBeatmap.HitObjectUpdated += (HitObject updatedHitObject) =>
             {
                 if (updatedHitObject == hitObject)
                     UpdateActiveStateAndSample();
-                updateColour();
             };
 
-            if (hitObject is IHasDisplayColour displayColour)
-                displayColour.DisplayColour.GetBoundCopy().BindValueChanged(_ => updateColour(), true);
-
             hitObject.SamplesBindable.BindCollectionChanged((object? obj, NotifyCollectionChangedEventArgs e) => UpdateActiveStateAndSample(), true);
-            updateColour();
-        }
-
-        private void updateColour()
-        {
-            Color4 colour;
-
-            switch (hitObject)
-            {
-                case IHasDisplayColour displayColour:
-                    colour = displayColour.DisplayColour.Value;
-                    break;
-
-                case IHasComboInformation combo:
-                    colour = combo.GetComboColour(skin);
-                    break;
-
-                default:
-                    colour = colourProvider.Highlight1;
-                    break;
-            }
-
-            button.Colour = colour;
         }
 
         protected void UpdateActiveStateAndSample()
