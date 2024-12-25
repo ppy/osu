@@ -169,7 +169,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                 RelativeSizeAxes = Axes.Both,
                                 Content = new[]
                                 {
-                                    new[]
+                                    new Drawable[]
                                     {
                                         new Container
                                         {
