@@ -41,6 +41,7 @@ using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Overlays.OSD;
+using osu.Game.Overlays.Volume;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
@@ -333,6 +334,7 @@ namespace osu.Game.Screens.Edit
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
+                    new GlobalScrollAdjustsVolume(),
                     new Container
                     {
                         Name = "Screen container",
