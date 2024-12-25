@@ -14,12 +14,12 @@ namespace osu.Game.Screens.Edit.Audio
         {
         }
 
-        protected override void LoadComplete()
+        protected override void LoadAsyncComplete()
         {
-            base.LoadComplete();
+            base.LoadAsyncComplete();
             RelativeSizeAxes = Axes.X;
 
-            WaveformOpacity.BindTarget = new Bindable<float>(0.2f);
+            WaveformOpacity = new Bindable<float>(0f);
         }
 
         protected override void UpdateAfterAutoSize()
