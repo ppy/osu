@@ -12,14 +12,14 @@ using osu.Game.Screens.Edit.Components.Timelines.Summary.Parts;
 namespace osu.Game.Screens.Edit.Audio
 {
     [Cached]
-    public partial class SoundTrackObjectsDisplay : TimelinePart<HitSoundTrackPart>
+    public partial class HitSoundTrackSamplePointBlueprintContainer : TimelinePart<HitSoundTrackSamplePointBlueprint>
     {
         [Resolved]
         private EditorBeatmap editorBeatmap { get; set; } = null!;
 
         public readonly HitSoundTrackMode Mode;
 
-        public SoundTrackObjectsDisplay(HitSoundTrackMode mode)
+        public HitSoundTrackSamplePointBlueprintContainer(HitSoundTrackMode mode)
         {
             Mode = mode;
         }
@@ -38,7 +38,7 @@ namespace osu.Game.Screens.Edit.Audio
                 }
             };
 
-            List<HitSoundTrackPart> objects = [];
+            List<HitSoundTrackSamplePointBlueprint> objects = [];
 
             editorBeatmap.HitObjects.ForEach(addHitObjectToTrack);
 
@@ -49,8 +49,8 @@ namespace osu.Game.Screens.Edit.Audio
         {
             Children.Where(v =>
             {
-                if (v is HitSoundTrackPart hitSoundTrackPart)
-                    return hitSoundTrackPart.HitObject == hitObject;
+                if (v is HitSoundTrackSamplePointBlueprint samplePoint)
+                    return samplePoint.HitObject == hitObject;
                 return false;
             }).ForEach(part => part.Expire());
         }
@@ -60,16 +60,16 @@ namespace osu.Game.Screens.Edit.Audio
             if (hitObject is IHasRepeats || hitObject is IHasDuration)
             {
                 if (hitObject is IHasDuration)
-                    Add(new ExtendableHitSoundTrackPart(hitObject));
+                    Add(new ExtendableHitSoundTrackSamplePointBlueprint(hitObject));
 
                 if (hitObject is IHasRepeats repeatedHitObject)
                     for (int i = 0; i < repeatedHitObject.NodeSamples.Count; i++)
                     {
-                        Add(new NodeHitSoundTrackPart(hitObject, repeatedHitObject, i));
+                        Add(new NodeHitSoundTrackSamplePointBlueprint(hitObject, repeatedHitObject, i));
                     }
             }
             else
-                Add(new HitSoundTrackPart(hitObject));
+                Add(new HitSoundTrackSamplePointBlueprint(hitObject));
         }
     }
 }

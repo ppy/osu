@@ -11,8 +11,6 @@ using osu.Game.Audio;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
 using osuTK;
-using osu.Framework.Bindables;
-using osu.Game.Beatmaps;
 using Humanizer;
 using osu.Game.Rulesets.Edit;
 
@@ -20,19 +18,12 @@ namespace osu.Game.Screens.Edit.Audio
 {
     public partial class HitSoundTrackTable : CompositeDrawable
     {
-
         private const int bank_column_width = 155;
         private const int header_height = 25;
         private const int row_height = 30;
 
         [Resolved]
         private OverlayColourProvider colours { get; set; } = null!;
-
-        [Resolved]
-        private IBindable<WorkingBeatmap> workingBeatmap { get; set; } = null!;
-
-        [Resolved]
-        private EditorBeatmap editorBeatmap { get; set; } = null!;
 
         [Resolved(CanBeNull = true)]
         private HitObjectComposer composer { get; set; } = null!;
@@ -107,7 +98,7 @@ namespace osu.Game.Screens.Edit.Audio
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
                 Children = new[] {
-                    new HitSoundTrackTimeline(new SoundTrackObjectsDisplay(mode)
+                    new HitSoundTrackTimeline(new HitSoundTrackSamplePointBlueprintContainer(mode)
                     {
                         RelativeSizeAxes = Axes.Both,
                         Anchor = Anchor.CentreLeft,

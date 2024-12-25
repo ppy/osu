@@ -19,7 +19,7 @@ using osu.Framework.Input.Events;
 
 namespace osu.Game.Screens.Edit.Audio
 {
-    public partial class HitSoundTrackObjectToggleButton : ClickableContainer
+    public partial class HitSoundTrackSamplePointToggleButton : ClickableContainer
     {
         public IBindable<bool>? Active;
 
@@ -27,7 +27,7 @@ namespace osu.Game.Screens.Edit.Audio
 
         public new IBindable<Colour4> Colour = new Bindable<Colour4>();
 
-        public HitSoundTrackObjectToggleButton()
+        public HitSoundTrackSamplePointToggleButton()
         {
             RelativeSizeAxes = Axes.Both;
             Child = circle = new Circle
@@ -73,7 +73,7 @@ namespace osu.Game.Screens.Edit.Audio
         }
     }
 
-    public partial class HitSoundTrackObjectToggle : Container
+    public partial class HitSoundTrackSamplePointToggle : Container
     {
         private IList<HitSampleInfo> samples = null!;
         private HitObject hitObject = null!;
@@ -87,12 +87,12 @@ namespace osu.Game.Screens.Edit.Audio
         private EditorBeatmap editorBeatmap { get; set; } = null!;
 
         [Resolved]
-        private SoundTrackObjectsDisplay soundTrackObjectsDisplay { get; set; } = null!;
+        private HitSoundTrackSamplePointBlueprintContainer samplePointsContainer { get; set; } = null!;
 
         [Resolved]
-        private HitSoundTrackPart hitSoundTrackPart { get; set; } = null!;
+        private HitSoundTrackSamplePointBlueprint samplePoint { get; set; } = null!;
 
-        public HitSoundTrackObjectToggle(string target)
+        public HitSoundTrackSamplePointToggle(string target)
         {
             this.target = target;
 
@@ -107,17 +107,17 @@ namespace osu.Game.Screens.Edit.Audio
         {
             base.LoadComplete();
 
-            Child = new HitSoundTrackObjectToggleButton
+            Child = new HitSoundTrackSamplePointToggleButton
             {
                 RelativeSizeAxes = Axes.Both,
                 Anchor = Anchor.CentreLeft,
                 Origin = Anchor.CentreLeft,
                 Action = Toggle,
                 Active = active,
-                Colour = hitSoundTrackPart.Colour,
+                Colour = samplePoint.Colour,
             };
 
-            hitObject = hitSoundTrackPart.HitObject;
+            hitObject = samplePoint.HitObject;
 
             editorBeatmap.HitObjectUpdated += (HitObject updatedHitObject) =>
             {
@@ -130,12 +130,12 @@ namespace osu.Game.Screens.Edit.Audio
 
         protected void UpdateActiveStateAndSample()
         {
-            if (hitObject is IHasRepeats repeatedHitObject && hitSoundTrackPart is NodeHitSoundTrackPart nodeHitSoundTrackPart)
-                samples = nodeHitSoundTrackPart.NodeIndex < repeatedHitObject.NodeSamples.Count ? repeatedHitObject.NodeSamples[nodeHitSoundTrackPart.NodeIndex] : hitObject.Samples;
+            if (hitObject is IHasRepeats repeatedHitObject && samplePoint is NodeHitSoundTrackSamplePointBlueprint nodeSamplePoint)
+                samples = nodeSamplePoint.NodeIndex < repeatedHitObject.NodeSamples.Count ? repeatedHitObject.NodeSamples[nodeSamplePoint.NodeIndex] : hitObject.Samples;
             else
                 samples = hitObject.Samples;
 
-            switch (soundTrackObjectsDisplay.Mode)
+            switch (samplePointsContainer.Mode)
             {
                 case HitSoundTrackMode.Sample:
                     active.Value = samples.FirstOrDefault(sample => sample.Name == target) != null;
@@ -152,7 +152,7 @@ namespace osu.Game.Screens.Edit.Audio
         protected void Toggle()
         {
             editorBeatmap.BeginChange();
-            switch (soundTrackObjectsDisplay.Mode)
+            switch (samplePointsContainer.Mode)
             {
                 case HitSoundTrackMode.Sample:
                     setSample(samples);

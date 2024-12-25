@@ -14,9 +14,6 @@ namespace osu.Game.Screens.Edit.Audio
 {
     public partial class AudioScreen : EditorScreenWithTimeline
     {
-        [Resolved]
-        private IBindable<WorkingBeatmap> workingBeatmap { get; set; } = null!;
-
         public AudioScreen()
             : base(EditorScreenMode.Audio)
         {

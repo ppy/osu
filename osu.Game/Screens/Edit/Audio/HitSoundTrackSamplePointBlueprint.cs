@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Specialized;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -23,7 +22,7 @@ namespace osu.Game.Screens.Edit.Audio
     }
 
     [Cached]
-    public partial class HitSoundTrackPart : FillFlowContainer
+    public partial class HitSoundTrackSamplePointBlueprint : FillFlowContainer
     {
         public HitObject HitObject;
 
@@ -32,7 +31,7 @@ namespace osu.Game.Screens.Edit.Audio
         protected const float CIRCLE_WIDTH = 15;
 
         [Resolved]
-        private SoundTrackObjectsDisplay soundTrackObjectsDisplay { get; set; } = null!;
+        private HitSoundTrackSamplePointBlueprintContainer samplePointsContainer { get; set; } = null!;
 
         [Resolved]
         private ISkinSource skin { get; set; } = null!;
@@ -40,7 +39,7 @@ namespace osu.Game.Screens.Edit.Audio
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
-        public HitSoundTrackPart(HitObject hitObject)
+        public HitSoundTrackSamplePointBlueprint(HitObject hitObject)
         {
             HitObject = hitObject;
 
@@ -56,13 +55,13 @@ namespace osu.Game.Screens.Edit.Audio
         {
             base.LoadComplete();
 
-            string buildTarget(string sample, string bank) => soundTrackObjectsDisplay.Mode == HitSoundTrackMode.Sample ? sample : bank;
+            string buildTarget(string sample, string bank) => samplePointsContainer.Mode == HitSoundTrackMode.Sample ? sample : bank;
 
             Children = new[]
             {
-                new HitSoundTrackObjectToggle(buildTarget(HitSampleInfo.HIT_WHISTLE, HitSampleInfo.BANK_NORMAL)),
-                new HitSoundTrackObjectToggle(buildTarget(HitSampleInfo.HIT_FINISH, HitSampleInfo.BANK_SOFT)),
-                new HitSoundTrackObjectToggle(buildTarget(HitSampleInfo.HIT_CLAP, HitSampleInfo.BANK_DRUM)),
+                new HitSoundTrackSamplePointToggle(buildTarget(HitSampleInfo.HIT_WHISTLE, HitSampleInfo.BANK_NORMAL)),
+                new HitSoundTrackSamplePointToggle(buildTarget(HitSampleInfo.HIT_FINISH, HitSampleInfo.BANK_SOFT)),
+                new HitSoundTrackSamplePointToggle(buildTarget(HitSampleInfo.HIT_CLAP, HitSampleInfo.BANK_DRUM)),
             };
 
             HitObject.StartTimeBindable.BindValueChanged(v =>
@@ -71,10 +70,14 @@ namespace osu.Game.Screens.Edit.Audio
             }, true);
 
             if (HitObject is IHasDisplayColour displayColour)
-                displayColour.DisplayColour.BindValueChanged(_ => updateColour(), true);
+                displayColour.DisplayColour.BindValueChanged(_ => updateColour());
 
             if (HitObject is IHasComboInformation comboInfo)
-                comboInfo.IndexInCurrentComboBindable.BindValueChanged(_ => updateColour(), true);
+            {
+                comboInfo.IndexInCurrentComboBindable.BindValueChanged(_ => updateColour());
+                comboInfo.ComboIndexBindable.BindValueChanged(_ => updateColour());
+                comboInfo.ComboIndexWithOffsetsBindable.BindValueChanged(_ => updateColour());
+            }
 
             skin.SourceChanged += updateColour;
 
@@ -113,18 +116,19 @@ namespace osu.Game.Screens.Edit.Audio
         {
             return HitObject.StartTime;
         }
+
         protected virtual double GetWidth()
         {
             return CIRCLE_WIDTH;
         }
     }
 
-    public partial class NodeHitSoundTrackPart : HitSoundTrackPart
+    public partial class NodeHitSoundTrackSamplePointBlueprint : HitSoundTrackSamplePointBlueprint
     {
         public IHasRepeats HasRepeat;
         public int NodeIndex;
 
-        public NodeHitSoundTrackPart(HitObject hitObject, IHasRepeats hasRepeat, int nodeIndex) : base(hitObject)
+        public NodeHitSoundTrackSamplePointBlueprint(HitObject hitObject, IHasRepeats hasRepeat, int nodeIndex) : base(hitObject)
         {
             HasRepeat = hasRepeat;
             NodeIndex = nodeIndex;
@@ -143,9 +147,9 @@ namespace osu.Game.Screens.Edit.Audio
         }
     }
 
-    public partial class ExtendableHitSoundTrackPart : HitSoundTrackPart
+    public partial class ExtendableHitSoundTrackSamplePointBlueprint : HitSoundTrackSamplePointBlueprint
     {
-        public ExtendableHitSoundTrackPart(HitObject hitObject) : base(hitObject)
+        public ExtendableHitSoundTrackSamplePointBlueprint(HitObject hitObject) : base(hitObject)
         {
             RelativeSizeAxes = Axes.Both;
         }
