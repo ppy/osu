@@ -4,14 +4,12 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
-using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
@@ -28,6 +26,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.OnlinePlay.Match.Components;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
+using osu.Game.Utils;
 using Container = osu.Framework.Graphics.Containers.Container;
 
 namespace osu.Game.Screens.OnlinePlay.Match
@@ -36,18 +35,6 @@ namespace osu.Game.Screens.OnlinePlay.Match
     public abstract partial class RoomSubScreen : OnlinePlaySubScreen, IPreviewTrackOwner
     {
         public readonly Bindable<PlaylistItem?> SelectedItem = new Bindable<PlaylistItem?>();
-
-        /// <summary>
-        /// When players are freely allowed to select their own gameplay style (selected item has a non-null beatmapset id),
-        /// a non-null value indicates a local beatmap selection from the same beatmapset as the selected item.
-        /// </summary>
-        public readonly Bindable<BeatmapInfo?> DifficultyOverride = new Bindable<BeatmapInfo?>();
-
-        /// <summary>
-        /// When players are freely allowed to select their own gameplay style (selected item has a non-null beatmapset id),
-        /// a non-null value indicates a local ruleset selection.
-        /// </summary>
-        public readonly Bindable<RulesetInfo?> RulesetOverride = new Bindable<RulesetInfo?>();
 
         public override bool? ApplyModTrackAdjustments => true;
 
@@ -65,13 +52,13 @@ namespace osu.Game.Screens.OnlinePlay.Match
         protected Drawable? UserModsSection;
 
         /// <summary>
-        /// A container that provides controls for selection of the user's difficulty override.
+        /// A container that provides controls for selection of the user style.
         /// This will be shown/hidden automatically when applicable.
         /// </summary>
-        protected Drawable? UserDifficultySection;
+        protected Drawable? UserStyleSection;
 
         /// <summary>
-        /// A container that will display the user's difficulty override.
+        /// A container that will display the user's style.
         /// </summary>
         protected Container<DrawableRoomPlaylistItem>? UserStyleDisplayContainer;
 
@@ -81,6 +68,18 @@ namespace osu.Game.Screens.OnlinePlay.Match
         /// Any mods applied by/to the local user.
         /// </summary>
         protected readonly Bindable<IReadOnlyList<Mod>> UserMods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
+
+        /// <summary>
+        /// When players are freely allowed to select their own gameplay style (selected item has a non-null beatmapset id),
+        /// a non-null value indicates a local beatmap selection from the same beatmapset as the selected item.
+        /// </summary>
+        public readonly Bindable<BeatmapInfo?> UserBeatmap = new Bindable<BeatmapInfo?>();
+
+        /// <summary>
+        /// When players are freely allowed to select their own gameplay style (selected item has a non-null beatmapset id),
+        /// a non-null value indicates a local ruleset selection.
+        /// </summary>
+        public readonly Bindable<RulesetInfo?> UserRuleset = new Bindable<RulesetInfo?>();
 
         [Resolved(CanBeNull = true)]
         private IOverlayManager? overlayManager { get; set; }
@@ -272,13 +271,25 @@ namespace osu.Game.Screens.OnlinePlay.Match
         {
             base.LoadComplete();
 
-            SelectedItem.BindValueChanged(_ => Scheduler.AddOnce(selectedItemChanged));
-            UserMods.BindValueChanged(_ => Scheduler.AddOnce(UpdateMods));
-            DifficultyOverride.BindValueChanged(_ => Scheduler.AddOnce(updateStyleOverride));
-            RulesetOverride.BindValueChanged(_ => Scheduler.AddOnce(updateStyleOverride));
+            SelectedItem.BindValueChanged(_ => Scheduler.AddOnce(OnSelectedItemChanged));
+
+            UserMods.BindValueChanged(_ => Scheduler.AddOnce(updateMods));
+
+            UserBeatmap.BindValueChanged(_ => Scheduler.AddOnce(() =>
+            {
+                updateBeatmap();
+                updateUserStyle();
+            }));
+
+            UserRuleset.BindValueChanged(_ => Scheduler.AddOnce(() =>
+            {
+                updateUserMods();
+                updateRuleset();
+                updateUserStyle();
+            }));
 
             beatmapAvailabilityTracker.SelectedItem.BindTo(SelectedItem);
-            beatmapAvailabilityTracker.Availability.BindValueChanged(_ => updateWorkingBeatmap());
+            beatmapAvailabilityTracker.Availability.BindValueChanged(_ => updateBeatmap());
 
             userModsSelectOverlayRegistration = overlayManager?.RegisterBlockingOverlay(UserModsSelectOverlay);
 
@@ -347,7 +358,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
         public override void OnSuspending(ScreenTransitionEvent e)
         {
             // Should be a noop in most cases, but let's ensure beyond doubt that the beatmap is in a correct state.
-            updateWorkingBeatmap();
+            updateBeatmap();
 
             onLeaving();
             base.OnSuspending(e);
@@ -356,10 +367,11 @@ namespace osu.Game.Screens.OnlinePlay.Match
         public override void OnResuming(ScreenTransitionEvent e)
         {
             base.OnResuming(e);
-            updateWorkingBeatmap();
+            updateBeatmap();
             beginHandlingTrack();
-            Scheduler.AddOnce(UpdateMods);
+            Scheduler.AddOnce(updateMods);
             Scheduler.AddOnce(updateRuleset);
+            Scheduler.AddOnce(updateUserStyle);
         }
 
         protected bool ExitConfirmed { get; private set; }
@@ -409,8 +421,12 @@ namespace osu.Game.Screens.OnlinePlay.Match
 
         protected void StartPlay()
         {
-            if (GetGameplayItem() is not PlaylistItem item)
+            if (SelectedItem.Value is not PlaylistItem item)
                 return;
+
+            item = item.With(
+                ruleset: GetGameplayRuleset().OnlineID,
+                beatmap: new Optional<IBeatmapInfo>(GetGameplayBeatmap()));
 
             // User may be at song select or otherwise when the host starts gameplay.
             // Ensure that they first return to this screen, else global bindables (beatmap etc.) may be in a bad state.
@@ -437,31 +453,26 @@ namespace osu.Game.Screens.OnlinePlay.Match
         /// <returns>The screen to enter.</returns>
         protected abstract Screen CreateGameplayScreen(PlaylistItem selectedItem);
 
-        private void selectedItemChanged()
+        protected void OnSelectedItemChanged()
         {
-            if (SelectedItem.Value is not PlaylistItem selected)
+            if (!this.IsCurrentScreen() || SelectedItem.Value is not PlaylistItem item)
                 return;
 
-            if (selected.BeatmapSetId == null || selected.BeatmapSetId != DifficultyOverride.Value?.BeatmapSet.AsNonNull().OnlineID)
+            // Reset user style if no longer valid.
+            // Todo: In the future this can be made more lenient, such as allowing a non-null ruleset as the set changes.
+            if (item.BeatmapSetId == null || item.BeatmapSetId != UserBeatmap.Value?.BeatmapSet!.OnlineID)
             {
-                DifficultyOverride.Value = null;
-                RulesetOverride.Value = null;
+                UserBeatmap.Value = null;
+                UserRuleset.Value = null;
             }
 
-            updateStyleOverride();
-            updateWorkingBeatmap();
-
-            var rulesetInstance = Rulesets.GetRuleset(selected.RulesetID)?.CreateInstance();
-            Debug.Assert(rulesetInstance != null);
-            var allowedMods = selected.AllowedMods.Select(m => m.ToMod(rulesetInstance));
-
-            // Remove any user mods that are no longer allowed.
-            UserMods.Value = UserMods.Value.Where(m => allowedMods.Any(a => m.GetType() == a.GetType())).ToList();
-
-            UpdateMods();
+            updateUserMods();
+            updateBeatmap();
+            updateMods();
             updateRuleset();
+            updateUserStyle();
 
-            if (!selected.AllowedMods.Any())
+            if (!item.AllowedMods.Any())
             {
                 UserModsSection?.Hide();
                 UserModsSelectOverlay.Hide();
@@ -470,99 +481,88 @@ namespace osu.Game.Screens.OnlinePlay.Match
             else
             {
                 UserModsSection?.Show();
+
+                var rulesetInstance = GetGameplayRuleset().CreateInstance();
+                var allowedMods = item.AllowedMods.Select(m => m.ToMod(rulesetInstance));
                 UserModsSelectOverlay.IsValidMod = m => allowedMods.Any(a => a.GetType() == m.GetType());
             }
 
-            if (selected.BeatmapSetId == null)
-                UserDifficultySection?.Hide();
+            if (item.BeatmapSetId == null)
+                UserStyleSection?.Hide();
             else
-                UserDifficultySection?.Show();
+                UserStyleSection?.Show();
         }
 
-        private void updateWorkingBeatmap()
+        private void updateUserMods()
         {
-            if (GetGameplayItem() is not PlaylistItem item || !this.IsCurrentScreen())
+            if (!this.IsCurrentScreen() || SelectedItem.Value is not PlaylistItem item)
+                return;
+
+            // Remove any user mods that are no longer allowed.
+            var rulesetInstance = GetGameplayRuleset().CreateInstance();
+            var allowedMods = item.AllowedMods.Select(m => m.ToMod(rulesetInstance));
+            UserMods.Value = UserMods.Value.Where(m => allowedMods.Any(a => m.GetType() == a.GetType())).ToList();
+        }
+
+        private void updateBeatmap()
+        {
+            if (!this.IsCurrentScreen() || SelectedItem.Value is not PlaylistItem)
                 return;
 
             // Retrieve the corresponding local beatmap, since we can't directly use the playlist's beatmap info
-            var localBeatmap = beatmapManager.QueryBeatmap(b => b.OnlineID == item.Beatmap.OnlineID);
-
-            UserModsSelectOverlay.Beatmap.Value = Beatmap.Value = beatmapManager.GetWorkingBeatmap(localBeatmap);
+            int beatmapId = GetGameplayBeatmap().OnlineID;
+            var localBeatmap = beatmapManager.QueryBeatmap(b => b.OnlineID == beatmapId);
+            Beatmap.Value = beatmapManager.GetWorkingBeatmap(localBeatmap);
+            UserModsSelectOverlay.Beatmap.Value = Beatmap.Value;
         }
 
-        protected virtual void UpdateMods()
+        private void updateMods()
         {
-            if (GetGameplayItem() is not PlaylistItem item || !this.IsCurrentScreen())
+            if (!this.IsCurrentScreen() || SelectedItem.Value is not PlaylistItem)
                 return;
 
-            var rulesetInstance = Rulesets.GetRuleset(item.RulesetID)?.CreateInstance();
-            Debug.Assert(rulesetInstance != null);
-            Mods.Value = UserMods.Value.Concat(item.RequiredMods.Select(m => m.ToMod(rulesetInstance))).ToList();
-        }
-
-        private void updateStyleOverride()
-        {
-            if (SelectedItem.Value == null || !this.IsCurrentScreen())
-                return;
-
-            if (UserStyleDisplayContainer == null)
-                return;
-
-            PlaylistItem gameplayItem = GetGameplayItem()!;
-
-            if (UserStyleDisplayContainer.SingleOrDefault()?.Item.Equals(gameplayItem) == true)
-                return;
-
-            UserStyleDisplayContainer.Child = new DrawableRoomPlaylistItem(gameplayItem)
-            {
-                AllowReordering = false,
-                AllowEditing = true,
-                RequestEdit = _ => openStyleSelection()
-            };
-        }
-
-        protected PlaylistItem? GetGameplayItem()
-        {
-            PlaylistItem? selectedItemWithOverride = SelectedItem.Value;
-
-            if (selectedItemWithOverride?.BeatmapSetId == null)
-                return selectedItemWithOverride;
-
-            // Sanity check.
-            if (DifficultyOverride.Value?.BeatmapSet?.OnlineID != selectedItemWithOverride.BeatmapSetId)
-                return selectedItemWithOverride;
-
-            if (DifficultyOverride.Value != null)
-                selectedItemWithOverride = selectedItemWithOverride.With(beatmap: DifficultyOverride.Value);
-
-            if (RulesetOverride.Value != null)
-                selectedItemWithOverride = selectedItemWithOverride.With(ruleset: RulesetOverride.Value.OnlineID);
-
-            return selectedItemWithOverride;
-        }
-
-        private void openStyleSelection()
-        {
-            if (SelectedItem.Value == null || !this.IsCurrentScreen())
-                return;
-
-            this.Push(new MultiplayerMatchStyleSelect(Room, SelectedItem.Value, (beatmap, ruleset) =>
-            {
-                if (SelectedItem.Value?.BeatmapSetId == null || SelectedItem.Value.BeatmapSetId != beatmap.BeatmapSet?.OnlineID)
-                    return;
-
-                DifficultyOverride.Value = beatmap;
-                RulesetOverride.Value = ruleset;
-            }));
+            var rulesetInstance = GetGameplayRuleset().CreateInstance();
+            Mods.Value = GetGameplayMods().Select(m => m.ToMod(rulesetInstance)).ToArray();
         }
 
         private void updateRuleset()
         {
-            if (GetGameplayItem() is not PlaylistItem item || !this.IsCurrentScreen())
+            if (!this.IsCurrentScreen() || SelectedItem.Value is not PlaylistItem)
                 return;
 
-            Ruleset.Value = Rulesets.GetRuleset(item.RulesetID);
+            Ruleset.Value = GetGameplayRuleset();
         }
+
+        private void updateUserStyle()
+        {
+            if (!this.IsCurrentScreen() || SelectedItem.Value is not PlaylistItem)
+                return;
+
+            if (UserStyleDisplayContainer != null)
+            {
+                PlaylistItem gameplayItem = SelectedItem.Value.With(
+                    ruleset: GetGameplayRuleset().OnlineID,
+                    beatmap: new Optional<IBeatmapInfo>(GetGameplayBeatmap()));
+
+                UserStyleDisplayContainer.Child = new DrawableRoomPlaylistItem(gameplayItem)
+                {
+                    AllowReordering = false,
+                    AllowEditing = true,
+                    RequestEdit = _ => OpenStyleSelection()
+                };
+            }
+        }
+
+        protected virtual APIMod[] GetGameplayMods()
+            => UserMods.Value.Select(m => new APIMod(m)).Concat(SelectedItem.Value!.RequiredMods).ToArray();
+
+        protected virtual RulesetInfo GetGameplayRuleset()
+            => Rulesets.GetRuleset(UserRuleset.Value?.OnlineID ?? SelectedItem.Value!.RulesetID)!;
+
+        protected virtual IBeatmapInfo GetGameplayBeatmap()
+            => UserBeatmap.Value ?? SelectedItem.Value!.Beatmap;
+
+        protected abstract void OpenStyleSelection();
 
         private void beginHandlingTrack()
         {
