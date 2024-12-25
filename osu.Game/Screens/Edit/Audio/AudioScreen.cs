@@ -51,7 +51,7 @@ namespace osu.Game.Screens.Edit.Audio
         protected override Drawable CreateMainContent()
         {
             if (composer == null)
-                return Empty();
+                return new ScreenWhiteBox.UnderConstructionMessage("Audio mode");
 
             return new EditorSkinProvidingContainer(EditorBeatmap).WithChild(new Container
             {
