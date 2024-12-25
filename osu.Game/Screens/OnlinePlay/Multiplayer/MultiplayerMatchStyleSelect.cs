@@ -2,106 +2,88 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using Humanizer;
 using osu.Framework.Allocation;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
+using osu.Framework.Bindables;
+using osu.Framework.Logging;
 using osu.Framework.Screens;
-using osu.Game.Beatmaps;
-using osu.Game.Database;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
-using osu.Game.Rulesets;
-using osu.Game.Screens.Select;
-using osu.Game.Users;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
-    public partial class MultiplayerMatchStyleSelect : SongSelect, IOnlinePlaySubScreen, IHandlePresentBeatmap
+    public partial class MultiplayerMatchStyleSelect : OnlinePlayStyleSelect
     {
-        public string ShortTitle => "style selection";
+        [Resolved]
+        private MultiplayerClient client { get; set; } = null!;
 
-        public override string Title => ShortTitle.Humanize();
+        [Resolved]
+        private OngoingOperationTracker operationTracker { get; set; } = null!;
 
-        public override bool AllowEditing => false;
+        private readonly IBindable<bool> operationInProgress = new Bindable<bool>();
 
-        protected override UserActivity InitialActivity => new UserActivity.InLobby(room);
+        private LoadingLayer loadingLayer = null!;
+        private IDisposable? selectionOperation;
 
-        private readonly Room room;
-        private readonly PlaylistItem item;
-        private readonly Action<BeatmapInfo, RulesetInfo> onSelect;
-
-        public MultiplayerMatchStyleSelect(Room room, PlaylistItem item, Action<BeatmapInfo, RulesetInfo> onSelect)
+        public MultiplayerMatchStyleSelect(Room room, PlaylistItem item)
+            : base(room, item)
         {
-            this.room = room;
-            this.item = item;
-            this.onSelect = onSelect;
-
-            Padding = new MarginPadding { Horizontal = HORIZONTAL_OVERFLOW_PADDING };
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            LeftArea.Padding = new MarginPadding { Top = Header.HEIGHT };
+            AddInternal(loadingLayer = new LoadingLayer(true));
         }
 
-        protected override FilterControl CreateFilterControl() => new DifficultySelectFilterControl(item);
-
-        protected override IEnumerable<(FooterButton, OverlayContainer?)> CreateSongSelectFooterButtons()
+        protected override void LoadComplete()
         {
-            // Required to create the drawable components.
-            base.CreateSongSelectFooterButtons();
-            return Enumerable.Empty<(FooterButton, OverlayContainer?)>();
+            base.LoadComplete();
+
+            operationInProgress.BindTo(operationTracker.InProgress);
+            operationInProgress.BindValueChanged(_ => updateLoadingLayer(), true);
         }
 
-        protected override BeatmapDetailArea CreateBeatmapDetailArea() => new PlayBeatmapDetailArea();
+        private void updateLoadingLayer()
+        {
+            if (operationInProgress.Value)
+                loadingLayer.Show();
+            else
+                loadingLayer.Hide();
+        }
 
         protected override bool OnStart()
         {
-            onSelect(Beatmap.Value.BeatmapInfo, Ruleset.Value);
-            this.Exit();
+            if (operationInProgress.Value)
+            {
+                Logger.Log($"{nameof(OnStart)} aborted due to {nameof(operationInProgress)}");
+                return false;
+            }
+
+            selectionOperation = operationTracker.BeginOperation();
+
+            client.ChangeUserStyle(Beatmap.Value.BeatmapInfo.OnlineID, Ruleset.Value.OnlineID)
+                  .FireAndForget(onSuccess: () =>
+                  {
+                      selectionOperation.Dispose();
+
+                      Schedule(() =>
+                      {
+                          // If an error or server side trigger occurred this screen may have already exited by external means.
+                          if (this.IsCurrentScreen())
+                              this.Exit();
+                      });
+                  }, onError: _ =>
+                  {
+                      selectionOperation.Dispose();
+
+                      Schedule(() =>
+                      {
+                          Carousel.AllowSelection = true;
+                      });
+                  });
+
             return true;
-        }
-
-        public void PresentBeatmap(WorkingBeatmap beatmap, RulesetInfo ruleset)
-        {
-            // This screen cannot present beatmaps.
-        }
-
-        private partial class DifficultySelectFilterControl : FilterControl
-        {
-            private readonly PlaylistItem item;
-            private double itemLength;
-
-            public DifficultySelectFilterControl(PlaylistItem item)
-            {
-                this.item = item;
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(RealmAccess realm)
-            {
-                int beatmapId = item.Beatmap.OnlineID;
-                itemLength = realm.Run(r => r.All<BeatmapInfo>().FirstOrDefault(b => b.OnlineID == beatmapId)?.Length ?? 0);
-            }
-
-            public override FilterCriteria CreateCriteria()
-            {
-                var criteria = base.CreateCriteria();
-
-                // Must be from the same set as the playlist item.
-                criteria.BeatmapSetId = item.BeatmapSetId;
-
-                // Must be within 30s of the playlist item.
-                criteria.Length.Min = itemLength - 30000;
-                criteria.Length.Max = itemLength + 30000;
-                criteria.Length.IsLowerInclusive = true;
-                criteria.Length.IsUpperInclusive = true;
-
-                return criteria;
-            }
         }
     }
 }

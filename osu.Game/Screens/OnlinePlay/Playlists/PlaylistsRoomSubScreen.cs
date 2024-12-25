@@ -213,7 +213,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                         }
                                                     }
                                                 },
-                                                UserDifficultySection = new FillFlowContainer
+                                                UserStyleSection = new FillFlowContainer
                                                 {
                                                     RelativeSizeAxes = Axes.X,
                                                     AutoSizeAxes = Axes.Y,
@@ -298,6 +298,18 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                     this.Push(new PlaylistsSongSelect(Room));
             },
         };
+
+        protected override void OpenStyleSelection()
+        {
+            if (!this.IsCurrentScreen() || SelectedItem.Value is not PlaylistItem item)
+                return;
+
+            this.Push(new PlaylistsRoomStyleSelect(Room, item)
+            {
+                Beatmap = { BindTarget = UserBeatmap },
+                Ruleset = { BindTarget = UserRuleset }
+            });
+        }
 
         private void updatePollingRate()
         {

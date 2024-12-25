@@ -16,6 +16,8 @@ using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Online;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
@@ -188,7 +190,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                                         },
                                                     }
                                                 },
-                                                UserDifficultySection = new FillFlowContainer
+                                                UserStyleSection = new FillFlowContainer
                                                 {
                                                     RelativeSizeAxes = Axes.X,
                                                     AutoSizeAxes = Axes.Y,
@@ -251,6 +253,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             this.Push(new MultiplayerMatchSongSelect(Room, itemToEdit));
         }
 
+        protected override void OpenStyleSelection()
+        {
+            if (!this.IsCurrentScreen() || SelectedItem.Value is not PlaylistItem item)
+                return;
+
+            this.Push(new MultiplayerMatchStyleSelect(Room, item));
+        }
+
         protected override Drawable CreateFooter() => new MultiplayerMatchFooter
         {
             SelectedItem = SelectedItem
@@ -261,16 +271,22 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             SelectedItem = SelectedItem
         };
 
-        protected override void UpdateMods()
+        protected override APIMod[] GetGameplayMods()
         {
-            if (GetGameplayItem() is not PlaylistItem item || client.LocalUser == null || !this.IsCurrentScreen())
-                return;
+            // Using the room's reported status makes the server authoritative.
+            return client.LocalUser?.Mods.Concat(SelectedItem.Value!.RequiredMods).ToArray()!;
+        }
 
-            // update local mods based on room's reported status for the local user (omitting the base call implementation).
-            // this makes the server authoritative, and avoids the local user potentially setting mods that the server is not aware of (ie. if the match was started during the selection being changed).
-            var rulesetInstance = Rulesets.GetRuleset(item.RulesetID)?.CreateInstance();
-            Debug.Assert(rulesetInstance != null);
-            Mods.Value = client.LocalUser.Mods.Select(m => m.ToMod(rulesetInstance)).Concat(item.RequiredMods.Select(m => m.ToMod(rulesetInstance))).ToList();
+        protected override RulesetInfo GetGameplayRuleset()
+        {
+            // Using the room's reported status makes the server authoritative.
+            return client.LocalUser?.RulesetId != null ? Rulesets.GetRuleset(client.LocalUser.RulesetId.Value)! : base.GetGameplayRuleset();
+        }
+
+        protected override IBeatmapInfo GetGameplayBeatmap()
+        {
+            // Using the room's reported status makes the server authoritative.
+            return client.LocalUser?.BeatmapId != null ? new APIBeatmap { OnlineID = client.LocalUser.BeatmapId.Value } : base.GetGameplayBeatmap();
         }
 
         [Resolved(canBeNull: true)]
@@ -376,7 +392,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             addItemButton.Alpha = localUserCanAddItem ? 1 : 0;
 
-            Scheduler.AddOnce(UpdateMods);
+            // Forcefully update the selected item so that the user state is applied.
+            Scheduler.AddOnce(OnSelectedItemChanged);
 
             Activity.Value = new UserActivity.InLobby(Room);
         }
