@@ -22,7 +22,7 @@ namespace osu.Game.Screens.Edit.Audio
     }
 
     [Cached]
-    public partial class HitSoundTrackSamplePointBlueprint : FillFlowContainer
+    public partial class HitSoundTrackSamplePointBlueprint : FillFlowContainer<HitSoundTrackSamplePointToggle>
     {
         public HitObject HitObject;
 

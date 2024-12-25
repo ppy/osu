@@ -77,7 +77,7 @@ namespace osu.Game.Screens.Edit.Audio
         private IList<HitSampleInfo> samples = null!;
         private HitObject hitObject = null!;
 
-        private readonly string target;
+        public readonly string Target;
         private readonly Bindable<bool> active = new Bindable<bool>(false);
 
         public Action<string>? Action;
@@ -93,7 +93,7 @@ namespace osu.Game.Screens.Edit.Audio
 
         public HitSoundTrackSamplePointToggle(string target)
         {
-            this.target = target;
+            Target = target;
 
             Anchor = Anchor.CentreLeft;
             Origin = Anchor.CentreLeft;
@@ -137,15 +137,15 @@ namespace osu.Game.Screens.Edit.Audio
             switch (samplePointsContainer.Mode)
             {
                 case HitSoundTrackMode.Sample:
-                    active.Value = samples.FirstOrDefault(sample => sample.Name == target) != null;
+                    active.Value = samples.FirstOrDefault(sample => sample.Name == Target) != null;
                     break;
 
                 case HitSoundTrackMode.NormalBank:
-                    active.Value = SamplePointPiece.GetBankValue(samples) == target;
+                    active.Value = SamplePointPiece.GetBankValue(samples) == Target;
                     break;
 
                 case HitSoundTrackMode.AdditionBank:
-                    active.Value = SamplePointPiece.GetAdditionBankValue(samples) == target;
+                    active.Value = SamplePointPiece.GetAdditionBankValue(samples) == Target;
                     break;
             }
         }
@@ -177,7 +177,7 @@ namespace osu.Game.Screens.Edit.Audio
         {
             if (active.Value)
             {
-                var targetSample = samples.FirstOrDefault(sample => sample.Name == target);
+                var targetSample = samples.FirstOrDefault(sample => sample.Name == Target);
                 if (targetSample == null)
                     return;
 
@@ -185,7 +185,7 @@ namespace osu.Game.Screens.Edit.Audio
             }
             else
             {
-                samples.Add(new HitSampleInfo(target, bank: SamplePointPiece.GetBankValue(samples) ?? HitSampleInfo.BANK_NORMAL));
+                samples.Add(new HitSampleInfo(Target, bank: SamplePointPiece.GetBankValue(samples) ?? HitSampleInfo.BANK_NORMAL));
             }
         }
 
@@ -198,7 +198,7 @@ namespace osu.Game.Screens.Edit.Audio
             if (originalNormalBank == null)
                 return;
 
-            samples.Add(originalNormalBank.With(newBank: target));
+            samples.Add(originalNormalBank.With(newBank: Target));
             samples.Remove(originalNormalBank);
         }
 
@@ -211,7 +211,7 @@ namespace osu.Game.Screens.Edit.Audio
                     if (active.Value)
                         samples.Add(originalSample.With(newEditorAutoBank: true));
                     else
-                        samples.Add(originalSample.With(newBank: target, newEditorAutoBank: false));
+                        samples.Add(originalSample.With(newBank: Target, newEditorAutoBank: false));
 
                     samples.Remove(originalSample);
                 });
