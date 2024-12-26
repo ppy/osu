@@ -205,18 +205,20 @@ namespace osu.Game.Rulesets.Taiko.UI
             AddRangeInternal(poolsHit.Values);
         }
 
-        private readonly IDictionary<HitType, HitPool> poolsHit = new Dictionary<HitType, HitPool>()
+        private readonly IDictionary<(HitType, bool), HitPool> poolsHit = new Dictionary<(HitType, bool), HitPool>()
         {
-            {HitType.Centre, new HitPool(HitType.Centre, 50)},
-            {HitType.Rim, new HitPool(HitType.Rim, 50)},
+            // Non strong (pool size is 50 for each type):
+            {(HitType.Centre, false), new HitPool(50, HitType.Centre, false)},
+            {(HitType.Rim, false), new HitPool(50, HitType.Rim, false)},
+            // Strong (pool size is 20 for each type):
+            {(HitType.Centre, true), new HitPool(20, HitType.Centre, true)},
+            {(HitType.Rim, true), new HitPool(20, HitType.Rim, true)},
         };
         protected override IDrawablePool? AdditionalPrepareDrawablePool(HitObject hitObject)
         {
             switch (hitObject)
             {
-                case Hit hit: return poolsHit[hit.Type];
-                // TODO: ???
-                //case Hit.StrongNestedHit hitStrong: return  ;
+                case Hit hit: return poolsHit[(hit.Type, hit.IsStrong)];
                 default: return null;
             }
         }

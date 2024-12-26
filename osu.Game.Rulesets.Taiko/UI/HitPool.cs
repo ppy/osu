@@ -11,13 +11,15 @@ namespace osu.Game.Rulesets.Taiko.UI
     internal partial class HitPool : DrawablePool<DrawableHit>
     {
         private readonly HitType hitType;
+        private readonly bool isStrong;
 
-        public HitPool(HitType hitType, int initialSize)
+        public HitPool(int initialSize, HitType hitType, bool isStrong)
             : base(initialSize)
         {
             this.hitType = hitType;
+            this.isStrong = isStrong;
         }
 
-        protected override DrawableHit CreateNewDrawable() => new DrawableHit(new Hit(hitType));
+        protected override DrawableHit CreateNewDrawable() => new DrawableHit(new Hit(hitType, isStrong));
     }
 }
