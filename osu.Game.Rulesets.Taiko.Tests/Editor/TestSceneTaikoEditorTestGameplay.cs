@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Editor
             {
                 EditorBeatmap.Clear();
                 EditorBeatmap.Add(new Swell { StartTime = 500, EndTime = 1500 });
-                EditorBeatmap.Add(new Hit { StartTime = 3000 });
+                EditorBeatmap.Add(new HitCentre { StartTime = 3000 });
             });
             AddStep("seek to 250", () => EditorClock.Seek(250));
             AddUntilStep("wait for seek", () => EditorClock.CurrentTime, () => Is.EqualTo(250));

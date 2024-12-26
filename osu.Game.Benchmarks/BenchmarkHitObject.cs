@@ -74,11 +74,11 @@ namespace osu.Game.Benchmarks
 
             for (int i = 0; i < Count; i++)
             {
-                hits[i] = new Hit();
+                hits[i] = new HitCentre();
 
                 if (WithBindableAccess)
                 {
-                    _ = hits[i].TypeBindable;
+                    _ = hits[i].Type;
                     _ = hits[i].IsStrongBindable;
                     _ = hits[i].SamplesBindable;
                     _ = hits[i].StartTimeBindable;

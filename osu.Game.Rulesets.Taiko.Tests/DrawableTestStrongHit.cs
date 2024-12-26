@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
         private readonly bool hitBoth;
 
         public DrawableTestStrongHit(double startTime, HitResult type = HitResult.Great, bool hitBoth = true)
-            : base(new Hit
+            : base(new HitCentre
             {
                 IsStrong = true,
                 StartTime = startTime,

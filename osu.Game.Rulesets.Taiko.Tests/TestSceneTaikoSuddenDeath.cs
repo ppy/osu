@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
                 HitObjects =
                 {
                     new Swell { StartTime = 1500 },
-                    new Hit { StartTime = 100000 },
+                    new HitCentre { StartTime = 100000 },
                 },
                 BeatmapInfo =
                 {

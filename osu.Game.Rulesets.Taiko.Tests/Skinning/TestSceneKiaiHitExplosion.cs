@@ -32,6 +32,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
             };
         }
 
-        private DrawableTestHit createHit(HitType type) => new DrawableTestHit(new Hit { StartTime = Time.Current, Type = type });
+        private DrawableTestHit createHit(HitType type) => new DrawableTestHit(
+            type == HitType.Centre ? new HitCentre { StartTime = Time.Current } : new HitRim { StartTime = Time.Current });
     }
 }

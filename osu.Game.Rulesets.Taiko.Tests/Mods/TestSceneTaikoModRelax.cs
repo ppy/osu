@@ -38,8 +38,8 @@ namespace osu.Game.Rulesets.Taiko.Tests.Mods
             {
                 HitObjects =
                 {
-                    new Hit { StartTime = 0, Type = HitType.Centre, },
-                    new Hit { StartTime = 250, Type = HitType.Rim, },
+                    new HitCentre { StartTime = 0, },
+                    new HitRim { StartTime = 250, },
                     new DrumRoll { StartTime = 500, Duration = 500, },
                     new Swell { StartTime = 1250, Duration = 500 },
                 }

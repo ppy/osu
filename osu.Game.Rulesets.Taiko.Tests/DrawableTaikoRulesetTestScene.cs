@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
         {
             return new Beatmap
             {
-                HitObjects = new List<HitObject> { new Hit { Type = HitType.Centre } },
+                HitObjects = new List<HitObject> { new HitCentre() },
                 BeatmapInfo = new BeatmapInfo
                 {
                     Difficulty = new BeatmapDifficulty(),

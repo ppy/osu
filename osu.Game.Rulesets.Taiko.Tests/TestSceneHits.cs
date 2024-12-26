@@ -107,7 +107,8 @@ namespace osu.Game.Rulesets.Taiko.Tests
         {
             HitResult hitResult = RNG.Next(2) == 0 ? HitResult.Ok : HitResult.Great;
 
-            Hit hit = new Hit { StartTime = DrawableRuleset.Playfield.Time.Current };
+            Hit hit = RNG.NextBool() ? new HitCentre() : new HitRim();
+            hit.StartTime = DrawableRuleset.Playfield.Time.Current;
             var h = new DrawableTestHit(hit, kiai: kiai) { X = RNG.NextSingle(hitResult == HitResult.Ok ? -0.1f : -0.05f, hitResult == HitResult.Ok ? 0.1f : 0.05f) };
 
             DrawableRuleset.Playfield.Add(h);
@@ -119,12 +120,11 @@ namespace osu.Game.Rulesets.Taiko.Tests
         {
             HitResult hitResult = RNG.Next(2) == 0 ? HitResult.Ok : HitResult.Great;
 
-            Hit hit = new Hit
-            {
-                StartTime = DrawableRuleset.Playfield.Time.Current,
-                IsStrong = true,
-                Samples = createSamples(strong: true)
-            };
+            Hit hit = RNG.NextBool() ? new HitCentre() : new HitRim();
+            hit.StartTime = DrawableRuleset.Playfield.Time.Current;
+            hit.IsStrong = true;
+            hit.Samples = createSamples(strong: true);
+
             var h = new DrawableTestHit(hit, kiai: kiai) { X = RNG.NextSingle(hitResult == HitResult.Ok ? -0.1f : -0.05f, hitResult == HitResult.Ok ? 0.1f : 0.05f) };
 
             DrawableRuleset.Playfield.Add(h);
@@ -136,7 +136,9 @@ namespace osu.Game.Rulesets.Taiko.Tests
         private void addMissJudgement()
         {
             DrawableTestHit h;
-            DrawableRuleset.Playfield.Add(h = new DrawableTestHit(new Hit { StartTime = DrawableRuleset.Playfield.Time.Current }, HitResult.Miss)
+            Hit hit = RNG.NextBool() ? new HitCentre() : new HitRim();
+            hit.StartTime = DrawableRuleset.Playfield.Time.Current;
+            DrawableRuleset.Playfield.Add(h = new DrawableTestHit(hit, HitResult.Miss)
             {
                 Alpha = 0
             });
@@ -191,30 +193,24 @@ namespace osu.Game.Rulesets.Taiko.Tests
 
         private void addCentreHit(bool strong)
         {
-            Hit h = new Hit
-            {
-                StartTime = DrawableRuleset.Playfield.Time.Current + scroll_time,
-                IsStrong = strong,
-                Samples = createSamples(HitType.Centre, strong)
-            };
+            Hit h = Hit.CreateConcreteBySample(createSamples(HitType.Centre, strong));
+            h.StartTime = DrawableRuleset.Playfield.Time.Current + scroll_time;
+            h.IsStrong = strong;
 
             h.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
 
-            DrawableRuleset.Playfield.Add(new DrawableHit(h));
+            DrawableRuleset.Playfield.Add(DrawableHit.CreateConcrete(h));
         }
 
         private void addRimHit(bool strong)
         {
-            Hit h = new Hit
-            {
-                StartTime = DrawableRuleset.Playfield.Time.Current + scroll_time,
-                IsStrong = strong,
-                Samples = createSamples(HitType.Rim, strong)
-            };
+            Hit h = Hit.CreateConcreteBySample(createSamples(HitType.Rim, strong));
+            h.StartTime = DrawableRuleset.Playfield.Time.Current + scroll_time;
+            h.IsStrong = strong;
 
             h.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
 
-            DrawableRuleset.Playfield.Add(new DrawableHit(h));
+            DrawableRuleset.Playfield.Add(DrawableHit.CreateConcrete(h));
         }
 
         // TODO: can be removed if a better way of handling colour/strong type and samples is developed

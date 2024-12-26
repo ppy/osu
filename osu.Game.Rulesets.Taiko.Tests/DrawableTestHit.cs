@@ -7,6 +7,7 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.Objects.Drawables;
+using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Taiko.Tests
 {
@@ -39,5 +40,12 @@ namespace osu.Game.Rulesets.Taiko.Tests
         }
 
         public override bool OnPressed(KeyBindingPressEvent<TaikoAction> e) => false;
+
+        public override TaikoAction[] HitActions
+        {
+            get => HitObject.Type == HitType.Centre ? [TaikoAction.LeftCentre, TaikoAction.RightCentre] : [TaikoAction.LeftRim, TaikoAction.RightRim];
+            protected set { }
+        }
+        protected override SkinnableDrawable? OnLoadCreateMainPiece() => null;
     }
 }

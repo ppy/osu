@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Mods
 
         [TestCase(false)]
         [TestCase(true)]
-        public void TestHit(bool shouldMiss) => CreateHitObjectTest(new HitObjectTestData(new Hit { StartTime = 1000, Type = HitType.Centre }), shouldMiss);
+        public void TestHit(bool shouldMiss) => CreateHitObjectTest(new HitObjectTestData(new HitCentre { StartTime = 1000 }), shouldMiss);
 
         [TestCase(false)]
         [TestCase(true)]

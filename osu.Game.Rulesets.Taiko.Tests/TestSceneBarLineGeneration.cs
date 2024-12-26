@@ -23,9 +23,8 @@ namespace osu.Game.Rulesets.Taiko.Tests
             {
                 HitObjects =
                 {
-                    new Hit
+                    new HitCentre
                     {
-                        Type = HitType.Centre,
                         StartTime = start_time
                     }
                 },
@@ -57,9 +56,8 @@ namespace osu.Game.Rulesets.Taiko.Tests
             {
                 HitObjects =
                 {
-                    new Hit
+                    new HitCentre
                     {
-                        Type = HitType.Centre,
                         StartTime = start_time
                     }
                 },
@@ -94,9 +92,8 @@ namespace osu.Game.Rulesets.Taiko.Tests
             {
                 HitObjects =
                 {
-                    new Hit
+                    new HitCentre
                     {
-                        Type = HitType.Centre,
                         StartTime = 1000
                     }
                 },

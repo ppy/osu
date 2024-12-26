@@ -53,6 +53,9 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             FillMode = FillMode.Fit;
         }
 
+        public static DrawableHit CreateConcrete(Hit hit)
+            => hit.Type == HitType.Centre ? new DrawableHitCentre(hit) : new DrawableHitRim(hit);
+
         protected override void OnApply()
         {
             base.OnApply();
@@ -228,14 +231,14 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         }
     }
 
-    public partial class DrawableHitCenter : DrawableHit
+    public partial class DrawableHitCentre : DrawableHit
     {
         public override TaikoAction[] HitActions { get; protected set; } = { TaikoAction.LeftCentre, TaikoAction.RightCentre };
 
         /// <summary> This constructor exsits only to satisfy Pool where constraints </summary>
-        public DrawableHitCenter() : base(null) { }
+        public DrawableHitCentre() : base(null) { }
 
-        public DrawableHitCenter([CanBeNull] Hit hit)
+        public DrawableHitCentre([CanBeNull] Hit hit)
             : base(hit)
         {
             if (hit != null && hit.Type != HitType.Centre)

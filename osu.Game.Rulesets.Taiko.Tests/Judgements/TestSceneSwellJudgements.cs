@@ -209,7 +209,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Judgements
                 RequiredHits = 1
             };
 
-            Hit hit = new Hit
+            Hit hit = new HitCentre
             {
                 StartTime = hit_time
             };
@@ -243,7 +243,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Judgements
                 RequiredHits = 1
             };
 
-            Hit hit = new Hit
+            Hit hit = new HitCentre
             {
                 StartTime = hit_time
             };

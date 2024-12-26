@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Bindables;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
@@ -32,7 +33,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
         {
             var beatmap = new TaikoBeatmap();
             for (int i = 0; i < maxCombo; ++i)
-                beatmap.HitObjects.Add(new Hit());
+                beatmap.HitObjects.Add(RNG.NextBool() ? new HitCentre() : new HitRim());
             return beatmap;
         }
 
@@ -207,10 +208,11 @@ namespace osu.Game.Rulesets.Taiko.Tests
             {
             }
 
+            private static Hit randomHit() => RNG.NextBool() ? new HitCentre() : new HitRim();
             protected override ScoreProcessor CreateScoreProcessor() => new TaikoScoreProcessor();
-            protected override JudgementResult CreatePerfectJudgementResult() => new JudgementResult(new Hit(), new TaikoJudgement()) { Type = HitResult.Great };
-            protected override JudgementResult CreateNonPerfectJudgementResult() => new JudgementResult(new Hit(), new TaikoJudgement()) { Type = HitResult.Ok };
-            protected override JudgementResult CreateMissJudgementResult() => new JudgementResult(new Hit(), new TaikoJudgement()) { Type = HitResult.Miss };
+            protected override JudgementResult CreatePerfectJudgementResult() => new JudgementResult(randomHit(), new TaikoJudgement()) { Type = HitResult.Great };
+            protected override JudgementResult CreateNonPerfectJudgementResult() => new JudgementResult(randomHit(), new TaikoJudgement()) { Type = HitResult.Ok };
+            protected override JudgementResult CreateMissJudgementResult() => new JudgementResult(randomHit(), new TaikoJudgement()) { Type = HitResult.Miss };
         }
     }
 }

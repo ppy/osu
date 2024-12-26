@@ -22,8 +22,8 @@ namespace osu.Game.Rulesets.Taiko.Tests
             {
                 HitObjects =
                 {
-                    new Hit(),
-                    new Hit { StartTime = 1000 }
+                    new HitCentre(),
+                    new HitCentre { StartTime = 1000 }
                 }
             };
 

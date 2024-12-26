@@ -593,11 +593,11 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("add timing point", () => EditorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = 1000 }));
             AddStep("add hitobjects", () => EditorBeatmap.AddRange(new[]
             {
-                new Hit
+                new HitCentre
                 {
                     StartTime = 0
                 },
-                new Hit
+                new HitCentre
                 {
                     StartTime = 1000
                 }

@@ -24,25 +24,21 @@ namespace osu.Game.Rulesets.Taiko.Tests.Mods
             {
                 HitObjects = new List<HitObject>
                 {
-                    new Hit
+                    new HitRim
                     {
                         StartTime = 100,
-                        Type = HitType.Rim
                     },
-                    new Hit
+                    new HitRim
                     {
                         StartTime = 300,
-                        Type = HitType.Rim
                     },
-                    new Hit
+                    new HitRim
                     {
                         StartTime = 500,
-                        Type = HitType.Rim
                     },
-                    new Hit
+                    new HitRim
                     {
                         StartTime = 700,
-                        Type = HitType.Rim
                     },
                 },
             },
@@ -69,25 +65,21 @@ namespace osu.Game.Rulesets.Taiko.Tests.Mods
             {
                 HitObjects = new List<HitObject>
                 {
-                    new Hit
+                    new HitRim
                     {
                         StartTime = 100,
-                        Type = HitType.Rim
                     },
-                    new Hit
+                    new HitRim
                     {
                         StartTime = 300,
-                        Type = HitType.Rim
                     },
-                    new Hit
+                    new HitRim
                     {
                         StartTime = 500,
-                        Type = HitType.Rim
                     },
-                    new Hit
+                    new HitRim
                     {
                         StartTime = 700,
-                        Type = HitType.Rim
                     },
                 },
             },
@@ -114,10 +106,9 @@ namespace osu.Game.Rulesets.Taiko.Tests.Mods
             {
                 HitObjects = new List<HitObject>
                 {
-                    new Hit
+                    new HitRim
                     {
                         StartTime = 100,
-                        Type = HitType.Rim
                     },
                 },
             },
@@ -140,21 +131,18 @@ namespace osu.Game.Rulesets.Taiko.Tests.Mods
             {
                 HitObjects = new List<HitObject>
                 {
-                    new Hit
+                    new HitRim
                     {
                         StartTime = 100,
-                        Type = HitType.Rim
                     },
-                    new Hit
+                    new HitRim
                     {
                         StartTime = 300,
-                        Type = HitType.Rim,
                         IsStrong = true
                     },
-                    new Hit
+                    new HitRim
                     {
                         StartTime = 500,
-                        Type = HitType.Rim,
                     },
                 },
             },
@@ -183,15 +171,13 @@ namespace osu.Game.Rulesets.Taiko.Tests.Mods
                 },
                 HitObjects = new List<HitObject>
                 {
-                    new Hit
+                    new HitRim
                     {
                         StartTime = 100,
-                        Type = HitType.Rim
                     },
-                    new Hit
+                    new HitRim
                     {
                         StartTime = 2000,
-                        Type = HitType.Rim,
                     },
                 },
             },

@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Editor
                 };
 
                 for (int i = 0; i < 10; i++)
-                    EditorBeatmap.Add(new Hit { StartTime = 125 * i });
+                    EditorBeatmap.Add(new HitCentre { StartTime = 125 * i });
             }
         }
     }

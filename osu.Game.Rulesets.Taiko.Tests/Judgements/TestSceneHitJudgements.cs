@@ -26,9 +26,8 @@ namespace osu.Game.Rulesets.Taiko.Tests.Judgements
             {
                 new TaikoReplayFrame(0),
                 new TaikoReplayFrame(hit_time, TaikoAction.LeftCentre),
-            }, CreateBeatmap(new Hit
+            }, CreateBeatmap(new HitCentre
             {
-                Type = HitType.Centre,
                 StartTime = hit_time
             }));
 
@@ -43,13 +42,11 @@ namespace osu.Game.Rulesets.Taiko.Tests.Judgements
             {
                 new TaikoReplayFrame(0),
                 new TaikoReplayFrame(1000, TaikoAction.LeftCentre, TaikoAction.RightCentre),
-            }, CreateBeatmap(new Hit
+            }, CreateBeatmap(new HitCentre
             {
-                Type = HitType.Centre,
                 StartTime = 1000,
-            }, new Hit
+            }, new HitCentre
             {
-                Type = HitType.Centre,
                 StartTime = 1020
             }));
 
@@ -67,9 +64,8 @@ namespace osu.Game.Rulesets.Taiko.Tests.Judgements
             {
                 new TaikoReplayFrame(0),
                 new TaikoReplayFrame(hit_time, TaikoAction.LeftRim),
-            }, CreateBeatmap(new Hit
+            }, CreateBeatmap(new HitRim
             {
-                Type = HitType.Rim,
                 StartTime = hit_time
             }));
 
@@ -85,9 +81,8 @@ namespace osu.Game.Rulesets.Taiko.Tests.Judgements
             PerformTest(new List<ReplayFrame>
             {
                 new TaikoReplayFrame(0)
-            }, CreateBeatmap(new Hit
+            }, CreateBeatmap(new HitCentre
             {
-                Type = HitType.Centre,
                 StartTime = hit_time
             }));
 
@@ -104,9 +99,8 @@ namespace osu.Game.Rulesets.Taiko.Tests.Judgements
             {
                 new TaikoReplayFrame(0),
                 new TaikoReplayFrame(hit_time, TaikoAction.LeftCentre),
-            }, CreateBeatmap(new Hit
+            }, CreateBeatmap(new HitCentre
             {
-                Type = HitType.Centre,
                 StartTime = hit_time,
                 IsStrong = true
             }));
@@ -125,9 +119,8 @@ namespace osu.Game.Rulesets.Taiko.Tests.Judgements
             {
                 new TaikoReplayFrame(0),
                 new TaikoReplayFrame(hit_time, TaikoAction.LeftCentre, TaikoAction.RightCentre),
-            }, CreateBeatmap(new Hit
+            }, CreateBeatmap(new HitCentre
             {
-                Type = HitType.Centre,
                 StartTime = hit_time,
                 IsStrong = true
             }));
@@ -145,9 +138,8 @@ namespace osu.Game.Rulesets.Taiko.Tests.Judgements
             PerformTest(new List<ReplayFrame>
             {
                 new TaikoReplayFrame(0),
-            }, CreateBeatmap(new Hit
+            }, CreateBeatmap(new HitCentre
             {
-                Type = HitType.Centre,
                 StartTime = hit_time,
                 IsStrong = true
             }));
@@ -162,9 +154,8 @@ namespace osu.Game.Rulesets.Taiko.Tests.Judgements
         {
             const double hit_time = 1000;
 
-            var beatmap = CreateBeatmap(new Hit
+            var beatmap = CreateBeatmap(new HitCentre
             {
-                Type = HitType.Centre,
                 StartTime = hit_time,
             });
 
@@ -189,9 +180,8 @@ namespace osu.Game.Rulesets.Taiko.Tests.Judgements
         {
             const double hit_time = 1000;
 
-            var beatmap = CreateBeatmap(new Hit
+            var beatmap = CreateBeatmap(new HitCentre
             {
-                Type = HitType.Centre,
                 StartTime = hit_time,
                 IsStrong = true
             });
@@ -215,9 +205,8 @@ namespace osu.Game.Rulesets.Taiko.Tests.Judgements
         {
             const double hit_time = 1000;
 
-            var beatmap = CreateBeatmap(new Hit
+            var beatmap = CreateBeatmap(new HitCentre
             {
-                Type = HitType.Centre,
                 StartTime = hit_time,
                 IsStrong = true
             });

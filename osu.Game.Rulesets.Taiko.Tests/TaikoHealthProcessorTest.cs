@@ -21,11 +21,11 @@ namespace osu.Game.Rulesets.Taiko.Tests
             {
                 HitObjects =
                 {
-                    new Hit(),
-                    new Hit { StartTime = 1000 },
-                    new Hit { StartTime = 2000 },
-                    new Hit { StartTime = 3000 },
-                    new Hit { StartTime = 4000 },
+                    new HitCentre(),
+                    new HitCentre { StartTime = 1000 },
+                    new HitCentre { StartTime = 2000 },
+                    new HitCentre { StartTime = 3000 },
+                    new HitCentre { StartTime = 4000 },
                 }
             };
 
@@ -52,11 +52,11 @@ namespace osu.Game.Rulesets.Taiko.Tests
             {
                 HitObjects =
                 {
-                    new Hit(),
-                    new Hit { StartTime = 1000 },
-                    new Hit { StartTime = 2000 },
-                    new Hit { StartTime = 3000 },
-                    new Hit { StartTime = 4000 },
+                    new HitCentre(),
+                    new HitCentre { StartTime = 1000 },
+                    new HitCentre { StartTime = 2000 },
+                    new HitCentre { StartTime = 3000 },
+                    new HitCentre { StartTime = 4000 },
                 }
             };
 
@@ -83,11 +83,11 @@ namespace osu.Game.Rulesets.Taiko.Tests
             {
                 HitObjects =
                 {
-                    new Hit(),
-                    new Hit { StartTime = 1000 },
-                    new Hit { StartTime = 2000 },
-                    new Hit { StartTime = 3000 },
-                    new Hit { StartTime = 4000 },
+                    new HitCentre(),
+                    new HitCentre { StartTime = 1000 },
+                    new HitCentre { StartTime = 2000 },
+                    new HitCentre { StartTime = 3000 },
+                    new HitCentre { StartTime = 4000 },
                 }
             };
 
@@ -180,7 +180,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
             {
                 HitObjects =
                 {
-                    new Hit(),
+                    new HitCentre(),
                     new Swell { Duration = 2000 }
                 }
             };
@@ -212,8 +212,8 @@ namespace osu.Game.Rulesets.Taiko.Tests
         private static readonly object[][] test_cases =
         [
             // hitobject, fail expected after miss
-            [new Hit(), true],
-            [new Hit.StrongNestedHit(new Hit()), false],
+            [new HitCentre(), true],
+            [new Hit.StrongNestedHit(new HitCentre()), false],
             [new DrumRollTick(new DrumRoll()), false],
             [new DrumRollTick.StrongNestedHit(new DrumRollTick(new DrumRoll())), false],
             [new DrumRoll(), false],

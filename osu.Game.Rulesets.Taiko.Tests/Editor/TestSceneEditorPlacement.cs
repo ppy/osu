@@ -23,8 +23,8 @@ namespace osu.Game.Rulesets.Taiko.Tests.Editor
             AddStep("clear objects", () => EditorBeatmap.Clear());
             AddStep("add two objects", () =>
             {
-                EditorBeatmap.Add(new Hit { StartTime = 1818 });
-                EditorBeatmap.Add(new Hit { StartTime = 1584 });
+                EditorBeatmap.Add(new HitCentre { StartTime = 1818 });
+                EditorBeatmap.Add(new HitCentre { StartTime = 1584 });
             });
             AddStep("seek back", () => EditorClock.Seek(1584));
             AddStep("choose hit placement tool", () => InputManager.Key(Key.Number2));

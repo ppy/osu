@@ -48,39 +48,25 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
 
         private void addHitSteps()
         {
-            AddStep("Centre hit", () => SetContents(_ => new DrawableHit(createHitAtCurrentTime())
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-            }));
+            AddStep("Centre hit", () => SetContents(_ => createDrawableHitAtCurrentTime()));
+            AddStep("Centre hit (strong)", () => SetContents(_ => createDrawableHitAtCurrentTime(true)));
+            AddStep("Rim hit", () => SetContents(_ => createDrawableHitAtCurrentTime(rim: true)));
+            AddStep("Rim hit (strong)", () => SetContents(_ => createDrawableHitAtCurrentTime(true, true)));
+        }
 
-            AddStep("Centre hit (strong)", () => SetContents(_ => new DrawableHit(createHitAtCurrentTime(true))
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-            }));
-
-            AddStep("Rim hit", () => SetContents(_ => new DrawableHit(createHitAtCurrentTime(rim: true))
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-            }));
-
-            AddStep("Rim hit (strong)", () => SetContents(_ => new DrawableHit(createHitAtCurrentTime(true, true))
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-            }));
+        private DrawableHit createDrawableHitAtCurrentTime(bool strong = false, bool rim = false)
+        {
+            var drawable = DrawableHit.CreateConcrete(createHitAtCurrentTime(strong, rim));
+            drawable.Anchor = Anchor.Centre;
+            drawable.Origin = Anchor.Centre;
+            return drawable;
         }
 
         private Hit createHitAtCurrentTime(bool strong = false, bool rim = false)
         {
-            var hit = new Hit
-            {
-                Type = rim ? HitType.Rim : HitType.Centre,
-                IsStrong = strong,
-                StartTime = Time.Current + 3000,
-            };
+            Hit hit = rim ? new HitRim() : new HitCentre();
+            hit.IsStrong = strong;
+            hit.StartTime = Time.Current + 3000;
 
             hit.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
 

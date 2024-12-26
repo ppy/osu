@@ -79,7 +79,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         protected override void RestorePieceState()
         {
-            //base.RestorePieceState(); // TODO:STOP HERE
             updateColour();
             Height = HitObject.IsStrong ? TaikoStrongableHitObject.DEFAULT_STRONG_SIZE : TaikoHitObject.DEFAULT_SIZE;
         }
@@ -174,7 +173,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         private void updateColour(double fadeDuration = 0)
         {
             Color4 newColour = Interpolation.ValueAt((float)rollingHits / rolling_hits_for_engaged_colour, colourIdle, colourEngaged, 0, 1);
-            (MainPiece.Drawable as IHasAccentColour)?.FadeAccent(newColour, fadeDuration);
+            (MainPiece?.Drawable as IHasAccentColour)?.FadeAccent(newColour, fadeDuration);
         }
 
         public partial class StrongNestedHit : DrawableStrongNestedHit

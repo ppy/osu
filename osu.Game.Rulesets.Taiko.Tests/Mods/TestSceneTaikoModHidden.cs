@@ -42,14 +42,12 @@ namespace osu.Game.Rulesets.Taiko.Tests.Mods
                     {
                         HitObjects = new List<TaikoHitObject>
                         {
-                            new Hit
+                            new HitRim
                             {
-                                Type = HitType.Rim,
                                 StartTime = hit_time,
                             },
-                            new Hit
+                            new HitCentre
                             {
-                                Type = HitType.Centre,
                                 StartTime = hit_time * 2,
                             },
                         },

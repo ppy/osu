@@ -58,16 +58,11 @@ namespace osu.Game.Rulesets.Taiko.Tests
         {
             AddStep("add hit with normal samples", () =>
             {
-                var hit = new Hit
-                {
-                    StartTime = 100,
-                    Samples = new List<HitSampleInfo>
-                    {
-                        new HitSampleInfo(HitSampleInfo.HIT_NORMAL)
-                    }
-                };
+                var samples = new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL) };
+                var hit = Hit.CreateConcreteBySample(samples);
+                hit.StartTime = 100;
                 hit.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
-                var drawableHit = new DrawableHit(hit);
+                var drawableHit = DrawableHit.CreateConcrete(hit);
                 hitObjectContainer.Add(drawableHit);
             });
 
@@ -86,16 +81,11 @@ namespace osu.Game.Rulesets.Taiko.Tests
         {
             AddStep("add hit with soft samples", () =>
             {
-                var hit = new Hit
-                {
-                    StartTime = 100,
-                    Samples = new List<HitSampleInfo>
-                    {
-                        new HitSampleInfo(HitSampleInfo.HIT_NORMAL, HitSampleInfo.BANK_SOFT)
-                    }
-                };
+                var samples = new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL, HitSampleInfo.BANK_SOFT) };
+                var hit = Hit.CreateConcreteBySample(samples);
+                hit.StartTime = 100;
                 hit.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
-                var drawableHit = new DrawableHit(hit);
+                var drawableHit = DrawableHit.CreateConcrete(hit);
                 hitObjectContainer.Add(drawableHit);
             });
 
@@ -116,31 +106,24 @@ namespace osu.Game.Rulesets.Taiko.Tests
 
             AddStep("add hit with normal samples", () =>
             {
-                first = new Hit
-                {
-                    StartTime = 100,
-                    Samples = new List<HitSampleInfo>
-                    {
-                        new HitSampleInfo(HitSampleInfo.HIT_NORMAL)
-                    }
-                };
+                var samples = new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL) };
+                first = Hit.CreateConcreteBySample(samples);
+                first.StartTime = 100;
                 first.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
-                var drawableHit = new DrawableHit(first);
+                var drawableHit = DrawableHit.CreateConcrete(first);
                 hitObjectContainer.Add(drawableHit);
             });
             AddStep("add hit with soft samples", () =>
             {
-                second = new Hit
+                var samples = new List<HitSampleInfo>
                 {
-                    StartTime = 500,
-                    Samples = new List<HitSampleInfo>
-                    {
                         new HitSampleInfo(HitSampleInfo.HIT_NORMAL, HitSampleInfo.BANK_SOFT),
                         new HitSampleInfo(HitSampleInfo.HIT_CLAP, HitSampleInfo.BANK_SOFT)
-                    }
                 };
+                second = Hit.CreateConcreteBySample(samples);
+                second.StartTime = 500;
                 second.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
-                var drawableHit = new DrawableHit(second);
+                var drawableHit = DrawableHit.CreateConcrete(second);
                 hitObjectContainer.Add(drawableHit);
             });
 
@@ -169,17 +152,15 @@ namespace osu.Game.Rulesets.Taiko.Tests
         {
             AddStep("add strong hit with drum samples", () =>
             {
-                var hit = new Hit
+                var samples = new List<HitSampleInfo>
                 {
-                    StartTime = 100,
-                    Samples = new List<HitSampleInfo>
-                    {
-                        new HitSampleInfo(HitSampleInfo.HIT_NORMAL, HitSampleInfo.BANK_DRUM),
-                        new HitSampleInfo(HitSampleInfo.HIT_FINISH, HitSampleInfo.BANK_DRUM) // implies strong
-                    }
+                    new HitSampleInfo(HitSampleInfo.HIT_NORMAL, HitSampleInfo.BANK_DRUM),
+                    new HitSampleInfo(HitSampleInfo.HIT_FINISH, HitSampleInfo.BANK_DRUM) // implies strong
                 };
+                var hit = Hit.CreateConcreteBySample(samples);
+                hit.StartTime = 100;
                 hit.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
-                var drawableHit = new DrawableHit(hit);
+                var drawableHit = DrawableHit.CreateConcrete(hit);
                 hitObjectContainer.Add(drawableHit);
             });
 

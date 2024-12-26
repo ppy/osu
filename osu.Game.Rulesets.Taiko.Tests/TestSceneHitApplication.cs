@@ -12,26 +12,43 @@ namespace osu.Game.Rulesets.Taiko.Tests
         [Test]
         public void TestApplyNewHit()
         {
-            var hit = new DrawableHit();
+            // Now we have pools for different types:
+            // ```
+            // RegisterPool<HitRim, DrawableHitRim>(50);
+            // RegisterPool<HitCentre, DrawableHitCentre>(50);
+            // ```
+            // And therefore we cant Apply between differ HitTypes
 
-            AddStep("apply new hit", () => hit.Apply(PrepareObject(new Hit
+            var first_rim = new HitRim
             {
-                Type = HitType.Rim,
+                IsStrong = false,
+                StartTime = 100
+            };
+            var hit_rim = DrawableHit.CreateConcrete(first_rim);
+
+            AddStep("apply new rim hit", () => hit_rim.Apply(PrepareObject(new HitRim
+            {
                 IsStrong = false,
                 StartTime = 300
             })));
 
-            AddHitObject(hit);
-            RemoveHitObject(hit);
+            AddHitObject(hit_rim);
+            RemoveHitObject(hit_rim);
 
-            AddStep("apply new hit", () => hit.Apply(PrepareObject(new Hit
+            var first_centre = new HitCentre
             {
-                Type = HitType.Centre,
+                IsStrong = false,
+                StartTime = 400
+            };
+            var hit_centre = DrawableHit.CreateConcrete(first_centre);
+
+            AddStep("apply new centre hit", () => hit_centre.Apply(PrepareObject(new HitCentre
+            {
                 IsStrong = true,
                 StartTime = 500
             })));
 
-            AddHitObject(hit);
+            AddHitObject(hit_centre);
         }
     }
 }
