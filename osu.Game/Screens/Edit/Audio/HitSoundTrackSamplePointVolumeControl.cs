@@ -2,11 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
-using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
@@ -14,11 +15,15 @@ using osu.Framework.Localisation;
 
 namespace osu.Game.Screens.Edit.Audio
 {
-    public partial class HitSoundTrackSamplePointVolumeControl<T> : Container, IHasCurrentValue<int>, IHasTooltip
+    public partial class HitSoundTrackSamplePointVolumeControl : Container, IHasCurrentValue<int>, IHasTooltip
     {
+        [Resolved]
+        private HitSoundTrackSamplePointBlueprint blueprint { get; set; } = null!;
+
         private readonly BindableNumberWithCurrent<int> current = new BindableNumberWithCurrent<int>();
 
-        private bool inProgress = false;
+        private bool inProgress;
+
         private readonly BindableNumberWithCurrent<int> inProgressValue = new BindableNumberWithCurrent<int>();
 
         public Action<int>? OnVolumeChange;
@@ -26,44 +31,33 @@ namespace osu.Game.Screens.Edit.Audio
         public Bindable<int> Current
         {
             get => current;
-            set
-            {
-                ArgumentNullException.ThrowIfNull(value, "value");
-                current.Current = value;
-            }
+            set => current.Current = value;
         }
 
         public LocalisableString TooltipText => Current.Value.ToString();
 
-        private Box background;
-        private Container fill;
+        private readonly Box background;
+        private readonly Container fill;
 
         public HitSoundTrackSamplePointVolumeControl()
         {
-            Masking = true;
-
             Children = new Drawable[]
             {
-                 background = new Box
-                 {
-                     RelativeSizeAxes = Axes.Both,
-                     Alpha = 0.3f,
-                 },
-                 fill = new Container
-                 {
-                     RelativeSizeAxes = Axes.X,
-                     Anchor = Anchor.BottomLeft,
-                     Origin = Anchor.BottomLeft,
-                     Child = new Box { RelativeSizeAxes = Axes.Both },
-                 },
-            };
-
-            EdgeEffect = new EdgeEffectParameters
-            {
-                Colour = Colour4.White,
-                Radius = 10f,
-                Hollow = false,
-                Type = EdgeEffectType.Glow,
+                background = new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Alpha = 0.5f,
+                },
+                fill = new Container
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
+                    Child = new Box { RelativeSizeAxes = Axes.Both },
+                    Masking = true,
+                    Alpha = 1f,
+                    BorderThickness = 2,
+                },
             };
         }
 
@@ -71,10 +65,13 @@ namespace osu.Game.Screens.Edit.Audio
         {
             base.LoadComplete();
 
-            Colour.TryExtractSingleColour(out var edgeGlowColour);
-            FadeEdgeEffectTo(edgeGlowColour);
+            blueprint.Colour.BindValueChanged(v =>
+            {
+                Colour = v.NewValue.Darken(1f);
+                updateFill();
+            }, true);
 
-            current.ValueChanged += v => inProgressValue.Value = inProgress == true ? inProgressValue.Value : v.NewValue;
+            current.ValueChanged += v => inProgressValue.Value = inProgress ? inProgressValue.Value : v.NewValue;
             current.MaxValueChanged += v => inProgressValue.MaxValue = v;
             current.MinValueChanged += v => inProgressValue.MinValue = v;
 
@@ -91,22 +88,15 @@ namespace osu.Game.Screens.Edit.Audio
         private void updateFill()
         {
             fill.ResizeHeightTo(inProgressValue.NormalizedValue * background.DrawHeight, 100, Easing.InOutCubic);
-            FadeEdgeEffectTo(0.2f * inProgressValue.NormalizedValue, 100);
+            Colour.TryExtractSingleColour(out var singleColour);
+            background.Colour = singleColour.SRGB.Darken(1f);
+            fill.BorderColour = singleColour.SRGB.Darken(0.5f);
         }
 
         private void applyChanges()
         {
+            inProgress = false;
             OnVolumeChange?.Invoke(inProgressValue.Value);
-        }
-
-        protected override bool OnHover(HoverEvent e)
-        {
-            return base.OnHover(e);
-        }
-
-        protected override void OnHoverLost(HoverLostEvent e)
-        {
-            base.OnHoverLost(e);
         }
 
         #region drag & click handling
@@ -115,6 +105,7 @@ namespace osu.Game.Screens.Edit.Audio
 
         protected override bool OnClick(ClickEvent e)
         {
+            inProgress = true;
             updateCurrentFromMouseEvent(e);
             applyChanges();
             base.OnClick(e);
@@ -123,12 +114,14 @@ namespace osu.Game.Screens.Edit.Audio
 
         protected override void OnDrag(DragEvent e)
         {
+            inProgress = true;
             updateCurrentFromMouseEvent(e);
             base.OnDrag(e);
         }
 
         protected override bool OnDragStart(DragStartEvent e)
         {
+            inProgress = true;
             updateCurrentFromMouseEvent(e);
             base.OnDragStart(e);
             return true;

@@ -42,22 +42,33 @@ namespace osu.Game.Screens.Edit.Audio
 
             editorBeatmap.HitObjects.ForEach(addHitObjectToTrack);
         }
+
         private void addHitObjectToTrack(HitObject hitObject)
         {
             IList<HitSampleInfo> samples = hitObject.SamplesBindable;
 
             if (hitObject is IHasRepeats repeatedHitObject)
             {
-                Add(new HitSoundTrackSamplePointBlueprint(hitObject, samples));
+                if (Mode == HitSoundTrackMode.Volume)
+                    Add(new HitSoundTrackSamplePointVolumeControlBlueprint(hitObject, samples));
+                else
+                    Add(new HitSoundTrackSamplePointBlueprint(hitObject, samples));
+
                 for (int nodeIndex = 0; nodeIndex < repeatedHitObject.NodeSamples.Count; nodeIndex++)
                 {
                     samples = nodeIndex < repeatedHitObject.NodeSamples.Count ? repeatedHitObject.NodeSamples[nodeIndex] : hitObject.Samples;
-                    Add(new NodeHitSoundTrackSamplePointBlueprint(hitObject, samples, nodeIndex));
+                    if (Mode == HitSoundTrackMode.Volume)
+                        Add(new NodeHitSoundTrackSamplePointVolumeControlBlueprint(hitObject, samples, nodeIndex));
+                    else
+                        Add(new NodeHitSoundTrackSamplePointBlueprint(hitObject, samples, nodeIndex));
                 }
             }
             else
             {
-                Add(new HitSoundTrackSamplePointBlueprint(hitObject, samples));
+                if (Mode == HitSoundTrackMode.Volume)
+                    Add(new HitSoundTrackSamplePointVolumeControlBlueprint(hitObject, samples));
+                else
+                    Add(new HitSoundTrackSamplePointBlueprint(hitObject, samples));
             }
         }
 
@@ -89,11 +100,14 @@ namespace osu.Game.Screens.Edit.Audio
                 blueprint.UpdateWidthAndPosition();
             });
 
-            // hasRepeats.RepeatCount + 2 is because we only add the missing points between two ends
-            for (int nodeIndex = existsNodeSamplePoints; nodeIndex < hasRepeats.RepeatCount + 2; nodeIndex++)
+            if (Mode != HitSoundTrackMode.Volume)
             {
-                IList<HitSampleInfo> samples = nodeIndex < hasRepeats.NodeSamples.Count ? hasRepeats.NodeSamples[nodeIndex] : hitObject.Samples;
-                Add(new NodeHitSoundTrackSamplePointBlueprint(hitObject, samples, nodeIndex));
+                // hasRepeats.RepeatCount + 2 is because we only add the missing points between two ends
+                for (int nodeIndex = existsNodeSamplePoints; nodeIndex < hasRepeats.RepeatCount + 2; nodeIndex++)
+                {
+                    IList<HitSampleInfo> samples = nodeIndex < hasRepeats.NodeSamples.Count ? hasRepeats.NodeSamples[nodeIndex] : hitObject.Samples;
+                    Add(new NodeHitSoundTrackSamplePointBlueprint(hitObject, samples, nodeIndex));
+                }
             }
         }
 
@@ -107,6 +121,5 @@ namespace osu.Game.Screens.Edit.Audio
                 return false;
             }, true);
         }
-
     }
 }

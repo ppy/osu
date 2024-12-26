@@ -24,7 +24,7 @@ namespace osu.Game.Screens.Edit.Audio
     [Cached]
     public partial class HitSoundTrackSamplePointBlueprint : FillFlowContainer
     {
-        protected const float CIRCLE_WIDTH = 15;
+        public const float CIRCLE_WIDTH = 15;
 
         public IList<HitSampleInfo> Samples;
 
@@ -75,21 +75,6 @@ namespace osu.Game.Screens.Edit.Audio
         {
             base.LoadComplete();
 
-            Children = CreateControls();
-
-            HitObject.StartTimeBindable.BindValueChanged(v =>
-            {
-                UpdateWidthAndPosition();
-            }, true);
-
-            editorBeatmap.HitObjectUpdated += updatedHitObject =>
-            {
-                if (updatedHitObject == HitObject)
-                    OnSampleChange?.Invoke();
-            };
-
-            HitObject.SamplesBindable.BindCollectionChanged((obj, e) => OnSampleChange?.Invoke(), true);
-
             #region bind colour change
 
             void updateColour()
@@ -114,8 +99,8 @@ namespace osu.Game.Screens.Edit.Audio
                 Colour.Value = colour;
             }
 
-            if (HitObject is IHasDisplayColour displayColour)
-                displayColour.DisplayColour.BindValueChanged(_ => updateColour());
+            if (HitObject is IHasDisplayColour hitObjectColour)
+                hitObjectColour.DisplayColour.BindValueChanged(_ => updateColour());
 
             if (HitObject is IHasComboInformation comboInfo)
             {
@@ -129,6 +114,21 @@ namespace osu.Game.Screens.Edit.Audio
             updateColour();
 
             #endregion
+
+            Children = CreateControls();
+
+            HitObject.StartTimeBindable.BindValueChanged(v =>
+            {
+                UpdateWidthAndPosition();
+            }, true);
+
+            editorBeatmap.HitObjectUpdated += updatedHitObject =>
+            {
+                if (updatedHitObject == HitObject)
+                    OnSampleChange?.Invoke();
+            };
+
+            HitObject.SamplesBindable.BindCollectionChanged((obj, e) => OnSampleChange?.Invoke(), true);
         }
 
         #region sample manipulation method
@@ -140,9 +140,11 @@ namespace osu.Game.Screens.Edit.Audio
                 case HitSoundTrackMode.Sample:
                     toggleSample(target);
                     break;
+
                 case HitSoundTrackMode.NormalBank:
                     setNormalBank(target);
                     break;
+
                 case HitSoundTrackMode.AdditionBank:
                     setAdditionBank(target);
                     break;
@@ -156,14 +158,17 @@ namespace osu.Game.Screens.Edit.Audio
             var existSample = Samples.FirstOrDefault(sample => sample.Name == targetSample);
 
             if (existSample == null)
+            {
                 Samples.Add(new HitSampleInfo(
                     targetSample,
                     bank: SamplePointPiece.GetBankValue(Samples) ?? HitSampleInfo.BANK_NORMAL,
                     volume: Samples.FirstOrDefault()?.Volume ?? 100
                 ));
+            }
             else
+            {
                 Samples.Remove(existSample);
-
+            }
         }
 
         private void setNormalBank(string targetBank)
@@ -249,10 +254,18 @@ namespace osu.Game.Screens.Edit.Audio
         }
     }
 
-    public partial class NodeHitSoundTrackSamplePointBlueprint : HitSoundTrackSamplePointBlueprint
+    public interface INodeHitSoundTrackSamplePointBlueprint
     {
-        public IHasRepeats HasRepeat;
-        public int NodeIndex;
+        public IHasRepeats HasRepeat { get; }
+
+        public int NodeIndex { get; }
+    }
+
+    public partial class NodeHitSoundTrackSamplePointBlueprint : HitSoundTrackSamplePointBlueprint, INodeHitSoundTrackSamplePointBlueprint
+    {
+        public IHasRepeats HasRepeat { get; }
+
+        public int NodeIndex { get; }
 
         public NodeHitSoundTrackSamplePointBlueprint(HitObject hitObject, IList<HitSampleInfo> samples, int nodeIndex)
             : base(hitObject, samples)

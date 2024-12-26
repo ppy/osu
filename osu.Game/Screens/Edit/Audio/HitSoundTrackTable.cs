@@ -80,18 +80,20 @@ namespace osu.Game.Screens.Edit.Audio
                         Children = new[]
                         {
                             createBankHeader("Samples"),
-                            createHitSoundTrackDisplay(HitSampleInfo.AllAdditions.ToList(), HitSoundTrackMode.Sample),
+                            createHitSoundTrackDisplay(HitSoundTrackMode.Sample, createHitSoundTracksLabel(HitSampleInfo.AllAdditions.ToList())),
                             createBankHeader("Normal bank"),
-                            createHitSoundTrackDisplay(HitSampleInfo.AllBanks.ToList(), HitSoundTrackMode.NormalBank),
+                            createHitSoundTrackDisplay(HitSoundTrackMode.NormalBank, createHitSoundTracksLabel(HitSampleInfo.AllBanks.ToList())),
                             createBankHeader("Addition bank"),
-                            createHitSoundTrackDisplay(HitSampleInfo.AllBanks.ToList(), HitSoundTrackMode.AdditionBank),
+                            createHitSoundTrackDisplay(HitSoundTrackMode.AdditionBank, createHitSoundTracksLabel(HitSampleInfo.AllBanks.ToList())),
+                            createBankHeader("Volume"),
+                            createHitSoundTrackDisplay(HitSoundTrackMode.Volume)
                         }
                     }
                 },
             };
         }
 
-        private Drawable createHitSoundTrackDisplay(List<string> samples, HitSoundTrackMode mode)
+        private Drawable createHitSoundTrackDisplay(HitSoundTrackMode mode, Drawable? leftSideLabel = null)
         {
             return new Container
             {
@@ -107,11 +109,11 @@ namespace osu.Game.Screens.Edit.Audio
                     }),
                     new Box
                     {
-                        Width = bank_column_width,
+                        Colour = colours.Background3,
                         RelativeSizeAxes = Axes.Y,
-                        Colour = colours.Background4
+                        Width = bank_column_width,
                     },
-                    createHitSoundTracksLabel(samples),
+                    leftSideLabel ?? Empty()
                 },
             };
         }
