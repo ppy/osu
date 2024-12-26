@@ -3,6 +3,8 @@
 
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Rulesets.Taiko.Skinning.Default;
+using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
@@ -26,6 +28,17 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         {
             base.LoadComplete();
             ApplyMaxResult();
+            Size = new osuTK.Vector2(0.3f);
+        }
+
+        private static float degree = 0f;
+        protected override void PrepareForUse()
+        {
+            const float single_rotation_degree = 7f;
+
+            base.PrepareForUse();
+            degree = (degree + single_rotation_degree) % 360f;
+            Rotation = degree;
         }
 
         protected override void LoadSamples()
@@ -33,5 +46,9 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             // block base call - flying hits are not supposed to play samples
             // the base call could overwrite the type of this hit
         }
+
+        // TODO: which skin use?
+        protected override SkinnableDrawable? OnLoadCreateMainPiece()
+            => new SkinnableDrawable(new TaikoSkinComponentLookup(TaikoSkinComponents.Swell), _ => new SwellCirclePiece(), confineMode: ConfineMode.ScaleToFit);
     }
 }

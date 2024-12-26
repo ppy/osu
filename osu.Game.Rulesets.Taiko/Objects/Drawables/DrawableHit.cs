@@ -55,15 +55,14 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         {
             type.BindTo(HitObject.TypeBindable);
             // this doesn't need to be run inline as RecreatePieces is called by the base call below.
-            type.BindValueChanged(_ => Scheduler.AddOnce(RecreatePieces));
+            type.BindValueChanged(_ => Scheduler.AddOnce(RestorePieceState));
 
             base.OnApply();
         }
 
-        protected override void RecreatePieces()
+        protected override void RestorePieceState()
         {
             updateActionsFromType();
-            base.RecreatePieces();
             Size = new Vector2(HitObject.IsStrong ? TaikoStrongableHitObject.DEFAULT_STRONG_SIZE : TaikoHitObject.DEFAULT_SIZE);
         }
 
@@ -90,7 +89,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                     : new[] { TaikoAction.LeftRim, TaikoAction.RightRim };
         }
 
-        protected override SkinnableDrawable CreateMainPiece() => HitObject.Type == HitType.Centre
+        protected override SkinnableDrawable OnLoadCreateMainPiece() => HitObject.Type == HitType.Centre
             ? new SkinnableDrawable(new TaikoSkinComponentLookup(TaikoSkinComponents.CentreHit), _ => new CentreHitCirclePiece(), confineMode: ConfineMode.ScaleToFit)
             : new SkinnableDrawable(new TaikoSkinComponentLookup(TaikoSkinComponents.RimHit), _ => new RimHitCirclePiece(), confineMode: ConfineMode.ScaleToFit);
 

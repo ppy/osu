@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             FillMode = FillMode.Fit;
         }
 
-        protected override SkinnableDrawable CreateMainPiece() => new SkinnableDrawable(new TaikoSkinComponentLookup(TaikoSkinComponents.DrumRollTick), _ => new TickPiece());
+        protected override SkinnableDrawable OnLoadCreateMainPiece() => new SkinnableDrawable(new TaikoSkinComponentLookup(TaikoSkinComponents.DrumRollTick), _ => new TickPiece());
 
         protected override void OnApply()
         {
@@ -45,9 +45,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             IsFirstTick.Value = HitObject.FirstTick;
         }
 
-        protected override void RecreatePieces()
+        protected override void RestorePieceState()
         {
-            base.RecreatePieces();
             Size = new Vector2(HitObject.IsStrong ? TaikoStrongableHitObject.DEFAULT_STRONG_SIZE : TaikoHitObject.DEFAULT_SIZE);
         }
 

@@ -7,17 +7,18 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Pooling;
 using osu.Game.Graphics;
-using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Rulesets.UI;
-using osu.Game.Rulesets.UI.Scrolling;
-using osu.Game.Rulesets.Taiko.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Judgements;
 using osu.Game.Rulesets.Taiko.Objects;
+using osu.Game.Rulesets.Taiko.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Scoring;
+using osu.Game.Rulesets.UI;
+using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Taiko.UI
@@ -180,7 +181,6 @@ namespace osu.Game.Rulesets.Taiko.UI
                 inputDrum,
             };
 
-            RegisterPool<Hit, DrawableHit>(50);
             RegisterPool<Hit.StrongNestedHit, DrawableHit.StrongNestedHit>(50);
 
             RegisterPool<DrumRoll, DrawableDrumRoll>(5);
@@ -194,13 +194,31 @@ namespace osu.Game.Rulesets.Taiko.UI
 
             var hitWindows = new TaikoHitWindows();
 
-            HitResult[] usableHitResults = Enum.GetValues<HitResult>().Where(r => hitWindows.IsHitResultAllowed(r)).ToArray();
+            HitResult[] usableHitResults = Enum.GetValues<HitResult>().Where(hitWindows.IsHitResultAllowed).ToArray();
 
             AddInternal(judgementPooler = new JudgementPooler<DrawableTaikoJudgement>(usableHitResults));
 
             foreach (var result in usableHitResults)
                 explosionPools.Add(result, new HitExplosionPool(result));
             AddRangeInternal(explosionPools.Values);
+
+            AddRangeInternal(poolsHit.Values);
+        }
+
+        private readonly IDictionary<HitType, HitPool> poolsHit = new Dictionary<HitType, HitPool>()
+        {
+            {HitType.Centre, new HitPool(HitType.Centre, 50)},
+            {HitType.Rim, new HitPool(HitType.Rim, 50)},
+        };
+        protected override IDrawablePool? AdditionalPrepareDrawablePool(HitObject hitObject)
+        {
+            switch (hitObject)
+            {
+                case Hit hit: return poolsHit[hit.Type];
+                // TODO: ???
+                //case Hit.StrongNestedHit hitStrong: return  ;
+                default: return null;
+            }
         }
 
         protected override void LoadComplete()

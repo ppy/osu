@@ -6,6 +6,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
@@ -141,22 +142,31 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             RelativeSizeAxes = Axes.Both;
         }
 
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            var drawable = OnLoadCreateMainPiece();
+            if (drawable is not null)
+                Content.Add(MainPiece = drawable);
+        }
+
         protected override void OnApply()
         {
             base.OnApply();
 
+            // TODO: now it fixed, yes?
             // TODO: THIS CANNOT BE HERE, it makes pooling pointless (see https://github.com/ppy/osu/issues/21072).
-            RecreatePieces();
+            RestorePieceState();
         }
 
-        protected virtual void RecreatePieces()
+        protected abstract void RestorePieceState();
+        protected abstract SkinnableDrawable OnLoadCreateMainPiece();
+
+        // TODO: call it from Editor OR even delete it and use somehow TaikoPlayfield from Editor
+        public unsafe void ReLoadMainPiece()
         {
-            if (MainPiece != null)
-                Content.Remove(MainPiece, true);
-
-            Content.Add(MainPiece = CreateMainPiece());
+            Content.Remove(MainPiece, true);
+            load();
         }
-
-        protected abstract SkinnableDrawable CreateMainPiece();
     }
 }
