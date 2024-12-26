@@ -38,6 +38,17 @@ namespace osu.Game.Beatmaps.Formats
             SetFallbackDecoder<Storyboard>(() => new LegacyStoryboardDecoder());
         }
 
+        protected override Storyboard CreateTemplateObject()
+        {
+            var sb = base.CreateTemplateObject();
+
+            var beatmap = new Beatmap();
+            LegacyBeatmapDecoder.ApplyLegacyDefaults(beatmap);
+            sb.Beatmap = beatmap;
+
+            return sb;
+        }
+
         protected override void ParseStreamInto(LineBufferedReader stream, Storyboard storyboard)
         {
             this.storyboard = storyboard;
@@ -72,6 +83,10 @@ namespace osu.Game.Beatmaps.Formats
             {
                 case "UseSkinSprites":
                     storyboard.UseSkinSprites = pair.Value == "1";
+                    break;
+
+                case @"WidescreenStoryboard":
+                    storyboard.Beatmap.WidescreenStoryboard = Parsing.ParseInt(pair.Value) == 1;
                     break;
             }
         }

@@ -34,6 +34,9 @@ namespace osu.Game.Screens.Edit.Timing
         [Resolved]
         private Bindable<ControlPointGroup?> selectedGroup { get; set; } = null!;
 
+        [Resolved]
+        private IEditorChangeHandler? editorChangeHandler { get; set; }
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, OverlayColourProvider colourProvider)
         {
@@ -110,6 +113,9 @@ namespace osu.Game.Screens.Edit.Timing
                     }
                 },
             };
+
+            if (editorChangeHandler != null)
+                editorChangeHandler.OnStateChange += onUndoRedo;
         }
 
         protected override void LoadComplete()
@@ -184,6 +190,22 @@ namespace osu.Game.Screens.Edit.Timing
             }
 
             selectedGroup.Value = group;
+        }
+
+        private void onUndoRedo()
+        {
+            // Best effort. We have no tracking of control points through undo/redo changes.
+            // If we don't deselect, things like offset changes could spawn groups to be added from previous states (see https://github.com/ppy/osu/issues/31098).
+            if (selectedGroup.Value != null && !Beatmap.ControlPointInfo.Groups.Contains(selectedGroup.Value))
+                selectedGroup.Value = null;
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (editorChangeHandler != null)
+                editorChangeHandler.OnStateChange -= onUndoRedo;
         }
     }
 }
