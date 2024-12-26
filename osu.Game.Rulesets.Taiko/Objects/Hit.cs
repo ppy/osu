@@ -26,8 +26,12 @@ namespace osu.Game.Rulesets.Taiko.Objects
 
         public Hit(HitType type)
         {
-            ChangeType(type);
-            SamplesBindable.BindCollectionChanged((_, _) => updateTypeFromSamples());
+            changeType(type);
+            SamplesBindable.BindCollectionChanged((_, _) =>
+            {
+                updateSamplesFromType();
+                updateTypeFromSamples();
+            });
         }
 
         public static Hit? InvertType(TaikoHitObject obj)
@@ -39,15 +43,13 @@ namespace osu.Game.Rulesets.Taiko.Objects
                 case HitCentre centre:
                     return new HitRim(centre);
                 case Hit hit:
-                    hit.ChangeType(hit.Type == HitType.Centre ? HitType.Rim : HitType.Centre);
+                    hit.changeType(hit.Type == HitType.Centre ? HitType.Rim : HitType.Centre);
                     break;
             }
             return null;
         }
 
-        // TODO:EDITOR ONLY
-        // TODO: seems like we should to change type (and pass all fileds between them ://)
-        public void ChangeType(HitType type)
+        private void changeType(HitType type)
         {
             Type = type;
             DisplayColour.Value = Type == HitType.Centre ? COLOUR_CENTRE : COLOUR_RIM;
@@ -55,9 +57,9 @@ namespace osu.Game.Rulesets.Taiko.Objects
 
         private void updateTypeFromSamples()
         {
-            var newType = getRimSamples().Any() ? HitType.Rim : HitType.Centre;
-            //if (newType != Type)
-            //    throw new ArgumentException("new type differs from previous");
+            HitType newType = getRimSamples().Any() ? HitType.Rim : HitType.Centre;
+            if ((newType != Type) && (this is HitCentre || this is HitRim))
+                throw new ArgumentException("HitCentre/HitRim was dynamically changed between each other!");
         }
 
         public static HitType SampleType(IList<HitSampleInfo> samples)
