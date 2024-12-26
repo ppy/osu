@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Taiko.Edit.Blueprints
         public new Hit HitObject => (Hit)base.HitObject;
 
         public HitPlacementBlueprint()
-            : base(new Hit(HitType.Centre))
+            : base(new HitCentre())
         {
             InternalChild = piece = new HitPiece
             {

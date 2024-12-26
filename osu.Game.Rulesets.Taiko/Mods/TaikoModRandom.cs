@@ -19,16 +19,11 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
         public void ApplyToBeatmap(IBeatmap beatmap)
         {
-            var taikoBeatmap = (TaikoBeatmap)beatmap;
-
             Seed.Value ??= RNG.Next();
             var rng = new Random((int)Seed.Value);
 
-            foreach (var obj in taikoBeatmap.HitObjects)
-            {
-                if (obj is Hit hit)
-                    hit.ChangeType(rng.Next(2) == 0 ? HitType.Centre : HitType.Rim); // TODO: seems like we should to change type (and pass all fileds between them ://)
-            }
+            var taikoBeatmap = (TaikoBeatmap)beatmap;
+            taikoBeatmap.InvertTypes(_ => rng.Next(2) == 0);
         }
     }
 }

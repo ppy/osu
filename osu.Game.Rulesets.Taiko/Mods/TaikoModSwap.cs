@@ -23,13 +23,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
         public void ApplyToBeatmap(IBeatmap beatmap)
         {
             var taikoBeatmap = (TaikoBeatmap)beatmap;
-
-            foreach (var obj in taikoBeatmap.HitObjects)
-            {
-                // TODO: seems like we should to change type (and pass all fileds between them ://)
-                if (obj is Hit hit)
-                    hit.ChangeType(hit.Type == HitType.Centre ? HitType.Rim : HitType.Centre);
-            }
+            taikoBeatmap.InvertTypes(_ => true);
         }
     }
 }

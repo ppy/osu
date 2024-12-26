@@ -7,7 +7,6 @@ using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Game.Audio;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osuTK.Graphics;
 
@@ -31,6 +30,21 @@ namespace osu.Game.Rulesets.Taiko.Objects
             SamplesBindable.BindCollectionChanged((_, _) => updateTypeFromSamples());
         }
 
+        public static Hit? InvertType(TaikoHitObject obj)
+        {
+            switch (obj)
+            {
+                case HitRim rim:
+                    return new HitCentre(rim);
+                case HitCentre centre:
+                    return new HitRim(centre);
+                case Hit hit:
+                    hit.ChangeType(hit.Type == HitType.Centre ? HitType.Rim : HitType.Centre);
+                    break;
+            }
+            return null;
+        }
+
         // TODO:EDITOR ONLY
         // TODO: seems like we should to change type (and pass all fileds between them ://)
         public void ChangeType(HitType type)
@@ -42,8 +56,8 @@ namespace osu.Game.Rulesets.Taiko.Objects
         private void updateTypeFromSamples()
         {
             var newType = getRimSamples().Any() ? HitType.Rim : HitType.Centre;
-            if (newType != Type)
-                throw new ArgumentException("new type differs from previous");
+            //if (newType != Type)
+            //    throw new ArgumentException("new type differs from previous");
         }
 
         public static HitType SampleType(IList<HitSampleInfo> samples)
@@ -53,7 +67,7 @@ namespace osu.Game.Rulesets.Taiko.Objects
         {
             switch (SampleType(samples))
             {
-                case HitType.Centre: return new HitCenter() { Samples = samples };
+                case HitType.Centre: return new HitCentre() { Samples = samples };
                 case HitType.Rim: return new HitRim() { Samples = samples };
                 default: throw new NotImplementedException("Unimplemented hit type!");
             }
@@ -100,10 +114,28 @@ namespace osu.Game.Rulesets.Taiko.Objects
     public class HitRim : Hit
     {
         public HitRim() : base(HitType.Rim) { }
+        public HitRim(HitCentre opposite) : base(HitType.Rim)
+        {
+            // TODO: is there a better way?
+            StartTime = opposite.StartTime;
+            IsStrong = opposite.IsStrong;
+            HitWindows = opposite.HitWindows;
+            // TODO: change to opposite? / Seems like really copied only Volume
+            Samples = opposite.Samples;
+        }
     }
 
-    public class HitCenter : Hit
+    public class HitCentre : Hit
     {
-        public HitCenter() : base(HitType.Centre) { }
+        public HitCentre() : base(HitType.Centre) { }
+        public HitCentre(HitRim opposite) : base(HitType.Centre)
+        {
+            // TODO: is there a better way?
+            StartTime = opposite.StartTime;
+            IsStrong = opposite.IsStrong;
+            HitWindows = opposite.HitWindows;
+            // TODO: change to opposite? / Seems like really copied only Volume
+            Samples = opposite.Samples;
+        }
     }
 }

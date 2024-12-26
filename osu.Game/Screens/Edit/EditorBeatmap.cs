@@ -318,6 +318,52 @@ namespace osu.Game.Screens.Edit
         }
 
         /// <summary>
+        /// Perform the provided map on every selected hitobject.
+        /// Changes will be grouped as one history action.
+        /// </summary>
+        /// <remarks>See also <see cref="PerformOnSelection"/></remarks>
+        /// <param name="map">
+        /// Map the HitObject.
+        /// Returns: (is_need_to_be_updated, newValue):
+        ///     * If newValue is not null => change Beatmap HitObject to the newValue (also change selection).
+        ///     * If is_need_to_be_updated & newValue is null => call Update for value.
+        /// </param>
+        public void ChangeOnSelection(Func<HitObject, (bool, HitObject)> map)
+        {
+            if (SelectedHitObjects.Count == 0)
+                return;
+
+            var newSelection = new HashSet<HitObject>();
+
+            BeginChange();
+            for (int index = SelectedHitObjects.Count - 1; index >= 0; index--)
+            {
+                (bool upd, var mappedValue) = map(SelectedHitObjects[index]);
+                if (mappedValue is not null)
+                {
+                    // TODO: it's differ in working by click & by key down
+                    //     | and each of the way of working have half of expected behavior :\
+                    //     | seems like the reason in some events.
+                    //     | I cannot figured it out without tests: so fix the tests.
+                    int prev_index = FindIndex(SelectedHitObjects[index]);
+                    RemoveAt(prev_index);
+                    Insert(prev_index, mappedValue);
+                    Update(mappedValue);
+                    newSelection.Add(mappedValue);
+                }
+                else if (upd)
+                {
+                    Update(SelectedHitObjects[index]);
+                    newSelection.Add(SelectedHitObjects[index]);
+                }
+                else newSelection.Add(SelectedHitObjects[index]);
+            }
+            SelectedHitObjects.Clear();
+            SelectedHitObjects.AddRange(newSelection);
+            EndChange();
+        }
+
+        /// <summary>
         /// Adds a collection of <see cref="HitObject"/>s to this <see cref="EditorBeatmap"/>.
         /// </summary>
         /// <param name="hitObjects">The <see cref="HitObject"/>s to add.</param>

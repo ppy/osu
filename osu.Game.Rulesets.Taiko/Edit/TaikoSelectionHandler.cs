@@ -71,18 +71,14 @@ namespace osu.Game.Rulesets.Taiko.Edit
 
         public void SetRimState(bool state)
         {
-            if (SelectedItems.OfType<Hit>().All(h => h.Type == (state ? HitType.Rim : HitType.Centre)))
+            var expectedType = state ? HitType.Rim : HitType.Centre;
+            if (SelectedItems.OfType<Hit>().All(h => h.Type == expectedType))
                 return;
 
-            EditorBeatmap.PerformOnSelection(h =>
-            {
-                if (h is Hit taikoHit)
-                {
-                    // TODO: seems like we should to change type (and pass all fileds between them ://)
-                    taikoHit.ChangeType(state ? HitType.Rim : HitType.Centre);
-                    EditorBeatmap.Update(h);
-                }
-            });
+            EditorBeatmap.ChangeOnSelection(hit => (hit is Hit taikoHit && taikoHit.Type != expectedType) ? (true, Hit.InvertType(taikoHit)) : (false, null));
+
+            //// TODO: invert state function & bind it to some key (seems handy):
+            //EditorBeatmap.ChangeOnSelection(hit => (hit is TaikoHitObject taikoHit) ? (true, Hit.InvertType(taikoHit)) : (false, null));
         }
 
         protected override IEnumerable<MenuItem> GetContextMenuItemsForSelection(IEnumerable<SelectionBlueprint<HitObject>> selection)
