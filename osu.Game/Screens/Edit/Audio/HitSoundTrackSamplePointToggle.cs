@@ -15,8 +15,6 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
-using osu.Framework.Extensions.IEnumerableExtensions;
-using osu.Framework.Logging;
 
 namespace osu.Game.Screens.Edit.Audio
 {
@@ -74,12 +72,12 @@ namespace osu.Game.Screens.Edit.Audio
         }
     }
 
-    public partial class HitSoundTrackSamplePointToggle : Container
+    public partial class HitSoundTrackSamplePointToggle : Container, IHasTarget
     {
         private IList<HitSampleInfo> samples = null!;
         private HitObject hitObject = null!;
 
-        public readonly string Target;
+        public string Target { get; }
         private readonly Bindable<bool> active = new Bindable<bool>(false);
 
         public Action<string>? Action;

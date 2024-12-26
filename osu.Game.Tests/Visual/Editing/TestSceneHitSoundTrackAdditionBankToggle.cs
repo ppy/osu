@@ -28,7 +28,7 @@ namespace osu.Game.Tests.Visual.Editing
         private void addSample(IList<HitSampleInfo> samples, Type blueprintType)
         {
             var samplePointBlueprint = getSpecificModeTrack(HitSoundTrackMode.Sample).Children.First(p => p.GetType() == blueprintType);
-            var firstSamplePoint = samplePointBlueprint.Children.First();
+            var firstSamplePoint = samplePointBlueprint.ChildrenOfType<HitSoundTrackSamplePointToggle>().First();
             AddStep($"add {firstSamplePoint.Target} sample", () =>
             {
                 if (samples.Any(sample => sample.Name == firstSamplePoint.Target))
@@ -45,7 +45,7 @@ namespace osu.Game.Tests.Visual.Editing
             var samplePointBlueprint = getSpecificModeTrack(HitSoundTrackMode.AdditionBank).Children.First(p => p.GetType() == typeof(HitSoundTrackSamplePointBlueprint));
             int row = 0;
             addSample(samplePointBlueprint.HitObject.Samples, typeof(HitSoundTrackSamplePointBlueprint));
-            samplePointBlueprint.Children.ForEach(point =>
+            samplePointBlueprint.ChildrenOfType<HitSoundTrackSamplePointToggle>().ForEach(point =>
             {
                 row++;
                 AddStep($"move to {row.ToOrdinalWords()} sample point", () => InputManager.MoveMouseTo(point));
@@ -60,7 +60,7 @@ namespace osu.Game.Tests.Visual.Editing
             var samplePointBlueprint = getSpecificModeTrack(HitSoundTrackMode.AdditionBank).Children.First(p => p.GetType() == typeof(ExtendableHitSoundTrackSamplePointBlueprint));
             int row = 0;
             addSample(samplePointBlueprint.HitObject.Samples, typeof(ExtendableHitSoundTrackSamplePointBlueprint));
-            samplePointBlueprint.Children.ForEach(point =>
+            samplePointBlueprint.ChildrenOfType<HitSoundTrackSamplePointToggle>().ForEach(point =>
             {
                 row++;
                 AddStep($"move to {row.ToOrdinalWords()} extendable sample point", () => InputManager.MoveMouseTo(point));
@@ -75,7 +75,7 @@ namespace osu.Game.Tests.Visual.Editing
             var samplePointBlueprint = getSpecificModeTrack(HitSoundTrackMode.AdditionBank).Children.First(p => p.GetType() == typeof(NodeHitSoundTrackSamplePointBlueprint));
             int row = 0;
             addSample(samplePointBlueprint.HitObject.Samples, typeof(NodeHitSoundTrackSamplePointBlueprint));
-            samplePointBlueprint.Children.ForEach(point =>
+            samplePointBlueprint.ChildrenOfType<HitSoundTrackSamplePointToggle>().ForEach(point =>
             {
                 row++;
                 AddStep($"move to {row.ToOrdinalWords()} node sample point", () => InputManager.MoveMouseTo(point));

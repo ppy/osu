@@ -21,6 +21,14 @@ namespace osu.Game.Screens.Edit.Audio
         AdditionBank,
     }
 
+    public interface IHasTarget
+    {
+        string Target { get; }
+    }
+
+    /// <summary>
+    /// Only handles sample, normal bank and addition bank, but not include volume
+    /// </summary>
     [Cached]
     public partial class HitSoundTrackSamplePointBlueprint : FillFlowContainer<HitSoundTrackSamplePointToggle>
     {
