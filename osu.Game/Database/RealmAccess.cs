@@ -96,8 +96,9 @@ namespace osu.Game.Database
         /// 43   2024-10-14    Reset keybind for toggling FPS display to avoid conflict with "convert to stream" in the editor, if not already changed by user.
         /// 44   2024-11-22    Removed several properties from BeatmapInfo which did not need to be persisted to realm.
         /// 45   2024-12-23    Change beat snap divisor adjust defaults to be Ctrl+Scroll instead of Ctrl+Shift+Scroll, if not already changed by user.
+        /// 46   2024-12-26    Change beat snap divisor bindings to match stable directionality ¯\_(ツ)_/¯.
         /// </summary>
-        private const int schema_version = 45;
+        private const int schema_version = 46;
 
         /// <summary>
         /// Lock object which is held during <see cref="BlockAllOperations"/> sections, blocking realm retrieval during blocking periods.
@@ -1218,6 +1219,22 @@ namespace osu.Game.Database
 
                     var previousBeatSnapBinding = keyBindings.FirstOrDefault(k => k.ActionInt == (int)GlobalAction.EditorCyclePreviousBeatSnapDivisor);
                     if (previousBeatSnapBinding != null && previousBeatSnapBinding.KeyCombination.Keys.SequenceEqual(new[] { InputKey.Shift, InputKey.Control, InputKey.MouseWheelRight }))
+                        migration.NewRealm.Remove(previousBeatSnapBinding);
+
+                    break;
+                }
+
+                case 46:
+                {
+                    // Stable direction didn't match.
+                    var keyBindings = migration.NewRealm.All<RealmKeyBinding>();
+
+                    var nextBeatSnapBinding = keyBindings.FirstOrDefault(k => k.ActionInt == (int)GlobalAction.EditorCycleNextBeatSnapDivisor);
+                    if (nextBeatSnapBinding != null && nextBeatSnapBinding.KeyCombination.Keys.SequenceEqual(new[] { InputKey.Control, InputKey.MouseWheelDown }))
+                        migration.NewRealm.Remove(nextBeatSnapBinding);
+
+                    var previousBeatSnapBinding = keyBindings.FirstOrDefault(k => k.ActionInt == (int)GlobalAction.EditorCyclePreviousBeatSnapDivisor);
+                    if (previousBeatSnapBinding != null && previousBeatSnapBinding.KeyCombination.Keys.SequenceEqual(new[] { InputKey.Control, InputKey.MouseWheelUp }))
                         migration.NewRealm.Remove(previousBeatSnapBinding);
 
                     break;
