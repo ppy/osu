@@ -139,7 +139,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             {
                 StarRating = starRating,
                 Mods = mods,
-                RhythmDifficulty = rhythmRating * 8,
+                RhythmDifficulty = rhythmRating,
                 ReadingDifficulty = readingRating,
                 ColourDifficulty = colourRating,
                 StaminaDifficulty = staminaRating,
