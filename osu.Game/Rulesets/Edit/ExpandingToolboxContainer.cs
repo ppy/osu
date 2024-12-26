@@ -62,15 +62,5 @@ namespace osu.Game.Rulesets.Edit
         private bool anyToolboxHovered(Vector2 screenSpacePos) => FillFlow.ScreenSpaceDrawQuad.Contains(screenSpacePos);
 
         protected override bool OnMouseDown(MouseDownEvent e) => true;
-
-        protected override bool OnClick(ClickEvent e)
-        {
-            base.OnClick(e);
-
-            if (!Expanded.Value)
-                Expanded.Value = true;
-
-            return true;
-        }
     }
 }
