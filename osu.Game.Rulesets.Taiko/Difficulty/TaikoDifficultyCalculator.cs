@@ -86,10 +86,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 ));
             }
 
-            var groupedHitObjects = EvenHitObjects.GroupHitObjects(noteObjects);
+            var groupedHitObjects = SameRhythmHitObjects.GroupHitObjects(noteObjects);
 
             TaikoColourDifficultyPreprocessor.ProcessAndAssign(difficultyHitObjects);
-            EvenPatterns.GroupPatterns(groupedHitObjects);
+            SamePatterns.GroupPatterns(groupedHitObjects);
             bpmLoader.ProcessEffectiveBPM(beatmap.ControlPointInfo, clockRate);
 
             return difficultyHitObjects;

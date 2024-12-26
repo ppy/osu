@@ -10,7 +10,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Rhythm.Data
     /// A base class for grouping <see cref="IHasInterval"/>s by their interval. In edges where an interval change
     /// occurs, the <see cref="IHasInterval"/> is added to the group with the smaller interval.
     /// </summary>
-    public abstract class EvenRhythm<ChildType>
+    public abstract class SameRhythm<ChildType>
         where ChildType : IHasInterval
     {
         public IReadOnlyList<ChildType> Children { get; private set; }
@@ -25,18 +25,18 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Rhythm.Data
         }
 
         /// <summary>
-        /// Create a new <see cref="EvenRhythm{ChildType}"/> from a list of <see cref="IHasInterval"/>s, and add
+        /// Create a new <see cref="SameRhythm{ChildType}"/> from a list of <see cref="IHasInterval"/>s, and add
         /// them to the <see cref="Children"/> list until the end of the group.
         /// </summary>
         /// <param name="data">The list of <see cref="IHasInterval"/>s.</param>
         /// <param name="i">
         /// Index in <paramref name="data"/> to start adding children. This will be modified and should be passed into
-        /// the next <see cref="EvenRhythm{ChildType}"/>'s constructor.
+        /// the next <see cref="SameRhythm{ChildType}"/>'s constructor.
         /// </param>
         /// <param name="marginOfError">
         /// The margin of error for the interval, within of which no interval change is considered to have occured.
         /// </param>
-        protected EvenRhythm(List<ChildType> data, ref int i, double marginOfError)
+        protected SameRhythm(List<ChildType> data, ref int i, double marginOfError)
         {
             List<ChildType> children = new List<ChildType>();
             Children = children;

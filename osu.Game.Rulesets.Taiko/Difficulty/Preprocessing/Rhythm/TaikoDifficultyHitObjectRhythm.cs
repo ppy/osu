@@ -15,12 +15,12 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Rhythm
         /// <summary>
         /// The group of hit objects with consistent rhythm that this object belongs to.
         /// </summary>
-        public EvenHitObjects? EvenHitObjects;
+        public SameRhythmHitObjects? SameRhythmHitObjects;
 
         /// <summary>
         /// The larger pattern of rhythm groups that this object is part of.
         /// </summary>
-        public EvenPatterns? EvenPatterns;
+        public SamePatterns? SamePatterns;
 
         /// <summary>
         /// The ratio of current <see cref="Rulesets.Difficulty.Preprocessing.DifficultyHitObject.DeltaTime"/>
@@ -28,11 +28,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Rhythm
         /// A <see cref="Ratio"/> above 1 indicates a slow-down; a <see cref="Ratio"/> below 1 indicates a speed-up.
         /// </summary>
         public readonly double Ratio;
-
-        /// <summary>
-        /// The difficulty multiplier associated with this rhythm change.
-        /// </summary>
-        public readonly double Difficulty;
 
         /// <summary>
         /// List of most common rhythm changes in taiko maps. Based on how each object's interval compares to the previous object.
@@ -69,7 +64,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Rhythm
             if (previous == null)
             {
                 Ratio = 1;
-                Difficulty = 0.0;
                 return;
             }
 

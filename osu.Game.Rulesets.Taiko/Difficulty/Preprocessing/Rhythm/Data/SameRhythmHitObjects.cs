@@ -9,11 +9,11 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Rhythm.Data
     /// <summary>
     /// Represents a group of <see cref="TaikoDifficultyHitObject"/>s with no rhythm variation.
     /// </summary>
-    public class EvenHitObjects : EvenRhythm<TaikoDifficultyHitObject>, IHasInterval
+    public class SameRhythmHitObjects : SameRhythm<TaikoDifficultyHitObject>, IHasInterval
     {
         public TaikoDifficultyHitObject FirstHitObject => Children[0];
 
-        public EvenHitObjects? Previous;
+        public SameRhythmHitObjects? Previous;
 
         /// <summary>
         /// <see cref="DifficultyHitObject.StartTime"/> of the first hit object.
@@ -26,30 +26,30 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Rhythm.Data
         public double Duration => Children[^1].StartTime - Children[0].StartTime;
 
         /// <summary>
-        /// The interval in ms of each hit object in this <see cref="EvenHitObjects"/>. This is only defined if there is
-        /// more than two hit objects in this <see cref="EvenHitObjects"/>.
+        /// The interval in ms of each hit object in this <see cref="SameRhythmHitObjects"/>. This is only defined if there is
+        /// more than two hit objects in this <see cref="SameRhythmHitObjects"/>.
         /// </summary>
         public double? HitObjectInterval;
 
         /// <summary>
-        /// The ratio of <see cref="HitObjectInterval"/> between this and the previous <see cref="EvenHitObjects"/>. In the
+        /// The ratio of <see cref="HitObjectInterval"/> between this and the previous <see cref="SameRhythmHitObjects"/>. In the
         /// case where one or both of the <see cref="HitObjectInterval"/> is undefined, this will have a value of 1.
         /// </summary>
         public double HitObjectIntervalRatio = 1;
 
         /// <summary>
-        /// The interval between the <see cref="StartTime"/> of this and the previous <see cref="EvenHitObjects"/>.
+        /// The interval between the <see cref="StartTime"/> of this and the previous <see cref="SameRhythmHitObjects"/>.
         /// </summary>
         public double Interval { get; private set; } = double.PositiveInfinity;
 
-        public EvenHitObjects(EvenHitObjects? previous, List<TaikoDifficultyHitObject> data, ref int i)
+        public SameRhythmHitObjects(SameRhythmHitObjects? previous, List<TaikoDifficultyHitObject> data, ref int i)
             : base(data, ref i, 5)
         {
             Previous = previous;
 
             foreach (var hitObject in Children)
             {
-                hitObject.Rhythm.EvenHitObjects = this;
+                hitObject.Rhythm.SameRhythmHitObjects = this;
 
                 // Pass the HitObjectInterval to each child.
                 hitObject.HitObjectInterval = HitObjectInterval;
@@ -58,15 +58,15 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Rhythm.Data
             calculateIntervals();
         }
 
-        public static List<EvenHitObjects> GroupHitObjects(List<TaikoDifficultyHitObject> data)
+        public static List<SameRhythmHitObjects> GroupHitObjects(List<TaikoDifficultyHitObject> data)
         {
-            List<EvenHitObjects> flatPatterns = new List<EvenHitObjects>();
+            List<SameRhythmHitObjects> flatPatterns = new List<SameRhythmHitObjects>();
 
-            // Index does not need to be incremented, as it is handled within EvenRhythm's constructor.
+            // Index does not need to be incremented, as it is handled within SameRhythm's constructor.
             for (int i = 0; i < data.Count;)
             {
-                EvenHitObjects? previous = flatPatterns.Count > 0 ? flatPatterns[^1] : null;
-                flatPatterns.Add(new EvenHitObjects(previous, data, ref i));
+                SameRhythmHitObjects? previous = flatPatterns.Count > 0 ? flatPatterns[^1] : null;
+                flatPatterns.Add(new SameRhythmHitObjects(previous, data, ref i));
             }
 
             return flatPatterns;
