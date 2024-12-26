@@ -57,6 +57,16 @@ namespace osu.Game.Rulesets.Difficulty.Utils
         public static double Norm(double p, params double[] values) => Math.Pow(values.Sum(x => Math.Pow(x, p)), 1 / p);
 
         /// <summary>
+        /// Calculates a Gaussian-based bell curve function (https://en.wikipedia.org/wiki/Gaussian_function)
+        /// </summary>
+        /// <param name="x">Value to calculate the function for</param>
+        /// <param name="mean">The mean (center) of the bell curve</param>
+        /// <param name="width">The width (spread) of the curve</param>
+        /// <param name="multiplier">Multiplier to adjust the curve's height</param>
+        /// <returns>The output of the bell curve function of <paramref name="x"/></returns>
+        public static double BellCurve(double x, double mean, double width, double multiplier = 1.0) => multiplier * Math.Exp(Math.E * -(Math.Pow(x - mean, 2) / Math.Pow(width, 2)));
+
+        /// <summary>
         /// Smootherstep function (https://en.wikipedia.org/wiki/Smoothstep#Variations)
         /// </summary>
         /// <param name="x">Value to calculate the function for</param>
