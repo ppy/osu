@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Input.Bindings;
 
@@ -20,14 +21,25 @@ namespace osu.Game.Overlays.Volume
         [Resolved]
         private VolumeOverlay? volumeOverlay { get; set; }
 
+        private bool needsAltPressed = false;
+
         public GlobalScrollAdjustsVolume()
         {
             RelativeSizeAxes = Axes.Both;
         }
 
+        public GlobalScrollAdjustsVolume(bool needsAltPressed)
+        {
+            RelativeSizeAxes = Axes.Both;
+            this.needsAltPressed = needsAltPressed;
+        }
+
         protected override bool OnScroll(ScrollEvent e)
         {
             if (e.ScrollDelta.Y == 0)
+                return false;
+
+            if (needsAltPressed && !e.AltPressed)
                 return false;
 
             // forward any unhandled mouse scroll events to the volume control.

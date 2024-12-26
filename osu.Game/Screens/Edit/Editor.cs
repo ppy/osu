@@ -334,7 +334,7 @@ namespace osu.Game.Screens.Edit
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
-                    new GlobalScrollAdjustsVolume(),
+                    new GlobalScrollAdjustsVolume(true),
                     new Container
                     {
                         Name = "Screen container",
