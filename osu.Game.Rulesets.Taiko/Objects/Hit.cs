@@ -24,10 +24,13 @@ namespace osu.Game.Rulesets.Taiko.Objects
         public static readonly Color4 COLOUR_CENTRE = Color4Extensions.FromHex(@"bb1177");
         public static readonly Color4 COLOUR_RIM = Color4Extensions.FromHex(@"2299bb");
 
-        public Hit(HitType type)
+        public Hit(HitType type, IList<HitSampleInfo>? samples = null)
         {
             changeType(type);
-            SamplesBindable.BindCollectionChanged((_, _) =>
+            if (samples is not null) Samples = samples;
+            updateSamplesFromType();
+            UpdateStrongSamplesFromType();
+            SamplesBindable.BindCollectionChanged((_, e) =>
             {
                 updateSamplesFromType();
                 updateTypeFromSamples();
@@ -60,6 +63,7 @@ namespace osu.Game.Rulesets.Taiko.Objects
             HitType newType = getRimSamples().Any() ? HitType.Rim : HitType.Centre;
             if ((newType != Type) && (this is HitCentre || this is HitRim))
                 throw new ArgumentException("HitCentre/HitRim was dynamically changed between each other!");
+            Type = newType;
         }
 
         public static HitType SampleType(IList<HitSampleInfo> samples)
@@ -69,8 +73,8 @@ namespace osu.Game.Rulesets.Taiko.Objects
         {
             switch (SampleType(samples))
             {
-                case HitType.Centre: return new HitCentre() { Samples = samples };
-                case HitType.Rim: return new HitRim() { Samples = samples };
+                case HitType.Centre: return new HitCentre(samples);
+                case HitType.Rim: return new HitRim(samples);
                 default: throw new NotImplementedException("Unimplemented hit type!");
             }
         }
@@ -85,11 +89,12 @@ namespace osu.Game.Rulesets.Taiko.Objects
             var rimSamples = getRimSamples();
 
             bool isRimType = Type == HitType.Rim;
+            int volume = Samples.Any() ? Samples.First().Volume : 100;
 
             if (isRimType != rimSamples.Any())
             {
                 if (isRimType)
-                    Samples.Add(CreateHitSampleInfo(HitSampleInfo.HIT_CLAP));
+                    Samples.Add(CreateHitSampleInfo(HitSampleInfo.HIT_CLAP).With(newVolume: volume));
                 else
                 {
                     foreach (var sample in rimSamples)
@@ -115,29 +120,25 @@ namespace osu.Game.Rulesets.Taiko.Objects
 
     public class HitRim : Hit
     {
-        public HitRim() : base(HitType.Rim) { }
-        public HitRim(HitCentre opposite) : base(HitType.Rim)
+        public HitRim(IList<HitSampleInfo>? samples = null) : base(HitType.Rim, samples) { }
+        public HitRim(HitCentre opposite) : base(HitType.Rim, opposite.Samples)
         {
             // TODO: is there a better way?
             StartTime = opposite.StartTime;
             IsStrong = opposite.IsStrong;
             HitWindows = opposite.HitWindows;
-            // TODO: change to opposite? / Seems like really copied only Volume
-            Samples = opposite.Samples;
         }
     }
 
     public class HitCentre : Hit
     {
-        public HitCentre() : base(HitType.Centre) { }
-        public HitCentre(HitRim opposite) : base(HitType.Centre)
+        public HitCentre(IList<HitSampleInfo>? samples = null) : base(HitType.Centre, samples) { }
+        public HitCentre(HitRim opposite) : base(HitType.Centre, opposite.Samples)
         {
             // TODO: is there a better way?
             StartTime = opposite.StartTime;
             IsStrong = opposite.IsStrong;
             HitWindows = opposite.HitWindows;
-            // TODO: change to opposite? / Seems like really copied only Volume
-            Samples = opposite.Samples;
         }
     }
 }

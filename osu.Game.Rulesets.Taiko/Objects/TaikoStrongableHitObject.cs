@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Taiko.Objects
 
         protected TaikoStrongableHitObject()
         {
-            IsStrongBindable.BindValueChanged(_ => updateSamplesFromType());
+            IsStrongBindable.BindValueChanged(_ => UpdateStrongSamplesFromType());
             SamplesBindable.BindCollectionChanged((_, _) => updateTypeFromSamples());
         }
 
@@ -47,14 +47,15 @@ namespace osu.Game.Rulesets.Taiko.Objects
             IsStrong = getStrongSamples().Any();
         }
 
-        private void updateSamplesFromType()
+        protected void UpdateStrongSamplesFromType()
         {
             var strongSamples = getStrongSamples();
+            int volume = Samples.Any() ? Samples.First().Volume : 100;
 
             if (IsStrongBindable.Value != strongSamples.Any())
             {
                 if (IsStrongBindable.Value)
-                    Samples.Add(CreateHitSampleInfo(HitSampleInfo.HIT_FINISH));
+                    Samples.Add(CreateHitSampleInfo(HitSampleInfo.HIT_FINISH).With(newVolume: volume));
                 else
                 {
                     foreach (var sample in strongSamples)
