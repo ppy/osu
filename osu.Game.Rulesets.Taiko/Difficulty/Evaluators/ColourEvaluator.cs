@@ -78,8 +78,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
         /// </summary>
         public static double EvaluateDifficultyOf(DifficultyHitObject hitObject)
         {
-            TaikoDifficultyHitObjectColour colour = ((TaikoDifficultyHitObject)hitObject).Colour;
             var taikoObject = (TaikoDifficultyHitObject)hitObject;
+            TaikoDifficultyHitObjectColour colour = taikoObject.Colour;
             double difficulty = 0.0d;
 
             if (colour.MonoStreak?.FirstHitObject == hitObject) // Difficulty for MonoStreak
