@@ -36,15 +36,18 @@ namespace osu.Game.Screens.Edit.Audio
                     int existsNodeSamplePoints = 0;
                     Children.ForEach(v =>
                     {
-                        if (v.HitObject != hitObject)
+                        if (v is not HitSoundTrackSamplePointBlueprint blueprint)
                             return;
 
-                        if (v is NodeHitSoundTrackSamplePointBlueprint samplePoint)
+                        if (blueprint.HitObject != hitObject)
+                            return;
+
+                        if (blueprint is NodeHitSoundTrackSamplePointBlueprint nodeSamplePoint)
                         {
-                            if (hasRepeats.RepeatCount < samplePoint.NodeIndex - 1)
-                                samplePoint.Expire();
+                            if (hasRepeats.RepeatCount < nodeSamplePoint.NodeIndex - 1)
+                                nodeSamplePoint.Expire();
                             else
-                                samplePoint.UpdateWidthAndPosition();
+                                nodeSamplePoint.UpdateWidthAndPosition();
 
                             existsNodeSamplePoints++;
                         }

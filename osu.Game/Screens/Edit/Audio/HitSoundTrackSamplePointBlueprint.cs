@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -30,7 +31,7 @@ namespace osu.Game.Screens.Edit.Audio
     /// Only handles sample, normal bank and addition bank, but not include volume
     /// </summary>
     [Cached]
-    public partial class HitSoundTrackSamplePointBlueprint : FillFlowContainer<HitSoundTrackSamplePointToggle>
+    public partial class HitSoundTrackSamplePointBlueprint : FillFlowContainer
     {
         public HitObject HitObject;
 
@@ -58,19 +59,22 @@ namespace osu.Game.Screens.Edit.Audio
 
             Spacing = new Vector2(12.5f);
         }
+        protected string BuildTarget(string sample, string bank) => samplePointsContainer.Mode == HitSoundTrackMode.Sample ? sample : bank;
 
+        protected virtual IReadOnlyList<Drawable> CreateControls()
+        {
+            return new[]
+            {
+                new HitSoundTrackSamplePointToggle(BuildTarget(HitSampleInfo.HIT_WHISTLE, HitSampleInfo.BANK_NORMAL)),
+                new HitSoundTrackSamplePointToggle(BuildTarget(HitSampleInfo.HIT_FINISH, HitSampleInfo.BANK_SOFT)),
+                new HitSoundTrackSamplePointToggle(BuildTarget(HitSampleInfo.HIT_CLAP, HitSampleInfo.BANK_DRUM)),
+            };
+        }
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            string buildTarget(string sample, string bank) => samplePointsContainer.Mode == HitSoundTrackMode.Sample ? sample : bank;
-
-            Children = new[]
-            {
-                new HitSoundTrackSamplePointToggle(buildTarget(HitSampleInfo.HIT_WHISTLE, HitSampleInfo.BANK_NORMAL)),
-                new HitSoundTrackSamplePointToggle(buildTarget(HitSampleInfo.HIT_FINISH, HitSampleInfo.BANK_SOFT)),
-                new HitSoundTrackSamplePointToggle(buildTarget(HitSampleInfo.HIT_CLAP, HitSampleInfo.BANK_DRUM)),
-            };
+            Children = CreateControls();
 
             HitObject.StartTimeBindable.BindValueChanged(v =>
             {
