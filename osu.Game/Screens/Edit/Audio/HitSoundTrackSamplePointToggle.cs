@@ -15,6 +15,8 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Logging;
 
 namespace osu.Game.Screens.Edit.Audio
 {
@@ -185,7 +187,8 @@ namespace osu.Game.Screens.Edit.Audio
             }
             else
             {
-                samples.Add(new HitSampleInfo(Target, bank: SamplePointPiece.GetBankValue(samples) ?? HitSampleInfo.BANK_NORMAL));
+                var elapsedSample = samples.FirstOrDefault();
+                samples.Add(new HitSampleInfo(Target, bank: SamplePointPiece.GetBankValue(samples) ?? HitSampleInfo.BANK_NORMAL, volume: elapsedSample?.Volume ?? 100));
             }
         }
 
