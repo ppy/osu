@@ -11,18 +11,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
     public class TaikoDifficultyAttributes : DifficultyAttributes
     {
         /// <summary>
-        /// The difficulty corresponding to the stamina skill.
-        /// </summary>
-        [JsonProperty("stamina_difficulty")]
-        public double StaminaDifficulty { get; set; }
-
-        /// <summary>
-        /// The ratio of stamina difficulty from mono-color (single colour) streams to total stamina difficulty.
-        /// </summary>
-        [JsonProperty("mono_stamina_factor")]
-        public double MonoStaminaFactor { get; set; }
-
-        /// <summary>
         /// The difficulty corresponding to the rhythm skill.
         /// </summary>
         [JsonProperty("rhythm_difficulty")]
@@ -40,14 +28,26 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         [JsonProperty("colour_difficulty")]
         public double ColourDifficulty { get; set; }
 
-        [JsonProperty("stamina_difficult_strains")]
-        public double StaminaTopStrains { get; set; }
+        /// <summary>
+        /// The difficulty corresponding to the stamina skill.
+        /// </summary>
+        [JsonProperty("stamina_difficulty")]
+        public double StaminaDifficulty { get; set; }
+
+        /// <summary>
+        /// The ratio of stamina difficulty from mono-color (single colour) streams to total stamina difficulty.
+        /// </summary>
+        [JsonProperty("mono_stamina_factor")]
+        public double MonoStaminaFactor { get; set; }
 
         [JsonProperty("reading_difficult_strains")]
         public double ReadingTopStrains { get; set; }
 
         [JsonProperty("colour_difficult_strains")]
         public double ColourTopStrains { get; set; }
+
+        [JsonProperty("stamina_difficult_strains")]
+        public double StaminaTopStrains { get; set; }
 
         /// <summary>
         /// The perceived hit window for a GREAT hit inclusive of rate-adjusting mods (DT/HT/etc).
