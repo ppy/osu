@@ -126,7 +126,7 @@ namespace osu.Game.Skinning
 
                                     if (hitError != null)
                                     {
-                                        hitError.Position = new Vector2(0, -30);
+                                        hitError.Position = new Vector2(0, -50);
                                         hitError.Anchor = Anchor.BottomCentre;
                                         hitError.Origin = Anchor.CentreLeft;
                                         hitError.Rotation = -90;
