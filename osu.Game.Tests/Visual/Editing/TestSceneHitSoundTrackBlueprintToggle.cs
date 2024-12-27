@@ -6,6 +6,7 @@ using Humanizer;
 using NUnit.Framework;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Testing;
+using osu.Game.Audio;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Screens.Edit.Audio;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
@@ -27,6 +28,7 @@ namespace osu.Game.Tests.Visual.Editing
         {
             var samplePointBlueprint = getSpecificModeTrack(HitSoundTrackMode.Sample).Children.First(p => p.GetType() == typeof(HitSoundTrackSamplePointBlueprint));
             int row = 0;
+            AddStep("clear samples", samplePointBlueprint.HitObject.Samples.Clear);
             samplePointBlueprint.ChildrenOfType<HitSoundTrackSamplePointToggle>().ForEach(point =>
             {
                 row++;
@@ -94,6 +96,7 @@ namespace osu.Game.Tests.Visual.Editing
         public void TestToggleAdditionBank()
         {
             var samplePointBlueprint = getSpecificModeTrack(HitSoundTrackMode.AdditionBank).Children.First(p => p.GetType() == typeof(HitSoundTrackSamplePointBlueprint));
+            AddStep("add an sample", () => samplePointBlueprint.HitObject.Samples.Add(new HitSampleInfo(HitSampleInfo.HIT_WHISTLE, editorAutoBank: true)));
             int row = 0;
             samplePointBlueprint.ChildrenOfType<HitSoundTrackSamplePointToggle>().ForEach(point =>
             {
