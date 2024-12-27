@@ -54,8 +54,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double aimDifficultyStrainCount = aim.CountTopWeightedStrains();
             double speedDifficultyStrainCount = speed.CountTopWeightedStrains();
 
-            double aimTopWeightedSliderFactor = aim.CalculateTopWeightedSliderFactor();
-            double speedTopWeightedSliderFactor = speed.CalculateTopWeightedSliderFactor();
+            double aimTopWeightedSliderCount = aim.CountTopWeightedSliders();
+            // We know that slider count + circle count = total count, so circle count = total count - slider count.
+            // This means we only need to calculate on sliders, and then work from the total count
+            double aimTopWeightedSliderFactor = aimTopWeightedSliderCount / (aimDifficultyStrainCount - aimTopWeightedSliderCount);
+            double speedTopWeightedSliderCount = speed.CountTopWeightedSliders();
+            double speedTopWeightedSliderFactor = speedTopWeightedSliderCount / (speedDifficultyStrainCount - speedTopWeightedSliderCount);
 
             if (mods.Any(m => m is OsuModTouchDevice))
             {
