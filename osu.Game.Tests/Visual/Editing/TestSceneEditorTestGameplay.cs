@@ -177,6 +177,7 @@ namespace osu.Game.Tests.Visual.Editing
             // bit of a hack to ensure this test can be ran multiple times without running into UNIQUE constraint failures
             AddStep("set unique difficulty name", () => EditorBeatmap.BeatmapInfo.DifficultyName = Guid.NewGuid().ToString());
 
+            AddStep("start playing track", () => InputManager.Key(Key.Space));
             AddStep("click test gameplay button", () =>
             {
                 var button = Editor.ChildrenOfType<TestGameplayButton>().Single();
@@ -185,11 +186,13 @@ namespace osu.Game.Tests.Visual.Editing
                 InputManager.Click(MouseButton.Left);
             });
             AddUntilStep("save prompt shown", () => DialogOverlay.CurrentDialog is SaveRequiredPopupDialog);
+            AddAssert("track stopped", () => !Beatmap.Value.Track.IsRunning);
 
             AddStep("save changes", () => DialogOverlay.CurrentDialog!.PerformOkAction());
 
             EditorPlayer editorPlayer = null;
             AddUntilStep("player pushed", () => (editorPlayer = Stack.CurrentScreen as EditorPlayer) != null);
+            AddUntilStep("track playing", () => Beatmap.Value.Track.IsRunning);
             AddAssert("beatmap has 1 object", () => editorPlayer.Beatmap.Value.Beatmap.HitObjects.Count == 1);
 
             AddUntilStep("wait for return to editor", () => Stack.CurrentScreen is Editor);
