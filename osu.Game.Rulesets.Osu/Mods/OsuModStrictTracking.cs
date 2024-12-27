@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 {
                     if (e.NewValue || slider.Judged) return;
 
-                    if (slider.Time.Current < slider.HitObject.StartTime)
+                    if (slider.Time.Current < slider.HitObject.StartTime || !slider.HeadCircle.Judged)
                         return;
 
                     var tail = slider.NestedHitObjects.OfType<StrictTrackingDrawableSliderTail>().First();
