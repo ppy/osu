@@ -15,7 +15,7 @@ namespace osu.Game.Screens.Select
 {
     public partial class PlayBeatmapDetailArea : BeatmapDetailArea
     {
-        private readonly BeatmapLeaderboardScoresProvider leaderboardScoresProvider;
+        private readonly BeatmapLeaderboardScoresProvider scoresProvider;
 
         private readonly BeatmapLeaderboard leaderboard;
 
@@ -26,7 +26,7 @@ namespace osu.Game.Screens.Select
             {
                 base.Beatmap = value;
 
-                leaderboardScoresProvider.BeatmapInfo = value is DummyWorkingBeatmap ? null : value.BeatmapInfo;
+                scoresProvider.BeatmapInfo = value is DummyWorkingBeatmap ? null : value.BeatmapInfo;
             }
         }
 
@@ -34,11 +34,11 @@ namespace osu.Game.Screens.Select
 
         private Bindable<bool> selectedModsFilter = null!;
 
-        public PlayBeatmapDetailArea(BeatmapLeaderboardScoresProvider leaderboardScoresProvider, Action<ScoreInfo>? onScoreSelected = null)
+        public PlayBeatmapDetailArea(BeatmapLeaderboardScoresProvider scoresProvider, Action<ScoreInfo>? onScoreSelected = null)
         {
-            this.leaderboardScoresProvider = leaderboardScoresProvider;
+            this.scoresProvider = scoresProvider;
 
-            Add(leaderboard = new BeatmapLeaderboard(leaderboardScoresProvider)
+            Add(leaderboard = new BeatmapLeaderboard(scoresProvider)
             {
                 ScoreSelected = onScoreSelected,
                 RelativeSizeAxes = Axes.Both
@@ -62,19 +62,19 @@ namespace osu.Game.Screens.Select
         {
             base.Refresh();
 
-            leaderboardScoresProvider.RefetchScores();
+            scoresProvider.RefetchScores();
         }
 
         protected override void OnTabChanged(BeatmapDetailAreaTabItem tab, bool selectedMods)
         {
             base.OnTabChanged(tab, selectedMods);
 
-            leaderboardScoresProvider.FilterMods = selectedMods;
+            scoresProvider.FilterMods = selectedMods;
 
             switch (tab)
             {
                 case BeatmapDetailAreaLeaderboardTabItem<BeatmapLeaderboardScope> leaderboardTab:
-                    leaderboardScoresProvider.Scope = leaderboardTab.Scope;
+                    scoresProvider.Scope = leaderboardTab.Scope;
                     leaderboard.Show();
                     break;
 

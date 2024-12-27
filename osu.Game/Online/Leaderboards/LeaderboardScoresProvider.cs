@@ -36,16 +36,12 @@ namespace osu.Game.Online.Leaderboards
 
         private APIRequest? fetchScoresRequest;
 
-        public Action<CancellationToken>? OnStateChange;
-
         [Resolved(CanBeNull = true)]
         private IAPIProvider? api { get; set; }
 
         private readonly IBindable<APIState> apiState = new Bindable<APIState>();
 
         private CancellationTokenSource? currentFetchCancellationSource;
-
-        public Action<TScoreInfo?, CancellationToken, Action>? OnLoadScores;
 
         private TScope scope = default!;
 
