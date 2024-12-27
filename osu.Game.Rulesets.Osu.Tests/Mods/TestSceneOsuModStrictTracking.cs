@@ -49,5 +49,39 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
             },
             PassCondition = () => Player.ScoreProcessor.Combo.Value == 2
         });
+
+        [Test]
+        public void TestReleaseOverSliderBeforeHeadHit() => CreateModTest(new ModTestData
+        {
+            Mod = new OsuModStrictTracking(),
+            Autoplay = false,
+            CreateBeatmap = () => new Beatmap
+            {
+                HitObjects = new List<HitObject>
+                {
+                    new Slider
+                    {
+                        StartTime = 1000,
+                        Path = new SliderPath
+                        {
+                            ControlPoints =
+                            {
+                                new PathControlPoint(),
+                                new PathControlPoint(new Vector2(0, 100))
+                            }
+                        }
+                    }
+                }
+            },
+            ReplayFrames = new List<ReplayFrame>
+            {
+                new OsuReplayFrame(501, new Vector2(200, 0), OsuAction.LeftButton),
+                new OsuReplayFrame(1000, new Vector2()),
+                new OsuReplayFrame(1020, new Vector2(), OsuAction.LeftButton),
+                new OsuReplayFrame(1750, new Vector2(0, 100), OsuAction.LeftButton),
+                new OsuReplayFrame(1751, new Vector2(0, 100)),
+            },
+            PassCondition = () => Player.ScoreProcessor.Combo.Value == 2
+        });
     }
 }
