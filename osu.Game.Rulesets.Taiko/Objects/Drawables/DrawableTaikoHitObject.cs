@@ -72,7 +72,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         /// <summary>
         /// Moves <see cref="Content"/> to the normal hitobject layer.
-        /// Does nothing is content is not currently proxied.
+        /// Does nothing if content is not currently proxied.
         /// </summary>
         protected void UnproxyContent()
         {

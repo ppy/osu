@@ -40,15 +40,18 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         private readonly Bindable<HitType> type = new Bindable<HitType>();
 
+        private readonly bool editorMode = false;
+
         public DrawableHit()
             : this(null)
         {
         }
 
-        public DrawableHit([CanBeNull] Hit hit)
+        public DrawableHit([CanBeNull] Hit hit, bool editorMode = false)
             : base(hit)
         {
             FillMode = FillMode.Fit;
+            this.editorMode = editorMode;
         }
 
         protected override void OnApply()
@@ -62,6 +65,12 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         protected override void RestorePieceState()
         {
+            if (editorMode)
+            {
+                // We in Editor Mode so the performance is not critical and we can recreate piece.
+                if (MainPiece != null) Content.Remove(MainPiece, true);
+                Content.Add(MainPiece = OnLoadCreateMainPiece());
+            }
             updateActionsFromType();
             Size = new Vector2(HitObject.IsStrong ? TaikoStrongableHitObject.DEFAULT_STRONG_SIZE : TaikoHitObject.DEFAULT_SIZE);
         }

@@ -12,6 +12,12 @@ namespace osu.Game.Rulesets.Taiko.UI
     {
         private readonly HitType hitType;
         private readonly bool isStrong;
+        private readonly bool editorMode = false;
+
+        public HitPool(int initialSize, bool editorMode) : base(initialSize)
+        {
+            this.editorMode = editorMode;
+        }
 
         public HitPool(int initialSize, HitType hitType, bool isStrong)
             : base(initialSize)
@@ -20,6 +26,6 @@ namespace osu.Game.Rulesets.Taiko.UI
             this.isStrong = isStrong;
         }
 
-        protected override DrawableHit CreateNewDrawable() => new DrawableHit(new Hit(hitType, isStrong));
+        protected override DrawableHit CreateNewDrawable() => new DrawableHit(new Hit(hitType, isStrong), editorMode);
     }
 }
