@@ -29,16 +29,25 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         public double RhythmDifficulty { get; set; }
 
         /// <summary>
+        /// The difficulty corresponding to the reading skill.
+        /// </summary>
+        [JsonProperty("reading_difficulty")]
+        public double ReadingDifficulty { get; set; }
+
+        /// <summary>
         /// The difficulty corresponding to the colour skill.
         /// </summary>
         [JsonProperty("colour_difficulty")]
         public double ColourDifficulty { get; set; }
 
-        /// <summary>
-        /// The difficulty corresponding to the hardest parts of the map.
-        /// </summary>
-        [JsonProperty("peak_difficulty")]
-        public double PeakDifficulty { get; set; }
+        [JsonProperty("rhythm_difficult_strains")]
+        public double RhythmTopStrains { get; set; }
+
+        [JsonProperty("colour_difficult_strains")]
+        public double ColourTopStrains { get; set; }
+
+        [JsonProperty("stamina_difficult_strains")]
+        public double StaminaTopStrains { get; set; }
 
         /// <summary>
         /// The perceived hit window for a GREAT hit inclusive of rate-adjusting mods (DT/HT/etc).

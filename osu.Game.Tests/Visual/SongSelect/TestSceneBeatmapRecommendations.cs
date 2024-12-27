@@ -13,9 +13,12 @@ using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Extensions;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Overlays;
+using osu.Game.Overlays.BeatmapListing;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Mania;
@@ -23,6 +26,8 @@ using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Taiko;
 using osu.Game.Tests.Resources;
 using osu.Game.Users;
+using osu.Game.Utils;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.SongSelect
 {
@@ -63,7 +68,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                         return 336; // recommended star rating of 2
 
                     case 1:
-                        return 928; // SR 3
+                        return 973; // SR 3
 
                     case 2:
                         return 1905; // SR 4
@@ -168,6 +173,45 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             // Present mania set, expect the difficulty that matches recommended mania star rating
             presentAndConfirm(() => maniaSet, 5);
+        }
+
+        [Test]
+        public void TestBeatmapListingFilter()
+        {
+            AddStep("set playmode to taiko", () => ((DummyAPIAccess)API).LocalUser.Value.PlayMode = "taiko");
+
+            AddStep("open beatmap listing", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.PressKey(Key.B);
+                InputManager.ReleaseKey(Key.B);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+
+            AddUntilStep("wait for load", () => Game.ChildrenOfType<BeatmapListingOverlay>().SingleOrDefault()?.IsLoaded, () => Is.True);
+
+            checkRecommendedDifficulty(3);
+
+            AddStep("change mode filter to osu!", () => Game.ChildrenOfType<BeatmapSearchRulesetFilterRow>().Single().ChildrenOfType<FilterTabItem<RulesetInfo>>().ElementAt(1).TriggerClick());
+
+            checkRecommendedDifficulty(2);
+
+            AddStep("change mode filter to osu!taiko", () => Game.ChildrenOfType<BeatmapSearchRulesetFilterRow>().Single().ChildrenOfType<FilterTabItem<RulesetInfo>>().ElementAt(2).TriggerClick());
+
+            checkRecommendedDifficulty(3);
+
+            AddStep("change mode filter to osu!catch", () => Game.ChildrenOfType<BeatmapSearchRulesetFilterRow>().Single().ChildrenOfType<FilterTabItem<RulesetInfo>>().ElementAt(3).TriggerClick());
+
+            checkRecommendedDifficulty(4);
+
+            AddStep("change mode filter to osu!mania", () => Game.ChildrenOfType<BeatmapSearchRulesetFilterRow>().Single().ChildrenOfType<FilterTabItem<RulesetInfo>>().ElementAt(4).TriggerClick());
+
+            checkRecommendedDifficulty(5);
+
+            void checkRecommendedDifficulty(double starRating)
+                => AddAssert($"recommended difficulty is {starRating}",
+                    () => Game.ChildrenOfType<BeatmapSearchGeneralFilterRow>().Single().ChildrenOfType<OsuSpriteText>().ElementAt(1).Text.ToString(),
+                    () => Is.EqualTo($"Recommended difficulty ({starRating.FormatStarRating()})"));
         }
 
         private BeatmapSetInfo importBeatmapSet(IEnumerable<RulesetInfo> difficultyRulesets)
