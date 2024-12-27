@@ -144,8 +144,9 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 Origin = Anchor.Centre,
             });
 
-        protected override void RestorePieceState()
+        protected override void OnApply()
         {
+            base.OnApply();
             Size = baseSize = new Vector2(TaikoHitObject.DEFAULT_SIZE);
         }
 

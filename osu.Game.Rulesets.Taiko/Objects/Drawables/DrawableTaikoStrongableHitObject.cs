@@ -27,11 +27,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         protected override void OnApply()
         {
-            isStrong.BindTo(HitObject.IsStrongBindable);
-            // this doesn't need to be run inline as RecreatePieces is called by the base call below.
-            isStrong.BindValueChanged(_ => Scheduler.AddOnce(RestorePieceState));
-
             base.OnApply();
+            isStrong.BindTo(HitObject.IsStrongBindable);
         }
 
         protected override void OnFree()

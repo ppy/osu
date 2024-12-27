@@ -150,17 +150,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 Content.Add(MainPiece = drawable);
         }
 
-        protected override void OnApply()
-        {
-            base.OnApply();
-
-            // TODO: now it fixed, yes?
-            // TODO: THIS CANNOT BE HERE, it makes pooling pointless (see https://github.com/ppy/osu/issues/21072).
-            RestorePieceState();
-        }
-
-        protected abstract void RestorePieceState();
-
         /// <summary>Creates <c>MainPiece</c>. Calls only on <c>load</c> or in EditorMode.</summary>
         protected abstract SkinnableDrawable OnLoadCreateMainPiece();
     }

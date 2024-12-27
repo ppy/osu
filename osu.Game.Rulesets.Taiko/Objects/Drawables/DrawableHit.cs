@@ -56,15 +56,9 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         protected override void OnApply()
         {
+            base.OnApply(); // it's empty actually
             type.BindTo(HitObject.TypeBindable);
-            // this doesn't need to be run inline as RecreatePieces is called by the base call below.
-            type.BindValueChanged(_ => Scheduler.AddOnce(RestorePieceState));
 
-            base.OnApply();
-        }
-
-        protected override void RestorePieceState()
-        {
             if (editorMode)
             {
                 // We in Editor Mode so the performance is not critical and we can recreate piece.

@@ -77,8 +77,9 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             OnNewResult += onNewResult;
         }
 
-        protected override void RestorePieceState()
+        protected override void OnApply()
         {
+            base.OnApply();
             updateColour();
             Height = HitObject.IsStrong ? TaikoStrongableHitObject.DEFAULT_STRONG_SIZE : TaikoHitObject.DEFAULT_SIZE;
         }

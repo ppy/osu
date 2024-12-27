@@ -43,10 +43,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             base.OnApply();
 
             IsFirstTick.Value = HitObject.FirstTick;
-        }
-
-        protected override void RestorePieceState()
-        {
             Size = new Vector2(HitObject.IsStrong ? TaikoStrongableHitObject.DEFAULT_STRONG_SIZE : TaikoHitObject.DEFAULT_SIZE);
         }
 

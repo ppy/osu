@@ -43,7 +43,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         public override bool OnPressed(KeyBindingPressEvent<TaikoAction> e) => false;
 
-        protected override void RestorePieceState() { }
         protected override SkinnableDrawable OnLoadCreateMainPiece()
             => new SkinnableDrawable(new TaikoSkinComponentLookup(TaikoSkinComponents.DrumRollTick), _ => new TickPiece());
     }
