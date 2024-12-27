@@ -46,6 +46,25 @@ namespace osu.Game.Screens.Edit.Audio
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
+        protected virtual double GetStartTime()
+        {
+            if (HitObject is IHasDuration)
+                return HitObject.StartTime + (Width / 2) - (CIRCLE_WIDTH / 2);
+
+            return HitObject.StartTime;
+        }
+
+        protected virtual double GetWidth()
+        {
+            if (HitObject is IHasDuration duration)
+            {
+                RelativeSizeAxes = Axes.Both;
+                return duration.Duration + CIRCLE_WIDTH;
+            }
+
+            return CIRCLE_WIDTH;
+        }
+
         public HitSoundTrackSamplePointBlueprint(HitObject hitObject, IList<HitSampleInfo> samples)
         {
             HitObject = hitObject;
@@ -233,60 +252,5 @@ namespace osu.Game.Screens.Edit.Audio
             Width = (float)GetWidth();
             X = (float)GetStartTime();
         }
-
-        protected virtual double GetStartTime()
-        {
-            if (HitObject is IHasDuration)
-                return HitObject.StartTime + Width / 2 - CIRCLE_WIDTH / 2;
-
-            return HitObject.StartTime;
-        }
-
-        protected virtual double GetWidth()
-        {
-            if (HitObject is IHasDuration duration)
-            {
-                RelativeSizeAxes = Axes.Both;
-                return duration.Duration + CIRCLE_WIDTH;
-            }
-
-            return CIRCLE_WIDTH;
-        }
-    }
-
-    public interface INodeHitSoundTrackSamplePointBlueprint
-    {
-        public IHasRepeats HasRepeat { get; }
-
-        public int NodeIndex { get; }
-    }
-
-    public partial class NodeHitSoundTrackSamplePointBlueprint : HitSoundTrackSamplePointBlueprint, INodeHitSoundTrackSamplePointBlueprint
-    {
-        public IHasRepeats HasRepeat { get; }
-
-        public int NodeIndex { get; }
-
-        public NodeHitSoundTrackSamplePointBlueprint(HitObject hitObject, IList<HitSampleInfo> samples, int nodeIndex)
-            : base(hitObject, samples)
-        {
-            if (hitObject is not IHasRepeats hasRepeat)
-                throw new ArgumentException("HitObject must be implement IHasRepeats");
-
-            HasRepeat = hasRepeat;
-            NodeIndex = nodeIndex;
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-
-            if (HasRepeat.RepeatCount < NodeIndex - 1)
-                Expire();
-        }
-
-        protected override double GetStartTime() => HitObject.StartTime + HasRepeat.Duration * NodeIndex / HasRepeat.SpanCount();
-
-        protected override double GetWidth() => CIRCLE_WIDTH;
     }
 }

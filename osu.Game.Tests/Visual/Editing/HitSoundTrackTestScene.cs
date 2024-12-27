@@ -57,7 +57,7 @@ namespace osu.Game.Tests.Visual.Editing
             int i = 0;
             AddRepeatStep("add hit circles", () =>
             {
-                EditorBeatmap.Add(new HitCircle { StartTime = startTime + ++i * 200 });
+                EditorBeatmap.Add(new HitCircle { StartTime = startTime + (++i) * 200 });
             }, count);
         }
 
@@ -85,7 +85,7 @@ namespace osu.Game.Tests.Visual.Editing
                     ),
                     RepeatCount = repeatCount - 2,
                     Scale = 0.5f,
-                    StartTime = startTime + ++i * 500 * repeatCount,
+                    StartTime = startTime + (++i) * 500 * repeatCount,
                 });
             }, count);
         }
@@ -106,7 +106,7 @@ namespace osu.Game.Tests.Visual.Editing
                 {
                     Position = new Vector2(128, 256),
                     Duration = 100,
-                    StartTime = startTime + ++i * 200,
+                    StartTime = startTime + (++i) * 200,
                 });
             }, count);
         }

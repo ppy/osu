@@ -34,7 +34,7 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddStep("click on volume of 100", () =>
             {
-                Vector2 topCentre = new Vector2(target.ScreenSpaceDrawQuad.Centre.X, target.ScreenSpaceDrawQuad.Centre.Y - target.ScreenSpaceDrawQuad.Height / 2 + 1);
+                Vector2 topCentre = new Vector2(target.ScreenSpaceDrawQuad.Centre.X, target.ScreenSpaceDrawQuad.Centre.Y - (target.ScreenSpaceDrawQuad.Height / 2) + 1);
                 InputManager.MoveMouseTo(topCentre);
                 InputManager.Click(MouseButton.Left);
             });
@@ -42,7 +42,7 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddStep("click on volume of 0", () =>
             {
-                Vector2 bottomCentre = new Vector2(target.ScreenSpaceDrawQuad.Centre.X, target.ScreenSpaceDrawQuad.Centre.Y + target.ScreenSpaceDrawQuad.Height / 2 - 1);
+                Vector2 bottomCentre = new Vector2(target.ScreenSpaceDrawQuad.Centre.X, target.ScreenSpaceDrawQuad.Centre.Y + (target.ScreenSpaceDrawQuad.Height / 2) - 1);
                 InputManager.MoveMouseTo(bottomCentre);
                 InputManager.Click(MouseButton.Left);
             });
@@ -50,7 +50,7 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddStep("press on 100", () =>
             {
-                Vector2 topCentre = new Vector2(target.ScreenSpaceDrawQuad.Centre.X, target.ScreenSpaceDrawQuad.Centre.Y - target.ScreenSpaceDrawQuad.Height / 2 + 1);
+                Vector2 topCentre = new Vector2(target.ScreenSpaceDrawQuad.Centre.X, target.ScreenSpaceDrawQuad.Centre.Y - (target.ScreenSpaceDrawQuad.Height / 2) + 1);
                 InputManager.PressButton(MouseButton.Left);
                 InputManager.MoveMouseTo(topCentre);
             });

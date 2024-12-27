@@ -11,7 +11,7 @@ using osu.Framework.Input.Events;
 
 namespace osu.Game.Screens.Edit.Audio
 {
-    public partial class HitSoundTrackSamplePointToggleButton : ClickableContainer
+    internal partial class HitSoundTrackSamplePointToggleButton : ClickableContainer
     {
         public IBindable<bool>? Active;
 
