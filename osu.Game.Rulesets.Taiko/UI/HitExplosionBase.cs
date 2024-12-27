@@ -15,6 +15,7 @@ namespace osu.Game.Rulesets.Taiko.UI
     /// </summary>
     internal abstract partial class HitExplosionBase : PoolableDrawable
     {
+        /// <summary>Creates <c>Skinnable</c>. Calls only on <c>load</c>.</summary>
         protected abstract SkinnableDrawable OnLoadSkinnableCreate();
 
         public override bool RemoveWhenNotAlive => true;

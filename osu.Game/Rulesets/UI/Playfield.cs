@@ -350,8 +350,6 @@ namespace osu.Game.Rulesets.UI
             OnHitObjectRemoved(entry.HitObject);
         }
 
-        protected virtual IDrawablePool AdditionalPrepareDrawablePool(HitObject hitObject) => null;
-
         /// <summary>
         /// Creates the <see cref="HitObjectLifetimeEntry"/> for a given <see cref="HitObject"/>.
         /// </summary>
@@ -430,10 +428,21 @@ namespace osu.Game.Rulesets.UI
             });
         }
 
+        /// <summary>
+        /// Returns a pool for given <see cref="HitObject"/> in case when it can not be determined only by <see cref="HitObject"/> type alone.<br/>
+        /// It only have sense if the same <see cref="HitObject"/> can have different <see cref="PoolableDrawable"/> for its representation.
+        /// </summary>
+        /// <param name="hitObject">The <see cref="HitObject"/> for which <see cref="IDrawablePool"/> will be returned.</param>
+        /// <returns>
+        /// * <c>null</c> if no property based pool is required for given <see cref="HitObject"/>;<br/>
+        /// * <see cref="IDrawablePool"/> if given <see cref="HitObject"/> requires property based pool.
+        /// </returns>
+        protected virtual IDrawablePool PropertyBasedDrawableHitObjectPool(HitObject hitObject) => null;
+
         private IDrawablePool prepareDrawableHitObjectPool(HitObject hitObject)
         {
-            var additional = AdditionalPrepareDrawablePool(hitObject);
-            if (additional is not null) return additional;
+            var property_based_pool = PropertyBasedDrawableHitObjectPool(hitObject);
+            if (property_based_pool is not null) return property_based_pool;
 
             var lookupType = hitObject.GetType();
 

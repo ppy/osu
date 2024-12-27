@@ -160,6 +160,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         }
 
         protected abstract void RestorePieceState();
+
+        /// <summary>Creates <c>MainPiece</c>. Calls only on <c>load</c> or in EditorMode.</summary>
         protected abstract SkinnableDrawable OnLoadCreateMainPiece();
     }
 }
