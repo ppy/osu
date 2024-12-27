@@ -70,7 +70,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
 
             double ratioPenalty = 1 - totalRatioCount / (consistentRatioCount + 1) * 0.15;
 
-            return 1.0 - (1 - ratioPenalty);
+            return ratioPenalty;
         }
 
         /// <summary>
