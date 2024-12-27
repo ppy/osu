@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Edit.Setup
         public override LocalisableString Title => EditorSetupStrings.MetadataHeader;
 
         [BackgroundDependencyLoader]
-        private void load(SetupScreen setupScreen)
+        private void load(SetupScreen? setupScreen)
         {
             Children = new[]
             {
@@ -42,7 +42,9 @@ namespace osu.Game.Screens.Edit.Setup
                 tagsTextBox = createTextBox<FormTextBox>(BeatmapsetsStrings.ShowInfoTags)
             };
 
-            setupScreen.MetadataChanged += reloadMetadata;
+            if (setupScreen != null)
+                setupScreen.MetadataChanged += reloadMetadata;
+
             reloadMetadata();
         }
 
