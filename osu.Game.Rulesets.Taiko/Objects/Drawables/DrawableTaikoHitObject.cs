@@ -161,12 +161,5 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         protected abstract void RestorePieceState();
         protected abstract SkinnableDrawable OnLoadCreateMainPiece();
-
-        // TODO: call it from Editor OR even delete it and use somehow TaikoPlayfield from Editor
-        public unsafe void ReLoadMainPiece()
-        {
-            Content.Remove(MainPiece, true);
-            load();
-        }
     }
 }
