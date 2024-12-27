@@ -43,15 +43,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 sliderStrains.Add(currentStrain);
             }
 
-            TypedObjectStrains.Add((currentStrain, current.BaseObject is Slider));
+            if (current.BaseObject is Slider)
+                sliderStrains.Add(currentStrain);
 
             return currentStrain;
         }
 
         public double GetDifficultSliders()
         {
-            IEnumerable<double> sliderStrains = TypedObjectStrains.Where(typedObjectStrain => typedObjectStrain.isSlider).Select(typedObjectStrain => typedObjectStrain.difficulty);
-            if (!sliderStrains.Any())
+            if (sliderStrains.Count == 0)
                 return 0;
 
             double maxSliderStrain = sliderStrains.Max();
