@@ -87,6 +87,7 @@ namespace osu.Game.Skinning
                                 var score = container.OfType<DefaultScoreCounter>().FirstOrDefault();
                                 var accuracy = container.OfType<DefaultAccuracyCounter>().FirstOrDefault();
                                 var combo = container.OfType<DefaultComboCounter>().FirstOrDefault();
+                                var hitError = container.OfType<HitErrorMeter>().FirstOrDefault();
                                 var ppCounter = container.OfType<PerformancePointsCounter>().FirstOrDefault();
                                 var songProgress = container.OfType<DefaultSongProgress>().FirstOrDefault();
                                 var keyCounter = container.OfType<DefaultKeyCounterDisplay>().FirstOrDefault();
@@ -123,22 +124,12 @@ namespace osu.Game.Skinning
                                         }
                                     }
 
-                                    var hitError = container.OfType<HitErrorMeter>().FirstOrDefault();
-
                                     if (hitError != null)
                                     {
-                                        hitError.Anchor = Anchor.CentreLeft;
+                                        hitError.Position = new Vector2(0, -30);
+                                        hitError.Anchor = Anchor.BottomCentre;
                                         hitError.Origin = Anchor.CentreLeft;
-                                    }
-
-                                    var hitError2 = container.OfType<HitErrorMeter>().LastOrDefault();
-
-                                    if (hitError2 != null)
-                                    {
-                                        hitError2.Anchor = Anchor.CentreRight;
-                                        hitError2.Scale = new Vector2(-1, 1);
-                                        // origin flipped to match scale above.
-                                        hitError2.Origin = Anchor.CentreLeft;
+                                        hitError.Rotation = -90;
                                     }
                                 }
 
@@ -163,7 +154,6 @@ namespace osu.Game.Skinning
                                     new DefaultHealthDisplay(),
                                     new DefaultSongProgress(),
                                     new DefaultKeyCounterDisplay(),
-                                    new BarHitErrorMeter(),
                                     new BarHitErrorMeter(),
                                     new TrianglesPerformancePointsCounter()
                                 }
