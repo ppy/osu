@@ -1444,10 +1444,6 @@ namespace osu.Game
 
             switch (e.Action)
             {
-                case GlobalAction.DecreaseVolume:
-                case GlobalAction.IncreaseVolume:
-                    return volume.Adjust(e.Action);
-
                 case GlobalAction.ToggleMute:
                 case GlobalAction.NextVolumeMeter:
                 case GlobalAction.PreviousVolumeMeter:
