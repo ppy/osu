@@ -83,7 +83,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     acuteAngleBonus = calcAcuteAngleBonus(currAngle);
 
                     // Penalize angle repetition.
-                    wideAngleBonus *= (1 - Math.Min(wideAngleBonus, Math.Pow(calcWideAngleBonus(lastAngle), 3)));
+                    wideAngleBonus *= 1 - Math.Min(wideAngleBonus, Math.Pow(calcWideAngleBonus(lastAngle), 3));
                     acuteAngleBonus *= 0.03 + 0.97 * (1 - Math.Min(acuteAngleBonus, Math.Pow(calcAcuteAngleBonus(lastAngle), 3)));
 
                     // Apply wide angle bonus for distance more than one radius
