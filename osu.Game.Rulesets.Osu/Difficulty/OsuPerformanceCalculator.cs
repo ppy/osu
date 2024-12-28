@@ -206,7 +206,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             if (effectiveMissCount > 0)
             {
-                double estimatedSliderbreaks = Math.Min(countMeh + countOk, countMiss * attributes.AimTopWeightedSliderFactor);
+                double missedComboPercent = 1.0 - (double)score.MaxCombo / attributes.MaxCombo;
+                double estimatedSliderbreaks = Math.Min(countMeh + countOk, countMiss * attributes.AimTopWeightedSliderFactor) * DifficultyCalculationUtils.Logistic(missedComboPercent, 0.33, 15);
                 aimValue *= calculateMissPenalty(effectiveMissCount + (usingClassicSliderAccuracy ? estimatedSliderbreaks : 0), attributes.AimDifficultStrainCount);
             }
 
@@ -237,7 +238,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             if (effectiveMissCount > 0)
             {
-                double estimatedSliderbreaks = Math.Min(countMeh + countOk, countMiss * attributes.SpeedTopWeightedSliderFactor);
+                double missedComboPercent = 1.0 - (double)score.MaxCombo / attributes.MaxCombo;
+                double estimatedSliderbreaks = Math.Min(countMeh + countOk, countMiss * attributes.SpeedTopWeightedSliderFactor) * DifficultyCalculationUtils.Logistic(missedComboPercent, 0.33, 15);
                 speedValue *= calculateMissPenalty(effectiveMissCount + (usingClassicSliderAccuracy ? estimatedSliderbreaks : 0), attributes.SpeedDifficultStrainCount);
             }
 
