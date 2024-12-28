@@ -17,12 +17,14 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Configuration;
+using osu.Game.Database;
 using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Overlays.FirstRunSetup;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Screens;
 using osu.Game.Screens.Footer;
+using osu.Game.Tests.Beatmaps;
 using osuTK;
 using osuTK.Input;
 
@@ -47,6 +49,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             Dependencies.Cache(LocalConfig = new OsuConfigManager(LocalStorage));
             Dependencies.CacheAs<IPerformFromScreenRunner>(performer.Object);
             Dependencies.CacheAs<INotificationOverlay>(notificationOverlay.Object);
+            Dependencies.CacheAs<BeatmapStore>(new TestBeatmapStore());
         }
 
         [SetUpSteps]

@@ -406,13 +406,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         /// <summary>
-        /// Tests spectating with a beatmap that has a high <see cref="BeatmapInfo.AudioLeadIn"/> value.
+        /// Tests spectating with a beatmap that has a high <see cref="IBeatmap.AudioLeadIn"/> value.
         ///
         /// This test is not intended not to check the correct initial time value, but only to guard against
         /// gameplay potentially getting stuck in a stopped state due to lead in time being present.
         /// </summary>
         [Test]
-        public void TestAudioLeadIn() => testLeadIn(b => b.BeatmapInfo.AudioLeadIn = 2000);
+        public void TestAudioLeadIn() => testLeadIn(b => b.Beatmap.AudioLeadIn = 2000);
 
         /// <summary>
         /// Tests spectating with a beatmap that has a storyboard element with a negative start time (i.e. intro storyboard element).
@@ -455,7 +455,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                 applyToBeatmap?.Invoke(Beatmap.Value);
 
-                LoadScreen(spectatorScreen = new MultiSpectatorScreen(SelectedRoom.Value, playingUsers.ToArray()));
+                LoadScreen(spectatorScreen = new MultiSpectatorScreen(SelectedRoom.Value!, playingUsers.ToArray()));
             });
 
             AddUntilStep("wait for screen load", () => spectatorScreen.LoadState == LoadState.Loaded && (!waitForPlayerLoad || spectatorScreen.AllPlayersLoaded));

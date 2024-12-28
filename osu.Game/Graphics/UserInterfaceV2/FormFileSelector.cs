@@ -242,20 +242,26 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         Task ICanAcceptFiles.Import(ImportTask[] tasks, ImportParameters parameters) => throw new NotImplementedException();
 
+        protected virtual FileChooserPopover CreatePopover(string[] handledExtensions, Bindable<FileInfo?> current, string? chooserPath) => new FileChooserPopover(handledExtensions, current, chooserPath);
+
         public Popover GetPopover()
         {
-            var popover = new FileChooserPopover(handledExtensions, Current, initialChooserPath);
+            var popover = CreatePopover(handledExtensions, Current, initialChooserPath);
             popoverState.UnbindBindings();
             popoverState.BindTo(popover.State);
             return popover;
         }
 
-        private partial class FileChooserPopover : OsuPopover
+        protected partial class FileChooserPopover : OsuPopover
         {
             protected override string PopInSampleName => "UI/overlay-big-pop-in";
             protected override string PopOutSampleName => "UI/overlay-big-pop-out";
 
-            public FileChooserPopover(string[] handledExtensions, Bindable<FileInfo?> currentFile, string? chooserPath)
+            private readonly Bindable<FileInfo?> current = new Bindable<FileInfo?>();
+
+            protected OsuFileSelector FileSelector;
+
+            public FileChooserPopover(string[] handledExtensions, Bindable<FileInfo?> current, string? chooserPath)
                 : base(false)
             {
                 Child = new Container
@@ -264,12 +270,13 @@ namespace osu.Game.Graphics.UserInterfaceV2
                     // simplest solution to avoid underlying text to bleed through the bottom border
                     // https://github.com/ppy/osu/pull/30005#issuecomment-2378884430
                     Padding = new MarginPadding { Bottom = 1 },
-                    Child = new OsuFileSelector(chooserPath, handledExtensions)
+                    Child = FileSelector = new OsuFileSelector(chooserPath, handledExtensions)
                     {
                         RelativeSizeAxes = Axes.Both,
-                        CurrentFile = { BindTarget = currentFile }
                     },
                 };
+
+                this.current.BindTo(current);
             }
 
             [BackgroundDependencyLoader]
@@ -292,6 +299,19 @@ namespace osu.Game.Graphics.UserInterfaceV2
                     }
                 });
             }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                FileSelector.CurrentFile.ValueChanged += f =>
+                {
+                    if (f.NewValue != null)
+                        OnFileSelected(f.NewValue);
+                };
+            }
+
+            protected virtual void OnFileSelected(FileInfo file) => current.Value = file;
         }
     }
 }
