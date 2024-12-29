@@ -91,17 +91,9 @@ namespace osu.Game.Online.Leaderboards
             LeaderboardScoresProvider.State.BindValueChanged(state => onStateChange(state.NewValue));
         }
 
-        private void setNewScores(LeaderboardState state)
+        private void onStateChange(LeaderboardState state)
         {
-            // Non-delayed schedule may potentially run inline (due to IsMainThread check passing) after leaderboard  is disposed.
-            // This is guarded against in BeatmapLeaderboard via web request cancellation, but let's be extra safe.
-            if (!IsDisposed)
-            {
-                // Schedule needs to be non-delayed here for the weird logic in refetchScores to work.
-                // If it is removed, the placeholder will be incorrectly updated to "no scores" rather than "retrieving".
-                // This whole flow should be refactored in the future.
-                Scheduler.Add(applyNewScores, false);
-            }
+            Schedule(applyNewScores);
 
             void applyNewScores()
             {
@@ -129,7 +121,7 @@ namespace osu.Game.Online.Leaderboards
                 .Expire();
             scoreFlowContainer = null;
 
-            if (state == LeaderboardState.NoScores)
+            if (!LeaderboardScoresProvider.Scores.Any())
             {
                 setPlaceholder(state);
                 return;
@@ -160,21 +152,6 @@ namespace osu.Game.Online.Leaderboards
 
                 scrollContainer.ScrollToStart(false);
             }, (currentScoresAsyncLoadCancellationSource = new CancellationTokenSource()).Token);
-        }
-
-        private void onStateChange(LeaderboardState state)
-        {
-            switch (state)
-            {
-                case LeaderboardState.Success:
-                case LeaderboardState.NoScores:
-                    setNewScores(state);
-                    break;
-
-                default:
-                    setPlaceholder(state);
-                    break;
-            }
         }
 
         #region Placeholder handling

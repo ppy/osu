@@ -91,8 +91,7 @@ namespace osu.Game.Online.Leaderboards
         {
             Debug.Assert(ThreadSafety.IsUpdateThread);
 
-            ClearScores();
-            SetState(LeaderboardState.Retrieving);
+            PrepareScoresRetrieval();
 
             currentFetchCancellationSource = new CancellationTokenSource();
 
@@ -138,10 +137,12 @@ namespace osu.Game.Online.Leaderboards
         /// <returns>An <see cref="APIRequest"/> responsible for the fetch operation. This will be queued and performed automatically.</returns>
         protected abstract APIRequest? FetchScores(CancellationToken cancellationToken);
 
-        public void ClearScores()
+        protected void PrepareScoresRetrieval()
         {
             cancelPendingWork();
-            SetScores(null);
+
+            scores.Clear();
+            SetState(LeaderboardState.Retrieving);
         }
 
         private void cancelPendingWork()
