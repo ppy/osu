@@ -19,10 +19,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         public Aim(Mod[] mods, bool withSliders)
             : base(mods)
         {
-            this.withSliders = withSliders;
+            WithSliders = withSliders;
         }
-
-        private readonly bool withSliders;
 
         private double currentStrain;
 
@@ -31,6 +29,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private readonly List<double> sliderStrains = new List<double>();
 
+        public readonly bool WithSliders;
+
         private double strainDecay(double ms) => Math.Pow(strainDecayBase, ms / 1000);
 
         protected override double CalculateInitialStrain(double time, DifficultyHitObject current) => currentStrain * strainDecay(time - current.Previous(0).StartTime);
@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         protected override double StrainValueAt(DifficultyHitObject current)
         {
             currentStrain *= strainDecay(current.DeltaTime);
-            currentStrain += AimEvaluator.EvaluateDifficultyOf(current, withSliders) * skillMultiplier;
+            currentStrain += AimEvaluator.EvaluateDifficultyOf(current, WithSliders) * skillMultiplier;
 
             if (current.BaseObject is Slider)
             {
