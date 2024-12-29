@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Osu.Difficulty.Evaluators;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
@@ -165,6 +166,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 // Bonus for repeat sliders until a better per nested object strain system can be achieved.
                 TravelDistance = currentSlider.LazyTravelDistance * (float)Math.Pow(1 + currentSlider.RepeatCount / 2.5, 1.0 / 2.5);
                 TravelTime = Math.Max(currentSlider.LazyTravelTime / clockRate, MIN_DELTA_TIME);
+
+                // Buff curvy sliders
+                TravelDistance *= 1 + SliderReadingEvaluator.EvaluateDifficultyOf(currentSlider);
             }
 
             // We don't need to calculate either angle or distance when one of the last->curr objects is a spinner
@@ -291,7 +295,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             slider.LazyEndPosition = slider.StackedPosition + slider.Path.PositionAt(endTimeMin); // temporary lazy end position until a real result can be derived.
 
             Vector2 currCursorPosition = slider.StackedPosition;
-
             double scalingFactor = NORMALISED_RADIUS / slider.Radius; // lazySliderDistance is coded to be sensitive to scaling, this makes the maths easier with the thresholds being used.
 
             for (int i = 1; i < nestedObjects.Count; i++)
@@ -316,6 +319,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                         currMovement = lazyMovement;
 
                     currMovementLength = scalingFactor * currMovement.Length;
+
                 }
                 else if (currMovementObj is SliderRepeat)
                 {
