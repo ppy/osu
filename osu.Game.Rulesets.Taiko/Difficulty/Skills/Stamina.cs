@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -44,10 +44,12 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             var currentObject = current as TaikoDifficultyHitObject;
             int index = currentObject?.Colour.MonoStreak?.HitObjects.IndexOf(currentObject) ?? 0;
 
-            if (singleColourStamina)
-                return currentStrain / (1 + Math.Exp(-(index - 10) / 2.0));
+            double monolengthBonus = 1 + Math.Min(Math.Max((index - 5) / 20.0, 0), 0.30);
 
-            return currentStrain;
+            if (singleColourStamina)
+                return (currentStrain) / (1 + Math.Exp(-(index - 10) / 2.0));
+
+            return currentStrain * monolengthBonus;
         }
 
         protected override double CalculateInitialStrain(double time, DifficultyHitObject current) => singleColourStamina ? 0 : currentStrain * strainDecay(time - current.Previous(0).StartTime);

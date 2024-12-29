@@ -1,3 +1,4 @@
+
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
@@ -45,7 +46,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
         }
 
         /// <summary>
-        /// Determines if the changes in hit object intervals is consistent based on a given threshold.
+        /// Determines if the changes in hit object intervals are consistent based on a given threshold.
         /// </summary>
         private static double repeatedIntervalPenalty(SameRhythmHitObjects sameRhythmHitObjects, double hitWindow, double threshold = 0.1)
         {
@@ -62,31 +63,46 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
 
             double sameInterval(SameRhythmHitObjects startObject, int intervalCount)
             {
+                List<double?> intervalRatios = new List<double?>();
                 List<double?> intervals = new List<double?>();
                 var currentObject = startObject;
 
                 for (int i = 0; i < intervalCount && currentObject != null; i++)
                 {
+                    intervalRatios.Add(currentObject.HitObjectIntervalRatio);
                     intervals.Add(currentObject.HitObjectInterval);
                     currentObject = currentObject.Previous;
                 }
 
+                intervalRatios.RemoveAll(interval => interval == null);
                 intervals.RemoveAll(interval => interval == null);
 
-                if (intervals.Count < intervalCount)
+                if (intervalRatios.Count < intervalCount || intervals.Count < intervalCount)
                     return 1.0; // No penalty if there aren't enough valid intervals.
 
+                // Check for penalties based on HitObjectIntervalRatio
+                for (int i = 0; i < intervalRatios.Count; i++)
+                {
+                    for (int j = i + 1; j < intervalRatios.Count; j++)
+                    {
+                        double ratio = intervalRatios[i]!.Value / intervalRatios[j]!.Value;
+                        if (Math.Abs(1 - ratio) <= threshold) // If any two ratios are similar
+                            return 0.0;
+                    }
+                }
+
+                // Check for penalties based on HitObjectInterval
                 for (int i = 0; i < intervals.Count; i++)
                 {
                     for (int j = i + 1; j < intervals.Count; j++)
                     {
-                        double ratio = intervals[i]!.Value / intervals[j]!.Value;
-                        if (Math.Abs(1 - ratio) <= threshold) // If any two intervals are similar, apply a penalty.
-                            return 0.3;
+                        double difference = Math.Abs(intervals[i]!.Value - intervals[j]!.Value);
+                        if (difference <= hitWindow) // If any two intervals are close
+                            return 0.5;
                     }
                 }
 
-                return 1.0; // No penalty if all intervals are different.
+                return 1.0; // No penalty if all intervals are sufficiently different.
             }
         }
 
