@@ -40,7 +40,7 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
             if (room.RoomID == null)
                 return;
 
-            SetScores(null);
+            PrepareScoresRetrieval();
             RefetchScores();
         }
 

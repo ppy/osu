@@ -183,8 +183,6 @@ namespace osu.Game.Screens.Select.Leaderboards
 
             void localScoresChanged(IRealmCollection<ScoreInfo> sender, ChangeSet? changes)
             {
-                SetState(LeaderboardState.Retrieving);
-
                 if (cancellationToken.IsCancellationRequested)
                     return;
 
@@ -192,6 +190,8 @@ namespace osu.Game.Screens.Select.Leaderboards
                 // It's currently not possible for a score to be modified after insertion, so we can safely ignore callbacks with only modifications.
                 if (changes?.HasCollectionChanges() == false)
                     return;
+
+                SetState(LeaderboardState.Retrieving);
 
                 var scores = sender.AsEnumerable();
 

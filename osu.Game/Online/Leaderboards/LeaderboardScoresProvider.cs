@@ -16,9 +16,6 @@ namespace osu.Game.Online.Leaderboards
 {
     public abstract partial class LeaderboardScoresProvider<TScope, TScoreInfo> : Component
     {
-        /// <summary>
-        /// The currently displayed scores.
-        /// </summary>
         public IBindableList<TScoreInfo> Scores => scores;
 
         public TScoreInfo? UserScore { get; private set; }
@@ -112,9 +109,9 @@ namespace osu.Game.Online.Leaderboards
         }
 
         /// <summary>
-        /// Call when a retrieval or display failure happened to show a relevant message to the user.
+        /// Call when a retrieval of scores failed.
         /// </summary>
-        /// <param name="state">The state to display.</param>
+        /// <param name="state">The error state.</param>
         protected void SetErrorState(LeaderboardState state)
         {
             switch (state)
@@ -131,7 +128,7 @@ namespace osu.Game.Online.Leaderboards
         }
 
         /// <summary>
-        /// Performs a fetch/refresh of scores to be displayed.
+        /// Performs a fetch/refresh of scores of the leaderboard.
         /// </summary>
         /// <param name="cancellationToken"></param>
         /// <returns>An <see cref="APIRequest"/> responsible for the fetch operation. This will be queued and performed automatically.</returns>
@@ -160,9 +157,9 @@ namespace osu.Game.Online.Leaderboards
         }
 
         /// <summary>
-        /// Call when retrieved scores are ready to be displayed.
+        /// Call when retrieved scores are ready to use by a leaderboard.
         /// </summary>
-        /// <param name="scores">The scores to display.</param>
+        /// <param name="scores">The scores to use.</param>
         /// <param name="userScore">The user top score, if any.</param>
         protected void SetScores(IEnumerable<TScoreInfo>? scores, TScoreInfo? userScore = default)
         {
