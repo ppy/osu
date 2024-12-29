@@ -100,7 +100,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double multiplier = CalculateDifficultyMultiplier(mods, totalHits, spinnerCount);
 
             double starRating = basePerformance > 0.00001
-                ? Math.Cbrt(multiplier) * 0.027 * (Math.Cbrt(100000 / Math.Pow(2, 1 / 1.1) * basePerformance) + 4)
+                ? Math.Cbrt(multiplier) * 0.026 * (Math.Cbrt(100000 / Math.Pow(2, 1 / 1.1) * basePerformance) + 4)
                 : 0;
 
             OsuDifficultyAttributes attributes = new OsuDifficultyAttributes
