@@ -22,6 +22,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
     {
         private const double performance_base_multiplier = 1.15; // This is being adjusted to keep the final pp value scaled around what it used to be when changing things.
         private const double difficulty_multiplier = 0.0675;
+        private const double star_rating_multiplier = 0.026;
 
         public override int Version => 20241007;
 
@@ -100,7 +101,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double multiplier = CalculateDifficultyMultiplier(mods, totalHits, spinnerCount);
 
             double starRating = basePerformance > 0.00001
-                ? Math.Cbrt(multiplier) * 0.026 * (Math.Cbrt(100000 / Math.Pow(2, 1 / 1.1) * basePerformance) + 4)
+                ? Math.Cbrt(multiplier) * star_rating_multiplier * (Math.Cbrt(100000 / Math.Pow(2, 1 / 1.1) * basePerformance) + 4)
                 : 0;
 
             OsuDifficultyAttributes attributes = new OsuDifficultyAttributes
