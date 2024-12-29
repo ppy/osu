@@ -24,10 +24,12 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
     public class TaikoDifficultyCalculator : DifficultyCalculator
     {
         private const double difficulty_multiplier = 0.084375;
-        private const double rhythm_skill_multiplier = 1.24 * difficulty_multiplier;
+        private const double rhythm_skill_multiplier = 1.40 * difficulty_multiplier;
         private const double reading_skill_multiplier = 0.100 * difficulty_multiplier;
         private const double colour_skill_multiplier = 0.375 * difficulty_multiplier;
-        private const double stamina_skill_multiplier = 0.375 * difficulty_multiplier;
+        private const double stamina_skill_multiplier = 0.425 * difficulty_multiplier;
+
+        private double strainLengthBonus;
 
         public override int Version => 20241007;
 
@@ -116,8 +118,12 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             double monoStaminaFactor = staminaRating == 0 ? 1 : Math.Pow(monoStaminaRating / staminaRating, 5);
 
             double colourDifficultStrains = colour.CountTopWeightedStrains();
-            double readingDifficultStrains = reading.CountTopWeightedStrains();
-            double staminaDifficultStrains = stamina.CountTopWeightedStrains();
+            double rhythmDifficultStrains = rhythm.CountTopWeightedStrains();
+            double staminaDifficultStrains = stamina.CountTopWeightedStrains() * clockRate;
+
+            strainLengthBonus = 1
+                + Math.Min(Math.Max((staminaDifficultStrains - 1350) / 7500, 0), 0.07) + Math.Min(Math.Max((staminaRating - 8.0) / 1.0, 0), 0.05)
+                + Math.Min(Math.Max((rhythmDifficultStrains - 140) / 30, 0), 0.075) - Math.Min(Math.Max((55 - rhythmDifficultStrains) / 45, 0), 0.10);
 
             double combinedRating = combinedDifficultyValue(rhythm, reading, colour, stamina, isRelax);
             double starRating = rescale(combinedRating * 1.4);
@@ -125,7 +131,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             // Converts are penalised outside the scope of difficulty calculation, as our assumptions surrounding standard play-styles becomes out-of-scope.
             if (beatmap.BeatmapInfo.Ruleset.OnlineID == 0)
             {
-                starRating *= 0.825;
+                starRating *= 0.7;
 
                 // For maps with relax, multiple inputs are more likely to be abused.
                 if (isRelax)
@@ -144,7 +150,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 ColourDifficulty = colourRating,
                 StaminaDifficulty = staminaRating,
                 MonoStaminaFactor = monoStaminaFactor,
-                ReadingTopStrains = readingDifficultStrains,
+                RhythmTopStrains = rhythmDifficultStrains,
                 ColourTopStrains = colourDifficultStrains,
                 StaminaTopStrains = staminaDifficultStrains,
                 GreatHitWindow = hitWindows.WindowFor(HitResult.Great) / clockRate,
@@ -173,10 +179,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
             for (int i = 0; i < colourPeaks.Count; i++)
             {
-                double rhythmPeak = rhythmPeaks[i] * rhythm_skill_multiplier;
+                double rhythmPeak = rhythmPeaks[i] * rhythm_skill_multiplier * strainLengthBonus;
                 double readingPeak = readingPeaks[i] * reading_skill_multiplier;
                 double colourPeak = colourPeaks[i] * colour_skill_multiplier;
-                double staminaPeak = staminaPeaks[i] * stamina_skill_multiplier;
+                double staminaPeak = staminaPeaks[i] * stamina_skill_multiplier * strainLengthBonus;
 
                 if (isRelax)
                 {
