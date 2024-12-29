@@ -20,6 +20,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 {
     public class OsuDifficultyCalculator : DifficultyCalculator
     {
+        private const double performance_base_multiplier = 1.15; // This is being adjusted to keep the final pp value scaled around what it used to be when changing things.
         private const double difficulty_multiplier = 0.0675;
 
         public override int Version => 20241007;
@@ -27,6 +28,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         public OsuDifficultyCalculator(IRulesetInfo ruleset, IWorkingBeatmap beatmap)
             : base(ruleset, beatmap)
         {
+        }
+
+        public static double CalculateDifficultyMultiplier(Mod[] mods, int totalHits, int spinnerCount)
+        {
+            double multiplier = performance_base_multiplier;
+
+            if (mods.Any(m => m is OsuModSpunOut) && totalHits > 0)
+                multiplier *= 1.0 - Math.Pow((double)spinnerCount / totalHits, 0.85);
+
+            return multiplier;
         }
 
         protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
@@ -47,6 +58,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             int hitCircleCount = beatmap.HitObjects.Count(h => h is HitCircle);
             int sliderCount = beatmap.HitObjects.Count(h => h is Slider);
             int spinnerCount = beatmap.HitObjects.Count(h => h is Spinner);
+
+            int totalHits = beatmap.HitObjects.Count;
+
             double drainRate = beatmap.Difficulty.DrainRate;
 
             var aim = (Aim)skills.Single(s => s is Aim aimSkill && aimSkill.WithSliders);
@@ -61,14 +75,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double difficultSliders = aim.GetDifficultSliders();
 
-            double aimRating = computeAimRating(aim.DifficultyValue(), mods);
-            double aimRatingNoSliders = computeAimRating(aimNoSliders.DifficultyValue(), mods);
-            double speedRating = computeSpeedRating(speed.DifficultyValue(), mods);
+            double aimRating = computeAimRating(aim.DifficultyValue(), mods, totalHits, approachRate, overallDifficulty);
+            double aimRatingNoSliders = computeAimRating(aimNoSliders.DifficultyValue(), mods, totalHits, approachRate, overallDifficulty);
+            double speedRating = computeSpeedRating(speed.DifficultyValue(), mods, totalHits, approachRate);
 
             double flashlightRating = 0.0;
 
             if (flashlight is not null)
-                flashlightRating = computeFlashlightRating(flashlight.DifficultyValue(), mods);
+                flashlightRating = computeFlashlightRating(flashlight.DifficultyValue(), mods, totalHits, overallDifficulty);
 
             double sliderFactor = aimRating > 0 ? aimRatingNoSliders / aimRating : 1;
 
@@ -83,8 +97,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                     Math.Pow(baseFlashlightPerformance, 1.1), 1.0 / 1.1
                 );
 
+            double multiplier = CalculateDifficultyMultiplier(mods, totalHits, spinnerCount);
+
             double starRating = basePerformance > 0.00001
-                ? Math.Cbrt(OsuPerformanceCalculator.PERFORMANCE_BASE_MULTIPLIER) * 0.027 * (Math.Cbrt(100000 / Math.Pow(2, 1 / 1.1) * basePerformance) + 4)
+                ? Math.Cbrt(multiplier) * 0.027 * (Math.Cbrt(100000 / Math.Pow(2, 1 / 1.1) * basePerformance) + 4)
                 : 0;
 
             OsuDifficultyAttributes attributes = new OsuDifficultyAttributes
@@ -111,7 +127,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return attributes;
         }
 
-        private double computeAimRating(double aimDifficultyValue, Mod[] mods)
+        private double computeAimRating(double aimDifficultyValue, Mod[] mods, int totalHits, double approachRate, double overallDifficulty)
         {
             if (mods.Any(m => m is OsuModAutopilot))
                 return 0;
@@ -124,10 +140,37 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (mods.Any(m => m is OsuModRelax))
                 aimRating *= 0.9;
 
-            return aimRating;
+            double ratingMultiplier = 1.0;
+
+            double lengthBonus = 0.95 + 0.4 * Math.Min(1.0, totalHits / 2000.0) +
+                                 (totalHits > 2000 ? Math.Log10(totalHits / 2000.0) * 0.5 : 0.0);
+
+            ratingMultiplier *= lengthBonus;
+
+            double approachRateFactor = 0.0;
+            if (approachRate > 10.33)
+                approachRateFactor = 0.3 * (approachRate - 10.33);
+            else if (approachRate < 8.0)
+                approachRateFactor = 0.05 * (8.0 - approachRate);
+
+            if (mods.Any(h => h is OsuModRelax))
+                approachRateFactor = 0.0;
+
+            ratingMultiplier *= 1.0 + approachRateFactor * lengthBonus; // Buff for longer maps with high AR.
+
+            if (mods.Any(m => m is OsuModHidden || m is OsuModTraceable))
+            {
+                // We want to give more reward for lower AR when it comes to aim and HD. This nerfs high AR and buffs lower AR.
+                ratingMultiplier *= 1.0 + 0.04 * (12.0 - approachRate);
+            }
+
+            // It is important to consider accuracy difficulty when scaling with accuracy.
+            ratingMultiplier *= 0.98 + Math.Pow(overallDifficulty, 2) / 2500;
+
+            return aimRating * Math.Cbrt(ratingMultiplier);
         }
 
-        private double computeSpeedRating(double speedDifficultyValue, Mod[] mods)
+        private double computeSpeedRating(double speedDifficultyValue, Mod[] mods, int totalHits, double approachRate)
         {
             if (mods.Any(m => m is OsuModRelax))
                 return 0;
@@ -137,10 +180,37 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (mods.Any(m => m is OsuModAutopilot))
                 speedRating *= 0.5;
 
-            return speedRating;
+            double ratingMultiplier = 1.0;
+
+            double lengthBonus = 0.95 + 0.4 * Math.Min(1.0, totalHits / 2000.0) +
+                                 (totalHits > 2000 ? Math.Log10(totalHits / 2000.0) * 0.5 : 0.0);
+
+            ratingMultiplier *= lengthBonus;
+
+            double approachRateFactor = 0.0;
+            if (approachRate > 10.33)
+                approachRateFactor = 0.3 * (approachRate - 10.33);
+
+            if (mods.Any(m => m is OsuModAutopilot))
+                approachRateFactor = 0.0;
+
+            ratingMultiplier *= 1.0 + approachRateFactor * lengthBonus; // Buff for longer maps with high AR.
+
+            if (mods.Any(m => m is OsuModBlinds))
+            {
+                // Increasing the speed value by object count for Blinds isn't ideal, so the minimum buff is given.
+                ratingMultiplier *= 1.12;
+            }
+            else if (mods.Any(m => m is OsuModHidden || m is OsuModTraceable))
+            {
+                // We want to give more reward for lower AR when it comes to aim and HD. This nerfs high AR and buffs lower AR.
+                ratingMultiplier *= 1.0 + 0.04 * (12.0 - approachRate);
+            }
+
+            return speedRating * Math.Cbrt(ratingMultiplier);
         }
 
-        private double computeFlashlightRating(double flashlightDifficultyValue, Mod[] mods)
+        private double computeFlashlightRating(double flashlightDifficultyValue, Mod[] mods, int totalHits, double overallDifficulty)
         {
             double flashlightRating = Math.Sqrt(flashlightDifficultyValue) * difficulty_multiplier;
 
@@ -152,7 +222,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             else if (mods.Any(m => m is OsuModAutopilot))
                 flashlightRating *= 0.4;
 
-            return flashlightRating;
+            double ratingMultiplier = 1.0;
+
+            // Account for shorter maps having a higher ratio of 0 combo/100 combo flashlight radius.
+            ratingMultiplier *= 0.7 + 0.1 * Math.Min(1.0, totalHits / 200.0) +
+                                (totalHits > 200 ? 0.2 * Math.Min(1.0, (totalHits - 200) / 200.0) : 0.0);
+
+            // It is important to consider accuracy difficulty when scaling with accuracy.
+            ratingMultiplier *= 0.98 + Math.Pow(overallDifficulty, 2) / 2500;
+
+            return flashlightRating * Math.Cbrt(ratingMultiplier);
         }
 
         protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
