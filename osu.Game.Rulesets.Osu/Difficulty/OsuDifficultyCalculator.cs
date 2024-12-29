@@ -212,6 +212,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double computeFlashlightRating(double flashlightDifficultyValue, Mod[] mods, int totalHits, double overallDifficulty)
         {
+            if (!mods.Any(m => m is OsuModFlashlight))
+                return 0;
+
             double flashlightRating = Math.Sqrt(flashlightDifficultyValue) * difficulty_multiplier;
 
             if (mods.Any(m => m is OsuModTouchDevice))
