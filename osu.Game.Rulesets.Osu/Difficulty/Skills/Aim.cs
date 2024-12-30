@@ -24,8 +24,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private readonly bool withSliders;
 
         private double currentStrain;
-
-        private double skillMultiplier => 132;
+        protected override double FcProbability => 0.0005;
+        private double skillMultiplier => 146;
         private double strainDecayBase => 0.15;
 
         protected override double HitProbability(double skill, double difficulty)

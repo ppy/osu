@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Aggregation
         // We assume players have a 2% chance to hit every note in the map.
         // A higher value of fc_probability increases the influence of difficulty spikes,
         // while a lower value increases the influence of length and consistent difficulty.
-        private const double fc_probability = 0.02;
+        protected abstract double FcProbability { get; }
 
         private const int bin_count = 32;
 
@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Aggregation
             double upperBoundEstimate = 3.0 * maxDiff;
 
             double skill = RootFinding.FindRootExpand(
-                skill => fcProbability(skill) - fc_probability,
+                skill => fcProbability(skill) - FcProbability,
                 lower_bound,
                 upperBoundEstimate,
                 accuracy: 1e-4);
@@ -77,7 +77,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Aggregation
             double upperBoundEstimate = 3.0 * maxDiff;
 
             double skill = RootFinding.FindRootExpand(
-                skill => fcProbability(skill) - fc_probability,
+                skill => fcProbability(skill) - FcProbability,
                 lower_bound,
                 upperBoundEstimate,
                 accuracy: 1e-4);
@@ -149,7 +149,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Aggregation
 
             var poiBin = difficulties.Count > binThreshold ? new PoissonBinomial(bins, skill, HitProbability) : new PoissonBinomial(difficulties, skill, HitProbability);
 
-            return Math.Max(0, RootFinding.FindRootExpand(x => poiBin.CDF(x) - fc_probability, -50, 1000, accuracy: 1e-4));
+            return Math.Max(0, RootFinding.FindRootExpand(x => poiBin.CDF(x) - FcProbability, -50, 1000, accuracy: 1e-4));
         }
     }
 }
