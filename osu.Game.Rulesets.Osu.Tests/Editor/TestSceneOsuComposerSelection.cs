@@ -12,6 +12,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles.Components;
+using osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit.Compose.Components;
@@ -344,6 +345,79 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             });
             AddUntilStep("slider not deleted", () => EditorBeatmap.HitObjects.OfType<Slider>().Count(), () => Is.EqualTo(1));
             AddUntilStep("slider path has 2 nodes", () => EditorBeatmap.HitObjects.OfType<Slider>().Single().Path.ControlPoints.Count, () => Is.EqualTo(2));
+        }
+
+        [Test]
+        public void TestSliderDragMarkerDoesNotBlockControlPointContextMenu()
+        {
+            var slider = new Slider
+            {
+                StartTime = 0,
+                Position = new Vector2(100, 100),
+                Path = new SliderPath
+                {
+                    ControlPoints =
+                    {
+                        new PathControlPoint { Type = PathType.LINEAR },
+                        new PathControlPoint(new Vector2(50, 100)),
+                        new PathControlPoint(new Vector2(145, 100)),
+                    },
+                    ExpectedDistance = { Value = 162.62 }
+                },
+            };
+            AddStep("add slider", () => EditorBeatmap.Add(slider));
+            AddStep("select slider", () => EditorBeatmap.SelectedHitObjects.Add(slider));
+
+            AddStep("select last node", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<PathControlPointPiece<Slider>>().Last());
+                InputManager.Click(MouseButton.Left);
+            });
+            AddStep("right click node", () => InputManager.Click(MouseButton.Right));
+            AddUntilStep("context menu open", () => this.ChildrenOfType<ContextMenuContainer>().Single().ChildrenOfType<Menu>().All(m => m.State == MenuState.Open));
+        }
+
+        [Test]
+        public void TestSliderDragMarkerBlocksSelectionOfObjectsUnderneath()
+        {
+            var firstSlider = new Slider
+            {
+                StartTime = 0,
+                Position = new Vector2(10, 50),
+                Path = new SliderPath
+                {
+                    ControlPoints =
+                    {
+                        new PathControlPoint(),
+                        new PathControlPoint(new Vector2(100))
+                    }
+                }
+            };
+            var secondSlider = new Slider
+            {
+                StartTime = 500,
+                Position = new Vector2(200, 0),
+                Path = new SliderPath
+                {
+                    ControlPoints =
+                    {
+                        new PathControlPoint(),
+                        new PathControlPoint(new Vector2(-100, 100))
+                    }
+                }
+            };
+
+            AddStep("add objects", () => EditorBeatmap.AddRange(new HitObject[] { firstSlider, secondSlider }));
+            AddStep("select second slider", () => EditorBeatmap.SelectedHitObjects.Add(secondSlider));
+
+            AddStep("move to marker", () =>
+            {
+                var marker = this.ChildrenOfType<SliderEndDragMarker>().First();
+                var position = (marker.ScreenSpaceDrawQuad.TopRight + marker.ScreenSpaceDrawQuad.BottomRight) / 2;
+                InputManager.MoveMouseTo(position);
+            });
+            AddStep("click", () => InputManager.Click(MouseButton.Left));
+            AddAssert("second slider still selected", () => EditorBeatmap.SelectedHitObjects.Single(), () => Is.EqualTo(secondSlider));
         }
 
         private ComposeBlueprintContainer blueprintContainer
