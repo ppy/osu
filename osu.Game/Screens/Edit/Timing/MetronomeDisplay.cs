@@ -238,9 +238,7 @@ namespace osu.Game.Screens.Edit.Timing
 
         private bool spedUp;
 
-        private bool divisorChanged;
-
-        private void updateDivisor()
+        private bool updateDivisor()
         {
             int divisor = 1;
 
@@ -248,12 +246,12 @@ namespace osu.Game.Screens.Edit.Timing
                 divisor = beatDivisor.Value % 3 == 0 ? 3 : 2;
 
             if (divisor == Divisor)
-                return;
-
-            divisorChanged = true;
+                return false;
 
             Divisor = divisor;
             metronomeTick.Divisor = divisor;
+
+            return true;
         }
 
         protected override void LoadComplete()
@@ -274,9 +272,7 @@ namespace osu.Game.Screens.Edit.Timing
 
             timingPoint = BeatSyncSource.ControlPoints.TimingPointAt(BeatSyncSource.Clock.CurrentTime);
 
-            updateDivisor();
-
-            if (beatLength != timingPoint.BeatLength || divisorChanged)
+            if (updateDivisor() || beatLength != timingPoint.BeatLength)
             {
                 beatLength = timingPoint.BeatLength;
 
@@ -312,8 +308,6 @@ namespace osu.Game.Screens.Edit.Timing
                         latchDelegate = Schedule(() => sampleLatch?.Play());
                 }
             }
-
-            divisorChanged = false;
         }
 
         protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
