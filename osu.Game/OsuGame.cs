@@ -1428,24 +1428,25 @@ namespace osu.Game
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
-            if (e.Repeat)
-                return false;
-
-            if (introScreen == null) return false;
-
             switch (e.Action)
             {
                 case GlobalAction.DecreaseVolume:
                 case GlobalAction.IncreaseVolume:
                     return volume.Adjust(e.Action);
+            }
 
+            // All actions below this point don't allow key repeat.
+            if (e.Repeat)
+                return false;
+
+            // Wait until we're loaded at least to the intro before allowing various interactions.
+            if (introScreen == null) return false;
+
+            switch (e.Action)
+            {
                 case GlobalAction.ToggleMute:
                 case GlobalAction.NextVolumeMeter:
                 case GlobalAction.PreviousVolumeMeter:
-
-                    if (e.Repeat)
-                        return true;
-
                     return volume.Adjust(e.Action);
 
                 case GlobalAction.ToggleFPSDisplay:
