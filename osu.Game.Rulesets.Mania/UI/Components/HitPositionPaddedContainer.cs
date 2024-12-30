@@ -1,29 +1,22 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Mania.Skinning;
-using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Mania.UI.Components
 {
-    public partial class HitObjectArea : SkinReloadableDrawable
+    public partial class HitPositionPaddedContainer : SkinReloadableDrawable
     {
         protected readonly IBindable<ScrollingDirection> Direction = new Bindable<ScrollingDirection>();
-        public readonly HitObjectContainer HitObjectContainer;
 
-        public HitObjectArea(HitObjectContainer hitObjectContainer)
+        public HitPositionPaddedContainer(Drawable child)
         {
-            InternalChild = new Container
-            {
-                RelativeSizeAxes = Axes.Both,
-                Child = HitObjectContainer = hitObjectContainer
-            };
+            InternalChild = child;
         }
 
         [BackgroundDependencyLoader]
