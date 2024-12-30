@@ -57,6 +57,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.ChatDisplayHeight, ChatOverlay.DEFAULT_HEIGHT, 0.2f, 1f, 0.01f);
 
             SetDefault(OsuSetting.BeatmapListingCardSize, BeatmapCardSize.Normal);
+            SetDefault(OsuSetting.BeatmapListingFeaturedArtistFilter, true);
 
             SetDefault(OsuSetting.ProfileCoverExpanded, true);
 
@@ -138,6 +139,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.LightenDuringBreaks, true);
 
             SetDefault(OsuSetting.HitLighting, true);
+            SetDefault(OsuSetting.StarFountains, true);
 
             SetDefault(OsuSetting.HUDVisibilityMode, HUDVisibilityMode.Always);
             SetDefault(OsuSetting.ShowHealthDisplayWhenCantFail, true);
@@ -201,6 +203,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.HideCountryFlags, false);
 
             SetDefault(OsuSetting.MultiplayerRoomFilter, RoomPermissionsFilter.All);
+            SetDefault(OsuSetting.MultiplayerShowInProgressFilter, true);
 
             SetDefault(OsuSetting.LastProcessedMetadataId, -1);
 
@@ -414,6 +417,7 @@ namespace osu.Game.Configuration
         NotifyOnPrivateMessage,
         UIHoldActivationDelay,
         HitLighting,
+        StarFountains,
         MenuBackgroundSource,
         GameplayDisableWinKey,
         SeasonalBackgroundMode,
@@ -445,6 +449,8 @@ namespace osu.Game.Configuration
         EditorRotationOrigin,
         EditorTimelineShowBreaks,
         EditorAdjustExistingObjectsOnTimingChanges,
-        AlwaysRequireHoldingForPause
+        AlwaysRequireHoldingForPause,
+        MultiplayerShowInProgressFilter,
+        BeatmapListingFeaturedArtistFilter,
     }
 }

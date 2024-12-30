@@ -173,10 +173,10 @@ namespace osu.Game.Rulesets.Mods
             };
             drawable.OnRevertResult += (_, result) =>
             {
-                if (!ratesForRewinding.ContainsKey(result.HitObject)) return;
+                if (!ratesForRewinding.TryGetValue(result.HitObject, out double rate)) return;
                 if (!shouldProcessResult(result)) return;
 
-                recentRates.Insert(0, ratesForRewinding[result.HitObject]);
+                recentRates.Insert(0, rate);
                 ratesForRewinding.Remove(result.HitObject);
 
                 recentRates.RemoveAt(recentRates.Count - 1);

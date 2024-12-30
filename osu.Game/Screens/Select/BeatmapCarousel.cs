@@ -29,7 +29,6 @@ using osu.Game.Input.Bindings;
 using osu.Game.Screens.Select.Carousel;
 using osuTK;
 using osuTK.Input;
-using Realms;
 
 namespace osu.Game.Screens.Select
 {
@@ -113,27 +112,13 @@ namespace osu.Game.Screens.Select
         [Resolved]
         private RealmAccess realm { get; set; } = null!;
 
-        [Resolved]
-        private DetachedBeatmapStore? detachedBeatmapStore { get; set; }
-
         private IBindableList<BeatmapSetInfo>? detachedBeatmapSets;
 
         private readonly NoResultsPlaceholder noResultsPlaceholder;
 
         private IEnumerable<CarouselBeatmapSet> beatmapSets => root.Items.OfType<CarouselBeatmapSet>();
 
-        internal IEnumerable<BeatmapSetInfo> BeatmapSets
-        {
-            get => beatmapSets.Select(g => g.BeatmapSet);
-            set
-            {
-                if (LoadState != LoadState.NotLoaded)
-                    throw new InvalidOperationException("If not using a realm source, beatmap sets must be set before load.");
-
-                detachedBeatmapSets = new BindableList<BeatmapSetInfo>(value);
-                Schedule(loadNewRoot);
-            }
-        }
+        internal IEnumerable<BeatmapSetInfo> BeatmapSets => beatmapSets.Select(g => g.BeatmapSet);
 
         private void loadNewRoot()
         {
@@ -207,8 +192,6 @@ namespace osu.Game.Screens.Select
 
         private CarouselRoot root;
 
-        private IDisposable? subscriptionBeatmaps;
-
         private readonly DrawablePool<DrawableCarouselBeatmapSet> setPool = new DrawablePool<DrawableCarouselBeatmapSet>(100);
 
         private Sample? spinSample;
@@ -237,7 +220,7 @@ namespace osu.Game.Screens.Select
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config, AudioManager audio, CancellationToken? cancellationToken)
+        private void load(OsuConfigManager config, AudioManager audio, BeatmapStore beatmaps, CancellationToken? cancellationToken)
         {
             spinSample = audio.Samples.Get("SongSelect/random-spin");
             randomSelectSample = audio.Samples.Get(@"SongSelect/select-random");
@@ -247,22 +230,9 @@ namespace osu.Game.Screens.Select
 
             RightClickScrollingEnabled.BindValueChanged(enabled => Scroll.RightMouseScrollbar = enabled.NewValue, true);
 
-            if (detachedBeatmapStore != null && detachedBeatmapSets == null)
-            {
-                // This is performing an unnecessary second lookup on realm (in addition to the subscription), but for performance reasons
-                // we require it to be separate: the subscription's initial callback (with `ChangeSet` of `null`) will run on the update
-                // thread. If we attempt to detach beatmaps in this callback the game will fall over (it takes time).
-                detachedBeatmapSets = detachedBeatmapStore.GetDetachedBeatmaps(cancellationToken);
-                detachedBeatmapSets.BindCollectionChanged(beatmapSetsChanged);
-                loadNewRoot();
-            }
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            subscriptionBeatmaps = realm.RegisterForNotifications(r => r.All<BeatmapInfo>().Where(b => !b.Hidden), beatmapsChanged);
+            detachedBeatmapSets = beatmaps.GetBeatmapSets(cancellationToken);
+            detachedBeatmapSets.BindCollectionChanged(beatmapSetsChanged);
+            loadNewRoot();
         }
 
         private readonly HashSet<BeatmapSetInfo> setsRequiringUpdate = new HashSet<BeatmapSetInfo>();
@@ -364,35 +334,6 @@ namespace osu.Game.Screens.Select
             setsRequiringUpdate.Clear();
 
             BeatmapSetInfo? fetchFromID(Guid id) => realm.Realm.Find<BeatmapSetInfo>(id);
-        }
-
-        private void beatmapsChanged(IRealmCollection<BeatmapInfo> sender, ChangeSet? changes)
-        {
-            // we only care about actual changes in hidden status.
-            if (changes == null)
-                return;
-
-            bool changed = false;
-
-            foreach (int i in changes.InsertedIndices)
-            {
-                var beatmapInfo = sender[i];
-                var beatmapSet = beatmapInfo.BeatmapSet;
-
-                Debug.Assert(beatmapSet != null);
-
-                // Only require to action here if the beatmap is missing.
-                // This avoids processing these events unnecessarily when new beatmaps are imported, for example.
-                if (root.BeatmapSetsByID.TryGetValue(beatmapSet.ID, out var existingSets)
-                    && existingSets.SelectMany(s => s.Beatmaps).All(b => b.BeatmapInfo.ID != beatmapInfo.ID))
-                {
-                    updateBeatmapSet(beatmapSet.Detach());
-                    changed = true;
-                }
-            }
-
-            if (changed)
-                invalidateAfterChange();
         }
 
         public void RemoveBeatmapSet(BeatmapSetInfo beatmapSet) => Schedule(() =>
@@ -1291,13 +1232,6 @@ namespace osu.Game.Screens.Select
 
                 return ScrollableExtent * ((scrollbarPosition - top_padding) / (ScrollbarMovementExtent - (top_padding + bottom_padding)));
             }
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-
-            subscriptionBeatmaps?.Dispose();
         }
     }
 }
