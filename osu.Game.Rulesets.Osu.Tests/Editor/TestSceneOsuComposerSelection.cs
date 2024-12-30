@@ -346,6 +346,36 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             AddUntilStep("slider path has 2 nodes", () => EditorBeatmap.HitObjects.OfType<Slider>().Single().Path.ControlPoints.Count, () => Is.EqualTo(2));
         }
 
+        [Test]
+        public void TestSliderDragMarkerDoesNotBlockControlPointContextMenu()
+        {
+            var slider = new Slider
+            {
+                StartTime = 0,
+                Position = new Vector2(100, 100),
+                Path = new SliderPath
+                {
+                    ControlPoints =
+                    {
+                        new PathControlPoint { Type = PathType.LINEAR },
+                        new PathControlPoint(new Vector2(50, 100)),
+                        new PathControlPoint(new Vector2(145, 100)),
+                    },
+                    ExpectedDistance = { Value = 162.62 }
+                },
+            };
+            AddStep("add slider", () => EditorBeatmap.Add(slider));
+            AddStep("select slider", () => EditorBeatmap.SelectedHitObjects.Add(slider));
+
+            AddStep("select last node", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<PathControlPointPiece<Slider>>().Last());
+                InputManager.Click(MouseButton.Left);
+            });
+            AddStep("right click node", () => InputManager.Click(MouseButton.Right));
+            AddUntilStep("context menu open", () => this.ChildrenOfType<ContextMenuContainer>().Single().ChildrenOfType<Menu>().All(m => m.State == MenuState.Open));
+        }
+
         private ComposeBlueprintContainer blueprintContainer
             => Editor.ChildrenOfType<ComposeBlueprintContainer>().First();
 
