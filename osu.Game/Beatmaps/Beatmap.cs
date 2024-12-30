@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps.ControlPoints;
 using Newtonsoft.Json;
+using osu.Framework.Lists;
 using osu.Game.IO.Serialization.Converters;
 
 namespace osu.Game.Beatmaps
@@ -61,7 +62,7 @@ namespace osu.Game.Beatmaps
 
         public ControlPointInfo ControlPointInfo { get; set; } = new ControlPointInfo();
 
-        public List<BreakPeriod> Breaks { get; set; } = new List<BreakPeriod>();
+        public SortedList<BreakPeriod> Breaks { get; set; } = new SortedList<BreakPeriod>(Comparer<BreakPeriod>.Default);
 
         public List<string> UnhandledEventLines { get; set; } = new List<string>();
 
@@ -113,6 +114,32 @@ namespace osu.Game.Beatmaps
 
             return mostCommon.beatLength;
         }
+
+        public double AudioLeadIn { get; set; }
+
+        public float StackLeniency { get; set; } = 0.7f;
+
+        public bool SpecialStyle { get; set; }
+
+        public bool LetterboxInBreaks { get; set; }
+
+        public bool WidescreenStoryboard { get; set; } = true;
+
+        public bool EpilepsyWarning { get; set; }
+
+        public bool SamplesMatchPlaybackRate { get; set; }
+
+        public double DistanceSpacing { get; set; } = 1.0;
+
+        public int GridSize { get; set; }
+
+        public double TimelineZoom { get; set; } = 1.0;
+
+        public CountdownType Countdown { get; set; } = CountdownType.None;
+
+        public int CountdownOffset { get; set; }
+
+        public int[] Bookmarks { get; set; } = Array.Empty<int>();
 
         IBeatmap IBeatmap.Clone() => Clone();
 

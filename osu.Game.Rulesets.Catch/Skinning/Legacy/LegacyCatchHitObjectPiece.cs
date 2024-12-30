@@ -85,9 +85,25 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 
         protected void SetTexture(Texture? texture, Texture? overlayTexture)
         {
-            colouredSprite.Texture = texture;
-            overlaySprite.Texture = overlayTexture;
-            hyperSprite.Texture = texture;
+            // Sizes are reset due to an arguable osu!framework bug where Sprite retains the size of the first set texture.
+
+            if (colouredSprite.Texture != texture)
+            {
+                colouredSprite.Size = Vector2.Zero;
+                colouredSprite.Texture = texture;
+            }
+
+            if (overlaySprite.Texture != overlayTexture)
+            {
+                overlaySprite.Size = Vector2.Zero;
+                overlaySprite.Texture = overlayTexture;
+            }
+
+            if (hyperSprite.Texture != texture)
+            {
+                hyperSprite.Size = Vector2.Zero;
+                hyperSprite.Texture = texture;
+            }
         }
     }
 }

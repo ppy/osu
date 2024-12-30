@@ -157,6 +157,7 @@ namespace osu.Game.Overlays.Login
                         },
                     };
 
+                    updateDropdownCurrent(status.Value);
                     dropdown.Current.BindValueChanged(action =>
                     {
                         switch (action.NewValue)
@@ -216,7 +217,7 @@ namespace osu.Game.Overlays.Login
 
         protected override void OnFocus(FocusEvent e)
         {
-            if (form != null) GetContainingFocusManager().ChangeFocus(form);
+            if (form != null) GetContainingFocusManager()!.ChangeFocus(form);
             base.OnFocus(e);
         }
     }

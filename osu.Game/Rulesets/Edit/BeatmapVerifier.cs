@@ -46,6 +46,9 @@ namespace osu.Game.Rulesets.Edit
 
             // Events
             new CheckBreaks(),
+
+            // Metadata
+            new CheckTitleMarkers(),
         };
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)

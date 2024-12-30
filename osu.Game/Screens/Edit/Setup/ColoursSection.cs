@@ -6,30 +6,70 @@ using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
+using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Edit.Setup
 {
-    internal partial class ColoursSection : SetupSection
+    public partial class ColoursSection : SetupSection
     {
         public override LocalisableString Title => EditorSetupStrings.ColoursHeader;
 
-        private LabelledColourPalette comboColours = null!;
+        private FormColourPalette comboColours = null!;
 
         [BackgroundDependencyLoader]
         private void load()
         {
             Children = new Drawable[]
             {
-                comboColours = new LabelledColourPalette
+                comboColours = new FormColourPalette
                 {
-                    Label = EditorSetupStrings.HitCircleSliderCombos,
-                    FixedLabelWidth = LABEL_WIDTH,
-                    ColourNamePrefix = EditorSetupStrings.ComboColourPrefix
+                    Caption = EditorSetupStrings.HitCircleSliderCombos,
                 }
             };
+        }
 
+        private bool syncingColours;
+
+        protected override void LoadComplete()
+        {
             if (Beatmap.BeatmapSkin != null)
-                comboColours.Colours.BindTo(Beatmap.BeatmapSkin.ComboColours);
+                comboColours.Colours.AddRange(Beatmap.BeatmapSkin.ComboColours);
+
+            if (comboColours.Colours.Count == 0)
+            {
+                // compare ctor of `EditorBeatmapSkin`
+                for (int i = 0; i < SkinConfiguration.DefaultComboColours.Count; ++i)
+                    comboColours.Colours.Add(SkinConfiguration.DefaultComboColours[(i + 1) % SkinConfiguration.DefaultComboColours.Count]);
+            }
+
+            comboColours.Colours.BindCollectionChanged((_, _) =>
+            {
+                if (Beatmap.BeatmapSkin != null)
+                {
+                    if (syncingColours)
+                        return;
+
+                    syncingColours = true;
+
+                    Beatmap.BeatmapSkin.ComboColours.Clear();
+                    Beatmap.BeatmapSkin.ComboColours.AddRange(comboColours.Colours);
+
+                    syncingColours = false;
+                }
+            });
+
+            Beatmap.BeatmapSkin?.ComboColours.BindCollectionChanged((_, _) =>
+            {
+                if (syncingColours)
+                    return;
+
+                syncingColours = true;
+
+                comboColours.Colours.Clear();
+                comboColours.Colours.AddRange(Beatmap.BeatmapSkin?.ComboColours);
+
+                syncingColours = false;
+            });
         }
     }
 }

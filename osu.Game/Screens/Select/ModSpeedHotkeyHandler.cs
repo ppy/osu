@@ -27,6 +27,7 @@ namespace osu.Game.Screens.Select
         private OnScreenDisplay? onScreenDisplay { get; set; }
 
         private ModRateAdjust? lastActiveRateAdjustMod;
+        private ModSettingChangeTracker? settingChangeTracker;
 
         protected override void LoadComplete()
         {
@@ -34,8 +35,17 @@ namespace osu.Game.Screens.Select
 
             selectedMods.BindValueChanged(val =>
             {
-                lastActiveRateAdjustMod = val.NewValue.OfType<ModRateAdjust>().SingleOrDefault() ?? lastActiveRateAdjustMod;
+                storeLastActiveRateAdjustMod();
+
+                settingChangeTracker?.Dispose();
+                settingChangeTracker = new ModSettingChangeTracker(val.NewValue);
+                settingChangeTracker.SettingChanged += _ => storeLastActiveRateAdjustMod();
             }, true);
+        }
+
+        private void storeLastActiveRateAdjustMod()
+        {
+            lastActiveRateAdjustMod = (ModRateAdjust?)selectedMods.Value.OfType<ModRateAdjust>().SingleOrDefault()?.DeepClone() ?? lastActiveRateAdjustMod;
         }
 
         public bool ChangeSpeed(double delta, IEnumerable<Mod> availableMods)

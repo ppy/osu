@@ -88,6 +88,21 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddAssert("trail is disjoint", () => this.ChildrenOfType<LegacyCursorTrail>().Single().DisjointTrail, () => Is.True);
         }
 
+        [Test]
+        public void TestClickExpand()
+        {
+            createTest(() => new Container
+            {
+                RelativeSizeAxes = Axes.Both,
+                Scale = new Vector2(10),
+                Child = new CursorTrail(),
+            });
+
+            AddStep("expand", () => this.ChildrenOfType<CursorTrail>().Single().NewPartScale = new Vector2(3));
+            AddWaitStep("let the cursor trail draw a bit", 5);
+            AddStep("contract", () => this.ChildrenOfType<CursorTrail>().Single().NewPartScale = Vector2.One);
+        }
+
         private void createTest(Func<Drawable> createContent) => AddStep("create trail", () =>
         {
             Clear();

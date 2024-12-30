@@ -100,14 +100,15 @@ namespace osu.Game.Storyboards.Drawables
                 skinSourceChanged();
             }
             else
-                Texture = textureStore.Get(Sprite.Path);
+                Texture = textureStore.Get(Sprite.Path, WrapMode.ClampToEdge, WrapMode.ClampToEdge);
 
             Sprite.ApplyTransforms(this);
         }
 
         private void skinSourceChanged()
         {
-            Texture = skin.GetTexture(Sprite.Path) ?? textureStore.Get(Sprite.Path);
+            Texture = skin.GetTexture(Sprite.Path, WrapMode.ClampToEdge, WrapMode.ClampToEdge) ??
+                      textureStore.Get(Sprite.Path, WrapMode.ClampToEdge, WrapMode.ClampToEdge);
 
             // Setting texture will only update the size if it's zero.
             // So let's force an explicit update.

@@ -11,19 +11,33 @@ using osu.Game.Rulesets;
 namespace osu.Game.Skinning
 {
     /// <summary>
-    /// A serialisable model describing layout of a <see cref="SkinComponentsContainer"/>.
-    /// May contain multiple configurations for different rulesets, each of which should manifest their own <see cref="SkinComponentsContainer"/> as required.
+    /// A serialisable model describing layout of a <see cref="SkinnableContainer"/>.
+    /// May contain multiple configurations for different rulesets, each of which should manifest their own <see cref="SkinnableContainer"/> as required.
     /// </summary>
     [Serializable]
     public class SkinLayoutInfo
     {
         private const string global_identifier = @"global";
 
-        [JsonIgnore]
-        public IEnumerable<SerialisedDrawableInfo> AllDrawables => DrawableInfo.Values.SelectMany(v => v);
+        /// <summary>
+        /// Latest version representing the schema of the skin layout.
+        /// </summary>
+        /// <remarks>
+        /// <list type="bullet">
+        /// <item><description>0: Initial version of all skin layouts.</description></item>
+        /// <item><description>1: Moves existing combo counters from global to per-ruleset HUD targets.</description></item>
+        /// </list>
+        /// </remarks>
+        public const int LATEST_VERSION = 1;
+
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
+        public int Version = LATEST_VERSION;
 
         [JsonProperty]
         public Dictionary<string, SerialisedDrawableInfo[]> DrawableInfo { get; set; } = new Dictionary<string, SerialisedDrawableInfo[]>();
+
+        [JsonIgnore]
+        public IEnumerable<SerialisedDrawableInfo> AllDrawables => DrawableInfo.Values.SelectMany(v => v);
 
         public bool TryGetDrawableInfo(RulesetInfo? ruleset, [NotNullWhen(true)] out SerialisedDrawableInfo[]? components) =>
             DrawableInfo.TryGetValue(ruleset?.ShortName ?? global_identifier, out components);

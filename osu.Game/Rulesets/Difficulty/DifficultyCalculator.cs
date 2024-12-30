@@ -10,6 +10,7 @@ using System.Threading;
 using JetBrains.Annotations;
 using osu.Framework.Audio.Track;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Lists;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Timing;
@@ -109,26 +110,24 @@ namespace osu.Game.Rulesets.Difficulty
             var progressiveBeatmap = new ProgressiveCalculationBeatmap(Beatmap);
             var difficultyObjects = getDifficultyHitObjects().ToArray();
 
-            foreach (var obj in difficultyObjects)
+            int currentIndex = 0;
+
+            foreach (var obj in Beatmap.HitObjects)
             {
-                // Implementations expect the progressive beatmap to only contain top-level objects from the original beatmap.
-                // At the same time, we also need to consider the possibility DHOs may not be generated for any given object,
-                // so we'll add all remaining objects up to the current point in time to the progressive beatmap.
-                for (int i = progressiveBeatmap.HitObjects.Count; i < Beatmap.HitObjects.Count; i++)
-                {
-                    if (obj != difficultyObjects[^1] && Beatmap.HitObjects[i].StartTime > obj.BaseObject.StartTime)
-                        break;
+                progressiveBeatmap.HitObjects.Add(obj);
 
-                    progressiveBeatmap.HitObjects.Add(Beatmap.HitObjects[i]);
+                while (currentIndex < difficultyObjects.Length && difficultyObjects[currentIndex].BaseObject.GetEndTime() <= obj.GetEndTime())
+                {
+                    foreach (var skill in skills)
+                    {
+                        cancellationToken.ThrowIfCancellationRequested();
+                        skill.Process(difficultyObjects[currentIndex]);
+                    }
+
+                    currentIndex++;
                 }
 
-                foreach (var skill in skills)
-                {
-                    cancellationToken.ThrowIfCancellationRequested();
-                    skill.Process(obj);
-                }
-
-                attribs.Add(new TimedDifficultyAttributes(obj.EndTime * clockRate, CreateDifficultyAttributes(progressiveBeatmap, playableMods, skills, clockRate)));
+                attribs.Add(new TimedDifficultyAttributes(obj.GetEndTime(), CreateDifficultyAttributes(progressiveBeatmap, playableMods, skills, clockRate)));
             }
 
             return attribs;
@@ -329,13 +328,96 @@ namespace osu.Game.Rulesets.Difficulty
                 set => baseBeatmap.Difficulty = value;
             }
 
-            public List<BreakPeriod> Breaks => baseBeatmap.Breaks;
+            public SortedList<BreakPeriod> Breaks
+            {
+                get => baseBeatmap.Breaks;
+                set => baseBeatmap.Breaks = value;
+            }
+
             public List<string> UnhandledEventLines => baseBeatmap.UnhandledEventLines;
 
             public double TotalBreakTime => baseBeatmap.TotalBreakTime;
             public IEnumerable<BeatmapStatistic> GetStatistics() => baseBeatmap.GetStatistics();
             public double GetMostCommonBeatLength() => baseBeatmap.GetMostCommonBeatLength();
             public IBeatmap Clone() => new ProgressiveCalculationBeatmap(baseBeatmap.Clone());
+
+            public double AudioLeadIn
+            {
+                get => baseBeatmap.AudioLeadIn;
+                set => baseBeatmap.AudioLeadIn = value;
+            }
+
+            public float StackLeniency
+            {
+                get => baseBeatmap.StackLeniency;
+                set => baseBeatmap.StackLeniency = value;
+            }
+
+            public bool SpecialStyle
+            {
+                get => baseBeatmap.SpecialStyle;
+                set => baseBeatmap.SpecialStyle = value;
+            }
+
+            public bool LetterboxInBreaks
+            {
+                get => baseBeatmap.LetterboxInBreaks;
+                set => baseBeatmap.LetterboxInBreaks = value;
+            }
+
+            public bool WidescreenStoryboard
+            {
+                get => baseBeatmap.WidescreenStoryboard;
+                set => baseBeatmap.WidescreenStoryboard = value;
+            }
+
+            public bool EpilepsyWarning
+            {
+                get => baseBeatmap.EpilepsyWarning;
+                set => baseBeatmap.EpilepsyWarning = value;
+            }
+
+            public bool SamplesMatchPlaybackRate
+            {
+                get => baseBeatmap.SamplesMatchPlaybackRate;
+                set => baseBeatmap.SamplesMatchPlaybackRate = value;
+            }
+
+            public double DistanceSpacing
+            {
+                get => baseBeatmap.DistanceSpacing;
+                set => baseBeatmap.DistanceSpacing = value;
+            }
+
+            public int GridSize
+            {
+                get => baseBeatmap.GridSize;
+                set => baseBeatmap.GridSize = value;
+            }
+
+            public double TimelineZoom
+            {
+                get => baseBeatmap.TimelineZoom;
+                set => baseBeatmap.TimelineZoom = value;
+            }
+
+            public CountdownType Countdown
+            {
+                get => baseBeatmap.Countdown;
+                set => baseBeatmap.Countdown = value;
+            }
+
+            public int CountdownOffset
+            {
+                get => baseBeatmap.CountdownOffset;
+                set => baseBeatmap.CountdownOffset = value;
+            }
+
+            public int[] Bookmarks
+            {
+                get => baseBeatmap.Bookmarks;
+                set => baseBeatmap.Bookmarks = value;
+            }
 
             #endregion
         }

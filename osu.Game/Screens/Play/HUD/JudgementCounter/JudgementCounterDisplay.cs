@@ -126,7 +126,7 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
             }
         }
 
-        private JudgementCounter createCounter(JudgementCountController.JudgementCount info) =>
+        private JudgementCounter createCounter(JudgementCount info) =>
             new JudgementCounter(info)
             {
                 State = { Value = Visibility.Hidden },

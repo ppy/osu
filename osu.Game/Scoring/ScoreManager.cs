@@ -15,10 +15,10 @@ using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.IO.Archives;
+using osu.Game.Online.API;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Online.API;
 using osu.Game.Scoring.Legacy;
 
 namespace osu.Game.Scoring
@@ -78,7 +78,7 @@ namespace osu.Game.Scoring
         /// Perform a lookup query on available <see cref="ScoreInfo"/>s.
         /// </summary>
         /// <param name="query">The query.</param>
-        /// <returns>The first result for the provided query, or null if no results were found.</returns>
+        /// <returns>The first result for the provided query in its detached form, or null if no results were found.</returns>
         public ScoreInfo? Query(Expression<Func<ScoreInfo, bool>> query)
         {
             return Realm.Run(r => r.All<ScoreInfo>().FirstOrDefault(query)?.Detach());
@@ -88,8 +88,14 @@ namespace osu.Game.Scoring
         {
             ScoreInfo? databasedScoreInfo = null;
 
-            if (originalScoreInfo is ScoreInfo scoreInfo && !string.IsNullOrEmpty(scoreInfo.Hash))
-                databasedScoreInfo = Query(s => s.Hash == scoreInfo.Hash);
+            if (originalScoreInfo is ScoreInfo scoreInfo)
+            {
+                if (scoreInfo.IsManaged)
+                    return scoreInfo.Detach();
+
+                if (!string.IsNullOrEmpty(scoreInfo.Hash))
+                    databasedScoreInfo = Query(s => s.Hash == scoreInfo.Hash);
+            }
 
             if (originalScoreInfo.OnlineID > 0)
                 databasedScoreInfo ??= Query(s => s.OnlineID == originalScoreInfo.OnlineID);
@@ -214,6 +220,7 @@ namespace osu.Game.Scoring
         }
 
         public Task<Live<ScoreInfo>?> ImportAsUpdate(ProgressNotification notification, ImportTask task, ScoreInfo original) => scoreImporter.ImportAsUpdate(notification, task, original);
+        public Task<ExternalEditOperation<ScoreInfo>> BeginExternalEditing(ScoreInfo model) => scoreImporter.BeginExternalEditing(model);
 
         public Live<ScoreInfo>? Import(ScoreInfo item, ArchiveReader? archive = null, ImportParameters parameters = default, CancellationToken cancellationToken = default) =>
             scoreImporter.ImportModel(item, archive, parameters, cancellationToken);

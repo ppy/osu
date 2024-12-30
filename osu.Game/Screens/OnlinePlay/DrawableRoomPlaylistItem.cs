@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -49,26 +47,28 @@ namespace osu.Game.Screens.OnlinePlay
 
         private const float icon_height = 34;
 
+        private const float border_thickness = 3;
+
         /// <summary>
         /// Invoked when this item requests to be deleted.
         /// </summary>
-        public Action<PlaylistItem> RequestDeletion;
+        public Action<PlaylistItem>? RequestDeletion;
 
         /// <summary>
         /// Invoked when this item requests its results to be shown.
         /// </summary>
-        public Action<PlaylistItem> RequestResults;
+        public Action<PlaylistItem>? RequestResults;
 
         /// <summary>
         /// Invoked when this item requests to be edited.
         /// </summary>
-        public Action<PlaylistItem> RequestEdit;
+        public Action<PlaylistItem>? RequestEdit;
 
         /// <summary>
         /// The currently-selected item, used to show a border around this item.
         /// May be updated by this item if <see cref="AllowSelection"/> is <c>true</c>.
         /// </summary>
-        public readonly Bindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();
+        public readonly Bindable<PlaylistItem?> SelectedItem = new Bindable<PlaylistItem?>();
 
         public readonly PlaylistItem Item;
 
@@ -77,48 +77,48 @@ namespace osu.Game.Screens.OnlinePlay
         private readonly DelayedLoadWrapper onScreenLoader = new DelayedLoadWrapper(Empty) { RelativeSizeAxes = Axes.Both };
         private readonly IBindable<bool> valid = new Bindable<bool>();
 
-        private IBeatmapInfo beatmap;
-        private IRulesetInfo ruleset;
+        private IBeatmapInfo? beatmap;
+        private IRulesetInfo? ruleset;
         private Mod[] requiredMods = Array.Empty<Mod>();
 
-        private Container maskingContainer;
-        private FillFlowContainer difficultyIconContainer;
-        private LinkFlowContainer beatmapText;
-        private LinkFlowContainer authorText;
-        private ExplicitContentBeatmapBadge explicitContent;
-        private ModDisplay modDisplay;
-        private FillFlowContainer buttonsFlow;
-        private UpdateableAvatar ownerAvatar;
-        private Drawable showResultsButton;
-        private Drawable editButton;
-        private Drawable removeButton;
-        private PanelBackground panelBackground;
-        private FillFlowContainer mainFillFlow;
-        private BeatmapCardThumbnail thumbnail;
+        private Container? borderContainer;
+        private FillFlowContainer? difficultyIconContainer;
+        private LinkFlowContainer? beatmapText;
+        private LinkFlowContainer? authorText;
+        private ExplicitContentBeatmapBadge? explicitContent;
+        private ModDisplay? modDisplay;
+        private FillFlowContainer? buttonsFlow;
+        private UpdateableAvatar? ownerAvatar;
+        private Drawable? showResultsButton;
+        private Drawable? editButton;
+        private Drawable? removeButton;
+        private PanelBackground? panelBackground;
+        private FillFlowContainer? mainFillFlow;
+        private BeatmapCardThumbnail? thumbnail;
 
         [Resolved]
-        private RealmAccess realm { get; set; }
+        private RealmAccess realm { get; set; } = null!;
 
         [Resolved]
-        private RulesetStore rulesets { get; set; }
+        private RulesetStore rulesets { get; set; } = null!;
 
         [Resolved]
-        private BeatmapManager beatmaps { get; set; }
+        private BeatmapManager beatmaps { get; set; } = null!;
 
         [Resolved]
-        private OsuColour colours { get; set; }
+        private OsuColour colours { get; set; } = null!;
 
         [Resolved]
-        private UserLookupCache userLookupCache { get; set; }
+        private UserLookupCache userLookupCache { get; set; } = null!;
 
         [Resolved]
-        private BeatmapLookupCache beatmapLookupCache { get; set; }
+        private BeatmapLookupCache beatmapLookupCache { get; set; } = null!;
 
         [Resolved(CanBeNull = true)]
-        private BeatmapSetOverlay beatmapOverlay { get; set; }
+        private BeatmapSetOverlay? beatmapOverlay { get; set; }
 
         [Resolved(CanBeNull = true)]
-        private ManageCollectionsDialog manageCollectionsDialog { get; set; }
+        private ManageCollectionsDialog? manageCollectionsDialog { get; set; }
 
         public DrawableRoomPlaylistItem(PlaylistItem item)
             : base(item)
@@ -134,7 +134,8 @@ namespace osu.Game.Screens.OnlinePlay
         [BackgroundDependencyLoader]
         private void load()
         {
-            maskingContainer.BorderColour = colours.Yellow;
+            if (borderContainer != null)
+                borderContainer.BorderColour = colours.Yellow;
 
             ruleset = rulesets.GetRuleset(Item.RulesetID);
             var rulesetInstance = ruleset?.CreateInstance();
@@ -161,7 +162,8 @@ namespace osu.Game.Screens.OnlinePlay
                     return;
                 }
 
-                maskingContainer.BorderThickness = IsSelectedItem ? 5 : 0;
+                if (borderContainer != null)
+                    borderContainer.BorderThickness = IsSelectedItem ? border_thickness : 0;
             }, true);
 
             valid.BindValueChanged(_ => Scheduler.AddOnce(refresh));
@@ -175,7 +177,11 @@ namespace osu.Game.Screens.OnlinePlay
                         if (showItemOwner)
                         {
                             var foundUser = await userLookupCache.GetUserAsync(Item.OwnerID).ConfigureAwait(false);
-                            Schedule(() => ownerAvatar.User = foundUser);
+                            Schedule(() =>
+                            {
+                                if (ownerAvatar != null)
+                                    ownerAvatar.User = foundUser;
+                            });
                         }
 
                         beatmap = await beatmapLookupCache.GetBeatmapAsync(Item.Beatmap.OnlineID).ConfigureAwait(false);
@@ -276,67 +282,89 @@ namespace osu.Game.Screens.OnlinePlay
 
         private void refresh()
         {
-            if (!valid.Value)
+            if (borderContainer != null)
             {
-                maskingContainer.BorderThickness = 5;
-                maskingContainer.BorderColour = colours.Red;
-            }
-
-            if (beatmap != null)
-            {
-                difficultyIconContainer.Children = new Drawable[]
+                if (!valid.Value)
                 {
-                    thumbnail = new BeatmapCardThumbnail(beatmap.BeatmapSet!, (IBeatmapSetOnlineInfo)beatmap.BeatmapSet!)
-                    {
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
-                        Width = 60,
-                        RelativeSizeAxes = Axes.Y,
-                        Dimmed = { Value = IsHovered }
-                    },
-                    new DifficultyIcon(beatmap, ruleset, requiredMods)
-                    {
-                        Size = new Vector2(icon_height),
-                        TooltipType = DifficultyIconTooltipType.Extended,
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
-                    },
-                };
+                    borderContainer.BorderThickness = border_thickness;
+                    borderContainer.BorderColour = colours.Red;
+                }
             }
-            else
-                difficultyIconContainer.Clear();
 
-            panelBackground.Beatmap.Value = beatmap;
-
-            beatmapText.Clear();
-
-            if (beatmap != null)
+            if (difficultyIconContainer != null)
             {
-                beatmapText.AddLink(beatmap.GetDisplayTitleRomanisable(includeCreator: false),
-                    LinkAction.OpenBeatmap,
-                    beatmap.OnlineID.ToString(),
-                    null,
-                    text =>
+                if (beatmap != null)
+                {
+                    difficultyIconContainer.Children = new Drawable[]
                     {
-                        text.Truncate = true;
-                    });
+                        thumbnail = new BeatmapCardThumbnail(beatmap.BeatmapSet!, (IBeatmapSetOnlineInfo)beatmap.BeatmapSet!)
+                        {
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            Width = 60,
+                            Masking = true,
+                            CornerRadius = 10,
+                            RelativeSizeAxes = Axes.Y,
+                            Dimmed = { Value = IsHovered }
+                        },
+                        new DifficultyIcon(beatmap, ruleset, requiredMods)
+                        {
+                            Size = new Vector2(24),
+                            TooltipType = DifficultyIconTooltipType.Extended,
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                        },
+                    };
+                }
+                else
+                    difficultyIconContainer.Clear();
             }
 
-            authorText.Clear();
+            if (panelBackground != null)
+                panelBackground.Beatmap.Value = beatmap;
 
-            if (!string.IsNullOrEmpty(beatmap?.Metadata.Author.Username))
+            if (beatmapText != null)
             {
-                authorText.AddText("mapped by ");
-                authorText.AddUserLink(beatmap.Metadata.Author);
+                beatmapText.Clear();
+
+                if (beatmap != null)
+                {
+                    beatmapText.AddLink(beatmap.GetDisplayTitleRomanisable(includeCreator: false),
+                        LinkAction.OpenBeatmap,
+                        beatmap.OnlineID.ToString(),
+                        null,
+                        text =>
+                        {
+                            text.Truncate = true;
+                        });
+                }
             }
 
-            bool hasExplicitContent = (beatmap?.BeatmapSet as IBeatmapSetOnlineInfo)?.HasExplicitContent == true;
-            explicitContent.Alpha = hasExplicitContent ? 1 : 0;
+            if (authorText != null)
+            {
+                authorText.Clear();
 
-            modDisplay.Current.Value = requiredMods.ToArray();
+                if (!string.IsNullOrEmpty(beatmap?.Metadata.Author.Username))
+                {
+                    authorText.AddText("mapped by ");
+                    authorText.AddUserLink(beatmap.Metadata.Author);
+                }
+            }
 
-            buttonsFlow.Clear();
-            buttonsFlow.ChildrenEnumerable = createButtons();
+            if (explicitContent != null)
+            {
+                bool hasExplicitContent = (beatmap?.BeatmapSet as IBeatmapSetOnlineInfo)?.HasExplicitContent == true;
+                explicitContent.Alpha = hasExplicitContent ? 1 : 0;
+            }
+
+            if (modDisplay != null)
+                modDisplay.Current.Value = requiredMods.ToArray();
+
+            if (buttonsFlow != null)
+            {
+                buttonsFlow.Clear();
+                buttonsFlow.ChildrenEnumerable = createButtons();
+            }
 
             difficultyIconContainer.FadeInFromZero(500, Easing.OutQuint);
             mainFillFlow.FadeInFromZero(500, Easing.OutQuint);
@@ -346,136 +374,153 @@ namespace osu.Game.Screens.OnlinePlay
         {
             Action<SpriteText> fontParameters = s => s.Font = OsuFont.Default.With(size: 14, weight: FontWeight.SemiBold);
 
-            return maskingContainer = new Container
+            return new Container
             {
                 RelativeSizeAxes = Axes.X,
                 Height = HEIGHT,
-                Masking = true,
-                CornerRadius = 10,
                 Children = new Drawable[]
                 {
-                    new Box // A transparent box that forces the border to be drawn if the panel background is opaque
+                    new Container
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Alpha = 0,
-                        AlwaysPresent = true
-                    },
-                    onScreenLoader,
-                    panelBackground = new PanelBackground
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                    },
-                    new GridContainer
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        ColumnDimensions = new[]
+                        Masking = true,
+                        CornerRadius = 10,
+                        Children = new Drawable[]
                         {
-                            new Dimension(GridSizeMode.AutoSize),
-                            new Dimension(),
-                            new Dimension(GridSizeMode.AutoSize),
-                            new Dimension(GridSizeMode.AutoSize)
-                        },
-                        Content = new[]
-                        {
-                            new Drawable[]
+                            onScreenLoader,
+                            panelBackground = new PanelBackground
                             {
-                                difficultyIconContainer = new FillFlowContainer
+                                RelativeSizeAxes = Axes.Both,
+                            },
+                            new GridContainer
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                ColumnDimensions = new[]
                                 {
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.CentreLeft,
-                                    AutoSizeAxes = Axes.X,
-                                    RelativeSizeAxes = Axes.Y,
-                                    Direction = FillDirection.Horizontal,
-                                    Spacing = new Vector2(4),
-                                    Margin = new MarginPadding { Right = 4 },
+                                    new Dimension(GridSizeMode.AutoSize),
+                                    new Dimension(),
+                                    new Dimension(GridSizeMode.AutoSize),
+                                    new Dimension(GridSizeMode.AutoSize)
                                 },
-                                mainFillFlow = new MainFlow(() => SelectedItem.Value == Model || !AllowSelection)
+                                Content = new[]
                                 {
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.CentreLeft,
-                                    AutoSizeAxes = Axes.Y,
-                                    RelativeSizeAxes = Axes.X,
-                                    Direction = FillDirection.Vertical,
-                                    Children = new Drawable[]
+                                    new Drawable[]
                                     {
-                                        beatmapText = new LinkFlowContainer(fontParameters)
+                                        difficultyIconContainer = new FillFlowContainer
                                         {
-                                            RelativeSizeAxes = Axes.X,
-                                            // workaround to ensure only the first line of text shows, emulating truncation (but without ellipsis at the end).
-                                            // TODO: remove when text/link flow can support truncation with ellipsis natively.
-                                            Height = OsuFont.DEFAULT_FONT_SIZE,
-                                            Masking = true
-                                        },
-                                        new FillFlowContainer
-                                        {
-                                            AutoSizeAxes = Axes.Both,
+                                            Anchor = Anchor.CentreLeft,
+                                            Origin = Anchor.CentreLeft,
+                                            AutoSizeAxes = Axes.X,
+                                            RelativeSizeAxes = Axes.Y,
                                             Direction = FillDirection.Horizontal,
-                                            Spacing = new Vector2(10f, 0),
+                                            Spacing = new Vector2(4),
+                                            Margin = new MarginPadding { Right = 4 },
+                                        },
+                                        mainFillFlow = new MainFlow(() => SelectedItem.Value == Model || !AllowSelection)
+                                        {
+                                            Anchor = Anchor.CentreLeft,
+                                            Origin = Anchor.CentreLeft,
+                                            AutoSizeAxes = Axes.Y,
+                                            RelativeSizeAxes = Axes.X,
+                                            Direction = FillDirection.Vertical,
+                                            Spacing = new Vector2(0, -2),
                                             Children = new Drawable[]
                                             {
+                                                beatmapText = new LinkFlowContainer(fontParameters)
+                                                {
+                                                    RelativeSizeAxes = Axes.X,
+                                                    // workaround to ensure only the first line of text shows, emulating truncation (but without ellipsis at the end).
+                                                    // TODO: remove when text/link flow can support truncation with ellipsis natively.
+                                                    Height = OsuFont.DEFAULT_FONT_SIZE,
+                                                    Masking = true
+                                                },
                                                 new FillFlowContainer
                                                 {
                                                     AutoSizeAxes = Axes.Both,
-                                                    Anchor = Anchor.CentreLeft,
-                                                    Origin = Anchor.CentreLeft,
                                                     Direction = FillDirection.Horizontal,
                                                     Spacing = new Vector2(10f, 0),
                                                     Children = new Drawable[]
                                                     {
-                                                        authorText = new LinkFlowContainer(fontParameters) { AutoSizeAxes = Axes.Both },
-                                                        explicitContent = new ExplicitContentBeatmapBadge
+                                                        new FillFlowContainer
                                                         {
-                                                            Alpha = 0f,
+                                                            AutoSizeAxes = Axes.Both,
                                                             Anchor = Anchor.CentreLeft,
                                                             Origin = Anchor.CentreLeft,
-                                                            Margin = new MarginPadding { Top = 3f },
+                                                            Direction = FillDirection.Horizontal,
+                                                            Spacing = new Vector2(10f, 0),
+                                                            Children = new Drawable[]
+                                                            {
+                                                                authorText = new LinkFlowContainer(fontParameters) { AutoSizeAxes = Axes.Both },
+                                                                explicitContent = new ExplicitContentBeatmapBadge
+                                                                {
+                                                                    Alpha = 0f,
+                                                                    Anchor = Anchor.CentreLeft,
+                                                                    Origin = Anchor.CentreLeft,
+                                                                    Margin = new MarginPadding { Top = 3f },
+                                                                }
+                                                            },
+                                                        },
+                                                        new Container
+                                                        {
+                                                            Anchor = Anchor.CentreLeft,
+                                                            Origin = Anchor.CentreLeft,
+                                                            AutoSizeAxes = Axes.Both,
+                                                            Child = modDisplay = new ModDisplay
+                                                            {
+                                                                Scale = new Vector2(0.4f),
+                                                                ExpansionMode = ExpansionMode.AlwaysExpanded,
+                                                                Margin = new MarginPadding { Vertical = -6 },
+                                                            }
                                                         }
-                                                    },
-                                                },
-                                                new Container
-                                                {
-                                                    Anchor = Anchor.CentreLeft,
-                                                    Origin = Anchor.CentreLeft,
-                                                    AutoSizeAxes = Axes.Both,
-                                                    Child = modDisplay = new ModDisplay
-                                                    {
-                                                        Scale = new Vector2(0.4f),
-                                                        ExpansionMode = ExpansionMode.AlwaysExpanded,
-                                                        Margin = new MarginPadding { Vertical = -6 },
                                                     }
                                                 }
                                             }
-                                        }
+                                        },
+                                        buttonsFlow = new FillFlowContainer
+                                        {
+                                            Anchor = Anchor.CentreRight,
+                                            Origin = Anchor.CentreRight,
+                                            Direction = FillDirection.Horizontal,
+                                            Margin = new MarginPadding { Horizontal = 8 },
+                                            AutoSizeAxes = Axes.Both,
+                                            Spacing = new Vector2(5),
+                                            ChildrenEnumerable = createButtons().Select(button => button.With(b =>
+                                            {
+                                                b.Anchor = Anchor.Centre;
+                                                b.Origin = Anchor.Centre;
+                                            }))
+                                        },
+                                        ownerAvatar = new OwnerAvatar
+                                        {
+                                            Anchor = Anchor.Centre,
+                                            Origin = Anchor.Centre,
+                                            Size = new Vector2(icon_height),
+                                            Margin = new MarginPadding { Right = 8 },
+                                            Masking = true,
+                                            CornerRadius = 4,
+                                            Alpha = ShowItemOwner ? 1 : 0
+                                        },
                                     }
-                                },
-                                buttonsFlow = new FillFlowContainer
-                                {
-                                    Anchor = Anchor.CentreRight,
-                                    Origin = Anchor.CentreRight,
-                                    Direction = FillDirection.Horizontal,
-                                    Margin = new MarginPadding { Horizontal = 8 },
-                                    AutoSizeAxes = Axes.Both,
-                                    Spacing = new Vector2(5),
-                                    ChildrenEnumerable = createButtons().Select(button => button.With(b =>
-                                    {
-                                        b.Anchor = Anchor.Centre;
-                                        b.Origin = Anchor.Centre;
-                                    }))
-                                },
-                                ownerAvatar = new OwnerAvatar
-                                {
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                    Size = new Vector2(icon_height),
-                                    Margin = new MarginPadding { Right = 8 },
-                                    Masking = true,
-                                    CornerRadius = 4,
-                                    Alpha = ShowItemOwner ? 1 : 0
-                                },
-                            }
-                        }
+                                }
+                            },
+                        },
                     },
-                },
+                    borderContainer = new Container
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Masking = true,
+                        CornerRadius = 10,
+                        Children = new Drawable[]
+                        {
+                            new Box // A transparent box that forces the border to be drawn if the panel background is opaque
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Alpha = 0,
+                                AlwaysPresent = true
+                            },
+                        }
+                    }
+                }
             };
         }
 
@@ -509,6 +554,8 @@ namespace osu.Game.Screens.OnlinePlay
         {
             if (thumbnail != null)
                 thumbnail.Dimmed.Value = true;
+
+            panelBackground.FadeColour(OsuColour.Gray(0.7f), BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
             return base.OnHover(e);
         }
 
@@ -516,6 +563,8 @@ namespace osu.Game.Screens.OnlinePlay
         {
             if (thumbnail != null)
                 thumbnail.Dimmed.Value = false;
+
+            panelBackground.FadeColour(OsuColour.Gray(1f), BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
             base.OnHoverLost(e);
         }
 
@@ -576,7 +625,7 @@ namespace osu.Game.Screens.OnlinePlay
             private readonly IBeatmapInfo beatmap;
 
             [Resolved]
-            private BeatmapManager beatmapManager { get; set; }
+            private BeatmapManager beatmapManager { get; set; } = null!;
 
             // required for download tracking, as this button hides itself. can probably be removed with a bit of consideration.
             public override bool IsPresent => true;
@@ -631,7 +680,7 @@ namespace osu.Game.Screens.OnlinePlay
         // For now, this is the same implementation as in PanelBackground, but supports a beatmap info rather than a working beatmap
         private partial class PanelBackground : Container // todo: should be a buffered container (https://github.com/ppy/osu-framework/issues/3222)
         {
-            public readonly Bindable<IBeatmapInfo> Beatmap = new Bindable<IBeatmapInfo>();
+            public readonly Bindable<IBeatmapInfo?> Beatmap = new Bindable<IBeatmapInfo?>();
 
             public PanelBackground()
             {
@@ -642,7 +691,6 @@ namespace osu.Game.Screens.OnlinePlay
                     backgroundSprite = new UpdateableBeatmapBackgroundSprite
                     {
                         RelativeSizeAxes = Axes.Both,
-                        FillMode = FillMode.Fill,
                     },
                     new FillFlowContainer
                     {
@@ -651,7 +699,7 @@ namespace osu.Game.Screens.OnlinePlay
                         Direction = FillDirection.Horizontal,
                         // This makes the gradient not be perfectly horizontal, but diagonal at a ~40° angle
                         Shear = new Vector2(0.8f, 0),
-                        Alpha = 0.5f,
+                        Alpha = 0.6f,
                         Children = new[]
                         {
                             // The left half with no gradient applied

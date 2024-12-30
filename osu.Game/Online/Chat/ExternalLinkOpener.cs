@@ -11,7 +11,7 @@ using osu.Game.Configuration;
 using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Dialog;
-using CommonStrings = osu.Game.Resources.Localisation.Web.CommonStrings;
+using WebCommonStrings = osu.Game.Resources.Localisation.Web.CommonStrings;
 
 namespace osu.Game.Online.Chat
 {
@@ -46,7 +46,7 @@ namespace osu.Game.Online.Chat
         {
             public ExternalLinkDialog(string url, Action openExternalLinkAction, Action copyExternalLinkAction)
             {
-                HeaderText = DialogStrings.Caution;
+                HeaderText = DialogStrings.CautionHeaderText;
                 BodyText = $"Are you sure you want to open the following link in a web browser?\n\n{url}";
 
                 Icon = FontAwesome.Solid.ExclamationTriangle;
@@ -60,12 +60,12 @@ namespace osu.Game.Online.Chat
                     },
                     new PopupDialogCancelButton
                     {
-                        Text = @"Copy URL to the clipboard",
+                        Text = CommonStrings.CopyLink,
                         Action = copyExternalLinkAction
                     },
                     new PopupDialogCancelButton
                     {
-                        Text = CommonStrings.ButtonsCancel,
+                        Text = WebCommonStrings.ButtonsCancel,
                     },
                 };
             }

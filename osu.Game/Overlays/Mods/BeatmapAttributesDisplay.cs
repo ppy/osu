@@ -108,8 +108,6 @@ namespace osu.Game.Overlays.Mods
                 updateValues();
             }, true);
 
-            BeatmapInfo.BindValueChanged(_ => updateValues());
-
             Collapsed.BindValueChanged(_ =>
             {
                 // Only start autosize animations on first collapse toggle. This avoids an ugly initial presentation.
@@ -120,10 +118,30 @@ namespace osu.Game.Overlays.Mods
             GameRuleset = game.Ruleset.GetBoundCopy();
             GameRuleset.BindValueChanged(_ => updateValues());
 
-            BeatmapInfo.BindValueChanged(_ => updateValues());
+            BeatmapInfo.BindValueChanged(_ =>
+            {
+                updateStarDifficultyBindable();
+                updateValues();
+            }, true);
 
-            updateValues();
             updateCollapsedState();
+        }
+
+        private void updateStarDifficultyBindable()
+        {
+            cancellationSource?.Cancel();
+
+            if (BeatmapInfo.Value == null)
+                return;
+
+            starDifficulty = difficultyCache.GetBindableDifficulty(BeatmapInfo.Value, (cancellationSource = new CancellationTokenSource()).Token);
+            starDifficulty.BindValueChanged(s =>
+            {
+                starRatingDisplay.Current.Value = s.NewValue ?? default;
+
+                if (!starRatingDisplay.IsPresent)
+                    starRatingDisplay.FinishTransforms(true);
+            });
         }
 
         protected override bool OnHover(HoverEvent e)
@@ -153,17 +171,6 @@ namespace osu.Game.Overlays.Mods
         {
             if (BeatmapInfo.Value == null)
                 return;
-
-            cancellationSource?.Cancel();
-
-            starDifficulty = difficultyCache.GetBindableDifficulty(BeatmapInfo.Value, (cancellationSource = new CancellationTokenSource()).Token);
-            starDifficulty.BindValueChanged(s =>
-            {
-                starRatingDisplay.Current.Value = s.NewValue ?? default;
-
-                if (!starRatingDisplay.IsPresent)
-                    starRatingDisplay.FinishTransforms(true);
-            });
 
             double rate = ModUtils.CalculateRateWithMods(Mods.Value);
 
