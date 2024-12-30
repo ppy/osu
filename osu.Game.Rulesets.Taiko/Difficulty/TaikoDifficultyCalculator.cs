@@ -123,7 +123,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
             strainLengthBonus = 1
                 + Math.Min(Math.Max((staminaDifficultStrains - 1350) / 5000, 0), 0.15) + Math.Min(Math.Max((staminaRating - 7.0) / 1.0, 0), 0.05)
-                + Math.Min(Math.Max((rhythmRating - 4.25) / 0.75, 0), 0.15) - Math.Min(Math.Max((55 - rhythmDifficultStrains) / 45, 0), 0.10);
+                + Math.Min(Math.Max((rhythmRating - 4.25) / 0.75, 0), 0.15) - Math.Min(Math.Max((65 - rhythmDifficultStrains) / 25, 0), 0.10);
 
             double combinedRating = combinedDifficultyValue(rhythm, reading, colour, stamina, isRelax);
             double starRating = rescale(combinedRating * 1.4);
@@ -218,14 +218,11 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         {
             if (sr < 0) return sr;
 
-            // Base rescaling formula
-            double scaled = 10.43 * Math.Log(sr / 8 + 1);
+            double midrange = 10.43 * Math.Log(sr / 8 + 1);
+            double toprange = 11.6 + Math.Log(Math.Max(midrange - 11, 1));
+            double range = Math.Min(midrange, toprange);
 
-            // Apply tightened spread for star ratings 15+
-            double adjusted = 11.6 + Math.Log(Math.Max(scaled - 11, 1));
-            scaled = Math.Min(scaled, adjusted);
-
-            return scaled;
+            return range;
         }
     }
 }
