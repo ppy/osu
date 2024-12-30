@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             var currentObject = current as TaikoDifficultyHitObject;
             int index = currentObject?.Colour.MonoStreak?.HitObjects.IndexOf(currentObject) ?? 0;
 
-            double monolengthBonus = 1 + Math.Min(Math.Max((index - 5) / 20.0, 0), 0.30);
+            double monolengthBonus = 1 + Math.Min(Math.Max((index - 5) / 50.0, 0), 0.30);
 
             if (singleColourStamina)
                 return (currentStrain) / (1 + Math.Exp(-(index - 10) / 2.0));
