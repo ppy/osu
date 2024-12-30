@@ -3,7 +3,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing;
@@ -34,7 +33,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
                 difficulty += termPenalty(ratio, i, 2, 1);
             }
 
-            difficulty += terms;
+            difficulty += terms / (1 + ratio);
 
             // Give bonus to near-1 ratios
             difficulty += DifficultyCalculationUtils.BellCurve(ratio, 1, 0.7);
@@ -42,68 +41,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
             // Penalize ratios that are VERY near 1
             difficulty -= DifficultyCalculationUtils.BellCurve(ratio, 1, 0.5);
 
+            difficulty = Math.Max(difficulty, 0);
+
             return difficulty / Math.Sqrt(8);
-        }
-
-        /// <summary>
-        /// Determines if the changes in hit object intervals are consistent based on a given threshold.
-        /// </summary>
-        private static double repeatedIntervalPenalty(SameRhythmHitObjects sameRhythmHitObjects, double hitWindow, double threshold = 0.1)
-        {
-            double longIntervalPenalty = sameInterval(sameRhythmHitObjects, 3);
-
-            double shortIntervalPenalty = sameRhythmHitObjects.Children.Count < 6
-                ? sameInterval(sameRhythmHitObjects, 4)
-                : 1.0; // Returns a non-penalty if there are 6 or more notes within an interval.
-
-            // Scale penalties dynamically based on hit object duration relative to hitWindow.
-            double penaltyScaling = Math.Max(1 - sameRhythmHitObjects.Duration / (hitWindow * 2), 0.5);
-
-            return Math.Min(longIntervalPenalty, shortIntervalPenalty) * penaltyScaling;
-
-            double sameInterval(SameRhythmHitObjects startObject, int intervalCount)
-            {
-                List<double?> intervalRatios = new List<double?>();
-                List<double?> intervals = new List<double?>();
-                var currentObject = startObject;
-
-                for (int i = 0; i < intervalCount && currentObject != null; i++)
-                {
-                    intervalRatios.Add(currentObject.HitObjectIntervalRatio);
-                    intervals.Add(currentObject.HitObjectInterval);
-                    currentObject = currentObject.Previous;
-                }
-
-                intervalRatios.RemoveAll(interval => interval == null);
-                intervals.RemoveAll(interval => interval == null);
-
-                if (intervalRatios.Count < intervalCount || intervals.Count < intervalCount)
-                    return 1.0; // No penalty if there aren't enough valid intervals.
-
-                // Check for penalties based on HitObjectIntervalRatio
-                for (int i = 0; i < intervalRatios.Count; i++)
-                {
-                    for (int j = i + 1; j < intervalRatios.Count; j++)
-                    {
-                        double ratio = intervalRatios[i]!.Value / intervalRatios[j]!.Value;
-                        if (Math.Abs(1 - ratio) <= threshold) // If any two ratios are similar
-                            return 0.0;
-                    }
-                }
-
-                // Check for penalties based on HitObjectInterval
-                for (int i = 0; i < intervals.Count; i++)
-                {
-                    for (int j = i + 1; j < intervals.Count; j++)
-                    {
-                        double difference = Math.Abs(intervals[i]!.Value - intervals[j]!.Value);
-                        if (difference <= hitWindow) // If any two intervals are close
-                            return 0.5;
-                    }
-                }
-
-                return 1.0; // No penalty if all intervals are sufficiently different.
-            }
         }
 
         private static double evaluateDifficultyOf(SameRhythmHitObjects sameRhythmHitObjects, double hitWindow)
@@ -126,9 +66,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
                         maxValue: 1);
                 }
             }
-
-            // Apply consistency penalty.
-            intervalDifficulty *= repeatedIntervalPenalty(sameRhythmHitObjects, hitWindow);
 
             // Penalise patterns that can be hit within a single hit window.
             intervalDifficulty *= DifficultyCalculationUtils.Logistic(
@@ -157,7 +94,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
                 difficulty += evaluateDifficultyOf(rhythm.SameRhythmHitObjects, hitWindow);
 
             if (rhythm.SamePatterns?.FirstHitObject == hitObject) // Difficulty for SamePatterns
-                difficulty += 0.5 * evaluateDifficultyOf(rhythm.SamePatterns);
+                difficulty += 1.5 * evaluateDifficultyOf(rhythm.SamePatterns);
 
             return difficulty;
         }
