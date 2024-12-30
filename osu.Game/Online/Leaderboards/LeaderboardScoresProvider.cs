@@ -138,6 +138,7 @@ namespace osu.Game.Online.Leaderboards
         {
             cancelPendingWork();
 
+            UserScore = default;
             scores.Clear();
             SetState(LeaderboardState.Retrieving);
         }
