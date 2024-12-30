@@ -83,7 +83,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
             objectStrain += speedBonus(taikoCurrent.StartTime - previousMono.StartTime);
 
             // Consecutive notes exceeding 100 are buffed slowly, capped at 800 objects.
-            if (consecutiveCount >= 100)
+            if (consecutiveCount >= 200)
             {
                 objectStrain += 0.00025 * Math.Min(consecutiveCount, 600);
             }
