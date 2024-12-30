@@ -21,8 +21,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private double currentStrain;
         private double currentRhythm;
 
-        protected override int ReducedSectionCount => 5;
-
         public Speed(Mod[] mods)
             : base(mods)
         {
