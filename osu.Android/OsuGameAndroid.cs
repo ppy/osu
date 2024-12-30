@@ -71,7 +71,7 @@ namespace osu.Android
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            LoadComponentAsync(new GameplayScreenRotationLocker(), Add);
+            LoadComponentAsync(new AndroidOrientationManager(), Add);
         }
 
         public override void SetHost(GameHost host)

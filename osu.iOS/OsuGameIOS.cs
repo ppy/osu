@@ -28,7 +28,7 @@ namespace osu.iOS
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            Add(new IOSOrientationHandler(appDelegate));
+            LoadComponentAsync(new IOSOrientationManager(appDelegate), Add);
         }
 
         protected override UpdateManager CreateUpdateManager() => new MobileUpdateNotifier();
