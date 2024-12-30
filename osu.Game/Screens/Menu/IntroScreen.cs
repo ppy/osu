@@ -24,6 +24,7 @@ using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Overlays.Volume;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Skinning;
@@ -174,6 +175,8 @@ namespace osu.Game.Screens.Menu
 
                 return UsingThemedIntro = initialBeatmap != null;
             }
+
+            AddInternal(new GlobalScrollAdjustsVolume());
         }
 
         public override void OnEntering(ScreenTransitionEvent e)
@@ -207,7 +210,7 @@ namespace osu.Game.Screens.Menu
                         Text = NotificationsStrings.AudioPlaybackIssue
                     });
                 }
-            }, 5000);
+            }, 8000);
         }
 
         public override void OnResuming(ScreenTransitionEvent e)

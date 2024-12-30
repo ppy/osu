@@ -175,7 +175,7 @@ namespace osu.Desktop
                 presence.State = clampLength(activity.Value.GetStatus(hideIdentifiableInformation));
                 presence.Details = clampLength(activity.Value.GetDetails(hideIdentifiableInformation) ?? string.Empty);
 
-                if (getBeatmapID(activity.Value) is int beatmapId && beatmapId > 0)
+                if (activity.Value.GetBeatmapID(hideIdentifiableInformation) is int beatmapId && beatmapId > 0)
                 {
                     presence.Buttons = new[]
                     {
@@ -331,20 +331,6 @@ namespace osu.Desktop
             password = roomSecret.Password;
 
             return true;
-        }
-
-        private static int? getBeatmapID(UserActivity activity)
-        {
-            switch (activity)
-            {
-                case UserActivity.InGame game:
-                    return game.BeatmapID;
-
-                case UserActivity.EditingBeatmap edit:
-                    return edit.BeatmapID;
-            }
-
-            return null;
         }
 
         protected override void Dispose(bool isDisposing)

@@ -213,7 +213,7 @@ namespace osu.Game.Online.Leaderboards
                     return null;
 
                 default:
-                    throw new ArgumentOutOfRangeException();
+                    throw new ArgumentOutOfRangeException(nameof(state));
             }
         }
 
