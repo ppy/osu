@@ -15,9 +15,12 @@ namespace osu.Game.Rulesets.Mania.UI
 
         private partial class DefaultManiaJudgementPiece : DefaultJudgementPiece
         {
+            private const float judgement_y_position = -180f;
+
             public DefaultManiaJudgementPiece(HitResult result)
                 : base(result)
             {
+                Y = judgement_y_position;
             }
 
             protected override void LoadComplete()
