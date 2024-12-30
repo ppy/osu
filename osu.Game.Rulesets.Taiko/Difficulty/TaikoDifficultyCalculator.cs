@@ -24,10 +24,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
     public class TaikoDifficultyCalculator : DifficultyCalculator
     {
         private const double difficulty_multiplier = 0.084375;
-        private double rhythm_skill_multiplier = 1.63 * difficulty_multiplier;
+        private double rhythm_skill_multiplier = 1.70 * difficulty_multiplier;
         private const double reading_skill_multiplier = 0.100 * difficulty_multiplier;
         private const double colour_skill_multiplier = 0.375 * difficulty_multiplier;
-        private const double stamina_skill_multiplier = 0.425 * difficulty_multiplier;
+        private const double stamina_skill_multiplier = 0.445 * difficulty_multiplier;
 
         private double strainLengthBonus;
 
@@ -122,8 +122,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             double staminaDifficultStrains = stamina.CountTopWeightedStrains() * clockRate;
 
             strainLengthBonus = 1
-                + Math.Min(Math.Max((staminaDifficultStrains - 1350) / 7500, 0), 0.07) + Math.Min(Math.Max((staminaRating - 8.0) / 1.0, 0), 0.05)
-                + Math.Min(Math.Max((rhythmDifficultStrains - 140) / 30, 0), 0.075) - Math.Min(Math.Max((55 - rhythmDifficultStrains) / 45, 0), 0.10);
+                + Math.Min(Math.Max((staminaDifficultStrains - 1350) / 5000, 0), 0.15) + Math.Min(Math.Max((staminaRating - 7.0) / 1.0, 0), 0.05)
+                + Math.Min(Math.Max((rhythmDifficultStrains - 150) / 50, 0), 0.15) - Math.Min(Math.Max((55 - rhythmDifficultStrains) / 45, 0), 0.10);
 
             double combinedRating = combinedDifficultyValue(rhythm, reading, colour, stamina, isRelax);
             double starRating = rescale(combinedRating * 1.4);
@@ -211,14 +211,21 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         }
 
         /// <summary>
-        /// Applies a final re-scaling of the star rating.
+        /// Applies a final re-scaling of the star rating with tightened spread for star ratings 15 and above.
         /// </summary>
         /// <param name="sr">The raw star rating value before re-scaling.</param>
         private double rescale(double sr)
         {
             if (sr < 0) return sr;
 
-            return 10.43 * Math.Log(sr / 8 + 1);
+            // Base rescaling formula
+            double scaled = 10.43 * Math.Log(sr / 8 + 1);
+
+            // Apply tightened spread for star ratings 15+
+            double adjusted = 11.6 + Math.Log(Math.Max(scaled - 11, 1));
+            scaled = Math.Min(scaled, adjusted);
+
+            return scaled;
         }
     }
 }
