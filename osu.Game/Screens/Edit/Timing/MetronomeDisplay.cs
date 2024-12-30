@@ -12,6 +12,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Events;
 using osu.Framework.Threading;
 using osu.Framework.Timing;
 using osu.Framework.Utils;
@@ -232,6 +233,19 @@ namespace osu.Game.Screens.Edit.Timing
 
         private ScheduledDelegate? latchDelegate;
 
+        private bool divisorChanged;
+
+        private void setDivisor(int divisor)
+        {
+            if (divisor == Divisor)
+                return;
+
+            divisorChanged = true;
+
+            Divisor = divisor;
+            metronomeTick.Divisor = divisor;
+        }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -250,13 +264,13 @@ namespace osu.Game.Screens.Edit.Timing
 
             timingPoint = BeatSyncSource.ControlPoints.TimingPointAt(BeatSyncSource.Clock.CurrentTime);
 
-            if (beatLength != timingPoint.BeatLength)
+            if (beatLength != timingPoint.BeatLength || divisorChanged)
             {
                 beatLength = timingPoint.BeatLength;
 
                 EarlyActivationMilliseconds = timingPoint.BeatLength / 2;
 
-                float bpmRatio = (float)Interpolation.ApplyEasing(Easing.OutQuad, Math.Clamp((timingPoint.BPM - 30) / 480, 0, 1));
+                float bpmRatio = (float)Interpolation.ApplyEasing(Easing.OutQuad, Math.Clamp((timingPoint.BPM - 30) / 480 * Divisor, 0, 1));
 
                 weight.MoveToY((float)Interpolation.Lerp(0.1f, 0.83f, bpmRatio), 600, Easing.OutQuint);
                 this.TransformBindableTo(interpolatedBpm, (int)Math.Round(timingPoint.BPM), 600, Easing.OutQuint);
@@ -286,6 +300,8 @@ namespace osu.Game.Screens.Edit.Timing
                         latchDelegate = Schedule(() => sampleLatch?.Play());
                 }
             }
+
+            divisorChanged = false;
         }
 
         protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
@@ -315,6 +331,22 @@ namespace osu.Game.Screens.Edit.Timing
             // so now this matches the actual tick sample.
             stick.FlashColour(overlayColourProvider.Content1, beatLength, Easing.OutQuint);
         }
+
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            updateDivisorFromKey(e);
+
+            return base.OnKeyDown(e);
+        }
+
+        protected override void OnKeyUp(KeyUpEvent e)
+        {
+            base.OnKeyUp(e);
+
+            updateDivisorFromKey(e);
+        }
+
+        private void updateDivisorFromKey(UIEvent e) => setDivisor(e.ControlPressed ? 2 : 1);
 
         private partial class MetronomeTick : BeatSyncedContainer
         {
