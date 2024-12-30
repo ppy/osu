@@ -10,6 +10,7 @@ using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles.Components;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components;
 using osu.Game.Rulesets.Osu.Objects;
@@ -259,6 +260,90 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 InputManager.ReleaseKey(Key.ControlLeft);
             });
             AddAssert("selection preserved", () => EditorBeatmap.SelectedHitObjects.Count, () => Is.EqualTo(1));
+        }
+
+        [Test]
+        public void TestQuickDeleteOnUnselectedControlPointOnlyRemovesThatControlPoint()
+        {
+            var slider = new Slider
+            {
+                StartTime = 0,
+                Position = new Vector2(100, 100),
+                Path = new SliderPath
+                {
+                    ControlPoints =
+                    {
+                        new PathControlPoint { Type = PathType.LINEAR },
+                        new PathControlPoint(new Vector2(100, 0)),
+                        new PathControlPoint(new Vector2(100)),
+                        new PathControlPoint(new Vector2(0, 100))
+                    }
+                }
+            };
+            AddStep("add slider", () => EditorBeatmap.Add(slider));
+            AddStep("select slider", () => EditorBeatmap.SelectedHitObjects.Add(slider));
+
+            AddStep("select second node", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<PathControlPointPiece<Slider>>().ElementAt(1));
+                InputManager.Click(MouseButton.Left);
+            });
+            AddStep("also select third node", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.MoveMouseTo(this.ChildrenOfType<PathControlPointPiece<Slider>>().ElementAt(2));
+                InputManager.Click(MouseButton.Left);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+            AddStep("quick-delete fourth node", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<PathControlPointPiece<Slider>>().ElementAt(3));
+                InputManager.Click(MouseButton.Middle);
+            });
+            AddUntilStep("slider not deleted", () => EditorBeatmap.HitObjects.OfType<Slider>().Count(), () => Is.EqualTo(1));
+            AddUntilStep("slider path has 3 nodes", () => EditorBeatmap.HitObjects.OfType<Slider>().Single().Path.ControlPoints.Count, () => Is.EqualTo(3));
+        }
+
+        [Test]
+        public void TestQuickDeleteOnSelectedControlPointRemovesEntireSelection()
+        {
+            var slider = new Slider
+            {
+                StartTime = 0,
+                Position = new Vector2(100, 100),
+                Path = new SliderPath
+                {
+                    ControlPoints =
+                    {
+                        new PathControlPoint { Type = PathType.LINEAR },
+                        new PathControlPoint(new Vector2(100, 0)),
+                        new PathControlPoint(new Vector2(100)),
+                        new PathControlPoint(new Vector2(0, 100))
+                    }
+                }
+            };
+            AddStep("add slider", () => EditorBeatmap.Add(slider));
+            AddStep("select slider", () => EditorBeatmap.SelectedHitObjects.Add(slider));
+
+            AddStep("select second node", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<PathControlPointPiece<Slider>>().ElementAt(1));
+                InputManager.Click(MouseButton.Left);
+            });
+            AddStep("also select third node", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.MoveMouseTo(this.ChildrenOfType<PathControlPointPiece<Slider>>().ElementAt(2));
+                InputManager.Click(MouseButton.Left);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+            AddStep("quick-delete second node", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<PathControlPointPiece<Slider>>().ElementAt(1));
+                InputManager.Click(MouseButton.Middle);
+            });
+            AddUntilStep("slider not deleted", () => EditorBeatmap.HitObjects.OfType<Slider>().Count(), () => Is.EqualTo(1));
+            AddUntilStep("slider path has 2 nodes", () => EditorBeatmap.HitObjects.OfType<Slider>().Single().Path.ControlPoints.Count, () => Is.EqualTo(2));
         }
 
         private ComposeBlueprintContainer blueprintContainer

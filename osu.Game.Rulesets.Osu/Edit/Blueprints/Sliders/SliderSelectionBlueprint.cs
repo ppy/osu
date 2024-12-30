@@ -140,8 +140,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             if (hoveredControlPoint == null)
                 return false;
 
-            hoveredControlPoint.IsSelected.Value = true;
-            ControlPointVisualiser?.DeleteSelected();
+            if (hoveredControlPoint.IsSelected.Value)
+                ControlPointVisualiser?.DeleteSelected();
+            else
+                ControlPointVisualiser?.Delete([hoveredControlPoint.ControlPoint]);
+
             return true;
         }
 
