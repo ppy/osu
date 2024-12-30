@@ -42,6 +42,9 @@ namespace osu.Game.Screens.Edit.Timing
         [Resolved]
         private OverlayColourProvider overlayColourProvider { get; set; } = null!;
 
+        [Resolved]
+        private BindableBeatDivisor beatDivisor { get; set; } = null!;
+
         public bool EnableClicking
         {
             get => metronomeTick.EnableClicking;
@@ -233,10 +236,17 @@ namespace osu.Game.Screens.Edit.Timing
 
         private ScheduledDelegate? latchDelegate;
 
+        private bool spedUp;
+
         private bool divisorChanged;
 
-        private void setDivisor(int divisor)
+        private void updateDivisor()
         {
+            int divisor = 1;
+
+            if (spedUp)
+                divisor = beatDivisor.Value % 3 == 0 ? 3 : 2;
+
             if (divisor == Divisor)
                 return;
 
@@ -263,6 +273,8 @@ namespace osu.Game.Screens.Edit.Timing
             metronomeClock.Rate = IsBeatSyncedWithTrack ? BeatSyncSource.Clock.Rate : 1;
 
             timingPoint = BeatSyncSource.ControlPoints.TimingPointAt(BeatSyncSource.Clock.CurrentTime);
+
+            updateDivisor();
 
             if (beatLength != timingPoint.BeatLength || divisorChanged)
             {
@@ -346,7 +358,7 @@ namespace osu.Game.Screens.Edit.Timing
             updateDivisorFromKey(e);
         }
 
-        private void updateDivisorFromKey(UIEvent e) => setDivisor(e.ControlPressed ? 2 : 1);
+        private void updateDivisorFromKey(UIEvent e) => spedUp = e.ControlPressed;
 
         private partial class MetronomeTick : BeatSyncedContainer
         {
