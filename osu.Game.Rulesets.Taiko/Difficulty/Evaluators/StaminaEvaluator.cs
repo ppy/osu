@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
             // Interval is capped at a very small value to prevent infinite values.
             interval = Math.Max(interval, 1);
 
-            return 30 / interval;
+            return 20 / interval;
         }
 
         /// <summary>
@@ -85,7 +85,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
             // Consecutive notes exceeding 100 are buffed slowly, capped at 800 objects.
             if (consecutiveCount >= 100)
             {
-                objectStrain += 0.00025 * Math.Min(consecutiveCount, 800);
+                objectStrain += 0.00025 * Math.Min(consecutiveCount, 600);
             }
 
             return objectStrain;
