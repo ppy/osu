@@ -50,6 +50,8 @@ namespace osu.Android
         /// <remarks>Adjusted on startup to match expected UX for the current device type (phone/tablet).</remarks>
         public ScreenOrientation DefaultOrientation = ScreenOrientation.Unspecified;
 
+        public bool IsTablet { get; private set; }
+
         private OsuGameAndroid game = null!;
 
         protected override Framework.Game CreateGame() => game = new OsuGameAndroid(this);
@@ -76,9 +78,9 @@ namespace osu.Android
             WindowManager.DefaultDisplay.GetSize(displaySize);
 #pragma warning restore CA1422
             float smallestWidthDp = Math.Min(displaySize.X, displaySize.Y) / Resources.DisplayMetrics.Density;
-            bool isTablet = smallestWidthDp >= 600f;
+            IsTablet = smallestWidthDp >= 600f;
 
-            RequestedOrientation = DefaultOrientation = isTablet ? ScreenOrientation.FullUser : ScreenOrientation.SensorLandscape;
+            RequestedOrientation = DefaultOrientation = IsTablet ? ScreenOrientation.FullUser : ScreenOrientation.SensorLandscape;
 
             // Currently (SDK 6.0.200), BundleAssemblies is not runnable for net6-android.
             // The assembly files are not available as files either after native AOT.
