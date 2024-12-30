@@ -377,6 +377,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             UpdateState(ArmedState.Idle);
             HeadCircle.SuppressHitAnimations();
+
+            foreach (var repeat in repeatContainer)
+                repeat.SuppressHitAnimations();
+
             TailCircle.SuppressHitAnimations();
         }
 
@@ -384,6 +388,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             UpdateState(ArmedState.Hit);
             HeadCircle.RestoreHitAnimations();
+
+            foreach (var repeat in repeatContainer)
+                repeat.RestoreHitAnimations();
+
             TailCircle.RestoreHitAnimations();
         }
 
