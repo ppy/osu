@@ -157,5 +157,7 @@
 	<string>public.app-category.music-games</string>
 	<key>LSSupportsOpeningDocumentsInPlace</key>
 	<false/>
+	<key>GCSupportsGameMode</key>
+	<true/>
 </dict>
 </plist>
