@@ -7,12 +7,10 @@ using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
-using osu.Game.Configuration;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
@@ -42,14 +40,6 @@ namespace osu.Game.Tests.Visual.Editing
         private BeatmapManager beatmaps { get; set; }
 
         private BeatmapSetInfo importedBeatmapSet;
-
-        private Bindable<float> editorDim;
-
-        [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
-        {
-            editorDim = config.GetBindable<float>(OsuSetting.EditorDim);
-        }
 
         public override void SetUpSteps()
         {
