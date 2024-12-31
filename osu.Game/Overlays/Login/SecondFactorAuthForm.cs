@@ -121,9 +121,9 @@ namespace osu.Game.Overlays.Login
 
             codeTextBox.Current.BindValueChanged(code =>
             {
-                if (code.NewValue.Length == 8)
+                if (code.NewValue.Trim().Length == 8)
                 {
-                    api.AuthenticateSecondFactor(code.NewValue);
+                    api.AuthenticateSecondFactor(code.NewValue.Trim());
                     codeTextBox.Current.Disabled = true;
                 }
             });
