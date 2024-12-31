@@ -29,8 +29,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private double skillMultiplier => 25.18;
         private double strainDecayBase => 0.15;
 
-        private readonly List<double> sliderStrains = new List<double>();
-
         private double strainDecay(double ms) => Math.Pow(strainDecayBase, ms / 1000);
 
         protected override double CalculateInitialStrain(double time, DifficultyHitObject current) => currentStrain * strainDecay(time - current.Previous(0).StartTime);
@@ -41,9 +39,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             currentStrain += AimEvaluator.EvaluateDifficultyOf(current, withSliders) * skillMultiplier;
 
             if (current.BaseObject is Slider)
-            {
                 sliderStrains.Add(currentStrain);
-            }
 
             return currentStrain;
         }

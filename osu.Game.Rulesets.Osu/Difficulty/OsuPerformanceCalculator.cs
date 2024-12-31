@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Rulesets.Difficulty;
+using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Osu.Difficulty.Skills;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Scoring;
@@ -168,7 +169,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             aimValue *= lengthBonus;
 
             if (effectiveMissCount > 0)
-                aimValue *= calculateMissPenalty(effectiveMissCount, attributes.AimDifficultStrainCount);
+            {
+                double missedComboPercent = 1.0 - (double)score.MaxCombo / attributes.MaxCombo;
+                double estimatedSliderbreaks = Math.Min(countMeh + countOk, countMiss * attributes.AimTopWeightedSliderFactor) * DifficultyCalculationUtils.Logistic(missedComboPercent, 0.33, 15);
+                aimValue *= calculateMissPenalty(effectiveMissCount + (usingClassicSliderAccuracy ? estimatedSliderbreaks : 0), attributes.AimDifficultStrainCount);
+            }
 
             double approachRateFactor = 0.0;
             if (attributes.ApproachRate > 10.33)
@@ -208,7 +213,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             speedValue *= lengthBonus;
 
             if (effectiveMissCount > 0)
-                speedValue *= calculateMissPenalty(effectiveMissCount, attributes.SpeedDifficultStrainCount);
+            {
+                double missedComboPercent = 1.0 - (double)score.MaxCombo / attributes.MaxCombo;
+                double estimatedSliderbreaks = Math.Min(countMeh + countOk, countMiss * attributes.SpeedTopWeightedSliderFactor) * DifficultyCalculationUtils.Logistic(missedComboPercent, 0.33, 15);
+                speedValue *= calculateMissPenalty(effectiveMissCount + (usingClassicSliderAccuracy ? estimatedSliderbreaks : 0), attributes.SpeedDifficultStrainCount);
+            }
 
             double approachRateFactor = 0.0;
             if (attributes.ApproachRate > 10.33)
