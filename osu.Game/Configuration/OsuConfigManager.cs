@@ -218,6 +218,7 @@ namespace osu.Game.Configuration
 
             SetDefault(OsuSetting.AlwaysShowHoldForMenuButton, false);
             SetDefault(OsuSetting.AlwaysRequireHoldingForPause, false);
+            SetDefault(OsuSetting.EditorShowStoryboard, true);
         }
 
         protected override bool CheckLookupContainsPrivateInformation(OsuSetting lookup)
@@ -452,5 +453,6 @@ namespace osu.Game.Configuration
         AlwaysRequireHoldingForPause,
         MultiplayerShowInProgressFilter,
         BeatmapListingFeaturedArtistFilter,
+        EditorShowStoryboard,
     }
 }
