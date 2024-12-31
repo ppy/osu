@@ -474,7 +474,7 @@ namespace osu.Game.Screens.Edit
             changeHandler?.CanUndo.BindValueChanged(v => undoMenuItem.Action.Disabled = !v.NewValue, true);
             changeHandler?.CanRedo.BindValueChanged(v => redoMenuItem.Action.Disabled = !v.NewValue, true);
 
-            editorBackgroundDim.BindValueChanged(_ => dimBackground());
+            editorBackgroundDim.BindValueChanged(_ => setUpBackground());
         }
 
         [Resolved]
@@ -863,17 +863,17 @@ namespace osu.Game.Screens.Edit
         public override void OnEntering(ScreenTransitionEvent e)
         {
             base.OnEntering(e);
-            dimBackground();
+            setUpBackground();
             resetTrack(true);
         }
 
         public override void OnResuming(ScreenTransitionEvent e)
         {
             base.OnResuming(e);
-            dimBackground();
+            setUpBackground();
         }
 
-        private void dimBackground()
+        private void setUpBackground()
         {
             ApplyToBackground(b =>
             {
