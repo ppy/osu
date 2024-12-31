@@ -90,10 +90,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double aimDifficultyStrainCount = ((OsuStrainSkill)skills[0]).CountTopWeightedStrains();
             double speedDifficultyStrainCount = ((OsuStrainSkill)skills[2]).CountTopWeightedStrains();
 
-            double aimTopWeightedSliderCount = ((OsuStrainSkill)skills[0]).CountTopWeightedSliders();
-            // We know that slider count + circle count = total count, so circle count = total count - slider count.
-            // This means we only need to calculate on sliders, and then work from the total count
-            double aimTopWeightedSliderFactor = aimTopWeightedSliderCount / (aimDifficultyStrainCount - aimTopWeightedSliderCount);
+            double aimNoSlidersTopWeightedSliderCount = ((OsuStrainSkill)skills[1]).CountTopWeightedSliders();
+            double aimNoSlidersDifficultyStrainCount = ((OsuStrainSkill)skills[1]).CountTopWeightedStrains();
+            double aimTopWeightedSliderFactor = aimNoSlidersTopWeightedSliderCount / (aimNoSlidersDifficultyStrainCount - aimNoSlidersTopWeightedSliderCount);
             double speedTopWeightedSliderCount = ((OsuStrainSkill)skills[2]).CountTopWeightedSliders();
             double speedTopWeightedSliderFactor = speedTopWeightedSliderCount / (speedDifficultyStrainCount - speedTopWeightedSliderCount);
 
