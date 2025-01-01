@@ -38,6 +38,8 @@ namespace osu.Game.Overlays
 
         private bool displayUpdateRequired = true;
 
+        private string lastValidPath = INDEX_PATH;
+
         public WikiOverlay()
             : base(OverlayColourScheme.Orange, false)
         {
@@ -145,12 +147,13 @@ namespace osu.Game.Overlays
         private void onLangChanged(ValueChangedEvent<Language> e)
         {
             // Path unmodified, just reload the page with new language value.
-            loadPage(path.Value, e.NewValue);
+            loadPage(path.Value == "error" ? lastValidPath : path.Value, e.NewValue);
         }
 
         private void onSuccess(APIWikiPage response)
         {
             wikiData.Value = response;
+            lastValidPath = response.Path;
             path.Value = response.Path;
 
             if (response.Layout.Equals(INDEX_PATH, StringComparison.OrdinalIgnoreCase))
