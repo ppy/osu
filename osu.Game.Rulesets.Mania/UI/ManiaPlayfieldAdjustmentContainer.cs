@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Mania.UI
             base.Update();
 
             float aspectRatio = DrawWidth / DrawHeight;
-            bool isPortrait = aspectRatio < 4 / 3f;
+            bool isPortrait = aspectRatio < 1f;
 
             if (isPortrait && drawableManiaRuleset.Beatmap.Stages.Count == 1)
             {
