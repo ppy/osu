@@ -10,6 +10,7 @@ using osu.Framework.Platform;
 using osu.Game;
 using osu.Game.Updater;
 using osu.Game.Utils;
+using UIKit;
 
 namespace osu.iOS
 {
@@ -18,6 +19,8 @@ namespace osu.iOS
         public override Version AssemblyVersion => new Version(NSBundle.MainBundle.InfoDictionary["CFBundleVersion"].ToString());
 
         public override bool HideUnlicensedContent => true;
+
+        protected override float BaseAspectRatio => (float)(UIScreen.MainScreen.Bounds.Width / UIScreen.MainScreen.Bounds.Height);
 
         protected override UpdateManager CreateUpdateManager() => new MobileUpdateNotifier();
 
