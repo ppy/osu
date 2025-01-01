@@ -24,7 +24,7 @@ namespace osu.Game.Overlays
 
         private readonly Bindable<string> path = new Bindable<string>(INDEX_PATH);
         private readonly Bindable<APIWikiPage?> wikiData = new Bindable<APIWikiPage?>();
-        private readonly IBindable<Language> language = new Bindable<Language>();
+        private readonly Bindable<Language> language = new Bindable<Language>();
 
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
@@ -177,7 +177,8 @@ namespace osu.Game.Overlays
             path.Value = "error";
 
             LoadDisplay(articlePage = new WikiArticlePage($@"{api.WebsiteRootUrl}/wiki/",
-                $"Something went wrong when trying to fetch page \"{originalPath}\".\n\n[Return to the main page]({INDEX_PATH})."));
+                $"{WikiOverlayStrings.PageErrorDescription(originalPath)}\n\n"
+                + $"{WikiOverlayStrings.ReloadPageLink(originalPath)}\n{WikiOverlayStrings.ReturnToMainPageLink(INDEX_PATH)}"));
         }
 
         private void showParentPage()
