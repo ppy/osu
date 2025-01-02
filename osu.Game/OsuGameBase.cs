@@ -210,7 +210,7 @@ namespace osu.Game
 
         protected MultiplayerClient MultiplayerClient { get; private set; }
 
-        private MetadataClient metadataClient;
+        protected MetadataClient MetadataClient { get; private set; }
 
         private RealmAccess realm;
 
@@ -326,12 +326,9 @@ namespace osu.Game
             dependencies.CacheAs(beatmapUpdater = CreateBeatmapUpdater());
             dependencies.CacheAs(SpectatorClient = new OnlineSpectatorClient(endpoints));
             dependencies.CacheAs(MultiplayerClient = new OnlineMultiplayerClient(endpoints));
-            dependencies.CacheAs(metadataClient = new OnlineMetadataClient(endpoints));
+            dependencies.CacheAs(MetadataClient = new OnlineMetadataClient(endpoints));
 
-            metadataClient.OnFriendConnected += u => Logger.Log($"friend connected: {u}");
-            metadataClient.OnFriendDisconnected += u => Logger.Log($"friend disconnected: {u}");
-
-            base.Content.Add(new BeatmapOnlineChangeIngest(beatmapUpdater, realm, metadataClient));
+            base.Content.Add(new BeatmapOnlineChangeIngest(beatmapUpdater, realm, MetadataClient));
 
             BeatmapManager.ProcessBeatmap = (beatmapSet, scope) => beatmapUpdater.Process(beatmapSet, scope);
 
@@ -371,7 +368,7 @@ namespace osu.Game
 
             base.Content.Add(SpectatorClient);
             base.Content.Add(MultiplayerClient);
-            base.Content.Add(metadataClient);
+            base.Content.Add(MetadataClient);
 
             base.Content.Add(rulesetConfigCache);
 

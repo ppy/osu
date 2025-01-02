@@ -47,6 +47,7 @@ using osu.Game.Input.Bindings;
 using osu.Game.IO;
 using osu.Game.Localisation;
 using osu.Game.Online;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
@@ -957,6 +958,20 @@ namespace osu.Game
 
             MultiplayerClient.PostNotification = n => Notifications.Post(n);
             MultiplayerClient.PresentMatch = PresentMultiplayerMatch;
+
+            MetadataClient.OnFriendConnected += userId =>
+            {
+                APIUser friend = API.Friends.SingleOrDefault(u => u.TargetID == userId)?.TargetUser;
+                if (friend != null)
+                    Notifications.Post(new SimpleNotification { Text = $"Online: {friend.Username}" });
+            };
+
+            MetadataClient.OnFriendDisconnected += userId =>
+            {
+                APIUser friend = API.Friends.SingleOrDefault(u => u.TargetID == userId)?.TargetUser;
+                if (friend != null)
+                    Notifications.Post(new SimpleNotification { Text = $"Offline: {friend.Username}" });
+            };
 
             // make config aware of how to lookup skins for on-screen display purposes.
             // if this becomes a more common thing, tracked settings should be reconsidered to allow local DI.
