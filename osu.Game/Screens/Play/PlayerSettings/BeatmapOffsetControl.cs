@@ -15,6 +15,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -35,6 +36,8 @@ namespace osu.Game.Screens.Play.PlayerSettings
     public partial class BeatmapOffsetControl : CompositeDrawable, IKeyBindingHandler<GlobalAction>
     {
         public Bindable<ScoreInfo?> ReferenceScore { get; } = new Bindable<ScoreInfo?>();
+
+        private Bindable<ScoreInfo?> lastAppliedScore { get; } = new Bindable<ScoreInfo?>();
 
         public BindableDouble Current { get; } = new BindableDouble
         {
@@ -98,6 +101,12 @@ namespace osu.Game.Screens.Play.PlayerSettings
                     },
                 }
             };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(SessionStatics statics)
+        {
+            statics.BindWith(Static.LastAppliedOffsetScore, lastAppliedScore);
         }
 
         protected override void LoadComplete()
@@ -176,6 +185,9 @@ namespace osu.Game.Screens.Play.PlayerSettings
             if (score.NewValue == null)
                 return;
 
+            if (score.NewValue.Equals(lastAppliedScore.Value))
+                return;
+
             if (!score.NewValue.BeatmapInfo.AsNonNull().Equals(beatmap.Value.BeatmapInfo))
                 return;
 
@@ -230,7 +242,11 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 useAverageButton = new SettingsButton
                 {
                     Text = BeatmapOffsetControlStrings.CalibrateUsingLastPlay,
-                    Action = () => Current.Value = lastPlayBeatmapOffset - lastPlayAverage,
+                    Action = () =>
+                    {
+                        Current.Value = lastPlayBeatmapOffset - lastPlayAverage;
+                        lastAppliedScore.Value = ReferenceScore.Value;
+                    },
                     Enabled = { Value = !Precision.AlmostEquals(lastPlayAverage, 0, Current.Precision / 2) }
                 },
                 globalOffsetText = new LinkFlowContainer
