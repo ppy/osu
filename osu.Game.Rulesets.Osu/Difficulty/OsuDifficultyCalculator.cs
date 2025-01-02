@@ -68,16 +68,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double aimNoSlidersRelevantObjectCount = ((OsuStrainSkill)skills[1]).CountRelevantObjects();
             double speedRelevantObjectCount = ((OsuStrainSkill)skills[2]).CountRelevantObjects();
 
-            double aimLengthBonus = 1.0 + Math.Min(1.8, aimRelevantObjectCount / 300.0) +
-                                    (aimRelevantObjectCount > 540.0 ? Math.Log10(aimRelevantObjectCount / 540.0) : 0);
+            double aimLengthBonus = 1.0 + Math.Min(1.0, aimRelevantObjectCount / 300.0) +
+                                    (aimRelevantObjectCount > 300.0 ? 2.0 * Math.Log10(aimRelevantObjectCount / 300.0) : 0);
             aimRating *= Math.Cbrt(aimLengthBonus);
 
-            double aimNoSlidersLengthBonus = 1.0 + Math.Min(1.8, aimNoSlidersRelevantObjectCount / 300.0) +
-                                             (aimNoSlidersRelevantObjectCount > 540.0 ? Math.Log10(aimNoSlidersRelevantObjectCount / 540.0) : 0);
+            double aimNoSlidersLengthBonus = 1.0 + Math.Min(1.0, aimNoSlidersRelevantObjectCount / 300.0) +
+                                             (aimNoSlidersRelevantObjectCount > 300.0 ? 2.0 * Math.Log10(aimNoSlidersRelevantObjectCount / 300.0) : 0);
             aimRatingNoSliders *= Math.Cbrt(aimNoSlidersLengthBonus);
 
-            double speedLengthBonus = 1.0 + 0.45 * Math.Min(0.8, speedRelevantObjectCount / 500.0) +
-                                      (speedRelevantObjectCount > 400 ? 0.2 * Math.Log10(speedRelevantObjectCount / 400.0) : 0.0);
+            double speedLengthBonus = 1.0 + Math.Min(0.25, speedRelevantObjectCount / 1100.0) +
+                                      (speedRelevantObjectCount > 275 ? 0.6 * Math.Log10(speedRelevantObjectCount / 275.0) : 0.0);
             speedRating *= Math.Cbrt(speedLengthBonus);
 
             double sliderFactor = aimRating > 0 ? aimRatingNoSliders / aimRating : 1;
