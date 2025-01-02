@@ -328,6 +328,9 @@ namespace osu.Game
             dependencies.CacheAs(MultiplayerClient = new OnlineMultiplayerClient(endpoints));
             dependencies.CacheAs(metadataClient = new OnlineMetadataClient(endpoints));
 
+            metadataClient.OnFriendConnected += u => Logger.Log($"friend connected: {u}");
+            metadataClient.OnFriendDisconnected += u => Logger.Log($"friend disconnected: {u}");
+
             base.Content.Add(new BeatmapOnlineChangeIngest(beatmapUpdater, realm, metadataClient));
 
             BeatmapManager.ProcessBeatmap = (beatmapSet, scope) => beatmapUpdater.Process(beatmapSet, scope);
