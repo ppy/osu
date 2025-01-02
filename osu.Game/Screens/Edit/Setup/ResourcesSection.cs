@@ -35,6 +35,9 @@ namespace osu.Game.Screens.Edit.Setup
         [Resolved]
         private Editor? editor { get; set; }
 
+        [Resolved]
+        private SetupScreen setupScreen { get; set; } = null!;
+
         private SetupScreenHeaderBackground headerBackground = null!;
 
         [BackgroundDependencyLoader]
@@ -93,15 +96,37 @@ namespace osu.Game.Screens.Edit.Setup
             if (!source.Exists)
                 return false;
 
+            var tagSource = TagLib.File.Create(source.FullName);
+
             changeResource(source, applyToAllDifficulties, @"audio",
                 metadata => metadata.AudioFile,
-                (metadata, name) => metadata.AudioFile = name);
+                (metadata, name) =>
+                {
+                    metadata.AudioFile = name;
+
+                    string artist = tagSource.Tag.JoinedAlbumArtists;
+
+                    if (!string.IsNullOrWhiteSpace(artist))
+                    {
+                        metadata.ArtistUnicode = artist;
+                        metadata.Artist = MetadataUtils.StripNonRomanisedCharacters(metadata.ArtistUnicode);
+                    }
+
+                    string title = tagSource.Tag.Title;
+
+                    if (!string.IsNullOrEmpty(title))
+                    {
+                        metadata.TitleUnicode = title;
+                        metadata.Title = MetadataUtils.StripNonRomanisedCharacters(metadata.TitleUnicode);
+                    }
+                });
 
             music.ReloadCurrentTrack();
+            setupScreen.MetadataChanged?.Invoke();
             return true;
         }
 
-        private void changeResource(FileInfo source, bool applyToAllDifficulties, string baseFilename, Func<BeatmapMetadata, string> readFilename, Action<BeatmapMetadata, string> writeFilename)
+        private void changeResource(FileInfo source, bool applyToAllDifficulties, string baseFilename, Func<BeatmapMetadata, string> readFilename, Action<BeatmapMetadata, string> writeMetadata)
         {
             var set = working.Value.BeatmapSetInfo;
             var beatmap = working.Value.BeatmapInfo;
@@ -148,10 +173,7 @@ namespace osu.Game.Screens.Edit.Setup
             {
                 foreach (var b in otherBeatmaps)
                 {
-                    // This operation is quite expensive, so only perform it if required.
-                    if (readFilename(b.Metadata) == newFilename) continue;
-
-                    writeFilename(b.Metadata, newFilename);
+                    writeMetadata(b.Metadata, newFilename);
 
                     // save the difficulty to re-encode the .osu file, updating any reference of the old filename.
                     //
@@ -162,7 +184,7 @@ namespace osu.Game.Screens.Edit.Setup
                 }
             }
 
-            writeFilename(beatmap.Metadata, newFilename);
+            writeMetadata(beatmap.Metadata, newFilename);
 
             // editor change handler cannot be aware of any file changes or other difficulties having their metadata modified.
             // for simplicity's sake, trigger a save when changing any resource to ensure the change is correctly saved.
