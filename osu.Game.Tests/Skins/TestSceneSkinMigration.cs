@@ -372,8 +372,6 @@ namespace osu.Game.Tests.Skins
 
         private class TestSkinInfo : SkinInfo
         {
-            public override IList<RealmNamedFileUsage> Files { get; } = new List<RealmNamedFileUsage>();
-
             public TestSkinInfo(string instantiationInfo, IDictionary<GlobalSkinnableContainers, SkinLayoutInfo>? layout)
                 : base("test skin", "me", instantiationInfo)
             {

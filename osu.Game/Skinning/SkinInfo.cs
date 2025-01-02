@@ -63,7 +63,7 @@ namespace osu.Game.Skinning
 
         public virtual Skin CreateInstance(IStorageResourceProvider resources) => (Skin)Activator.CreateInstance(GetInstanceType(), this, resources)!;
 
-        public virtual IList<RealmNamedFileUsage> Files { get; } = null!;
+        public IList<RealmNamedFileUsage> Files { get; } = null!;
 
         public bool DeletePending { get; set; }
 
