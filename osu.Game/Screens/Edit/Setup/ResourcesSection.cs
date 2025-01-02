@@ -12,6 +12,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Overlays;
 using osu.Game.Localisation;
 using osu.Game.Models;
+using osu.Game.Screens.Backgrounds;
 using osu.Game.Utils;
 
 namespace osu.Game.Screens.Edit.Setup
@@ -87,7 +88,7 @@ namespace osu.Game.Screens.Edit.Setup
                 (metadata, name) => metadata.BackgroundFile = name);
 
             headerBackground.UpdateBackground();
-            editor?.ApplyToBackground(bg => bg.RefreshBackground());
+            editor?.ApplyToBackground(bg => ((EditorBackgroundScreen)bg).RefreshBackground());
             return true;
         }
 
