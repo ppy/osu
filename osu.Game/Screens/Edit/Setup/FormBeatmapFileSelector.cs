@@ -1,14 +1,14 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Diagnostics;
-using System.IO;
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterfaceV2;
@@ -32,123 +32,117 @@ namespace osu.Game.Screens.Edit.Setup
 
         public readonly Bindable<bool> ApplyToAllDifficulties = new Bindable<bool>(true);
 
+        private SelectionScopePopoverTarget selectionScopeTarget = null!;
+
+        protected override bool IsPopoverVisible => base.IsPopoverVisible || selectionScopeTarget.PopoverState.Value == Visibility.Visible;
+
         public FormBeatmapFileSelector(bool beatmapHasMultipleDifficulties, params string[] handledExtensions)
             : base(handledExtensions)
         {
             this.beatmapHasMultipleDifficulties = beatmapHasMultipleDifficulties;
         }
 
-        protected override FileChooserPopover CreatePopover(string[] handledExtensions, Bindable<FileInfo?> current, string? chooserPath)
+        [BackgroundDependencyLoader]
+        private void load()
         {
-            var popover = new BeatmapFileChooserPopover(handledExtensions, current, chooserPath, beatmapHasMultipleDifficulties);
-            popover.ApplyToAllDifficulties.BindTo(ApplyToAllDifficulties);
-            return popover;
+            AddInternal(selectionScopeTarget = new SelectionScopePopoverTarget
+            {
+                RelativeSizeAxes = Axes.Both,
+            });
         }
 
-        private partial class BeatmapFileChooserPopover : FileChooserPopover
+        protected override void LoadComplete()
         {
-            private readonly bool beatmapHasMultipleDifficulties;
+            base.LoadComplete();
+            selectionScopeTarget.PopoverState.BindValueChanged(_ => UpdateState(), true);
+        }
 
-            public readonly Bindable<bool> ApplyToAllDifficulties = new Bindable<bool>(true);
+        protected override void OnFileSelected()
+        {
+            if (InternalSelection.Value == null)
+                return;
 
-            private Container selectApplicationScopeContainer = null!;
-
-            public BeatmapFileChooserPopover(string[] handledExtensions, Bindable<FileInfo?> current, string? chooserPath, bool beatmapHasMultipleDifficulties)
-                : base(handledExtensions, current, chooserPath)
+            if (!beatmapHasMultipleDifficulties)
             {
-                this.beatmapHasMultipleDifficulties = beatmapHasMultipleDifficulties;
+                base.OnFileSelected();
+                return;
+            }
+
+            selectionScopeTarget.ShowPopover();
+            selectionScopeTarget.OnSelected = v =>
+            {
+                ApplyToAllDifficulties.Value = v;
+                base.OnFileSelected();
+            };
+        }
+
+        public partial class SelectionScopePopoverTarget : Drawable, IHasPopover
+        {
+            public Action<bool>? OnSelected;
+
+            public readonly Bindable<Visibility> PopoverState = new Bindable<Visibility>();
+
+            public Popover GetPopover()
+            {
+                var popover = new SelectionScopePopover(v => OnSelected?.Invoke(v));
+                PopoverState.UnbindBindings();
+                PopoverState.BindTo(popover.State);
+                return popover;
+            }
+        }
+
+        private partial class SelectionScopePopover : OsuPopover
+        {
+            private readonly Action<bool> onSelected;
+
+            public SelectionScopePopover(Action<bool> onSelected)
+            {
+                this.onSelected = onSelected;
             }
 
             [BackgroundDependencyLoader]
-            private void load(OverlayColourProvider colourProvider, OsuColour colours)
+            private void load(OsuColour colours, OverlayColourProvider colourProvider)
             {
-                Add(selectApplicationScopeContainer = new InputBlockingContainer
+                AutoSizeAxes = Axes.Both;
+
+                Body.BorderColour = colourProvider.Highlight1;
+                Body.BorderThickness = 2;
+
+                Child = new FillFlowContainer
                 {
-                    Alpha = 0f,
-                    RelativeSizeAxes = Axes.Both,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    AutoSizeAxes = Axes.Both,
+                    Direction = FillDirection.Vertical,
+                    Spacing = new Vector2(0f, 10f),
                     Children = new Drawable[]
                     {
-                        new Box
-                        {
-                            Colour = colourProvider.Background6.Opacity(0.9f),
-                            RelativeSizeAxes = Axes.Both,
-                        },
-                        new Container
+                        new OsuSpriteText
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Masking = true,
-                            CornerRadius = 10f,
-                            AutoSizeAxes = Axes.Both,
-                            Children = new Drawable[]
-                            {
-                                new Box
-                                {
-                                    Colour = colourProvider.Background5,
-                                    RelativeSizeAxes = Axes.Both,
-                                },
-                                new FillFlowContainer
-                                {
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                    AutoSizeAxes = Axes.Both,
-                                    Direction = FillDirection.Vertical,
-                                    Spacing = new Vector2(0f, 10f),
-                                    Margin = new MarginPadding(30),
-                                    Children = new Drawable[]
-                                    {
-                                        new OsuSpriteText
-                                        {
-                                            Anchor = Anchor.Centre,
-                                            Origin = Anchor.Centre,
-                                            Text = EditorSetupStrings.ApplicationScopeSelectionTitle,
-                                            Margin = new MarginPadding { Bottom = 20f },
-                                        },
-                                        new RoundedButton
-                                        {
-                                            Anchor = Anchor.Centre,
-                                            Origin = Anchor.Centre,
-                                            Width = 300f,
-                                            Text = EditorSetupStrings.ApplyToAllDifficulties,
-                                            Action = () =>
-                                            {
-                                                ApplyToAllDifficulties.Value = true;
-                                                updateFileSelection();
-                                            },
-                                            BackgroundColour = colours.Red2,
-                                        },
-                                        new RoundedButton
-                                        {
-                                            Anchor = Anchor.Centre,
-                                            Origin = Anchor.Centre,
-                                            Width = 300f,
-                                            Text = EditorSetupStrings.ApplyToThisDifficulty,
-                                            Action = () =>
-                                            {
-                                                ApplyToAllDifficulties.Value = false;
-                                                updateFileSelection();
-                                            },
-                                        },
-                                    }
-                                }
-                            }
+                            Text = EditorSetupStrings.ApplicationScopeSelectionTitle,
+                            Margin = new MarginPadding { Bottom = 20f },
+                        },
+                        new RoundedButton
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Width = 300f,
+                            Text = EditorSetupStrings.ApplyToAllDifficulties,
+                            Action = () => onSelected(true),
+                            BackgroundColour = colours.Red2,
+                        },
+                        new RoundedButton
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Width = 300f,
+                            Text = EditorSetupStrings.ApplyToThisDifficulty,
+                            Action = () => onSelected(false),
                         },
                     }
-                });
-            }
-
-            protected override void OnFileSelected(FileInfo file)
-            {
-                if (beatmapHasMultipleDifficulties)
-                    selectApplicationScopeContainer.FadeIn(200, Easing.InQuint);
-                else
-                    base.OnFileSelected(file);
-            }
-
-            private void updateFileSelection()
-            {
-                Debug.Assert(FileSelector.CurrentFile.Value != null);
-                base.OnFileSelected(FileSelector.CurrentFile.Value);
+                };
             }
         }
     }
