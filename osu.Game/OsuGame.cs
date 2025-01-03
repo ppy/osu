@@ -831,6 +831,11 @@ namespace osu.Game
 
         protected virtual UpdateManager CreateUpdateManager() => new UpdateManager();
 
+        /// <summary>
+        /// The base aspect ratio to use in all <see cref="ScalingContainer"/>s.
+        /// </summary>
+        protected internal virtual float BaseAspectRatio => 4f / 3f;
+
         protected override Container CreateScalingContainer() => new ScalingContainer(ScalingMode.Everything);
 
         #region Beatmap progression
