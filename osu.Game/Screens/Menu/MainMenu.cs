@@ -19,6 +19,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
+using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
@@ -258,6 +259,9 @@ namespace osu.Game.Screens.Menu
         [CanBeNull]
         private Drawable proxiedLogo;
 
+        [CanBeNull]
+        private ScheduledDelegate mobileDisclaimerSchedule;
+
         protected override void LogoArriving(OsuLogo logo, bool resuming)
         {
             base.LogoArriving(logo, resuming);
@@ -296,18 +300,21 @@ namespace osu.Game.Screens.Menu
             {
                 if (!loginDisplayed.Value)
                 {
-                    this.Delay(500).Schedule(() => login?.Show());
+                    Scheduler.AddDelayed(() => login?.Show(), 500);
                     loginDisplayed.Value = true;
                 }
             }
 
             if (showMobileDisclaimer.Value)
             {
-                this.Delay(500).Schedule(() =>
+                mobileDisclaimerSchedule?.Cancel();
+                mobileDisclaimerSchedule = Scheduler.AddDelayed(() =>
                 {
-                    dialogOverlay.Push(new MobileDisclaimerDialog());
-                    showMobileDisclaimer.Value = false;
-                });
+                    dialogOverlay.Push(new MobileDisclaimerDialog(() =>
+                    {
+                        showMobileDisclaimer.Value = false;
+                    }));
+                }, 500);
             }
 
             return originalAction.Invoke();
@@ -461,10 +468,11 @@ namespace osu.Game.Screens.Menu
 
         private partial class MobileDisclaimerDialog : PopupDialog
         {
-            public MobileDisclaimerDialog()
+            public MobileDisclaimerDialog(Action confirmed)
             {
-                HeaderText = "Mobile disclaimer";
-                BodyText = "We're releasing this for your enjoyment, but PC is still our focus and mobile is hard to support.\n\nPlease bear with us as we continue to improve the experience!";
+                HeaderText = "A few important words from your dev team!";
+                BodyText =
+                    "While we have released osu! on mobile platforms to maximise the number of people that can enjoy the game, our focus is still on the PC version.\n\nYour experience will not be perfect, and may even feel subpar compared to games which are made mobile-first.\n\nPlease bear with us as we continue to improve the game for you!";
 
                 Icon = FontAwesome.Solid.Mobile;
 
@@ -472,7 +480,8 @@ namespace osu.Game.Screens.Menu
                 {
                     new PopupDialogOkButton
                     {
-                        Text = "Alright!",
+                        Text = "Understood",
+                        Action = confirmed,
                     },
                 };
             }
