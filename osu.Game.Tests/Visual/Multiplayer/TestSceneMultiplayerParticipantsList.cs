@@ -309,6 +309,33 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        public void TestUserWithStyle()
+        {
+            AddStep("add users", () =>
+            {
+                MultiplayerClient.AddUser(new APIUser
+                {
+                    Id = 0,
+                    Username = "User 0",
+                    RulesetsStatistics = new Dictionary<string, UserStatistics>
+                    {
+                        {
+                            Ruleset.Value.ShortName,
+                            new UserStatistics { GlobalRank = RNG.Next(1, 100000), }
+                        }
+                    },
+                    CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
+                });
+
+                MultiplayerClient.ChangeUserStyle(0, 259, 2);
+            });
+
+            AddStep("set beatmap locally available", () => MultiplayerClient.ChangeUserBeatmapAvailability(0, BeatmapAvailability.LocallyAvailable()));
+            AddStep("change user style to beatmap: 258, ruleset: 1", () => MultiplayerClient.ChangeUserStyle(0, 258, 1));
+            AddStep("change user style to beatmap: null, ruleset: null", () => MultiplayerClient.ChangeUserStyle(0, null, null));
+        }
+
+        [Test]
         public void TestModOverlap()
         {
             AddStep("add dummy mods", () =>

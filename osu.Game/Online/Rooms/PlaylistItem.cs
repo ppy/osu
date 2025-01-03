@@ -68,6 +68,13 @@ namespace osu.Game.Online.Rooms
         }
 
         /// <summary>
+        /// A non-<c>null</c> value indicates "freestyle" mode where players are able to individually select
+        /// their own choice of beatmap (from the respective beatmap set) and ruleset to play in the room.
+        /// </summary>
+        [JsonProperty("beatmapset_id")]
+        public int? BeatmapSetId { get; set; }
+
+        /// <summary>
         /// A beatmap representing this playlist item.
         /// In many cases, this will *not* contain any usable information apart from OnlineID.
         /// </summary>
@@ -101,6 +108,7 @@ namespace osu.Game.Online.Rooms
             PlayedAt = item.PlayedAt;
             RequiredMods = item.RequiredMods.ToArray();
             AllowedMods = item.AllowedMods.ToArray();
+            BeatmapSetId = item.BeatmapSetID;
         }
 
         public void MarkInvalid() => valid.Value = false;
@@ -120,25 +128,28 @@ namespace osu.Game.Online.Rooms
 
         #endregion
 
-        public PlaylistItem With(Optional<long> id = default, Optional<IBeatmapInfo> beatmap = default, Optional<ushort?> playlistOrder = default)
+        public PlaylistItem With(Optional<long> id = default, Optional<IBeatmapInfo> beatmap = default, Optional<ushort?> playlistOrder = default,
+                                 Optional<int> ruleset = default)
         {
             return new PlaylistItem(beatmap.GetOr(Beatmap))
             {
                 ID = id.GetOr(ID),
                 OwnerID = OwnerID,
-                RulesetID = RulesetID,
+                RulesetID = ruleset.GetOr(RulesetID),
                 Expired = Expired,
                 PlaylistOrder = playlistOrder.GetOr(PlaylistOrder),
                 PlayedAt = PlayedAt,
                 AllowedMods = AllowedMods,
                 RequiredMods = RequiredMods,
                 valid = { Value = Valid.Value },
+                BeatmapSetId = BeatmapSetId
             };
         }
 
         public bool Equals(PlaylistItem? other)
             => ID == other?.ID
                && Beatmap.OnlineID == other.Beatmap.OnlineID
+               && BeatmapSetId == other.BeatmapSetId
                && RulesetID == other.RulesetID
                && Expired == other.Expired
                && PlaylistOrder == other.PlaylistOrder

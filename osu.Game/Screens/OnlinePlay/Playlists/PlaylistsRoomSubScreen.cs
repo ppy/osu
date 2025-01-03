@@ -168,41 +168,65 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                 RelativeSizeAxes = Axes.Both,
                                 Content = new[]
                                 {
-                                    new[]
+                                    new Drawable[]
                                     {
-                                        UserModsSection = new FillFlowContainer
+                                        new Container
                                         {
                                             RelativeSizeAxes = Axes.X,
                                             AutoSizeAxes = Axes.Y,
-                                            Alpha = 0,
                                             Margin = new MarginPadding { Bottom = 10 },
-                                            Children = new Drawable[]
+                                            Children = new[]
                                             {
-                                                new OverlinedHeader("Extra mods"),
-                                                new FillFlowContainer
+                                                UserModsSection = new FillFlowContainer
                                                 {
-                                                    AutoSizeAxes = Axes.Both,
-                                                    Direction = FillDirection.Horizontal,
-                                                    Spacing = new Vector2(10, 0),
+                                                    RelativeSizeAxes = Axes.X,
+                                                    AutoSizeAxes = Axes.Y,
+                                                    Alpha = 0,
+                                                    Margin = new MarginPadding { Bottom = 10 },
                                                     Children = new Drawable[]
                                                     {
-                                                        new UserModSelectButton
+                                                        new OverlinedHeader("Extra mods"),
+                                                        new FillFlowContainer
                                                         {
-                                                            Anchor = Anchor.CentreLeft,
-                                                            Origin = Anchor.CentreLeft,
-                                                            Width = 90,
-                                                            Text = "Select",
-                                                            Action = ShowUserModSelect,
-                                                        },
-                                                        new ModDisplay
-                                                        {
-                                                            Anchor = Anchor.CentreLeft,
-                                                            Origin = Anchor.CentreLeft,
-                                                            Current = UserMods,
-                                                            Scale = new Vector2(0.8f),
-                                                        },
+                                                            AutoSizeAxes = Axes.Both,
+                                                            Direction = FillDirection.Horizontal,
+                                                            Spacing = new Vector2(10, 0),
+                                                            Children = new Drawable[]
+                                                            {
+                                                                new UserModSelectButton
+                                                                {
+                                                                    Anchor = Anchor.CentreLeft,
+                                                                    Origin = Anchor.CentreLeft,
+                                                                    Width = 90,
+                                                                    Text = "Select",
+                                                                    Action = ShowUserModSelect,
+                                                                },
+                                                                new ModDisplay
+                                                                {
+                                                                    Anchor = Anchor.CentreLeft,
+                                                                    Origin = Anchor.CentreLeft,
+                                                                    Current = UserMods,
+                                                                    Scale = new Vector2(0.8f),
+                                                                },
+                                                            }
+                                                        }
                                                     }
-                                                }
+                                                },
+                                                UserStyleSection = new FillFlowContainer
+                                                {
+                                                    RelativeSizeAxes = Axes.X,
+                                                    AutoSizeAxes = Axes.Y,
+                                                    Alpha = 0,
+                                                    Children = new Drawable[]
+                                                    {
+                                                        new OverlinedHeader("Difficulty"),
+                                                        UserStyleDisplayContainer = new Container<DrawableRoomPlaylistItem>
+                                                        {
+                                                            RelativeSizeAxes = Axes.X,
+                                                            AutoSizeAxes = Axes.Y
+                                                        }
+                                                    }
+                                                },
                                             }
                                         },
                                     },
@@ -273,6 +297,18 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                     this.Push(new PlaylistsSongSelect(Room));
             },
         };
+
+        protected override void OpenStyleSelection()
+        {
+            if (!this.IsCurrentScreen() || SelectedItem.Value is not PlaylistItem item)
+                return;
+
+            this.Push(new PlaylistsRoomStyleSelect(Room, item)
+            {
+                Beatmap = { BindTarget = UserBeatmap },
+                Ruleset = { BindTarget = UserRuleset }
+            });
+        }
 
         private void updatePollingRate()
         {
