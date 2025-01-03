@@ -71,14 +71,15 @@ namespace osu.Game.Rulesets.Taiko.Edit
 
         public void SetRimState(bool state)
         {
-            if (SelectedItems.OfType<Hit>().All(h => h.Type == (state ? HitType.Rim : HitType.Centre)))
+            var expectedType = state ? HitType.Rim : HitType.Centre;
+            if (SelectedItems.OfType<Hit>().All(h => h.Type == expectedType))
                 return;
 
             EditorBeatmap.PerformOnSelection(h =>
             {
-                if (h is Hit taikoHit)
+                if (h is Hit taikoHit && taikoHit.Type != expectedType)
                 {
-                    taikoHit.Type = state ? HitType.Rim : HitType.Centre;
+                    taikoHit.Type = expectedType;
                     EditorBeatmap.Update(h);
                 }
             });

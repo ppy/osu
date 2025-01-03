@@ -6,19 +6,19 @@
 using System;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
-using osu.Framework.Utils;
-using osu.Game.Graphics;
-using osu.Game.Rulesets.Objects.Drawables;
-using osuTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Input.Events;
+using osu.Framework.Utils;
+using osu.Game.Graphics;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Skinning.Default;
 using osu.Game.Skinning;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
@@ -77,9 +77,9 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             OnNewResult += onNewResult;
         }
 
-        protected override void RecreatePieces()
+        protected override void OnApply()
         {
-            base.RecreatePieces();
+            base.OnApply();
             updateColour();
             Height = HitObject.IsStrong ? TaikoStrongableHitObject.DEFAULT_STRONG_SIZE : TaikoHitObject.DEFAULT_SIZE;
         }
@@ -119,8 +119,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             return base.CreateNestedHitObject(hitObject);
         }
 
-        protected override SkinnableDrawable CreateMainPiece() => new SkinnableDrawable(new TaikoSkinComponentLookup(TaikoSkinComponents.DrumRollBody),
-            _ => new ElongatedCirclePiece());
+        protected override SkinnableDrawable OnLoadCreateMainPiece()
+            => new SkinnableDrawable(new TaikoSkinComponentLookup(TaikoSkinComponents.DrumRollBody), _ => new ElongatedCirclePiece());
 
         public override bool OnPressed(KeyBindingPressEvent<TaikoAction> e) => false;
 
@@ -174,7 +174,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         private void updateColour(double fadeDuration = 0)
         {
             Color4 newColour = Interpolation.ValueAt((float)rollingHits / rolling_hits_for_engaged_colour, colourIdle, colourEngaged, 0, 1);
-            (MainPiece.Drawable as IHasAccentColour)?.FadeAccent(newColour, fadeDuration);
+            (MainPiece?.Drawable as IHasAccentColour)?.FadeAccent(newColour, fadeDuration);
         }
 
         public partial class StrongNestedHit : DrawableStrongNestedHit
