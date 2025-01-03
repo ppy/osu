@@ -83,6 +83,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                                 {
                                     new LegacyDefaultComboCounter(),
                                     new LegacyKeyCounterDisplay(),
+                                    new LegacyHealthDisplay(),
                                 }
                             };
                     }

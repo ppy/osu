@@ -9,6 +9,7 @@ using System.Linq;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
@@ -16,6 +17,7 @@ using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
+using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 {
@@ -105,6 +107,20 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                             })
                             {
                                 new LegacyManiaComboCounter(),
+                            };
+
+                        case GlobalSkinnableContainers.Playfield:
+                            return new Container
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Child = new LegacyHealthDisplay
+                                {
+                                    Rotation = -90f,
+                                    Anchor = Anchor.BottomRight,
+                                    Origin = Anchor.TopLeft,
+                                    X = 1,
+                                    Scale = new Vector2(0.7f),
+                                },
                             };
                     }
 
