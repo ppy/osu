@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         public static double MaxDifficulty;
 
-        public static double AvgDifficulty;
+        public static double SummedDifficulty;
         protected override int ReducedSectionCount => 5;
         private double skillMultiplier => 1.430;
         private double strainDecayBase => 0.3;
@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double maxDifficulty;
 
-        private double avgDifficulty;
+        private double summedDifficulty;
 
         private double strainDecay(double ms) => Math.Pow(strainDecayBase, ms / 1000);
 
@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             double totalStrain = currentStrain * currentRhythm;
 
-            avgDifficulty += currentHitObjectStrain * currentRhythm;
+            summedDifficulty += currentHitObjectStrain * currentRhythm;
 
             if (maxDifficulty < currentHitObjectStrain)
                 maxDifficulty = currentHitObjectStrain;
@@ -58,7 +58,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             if (current.Next(1) is null)
             {
                 MaxDifficulty = maxDifficulty;
-                AvgDifficulty = avgDifficulty;
+                SummedDifficulty = summedDifficulty;
             }
 
             return totalStrain;
