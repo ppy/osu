@@ -137,7 +137,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
             double aimValue = OsuStrainSkill.DifficultyToPerformance(attributes.AimDifficulty);
 
-            double difficultyFactor = Aim.AvgDifficulty / totalHits / Aim.MaxDifficulty;
+            double difficultyFactor = Aim.SummedDifficulty / totalHits / Aim.MaxDifficulty;
 
             double hardHits = totalHits * difficultyFactor;
 
@@ -208,7 +208,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double speedValue = OsuStrainSkill.DifficultyToPerformance(attributes.SpeedDifficulty);
 
-            double difficultyFactor = Speed.AvgDifficulty / totalHits / Speed.MaxDifficulty;
+            double difficultyFactor = Speed.SummedDifficulty / totalHits / Speed.MaxDifficulty;
 
             double hardHits = totalHits * difficultyFactor;
 
