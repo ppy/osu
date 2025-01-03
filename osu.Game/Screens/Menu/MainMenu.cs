@@ -13,6 +13,7 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Logging;
@@ -87,6 +88,7 @@ namespace osu.Game.Screens.Menu
 
         private Bindable<double> holdDelay;
         private Bindable<bool> loginDisplayed;
+        private Bindable<bool> showMobileDisclaimer;
 
         private HoldToExitGameOverlay holdToExitGameOverlay;
 
@@ -111,6 +113,7 @@ namespace osu.Game.Screens.Menu
         {
             holdDelay = config.GetBindable<double>(OsuSetting.UIHoldActivationDelay);
             loginDisplayed = statics.GetBindable<bool>(Static.LoginOverlayDisplayed);
+            showMobileDisclaimer = config.GetBindable<bool>(OsuSetting.ShowMobileDisclaimer);
 
             if (host.CanExit)
             {
@@ -275,26 +278,54 @@ namespace osu.Game.Screens.Menu
 
                 sideFlashes.Delay(FADE_IN_DURATION).FadeIn(64, Easing.InQuint);
             }
-            else if (!api.IsLoggedIn || api.State.Value == APIState.RequiresSecondFactorAuth)
+            else
             {
                 // copy out old action to avoid accidentally capturing logo.Action in closure, causing a self-reference loop.
                 var previousAction = logo.Action;
 
-                // we want to hook into logo.Action to display the login overlay, but also preserve the return value of the old action.
+                // we want to hook into logo.Action to display certain overlays, but also preserve the return value of the old action.
                 // therefore pass the old action to displayLogin, so that it can return that value.
                 // this ensures that the OsuLogo sample does not play when it is not desired.
-                logo.Action = () => displayLogin(previousAction);
+                logo.Action = () => onLogoClick(previousAction);
             }
+        }
 
-            bool displayLogin(Func<bool> originalAction)
+        private bool onLogoClick(Func<bool> originalAction)
+        {
+            if (!api.IsLoggedIn || api.State.Value == APIState.RequiresSecondFactorAuth)
             {
                 if (!loginDisplayed.Value)
                 {
-                    Scheduler.AddDelayed(() => login?.Show(), 500);
+                    this.Delay(500).Schedule(() => login?.Show());
                     loginDisplayed.Value = true;
                 }
+            }
 
-                return originalAction.Invoke();
+            if (showMobileDisclaimer.Value)
+            {
+                this.Delay(500).Schedule(() => dialogOverlay.Push(new MobileDisclaimerDialog()));
+                showMobileDisclaimer.Value = false;
+            }
+
+            return originalAction.Invoke();
+        }
+
+        internal partial class MobileDisclaimerDialog : PopupDialog
+        {
+            public MobileDisclaimerDialog()
+            {
+                HeaderText = "Mobile disclaimer";
+                BodyText = "We're releasing this for your enjoyment, but PC is still our focus and mobile is hard to support.\n\nPlease bear with us as we continue to improve the experience!";
+
+                Icon = FontAwesome.Solid.Mobile;
+
+                Buttons = new PopupDialogButton[]
+                {
+                    new PopupDialogOkButton
+                    {
+                        Text = "Alright!",
+                    },
+                };
             }
         }
 
