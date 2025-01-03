@@ -112,5 +112,20 @@ namespace osu.Game.Tests.Beatmaps
                 }
             });
         }
+
+        [Test]
+        public void TestRepeatsGeneratedEvenForZeroLengthSlider()
+        {
+            var events = SliderEventGenerator.Generate(start_time, span_duration, 1, span_duration / 2, 0, 2).ToArray();
+
+            Assert.That(events[0].Type, Is.EqualTo(SliderEventType.Head));
+            Assert.That(events[0].Time, Is.EqualTo(start_time));
+
+            Assert.That(events[1].Type, Is.EqualTo(SliderEventType.Repeat));
+            Assert.That(events[1].Time, Is.EqualTo(span_duration));
+
+            Assert.That(events[3].Type, Is.EqualTo(SliderEventType.Tail));
+            Assert.That(events[3].Time, Is.EqualTo(span_duration * 2));
+        }
     }
 }
