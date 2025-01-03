@@ -39,6 +39,7 @@ using osu.Game.Screens.Edit;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Select.Details;
+using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Screens.Select.Options;
 using osu.Game.Skinning;
 using osu.Game.Utils;
@@ -151,6 +152,8 @@ namespace osu.Game.Screens.Select
         [Resolved]
         internal IOverlayManager? OverlayManager { get; private set; }
 
+        protected BeatmapLeaderboardScoresProvider ScoresProvider = null!;
+
         private Bindable<bool> configBackgroundBlur = null!;
 
         [BackgroundDependencyLoader(true)]
@@ -170,6 +173,7 @@ namespace osu.Game.Screens.Select
 
             AddRangeInternal(new Drawable[]
             {
+                ScoresProvider = new BeatmapLeaderboardScoresProvider(),
                 new GlobalScrollAdjustsVolume(),
                 new VerticalMaskingContainer
                 {

@@ -24,6 +24,7 @@ using osu.Game.Online.Spectator;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Settings;
 using osu.Game.Screens.OnlinePlay.Match.Components;
+using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Screens.Spectate;
 using osu.Game.Users;
 using osuTK;
@@ -53,6 +54,8 @@ namespace osu.Game.Screens.Play
         private SettingsCheckbox automaticDownload = null!;
 
         private readonly APIUser targetUser;
+
+        private BeatmapLeaderboardScoresProvider scoresProvider = null!;
 
         /// <summary>
         /// The player's immediate online gameplay state.
@@ -157,6 +160,11 @@ namespace osu.Game.Screens.Play
                     }
                 }
             };
+
+            AddInternal(scoresProvider = new BeatmapLeaderboardScoresProvider
+            {
+                Scope = BeatmapLeaderboardScope.Global
+            });
         }
 
         protected override void LoadComplete()
@@ -236,7 +244,14 @@ namespace osu.Game.Screens.Play
                 Beatmap.Value = spectatorGameplayState.Beatmap;
                 Ruleset.Value = spectatorGameplayState.Ruleset.RulesetInfo;
 
-                this.Push(new SpectatorPlayerLoader(spectatorGameplayState.Score, () => new SoloSpectatorPlayer(spectatorGameplayState.Score)));
+                scoresProvider.BeatmapInfo = Beatmap.Value is DummyWorkingBeatmap ? null : Beatmap.Value.BeatmapInfo;
+
+                this.Push(new SpectatorPlayerLoader(spectatorGameplayState.Score, createPlayer));
+
+                SoloSpectatorPlayer createPlayer() => new SoloSpectatorPlayer(spectatorGameplayState.Score)
+                {
+                    LeaderboardScores = { BindTarget = scoresProvider.Scores }
+                };
             }
         }
 

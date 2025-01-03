@@ -2,13 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Threading;
-using osu.Framework.Allocation;
-using osu.Framework.Bindables;
-using osu.Framework.Development;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -17,11 +11,11 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Online.API;
 using osu.Game.Online.Placeholders;
 using osuTK;
 using osuTK.Graphics;
 using osu.Game.Localisation;
+using System.Threading;
 
 namespace osu.Game.Online.Leaderboards
 {
@@ -33,17 +27,7 @@ namespace osu.Game.Online.Leaderboards
     /// <typeparam name="TScoreInfo">The score model class.</typeparam>
     public abstract partial class Leaderboard<TScope, TScoreInfo> : CompositeDrawable
     {
-        /// <summary>
-        /// The currently displayed scores.
-        /// </summary>
-        public IBindableList<TScoreInfo> Scores => scores;
-
-        private readonly BindableList<TScoreInfo> scores = new BindableList<TScoreInfo>();
-
-        /// <summary>
-        /// Whether the current scope should refetch in response to changes in API connectivity state.
-        /// </summary>
-        protected abstract bool IsOnlineScope { get; }
+        protected LeaderboardScoresProvider<TScope, TScoreInfo> LeaderboardScoresProvider;
 
         private const double fade_duration = 300;
 
@@ -55,35 +39,12 @@ namespace osu.Game.Online.Leaderboards
 
         private readonly LoadingSpinner loading;
 
-        private CancellationTokenSource? currentFetchCancellationSource;
         private CancellationTokenSource? currentScoresAsyncLoadCancellationSource;
 
-        private APIRequest? fetchScoresRequest;
-
-        private LeaderboardState state;
-
-        [Resolved(CanBeNull = true)]
-        private IAPIProvider? api { get; set; }
-
-        private readonly IBindable<APIState> apiState = new Bindable<APIState>();
-
-        private TScope scope = default!;
-
-        public TScope Scope
+        protected Leaderboard(LeaderboardScoresProvider<TScope, TScoreInfo> leaderboardScoresProvider)
         {
-            get => scope;
-            set
-            {
-                if (EqualityComparer<TScope>.Default.Equals(value, scope))
-                    return;
+            LeaderboardScoresProvider = leaderboardScoresProvider;
 
-                scope = value;
-                RefetchScores();
-            }
-        }
-
-        protected Leaderboard()
-        {
             InternalChildren = new Drawable[]
             {
                 new OsuContextMenuContainer
@@ -127,137 +88,31 @@ namespace osu.Game.Online.Leaderboards
         {
             base.LoadComplete();
 
-            if (api != null)
-            {
-                apiState.BindTo(api.State);
-                apiState.BindValueChanged(state =>
-                {
-                    switch (state.NewValue)
-                    {
-                        case APIState.Online:
-                        case APIState.Offline:
-                            if (IsOnlineScope)
-                                RefetchScores();
-
-                            break;
-                    }
-                });
-            }
-
-            RefetchScores();
+            LeaderboardScoresProvider.State.BindValueChanged(state => onStateChange(state.NewValue));
         }
 
-        /// <summary>
-        /// Perform a full refetch of scores using current criteria.
-        /// </summary>
-        public void RefetchScores() => Scheduler.AddOnce(refetchScores);
-
-        /// <summary>
-        /// Clear all scores from the display.
-        /// </summary>
-        public void ClearScores()
+        private void onStateChange(LeaderboardState state)
         {
-            cancelPendingWork();
-            SetScores(null);
-        }
-
-        /// <summary>
-        /// Call when a retrieval or display failure happened to show a relevant message to the user.
-        /// </summary>
-        /// <param name="state">The state to display.</param>
-        protected void SetErrorState(LeaderboardState state)
-        {
-            switch (state)
-            {
-                case LeaderboardState.NoScores:
-                case LeaderboardState.Retrieving:
-                case LeaderboardState.Success:
-                    throw new InvalidOperationException($"State {state} cannot be set by a leaderboard implementation.");
-            }
-
-            Debug.Assert(!scores.Any());
-
-            setState(state);
-        }
-
-        /// <summary>
-        /// Call when retrieved scores are ready to be displayed.
-        /// </summary>
-        /// <param name="scores">The scores to display.</param>
-        /// <param name="userScore">The user top score, if any.</param>
-        protected void SetScores(IEnumerable<TScoreInfo>? scores, TScoreInfo? userScore = default)
-        {
-            this.scores.Clear();
-            if (scores != null)
-                this.scores.AddRange(scores);
-
-            // Non-delayed schedule may potentially run inline (due to IsMainThread check passing) after leaderboard  is disposed.
-            // This is guarded against in BeatmapLeaderboard via web request cancellation, but let's be extra safe.
-            if (!IsDisposed)
-            {
-                // Schedule needs to be non-delayed here for the weird logic in refetchScores to work.
-                // If it is removed, the placeholder will be incorrectly updated to "no scores" rather than "retrieving".
-                // This whole flow should be refactored in the future.
-                Scheduler.Add(applyNewScores, false);
-            }
+            Schedule(applyNewScores);
 
             void applyNewScores()
             {
-                userScoreContainer.Score.Value = userScore;
+                userScoreContainer.Score.Value = LeaderboardScoresProvider.UserScore;
 
-                if (userScore == null)
+                if (LeaderboardScoresProvider.UserScore == null)
                     userScoreContainer.Hide();
                 else
                     userScoreContainer.Show();
 
-                updateScoresDrawables();
+                updateScoresDrawables(state);
             }
         }
-
-        /// <summary>
-        /// Performs a fetch/refresh of scores to be displayed.
-        /// </summary>
-        /// <param name="cancellationToken"></param>
-        /// <returns>An <see cref="APIRequest"/> responsible for the fetch operation. This will be queued and performed automatically.</returns>
-        protected abstract APIRequest? FetchScores(CancellationToken cancellationToken);
 
         protected abstract LeaderboardScore CreateDrawableScore(TScoreInfo model, int index);
 
         protected abstract LeaderboardScore CreateDrawableTopScore(TScoreInfo model);
 
-        private void refetchScores()
-        {
-            Debug.Assert(ThreadSafety.IsUpdateThread);
-
-            ClearScores();
-            setState(LeaderboardState.Retrieving);
-
-            currentFetchCancellationSource = new CancellationTokenSource();
-
-            fetchScoresRequest = FetchScores(currentFetchCancellationSource.Token);
-
-            if (fetchScoresRequest == null)
-                return;
-
-            fetchScoresRequest.Failure += e => Schedule(() =>
-            {
-                if (e is OperationCanceledException || currentFetchCancellationSource.IsCancellationRequested)
-                    return;
-
-                SetErrorState(LeaderboardState.NetworkFailure);
-            });
-
-            api?.Queue(fetchScoresRequest);
-        }
-
-        private void cancelPendingWork()
-        {
-            currentFetchCancellationSource?.Cancel();
-            currentScoresAsyncLoadCancellationSource?.Cancel();
-            fetchScoresRequest?.Cancel();
-        }
-
-        private void updateScoresDrawables()
+        private void updateScoresDrawables(LeaderboardState state)
         {
             currentScoresAsyncLoadCancellationSource?.Cancel();
 
@@ -266,9 +121,9 @@ namespace osu.Game.Online.Leaderboards
                 .Expire();
             scoreFlowContainer = null;
 
-            if (!scores.Any())
+            if (!LeaderboardScoresProvider.Scores.Any())
             {
-                setState(LeaderboardState.NoScores);
+                setPlaceholder(state);
                 return;
             }
 
@@ -278,10 +133,10 @@ namespace osu.Game.Online.Leaderboards
                 AutoSizeAxes = Axes.Y,
                 Spacing = new Vector2(0f, 5f),
                 Padding = new MarginPadding { Top = 10, Bottom = 5 },
-                ChildrenEnumerable = scores.Select((s, index) => CreateDrawableScore(s, index + 1))
+                ChildrenEnumerable = LeaderboardScoresProvider.Scores.Select((s, index) => CreateDrawableScore(s, index + 1))
             }, newFlow =>
             {
-                setState(LeaderboardState.Success);
+                setPlaceholder(state);
 
                 scrollContainer.Add(scoreFlowContainer = newFlow);
 
@@ -303,17 +158,12 @@ namespace osu.Game.Online.Leaderboards
 
         private Placeholder? placeholder;
 
-        private void setState(LeaderboardState state)
+        private void setPlaceholder(LeaderboardState state)
         {
-            if (state == this.state)
-                return;
-
             if (state == LeaderboardState.Retrieving)
                 loading.Show();
             else
                 loading.Hide();
-
-            this.state = state;
 
             placeholder?.FadeOut(150, Easing.OutQuint).Expire();
 
@@ -335,7 +185,7 @@ namespace osu.Game.Online.Leaderboards
                 case LeaderboardState.NetworkFailure:
                     return new ClickablePlaceholder(LeaderboardStrings.CouldntFetchScores, FontAwesome.Solid.Sync)
                     {
-                        Action = RefetchScores
+                        Action = LeaderboardScoresProvider.RefetchScores
                     };
 
                 case LeaderboardState.NoneSelected:

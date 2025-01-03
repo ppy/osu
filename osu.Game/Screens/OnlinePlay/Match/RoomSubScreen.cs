@@ -95,6 +95,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
         private IDisposable? userModsSelectOverlayRegistration;
         private RoomSettingsOverlay settingsOverlay = null!;
         private Drawable mainContent = null!;
+        protected MatchLeaderboardScoresProvider MatchScoresProvider = null!;
 
         /// <summary>
         /// Creates a new <see cref="RoomSubScreen"/>.
@@ -119,6 +120,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
+                    MatchScoresProvider = new MatchLeaderboardScoresProvider(Room),
                     beatmapAvailabilityTracker,
                     new MultiplayerRoomSounds(),
                     new GridContainer

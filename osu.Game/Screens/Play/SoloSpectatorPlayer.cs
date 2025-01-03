@@ -2,10 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Screens;
 using osu.Game.Online.Spectator;
 using osu.Game.Scoring;
+using osu.Game.Screens.Play.HUD;
 using osu.Game.Users;
 
 namespace osu.Game.Screens.Play
@@ -13,6 +15,8 @@ namespace osu.Game.Screens.Play
     public partial class SoloSpectatorPlayer : SpectatorPlayer
     {
         private readonly Score score;
+
+        public readonly IBindableList<ScoreInfo> LeaderboardScores = new BindableList<ScoreInfo>();
 
         protected override UserActivity InitialActivity => new UserActivity.SpectatingUser(Score.ScoreInfo);
 
@@ -44,6 +48,13 @@ namespace osu.Game.Screens.Play
                 if (this.IsCurrentScreen()) this.Exit();
             });
         }
+
+        protected override GameplayLeaderboard CreateGameplayLeaderboard() =>
+            new SoloGameplayLeaderboard(Score.ScoreInfo.User)
+            {
+                AlwaysVisible = { Value = true },
+                Scores = { BindTarget = LeaderboardScores }
+            };
 
         protected override void Dispose(bool isDisposing)
         {
