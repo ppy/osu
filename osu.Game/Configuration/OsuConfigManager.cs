@@ -3,6 +3,7 @@
 
 using System;
 using System.Diagnostics;
+using osu.Framework;
 using osu.Framework.Bindables;
 using osu.Framework.Configuration;
 using osu.Framework.Configuration.Tracking;
@@ -163,6 +164,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.Version, string.Empty);
 
             SetDefault(OsuSetting.ShowFirstRunSetup, true);
+            SetDefault(OsuSetting.ShowMobileDisclaimer, RuntimeInfo.IsMobile);
 
             SetDefault(OsuSetting.ScreenshotFormat, ScreenshotFormat.Jpg);
             SetDefault(OsuSetting.ScreenshotCaptureMenuCursor, false);
@@ -452,5 +454,6 @@ namespace osu.Game.Configuration
         AlwaysRequireHoldingForPause,
         MultiplayerShowInProgressFilter,
         BeatmapListingFeaturedArtistFilter,
+        ShowMobileDisclaimer,
     }
 }
