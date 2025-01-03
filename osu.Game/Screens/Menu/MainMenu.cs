@@ -41,6 +41,7 @@ using osu.Game.Screens.Select;
 using osu.Game.Seasonal;
 using osuTK;
 using osuTK.Graphics;
+using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Menu
 {
@@ -470,11 +471,10 @@ namespace osu.Game.Screens.Menu
         {
             public MobileDisclaimerDialog(Action confirmed)
             {
-                HeaderText = "A few important words from your dev team!";
-                BodyText =
-                    "While we have released osu! on mobile platforms to maximise the number of people that can enjoy the game, our focus is still on the PC version.\n\nYour experience will not be perfect, and may even feel subpar compared to games which are made mobile-first.\n\nPlease bear with us as we continue to improve the game for you!";
+                HeaderText = ButtonSystemStrings.MobileDisclaimerHeader;
+                BodyText = ButtonSystemStrings.MobileDisclaimerBody;
 
-                Icon = FontAwesome.Solid.Mobile;
+                Icon = FontAwesome.Solid.SmileBeam;
 
                 Buttons = new PopupDialogButton[]
                 {
