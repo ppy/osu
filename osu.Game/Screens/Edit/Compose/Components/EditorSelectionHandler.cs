@@ -293,7 +293,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             foreach ((string bankName, var bindable) in SelectionAdditionBankStates)
             {
-                bindable.Value = GetStateFromSelection(samplesInSelection.SelectMany(s => s).Where(o => o.Name != HitSampleInfo.HIT_NORMAL), h => (bankName != HIT_BANK_AUTO && h.Bank == bankName && !h.EditorAutoBank) || (bankName == HIT_BANK_AUTO && h.EditorAutoBank));
+                bindable.Value = GetStateFromSelection(samplesInSelection.SelectMany(s => s).Where(o => o.Name != HitSampleInfo.HIT_NORMAL),
+                    h => (bankName != HIT_BANK_AUTO && h.Bank == bankName && !h.EditorAutoBank) || (bankName == HIT_BANK_AUTO && h.EditorAutoBank));
             }
         }
 
@@ -380,14 +381,21 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     return;
 
                 string normalBank = h.Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL)?.Bank ?? HitSampleInfo.BANK_SOFT;
-                h.Samples = h.Samples.Select(s => s.Name != HitSampleInfo.HIT_NORMAL ? bankName == HIT_BANK_AUTO ? s.With(newBank: normalBank, newEditorAutoBank: true) : s.With(newBank: bankName, newEditorAutoBank: false) : s).ToList();
+                h.Samples = h.Samples.Select(s =>
+                                 s.Name != HitSampleInfo.HIT_NORMAL
+                                     ? bankName == HIT_BANK_AUTO ? s.With(newBank: normalBank, newEditorAutoBank: true) : s.With(newBank: bankName, newEditorAutoBank: false)
+                                     : s)
+                             .ToList();
 
                 if (h is IHasRepeats hasRepeats)
                 {
                     for (int i = 0; i < hasRepeats.NodeSamples.Count; ++i)
                     {
                         normalBank = hasRepeats.NodeSamples[i].FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL)?.Bank ?? HitSampleInfo.BANK_SOFT;
-                        hasRepeats.NodeSamples[i] = hasRepeats.NodeSamples[i].Select(s => s.Name != HitSampleInfo.HIT_NORMAL ? bankName == HIT_BANK_AUTO ? s.With(newBank: normalBank, newEditorAutoBank: true) : s.With(newBank: bankName, newEditorAutoBank: false) : s).ToList();
+                        hasRepeats.NodeSamples[i] = hasRepeats.NodeSamples[i].Select(s =>
+                            s.Name != HitSampleInfo.HIT_NORMAL
+                                ? bankName == HIT_BANK_AUTO ? s.With(newBank: normalBank, newEditorAutoBank: true) : s.With(newBank: bankName, newEditorAutoBank: false)
+                                : s).ToList();
                     }
                 }
 
