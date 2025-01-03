@@ -355,18 +355,18 @@ namespace osu.Game.Tests.Visual.Navigation
         }
 
         [Test]
-        public void TestLastScoreNullAfterExitingPlayer()
+        public void TestLastScoreNotNullAfterExitingPlayer()
         {
-            AddUntilStep("wait for last play null", getLastPlay, () => Is.Null);
+            AddUntilStep("last play null", getLastPlay, () => Is.Null);
 
             var getOriginalPlayer = playToCompletion();
 
             AddStep("attempt to retry", () => getOriginalPlayer().ChildrenOfType<HotkeyRetryOverlay>().First().Action());
-            AddUntilStep("wait for last play matches player", getLastPlay, () => Is.EqualTo(getOriginalPlayer().Score.ScoreInfo));
+            AddUntilStep("last play matches player", getLastPlay, () => Is.EqualTo(getOriginalPlayer().Score.ScoreInfo));
 
             AddUntilStep("wait for player", () => Game.ScreenStack.CurrentScreen != getOriginalPlayer() && Game.ScreenStack.CurrentScreen is Player);
             AddStep("exit player", () => (Game.ScreenStack.CurrentScreen as Player)?.Exit());
-            AddUntilStep("wait for last play null", getLastPlay, () => Is.Null);
+            AddUntilStep("last play not null", getLastPlay, () => Is.Not.Null);
 
             ScoreInfo getLastPlay() => Game.Dependencies.Get<SessionStatics>().Get<ScoreInfo>(Static.LastLocalUserScore);
         }
