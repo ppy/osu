@@ -310,25 +310,6 @@ namespace osu.Game.Screens.Menu
             return originalAction.Invoke();
         }
 
-        internal partial class MobileDisclaimerDialog : PopupDialog
-        {
-            public MobileDisclaimerDialog()
-            {
-                HeaderText = "Mobile disclaimer";
-                BodyText = "We're releasing this for your enjoyment, but PC is still our focus and mobile is hard to support.\n\nPlease bear with us as we continue to improve the experience!";
-
-                Icon = FontAwesome.Solid.Mobile;
-
-                Buttons = new PopupDialogButton[]
-                {
-                    new PopupDialogOkButton
-                    {
-                        Text = "Alright!",
-                    },
-                };
-            }
-        }
-
         protected override void LogoSuspending(OsuLogo logo)
         {
             var seq = logo.FadeOut(300, Easing.InSine)
@@ -473,6 +454,25 @@ namespace osu.Game.Screens.Menu
 
         public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
+        }
+
+        private partial class MobileDisclaimerDialog : PopupDialog
+        {
+            public MobileDisclaimerDialog()
+            {
+                HeaderText = "Mobile disclaimer";
+                BodyText = "We're releasing this for your enjoyment, but PC is still our focus and mobile is hard to support.\n\nPlease bear with us as we continue to improve the experience!";
+
+                Icon = FontAwesome.Solid.Mobile;
+
+                Buttons = new PopupDialogButton[]
+                {
+                    new PopupDialogOkButton
+                    {
+                        Text = "Alright!",
+                    },
+                };
+            }
         }
     }
 }
