@@ -277,6 +277,7 @@ namespace osu.Game.Rulesets.Mania
                             new ManiaModKey9(),
                             new ManiaModKey10()
                         ),
+                        new ManiaModUnranked()
                     };
 
                 case ModType.Automation:
