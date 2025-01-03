@@ -177,6 +177,8 @@ namespace osu.Game.Screens.Edit
         [CanBeNull] // Should be non-null once it can support custom rulesets.
         private EditorChangeHandler changeHandler;
 
+        private NewBeatmapEditorChangeHandler newChangeHandler;
+
         private DependencyContainer dependencies;
 
         private bool isNewBeatmap;
@@ -301,6 +303,9 @@ namespace osu.Game.Screens.Edit
                 changeHandler = new BeatmapEditorChangeHandler(editorBeatmap);
                 dependencies.CacheAs<IEditorChangeHandler>(changeHandler);
             }
+
+            newChangeHandler = new NewBeatmapEditorChangeHandler(editorBeatmap);
+            dependencies.CacheAs(newChangeHandler);
 
             beatDivisor.SetArbitraryDivisor(editorBeatmap.BeatmapInfo.BeatDivisor);
             beatDivisor.BindValueChanged(divisor => editorBeatmap.BeatmapInfo.BeatDivisor = divisor.NewValue);
@@ -463,8 +468,8 @@ namespace osu.Game.Screens.Edit
                 }
             });
 
-            changeHandler?.CanUndo.BindValueChanged(v => undoMenuItem.Action.Disabled = !v.NewValue, true);
-            changeHandler?.CanRedo.BindValueChanged(v => redoMenuItem.Action.Disabled = !v.NewValue, true);
+            newChangeHandler.CanUndo.BindValueChanged(v => undoMenuItem.Action.Disabled = !v.NewValue, true);
+            newChangeHandler.CanRedo.BindValueChanged(v => redoMenuItem.Action.Disabled = !v.NewValue, true);
 
             editorBackgroundDim.BindValueChanged(_ => dimBackground());
         }
@@ -1025,9 +1030,9 @@ namespace osu.Game.Screens.Edit
 
         #endregion
 
-        protected void Undo() => changeHandler?.RestoreState(-1);
+        protected void Undo() => newChangeHandler.Undo();
 
-        protected void Redo() => changeHandler?.RestoreState(1);
+        protected void Redo() => newChangeHandler.Redo();
 
         protected void SetPreviewPointToCurrentTime()
         {
