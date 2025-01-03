@@ -303,8 +303,11 @@ namespace osu.Game.Screens.Menu
 
             if (showMobileDisclaimer.Value)
             {
-                this.Delay(500).Schedule(() => dialogOverlay.Push(new MobileDisclaimerDialog()));
-                showMobileDisclaimer.Value = false;
+                this.Delay(500).Schedule(() =>
+                {
+                    dialogOverlay.Push(new MobileDisclaimerDialog());
+                    showMobileDisclaimer.Value = false;
+                });
             }
 
             return originalAction.Invoke();
