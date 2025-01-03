@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         public static double MaxDifficulty;
 
-        public static double AvgDifficulty;
+        public static double SummedDifficulty;
 
         private readonly bool withSliders;
 
@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double maxDifficulty;
 
-        private double avgDifficulty;
+        private double summedDifficulty;
 
         private double skillMultiplier => 25.18;
         private double strainDecayBase => 0.15;
