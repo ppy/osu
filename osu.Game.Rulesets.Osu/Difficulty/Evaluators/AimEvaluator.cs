@@ -89,10 +89,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     acuteAngleBonus *= 0.03 + 0.97 * (1 - Math.Min(acuteAngleBonus, Math.Pow(calcAcuteAngleBonus(lastAngle), 3)));
                 }
 
-                wideAngleBonus = calcWideAngleBonus(currAngle) *
-                                 angleBonus *
-                                 DifficultyCalculationUtils.Smootherstep(osuCurrObj.LazyJumpDistance, radius, diameter) *
-                                 (1 - Math.Min(wideAngleBonus, Math.Pow(calcWideAngleBonus(lastAngle), 3))); // penalize repetitive wide angles
+                wideAngleBonus = calcWideAngleBonus(currAngle);
+
+                // Penalize wide angles if they're repeated, reducing the penalty as the lastAngle gets more acute.
+                wideAngleBonus *= angleBonus * (1 - Math.Min(wideAngleBonus, Math.Pow(calcWideAngleBonus(lastAngle), 3)));
+
+                wideAngleBonus *= DifficultyCalculationUtils.Smootherstep(osuCurrObj.LazyJumpDistance, radius, diameter);
 
                 // Apply wiggle bonus for jumps that are [radius, 3*diameter] in distance, with < 110 angle
                 // https://www.desmos.com/calculator/dp0v0nvowc
