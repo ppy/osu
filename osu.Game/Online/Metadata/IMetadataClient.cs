@@ -9,7 +9,7 @@ namespace osu.Game.Online.Metadata
     /// <summary>
     /// Interface for metadata-related remote procedure calls to be executed on the client side.
     /// </summary>
-    public interface IMetadataClient : IStatefulUserHubClient
+    public partial interface IMetadataClient : IStatefulUserHubClient
     {
         /// <summary>
         /// Delivers the set of requested <see cref="BeatmapUpdates"/> to the client.
