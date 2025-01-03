@@ -302,6 +302,7 @@ namespace osu.Game.Overlays.Dialog
             {
                 content.ScaleTo(0.7f);
                 ring.ResizeTo(ringMinifiedSize);
+                icon.ScaleTo(0f);
             }
 
             content
@@ -309,6 +310,7 @@ namespace osu.Game.Overlays.Dialog
                 .FadeIn(ENTER_DURATION, Easing.OutQuint);
 
             ring.ResizeTo(ringSize, ENTER_DURATION * 1.5f, Easing.OutQuint);
+            icon.Delay(100).ScaleTo(1, ENTER_DURATION * 1.5f, Easing.OutQuint);
         }
 
         protected override void PopOut()
