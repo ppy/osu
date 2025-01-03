@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -137,8 +137,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
             double aimValue = OsuStrainSkill.DifficultyToPerformance(attributes.AimDifficulty);
 
-            double lengthBonus = 0.95 + 0.4 * Math.Min(1.0, totalHits / 2000.0) +
-                                 (totalHits > 2000 ? Math.Log10(totalHits / 2000.0) * 0.5 : 0.0);
+            double difficultyFactor = Aim.AvgDifficulty / totalHits / Aim.MaxDifficulty;
+
+            double hardHits = totalHits * difficultyFactor;
+
+            double avgHit = (hardHits + totalHits) / 2;
+
+            double lengthBonus = 0.95 + 0.4 * Math.Min(1.0, avgHit / 1500.0) +
+                                 (avgHit > 1500 ? Math.Log10(avgHit / 1500.0) * 0.5 : 0.0);
+
             aimValue *= lengthBonus;
 
             if (effectiveMissCount > 0)
@@ -201,8 +208,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double speedValue = OsuStrainSkill.DifficultyToPerformance(attributes.SpeedDifficulty);
 
-            double lengthBonus = 0.95 + 0.4 * Math.Min(1.0, totalHits / 2000.0) +
-                                 (totalHits > 2000 ? Math.Log10(totalHits / 2000.0) * 0.5 : 0.0);
+            double difficultyFactor = Speed.AvgDifficulty / totalHits / Speed.MaxDifficulty;
+
+            double hardHits = totalHits * difficultyFactor;
+
+            double avgHit = (hardHits + totalHits) / 2;
+
+            double lengthBonus = 0.95 + 0.4 * Math.Min(1.0, avgHit / 1500.0) +
+                                 (avgHit > 1500 ? Math.Log10(avgHit / 1500.0) * 0.5 : 0.0);
             speedValue *= lengthBonus;
 
             if (effectiveMissCount > 0)
