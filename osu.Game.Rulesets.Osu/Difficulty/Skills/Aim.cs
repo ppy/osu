@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             currentStrain += currentHitObjectStrain;
 
-            avgDifficulty += currentHitObjectStrain;
+            summedDifficulty += currentHitObjectStrain;
 
             if (maxDifficulty < currentHitObjectStrain)
                 maxDifficulty = currentHitObjectStrain;
@@ -54,7 +54,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             if (current.Next(1) is null)
             {
                 MaxDifficulty = maxDifficulty;
-                AvgDifficulty = avgDifficulty;
+                SummedDifficulty = summedDifficulty;
             }
 
             return currentStrain;
