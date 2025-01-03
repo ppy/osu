@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
 {
     public partial class ArgonJudgementPiece : TextJudgementPiece, IAnimatableJudgement
     {
-        private const float judgement_y_position = 160;
+        private const float judgement_y_position = -180f;
 
         private RingExplosion? ringExplosion;
 
