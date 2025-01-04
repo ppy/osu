@@ -140,10 +140,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
             double difficulty = 0.0d;
 
             if (rhythm.SameRhythmHitObjects?.FirstHitObject == hitObject) // Difficulty for SameRhythmHitObjects
-                difficulty += 1.75 * evaluateDifficultyOf(rhythm.SameRhythmHitObjects, hitWindow);
+                difficulty += 5.0 * evaluateDifficultyOf(rhythm.SameRhythmHitObjects, hitWindow);
 
             if (rhythm.SamePatterns?.FirstHitObject == hitObject) // Difficulty for SamePatterns
-                difficulty += 1.25 * evaluateDifficultyOf(rhythm.SamePatterns);
+                difficulty += 5.0 * evaluateDifficultyOf(rhythm.SamePatterns);
 
             return difficulty;
         }

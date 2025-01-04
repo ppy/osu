@@ -57,36 +57,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
             }
 
             TaikoDifficultyHitObject taikoCurrent = (TaikoDifficultyHitObject)current;
-            TaikoDifficultyHitObject? previousObject = taikoCurrent.Previous(1) as TaikoDifficultyHitObject;
             TaikoDifficultyHitObject? previousMono = taikoCurrent.PreviousMono(availableFingersFor(taikoCurrent) - 1);
 
-            // There is no previous hit object hit by the current finger
-            if (previousMono == null)
-                return 0.0;
-
-            int consecutiveCount = 1;
-
-            while (previousObject != null)
-            {
-                if (Math.Abs(previousObject.DeltaTime - taikoCurrent.DeltaTime) < 5.0) // Tolerance of 5ms for unsnaps
-                {
-                    consecutiveCount++;
-                    previousObject = previousObject.Previous(1) as TaikoDifficultyHitObject;
-                }
-                else
-                {
-                    break;
-                }
-            }
-
             double objectStrain = 0.5; // Add a base strain to all objects
-            objectStrain += speedBonus(taikoCurrent.StartTime - previousMono.StartTime);
-
-            // Consecutive notes exceeding 100 are buffed slowly, capped at 800 objects.
-            if (consecutiveCount >= 200)
-            {
-                objectStrain += 0.00025 * Math.Min(consecutiveCount, 600);
-            }
+            if (previousMono != null) objectStrain += speedBonus(taikoCurrent.StartTime - previousMono.StartTime);
 
             return objectStrain;
         }
