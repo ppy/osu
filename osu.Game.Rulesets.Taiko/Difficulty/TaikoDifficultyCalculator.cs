@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
     public class TaikoDifficultyCalculator : DifficultyCalculator
     {
         private const double difficulty_multiplier = 0.084375;
-        private double rhythm_skill_multiplier = 0.65 * difficulty_multiplier;
+        private const double rhythm_skill_multiplier = 0.65 * difficulty_multiplier;
         private const double reading_skill_multiplier = 0.100 * difficulty_multiplier;
         private const double colour_skill_multiplier = 0.375 * difficulty_multiplier;
         private const double stamina_skill_multiplier = 0.445 * difficulty_multiplier;
