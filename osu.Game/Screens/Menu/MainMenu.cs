@@ -317,13 +317,12 @@ namespace osu.Game.Screens.Menu
 
         private void displayLoginIfApplicable()
         {
+            if (loginDisplayed.Value) return;
+
             if (!api.IsLoggedIn || api.State.Value == APIState.RequiresSecondFactorAuth)
             {
-                if (!loginDisplayed.Value)
-                {
-                    Scheduler.AddDelayed(() => login?.Show(), 500);
-                    loginDisplayed.Value = true;
-                }
+                Scheduler.AddDelayed(() => login?.Show(), 500);
+                loginDisplayed.Value = true;
             }
         }
 
