@@ -11,6 +11,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Configuration;
 using osu.Framework.Logging;
+using osu.Framework.Platform;
 using osu.Framework.Statistics;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
@@ -36,7 +37,7 @@ namespace osu.Game.Utils
 
         private readonly OsuGame game;
 
-        public SentryLogger(OsuGame game)
+        public SentryLogger(OsuGame game, Storage? storage = null)
         {
             this.game = game;
 
@@ -49,6 +50,7 @@ namespace osu.Game.Utils
                 options.AutoSessionTracking = true;
                 options.IsEnvironmentUser = false;
                 options.IsGlobalModeEnabled = true;
+                options.CacheDirectoryPath = storage?.GetFullPath(string.Empty);
                 // The reported release needs to match version as reported to Sentry in .github/workflows/sentry-release.yml
                 options.Release = $"osu@{game.Version.Replace($@"-{OsuGameBase.BUILD_SUFFIX}", string.Empty)}";
             });
