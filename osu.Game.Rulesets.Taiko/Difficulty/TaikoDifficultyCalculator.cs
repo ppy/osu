@@ -122,8 +122,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             double staminaDifficultStrains = stamina.CountTopWeightedStrains() * clockRate;
 
             strainLengthBonus = 1
-                + Math.Min(Math.Max((staminaDifficultStrains - 1350) / 5000, 0), 0.15) + Math.Min(Math.Max((staminaRating - 7.0) / 1.0, 0), 0.05)
-                + Math.Min(Math.Max((rhythmRating - 4.25) / 0.75, 0), 0.15) - Math.Min(Math.Max((65 - rhythmDifficultStrains) / 25, 0), 0.10);
+                                + Math.Min(Math.Max((staminaDifficultStrains - 1350) / 5000, 0), 0.15) + Math.Min(Math.Max((staminaRating - 7.0) / 1.0, 0), 0.05)
+                                + Math.Min(Math.Max((rhythmRating - 4.25) / 0.75, 0), 0.15);
 
             double combinedRating = combinedDifficultyValue(rhythm, reading, colour, stamina, isRelax);
             double starRating = rescale(combinedRating * 1.4);
