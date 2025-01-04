@@ -74,7 +74,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         private double computeDifficultyValue(ScoreInfo score, TaikoDifficultyAttributes attributes)
         {
             double baseDifficulty = 5 * Math.Max(1.0, attributes.StarRating / 0.110) - 4.0;
-            double difficultyValue = Math.Min(Math.Pow(baseDifficulty, 3) / 69052.51, Math.Pow(baseDifficulty, 2.25) / 1200.0);
+            double difficultyValue = Math.Min(Math.Pow(baseDifficulty, 3) / 69052.51, Math.Pow(baseDifficulty, 2.25) / 1450.0);
 
             difficultyValue *= 1 + 0.20 * Math.Max(0, attributes.StarRating - 10);
 
