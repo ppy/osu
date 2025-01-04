@@ -14,6 +14,7 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour;
 using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Reading;
+using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Rhythm.Data;
 using osu.Game.Rulesets.Taiko.Difficulty.Skills;
 using osu.Game.Rulesets.Taiko.Mods;
 using osu.Game.Rulesets.Taiko.Scoring;
@@ -23,7 +24,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
     public class TaikoDifficultyCalculator : DifficultyCalculator
     {
         private const double difficulty_multiplier = 0.084375;
-        private const double rhythm_skill_multiplier = 0.200 * difficulty_multiplier;
+        private const double rhythm_skill_multiplier = 1.24 * difficulty_multiplier;
         private const double reading_skill_multiplier = 0.100 * difficulty_multiplier;
         private const double colour_skill_multiplier = 0.375 * difficulty_multiplier;
         private const double stamina_skill_multiplier = 0.375 * difficulty_multiplier;
@@ -37,9 +38,12 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
         protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods, double clockRate)
         {
+            HitWindows hitWindows = new HitWindows();
+            hitWindows.SetDifficulty(beatmap.Difficulty.OverallDifficulty);
+
             return new Skill[]
             {
-                new Rhythm(mods),
+                new Rhythm(mods, hitWindows.WindowFor(HitResult.Great) / clockRate),
                 new Reading(mods),
                 new Colour(mods),
                 new Stamina(mods, false),
@@ -57,6 +61,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
         protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
         {
+            var hitWindows = new HitWindows();
+            hitWindows.SetDifficulty(beatmap.Difficulty.OverallDifficulty);
+
             var difficultyHitObjects = new List<DifficultyHitObject>();
             var centreObjects = new List<TaikoDifficultyHitObject>();
             var rimObjects = new List<TaikoDifficultyHitObject>();
@@ -79,7 +86,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 ));
             }
 
+            var groupedHitObjects = SameRhythmHitObjects.GroupHitObjects(noteObjects);
+
             TaikoColourDifficultyPreprocessor.ProcessAndAssign(difficultyHitObjects);
+            SamePatterns.GroupPatterns(groupedHitObjects);
             bpmLoader.ProcessEffectiveBPM(beatmap.ControlPointInfo, clockRate);
 
             return difficultyHitObjects;
@@ -105,8 +115,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             double monoStaminaRating = singleColourStamina.DifficultyValue() * stamina_skill_multiplier;
             double monoStaminaFactor = staminaRating == 0 ? 1 : Math.Pow(monoStaminaRating / staminaRating, 5);
 
-            double rhythmDifficultStrains = rhythm.CountTopWeightedStrains();
             double colourDifficultStrains = colour.CountTopWeightedStrains();
+            double readingDifficultStrains = reading.CountTopWeightedStrains();
             double staminaDifficultStrains = stamina.CountTopWeightedStrains();
 
             double combinedRating = combinedDifficultyValue(rhythm, reading, colour, stamina, isRelax);
@@ -134,9 +144,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 ColourDifficulty = colourRating,
                 StaminaDifficulty = staminaRating,
                 MonoStaminaFactor = monoStaminaFactor,
-                StaminaTopStrains = staminaDifficultStrains,
-                RhythmTopStrains = rhythmDifficultStrains,
+                ReadingTopStrains = readingDifficultStrains,
                 ColourTopStrains = colourDifficultStrains,
+                StaminaTopStrains = staminaDifficultStrains,
                 GreatHitWindow = hitWindows.WindowFor(HitResult.Great) / clockRate,
                 OkHitWindow = hitWindows.WindowFor(HitResult.Ok) / clockRate,
                 MaxCombo = beatmap.GetMaxCombo(),

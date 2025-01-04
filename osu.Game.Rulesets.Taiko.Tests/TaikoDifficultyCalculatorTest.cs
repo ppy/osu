@@ -14,13 +14,13 @@ namespace osu.Game.Rulesets.Taiko.Tests
     {
         protected override string ResourceAssembly => "osu.Game.Rulesets.Taiko";
 
-        [TestCase(3.0920212594351191d, 200, "diffcalc-test")]
-        [TestCase(3.0920212594351191d, 200, "diffcalc-test-strong")]
+        [TestCase(3.0950934814938953d, 200, "diffcalc-test")]
+        [TestCase(3.0950934814938953d, 200, "diffcalc-test-strong")]
         public void Test(double expectedStarRating, int expectedMaxCombo, string name)
             => base.Test(expectedStarRating, expectedMaxCombo, name);
 
-        [TestCase(4.0789820318081444d, 200, "diffcalc-test")]
-        [TestCase(4.0789820318081444d, 200, "diffcalc-test-strong")]
+        [TestCase(4.0839365008715403d, 200, "diffcalc-test")]
+        [TestCase(4.0839365008715403d, 200, "diffcalc-test-strong")]
         public void TestClockRateAdjusted(double expectedStarRating, int expectedMaxCombo, string name)
             => Test(expectedStarRating, expectedMaxCombo, name, new TaikoModDoubleTime());
 
