@@ -297,15 +297,6 @@ namespace osu.Game.Screens.Menu
 
         private bool onLogoClick(Func<bool> originalAction)
         {
-            if (!api.IsLoggedIn || api.State.Value == APIState.RequiresSecondFactorAuth)
-            {
-                if (!loginDisplayed.Value)
-                {
-                    Scheduler.AddDelayed(() => login?.Show(), 500);
-                    loginDisplayed.Value = true;
-                }
-            }
-
             if (showMobileDisclaimer.Value)
             {
                 mobileDisclaimerSchedule?.Cancel();
@@ -314,11 +305,25 @@ namespace osu.Game.Screens.Menu
                     dialogOverlay.Push(new MobileDisclaimerDialog(() =>
                     {
                         showMobileDisclaimer.Value = false;
+                        displayLoginIfApplicable();
                     }));
                 }, 500);
             }
+            else
+                displayLoginIfApplicable();
 
             return originalAction.Invoke();
+        }
+
+        private void displayLoginIfApplicable()
+        {
+            if (loginDisplayed.Value) return;
+
+            if (!api.IsLoggedIn || api.State.Value == APIState.RequiresSecondFactorAuth)
+            {
+                Scheduler.AddDelayed(() => login?.Show(), 500);
+                loginDisplayed.Value = true;
+            }
         }
 
         protected override void LogoSuspending(OsuLogo logo)
