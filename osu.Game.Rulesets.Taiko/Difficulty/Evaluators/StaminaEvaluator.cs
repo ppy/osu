@@ -57,10 +57,14 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
             }
 
             TaikoDifficultyHitObject taikoCurrent = (TaikoDifficultyHitObject)current;
+            TaikoDifficultyHitObject? taikoPrevious = current.Previous(1) as TaikoDifficultyHitObject;
             TaikoDifficultyHitObject? previousMono = taikoCurrent.PreviousMono(availableFingersFor(taikoCurrent) - 1);
 
             double objectStrain = 0.5; // Add a base strain to all objects
-            if (previousMono != null) objectStrain += speedBonus(taikoCurrent.StartTime - previousMono.StartTime);
+            if (taikoPrevious == null) return objectStrain;
+
+            if (previousMono != null)
+                objectStrain += speedBonus(taikoCurrent.StartTime - previousMono.StartTime) + 0.5 * speedBonus(taikoCurrent.StartTime - taikoPrevious.StartTime);
 
             return objectStrain;
         }
