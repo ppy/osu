@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
                 difficulty += termPenalty(ratio, i, 2, 1);
             }
 
-            difficulty += Math.Pow(terms / (1 + ratio), 1 / total);
+            difficulty += Math.Pow(terms / (1.0 + ratio), 1.0 / total);
 
             // Give bonus to near-1 ratios
             difficulty += DifficultyCalculationUtils.BellCurve(ratio, 1, 0.7);
