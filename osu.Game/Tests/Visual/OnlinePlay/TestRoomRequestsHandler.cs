@@ -1,14 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Newtonsoft.Json;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
@@ -18,6 +17,7 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Tests.Beatmaps;
+using osu.Game.Utils;
 
 namespace osu.Game.Tests.Visual.OnlinePlay
 {
@@ -51,8 +51,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
                     var apiRoom = cloneRoom(createRoomRequest.Room);
 
                     // Passwords are explicitly not copied between rooms.
-                    apiRoom.HasPassword.Value = !string.IsNullOrEmpty(createRoomRequest.Room.Password.Value);
-                    apiRoom.Password.Value = createRoomRequest.Room.Password.Value;
+                    apiRoom.Password = createRoomRequest.Room.Password;
 
                     AddServerSideRoom(apiRoom, localUser);
 
@@ -64,15 +63,15 @@ namespace osu.Game.Tests.Visual.OnlinePlay
 
                 case JoinRoomRequest joinRoomRequest:
                 {
-                    var room = ServerSideRooms.Single(r => r.RoomID.Value == joinRoomRequest.Room.RoomID.Value);
+                    var room = ServerSideRooms.Single(r => r.RoomID == joinRoomRequest.Room.RoomID);
 
-                    if (joinRoomRequest.Password != room.Password.Value)
+                    if (joinRoomRequest.Password != room.Password)
                     {
                         joinRoomRequest.TriggerFailure(new InvalidOperationException("Invalid password."));
                         return true;
                     }
 
-                    joinRoomRequest.TriggerSuccess();
+                    joinRoomRequest.TriggerSuccess(createResponseRoom(room, true));
                     return true;
                 }
 
@@ -115,6 +114,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
                                 MaxCombo = 1000,
                                 TotalScore = 1000000,
                                 User = new APIUser { Username = "best user" },
+                                Mods = [new APIMod { Acronym = @"DT" }],
                                 Statistics = new Dictionary<HitResult, int>()
                             },
                             new MultiplayerScore
@@ -161,7 +161,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
                     return true;
 
                 case GetRoomRequest getRoomRequest:
-                    getRoomRequest.TriggerSuccess(createResponseRoom(ServerSideRooms.Single(r => r.RoomID.Value == getRoomRequest.RoomId), true));
+                    getRoomRequest.TriggerSuccess(createResponseRoom(ServerSideRooms.Single(r => r.RoomID == getRoomRequest.RoomId), true));
                     return true;
 
                 case CreateRoomScoreRequest createRoomScoreRequest:
@@ -185,7 +185,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
 
                 case GetBeatmapRequest getBeatmapRequest:
                 {
-                    getBeatmapRequest.TriggerSuccess(createResponseBeatmaps(getBeatmapRequest.BeatmapInfo.OnlineID).Single());
+                    getBeatmapRequest.TriggerSuccess(createResponseBeatmaps(getBeatmapRequest.OnlineID).Single());
                     return true;
                 }
 
@@ -199,7 +199,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
                 {
                     var baseBeatmap = getBeatmapSetRequest.Type == BeatmapSetLookupType.BeatmapId
                         ? beatmapManager.QueryBeatmap(b => b.OnlineID == getBeatmapSetRequest.ID)
-                        : beatmapManager.QueryBeatmap(b => b.BeatmapSet.OnlineID == getBeatmapSetRequest.ID);
+                        : beatmapManager.QueryBeatmapSet(s => s.OnlineID == getBeatmapSetRequest.ID)?.PerformRead(s => s.Beatmaps.First().Detach());
 
                     if (baseBeatmap == null)
                     {
@@ -209,6 +209,22 @@ namespace osu.Game.Tests.Visual.OnlinePlay
                     }
 
                     getBeatmapSetRequest.TriggerSuccess(OsuTestScene.CreateAPIBeatmapSet(baseBeatmap));
+                    return true;
+                }
+
+                case GetUsersRequest getUsersRequest:
+                {
+                    getUsersRequest.TriggerSuccess(new GetUsersResponse
+                    {
+                        Users = getUsersRequest.UserIds.Select(id => id == TestUserLookupCache.UNRESOLVED_USER_ID
+                                                   ? null
+                                                   : new APIUser
+                                                   {
+                                                       Id = id,
+                                                       Username = $"User {id}"
+                                                   })
+                                               .Where(u => u != null).ToList(),
+                    });
                     return true;
                 }
             }
@@ -244,13 +260,13 @@ namespace osu.Game.Tests.Visual.OnlinePlay
         /// <param name="host">The room host.</param>
         public void AddServerSideRoom(Room room, APIUser host)
         {
-            room.RoomID.Value ??= currentRoomId++;
-            room.Host.Value = host;
+            room.RoomID ??= currentRoomId++;
+            room.Host = host;
 
             for (int i = 0; i < room.Playlist.Count; i++)
             {
                 room.Playlist[i].ID = currentPlaylistItemId++;
-                room.Playlist[i].OwnerID = room.Host.Value.OnlineID;
+                room.Playlist[i].OwnerID = room.Host.OnlineID;
             }
 
             serverSideRooms.Add(room);
@@ -261,12 +277,10 @@ namespace osu.Game.Tests.Visual.OnlinePlay
             var responseRoom = cloneRoom(room);
 
             // Password is hidden from the response, and is only propagated via HasPassword.
-            bool hadPassword = responseRoom.HasPassword.Value;
-            responseRoom.Password.Value = null;
-            responseRoom.HasPassword.Value = hadPassword;
+            responseRoom.Password = responseRoom.HasPassword ? Guid.NewGuid().ToString() : null;
 
             if (!withParticipants)
-                responseRoom.RecentParticipants.Clear();
+                responseRoom.RecentParticipants = [];
 
             return responseRoom;
         }
@@ -276,11 +290,17 @@ namespace osu.Game.Tests.Visual.OnlinePlay
             var result = JsonConvert.DeserializeObject<Room>(JsonConvert.SerializeObject(source));
             Debug.Assert(result != null);
 
-            // Playlist item IDs aren't serialised.
-            if (source.CurrentPlaylistItem.Value != null)
-                result.CurrentPlaylistItem.Value.ID = source.CurrentPlaylistItem.Value.ID;
-            for (int i = 0; i < source.Playlist.Count; i++)
-                result.Playlist[i].ID = source.Playlist[i].ID;
+            // When serialising, only beatmap IDs are sent to the server.
+            // When deserialising, full beatmaps and IDs are expected to arrive.
+
+            PlaylistItem? finalCurrentItem = result.CurrentPlaylistItem?.With(id: source.CurrentPlaylistItem!.ID, beatmap: new Optional<IBeatmapInfo>(source.CurrentPlaylistItem.Beatmap));
+            PlaylistItem[] finalPlaylist = result.Playlist.Select((pi, i) => pi.With(id: source.Playlist[i].ID, beatmap: new Optional<IBeatmapInfo>(source.Playlist[i].Beatmap))).ToArray();
+
+            // When setting the properties, we do a clear-then-add, otherwise equality comparers (that only compare by ID) pass early and members don't get replaced.
+            result.CurrentPlaylistItem = null;
+            result.CurrentPlaylistItem = finalCurrentItem;
+            result.Playlist = [];
+            result.Playlist = finalPlaylist;
 
             return result;
         }

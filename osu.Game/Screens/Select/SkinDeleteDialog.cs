@@ -7,7 +7,7 @@ using osu.Game.Overlays.Dialog;
 
 namespace osu.Game.Screens.Select
 {
-    public partial class SkinDeleteDialog : DangerousActionDialog
+    public partial class SkinDeleteDialog : DeletionDialog
     {
         private readonly Skin skin;
 

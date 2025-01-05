@@ -108,7 +108,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             base.Dispose(isDisposing);
 
             if (client.IsNotNull())
+            {
                 client.RoomUpdated -= onRoomUpdated;
+                client.GameplayAborted -= onGameplayAborted;
+            }
         }
     }
 }

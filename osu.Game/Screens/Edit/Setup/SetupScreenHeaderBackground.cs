@@ -29,7 +29,8 @@ namespace osu.Game.Screens.Edit.Setup
             InternalChild = content = new Container
             {
                 RelativeSizeAxes = Axes.Both,
-                Masking = true
+                Masking = true,
+                CornerRadius = 3.5f,
             };
         }
 

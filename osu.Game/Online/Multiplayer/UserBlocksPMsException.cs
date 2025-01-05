@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Runtime.Serialization;
 using Microsoft.AspNetCore.SignalR;
 
 namespace osu.Game.Online.Multiplayer
@@ -14,11 +13,6 @@ namespace osu.Game.Online.Multiplayer
 
         public UserBlocksPMsException()
             : base(MESSAGE)
-        {
-        }
-
-        protected UserBlocksPMsException(SerializationInfo info, StreamingContext context)
-            : base(info, context)
         {
         }
     }

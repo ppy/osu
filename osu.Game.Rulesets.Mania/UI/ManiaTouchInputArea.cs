@@ -99,12 +99,6 @@ namespace osu.Game.Rulesets.Mania.UI
             return false;
         }
 
-        protected override bool OnMouseDown(MouseDownEvent e)
-        {
-            Show();
-            return true;
-        }
-
         protected override bool OnTouchDown(TouchDownEvent e)
         {
             Show();
@@ -168,17 +162,6 @@ namespace osu.Game.Rulesets.Mania.UI
             }
 
             protected override void OnTouchUp(TouchUpEvent e)
-            {
-                updateButton(false);
-            }
-
-            protected override bool OnMouseDown(MouseDownEvent e)
-            {
-                updateButton(true);
-                return false; // handled by parent container to show overlay.
-            }
-
-            protected override void OnMouseUp(MouseUpEvent e)
             {
                 updateButton(false);
             }

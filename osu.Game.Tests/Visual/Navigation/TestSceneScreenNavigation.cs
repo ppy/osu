@@ -47,6 +47,7 @@ using osu.Game.Screens.Select.Carousel;
 using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Screens.Select.Options;
 using osu.Game.Tests.Beatmaps.IO;
+using osu.Game.Utils;
 using osuTK;
 using osuTK.Input;
 using SharpCompress;
@@ -141,6 +142,28 @@ namespace osu.Game.Tests.Visual.Navigation
             pushEscape();
             AddAssert("Overlay was hidden", () => songSelect.ModSelectOverlay.State.Value == Visibility.Hidden);
             exitViaEscapeAndConfirm();
+        }
+
+        [Test]
+        public void TestEnterGameplayWhileFilteringToNoSelection()
+        {
+            TestPlaySongSelect songSelect = null;
+
+            PushAndConfirm(() => songSelect = new TestPlaySongSelect());
+            AddUntilStep("wait for song select", () => songSelect.BeatmapSetsLoaded);
+            AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).WaitSafely());
+            AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
+
+            AddStep("force selection", () =>
+            {
+                songSelect.FinaliseSelection();
+                songSelect.FilterControl.CurrentTextSearch.Value = "test";
+            });
+
+            AddUntilStep("wait for player", () => !songSelect.IsCurrentScreen());
+            AddStep("return to song select", () => songSelect.MakeCurrent());
+
+            AddUntilStep("wait for selection lost", () => songSelect.Beatmap.IsDefault);
         }
 
         [Test]
@@ -240,11 +263,14 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddStep("change beatmap files", () =>
             {
-                foreach (var file in Game.Beatmap.Value.BeatmapSetInfo.Files.Where(f => Path.GetExtension(f.Filename) == ".osu"))
+                FileUtils.AttemptOperation(() =>
                 {
-                    using (var stream = Game.Storage.GetStream(Path.Combine("files", file.File.GetStoragePath()), FileAccess.ReadWrite))
-                        stream.WriteByte(0);
-                }
+                    foreach (var file in Game.Beatmap.Value.BeatmapSetInfo.Files.Where(f => Path.GetExtension(f.Filename) == ".osu"))
+                    {
+                        using (var stream = Game.Storage.GetStream(Path.Combine("files", file.File.GetStoragePath()), FileAccess.ReadWrite))
+                            stream.WriteByte(0);
+                    }
+                });
             });
 
             AddStep("invalidate cache", () =>
@@ -272,8 +298,11 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddStep("delete beatmap files", () =>
             {
-                foreach (var file in Game.Beatmap.Value.BeatmapSetInfo.Files.Where(f => Path.GetExtension(f.Filename) == ".osu"))
-                    Game.Storage.Delete(Path.Combine("files", file.File.GetStoragePath()));
+                FileUtils.AttemptOperation(() =>
+                {
+                    foreach (var file in Game.Beatmap.Value.BeatmapSetInfo.Files.Where(f => Path.GetExtension(f.Filename) == ".osu"))
+                        Game.Storage.Delete(Path.Combine("files", file.File.GetStoragePath()));
+                });
             });
 
             AddStep("invalidate cache", () =>
@@ -323,6 +352,23 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddUntilStep("get new player", () => (player = Game.ScreenStack.CurrentScreen as Player) != null);
             AddAssert("retry count is 1", () => player.RestartCount == 1);
+        }
+
+        [Test]
+        public void TestLastScoreNullAfterExitingPlayer()
+        {
+            AddUntilStep("wait for last play null", getLastPlay, () => Is.Null);
+
+            var getOriginalPlayer = playToCompletion();
+
+            AddStep("attempt to retry", () => getOriginalPlayer().ChildrenOfType<HotkeyRetryOverlay>().First().Action());
+            AddUntilStep("wait for last play matches player", getLastPlay, () => Is.EqualTo(getOriginalPlayer().Score.ScoreInfo));
+
+            AddUntilStep("wait for player", () => Game.ScreenStack.CurrentScreen != getOriginalPlayer() && Game.ScreenStack.CurrentScreen is Player);
+            AddStep("exit player", () => (Game.ScreenStack.CurrentScreen as Player)?.Exit());
+            AddUntilStep("wait for last play null", getLastPlay, () => Is.Null);
+
+            ScoreInfo getLastPlay() => Game.Dependencies.Get<SessionStatics>().Get<ScoreInfo>(Static.LastLocalUserScore);
         }
 
         [Test]
@@ -952,6 +998,8 @@ namespace osu.Game.Tests.Visual.Navigation
         [Test]
         public void TestTouchScreenDetectionAtSongSelect()
         {
+            AddUntilStep("wait for settings", () => Game.Settings.IsLoaded);
+
             AddStep("touch logo", () =>
             {
                 var button = Game.ChildrenOfType<OsuLogo>().Single();
@@ -1026,9 +1074,11 @@ namespace osu.Game.Tests.Visual.Navigation
         [Test]
         public void TestTouchScreenDetectionInGame()
         {
+            BeatmapSetInfo beatmapSet = null;
+
             PushAndConfirm(() => new TestPlaySongSelect());
-            AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).WaitSafely());
-            AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
+            AddStep("import beatmap", () => beatmapSet = BeatmapImportHelper.LoadQuickOszIntoOsu(Game).GetResultSafely());
+            AddUntilStep("wait for selected", () => Game.Beatmap.Value.BeatmapSetInfo.Equals(beatmapSet));
             AddStep("select", () => InputManager.Key(Key.Enter));
 
             Player player = null;

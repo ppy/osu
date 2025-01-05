@@ -75,7 +75,7 @@ namespace osu.Game.Graphics.UserInterface
             [BackgroundDependencyLoader(true)]
             private void load(OverlayColourProvider? colourProvider, OsuColour colours, AudioManager audio)
             {
-                BackgroundColour = colourProvider?.Background5 ?? Color4.Black.Opacity(0.5f);
+                BackgroundColour = colourProvider?.Background5 ?? Color4.Black;
                 HoverColour = colourProvider?.Light4 ?? colours.PinkDarker;
                 SelectionColour = colourProvider?.Background3 ?? colours.PinkDarker.Opacity(0.5f);
 
@@ -397,7 +397,7 @@ namespace osu.Game.Graphics.UserInterface
             {
                 bool hovered = Enabled.Value && IsHovered;
                 var hoveredColour = colourProvider?.Light4 ?? colours.PinkDarker;
-                var unhoveredColour = colourProvider?.Background5 ?? Color4.Black.Opacity(0.5f);
+                var unhoveredColour = colourProvider?.Background5 ?? Color4.Black;
 
                 Colour = Color4.White;
                 Alpha = Enabled.Value ? 1 : 0.3f;

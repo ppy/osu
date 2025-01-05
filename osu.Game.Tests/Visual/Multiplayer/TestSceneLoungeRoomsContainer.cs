@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
@@ -23,7 +21,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
     {
         protected new TestRoomManager RoomManager => (TestRoomManager)base.RoomManager;
 
-        private RoomsContainer container;
+        private RoomsContainer container = null!;
 
         public override void SetUpSteps()
         {
@@ -55,20 +53,20 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddAssert("has 5 rooms", () => container.Rooms.Count == 5);
 
             AddAssert("all spotlights at top", () => container.Rooms
-                                                              .SkipWhile(r => r.Room.Category.Value == RoomCategory.Spotlight)
-                                                              .All(r => r.Room.Category.Value == RoomCategory.Normal));
+                                                              .SkipWhile(r => r.Room.Category == RoomCategory.Spotlight)
+                                                              .All(r => r.Room.Category == RoomCategory.Normal));
 
-            AddStep("remove first room", () => RoomManager.RemoveRoom(RoomManager.Rooms.First(r => r.RoomID.Value == 0)));
+            AddStep("remove first room", () => RoomManager.RemoveRoom(RoomManager.Rooms.First(r => r.RoomID == 0)));
             AddAssert("has 4 rooms", () => container.Rooms.Count == 4);
-            AddAssert("first room removed", () => container.Rooms.All(r => r.Room.RoomID.Value != 0));
+            AddAssert("first room removed", () => container.Rooms.All(r => r.Room.RoomID != 0));
 
             AddStep("select first room", () => container.Rooms.First().TriggerClick());
-            AddAssert("first spotlight selected", () => checkRoomSelected(RoomManager.Rooms.First(r => r.Category.Value == RoomCategory.Spotlight)));
+            AddAssert("first spotlight selected", () => checkRoomSelected(RoomManager.Rooms.First(r => r.Category == RoomCategory.Spotlight)));
 
-            AddStep("remove last room", () => RoomManager.RemoveRoom(RoomManager.Rooms.MinBy(r => r.RoomID?.Value)));
-            AddAssert("first spotlight still selected", () => checkRoomSelected(RoomManager.Rooms.First(r => r.Category.Value == RoomCategory.Spotlight)));
+            AddStep("remove last room", () => RoomManager.RemoveRoom(RoomManager.Rooms.MinBy(r => r.RoomID)!));
+            AddAssert("first spotlight still selected", () => checkRoomSelected(RoomManager.Rooms.First(r => r.Category == RoomCategory.Spotlight)));
 
-            AddStep("remove spotlight room", () => RoomManager.RemoveRoom(RoomManager.Rooms.Single(r => r.Category.Value == RoomCategory.Spotlight)));
+            AddStep("remove spotlight room", () => RoomManager.RemoveRoom(RoomManager.Rooms.Single(r => r.Category == RoomCategory.Spotlight)));
             AddAssert("selection vacated", () => checkRoomSelected(null));
         }
 
@@ -157,7 +155,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("add rooms", () => RoomManager.AddRooms(3, new CatchRuleset().RulesetInfo));
 
             // Todo: What even is this case...?
-            AddStep("set empty filter criteria", () => container.Filter.Value = null);
+            AddStep("set empty filter criteria", () => container.Filter.Value = new FilterCriteria());
             AddUntilStep("5 rooms visible", () => container.Rooms.Count(r => r.IsPresent) == 5);
 
             AddStep("filter osu! rooms", () => container.Filter.Value = new FilterCriteria { Ruleset = new OsuRuleset().RulesetInfo });
@@ -182,11 +180,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("filter public rooms", () => container.Filter.Value = new FilterCriteria { Permissions = RoomPermissionsFilter.Public });
 
-            AddUntilStep("private room hidden", () => container.Rooms.All(r => !r.Room.HasPassword.Value));
+            AddUntilStep("private room hidden", () => container.Rooms.All(r => !r.Room.HasPassword));
 
             AddStep("filter private rooms", () => container.Filter.Value = new FilterCriteria { Permissions = RoomPermissionsFilter.Private });
 
-            AddUntilStep("public room hidden", () => container.Rooms.All(r => r.Room.HasPassword.Value));
+            AddUntilStep("public room hidden", () => container.Rooms.All(r => r.Room.HasPassword));
         }
 
         [Test]
@@ -195,9 +193,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("add rooms", () => RoomManager.AddRooms(3, withPassword: true));
         }
 
-        private bool checkRoomSelected(Room room) => SelectedRoom.Value == room;
+        private bool checkRoomSelected(Room? room) => SelectedRoom.Value == room;
 
-        private Room getRoomInFlow(int index) =>
+        private Room? getRoomInFlow(int index) =>
             (container.ChildrenOfType<FillFlowContainer<DrawableLoungeRoom>>().First().FlowingChildren.ElementAt(index) as DrawableRoom)?.Room;
     }
 }

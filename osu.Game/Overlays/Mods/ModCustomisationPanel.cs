@@ -11,6 +11,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Configuration;
@@ -38,7 +39,7 @@ namespace osu.Game.Overlays.Mods
 
         public readonly BindableBool Enabled = new BindableBool();
 
-        public readonly BindableBool Expanded = new BindableBool();
+        public readonly Bindable<ModCustomisationPanelState> ExpandedState = new Bindable<ModCustomisationPanelState>();
 
         public Bindable<IReadOnlyList<Mod>> SelectedMods { get; } = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
@@ -46,9 +47,9 @@ namespace osu.Game.Overlays.Mods
 
         // Handle{Non}PositionalInput controls whether the panel should act as a blocking layer on the screen. only block when the panel is expanded.
         // These properties are used because they correctly handle blocking/unblocking hover when mouse is pointing at a drawable outside
-        // (returning Expanded.Value to OnHover or overriding Block{Non}PositionalInput doesn't work).
-        public override bool HandlePositionalInput => Expanded.Value;
-        public override bool HandleNonPositionalInput => Expanded.Value;
+        // (handling OnHover or overriding Block{Non}PositionalInput doesn't work).
+        public override bool HandlePositionalInput => ExpandedState.Value != ModCustomisationPanelState.Collapsed;
+        public override bool HandleNonPositionalInput => ExpandedState.Value != ModCustomisationPanelState.Collapsed;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -57,15 +58,15 @@ namespace osu.Game.Overlays.Mods
 
             InternalChildren = new Drawable[]
             {
-                new ModCustomisationHeader
+                new ModCustomisationHeader(this)
                 {
                     Depth = float.MinValue,
                     RelativeSizeAxes = Axes.X,
                     Height = header_height,
                     Enabled = { BindTarget = Enabled },
-                    Expanded = { BindTarget = Expanded },
+                    ExpandedState = { BindTarget = ExpandedState },
                 },
-                content = new FocusGrabbingContainer
+                content = new FocusGrabbingContainer(this)
                 {
                     RelativeSizeAxes = Axes.X,
                     BorderColour = colourProvider.Dark3,
@@ -80,7 +81,7 @@ namespace osu.Game.Overlays.Mods
                         Roundness = 5f,
                         Colour = Color4.Black.Opacity(0.25f),
                     },
-                    Expanded = { BindTarget = Expanded },
+                    ExpandedState = { BindTarget = ExpandedState },
                     Children = new Drawable[]
                     {
                         new Box
@@ -122,7 +123,7 @@ namespace osu.Game.Overlays.Mods
                 this.FadeColour(OsuColour.Gray(e.NewValue ? 1f : 0.6f), 300, Easing.OutQuint);
             }, true);
 
-            Expanded.BindValueChanged(_ => updateDisplay(), true);
+            ExpandedState.BindValueChanged(_ => updateDisplay(), true);
             SelectedMods.BindValueChanged(_ => updateMods(), true);
 
             FinishTransforms(true);
@@ -134,7 +135,7 @@ namespace osu.Game.Overlays.Mods
 
         protected override bool OnClick(ClickEvent e)
         {
-            Expanded.Value = false;
+            ExpandedState.Value = ModCustomisationPanelState.Collapsed;
             return base.OnClick(e);
         }
 
@@ -147,7 +148,7 @@ namespace osu.Game.Overlays.Mods
             switch (e.Action)
             {
                 case GlobalAction.Back:
-                    Expanded.Value = false;
+                    ExpandedState.Value = ModCustomisationPanelState.Collapsed;
                     return true;
             }
 
@@ -162,7 +163,7 @@ namespace osu.Game.Overlays.Mods
         {
             content.ClearTransforms();
 
-            if (Expanded.Value)
+            if (ExpandedState.Value != ModCustomisationPanelState.Collapsed)
             {
                 content.AutoSizeDuration = 400;
                 content.AutoSizeEasing = Easing.OutQuint;
@@ -179,7 +180,7 @@ namespace osu.Game.Overlays.Mods
 
         private void updateMods()
         {
-            Expanded.Value = false;
+            ExpandedState.Value = ModCustomisationPanelState.Collapsed;
             sectionsFlow.Clear();
 
             // Importantly, the selected mods bindable is already ordered by the mod select overlay (following the order of mod columns and panels).
@@ -202,10 +203,44 @@ namespace osu.Game.Overlays.Mods
 
         private partial class FocusGrabbingContainer : InputBlockingContainer
         {
-            public IBindable<bool> Expanded { get; } = new BindableBool();
+            public readonly Bindable<ModCustomisationPanelState> ExpandedState = new Bindable<ModCustomisationPanelState>();
 
-            public override bool RequestsFocus => Expanded.Value;
-            public override bool AcceptsFocus => Expanded.Value;
+            public override bool RequestsFocus => panel.ExpandedState.Value != ModCustomisationPanelState.Collapsed;
+            public override bool AcceptsFocus => panel.ExpandedState.Value != ModCustomisationPanelState.Collapsed;
+
+            private readonly ModCustomisationPanel panel;
+
+            public FocusGrabbingContainer(ModCustomisationPanel panel)
+            {
+                this.panel = panel;
+            }
+
+            private InputManager inputManager = null!;
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                inputManager = GetContainingInputManager()!;
+            }
+
+            protected override void Update()
+            {
+                base.Update();
+
+                if (ExpandedState.Value == ModCustomisationPanelState.Expanded
+                    && !ReceivePositionalInputAt(inputManager.CurrentState.Mouse.Position)
+                    && inputManager.DraggedDrawable == null)
+                {
+                    ExpandedState.Value = ModCustomisationPanelState.Collapsed;
+                }
+            }
+        }
+
+        public enum ModCustomisationPanelState
+        {
+            Collapsed = 0,
+            Expanded = 1,
+            ExpandedByMod = 2,
         }
     }
 }

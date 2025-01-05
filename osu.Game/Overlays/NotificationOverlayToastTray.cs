@@ -153,8 +153,22 @@ namespace osu.Game.Overlays
         {
             base.Update();
 
-            float height = toastFlow.Count > 0 ? toastFlow.DrawHeight + 120 : 0;
-            float alpha = toastFlow.Count > 0 ? MathHelper.Clamp(toastFlow.DrawHeight / 41, 0, 1) * toastFlow.Children.Max(n => n.Alpha) : 0;
+            float height = 0;
+            float alpha = 0;
+
+            if (toastFlow.Count > 0)
+            {
+                float maxNotificationAlpha = 0;
+
+                foreach (var t in toastFlow)
+                {
+                    if (t.Alpha > maxNotificationAlpha)
+                        maxNotificationAlpha = t.Alpha;
+                }
+
+                height = toastFlow.DrawHeight + 120;
+                alpha = MathHelper.Clamp(toastFlow.DrawHeight / 41, 0, 1) * maxNotificationAlpha;
+            }
 
             toastContentBackground.Height = (float)Interpolation.DampContinuously(toastContentBackground.Height, height, 10, Clock.ElapsedFrameTime);
             toastContentBackground.Alpha = (float)Interpolation.DampContinuously(toastContentBackground.Alpha, alpha, 10, Clock.ElapsedFrameTime);

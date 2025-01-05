@@ -20,10 +20,10 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
         [Test]
         public void TestKeyCountChange()
         {
-            LabelledSliderBar<float> keyCount = null!;
+            FormSliderBar<float> keyCount = null!;
 
             AddStep("go to setup screen", () => InputManager.Key(Key.F4));
-            AddUntilStep("retrieve key count slider", () => keyCount = Editor.ChildrenOfType<SetupScreen>().Single().ChildrenOfType<LabelledSliderBar<float>>().First(), () => Is.Not.Null);
+            AddUntilStep("retrieve key count slider", () => keyCount = Editor.ChildrenOfType<SetupScreen>().Single().ChildrenOfType<FormSliderBar<float>>().First(), () => Is.Not.Null);
             AddAssert("key count is 5", () => keyCount.Current.Value, () => Is.EqualTo(5));
             AddStep("change key count to 8", () =>
             {

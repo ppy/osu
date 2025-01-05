@@ -138,6 +138,7 @@ namespace osu.Game.Overlays.Mods
                                     },
                                     new GridContainer
                                     {
+                                        Padding = new MarginPadding { Top = 1, Bottom = 3 },
                                         RelativeSizeAxes = Axes.Both,
                                         RowDimensions = new[]
                                         {

@@ -25,5 +25,17 @@ namespace osu.Game.Online.Metadata
         /// </summary>
         [Key(1)]
         public long[] TotalScoreDistribution { get; set; } = new long[TOTAL_SCORE_DISTRIBUTION_BINS];
+
+        /// <summary>
+        /// The cumulative total of all passing scores (across all users) for the playlist item so far.
+        /// </summary>
+        [Key(2)]
+        public long CumulativeScore { get; set; }
+
+        /// <summary>
+        /// The last score to have been processed into provided statistics. Generally only for server-side accounting purposes.
+        /// </summary>
+        [Key(3)]
+        public ulong LastProcessedScoreID { get; set; }
     }
 }

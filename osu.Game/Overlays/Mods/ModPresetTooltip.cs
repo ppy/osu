@@ -7,7 +7,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Mods;
 using osuTK;
 
@@ -19,7 +18,7 @@ namespace osu.Game.Overlays.Mods
 
         private const double transition_duration = 200;
 
-        private readonly OsuSpriteText descriptionText;
+        private readonly TextFlowContainer descriptionText;
 
         public ModPresetTooltip(OverlayColourProvider colourProvider)
         {
@@ -44,11 +43,15 @@ namespace osu.Game.Overlays.Mods
                     Spacing = new Vector2(7),
                     Children = new[]
                     {
-                        descriptionText = new OsuSpriteText
+                        descriptionText = new TextFlowContainer(f =>
                         {
-                            Font = OsuFont.GetFont(weight: FontWeight.Regular),
-                            Colour = colourProvider.Content1,
-                        },
+                            f.Font = OsuFont.GetFont(weight: FontWeight.Regular);
+                            f.Colour = colourProvider.Content1;
+                        })
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                        }
                     }
                 }
             };

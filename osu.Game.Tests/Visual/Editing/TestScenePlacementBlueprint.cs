@@ -29,7 +29,53 @@ namespace osu.Game.Tests.Visual.Editing
         private GlobalActionContainer globalActionContainer => this.ChildrenOfType<GlobalActionContainer>().Single();
 
         [Test]
-        public void TestCommitPlacementViaGlobalAction()
+        public void TestDeleteUsingMiddleMouse()
+        {
+            AddStep("select circle placement tool", () => InputManager.Key(Key.Number2));
+            AddStep("move mouse to center of playfield", () => InputManager.MoveMouseTo(this.ChildrenOfType<Playfield>().Single()));
+            AddStep("place circle", () => InputManager.Click(MouseButton.Left));
+
+            AddAssert("one circle added", () => EditorBeatmap.HitObjects, () => Has.One.Items);
+            AddStep("delete with middle mouse", () => InputManager.Click(MouseButton.Middle));
+            AddAssert("circle removed", () => EditorBeatmap.HitObjects, () => Is.Empty);
+        }
+
+        [Test]
+        public void TestDeleteUsingShiftRightClick()
+        {
+            AddStep("select circle placement tool", () => InputManager.Key(Key.Number2));
+            AddStep("move mouse to center of playfield", () => InputManager.MoveMouseTo(this.ChildrenOfType<Playfield>().Single()));
+            AddStep("place circle", () => InputManager.Click(MouseButton.Left));
+
+            AddAssert("one circle added", () => EditorBeatmap.HitObjects, () => Has.One.Items);
+            AddStep("delete with right mouse", () =>
+            {
+                InputManager.PressKey(Key.ShiftLeft);
+                InputManager.Click(MouseButton.Right);
+                InputManager.ReleaseKey(Key.ShiftLeft);
+            });
+            AddAssert("circle removed", () => EditorBeatmap.HitObjects, () => Is.Empty);
+        }
+
+        [Test]
+        public void TestContextMenu()
+        {
+            AddStep("select circle placement tool", () => InputManager.Key(Key.Number2));
+            AddStep("move mouse to center of playfield", () => InputManager.MoveMouseTo(this.ChildrenOfType<Playfield>().Single()));
+            AddStep("place circle", () => InputManager.Click(MouseButton.Left));
+
+            AddAssert("one circle added", () => EditorBeatmap.HitObjects, () => Has.One.Items);
+            AddStep("delete with right mouse", () =>
+            {
+                InputManager.Click(MouseButton.Right);
+            });
+            AddAssert("circle not removed", () => EditorBeatmap.HitObjects, () => Has.One.Items);
+            AddAssert("circle selected", () => EditorBeatmap.SelectedHitObjects, () => Has.One.Items);
+        }
+
+        [Test]
+        [Solo]
+        public void TestCommitPlacementViaRightClick()
         {
             Playfield playfield = null!;
 
@@ -46,11 +92,7 @@ namespace osu.Game.Tests.Visual.Editing
                 var location = (playfield.ScreenSpaceDrawQuad.TopLeft + 3 * playfield.ScreenSpaceDrawQuad.BottomRight) / 4;
                 InputManager.MoveMouseTo(location);
             });
-            AddStep("confirm via global action", () =>
-            {
-                globalActionContainer.TriggerPressed(GlobalAction.Select);
-                globalActionContainer.TriggerReleased(GlobalAction.Select);
-            });
+            AddStep("confirm via right click", () => InputManager.Click(MouseButton.Right));
             AddAssert("slider placed", () => EditorBeatmap.HitObjects.Count, () => Is.EqualTo(1));
         }
 
@@ -123,7 +165,9 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("enable automatic bank assignment", () =>
             {
                 InputManager.PressKey(Key.LShift);
+                InputManager.PressKey(Key.LAlt);
                 InputManager.Key(Key.Q);
+                InputManager.ReleaseKey(Key.LAlt);
                 InputManager.ReleaseKey(Key.LShift);
             });
             AddStep("select circle placement tool", () => InputManager.Key(Key.Number2));
@@ -186,7 +230,9 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("select drum bank", () =>
             {
                 InputManager.PressKey(Key.LShift);
+                InputManager.PressKey(Key.LAlt);
                 InputManager.Key(Key.R);
+                InputManager.ReleaseKey(Key.LAlt);
                 InputManager.ReleaseKey(Key.LShift);
             });
             AddStep("enable clap addition", () => InputManager.Key(Key.R));
@@ -204,11 +250,7 @@ namespace osu.Game.Tests.Visual.Editing
                 var location = (playfield.ScreenSpaceDrawQuad.TopLeft + 3 * playfield.ScreenSpaceDrawQuad.BottomRight) / 4;
                 InputManager.MoveMouseTo(location);
             });
-            AddStep("confirm via global action", () =>
-            {
-                globalActionContainer.TriggerPressed(GlobalAction.Select);
-                globalActionContainer.TriggerReleased(GlobalAction.Select);
-            });
+            AddStep("confirm via right click", () => InputManager.Click(MouseButton.Right));
             AddAssert("slider placed", () => EditorBeatmap.HitObjects.Count, () => Is.EqualTo(1));
 
             AddAssert("slider samples have drum bank", () => EditorBeatmap.HitObjects[0].Samples.All(s => s.Bank == HitSampleInfo.BANK_DRUM));

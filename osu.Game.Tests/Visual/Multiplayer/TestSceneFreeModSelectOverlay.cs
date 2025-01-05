@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,9 +24,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public partial class TestSceneFreeModSelectOverlay : MultiplayerTestScene
     {
-        private FreeModSelectOverlay freeModSelectOverlay;
-        private FooterButtonFreeMods footerButtonFreeMods;
-        private ScreenFooter footer;
+        private FreeModSelectOverlay freeModSelectOverlay = null!;
+        private FooterButtonFreeMods footerButtonFreeMods = null!;
+        private ScreenFooter footer = null!;
         private readonly Bindable<Dictionary<ModType, IReadOnlyList<Mod>>> availableMods = new Bindable<Dictionary<ModType, IReadOnlyList<Mod>>>();
 
         [BackgroundDependencyLoader]
@@ -49,8 +47,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddToggleStep("toggle visibility", visible =>
             {
-                if (freeModSelectOverlay != null)
-                    freeModSelectOverlay.State.Value = visible ? Visibility.Visible : Visibility.Hidden;
+                freeModSelectOverlay.State.Value = visible ? Visibility.Visible : Visibility.Hidden;
             });
         }
 
@@ -61,7 +58,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("select difficulty adjust", () => freeModSelectOverlay.SelectedMods.Value = new[] { new OsuModDifficultyAdjust() });
             AddWaitStep("wait some", 3);
-            AddAssert("customisation area not expanded", () => !this.ChildrenOfType<ModCustomisationPanel>().Single().Expanded.Value);
+            AddAssert("customisation area not expanded",
+                () => this.ChildrenOfType<ModCustomisationPanel>().Single().ExpandedState.Value,
+                () => Is.EqualTo(ModCustomisationPanel.ModCustomisationPanelState.Collapsed));
         }
 
         [Test]

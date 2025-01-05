@@ -14,11 +14,11 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
         {
         }
 
-        public override Drawable? GetDrawableComponent(ISkinComponentLookup component)
+        public override Drawable? GetDrawableComponent(ISkinComponentLookup lookup)
         {
-            switch (component)
+            switch (lookup)
             {
-                case GameplaySkinComponentLookup<HitResult> resultComponent:
+                case SkinComponentLookup<HitResult> resultComponent:
                     // This should eventually be moved to a skin setting, when supported.
                     if (Skin is ArgonProSkin && resultComponent.Component >= HitResult.Great)
                         return Drawable.Empty();
@@ -75,7 +75,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
                     break;
             }
 
-            return base.GetDrawableComponent(component);
+            return base.GetDrawableComponent(lookup);
         }
     }
 }

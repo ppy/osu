@@ -48,13 +48,11 @@ namespace osu.Game.Screens.Menu
 
         public override bool HideOverlaysOnEnter => Buttons == null || Buttons.State == ButtonSystemState.Initial;
 
-        public override bool AllowBackButton => false;
+        public override bool AllowUserExit => false;
 
         public override bool AllowExternalScreenChange => true;
 
         public override bool? AllowGlobalTrackControl => true;
-
-        private Screen songSelect;
 
         private MenuSideFlashes sideFlashes;
 
@@ -80,9 +78,6 @@ namespace osu.Game.Screens.Menu
 
         [Resolved(canBeNull: true)]
         private IDialogOverlay dialogOverlay { get; set; }
-
-        [Resolved(canBeNull: true)]
-        private VersionManager versionManager { get; set; }
 
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenDefault();
 
@@ -150,11 +145,14 @@ namespace osu.Game.Screens.Menu
                             OnPlaylists = () => this.Push(new Playlists()),
                             OnDailyChallenge = room =>
                             {
-                                this.Push(new DailyChallenge(room));
+                                if (statics.Get<bool>(Static.DailyChallengeIntroPlayed))
+                                    this.Push(new DailyChallenge(room));
+                                else
+                                    this.Push(new DailyChallengeIntro(room));
                             },
-                            OnExit = () =>
+                            OnExit = e =>
                             {
-                                exitConfirmedViaHoldOrClick = true;
+                                exitConfirmedViaHoldOrClick = e is MouseEvent;
                                 this.Exit();
                             }
                         }
@@ -220,26 +218,11 @@ namespace osu.Game.Screens.Menu
             Buttons.OnBeatmapListing = () => beatmapListing?.ToggleVisibility();
 
             reappearSampleSwoosh = audio.Samples.Get(@"Menu/reappear-swoosh");
-
-            preloadSongSelect();
         }
 
         public void ReturnToOsuLogo() => Buttons.State = ButtonSystemState.Initial;
 
-        private void preloadSongSelect()
-        {
-            if (songSelect == null)
-                LoadComponentAsync(songSelect = new PlaySongSelect());
-        }
-
-        private void loadSoloSongSelect() => this.Push(consumeSongSelect());
-
-        private Screen consumeSongSelect()
-        {
-            var s = songSelect;
-            songSelect = null;
-            return s;
-        }
+        private void loadSoloSongSelect() => this.Push(new PlaySongSelect());
 
         public override void OnEntering(ScreenTransitionEvent e)
         {
@@ -308,16 +291,6 @@ namespace osu.Game.Screens.Menu
             }
         }
 
-        protected override void Update()
-        {
-            base.Update();
-
-            bottomElementsFlow.Margin = new MarginPadding
-            {
-                Bottom = (versionManager?.DrawHeight + 5) ?? 0
-            };
-        }
-
         protected override void LogoSuspending(OsuLogo logo)
         {
             var seq = logo.FadeOut(300, Easing.InSine)
@@ -372,9 +345,6 @@ namespace osu.Game.Screens.Menu
             reappearSampleSwoosh?.Play();
 
             ApplyToBackground(b => (b as BackgroundScreenDefault)?.Next());
-
-            // we may have consumed our preloaded instance, so let's make another.
-            preloadSongSelect();
 
             musicController.EnsurePlayingSomething();
 

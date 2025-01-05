@@ -215,6 +215,7 @@ namespace osu.Game.Online.Metadata
             Debug.Assert(connection != null);
             await connection.InvokeAsync(nameof(IMetadataServer.BeginWatchingUserPresence)).ConfigureAwait(false);
             Schedule(() => isWatchingUserPresence.Value = true);
+            Logger.Log($@"{nameof(OnlineMetadataClient)} began watching user presence", LoggingTarget.Network);
         }
 
         public override async Task EndWatchingUserPresence()
@@ -228,6 +229,7 @@ namespace osu.Game.Online.Metadata
                 Schedule(() => userStates.Clear());
                 Debug.Assert(connection != null);
                 await connection.InvokeAsync(nameof(IMetadataServer.EndWatchingUserPresence)).ConfigureAwait(false);
+                Logger.Log($@"{nameof(OnlineMetadataClient)} stopped watching user presence", LoggingTarget.Network);
             }
             finally
             {
@@ -247,7 +249,9 @@ namespace osu.Game.Online.Metadata
                 throw new OperationCanceledException();
 
             Debug.Assert(connection != null);
-            return await connection.InvokeAsync<MultiplayerPlaylistItemStats[]>(nameof(IMetadataServer.BeginWatchingMultiplayerRoom), id).ConfigureAwait(false);
+            var result = await connection.InvokeAsync<MultiplayerPlaylistItemStats[]>(nameof(IMetadataServer.BeginWatchingMultiplayerRoom), id).ConfigureAwait(false);
+            Logger.Log($@"{nameof(OnlineMetadataClient)} began watching multiplayer room with ID {id}", LoggingTarget.Network);
+            return result;
         }
 
         public override async Task EndWatchingMultiplayerRoom(long id)
@@ -257,6 +261,7 @@ namespace osu.Game.Online.Metadata
 
             Debug.Assert(connection != null);
             await connection.InvokeAsync(nameof(IMetadataServer.EndWatchingMultiplayerRoom), id).ConfigureAwait(false);
+            Logger.Log($@"{nameof(OnlineMetadataClient)} stopped watching multiplayer room with ID {id}", LoggingTarget.Network);
         }
 
         public override async Task DisconnectRequested()

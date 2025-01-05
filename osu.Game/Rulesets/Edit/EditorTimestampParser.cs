@@ -11,7 +11,8 @@ namespace osu.Game.Rulesets.Edit
     {
         /// <summary>
         /// Used for parsing in contexts where we don't want e.g. normal times of day to be parsed as timestamps (e.g. chat)
-        /// Original osu-web regex: https://github.com/ppy/osu-web/blob/3b1698639244cfdaf0b41c68bfd651ea729ec2e3/resources/js/utils/beatmapset-discussion-helper.ts#L78
+        /// Original osu-web regex:
+        /// https://github.com/ppy/osu-web/blob/3b1698639244cfdaf0b41c68bfd651ea729ec2e3/resources/js/utils/beatmapset-discussion-helper.ts#L78
         /// </summary>
         /// <example>
         /// 00:00:000 (...) - test
@@ -32,7 +33,10 @@ namespace osu.Game.Rulesets.Edit
         /// <item>1:02:300 (1,2,3) - parses to 01:02:300 with selection</item>
         /// </list>
         /// </example>
-        private static readonly Regex time_regex_lenient = new Regex(@"^(((?<minutes>\d{1,3}):(?<seconds>([0-5]?\d))([:.](?<milliseconds>\d{0,3}))?)(?<selection>\s\([^)]+\))?)$", RegexOptions.Compiled);
+        private static readonly Regex time_regex_lenient = new Regex(
+            @"^(((?<minutes>\d{1,3}):(?<seconds>([0-5]?\d))([:.](?<milliseconds>\d{0,3}))?)(?<selection>\s\([^)]+\))?)(?<suffix>\s-.*)?$",
+            RegexOptions.Compiled | RegexOptions.Singleline
+        );
 
         public static bool TryParse(string timestamp, [NotNullWhen(true)] out TimeSpan? parsedTime, out string? parsedSelection)
         {

@@ -43,6 +43,8 @@ namespace osu.Game.Beatmaps
 
         public override async Task<Live<BeatmapSetInfo>?> ImportAsUpdate(ProgressNotification notification, ImportTask importTask, BeatmapSetInfo original)
         {
+            var originalDateAdded = original.DateAdded;
+
             Guid originalId = original.ID;
 
             var imported = await Import(notification, new[] { importTask }).ConfigureAwait(false);
@@ -57,8 +59,11 @@ namespace osu.Game.Beatmaps
             // If there were no changes, ensure we don't accidentally nuke ourselves.
             if (first.ID == originalId)
             {
-                first.PerformRead(s =>
+                first.PerformWrite(s =>
                 {
+                    // Transfer local values which should be persisted across a beatmap update.
+                    s.DateAdded = originalDateAdded;
+
                     // Re-run processing even in this case. We might have outdated metadata.
                     ProcessBeatmap?.Invoke(s, MetadataLookupScope.OnlineFirst);
                 });
@@ -79,7 +84,7 @@ namespace osu.Game.Beatmaps
                 original.DeletePending = true;
 
                 // Transfer local values which should be persisted across a beatmap update.
-                updated.DateAdded = original.DateAdded;
+                updated.DateAdded = originalDateAdded;
 
                 transferCollectionReferences(realm, original, updated);
 
@@ -193,8 +198,11 @@ namespace osu.Game.Beatmaps
 
             if (beatmapSet.OnlineID > 0)
             {
+                // Required local for iOS. Will cause runtime crash if inlined.
+                int onlineId = beatmapSet.OnlineID;
+
                 // OnlineID should really be unique, but to avoid catastrophic failure let's iterate just to be sure.
-                foreach (var existingSetWithSameOnlineID in realm.All<BeatmapSetInfo>().Where(b => b.OnlineID == beatmapSet.OnlineID))
+                foreach (var existingSetWithSameOnlineID in realm.All<BeatmapSetInfo>().Where(b => b.OnlineID == onlineId))
                 {
                     existingSetWithSameOnlineID.DeletePending = true;
                     existingSetWithSameOnlineID.OnlineID = -1;
@@ -278,6 +286,9 @@ namespace osu.Game.Beatmaps
 
         protected override void UndeleteForReuse(BeatmapSetInfo existing)
         {
+            if (!existing.DeletePending)
+                return;
+
             base.UndeleteForReuse(existing);
             existing.DateAdded = DateTimeOffset.UtcNow;
         }
@@ -417,17 +428,7 @@ namespace osu.Game.Beatmaps
                         Hash = hash,
                         DifficultyName = decodedInfo.DifficultyName,
                         OnlineID = decodedInfo.OnlineID,
-                        AudioLeadIn = decodedInfo.AudioLeadIn,
-                        StackLeniency = decodedInfo.StackLeniency,
-                        SpecialStyle = decodedInfo.SpecialStyle,
-                        LetterboxInBreaks = decodedInfo.LetterboxInBreaks,
-                        WidescreenStoryboard = decodedInfo.WidescreenStoryboard,
-                        EpilepsyWarning = decodedInfo.EpilepsyWarning,
-                        SamplesMatchPlaybackRate = decodedInfo.SamplesMatchPlaybackRate,
-                        DistanceSpacing = decodedInfo.DistanceSpacing,
                         BeatDivisor = decodedInfo.BeatDivisor,
-                        GridSize = decodedInfo.GridSize,
-                        TimelineZoom = decodedInfo.TimelineZoom,
                         MD5Hash = memoryStream.ComputeMD5Hash(),
                         EndTimeObjectCount = decoded.HitObjects.Count(h => h is IHasDuration),
                         TotalObjectCount = decoded.HitObjects.Count

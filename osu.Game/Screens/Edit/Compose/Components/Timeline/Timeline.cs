@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
@@ -16,6 +14,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
+using osu.Game.Overlays;
 using osu.Game.Rulesets.Edit;
 using osuTK;
 using osuTK.Input;
@@ -26,15 +25,29 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
     public partial class Timeline : ZoomableScrollContainer, IPositionSnapProvider
     {
         private const float timeline_height = 80;
-        private const float timeline_expanded_height = 94;
 
         private readonly Drawable userContent;
 
-        [Resolved]
-        private EditorClock editorClock { get; set; }
+        private bool alwaysShowControlPoints;
+
+        public bool AlwaysShowControlPoints
+        {
+            get => alwaysShowControlPoints;
+            set
+            {
+                if (value == alwaysShowControlPoints)
+                    return;
+
+                alwaysShowControlPoints = value;
+                controlPointsVisible.TriggerChange();
+            }
+        }
 
         [Resolved]
-        private EditorBeatmap editorBeatmap { get; set; }
+        private EditorClock editorClock { get; set; } = null!;
+
+        [Resolved]
+        private EditorBeatmap editorBeatmap { get; set; } = null!;
 
         /// <summary>
         /// The timeline's scroll position in the last frame.
@@ -61,6 +74,20 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         /// </summary>
         private float defaultTimelineZoom;
 
+        private WaveformGraph waveform = null!;
+
+        private TimelineTickDisplay ticks = null!;
+
+        private TimelineTimingChangeDisplay controlPoints = null!;
+
+        private Bindable<float> waveformOpacity = null!;
+        private Bindable<bool> controlPointsVisible = null!;
+        private Bindable<bool> ticksVisible = null!;
+
+        private double trackLengthForZoom;
+
+        private readonly IBindable<Track> track = new Bindable<Track>();
+
         public Timeline(Drawable userContent)
         {
             this.userContent = userContent;
@@ -73,48 +100,35 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             ScrollbarVisible = false;
         }
 
-        private WaveformGraph waveform;
-
-        private TimelineTickDisplay ticks;
-
-        private TimelineControlPointDisplay controlPoints;
-
-        private Container mainContent;
-
-        private Bindable<float> waveformOpacity;
-        private Bindable<bool> controlPointsVisible;
-        private Bindable<bool> ticksVisible;
-
-        private double trackLengthForZoom;
-
-        private readonly IBindable<Track> track = new Bindable<Track>();
-
         [BackgroundDependencyLoader]
-        private void load(IBindable<WorkingBeatmap> beatmap, OsuColour colours, OsuConfigManager config)
+        private void load(IBindable<WorkingBeatmap> beatmap, OsuColour colours, OverlayColourProvider colourProvider, OsuConfigManager config)
         {
             CentreMarker centreMarker;
 
             // We don't want the centre marker to scroll
             AddInternal(centreMarker = new CentreMarker());
 
-            ticks = new TimelineTickDisplay
-            {
-                Padding = new MarginPadding { Vertical = 2, },
-            };
-
             AddRange(new Drawable[]
             {
-                controlPoints = new TimelineControlPointDisplay
+                ticks = new TimelineTickDisplay(),
+                new Box
                 {
-                    RelativeSizeAxes = Axes.X,
-                    Height = timeline_expanded_height,
+                    Name = "zero marker",
+                    RelativeSizeAxes = Axes.Y,
+                    Width = TimelineTickDisplay.TICK_WIDTH / 2,
+                    Origin = Anchor.TopCentre,
+                    Colour = colourProvider.Background1,
                 },
-                ticks,
-                mainContent = new Container
+                controlPoints = new TimelineTimingChangeDisplay
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                },
+                new Container
                 {
                     RelativeSizeAxes = Axes.X,
                     Height = timeline_height,
-                    Depth = float.MaxValue,
                     Children = new[]
                     {
                         waveform = new WaveformGraph
@@ -125,16 +139,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                             MidColour = colours.BlueDark,
                             HighColour = colours.BlueDarker,
                         },
-                        ticks.CreateProxy(),
                         centreMarker.CreateProxy(),
-                        new Box
-                        {
-                            Name = "zero marker",
-                            RelativeSizeAxes = Axes.Y,
-                            Width = 2,
-                            Origin = Anchor.TopCentre,
-                            Colour = colours.YellowDarker,
-                        },
+                        ticks.CreateProxy(),
                         userContent,
                     }
                 },
@@ -151,7 +157,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 Scheduler.AddOnce(applyVisualOffset, beatmap);
             }, true);
 
-            Zoom = (float)(defaultTimelineZoom * editorBeatmap.BeatmapInfo.TimelineZoom);
+            Zoom = (float)(defaultTimelineZoom * editorBeatmap.TimelineZoom);
         }
 
         private void applyVisualOffset(IBindable<WorkingBeatmap> beatmap)
@@ -178,22 +184,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             controlPointsVisible.BindValueChanged(visible =>
             {
-                if (visible.NewValue)
-                {
-                    this.ResizeHeightTo(timeline_expanded_height, 200, Easing.OutQuint);
-                    mainContent.MoveToY(15, 200, Easing.OutQuint);
-
-                    // delay the fade in else masking looks weird.
-                    controlPoints.Delay(180).FadeIn(400, Easing.OutQuint);
-                }
+                if (visible.NewValue || alwaysShowControlPoints)
+                    controlPoints.FadeIn(400, Easing.OutQuint);
                 else
-                {
                     controlPoints.FadeOut(200, Easing.OutQuint);
-
-                    // likewise, delay the resize until the fade is complete.
-                    this.Delay(180).ResizeHeightTo(timeline_height, 200, Easing.OutQuint);
-                    mainContent.Delay(180).MoveToY(0, 200, Easing.OutQuint);
-                }
             }, true);
         }
 
@@ -218,7 +212,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 float minimumZoom = getZoomLevelForVisibleMilliseconds(10000);
                 float maximumZoom = getZoomLevelForVisibleMilliseconds(500);
 
-                float initialZoom = (float)Math.Clamp(defaultTimelineZoom * (editorBeatmap.BeatmapInfo.TimelineZoom == 0 ? 1 : editorBeatmap.BeatmapInfo.TimelineZoom), minimumZoom, maximumZoom);
+                float initialZoom = (float)Math.Clamp(defaultTimelineZoom * (editorBeatmap.TimelineZoom == 0 ? 1 : editorBeatmap.TimelineZoom), minimumZoom, maximumZoom);
 
                 SetupZoom(initialZoom, minimumZoom, maximumZoom);
 
@@ -240,7 +234,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         protected override void OnZoomChanged()
         {
             base.OnZoomChanged();
-            editorBeatmap.BeatmapInfo.TimelineZoom = Zoom / defaultTimelineZoom;
+            editorBeatmap.TimelineZoom = Zoom / defaultTimelineZoom;
         }
 
         protected override void UpdateAfterChildren()
@@ -318,7 +312,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         }
 
         [Resolved]
-        private IBeatSnapProvider beatSnapProvider { get; set; }
+        private IBeatSnapProvider beatSnapProvider { get; set; } = null!;
 
         /// <summary>
         /// The total amount of time visible on the timeline.

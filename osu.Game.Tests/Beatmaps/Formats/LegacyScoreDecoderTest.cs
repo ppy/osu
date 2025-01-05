@@ -19,7 +19,7 @@ using osu.Game.Replays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Mania;
-using osu.Game.Rulesets.Mania.Mods;
+using osu.Game.Rulesets.Mania.Replays;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
@@ -65,14 +65,13 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual(829_931, score.ScoreInfo.LegacyTotalScore);
                 Assert.AreEqual(3, score.ScoreInfo.MaxCombo);
 
-                Assert.IsTrue(score.ScoreInfo.Mods.Any(m => m is ManiaModClassic));
-                Assert.IsTrue(score.ScoreInfo.APIMods.Any(m => m.Acronym == "CL"));
-                Assert.IsTrue(score.ScoreInfo.ModsJson.Contains("CL"));
+                Assert.That(score.ScoreInfo.APIMods.Select(m => m.Acronym), Is.EquivalentTo(new[] { "CL", "9K", "DS" }));
 
                 Assert.That((2 * 300d + 1 * 200) / (3 * 305d), Is.EqualTo(score.ScoreInfo.Accuracy).Within(0.0001));
                 Assert.AreEqual(ScoreRank.B, score.ScoreInfo.Rank);
 
-                Assert.That(score.Replay.Frames, Is.Not.Empty);
+                Assert.That(score.Replay.Frames, Has.One.Matches<ManiaReplayFrame>(frame =>
+                    frame.Time == 414 && frame.Actions.SequenceEqual(new[] { ManiaAction.Key1, ManiaAction.Key18 })));
             }
         }
 

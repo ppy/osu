@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +14,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Resources.Localisation.Web;
@@ -50,14 +49,17 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private readonly List<SelectionBlueprint<T>> selectedBlueprints;
 
-        protected SelectionBox SelectionBox { get; private set; }
+        protected SelectionBox SelectionBox { get; private set; } = null!;
 
         [Resolved(CanBeNull = true)]
-        protected IEditorChangeHandler ChangeHandler { get; private set; }
+        protected IEditorChangeHandler? ChangeHandler { get; private set; }
 
-        public SelectionRotationHandler RotationHandler { get; private set; }
+        public SelectionRotationHandler RotationHandler { get; private set; } = null!;
 
-        public SelectionScaleHandler ScaleHandler { get; private set; }
+        public SelectionScaleHandler ScaleHandler { get; private set; } = null!;
+
+        [Resolved(CanBeNull = true)]
+        protected OsuContextMenuContainer? ContextMenuContainer { get; private set; }
 
         protected SelectionHandler()
         {
@@ -85,10 +87,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 SelectionBox = CreateSelectionBox(),
             });
 
-            SelectedItems.CollectionChanged += (_, _) =>
-            {
-                Scheduler.AddOnce(updateVisibility);
-            };
+            SelectedItems.BindCollectionChanged((_, _) => Scheduler.AddOnce(updateVisibility), true);
         }
 
         public SelectionBox CreateSelectionBox()
@@ -233,7 +232,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <summary>
         /// Deselect all selected items.
         /// </summary>
-        protected void DeselectAll() => SelectedItems.Clear();
+        protected void DeselectAll()
+        {
+            SelectedItems.Clear();
+            ContextMenuContainer?.CloseMenu();
+        }
 
         /// <summary>
         /// Handle a blueprint becoming selected.
@@ -246,6 +249,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 SelectedItems.Add(blueprint.Item);
 
             selectedBlueprints.Add(blueprint);
+
+            ContextMenuContainer?.CloseMenu();
         }
 
         /// <summary>
@@ -266,7 +271,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <returns>Whether a selection was performed.</returns>
         internal virtual bool MouseDownSelectionRequested(SelectionBlueprint<T> blueprint, MouseButtonEvent e)
         {
-            if (e.ShiftPressed && e.Button == MouseButton.Right)
+            if (e.Button == MouseButton.Middle || (e.ShiftPressed && e.Button == MouseButton.Right))
             {
                 handleQuickDeletion(blueprint);
                 return true;
@@ -410,7 +415,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 if (SelectedBlueprints.Count == 1)
                     items.AddRange(SelectedBlueprints[0].ContextMenuItems);
 
-                items.Add(new OsuMenuItem(CommonStrings.ButtonsDelete, MenuItemType.Destructive, DeleteSelected));
+                items.Add(new OsuMenuItem(CommonStrings.ButtonsDelete, MenuItemType.Destructive, DeleteSelected)
+                {
+                    Hotkey = new Hotkey { PlatformAction = PlatformAction.Delete, KeyCombinations = [new KeyCombination(InputKey.Shift, InputKey.MouseRight), new KeyCombination(InputKey.MouseMiddle)] }
+                });
 
                 return items.ToArray();
             }

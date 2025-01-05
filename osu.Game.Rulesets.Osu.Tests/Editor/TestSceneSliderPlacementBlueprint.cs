@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Input;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Edit;
@@ -299,6 +300,14 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             });
             assertControlPointTypeDuringPlacement(0, PathType.BSpline(4));
 
+            AddStep("press alt-2", () =>
+            {
+                InputManager.PressKey(Key.AltLeft);
+                InputManager.Key(Key.Number2);
+                InputManager.ReleaseKey(Key.AltLeft);
+            });
+            assertControlPointTypeDuringPlacement(0, PathType.BEZIER);
+
             AddStep("start new segment via S", () => InputManager.Key(Key.S));
             assertControlPointTypeDuringPlacement(2, PathType.LINEAR);
 
@@ -309,7 +318,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             addClickStep(MouseButton.Right);
 
             assertPlaced(true);
-            assertFinalControlPointType(0, PathType.BSpline(4));
+            assertFinalControlPointType(0, PathType.BEZIER);
             assertFinalControlPointType(2, PathType.PERFECT_CURVE);
         }
 
@@ -382,6 +391,29 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             assertFinalControlPointType(1, PathType.BSpline(4));
             assertFinalControlPointType(2, PathType.BSpline(4));
             assertFinalControlPointType(3, null);
+        }
+
+        [Test]
+        public void TestSliderDrawingViaTouch()
+        {
+            Vector2 startPoint = new Vector2(200);
+
+            AddStep("move mouse to a random point", () => InputManager.MoveMouseTo(InputManager.ToScreenSpace(Vector2.Zero)));
+            AddStep("begin touch at start point", () => InputManager.BeginTouch(new Touch(TouchSource.Touch1, InputManager.ToScreenSpace(startPoint))));
+
+            for (int i = 1; i < 20; i++)
+                addTouchMovementStep(startPoint + new Vector2(i * 40, MathF.Sin(i * MathF.PI / 5) * 50));
+
+            AddStep("release touch at end point", () => InputManager.EndTouch(new Touch(TouchSource.Touch1, InputManager.CurrentState.Touch.GetTouchPosition(TouchSource.Touch1)!.Value)));
+
+            assertPlaced(true);
+            assertLength(808, tolerance: 10);
+            assertControlPointCount(5);
+            assertFinalControlPointType(0, PathType.BSpline(4));
+            assertFinalControlPointType(1, null);
+            assertFinalControlPointType(2, null);
+            assertFinalControlPointType(3, null);
+            assertFinalControlPointType(4, null);
         }
 
         [Test]
@@ -484,6 +516,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
         private void addMovementStep(Vector2 position) => AddStep($"move mouse to {position}", () => InputManager.MoveMouseTo(InputManager.ToScreenSpace(position)));
 
+        private void addTouchMovementStep(Vector2 position) => AddStep($"move touch1 to {position}", () => InputManager.MoveTouchTo(new Touch(TouchSource.Touch1, InputManager.ToScreenSpace(position))));
+
         private void addClickStep(MouseButton button)
         {
             AddStep($"click {button}", () => InputManager.Click(button));
@@ -506,6 +540,6 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         private Slider? getSlider() => HitObjectContainer.Count > 0 ? ((DrawableSlider)HitObjectContainer[0]).HitObject : null;
 
         protected override DrawableHitObject CreateHitObject(HitObject hitObject) => new DrawableSlider((Slider)hitObject);
-        protected override PlacementBlueprint CreateBlueprint() => new SliderPlacementBlueprint();
+        protected override HitObjectPlacementBlueprint CreateBlueprint() => new SliderPlacementBlueprint();
     }
 }
