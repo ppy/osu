@@ -36,8 +36,19 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
             var highVelocity = new VelocityRange(480, 640);
             var midVelocity = new VelocityRange(360, 480);
 
-            return 1.0 * DifficultyCalculationUtils.Logistic(effectiveBPM, highVelocity.Center, 1.0 / (highVelocity.Range / 10))
-                   + 0.5 * DifficultyCalculationUtils.Logistic(effectiveBPM, midVelocity.Center, 1.0 / (midVelocity.Range / 10));
+			// High velocity notes are penalised if their note density is highVelDifficulty
+			// Density is worked out by taking the time between this note and the previous
+			// and comparing it to the expected time at this note's effective BPM
+			double density = (21000.0 / effectiveBPM) / noteObject.DeltaTime;
+			
+			// Explain properly soon
+			// https://www.desmos.com/calculator/ftvspcqgqd
+			double densityPenalty = 0.5 * DifficultyCalculationUtils.Logistic(density, 1, 15);
+
+			double midVelDifficulty = 0.5 * DifficultyCalculationUtils.Logistic(effectiveBPM, midVelocity.Center, 1.0 / (midVelocity.Range / 10));
+			double highVelDifficulty = (1.0 - densityPenalty) * DifficultyCalculationUtils.Logistic(effectiveBPM, highVelocity.Center, 1.0 / (highVelocity.Range / 10));
+			
+            return midVelDifficulty + highVelDifficulty;
         }
     }
 }
