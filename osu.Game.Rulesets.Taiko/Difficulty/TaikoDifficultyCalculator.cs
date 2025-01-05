@@ -30,6 +30,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         private const double stamina_skill_multiplier = 0.445 * difficulty_multiplier;
 
         private double strainLengthBonus;
+        
+        private double rhythmScale;
 
         public override int Version => 20241007;
 
@@ -121,6 +123,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             double rhythmDifficultStrains = rhythm.CountTopWeightedStrains();
             double staminaDifficultStrains = stamina.CountTopWeightedStrains() * clockRate;
 
+            rhythmScale = Math.Pow(staminaRating * colourRating, 0.28);
+
             strainLengthBonus = 1
                                 + Math.Min(Math.Max((staminaDifficultStrains - 1350) / 5000, 0), 0.15)
                                 + Math.Min(Math.Max((staminaRating - 7.0) / 1.0, 0), 0.05);
@@ -179,7 +183,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
             for (int i = 0; i < colourPeaks.Count; i++)
             {
-                double rhythmPeak = rhythmPeaks[i] * rhythm_skill_multiplier * strainLengthBonus;
+                double rhythmPeak = rhythmPeaks[i] * rhythm_skill_multiplier * strainLengthBonus * rhythmScale;
                 double readingPeak = readingPeaks[i] * reading_skill_multiplier;
                 double colourPeak = colourPeaks[i] * colour_skill_multiplier;
                 double staminaPeak = staminaPeaks[i] * stamina_skill_multiplier * strainLengthBonus;

@@ -27,6 +27,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Rhythm.Data
 
         public TaikoDifficultyHitObject FirstHitObject => Children[0].FirstHitObject;
 
+        public int Total => Children.Sum(x => x.Children.Count);
+
         public IEnumerable<TaikoDifficultyHitObject> AllHitObjects => Children.SelectMany(child => child.Children);
 
         private SamePatterns(SamePatterns? previous, List<SameRhythmHitObjects> data, ref int i)
