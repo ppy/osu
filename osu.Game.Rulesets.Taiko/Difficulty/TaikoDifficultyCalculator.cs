@@ -118,7 +118,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             double monoStaminaFactor = staminaRating == 0 ? 1 : Math.Pow(monoStaminaRating / staminaRating, 5);
 
             double colourDifficultStrains = colour.CountTopWeightedStrains();
-            double rhythmDifficultStrains = rhythm.CountTopWeightedStrains() * Math.Max((rhythmRating - 4.0) / 0.5 * 2, 1);
+            double rhythmDifficultStrains = rhythm.CountTopWeightedStrains();
             double staminaDifficultStrains = stamina.CountTopWeightedStrains() * clockRate;
 
             strainLengthBonus = 1
@@ -218,11 +218,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         {
             if (sr < 0) return sr;
 
-            double midrange = 10.43 * Math.Log(sr / 8 + 1);
-            double toprange = 11.6 + Math.Log(Math.Max(midrange - 11, 1));
-            double range = Math.Min(midrange, toprange);
-
-            return range;
+            return 10.43 * Math.Log(sr / 8 + 1);
         }
     }
 }
