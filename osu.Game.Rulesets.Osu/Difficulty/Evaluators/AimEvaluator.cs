@@ -34,6 +34,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             var osuCurrObj = (OsuDifficultyHitObject)current;
             var osuLastObj = (OsuDifficultyHitObject)current.Previous(0);
             var osuLastLastObj = (OsuDifficultyHitObject)current.Previous(1);
+            var osuLast2Obj = (OsuDifficultyHitObject)current.Previous(2);
 
             const int radius = OsuDifficultyHitObject.NORMALISED_RADIUS;
             const int diameter = OsuDifficultyHitObject.NORMALISED_DIAMETER;
@@ -79,7 +80,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     // Rewarding angles, take the smaller velocity as base.
                     double angleBonus = Math.Min(currVelocity, prevVelocity);
 
-                    wideAngleBonus = calcWideAngleBonus(lastAngle);
+                    wideAngleBonus = calcWideAngleBonus(currAngle);
 
                     // Apply acute angle bonus for BPM above 300 1/2 and distance more than one diameter
                     acuteAngleBonus = calcAcuteAngleBonus(currAngle) *
@@ -88,7 +89,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                                       DifficultyCalculationUtils.Smootherstep(osuCurrObj.LazyJumpDistance, diameter, diameter * 2);
 
                     // Penalize wide angles if they're repeated, reducing the penalty as the lastAngle gets more acute.
-                    wideAngleBonus *= angleBonus * (1 - Math.Min(wideAngleBonus, Math.Pow(calcWideAngleBonus(lastLastAngle), 3)));
+                    wideAngleBonus *= angleBonus * (1 - Math.Min(wideAngleBonus, Math.Pow(calcWideAngleBonus(lastAngle), 3)));
                     // Penalize acute angles if they're repeated, reducing the penalty as the lastAngle gets more obtuse.
                     acuteAngleBonus *= 0.03 + 0.97 * (1 - Math.Min(acuteAngleBonus, Math.Pow(calcAcuteAngleBonus(lastAngle), 3)));
 
@@ -103,11 +104,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                                   * DifficultyCalculationUtils.Smootherstep(lastAngle, double.DegreesToRadians(110), double.DegreesToRadians(60));
 
                     // If objects just go back and forth through a middle point - don't give as much wide bonus
-                    var lastLastBaseObject = (OsuHitObject)osuLastLastObj.BaseObject;
-                    var currBaseObject = (OsuHitObject)osuCurrObj.BaseObject;
+                    // Use Previous(2) and Previous(0) because angles calculation is done prevprev-prev-curr, so any object's angle's center point is always the previous object
+                    var lastBaseObject = (OsuHitObject)osuLastObj.BaseObject;
+                    var last2BaseObject = (OsuHitObject)osuLast2Obj.BaseObject;
 
-                    float scalingFactor = OsuDifficultyHitObject.NORMALISED_RADIUS / (float)currBaseObject.Radius;
-                    float distance = (lastLastBaseObject.StackedPosition * scalingFactor - currBaseObject.StackedPosition * scalingFactor).Length;
+                    float distance = (last2BaseObject.StackedPosition - lastBaseObject.StackedPosition).Length;
 
                     if (distance < 1)
                     {
