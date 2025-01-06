@@ -254,8 +254,10 @@ namespace osu.Desktop.Windows
 
                 using (var extensionKey = classes.CreateSubKey(Extension))
                 {
-                    // set ourselves as the default program
-                    extensionKey.SetValue(null, ProgramId);
+                    // Clear out our existing default ProgramID. Default programs in Windows are handled internally by Explorer,
+                    // so having it here is just confusing and may override user preferences.
+                    if (extensionKey.GetValue(null) is string s && s == ProgramId)
+                        extensionKey.SetValue(null, string.Empty);
 
                     // add to the open with dialog
                     // https://learn.microsoft.com/en-us/windows/win32/shell/how-to-include-an-application-on-the-open-with-dialog-box
@@ -283,11 +285,6 @@ namespace osu.Desktop.Windows
 
                 using (var extensionKey = classes.OpenSubKey(Extension, true))
                 {
-                    // clear our default association so that Explorer doesn't show the raw ProgramId to users
-                    // the null/(Default) entry is used for both ProdID association and as a fallback friendly name, for legacy reasons
-                    if (extensionKey?.GetValue(null) is string s && s == ProgramId)
-                        extensionKey.SetValue(null, string.Empty);
-
                     using (var openWithKey = extensionKey?.CreateSubKey(@"OpenWithProgIds"))
                         openWithKey?.DeleteValue(ProgramId, throwOnMissingValue: false);
                 }
