@@ -25,7 +25,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             if (DifficultyCalculationUtils.MillisecondsToBPM(strainTime) > 220)
                 speedBonus = Math.Pow((DifficultyCalculationUtils.BPMToMilliseconds(220) - strainTime) / 40, 2);
 
-            return (1 + speedBonus) * 1000 / strainTime;
+            double finalValue = (1 + speedBonus) * 1000 / strainTime;
+
+            double lowBpmPenalty = Math.Min(1.0, Math.Sqrt(strainTime / DifficultyCalculationUtils.BPMToMilliseconds(220)));
+            finalValue *= lowBpmPenalty;
+
+            return finalValue;
         }
     }
 }
