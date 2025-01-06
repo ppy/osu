@@ -157,7 +157,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                 foreach (var sample in hitObject.Samples)
                 {
-                    if (!HitSampleInfo.AllBanks.Contains(sample.Bank))
+                    if (!HitSampleInfo.ALL_BANKS.Contains(sample.Bank))
                         minimumGap = Math.Max(minimumGap, absolute_minimum_gap + sample.Bank.Length * 3);
                 }
 
@@ -167,7 +167,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                     foreach (var sample in hasRepeats.NodeSamples.SelectMany(s => s))
                     {
-                        if (!HitSampleInfo.AllBanks.Contains(sample.Bank))
+                        if (!HitSampleInfo.ALL_BANKS.Contains(sample.Bank))
                             minimumGap = Math.Max(minimumGap, absolute_minimum_gap + sample.Bank.Length * 3);
                     }
                 }
