@@ -69,7 +69,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             double aimStrain = currVelocity; // Start strain with regular velocity.
 
-            if (osuCurrObj.Angle != null && osuLastObj.Angle != null && osuLastLastObj.Angle != null)
+            if (osuCurrObj.Angle != null && osuLastObj.Angle != null)
             {
                 double currAngle = osuCurrObj.Angle.Value;
                 double lastAngle = osuLastObj.Angle.Value;
