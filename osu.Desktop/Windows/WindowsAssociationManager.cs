@@ -17,6 +17,7 @@ namespace osu.Desktop.Windows
     public static class WindowsAssociationManager
     {
         private const string software_classes = @"Software\Classes";
+        private const string software_registered_applications = @"Software\RegisteredApplications";
 
         /// <summary>
         /// Sub key for setting the icon.
@@ -37,6 +38,8 @@ namespace osu.Desktop.Windows
         /// see https://learn.microsoft.com/en-us/windows/win32/com/-progid--key.
         /// </summary>
         private const string program_id_prefix = "osu.File";
+
+        private static readonly ApplicationCapability application_capability = new ApplicationCapability(@"osu", @"Software\ppy\osu\Capabilities", "osu!(lazer)");
 
         private static readonly FileAssociation[] file_associations =
         {
@@ -112,6 +115,8 @@ namespace osu.Desktop.Windows
         {
             try
             {
+                application_capability.Uninstall();
+
                 foreach (var association in file_associations)
                     association.Uninstall();
 
@@ -133,15 +138,21 @@ namespace osu.Desktop.Windows
         /// </summary>
         private static void updateAssociations()
         {
+            application_capability.Install();
+
             foreach (var association in file_associations)
                 association.Install();
 
             foreach (var association in uri_associations)
                 association.Install();
+
+            application_capability.RegisterFileAssociations(file_associations);
         }
 
         private static void updateDescriptions(LocalisationManager? localisation)
         {
+            application_capability.UpdateDescription(getLocalisedString(application_capability.Description));
+
             foreach (var association in file_associations)
                 association.UpdateDescription(getLocalisedString(association.Description));
 
@@ -173,6 +184,51 @@ namespace osu.Desktop.Windows
         }
 
         #endregion
+
+        private record ApplicationCapability(string UniqueName, string CapabilityPath, LocalisableString Description)
+        {
+            /// <summary>
+            /// Registers an application capability according to <see href="https://learn.microsoft.com/en-us/windows/win32/shell/default-programs#registering-an-application-for-use-with-default-programs">
+            /// Registering an Application for Use with Default Programs</see>.
+            /// </summary>
+            public void Install()
+            {
+                using (Registry.CurrentUser.CreateSubKey(CapabilityPath))
+                {
+                    // create an empty "capability" key, other methods will fill it with information
+                }
+
+                using (var registeredApplications = Registry.CurrentUser.OpenSubKey(software_registered_applications, true))
+                    registeredApplications?.SetValue(UniqueName, CapabilityPath);
+            }
+
+            public void RegisterFileAssociations(FileAssociation[] associations)
+            {
+                using var capability = Registry.CurrentUser.OpenSubKey(CapabilityPath, true);
+                if (capability == null) return;
+
+                using var fileAssociations = capability.CreateSubKey(@"FileAssociations");
+
+                foreach (var association in associations)
+                    fileAssociations.SetValue(association.Extension, association.ProgramId);
+            }
+
+            public void UpdateDescription(string description)
+            {
+                using (var capability = Registry.CurrentUser.OpenSubKey(CapabilityPath, true))
+                {
+                    capability?.SetValue(@"ApplicationDescription", description);
+                }
+            }
+
+            public void Uninstall()
+            {
+                using (var registeredApplications = Registry.CurrentUser.OpenSubKey(software_registered_applications, true))
+                    registeredApplications?.DeleteValue(UniqueName, throwOnMissingValue: false);
+
+                Registry.CurrentUser.DeleteSubKeyTree(CapabilityPath, throwOnMissingSubKey: false);
+            }
+        }
 
         private record FileAssociation(string Extension, LocalisableString Description, string IconPath)
         {
