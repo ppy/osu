@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
     public class Stamina : StrainSkill
     {
-        private double skillMultiplier => 0.01;
+        private double skillMultiplier => 0.03;
         private double strainDecayBase => 0.1;
         private double currentStrain;
 
@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         {
         }
 
-        private double strainDecay(double ms) => Math.Pow(strainDecayBase, Math.Pow(ms / 1000, 3.5));
+        private double strainDecay(double ms) => Math.Pow(strainDecayBase, Math.Pow(ms / 1000, 3.0));
 
         protected override double CalculateInitialStrain(double time, DifficultyHitObject current) => (currentStrain) * strainDecay(time - current.Previous(0).StartTime);
 
