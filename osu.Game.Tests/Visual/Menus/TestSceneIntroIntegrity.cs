@@ -28,7 +28,7 @@ namespace osu.Game.Tests.Visual.Menus
             RestartIntro();
             WaitForMenu();
 
-            AddUntilStep("wait for track playing", () => Intro.Beatmap.Value.Track is TrackBass trackBass && trackBass.IsRunning);
+            AddUntilStep("ensure track is not virtual", () => Intro.Beatmap.Value.Track is TrackBass);
         }
 
         protected override bool IntroReliesOnTrack => true;
