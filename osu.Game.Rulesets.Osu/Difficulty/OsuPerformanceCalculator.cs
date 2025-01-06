@@ -396,6 +396,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double speedValue = OsuStrainSkill.DifficultyToPerformance(attributes.SpeedDifficulty);
 
+            // Decides a point where the PP value achieved against the speed deviation is considered "abuse".
+            // This is used to cause PP above the abuse point to scale logistically towards the original speed value thus nerfing the value.
             double abusePoint = 100 + 220 * Math.Pow(22 / speedDeviation.Value, 6.5);
 
             if (speedValue <= abusePoint)
