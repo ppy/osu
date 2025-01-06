@@ -136,6 +136,7 @@ namespace osu.Game.Configuration
             // Gameplay
             SetDefault(OsuSetting.PositionalHitsoundsLevel, 0.2f, 0, 1, 0.01f);
             SetDefault(OsuSetting.DimLevel, 0.7, 0, 1, 0.01);
+            SetDefault(OsuSetting.DimColour, 0, 0, 1, 0.01);
             SetDefault(OsuSetting.BlurLevel, 0, 0, 1, 0.01);
             SetDefault(OsuSetting.LightenDuringBreaks, true);
 
@@ -342,6 +343,7 @@ namespace osu.Game.Configuration
         AutoCursorSize,
         GameplayCursorDuringTouch,
         DimLevel,
+        DimColour,
         BlurLevel,
         EditorDim,
         LightenDuringBreaks,
