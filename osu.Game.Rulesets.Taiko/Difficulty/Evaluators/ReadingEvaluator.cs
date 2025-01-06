@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
 			// and comparing it to the expected time at this note's effective BPM
 			double density = (21000.0 / effectiveBPM) / noteObject.DeltaTime;
 			
-			// https://www.desmos.com/calculator/sgab5r9nh1
+			// https://www.desmos.com/calculator/biltwjojyo
 			double densityPenalty = DifficultyCalculationUtils.Logistic(density, 1, 15);
 			
 			double midVelDifficulty = 0.5 * DifficultyCalculationUtils.Logistic(effectiveBPM, midVelocity.Center, 1.0 / (midVelocity.Range / 10));
