@@ -176,7 +176,7 @@ namespace osu.Desktop.Windows
 
         private record FileAssociation(string Extension, LocalisableString Description, string IconPath)
         {
-            private string programId => $@"{program_id_prefix}{Extension}";
+            public string ProgramId => $@"{program_id_prefix}{Extension}";
 
             /// <summary>
             /// Installs a file extension association in accordance with https://learn.microsoft.com/en-us/windows/win32/com/-progid--key
@@ -187,7 +187,7 @@ namespace osu.Desktop.Windows
                 if (classes == null) return;
 
                 // register a program id for the given extension
-                using (var programKey = classes.CreateSubKey(programId))
+                using (var programKey = classes.CreateSubKey(ProgramId))
                 {
                     using (var defaultIconKey = programKey.CreateSubKey(default_icon))
                         defaultIconKey.SetValue(null, IconPath);
@@ -199,12 +199,12 @@ namespace osu.Desktop.Windows
                 using (var extensionKey = classes.CreateSubKey(Extension))
                 {
                     // set ourselves as the default program
-                    extensionKey.SetValue(null, programId);
+                    extensionKey.SetValue(null, ProgramId);
 
                     // add to the open with dialog
                     // https://learn.microsoft.com/en-us/windows/win32/shell/how-to-include-an-application-on-the-open-with-dialog-box
                     using (var openWithKey = extensionKey.CreateSubKey(@"OpenWithProgIds"))
-                        openWithKey.SetValue(programId, string.Empty);
+                        openWithKey.SetValue(ProgramId, string.Empty);
                 }
             }
 
@@ -213,7 +213,7 @@ namespace osu.Desktop.Windows
                 using var classes = Registry.CurrentUser.OpenSubKey(software_classes, true);
                 if (classes == null) return;
 
-                using (var programKey = classes.OpenSubKey(programId, true))
+                using (var programKey = classes.OpenSubKey(ProgramId, true))
                     programKey?.SetValue(null, description);
             }
 
@@ -227,16 +227,16 @@ namespace osu.Desktop.Windows
 
                 using (var extensionKey = classes.OpenSubKey(Extension, true))
                 {
-                    // clear our default association so that Explorer doesn't show the raw programId to users
+                    // clear our default association so that Explorer doesn't show the raw ProgramId to users
                     // the null/(Default) entry is used for both ProdID association and as a fallback friendly name, for legacy reasons
-                    if (extensionKey?.GetValue(null) is string s && s == programId)
+                    if (extensionKey?.GetValue(null) is string s && s == ProgramId)
                         extensionKey.SetValue(null, string.Empty);
 
                     using (var openWithKey = extensionKey?.CreateSubKey(@"OpenWithProgIds"))
-                        openWithKey?.DeleteValue(programId, throwOnMissingValue: false);
+                        openWithKey?.DeleteValue(ProgramId, throwOnMissingValue: false);
                 }
 
-                classes.DeleteSubKeyTree(programId, throwOnMissingSubKey: false);
+                classes.DeleteSubKeyTree(ProgramId, throwOnMissingSubKey: false);
             }
         }
 
