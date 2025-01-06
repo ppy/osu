@@ -155,8 +155,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 if (hitObject.GetEndTime() < editorClock.CurrentTime - timeline.VisibleRange / 2)
                     break;
 
-                foreach (var sample in hitObject.Samples)
+                for (int i = 0; i < hitObject.Samples.Count; i++)
                 {
+                    var sample = hitObject.Samples[i];
+
                     if (!HitSampleInfo.ALL_BANKS.Contains(sample.Bank))
                         minimumGap = Math.Max(minimumGap, absolute_minimum_gap + sample.Bank.Length * 3);
                 }
@@ -165,10 +167,17 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 {
                     smallestTimeGap = Math.Min(smallestTimeGap, hasRepeats.Duration / hasRepeats.SpanCount() / 2);
 
-                    foreach (var sample in hasRepeats.NodeSamples.SelectMany(s => s))
+                    for (int i = 0; i < hasRepeats.NodeSamples.Count; i++)
                     {
-                        if (!HitSampleInfo.ALL_BANKS.Contains(sample.Bank))
-                            minimumGap = Math.Max(minimumGap, absolute_minimum_gap + sample.Bank.Length * 3);
+                        var node = hasRepeats.NodeSamples[i];
+
+                        for (int j = 0; j < node.Count; j++)
+                        {
+                            var sample = node[j];
+
+                            if (!HitSampleInfo.ALL_BANKS.Contains(sample.Bank))
+                                minimumGap = Math.Max(minimumGap, absolute_minimum_gap + sample.Bank.Length * 3);
+                        }
                     }
                 }
 
