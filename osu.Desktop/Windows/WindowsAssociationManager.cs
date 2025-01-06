@@ -37,7 +37,9 @@ namespace osu.Desktop.Windows
         /// Program ID prefix used for file associations. Should be relatively short since the full program ID has a 39 character limit,
         /// see https://learn.microsoft.com/en-us/windows/win32/com/-progid--key.
         /// </summary>
-        private const string program_id_prefix = "osu.File";
+        private const string program_id_file_prefix = "osu.File";
+
+        private const string program_id_protocol_prefix = "osu.Uri";
 
         private static readonly ApplicationCapability application_capability = new ApplicationCapability(@"osu", @"Software\ppy\osu\Capabilities", "osu!(lazer)");
 
@@ -147,6 +149,7 @@ namespace osu.Desktop.Windows
                 association.Install();
 
             application_capability.RegisterFileAssociations(file_associations);
+            application_capability.RegisterUriAssociations(uri_associations);
         }
 
         private static void updateDescriptions(LocalisationManager? localisation)
@@ -213,6 +216,17 @@ namespace osu.Desktop.Windows
                     fileAssociations.SetValue(association.Extension, association.ProgramId);
             }
 
+            public void RegisterUriAssociations(UriAssociation[] associations)
+            {
+                using var capability = Registry.CurrentUser.OpenSubKey(CapabilityPath, true);
+                if (capability == null) return;
+
+                using var urlAssociations = capability.CreateSubKey(@"UrlAssociations");
+
+                foreach (var association in associations)
+                    urlAssociations.SetValue(association.Protocol, association.ProgramId);
+            }
+
             public void UpdateDescription(string description)
             {
                 using (var capability = Registry.CurrentUser.OpenSubKey(CapabilityPath, true))
@@ -232,7 +246,7 @@ namespace osu.Desktop.Windows
 
         private record FileAssociation(string Extension, LocalisableString Description, string IconPath)
         {
-            public string ProgramId => $@"{program_id_prefix}{Extension}";
+            public string ProgramId => $@"{program_id_file_prefix}{Extension}";
 
             /// <summary>
             /// Installs a file extension association in accordance with https://learn.microsoft.com/en-us/windows/win32/com/-progid--key
@@ -301,6 +315,8 @@ namespace osu.Desktop.Windows
             /// </summary>
             public const string URL_PROTOCOL = @"URL Protocol";
 
+            public string ProgramId => $@"{program_id_protocol_prefix}.{Protocol}";
+
             /// <summary>
             /// Registers an URI protocol handler in accordance with https://learn.microsoft.com/en-us/previous-versions/windows/internet-explorer/ie-developer/platform-apis/aa767914(v=vs.85).
             /// </summary>
@@ -319,6 +335,16 @@ namespace osu.Desktop.Windows
                     using (var openCommandKey = protocolKey.CreateSubKey(SHELL_OPEN_COMMAND))
                         openCommandKey.SetValue(null, $@"""{exe_path}"" ""%1""");
                 }
+
+                // register a program id for the given protocol
+                using (var programKey = classes.CreateSubKey(ProgramId))
+                {
+                    using (var defaultIconKey = programKey.CreateSubKey(default_icon))
+                        defaultIconKey.SetValue(null, IconPath);
+
+                    using (var openCommandKey = programKey.CreateSubKey(SHELL_OPEN_COMMAND))
+                        openCommandKey.SetValue(null, $@"""{exe_path}"" ""%1""");
+                }
             }
 
             public void UpdateDescription(string description)
@@ -333,6 +359,7 @@ namespace osu.Desktop.Windows
             public void Uninstall()
             {
                 using var classes = Registry.CurrentUser.OpenSubKey(software_classes, true);
+                classes?.DeleteSubKeyTree(ProgramId, throwOnMissingSubKey: false);
                 classes?.DeleteSubKeyTree(Protocol, throwOnMissingSubKey: false);
             }
         }
