@@ -6,6 +6,7 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
+using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -28,6 +29,8 @@ namespace osu.Game.Screens.Edit
         private readonly Bindable<Track> track = new Bindable<Track>();
 
         public double TrackLength => track.Value?.IsLoaded == true ? track.Value.Length : 60000;
+
+        public AudioAdjustments AudioAdjustments { get; } = new AudioAdjustments();
 
         public ControlPointInfo ControlPointInfo => Beatmap.ControlPointInfo;
 
@@ -208,7 +211,16 @@ namespace osu.Game.Screens.Edit
             }
         }
 
-        public void ResetSpeedAdjustments() => underlyingClock.ResetSpeedAdjustments();
+        public void BindAdjustments() => track.Value?.BindAdjustments(AudioAdjustments);
+
+        public void UnbindAdjustments() => track.Value?.UnbindAdjustments(AudioAdjustments);
+
+        public void ResetSpeedAdjustments()
+        {
+            AudioAdjustments.RemoveAllAdjustments(AdjustableProperty.Frequency);
+            AudioAdjustments.RemoveAllAdjustments(AdjustableProperty.Tempo);
+            underlyingClock.ResetSpeedAdjustments();
+        }
 
         double IAdjustableClock.Rate
         {
@@ -231,8 +243,12 @@ namespace osu.Game.Screens.Edit
 
         public void ChangeSource(IClock source)
         {
+            UnbindAdjustments();
+
             track.Value = source as Track;
             underlyingClock.ChangeSource(source);
+
+            BindAdjustments();
         }
 
         public IClock Source => underlyingClock.Source;
