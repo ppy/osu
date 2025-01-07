@@ -3,12 +3,11 @@
 
 using System.Threading.Tasks;
 
-namespace osu.Game.Online.Metadata
+namespace osu.Game.Online.Friends
 {
-    public partial interface IMetadataClient
+    public interface IFriendsClient
     {
         Task FriendConnected(int userId);
-
         Task FriendDisconnected(int userId);
     }
 }

@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Threading.Tasks;
+using osu.Game.Online.Friends;
 using osu.Game.Users;
 
 namespace osu.Game.Online.Metadata
@@ -9,7 +10,7 @@ namespace osu.Game.Online.Metadata
     /// <summary>
     /// Interface for metadata-related remote procedure calls to be executed on the client side.
     /// </summary>
-    public partial interface IMetadataClient : IStatefulUserHubClient
+    public partial interface IMetadataClient : IStatefulUserHubClient, IFriendsClient
     {
         /// <summary>
         /// Delivers the set of requested <see cref="BeatmapUpdates"/> to the client.

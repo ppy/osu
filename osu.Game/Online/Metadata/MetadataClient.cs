@@ -5,14 +5,20 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Game.Online.Friends;
 using osu.Game.Users;
 
 namespace osu.Game.Online.Metadata
 {
-    public abstract partial class MetadataClient : Component, IMetadataClient, IMetadataServer
+    public abstract partial class MetadataClient : CompositeComponent, IMetadataClient, IMetadataServer
     {
         public abstract IBindable<bool> IsConnected { get; }
+
+        protected MetadataClient()
+        {
+            AddInternal(Friends);
+        }
 
         #region Beatmap metadata updates
 
@@ -95,6 +101,20 @@ namespace osu.Game.Online.Metadata
             Schedule(() => Disconnecting?.Invoke());
             return Task.CompletedTask;
         }
+
+        #endregion
+
+        #region Friends
+
+        public abstract FriendsClient Friends { get; }
+
+        // Unused but required for now because IMetadataClient extends the IFriendsClient interface.
+        Task IFriendsClient.FriendConnected(int userId)
+            => ((IFriendsClient)Friends).FriendConnected(userId);
+
+        // Unused but required for now because IMetadataClient extends the IFriendsClient interface.
+        Task IFriendsClient.FriendDisconnected(int userId)
+            => ((IFriendsClient)Friends).FriendDisconnected(userId);
 
         #endregion
     }

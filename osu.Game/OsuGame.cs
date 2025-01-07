@@ -959,14 +959,14 @@ namespace osu.Game
             MultiplayerClient.PostNotification = n => Notifications.Post(n);
             MultiplayerClient.PresentMatch = PresentMultiplayerMatch;
 
-            MetadataClient.OnFriendConnected += userId =>
+            MetadataClient.Friends.Connected += userId =>
             {
                 APIUser friend = API.Friends.SingleOrDefault(u => u.TargetID == userId)?.TargetUser;
                 if (friend != null)
                     Notifications.Post(new SimpleNotification { Text = $"Online: {friend.Username}" });
             };
 
-            MetadataClient.OnFriendDisconnected += userId =>
+            MetadataClient.Friends.Disconnected += userId =>
             {
                 APIUser friend = API.Friends.SingleOrDefault(u => u.TargetID == userId)?.TargetUser;
                 if (friend != null)

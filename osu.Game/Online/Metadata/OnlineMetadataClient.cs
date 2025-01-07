@@ -12,6 +12,7 @@ using osu.Framework.Logging;
 using osu.Game.Configuration;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Friends;
 using osu.Game.Users;
 
 namespace osu.Game.Online.Metadata
@@ -64,7 +65,7 @@ namespace osu.Game.Online.Metadata
                     connection.On<DailyChallengeInfo?>(nameof(IMetadataClient.DailyChallengeUpdated), ((IMetadataClient)this).DailyChallengeUpdated);
                     connection.On<MultiplayerRoomScoreSetEvent>(nameof(IMetadataClient.MultiplayerRoomScoreSet), ((IMetadataClient)this).MultiplayerRoomScoreSet);
                     connection.On(nameof(IStatefulUserHubClient.DisconnectRequested), ((IMetadataClient)this).DisconnectRequested);
-                    configureConnection_Friends(connection);
+                    Friends.Configure(connection);
                 };
 
                 IsConnected.BindTo(connector.IsConnected);
@@ -271,6 +272,8 @@ namespace osu.Game.Online.Metadata
             if (connector != null)
                 await connector.Disconnect().ConfigureAwait(false);
         }
+
+        public override OnlineFriendsClient Friends { get; } = new OnlineFriendsClient();
 
         protected override void Dispose(bool isDisposing)
         {
