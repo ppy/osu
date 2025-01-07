@@ -7,6 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
@@ -38,6 +39,10 @@ namespace osu.Game.Online
         [Resolved]
         private OsuColour colours { get; set; } = null!;
 
+        [Resolved]
+        private OsuConfigManager config { get; set; } = null!;
+
+        private readonly Bindable<bool> notifyOnFriendPresenceChange = new BindableBool();
         private readonly IBindableDictionary<int, UserPresence> userStates = new BindableDictionary<int, UserPresence>();
         private readonly HashSet<APIUser> onlineAlertQueue = new HashSet<APIUser>();
         private readonly HashSet<APIUser> offlineAlertQueue = new HashSet<APIUser>();
@@ -48,6 +53,8 @@ namespace osu.Game.Online
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            config.BindWith(OsuSetting.NotifyOnFriendPresenceChange, notifyOnFriendPresenceChange);
 
             userStates.BindTo(metadataClient.UserStates);
             userStates.BindCollectionChanged((_, args) =>
@@ -103,6 +110,12 @@ namespace osu.Game.Online
             if (lastOnlineAlertTime == null || Time.Current - lastOnlineAlertTime < 1000)
                 return;
 
+            if (!notifyOnFriendPresenceChange.Value)
+            {
+                lastOnlineAlertTime = null;
+                return;
+            }
+
             APIUser? singleUser = onlineAlertQueue.Count == 1 ? onlineAlertQueue.Single() : null;
 
             notifications.Post(new SimpleNotification
@@ -133,6 +146,12 @@ namespace osu.Game.Online
 
             if (lastOfflineAlertTime == null || Time.Current - lastOfflineAlertTime < 1000)
                 return;
+
+            if (!notifyOnFriendPresenceChange.Value)
+            {
+                lastOfflineAlertTime = null;
+                return;
+            }
 
             notifications.Post(new SimpleNotification
             {
