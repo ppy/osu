@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.SignalR.Client;
 
 namespace osu.Game.Online.Friends
 {
-    public class OnlineFriendsClient : FriendsClient
+    public partial class OnlineFriendsClient : FriendsClient
     {
         public void Configure(HubConnection connection)
         {

@@ -7,7 +7,7 @@ using osu.Framework.Graphics;
 
 namespace osu.Game.Online.Friends
 {
-    public class FriendsClient : Component, IFriendsClient
+    public partial class FriendsClient : Component, IFriendsClient
     {
         public event Action<int>? Connected;
         public event Action<int>? Disconnected;
