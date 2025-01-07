@@ -75,6 +75,7 @@ namespace osu.Game.Online.API
 
         protected bool HasLogin => authentication.Token.Value != null || (!string.IsNullOrEmpty(ProvidedUsername) && !string.IsNullOrEmpty(password));
 
+        private readonly Dictionary<int, APIRelation> friendsMapping = new Dictionary<int, APIRelation>();
         private readonly CancellationTokenSource cancellationToken = new CancellationTokenSource();
 
         private readonly Logger log;
@@ -403,6 +404,8 @@ namespace osu.Game.Online.API
 
         public IChatClient GetChatClient() => new WebSocketChatClient(this);
 
+        public APIRelation GetFriend(int userId) => friendsMapping.GetValueOrDefault(userId);
+
         public RegistrationRequest.RegistrationRequestErrors CreateAccount(string email, string username, string password)
         {
             Debug.Assert(State.Value == APIState.Offline);
@@ -594,6 +597,8 @@ namespace osu.Game.Online.API
             Schedule(() =>
             {
                 setLocalUser(createGuestUser());
+
+                friendsMapping.Clear();
                 friends.Clear();
             });
 
@@ -610,7 +615,11 @@ namespace osu.Game.Online.API
             friendsReq.Failure += _ => state.Value = APIState.Failing;
             friendsReq.Success += res =>
             {
+                friendsMapping.Clear();
                 friends.Clear();
+
+                foreach (var u in res)
+                    friendsMapping[u.TargetID] = u;
                 friends.AddRange(res);
             };
 
