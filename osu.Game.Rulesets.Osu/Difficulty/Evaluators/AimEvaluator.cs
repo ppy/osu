@@ -144,6 +144,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
         private static double calcWideAngleBonus(double angle) => DifficultyCalculationUtils.Smoothstep(angle, double.DegreesToRadians(30), double.DegreesToRadians(150));
 
-        private static double calcAcuteAngleBonus(double angle) => 1 - calcWideAngleBonus(angle);
+        private static double calcAcuteAngleBonus(double angle) => DifficultyCalculationUtils.Smoothstep(angle, double.DegreesToRadians(150), double.DegreesToRadians(30));
     }
 }
