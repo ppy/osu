@@ -6,6 +6,7 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
@@ -24,7 +25,8 @@ namespace osu.Game.Screens.Edit
     /// </summary>
     public partial class EditorClock : CompositeComponent, IFrameBasedClock, IAdjustableClock, ISourceChangeableClock
     {
-        public IBindable<Track> Track => track;
+        [CanBeNull]
+        public event Action TrackChanged;
 
         private readonly Bindable<Track> track = new Bindable<Track>();
 
@@ -59,6 +61,8 @@ namespace osu.Game.Screens.Edit
 
             underlyingClock = new FramedBeatmapClock(applyOffsets: true, requireDecoupling: true);
             AddInternal(underlyingClock);
+
+            track.BindValueChanged(_ => TrackChanged?.Invoke());
         }
 
         /// <summary>
