@@ -208,9 +208,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             if (effectiveMissCount > 0)
             {
-                double missedComboPercent = 1.0 - (double)score.MaxCombo / attributes.MaxCombo;
-                double estimatedSliderbreaks = Math.Min(countMeh + countOk, countMiss * attributes.AimTopWeightedSliderFactor) * DifficultyCalculationUtils.Logistic(missedComboPercent, 0.33, 15);
-                aimValue *= calculateMissPenalty(effectiveMissCount + (usingClassicSliderAccuracy ? estimatedSliderbreaks : 0), attributes.AimDifficultStrainCount);
+                double estimatedSliderbreaks = calculateEstimatedSliderbreaks(attributes.AimTopWeightedSliderFactor, attributes);
+                aimValue *= calculateMissPenalty(effectiveMissCount + estimatedSliderbreaks, attributes.AimDifficultStrainCount);
             }
 
             double approachRateFactor = 0.0;
@@ -252,9 +251,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             if (effectiveMissCount > 0)
             {
-                double missedComboPercent = 1.0 - (double)score.MaxCombo / attributes.MaxCombo;
-                double estimatedSliderbreaks = Math.Min(countMeh + countOk, countMiss * attributes.SpeedTopWeightedSliderFactor) * DifficultyCalculationUtils.Logistic(missedComboPercent, 0.33, 15);
-                speedValue *= calculateMissPenalty(effectiveMissCount + (usingClassicSliderAccuracy ? estimatedSliderbreaks : 0), attributes.SpeedDifficultStrainCount);
+                double estimatedSliderbreaks = calculateEstimatedSliderbreaks(attributes.SpeedTopWeightedSliderFactor, attributes);
+                speedValue *= calculateMissPenalty(effectiveMissCount + estimatedSliderbreaks, attributes.SpeedDifficultStrainCount);
             }
 
             double approachRateFactor = 0.0;
@@ -453,6 +451,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             adjustedSpeedValue = double.Lerp(adjustedSpeedValue, speedValue, lerp);
 
             return adjustedSpeedValue / speedValue;
+        }
+
+        private double calculateEstimatedSliderbreaks(double topWeightedSliderFactor, OsuDifficultyAttributes attributes)
+        {
+            if (!usingClassicSliderAccuracy)
+                return 0;
+            double missedComboPercent = 1.0 - (double)scoreMaxCombo / attributes.MaxCombo;
+            double estimatedSliderbreaks = countMiss * topWeightedSliderFactor * DifficultyCalculationUtils.Logistic(missedComboPercent, 0.33, 15);
+            return Math.Min(countMeh + countOk, estimatedSliderbreaks);
         }
 
         // Miss penalty assumes that a player will miss on the hardest parts of a map,
