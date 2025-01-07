@@ -68,7 +68,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
                 current = previousHitObject;
             }
 
-            double ratioPenalty = 1 - totalRatioCount / (consistentRatioCount + 1) * 0.30;
+            double ratioPenalty = 1 - totalRatioCount / (consistentRatioCount + 1) * 0.40;
 
             return ratioPenalty;
         }
