@@ -104,9 +104,9 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                 main.Scale = new Vector2(Interpolation.ValueAt(loopCurrentTime, scale_amount, 1f, move_out_duration, move_out_duration + move_in_duration, Easing.Out));
 
             if (loopCurrentTime < move_out_duration)
-                side.X = Interpolation.ValueAt(loopCurrentTime, 1, move_distance, 0, move_out_duration, Easing.Out);
+                side.X = Interpolation.ValueAt(loopCurrentTime, 0, move_distance, 0, move_out_duration, Easing.Out);
             else
-                side.X = Interpolation.ValueAt(loopCurrentTime, move_distance, 1f, move_out_duration, move_out_duration + move_in_duration, Easing.Out);
+                side.X = Interpolation.ValueAt(loopCurrentTime, move_distance, 0, move_out_duration, move_out_duration + move_in_duration, Easing.Out);
         }
     }
 }
