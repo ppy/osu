@@ -245,9 +245,9 @@ namespace osu.Game.Database
             var scoreProcessor = ruleset.CreateScoreProcessor();
 
             // warning: ordering is important here - both total score and ranks are dependent on accuracy!
-            score.Accuracy = computeAccuracy(score, scoreProcessor);
-            score.Rank = computeRank(score, scoreProcessor);
-            score.TotalScore = convertFromLegacyTotalScore(score, ruleset, beatmap);
+            score.Accuracy = ComputeAccuracy(score, scoreProcessor);
+            score.Rank = ComputeRank(score, scoreProcessor);
+            (score.TotalScoreWithoutMods, score.TotalScore) = convertFromLegacyTotalScore(score, ruleset, beatmap);
         }
 
         /// <summary>
@@ -269,9 +269,9 @@ namespace osu.Game.Database
             var scoreProcessor = ruleset.CreateScoreProcessor();
 
             // warning: ordering is important here - both total score and ranks are dependent on accuracy!
-            score.Accuracy = computeAccuracy(score, scoreProcessor);
-            score.Rank = computeRank(score, scoreProcessor);
-            score.TotalScore = convertFromLegacyTotalScore(score, ruleset, difficulty, attributes);
+            score.Accuracy = ComputeAccuracy(score, scoreProcessor);
+            score.Rank = ComputeRank(score, scoreProcessor);
+            (score.TotalScoreWithoutMods, score.TotalScore) = convertFromLegacyTotalScore(score, ruleset, difficulty, attributes);
         }
 
         /// <summary>
@@ -281,17 +281,13 @@ namespace osu.Game.Database
         /// <param name="ruleset">The <see cref="Ruleset"/> in which the score was set.</param>
         /// <param name="beatmap">The <see cref="WorkingBeatmap"/> applicable for this score.</param>
         /// <returns>The standardised total score.</returns>
-        private static long convertFromLegacyTotalScore(ScoreInfo score, Ruleset ruleset, WorkingBeatmap beatmap)
+        private static (long withoutMods, long withMods) convertFromLegacyTotalScore(ScoreInfo score, Ruleset ruleset, WorkingBeatmap beatmap)
         {
             if (!score.IsLegacyScore)
-                return score.TotalScore;
+                return (score.TotalScoreWithoutMods, score.TotalScore);
 
             if (ruleset is not ILegacyRuleset legacyRuleset)
-                return score.TotalScore;
-
-            var mods = score.Mods;
-            if (mods.Any(mod => mod is ModScoreV2))
-                return score.TotalScore;
+                return (score.TotalScoreWithoutMods, score.TotalScore);
 
             var playableBeatmap = beatmap.GetPlayableBeatmap(ruleset.RulesetInfo, score.Mods);
 
@@ -300,8 +296,13 @@ namespace osu.Game.Database
 
             ILegacyScoreSimulator sv1Simulator = legacyRuleset.CreateLegacyScoreSimulator();
             LegacyScoreAttributes attributes = sv1Simulator.Simulate(beatmap, playableBeatmap);
+            var legacyBeatmapConversionDifficultyInfo = LegacyBeatmapConversionDifficultyInfo.FromBeatmap(beatmap.Beatmap);
 
-            return convertFromLegacyTotalScore(score, ruleset, LegacyBeatmapConversionDifficultyInfo.FromBeatmap(beatmap.Beatmap), attributes);
+            var mods = score.Mods;
+            if (mods.Any(mod => mod is ModScoreV2))
+                return ((long)Math.Round(score.TotalScore / sv1Simulator.GetLegacyScoreMultiplier(mods, legacyBeatmapConversionDifficultyInfo)), score.TotalScore);
+
+            return convertFromLegacyTotalScore(score, ruleset, legacyBeatmapConversionDifficultyInfo, attributes);
         }
 
         /// <summary>
@@ -312,15 +313,16 @@ namespace osu.Game.Database
         /// <param name="difficulty">The beatmap difficulty.</param>
         /// <param name="attributes">The legacy scoring attributes for the beatmap which the score was set on.</param>
         /// <returns>The standardised total score.</returns>
-        private static long convertFromLegacyTotalScore(ScoreInfo score, Ruleset ruleset, LegacyBeatmapConversionDifficultyInfo difficulty, LegacyScoreAttributes attributes)
+        private static (long withoutMods, long withMods) convertFromLegacyTotalScore(ScoreInfo score, Ruleset ruleset, LegacyBeatmapConversionDifficultyInfo difficulty,
+                                                                                     LegacyScoreAttributes attributes)
         {
             if (!score.IsLegacyScore)
-                return score.TotalScore;
+                return (score.TotalScoreWithoutMods, score.TotalScore);
 
             Debug.Assert(score.LegacyTotalScore != null);
 
             if (ruleset is not ILegacyRuleset legacyRuleset)
-                return score.TotalScore;
+                return (score.TotalScoreWithoutMods, score.TotalScore);
 
             double legacyModMultiplier = legacyRuleset.CreateLegacyScoreSimulator().GetLegacyScoreMultiplier(score.Mods, difficulty);
             int maximumLegacyAccuracyScore = attributes.AccuracyScore;
@@ -352,17 +354,18 @@ namespace osu.Game.Database
 
             double modMultiplier = score.Mods.Select(m => m.ScoreMultiplier).Aggregate(1.0, (c, n) => c * n);
 
-            long convertedTotalScore;
+            long convertedTotalScoreWithoutMods;
 
             switch (score.Ruleset.OnlineID)
             {
                 case 0:
                     if (score.MaxCombo == 0 || score.Accuracy == 0)
                     {
-                        return (long)Math.Round((
+                        convertedTotalScoreWithoutMods = (long)Math.Round(
                             0
                             + 500000 * Math.Pow(score.Accuracy, 5)
-                            + bonusProportion) * modMultiplier);
+                            + bonusProportion);
+                        break;
                     }
 
                     // see similar check above.
@@ -370,10 +373,11 @@ namespace osu.Game.Database
                     // are either pointless or wildly wrong.
                     if (maximumLegacyComboScore + maximumLegacyBonusScore == 0)
                     {
-                        return (long)Math.Round((
+                        convertedTotalScoreWithoutMods = (long)Math.Round(
                             500000 * comboProportion // as above, zero if mods result in zero multiplier, one otherwise
                             + 500000 * Math.Pow(score.Accuracy, 5)
-                            + bonusProportion) * modMultiplier);
+                            + bonusProportion);
+                        break;
                     }
 
                     // Assumptions:
@@ -470,17 +474,17 @@ namespace osu.Game.Database
 
                     double newComboScoreProportion = estimatedComboPortionInStandardisedScore / maximumAchievableComboPortionInStandardisedScore;
 
-                    convertedTotalScore = (long)Math.Round((
+                    convertedTotalScoreWithoutMods = (long)Math.Round(
                         500000 * newComboScoreProportion * score.Accuracy
                         + 500000 * Math.Pow(score.Accuracy, 5)
-                        + bonusProportion) * modMultiplier);
+                        + bonusProportion);
                     break;
 
                 case 1:
-                    convertedTotalScore = (long)Math.Round((
+                    convertedTotalScoreWithoutMods = (long)Math.Round(
                         250000 * comboProportion
                         + 750000 * Math.Pow(score.Accuracy, 3.6)
-                        + bonusProportion) * modMultiplier);
+                        + bonusProportion);
                     break;
 
                 case 2:
@@ -505,28 +509,28 @@ namespace osu.Game.Database
                         ? 0
                         : (double)score.Statistics.GetValueOrDefault(HitResult.SmallTickHit) / score.MaximumStatistics.GetValueOrDefault(HitResult.SmallTickHit);
 
-                    convertedTotalScore = (long)Math.Round((
+                    convertedTotalScoreWithoutMods = (long)Math.Round(
                         comboPortion * estimateComboProportionForCatch(attributes.MaxCombo, score.MaxCombo, score.Statistics.GetValueOrDefault(HitResult.Miss))
                         + dropletsPortion * dropletsHit
-                        + bonusProportion) * modMultiplier);
+                        + bonusProportion);
                     break;
 
                 case 3:
-                    convertedTotalScore = (long)Math.Round((
+                    convertedTotalScoreWithoutMods = (long)Math.Round(
                         850000 * comboProportion
                         + 150000 * Math.Pow(score.Accuracy, 2 + 2 * score.Accuracy)
-                        + bonusProportion) * modMultiplier);
+                        + bonusProportion);
                     break;
 
                 default:
-                    convertedTotalScore = score.TotalScore;
-                    break;
+                    return (score.TotalScoreWithoutMods, score.TotalScore);
             }
 
-            if (convertedTotalScore < 0)
-                throw new InvalidOperationException($"Total score conversion operation returned invalid total of {convertedTotalScore}");
+            if (convertedTotalScoreWithoutMods < 0)
+                throw new InvalidOperationException($"Total score conversion operation returned invalid total of {convertedTotalScoreWithoutMods}");
 
-            return convertedTotalScore;
+            long convertedTotalScore = (long)Math.Round(convertedTotalScoreWithoutMods * modMultiplier);
+            return (convertedTotalScoreWithoutMods, convertedTotalScore);
         }
 
         /// <summary>
@@ -617,24 +621,31 @@ namespace osu.Game.Database
             }
         }
 
-        private static double computeAccuracy(ScoreInfo scoreInfo, ScoreProcessor scoreProcessor)
+        public static double ComputeAccuracy(ScoreInfo scoreInfo, ScoreProcessor scoreProcessor)
+            => ComputeAccuracy(scoreInfo.Statistics, scoreInfo.MaximumStatistics, scoreProcessor);
+
+        public static double ComputeAccuracy(IReadOnlyDictionary<HitResult, int> statistics, IReadOnlyDictionary<HitResult, int> maximumStatistics, ScoreProcessor scoreProcessor)
         {
-            int baseScore = scoreInfo.Statistics.Where(kvp => kvp.Key.AffectsAccuracy())
-                                     .Sum(kvp => kvp.Value * scoreProcessor.GetBaseScoreForResult(kvp.Key));
-            int maxBaseScore = scoreInfo.MaximumStatistics.Where(kvp => kvp.Key.AffectsAccuracy())
-                                        .Sum(kvp => kvp.Value * scoreProcessor.GetBaseScoreForResult(kvp.Key));
+            int baseScore = statistics.Where(kvp => kvp.Key.AffectsAccuracy())
+                                      .Sum(kvp => kvp.Value * scoreProcessor.GetBaseScoreForResult(kvp.Key));
+            int maxBaseScore = maximumStatistics.Where(kvp => kvp.Key.AffectsAccuracy())
+                                                .Sum(kvp => kvp.Value * scoreProcessor.GetBaseScoreForResult(kvp.Key));
 
             return maxBaseScore == 0 ? 1 : baseScore / (double)maxBaseScore;
         }
 
-        public static ScoreRank ComputeRank(ScoreInfo scoreInfo) => computeRank(scoreInfo, scoreInfo.Ruleset.CreateInstance().CreateScoreProcessor());
+        public static ScoreRank ComputeRank(ScoreInfo scoreInfo) =>
+            ComputeRank(scoreInfo.Accuracy, scoreInfo.Statistics, scoreInfo.Mods, scoreInfo.Ruleset.CreateInstance().CreateScoreProcessor());
 
-        private static ScoreRank computeRank(ScoreInfo scoreInfo, ScoreProcessor scoreProcessor)
+        public static ScoreRank ComputeRank(ScoreInfo scoreInfo, ScoreProcessor processor) =>
+            ComputeRank(scoreInfo.Accuracy, scoreInfo.Statistics, scoreInfo.Mods, processor);
+
+        public static ScoreRank ComputeRank(double accuracy, IReadOnlyDictionary<HitResult, int> statistics, IList<Mod> mods, ScoreProcessor scoreProcessor)
         {
-            var rank = scoreProcessor.RankFromScore(scoreInfo.Accuracy, scoreInfo.Statistics);
+            var rank = scoreProcessor.RankFromScore(accuracy, statistics);
 
-            foreach (var mod in scoreInfo.Mods.OfType<IApplicableToScoreProcessor>())
-                rank = mod.AdjustRank(rank, scoreInfo.Accuracy);
+            foreach (var mod in mods.OfType<IApplicableToScoreProcessor>())
+                rank = mod.AdjustRank(rank, accuracy);
 
             return rank;
         }

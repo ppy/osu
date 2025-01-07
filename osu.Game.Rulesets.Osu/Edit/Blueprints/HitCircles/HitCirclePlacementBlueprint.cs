@@ -9,7 +9,7 @@ using osuTK.Input;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles
 {
-    public partial class HitCirclePlacementBlueprint : PlacementBlueprint
+    public partial class HitCirclePlacementBlueprint : HitObjectPlacementBlueprint
     {
         public new HitCircle HitObject => (HitCircle)base.HitObject;
 

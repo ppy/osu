@@ -24,6 +24,11 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString MentionUser => new TranslatableString(getKey(@"mention_user"), @"Mention");
 
-        private static string getKey(string key) => $"{prefix}:{key}";
+        /// <summary>
+        /// "press enter to chat..."
+        /// </summary>
+        public static LocalisableString InGameInputPlaceholder => new TranslatableString(getKey(@"in_game_input_placeholder"), @"press enter to chat...");
+
+        private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

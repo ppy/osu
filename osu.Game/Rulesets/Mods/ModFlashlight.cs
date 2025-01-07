@@ -83,8 +83,6 @@ namespace osu.Game.Rulesets.Mods
 
             flashlight.RelativeSizeAxes = Axes.Both;
             flashlight.Colour = Color4.Black;
-            // Flashlight mods should always draw above any other mod adding overlays.
-            flashlight.Depth = float.MinValue;
 
             flashlight.Combo.BindTo(Combo);
             flashlight.GetPlayfieldScale = () => drawableRuleset.Playfield.Scale;
@@ -95,6 +93,9 @@ namespace osu.Game.Rulesets.Mods
                 // workaround for 1px gaps on the edges of the playfield which would sometimes show with "gameplay" screen scaling active.
                 Padding = new MarginPadding(-1),
                 Child = flashlight,
+                // Flashlight mods should always draw above any other mod adding overlays.
+                // NegativeInfinity is not used to allow one more thing drawn on top (used in replay analysis overlay in osu!).
+                Depth = float.MinValue,
             });
         }
 

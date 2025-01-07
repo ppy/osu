@@ -27,7 +27,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                     {
                         deleteSkinsButton.Enabled.Value = false;
                         Task.Run(() => skins.Delete()).ContinueWith(_ => Schedule(() => deleteSkinsButton.Enabled.Value = true));
-                    }));
+                    }, DeleteConfirmationContentStrings.Skins));
                 }
             });
         }

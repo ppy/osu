@@ -2,15 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
-using osu.Game.Graphics.UserInterface;
-using osu.Game.Localisation;
 using osu.Game.Overlays;
-using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets.Edit;
 using osuTK;
 
@@ -22,6 +20,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private readonly Drawable userContent;
 
+        private Box timelineBackground = null!;
+        private readonly Bindable<bool> composerFocusMode = new Bindable<bool>();
+
         public TimelineArea(Drawable? content = null)
         {
             RelativeSizeAxes = Axes.X;
@@ -31,16 +32,20 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         }
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider, OsuColour colours)
+        private void load(OverlayColourProvider colourProvider, OsuColour colours, Editor? editor)
         {
-            OsuCheckbox waveformCheckbox;
-            OsuCheckbox controlPointsCheckbox;
-            OsuCheckbox ticksCheckbox;
-
             const float padding = 10;
 
             InternalChildren = new Drawable[]
             {
+                new Box
+                {
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight,
+                    Width = 35 + HitObjectComposer.TOOLBOX_CONTRACTED_SIZE_RIGHT,
+                    RelativeSizeAxes = Axes.Y,
+                    Colour = colourProvider.Background4
+                },
                 new GridContainer
                 {
                     RelativeSizeAxes = Axes.X,
@@ -51,10 +56,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     },
                     ColumnDimensions = new[]
                     {
-                        new Dimension(GridSizeMode.Absolute, 135),
                         new Dimension(),
                         new Dimension(GridSizeMode.Absolute, 35),
-                        new Dimension(GridSizeMode.Absolute, HitObjectComposer.TOOLBOX_CONTRACTED_SIZE_RIGHT - padding * 2),
+                        new Dimension(GridSizeMode.Absolute, HitObjectComposer.TOOLBOX_CONTRACTED_SIZE_RIGHT),
                     },
                     Content = new[]
                     {
@@ -62,59 +66,11 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                         {
                             new Container
                             {
-                                RelativeSizeAxes = Axes.Both,
-                                Name = @"Toggle controls",
-                                Children = new Drawable[]
-                                {
-                                    new Box
-                                    {
-                                        RelativeSizeAxes = Axes.Both,
-                                        Colour = colourProvider.Background2,
-                                    },
-                                    new FillFlowContainer
-                                    {
-                                        RelativeSizeAxes = Axes.Both,
-                                        Padding = new MarginPadding(padding),
-                                        Direction = FillDirection.Vertical,
-                                        Spacing = new Vector2(0, 4),
-                                        Children = new[]
-                                        {
-                                            waveformCheckbox = new OsuCheckbox(nubSize: 30f)
-                                            {
-                                                LabelText = EditorStrings.TimelineWaveform,
-                                                Current = { Value = true },
-                                            },
-                                            ticksCheckbox = new OsuCheckbox(nubSize: 30f)
-                                            {
-                                                LabelText = EditorStrings.TimelineTicks,
-                                                Current = { Value = true },
-                                            },
-                                            controlPointsCheckbox = new OsuCheckbox(nubSize: 30f)
-                                            {
-                                                LabelText = BeatmapsetsStrings.ShowStatsBpm,
-                                                Current = { Value = true },
-                                            },
-                                        }
-                                    }
-                                }
-                            },
-                            new Container
-                            {
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
                                 Children = new Drawable[]
                                 {
-                                    // the out-of-bounds portion of the centre marker.
-                                    new Box
-                                    {
-                                        Width = 24,
-                                        Height = EditorScreenWithTimeline.PADDING,
-                                        Depth = float.MaxValue,
-                                        Colour = colours.Red1,
-                                        Anchor = Anchor.TopCentre,
-                                        Origin = Anchor.BottomCentre,
-                                    },
-                                    new Box
+                                    timelineBackground = new Box
                                     {
                                         RelativeSizeAxes = Axes.Both,
                                         Depth = float.MaxValue,
@@ -168,9 +124,22 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 }
             };
 
-            Timeline.WaveformVisible.BindTo(waveformCheckbox.Current);
-            Timeline.ControlPointsVisible.BindTo(controlPointsCheckbox.Current);
-            Timeline.TicksVisible.BindTo(ticksCheckbox.Current);
+            if (editor != null)
+                composerFocusMode.BindTo(editor.ComposerFocusMode);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            composerFocusMode.BindValueChanged(_ =>
+            {
+                // Transforms should be kept in sync with other usages of composer focus mode.
+                if (!composerFocusMode.Value)
+                    timelineBackground.FadeIn(750, Easing.OutQuint);
+                else
+                    timelineBackground.Delay(600).FadeTo(0.5f, 4000, Easing.OutQuint);
+            }, true);
         }
     }
 }

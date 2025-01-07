@@ -22,6 +22,8 @@ namespace osu.Game.Overlays.Mods
         /// </summary>
         public BindableBool Active { get; } = new BindableBool();
 
+        public BindableBool Preselected { get; } = new BindableBool();
+
         /// <summary>
         /// Whether the mod requires further customisation.
         /// This flag is read by the <see cref="ModSelectOverlay"/> to determine if the customisation panel should be opened after a mod change

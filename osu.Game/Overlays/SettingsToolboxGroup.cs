@@ -4,7 +4,6 @@
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Caching;
-using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -161,7 +160,7 @@ namespace osu.Game.Overlays
 
         protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
         {
-            if (invalidation.HasFlagFast(Invalidation.DrawSize))
+            if (invalidation.HasFlag(Invalidation.DrawSize))
                 headerTextVisibilityCache.Invalidate();
 
             return base.OnInvalidate(invalidation, source);
@@ -185,7 +184,7 @@ namespace osu.Game.Overlays
                 content.ResizeHeightTo(0, animate ? transition_duration : 0, Easing.OutQuint);
             }
 
-            headerContent.FadeColour(Expanded.Value ? Color4.White : OsuColour.Gray(0.5f), 200, Easing.OutQuint);
+            headerContent.FadeColour(Expanded.Value ? Color4.White : OsuColour.Gray(0.7f), 200, Easing.OutQuint);
         }
 
         private void updateFadeState()

@@ -161,7 +161,7 @@ namespace osu.Game.Online.Chat
             Messages.AddRange(messages);
 
             long? maxMessageId = messages.Max(m => m.Id);
-            if (maxMessageId > LastMessageId)
+            if (LastMessageId == null || maxMessageId > LastMessageId)
                 LastMessageId = maxMessageId;
 
             purgeOldMessages();

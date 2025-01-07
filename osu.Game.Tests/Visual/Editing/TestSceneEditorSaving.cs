@@ -70,7 +70,7 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("Set beat divisor", () => Editor.Dependencies.Get<BindableBeatDivisor>().Value = 16);
             AddStep("Set timeline zoom", () =>
             {
-                originalTimelineZoom = EditorBeatmap.BeatmapInfo.TimelineZoom;
+                originalTimelineZoom = EditorBeatmap.TimelineZoom;
 
                 var timeline = Editor.ChildrenOfType<Timeline>().Single();
                 InputManager.MoveMouseTo(timeline);
@@ -81,19 +81,19 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddAssert("Ensure timeline zoom changed", () =>
             {
-                changedTimelineZoom = EditorBeatmap.BeatmapInfo.TimelineZoom;
+                changedTimelineZoom = EditorBeatmap.TimelineZoom;
                 return !Precision.AlmostEquals(changedTimelineZoom, originalTimelineZoom);
             });
 
             SaveEditor();
 
             AddAssert("Beatmap has correct beat divisor", () => EditorBeatmap.BeatmapInfo.BeatDivisor == 16);
-            AddAssert("Beatmap has correct timeline zoom", () => EditorBeatmap.BeatmapInfo.TimelineZoom == changedTimelineZoom);
+            AddAssert("Beatmap has correct timeline zoom", () => EditorBeatmap.TimelineZoom == changedTimelineZoom);
 
             ReloadEditorToSameBeatmap();
 
             AddAssert("Beatmap still has correct beat divisor", () => EditorBeatmap.BeatmapInfo.BeatDivisor == 16);
-            AddAssert("Beatmap still has correct timeline zoom", () => EditorBeatmap.BeatmapInfo.TimelineZoom == changedTimelineZoom);
+            AddAssert("Beatmap still has correct timeline zoom", () => EditorBeatmap.TimelineZoom == changedTimelineZoom);
         }
 
         [Test]
@@ -192,6 +192,21 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("Exit editor", () => Editor.Exit());
             AddUntilStep("Wait for song select", () => Game.ScreenStack.CurrentScreen is PlaySongSelect);
             AddAssert("Tags reverted correctly", () => Game.Beatmap.Value.BeatmapInfo.Metadata.Tags == tags_to_save);
+        }
+
+        [Test]
+        public void TestBeatDivisor()
+        {
+            AddStep("Set custom beat divisor", () => Editor.Dependencies.Get<BindableBeatDivisor>().SetArbitraryDivisor(7));
+
+            SaveEditor();
+            AddAssert("Hash updated", () => !string.IsNullOrEmpty(EditorBeatmap.BeatmapInfo.BeatmapSet?.Hash));
+            AddAssert("Beatmap has correct beat divisor", () => EditorBeatmap.BeatmapInfo.BeatDivisor, () => Is.EqualTo(7));
+
+            ReloadEditorToSameBeatmap();
+
+            AddAssert("Beatmap still has correct beat divisor", () => EditorBeatmap.BeatmapInfo.BeatDivisor, () => Is.EqualTo(7));
+            AddAssert("Correct beat divisor actually active", () => Editor.BeatDivisor, () => Is.EqualTo(7));
         }
     }
 }

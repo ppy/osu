@@ -3,6 +3,7 @@
 
 using osu.Game.Audio;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace osu.Game.Rulesets.Objects.Types
 {
@@ -45,5 +46,19 @@ namespace osu.Game.Rulesets.Objects.Types
         public static IList<HitSampleInfo> GetNodeSamples<T>(this T obj, int nodeIndex)
             where T : HitObject, IHasRepeats
             => nodeIndex < obj.NodeSamples.Count ? obj.NodeSamples[nodeIndex] : obj.Samples;
+
+        /// <summary>
+        /// Ensures that the list of node samples is at least as long as the number of nodes.
+        /// </summary>
+        /// <param name="obj">The <see cref="HitObject"/>.</param>
+        public static void PopulateNodeSamples<T>(this T obj)
+            where T : HitObject, IHasRepeats
+        {
+            if (obj.NodeSamples.Count >= obj.RepeatCount + 2)
+                return;
+
+            while (obj.NodeSamples.Count < obj.RepeatCount + 2)
+                obj.NodeSamples.Add(obj.Samples.Select(o => o.With()).ToList());
+        }
     }
 }

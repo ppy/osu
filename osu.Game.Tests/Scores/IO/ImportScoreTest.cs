@@ -15,6 +15,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.IO.Archives;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
@@ -23,6 +24,7 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Tests.Beatmaps.IO;
 using osu.Game.Tests.Resources;
+using osu.Game.Users;
 
 namespace osu.Game.Tests.Scores.IO
 {
@@ -276,6 +278,272 @@ namespace osu.Game.Tests.Scores.IO
                         BeatmapInfo = beatmap.Beatmaps.First(),
                         OnlineID = 2
                     }));
+                }
+                finally
+                {
+                    host.Exit();
+                }
+            }
+        }
+
+        [Test]
+        public void TestUserLookedUpByUsernameForOnlineScoreIfUserIDMissing()
+        {
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
+            {
+                try
+                {
+                    var osu = LoadOsuIntoHost(host, true);
+
+                    var api = (DummyAPIAccess)osu.API;
+                    api.HandleRequest = req =>
+                    {
+                        switch (req)
+                        {
+                            case GetUserRequest userRequest:
+                                if (userRequest.Lookup != "Test user")
+                                    return false;
+
+                                userRequest.TriggerSuccess(new APIUser
+                                {
+                                    Username = "Test user",
+                                    CountryCode = CountryCode.JP,
+                                    Id = 1234
+                                });
+                                return true;
+
+                            default:
+                                return false;
+                        }
+                    };
+
+                    var beatmap = BeatmapImportHelper.LoadOszIntoOsu(osu, TestResources.GetQuickTestBeatmapForImport()).GetResultSafely();
+
+                    var toImport = new ScoreInfo
+                    {
+                        Rank = ScoreRank.B,
+                        TotalScore = 987654,
+                        Accuracy = 0.8,
+                        MaxCombo = 500,
+                        Combo = 250,
+                        User = new APIUser { Username = "Test user" },
+                        Date = DateTimeOffset.Now,
+                        OnlineID = 12345,
+                        Ruleset = new OsuRuleset().RulesetInfo,
+                        BeatmapInfo = beatmap.Beatmaps.First()
+                    };
+
+                    var imported = LoadScoreIntoOsu(osu, toImport);
+
+                    Assert.AreEqual(toImport.Rank, imported.Rank);
+                    Assert.AreEqual(toImport.TotalScore, imported.TotalScore);
+                    Assert.AreEqual(toImport.Accuracy, imported.Accuracy);
+                    Assert.AreEqual(toImport.MaxCombo, imported.MaxCombo);
+                    Assert.AreEqual(toImport.User.Username, imported.User.Username);
+                    Assert.AreEqual(toImport.Date, imported.Date);
+                    Assert.AreEqual(toImport.OnlineID, imported.OnlineID);
+                    Assert.AreEqual(toImport.User.Username, imported.RealmUser.Username);
+                    Assert.AreEqual(1234, imported.RealmUser.OnlineID);
+                }
+                finally
+                {
+                    host.Exit();
+                }
+            }
+        }
+
+        [Test]
+        public void TestUserLookedUpByUsernameForLegacyOnlineScore()
+        {
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
+            {
+                try
+                {
+                    var osu = LoadOsuIntoHost(host, true);
+
+                    var api = (DummyAPIAccess)osu.API;
+                    api.HandleRequest = req =>
+                    {
+                        switch (req)
+                        {
+                            case GetUserRequest userRequest:
+                                if (userRequest.Lookup != "Test user")
+                                    return false;
+
+                                userRequest.TriggerSuccess(new APIUser
+                                {
+                                    Username = "Test user",
+                                    CountryCode = CountryCode.JP,
+                                    Id = 1234
+                                });
+                                return true;
+
+                            default:
+                                return false;
+                        }
+                    };
+
+                    var beatmap = BeatmapImportHelper.LoadOszIntoOsu(osu, TestResources.GetQuickTestBeatmapForImport()).GetResultSafely();
+
+                    var toImport = new ScoreInfo
+                    {
+                        Rank = ScoreRank.B,
+                        TotalScore = 987654,
+                        Accuracy = 0.8,
+                        MaxCombo = 500,
+                        Combo = 250,
+                        User = new APIUser { Username = "Test user" },
+                        Date = DateTimeOffset.Now,
+                        LegacyOnlineID = 12345,
+                        Ruleset = new OsuRuleset().RulesetInfo,
+                        BeatmapInfo = beatmap.Beatmaps.First()
+                    };
+
+                    var imported = LoadScoreIntoOsu(osu, toImport);
+
+                    Assert.AreEqual(toImport.Rank, imported.Rank);
+                    Assert.AreEqual(toImport.TotalScore, imported.TotalScore);
+                    Assert.AreEqual(toImport.Accuracy, imported.Accuracy);
+                    Assert.AreEqual(toImport.MaxCombo, imported.MaxCombo);
+                    Assert.AreEqual(toImport.User.Username, imported.User.Username);
+                    Assert.AreEqual(toImport.Date, imported.Date);
+                    Assert.AreEqual(toImport.OnlineID, imported.OnlineID);
+                    Assert.AreEqual(toImport.User.Username, imported.RealmUser.Username);
+                    Assert.AreEqual(1234, imported.RealmUser.OnlineID);
+                }
+                finally
+                {
+                    host.Exit();
+                }
+            }
+        }
+
+        [Test]
+        public void TestUserNotLookedUpForOfflineScoreIfUserIDMissing()
+        {
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
+            {
+                try
+                {
+                    var osu = LoadOsuIntoHost(host, true);
+
+                    var api = (DummyAPIAccess)osu.API;
+                    api.HandleRequest = req =>
+                    {
+                        switch (req)
+                        {
+                            case GetUserRequest userRequest:
+                                if (userRequest.Lookup != "Test user")
+                                    return false;
+
+                                userRequest.TriggerSuccess(new APIUser
+                                {
+                                    Username = "Test user",
+                                    CountryCode = CountryCode.JP,
+                                    Id = 1234
+                                });
+                                return true;
+
+                            default:
+                                return false;
+                        }
+                    };
+
+                    var beatmap = BeatmapImportHelper.LoadOszIntoOsu(osu, TestResources.GetQuickTestBeatmapForImport()).GetResultSafely();
+
+                    var toImport = new ScoreInfo
+                    {
+                        Rank = ScoreRank.B,
+                        TotalScore = 987654,
+                        Accuracy = 0.8,
+                        MaxCombo = 500,
+                        Combo = 250,
+                        User = new APIUser { Username = "Test user" },
+                        Date = DateTimeOffset.Now,
+                        OnlineID = -1,
+                        LegacyOnlineID = -1,
+                        Ruleset = new OsuRuleset().RulesetInfo,
+                        BeatmapInfo = beatmap.Beatmaps.First()
+                    };
+
+                    var imported = LoadScoreIntoOsu(osu, toImport);
+
+                    Assert.AreEqual(toImport.Rank, imported.Rank);
+                    Assert.AreEqual(toImport.TotalScore, imported.TotalScore);
+                    Assert.AreEqual(toImport.Accuracy, imported.Accuracy);
+                    Assert.AreEqual(toImport.MaxCombo, imported.MaxCombo);
+                    Assert.AreEqual(toImport.User.Username, imported.User.Username);
+                    Assert.AreEqual(toImport.Date, imported.Date);
+                    Assert.AreEqual(toImport.OnlineID, imported.OnlineID);
+                    Assert.AreEqual(toImport.User.Username, imported.RealmUser.Username);
+                    Assert.That(imported.RealmUser.OnlineID, Is.LessThanOrEqualTo(1));
+                }
+                finally
+                {
+                    host.Exit();
+                }
+            }
+        }
+
+        [Test]
+        public void TestUserLookedUpByOnlineIDIfPresent([Values] bool isOnlineScore)
+        {
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
+            {
+                try
+                {
+                    var osu = LoadOsuIntoHost(host, true);
+
+                    var api = (DummyAPIAccess)osu.API;
+                    api.HandleRequest = req =>
+                    {
+                        switch (req)
+                        {
+                            case GetUserRequest userRequest:
+                                if (userRequest.Lookup != "5555")
+                                    return false;
+
+                                userRequest.TriggerSuccess(new APIUser
+                                {
+                                    Username = "Some other guy",
+                                    CountryCode = CountryCode.DE,
+                                    Id = 5555
+                                });
+                                return true;
+
+                            default:
+                                return false;
+                        }
+                    };
+
+                    var beatmap = BeatmapImportHelper.LoadOszIntoOsu(osu, TestResources.GetQuickTestBeatmapForImport()).GetResultSafely();
+
+                    var toImport = new ScoreInfo
+                    {
+                        Rank = ScoreRank.B,
+                        TotalScore = 987654,
+                        Accuracy = 0.8,
+                        MaxCombo = 500,
+                        Combo = 250,
+                        User = new APIUser { Id = 5555 },
+                        Date = DateTimeOffset.Now,
+                        Ruleset = new OsuRuleset().RulesetInfo,
+                        BeatmapInfo = beatmap.Beatmaps.First()
+                    };
+                    if (isOnlineScore)
+                        toImport.OnlineID = 12345;
+
+                    var imported = LoadScoreIntoOsu(osu, toImport);
+
+                    Assert.AreEqual(toImport.Rank, imported.Rank);
+                    Assert.AreEqual(toImport.TotalScore, imported.TotalScore);
+                    Assert.AreEqual(toImport.Accuracy, imported.Accuracy);
+                    Assert.AreEqual(toImport.MaxCombo, imported.MaxCombo);
+                    Assert.AreEqual(toImport.Date, imported.Date);
+                    Assert.AreEqual(toImport.OnlineID, imported.OnlineID);
+                    Assert.AreEqual("Some other guy", imported.RealmUser.Username);
+                    Assert.AreEqual(5555, imported.RealmUser.OnlineID);
+                    Assert.AreEqual(CountryCode.DE, imported.RealmUser.CountryCode);
                 }
                 finally
                 {

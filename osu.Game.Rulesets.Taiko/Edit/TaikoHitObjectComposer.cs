@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Taiko.Edit
         {
         }
 
-        protected override IReadOnlyList<HitObjectCompositionTool> CompositionTools => new HitObjectCompositionTool[]
+        protected override IReadOnlyList<CompositionTool> CompositionTools => new CompositionTool[]
         {
             new HitCompositionTool(),
             new DrumRollCompositionTool(),

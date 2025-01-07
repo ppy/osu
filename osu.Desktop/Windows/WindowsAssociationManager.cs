@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
@@ -39,10 +40,10 @@ namespace osu.Desktop.Windows
 
         private static readonly FileAssociation[] file_associations =
         {
-            new FileAssociation(@".osz", WindowsAssociationManagerStrings.OsuBeatmap, Icons.Lazer),
-            new FileAssociation(@".olz", WindowsAssociationManagerStrings.OsuBeatmap, Icons.Lazer),
-            new FileAssociation(@".osr", WindowsAssociationManagerStrings.OsuReplay, Icons.Lazer),
-            new FileAssociation(@".osk", WindowsAssociationManagerStrings.OsuSkin, Icons.Lazer),
+            new FileAssociation(@".osz", WindowsAssociationManagerStrings.OsuBeatmap, Icons.Beatmap),
+            new FileAssociation(@".olz", WindowsAssociationManagerStrings.OsuBeatmap, Icons.Beatmap),
+            new FileAssociation(@".osr", WindowsAssociationManagerStrings.OsuReplay, Icons.Beatmap),
+            new FileAssociation(@".osk", WindowsAssociationManagerStrings.OsuSkin, Icons.Beatmap),
         };
 
         private static readonly UriAssociation[] uri_associations =
@@ -147,15 +148,7 @@ namespace osu.Desktop.Windows
             foreach (var association in uri_associations)
                 association.UpdateDescription(getLocalisedString(association.Description));
 
-            string getLocalisedString(LocalisableString s)
-            {
-                if (localisation == null)
-                    return s.ToString();
-
-                var b = localisation.GetLocalisedBindableString(s);
-                b.UnbindAll();
-                return b.Value;
-            }
+            string getLocalisedString(LocalisableString s) => localisation?.GetLocalisedString(s) ?? s.ToString();
         }
 
         #region Native interop
@@ -163,6 +156,7 @@ namespace osu.Desktop.Windows
         [DllImport("Shell32.dll")]
         private static extern void SHChangeNotify(EventId wEventId, Flags uFlags, IntPtr dwItem1, IntPtr dwItem2);
 
+        [SuppressMessage("ReSharper", "InconsistentNaming")]
         private enum EventId
         {
             /// <summary>
@@ -172,6 +166,7 @@ namespace osu.Desktop.Windows
             SHCNE_ASSOCCHANGED = 0x08000000
         }
 
+        [SuppressMessage("ReSharper", "InconsistentNaming")]
         private enum Flags : uint
         {
             SHCNF_IDLIST = 0x0000

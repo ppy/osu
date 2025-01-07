@@ -4,8 +4,6 @@
 #nullable disable
 
 using osu.Framework.Allocation;
-using osu.Framework.Audio;
-using osu.Framework.Audio.Sample;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -20,11 +18,11 @@ namespace osu.Game.Graphics.UserInterface
 {
     public partial class OsuMenu : Menu
     {
-        private Sample sampleOpen;
-        private Sample sampleClose;
-
         // todo: this shouldn't be required after https://github.com/ppy/osu-framework/issues/4519 is fixed.
         private bool wasOpened;
+
+        [Resolved]
+        private OsuMenuSamples menuSamples { get; set; } = null!;
 
         public OsuMenu(Direction direction, bool topLevelMenu = false)
             : base(direction, topLevelMenu)
@@ -33,19 +31,33 @@ namespace osu.Game.Graphics.UserInterface
 
             MaskingContainer.CornerRadius = 4;
             ItemsContainer.Padding = new MarginPadding(5);
+
+            OnSubmenuOpen += _ => { menuSamples?.PlaySubOpenSample(); };
         }
 
-        [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
+        protected override void Update()
         {
-            sampleOpen = audio.Samples.Get(@"UI/dropdown-open");
-            sampleClose = audio.Samples.Get(@"UI/dropdown-close");
+            base.Update();
+
+            bool showCheckboxes = false;
+
+            foreach (var drawableItem in ItemsContainer)
+            {
+                if (drawableItem.Item is StatefulMenuItem)
+                    showCheckboxes = true;
+            }
+
+            foreach (var drawableItem in ItemsContainer)
+            {
+                if (drawableItem is DrawableOsuMenuItem osuItem)
+                    osuItem.ShowCheckbox.Value = showCheckboxes;
+            }
         }
 
         protected override void AnimateOpen()
         {
             if (!TopLevelMenu && !wasOpened)
-                sampleOpen?.Play();
+                menuSamples?.PlayOpenSample();
 
             this.FadeIn(300, Easing.OutQuint);
             wasOpened = true;
@@ -54,7 +66,7 @@ namespace osu.Game.Graphics.UserInterface
         protected override void AnimateClose()
         {
             if (!TopLevelMenu && wasOpened)
-                sampleClose?.Play();
+                menuSamples?.PlayCloseSample();
 
             this.FadeOut(300, Easing.OutQuint);
             wasOpened = false;
@@ -109,7 +121,7 @@ namespace osu.Game.Graphics.UserInterface
                     Colour = BackgroundColourHover,
                     RelativeSizeAxes = Axes.X,
                     Height = 2f,
-                    Width = 0.8f,
+                    Width = 0.9f,
                 });
             }
 

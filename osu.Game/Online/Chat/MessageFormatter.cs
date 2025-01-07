@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Web;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets.Edit;
 
@@ -234,7 +235,7 @@ namespace osu.Game.Online.Chat
                             return new LinkDetails(LinkAction.External, url);
                     }
 
-                    return new LinkDetails(linkType, args[2]);
+                    return new LinkDetails(linkType, HttpUtility.UrlDecode(args[2]));
 
                 case "osump":
                     return new LinkDetails(LinkAction.JoinMultiplayerMatch, args[1]);
@@ -271,7 +272,7 @@ namespace osu.Game.Online.Chat
             handleAdvanced(advanced_link_regex, result, startIndex);
 
             // handle editor times
-            handleMatches(EditorTimestampParser.TIME_REGEX, "{0}", $@"{OsuGameBase.OSU_PROTOCOL}edit/{{0}}", result, startIndex, LinkAction.OpenEditorTimestamp);
+            handleMatches(EditorTimestampParser.TIME_REGEX_STRICT, "{0}", $@"{OsuGameBase.OSU_PROTOCOL}edit/{{0}}", result, startIndex, LinkAction.OpenEditorTimestamp);
 
             // handle channels
             handleMatches(channel_regex, "{0}", $@"{OsuGameBase.OSU_PROTOCOL}chan/{{0}}", result, startIndex, LinkAction.OpenChannel);

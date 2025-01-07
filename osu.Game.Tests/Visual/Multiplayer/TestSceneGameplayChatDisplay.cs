@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Linq;
 using Moq;
 using NUnit.Framework;
@@ -20,19 +18,19 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public partial class TestSceneGameplayChatDisplay : OsuManualInputManagerTestScene
     {
-        private GameplayChatDisplay chatDisplay;
+        private GameplayChatDisplay chatDisplay = null!;
 
         [Cached(typeof(ILocalUserPlayInfo))]
         private ILocalUserPlayInfo localUserInfo;
 
-        private readonly Bindable<bool> localUserPlaying = new Bindable<bool>();
+        private readonly Bindable<LocalUserPlayingState> playingState = new Bindable<LocalUserPlayingState>();
 
         private TextBox textBox => chatDisplay.ChildrenOfType<TextBox>().First();
 
         public TestSceneGameplayChatDisplay()
         {
             var mockLocalUserInfo = new Mock<ILocalUserPlayInfo>();
-            mockLocalUserInfo.SetupGet(i => i.IsPlaying).Returns(localUserPlaying);
+            mockLocalUserInfo.SetupGet(i => i.PlayingState).Returns(playingState);
 
             localUserInfo = mockLocalUserInfo.Object;
         }
@@ -124,6 +122,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddAssert($"chat {(isFocused ? "focused" : "not focused")}", () => textBox.HasFocus == isFocused);
 
         private void setLocalUserPlaying(bool playing) =>
-            AddStep($"local user {(playing ? "playing" : "not playing")}", () => localUserPlaying.Value = playing);
+            AddStep($"local user {(playing ? "playing" : "not playing")}", () => playingState.Value = playing ? LocalUserPlayingState.Playing : LocalUserPlayingState.NotPlaying);
     }
 }

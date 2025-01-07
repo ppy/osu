@@ -21,11 +21,9 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         public Bindable<Color4> AccentColour { get; } = new Bindable<Color4>();
         public Bindable<bool> HyperDash { get; } = new Bindable<bool>();
         public Bindable<int> IndexInBeatmap { get; } = new Bindable<int>();
-
+        public Vector2 DisplayPosition => DrawPosition;
         public Vector2 DisplaySize => Size * Scale;
-
         public float DisplayRotation => Rotation;
-
         public double DisplayStartTime => HitObject.StartTime;
 
         /// <summary>
@@ -44,25 +42,23 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
             Size = new Vector2(CatchHitObject.OBJECT_RADIUS * 2);
         }
 
-        /// <summary>
-        /// Copies the hit object visual state from another <see cref="IHasCatchObjectState"/> object.
-        /// </summary>
-        public virtual void CopyStateFrom(IHasCatchObjectState objectState)
-        {
-            HitObject = objectState.HitObject;
-            Scale = Vector2.Divide(objectState.DisplaySize, Size);
-            Rotation = objectState.DisplayRotation;
-            AccentColour.Value = objectState.AccentColour.Value;
-            HyperDash.Value = objectState.HyperDash.Value;
-            IndexInBeatmap.Value = objectState.IndexInBeatmap.Value;
-        }
-
         protected override void FreeAfterUse()
         {
             ClearTransforms();
             Alpha = 1;
 
             base.FreeAfterUse();
+        }
+
+        public void RestoreState(CatchObjectState state)
+        {
+            HitObject = state.HitObject;
+            AccentColour.Value = state.AccentColour;
+            HyperDash.Value = state.HyperDash;
+            IndexInBeatmap.Value = state.IndexInBeatmap;
+            Position = state.DisplayPosition;
+            Scale = Vector2.Divide(state.DisplaySize, Size);
+            Rotation = state.DisplayRotation;
         }
     }
 }
