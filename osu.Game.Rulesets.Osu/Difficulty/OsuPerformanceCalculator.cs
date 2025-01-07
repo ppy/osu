@@ -435,6 +435,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
             if (!usingClassicSliderAccuracy)
                 return 0;
+
             double missedComboPercent = 1.0 - (double)scoreMaxCombo / attributes.MaxCombo;
             double estimatedSliderbreaks = countMiss * topWeightedSliderFactor * DifficultyCalculationUtils.Logistic(missedComboPercent, 0.33, 15);
             return Math.Min(countMeh + countOk, estimatedSliderbreaks);
