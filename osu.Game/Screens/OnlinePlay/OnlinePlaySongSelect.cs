@@ -32,9 +32,6 @@ namespace osu.Game.Screens.OnlinePlay
 
         public override bool AllowEditing => false;
 
-        [Resolved(typeof(Room), nameof(Room.Playlist))]
-        protected BindableList<PlaylistItem> Playlist { get; private set; } = null!;
-
         [Resolved]
         private RulesetStore rulesets { get; set; } = null!;
 
@@ -173,9 +170,9 @@ namespace osu.Game.Screens.OnlinePlay
             IsValidMod = IsValidMod
         };
 
-        protected override IEnumerable<(FooterButton, OverlayContainer?)> CreateFooterButtons()
+        protected override IEnumerable<(FooterButton, OverlayContainer?)> CreateSongSelectFooterButtons()
         {
-            var baseButtons = base.CreateFooterButtons().ToList();
+            var baseButtons = base.CreateSongSelectFooterButtons().ToList();
             var freeModsButton = new FooterButtonFreeMods(freeModSelectOverlay) { Current = FreeMods };
 
             baseButtons.Insert(baseButtons.FindIndex(b => b.Item1 is FooterButtonMods) + 1, (freeModsButton, freeModSelectOverlay));

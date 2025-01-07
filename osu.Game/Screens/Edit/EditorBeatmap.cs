@@ -10,6 +10,7 @@ using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Lists;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Legacy;
@@ -105,10 +106,25 @@ namespace osu.Game.Screens.Edit
                 BeatmapSkin.BeatmapSkinChanged += SaveState;
             }
 
-            beatmapProcessor = playableBeatmap.BeatmapInfo.Ruleset.CreateInstance().CreateBeatmapProcessor(PlayableBeatmap);
+            beatmapProcessor = new EditorBeatmapProcessor(this, playableBeatmap.BeatmapInfo.Ruleset.CreateInstance());
 
             foreach (var obj in HitObjects)
                 trackStartTime(obj);
+
+            Breaks = new BindableList<BreakPeriod>(playableBeatmap.Breaks);
+            Breaks.BindCollectionChanged((_, _) =>
+            {
+                playableBeatmap.Breaks.Clear();
+                playableBeatmap.Breaks.AddRange(Breaks);
+            });
+
+            Bookmarks = new BindableList<int>(playableBeatmap.Bookmarks);
+            Bookmarks.BindCollectionChanged((_, _) =>
+            {
+                BeginChange();
+                playableBeatmap.Bookmarks = Bookmarks.OrderBy(x => x).Distinct().ToArray();
+                EndChange();
+            });
 
             PreviewTime = new BindableInt(BeatmapInfo.Metadata.PreviewTime);
             PreviewTime.BindValueChanged(s =>
@@ -172,7 +188,15 @@ namespace osu.Game.Screens.Edit
             set => PlayableBeatmap.ControlPointInfo = value;
         }
 
-        public List<BreakPeriod> Breaks => PlayableBeatmap.Breaks;
+        public readonly BindableList<BreakPeriod> Breaks;
+
+        SortedList<BreakPeriod> IBeatmap.Breaks
+        {
+            get => PlayableBeatmap.Breaks;
+            set => PlayableBeatmap.Breaks = value;
+        }
+
+        public List<string> UnhandledEventLines => PlayableBeatmap.UnhandledEventLines;
 
         public double TotalBreakTime => PlayableBeatmap.TotalBreakTime;
 
@@ -181,6 +205,86 @@ namespace osu.Game.Screens.Edit
         public IEnumerable<BeatmapStatistic> GetStatistics() => PlayableBeatmap.GetStatistics();
 
         public double GetMostCommonBeatLength() => PlayableBeatmap.GetMostCommonBeatLength();
+
+        public double AudioLeadIn
+        {
+            get => PlayableBeatmap.AudioLeadIn;
+            set => PlayableBeatmap.AudioLeadIn = value;
+        }
+
+        public float StackLeniency
+        {
+            get => PlayableBeatmap.StackLeniency;
+            set => PlayableBeatmap.StackLeniency = value;
+        }
+
+        public bool SpecialStyle
+        {
+            get => PlayableBeatmap.SpecialStyle;
+            set => PlayableBeatmap.SpecialStyle = value;
+        }
+
+        public bool LetterboxInBreaks
+        {
+            get => PlayableBeatmap.LetterboxInBreaks;
+            set => PlayableBeatmap.LetterboxInBreaks = value;
+        }
+
+        public bool WidescreenStoryboard
+        {
+            get => PlayableBeatmap.WidescreenStoryboard;
+            set => PlayableBeatmap.WidescreenStoryboard = value;
+        }
+
+        public bool EpilepsyWarning
+        {
+            get => PlayableBeatmap.EpilepsyWarning;
+            set => PlayableBeatmap.EpilepsyWarning = value;
+        }
+
+        public bool SamplesMatchPlaybackRate
+        {
+            get => PlayableBeatmap.SamplesMatchPlaybackRate;
+            set => PlayableBeatmap.SamplesMatchPlaybackRate = value;
+        }
+
+        public double DistanceSpacing
+        {
+            get => PlayableBeatmap.DistanceSpacing;
+            set => PlayableBeatmap.DistanceSpacing = value;
+        }
+
+        public int GridSize
+        {
+            get => PlayableBeatmap.GridSize;
+            set => PlayableBeatmap.GridSize = value;
+        }
+
+        public double TimelineZoom
+        {
+            get => PlayableBeatmap.TimelineZoom;
+            set => PlayableBeatmap.TimelineZoom = value;
+        }
+
+        public CountdownType Countdown
+        {
+            get => PlayableBeatmap.Countdown;
+            set => PlayableBeatmap.Countdown = value;
+        }
+
+        public int CountdownOffset
+        {
+            get => PlayableBeatmap.CountdownOffset;
+            set => PlayableBeatmap.CountdownOffset = value;
+        }
+
+        public readonly BindableList<int> Bookmarks;
+
+        int[] IBeatmap.Bookmarks
+        {
+            get => PlayableBeatmap.Bookmarks;
+            set => PlayableBeatmap.Bookmarks = value;
+        }
 
         public IBeatmap Clone() => (EditorBeatmap)MemberwiseClone();
 
@@ -196,6 +300,11 @@ namespace osu.Game.Screens.Edit
         /// Perform the provided action on every selected hitobject.
         /// Changes will be grouped as one history action.
         /// </summary>
+        /// <remarks>
+        /// Note that this incurs a full state save, and as such requires the entire beatmap to be encoded, etc.
+        /// Very frequent use of this method (e.g. once a frame) is most discouraged.
+        /// If there is need to do so, use local precondition checks to eliminate changes that are known to be no-ops.
+        /// </remarks>
         /// <param name="action">The action to perform.</param>
         public void PerformOnSelection(Action<HitObject> action)
         {
@@ -342,13 +451,13 @@ namespace osu.Game.Screens.Edit
             if (batchPendingUpdates.Count == 0 && batchPendingDeletes.Count == 0 && batchPendingInserts.Count == 0)
                 return;
 
-            beatmapProcessor?.PreProcess();
+            beatmapProcessor.PreProcess();
 
             foreach (var h in batchPendingDeletes) processHitObject(h);
             foreach (var h in batchPendingInserts) processHitObject(h);
             foreach (var h in batchPendingUpdates) processHitObject(h);
 
-            beatmapProcessor?.PostProcess();
+            beatmapProcessor.PostProcess();
 
             BeatmapReprocessed?.Invoke();
 

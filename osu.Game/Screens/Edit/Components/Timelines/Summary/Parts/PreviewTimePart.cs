@@ -3,6 +3,9 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics.Cursor;
+using osu.Framework.Localisation;
+using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Screens.Edit.Components.Timelines.Summary.Visualisations;
 
@@ -27,15 +30,18 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
             }, true);
         }
 
-        private partial class PreviewTimeVisualisation : PointVisualisation
+        private partial class PreviewTimeVisualisation : PointVisualisation, IHasTooltip
         {
             public PreviewTimeVisualisation(double time)
                 : base(time)
             {
+                Alpha = 0.8f;
             }
 
             [BackgroundDependencyLoader]
             private void load(OsuColour colours) => Colour = colours.Green1;
+
+            public LocalisableString TooltipText => $"{StartTime.ToEditorFormattedString()} preview time";
         }
     }
 }

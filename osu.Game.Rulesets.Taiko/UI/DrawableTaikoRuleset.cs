@@ -82,7 +82,15 @@ namespace osu.Game.Rulesets.Taiko.UI
             TimeRange.Value = ComputeTimeRange();
         }
 
-        protected virtual double ComputeTimeRange() => PlayfieldAdjustmentContainer.ComputeTimeRange();
+        protected virtual double ComputeTimeRange()
+        {
+            // Using the constant algorithm results in a sluggish scroll speed that's equal to 60 BPM.
+            // We need to adjust it to the expected default scroll speed (BPM * base SV multiplier).
+            double multiplier = VisualisationMethod == ScrollVisualisationMethod.Constant
+                ? (Beatmap.BeatmapInfo.BPM * Beatmap.Difficulty.SliderMultiplier) / 60
+                : 1;
+            return PlayfieldAdjustmentContainer.ComputeTimeRange() / multiplier;
+        }
 
         protected override void UpdateAfterChildren()
         {

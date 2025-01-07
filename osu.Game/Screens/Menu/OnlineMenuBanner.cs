@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Events;
 using osu.Framework.Threading;
+using osu.Framework.Utils;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
@@ -72,8 +73,19 @@ namespace osu.Game.Screens.Menu
             Task.Run(() => request.Perform())
                 .ContinueWith(r =>
                 {
+                    if (!FetchOnlineContent)
+                        return;
+
                     if (r.IsCompletedSuccessfully)
-                        Schedule(() => Current.Value = request.ResponseObject);
+                    {
+                        Schedule(() =>
+                        {
+                            if (!FetchOnlineContent)
+                                return;
+
+                            Current.Value = request.ResponseObject;
+                        });
+                    }
 
                     // if the request failed, "observe" the exception.
                     // it isn't very important why this failed, as it's only for display.
@@ -111,7 +123,9 @@ namespace osu.Game.Screens.Menu
 
                 content.AddRange(loaded);
 
-                displayIndex = -1;
+                // Many users don't spend much time at the main menu, so let's randomise where in the
+                // carousel of available images we start at to give each a fair chance.
+                displayIndex = RNG.Next(0, images.NewValue.Images.Length) - 1;
                 showNext();
             }, (cancellationTokenSource ??= new CancellationTokenSource()).Token);
         }
@@ -166,6 +180,11 @@ namespace osu.Game.Screens.Menu
             public readonly APIMenuImage Image;
 
             private Sprite flash = null!;
+
+            /// <remarks>
+            /// Overridden as a safety for <see cref="openUrlAction"/> functioning correctly.
+            /// </remarks>
+            public override bool IsPresent => base.IsPresent || Scheduler.HasPendingTasks;
 
             private ScheduledDelegate? openUrlAction;
 

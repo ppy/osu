@@ -57,10 +57,11 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                     LabelText = MouseSettingsStrings.HighPrecisionMouse,
                     TooltipText = MouseSettingsStrings.HighPrecisionMouseTooltip,
                     Current = relativeMode,
-                    Keywords = new[] { @"raw", @"input", @"relative", @"cursor" }
+                    Keywords = new[] { @"raw", @"input", @"relative", @"cursor", "sensitivity", "speed", "velocity" },
                 },
                 new SensitivitySetting
                 {
+                    Keywords = new[] { "speed", "velocity" },
                     LabelText = MouseSettingsStrings.CursorSensitivity,
                     Current = localSensitivity
                 },
@@ -105,12 +106,17 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
             highPrecisionMouse.Current.BindValueChanged(highPrecision =>
             {
-                if (RuntimeInfo.OS != RuntimeInfo.Platform.Windows)
+                switch (RuntimeInfo.OS)
                 {
-                    if (highPrecision.NewValue)
-                        highPrecisionMouse.SetNoticeText(MouseSettingsStrings.HighPrecisionPlatformWarning, true);
-                    else
-                        highPrecisionMouse.ClearNoticeText();
+                    case RuntimeInfo.Platform.Linux:
+                    case RuntimeInfo.Platform.macOS:
+                    case RuntimeInfo.Platform.iOS:
+                        if (highPrecision.NewValue)
+                            highPrecisionMouse.SetNoticeText(MouseSettingsStrings.HighPrecisionPlatformWarning, true);
+                        else
+                            highPrecisionMouse.ClearNoticeText();
+
+                        break;
                 }
             }, true);
         }

@@ -122,8 +122,6 @@ namespace osu.Game.Graphics.UserInterface
                         Anchor = Anchor.Centre,
                     }
                 };
-
-                Padding = new MarginPadding { Left = 5, Right = 5 };
             }
 
             protected override bool OnHover(HoverEvent e)

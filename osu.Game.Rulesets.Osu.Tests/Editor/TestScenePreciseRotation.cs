@@ -116,7 +116,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 () => EditorBeatmap.HitObjects.OfType<HitCircle>().ElementAt(1).Position,
                 () => Is.EqualTo(OsuPlayfield.BASE_SIZE - new Vector2(200)));
 
-            AddStep("change rotation origin", () => getPopover().ChildrenOfType<EditorRadioButton>().ElementAt(1).TriggerClick());
+            AddStep("change rotation origin", () => getPopover().ChildrenOfType<EditorRadioButton>().ElementAt(2).TriggerClick());
             AddAssert("first object rotated 90deg around selection centre",
                 () => EditorBeatmap.HitObjects.OfType<HitCircle>().ElementAt(0).Position, () => Is.EqualTo(new Vector2(200, 200)));
             AddAssert("second object rotated 90deg around selection centre",

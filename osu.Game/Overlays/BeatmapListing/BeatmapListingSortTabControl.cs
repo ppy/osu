@@ -126,7 +126,8 @@ namespace osu.Game.Overlays.BeatmapListing
                     Origin = Anchor.Centre,
                     AlwaysPresent = true,
                     Alpha = 0,
-                    Size = new Vector2(6)
+                    Size = new Vector2(6),
+                    Icon = FontAwesome.Solid.CaretDown,
                 });
             }
 
@@ -136,7 +137,7 @@ namespace osu.Game.Overlays.BeatmapListing
 
                 SortDirection.BindValueChanged(direction =>
                 {
-                    icon.Icon = direction.NewValue == Overlays.SortDirection.Ascending && Active.Value ? FontAwesome.Solid.CaretUp : FontAwesome.Solid.CaretDown;
+                    icon.ScaleTo(direction.NewValue == Overlays.SortDirection.Ascending && Active.Value ? new Vector2(1f, -1f) : Vector2.One, 300, Easing.OutQuint);
                 }, true);
             }
 

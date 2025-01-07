@@ -7,13 +7,13 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Volume
 {
@@ -33,18 +33,18 @@ namespace osu.Game.Overlays.Volume
             }
         }
 
-        private Color4 hoveredColour, unhoveredColour;
-
-        private const float width = 100;
-        public const float HEIGHT = 35;
+        private ColourInfo hoveredBorderColour;
+        private ColourInfo unhoveredBorderColour;
+        private CompositeDrawable border = null!;
 
         public MuteButton()
         {
-            Content.BorderThickness = 3;
-            Content.CornerRadius = HEIGHT / 2;
-            Content.CornerExponent = 2;
+            const float width = 30;
+            const float height = 30;
 
-            Size = new Vector2(width, HEIGHT);
+            Size = new Vector2(width, height);
+            Content.CornerRadius = height / 2;
+            Content.CornerExponent = 2;
 
             Action = () => Current.Value = !Current.Value;
         }
@@ -52,10 +52,9 @@ namespace osu.Game.Overlays.Volume
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            hoveredColour = colours.YellowDark;
-
-            Content.BorderColour = unhoveredColour = colours.Gray1;
             BackgroundColour = colours.Gray1;
+            hoveredBorderColour = colours.PinkLight;
+            unhoveredBorderColour = colours.Gray1;
 
             SpriteIcon icon;
 
@@ -65,26 +64,39 @@ namespace osu.Game.Overlays.Volume
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
+                },
+                border = new CircularContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Masking = true,
+                    BorderThickness = 3,
+                    BorderColour = unhoveredBorderColour,
+                    Child = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Alpha = 0,
+                        AlwaysPresent = true
+                    }
                 }
             });
 
             Current.BindValueChanged(muted =>
             {
                 icon.Icon = muted.NewValue ? FontAwesome.Solid.VolumeMute : FontAwesome.Solid.VolumeUp;
-                icon.Size = new Vector2(muted.NewValue ? 18 : 20);
+                icon.Size = new Vector2(muted.NewValue ? 12 : 16);
                 icon.Margin = new MarginPadding { Right = muted.NewValue ? 2 : 0 };
             }, true);
         }
 
         protected override bool OnHover(HoverEvent e)
         {
-            Content.TransformTo<Container<Drawable>, ColourInfo>("BorderColour", hoveredColour, 500, Easing.OutQuint);
+            border.TransformTo(nameof(BorderColour), hoveredBorderColour, 500, Easing.OutQuint);
             return false;
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            Content.TransformTo<Container<Drawable>, ColourInfo>("BorderColour", unhoveredColour, 500, Easing.OutQuint);
+            border.TransformTo(nameof(BorderColour), unhoveredBorderColour, 500, Easing.OutQuint);
         }
 
         protected override bool OnMouseDown(MouseDownEvent e)

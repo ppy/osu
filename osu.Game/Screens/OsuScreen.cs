@@ -16,6 +16,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Screens.Footer;
 using osu.Game.Screens.Menu;
 using osu.Game.Users;
 
@@ -36,7 +37,9 @@ namespace osu.Game.Screens
 
         public string Description => Title;
 
-        public virtual bool AllowBackButton => true;
+        public virtual bool AllowUserExit => true;
+
+        public virtual bool ShowFooter => false;
 
         public virtual bool AllowExternalScreenChange => false;
 
@@ -52,6 +55,15 @@ namespace osu.Game.Screens
         public readonly Bindable<OverlayActivation> OverlayActivationMode;
 
         IBindable<OverlayActivation> IOsuScreen.OverlayActivationMode => OverlayActivationMode;
+
+        /// <summary>
+        /// The initial visibility state of the back button when this screen is entered for the first time.
+        /// </summary>
+        protected virtual bool InitialBackButtonVisibility => AllowUserExit;
+
+        public readonly Bindable<bool> BackButtonVisibility;
+
+        IBindable<bool> IOsuScreen.BackButtonVisibility => BackButtonVisibility;
 
         public virtual bool CursorVisible => true;
 
@@ -141,12 +153,17 @@ namespace osu.Game.Screens
         [Resolved(canBeNull: true)]
         private OsuLogo logo { get; set; }
 
+        [Resolved(canBeNull: true)]
+        [CanBeNull]
+        protected ScreenFooter Footer { get; private set; }
+
         protected OsuScreen()
         {
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
             OverlayActivationMode = new Bindable<OverlayActivation>(InitialOverlayActivationMode);
+            BackButtonVisibility = new Bindable<bool>(InitialBackButtonVisibility);
         }
 
         [BackgroundDependencyLoader(true)]
@@ -297,6 +314,8 @@ namespace osu.Game.Screens
         /// Note that the instance created may not be the used instance if it matches the BackgroundMode equality clause.
         /// </summary>
         protected virtual BackgroundScreen CreateBackground() => null;
+
+        public virtual IReadOnlyList<ScreenFooterButton> CreateFooterButtons() => Array.Empty<ScreenFooterButton>();
 
         public virtual bool OnBackButton() => false;
     }

@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -12,10 +10,12 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
+using osu.Game.Beatmaps.Drawables.Cards;
 using osu.Game.Database;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
@@ -37,9 +37,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public partial class TestSceneDrawableRoomPlaylist : MultiplayerTestScene
     {
-        private TestPlaylist playlist;
-
-        private BeatmapManager manager;
+        private TestPlaylist playlist = null!;
+        private BeatmapManager manager = null!;
 
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
@@ -197,14 +196,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestDownloadButtonHiddenWhenBeatmapExists()
         {
-            Live<BeatmapSetInfo> imported = null;
+            Live<BeatmapSetInfo> imported = null!;
 
             AddStep("import beatmap", () =>
             {
                 var beatmap = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo;
 
                 Debug.Assert(beatmap.BeatmapSet != null);
-                imported = manager.Import(beatmap.BeatmapSet);
+                imported = manager.Import(beatmap.BeatmapSet)!;
             });
 
             createPlaylistWithBeatmaps(() => imported.PerformRead(s => s.Beatmaps.Detach()));
@@ -317,17 +316,18 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 p.RequestResults = _ => resultsRequested = true;
             });
 
-            AddStep("move mouse to first item title", () =>
-            {
-                var drawQuad = playlist.ChildrenOfType<LinkFlowContainer>().First().ScreenSpaceDrawQuad;
-                var location = (drawQuad.TopLeft + drawQuad.BottomLeft) / 2 + new Vector2(drawQuad.Width * 0.2f, 0);
-                InputManager.MoveMouseTo(location);
-            });
-            AddUntilStep("wait for text load", () => playlist.ChildrenOfType<DrawableLinkCompiler>().Any());
+            AddUntilStep("wait for load", () => playlist.ChildrenOfType<DrawableLinkCompiler>().Any() && playlist.ChildrenOfType<BeatmapCardThumbnail>().First().DrawWidth > 0);
+
+            AddStep("move mouse to first item title", () => InputManager.MoveMouseTo(playlist.ChildrenOfType<LinkFlowContainer>().First().ChildrenOfType<SpriteText>().First()));
             AddAssert("first item title not hovered", () => playlist.ChildrenOfType<DrawableLinkCompiler>().First().IsHovered, () => Is.False);
-            AddStep("click left mouse", () => InputManager.Click(MouseButton.Left));
+
+            AddStep("click title", () =>
+            {
+                InputManager.MoveMouseTo(playlist.ChildrenOfType<LinkFlowContainer>().First().ChildrenOfType<SpriteText>().First());
+                InputManager.Click(MouseButton.Left);
+            });
+
             AddUntilStep("first item selected", () => playlist.ChildrenOfType<DrawableRoomPlaylistItem>().First().IsSelectedItem, () => Is.True);
-            // implies being clickable.
             AddUntilStep("first item title hovered", () => playlist.ChildrenOfType<DrawableLinkCompiler>().First().IsHovered, () => Is.True);
 
             AddStep("move mouse to second item results button", () => InputManager.MoveMouseTo(playlist.ChildrenOfType<GrayButton>().ElementAt(5)));
@@ -375,7 +375,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             }
         });
 
-        private void createPlaylist(Action<TestPlaylist> setupPlaylist = null)
+        private void createPlaylist(Action<TestPlaylist>? setupPlaylist = null)
         {
             AddStep("create playlist", () =>
             {

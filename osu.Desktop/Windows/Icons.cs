@@ -13,5 +13,7 @@ namespace osu.Desktop.Windows
         private static readonly string icon_directory = Path.GetDirectoryName(typeof(Icons).Assembly.Location)!;
 
         public static string Lazer => Path.Join(icon_directory, "lazer.ico");
+
+        public static string Beatmap => Path.Join(icon_directory, "beatmap.ico");
     }
 }

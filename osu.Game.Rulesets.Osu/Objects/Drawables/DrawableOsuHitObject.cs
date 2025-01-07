@@ -91,19 +91,34 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     drawableObjectPiece.ApplyCustomUpdateState -= applyDimToDrawableHitObject;
                     drawableObjectPiece.ApplyCustomUpdateState += applyDimToDrawableHitObject;
                 }
-                else
-                    applyDim(piece);
-            }
 
-            void applyDim(Drawable piece)
-            {
-                piece.FadeColour(new Color4(195, 195, 195, 255));
-                using (piece.BeginDelayedSequence(InitialLifetimeOffset - OsuHitWindows.MISS_WINDOW))
-                    piece.FadeColour(Color4.White, 100);
+                // but at the end apply the transforms now regardless of whether this is a DHO or not.
+                // the above is just to ensure they don't get overwritten later.
+                applyDim(piece);
             }
-
-            void applyDimToDrawableHitObject(DrawableHitObject dho, ArmedState _) => applyDim(dho);
         }
+
+        protected override void ClearNestedHitObjects()
+        {
+            base.ClearNestedHitObjects();
+
+            // any dimmable pieces that are DHOs will be pooled separately.
+            // `applyDimToDrawableHitObject` is a closure that implicitly captures `this`,
+            // and because of separate pooling of parent and child objects, there is no guarantee that the pieces will be associated with `this` again on re-use.
+            // therefore, clean up the subscription here to avoid crosstalk.
+            // not doing so can result in the callback attempting to read things from `this` when it is in a completely bogus state (not in use or similar).
+            foreach (var piece in DimmablePieces.OfType<DrawableHitObject>())
+                piece.ApplyCustomUpdateState -= applyDimToDrawableHitObject;
+        }
+
+        private void applyDim(Drawable piece)
+        {
+            piece.FadeColour(new Color4(195, 195, 195, 255));
+            using (piece.BeginDelayedSequence(InitialLifetimeOffset - OsuHitWindows.MISS_WINDOW))
+                piece.FadeColour(Color4.White, 100);
+        }
+
+        private void applyDimToDrawableHitObject(DrawableHitObject dho, ArmedState _) => applyDim(dho);
 
         protected sealed override double InitialLifetimeOffset => HitObject.TimePreempt;
 

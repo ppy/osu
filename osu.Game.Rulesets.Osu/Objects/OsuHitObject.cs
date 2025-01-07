@@ -14,7 +14,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects
 {
-    public abstract class OsuHitObject : HitObject, IHasComboInformation, IHasPosition
+    public abstract class OsuHitObject : HitObject, IHasComboInformation, IHasPosition, IHasTimePreempt
     {
         /// <summary>
         /// The radius of hit objects (ie. the radius of a <see cref="HitCircle"/>).
@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Osu.Objects
         /// </summary>
         public const double PREEMPT_MAX = 1800;
 
-        public double TimePreempt = 600;
+        public double TimePreempt { get; set; } = 600;
         public double TimeFadeIn = 400;
 
         private HitObjectProperty<Vector2> position;
@@ -59,8 +59,17 @@ namespace osu.Game.Rulesets.Osu.Objects
             set => position.Value = value;
         }
 
-        public float X => Position.X;
-        public float Y => Position.Y;
+        public float X
+        {
+            get => Position.X;
+            set => Position = new Vector2(value, Position.Y);
+        }
+
+        public float Y
+        {
+            get => Position.Y;
+            set => Position = new Vector2(Position.X, value);
+        }
 
         public Vector2 StackedPosition => Position + StackOffset;
 

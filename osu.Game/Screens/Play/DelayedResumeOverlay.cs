@@ -11,7 +11,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
-using osu.Framework.Threading;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
@@ -24,8 +23,9 @@ namespace osu.Game.Screens.Play
     /// </summary>
     public partial class DelayedResumeOverlay : ResumeOverlay
     {
-        // todo: this shouldn't define its own colour provider, but nothing in Player screen does, so let's do that for now.
-        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
+        // todo: this shouldn't define its own colour provider, but nothing in DrawableRuleset guarantees this, so let's do it locally for now.
+        // (of note, Player does cache one but any test which uses a DrawableRuleset without Player will fail without this).
+        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
 
         private const float outer_size = 200;
         private const float inner_size = 150;
@@ -34,9 +34,10 @@ namespace osu.Game.Screens.Play
 
         private const double countdown_time = 2000;
 
+        private const int total_count = 3;
+
         protected override LocalisableString Message => string.Empty;
 
-        private ScheduledDelegate? scheduledResume;
         private int? countdownCount;
         private double countdownStartTime;
         private bool countdownComplete;
@@ -120,21 +121,17 @@ namespace osu.Game.Screens.Play
             innerContent.FadeIn().ScaleTo(Vector2.Zero).Then().ScaleTo(Vector2.One, 400, Easing.OutElasticHalf);
             countdownComponents.FadeOut().Delay(50).FadeTo(1, 100);
 
+            countdownProgress.Progress = 0;
+
             // Reset states for various components.
             countdownBackground.FadeIn();
             countdownText.FadeIn();
+            countdownText.Text = string.Empty;
             countdownProgress.FadeIn().ScaleTo(1);
 
             countdownComplete = false;
             countdownCount = null;
-            countdownStartTime = Time.Current;
-
-            scheduledResume?.Cancel();
-            scheduledResume = Scheduler.AddDelayed(() =>
-            {
-                countdownComplete = true;
-                Resume();
-            }, countdown_time);
+            countdownStartTime = Time.Current + 200;
         }
 
         protected override void PopOut()
@@ -152,8 +149,6 @@ namespace osu.Game.Screens.Play
             }
             else
                 countdownProgress.FadeOut();
-
-            scheduledResume?.Cancel();
         }
 
         protected override void Update()
@@ -164,11 +159,16 @@ namespace osu.Game.Screens.Play
 
         private void updateCountdown()
         {
-            double amountTimePassed = Math.Min(countdown_time, Time.Current - countdownStartTime) / countdown_time;
-            int newCount = 3 - (int)Math.Floor(amountTimePassed * 3);
+            if (State.Value == Visibility.Hidden || countdownComplete || Time.Current < countdownStartTime)
+                return;
+
+            double amountTimePassed = Math.Clamp((Time.Current - countdownStartTime) / countdown_time, 0, countdown_time);
+            int newCount = Math.Clamp(total_count - (int)Math.Floor(amountTimePassed * total_count), 0, total_count);
 
             countdownProgress.Progress = amountTimePassed;
             countdownProgress.InnerRadius = progress_stroke_width / progress_size / countdownProgress.Scale.X;
+
+            Alpha = 0.2f + 0.8f * newCount / total_count;
 
             if (countdownCount != newCount)
             {
@@ -191,6 +191,12 @@ namespace osu.Game.Screens.Play
             }
 
             countdownCount = newCount;
+
+            if (countdownCount == 0)
+            {
+                countdownComplete = true;
+                Resume();
+            }
         }
     }
 }

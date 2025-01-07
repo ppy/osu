@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Utils;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
+using osu.Game.Skinning;
 using osuTK;
 using osuTK.Input;
 
@@ -56,6 +57,11 @@ namespace osu.Game.Tests.Visual.Gameplay
                             Anchor = Anchor.Centre,
                             Scale = new Vector2(1, -1)
                         },
+                        new LegacyKeyCounterDisplay
+                        {
+                            Origin = Anchor.Centre,
+                            Anchor = Anchor.Centre,
+                        },
                         new FillFlowContainer
                         {
                             AutoSizeAxes = Axes.Both,
@@ -84,6 +90,12 @@ namespace osu.Game.Tests.Visual.Gameplay
                                     Rotation = -90,
                                 },
                                 new ArgonKeyCounterDisplay
+                                {
+                                    Origin = Anchor.Centre,
+                                    Anchor = Anchor.Centre,
+                                    Rotation = 90,
+                                },
+                                new LegacyKeyCounterDisplay
                                 {
                                     Origin = Anchor.Centre,
                                     Anchor = Anchor.Centre,

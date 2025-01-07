@@ -40,6 +40,7 @@ namespace osu.Game.Screens.Play
         public readonly Score Score;
 
         public readonly ScoreProcessor ScoreProcessor;
+        public readonly HealthProcessor HealthProcessor;
 
         /// <summary>
         /// The storyboard associated with the beatmap.
@@ -68,7 +69,14 @@ namespace osu.Game.Screens.Play
 
         private readonly Bindable<JudgementResult> lastJudgementResult = new Bindable<JudgementResult>();
 
-        public GameplayState(IBeatmap beatmap, Ruleset ruleset, IReadOnlyList<Mod>? mods = null, Score? score = null, ScoreProcessor? scoreProcessor = null, Storyboard? storyboard = null)
+        public GameplayState(
+            IBeatmap beatmap,
+            Ruleset ruleset,
+            IReadOnlyList<Mod>? mods = null,
+            Score? score = null,
+            ScoreProcessor? scoreProcessor = null,
+            HealthProcessor? healthProcessor = null,
+            Storyboard? storyboard = null)
         {
             Beatmap = beatmap;
             Ruleset = ruleset;
@@ -82,6 +90,7 @@ namespace osu.Game.Screens.Play
             };
             Mods = mods ?? Array.Empty<Mod>();
             ScoreProcessor = scoreProcessor ?? ruleset.CreateScoreProcessor();
+            HealthProcessor = healthProcessor ?? ruleset.CreateHealthProcessor(beatmap.HitObjects[0].StartTime);
             Storyboard = storyboard ?? new Storyboard();
         }
 

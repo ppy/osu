@@ -129,6 +129,13 @@ namespace osu.Game.Rulesets.Scoring
                     OnIterationFail?.Invoke($"FAILED drop {testDrop}: recovery too low ({recovery} < {hpRecoveryAvailable})");
                 }
 
+                if (!fail && double.IsInfinity(HpMultiplierNormal))
+                {
+                    OnIterationSuccess?.Invoke("Drain computation algorithm diverged to infinity. PASSING with zero drop, resetting HP multiplier to 1.");
+                    HpMultiplierNormal = 1;
+                    return 0;
+                }
+
                 if (!fail)
                 {
                     OnIterationSuccess?.Invoke($"PASSED drop {testDrop}");

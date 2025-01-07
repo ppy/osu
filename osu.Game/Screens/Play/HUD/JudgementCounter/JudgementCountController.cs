@@ -6,7 +6,6 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Localisation;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
@@ -53,8 +52,27 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
         {
             base.LoadComplete();
 
+            scoreProcessor.OnResetFromReplayFrame += updateAllCountsFromReplayFrame;
             scoreProcessor.NewJudgement += judgement => updateCount(judgement, false);
             scoreProcessor.JudgementReverted += judgement => updateCount(judgement, true);
+        }
+
+        private bool hasUpdatedCountsFromReplayFrame;
+
+        private void updateAllCountsFromReplayFrame()
+        {
+            if (hasUpdatedCountsFromReplayFrame)
+                return;
+
+            foreach (var kvp in scoreProcessor.Statistics)
+            {
+                if (!results.TryGetValue(kvp.Key, out var count))
+                    continue;
+
+                count.ResultCount.Value = kvp.Value;
+            }
+
+            hasUpdatedCountsFromReplayFrame = true;
         }
 
         private void updateCount(JudgementResult judgement, bool revert)
@@ -66,15 +84,6 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
                 count.ResultCount.Value--;
             else
                 count.ResultCount.Value++;
-        }
-
-        public struct JudgementCount
-        {
-            public LocalisableString DisplayName { get; set; }
-
-            public HitResult[] Types { get; set; }
-
-            public BindableInt ResultCount { get; set; }
         }
     }
 }

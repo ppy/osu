@@ -27,7 +27,7 @@ namespace osu.Game.Screens.Ranking
         {
         }
 
-        protected override APIRequest? FetchScores(Action<IEnumerable<ScoreInfo>>? scoresCallback)
+        protected override APIRequest? FetchScores(Action<IEnumerable<ScoreInfo>> scoresCallback)
         {
             Debug.Assert(Score != null);
 
@@ -35,7 +35,7 @@ namespace osu.Game.Screens.Ranking
                 return null;
 
             getScoreRequest = new GetScoresRequest(Score.BeatmapInfo, Score.Ruleset);
-            getScoreRequest.Success += r => scoresCallback?.Invoke(r.Scores.Where(s => !s.MatchesOnlineID(Score)).Select(s => s.ToScoreInfo(rulesets, Beatmap.Value.BeatmapInfo)));
+            getScoreRequest.Success += r => scoresCallback.Invoke(r.Scores.Where(s => !s.MatchesOnlineID(Score)).Select(s => s.ToScoreInfo(rulesets, Beatmap.Value.BeatmapInfo)));
             return getScoreRequest;
         }
 

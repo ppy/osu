@@ -296,7 +296,7 @@ namespace osu.Game.Tests.Visual.Settings
         }
 
         [Test]
-        public void TestBindingConflictResolvedByRollback()
+        public void TestBindingConflictResolvedByRollbackViaMouse()
         {
             AddStep("reset taiko section to default", () =>
             {
@@ -315,7 +315,7 @@ namespace osu.Game.Tests.Visual.Settings
         }
 
         [Test]
-        public void TestBindingConflictResolvedByOverwrite()
+        public void TestBindingConflictResolvedByOverwriteViaMouse()
         {
             AddStep("reset taiko section to default", () =>
             {
@@ -329,6 +329,46 @@ namespace osu.Game.Tests.Visual.Settings
             KeyBindingConflictPopover popover = null;
             AddUntilStep("wait for popover", () => popover = panel.ChildrenOfType<KeyBindingConflictPopover>().SingleOrDefault(), () => Is.Not.Null);
             AddStep("click second button", () => popover.ChildrenOfType<RoundedButton>().ElementAt(1).TriggerClick());
+            checkBinding("Left (centre)", InputSettingsStrings.ActionHasNoKeyBinding.ToString());
+            checkBinding("Left (rim)", "M1");
+        }
+
+        [Test]
+        public void TestBindingConflictResolvedByRollbackViaKeyboard()
+        {
+            AddStep("reset taiko & global sections to default", () =>
+            {
+                panel.ChildrenOfType<VariantBindingsSubsection>().First(section => new TaikoRuleset().RulesetInfo.Equals(section.Ruleset))
+                     .ChildrenOfType<ResetButton>().Single().TriggerClick();
+
+                panel.ChildrenOfType<ResetButton>().First().TriggerClick();
+            });
+            AddStep("move mouse to centre", () => InputManager.MoveMouseTo(panel.ScreenSpaceDrawQuad.Centre));
+            scrollToAndStartBinding("Left (rim)");
+            AddStep("attempt to bind M1 to two keys", () => InputManager.Click(MouseButton.Left));
+
+            AddUntilStep("wait for popover", () => panel.ChildrenOfType<KeyBindingConflictPopover>().SingleOrDefault(), () => Is.Not.Null);
+            AddStep("press Esc", () => InputManager.Key(Key.Escape));
+            checkBinding("Left (centre)", "M1");
+            checkBinding("Left (rim)", "M2");
+        }
+
+        [Test]
+        public void TestBindingConflictResolvedByOverwriteViaKeyboard()
+        {
+            AddStep("reset taiko & global sections to default", () =>
+            {
+                panel.ChildrenOfType<VariantBindingsSubsection>().First(section => new TaikoRuleset().RulesetInfo.Equals(section.Ruleset))
+                     .ChildrenOfType<ResetButton>().Single().TriggerClick();
+
+                panel.ChildrenOfType<ResetButton>().First().TriggerClick();
+            });
+            AddStep("move mouse to centre", () => InputManager.MoveMouseTo(panel.ScreenSpaceDrawQuad.Centre));
+            scrollToAndStartBinding("Left (rim)");
+            AddStep("attempt to bind M1 to two keys", () => InputManager.Click(MouseButton.Left));
+
+            AddUntilStep("wait for popover", () => panel.ChildrenOfType<KeyBindingConflictPopover>().SingleOrDefault(), () => Is.Not.Null);
+            AddStep("press Enter", () => InputManager.Key(Key.Enter));
             checkBinding("Left (centre)", InputSettingsStrings.ActionHasNoKeyBinding.ToString());
             checkBinding("Left (rim)", "M1");
         }
@@ -374,11 +414,7 @@ namespace osu.Game.Tests.Visual.Settings
             });
             AddStep("move mouse to centre", () => InputManager.MoveMouseTo(panel.ScreenSpaceDrawQuad.Centre));
             scrollToAndStartBinding("Left (centre)");
-            AddStep("clear binding", () =>
-            {
-                var row = panel.ChildrenOfType<KeyBindingRow>().First(r => r.ChildrenOfType<OsuSpriteText>().Any(s => s.Text.ToString() == "Left (centre)"));
-                row.ChildrenOfType<KeyBindingRow.ClearButton>().Single().TriggerClick();
-            });
+            clearBinding();
             scrollToAndStartBinding("Left (rim)");
             AddStep("bind M1", () => InputManager.Click(MouseButton.Left));
 
@@ -389,6 +425,45 @@ namespace osu.Game.Tests.Visual.Settings
             });
             AddWaitStep("wait a bit", 3);
             AddUntilStep("conflict popover not shown", () => panel.ChildrenOfType<KeyBindingConflictPopover>().SingleOrDefault(), () => Is.Null);
+        }
+
+        [Test]
+        public void TestResettingRowCannotConflictWithItself()
+        {
+            AddStep("reset taiko section to default", () =>
+            {
+                var section = panel.ChildrenOfType<VariantBindingsSubsection>().First(section => new TaikoRuleset().RulesetInfo.Equals(section.Ruleset));
+                section.ChildrenOfType<ResetButton>().Single().TriggerClick();
+            });
+            AddStep("move mouse to centre", () => InputManager.MoveMouseTo(panel.ScreenSpaceDrawQuad.Centre));
+
+            scrollToAndStartBinding("Left (centre)");
+            clearBinding();
+            scrollToAndStartBinding("Left (centre)", 1);
+            clearBinding();
+
+            scrollToAndStartBinding("Left (centre)");
+            AddStep("bind F", () => InputManager.Key(Key.F));
+            scrollToAndStartBinding("Left (centre)", 1);
+            AddStep("bind M1", () => InputManager.Click(MouseButton.Left));
+
+            AddStep("revert row to default", () =>
+            {
+                var row = panel.ChildrenOfType<KeyBindingRow>().First(r => r.ChildrenOfType<OsuSpriteText>().Any(s => s.Text.ToString() == "Left (centre)"));
+                InputManager.MoveMouseTo(row.ChildrenOfType<RevertToDefaultButton<bool>>().Single());
+                InputManager.Click(MouseButton.Left);
+            });
+            AddWaitStep("wait a bit", 3);
+            AddUntilStep("conflict popover not shown", () => panel.ChildrenOfType<KeyBindingConflictPopover>().SingleOrDefault(), () => Is.Null);
+        }
+
+        private void clearBinding()
+        {
+            AddStep("clear binding", () =>
+            {
+                var row = panel.ChildrenOfType<KeyBindingRow>().First(r => r.ChildrenOfType<OsuSpriteText>().Any(s => s.Text.ToString() == "Left (centre)"));
+                row.ChildrenOfType<KeyBindingRow.ClearButton>().Single().TriggerClick();
+            });
         }
 
         private void checkBinding(string name, string keyName)
@@ -402,23 +477,23 @@ namespace osu.Game.Tests.Visual.Settings
             }, () => Is.EqualTo(keyName));
         }
 
-        private void scrollToAndStartBinding(string name)
+        private void scrollToAndStartBinding(string name, int bindingIndex = 0)
         {
-            KeyBindingRow.KeyButton firstButton = null;
+            KeyBindingRow.KeyButton targetButton = null;
 
             AddStep($"Scroll to {name}", () =>
             {
                 var firstRow = panel.ChildrenOfType<KeyBindingRow>().First(r => r.ChildrenOfType<OsuSpriteText>().Any(s => s.Text.ToString() == name));
-                firstButton = firstRow.ChildrenOfType<KeyBindingRow.KeyButton>().First();
+                targetButton = firstRow.ChildrenOfType<KeyBindingRow.KeyButton>().ElementAt(bindingIndex);
 
-                panel.ChildrenOfType<SettingsPanel.SettingsSectionsContainer>().First().ScrollTo(firstButton);
+                panel.ChildrenOfType<SettingsPanel.SettingsSectionsContainer>().First().ScrollTo(targetButton);
             });
 
             AddWaitStep("wait for scroll", 5);
 
             AddStep("click to bind", () =>
             {
-                InputManager.MoveMouseTo(firstButton);
+                InputManager.MoveMouseTo(targetButton);
                 InputManager.Click(MouseButton.Left);
             });
         }

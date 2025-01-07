@@ -96,6 +96,7 @@ namespace osu.Game.Tests.NonVisual
 
             public override IAdjustableAudioComponent Audio { get; }
             public override Playfield Playfield { get; }
+            public override PlayfieldAdjustmentContainer PlayfieldAdjustmentContainer { get; }
             public override Container Overlays { get; }
             public override Container FrameStableComponents { get; }
             public override IFrameStableClock FrameStableClock { get; }

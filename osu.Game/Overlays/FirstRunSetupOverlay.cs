@@ -26,6 +26,7 @@ using osu.Game.Overlays.FirstRunSetup;
 using osu.Game.Overlays.Mods;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Screens;
+using osu.Game.Screens.Footer;
 using osu.Game.Screens.Menu;
 
 namespace osu.Game.Overlays
@@ -44,8 +45,7 @@ namespace osu.Game.Overlays
 
         private ScreenStack? stack;
 
-        public ShearedButton NextButton = null!;
-        public ShearedButton BackButton = null!;
+        public ShearedButton? NextButton => DisplayedFooterContent?.NextButton;
 
         private readonly Bindable<bool> showFirstRunSetup = new Bindable<bool>();
 
@@ -90,7 +90,7 @@ namespace osu.Game.Overlays
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Bottom = 20, },
+                    Padding = new MarginPadding { Bottom = 20 },
                     Child = new GridContainer
                     {
                         Anchor = Anchor.Centre,
@@ -134,51 +134,6 @@ namespace osu.Game.Overlays
                     }
                 },
             });
-
-            FooterContent.Add(new GridContainer
-            {
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
-                Margin = new MarginPadding { Vertical = PADDING },
-                Anchor = Anchor.BottomLeft,
-                Origin = Anchor.BottomLeft,
-                ColumnDimensions = new[]
-                {
-                    new Dimension(GridSizeMode.Absolute, 10),
-                    new Dimension(GridSizeMode.AutoSize),
-                    new Dimension(),
-                    new Dimension(GridSizeMode.Absolute, 10),
-                },
-                RowDimensions = new[]
-                {
-                    new Dimension(GridSizeMode.AutoSize),
-                },
-                Content = new[]
-                {
-                    new[]
-                    {
-                        Empty(),
-                        BackButton = new ShearedButton(300)
-                        {
-                            Text = CommonStrings.Back,
-                            Action = showPreviousStep,
-                            Enabled = { Value = false },
-                            DarkerColour = colours.Pink2,
-                            LighterColour = colours.Pink1,
-                        },
-                        NextButton = new ShearedButton(0)
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Width = 1,
-                            Text = FirstRunSetupOverlayStrings.GetStarted,
-                            DarkerColour = ColourProvider.Colour2,
-                            LighterColour = ColourProvider.Colour1,
-                            Action = showNextStep
-                        },
-                        Empty(),
-                    },
-                }
-            });
         }
 
         protected override void LoadComplete()
@@ -190,6 +145,36 @@ namespace osu.Game.Overlays
             if (showFirstRunSetup.Value) Show();
         }
 
+        [Resolved]
+        private ScreenFooter footer { get; set; } = null!;
+
+        public new FirstRunSetupFooterContent? DisplayedFooterContent => base.DisplayedFooterContent as FirstRunSetupFooterContent;
+
+        public override VisibilityContainer CreateFooterContent()
+        {
+            var footerContent = new FirstRunSetupFooterContent
+            {
+                ShowNextStep = showNextStep,
+            };
+
+            footerContent.OnLoadComplete += _ => updateButtons();
+            return footerContent;
+        }
+
+        public override bool OnBackButton()
+        {
+            if (currentStepIndex == 0)
+                return false;
+
+            Debug.Assert(stack != null);
+
+            stack.CurrentScreen.Exit();
+            currentStepIndex--;
+
+            updateButtons();
+            return true;
+        }
+
         public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
             if (!e.Repeat)
@@ -197,19 +182,12 @@ namespace osu.Game.Overlays
                 switch (e.Action)
                 {
                     case GlobalAction.Select:
-                        NextButton.TriggerClick();
+                        DisplayedFooterContent?.NextButton.TriggerClick();
                         return true;
 
                     case GlobalAction.Back:
-                        if (BackButton.Enabled.Value)
-                        {
-                            BackButton.TriggerClick();
-                            return true;
-                        }
-
-                        // If back button is disabled, we are at the first step.
-                        // The base call will handle dismissal of the overlay.
-                        break;
+                        footer.BackButton.TriggerClick();
+                        return false;
                 }
             }
 
@@ -279,19 +257,6 @@ namespace osu.Game.Overlays
             showNextStep();
         }
 
-        private void showPreviousStep()
-        {
-            if (currentStepIndex == 0)
-                return;
-
-            Debug.Assert(stack != null);
-
-            stack.CurrentScreen.Exit();
-            currentStepIndex--;
-
-            updateButtons();
-        }
-
         private void showNextStep()
         {
             Debug.Assert(currentStepIndex != null);
@@ -322,29 +287,61 @@ namespace osu.Game.Overlays
             updateButtons();
         }
 
-        private void updateButtons()
+        private void updateButtons() => DisplayedFooterContent?.UpdateButtons(currentStepIndex, steps);
+
+        public partial class FirstRunSetupFooterContent : VisibilityContainer
         {
-            BackButton.Enabled.Value = currentStepIndex > 0;
-            NextButton.Enabled.Value = currentStepIndex != null;
+            public ShearedButton NextButton { get; private set; } = null!;
 
-            if (currentStepIndex == null)
-                return;
+            public Action? ShowNextStep;
 
-            bool isFirstStep = currentStepIndex == 0;
-            bool isLastStep = currentStepIndex == steps.Count - 1;
-
-            if (isFirstStep)
+            [BackgroundDependencyLoader]
+            private void load(OverlayColourProvider colourProvider)
             {
-                BackButton.Text = CommonStrings.Back;
-                NextButton.Text = FirstRunSetupOverlayStrings.GetStarted;
+                RelativeSizeAxes = Axes.Both;
+
+                InternalChild = NextButton = new ShearedButton(0)
+                {
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
+                    Margin = new MarginPadding { Right = 12f },
+                    RelativeSizeAxes = Axes.X,
+                    Width = 1,
+                    Text = FirstRunSetupOverlayStrings.GetStarted,
+                    DarkerColour = colourProvider.Colour2,
+                    LighterColour = colourProvider.Colour1,
+                    Action = () => ShowNextStep?.Invoke(),
+                };
             }
-            else
-            {
-                BackButton.Text = LocalisableString.Interpolate($@"{CommonStrings.Back} ({steps[currentStepIndex.Value - 1].GetLocalisableDescription()})");
 
-                NextButton.Text = isLastStep
-                    ? CommonStrings.Finish
-                    : LocalisableString.Interpolate($@"{CommonStrings.Next} ({steps[currentStepIndex.Value + 1].GetLocalisableDescription()})");
+            public void UpdateButtons(int? currentStep, IReadOnlyList<Type> steps)
+            {
+                NextButton.Enabled.Value = currentStep != null;
+
+                if (currentStep == null)
+                    return;
+
+                bool isFirstStep = currentStep == 0;
+                bool isLastStep = currentStep == steps.Count - 1;
+
+                if (isFirstStep)
+                    NextButton.Text = FirstRunSetupOverlayStrings.GetStarted;
+                else
+                {
+                    NextButton.Text = isLastStep
+                        ? CommonStrings.Finish
+                        : LocalisableString.Interpolate($@"{CommonStrings.Next} ({steps[currentStep.Value + 1].GetLocalisableDescription()})");
+                }
+            }
+
+            protected override void PopIn()
+            {
+                this.FadeIn();
+            }
+
+            protected override void PopOut()
+            {
+                this.Delay(400).FadeOut();
             }
         }
     }

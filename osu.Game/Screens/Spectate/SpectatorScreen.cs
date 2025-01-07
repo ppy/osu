@@ -135,6 +135,7 @@ namespace osu.Game.Screens.Spectate
 
                 case SpectatedUserState.Passed:
                     markReceivedAllFrames(userId);
+                    PassGameplay(userId);
                     break;
 
                 case SpectatedUserState.Failed:
@@ -232,6 +233,12 @@ namespace osu.Game.Screens.Spectate
         /// <param name="userId">The user to start gameplay for.</param>
         /// <param name="spectatorGameplayState">The gameplay state.</param>
         protected abstract void StartGameplay(int userId, SpectatorGameplayState spectatorGameplayState);
+
+        /// <summary>
+        /// Fired when a user passes gameplay.
+        /// </summary>
+        /// <param name="userId">The user which passed.</param>
+        protected virtual void PassGameplay(int userId) { }
 
         /// <summary>
         /// Quits gameplay for a user.

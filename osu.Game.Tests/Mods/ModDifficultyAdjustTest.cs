@@ -8,6 +8,8 @@ using osu.Game.Online.API;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Tests.Mods
@@ -105,9 +107,6 @@ namespace osu.Game.Tests.Mods
             testMod.ResetSettingsToDefaults();
 
             Assert.That(testMod.DrainRate.Value, Is.Null);
-
-            // ReSharper disable once HeuristicUnreachableCode
-            // see https://youtrack.jetbrains.com/issue/RIDER-70159.
             Assert.That(testMod.OverallDifficulty.Value, Is.Null);
 
             var applied = applyDifficulty(new BeatmapDifficulty
@@ -117,6 +116,48 @@ namespace osu.Game.Tests.Mods
             });
 
             Assert.That(applied.OverallDifficulty, Is.EqualTo(10));
+        }
+
+        [Test]
+        public void TestDeserializeIncorrectRange()
+        {
+            var apiMod = new APIMod
+            {
+                Acronym = @"DA",
+                Settings = new Dictionary<string, object>
+                {
+                    [@"circle_size"] = -727,
+                    [@"approach_rate"] = -727,
+                }
+            };
+            var ruleset = new OsuRuleset();
+
+            var mod = (OsuModDifficultyAdjust)apiMod.ToMod(ruleset);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(mod.CircleSize.Value, Is.GreaterThanOrEqualTo(0).And.LessThanOrEqualTo(11));
+                Assert.That(mod.ApproachRate.Value, Is.GreaterThanOrEqualTo(-10).And.LessThanOrEqualTo(11));
+            });
+        }
+
+        [Test]
+        public void TestDeserializeNegativeApproachRate()
+        {
+            var apiMod = new APIMod
+            {
+                Acronym = @"DA",
+                Settings = new Dictionary<string, object>
+                {
+                    [@"approach_rate"] = -9,
+                }
+            };
+            var ruleset = new OsuRuleset();
+
+            var mod = (OsuModDifficultyAdjust)apiMod.ToMod(ruleset);
+
+            Assert.That(mod.ApproachRate.Value, Is.GreaterThanOrEqualTo(-10).And.LessThanOrEqualTo(11));
+            Assert.That(mod.ApproachRate.Value, Is.EqualTo(-9));
         }
 
         /// <summary>

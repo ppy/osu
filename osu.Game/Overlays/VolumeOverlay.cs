@@ -1,8 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
@@ -19,24 +18,21 @@ using osu.Game.Input.Bindings;
 using osu.Game.Overlays.Volume;
 using osuTK;
 using osuTK.Graphics;
-using osuTK.Input;
 
 namespace osu.Game.Overlays
 {
+    [Cached]
     public partial class VolumeOverlay : VisibilityContainer
     {
-        private const float offset = 10;
-
-        private VolumeMeter volumeMeterMaster;
-        private VolumeMeter volumeMeterEffect;
-        private VolumeMeter volumeMeterMusic;
-        private MuteButton muteButton;
-
-        private readonly BindableDouble muteAdjustment = new BindableDouble();
-
         public Bindable<bool> IsMuted { get; } = new Bindable<bool>();
 
-        private SelectionCycleFillFlowContainer<VolumeMeter> volumeMeters;
+        private const float offset = 10;
+
+        private VolumeMeter volumeMeterMaster = null!;
+        private VolumeMeter volumeMeterEffect = null!;
+        private VolumeMeter volumeMeterMusic = null!;
+
+        private SelectionCycleFillFlowContainer<VolumeMeter> volumeMeters = null!;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, OsuColour colours)
@@ -52,14 +48,7 @@ namespace osu.Game.Overlays
                     Width = 300,
                     Colour = ColourInfo.GradientHorizontal(Color4.Black.Opacity(0.75f), Color4.Black.Opacity(0))
                 },
-                muteButton = new MuteButton
-                {
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
-                    Margin = new MarginPadding(10),
-                    Current = { BindTarget = IsMuted }
-                },
-                volumeMeters = new SelectionCycleFillFlowContainer<VolumeMeter>
+                new FillFlowContainer
                 {
                     Direction = FillDirection.Vertical,
                     AutoSizeAxes = Axes.Both,
@@ -67,26 +56,29 @@ namespace osu.Game.Overlays
                     Origin = Anchor.CentreLeft,
                     Spacing = new Vector2(0, offset),
                     Margin = new MarginPadding { Left = offset },
-                    Children = new[]
+                    Children = new Drawable[]
                     {
-                        volumeMeterEffect = new VolumeMeter("EFFECTS", 125, colours.BlueDarker),
-                        volumeMeterMaster = new VolumeMeter("MASTER", 150, colours.PinkDarker),
-                        volumeMeterMusic = new VolumeMeter("MUSIC", 125, colours.BlueDarker),
-                    }
-                }
+                        volumeMeters = new SelectionCycleFillFlowContainer<VolumeMeter>
+                        {
+                            Direction = FillDirection.Vertical,
+                            AutoSizeAxes = Axes.Both,
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            Spacing = new Vector2(0, offset),
+                            Children = new[]
+                            {
+                                volumeMeterEffect = new VolumeMeter("EFFECTS", 125, colours.BlueDarker),
+                                volumeMeterMaster = new MasterVolumeMeter("MASTER", 150, colours.PinkDarker) { IsMuted = { BindTarget = IsMuted }, },
+                                volumeMeterMusic = new VolumeMeter("MUSIC", 125, colours.BlueDarker),
+                            }
+                        },
+                    },
+                },
             });
 
             volumeMeterMaster.Bindable.BindTo(audio.Volume);
             volumeMeterEffect.Bindable.BindTo(audio.VolumeSample);
             volumeMeterMusic.Bindable.BindTo(audio.VolumeTrack);
-
-            IsMuted.BindValueChanged(muted =>
-            {
-                if (muted.NewValue)
-                    audio.AddAdjustment(AdjustableProperty.Volume, muteAdjustment);
-                else
-                    audio.RemoveAdjustment(AdjustableProperty.Volume, muteAdjustment);
-            });
         }
 
         protected override void LoadComplete()
@@ -95,8 +87,6 @@ namespace osu.Game.Overlays
 
             foreach (var volumeMeter in volumeMeters)
                 volumeMeter.Bindable.ValueChanged += _ => Show();
-
-            muteButton.Current.ValueChanged += _ => Show();
         }
 
         public bool Adjust(GlobalAction action, float amount = 1, bool isPrecise = false)
@@ -120,27 +110,29 @@ namespace osu.Game.Overlays
                     return true;
 
                 case GlobalAction.NextVolumeMeter:
-                    if (State.Value == Visibility.Visible)
-                        volumeMeters.SelectNext();
+                    if (State.Value != Visibility.Visible)
+                        return false;
+
+                    volumeMeters.SelectNext();
                     Show();
                     return true;
 
                 case GlobalAction.PreviousVolumeMeter:
-                    if (State.Value == Visibility.Visible)
-                        volumeMeters.SelectPrevious();
+                    if (State.Value != Visibility.Visible)
+                        return false;
+
+                    volumeMeters.SelectPrevious();
                     Show();
                     return true;
 
                 case GlobalAction.ToggleMute:
                     Show();
-                    muteButton.Current.Value = !muteButton.Current.Value;
+                    volumeMeters.OfType<MasterVolumeMeter>().First().ToggleMute();
                     return true;
             }
 
             return false;
         }
-
-        private ScheduledDelegate popOutDelegate;
 
         public void FocusMasterVolume()
         {
@@ -179,30 +171,6 @@ namespace osu.Game.Overlays
             return base.OnMouseMove(e);
         }
 
-        protected override bool OnKeyDown(KeyDownEvent e)
-        {
-            switch (e.Key)
-            {
-                case Key.Left:
-                    Adjust(GlobalAction.PreviousVolumeMeter);
-                    return true;
-
-                case Key.Right:
-                    Adjust(GlobalAction.NextVolumeMeter);
-                    return true;
-
-                case Key.Down:
-                    Adjust(GlobalAction.DecreaseVolume);
-                    return true;
-
-                case Key.Up:
-                    Adjust(GlobalAction.IncreaseVolume);
-                    return true;
-            }
-
-            return base.OnKeyDown(e);
-        }
-
         protected override bool OnHover(HoverEvent e)
         {
             schedulePopOut();
@@ -214,6 +182,8 @@ namespace osu.Game.Overlays
             schedulePopOut();
             base.OnHoverLost(e);
         }
+
+        private ScheduledDelegate? popOutDelegate;
 
         private void schedulePopOut()
         {

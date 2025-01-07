@@ -29,6 +29,7 @@ namespace osu.Game.Configuration
             SetDefault<APISeasonalBackgrounds>(Static.SeasonalBackgrounds, null);
             SetDefault(Static.TouchInputActive, RuntimeInfo.IsMobile);
             SetDefault<ScoreInfo>(Static.LastLocalUserScore, null);
+            SetDefault<ScoreInfo>(Static.LastAppliedOffsetScore, null);
         }
 
         /// <summary>
@@ -80,5 +81,16 @@ namespace osu.Game.Configuration
         /// Stores the local user's last score (can be completed or aborted).
         /// </summary>
         LastLocalUserScore,
+
+        /// <summary>
+        /// Stores the local user's last score which was used to apply an offset.
+        /// </summary>
+        LastAppliedOffsetScore,
+
+        /// <summary>
+        /// Whether the intro animation for the daily challenge screen has been played once.
+        /// This is reset when a new challenge is up.
+        /// </summary>
+        DailyChallengeIntroPlayed,
     }
 }

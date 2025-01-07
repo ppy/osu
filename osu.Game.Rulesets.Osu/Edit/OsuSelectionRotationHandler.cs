@@ -41,25 +41,26 @@ namespace osu.Game.Rulesets.Osu.Edit
         private void updateState()
         {
             var quad = GeometryUtils.GetSurroundingQuad(selectedMovableObjects);
-            CanRotateSelectionOrigin.Value = quad.Width > 0 || quad.Height > 0;
-            CanRotatePlayfieldOrigin.Value = selectedMovableObjects.Any();
+            CanRotateAroundSelectionOrigin.Value = quad.Width > 0 || quad.Height > 0;
+            CanRotateAroundPlayfieldOrigin.Value = selectedMovableObjects.Any();
         }
 
         private OsuHitObject[]? objectsInRotation;
 
-        private Vector2? defaultOrigin;
         private Dictionary<OsuHitObject, Vector2>? originalPositions;
         private Dictionary<IHasPath, Vector2[]>? originalPathControlPointPositions;
 
         public override void Begin()
         {
-            if (objectsInRotation != null)
+            if (OperationInProgress.Value)
                 throw new InvalidOperationException($"Cannot {nameof(Begin)} a rotate operation while another is in progress!");
+
+            base.Begin();
 
             changeHandler?.BeginChange();
 
             objectsInRotation = selectedMovableObjects.ToArray();
-            defaultOrigin = GeometryUtils.GetSurroundingQuad(objectsInRotation).Centre;
+            DefaultOrigin = GeometryUtils.MinimumEnclosingCircle(objectsInRotation).Item1;
             originalPositions = objectsInRotation.ToDictionary(obj => obj, obj => obj.Position);
             originalPathControlPointPositions = objectsInRotation.OfType<IHasPath>().ToDictionary(
                 obj => obj,
@@ -68,12 +69,12 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         public override void Update(float rotation, Vector2? origin = null)
         {
-            if (objectsInRotation == null)
+            if (!OperationInProgress.Value)
                 throw new InvalidOperationException($"Cannot {nameof(Update)} a rotate operation without calling {nameof(Begin)} first!");
 
-            Debug.Assert(originalPositions != null && originalPathControlPointPositions != null && defaultOrigin != null);
+            Debug.Assert(objectsInRotation != null && originalPositions != null && originalPathControlPointPositions != null && DefaultOrigin != null);
 
-            Vector2 actualOrigin = origin ?? defaultOrigin.Value;
+            Vector2 actualOrigin = origin ?? DefaultOrigin.Value;
 
             foreach (var ho in objectsInRotation)
             {
@@ -91,15 +92,17 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         public override void Commit()
         {
-            if (objectsInRotation == null)
+            if (!OperationInProgress.Value)
                 throw new InvalidOperationException($"Cannot {nameof(Commit)} a rotate operation without calling {nameof(Begin)} first!");
 
             changeHandler?.EndChange();
 
+            base.Commit();
+
             objectsInRotation = null;
             originalPositions = null;
             originalPathControlPointPositions = null;
-            defaultOrigin = null;
+            DefaultOrigin = null;
         }
 
         private IEnumerable<OsuHitObject> selectedMovableObjects => selectedItems.Cast<OsuHitObject>()

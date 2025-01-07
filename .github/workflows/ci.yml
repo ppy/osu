@@ -64,10 +64,11 @@ jobs:
        matrix:
           os:
             - { prettyname: Windows, fullname: windows-latest }
-            - { prettyname: macOS, fullname: macos-latest }
+            # macOS runner performance has gotten unbearably slow so let's turn them off temporarily.
+            # - { prettyname: macOS, fullname: macos-latest }
             - { prettyname: Linux, fullname: ubuntu-latest }
           threadingMode: ['SingleThread', 'MultiThreaded']
-    timeout-minutes: 60
+    timeout-minutes: 120
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -87,7 +88,7 @@ jobs:
       # Attempt to upload results even if test fails.
       # https://docs.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions#always
       - name: Upload Test Results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: ${{ always() }}
         with:
           name: osu-test-results-${{matrix.os.prettyname}}-${{matrix.threadingMode}}
@@ -113,16 +114,17 @@ jobs:
           dotnet-version: "8.0.x"
 
       - name: Install .NET workloads
-        run: dotnet workload install maui-android
+        # since windows image 20241113.3.0, not specifying a version here
+        # installs the .NET 7 version of android workload for very unknown reasons.
+        # revisit once we upgrade to .NET 9, it's probably fixed there.
+        run: dotnet workload install android --version (dotnet --version)
 
       - name: Compile
         run: dotnet build -c Debug osu.Android.slnf
 
   build-only-ios:
     name: Build only (iOS)
-    # `macos-13` is required, because the newest Microsoft.iOS.Sdk versions require Xcode 14.3.
-    # TODO: can be changed to `macos-latest` once `macos-13` becomes latest (currently in beta: https://github.com/actions/runner-images/tree/main#available-images)
-    runs-on: macos-13
+    runs-on: macos-latest
     timeout-minutes: 60
     steps:
       - name: Checkout
@@ -134,10 +136,7 @@ jobs:
           dotnet-version: "8.0.x"
 
       - name: Install .NET Workloads
-        run: dotnet workload install maui-ios
-
-      - name: Select Xcode 15.2
-        run: sudo xcode-select -s /Applications/Xcode_15.2.app/Contents/Developer
+        run: dotnet workload install ios --from-rollback-file https://raw.githubusercontent.com/ppy/osu-framework/refs/heads/master/workloads.json
 
       - name: Build
         run: dotnet build -c Debug osu.iOS

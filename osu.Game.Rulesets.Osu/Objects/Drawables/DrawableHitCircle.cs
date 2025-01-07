@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Utils;
 using osu.Game.Graphics.Containers;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -19,6 +20,7 @@ using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -319,5 +321,32 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             {
             }
         }
+
+        #region FOR EDITOR USE ONLY, DO NOT USE FOR ANY OTHER PURPOSE
+
+        internal void SuppressHitAnimations()
+        {
+            UpdateState(ArmedState.Idle);
+            UpdateComboColour();
+
+            // This method is called every frame in editor contexts, thus the lack of need for transforms.
+
+            if (Time.Current >= HitStateUpdateTime)
+            {
+                // More or less matches stable (see https://github.com/peppy/osu-stable-reference/blob/bb57924c1552adbed11ee3d96cdcde47cf96f2b6/osu!/GameplayElements/HitObjects/Osu/HitCircleOsu.cs#L336-L338)
+                AccentColour.Value = Color4.White;
+                Alpha = Interpolation.ValueAt(Time.Current, 1f, 0f, HitStateUpdateTime, HitStateUpdateTime + 700);
+            }
+
+            LifetimeEnd = HitStateUpdateTime + 700;
+        }
+
+        internal void RestoreHitAnimations()
+        {
+            UpdateState(ArmedState.Hit, force: true);
+            UpdateComboColour();
+        }
+
+        #endregion
     }
 }

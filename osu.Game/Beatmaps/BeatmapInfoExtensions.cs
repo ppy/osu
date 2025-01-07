@@ -2,6 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Localisation;
+using osu.Game.Online.API;
+using osu.Game.Rulesets;
 using osu.Game.Screens.Select;
 
 namespace osu.Game.Beatmaps
@@ -48,5 +50,16 @@ namespace osu.Game.Beatmaps
         }
 
         private static string getVersionString(IBeatmapInfo beatmapInfo) => string.IsNullOrEmpty(beatmapInfo.DifficultyName) ? string.Empty : $"[{beatmapInfo.DifficultyName}]";
+
+        /// <summary>
+        /// Get the beatmap info page URL, or <c>null</c> if unavailable.
+        /// </summary>
+        public static string? GetOnlineURL(this IBeatmapInfo beatmapInfo, IAPIProvider api, IRulesetInfo? ruleset = null)
+        {
+            if (beatmapInfo.OnlineID <= 0 || beatmapInfo.BeatmapSet == null)
+                return null;
+
+            return $@"{api.WebsiteRootUrl}/beatmapsets/{beatmapInfo.BeatmapSet.OnlineID}#{ruleset?.ShortName ?? beatmapInfo.Ruleset.ShortName}/{beatmapInfo.OnlineID}";
+        }
     }
 }

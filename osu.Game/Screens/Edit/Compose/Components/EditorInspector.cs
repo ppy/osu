@@ -10,7 +10,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
-    internal partial class EditorInspector : CompositeDrawable
+    public partial class EditorInspector : CompositeDrawable
     {
         protected OsuTextFlowContainer InspectorText = null!;
 

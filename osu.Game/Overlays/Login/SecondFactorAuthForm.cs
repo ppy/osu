@@ -121,9 +121,11 @@ namespace osu.Game.Overlays.Login
 
             codeTextBox.Current.BindValueChanged(code =>
             {
-                if (code.NewValue.Length == 8)
+                string trimmedCode = code.NewValue.Trim();
+
+                if (trimmedCode.Length == 8)
                 {
-                    api.AuthenticateSecondFactor(code.NewValue);
+                    api.AuthenticateSecondFactor(trimmedCode);
                     codeTextBox.Current.Disabled = true;
                 }
             });
@@ -141,7 +143,7 @@ namespace osu.Game.Overlays.Login
 
         protected override void OnFocus(FocusEvent e)
         {
-            Schedule(() => { GetContainingInputManager().ChangeFocus(codeTextBox); });
+            Schedule(() => { GetContainingFocusManager()!.ChangeFocus(codeTextBox); });
         }
     }
 }

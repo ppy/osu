@@ -23,6 +23,7 @@ using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens;
+using osu.Game.Screens.Footer;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Select;
 using osu.Game.Tests.Visual;
@@ -153,6 +154,7 @@ namespace osu.Game.Overlays.FirstRunSetup
 
                 OsuScreenStack stack;
                 OsuLogo logo;
+                ScreenFooter footer;
 
                 Padding = new MarginPadding(5);
 
@@ -166,7 +168,8 @@ namespace osu.Game.Overlays.FirstRunSetup
                             {
                                 RelativePositionAxes = Axes.Both,
                                 Position = new Vector2(0.5f),
-                            })
+                            }),
+                            (typeof(ScreenFooter), footer = new ScreenFooter()),
                         },
                         RelativeSizeAxes = Axes.Both,
                         Children = new Drawable[]
@@ -178,7 +181,8 @@ namespace osu.Game.Overlays.FirstRunSetup
                                 Children = new Drawable[]
                                 {
                                     stack = new OsuScreenStack(),
-                                    logo
+                                    footer,
+                                    logo,
                                 },
                             },
                         }
