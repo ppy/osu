@@ -329,11 +329,9 @@ namespace osu.Desktop.Windows
                 {
                     protocolKey.SetValue(URL_PROTOCOL, string.Empty);
 
-                    using (var defaultIconKey = protocolKey.CreateSubKey(default_icon))
-                        defaultIconKey.SetValue(null, IconPath);
-
-                    using (var openCommandKey = protocolKey.CreateSubKey(SHELL_OPEN_COMMAND))
-                        openCommandKey.SetValue(null, $@"""{exe_path}"" ""%1""");
+                    // clear out old data
+                    protocolKey.DeleteSubKeyTree(default_icon, throwOnMissingSubKey: false);
+                    protocolKey.DeleteSubKeyTree(@"Shell", throwOnMissingSubKey: false);
                 }
 
                 // register a program id for the given protocol
@@ -360,7 +358,6 @@ namespace osu.Desktop.Windows
             {
                 using var classes = Registry.CurrentUser.OpenSubKey(software_classes, true);
                 classes?.DeleteSubKeyTree(ProgramId, throwOnMissingSubKey: false);
-                classes?.DeleteSubKeyTree(Protocol, throwOnMissingSubKey: false);
             }
         }
     }
