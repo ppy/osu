@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing;
 
@@ -41,7 +42,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
 			// High velocity notes are penalised if they are close to other notes
 			// Note density is worked out by taking the time between this note and the previous
 			// and comparing it to the expected time at this note's effective BPM
-			double density = (21000.0 / effectiveBPM) / noteObject.DeltaTime;
+			double density = (21000.0 / effectiveBPM) / Math.Max(1.0, noteObject.DeltaTime);
 			
 			// https://www.desmos.com/calculator/r1ffltv1i6
 			double densityPenalty = DifficultyCalculationUtils.Logistic(density, 0.95, 15);
