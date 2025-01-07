@@ -43,18 +43,20 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
         /// <param name="hitObject">The current hitObject to consider.</param>
         /// <param name="threshold"> The allowable margin of error for determining whether ratios are consistent.</param>
         /// <param name="maxObjectsToCheck">The maximum objects to check per count of consistent ratio.</param>
-        private static double consistentRatioPenalty(TaikoDifficultyHitObject? hitObject, double threshold = 0.01, int maxObjectsToCheck = 64)
+        private static double consistentRatioPenalty(TaikoDifficultyHitObject hitObject, double threshold = 0.01, int maxObjectsToCheck = 64)
         {
             int consistentRatioCount = 0;
             double totalRatioCount = 0.0;
 
-            TaikoDifficultyHitObject? current = hitObject;
+            TaikoDifficultyHitObject current = hitObject;
 
             for (int i = 0; i < maxObjectsToCheck; i++)
             {
-                // If there is no previous or current object to check, break the loop.
-                if (current?.Previous(1) is not TaikoDifficultyHitObject previousHitObject || previousHitObject.Index <= 1)
+                // Break if there is no valid previous object
+                if (current.Index <= 1)
                     break;
+
+                var previousHitObject = (TaikoDifficultyHitObject)current.Previous(1);
 
                 double currentRatio = current.Rhythm.Ratio;
                 double previousRatio = previousHitObject.Rhythm.Ratio;
@@ -67,6 +69,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
                     break;
                 }
 
+                // Move to the previous object
                 current = previousHitObject;
             }
 
