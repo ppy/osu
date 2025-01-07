@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// </summary>
         protected virtual double ReducedStrainBaseline => 0.75;
 
-        protected readonly List<double> sliderStrains = new List<double>();
+        protected readonly List<double> SliderStrains = new List<double>();
 
         protected OsuStrainSkill(Mod[] mods)
             : base(mods)
@@ -61,7 +61,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         public double CountTopWeightedSliders()
         {
-            if (sliderStrains.Count == 0)
+            if (SliderStrains.Count == 0)
                 return 0;
 
             double consistentTopStrain = DifficultyValue() / 10; // What would the top strain be if all strain values were identical
@@ -70,7 +70,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 return 0;
 
             // Use a weighted sum of all strains. Constants are arbitrary and give nice values
-            return sliderStrains.Sum(s => 1.1 / (1 + Math.Exp(-10 * (s / consistentTopStrain - 0.88))));
+            return SliderStrains.Sum(s => 1.1 / (1 + Math.Exp(-10 * (s / consistentTopStrain - 0.88))));
         }
 
         public static double DifficultyToPerformance(double difficulty) => Math.Pow(5.0 * Math.Max(1.0, difficulty / 0.0675) - 4.0, 3.0) / 100000.0;
