@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -66,7 +67,7 @@ namespace osu.Game.Tests.Visual.Metadata
 
         public override Task UserPresenceUpdated(int userId, UserPresence? presence)
         {
-            if (isWatchingUserPresence.Value)
+            if (isWatchingUserPresence.Value || api.Friends.Any(f => f.TargetID == userId))
             {
                 if (presence.HasValue)
                     userStates[userId] = presence.Value;
