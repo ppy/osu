@@ -148,7 +148,7 @@ namespace osu.Game.Screens.Edit.Components
             public LocalisableString TooltipText { get; set; }
         }
 
-        private partial class PlaybackTabControl : OsuTabControl<double>
+        public partial class PlaybackTabControl : OsuTabControl<double>
         {
             private static readonly double[] tempo_values = { 0.25, 0.5, 0.75, 1 };
 

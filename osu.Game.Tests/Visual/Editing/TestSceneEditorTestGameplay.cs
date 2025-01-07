@@ -19,6 +19,7 @@ using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Edit;
+using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Edit.Components.Timelines.Summary;
 using osu.Game.Screens.Edit.GameplayTest;
 using osu.Game.Screens.Play;
@@ -125,6 +126,35 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddStep("start track", () => EditorClock.Start());
             AddAssert("sample playback re-enabled", () => !Editor.SamplePlaybackDisabled.Value);
+        }
+
+        [Test]
+        public void TestGameplayTestResetsPlaybackSpeedAdjustment()
+        {
+            AddStep("start track", () => EditorClock.Start());
+            AddStep("change playback speed", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<PlaybackControl.PlaybackTabControl.PlaybackTabItem>().First());
+                InputManager.Click(MouseButton.Left);
+            });
+            AddAssert("track playback rate is 0.25x", () => Beatmap.Value.Track.AggregateTempo.Value, () => Is.EqualTo(0.25));
+
+            AddStep("click test gameplay button", () =>
+            {
+                var button = Editor.ChildrenOfType<TestGameplayButton>().Single();
+
+                InputManager.MoveMouseTo(button);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            EditorPlayer editorPlayer = null;
+            AddUntilStep("player pushed", () => (editorPlayer = Stack.CurrentScreen as EditorPlayer) != null);
+            AddAssert("editor track stopped", () => !EditorClock.IsRunning);
+            AddAssert("track playback rate is 1x", () => Beatmap.Value.Track.AggregateTempo.Value, () => Is.EqualTo(1));
+
+            AddStep("exit player", () => editorPlayer.Exit());
+            AddUntilStep("current screen is editor", () => Stack.CurrentScreen is Editor);
+            AddAssert("track playback rate is 0.25x", () => Beatmap.Value.Track.AggregateTempo.Value, () => Is.EqualTo(0.25));
         }
 
         [TestCase(2000)] // chosen to be after last object in the map
