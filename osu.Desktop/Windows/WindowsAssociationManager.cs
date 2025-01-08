@@ -190,7 +190,7 @@ namespace osu.Desktop.Windows
                 // register a program id for the given extension
                 using (var programKey = classes.CreateSubKey(programId))
                 {
-                    programKey.SetValue(null, description);
+                    programKey.SetValue(null, description.ToString());
 
                     using (var defaultIconKey = programKey.CreateSubKey(default_icon))
                         defaultIconKey.SetValue(null, iconPath);
