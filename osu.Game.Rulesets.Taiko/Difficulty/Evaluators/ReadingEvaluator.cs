@@ -42,10 +42,13 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
 			// High velocity notes are penalised if they are close to other notes
 			// Note density is worked out by taking the time between this note and the previous
 			// and comparing it to the expected time at this note's effective BPM
-			double density = (21000.0 / effectiveBPM) / Math.Max(1.0, noteObject.DeltaTime);
-			
-			// https://www.desmos.com/calculator/u63f3ntdsi
-			double densityPenalty = DifficultyCalculationUtils.Logistic(density, 0.925, 15);
+			double densityPenalty = 0.0;
+			if (effectiveBPM > 0 && noteObject.DeltaTime > 0)
+			{
+				double density = (21000.0 / effectiveBPM) / noteObject.DeltaTime;
+				// https://www.desmos.com/calculator/u63f3ntdsi
+				densityPenalty = DifficultyCalculationUtils.Logistic(density, 0.925, 15);
+			}
 			
 			double midpointOffset = highVelocity.Center + 8 * densityPenalty;
 			double multiplier = (1.0 + 0.5 * densityPenalty) / (highVelocity.Range / 10);
