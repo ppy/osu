@@ -111,20 +111,29 @@ namespace osu.Game.Screens.Edit
 
             int currentBreak = 0;
 
-            for (int i = 0; i < Beatmap.HitObjects.Count; ++i)
-            {
-                var hitObject = Beatmap.HitObjects[i];
+            IHasComboInformation? lastObj = null;
+            bool comboInformationUpdateRequired = false;
 
+            foreach (var hitObject in Beatmap.HitObjects)
+            {
                 if (hitObject is not IHasComboInformation hasCombo)
                     continue;
 
                 if (currentBreak < breakEnds.Count && hitObject.StartTime >= breakEnds[currentBreak])
                 {
-                    hasCombo.NewCombo = true;
+                    if (!hasCombo.NewCombo)
+                    {
+                        hasCombo.NewCombo = true;
+                        comboInformationUpdateRequired = true;
+                    }
+
                     currentBreak += 1;
                 }
 
-                hasCombo.UpdateComboInformation(i > 0 ? Beatmap.HitObjects[i - 1] as IHasComboInformation : null);
+                if (comboInformationUpdateRequired)
+                    hasCombo.UpdateComboInformation(lastObj);
+
+                lastObj = hasCombo;
             }
         }
     }
