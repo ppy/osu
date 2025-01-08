@@ -576,6 +576,10 @@ namespace osu.Game.Tests.Editing
             {
                 Assert.That(((HitCircle)beatmap.HitObjects[1]).NewCombo, Is.True);
                 Assert.That(((HitCircle)beatmap.HitObjects[2]).NewCombo, Is.True);
+
+                Assert.That(((HitCircle)beatmap.HitObjects[0]).ComboIndex, Is.EqualTo(1));
+                Assert.That(((HitCircle)beatmap.HitObjects[1]).ComboIndex, Is.EqualTo(2));
+                Assert.That(((HitCircle)beatmap.HitObjects[2]).ComboIndex, Is.EqualTo(3));
             });
         }
 
@@ -610,6 +614,9 @@ namespace osu.Game.Tests.Editing
             {
                 Assert.That(beatmap.Breaks, Has.Count.EqualTo(1));
                 Assert.That(((HitCircle)beatmap.HitObjects[1]).NewCombo, Is.True);
+
+                Assert.That(((HitCircle)beatmap.HitObjects[0]).ComboIndex, Is.EqualTo(1));
+                Assert.That(((HitCircle)beatmap.HitObjects[1]).ComboIndex, Is.EqualTo(2));
             });
         }
     }
