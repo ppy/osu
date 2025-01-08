@@ -194,6 +194,17 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
         }
 
         [Test]
+        public void TestDeletingSecondVertexDeletesEntireJuiceStream()
+        {
+            double[] times = { 100, 400 };
+            float[] positions = { 100, 150 };
+            addBlueprintStep(times, positions);
+
+            addDeleteVertexSteps(times[1], positions[1]);
+            AddAssert("juice stream deleted", () => EditorBeatmap.HitObjects, () => Is.Empty);
+        }
+
+        [Test]
         public void TestVertexResampling()
         {
             addBlueprintStep(100, 100, new SliderPath(PathType.PERFECT_CURVE, new[]
