@@ -57,11 +57,10 @@ namespace osu.Game.Online.Rooms
         public double StarRating { get; set; }
 
         /// <summary>
-        /// A non-<c>null</c> value indicates "freestyle" mode where players are able to individually select
-        /// their own choice of beatmap (from the respective beatmap set) and ruleset to play in the room.
+        /// Indicates whether participants in the room are able to pick their own choice of beatmap difficulty and ruleset.
         /// </summary>
         [Key(11)]
-        public int? BeatmapSetID { get; set; }
+        public bool FreeStyle { get; set; }
 
         [SerializationConstructor]
         public MultiplayerPlaylistItem()

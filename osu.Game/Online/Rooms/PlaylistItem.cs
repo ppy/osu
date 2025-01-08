@@ -68,11 +68,10 @@ namespace osu.Game.Online.Rooms
         }
 
         /// <summary>
-        /// A non-<c>null</c> value indicates "freestyle" mode where players are able to individually select
-        /// their own choice of beatmap (from the respective beatmap set) and ruleset to play in the room.
+        /// Indicates whether participants in the room are able to pick their own choice of beatmap difficulty and ruleset.
         /// </summary>
-        [JsonProperty("beatmapset_id")]
-        public int? BeatmapSetId { get; set; }
+        [JsonProperty("freestyle")]
+        public bool FreeStyle { get; set; }
 
         /// <summary>
         /// A beatmap representing this playlist item.
@@ -108,7 +107,7 @@ namespace osu.Game.Online.Rooms
             PlayedAt = item.PlayedAt;
             RequiredMods = item.RequiredMods.ToArray();
             AllowedMods = item.AllowedMods.ToArray();
-            BeatmapSetId = item.BeatmapSetID;
+            FreeStyle = item.FreeStyle;
         }
 
         public void MarkInvalid() => valid.Value = false;
@@ -128,8 +127,7 @@ namespace osu.Game.Online.Rooms
 
         #endregion
 
-        public PlaylistItem With(Optional<long> id = default, Optional<IBeatmapInfo> beatmap = default, Optional<ushort?> playlistOrder = default,
-                                 Optional<int> ruleset = default)
+        public PlaylistItem With(Optional<long> id = default, Optional<IBeatmapInfo> beatmap = default, Optional<ushort?> playlistOrder = default, Optional<int> ruleset = default)
         {
             return new PlaylistItem(beatmap.GetOr(Beatmap))
             {
@@ -141,19 +139,19 @@ namespace osu.Game.Online.Rooms
                 PlayedAt = PlayedAt,
                 AllowedMods = AllowedMods,
                 RequiredMods = RequiredMods,
+                FreeStyle = FreeStyle,
                 valid = { Value = Valid.Value },
-                BeatmapSetId = BeatmapSetId
             };
         }
 
         public bool Equals(PlaylistItem? other)
             => ID == other?.ID
                && Beatmap.OnlineID == other.Beatmap.OnlineID
-               && BeatmapSetId == other.BeatmapSetId
                && RulesetID == other.RulesetID
                && Expired == other.Expired
                && PlaylistOrder == other.PlaylistOrder
                && AllowedMods.SequenceEqual(other.AllowedMods)
-               && RequiredMods.SequenceEqual(other.RequiredMods);
+               && RequiredMods.SequenceEqual(other.RequiredMods)
+               && FreeStyle == other.FreeStyle;
     }
 }

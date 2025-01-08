@@ -111,8 +111,7 @@ namespace osu.Game.Screens.OnlinePlay
                     FreeMods.Value = initialItem.AllowedMods.Select(m => m.ToMod(rulesetInstance)).ToArray();
                 }
 
-                if (initialItem.BeatmapSetId != null)
-                    FreeStyle.Value = true;
+                FreeStyle.Value = initialItem.FreeStyle;
             }
 
             Mods.BindValueChanged(onModsChanged);
@@ -162,7 +161,7 @@ namespace osu.Game.Screens.OnlinePlay
                 RulesetID = Ruleset.Value.OnlineID,
                 RequiredMods = Mods.Value.Select(m => new APIMod(m)).ToArray(),
                 AllowedMods = FreeMods.Value.Select(m => new APIMod(m)).ToArray(),
-                BeatmapSetId = FreeStyle.Value ? Beatmap.Value.BeatmapSetInfo.OnlineID : null
+                FreeStyle = FreeStyle.Value
             };
 
             return SelectItem(item);

@@ -83,11 +83,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 {
                     ID = itemToEdit?.ID ?? 0,
                     BeatmapID = item.Beatmap.OnlineID,
-                    BeatmapSetID = item.BeatmapSetId,
                     BeatmapChecksum = item.Beatmap.MD5Hash,
                     RulesetID = item.RulesetID,
                     RequiredMods = item.RequiredMods.ToArray(),
-                    AllowedMods = item.AllowedMods.ToArray()
+                    AllowedMods = item.AllowedMods.ToArray(),
+                    FreeStyle = item.FreeStyle
                 };
 
                 Task task = itemToEdit != null ? client.EditPlaylistItem(multiplayerItem) : client.AddPlaylistItem(multiplayerItem);
