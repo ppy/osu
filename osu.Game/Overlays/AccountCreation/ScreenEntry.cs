@@ -18,6 +18,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Online.API;
+using osu.Game.Online.Chat;
 using osu.Game.Overlays.Settings;
 using osu.Game.Resources.Localisation.Web;
 using osuTK;
@@ -213,7 +214,7 @@ namespace osu.Game.Overlays.AccountCreation
                                 if (!string.IsNullOrEmpty(errors.Message))
                                     passwordDescription.AddErrors(new[] { errors.Message });
 
-                                game?.OpenUrlExternally($"{errors.Redirect}?username={usernameTextBox.Text}&email={emailTextBox.Text}", true);
+                                game?.OpenUrlExternally($"{errors.Redirect}?username={usernameTextBox.Text}&email={emailTextBox.Text}", LinkWarnMode.NeverWarn);
                             }
                         }
                         else
