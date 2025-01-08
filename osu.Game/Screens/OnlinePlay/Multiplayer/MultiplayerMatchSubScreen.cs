@@ -274,7 +274,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         protected override APIMod[] GetGameplayMods()
         {
             // Using the room's reported status makes the server authoritative.
-            return client.LocalUser?.Mods.Concat(SelectedItem.Value!.RequiredMods).ToArray()!;
+            return client.LocalUser?.Mods != null ? client.LocalUser.Mods.Concat(SelectedItem.Value!.RequiredMods).ToArray() : base.GetGameplayMods();
         }
 
         protected override RulesetInfo GetGameplayRuleset()
