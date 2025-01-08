@@ -67,12 +67,20 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         {
             base.LoadComplete();
 
+            SelectedItem.BindValueChanged(onSelectedItemChanged, true);
             isIdle.BindValueChanged(_ => updatePollingRate(), true);
 
             Room.PropertyChanged += onRoomPropertyChanged;
             updateSetupState();
             updateRoomMaxAttempts();
             updateRoomPlaylist();
+        }
+
+        private void onSelectedItemChanged(ValueChangedEvent<PlaylistItem?> item)
+        {
+            // Simplest for now.
+            UserBeatmap.Value = null;
+            UserRuleset.Value = null;
         }
 
         private void onRoomPropertyChanged(object? sender, PropertyChangedEventArgs e)

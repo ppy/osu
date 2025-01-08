@@ -63,6 +63,7 @@ namespace osu.Game.Screens.OnlinePlay
         {
             private readonly PlaylistItem item;
             private double itemLength;
+            private int beatmapSetId;
 
             public DifficultySelectFilterControl(PlaylistItem item)
             {
@@ -72,8 +73,14 @@ namespace osu.Game.Screens.OnlinePlay
             [BackgroundDependencyLoader]
             private void load(RealmAccess realm)
             {
-                int beatmapId = item.Beatmap.OnlineID;
-                itemLength = realm.Run(r => r.All<BeatmapInfo>().FirstOrDefault(b => b.OnlineID == beatmapId)?.Length ?? 0);
+                realm.Run(r =>
+                {
+                    int beatmapId = item.Beatmap.OnlineID;
+                    BeatmapInfo? beatmap = r.All<BeatmapInfo>().FirstOrDefault(b => b.OnlineID == beatmapId);
+
+                    itemLength = beatmap?.Length ?? 0;
+                    beatmapSetId = beatmap?.BeatmapSet?.OnlineID ?? 0;
+                });
             }
 
             public override FilterCriteria CreateCriteria()
@@ -81,7 +88,7 @@ namespace osu.Game.Screens.OnlinePlay
                 var criteria = base.CreateCriteria();
 
                 // Must be from the same set as the playlist item.
-                criteria.BeatmapSetId = item.BeatmapSetId;
+                criteria.BeatmapSetId = beatmapSetId;
 
                 // Must be within 30s of the playlist item.
                 criteria.Length.Min = itemLength - 30000;

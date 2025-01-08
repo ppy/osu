@@ -403,7 +403,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         private void updateCurrentItem()
         {
             Debug.Assert(client.Room != null);
+
             SelectedItem.Value = Room.Playlist.SingleOrDefault(i => i.ID == client.Room.Settings.PlaylistItemId);
+            UserBeatmap.Value = client.LocalUser?.BeatmapId == null ? null : UserBeatmap.Value;
+            UserRuleset.Value = client.LocalUser?.RulesetId == null ? null : UserRuleset.Value;
         }
 
         private void handleRoomLost() => Schedule(() =>

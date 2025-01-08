@@ -272,21 +272,9 @@ namespace osu.Game.Screens.OnlinePlay.Match
             base.LoadComplete();
 
             SelectedItem.BindValueChanged(_ => Scheduler.AddOnce(OnSelectedItemChanged));
-
-            UserMods.BindValueChanged(_ => Scheduler.AddOnce(updateMods));
-
-            UserBeatmap.BindValueChanged(_ => Scheduler.AddOnce(() =>
-            {
-                updateBeatmap();
-                updateUserStyle();
-            }));
-
-            UserRuleset.BindValueChanged(_ => Scheduler.AddOnce(() =>
-            {
-                updateUserMods();
-                updateRuleset();
-                updateUserStyle();
-            }));
+            UserMods.BindValueChanged(_ => Scheduler.AddOnce(OnSelectedItemChanged));
+            UserBeatmap.BindValueChanged(_ => Scheduler.AddOnce(OnSelectedItemChanged));
+            UserRuleset.BindValueChanged(_ => Scheduler.AddOnce(OnSelectedItemChanged));
 
             beatmapAvailabilityTracker.SelectedItem.BindTo(SelectedItem);
             beatmapAvailabilityTracker.Availability.BindValueChanged(_ => updateBeatmap());
@@ -458,14 +446,6 @@ namespace osu.Game.Screens.OnlinePlay.Match
             if (!this.IsCurrentScreen() || SelectedItem.Value is not PlaylistItem item)
                 return;
 
-            // Reset user style if no longer valid.
-            // Todo: In the future this can be made more lenient, such as allowing a non-null ruleset as the set changes.
-            if (item.BeatmapSetId == null || item.BeatmapSetId != UserBeatmap.Value?.BeatmapSet!.OnlineID)
-            {
-                UserBeatmap.Value = null;
-                UserRuleset.Value = null;
-            }
-
             updateUserMods();
             updateBeatmap();
             updateMods();
@@ -487,10 +467,10 @@ namespace osu.Game.Screens.OnlinePlay.Match
                 UserModsSelectOverlay.IsValidMod = m => allowedMods.Any(a => a.GetType() == m.GetType());
             }
 
-            if (item.BeatmapSetId == null)
-                UserStyleSection?.Hide();
-            else
+            if (item.FreeStyle)
                 UserStyleSection?.Show();
+            else
+                UserStyleSection?.Hide();
         }
 
         private void updateUserMods()
@@ -499,8 +479,13 @@ namespace osu.Game.Screens.OnlinePlay.Match
                 return;
 
             // Remove any user mods that are no longer allowed.
-            var rulesetInstance = GetGameplayRuleset().CreateInstance();
-            var allowedMods = item.AllowedMods.Select(m => m.ToMod(rulesetInstance));
+            Ruleset rulesetInstance = GetGameplayRuleset().CreateInstance();
+            Mod[] allowedMods = item.AllowedMods.Select(m => m.ToMod(rulesetInstance)).ToArray();
+            Mod[] newUserMods = UserMods.Value.Where(m => allowedMods.Any(a => m.GetType() == a.GetType())).ToArray();
+
+            if (newUserMods.SequenceEqual(UserMods.Value))
+                return;
+
             UserMods.Value = UserMods.Value.Where(m => allowedMods.Any(a => m.GetType() == a.GetType())).ToList();
         }
 
