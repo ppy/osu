@@ -5,12 +5,12 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
-using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Utils;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
@@ -75,44 +75,38 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
 
             accentColour = drawableRepeat.AccentColour.GetBoundCopy();
             accentColour.BindValueChanged(accent => icon.Colour = accent.NewValue.Darken(4), true);
-
-            drawableRepeat.ApplyCustomUpdateState += updateStateTransforms;
         }
 
-        private void updateStateTransforms(DrawableHitObject hitObject, ArmedState state)
+        protected override void Update()
         {
+            base.Update();
+
+            if (Time.Current >= drawableRepeat.HitStateUpdateTime && drawableRepeat.State.Value == ArmedState.Hit)
+            {
+                double animDuration = Math.Min(300, drawableRepeat.HitObject.SpanDuration);
+                Scale = new Vector2(Interpolation.ValueAt(Time.Current, 1, 1.5f, drawableRepeat.HitStateUpdateTime, drawableRepeat.HitStateUpdateTime + animDuration, Easing.Out));
+            }
+            else
+                Scale = Vector2.One;
+
             const float move_distance = -12;
+            const float scale_amount = 1.3f;
+
             const double move_out_duration = 35;
             const double move_in_duration = 250;
             const double total = 300;
 
-            switch (state)
-            {
-                case ArmedState.Idle:
-                    main.ScaleTo(1.3f, move_out_duration, Easing.Out)
-                        .Then()
-                        .ScaleTo(1f, move_in_duration, Easing.Out)
-                        .Loop(total - (move_in_duration + move_out_duration));
-                    side
-                        .MoveToX(move_distance, move_out_duration, Easing.Out)
-                        .Then()
-                        .MoveToX(0, move_in_duration, Easing.Out)
-                        .Loop(total - (move_in_duration + move_out_duration));
-                    break;
+            double loopCurrentTime = (Time.Current - drawableRepeat.AnimationStartTime.Value) % total;
 
-                case ArmedState.Hit:
-                    double animDuration = Math.Min(300, drawableRepeat.HitObject.SpanDuration);
-                    this.ScaleTo(1.5f, animDuration, Easing.Out);
-                    break;
-            }
-        }
+            if (loopCurrentTime < move_out_duration)
+                main.Scale = new Vector2(Interpolation.ValueAt(loopCurrentTime, 1, scale_amount, 0, move_out_duration, Easing.Out));
+            else
+                main.Scale = new Vector2(Interpolation.ValueAt(loopCurrentTime, scale_amount, 1f, move_out_duration, move_out_duration + move_in_duration, Easing.Out));
 
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-
-            if (drawableRepeat.IsNotNull())
-                drawableRepeat.ApplyCustomUpdateState -= updateStateTransforms;
+            if (loopCurrentTime < move_out_duration)
+                side.X = Interpolation.ValueAt(loopCurrentTime, 0, move_distance, 0, move_out_duration, Easing.Out);
+            else
+                side.X = Interpolation.ValueAt(loopCurrentTime, move_distance, 0, move_out_duration, move_out_duration + move_in_duration, Easing.Out);
         }
     }
 }
