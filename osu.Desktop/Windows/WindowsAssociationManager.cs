@@ -56,14 +56,13 @@ namespace osu.Desktop.Windows
         /// Installs file and URI associations.
         /// </summary>
         /// <remarks>
-        /// Call <see cref="UpdateDescriptions"/> in a timely fashion to keep descriptions up-to-date and localised.
+        /// Call <see cref="LocaliseDescriptions"/> in a timely fashion to keep descriptions up-to-date and localised.
         /// </remarks>
         public static void InstallAssociations()
         {
             try
             {
                 updateAssociations();
-                updateDescriptions(null); // write default descriptions in case `UpdateDescriptions()` is not called.
                 NotifyShellUpdate();
             }
             catch (Exception e)
@@ -76,17 +75,13 @@ namespace osu.Desktop.Windows
         /// Updates associations with latest definitions.
         /// </summary>
         /// <remarks>
-        /// Call <see cref="UpdateDescriptions"/> in a timely fashion to keep descriptions up-to-date and localised.
+        /// Call <see cref="LocaliseDescriptions"/> in a timely fashion to keep descriptions up-to-date and localised.
         /// </remarks>
         public static void UpdateAssociations()
         {
             try
             {
                 updateAssociations();
-
-                // TODO: Remove once UpdateDescriptions() is called as specified in the xmldoc.
-                updateDescriptions(null); // always write default descriptions, in case of updating from an older version in which file associations were not implemented/installed
-
                 NotifyShellUpdate();
             }
             catch (Exception e)
@@ -95,11 +90,17 @@ namespace osu.Desktop.Windows
             }
         }
 
-        public static void UpdateDescriptions(LocalisationManager localisationManager)
+        // TODO: call this sometime.
+        public static void LocaliseDescriptions(LocalisationManager localisationManager)
         {
             try
             {
-                updateDescriptions(localisationManager);
+                foreach (var association in file_associations)
+                    association.LocaliseDescription(localisationManager);
+
+                foreach (var association in uri_associations)
+                    association.LocaliseDescription(localisationManager);
+
                 NotifyShellUpdate();
             }
             catch (Exception e)
@@ -138,17 +139,6 @@ namespace osu.Desktop.Windows
 
             foreach (var association in uri_associations)
                 association.Install();
-        }
-
-        private static void updateDescriptions(LocalisationManager? localisation)
-        {
-            foreach (var association in file_associations)
-                association.UpdateDescription(getLocalisedString(association.Description));
-
-            foreach (var association in uri_associations)
-                association.UpdateDescription(getLocalisedString(association.Description));
-
-            string getLocalisedString(LocalisableString s) => localisation?.GetLocalisedString(s) ?? s.ToString();
         }
 
         #region Native interop
@@ -200,6 +190,8 @@ namespace osu.Desktop.Windows
                 // register a program id for the given extension
                 using (var programKey = classes.CreateSubKey(programId))
                 {
+                    programKey.SetValue(null, description);
+
                     using (var defaultIconKey = programKey.CreateSubKey(default_icon))
                         defaultIconKey.SetValue(null, iconPath);
 
@@ -219,13 +211,13 @@ namespace osu.Desktop.Windows
                 }
             }
 
-            public void UpdateDescription(string description)
+            public void LocaliseDescription(LocalisationManager localisationManager)
             {
                 using var classes = Registry.CurrentUser.OpenSubKey(software_classes, true);
                 if (classes == null) return;
 
                 using (var programKey = classes.OpenSubKey(programId, true))
-                    programKey?.SetValue(null, description);
+                    programKey?.SetValue(null, localisationManager.GetLocalisedString(description));
             }
 
             /// <summary>
@@ -280,6 +272,7 @@ namespace osu.Desktop.Windows
 
                 using (var protocolKey = classes.CreateSubKey(protocol))
                 {
+                    protocolKey.SetValue(null, $@"URL:{description}");
                     protocolKey.SetValue(url_protocol, string.Empty);
 
                     using (var defaultIconKey = protocolKey.CreateSubKey(default_icon))
@@ -290,13 +283,13 @@ namespace osu.Desktop.Windows
                 }
             }
 
-            public void UpdateDescription(string description)
+            public void LocaliseDescription(LocalisationManager localisationManager)
             {
                 using var classes = Registry.CurrentUser.OpenSubKey(software_classes, true);
                 if (classes == null) return;
 
                 using (var protocolKey = classes.OpenSubKey(protocol, true))
-                    protocolKey?.SetValue(null, $@"URL:{description}");
+                    protocolKey?.SetValue(null, $@"URL:{localisationManager.GetLocalisedString(description)}");
             }
 
             public void Uninstall()
