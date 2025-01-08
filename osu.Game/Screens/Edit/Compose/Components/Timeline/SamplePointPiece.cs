@@ -409,7 +409,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             private void createStateBindables()
             {
-                foreach (string sampleName in HitSampleInfo.AllAdditions)
+                foreach (string sampleName in HitSampleInfo.ALL_ADDITIONS)
                 {
                     var bindable = new Bindable<TernaryState>
                     {
@@ -433,7 +433,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     selectionSampleStates[sampleName] = bindable;
                 }
 
-                banks.AddRange(HitSampleInfo.AllBanks.Prepend(EditorSelectionHandler.HIT_BANK_AUTO));
+                banks.AddRange(HitSampleInfo.ALL_BANKS.Prepend(EditorSelectionHandler.HIT_BANK_AUTO));
             }
 
             private void updateTernaryStates()

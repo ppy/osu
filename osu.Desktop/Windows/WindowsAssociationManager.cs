@@ -61,14 +61,13 @@ namespace osu.Desktop.Windows
         /// Installs file and URI associations.
         /// </summary>
         /// <remarks>
-        /// Call <see cref="UpdateDescriptions"/> in a timely fashion to keep descriptions up-to-date and localised.
+        /// Call <see cref="LocaliseDescriptions"/> in a timely fashion to keep descriptions up-to-date and localised.
         /// </remarks>
         public static void InstallAssociations()
         {
             try
             {
                 updateAssociations();
-                updateDescriptions(null); // write default descriptions in case `UpdateDescriptions()` is not called.
                 NotifyShellUpdate();
             }
             catch (Exception e)
@@ -81,17 +80,13 @@ namespace osu.Desktop.Windows
         /// Updates associations with latest definitions.
         /// </summary>
         /// <remarks>
-        /// Call <see cref="UpdateDescriptions"/> in a timely fashion to keep descriptions up-to-date and localised.
+        /// Call <see cref="LocaliseDescriptions"/> in a timely fashion to keep descriptions up-to-date and localised.
         /// </remarks>
         public static void UpdateAssociations()
         {
             try
             {
                 updateAssociations();
-
-                // TODO: Remove once UpdateDescriptions() is called as specified in the xmldoc.
-                updateDescriptions(null); // always write default descriptions, in case of updating from an older version in which file associations were not implemented/installed
-
                 NotifyShellUpdate();
             }
             catch (Exception e)
@@ -100,11 +95,19 @@ namespace osu.Desktop.Windows
             }
         }
 
-        public static void UpdateDescriptions(LocalisationManager localisationManager)
+        // TODO: call this sometime.
+        public static void LocaliseDescriptions(LocalisationManager localisationManager)
         {
             try
             {
-                updateDescriptions(localisationManager);
+                application_capability.LocaliseDescription(localisationManager);
+
+                foreach (var association in file_associations)
+                    association.LocaliseDescription(localisationManager);
+
+                foreach (var association in uri_associations)
+                    association.LocaliseDescription(localisationManager);
+
                 NotifyShellUpdate();
             }
             catch (Exception e)
@@ -152,19 +155,6 @@ namespace osu.Desktop.Windows
             application_capability.RegisterUriAssociations(uri_associations);
         }
 
-        private static void updateDescriptions(LocalisationManager? localisation)
-        {
-            application_capability.UpdateDescription(getLocalisedString(application_capability.Description));
-
-            foreach (var association in file_associations)
-                association.UpdateDescription(getLocalisedString(association.Description));
-
-            foreach (var association in uri_associations)
-                association.UpdateDescription(getLocalisedString(association.Description));
-
-            string getLocalisedString(LocalisableString s) => localisation?.GetLocalisedString(s) ?? s.ToString();
-        }
-
         #region Native interop
 
         [DllImport("Shell32.dll")]
@@ -188,26 +178,37 @@ namespace osu.Desktop.Windows
 
         #endregion
 
-        private record ApplicationCapability(string UniqueName, string CapabilityPath, LocalisableString Description)
+        private class ApplicationCapability
         {
+            private string uniqueName { get; }
+            private string capabilityPath { get; }
+            private LocalisableString description { get; }
+
+            public ApplicationCapability(string uniqueName, string capabilityPath, LocalisableString description)
+            {
+                this.uniqueName = uniqueName;
+                this.capabilityPath = capabilityPath;
+                this.description = description;
+            }
+
             /// <summary>
             /// Registers an application capability according to <see href="https://learn.microsoft.com/en-us/windows/win32/shell/default-programs#registering-an-application-for-use-with-default-programs">
             /// Registering an Application for Use with Default Programs</see>.
             /// </summary>
             public void Install()
             {
-                using (Registry.CurrentUser.CreateSubKey(CapabilityPath))
+                using (var capability = Registry.CurrentUser.CreateSubKey(capabilityPath))
                 {
-                    // create an empty "capability" key, other methods will fill it with information
+                    capability.SetValue(@"ApplicationDescription", description.ToString());
                 }
 
                 using (var registeredApplications = Registry.CurrentUser.OpenSubKey(software_registered_applications, true))
-                    registeredApplications?.SetValue(UniqueName, CapabilityPath);
+                    registeredApplications?.SetValue(uniqueName, capabilityPath);
             }
 
             public void RegisterFileAssociations(FileAssociation[] associations)
             {
-                using var capability = Registry.CurrentUser.OpenSubKey(CapabilityPath, true);
+                using var capability = Registry.CurrentUser.OpenSubKey(capabilityPath, true);
                 if (capability == null) return;
 
                 using var fileAssociations = capability.CreateSubKey(@"FileAssociations");
@@ -218,7 +219,7 @@ namespace osu.Desktop.Windows
 
             public void RegisterUriAssociations(UriAssociation[] associations)
             {
-                using var capability = Registry.CurrentUser.OpenSubKey(CapabilityPath, true);
+                using var capability = Registry.CurrentUser.OpenSubKey(capabilityPath, true);
                 if (capability == null) return;
 
                 using var urlAssociations = capability.CreateSubKey(@"UrlAssociations");
@@ -227,26 +228,37 @@ namespace osu.Desktop.Windows
                     urlAssociations.SetValue(association.Protocol, association.ProgramId);
             }
 
-            public void UpdateDescription(string description)
+            public void LocaliseDescription(LocalisationManager localisationManager)
             {
-                using (var capability = Registry.CurrentUser.OpenSubKey(CapabilityPath, true))
+                using (var capability = Registry.CurrentUser.OpenSubKey(capabilityPath, true))
                 {
-                    capability?.SetValue(@"ApplicationDescription", description);
+                    capability?.SetValue(@"ApplicationDescription", localisationManager.GetLocalisedString(description));
                 }
             }
 
             public void Uninstall()
             {
                 using (var registeredApplications = Registry.CurrentUser.OpenSubKey(software_registered_applications, true))
-                    registeredApplications?.DeleteValue(UniqueName, throwOnMissingValue: false);
+                    registeredApplications?.DeleteValue(uniqueName, throwOnMissingValue: false);
 
-                Registry.CurrentUser.DeleteSubKeyTree(CapabilityPath, throwOnMissingSubKey: false);
+                Registry.CurrentUser.DeleteSubKeyTree(capabilityPath, throwOnMissingSubKey: false);
             }
         }
 
-        private record FileAssociation(string Extension, LocalisableString Description, string IconPath)
+        private class FileAssociation
         {
             public string ProgramId => $@"{program_id_file_prefix}{Extension}";
+
+            public string Extension { get; }
+            private LocalisableString description { get; }
+            private string iconPath { get; }
+
+            public FileAssociation(string extension, LocalisableString description, string iconPath)
+            {
+                Extension = extension;
+                this.description = description;
+                this.iconPath = iconPath;
+            }
 
             /// <summary>
             /// Installs a file extension association in accordance with https://learn.microsoft.com/en-us/windows/win32/com/-progid--key
@@ -259,8 +271,10 @@ namespace osu.Desktop.Windows
                 // register a program id for the given extension
                 using (var programKey = classes.CreateSubKey(ProgramId))
                 {
+                    programKey.SetValue(null, description.ToString());
+
                     using (var defaultIconKey = programKey.CreateSubKey(default_icon))
-                        defaultIconKey.SetValue(null, IconPath);
+                        defaultIconKey.SetValue(null, iconPath);
 
                     using (var openCommandKey = programKey.CreateSubKey(SHELL_OPEN_COMMAND))
                         openCommandKey.SetValue(null, $@"""{exe_path}"" ""%1""");
@@ -280,13 +294,13 @@ namespace osu.Desktop.Windows
                 }
             }
 
-            public void UpdateDescription(string description)
+            public void LocaliseDescription(LocalisationManager localisationManager)
             {
                 using var classes = Registry.CurrentUser.OpenSubKey(software_classes, true);
                 if (classes == null) return;
 
                 using (var programKey = classes.OpenSubKey(ProgramId, true))
-                    programKey?.SetValue(null, description);
+                    programKey?.SetValue(null, localisationManager.GetLocalisedString(description));
             }
 
             /// <summary>
@@ -307,13 +321,24 @@ namespace osu.Desktop.Windows
             }
         }
 
-        private record UriAssociation(string Protocol, LocalisableString Description, string IconPath)
+        private class UriAssociation
         {
             /// <summary>
             /// "The <c>URL Protocol</c> string value indicates that this key declares a custom pluggable protocol handler."
             /// See https://learn.microsoft.com/en-us/previous-versions/windows/internet-explorer/ie-developer/platform-apis/aa767914(v=vs.85).
             /// </summary>
-            public const string URL_PROTOCOL = @"URL Protocol";
+            private const string url_protocol = @"URL Protocol";
+
+            public string Protocol { get; }
+            private LocalisableString description { get; }
+            private string iconPath { get; }
+
+            public UriAssociation(string protocol, LocalisableString description, string iconPath)
+            {
+                Protocol = protocol;
+                this.description = description;
+                this.iconPath = iconPath;
+            }
 
             public string ProgramId => $@"{program_id_protocol_prefix}.{Protocol}";
 
@@ -327,7 +352,8 @@ namespace osu.Desktop.Windows
 
                 using (var protocolKey = classes.CreateSubKey(Protocol))
                 {
-                    protocolKey.SetValue(URL_PROTOCOL, string.Empty);
+                    protocolKey.SetValue(null, $@"URL:{description}");
+                    protocolKey.SetValue(url_protocol, string.Empty);
 
                     // clear out old data
                     protocolKey.DeleteSubKeyTree(default_icon, throwOnMissingSubKey: false);
@@ -338,20 +364,20 @@ namespace osu.Desktop.Windows
                 using (var programKey = classes.CreateSubKey(ProgramId))
                 {
                     using (var defaultIconKey = programKey.CreateSubKey(default_icon))
-                        defaultIconKey.SetValue(null, IconPath);
+                        defaultIconKey.SetValue(null, iconPath);
 
                     using (var openCommandKey = programKey.CreateSubKey(SHELL_OPEN_COMMAND))
                         openCommandKey.SetValue(null, $@"""{exe_path}"" ""%1""");
                 }
             }
 
-            public void UpdateDescription(string description)
+            public void LocaliseDescription(LocalisationManager localisationManager)
             {
                 using var classes = Registry.CurrentUser.OpenSubKey(software_classes, true);
                 if (classes == null) return;
 
                 using (var protocolKey = classes.OpenSubKey(Protocol, true))
-                    protocolKey?.SetValue(null, $@"URL:{description}");
+                    protocolKey?.SetValue(null, $@"URL:{localisationManager.GetLocalisedString(description)}");
             }
 
             public void Uninstall()
