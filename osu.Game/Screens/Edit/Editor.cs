@@ -871,6 +871,7 @@ namespace osu.Game.Screens.Edit
         {
             base.OnResuming(e);
             setUpBackground();
+            clock.BindAdjustments();
         }
 
         private void setUpBackground()
@@ -929,6 +930,10 @@ namespace osu.Game.Screens.Edit
             base.OnSuspending(e);
             clock.Stop();
             refetchBeatmap();
+            // unfortunately ordering matters here.
+            // this unbind MUST happen after `refetchBeatmap()`, because along other things, `refetchBeatmap()` causes a global working beatmap change,
+            // which causes `EditorClock` to reload the track and automatically reapply adjustments to it.
+            clock.UnbindAdjustments();
         }
 
         private void refetchBeatmap()
