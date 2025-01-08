@@ -33,17 +33,18 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
         public static double EvaluateDifficultyOf(TaikoDifficultyHitObject noteObject)
         {
             double effectiveBPM = Math.Max(1.0, noteObject.EffectiveBPM);
+			// Effective BPM normalised such that base SV 1/4 is 1.0, 1/8 is 2.0 etc.
+			double normalisedBPM = 21000.0 / effectiveBPM;
 
 			var midVelocity = new VelocityRange(360, 480);
             var highVelocity = new VelocityRange(480, 640);
 			
 			double midVelDifficulty = 0.5 * DifficultyCalculationUtils.Logistic(effectiveBPM, midVelocity.Center, 1.0 / (midVelocity.Range / 10));
 
-			// High velocity notes are penalised if they are close to other notes
-			// Note density is worked out by taking the time between this note and the previous
-			// and comparing it to the expected time at this note's effective BPM
-			double density = (21000.0 / effectiveBPM) / Math.Max(1.0, noteObject.DeltaTime);
+			// Density refers to an object's normalised BPM relative to its deltatime
+			double density = normalisedBPM / Math.Max(1.0, noteObject.DeltaTime);
 			
+			// Dense notes are penalised at high velocities
 			// https://www.desmos.com/calculator/u63f3ntdsi
 			double densityPenalty = DifficultyCalculationUtils.Logistic(density, 0.925, 15);
 			
