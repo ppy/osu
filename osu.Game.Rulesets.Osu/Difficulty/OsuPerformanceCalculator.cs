@@ -396,16 +396,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double speedValue = OsuStrainSkill.DifficultyToPerformance(attributes.SpeedDifficulty);
 
-            // Decides a point where the PP value achieved against the speed deviation is considered "abuse".
-            // This is used to cause PP above the abuse point to scale logistically towards the original speed value thus nerfing the value.
-            double abusePoint = 100 + 220 * Math.Pow(22 / speedDeviation.Value, 6.5);
+            // Decides a point where the PP value achieved compared to the speed deviation is assumed to be tapped improperly. Any PP above this point is considered "excess" speed difficulty.
+            // This is used to cause PP above the cutoff to scale logarithmically towards the original speed value thus nerfing the value.
+            double excessSpeedDifficultyCutoff = 100 + 220 * Math.Pow(22 / speedDeviation.Value, 6.5);
 
-            if (speedValue <= abusePoint)
+            if (speedValue <= improperTappingPoint)
                 return 1.0;
 
-            // Use log curve to make additional rise in difficulty less impactful. Rescale values to make curve have correct steepness
             const double scale = 50;
-            double adjustedSpeedValue = scale * (Math.Log((speedValue - abusePoint) / scale + 1) + abusePoint / scale);
+            double adjustedSpeedValue = scale * (Math.Log((speedValue - excessSpeedDifficultyCutoff) / scale + 1) + excessSpeedDifficultyCutoff / scale);
 
             // 200 UR and less are considered tapped correctly to ensure that normal scores will be punished as little as possible
             double lerp = 1 - Math.Clamp((speedDeviation.Value - 20) / (24 - 20), 0, 1);
