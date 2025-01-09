@@ -143,8 +143,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             if (hoveredControlPoint == null)
                 return false;
 
-            hoveredControlPoint.IsSelected.Value = true;
-            ControlPointVisualiser?.DeleteSelected();
+            if (hoveredControlPoint.IsSelected.Value)
+                ControlPointVisualiser?.DeleteSelected();
+            else
+                ControlPointVisualiser?.Delete([hoveredControlPoint.ControlPoint]);
+
             return true;
         }
 
@@ -557,6 +560,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             new PositionChange(HitObject, HitObject.Position + first).Apply(changeHandler);
         }
 
+        // duplicated in `JuiceStreamSelectionBlueprint.convertToStream()`
+        // consider extracting common helper when applying changes here
         private void convertToStream()
         {
             if (editorBeatmap == null || beatDivisor == null)
@@ -627,7 +632,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
         {
-            if (BodyPiece.ReceivePositionalInputAt(screenSpacePos))
+            if (BodyPiece.ReceivePositionalInputAt(screenSpacePos) && DrawableObject.Body.Alpha > 0)
                 return true;
 
             if (ControlPointVisualiser == null)

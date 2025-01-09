@@ -19,6 +19,7 @@ using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Edit;
+using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Edit.Components.Timelines.Summary;
 using osu.Game.Screens.Edit.GameplayTest;
 using osu.Game.Screens.Play;
@@ -127,6 +128,35 @@ namespace osu.Game.Tests.Visual.Editing
             AddAssert("sample playback re-enabled", () => !Editor.SamplePlaybackDisabled.Value);
         }
 
+        [Test]
+        public void TestGameplayTestResetsPlaybackSpeedAdjustment()
+        {
+            AddStep("start track", () => EditorClock.Start());
+            AddStep("change playback speed", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<PlaybackControl.PlaybackTabControl.PlaybackTabItem>().First());
+                InputManager.Click(MouseButton.Left);
+            });
+            AddAssert("track playback rate is 0.25x", () => Beatmap.Value.Track.AggregateTempo.Value, () => Is.EqualTo(0.25));
+
+            AddStep("click test gameplay button", () =>
+            {
+                var button = Editor.ChildrenOfType<TestGameplayButton>().Single();
+
+                InputManager.MoveMouseTo(button);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            EditorPlayer editorPlayer = null;
+            AddUntilStep("player pushed", () => (editorPlayer = Stack.CurrentScreen as EditorPlayer) != null);
+            AddAssert("editor track stopped", () => !EditorClock.IsRunning);
+            AddAssert("track playback rate is 1x", () => Beatmap.Value.Track.AggregateTempo.Value, () => Is.EqualTo(1));
+
+            AddStep("exit player", () => editorPlayer.Exit());
+            AddUntilStep("current screen is editor", () => Stack.CurrentScreen is Editor);
+            AddAssert("track playback rate is 0.25x", () => Beatmap.Value.Track.AggregateTempo.Value, () => Is.EqualTo(0.25));
+        }
+
         [TestCase(2000)] // chosen to be after last object in the map
         [TestCase(22000)] // chosen to be in the middle of the last spinner
         public void TestGameplayTestAtEndOfBeatmap(int offsetFromEnd)
@@ -177,6 +207,7 @@ namespace osu.Game.Tests.Visual.Editing
             // bit of a hack to ensure this test can be ran multiple times without running into UNIQUE constraint failures
             AddStep("set unique difficulty name", () => EditorBeatmap.BeatmapInfo.DifficultyName = Guid.NewGuid().ToString());
 
+            AddStep("start playing track", () => InputManager.Key(Key.Space));
             AddStep("click test gameplay button", () =>
             {
                 var button = Editor.ChildrenOfType<TestGameplayButton>().Single();
@@ -185,11 +216,13 @@ namespace osu.Game.Tests.Visual.Editing
                 InputManager.Click(MouseButton.Left);
             });
             AddUntilStep("save prompt shown", () => DialogOverlay.CurrentDialog is SaveRequiredPopupDialog);
+            AddAssert("track stopped", () => !Beatmap.Value.Track.IsRunning);
 
             AddStep("save changes", () => DialogOverlay.CurrentDialog!.PerformOkAction());
 
             EditorPlayer editorPlayer = null;
             AddUntilStep("player pushed", () => (editorPlayer = Stack.CurrentScreen as EditorPlayer) != null);
+            AddUntilStep("track playing", () => Beatmap.Value.Track.IsRunning);
             AddAssert("beatmap has 1 object", () => editorPlayer.Beatmap.Value.Beatmap.HitObjects.Count == 1);
 
             AddUntilStep("wait for return to editor", () => Stack.CurrentScreen is Editor);

@@ -433,7 +433,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// Finishes the current blueprint selection.
         /// </summary>
         /// <param name="e">The mouse event which triggered end of selection.</param>
-        /// <returns>Whether a click selection was active.</returns>
+        /// <returns>
+        /// Whether the mouse event is considered to be fully handled.
+        /// If the return value is <see langword="false"/>, the standard click / mouse up action will follow.
+        /// </returns>
         private bool endClickSelection(MouseButtonEvent e)
         {
             // If already handled a selection, double-click, or drag, we don't want to perform a mouse up / click action.
@@ -443,14 +446,16 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             if (e.ControlPressed)
             {
-                // if a selection didn't occur, we may want to trigger a deselection.
-
                 // Iterate from the top of the input stack (blueprints closest to the front of the screen first).
                 // Priority is given to already-selected blueprints.
                 foreach (SelectionBlueprint<T> blueprint in SelectionBlueprints.AliveChildren.Where(b => b.IsHovered).OrderByDescending(b => b.IsSelected))
                     return clickSelectionHandled = SelectionHandler.MouseUpSelectionRequested(blueprint, e);
 
-                return false;
+                // can only be reached if there are no hovered blueprints.
+                // in that case, we still want to suppress mouse up / click handling, because when control is pressed,
+                // it is presumed we want to add to existing selection, not remove from it
+                // (unless explicitly control-clicking a selected object, which is handled above).
+                return true;
             }
 
             if (selectedBlueprintAlreadySelectedOnMouseDown && SelectedItems.Count == 1)

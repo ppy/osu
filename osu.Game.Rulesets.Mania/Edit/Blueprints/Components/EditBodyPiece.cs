@@ -3,21 +3,39 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
-using osu.Game.Rulesets.Mania.Skinning.Default;
 
 namespace osu.Game.Rulesets.Mania.Edit.Blueprints.Components
 {
-    public partial class EditBodyPiece : DefaultBodyPiece
+    public partial class EditBodyPiece : CompositeDrawable
     {
+        private readonly Container border;
+
+        public EditBodyPiece()
+        {
+            InternalChildren = new Drawable[]
+            {
+                border = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Masking = true,
+                    BorderThickness = 3,
+                    Child = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Alpha = 0,
+                        AlwaysPresent = true,
+                    },
+                },
+            };
+        }
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            AccentColour.Value = colours.Yellow;
-
-            Background.Alpha = 0.5f;
+            border.BorderColour = colours.YellowDarker;
         }
-
-        protected override Drawable CreateForeground() => base.CreateForeground().With(d => d.Alpha = 0);
     }
 }

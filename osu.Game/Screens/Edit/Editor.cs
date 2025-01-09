@@ -80,8 +80,6 @@ namespace osu.Game.Screens.Edit
 
         public override float BackgroundParallaxAmount => 0.1f;
 
-        public override bool AllowBackButton => false;
-
         public override bool HideOverlaysOnEnter => true;
 
         public override bool DisallowExternalBeatmapRulesetChanges => true;
@@ -195,6 +193,8 @@ namespace osu.Game.Screens.Edit
                 return new UserActivity.ModdingBeatmap(Beatmap.Value.BeatmapInfo);
             }
         }
+
+        protected override bool InitialBackButtonVisibility => false;
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
             => dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
@@ -427,6 +427,29 @@ namespace osu.Game.Screens.Edit
                                         Items = new MenuItem[]
                                         {
                                             new EditorMenuItem(EditorStrings.SetPreviewPointToCurrent, MenuItemType.Standard, SetPreviewPointToCurrentTime),
+                                            new EditorMenuItem(EditorStrings.Bookmarks)
+                                            {
+                                                Items = new MenuItem[]
+                                                {
+                                                    new EditorMenuItem(EditorStrings.AddBookmark, MenuItemType.Standard, addBookmarkAtCurrentTime)
+                                                    {
+                                                        Hotkey = new Hotkey(GlobalAction.EditorAddBookmark),
+                                                    },
+                                                    new EditorMenuItem(EditorStrings.RemoveClosestBookmark, MenuItemType.Destructive, removeBookmarksInProximityToCurrentTime)
+                                                    {
+                                                        Hotkey = new Hotkey(GlobalAction.EditorRemoveClosestBookmark)
+                                                    },
+                                                    new EditorMenuItem(EditorStrings.SeekToPreviousBookmark, MenuItemType.Standard, () => seekBookmark(-1))
+                                                    {
+                                                        Hotkey = new Hotkey(GlobalAction.EditorSeekToPreviousBookmark)
+                                                    },
+                                                    new EditorMenuItem(EditorStrings.SeekToNextBookmark, MenuItemType.Standard, () => seekBookmark(1))
+                                                    {
+                                                        Hotkey = new Hotkey(GlobalAction.EditorSeekToNextBookmark)
+                                                    },
+                                                    new EditorMenuItem(EditorStrings.ResetBookmarks, MenuItemType.Destructive, () => editorBeatmap.Bookmarks.Clear())
+                                                }
+                                            }
                                         }
                                     }
                                 }
@@ -505,6 +528,8 @@ namespace osu.Game.Screens.Edit
 
         public void TestGameplay()
         {
+            clock.Stop();
+
             if (HasUnsavedChanges)
             {
                 dialogOverlay.Push(new SaveRequiredPopupDialog(() => attemptMutationOperation(() =>
@@ -758,6 +783,14 @@ namespace osu.Game.Screens.Edit
                 case GlobalAction.EditorSeekToNextSamplePoint:
                     seekSamplePoint(1);
                     return true;
+
+                case GlobalAction.EditorSeekToPreviousBookmark:
+                    seekBookmark(-1);
+                    return true;
+
+                case GlobalAction.EditorSeekToNextBookmark:
+                    seekBookmark(1);
+                    return true;
             }
 
             if (e.Repeat)
@@ -765,9 +798,12 @@ namespace osu.Game.Screens.Edit
 
             switch (e.Action)
             {
-                case GlobalAction.Back:
-                    // as we don't want to display the back button, manual handling of exit action is required.
-                    this.Exit();
+                case GlobalAction.EditorAddBookmark:
+                    addBookmarkAtCurrentTime();
+                    return true;
+
+                case GlobalAction.EditorRemoveClosestBookmark:
+                    removeBookmarksInProximityToCurrentTime();
                     return true;
 
                 case GlobalAction.EditorCloneSelection:
@@ -802,6 +838,19 @@ namespace osu.Game.Screens.Edit
             return false;
         }
 
+        private void addBookmarkAtCurrentTime()
+        {
+            int bookmark = (int)clock.CurrentTimeAccurate;
+            int idx = editorBeatmap.Bookmarks.BinarySearch(bookmark);
+            if (idx < 0)
+                editorBeatmap.Bookmarks.Insert(~idx, bookmark);
+        }
+
+        private void removeBookmarksInProximityToCurrentTime()
+        {
+            editorBeatmap.Bookmarks.RemoveAll(b => Math.Abs(b - clock.CurrentTimeAccurate) < 2000);
+        }
+
         public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
         }
@@ -817,6 +866,7 @@ namespace osu.Game.Screens.Edit
         {
             base.OnResuming(e);
             dimBackground();
+            clock.BindAdjustments();
         }
 
         private void dimBackground()
@@ -881,6 +931,10 @@ namespace osu.Game.Screens.Edit
             base.OnSuspending(e);
             clock.Stop();
             refetchBeatmap();
+            // unfortunately ordering matters here.
+            // this unbind MUST happen after `refetchBeatmap()`, because along other things, `refetchBeatmap()` causes a global working beatmap change,
+            // which causes `EditorClock` to reload the track and automatically reapply adjustments to it.
+            clock.UnbindAdjustments();
         }
 
         private void refetchBeatmap()
@@ -1137,6 +1191,16 @@ namespace osu.Game.Screens.Edit
                 clock.SeekSmoothlyTo(found.StartTime);
         }
 
+        private void seekBookmark(int direction)
+        {
+            int? targetBookmark = direction < 1
+                ? editorBeatmap.Bookmarks.Cast<int?>().LastOrDefault(b => b < clock.CurrentTimeAccurate)
+                : editorBeatmap.Bookmarks.Cast<int?>().FirstOrDefault(b => b > clock.CurrentTimeAccurate);
+
+            if (targetBookmark != null)
+                clock.SeekSmoothlyTo(targetBookmark.Value);
+        }
+
         private void seekSamplePoint(int direction)
         {
             double currentTime = clock.CurrentTimeAccurate;
@@ -1225,12 +1289,15 @@ namespace osu.Game.Screens.Edit
             saveRelatedMenuItems.Add(save);
             yield return save;
 
-            if (RuntimeInfo.IsDesktop)
+            if (RuntimeInfo.OS != RuntimeInfo.Platform.Android)
             {
                 var export = createExportMenu();
                 saveRelatedMenuItems.AddRange(export.Items);
                 yield return export;
+            }
 
+            if (RuntimeInfo.IsDesktop)
+            {
                 var externalEdit = new EditorMenuItem("Edit externally", MenuItemType.Standard, editExternally);
                 saveRelatedMenuItems.Add(externalEdit);
                 yield return externalEdit;

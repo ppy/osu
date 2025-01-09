@@ -17,4 +17,8 @@
     <ProjectReference Include="..\osu.Game\osu.Game.csproj" />
     <ProjectReference Include="..\osu.Game.Rulesets.Osu\osu.Game.Rulesets.Osu.csproj" />
   </ItemGroup>
+  <ItemGroup Label="Package References">
+    <PackageReference Include="DeepEqual" Version="2.0.0" />
+    <PackageReference Include="Moq" Version="4.17.2" />
+  </ItemGroup>
 </Project>
