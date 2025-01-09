@@ -3,6 +3,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -31,10 +32,11 @@ namespace osu.Game.Online.Metadata
 
         private readonly string endpoint;
 
+        [Resolved]
+        private IAPIProvider api { get; set; } = null!;
+
         private IHubClientConnector? connector;
-
         private Bindable<int> lastQueueId = null!;
-
         private IBindable<APIUser> localUser = null!;
         private IBindable<UserActivity?> userActivity = null!;
         private IBindable<UserStatus?>? userStatus;
@@ -47,7 +49,7 @@ namespace osu.Game.Online.Metadata
         }
 
         [BackgroundDependencyLoader]
-        private void load(IAPIProvider api, OsuConfigManager config)
+        private void load(OsuConfigManager config)
         {
             // Importantly, we are intentionally not using MessagePack here to correctly support derived class serialization.
             // More information on the limitations / reasoning can be found in osu-server-spectator's initialisation code.
@@ -226,7 +228,15 @@ namespace osu.Game.Online.Metadata
                     throw new OperationCanceledException();
 
                 // must be scheduled before any remote calls to avoid mis-ordering.
-                Schedule(() => userStates.Clear());
+                Schedule(() =>
+                {
+                    foreach (int userId in userStates.Keys.ToArray())
+                    {
+                        if (api.GetFriend(userId) == null)
+                            userStates.Remove(userId);
+                    }
+                });
+
                 Debug.Assert(connection != null);
                 await connection.InvokeAsync(nameof(IMetadataServer.EndWatchingUserPresence)).ConfigureAwait(false);
                 Logger.Log($@"{nameof(OnlineMetadataClient)} stopped watching user presence", LoggingTarget.Network);
