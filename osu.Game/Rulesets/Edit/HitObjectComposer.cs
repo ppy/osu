@@ -555,13 +555,13 @@ namespace osu.Game.Rulesets.Edit
         public void CommitPlacement(HitObject hitObject)
         {
             EditorBeatmap.PlacementObject.Value = null;
-            new AddHitObjectChange(EditorBeatmap, hitObject).Apply(changeHandler);
+            new AddHitObjectChange(EditorBeatmap, hitObject).Apply(changeHandler, true);
 
             if (autoSeekOnPlacement.Value && EditorClock.CurrentTime < hitObject.StartTime)
                 EditorClock.SeekSmoothlyTo(hitObject.StartTime);
         }
 
-        public void Delete(HitObject hitObject) => new RemoveHitObjectChange(EditorBeatmap, hitObject).Apply(changeHandler);
+        public void Delete(HitObject hitObject) => new RemoveHitObjectChange(EditorBeatmap, hitObject).Apply(changeHandler, true);
 
         #endregion
 
