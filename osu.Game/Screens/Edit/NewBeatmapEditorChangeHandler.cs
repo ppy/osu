@@ -49,7 +49,7 @@ namespace osu.Game.Screens.Edit
             record(change);
 
             if (commitImmediately)
-                UpdateState();
+                SaveState();
         }
 
         /// <summary>
