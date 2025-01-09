@@ -16,6 +16,7 @@ using osu.Game.Extensions;
 using osu.Game.IO.Serialization;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Screens.Edit.Changes;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
 
 namespace osu.Game.Screens.Edit.Compose
@@ -30,6 +31,9 @@ namespace osu.Game.Screens.Edit.Compose
 
         [Resolved]
         private IGameplaySettings globalGameplaySettings { get; set; }
+
+        [Resolved]
+        private NewBeatmapEditorChangeHandler changeHandler { get; set; }
 
         private Bindable<string> clipboard { get; set; }
 
@@ -126,7 +130,7 @@ namespace osu.Game.Screens.Edit.Compose
                 return;
 
             Copy();
-            EditorBeatmap.RemoveRange(EditorBeatmap.SelectedHitObjects.ToArray());
+            new RemoveRangeHitObjectChange(EditorBeatmap, EditorBeatmap.SelectedHitObjects.ToArray()).Apply(changeHandler, true);
         }
 
         public override void Copy()
@@ -159,7 +163,7 @@ namespace osu.Game.Screens.Edit.Compose
 
             EditorBeatmap.SelectedHitObjects.Clear();
 
-            EditorBeatmap.AddRange(objects);
+            new AddRangeHitObjectChange(EditorBeatmap, objects).Apply(changeHandler);
             EditorBeatmap.SelectedHitObjects.AddRange(objects);
 
             EditorBeatmap.EndChange();

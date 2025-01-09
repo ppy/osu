@@ -15,6 +15,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Screens.Edit.Changes;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
@@ -40,7 +41,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             SelectedItems.CollectionChanged += onSelectedItemsChanged;
         }
 
-        protected override void DeleteItems(IEnumerable<HitObject> items) => EditorBeatmap.RemoveRange(items);
+        protected override void DeleteItems(IEnumerable<HitObject> items) => new RemoveRangeHitObjectChange(EditorBeatmap, items).Apply(ChangeHandler, true);
 
         #region Selection State
 
