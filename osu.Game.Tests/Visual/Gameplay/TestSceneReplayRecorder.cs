@@ -75,7 +75,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
-        [Explicit]
+        [Explicit("Making this test work in a headless context is high effort due to rate adjustment requirements not aligning with the global fast clock. StopwatchClock usage would need to be replace with a rate adjusting clock that still reads from the parent clock. High effort for a test which likely will not see any changes to covered code for some years.")]
         public void TestSlowClockStillRecordsFramesInRealtime()
         {
             ScheduledDelegate moveFunction = null;
