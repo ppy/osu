@@ -56,16 +56,16 @@ namespace osu.Game.Tests.Visual.Components
         [Test]
         public void TestNotifications()
         {
-            AddStep("bring friend 1 online", () => metadataClient.UserPresenceUpdated(1, new UserPresence { Status = UserStatus.Online }));
+            AddStep("bring friend 1 online", () => metadataClient.FriendPresenceUpdated(1, new UserPresence { Status = UserStatus.Online }));
             AddUntilStep("wait for notification", () => notificationOverlay.AllNotifications.Count(), () => Is.EqualTo(1));
-            AddStep("bring friend 1 offline", () => metadataClient.UserPresenceUpdated(1, null));
+            AddStep("bring friend 1 offline", () => metadataClient.FriendPresenceUpdated(1, null));
             AddUntilStep("wait for notification", () => notificationOverlay.AllNotifications.Count(), () => Is.EqualTo(2));
         }
 
         [Test]
         public void TestSingleUserNotificationOpensChat()
         {
-            AddStep("bring friend 1 online", () => metadataClient.UserPresenceUpdated(1, new UserPresence { Status = UserStatus.Online }));
+            AddStep("bring friend 1 online", () => metadataClient.FriendPresenceUpdated(1, new UserPresence { Status = UserStatus.Online }));
             AddUntilStep("wait for notification", () => notificationOverlay.AllNotifications.Count(), () => Is.EqualTo(1));
 
             AddStep("click notification", () =>
@@ -83,8 +83,8 @@ namespace osu.Game.Tests.Visual.Components
         {
             AddStep("bring friends 1 & 2 online", () =>
             {
-                metadataClient.UserPresenceUpdated(1, new UserPresence { Status = UserStatus.Online });
-                metadataClient.UserPresenceUpdated(2, new UserPresence { Status = UserStatus.Online });
+                metadataClient.FriendPresenceUpdated(1, new UserPresence { Status = UserStatus.Online });
+                metadataClient.FriendPresenceUpdated(2, new UserPresence { Status = UserStatus.Online });
             });
 
             AddUntilStep("wait for notification", () => notificationOverlay.AllNotifications.Count(), () => Is.EqualTo(1));
@@ -112,7 +112,7 @@ namespace osu.Game.Tests.Visual.Components
             AddStep("bring friends 1-10 online", () =>
             {
                 for (int i = 1; i <= 10; i++)
-                    metadataClient.UserPresenceUpdated(i, new UserPresence { Status = UserStatus.Online });
+                    metadataClient.FriendPresenceUpdated(i, new UserPresence { Status = UserStatus.Online });
             });
 
             AddUntilStep("wait for notification", () => notificationOverlay.AllNotifications.Count(), () => Is.EqualTo(1));
@@ -120,7 +120,7 @@ namespace osu.Game.Tests.Visual.Components
             AddStep("bring friends 1-10 offline", () =>
             {
                 for (int i = 1; i <= 10; i++)
-                    metadataClient.UserPresenceUpdated(i, null);
+                    metadataClient.FriendPresenceUpdated(i, null);
             });
 
             AddUntilStep("wait for notification", () => notificationOverlay.AllNotifications.Count(), () => Is.EqualTo(2));

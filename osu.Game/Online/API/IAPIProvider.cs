@@ -153,13 +153,6 @@ namespace osu.Game.Online.API
         IChatClient GetChatClient();
 
         /// <summary>
-        /// Retrieves a friend from a given user ID.
-        /// </summary>
-        /// <param name="userId">The friend's user ID.</param>
-        /// <returns>The <see cref="APIRelation"/> object representing the friend, if any.</returns>
-        APIRelation? GetFriend(int userId);
-
-        /// <summary>
         /// Create a new user account. This is a blocking operation.
         /// </summary>
         /// <param name="email">The email to create the account with.</param>

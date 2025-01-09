@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -43,7 +44,10 @@ namespace osu.Game.Online
         private OsuConfigManager config { get; set; } = null!;
 
         private readonly Bindable<bool> notifyOnFriendPresenceChange = new BindableBool();
-        private readonly IBindableDictionary<int, UserPresence> userStates = new BindableDictionary<int, UserPresence>();
+
+        private readonly IBindableList<APIRelation> friends = new BindableList<APIRelation>();
+        private readonly IBindableDictionary<int, UserPresence> friendStates = new BindableDictionary<int, UserPresence>();
+
         private readonly HashSet<APIUser> onlineAlertQueue = new HashSet<APIUser>();
         private readonly HashSet<APIUser> offlineAlertQueue = new HashSet<APIUser>();
 
@@ -56,42 +60,11 @@ namespace osu.Game.Online
 
             config.BindWith(OsuSetting.NotifyOnFriendPresenceChange, notifyOnFriendPresenceChange);
 
-            userStates.BindTo(metadataClient.UserStates);
-            userStates.BindCollectionChanged((_, args) =>
-            {
-                switch (args.Action)
-                {
-                    case NotifyDictionaryChangedAction.Add:
-                        foreach ((int userId, var _) in args.NewItems!)
-                        {
-                            if (api.GetFriend(userId)?.TargetUser is APIUser user)
-                            {
-                                if (!offlineAlertQueue.Remove(user))
-                                {
-                                    onlineAlertQueue.Add(user);
-                                    lastOnlineAlertTime ??= Time.Current;
-                                }
-                            }
-                        }
+            friends.BindTo(api.Friends);
+            friends.BindCollectionChanged(onFriendsChanged, true);
 
-                        break;
-
-                    case NotifyDictionaryChangedAction.Remove:
-                        foreach ((int userId, var _) in args.OldItems!)
-                        {
-                            if (api.GetFriend(userId)?.TargetUser is APIUser user)
-                            {
-                                if (!onlineAlertQueue.Remove(user))
-                                {
-                                    offlineAlertQueue.Add(user);
-                                    lastOfflineAlertTime ??= Time.Current;
-                                }
-                            }
-                        }
-
-                        break;
-                }
-            });
+            friendStates.BindTo(metadataClient.FriendStates);
+            friendStates.BindCollectionChanged(onFriendStatesChanged, true);
         }
 
         protected override void Update()
@@ -100,6 +73,82 @@ namespace osu.Game.Online
 
             alertOnlineUsers();
             alertOfflineUsers();
+        }
+
+        private void onFriendsChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                    foreach (APIRelation friend in e.NewItems!.Cast<APIRelation>())
+                    {
+                        if (friend.TargetUser is not APIUser user)
+                            continue;
+
+                        if (friendStates.TryGetValue(friend.TargetID, out _))
+                            markUserOnline(user);
+                    }
+
+                    break;
+
+                case NotifyCollectionChangedAction.Remove:
+                    foreach (APIRelation friend in e.OldItems!.Cast<APIRelation>())
+                    {
+                        if (friend.TargetUser is not APIUser user)
+                            continue;
+
+                        onlineAlertQueue.Remove(user);
+                        offlineAlertQueue.Remove(user);
+                    }
+
+                    break;
+            }
+        }
+
+        private void onFriendStatesChanged(object? sender, NotifyDictionaryChangedEventArgs<int, UserPresence> e)
+        {
+            switch (e.Action)
+            {
+                case NotifyDictionaryChangedAction.Add:
+                    foreach ((int friendId, _) in e.NewItems!)
+                    {
+                        APIRelation? friend = friends.FirstOrDefault(f => f.TargetID == friendId);
+
+                        if (friend?.TargetUser is APIUser user)
+                            markUserOnline(user);
+                    }
+
+                    break;
+
+                case NotifyDictionaryChangedAction.Remove:
+                    foreach ((int friendId, _) in e.OldItems!)
+                    {
+                        APIRelation? friend = friends.FirstOrDefault(f => f.TargetID == friendId);
+
+                        if (friend?.TargetUser is APIUser user)
+                            markUserOffline(user);
+                    }
+
+                    break;
+            }
+        }
+
+        private void markUserOnline(APIUser user)
+        {
+            if (!offlineAlertQueue.Remove(user))
+            {
+                onlineAlertQueue.Add(user);
+                lastOnlineAlertTime ??= Time.Current;
+            }
+        }
+
+        private void markUserOffline(APIUser user)
+        {
+            if (!onlineAlertQueue.Remove(user))
+            {
+                offlineAlertQueue.Add(user);
+                lastOfflineAlertTime ??= Time.Current;
+            }
         }
 
         private void alertOnlineUsers()
