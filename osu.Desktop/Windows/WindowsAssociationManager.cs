@@ -17,6 +17,7 @@ namespace osu.Desktop.Windows
     public static class WindowsAssociationManager
     {
         private const string software_classes = @"Software\Classes";
+        private const string software_registered_applications = @"Software\RegisteredApplications";
 
         /// <summary>
         /// Sub key for setting the icon.
@@ -36,7 +37,11 @@ namespace osu.Desktop.Windows
         /// Program ID prefix used for file associations. Should be relatively short since the full program ID has a 39 character limit,
         /// see https://learn.microsoft.com/en-us/windows/win32/com/-progid--key.
         /// </summary>
-        private const string program_id_prefix = "osu.File";
+        private const string program_id_file_prefix = "osu.File";
+
+        private const string program_id_protocol_prefix = "osu.Uri";
+
+        private static readonly ApplicationCapability application_capability = new ApplicationCapability(@"osu", @"Software\ppy\osu\Capabilities", "osu!(lazer)");
 
         private static readonly FileAssociation[] file_associations =
         {
@@ -95,6 +100,8 @@ namespace osu.Desktop.Windows
         {
             try
             {
+                application_capability.LocaliseDescription(localisationManager);
+
                 foreach (var association in file_associations)
                     association.LocaliseDescription(localisationManager);
 
@@ -113,6 +120,8 @@ namespace osu.Desktop.Windows
         {
             try
             {
+                application_capability.Uninstall();
+
                 foreach (var association in file_associations)
                     association.Uninstall();
 
@@ -134,11 +143,16 @@ namespace osu.Desktop.Windows
         /// </summary>
         private static void updateAssociations()
         {
+            application_capability.Install();
+
             foreach (var association in file_associations)
                 association.Install();
 
             foreach (var association in uri_associations)
                 association.Install();
+
+            application_capability.RegisterFileAssociations(file_associations);
+            application_capability.RegisterUriAssociations(uri_associations);
         }
 
         #region Native interop
@@ -164,17 +178,84 @@ namespace osu.Desktop.Windows
 
         #endregion
 
+        private class ApplicationCapability
+        {
+            private string uniqueName { get; }
+            private string capabilityPath { get; }
+            private LocalisableString description { get; }
+
+            public ApplicationCapability(string uniqueName, string capabilityPath, LocalisableString description)
+            {
+                this.uniqueName = uniqueName;
+                this.capabilityPath = capabilityPath;
+                this.description = description;
+            }
+
+            /// <summary>
+            /// Registers an application capability according to <see href="https://learn.microsoft.com/en-us/windows/win32/shell/default-programs#registering-an-application-for-use-with-default-programs">
+            /// Registering an Application for Use with Default Programs</see>.
+            /// </summary>
+            public void Install()
+            {
+                using (var capability = Registry.CurrentUser.CreateSubKey(capabilityPath))
+                {
+                    capability.SetValue(@"ApplicationDescription", description.ToString());
+                }
+
+                using (var registeredApplications = Registry.CurrentUser.OpenSubKey(software_registered_applications, true))
+                    registeredApplications?.SetValue(uniqueName, capabilityPath);
+            }
+
+            public void RegisterFileAssociations(FileAssociation[] associations)
+            {
+                using var capability = Registry.CurrentUser.OpenSubKey(capabilityPath, true);
+                if (capability == null) return;
+
+                using var fileAssociations = capability.CreateSubKey(@"FileAssociations");
+
+                foreach (var association in associations)
+                    fileAssociations.SetValue(association.Extension, association.ProgramId);
+            }
+
+            public void RegisterUriAssociations(UriAssociation[] associations)
+            {
+                using var capability = Registry.CurrentUser.OpenSubKey(capabilityPath, true);
+                if (capability == null) return;
+
+                using var urlAssociations = capability.CreateSubKey(@"UrlAssociations");
+
+                foreach (var association in associations)
+                    urlAssociations.SetValue(association.Protocol, association.ProgramId);
+            }
+
+            public void LocaliseDescription(LocalisationManager localisationManager)
+            {
+                using (var capability = Registry.CurrentUser.OpenSubKey(capabilityPath, true))
+                {
+                    capability?.SetValue(@"ApplicationDescription", localisationManager.GetLocalisedString(description));
+                }
+            }
+
+            public void Uninstall()
+            {
+                using (var registeredApplications = Registry.CurrentUser.OpenSubKey(software_registered_applications, true))
+                    registeredApplications?.DeleteValue(uniqueName, throwOnMissingValue: false);
+
+                Registry.CurrentUser.DeleteSubKeyTree(capabilityPath, throwOnMissingSubKey: false);
+            }
+        }
+
         private class FileAssociation
         {
-            private string programId => $@"{program_id_prefix}{extension}";
+            public string ProgramId => $@"{program_id_file_prefix}{Extension}";
 
-            private string extension { get; }
+            public string Extension { get; }
             private LocalisableString description { get; }
             private string iconPath { get; }
 
             public FileAssociation(string extension, LocalisableString description, string iconPath)
             {
-                this.extension = extension;
+                Extension = extension;
                 this.description = description;
                 this.iconPath = iconPath;
             }
@@ -188,7 +269,7 @@ namespace osu.Desktop.Windows
                 if (classes == null) return;
 
                 // register a program id for the given extension
-                using (var programKey = classes.CreateSubKey(programId))
+                using (var programKey = classes.CreateSubKey(ProgramId))
                 {
                     programKey.SetValue(null, description.ToString());
 
@@ -199,15 +280,17 @@ namespace osu.Desktop.Windows
                         openCommandKey.SetValue(null, $@"""{exe_path}"" ""%1""");
                 }
 
-                using (var extensionKey = classes.CreateSubKey(extension))
+                using (var extensionKey = classes.CreateSubKey(Extension))
                 {
-                    // set ourselves as the default program
-                    extensionKey.SetValue(null, programId);
+                    // Clear out our existing default ProgramID. Default programs in Windows are handled internally by Explorer,
+                    // so having it here is just confusing and may override user preferences.
+                    if (extensionKey.GetValue(null) is string s && s == ProgramId)
+                        extensionKey.SetValue(null, string.Empty);
 
                     // add to the open with dialog
                     // https://learn.microsoft.com/en-us/windows/win32/shell/how-to-include-an-application-on-the-open-with-dialog-box
                     using (var openWithKey = extensionKey.CreateSubKey(@"OpenWithProgIds"))
-                        openWithKey.SetValue(programId, string.Empty);
+                        openWithKey.SetValue(ProgramId, string.Empty);
                 }
             }
 
@@ -216,7 +299,7 @@ namespace osu.Desktop.Windows
                 using var classes = Registry.CurrentUser.OpenSubKey(software_classes, true);
                 if (classes == null) return;
 
-                using (var programKey = classes.OpenSubKey(programId, true))
+                using (var programKey = classes.OpenSubKey(ProgramId, true))
                     programKey?.SetValue(null, localisationManager.GetLocalisedString(description));
             }
 
@@ -228,18 +311,13 @@ namespace osu.Desktop.Windows
                 using var classes = Registry.CurrentUser.OpenSubKey(software_classes, true);
                 if (classes == null) return;
 
-                using (var extensionKey = classes.OpenSubKey(extension, true))
+                using (var extensionKey = classes.OpenSubKey(Extension, true))
                 {
-                    // clear our default association so that Explorer doesn't show the raw programId to users
-                    // the null/(Default) entry is used for both ProdID association and as a fallback friendly name, for legacy reasons
-                    if (extensionKey?.GetValue(null) is string s && s == programId)
-                        extensionKey.SetValue(null, string.Empty);
-
                     using (var openWithKey = extensionKey?.CreateSubKey(@"OpenWithProgIds"))
-                        openWithKey?.DeleteValue(programId, throwOnMissingValue: false);
+                        openWithKey?.DeleteValue(ProgramId, throwOnMissingValue: false);
                 }
 
-                classes.DeleteSubKeyTree(programId, throwOnMissingSubKey: false);
+                classes.DeleteSubKeyTree(ProgramId, throwOnMissingSubKey: false);
             }
         }
 
@@ -251,16 +329,18 @@ namespace osu.Desktop.Windows
             /// </summary>
             private const string url_protocol = @"URL Protocol";
 
-            private string protocol { get; }
+            public string Protocol { get; }
             private LocalisableString description { get; }
             private string iconPath { get; }
 
             public UriAssociation(string protocol, LocalisableString description, string iconPath)
             {
-                this.protocol = protocol;
+                Protocol = protocol;
                 this.description = description;
                 this.iconPath = iconPath;
             }
+
+            public string ProgramId => $@"{program_id_protocol_prefix}.{Protocol}";
 
             /// <summary>
             /// Registers an URI protocol handler in accordance with https://learn.microsoft.com/en-us/previous-versions/windows/internet-explorer/ie-developer/platform-apis/aa767914(v=vs.85).
@@ -270,15 +350,23 @@ namespace osu.Desktop.Windows
                 using var classes = Registry.CurrentUser.OpenSubKey(software_classes, true);
                 if (classes == null) return;
 
-                using (var protocolKey = classes.CreateSubKey(protocol))
+                using (var protocolKey = classes.CreateSubKey(Protocol))
                 {
                     protocolKey.SetValue(null, $@"URL:{description}");
                     protocolKey.SetValue(url_protocol, string.Empty);
 
-                    using (var defaultIconKey = protocolKey.CreateSubKey(default_icon))
+                    // clear out old data
+                    protocolKey.DeleteSubKeyTree(default_icon, throwOnMissingSubKey: false);
+                    protocolKey.DeleteSubKeyTree(@"Shell", throwOnMissingSubKey: false);
+                }
+
+                // register a program id for the given protocol
+                using (var programKey = classes.CreateSubKey(ProgramId))
+                {
+                    using (var defaultIconKey = programKey.CreateSubKey(default_icon))
                         defaultIconKey.SetValue(null, iconPath);
 
-                    using (var openCommandKey = protocolKey.CreateSubKey(SHELL_OPEN_COMMAND))
+                    using (var openCommandKey = programKey.CreateSubKey(SHELL_OPEN_COMMAND))
                         openCommandKey.SetValue(null, $@"""{exe_path}"" ""%1""");
                 }
             }
@@ -288,14 +376,14 @@ namespace osu.Desktop.Windows
                 using var classes = Registry.CurrentUser.OpenSubKey(software_classes, true);
                 if (classes == null) return;
 
-                using (var protocolKey = classes.OpenSubKey(protocol, true))
+                using (var protocolKey = classes.OpenSubKey(Protocol, true))
                     protocolKey?.SetValue(null, $@"URL:{localisationManager.GetLocalisedString(description)}");
             }
 
             public void Uninstall()
             {
                 using var classes = Registry.CurrentUser.OpenSubKey(software_classes, true);
-                classes?.DeleteSubKeyTree(protocol, throwOnMissingSubKey: false);
+                classes?.DeleteSubKeyTree(ProgramId, throwOnMissingSubKey: false);
             }
         }
     }
