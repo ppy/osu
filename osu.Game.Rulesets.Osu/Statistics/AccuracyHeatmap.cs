@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Osu.Statistics
         private const float rotation = 45;
 
         private BufferedContainer bufferedGrid = null!;
-        private GridContainer? pointGrid;
+        private GridContainer pointGrid = null!;
 
         private readonly ScoreInfo score;
         private readonly IBeatmap playableBeatmap;
@@ -234,7 +234,7 @@ namespace osu.Game.Rulesets.Osu.Statistics
 
         public void AddPoint(Vector2 start, Vector2 end, Vector2 hitPoint, float radius)
         {
-            if (pointGrid == null || pointGrid.Content.Count == 0)
+            if (pointGrid.Content.Count == 0)
                 return;
 
             double angle1 = Math.Atan2(end.Y - hitPoint.Y, hitPoint.X - end.X); // Angle between the end point and the hit point.

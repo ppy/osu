@@ -51,6 +51,16 @@ namespace osu.Game.Rulesets.Osu.Skinning
             scoreProcessor.NewJudgement += updateHeatmap;
         }
 
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (gameplayClockContainer != null)
+                gameplayClockContainer.OnSeek -= initHeatmap;
+
+            scoreProcessor.NewJudgement -= updateHeatmap;
+        }
+
         private void initHeatmap()
         {
             ScoreInfo scoreInfo = new ScoreInfo { BeatmapInfo = beatmap.Value.BeatmapInfo, HitEvents = (List<HitEvent>)scoreProcessor.HitEvents };
