@@ -18,6 +18,7 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Screens.Edit;
+using osu.Game.Screens.Edit.Changes;
 using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
 
@@ -45,7 +46,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         private EditorBeatmap editorBeatmap { get; set; } = null!;
 
         [Resolved]
-        private IEditorChangeHandler? changeHandler { get; set; }
+        private NewBeatmapEditorChangeHandler? changeHandler { get; set; }
 
         [Resolved]
         private HitObjectComposer composer { get; set; } = null!;
@@ -212,6 +213,9 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         private void commit()
         {
+            foreach (var insertedCircle in insertedCircles)
+                changeHandler?.Record(new AddHitObjectChange(editorBeatmap, insertedCircle));
+
             changeHandler?.EndChange();
             committed = true;
             Hide();

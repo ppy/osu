@@ -46,7 +46,7 @@ namespace osu.Game.Screens.Edit
         public void Submit(IRevertibleChange change, bool commitImmediately = false)
         {
             change.Apply();
-            record(change);
+            Record(change);
 
             if (commitImmediately)
                 SaveState();
@@ -163,7 +163,11 @@ namespace osu.Game.Screens.Edit
             CanRedo.Value = redoStack.Count > 0;
         }
 
-        private void record(IRevertibleChange change)
+        /// <summary>
+        /// Adds a change to the history but does not apply it.
+        /// </summary>
+        /// <param name="change">Change to be recorded.</param>
+        public void Record(IRevertibleChange change)
         {
             currentTransaction.Add(change);
         }
