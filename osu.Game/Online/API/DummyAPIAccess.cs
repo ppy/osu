@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Bindables;
@@ -194,8 +193,6 @@ namespace osu.Game.Online.API
         public IHubClientConnector? GetHubConnector(string clientName, string endpoint, bool preferMessagePack) => null;
 
         public IChatClient GetChatClient() => new TestChatClientConnector(this);
-
-        public APIRelation? GetFriend(int userId) => Friends.FirstOrDefault(r => r.TargetID == userId);
 
         public RegistrationRequest.RegistrationRequestErrors? CreateAccount(string email, string username, string password)
         {
