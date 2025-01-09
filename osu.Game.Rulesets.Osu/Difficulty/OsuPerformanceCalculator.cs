@@ -400,7 +400,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // This is used to cause PP above the cutoff to scale logarithmically towards the original speed value thus nerfing the value.
             double excessSpeedDifficultyCutoff = 100 + 220 * Math.Pow(22 / speedDeviation.Value, 6.5);
 
-            if (speedValue <= improperTappingPoint)
+            if (speedValue <= excessSpeedDifficultyCutoff)
                 return 1.0;
 
             const double scale = 50;
