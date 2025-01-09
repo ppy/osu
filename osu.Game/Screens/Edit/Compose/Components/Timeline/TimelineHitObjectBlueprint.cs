@@ -22,6 +22,7 @@ using osu.Game.Overlays;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Screens.Edit.Changes;
 using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
@@ -322,7 +323,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             private Timeline timeline { get; set; } = null!;
 
             [Resolved]
-            private IEditorChangeHandler? changeHandler { get; set; }
+            private NewBeatmapEditorChangeHandler? changeHandler { get; set; }
 
             private ScheduledDelegate? dragOperation;
 
@@ -432,8 +433,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                     if (Precision.AlmostEquals(newVelocity, hasSliderVelocity.SliderVelocityMultiplier))
                                         return;
 
-                                    hasSliderVelocity.SliderVelocityMultiplier = newVelocity;
+                                    new SliderVelocityMultiplierChange(hasSliderVelocity, newVelocity).Apply(changeHandler);
                                     beatmap.Update(hitObject);
+                                    changeHandler?.RecordUpdate(hitObject);
                                 }
                                 else
                                 {
@@ -444,8 +446,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                     if (proposedCount == repeatHitObject.RepeatCount || Precision.AlmostEquals(lengthOfOneRepeat, 0))
                                         return;
 
-                                    repeatHitObject.RepeatCount = proposedCount;
+                                    new RepeatCountChange(repeatHitObject, proposedCount).Apply(changeHandler);
                                     beatmap.Update(hitObject);
+                                    changeHandler?.RecordUpdate(hitObject);
                                 }
 
                                 break;
@@ -456,8 +459,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                 if (endTimeHitObject.EndTime == snappedTime)
                                     return;
 
-                                endTimeHitObject.Duration = snappedTime - hitObject.StartTime;
+                                new DurationChange(endTimeHitObject, snappedTime - hitObject.StartTime).Apply(changeHandler);
                                 beatmap.Update(hitObject);
+                                changeHandler?.RecordUpdate(hitObject);
                                 break;
                         }
                     }
