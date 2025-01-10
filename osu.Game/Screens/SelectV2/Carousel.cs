@@ -80,7 +80,7 @@ namespace osu.Game.Screens.SelectV2
         /// <remarks>
         /// Note that an <see cref="ICarouselFilter"/> may add new items which are displayed but not tracked in this list.
         /// </remarks>
-        protected readonly BindableList<CarouselItem> Items = new BindableList<CarouselItem>();
+        protected readonly BindableList<object> Items = new BindableList<object>();
 
         /// <summary>
         /// The currently selected model.
@@ -143,6 +143,13 @@ namespace osu.Game.Screens.SelectV2
         /// <returns>The manifested drawable.</returns>
         protected abstract Drawable GetDrawableForDisplay(CarouselItem item);
 
+        /// <summary>
+        /// Create an internal carousel representation for the provided model object.
+        /// </summary>
+        /// <param name="model">The model.</param>
+        /// <returns>A <see cref="CarouselItem"/> representing the model.</returns>
+        protected abstract CarouselItem CreateCarouselItemForModel(object model);
+
         #region Filtering and display preparation
 
         private Task filterTask = Task.CompletedTask;
@@ -161,7 +168,7 @@ namespace osu.Game.Screens.SelectV2
             }
 
             Stopwatch stopwatch = Stopwatch.StartNew();
-            IEnumerable<CarouselItem> items = new List<CarouselItem>(Items);
+            IEnumerable<CarouselItem> items = new List<CarouselItem>(Items.Select(CreateCarouselItemForModel));
 
             await Task.Run(async () =>
             {

@@ -60,6 +60,8 @@ namespace osu.Game.Screens.SelectV2
             return drawable;
         }
 
+        protected override CarouselItem CreateCarouselItemForModel(object model) => new BeatmapCarouselItem(model);
+
         private void beatmapSetsChanged(object? beatmaps, NotifyCollectionChangedEventArgs changed)
         {
             // TODO: moving management of BeatmapInfo tracking to BeatmapStore might be something we want to consider.
@@ -70,7 +72,7 @@ namespace osu.Game.Screens.SelectV2
             switch (changed.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    Items.AddRange(newBeatmapSets!.SelectMany(s => s.Beatmaps).Select(b => new BeatmapCarouselItem(b)));
+                    Items.AddRange(newBeatmapSets!.SelectMany(s => s.Beatmaps));
                     break;
 
                 case NotifyCollectionChangedAction.Remove:
@@ -78,7 +80,7 @@ namespace osu.Game.Screens.SelectV2
                     foreach (var set in beatmapSetInfos!)
                     {
                         foreach (var beatmap in set.Beatmaps)
-                            Items.RemoveAll(i => i.Model is BeatmapInfo bi && beatmap.Equals(bi));
+                            Items.RemoveAll(i => i is BeatmapInfo bi && beatmap.Equals(bi));
                     }
 
                     break;
