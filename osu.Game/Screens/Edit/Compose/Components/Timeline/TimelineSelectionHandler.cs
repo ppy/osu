@@ -12,6 +12,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Screens.Edit.Changes;
 using osuTK.Input;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
@@ -54,8 +55,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             EditorBeatmap.PerformOnSelection(h =>
             {
-                h.StartTime += adjustment;
+                new StartTimeChange(h, h.StartTime + adjustment).Apply(ChangeHandler);
                 EditorBeatmap.Update(h);
+                ChangeHandler?.RecordUpdate(h);
             });
         }
 
