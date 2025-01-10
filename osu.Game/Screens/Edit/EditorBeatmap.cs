@@ -89,7 +89,7 @@ namespace osu.Game.Screens.Edit
 
         public BindableInt PreviewTime { get; }
 
-        private readonly IBeatmapProcessor beatmapProcessor;
+        private IBeatmapProcessor beatmapProcessor;
 
         private readonly Dictionary<HitObject, Bindable<double>> startTimeBindables = new Dictionary<HitObject, Bindable<double>>();
 
@@ -105,8 +105,6 @@ namespace osu.Game.Screens.Edit
                 BeatmapSkin = new EditorBeatmapSkin(skin);
                 BeatmapSkin.BeatmapSkinChanged += SaveState;
             }
-
-            beatmapProcessor = new EditorBeatmapProcessor(this, playableBeatmap.BeatmapInfo.Ruleset.CreateInstance());
 
             foreach (var obj in HitObjects)
                 trackStartTime(obj);
@@ -133,6 +131,12 @@ namespace osu.Game.Screens.Edit
                 BeatmapInfo.Metadata.PreviewTime = s.NewValue;
                 EndChange();
             });
+        }
+
+        [BackgroundDependencyLoader]
+        private void load([CanBeNull] NewBeatmapEditorChangeHandler changeHandler)
+        {
+            beatmapProcessor = new EditorBeatmapProcessor(this, PlayableBeatmap.BeatmapInfo.Ruleset.CreateInstance(), changeHandler);
         }
 
         /// <summary>

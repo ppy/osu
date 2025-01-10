@@ -9,6 +9,7 @@ using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Screens.Edit.Changes;
 
 namespace osu.Game.Screens.Edit
 {
@@ -20,15 +21,18 @@ namespace osu.Game.Screens.Edit
 
         private readonly IBeatmapProcessor? rulesetBeatmapProcessor;
 
+        private readonly NewBeatmapEditorChangeHandler? changeHandler;
+
         /// <summary>
         /// Kept for the purposes of reducing redundant regeneration of automatic breaks.
         /// </summary>
         private HashSet<(double, double)> objectDurationCache = new HashSet<(double, double)>();
 
-        public EditorBeatmapProcessor(EditorBeatmap beatmap, Ruleset ruleset)
+        public EditorBeatmapProcessor(EditorBeatmap beatmap, Ruleset ruleset, NewBeatmapEditorChangeHandler? changeHandler = null)
         {
             Beatmap = beatmap;
-            rulesetBeatmapProcessor = ruleset.CreateBeatmapProcessor(beatmap);
+            rulesetBeatmapProcessor = ruleset.CreateBeatmapProcessor(beatmap, changeHandler);
+            this.changeHandler = changeHandler;
         }
 
         public void PreProcess()
@@ -123,7 +127,7 @@ namespace osu.Game.Screens.Edit
                 {
                     if (!hasCombo.NewCombo)
                     {
-                        hasCombo.NewCombo = true;
+                        new NewComboChange(hasCombo, true).Apply(changeHandler);
                         comboInformationUpdateRequired = true;
                     }
 

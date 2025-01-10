@@ -45,11 +45,14 @@ namespace osu.Game.Screens.Edit
         /// <param name="commitImmediately">Whether to commit the current transaction and push it onto the undo stack immediately.</param>
         public void Submit(IRevertibleChange change, bool commitImmediately = false)
         {
+            if (commitImmediately)
+                BeginChange();
+
             change.Apply();
             Record(change);
 
             if (commitImmediately)
-                SaveState();
+                EndChange();
         }
 
         /// <summary>

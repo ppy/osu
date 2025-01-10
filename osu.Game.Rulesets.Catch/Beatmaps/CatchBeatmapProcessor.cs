@@ -7,6 +7,8 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Screens.Edit;
+using osu.Game.Screens.Edit.Changes;
 using osu.Game.Utils;
 
 namespace osu.Game.Rulesets.Catch.Beatmaps
@@ -17,8 +19,8 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
 
         public bool HardRockOffsets { get; set; }
 
-        public CatchBeatmapProcessor(IBeatmap beatmap)
-            : base(beatmap)
+        public CatchBeatmapProcessor(IBeatmap beatmap, NewBeatmapEditorChangeHandler? changeHandler = null)
+            : base(beatmap, changeHandler)
         {
         }
 
@@ -30,8 +32,8 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
             // This is normally enforced by the legacy decoder, but is not enforced by the editor.
             foreach (var obj in Beatmap.HitObjects.OfType<IHasComboInformation>())
             {
-                if (obj is not BananaShower && (lastObj == null || lastObj is BananaShower))
-                    obj.NewCombo = true;
+                if (obj is not BananaShower && (lastObj == null || lastObj is BananaShower) && !obj.NewCombo)
+                    new NewComboChange(obj, true).Apply(ChangeHandler);
                 lastObj = obj;
             }
 
