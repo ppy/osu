@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -19,9 +19,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             this.withSliders = withSliders;
         }
 
+        public static double MaxDifficulty; //Max difficulty of a single object
+
+        public static double SumDifficulty; //Summed difficulty of a single object
+
         private readonly bool withSliders;
 
         private double currentStrain;
+
+        private double maxDifficulty;
+
+        private double sumDifficulty;
 
         private double skillMultiplier => 25.18;
         private double strainDecayBase => 0.15;
@@ -33,7 +41,21 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         protected override double StrainValueAt(DifficultyHitObject current)
         {
             currentStrain *= strainDecay(current.DeltaTime);
-            currentStrain += AimEvaluator.EvaluateDifficultyOf(current, withSliders) * skillMultiplier;
+
+            double currentHitObjectStrain = AimEvaluator.EvaluateDifficultyOf(current, withSliders) * skillMultiplier;
+
+            currentStrain += currentHitObjectStrain;
+
+            sumDifficulty += currentHitObjectStrain;
+
+            if (maxDifficulty < currentHitObjectStrain)
+                maxDifficulty = currentHitObjectStrain;
+
+            if (current.Next(1) is null)
+            {
+                MaxDifficulty = maxDifficulty;
+                SumDifficulty = sumDifficulty;
+            }
 
             return currentStrain;
         }
