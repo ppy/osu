@@ -18,6 +18,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Screens.Edit.Changes;
 using osu.Game.Screens.Edit.Timing;
 using osuTK;
 using osuTK.Graphics;
@@ -63,6 +64,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             [Resolved(canBeNull: true)]
             private EditorBeatmap beatmap { get; set; }
+
+            [Resolved(canBeNull: true)]
+            private NewBeatmapEditorChangeHandler changeHandler { get; set; }
 
             public DifficultyEditPopover(HitObject hitObject)
             {
@@ -128,8 +132,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                     foreach (var h in relevantObjects)
                     {
-                        ((IHasSliderVelocity)h).SliderVelocityMultiplier = val.NewValue.Value;
+                        new SliderVelocityMultiplierChange((IHasSliderVelocity)h, val.NewValue.Value).Apply(changeHandler);
                         beatmap.Update(h);
+                        changeHandler?.RecordUpdate(h);
                     }
 
                     beatmap.EndChange();
