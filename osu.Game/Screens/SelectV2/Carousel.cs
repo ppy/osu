@@ -24,7 +24,7 @@ namespace osu.Game.Screens.SelectV2
     /// A highly efficient vertical list display that is used primarily for the song select screen,
     /// but flexible enough to be used for other use cases.
     /// </summary>
-    public abstract partial class Carousel : CompositeDrawable
+    public abstract partial class Carousel<T> : CompositeDrawable
     {
         /// <summary>
         /// A collection of filters which should be run each time a <see cref="QueueFilter"/> is executed.
@@ -80,7 +80,7 @@ namespace osu.Game.Screens.SelectV2
         /// <remarks>
         /// Note that an <see cref="ICarouselFilter"/> may add new items which are displayed but not tracked in this list.
         /// </remarks>
-        protected readonly BindableList<object> Items = new BindableList<object>();
+        protected readonly BindableList<T> Items = new BindableList<T>();
 
         /// <summary>
         /// The currently selected model.
@@ -148,7 +148,7 @@ namespace osu.Game.Screens.SelectV2
         /// </summary>
         /// <param name="model">The model.</param>
         /// <returns>A <see cref="CarouselItem"/> representing the model.</returns>
-        protected abstract CarouselItem CreateCarouselItemForModel(object model);
+        protected abstract CarouselItem CreateCarouselItemForModel(T model);
 
         #region Filtering and display preparation
 

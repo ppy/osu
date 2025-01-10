@@ -25,7 +25,7 @@ using osuTK.Graphics;
 namespace osu.Game.Screens.SelectV2
 {
     [Cached]
-    public partial class BeatmapCarouselV2 : Carousel
+    public partial class BeatmapCarouselV2 : Carousel<BeatmapInfo>
     {
         private IBindableList<BeatmapSetInfo> detachedBeatmaps = null!;
 
@@ -60,7 +60,7 @@ namespace osu.Game.Screens.SelectV2
             return drawable;
         }
 
-        protected override CarouselItem CreateCarouselItemForModel(object model) => new BeatmapCarouselItem(model);
+        protected override CarouselItem CreateCarouselItemForModel(BeatmapInfo model) => new BeatmapCarouselItem(model);
 
         private void beatmapSetsChanged(object? beatmaps, NotifyCollectionChangedEventArgs changed)
         {
