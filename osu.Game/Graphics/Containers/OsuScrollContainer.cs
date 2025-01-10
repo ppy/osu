@@ -59,11 +59,11 @@ namespace osu.Game.Graphics.Containers
         /// <param name="extraScroll">An added amount to scroll beyond the requirement to bring the target into view.</param>
         public void ScrollIntoView(Drawable d, bool animated = true, float extraScroll = 0)
         {
-            float childPos0 = GetChildPosInContent(d);
-            float childPos1 = GetChildPosInContent(d, d.DrawSize);
+            double childPos0 = GetChildPosInContent(d);
+            double childPos1 = GetChildPosInContent(d, d.DrawSize);
 
-            float minPos = Math.Min(childPos0, childPos1);
-            float maxPos = Math.Max(childPos0, childPos1);
+            double minPos = Math.Min(childPos0, childPos1);
+            double maxPos = Math.Max(childPos0, childPos1);
 
             if (minPos < Current || (minPos > Current && d.DrawSize[ScrollDim] > DisplayableContent))
                 ScrollTo(minPos - extraScroll, animated);

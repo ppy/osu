@@ -114,15 +114,15 @@ namespace osu.Game.Screens.Play.HUD
 
             if (requiresScroll && TrackedScore != null)
             {
-                float scrollTarget = scroll.GetChildPosInContent(TrackedScore) + TrackedScore.DrawHeight / 2 - scroll.DrawHeight / 2;
+                double scrollTarget = scroll.GetChildPosInContent(TrackedScore) + TrackedScore.DrawHeight / 2 - scroll.DrawHeight / 2;
 
                 scroll.ScrollTo(scrollTarget);
             }
 
             const float panel_height = GameplayLeaderboardScore.PANEL_HEIGHT;
 
-            float fadeBottom = scroll.Current + scroll.DrawHeight;
-            float fadeTop = scroll.Current + panel_height;
+            float fadeBottom = (float)(scroll.Current + scroll.DrawHeight);
+            float fadeTop = (float)(scroll.Current + panel_height);
 
             if (scroll.IsScrolledToStart()) fadeTop -= panel_height;
             if (!scroll.IsScrolledToEnd()) fadeBottom -= panel_height;
