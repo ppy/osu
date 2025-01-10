@@ -342,6 +342,29 @@ namespace osu.Game.Online.Rooms
         // Not yet serialised (not implemented).
         private RoomAvailability availability;
 
+        public Room()
+        {
+        }
+
+        /// <summary>
+        /// Creates a <see cref="Room"/> from a <see cref="MultiplayerRoom"/>.
+        /// </summary>
+        public Room(MultiplayerRoom room)
+        {
+            RoomID = room.RoomID;
+            Host = room.Host?.User;
+
+            Name = room.Settings.Name;
+            Password = room.Settings.Password;
+            Type = room.Settings.MatchType;
+            QueueMode = room.Settings.QueueMode;
+            AutoStartDuration = room.Settings.AutoStartDuration;
+            AutoSkip = room.Settings.AutoSkip;
+
+            Playlist = room.Playlist.Select(item => new PlaylistItem(item)).ToArray();
+            CurrentPlaylistItem = Playlist.FirstOrDefault(item => item.ID == room.Settings.PlaylistItemId);
+        }
+
         /// <summary>
         /// Copies values from another <see cref="Room"/> into this one.
         /// </summary>
