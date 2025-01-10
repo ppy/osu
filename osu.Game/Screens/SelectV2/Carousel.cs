@@ -77,7 +77,27 @@ namespace osu.Game.Screens.SelectV2
         /// All items which are to be considered for display in this carousel.
         /// Mutating this list will automatically queue a <see cref="QueueFilter"/>.
         /// </summary>
+        /// <remarks>
+        /// Note that an <see cref="ICarouselFilter"/> may add new items which are displayed but not tracked in this list.
+        /// </remarks>
         protected readonly BindableList<CarouselItem> Items = new BindableList<CarouselItem>();
+
+        /// <summary>
+        /// The currently selected model.
+        /// </summary>
+        /// <remarks>
+        /// Setting this will ensure <see cref="CarouselItem.Selected"/> is set to <c>true</c> only on the matching <see cref="CarouselItem"/>.
+        /// Of note, if no matching item exists all items will be deselected while waiting for potential new item which matches.
+        /// </remarks>
+        public virtual object? CurrentSelection
+        {
+            get => currentSelection;
+            set
+            {
+                currentSelection = value;
+                updateSelection();
+            }
+        }
 
         private List<CarouselItem>? displayedCarouselItems;
 
@@ -169,6 +189,8 @@ namespace osu.Game.Screens.SelectV2
             displayedCarouselItems = items.ToList();
             displayedRange = null;
 
+            updateSelection();
+
             void log(string text) => Logger.Log($"Carousel[op {cts.GetHashCode().ToString().Substring(0, 5)}] {stopwatch.ElapsedMilliseconds} ms: {text}");
         }
 
@@ -183,6 +205,24 @@ namespace osu.Game.Screens.SelectV2
                 yPos += item.DrawHeight + spacing;
             }
         }, cancellationToken).ConfigureAwait(false);
+
+        #endregion
+
+        #region Selection handling
+
+        private object? currentSelection;
+
+        private void updateSelection()
+        {
+            if (displayedCarouselItems == null) return;
+
+            // TODO: this is ugly, we probably should stop exposing CarouselItem externally.
+            foreach (var item in Items)
+                item.Selected.Value = item.Model == currentSelection;
+
+            foreach (var item in displayedCarouselItems)
+                item.Selected.Value = item.Model == currentSelection;
+        }
 
         #endregion
 
