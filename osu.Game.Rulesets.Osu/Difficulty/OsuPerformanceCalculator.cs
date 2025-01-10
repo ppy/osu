@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -133,18 +133,21 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             };
         }
 
+        private const double hard_hit_muliplier = 3.0; //multiplier to balance spike weigth
+        private const double easy_hit_muliplier = 0.7; //multiplier to balance filler weigth
+
         private double computeAimValue(ScoreInfo score, OsuDifficultyAttributes attributes)
         {
             double aimValue = OsuStrainSkill.DifficultyToPerformance(attributes.AimDifficulty);
 
-            double lengthBonus = 0.95 + 0.4 * Math.Min(1.0, totalHits / 2000.0) +
-                                 (totalHits > 2000 ? Math.Log10(totalHits / 2000.0) * 0.5 : 0.0);
-            aimValue *= lengthBonus;
+            double difficultyFactor = Aim.SumDifficulty / totalHits / Aim.MaxDifficulty; //Multiplier to rappresent map consistency
 
-            if (effectiveMissCount > 0)
-                aimValue *= calculateMissPenalty(effectiveMissCount, attributes.AimDifficultStrainCount);
+            double hardHits = totalHits * difficultyFactor;
 
-            double approachRateFactor = 0.0;
+            double easyHits = totalHits - hardHits;
+
+            double approachRateFactor = 0.0; //AR bonus for highr and lower AR
+
             if (attributes.ApproachRate > 10.33)
                 approachRateFactor = 0.3 * (attributes.ApproachRate - 10.33);
             else if (attributes.ApproachRate < 8.0)
@@ -153,7 +156,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (score.Mods.Any(h => h is OsuModRelax))
                 approachRateFactor = 0.0;
 
-            aimValue *= 1.0 + approachRateFactor * lengthBonus; // Buff for longer maps with high AR.
+            double hardLengthBonus = aimValue * 0.0001 * hard_hit_muliplier * hardHits; //Length bonus for hard hit with aimValue * offset
+
+            double easyLengthBonus = aimValue * 0.0001 * easy_hit_muliplier * easyHits; //Length bonus for easy hit with aimValue * offset
+
+            double lengthBonus = hardLengthBonus + easyLengthBonus; //Total length bonus
+
+            lengthBonus *= 1.0 + approachRateFactor;
+
+            aimValue += lengthBonus;
+
+            if (effectiveMissCount > 0)
+                aimValue *= calculateMissPenalty(effectiveMissCount, attributes.AimDifficultStrainCount);
 
             if (score.Mods.Any(m => m is OsuModBlinds))
                 aimValue *= 1.3 + (totalHits * (0.0016 / (1 + 2 * effectiveMissCount)) * Math.Pow(accuracy, 16)) * (1 - 0.003 * attributes.DrainRate * attributes.DrainRate);
@@ -201,18 +215,29 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double speedValue = OsuStrainSkill.DifficultyToPerformance(attributes.SpeedDifficulty);
 
-            double lengthBonus = 0.95 + 0.4 * Math.Min(1.0, totalHits / 2000.0) +
-                                 (totalHits > 2000 ? Math.Log10(totalHits / 2000.0) * 0.5 : 0.0);
-            speedValue *= lengthBonus;
+            double difficultyFactor = Speed.SumDifficulty / totalHits / Speed.MaxDifficulty; //Multiplier to rappresent map consistency
 
-            if (effectiveMissCount > 0)
-                speedValue *= calculateMissPenalty(effectiveMissCount, attributes.SpeedDifficultStrainCount);
+            double hardHits = totalHits * difficultyFactor;
 
-            double approachRateFactor = 0.0;
+            double easyHits = totalHits - hardHits;
+
+            double approachRateFactor = 0.0; //AR bonus for highr and lower AR
+
             if (attributes.ApproachRate > 10.33)
                 approachRateFactor = 0.3 * (attributes.ApproachRate - 10.33);
 
-            speedValue *= 1.0 + approachRateFactor * lengthBonus; // Buff for longer maps with high AR.
+            double hardLengthBonus = speedValue * 0.0001 * hard_hit_muliplier * hardHits; //Length bonus for hard hit with aimValue * offset
+
+            double easyLengthBonus = speedValue * 0.0001 * easy_hit_muliplier * easyHits; //Length bonus for easy hit with aimValue * offset
+
+            double lengthBonus = hardLengthBonus + easyLengthBonus; //Total length bonus
+
+            lengthBonus *= 1.0 + approachRateFactor;
+
+            speedValue += lengthBonus;
+
+            if (effectiveMissCount > 0)
+                speedValue *= calculateMissPenalty(effectiveMissCount, attributes.SpeedDifficultStrainCount);
 
             if (score.Mods.Any(m => m is OsuModBlinds))
             {
