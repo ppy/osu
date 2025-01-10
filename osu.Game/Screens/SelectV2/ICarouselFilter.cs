@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace osu.Game.Screens.SelectV2
 {
     /// <summary>
-    /// An interface representing a filter operation which can be run on a <see cref="Carousel"/>.
+    /// An interface representing a filter operation which can be run on a <see cref="Carousel{T}"/>.
     /// </summary>
     public interface ICarouselFilter
     {

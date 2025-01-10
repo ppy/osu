@@ -6,7 +6,7 @@ using osu.Framework.Graphics;
 namespace osu.Game.Screens.SelectV2
 {
     /// <summary>
-    /// An interface to be attached to any <see cref="Drawable"/>s which are used for display inside a <see cref="Carousel"/>.
+    /// An interface to be attached to any <see cref="Drawable"/>s which are used for display inside a <see cref="Carousel{T}"/>.
     /// </summary>
     public interface ICarouselPanel
     {
@@ -16,7 +16,7 @@ namespace osu.Game.Screens.SelectV2
         double YPosition => Item!.CarouselYPosition;
 
         /// <summary>
-        /// The carousel item this drawable is representing. This is managed by <see cref="Carousel"/> and should not be set manually.
+        /// The carousel item this drawable is representing. This is managed by <see cref="Carousel{T}"/> and should not be set manually.
         /// </summary>
         CarouselItem? Item { get; set; }
     }

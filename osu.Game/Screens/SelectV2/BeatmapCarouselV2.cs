@@ -14,6 +14,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Pooling;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Graphics.Sprites;
@@ -23,6 +24,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.SelectV2
 {
+    [Cached]
     public partial class BeatmapCarouselV2 : Carousel
     {
         private IBindableList<BeatmapSetInfo> detachedBeatmaps = null!;
@@ -102,7 +104,48 @@ namespace osu.Game.Screens.SelectV2
 
     public partial class BeatmapCarouselPanel : PoolableDrawable, ICarouselPanel
     {
-        public CarouselItem? Item { get; set; }
+        [Resolved]
+        private BeatmapCarouselV2 carousel { get; set; } = null!;
+
+        public CarouselItem? Item
+        {
+            get => item;
+            set
+            {
+                item = value;
+
+                selected.UnbindBindings();
+
+                if (item != null)
+                    selected.BindTo(item.Selected);
+            }
+        }
+
+        private readonly BindableBool selected = new BindableBool();
+        private CarouselItem? item;
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            selected.BindValueChanged(value =>
+            {
+                if (value.NewValue)
+                {
+                    BorderThickness = 5;
+                    BorderColour = Color4.Pink;
+                }
+                else
+                {
+                    BorderThickness = 0;
+                }
+            });
+        }
+
+        protected override void FreeAfterUse()
+        {
+            base.FreeAfterUse();
+            Item = null;
+        }
 
         protected override void PrepareForUse()
         {
@@ -111,6 +154,7 @@ namespace osu.Game.Screens.SelectV2
             Debug.Assert(Item != null);
 
             Size = new Vector2(500, Item.DrawHeight);
+            Masking = true;
 
             InternalChildren = new Drawable[]
             {
@@ -127,6 +171,12 @@ namespace osu.Game.Screens.SelectV2
                     Origin = Anchor.CentreLeft,
                 }
             };
+        }
+
+        protected override bool OnClick(ClickEvent e)
+        {
+            carousel.CurrentSelection = Item!.Model;
+            return true;
         }
     }
 
@@ -165,7 +215,7 @@ namespace osu.Game.Screens.SelectV2
 
             CarouselItem? lastItem = null;
 
-            var newItems = new List<CarouselItem>();
+            var newItems = new List<CarouselItem>(items.Count());
 
             foreach (var item in items)
             {
