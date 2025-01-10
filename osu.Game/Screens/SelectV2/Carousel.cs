@@ -94,7 +94,13 @@ namespace osu.Game.Screens.SelectV2
             get => currentSelection;
             set
             {
+                if (currentSelectionCarouselItem != null)
+                    currentSelectionCarouselItem.Selected.Value = false;
+
                 currentSelection = value;
+
+                currentSelectionCarouselItem = null;
+                currentSelectionYPosition = null;
                 updateSelection();
             }
         }
@@ -211,17 +217,37 @@ namespace osu.Game.Screens.SelectV2
         #region Selection handling
 
         private object? currentSelection;
+        private CarouselItem? currentSelectionCarouselItem;
+        private double? currentSelectionYPosition;
 
         private void updateSelection()
         {
+            currentSelectionCarouselItem = null;
+
             if (displayedCarouselItems == null) return;
 
-            // TODO: this is ugly, we probably should stop exposing CarouselItem externally.
-            foreach (var item in Items)
-                item.Selected.Value = item.Model == currentSelection;
-
             foreach (var item in displayedCarouselItems)
-                item.Selected.Value = item.Model == currentSelection;
+            {
+                bool isSelected = item.Model == currentSelection;
+
+                if (isSelected)
+                {
+                    currentSelectionCarouselItem = item;
+
+                    if (currentSelectionYPosition != item.CarouselYPosition)
+                    {
+                        if (currentSelectionYPosition != null)
+                        {
+                            float adjustment = (float)(item.CarouselYPosition - currentSelectionYPosition.Value);
+                            scroll.OffsetScrollPosition(adjustment);
+                        }
+
+                        currentSelectionYPosition = item.CarouselYPosition;
+                    }
+                }
+
+                item.Selected.Value = isSelected;
+            }
         }
 
         #endregion
