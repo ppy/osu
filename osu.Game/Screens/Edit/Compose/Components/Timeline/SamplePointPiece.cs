@@ -24,6 +24,7 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Screens.Edit.Components.TernaryButtons;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Screens.Edit.Changes;
 using osu.Game.Screens.Edit.Timing;
 using osuTK;
 using osuTK.Graphics;
@@ -208,6 +209,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             [Resolved(canBeNull: true)]
             private EditorBeatmap beatmap { get; set; } = null!;
 
+            [Resolved]
+            private NewBeatmapEditorChangeHandler? changeHandler { get; set; }
+
             public SampleEditPopover(HitObject hitObject)
             {
                 this.hitObject = hitObject;
@@ -350,6 +354,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 {
                     updateAction(relevantHitObject, relevantSamples);
                     beatmap.Update(relevantHitObject);
+                    changeHandler?.RecordUpdate(relevantHitObject);
                 }
 
                 beatmap.EndChange();
@@ -363,7 +368,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     {
                         if (relevantSamples[i].Name != HitSampleInfo.HIT_NORMAL && !relevantSamples[i].EditorAutoBank) continue;
 
-                        relevantSamples[i] = relevantSamples[i].With(newBank: newBank);
+                        new ReplaceSampleChange(relevantSamples, i, relevantSamples[i].With(newBank: newBank)).Apply(changeHandler);
                     }
                 });
             }
@@ -381,11 +386,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                         // Addition samples with bank set to auto should inherit the bank of the normal sample
                         if (newBank == EditorSelectionHandler.HIT_BANK_AUTO)
-                        {
-                            relevantSamples[i] = relevantSamples[i].With(newBank: normalBank, newEditorAutoBank: true);
-                        }
+                            new ReplaceSampleChange(relevantSamples, i, relevantSamples[i].With(newBank: normalBank, newEditorAutoBank: true)).Apply(changeHandler);
                         else
-                            relevantSamples[i] = relevantSamples[i].With(newBank: newBank, newEditorAutoBank: false);
+                            new ReplaceSampleChange(relevantSamples, i, relevantSamples[i].With(newBank: newBank, newEditorAutoBank: false)).Apply(changeHandler);
                     }
                 });
             }
@@ -396,7 +399,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 {
                     for (int i = 0; i < relevantSamples.Count; i++)
                     {
-                        relevantSamples[i] = relevantSamples[i].With(newVolume: newVolume);
+                        new ReplaceSampleChange(relevantSamples, i, relevantSamples[i].With(newVolume: newVolume)).Apply(changeHandler);
                     }
                 });
             }
@@ -472,7 +475,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                     // First try inheriting the sample info from the node samples instead of the samples of the hitobject
                     var relevantSample = relevantSamples.FirstOrDefault(s => s.Name != HitSampleInfo.HIT_NORMAL) ?? relevantSamples.FirstOrDefault();
-                    relevantSamples.Add(relevantSample?.With(sampleName) ?? h.CreateHitSampleInfo(sampleName));
+                    new InsertSampleChange(relevantSamples, relevantSamples.Count, relevantSample?.With(sampleName) ?? h.CreateHitSampleInfo(sampleName)).Apply(changeHandler);
                 });
 
                 updateAdditionBankState();
@@ -488,7 +491,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     for (int i = 0; i < relevantSamples.Count; i++)
                     {
                         if (relevantSamples[i].Name == sampleName)
-                            relevantSamples.RemoveAt(i--);
+                        {
+                            new RemoveSampleChange(relevantSamples, i).Apply(changeHandler);
+                            i--;
+                        }
                     }
                 });
 

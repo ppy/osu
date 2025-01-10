@@ -9,16 +9,16 @@ namespace osu.Game.Screens.Edit.Changes
 {
     public class NodeSamplesChange : PropertyChange<IHasRepeats, IList<HitSampleInfo>>
     {
-        private readonly int nodeIndex;
+        public readonly int NodeIndex;
 
         public NodeSamplesChange(IHasRepeats target, int nodeIndex, IList<HitSampleInfo> value)
             : base(target, value)
         {
-            this.nodeIndex = nodeIndex;
+            NodeIndex = nodeIndex;
         }
 
-        protected override IList<HitSampleInfo> ReadValue(IHasRepeats target) => target.NodeSamples[nodeIndex];
+        protected override IList<HitSampleInfo> ReadValue(IHasRepeats target) => target.NodeSamples[NodeIndex];
 
-        protected override void WriteValue(IHasRepeats target, IList<HitSampleInfo> value) => target.NodeSamples[nodeIndex] = value;
+        protected override void WriteValue(IHasRepeats target, IList<HitSampleInfo> value) => target.NodeSamples[NodeIndex] = value;
     }
 }

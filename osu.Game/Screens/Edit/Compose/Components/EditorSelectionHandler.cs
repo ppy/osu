@@ -424,7 +424,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 // Make sure there isn't already an existing sample
                 if (h.Samples.All(s => s.Name != sampleName))
-                    new AddSampleChange(h.Samples, h.CreateHitSampleInfo(sampleName)).Apply(ChangeHandler);
+                    new InsertSampleChange(h.Samples, h.Samples.Count, h.CreateHitSampleInfo(sampleName)).Apply(ChangeHandler);
 
                 if (h is IHasRepeats hasRepeats)
                 {
@@ -439,7 +439,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                         if (existingAddition != null)
                             hitSample = hitSample.With(newBank: existingAddition.Bank, newEditorAutoBank: existingAddition.EditorAutoBank);
 
-                        new AddSampleChange(node, hitSample).Apply(ChangeHandler);
+                        new InsertSampleChange(node, node.Count, hitSample).Apply(ChangeHandler);
                     }
                 }
 
