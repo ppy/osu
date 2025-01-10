@@ -9,11 +9,13 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
+using osu.Game.Rulesets.Catch.Edit.Changes;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Screens.Edit;
+using osu.Game.Screens.Edit.Changes;
 using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
@@ -45,6 +47,9 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
 
         [Resolved]
         protected EditorBeatmap? EditorBeatmap { get; private set; }
+
+        [Resolved]
+        protected NewBeatmapEditorChangeHandler? ChangeHandler { get; private set; }
 
         protected EditablePath(Func<float, double> positionToTime)
         {
@@ -108,14 +113,14 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
             // The value is clamped here by the bindable min and max values.
             // In case the required velocity is too large, the path is not preserved.
             double previousVelocity = svBindable.Value;
-            svBindable.Value = Math.Ceiling(requiredVelocity / svToVelocityFactor);
+            new SliderVelocityMultiplierChange(hitObject, Math.Ceiling(requiredVelocity / svToVelocityFactor)).Apply(ChangeHandler);
 
             // adjust velocity locally, so that once the SV change is applied by applying defaults
             // (triggered by `EditorBeatmap.Update()` call at end of method),
             // it results in the outcome desired by the user.
             double relativeChange = svBindable.Value / previousVelocity;
             double localVelocity = hitObject.Velocity * relativeChange;
-            path.ConvertToSliderPath(hitObject.Path, hitObject.LegacyConvertedY, localVelocity);
+            new ConvertJuiceStreamPathToSliderPathChange(path, hitObject.Path, hitObject.LegacyConvertedY, localVelocity).Apply(ChangeHandler);
 
             if (beatSnapProvider == null) return;
 
@@ -124,6 +129,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
             hitObject.Path.ExpectedDistance.Value = (snappedEndTime - hitObject.StartTime) * localVelocity;
 
             EditorBeatmap?.Update(hitObject);
+            ChangeHandler?.RecordUpdate(hitObject);
         }
 
         public Vector2 ToRelativePosition(Vector2 screenSpacePosition)

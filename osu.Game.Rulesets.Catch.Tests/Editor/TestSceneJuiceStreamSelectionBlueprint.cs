@@ -9,6 +9,7 @@ using osu.Framework.Timing;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Catch.Edit.Blueprints;
 using osu.Game.Rulesets.Catch.Edit.Blueprints.Components;
+using osu.Game.Rulesets.Catch.Edit.Changes;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
@@ -239,7 +240,7 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
                 path.Add(times[i] - times[0], positions[i] - positions[0]);
 
             var sliderPath = new SliderPath();
-            path.ConvertToSliderPath(sliderPath, 0, velocity);
+            new ConvertJuiceStreamPathToSliderPathChange(path, sliderPath, 0, velocity).Apply();
             addBlueprintStep(times[0], positions[0], sliderPath, velocity);
         }
 

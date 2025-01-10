@@ -22,12 +22,6 @@ namespace osu.Game.Rulesets.Catch.Objects
     public class JuiceStreamPath
     {
         /// <summary>
-        /// The height of legacy osu!standard playfield.
-        /// The sliders converted by <see cref="ConvertToSliderPath"/> are vertically contained in this height.
-        /// </summary>
-        internal const float OSU_PLAYFIELD_HEIGHT = 384;
-
-        /// <summary>
         /// The list of vertices of the path, which is represented as a polyline connecting the vertices.
         /// </summary>
         public IReadOnlyList<JuiceStreamPathVertex> Vertices => vertices;
@@ -214,77 +208,6 @@ namespace osu.Game.Rulesets.Catch.Objects
             }
 
             return maximumSlope;
-        }
-
-        /// <summary>
-        /// Convert the path of this <see cref="JuiceStreamPath"/> to a <see cref="SliderPath"/> and write the result to <paramref name="sliderPath"/>.
-        /// The resulting slider is "folded" to make it vertically contained in the playfield `(0..<see cref="OSU_PLAYFIELD_HEIGHT"/>)` assuming the slider start position is <paramref name="sliderStartY"/>.
-        ///
-        /// The velocity of the converted slider is assumed to be <paramref name="velocity"/>.
-        /// To preserve the path, <paramref name="velocity"/> should be at least the value returned by <see cref="ComputeRequiredVelocity"/>.
-        /// </summary>
-        public void ConvertToSliderPath(SliderPath sliderPath, float sliderStartY, double velocity)
-        {
-            const float margin = 1;
-
-            // Note: these two variables and `sliderPath` are modified by the local functions.
-            double currentTime = 0;
-            Vector2 lastPosition = new Vector2(vertices[0].X, 0);
-
-            sliderPath.ControlPoints.Clear();
-            sliderPath.ControlPoints.Add(new PathControlPoint(lastPosition));
-
-            for (int i = 1; i < vertices.Count; i++)
-            {
-                sliderPath.ControlPoints[^1].Type = PathType.LINEAR;
-
-                float deltaX = vertices[i].X - lastPosition.X;
-                double length = (vertices[i].Time - currentTime) * velocity;
-
-                // Should satisfy `deltaX^2 + deltaY^2 = length^2`.
-                // The expression inside the `sqrt` is (almost) non-negative if the slider velocity is large enough.
-                double deltaY = Math.Sqrt(Math.Max(0, length * length - (double)deltaX * deltaX));
-
-                // When `deltaY` is small, one segment is always enough.
-                // This case is handled separately to prevent divide-by-zero.
-                if (deltaY <= OSU_PLAYFIELD_HEIGHT / 2 - margin)
-                {
-                    float nextX = vertices[i].X;
-                    float nextY = (float)(lastPosition.Y + getYDirection() * deltaY);
-                    addControlPoint(nextX, nextY);
-                    continue;
-                }
-
-                // When `deltaY` is large or when the slider velocity is fast, the segment must be partitioned to subsegments to stay in bounds.
-                for (double currentProgress = 0; currentProgress < deltaY;)
-                {
-                    double nextProgress = Math.Min(currentProgress + getMaxDeltaY(), deltaY);
-                    float nextX = (float)(vertices[i - 1].X + nextProgress / deltaY * deltaX);
-                    float nextY = (float)(lastPosition.Y + getYDirection() * (nextProgress - currentProgress));
-                    addControlPoint(nextX, nextY);
-                    currentProgress = nextProgress;
-                }
-            }
-
-            int getYDirection()
-            {
-                float lastSliderY = sliderStartY + lastPosition.Y;
-                return lastSliderY < OSU_PLAYFIELD_HEIGHT / 2 ? 1 : -1;
-            }
-
-            float getMaxDeltaY()
-            {
-                float lastSliderY = sliderStartY + lastPosition.Y;
-                return Math.Max(lastSliderY, OSU_PLAYFIELD_HEIGHT - lastSliderY) - margin;
-            }
-
-            void addControlPoint(float nextX, float nextY)
-            {
-                Vector2 nextPosition = new Vector2(nextX, nextY);
-                sliderPath.ControlPoints.Add(new PathControlPoint(nextPosition));
-                currentTime += Vector2.Distance(lastPosition, nextPosition) / velocity;
-                lastPosition = nextPosition;
-            }
         }
 
         /// <summary>

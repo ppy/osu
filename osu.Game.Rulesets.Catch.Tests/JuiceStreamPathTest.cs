@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using osu.Game.Rulesets.Catch.Edit.Changes;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
@@ -211,7 +212,7 @@ namespace osu.Game.Rulesets.Catch.Tests
                 double requiredVelocity = path.ComputeRequiredVelocity();
                 double velocity = Math.Clamp(requiredVelocity, 1, 100);
 
-                path.ConvertToSliderPath(sliderPath, sliderStartY, velocity);
+                new ConvertJuiceStreamPathToSliderPathChange(path, sliderPath, sliderStartY, velocity).Apply();
 
                 foreach (var point in sliderPath.ControlPoints)
                 {
