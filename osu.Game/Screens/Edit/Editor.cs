@@ -45,6 +45,7 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Edit.Components.Menus;
 using osu.Game.Screens.Edit.Compose;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
@@ -54,7 +55,6 @@ using osu.Game.Screens.Edit.Setup;
 using osu.Game.Screens.Edit.Timing;
 using osu.Game.Screens.Edit.Verify;
 using osu.Game.Screens.OnlinePlay;
-using osu.Game.Screens.Play;
 using osu.Game.Users;
 using osuTK.Input;
 using WebCommonStrings = osu.Game.Resources.Localisation.Web.CommonStrings;
@@ -63,7 +63,7 @@ namespace osu.Game.Screens.Edit
 {
     [Cached(typeof(IBeatSnapProvider))]
     [Cached]
-    public partial class Editor : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>, IKeyBindingHandler<PlatformAction>, IBeatSnapProvider, ISamplePlaybackDisabler, IBeatSyncProvider
+    public partial class Editor : OsuScreen, IKeyBindingHandler<GlobalAction>, IKeyBindingHandler<PlatformAction>, IBeatSnapProvider, ISamplePlaybackDisabler, IBeatSyncProvider
     {
         /// <summary>
         /// An offset applied to waveform visuals to align them with expectations.
@@ -210,6 +210,7 @@ namespace osu.Game.Screens.Edit
         private OnScreenDisplay onScreenDisplay { get; set; }
 
         private Bindable<float> editorBackgroundDim;
+        private Bindable<bool> editorShowStoryboard;
         private Bindable<bool> editorHitMarkers;
         private Bindable<bool> editorAutoSeekOnPlacement;
         private Bindable<bool> editorLimitedDistanceSnap;
@@ -320,6 +321,7 @@ namespace osu.Game.Screens.Edit
             OsuMenuItem redoMenuItem;
 
             editorBackgroundDim = config.GetBindable<float>(OsuSetting.EditorDim);
+            editorShowStoryboard = config.GetBindable<bool>(OsuSetting.EditorShowStoryboard);
             editorHitMarkers = config.GetBindable<bool>(OsuSetting.EditorShowHitMarkers);
             editorAutoSeekOnPlacement = config.GetBindable<bool>(OsuSetting.EditorAutoSeekOnPlacement);
             editorLimitedDistanceSnap = config.GetBindable<bool>(OsuSetting.EditorLimitedDistanceSnap);
@@ -398,7 +400,13 @@ namespace osu.Game.Screens.Edit
                                                     },
                                                 ]
                                             },
+                                            new OsuMenuItemSpacer(),
                                             new BackgroundDimMenuItem(editorBackgroundDim),
+                                            new ToggleMenuItem("Show storyboard")
+                                            {
+                                                State = { BindTarget = editorShowStoryboard },
+                                            },
+                                            new OsuMenuItemSpacer(),
                                             new ToggleMenuItem(EditorStrings.ShowHitMarkers)
                                             {
                                                 State = { BindTarget = editorHitMarkers },
@@ -466,11 +474,13 @@ namespace osu.Game.Screens.Edit
             changeHandler?.CanUndo.BindValueChanged(v => undoMenuItem.Action.Disabled = !v.NewValue, true);
             changeHandler?.CanRedo.BindValueChanged(v => redoMenuItem.Action.Disabled = !v.NewValue, true);
 
-            editorBackgroundDim.BindValueChanged(_ => dimBackground());
+            editorBackgroundDim.BindValueChanged(_ => setUpBackground());
         }
 
         [Resolved]
         private MusicController musicController { get; set; }
+
+        protected override BackgroundScreen CreateBackground() => new EditorBackgroundScreen(Beatmap.Value);
 
         protected override void LoadComplete()
         {
@@ -853,23 +863,23 @@ namespace osu.Game.Screens.Edit
         public override void OnEntering(ScreenTransitionEvent e)
         {
             base.OnEntering(e);
-            dimBackground();
+            setUpBackground();
             resetTrack(true);
         }
 
         public override void OnResuming(ScreenTransitionEvent e)
         {
             base.OnResuming(e);
-            dimBackground();
+            setUpBackground();
+            clock.BindAdjustments();
         }
 
-        private void dimBackground()
+        private void setUpBackground()
         {
             ApplyToBackground(b =>
             {
-                b.IgnoreUserSettings.Value = true;
-                b.DimWhenUserSettingsIgnored.Value = editorBackgroundDim.Value;
-                b.BlurAmount.Value = 0;
+                var editorBackground = (EditorBackgroundScreen)b;
+                editorBackground.ChangeClockSource(clock);
             });
         }
 
@@ -908,11 +918,6 @@ namespace osu.Game.Screens.Edit
                     beatmap.EditorTimestamp = clock.CurrentTime;
             });
 
-            ApplyToBackground(b =>
-            {
-                b.DimWhenUserSettingsIgnored.Value = 0;
-            });
-
             resetTrack();
 
             refetchBeatmap();
@@ -925,6 +930,10 @@ namespace osu.Game.Screens.Edit
             base.OnSuspending(e);
             clock.Stop();
             refetchBeatmap();
+            // unfortunately ordering matters here.
+            // this unbind MUST happen after `refetchBeatmap()`, because along other things, `refetchBeatmap()` causes a global working beatmap change,
+            // which causes `EditorClock` to reload the track and automatically reapply adjustments to it.
+            clock.UnbindAdjustments();
         }
 
         private void refetchBeatmap()
