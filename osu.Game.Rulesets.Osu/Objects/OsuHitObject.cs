@@ -188,20 +188,17 @@ namespace osu.Game.Rulesets.Osu.Objects
             int indexWithOffsets = lastObj?.ComboIndexWithOffsets ?? 0;
             int inCurrentCombo = (lastObj?.IndexInCurrentCombo + 1) ?? 0;
 
-            // For the purpose of combo colours, spinners never start a new combo even if they are flagged as doing so.
-            if (this is not Spinner)
+            // - For the purpose of combo colours, spinners never start a new combo even if they are flagged as doing so.
+            // - At decode time, the first hitobject in the beatmap and the first hitobject after a spinner are both enforced to be a new combo,
+            //   but this isn't directly enforced by the editor so the extra checks against the last hitobject are duplicated here.
+            if (this is not Spinner && (NewCombo || lastObj == null || lastObj is Spinner))
             {
-                // At decode time, the first hitobject in the beatmap and the first hitobject after a spinner are both enforced to be a new combo,
-                // but this isn't directly enforced by the editor so the extra checks against the last hitobject are duplicated here.
-                if (NewCombo || lastObj == null || lastObj is Spinner)
-                {
-                    inCurrentCombo = 0;
-                    index++;
-                    indexWithOffsets += ComboOffset + 1;
+                inCurrentCombo = 0;
+                index++;
+                indexWithOffsets += ComboOffset + 1;
 
-                    if (lastObj != null)
-                        lastObj.LastInCombo = true;
-                }
+                if (lastObj != null)
+                    lastObj.LastInCombo = true;
             }
 
             ComboIndex = index;
