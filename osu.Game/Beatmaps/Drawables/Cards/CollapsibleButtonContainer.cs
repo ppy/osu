@@ -21,6 +21,8 @@ namespace osu.Game.Beatmaps.Drawables.Cards
 
         private readonly BeatmapDownloadTracker downloadTracker;
 
+        public DownloadButton DownloadButton { get; private set; }
+
         private float buttonsExpandedWidth;
 
         public float ButtonsExpandedWidth
@@ -108,7 +110,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                                 RelativeSizeAxes = Axes.Both,
                                 Height = 0.48f,
                             },
-                            new DownloadButton(beatmapSet)
+                            DownloadButton = new DownloadButton(beatmapSet)
                             {
                                 Anchor = Anchor.BottomCentre,
                                 Origin = Anchor.BottomCentre,

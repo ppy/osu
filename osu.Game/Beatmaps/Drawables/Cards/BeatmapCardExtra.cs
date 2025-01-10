@@ -28,7 +28,6 @@ namespace osu.Game.Beatmaps.Drawables.Cards
         private readonly BeatmapCardContent content;
 
         private BeatmapCardThumbnail thumbnail = null!;
-        private CollapsibleButtonContainer buttonContainer = null!;
 
         private GridContainer statisticsContainer = null!;
 
@@ -74,7 +73,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                                 Spacing = new Vector2(1)
                             }
                         },
-                        buttonContainer = new CollapsibleButtonContainer(BeatmapSet)
+                        ButtonContainer = new CollapsibleButtonContainer(BeatmapSet)
                         {
                             X = height - CORNER_RADIUS,
                             Width = WIDTH - height + CORNER_RADIUS,
@@ -318,7 +317,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
 
             bool showDetails = IsHovered || Expanded.Value;
 
-            buttonContainer.ShowDetails.Value = showDetails;
+            ButtonContainer.ShowDetails.Value = showDetails;
             thumbnail.Dimmed.Value = showDetails;
         }
     }
