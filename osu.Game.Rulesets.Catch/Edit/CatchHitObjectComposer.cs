@@ -72,7 +72,7 @@ namespace osu.Game.Rulesets.Catch.Edit
 
         protected override Drawable CreateHitObjectInspector() => new CatchHitObjectInspector(DistanceSnapProvider);
 
-        protected override IEnumerable<TernaryButton> CreateTernaryButtons()
+        protected override IEnumerable<DrawableTernaryButton> CreateTernaryButtons()
             => base.CreateTernaryButtons()
                    .Concat(DistanceSnapProvider.CreateTernaryButtons());
 

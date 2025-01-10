@@ -273,11 +273,9 @@ namespace osu.Game.Rulesets.Edit
                 };
             }
 
-            TernaryStates = CreateTernaryButtons().ToArray();
-            togglesCollection.AddRange(TernaryStates.Select(b => new DrawableTernaryButton(b)));
+            togglesCollection.AddRange(CreateTernaryButtons().ToArray());
 
-            sampleBankTogglesCollection.AddRange(BlueprintContainer.SampleBankTernaryStates.Zip(BlueprintContainer.SampleAdditionBankTernaryStates)
-                                                                   .Select(b => new SampleBankTernaryButton(b.First, b.Second)));
+            sampleBankTogglesCollection.AddRange(BlueprintContainer.SampleBankTernaryStates);
 
             SetSelectTool();
 
