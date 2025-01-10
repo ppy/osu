@@ -349,15 +349,16 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 if (hasRelevantBank(h))
                     return;
 
-                h.Samples = h.Samples.Select(s => s.Name == HitSampleInfo.HIT_NORMAL ? s.With(newBank: bankName) : s).ToList();
+                new SamplesChange(h, h.Samples.Select(s => s.Name == HitSampleInfo.HIT_NORMAL ? s.With(newBank: bankName) : s).ToList()).Apply(ChangeHandler);
 
                 if (h is IHasRepeats hasRepeats)
                 {
                     for (int i = 0; i < hasRepeats.NodeSamples.Count; ++i)
-                        hasRepeats.NodeSamples[i] = hasRepeats.NodeSamples[i].Select(s => s.Name == HitSampleInfo.HIT_NORMAL ? s.With(newBank: bankName) : s).ToList();
+                        new NodeSamplesChange(hasRepeats, i, hasRepeats.NodeSamples[i].Select(s => s.Name == HitSampleInfo.HIT_NORMAL ? s.With(newBank: bankName) : s).ToList()).Apply(ChangeHandler);
                 }
 
                 EditorBeatmap.Update(h);
+                ChangeHandler?.RecordUpdate(h);
             });
         }
 
@@ -381,18 +382,19 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     return;
 
                 string normalBank = h.Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL)?.Bank ?? HitSampleInfo.BANK_SOFT;
-                h.Samples = h.Samples.Select(s => s.Name != HitSampleInfo.HIT_NORMAL ? bankName == HIT_BANK_AUTO ? s.With(newBank: normalBank, newEditorAutoBank: true) : s.With(newBank: bankName, newEditorAutoBank: false) : s).ToList();
+                new SamplesChange(h, h.Samples.Select(s => s.Name != HitSampleInfo.HIT_NORMAL ? bankName == HIT_BANK_AUTO ? s.With(newBank: normalBank, newEditorAutoBank: true) : s.With(newBank: bankName, newEditorAutoBank: false) : s).ToList()).Apply(ChangeHandler);
 
                 if (h is IHasRepeats hasRepeats)
                 {
                     for (int i = 0; i < hasRepeats.NodeSamples.Count; ++i)
                     {
                         normalBank = hasRepeats.NodeSamples[i].FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL)?.Bank ?? HitSampleInfo.BANK_SOFT;
-                        hasRepeats.NodeSamples[i] = hasRepeats.NodeSamples[i].Select(s => s.Name != HitSampleInfo.HIT_NORMAL ? bankName == HIT_BANK_AUTO ? s.With(newBank: normalBank, newEditorAutoBank: true) : s.With(newBank: bankName, newEditorAutoBank: false) : s).ToList();
+                        new NodeSamplesChange(hasRepeats, i, hasRepeats.NodeSamples[i].Select(s => s.Name != HitSampleInfo.HIT_NORMAL ? bankName == HIT_BANK_AUTO ? s.With(newBank: normalBank, newEditorAutoBank: true) : s.With(newBank: bankName, newEditorAutoBank: false) : s).ToList()).Apply(ChangeHandler);
                     }
                 }
 
                 EditorBeatmap.Update(h);
+                ChangeHandler?.RecordUpdate(h);
             });
         }
 
@@ -422,7 +424,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 // Make sure there isn't already an existing sample
                 if (h.Samples.All(s => s.Name != sampleName))
-                    h.Samples.Add(h.CreateHitSampleInfo(sampleName));
+                    new AddSampleChange(h.Samples, h.CreateHitSampleInfo(sampleName)).Apply(ChangeHandler);
 
                 if (h is IHasRepeats hasRepeats)
                 {
@@ -437,11 +439,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
                         if (existingAddition != null)
                             hitSample = hitSample.With(newBank: existingAddition.Bank, newEditorAutoBank: existingAddition.EditorAutoBank);
 
-                        node.Add(hitSample);
+                        new AddSampleChange(node, hitSample).Apply(ChangeHandler);
                     }
                 }
 
                 EditorBeatmap.Update(h);
+                ChangeHandler?.RecordUpdate(h);
             });
         }
 
@@ -456,15 +459,16 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             EditorBeatmap.PerformOnSelection(h =>
             {
-                h.SamplesBindable.RemoveAll(s => s.Name == sampleName);
+                new SamplesChange(h, h.Samples.Where(s => s.Name != sampleName).ToList()).Apply(ChangeHandler);
 
                 if (h is IHasRepeats hasRepeats)
                 {
                     for (int i = 0; i < hasRepeats.NodeSamples.Count; ++i)
-                        hasRepeats.NodeSamples[i] = hasRepeats.NodeSamples[i].Where(s => s.Name != sampleName).ToList();
+                        new NodeSamplesChange(hasRepeats, i, hasRepeats.NodeSamples[i].Where(s => s.Name != sampleName).ToList()).Apply(ChangeHandler);
                 }
 
                 EditorBeatmap.Update(h);
+                ChangeHandler?.RecordUpdate(h);
             });
         }
 
@@ -484,8 +488,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
                 if (comboInfo == null || comboInfo.NewCombo == state) return;
 
-                comboInfo.NewCombo = state;
+                new NewComboChange(comboInfo, state).Apply(ChangeHandler);
                 EditorBeatmap.Update(h);
+                ChangeHandler?.RecordUpdate(h);
             });
         }
 
