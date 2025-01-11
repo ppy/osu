@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         /// <item><description>and how easily they can be cheesed.</description></item>
         /// </list>
         /// </summary>
-        public static double EvaluateDifficultyOf(DifficultyHitObject current, bool withSpeedBonus, IReadOnlyList<Mod> mods)
+        public static double EvaluateDifficultyOf(DifficultyHitObject current, bool withDistanceBonus, IReadOnlyList<Mod> mods)
         {
             if (current.BaseObject is Spinner)
                 return 0;
@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double speedBonus = 0.0;
 
             // Add additional scaling bonus for streams/bursts higher than 200bpm
-            if (DifficultyCalculationUtils.MillisecondsToBPM(strainTime) > min_speed_bonus && withSpeedBonus)
+            if (DifficultyCalculationUtils.MillisecondsToBPM(strainTime) > min_speed_bonus)
                 speedBonus = 0.75 * Math.Pow((DifficultyCalculationUtils.BPMToMilliseconds(min_speed_bonus) - strainTime) / speed_balancing_factor, 2);
 
             double travelDistance = osuPrevObj?.TravelDistance ?? 0;
@@ -60,7 +60,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             // Max distance bonus is 1 * `distance_multiplier` at single_spacing_threshold
             double distanceBonus = Math.Pow(distance / single_spacing_threshold, 3.95) * distance_multiplier;
 
-            if (mods.OfType<OsuModAutopilot>().Any())
+            if (!withDistanceBonus || mods.OfType<OsuModAutopilot>().Any())
                 distanceBonus = 0;
 
             // Base difficulty with all bonuses

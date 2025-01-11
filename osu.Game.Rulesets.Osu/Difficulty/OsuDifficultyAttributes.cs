@@ -54,12 +54,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         public double SliderFactor { get; set; }
 
         /// <summary>
-        /// Describes how much of <see cref="SpeedDifficulty"/> is contributed to by tapping.
-        /// A value closer to 1.0 indicates most of <see cref="SpeedDifficulty"/> is contributed by flow aim.
-        /// A value closer to 0.0 indicates most of <see cref="SpeedDifficulty"/> is contributed by tapping.
+        /// Describes how much of <see cref="SpeedDifficulty"/> is contributed to by flow.
+        /// A value closer to 1.0 indicates most of <see cref="SpeedDifficulty"/> is contributed by tapping.
+        /// A value closer to 0.0 indicates most of <see cref="SpeedDifficulty"/> is contributed by flow.
         /// </summary>
-        [JsonProperty("tapping_factor")]
-        public double TappingFactor { get; set; }
+        [JsonProperty("flow_factor")]
+        public double FlowFactor { get; set; }
 
         [JsonProperty("aim_difficult_strain_count")]
         public double AimDifficultStrainCount { get; set; }
