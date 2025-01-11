@@ -260,6 +260,7 @@ namespace osu.Game.Rulesets
         /// Optionally creates a <see cref="IBeatmapProcessor"/> to alter a <see cref="IBeatmap"/> after it has been converted.
         /// </summary>
         /// <param name="beatmap">The <see cref="IBeatmap"/> to be processed.</param>
+        /// <param name="changeHandler">The <see cref="NewBeatmapEditorChangeHandler"/> to record changes to.</param>
         /// <returns>The <see cref="IBeatmapProcessor"/>.</returns>
         public virtual IBeatmapProcessor? CreateBeatmapProcessor(IBeatmap beatmap, NewBeatmapEditorChangeHandler? changeHandler = null) => null;
 

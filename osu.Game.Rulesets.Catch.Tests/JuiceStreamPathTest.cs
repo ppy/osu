@@ -207,7 +207,7 @@ namespace osu.Game.Rulesets.Catch.Tests
                     path.Add(time, x);
                 } while (rng.Next(5) != 0);
 
-                float sliderStartY = (float)(rng.NextDouble() * JuiceStreamPath.OSU_PLAYFIELD_HEIGHT);
+                float sliderStartY = (float)(rng.NextDouble() * ConvertJuiceStreamPathToSliderPathChange.OSU_PLAYFIELD_HEIGHT);
 
                 double requiredVelocity = path.ComputeRequiredVelocity();
                 double velocity = Math.Clamp(requiredVelocity, 1, 100);
@@ -217,7 +217,7 @@ namespace osu.Game.Rulesets.Catch.Tests
                 foreach (var point in sliderPath.ControlPoints)
                 {
                     Assert.That(point.Type, Is.EqualTo(PathType.LINEAR).Or.Null);
-                    Assert.That(sliderStartY + point.Position.Y, Is.InRange(0, JuiceStreamPath.OSU_PLAYFIELD_HEIGHT));
+                    Assert.That(sliderStartY + point.Position.Y, Is.InRange(0, ConvertJuiceStreamPathToSliderPathChange.OSU_PLAYFIELD_HEIGHT));
                 }
 
                 Assert.That(sliderPath.ControlPoints[0].Position.X, Is.EqualTo(path.Vertices[0].X));
