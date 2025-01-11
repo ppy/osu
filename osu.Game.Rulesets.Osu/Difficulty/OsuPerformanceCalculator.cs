@@ -234,7 +234,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             else if (score.Mods.Any(m => m is OsuModHidden || m is OsuModTraceable))
             {
                 // We want to give more reward for lower AR when it comes to aim and HD. This nerfs high AR and buffs lower AR.
-                speedValue *= 1.0 + 0.04 * (12.0 - attributes.ApproachRate);
+                speedValue *= 1.0 + 0.04 * (12.0 - attributes.ApproachRate) * attributes.TappingFactor;
             }
 
             double speedHighDeviationMultiplier = calculateSpeedHighDeviationNerf(attributes);
