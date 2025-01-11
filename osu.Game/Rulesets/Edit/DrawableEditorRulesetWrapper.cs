@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Edit
         }
 
         [Resolved]
-        private IEditorChangeHandler? changeHandler { get; set; }
+        private NewBeatmapEditorChangeHandler? changeHandler { get; set; }
 
         protected override void LoadComplete()
         {
