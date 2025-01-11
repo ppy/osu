@@ -73,7 +73,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
         private double computeDifficultyValue(ScoreInfo score, TaikoDifficultyAttributes attributes)
         {
-            double difficultyValue = Math.Pow(5 * Math.Max(1.0, attributes.StarRating / 0.115) - 4.0, 2.25) / 1150.0;
+            double baseDifficulty = 5 * Math.Max(1.0, attributes.StarRating / 0.115) - 4.0;
+            double difficultyValue = Math.Min(Math.Pow(baseDifficulty, 3) / 69052.51, Math.Pow(baseDifficulty, 2.25) / 1150.0);
 
             double lengthBonus = 1 + 0.1 * Math.Min(1.0, totalHits / 1500.0);
             difficultyValue *= lengthBonus;
@@ -86,9 +87,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             if (score.Mods.Any(m => m is ModHidden))
                 difficultyValue *= 1.025;
 
-            if (score.Mods.Any(m => m is ModHardRock))
-                difficultyValue *= 1.10;
-
             if (score.Mods.Any(m => m is ModFlashlight<TaikoHitObject>))
                 difficultyValue *= Math.Max(1, 1.050 - Math.Min(attributes.MonoStaminaFactor / 50, 1) * lengthBonus);
 
@@ -97,7 +95,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
             // Scale accuracy more harshly on nearly-completely mono (single coloured) speed maps.
             double accScalingExponent = 2 + attributes.MonoStaminaFactor;
-            double accScalingShift = 300 - 100 * attributes.MonoStaminaFactor;
+            double accScalingShift = 400 - 100 * attributes.MonoStaminaFactor;
 
             return difficultyValue * Math.Pow(SpecialFunctions.Erf(accScalingShift / (Math.Sqrt(2) * estimatedUnstableRate.Value)), accScalingExponent);
         }
@@ -133,6 +131,11 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
             const double z = 2.32634787404; // 99% critical value for the normal distribution (one-tailed).
 
+            double? deviationGreatWindow = calcDeviationGreatWindow();
+            double? deviationGoodWindow = calcDeviationGoodWindow();
+
+            return deviationGreatWindow is null ? deviationGoodWindow : Math.Min(deviationGreatWindow.Value, deviationGoodWindow!.Value);
+
             // The upper bound on deviation, calculated with the ratio of 300s to objects, and the great hit window.
             double? calcDeviationGreatWindow()
             {
@@ -159,7 +162,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 double n = totalHits;
 
                 // Proportion of greats + goods hit.
-                double p = totalSuccessfulHits / n;
+                double p = Math.Max(0, totalSuccessfulHits - 0.0005 * countOk) / n;
 
                 // We can be 99% confident that p is at least this value.
                 double pLowerBound = (n * p + z * z / 2) / (n + z * z) - z / (n + z * z) * Math.Sqrt(n * p * (1 - p) + z * z / 4);
@@ -167,14 +170,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 // We can be 99% confident that the deviation is not higher than:
                 return h100 / (Math.Sqrt(2) * SpecialFunctions.ErfInv(pLowerBound));
             }
-
-            double? deviationGreatWindow = calcDeviationGreatWindow();
-            double? deviationGoodWindow = calcDeviationGoodWindow();
-
-            if (deviationGreatWindow is null)
-                return deviationGoodWindow;
-
-            return Math.Min(deviationGreatWindow.Value, deviationGoodWindow!.Value);
         }
 
         private int totalHits => countGreat + countOk + countMeh + countMiss;
