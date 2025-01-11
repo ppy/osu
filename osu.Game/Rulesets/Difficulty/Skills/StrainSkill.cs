@@ -128,6 +128,16 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             // These sections will not contribute to the difficulty.
             var peaks = GetCurrentStrainPeaks().Where(p => p > 0);
 
+            // We select only the hardest 20% of picks in strains to ensure greater value in the most difficult sections of the map.
+            List<double> hardStrains = peaks.OrderDescending().ToList().GetRange(0, peaks.Count() / 10 * 2);
+
+            //We select only the moderate 20% of picks in strains to provide greater value in the more moderate sections of the map.
+            List<double> midStrains = peaks.OrderDescending().ToList().GetRange(peaks.Count() / 10 * 4, peaks.Count() / 10 * 6);
+
+            // We can calculate the difficulty factor by doing average pick difficulty / max peak difficulty.
+            // It resoult in a value that rappresent the consistency for all peaks (0 excluded) in a range number from 0 to 1.
+            ConsistencyFactor = midStrains.Average() / hardStrains.Average();
+
             // Difficulty is the weighted sum of the highest strains from every section.
             // We're sorting from highest to lowest strain.
             foreach (double strain in peaks.OrderDescending())

@@ -29,6 +29,13 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         private const double colour_skill_multiplier = 0.375 * difficulty_multiplier;
         private const double stamina_skill_multiplier = 0.375 * difficulty_multiplier;
 
+        //The bonus multiplier is a basic multiplier that indicate how strong the impact of Difficulty Factor is.
+        private const double bonus_multiplier = 0.5;
+
+
+        // The difficulty factor for all the skills interpolated.
+        private double totalConsistencyFactor;
+
         public override int Version => 20241007;
 
         public TaikoDifficultyCalculator(IRulesetInfo ruleset, IWorkingBeatmap beatmap)
@@ -101,6 +108,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 return new TaikoDifficultyAttributes { Mods = mods };
 
             bool isRelax = mods.Any(h => h is TaikoModRelax);
+            bool isFlashlight = mods.Any(h => h is TaikoModFlashlight);
+            bool isHidden = mods.Any(h => h is TaikoModHidden);
+
+            bool isConvert = beatmap.BeatmapInfo.OnlineID != 1;
 
             Rhythm rhythm = (Rhythm)skills.First(x => x is Rhythm);
             Reading reading = (Reading)skills.First(x => x is Reading);
@@ -119,8 +130,15 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             double readingDifficultStrains = reading.CountTopWeightedStrains();
             double staminaDifficultStrains = stamina.CountTopWeightedStrains();
 
+            rhythmRating *= Math.Pow(beatmap.HitObjects.Count * (0.75 + rhythm.ConsistencyFactor * bonus_multiplier), 0.57) / 1500 + 1.07;
+            readingRating *= Math.Pow(beatmap.HitObjects.Count * (0.75 + reading.ConsistencyFactor * bonus_multiplier), 0.57) / 1500 + 1.07;
+            colourRating *= Math.Pow(beatmap.HitObjects.Count * (0.75 + colour.ConsistencyFactor * bonus_multiplier), 0.57) / 1500 + 1.07;
+            staminaRating *= Math.Pow(beatmap.HitObjects.Count * (0.75 + stamina.ConsistencyFactor * bonus_multiplier), 0.57) / 1500 + 1.07;
+
             double combinedRating = combinedDifficultyValue(rhythm, reading, colour, stamina, isRelax);
             double starRating = rescale(combinedRating * 1.4);
+
+            starRating *= Math.Pow(beatmap.HitObjects.Count * (0.75 + totalConsistencyFactor * bonus_multiplier), 0.57) / 1500 + 1.07;
 
             // Converts are penalised outside the scope of difficulty calculation, as our assumptions surrounding standard play-styles becomes out-of-scope.
             if (beatmap.BeatmapInfo.Ruleset.OnlineID == 0)
@@ -138,6 +156,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             TaikoDifficultyAttributes attributes = new TaikoDifficultyAttributes
             {
                 StarRating = starRating,
+                TotalConsistencyFactor = totalConsistencyFactor,
                 Mods = mods,
                 RhythmDifficulty = rhythmRating,
                 ReadingDifficulty = readingRating,
@@ -191,6 +210,16 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 if (peak > 0)
                     peaks.Add(peak);
             }
+
+            // We select only the hardest 20% of picks in strains to ensure greater value in the most difficult sections of the map.
+            List<double> hardStrains = peaks.OrderDescending().ToList().GetRange(0, peaks.Count / 10 * 2);
+
+            //We select only the moderate 20% of picks in strains to provide greater value in the more moderate sections of the map.
+            List<double> midStrains = peaks.OrderDescending().ToList().GetRange(peaks.Count / 10 * 4, peaks.Count / 10 * 6);
+
+            // We can calculate the difficulty factor by doing average pick difficulty / max peak difficulty.
+            // It resoult in a value that rappresent the consistency for all peaks (0 excluded) in a range number from 0 to 1.
+            totalConsistencyFactor = midStrains.Average() / hardStrains.Average();
 
             double difficulty = 0;
             double weight = 1;
