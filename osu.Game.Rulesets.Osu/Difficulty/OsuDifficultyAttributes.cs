@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
@@ -20,10 +20,22 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         public double AimDifficulty { get; set; }
 
         /// <summary>
+        /// The difficulty factor corresponding to the aim skill.
+        /// </summary>
+        [JsonProperty("aim_difficulty_factor")]
+        public double AimDifficultyFactor { get; set; }
+
+        /// <summary>
         /// The difficulty corresponding to the speed skill.
         /// </summary>
         [JsonProperty("speed_difficulty")]
         public double SpeedDifficulty { get; set; }
+
+        /// <summary>
+        /// The difficulty factor corresponding to the speed skill.
+        /// </summary>
+        [JsonProperty("speed_difficulty_factor")]
+        public double SpeedDifficultyFactor { get; set; }
 
         /// <summary>
         /// The number of clickable objects weighted by difficulty.
