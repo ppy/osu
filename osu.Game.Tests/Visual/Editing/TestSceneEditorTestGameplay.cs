@@ -7,16 +7,15 @@ using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
-using osu.Game.Configuration;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.UI;
+using osu.Game.Screens;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Components;
@@ -42,14 +41,6 @@ namespace osu.Game.Tests.Visual.Editing
         private BeatmapManager beatmaps { get; set; }
 
         private BeatmapSetInfo importedBeatmapSet;
-
-        private Bindable<float> editorDim;
-
-        [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
-        {
-            editorDim = config.GetBindable<float>(OsuSetting.EditorDim);
-        }
 
         public override void SetUpSteps()
         {
@@ -81,15 +72,7 @@ namespace osu.Game.Tests.Visual.Editing
             AddUntilStep("player pushed", () => (editorPlayer = Stack.CurrentScreen as EditorPlayer) != null);
             AddStep("exit player", () => editorPlayer.Exit());
             AddUntilStep("current screen is editor", () => Stack.CurrentScreen is Editor);
-            AddUntilStep("background has correct params", () =>
-            {
-                // the test gameplay player's beatmap may be the "same" beatmap as the one being edited, *but* the `BeatmapInfo` references may differ
-                // due to the beatmap refetch logic ran on editor suspend.
-                // this test cares about checking the background belonging to the editor specifically, so check that using reference equality
-                // (as `.Equals()` cannot discern between the two, as they technically share the same database GUID).
-                var background = this.ChildrenOfType<BackgroundScreenBeatmap>().Single(b => ReferenceEquals(b.Beatmap.BeatmapInfo, EditorBeatmap.BeatmapInfo));
-                return background.DimWhenUserSettingsIgnored.Value == editorDim.Value && background.BlurAmount.Value == 0;
-            });
+            AddUntilStep("background is correct", () => this.ChildrenOfType<BackgroundScreenStack>().Single().CurrentScreen is EditorBackgroundScreen);
             AddAssert("no mods selected", () => SelectedMods.Value.Count == 0);
         }
 
@@ -114,15 +97,7 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddStep("exit player", () => editorPlayer.Exit());
             AddUntilStep("current screen is editor", () => Stack.CurrentScreen is Editor);
-            AddUntilStep("background has correct params", () =>
-            {
-                // the test gameplay player's beatmap may be the "same" beatmap as the one being edited, *but* the `BeatmapInfo` references may differ
-                // due to the beatmap refetch logic ran on editor suspend.
-                // this test cares about checking the background belonging to the editor specifically, so check that using reference equality
-                // (as `.Equals()` cannot discern between the two, as they technically share the same database GUID).
-                var background = this.ChildrenOfType<BackgroundScreenBeatmap>().Single(b => ReferenceEquals(b.Beatmap.BeatmapInfo, EditorBeatmap.BeatmapInfo));
-                return background.DimWhenUserSettingsIgnored.Value == editorDim.Value && background.BlurAmount.Value == 0;
-            });
+            AddUntilStep("background is correct", () => this.ChildrenOfType<BackgroundScreenStack>().Single().CurrentScreen is EditorBackgroundScreen);
 
             AddStep("start track", () => EditorClock.Start());
             AddAssert("sample playback re-enabled", () => !Editor.SamplePlaybackDisabled.Value);
