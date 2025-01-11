@@ -148,7 +148,7 @@ namespace osu.Game.Screens.Edit
 
         private bool switchingDifficulty;
 
-        private int lastSavedState;
+        private Guid lastSavedState;
 
         private ScreenContainer screenContainer;
 

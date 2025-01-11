@@ -29,7 +29,7 @@ namespace osu.Game.Screens.Edit
 
         public bool HasUncommittedChanges => currentTransaction.UndoChanges.Count != 0;
 
-        public int CurrentState => undoStack.Count;
+        public Guid CurrentState => undoStack.TryPeek(out var transaction) ? transaction.Id : Guid.Empty;
 
         private Transaction currentTransaction;
 
@@ -246,17 +246,21 @@ namespace osu.Game.Screens.Edit
         {
             public Transaction()
             {
+                Id = Guid.NewGuid();
                 IsChangeHandlerTransaction = false;
                 undoChanges = new List<IRevertibleChange>();
             }
 
             public Transaction(bool isChangeHandlerTransaction)
             {
+                Id = Guid.NewGuid();
                 IsChangeHandlerTransaction = isChangeHandlerTransaction;
                 undoChanges = new List<IRevertibleChange>();
             }
 
             public readonly bool IsChangeHandlerTransaction;
+
+            public readonly Guid Id;
 
             private readonly List<IRevertibleChange> undoChanges;
 

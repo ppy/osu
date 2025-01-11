@@ -115,6 +115,11 @@ namespace osu.Game.Tests.Visual.Editing
             AddAssert("unsaved changes", () => Editor.HasUnsavedChanges);
             AddStep("save changes", () => Editor.Save());
             AddAssert("no unsaved changes", () => !Editor.HasUnsavedChanges);
+
+            addUndoSteps();
+            AddAssert("unsaved changes", () => Editor.HasUnsavedChanges);
+            AddStep("add hitobject", () => new AddHitObjectChange(EditorBeatmap, new HitCircle { StartTime = 2000 }).Apply(ChangeHandler, true));
+            AddAssert("unsaved changes", () => Editor.HasUnsavedChanges);
         }
 
         [Test]

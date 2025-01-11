@@ -87,7 +87,7 @@ namespace osu.Game.Tests.Editing
             handler.SaveState();
             Assert.That(stateChangedFired, Is.EqualTo(0));
 
-            int originalState = handler.CurrentState;
+            var originalState = handler.CurrentState;
 
             addArbitraryChange(handler, beatmap);
             handler.SaveState();
@@ -96,7 +96,7 @@ namespace osu.Game.Tests.Editing
             Assert.That(handler.CanRedo.Value, Is.False);
             Assert.That(stateChangedFired, Is.EqualTo(1));
 
-            int state = handler.CurrentState;
+            var state = handler.CurrentState;
 
             // undo a change without saving
             handler.Undo();
@@ -127,7 +127,7 @@ namespace osu.Game.Tests.Editing
             Assert.That(handler.CanRedo.Value, Is.False);
             Assert.That(stateChangedFired, Is.EqualTo(1));
 
-            int state = handler.CurrentState;
+            var state = handler.CurrentState;
 
             // save a save without making any changes
             handler.SaveState();
