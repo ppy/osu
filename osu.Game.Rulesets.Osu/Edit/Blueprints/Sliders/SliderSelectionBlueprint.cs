@@ -121,7 +121,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             controlPoints.CollectionChanged += (_, _) => fullPathCache.Invalidate();
 
             pathVersion.BindTo(HitObject.Path.Version);
-            pathVersion.BindValueChanged(_ => editorBeatmap?.Update(HitObject));
+            pathVersion.BindValueChanged(_ =>
+            {
+                editorBeatmap?.Update(HitObject);
+                changeHandler?.RecordUpdate(HitObject);
+            });
 
             BodyPiece.UpdateFrom(HitObject);
             HitObject.DefaultsApplied += _ => BodyPiece.UpdateFrom(HitObject);
