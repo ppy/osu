@@ -32,5 +32,10 @@ namespace osu.Game.Rulesets.Difficulty
         /// <param name="score">The score to create the attributes for.</param>
         /// <param name="attributes">The difficulty attributes for the beatmap relating to the score.</param>
         protected abstract PerformanceAttributes CreatePerformanceAttributes(ScoreInfo score, DifficultyAttributes attributes);
+
+        /// <summary>
+        /// Calculating the length bonus as a multiplier considering also the Difficulty Factor.
+        /// </summary>
+        protected virtual double LengthBonusMultiplier(double offsetLengthBonus, double difficultyFactor, double multiplierDifficultyFactor) => offsetLengthBonus + difficultyFactor * multiplierDifficultyFactor;
     }
 }
