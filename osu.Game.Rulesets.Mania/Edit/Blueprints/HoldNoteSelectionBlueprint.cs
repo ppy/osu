@@ -11,6 +11,7 @@ using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Screens.Edit;
+using osu.Game.Screens.Edit.Changes;
 using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Edit.Blueprints
@@ -18,7 +19,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
     public partial class HoldNoteSelectionBlueprint : ManiaSelectionBlueprint<HoldNote>
     {
         [Resolved]
-        private IEditorChangeHandler? changeHandler { get; set; }
+        private NewBeatmapEditorChangeHandler? changeHandler { get; set; }
 
         [Resolved]
         private EditorBeatmap? editorBeatmap { get; set; }
@@ -63,9 +64,10 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
                         if (proposedStartTime >= proposedEndTime)
                             return;
 
-                        HitObject.StartTime = proposedStartTime;
-                        HitObject.EndTime = proposedEndTime;
+                        new StartTimeChange(HitObject, proposedStartTime).Apply(changeHandler);
+                        new DurationChange(HitObject, proposedEndTime - HitObject.StartTime).Apply(changeHandler);
                         editorBeatmap?.Update(HitObject);
+                        changeHandler?.RecordUpdate(HitObject);
                     },
                     DragEnded = () => changeHandler?.EndChange(),
                 },
@@ -83,9 +85,10 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
                         if (proposedStartTime >= proposedEndTime)
                             return;
 
-                        HitObject.StartTime = proposedStartTime;
-                        HitObject.EndTime = proposedEndTime;
+                        new StartTimeChange(HitObject, proposedStartTime).Apply(changeHandler);
+                        new DurationChange(HitObject, proposedEndTime - HitObject.StartTime).Apply(changeHandler);
                         editorBeatmap?.Update(HitObject);
+                        changeHandler?.RecordUpdate(HitObject);
                     },
                     DragEnded = () => changeHandler?.EndChange(),
                 },
