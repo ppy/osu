@@ -29,6 +29,16 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         private const double colour_skill_multiplier = 0.375 * difficulty_multiplier;
         private const double stamina_skill_multiplier = 0.375 * difficulty_multiplier;
 
+        //The bonus multiplier is a basic multiplier that indicate how strong the impact of Difficulty Factor is.
+        private const double bonus_multiplier = 0.3;
+
+
+        // The difficulty factor for all the skills interpolated.
+        private double totalDifficultyFactor;
+
+        // Indicate a flat multiplier value base only on map length.
+        private double lengthBonusBase;
+
         public override int Version => 20241007;
 
         public TaikoDifficultyCalculator(IRulesetInfo ruleset, IWorkingBeatmap beatmap)
@@ -101,6 +111,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 return new TaikoDifficultyAttributes { Mods = mods };
 
             bool isRelax = mods.Any(h => h is TaikoModRelax);
+            bool isFlashlight = mods.Any(h => h is TaikoModFlashlight);
+            bool isHidden = mods.Any(h => h is TaikoModHidden);
+
+            bool isConvert = beatmap.BeatmapInfo.OnlineInfo!.Ruleset.OnlineID != 1;
 
             Rhythm rhythm = (Rhythm)skills.First(x => x is Rhythm);
             Reading reading = (Reading)skills.First(x => x is Reading);
@@ -118,6 +132,17 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             double colourDifficultStrains = colour.CountTopWeightedStrains();
             double readingDifficultStrains = reading.CountTopWeightedStrains();
             double staminaDifficultStrains = stamina.CountTopWeightedStrains();
+
+            //We can have a base length bonus based only from the length of the map.
+            lengthBonusBase = Math.Max((Math.Log(10.0 + beatmap.HitObjects.Count / 1000.0) - 1.35) * 0.45 + 0.5, 1.0);
+
+            //Old formula that need to be removed with the reading rework.
+            lengthBonusBase *= isFlashlight && isHidden || !isConvert ? 1.05 : 1.0;
+
+            rhythmRating *= LengthBonusMultiplier(lengthBonusBase, rhythm.DifficultyFactor, bonus_multiplier);
+            readingRating *= LengthBonusMultiplier(lengthBonusBase, reading.DifficultyFactor, bonus_multiplier);
+            colourRating *= LengthBonusMultiplier(lengthBonusBase, colour.DifficultyFactor, bonus_multiplier);
+            staminaRating *= LengthBonusMultiplier(lengthBonusBase, stamina.DifficultyFactor, bonus_multiplier);
 
             double combinedRating = combinedDifficultyValue(rhythm, reading, colour, stamina, isRelax);
             double starRating = rescale(combinedRating * 1.4);
@@ -138,6 +163,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             TaikoDifficultyAttributes attributes = new TaikoDifficultyAttributes
             {
                 StarRating = starRating,
+                TotalDifficultyFactor = totalDifficultyFactor,
                 Mods = mods,
                 RhythmDifficulty = rhythmRating,
                 ReadingDifficulty = readingRating,
@@ -192,6 +218,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                     peaks.Add(peak);
             }
 
+            // We can calculate the difficulty factor by doing average pick difficulty / max peak difficulty.
+            // It resoult in a value that rappresent the consistency for all peaks (0 excluded) in a range number from 0 to 1.
+            totalDifficultyFactor = peaks.Average() / peaks.Max();
+
             double difficulty = 0;
             double weight = 1;
 
@@ -200,6 +230,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 difficulty += strain * weight;
                 weight *= 0.9;
             }
+
+            difficulty *= LengthBonusMultiplier(lengthBonusBase, totalDifficultyFactor, bonus_multiplier);
 
             return difficulty;
         }
