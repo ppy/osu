@@ -305,6 +305,7 @@ namespace osu.Game.Screens.Edit
             beatDivisor.BindValueChanged(divisor => editorBeatmap.BeatmapInfo.BeatDivisor = divisor.NewValue);
 
             updateLastSavedState();
+            changeHandler?.EnsureStateSaved();
 
             Schedule(() =>
             {

@@ -36,7 +36,7 @@ namespace osu.Game.Screens.Edit
         {
             get
             {
-                ensureStateSaved();
+                EnsureStateSaved();
 
                 using (var stream = new MemoryStream(savedStates[CurrentState]))
                     return stream.ComputeSHA2Hash();
@@ -49,12 +49,12 @@ namespace osu.Game.Screens.Edit
 
         public override void BeginChange()
         {
-            ensureStateSaved();
+            EnsureStateSaved();
 
             base.BeginChange();
         }
 
-        private void ensureStateSaved()
+        public void EnsureStateSaved()
         {
             if (savedStates.Count == 0)
                 SaveState();
