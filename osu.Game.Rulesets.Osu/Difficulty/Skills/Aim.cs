@@ -19,18 +19,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             this.withSliders = withSliders;
         }
 
-        public static double MaxDifficulty; //Max difficulty of a single object
-
-        public static double SumDifficulty; //Summed difficulty of a single object
-
         private readonly bool withSliders;
 
         private double currentStrain;
-
-        private double maxDifficulty;
-
-        private double sumDifficulty;
-
         private double skillMultiplier => 25.18;
         private double strainDecayBase => 0.15;
 
@@ -42,20 +33,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         {
             currentStrain *= strainDecay(current.DeltaTime);
 
-            double currentHitObjectStrain = AimEvaluator.EvaluateDifficultyOf(current, withSliders) * skillMultiplier;
-
-            currentStrain += currentHitObjectStrain;
-
-            sumDifficulty += currentHitObjectStrain;
-
-            if (maxDifficulty < currentHitObjectStrain)
-                maxDifficulty = currentHitObjectStrain;
-
-            if (current.Next(1) is null)
-            {
-                MaxDifficulty = maxDifficulty;
-                SumDifficulty = sumDifficulty;
-            }
+            currentStrain += AimEvaluator.EvaluateDifficultyOf(current, withSliders) * skillMultiplier;
 
             return currentStrain;
         }
