@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
@@ -37,5 +37,10 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// Returns the calculated difficulty value representing all <see cref="DifficultyHitObject"/>s that have been processed up to this point.
         /// </summary>
         public abstract double DifficultyValue();
+
+        /// <summary>
+        /// Returns the factor difficulty value representing all <see cref="DifficultyHitObject"/>s that have been processed up to this point.
+        /// </summary>
+        public abstract double DifficultyFactor();
     }
 }
