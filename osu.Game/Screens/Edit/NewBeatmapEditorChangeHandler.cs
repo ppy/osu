@@ -84,14 +84,8 @@ namespace osu.Game.Screens.Edit
 
         protected override void UpdateState()
         {
-            if (isRestoring)
+            if (isRestoring || !HasUncommittedChanges)
                 return;
-
-            if (!HasUncommittedChanges)
-            {
-                Logger.Log("Nothing to commit");
-                return;
-            }
 
             undoStack.Push(currentTransaction);
             redoStack.Clear();
