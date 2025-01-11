@@ -43,6 +43,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double difficultSliders = ((Aim)skills[0]).GetDifficultSliders();
             double flashlightRating = 0.0;
 
+            double aimConsistencyFactor = skills[0].ConsistencyFactor;
+            double speedConsistencyFactor = skills[2].ConsistencyFactor;
+
             if (mods.Any(h => h is OsuModFlashlight))
                 flashlightRating = Math.Sqrt(skills[3].DifficultyValue()) * difficulty_multiplier;
 
@@ -107,8 +110,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 StarRating = starRating,
                 Mods = mods,
                 AimDifficulty = aimRating,
+                AimConsistencyFactor = aimConsistencyFactor,
                 AimDifficultSliderCount = difficultSliders,
                 SpeedDifficulty = speedRating,
+                SpeedConsistencyFactor = speedConsistencyFactor,
                 SpeedNoteCount = speedNotes,
                 FlashlightDifficulty = flashlightRating,
                 SliderFactor = sliderFactor,
