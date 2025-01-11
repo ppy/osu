@@ -39,6 +39,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             List<double> strains = peaks.OrderDescending().ToList();
 
+            // We can calculate the difficulty factor by doing average pick difficulty / max peak difficulty.
+            // It resoult in a value that rappresent the consistency for all peaks (0 excluded) in a range number from 0 to 1.
+            DifficultyFactor = peaks.Average() / peaks.Max();
+
             // We are reducing the highest strains first to account for extreme difficulty spikes
             for (int i = 0; i < Math.Min(strains.Count, ReducedSectionCount); i++)
             {
@@ -56,7 +60,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             return difficulty;
         }
-
         public static double DifficultyToPerformance(double difficulty) => Math.Pow(5.0 * Math.Max(1.0, difficulty / 0.0675) - 4.0, 3.0) / 100000.0;
     }
 }
