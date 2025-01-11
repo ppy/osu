@@ -186,6 +186,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
         {
             editablePath.UpdateHitObjectFromPath(HitObject);
             editorBeatmap?.Update(HitObject);
+            changeHandler?.RecordUpdate(HitObject);
 
             lastEditablePathId = editablePath.PathId;
             lastSliderPathVersion = HitObject.Path.Version.Value;
