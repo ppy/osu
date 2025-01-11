@@ -29,6 +29,8 @@ namespace osu.Game.Screens.Edit
 
         public bool HasUncommittedChanges => currentTransaction.UndoChanges.Count != 0;
 
+        public int CurrentState => undoStack.Count;
+
         private Transaction currentTransaction;
 
         private readonly Stack<Transaction> undoStack = new Stack<Transaction>();

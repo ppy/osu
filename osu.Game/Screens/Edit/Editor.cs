@@ -88,17 +88,7 @@ namespace osu.Game.Screens.Edit
 
         protected override bool PlayExitSound => !ExitConfirmed && !switchingDifficulty;
 
-        protected bool HasUnsavedChanges
-        {
-            get
-            {
-                if (!canSave)
-                    return false;
-
-                // TODO: Handle this in the new change handler with a version number.
-                return lastSavedHash != changeHandler?.CurrentStateHash;
-            }
-        }
+        protected bool HasUnsavedChanges => lastSavedState != newChangeHandler.CurrentState;
 
         [Resolved]
         private BeatmapManager beatmapManager { get; set; }
@@ -158,7 +148,7 @@ namespace osu.Game.Screens.Edit
 
         private bool switchingDifficulty;
 
-        private string lastSavedHash;
+        private int lastSavedState;
 
         private ScreenContainer screenContainer;
 
@@ -314,7 +304,7 @@ namespace osu.Game.Screens.Edit
             beatDivisor.SetArbitraryDivisor(editorBeatmap.BeatmapInfo.BeatDivisor);
             beatDivisor.BindValueChanged(divisor => editorBeatmap.BeatmapInfo.BeatDivisor = divisor.NewValue);
 
-            updateLastSavedHash();
+            updateLastSavedState();
 
             Schedule(() =>
             {
@@ -607,7 +597,7 @@ namespace osu.Game.Screens.Edit
 
             // no longer new after first user-triggered save.
             isNewBeatmap = false;
-            updateLastSavedHash();
+            updateLastSavedState();
             onScreenDisplay?.Display(new BeatmapEditorToast(ToastStrings.BeatmapSaved, editorBeatmap.BeatmapInfo.GetDisplayTitle()));
             return true;
         }
@@ -1279,9 +1269,9 @@ namespace osu.Game.Screens.Edit
                 clock.SeekForward(!trackPlaying, amount);
         }
 
-        private void updateLastSavedHash()
+        private void updateLastSavedState()
         {
-            lastSavedHash = changeHandler?.CurrentStateHash;
+            lastSavedState = newChangeHandler.CurrentState;
         }
 
         private IEnumerable<MenuItem> createFileMenuItems()
@@ -1401,7 +1391,7 @@ namespace osu.Game.Screens.Edit
                 // this is generally undesirable and also ends up leaving the user in a broken state.
                 // therefore, just update the last saved hash to make the exit flow think the deleted beatmap is not dirty,
                 // so that it will not show the save dialog on exit.
-                updateLastSavedHash();
+                updateLastSavedState();
 
                 beatmapManager.DeleteDifficultyImmediately(difficultyToDelete);
 
