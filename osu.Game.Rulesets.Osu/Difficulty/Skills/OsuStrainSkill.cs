@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -23,6 +23,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// </summary>
         protected virtual double ReducedStrainBaseline => 0.75;
 
+        protected double MaxDifficulty; //Max difficulty of a single object
+
+        protected double SummedDifficulty; //Summed difficulty of a single object
+
+        protected double AddedStrain; //Summed difficulty of a single object
+
         protected OsuStrainSkill(Mod[] mods)
             : base(mods)
         {
@@ -38,6 +44,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             var peaks = GetCurrentStrainPeaks().Where(p => p > 0);
 
             List<double> strains = peaks.OrderDescending().ToList();
+
+            foreach (double strain in strains.OrderDescending())
+            {
+                AddStrain(strain);
+                AddedStrain = strains.Count;
+            }
 
             // We are reducing the highest strains first to account for extreme difficulty spikes
             for (int i = 0; i < Math.Min(strains.Count, ReducedSectionCount); i++)
@@ -56,6 +68,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             return difficulty;
         }
+
+        protected virtual void AddStrain(double currentStrain)
+        {
+            SummedDifficulty += currentStrain;
+
+            if (MaxDifficulty < currentStrain)
+                MaxDifficulty = currentStrain;
+        }
+
+        public override double DifficultyFactor() => SummedDifficulty / AddedStrain / MaxDifficulty;
 
         public static double DifficultyToPerformance(double difficulty) => Math.Pow(5.0 * Math.Max(1.0, difficulty / 0.0675) - 4.0, 3.0) / 100000.0;
     }
