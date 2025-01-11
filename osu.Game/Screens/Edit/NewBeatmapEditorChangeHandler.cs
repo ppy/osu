@@ -39,7 +39,7 @@ namespace osu.Game.Screens.Edit
 
         private bool isRestoring;
 
-        public NewBeatmapEditorChangeHandler(EditorBeatmap editorBeatmap, EditorChangeHandler? changeHandler)
+        public NewBeatmapEditorChangeHandler(EditorBeatmap editorBeatmap, EditorChangeHandler? changeHandler = null)
         {
             currentTransaction = new Transaction();
             this.editorBeatmap = editorBeatmap;
@@ -110,6 +110,7 @@ namespace osu.Game.Screens.Edit
 
             Logger.Log("Added old change handler transaction to undo stack");
 
+            OnStateChange?.Invoke();
             historyChanged();
         }
 
@@ -139,6 +140,7 @@ namespace osu.Game.Screens.Edit
 
             redoStack.Push(transaction);
 
+            OnStateChange?.Invoke();
             historyChanged();
 
             return true;
@@ -170,6 +172,7 @@ namespace osu.Game.Screens.Edit
 
             undoStack.Push(transaction);
 
+            OnStateChange?.Invoke();
             historyChanged();
 
             return true;

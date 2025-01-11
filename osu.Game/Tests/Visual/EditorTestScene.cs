@@ -31,6 +31,7 @@ namespace osu.Game.Tests.Visual
 
         protected EditorBeatmap EditorBeatmap => Editor.ChildrenOfType<EditorBeatmap>().Single();
         protected EditorClock EditorClock => Editor.ChildrenOfType<EditorClock>().Single();
+        protected NewBeatmapEditorChangeHandler ChangeHandler => Editor.ChildrenOfType<NewBeatmapEditorChangeHandler>().Single();
 
         /// <summary>
         /// Whether any saves performed by the editor should be isolate (and not persist) to the underlying <see cref="BeatmapManager"/>.
