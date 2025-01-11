@@ -15,6 +15,12 @@ namespace osu.Game.Screens.Edit
     {
         private readonly EditorBeatmap editorBeatmap;
 
+        /// <summary>
+        /// This change handler will be suppressed while a transaction with this command handler is in progress.
+        /// Any save states of this change handler will be added to the undo stack.
+        /// </summary>
+        private readonly EditorChangeHandler? changeHandler;
+
         public readonly Bindable<bool> CanUndo = new BindableBool();
 
         public readonly Bindable<bool> CanRedo = new BindableBool();
@@ -31,14 +37,18 @@ namespace osu.Game.Screens.Edit
 
         private bool isRestoring;
 
-        public NewBeatmapEditorChangeHandler(EditorBeatmap editorBeatmap)
+        public NewBeatmapEditorChangeHandler(EditorBeatmap editorBeatmap, EditorChangeHandler? changeHandler)
         {
             currentTransaction = new Transaction();
             this.editorBeatmap = editorBeatmap;
+            this.changeHandler = changeHandler;
 
             editorBeatmap.TransactionBegan += BeginChange;
             editorBeatmap.TransactionEnded += EndChange;
             editorBeatmap.SaveStateTriggered += SaveState;
+
+            if (this.changeHandler != null)
+                this.changeHandler.OnStateChange += commitChangeHandlerStateChange;
         }
 
         /// <summary>
@@ -94,6 +104,19 @@ namespace osu.Game.Screens.Edit
             historyChanged();
         }
 
+        private void commitChangeHandlerStateChange()
+        {
+            if (isRestoring || changeHandler!.CurrentState <= 0)
+                return;
+
+            undoStack.Push(new Transaction(true));
+            redoStack.Clear();
+
+            Logger.Log("Added old change handler transaction to undo stack");
+
+            historyChanged();
+        }
+
         /// <summary>
         /// Undoes the last transaction from the undo stack.
         /// Returns false if there are is nothing to undo.
@@ -105,7 +128,18 @@ namespace osu.Game.Screens.Edit
 
             var transaction = undoStack.Pop();
 
-            revertTransaction(transaction);
+            if (transaction.IsChangeHandlerTransaction)
+            {
+                isRestoring = true;
+                changeHandler!.RestoreState(-1);
+                isRestoring = false;
+                Logger.Log("Undo handled by old change handler");
+            }
+            else
+            {
+                revertTransaction(transaction);
+                Logger.Log("Undo handled by new change handler");
+            }
 
             redoStack.Push(transaction);
 
@@ -125,7 +159,18 @@ namespace osu.Game.Screens.Edit
 
             var transaction = redoStack.Pop();
 
-            applyTransaction(transaction);
+            if (transaction.IsChangeHandlerTransaction)
+            {
+                isRestoring = true;
+                changeHandler!.RestoreState(1);
+                isRestoring = false;
+                Logger.Log("Redo handled by old change handler");
+            }
+            else
+            {
+                applyTransaction(transaction);
+                Logger.Log("Redo handled by new change handler");
+            }
 
             undoStack.Push(transaction);
 
@@ -136,6 +181,10 @@ namespace osu.Game.Screens.Edit
 
         private void revertTransaction(Transaction transaction)
         {
+            // We are navigating history so we don't want to write a new state.
+            if (changeHandler != null)
+                changeHandler.SuppressStateChange = true;
+
             isRestoring = true;
             editorBeatmap.BeginChange();
 
@@ -147,10 +196,17 @@ namespace osu.Game.Screens.Edit
 
             editorBeatmap.EndChange();
             isRestoring = false;
+
+            if (changeHandler != null)
+                changeHandler.SuppressStateChange = false;
         }
 
         private void applyTransaction(Transaction transaction)
         {
+            // We are navigating history so we don't want to write a new state.
+            if (changeHandler != null)
+                changeHandler.SuppressStateChange = true;
+
             isRestoring = true;
             editorBeatmap.BeginChange();
 
@@ -162,6 +218,9 @@ namespace osu.Game.Screens.Edit
 
             editorBeatmap.EndChange();
             isRestoring = false;
+
+            if (changeHandler != null)
+                changeHandler.SuppressStateChange = false;
         }
 
         private void historyChanged()
@@ -188,8 +247,17 @@ namespace osu.Game.Screens.Edit
         {
             public Transaction()
             {
+                IsChangeHandlerTransaction = false;
                 undoChanges = new List<IRevertibleChange>();
             }
+
+            public Transaction(bool isChangeHandlerTransaction)
+            {
+                IsChangeHandlerTransaction = isChangeHandlerTransaction;
+                undoChanges = new List<IRevertibleChange>();
+            }
+
+            public readonly bool IsChangeHandlerTransaction;
 
             private readonly List<IRevertibleChange> undoChanges;
 

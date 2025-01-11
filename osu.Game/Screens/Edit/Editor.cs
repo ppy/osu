@@ -95,6 +95,7 @@ namespace osu.Game.Screens.Edit
                 if (!canSave)
                     return false;
 
+                // TODO: Handle this in the new change handler with a version number.
                 return lastSavedHash != changeHandler?.CurrentStateHash;
             }
         }
@@ -293,13 +294,6 @@ namespace osu.Game.Screens.Edit
             dependencies.Cache(beatDivisor);
 
             editorBeatmap = new EditorBeatmap(playableBeatmap, loadableBeatmap.GetSkin(), loadableBeatmap.BeatmapInfo);
-            newChangeHandler = new NewBeatmapEditorChangeHandler(editorBeatmap);
-            dependencies.CacheAs(newChangeHandler);
-
-            AddInternal(editorBeatmap);
-            dependencies.CacheAs(editorBeatmap);
-
-            editorBeatmap.UpdateInProgress.BindValueChanged(_ => updateSampleDisabledState());
 
             canSave = editorBeatmap.BeatmapInfo.Ruleset.CreateInstance() is ILegacyRuleset;
 
@@ -308,6 +302,14 @@ namespace osu.Game.Screens.Edit
                 changeHandler = new BeatmapEditorChangeHandler(editorBeatmap);
                 dependencies.CacheAs<IEditorChangeHandler>(changeHandler);
             }
+
+            newChangeHandler = new NewBeatmapEditorChangeHandler(editorBeatmap, changeHandler);
+            dependencies.CacheAs(newChangeHandler);
+
+            AddInternal(editorBeatmap);
+            dependencies.CacheAs(editorBeatmap);
+
+            editorBeatmap.UpdateInProgress.BindValueChanged(_ => updateSampleDisabledState());
 
             beatDivisor.SetArbitraryDivisor(editorBeatmap.BeatmapInfo.BeatDivisor);
             beatDivisor.BindValueChanged(divisor => editorBeatmap.BeatmapInfo.BeatDivisor = divisor.NewValue);
