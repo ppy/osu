@@ -13,7 +13,6 @@ using Android.Graphics;
 using Android.OS;
 using Android.Views;
 using osu.Framework.Android;
-using osu.Framework.Extensions.ObjectExtensions;
 using osu.Game.Database;
 using Debug = System.Diagnostics.Debug;
 using Uri = Android.Net.Uri;
@@ -95,25 +94,38 @@ namespace osu.Android
 
         private void handleIntent(Intent? intent)
         {
-            switch (intent?.Action)
+            if (intent == null)
+                return;
+
+            switch (intent.Action)
             {
                 case Intent.ActionDefault:
                     if (intent.Scheme == ContentResolver.SchemeContent)
-                        handleImportFromUris(intent.Data.AsNonNull());
+                    {
+                        if (intent.Data != null)
+                            handleImportFromUris(intent.Data);
+                    }
                     else if (osu_url_schemes.Contains(intent.Scheme))
-                        game.HandleLink(intent.DataString);
+                    {
+                        if (intent.DataString != null)
+                            game.HandleLink(intent.DataString);
+                    }
+
                     break;
 
                 case Intent.ActionSend:
                 case Intent.ActionSendMultiple:
                 {
+                    if (intent.ClipData == null)
+                        break;
+
                     var uris = new List<Uri>();
 
-                    for (int i = 0; i < intent.ClipData?.ItemCount; i++)
+                    for (int i = 0; i < intent.ClipData.ItemCount; i++)
                     {
-                        var content = intent.ClipData?.GetItemAt(i);
-                        if (content != null)
-                            uris.Add(content.Uri.AsNonNull());
+                        var item = intent.ClipData.GetItemAt(i);
+                        if (item?.Uri != null)
+                            uris.Add(item.Uri);
                     }
 
                     handleImportFromUris(uris.ToArray());
