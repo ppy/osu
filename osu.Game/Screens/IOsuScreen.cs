@@ -62,10 +62,11 @@ namespace osu.Game.Screens
         bool HideMenuCursorOnNonMouseInput { get; }
 
         /// <summary>
-        /// On mobile devices, this specifies whether this <see cref="OsuScreen"/> requires the device to be in portrait orientation.
+        /// On mobile phones, this specifies whether this <see cref="OsuScreen"/> requires the device to be in portrait orientation.
+        /// Tablet devices are unaffected by this property.
         /// </summary>
         /// <remarks>
-        /// By default, all screens in the game display in landscape orientation.
+        /// By default, all screens in the game display in landscape orientation on phones.
         /// Setting this to <c>true</c> will display this screen in portrait orientation instead,
         /// and switch back to landscape when transitioning back to a regular non-portrait screen.
         /// </remarks>
