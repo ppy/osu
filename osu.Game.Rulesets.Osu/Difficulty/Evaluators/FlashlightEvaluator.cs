@@ -42,12 +42,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double scalingFactor = 52.0 / osuHitObject.Radius;
             double smallDistNerf = 1.0;
             double cumulativeStrainTime = 0.0;
+            double angleRepeatCount = 0.0;
 
             double result = 0.0;
 
             OsuDifficultyHitObject lastObj = osuCurrent;
-
-            double angleRepeatCount = 0.0;
 
             // This is iterating backwards in time from the current object.
             for (int i = 0; i < Math.Min(current.Index, 10); i++)
@@ -76,10 +75,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                     // Small jumps within the visible Flashlight radius should be nerfed.
                     if (i == 0)
-                        smallDistNerf = Math.Min(1.0, pixelDistance / (flashlightRadius - 45));
+                        smallDistNerf = Math.Min(1.0, pixelDistance / (flashlightRadius - 35));
 
                     // Nerf stacks so that only the first object of the stack is accounted for.
-                    double stackNerf = Math.Min(1.0, (currentObj.LazyJumpDistance / scalingFactor) / 25.0);
+                    double stackNerf = Math.Min(1.0, (currentObj.LazyJumpDistance / scalingFactor) / 45.0);
 
                     // Bonus based on object opacity.
                     double opacityBonus = 1.0 + max_opacity_bonus * (1.0 - objectOpacity);

@@ -26,8 +26,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             osuModFlashlight = (OsuModFlashlight)mods.Single(m => m is OsuModFlashlight);
         }
 
-        private double skillMultiplier => 0.05512;
+        private double skillMultiplier => 0.0727;
         private double strainDecayBase => 0.15;
+        protected override double DecayWeight => 0.99984;
 
         private double currentStrain;
 
@@ -42,8 +43,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             return currentStrain;
         }
-
-        public override double DifficultyValue() => GetCurrentStrainPeaks().Sum();
 
         public static double DifficultyToPerformance(double difficulty) => 28.727 * Math.Pow(difficulty, 2);
     }
