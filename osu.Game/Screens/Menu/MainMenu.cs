@@ -13,11 +13,13 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
+using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
@@ -39,6 +41,7 @@ using osu.Game.Screens.Select;
 using osu.Game.Seasonal;
 using osuTK;
 using osuTK.Graphics;
+using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Menu
 {
@@ -87,6 +90,7 @@ namespace osu.Game.Screens.Menu
 
         private Bindable<double> holdDelay;
         private Bindable<bool> loginDisplayed;
+        private Bindable<bool> showMobileDisclaimer;
 
         private HoldToExitGameOverlay holdToExitGameOverlay;
 
@@ -111,6 +115,7 @@ namespace osu.Game.Screens.Menu
         {
             holdDelay = config.GetBindable<double>(OsuSetting.UIHoldActivationDelay);
             loginDisplayed = statics.GetBindable<bool>(Static.LoginOverlayDisplayed);
+            showMobileDisclaimer = config.GetBindable<bool>(OsuSetting.ShowMobileDisclaimer);
 
             if (host.CanExit)
             {
@@ -255,6 +260,9 @@ namespace osu.Game.Screens.Menu
         [CanBeNull]
         private Drawable proxiedLogo;
 
+        [CanBeNull]
+        private ScheduledDelegate mobileDisclaimerSchedule;
+
         protected override void LogoArriving(OsuLogo logo, bool resuming)
         {
             base.LogoArriving(logo, resuming);
@@ -275,26 +283,46 @@ namespace osu.Game.Screens.Menu
 
                 sideFlashes.Delay(FADE_IN_DURATION).FadeIn(64, Easing.InQuint);
             }
-            else if (!api.IsLoggedIn || api.State.Value == APIState.RequiresSecondFactorAuth)
+            else
             {
                 // copy out old action to avoid accidentally capturing logo.Action in closure, causing a self-reference loop.
                 var previousAction = logo.Action;
 
-                // we want to hook into logo.Action to display the login overlay, but also preserve the return value of the old action.
+                // we want to hook into logo.Action to display certain overlays, but also preserve the return value of the old action.
                 // therefore pass the old action to displayLogin, so that it can return that value.
                 // this ensures that the OsuLogo sample does not play when it is not desired.
-                logo.Action = () => displayLogin(previousAction);
+                logo.Action = () => onLogoClick(previousAction);
             }
+        }
 
-            bool displayLogin(Func<bool> originalAction)
+        private bool onLogoClick(Func<bool> originalAction)
+        {
+            if (showMobileDisclaimer.Value)
             {
-                if (!loginDisplayed.Value)
+                mobileDisclaimerSchedule?.Cancel();
+                mobileDisclaimerSchedule = Scheduler.AddDelayed(() =>
                 {
-                    Scheduler.AddDelayed(() => login?.Show(), 500);
-                    loginDisplayed.Value = true;
-                }
+                    dialogOverlay.Push(new MobileDisclaimerDialog(() =>
+                    {
+                        showMobileDisclaimer.Value = false;
+                        displayLoginIfApplicable();
+                    }));
+                }, 500);
+            }
+            else
+                displayLoginIfApplicable();
 
-                return originalAction.Invoke();
+            return originalAction.Invoke();
+        }
+
+        private void displayLoginIfApplicable()
+        {
+            if (loginDisplayed.Value) return;
+
+            if (!api.IsLoggedIn || api.State.Value == APIState.RequiresSecondFactorAuth)
+            {
+                Scheduler.AddDelayed(() => login?.Show(), 500);
+                loginDisplayed.Value = true;
             }
         }
 
@@ -442,6 +470,26 @@ namespace osu.Game.Screens.Menu
 
         public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
+        }
+
+        private partial class MobileDisclaimerDialog : PopupDialog
+        {
+            public MobileDisclaimerDialog(Action confirmed)
+            {
+                HeaderText = ButtonSystemStrings.MobileDisclaimerHeader;
+                BodyText = ButtonSystemStrings.MobileDisclaimerBody;
+
+                Icon = FontAwesome.Solid.SmileBeam;
+
+                Buttons = new PopupDialogButton[]
+                {
+                    new PopupDialogOkButton
+                    {
+                        Text = "Understood",
+                        Action = confirmed,
+                    },
+                };
+            }
         }
     }
 }

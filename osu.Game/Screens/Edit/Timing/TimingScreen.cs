@@ -15,6 +15,8 @@ namespace osu.Game.Screens.Edit.Timing
         [Cached]
         public readonly Bindable<ControlPointGroup> SelectedGroup = new Bindable<ControlPointGroup>();
 
+        private readonly Bindable<EditorScreenMode> currentEditorMode = new Bindable<EditorScreenMode>();
+
         [Resolved]
         private EditorClock? editorClock { get; set; }
 
@@ -41,18 +43,35 @@ namespace osu.Game.Screens.Edit.Timing
             }
         };
 
+        [BackgroundDependencyLoader]
+        private void load(Editor? editor)
+        {
+            if (editor != null)
+                currentEditorMode.BindTo(editor.Mode);
+        }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            if (editorClock != null)
+            // When entering the timing screen, let's choose the closest valid timing point.
+            // This will emulate the osu-stable behaviour where a metronome and timing information
+            // are presented on entering the screen.
+            currentEditorMode.BindValueChanged(mode =>
             {
-                // When entering the timing screen, let's choose the closest valid timing point.
-                // This will emulate the osu-stable behaviour where a metronome and timing information
-                // are presented on entering the screen.
-                var nearestTimingPoint = EditorBeatmap.ControlPointInfo.TimingPointAt(editorClock.CurrentTime);
-                SelectedGroup.Value = EditorBeatmap.ControlPointInfo.GroupAt(nearestTimingPoint.Time);
-            }
+                if (mode.NewValue == EditorScreenMode.Timing)
+                    selectClosestTimingPoint();
+            });
+            selectClosestTimingPoint();
+        }
+
+        private void selectClosestTimingPoint()
+        {
+            if (editorClock == null)
+                return;
+
+            var nearestTimingPoint = EditorBeatmap.ControlPointInfo.TimingPointAt(editorClock.CurrentTime);
+            SelectedGroup.Value = EditorBeatmap.ControlPointInfo.GroupAt(nearestTimingPoint.Time);
         }
 
         protected override void ConfigureTimeline(TimelineArea timelineArea)

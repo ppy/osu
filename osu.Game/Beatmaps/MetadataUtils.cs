@@ -15,7 +15,7 @@ namespace osu.Game.Beatmaps
         /// Returns <see langword="true"/> if the character <paramref name="c"/> can be used in <see cref="BeatmapMetadata.Artist"/> and <see cref="BeatmapMetadata.Title"/> fields.
         /// Characters not matched by this method can be placed in <see cref="BeatmapMetadata.ArtistUnicode"/> and <see cref="BeatmapMetadata.TitleUnicode"/>.
         /// </summary>
-        public static bool IsRomanised(char c) => c <= 0xFF;
+        public static bool IsRomanised(char c) => char.IsAscii(c) && !char.IsControl(c);
 
         /// <summary>
         /// Returns <see langword="true"/> if the string <paramref name="str"/> can be used in <see cref="BeatmapMetadata.Artist"/> and <see cref="BeatmapMetadata.Title"/> fields.

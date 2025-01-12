@@ -9,10 +9,12 @@ using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Utils;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Skinning;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Legacy
@@ -51,8 +53,6 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
             textureIsDefaultSkin = skin is ISkinTransformer transformer && transformer.Skin is DefaultLegacySkin;
 
-            drawableObject.ApplyCustomUpdateState += updateStateTransforms;
-
             shouldRotate = skinSource.GetConfig<SkinConfiguration.LegacySetting, decimal>(SkinConfiguration.LegacySetting.Version)?.Value <= 1;
         }
 
@@ -68,7 +68,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             accentColour = drawableRepeat.AccentColour.GetBoundCopy();
             accentColour.BindValueChanged(c =>
             {
-                arrow.Colour = textureIsDefaultSkin && c.NewValue.R + c.NewValue.G + c.NewValue.B > (600 / 255f) ? Color4.Black : Color4.White;
+                arrow.Colour = textureIsDefaultSkin && c.NewValue.R + c.NewValue.G + c.NewValue.B > 600 / 255f ? Color4.Black : Color4.White;
             }, true);
         }
 
@@ -80,36 +80,32 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             drawableRepeat.DrawableSlider.OverlayElementContainer.Add(proxy);
         }
 
-        private void updateStateTransforms(DrawableHitObject hitObject, ArmedState state)
+        protected override void Update()
         {
-            const double duration = 300;
-            const float rotation = 5.625f;
+            base.Update();
 
-            switch (state)
+            if (Time.Current >= drawableRepeat.HitStateUpdateTime && drawableRepeat.State.Value == ArmedState.Hit)
             {
-                case ArmedState.Idle:
-                    if (shouldRotate)
-                    {
-                        InternalChild.ScaleTo(1.3f)
-                                     .RotateTo(rotation)
-                                     .Then()
-                                     .ScaleTo(1f, duration)
-                                     .RotateTo(-rotation, duration)
-                                     .Loop();
-                    }
-                    else
-                    {
-                        InternalChild.ScaleTo(1.3f).Then()
-                                     .ScaleTo(1f, duration, Easing.Out)
-                                     .Loop();
-                    }
+                double animDuration = Math.Min(300, drawableRepeat.HitObject.SpanDuration);
+                arrow.Scale = new Vector2(Interpolation.ValueAt(Time.Current, 1, 1.4f, drawableRepeat.HitStateUpdateTime, drawableRepeat.HitStateUpdateTime + animDuration, Easing.Out));
+            }
+            else
+            {
+                const double duration = 300;
+                const float rotation = 5.625f;
 
-                    break;
+                double loopCurrentTime = (Time.Current - drawableRepeat.AnimationStartTime.Value) % duration;
 
-                case ArmedState.Hit:
-                    double animDuration = Math.Min(300, drawableRepeat.HitObject.SpanDuration);
-                    InternalChild.ScaleTo(1.4f, animDuration, Easing.Out);
-                    break;
+                // Reference: https://github.com/peppy/osu-stable-reference/blob/2280c4c436f80d04f9c79d3c905db00ac2902273/osu!/GameplayElements/HitObjects/Osu/HitCircleSliderEnd.cs#L79-L96
+                if (shouldRotate)
+                {
+                    arrow.Rotation = Interpolation.ValueAt(loopCurrentTime, rotation, -rotation, 0, duration);
+                    arrow.Scale = new Vector2(Interpolation.ValueAt(loopCurrentTime, 1.3f, 1, 0, duration));
+                }
+                else
+                {
+                    arrow.Scale = new Vector2(Interpolation.ValueAt(loopCurrentTime, 1.3f, 1, 0, duration, Easing.Out));
+                }
             }
         }
 
@@ -120,7 +116,6 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             if (drawableRepeat.IsNotNull())
             {
                 drawableRepeat.HitObjectApplied -= onHitObjectApplied;
-                drawableRepeat.ApplyCustomUpdateState -= updateStateTransforms;
             }
         }
     }
