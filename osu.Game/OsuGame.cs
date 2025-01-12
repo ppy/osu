@@ -174,7 +174,8 @@ namespace osu.Game
         public readonly IBindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>();
 
         /// <summary>
-        /// On mobile devices, this specifies whether the device should be set and locked to portrait orientation.
+        /// On mobile phones, this specifies whether the device should be set and locked to portrait orientation.
+        /// Tablet devices are unaffected by this property.
         /// </summary>
         /// <remarks>
         /// Implementations can be viewed in mobile projects.
