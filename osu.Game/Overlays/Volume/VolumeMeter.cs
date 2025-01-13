@@ -252,7 +252,7 @@ namespace osu.Game.Overlays.Volume
             get => displayVolume;
             set
             {
-                percentage = 1 - value / VolumeScaler.MIN;
+                percentage = 1 - (value / VolumeScaler.MIN);
 
                 int step = (int)Math.Round(value / adjust_step);
                 bool stepChanged = step != currentStep;
@@ -288,7 +288,7 @@ namespace osu.Game.Overlays.Volume
 
             var channel = notchSample.GetChannel();
 
-            channel.Frequency.Value = 0.99f + RNG.NextDouble(0.02f) + percentage * 0.1f;
+            channel.Frequency.Value = 0.99f + RNG.NextDouble(0.02f) + (percentage * 0.1f);
 
             // intentionally pitched down, even when hitting max.
             if (currentStep == step_min || currentStep == step_max)
