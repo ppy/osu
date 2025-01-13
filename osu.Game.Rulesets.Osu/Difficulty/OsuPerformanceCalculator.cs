@@ -437,8 +437,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 return 0;
 
             double missedComboPercent = 1.0 - (double)scoreMaxCombo / attributes.MaxCombo;
-            double estimatedSliderbreaks = countMiss * topWeightedSliderFactor * DifficultyCalculationUtils.Logistic(missedComboPercent, 0.33, 15);
-            return Math.Min(countMeh + countOk, estimatedSliderbreaks);
+            double estimatedSliderbreaks = Math.Min(countOk, effectiveMissCount * topWeightedSliderFactor);
+            // scores with more oks are more likely to have sliderbreaks
+            double okAdjustment = ((countOk - estimatedSliderbreaks) + 0.5) / countOk;
+            return estimatedSliderbreaks * okAdjustment * DifficultyCalculationUtils.Logistic(missedComboPercent, 0.33, 15);
         }
 
         private int totalHits => countGreat + countOk + countMeh + countMiss;
