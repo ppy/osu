@@ -120,7 +120,7 @@ namespace osu.Game.Tests.Visual.Navigation
 
             string state = string.Empty;
 
-            AddUntilStep("wait for accuracy counter", () => Game.ChildrenOfType<ArgonAccuracyCounter>().Any(counter => counter.IsLoaded));
+            AddUntilStep("wait for accuracy counter", () => Game.ChildrenOfType<ArgonAccuracyCounter>().Any(counter => counter.Position != new Vector2()));
             AddStep("dump state of accuracy meter", () => state = JsonConvert.SerializeObject(Game.ChildrenOfType<ArgonAccuracyCounter>().First().CreateSerialisedInfo()));
             AddStep("add any component", () => Game.ChildrenOfType<SkinComponentToolbox.ToolboxComponentButton>().First().TriggerClick());
             AddStep("undo", () =>
@@ -157,7 +157,7 @@ namespace osu.Game.Tests.Visual.Navigation
 
             string state = string.Empty;
 
-            AddUntilStep("wait for accuracy counter", () => Game.ChildrenOfType<ArgonAccuracyCounter>().Any(counter => counter.IsLoaded));
+            AddUntilStep("wait for accuracy counter", () => Game.ChildrenOfType<ArgonAccuracyCounter>().Any(counter => counter.Position != new Vector2()));
             AddStep("dump state of accuracy meter", () => state = JsonConvert.SerializeObject(Game.ChildrenOfType<ArgonAccuracyCounter>().First().CreateSerialisedInfo()));
             AddStep("add any component", () => Game.ChildrenOfType<SkinComponentToolbox.ToolboxComponentButton>().First().TriggerClick());
             AddStep("undo", () =>
