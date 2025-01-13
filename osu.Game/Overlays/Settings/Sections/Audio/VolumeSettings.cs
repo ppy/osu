@@ -15,7 +15,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
     {
         protected override LocalisableString Header => AudioSettingsStrings.VolumeHeader;
 
-        private readonly VolumeScaler volumeInactive = new VolumeScaler();
+        private readonly BindableVolume volumeInactive = new BindableVolume();
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, OsuConfigManager config)
@@ -29,34 +29,34 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                 {
                     LabelText = AudioSettingsStrings.MasterVolume,
                     Current = audio.Volume.Scaled,
-                    KeyboardStep = (float)VolumeScaler.STEP,
+                    KeyboardStep = (float)BindableVolume.STEP,
                 },
                 new VolumeAdjustSlider
                 {
                     LabelText = AudioSettingsStrings.MasterVolumeInactive,
                     Current = volumeInactive.Scaled,
-                    KeyboardStep = (float)VolumeScaler.STEP,
+                    KeyboardStep = (float)BindableVolume.STEP,
                     PlaySamplesOnAdjust = true,
                 },
                 new VolumeAdjustSlider
                 {
                     LabelText = AudioSettingsStrings.EffectVolume,
                     Current = audio.VolumeSample.Scaled,
-                    KeyboardStep = (float)VolumeScaler.STEP,
+                    KeyboardStep = (float)BindableVolume.STEP,
                 },
 
                 new VolumeAdjustSlider
                 {
                     LabelText = AudioSettingsStrings.MusicVolume,
                     Current = audio.VolumeTrack.Scaled,
-                    KeyboardStep = (float)VolumeScaler.STEP,
+                    KeyboardStep = (float)BindableVolume.STEP,
                 },
             };
         }
 
         private partial class DecibelSliderBar : RoundedSliderBar<double>
         {
-            public override LocalisableString TooltipText => (Current.Value <= VolumeScaler.MIN ? "-∞" : Current.Value.ToString("+#0.0;-#0.0;+0.0")) + " dB";
+            public override LocalisableString TooltipText => (Current.Value <= BindableVolume.MIN ? "-∞" : Current.Value.ToString("+#0.0;-#0.0;+0.0")) + " dB";
         }
 
         private partial class VolumeAdjustSlider : SettingsSlider<double>

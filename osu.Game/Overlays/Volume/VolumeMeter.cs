@@ -37,7 +37,7 @@ namespace osu.Game.Overlays.Volume
 
         protected static readonly Vector2 LABEL_SIZE = new Vector2(120, 20);
 
-        public BindableDouble Bindable { get; } = new BindableDouble { MinValue = VolumeScaler.MIN, MaxValue = 0, Precision = adjust_step };
+        public BindableDouble Bindable { get; } = new BindableDouble { MinValue = BindableVolume.MIN, MaxValue = 0, Precision = adjust_step };
 
         protected readonly float CircleSize;
 
@@ -252,7 +252,7 @@ namespace osu.Game.Overlays.Volume
             get => displayVolume;
             set
             {
-                percentage = 1 - (value / VolumeScaler.MIN);
+                percentage = 1 - (value / BindableVolume.MIN);
 
                 int step = (int)Math.Round(value / adjust_step);
                 bool stepChanged = step != currentStep;
@@ -304,9 +304,9 @@ namespace osu.Game.Overlays.Volume
             private set => Bindable.Value = value;
         }
 
-        private const double adjust_step = VolumeScaler.STEP;
+        private const double adjust_step = BindableVolume.STEP;
 
-        private const int step_min = (int)(VolumeScaler.MIN / VolumeScaler.STEP);
+        private const int step_min = (int)(BindableVolume.MIN / BindableVolume.STEP);
         private const int step_max = 0;
 
         public void Increase(double amount = 1, bool isPrecise = false) => adjust(amount, isPrecise);
