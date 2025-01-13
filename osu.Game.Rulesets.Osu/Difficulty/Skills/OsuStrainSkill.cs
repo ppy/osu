@@ -70,7 +70,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 return 0;
 
             // Use a weighted sum of all strains. Constants are arbitrary and give nice values
-            return SliderStrains.Sum(s => 1.1 / (1 + Math.Exp(-10 * (s / consistentTopStrain - 0.88))));
+            return SliderStrains.Sum(DifficultyCalculationUtils.Logistic(s / consistentTopStrain, 0.88, 10, 1.1));
         }
 
         public static double DifficultyToPerformance(double difficulty) => Math.Pow(5.0 * Math.Max(1.0, difficulty / 0.0675) - 4.0, 3.0) / 100000.0;
