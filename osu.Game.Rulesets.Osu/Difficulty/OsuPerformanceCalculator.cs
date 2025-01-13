@@ -114,7 +114,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 effectiveMissCount = Math.Min(effectiveMissCount + countOk * okMultiplier + countMeh * mehMultiplier, totalHits);
             }
 
-            totalDeviation = calculateTotalDeviation(score, osuAttributes);
+            totalDeviation = calculateTotalDeviation(osuAttributes);
             speedDeviation = calculateSpeedDeviation(osuAttributes);
 
             double aimValue = computeAimValue(score, osuAttributes);
@@ -202,7 +202,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 aimValue *= 1.0 + 0.04 * (12.0 - attributes.ApproachRate);
             }
 
-            aimValue *= SpecialFunctions.Erf(23.0 / (Math.Sqrt(2) * totalDeviation.Value));
+            aimValue *= SpecialFunctions.Erf(25.0 / (Math.Sqrt(2) * totalDeviation.Value));
 
             return aimValue;
         }
@@ -326,7 +326,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         /// Returns deviation for circles and sliders if score was set with slideracc.
         /// Returns the min between deviation of circles and deviation on circles and sliders (assuming slider hits are 50s), if score was set without slideracc.
         /// </summary>
-        private double? calculateTotalDeviation(ScoreInfo score, OsuDifficultyAttributes attributes)
+        private double? calculateTotalDeviation(OsuDifficultyAttributes attributes)
         {
             if (totalSuccessfulHits == 0)
                 return null;
