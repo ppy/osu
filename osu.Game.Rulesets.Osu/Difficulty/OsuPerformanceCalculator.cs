@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         /// </summary>
         private double effectiveMissCount;
 
-        private double? deviation;
+        private double? totalDeviation;
         private double? speedDeviation;
 
         public OsuPerformanceCalculator()
@@ -114,7 +114,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 effectiveMissCount = Math.Min(effectiveMissCount + countOk * okMultiplier + countMeh * mehMultiplier, totalHits);
             }
 
-            deviation = calculateTotalDeviation(score, osuAttributes);
+            totalDeviation = calculateTotalDeviation(score, osuAttributes);
             speedDeviation = calculateSpeedDeviation(osuAttributes);
 
             double aimValue = computeAimValue(score, osuAttributes);
@@ -137,7 +137,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 Accuracy = accuracyValue,
                 Flashlight = flashlightValue,
                 EffectiveMissCount = effectiveMissCount,
-                TotalDeviation = deviation,
+                TotalDeviation = totalDeviation,
                 SpeedDeviation = speedDeviation,
                 Total = totalValue
             };
@@ -148,7 +148,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (score.Mods.Any(h => h is OsuModAutopilot))
                 return 0.0;
 
-            if (deviation == null)
+            if (totalDeviation == null)
                 return 0;
 
             double aimDifficulty = attributes.AimDifficulty;
@@ -202,8 +202,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 aimValue *= 1.0 + 0.04 * (12.0 - attributes.ApproachRate);
             }
 
-            aimValue *= SpecialFunctions.Erf(25.0 / (Math.Sqrt(2) * deviation.Value));
-            aimValue *= 1.02; // Keeps OD 11 SS staying roughly the same
+            aimValue *= SpecialFunctions.Erf(23.0 / (Math.Sqrt(2) * totalDeviation.Value));
 
             return aimValue;
         }
@@ -334,6 +333,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             int accuracyObjectCount = attributes.HitCircleCount;
 
+            if (!usingClassicSliderAccuracy)
+                accuracyObjectCount += attributes.SliderCount;
+
             // Assume worst case: all mistakes was on accuracy objects
             int relevantCountMiss = Math.Min(countMiss, accuracyObjectCount);
             int relevantCountMeh = Math.Min(countMeh, accuracyObjectCount - relevantCountMiss);
@@ -344,6 +346,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double? deviation = calculateDeviation(attributes, relevantCountGreat, relevantCountOk, relevantCountMeh, relevantCountMiss);
             if (deviation == null)
                 return null;
+
+            if (!usingClassicSliderAccuracy)
+                return deviation.Value;
 
             // If score was set without slider accuracy - also compute deviation with sliders
             // Assume that all hits was 50s
