@@ -433,7 +433,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double calculateEstimatedSliderbreaks(double topWeightedSliderFactor, OsuDifficultyAttributes attributes)
         {
-            if (!usingClassicSliderAccuracy)
+            if (!usingClassicSliderAccuracy || countOk == 0)
                 return 0;
 
             double missedComboPercent = 1.0 - (double)scoreMaxCombo / attributes.MaxCombo;
