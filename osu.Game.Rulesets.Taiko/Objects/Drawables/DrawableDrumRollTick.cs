@@ -12,6 +12,7 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Skinning.Default;
 using osu.Game.Skinning;
+using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
@@ -42,6 +43,12 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             base.OnApply();
 
             IsFirstTick.Value = HitObject.FirstTick;
+        }
+
+        protected override void RecreatePieces()
+        {
+            base.RecreatePieces();
+            Size = new Vector2(HitObject.IsStrong ? TaikoStrongableHitObject.DEFAULT_STRONG_SIZE : TaikoHitObject.DEFAULT_SIZE);
         }
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)

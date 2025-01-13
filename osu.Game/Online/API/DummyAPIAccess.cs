@@ -26,11 +26,9 @@ namespace osu.Game.Online.API
             Id = DUMMY_USER_ID,
         });
 
-        public BindableList<APIUser> Friends { get; } = new BindableList<APIUser>();
+        public BindableList<APIRelation> Friends { get; } = new BindableList<APIRelation>();
 
         public Bindable<UserActivity> Activity { get; } = new Bindable<UserActivity>();
-
-        public Bindable<UserStatistics?> Statistics { get; } = new Bindable<UserStatistics?>();
 
         public DummyNotificationsClient NotificationsClient { get; } = new DummyNotificationsClient();
         INotificationsClient IAPIProvider.NotificationsClient => NotificationsClient;
@@ -178,11 +176,6 @@ namespace osu.Game.Online.API
         private void onSuccessfulLogin()
         {
             state.Value = APIState.Online;
-            Statistics.Value = new UserStatistics
-            {
-                GlobalRank = 1,
-                CountryRank = 1
-            };
         }
 
         public void Logout()
@@ -193,12 +186,8 @@ namespace osu.Game.Online.API
             LocalUser.Value = new GuestUser();
         }
 
-        public void UpdateStatistics(UserStatistics newStatistics)
+        public void UpdateLocalFriends()
         {
-            Statistics.Value = newStatistics;
-
-            if (IsLoggedIn)
-                LocalUser.Value.Statistics = newStatistics;
         }
 
         public IHubClientConnector? GetHubConnector(string clientName, string endpoint, bool preferMessagePack) => null;
@@ -214,9 +203,8 @@ namespace osu.Game.Online.API
         public void SetState(APIState newState) => state.Value = newState;
 
         IBindable<APIUser> IAPIProvider.LocalUser => LocalUser;
-        IBindableList<APIUser> IAPIProvider.Friends => Friends;
+        IBindableList<APIRelation> IAPIProvider.Friends => Friends;
         IBindable<UserActivity> IAPIProvider.Activity => Activity;
-        IBindable<UserStatistics?> IAPIProvider.Statistics => Statistics;
 
         /// <summary>
         /// Skip 2FA requirement for next login.

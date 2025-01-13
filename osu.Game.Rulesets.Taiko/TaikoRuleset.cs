@@ -190,9 +190,12 @@ namespace osu.Game.Rulesets.Taiko
 
         public override HitObjectComposer CreateHitObjectComposer() => new TaikoHitObjectComposer(this);
 
-        public override IEnumerable<SetupSection> CreateEditorSetupSections() =>
+        public override IEnumerable<Drawable> CreateEditorSetupSections() =>
         [
+            new MetadataSection(),
             new TaikoDifficultySection(),
+            new ResourcesSection(),
+            new DesignSection(),
         ];
 
         public override IBeatmapVerifier CreateBeatmapVerifier() => new TaikoBeatmapVerifier();

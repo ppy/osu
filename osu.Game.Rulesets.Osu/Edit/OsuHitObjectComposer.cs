@@ -45,16 +45,22 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
             new HitCircleCompositionTool(),
             new SliderCompositionTool(),
-            new SpinnerCompositionTool()
+            new SpinnerCompositionTool(),
+            new GridFromPointsTool()
         };
 
         private readonly Bindable<TernaryState> rectangularGridSnapToggle = new Bindable<TernaryState>();
 
         protected override Drawable CreateHitObjectInspector() => new OsuHitObjectInspector();
 
-        protected override IEnumerable<TernaryButton> CreateTernaryButtons()
+        protected override IEnumerable<DrawableTernaryButton> CreateTernaryButtons()
             => base.CreateTernaryButtons()
-                   .Append(new TernaryButton(rectangularGridSnapToggle, "Grid Snap", () => new SpriteIcon { Icon = OsuIcon.EditorGridSnap }))
+                   .Append(new DrawableTernaryButton
+                   {
+                       Current = rectangularGridSnapToggle,
+                       Description = "Grid Snap",
+                       CreateIcon = () => new SpriteIcon { Icon = OsuIcon.EditorGridSnap },
+                   })
                    .Concat(DistanceSnapProvider.CreateTernaryButtons());
 
         private BindableList<HitObject> selectedHitObjects;
@@ -79,13 +85,12 @@ namespace osu.Game.Rulesets.Osu.Edit
             // Give a bit of breathing room around the playfield content.
             PlayfieldContentContainer.Padding = new MarginPadding(10);
 
-            LayerBelowRuleset.AddRange(new Drawable[]
-            {
+            LayerBelowRuleset.Add(
                 distanceSnapGridContainer = new Container
                 {
                     RelativeSizeAxes = Axes.Both
                 }
-            });
+            );
 
             selectedHitObjects = EditorBeatmap.SelectedHitObjects.GetBoundCopy();
             selectedHitObjects.CollectionChanged += (_, _) => updateDistanceSnapGrid();

@@ -13,7 +13,8 @@ namespace osu.Game.Tests.Visual.Metadata
 {
     public partial class TestMetadataClient : MetadataClient
     {
-        public override IBindable<bool> IsConnected => new BindableBool(true);
+        public override IBindable<bool> IsConnected => isConnected;
+        private readonly BindableBool isConnected = new BindableBool(true);
 
         public override IBindable<bool> IsWatchingUserPresence => isWatchingUserPresence;
         private readonly BindableBool isWatchingUserPresence = new BindableBool();
@@ -98,5 +99,16 @@ namespace osu.Game.Tests.Visual.Metadata
         }
 
         public override Task EndWatchingMultiplayerRoom(long id) => Task.CompletedTask;
+
+        public void Disconnect()
+        {
+            isConnected.Value = false;
+            dailyChallengeInfo.Value = null;
+        }
+
+        public void Reconnect()
+        {
+            isConnected.Value = true;
+        }
     }
 }
