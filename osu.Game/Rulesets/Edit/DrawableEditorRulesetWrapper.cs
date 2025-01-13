@@ -19,16 +19,16 @@ namespace osu.Game.Rulesets.Edit
     internal partial class DrawableEditorRulesetWrapper<TObject> : CompositeDrawable
         where TObject : HitObject
     {
-        public Playfield Playfield => drawableRuleset.Playfield;
+        public Playfield Playfield => DrawableRuleset.Playfield;
 
-        private readonly DrawableRuleset<TObject> drawableRuleset;
+        public readonly DrawableRuleset<TObject> DrawableRuleset;
 
         [Resolved]
         private EditorBeatmap beatmap { get; set; } = null!;
 
         public DrawableEditorRulesetWrapper(DrawableRuleset<TObject> drawableRuleset)
         {
-            this.drawableRuleset = drawableRuleset;
+            DrawableRuleset = drawableRuleset;
 
             RelativeSizeAxes = Axes.Both;
 
@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Edit
         [BackgroundDependencyLoader]
         private void load()
         {
-            drawableRuleset.FrameStablePlayback = false;
+            DrawableRuleset.FrameStablePlayback = false;
             Playfield.DisplayJudgements.Value = false;
         }
 
@@ -67,27 +67,27 @@ namespace osu.Game.Rulesets.Edit
 
         private void regenerateAutoplay()
         {
-            var autoplayMod = drawableRuleset.Mods.OfType<ModAutoplay>().Single();
-            drawableRuleset.SetReplayScore(autoplayMod.CreateScoreFromReplayData(drawableRuleset.Beatmap, drawableRuleset.Mods));
+            var autoplayMod = DrawableRuleset.Mods.OfType<ModAutoplay>().Single();
+            DrawableRuleset.SetReplayScore(autoplayMod.CreateScoreFromReplayData(DrawableRuleset.Beatmap, DrawableRuleset.Mods));
         }
 
         private void addHitObject(HitObject hitObject)
         {
-            drawableRuleset.AddHitObject((TObject)hitObject);
-            drawableRuleset.Playfield.PostProcess();
+            DrawableRuleset.AddHitObject((TObject)hitObject);
+            DrawableRuleset.Playfield.PostProcess();
         }
 
         private void removeHitObject(HitObject hitObject)
         {
-            drawableRuleset.RemoveHitObject((TObject)hitObject);
-            drawableRuleset.Playfield.PostProcess();
+            DrawableRuleset.RemoveHitObject((TObject)hitObject);
+            DrawableRuleset.Playfield.PostProcess();
         }
 
         public override bool PropagatePositionalInputSubTree => false;
 
         public override bool PropagateNonPositionalInputSubTree => false;
 
-        public PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => drawableRuleset.CreatePlayfieldAdjustmentContainer();
+        public PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => DrawableRuleset.CreatePlayfieldAdjustmentContainer();
 
         protected override void Dispose(bool isDisposing)
         {

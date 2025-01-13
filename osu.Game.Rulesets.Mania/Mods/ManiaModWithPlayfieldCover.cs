@@ -5,9 +5,9 @@ using System;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.UI;
+using osu.Game.Rulesets.Mania.UI.Components;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Mania.Mods
             foreach (Column column in maniaPlayfield.Stages.SelectMany(stage => stage.Columns))
             {
                 HitObjectContainer hoc = column.HitObjectContainer;
-                Container hocParent = (Container)hoc.Parent!;
+                ColumnHitObjectArea hocParent = (ColumnHitObjectArea)hoc.Parent!;
 
                 hocParent.Remove(hoc, false);
                 hocParent.Add(CreateCover(hoc).With(c =>

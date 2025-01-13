@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Mania.UI
         }
 
         [Resolved]
-        private DrawableManiaRuleset drawableManiaRuleset { get; set; } = null!;
+        private DrawableRuleset drawableRuleset { get; set; } = null!;
 
         protected override void Update()
         {
@@ -39,6 +39,8 @@ namespace osu.Game.Rulesets.Mania.UI
 
             float aspectRatio = DrawWidth / DrawHeight;
             bool isPortrait = aspectRatio < 1f;
+
+            var drawableManiaRuleset = (DrawableManiaRuleset)drawableRuleset;
 
             if (isPortrait && drawableManiaRuleset.Beatmap.Stages.Count == 1)
             {

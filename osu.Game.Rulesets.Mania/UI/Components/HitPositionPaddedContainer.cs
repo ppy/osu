@@ -19,6 +19,16 @@ namespace osu.Game.Rulesets.Mania.UI.Components
             InternalChild = child;
         }
 
+        internal void Add(Drawable drawable)
+        {
+            base.AddInternal(drawable);
+        }
+
+        internal void Remove(Drawable drawable, bool disposeImmediately = true)
+        {
+            base.RemoveInternal(drawable, disposeImmediately);
+        }
+
         [BackgroundDependencyLoader]
         private void load(IScrollingInfo scrollingInfo)
         {
