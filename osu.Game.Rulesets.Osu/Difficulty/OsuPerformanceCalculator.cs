@@ -41,6 +41,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         /// </summary>
         private double effectiveMissCount;
 
+        private double? deviation;
         private double? speedDeviation;
 
         public OsuPerformanceCalculator()
@@ -113,6 +114,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 effectiveMissCount = Math.Min(effectiveMissCount + countOk * okMultiplier + countMeh * mehMultiplier, totalHits);
             }
 
+            deviation = calculateTotalDeviation(score, osuAttributes);
             speedDeviation = calculateSpeedDeviation(osuAttributes);
 
             double aimValue = computeAimValue(score, osuAttributes);
@@ -135,6 +137,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 Accuracy = accuracyValue,
                 Flashlight = flashlightValue,
                 EffectiveMissCount = effectiveMissCount,
+                TotalDeviation = deviation,
                 SpeedDeviation = speedDeviation,
                 Total = totalValue
             };
@@ -144,6 +147,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
             if (score.Mods.Any(h => h is OsuModAutopilot))
                 return 0.0;
+
+            if (deviation == null)
+                return 0;
 
             double aimDifficulty = attributes.AimDifficulty;
 
@@ -196,9 +202,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 aimValue *= 1.0 + 0.04 * (12.0 - attributes.ApproachRate);
             }
 
-            aimValue *= Math.Pow(accuracy, 2.0);
-            // It is important to consider accuracy difficulty when scaling with accuracy.
-            aimValue *= 0.98 + Math.Pow(Math.Max(0, attributes.OverallDifficulty), 2) / 2500;
+            aimValue *= SpecialFunctions.Erf(25.0 / (Math.Sqrt(2) * deviation.Value));
+            aimValue *= 0.98 + Math.Pow(100.0 / 9, 2) / 2500; // OD 11 SS stays the same.
 
             return aimValue;
         }
@@ -315,6 +320,42 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             flashlightValue *= 0.98 + Math.Pow(Math.Max(0, attributes.OverallDifficulty), 2) / 2500;
 
             return flashlightValue;
+        }
+
+        /// <summary>
+        /// Using <see cref="calculateDeviation"/> estimates player's deviation on accuracy objects.
+        /// Returns deviation for circles and sliders if score was set with slideracc.
+        /// Returns the min between deviation of circles and deviation on circles and sliders (assuming slider hits are 50s), if score was set without slideracc.
+        /// </summary>
+        private double? calculateTotalDeviation(ScoreInfo score, OsuDifficultyAttributes attributes)
+        {
+            if (totalSuccessfulHits == 0)
+                return null;
+
+            int accuracyObjectCount = attributes.HitCircleCount;
+
+            // Assume worst case: all mistakes was on accuracy objects
+            int relevantCountMiss = Math.Min(countMiss, accuracyObjectCount);
+            int relevantCountMeh = Math.Min(countMeh, accuracyObjectCount - relevantCountMiss);
+            int relevantCountOk = Math.Min(countOk, accuracyObjectCount - relevantCountMiss - relevantCountMeh);
+            int relevantCountGreat = Math.Max(0, accuracyObjectCount - relevantCountMiss - relevantCountMeh - relevantCountOk);
+
+            // Calculate deviation on accuracy objects
+            double? deviation = calculateDeviation(attributes, relevantCountGreat, relevantCountOk, relevantCountMeh, relevantCountMiss);
+            if (deviation == null)
+                return null;
+
+            // If score was set without slider accuracy - also compute deviation with sliders
+            // Assume that all hits was 50s
+            int totalCountWithSliders = attributes.HitCircleCount + attributes.SliderCount;
+            int missCountWithSliders = Math.Min(totalCountWithSliders, countMiss);
+            int hitCountWithSliders = totalCountWithSliders - missCountWithSliders;
+
+            double hitProbabilityWithSliders = hitCountWithSliders / (totalCountWithSliders + 1.0);
+            double deviationWithSliders = attributes.MehHitWindow / (Math.Sqrt(2) * SpecialFunctions.ErfInv(hitProbabilityWithSliders));
+
+            // Min is needed for edgecase maps with 1 circle and 999 sliders, as deviation on sliders can be lower in this case
+            return Math.Min(deviation.Value, deviationWithSliders);
         }
 
         /// <summary>
