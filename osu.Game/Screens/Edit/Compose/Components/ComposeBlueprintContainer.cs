@@ -456,6 +456,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
                 currentTool = value;
 
+                // Maybe this should go in EditorState or somewhere else? Feels a bit haphazard.
+                SelectionHandler.IsInSelectionMode = currentTool is SelectTool;
+
                 // As per stable editor, when changing tools, we should forcefully commit any pending placement.
                 CommitIfPlacementActive();
             }
