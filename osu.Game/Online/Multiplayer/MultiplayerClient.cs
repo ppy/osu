@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
@@ -15,10 +14,10 @@ using osu.Framework.Graphics;
 using osu.Game.Database;
 using osu.Game.Localisation;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer.Countdown;
 using osu.Game.Online.Rooms;
-using osu.Game.Online.Rooms.RoomStatuses;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
@@ -180,15 +179,15 @@ namespace osu.Game.Online.Multiplayer
 
             await joinOrLeaveTaskChain.Add(async () =>
             {
-                Debug.Assert(room.RoomID.Value != null);
+                Debug.Assert(room.RoomID != null);
 
                 // Join the server-side room.
-                var joinedRoom = await JoinRoom(room.RoomID.Value.Value, password ?? room.Password.Value).ConfigureAwait(false);
+                var joinedRoom = await JoinRoom(room.RoomID.Value, password ?? room.Password).ConfigureAwait(false);
                 Debug.Assert(joinedRoom != null);
 
                 // Populate users.
                 Debug.Assert(joinedRoom.Users != null);
-                await Task.WhenAll(joinedRoom.Users.Select(PopulateUser)).ConfigureAwait(false);
+                await PopulateUsers(joinedRoom.Users).ConfigureAwait(false);
 
                 // Update the stored room (must be done on update thread for thread-safety).
                 await runOnUpdateThreadAsync(() =>
@@ -200,12 +199,11 @@ namespace osu.Game.Online.Multiplayer
 
                     Debug.Assert(joinedRoom.Playlist.Count > 0);
 
-                    APIRoom.Playlist.Clear();
-                    APIRoom.Playlist.AddRange(joinedRoom.Playlist.Select(createPlaylistItem));
-                    APIRoom.CurrentPlaylistItem.Value = APIRoom.Playlist.Single(item => item.ID == joinedRoom.Settings.PlaylistItemId);
+                    APIRoom.Playlist = joinedRoom.Playlist.Select(item => new PlaylistItem(item)).ToArray();
+                    APIRoom.CurrentPlaylistItem = APIRoom.Playlist.Single(item => item.ID == joinedRoom.Settings.PlaylistItemId);
 
                     // The server will null out the end date upon the host joining the room, but the null value is never communicated to the client.
-                    APIRoom.EndDate.Value = null;
+                    APIRoom.EndDate = null;
 
                     Debug.Assert(LocalUser != null);
                     addUserToAPIRoom(LocalUser);
@@ -396,15 +394,17 @@ namespace osu.Game.Online.Multiplayer
                 switch (state)
                 {
                     case MultiplayerRoomState.Open:
-                        APIRoom.Status.Value = APIRoom.HasPassword.Value ? new RoomStatusOpenPrivate() : new RoomStatusOpen();
+                        APIRoom.Status = RoomStatus.Idle;
                         break;
 
+                    case MultiplayerRoomState.WaitingForLoad:
                     case MultiplayerRoomState.Playing:
-                        APIRoom.Status.Value = new RoomStatusPlaying();
+                        APIRoom.Status = RoomStatus.Playing;
                         break;
 
                     case MultiplayerRoomState.Closed:
-                        APIRoom.Status.Value = new RoomStatusEnded();
+                        APIRoom.EndDate = DateTimeOffset.Now;
+                        APIRoom.Status = RoomStatus.Idle;
                         break;
                 }
 
@@ -416,7 +416,7 @@ namespace osu.Game.Online.Multiplayer
 
         async Task IMultiplayerClient.UserJoined(MultiplayerRoomUser user)
         {
-            await PopulateUser(user).ConfigureAwait(false);
+            await PopulateUsers([user]).ConfigureAwait(false);
 
             Scheduler.Add(() =>
             {
@@ -458,7 +458,7 @@ namespace osu.Game.Online.Multiplayer
             if (apiUser == null || apiRoom == null) return;
 
             PostNotification?.Invoke(
-                new UserAvatarNotification(apiUser, NotificationsStrings.InvitedYouToTheMultiplayer(apiUser.Username, apiRoom.Name.Value))
+                new UserAvatarNotification(apiUser, NotificationsStrings.InvitedYouToTheMultiplayer(apiUser.Username, apiRoom.Name))
                 {
                     Activated = () =>
                     {
@@ -486,12 +486,12 @@ namespace osu.Game.Online.Multiplayer
         {
             Debug.Assert(APIRoom != null);
 
-            APIRoom.RecentParticipants.Add(user.User ?? new APIUser
+            APIRoom.RecentParticipants = APIRoom.RecentParticipants.Append(user.User ?? new APIUser
             {
                 Id = user.UserID,
                 Username = "[Unresolved]"
-            });
-            APIRoom.ParticipantCount.Value++;
+            }).ToArray();
+            APIRoom.ParticipantCount++;
         }
 
         private Task handleUserLeft(MultiplayerRoomUser user, Action<MultiplayerRoomUser>? callback)
@@ -505,8 +505,8 @@ namespace osu.Game.Online.Multiplayer
                 PlayingUserIds.Remove(user.UserID);
 
                 Debug.Assert(APIRoom != null);
-                APIRoom.RecentParticipants.RemoveAll(u => u.Id == user.UserID);
-                APIRoom.ParticipantCount.Value--;
+                APIRoom.RecentParticipants = APIRoom.RecentParticipants.Where(u => u.Id != user.UserID).ToArray();
+                APIRoom.ParticipantCount--;
 
                 callback?.Invoke(user);
                 RoomUpdated?.Invoke();
@@ -527,7 +527,7 @@ namespace osu.Game.Online.Multiplayer
                 var user = Room.Users.FirstOrDefault(u => u.UserID == userId);
 
                 Room.Host = user;
-                APIRoom.Host.Value = user?.User;
+                APIRoom.Host = user?.User;
 
                 RoomUpdated?.Invoke();
             }, false);
@@ -733,7 +733,7 @@ namespace osu.Game.Online.Multiplayer
                 Debug.Assert(APIRoom != null);
 
                 Room.Playlist.Add(item);
-                APIRoom.Playlist.Add(createPlaylistItem(item));
+                APIRoom.Playlist = APIRoom.Playlist.Append(new PlaylistItem(item)).ToArray();
 
                 ItemAdded?.Invoke(item);
                 RoomUpdated?.Invoke();
@@ -752,7 +752,7 @@ namespace osu.Game.Online.Multiplayer
                 Debug.Assert(APIRoom != null);
 
                 Room.Playlist.Remove(Room.Playlist.Single(existing => existing.ID == playlistItemId));
-                APIRoom.Playlist.RemoveAll(existing => existing.ID == playlistItemId);
+                APIRoom.Playlist = APIRoom.Playlist.Where(i => i.ID != playlistItemId).ToArray();
 
                 Debug.Assert(Room.Playlist.Count > 0);
 
@@ -770,30 +770,10 @@ namespace osu.Game.Online.Multiplayer
                 if (Room == null)
                     return;
 
-                try
-                {
-                    Debug.Assert(APIRoom != null);
+                Debug.Assert(APIRoom != null);
 
-                    Room.Playlist[Room.Playlist.IndexOf(Room.Playlist.Single(existing => existing.ID == item.ID))] = item;
-
-                    int existingIndex = APIRoom.Playlist.IndexOf(APIRoom.Playlist.Single(existing => existing.ID == item.ID));
-
-                    APIRoom.Playlist.RemoveAt(existingIndex);
-                    APIRoom.Playlist.Insert(existingIndex, createPlaylistItem(item));
-                }
-                catch (Exception ex)
-                {
-                    // Temporary code to attempt to figure out long-term failing tests.
-                    StringBuilder exceptionText = new StringBuilder();
-
-                    exceptionText.AppendLine("MultiplayerClient test failure investigation");
-                    exceptionText.AppendLine($"Exception                : {ex.ToString()}");
-                    exceptionText.AppendLine($"Lookup                   : {item.ID}");
-                    exceptionText.AppendLine($"Items in Room.Playlist   : {string.Join(',', Room.Playlist.Select(i => i.ID))}");
-                    exceptionText.AppendLine($"Items in APIRoom.Playlist: {string.Join(',', APIRoom!.Playlist.Select(i => i.ID))}");
-
-                    throw new AggregateException(exceptionText.ToString());
-                }
+                Room.Playlist[Room.Playlist.IndexOf(Room.Playlist.Single(existing => existing.ID == item.ID))] = item;
+                APIRoom.Playlist = APIRoom.Playlist.Select((pi, i) => pi.ID == item.ID ? new PlaylistItem(item) : APIRoom.Playlist[i]).ToArray();
 
                 ItemChanged?.Invoke(item);
                 RoomUpdated?.Invoke();
@@ -803,10 +783,26 @@ namespace osu.Game.Online.Multiplayer
         }
 
         /// <summary>
-        /// Populates the <see cref="APIUser"/> for a given <see cref="MultiplayerRoomUser"/>.
+        /// Populates the <see cref="APIUser"/> for a given collection of <see cref="MultiplayerRoomUser"/>s.
         /// </summary>
-        /// <param name="multiplayerUser">The <see cref="MultiplayerRoomUser"/> to populate.</param>
-        protected async Task PopulateUser(MultiplayerRoomUser multiplayerUser) => multiplayerUser.User ??= await userLookupCache.GetUserAsync(multiplayerUser.UserID).ConfigureAwait(false);
+        /// <param name="multiplayerUsers">The <see cref="MultiplayerRoomUser"/>s to populate.</param>
+        protected async Task PopulateUsers(IEnumerable<MultiplayerRoomUser> multiplayerUsers)
+        {
+            var request = new GetUsersRequest(multiplayerUsers.Select(u => u.UserID).Distinct().ToArray());
+
+            await API.PerformAsync(request).ConfigureAwait(false);
+
+            if (request.Response == null)
+                return;
+
+            Dictionary<int, APIUser> users = request.Response.Users.ToDictionary(user => user.Id);
+
+            foreach (var multiplayerUser in multiplayerUsers)
+            {
+                if (users.TryGetValue(multiplayerUser.UserID, out var user))
+                    multiplayerUser.User = user;
+            }
+        }
 
         /// <summary>
         /// Updates the local room settings with the given <see cref="MultiplayerRoomSettings"/>.
@@ -824,29 +820,16 @@ namespace osu.Game.Online.Multiplayer
 
             // Update a few properties of the room instantaneously.
             Room.Settings = settings;
-            APIRoom.Name.Value = Room.Settings.Name;
-            APIRoom.Password.Value = Room.Settings.Password;
-            APIRoom.Status.Value = string.IsNullOrEmpty(Room.Settings.Password) ? new RoomStatusOpen() : new RoomStatusOpenPrivate();
-            APIRoom.Type.Value = Room.Settings.MatchType;
-            APIRoom.QueueMode.Value = Room.Settings.QueueMode;
-            APIRoom.AutoStartDuration.Value = Room.Settings.AutoStartDuration;
-            APIRoom.CurrentPlaylistItem.Value = APIRoom.Playlist.Single(item => item.ID == settings.PlaylistItemId);
-            APIRoom.AutoSkip.Value = Room.Settings.AutoSkip;
+            APIRoom.Name = Room.Settings.Name;
+            APIRoom.Password = Room.Settings.Password;
+            APIRoom.Type = Room.Settings.MatchType;
+            APIRoom.QueueMode = Room.Settings.QueueMode;
+            APIRoom.AutoStartDuration = Room.Settings.AutoStartDuration;
+            APIRoom.CurrentPlaylistItem = APIRoom.Playlist.Single(item => item.ID == settings.PlaylistItemId);
+            APIRoom.AutoSkip = Room.Settings.AutoSkip;
 
             RoomUpdated?.Invoke();
         }
-
-        private PlaylistItem createPlaylistItem(MultiplayerPlaylistItem item) => new PlaylistItem(new APIBeatmap { OnlineID = item.BeatmapID, StarRating = item.StarRating })
-        {
-            ID = item.ID,
-            OwnerID = item.OwnerID,
-            RulesetID = item.RulesetID,
-            Expired = item.Expired,
-            PlaylistOrder = item.PlaylistOrder,
-            PlayedAt = item.PlayedAt,
-            RequiredMods = item.RequiredMods.ToArray(),
-            AllowedMods = item.AllowedMods.ToArray()
-        };
 
         /// <summary>
         /// For the provided user ID, update whether the user is included in <see cref="CurrentMatchPlayingUserIds"/>.

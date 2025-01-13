@@ -428,7 +428,7 @@ namespace osu.Game.Overlays.Comments
             if (replyEditorContainer.Count == 0)
             {
                 replyEditorContainer.Show();
-                replyEditorContainer.Add(new ReplyCommentEditor(Comment)
+                replyEditorContainer.Add(new ReplyCommentEditor(Comment, Meta)
                 {
                     OnPost = comments =>
                     {

@@ -60,7 +60,7 @@ namespace osu.Game.Extensions
         public static string ToCamelCase(this string input)
         {
             string word = input.ToPascalCase();
-            return word.Length > 0 ? word.Substring(0, 1).ToLowerInvariant() + word.Substring(1) : word;
+            return word.Length > 0 ? char.ToLowerInvariant(word[0]) + word.Substring(1) : word;
         }
 
         /// <summary>

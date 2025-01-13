@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -21,6 +22,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
 using osu.Game.Screens.Edit.Timing.RowAttributes;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Timing
 {
@@ -177,7 +179,7 @@ namespace osu.Game.Screens.Edit.Timing
             private readonly BindableWithCurrent<ControlPointGroup> current = new BindableWithCurrent<ControlPointGroup>();
 
             private Box background = null!;
-            private Box currentIndicator = null!;
+            private Drawable currentIndicator = null!;
 
             [Resolved]
             private OverlayColourProvider colourProvider { get; set; } = null!;
@@ -202,7 +204,7 @@ namespace osu.Game.Screens.Edit.Timing
             {
                 RelativeSizeAxes = Axes.Both;
 
-                InternalChildren = new Drawable[]
+                InternalChildren = new[]
                 {
                     background = new Box
                     {
@@ -210,11 +212,26 @@ namespace osu.Game.Screens.Edit.Timing
                         Colour = colourProvider.Background1,
                         Alpha = 0,
                     },
-                    currentIndicator = new Box
+                    currentIndicator = new Container
                     {
-                        RelativeSizeAxes = Axes.Y,
-                        Width = 5,
+                        RelativeSizeAxes = Axes.Both,
                         Alpha = 0,
+                        Children = new Drawable[]
+                        {
+                            new Box
+                            {
+                                RelativeSizeAxes = Axes.Y,
+                                Width = 5,
+                            },
+                            new Box
+                            {
+                                RelativeSizeAxes = Axes.Y,
+                                Blending = BlendingParameters.Additive,
+                                X = 5,
+                                Width = 150,
+                                Colour = ColourInfo.GradientHorizontal(Color4.White.Opacity(0.1f), Color4.White.Opacity(0))
+                            },
+                        }
                     },
                     new Container
                     {
@@ -281,14 +298,8 @@ namespace osu.Game.Screens.Edit.Timing
                 bool hasCurrentTimingPoint = activeTimingPoint.Value != null && current.Value.ControlPoints.Contains(activeTimingPoint.Value);
                 bool hasCurrentEffectPoint = activeEffectPoint.Value != null && current.Value.ControlPoints.Contains(activeEffectPoint.Value);
 
-                if (IsHovered || isSelected)
-                    background.FadeIn(100, Easing.OutQuint);
-                else if (hasCurrentTimingPoint || hasCurrentEffectPoint)
-                    background.FadeTo(0.2f, 100, Easing.OutQuint);
-                else
-                    background.FadeOut(100, Easing.OutQuint);
-
-                background.Colour = isSelected ? colourProvider.Colour3 : colourProvider.Background1;
+                background.FadeTo(IsHovered || isSelected ? 1 : 0, 100, Easing.OutQuint);
+                background.FadeColour(isSelected ? colourProvider.Colour3 : colourProvider.Background1, 100, Easing.OutQuint);
 
                 if (hasCurrentTimingPoint || hasCurrentEffectPoint)
                 {

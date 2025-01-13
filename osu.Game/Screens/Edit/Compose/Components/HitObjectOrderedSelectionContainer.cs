@@ -4,7 +4,6 @@
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
@@ -14,7 +13,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
     /// <summary>
     /// A container for <see cref="SelectionBlueprint{HitObject}"/> ordered by their <see cref="HitObject"/> start times.
     /// </summary>
-    public sealed partial class HitObjectOrderedSelectionContainer : Container<SelectionBlueprint<HitObject>>
+    public sealed partial class HitObjectOrderedSelectionContainer : BlueprintContainer<HitObject>.SelectionBlueprintContainer
     {
         [Resolved]
         private EditorBeatmap editorBeatmap { get; set; } = null!;
@@ -28,15 +27,17 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         public override void Add(SelectionBlueprint<HitObject> drawable)
         {
-            SortInternal();
+            Sort();
             base.Add(drawable);
         }
 
         public override bool Remove(SelectionBlueprint<HitObject> drawable, bool disposeImmediately)
         {
-            SortInternal();
+            Sort();
             return base.Remove(drawable, disposeImmediately);
         }
+
+        internal void Sort() => SortInternal();
 
         protected override int Compare(Drawable x, Drawable y)
         {

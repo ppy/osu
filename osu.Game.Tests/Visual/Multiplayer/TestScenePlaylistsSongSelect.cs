@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Linq;
 using NUnit.Framework;
@@ -27,25 +25,24 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public partial class TestScenePlaylistsSongSelect : OnlinePlayTestScene
     {
-        private BeatmapManager manager;
-
-        private TestPlaylistsSongSelect songSelect;
+        private BeatmapManager manager = null!;
+        private TestPlaylistsSongSelect songSelect = null!;
 
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
         {
-            DetachedBeatmapStore detachedBeatmapStore;
+            BeatmapStore beatmapStore;
 
             Dependencies.Cache(new RealmRulesetStore(Realm));
             Dependencies.Cache(manager = new BeatmapManager(LocalStorage, Realm, null, audio, Resources, host, Beatmap.Default));
-            Dependencies.Cache(detachedBeatmapStore = new DetachedBeatmapStore());
+            Dependencies.CacheAs(beatmapStore = new RealmDetachedBeatmapStore());
             Dependencies.Cache(Realm);
 
             var beatmapSet = TestResources.CreateTestBeatmapSetInfo();
 
             manager.Import(beatmapSet);
 
-            Add(detachedBeatmapStore);
+            Add(beatmapStore);
         }
 
         public override void SetUpSteps()
@@ -60,7 +57,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 SelectedMods.Value = Array.Empty<Mod>();
             });
 
-            AddStep("create song select", () => LoadScreen(songSelect = new TestPlaylistsSongSelect(SelectedRoom.Value)));
+            AddStep("create song select", () => LoadScreen(songSelect = new TestPlaylistsSongSelect(SelectedRoom.Value!)));
             AddUntilStep("wait for present", () => songSelect.IsCurrentScreen() && songSelect.BeatmapSetsLoaded);
         }
 
@@ -68,46 +65,41 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public void TestItemAddedIfEmptyOnStart()
         {
             AddStep("finalise selection", () => songSelect.FinaliseSelection());
-            AddAssert("playlist has 1 item", () => SelectedRoom.Value.Playlist.Count == 1);
+            AddAssert("playlist has 1 item", () => SelectedRoom.Value!.Playlist.Count == 1);
         }
 
         [Test]
         public void TestItemAddedWhenCreateNewItemClicked()
         {
-            AddStep("create new item", () => songSelect.BeatmapDetails.CreateNewItem());
-            AddAssert("playlist has 1 item", () => SelectedRoom.Value.Playlist.Count == 1);
+            AddStep("create new item", () => songSelect.BeatmapDetails.CreateNewItem!());
+            AddAssert("playlist has 1 item", () => SelectedRoom.Value!.Playlist.Count == 1);
         }
 
         [Test]
         public void TestItemNotAddedIfExistingOnStart()
         {
-            AddStep("create new item", () => songSelect.BeatmapDetails.CreateNewItem());
+            AddStep("create new item", () => songSelect.BeatmapDetails.CreateNewItem!());
             AddStep("finalise selection", () => songSelect.FinaliseSelection());
-            AddAssert("playlist has 1 item", () => SelectedRoom.Value.Playlist.Count == 1);
+            AddAssert("playlist has 1 item", () => SelectedRoom.Value!.Playlist.Count == 1);
         }
 
         [Test]
         public void TestAddSameItemMultipleTimes()
         {
-            AddStep("create new item", () => songSelect.BeatmapDetails.CreateNewItem());
-            AddStep("create new item", () => songSelect.BeatmapDetails.CreateNewItem());
-            AddAssert("playlist has 2 items", () => SelectedRoom.Value.Playlist.Count == 2);
+            AddStep("create new item", () => songSelect.BeatmapDetails.CreateNewItem!());
+            AddStep("create new item", () => songSelect.BeatmapDetails.CreateNewItem!());
+            AddAssert("playlist has 2 items", () => SelectedRoom.Value!.Playlist.Count == 2);
         }
 
         [Test]
         public void TestAddItemAfterRearrangement()
         {
-            AddStep("create new item", () => songSelect.BeatmapDetails.CreateNewItem());
-            AddStep("create new item", () => songSelect.BeatmapDetails.CreateNewItem());
-            AddStep("rearrange", () =>
-            {
-                var item = SelectedRoom.Value.Playlist[0];
-                SelectedRoom.Value.Playlist.RemoveAt(0);
-                SelectedRoom.Value.Playlist.Add(item);
-            });
+            AddStep("create new item", () => songSelect.BeatmapDetails.CreateNewItem!());
+            AddStep("create new item", () => songSelect.BeatmapDetails.CreateNewItem!());
+            AddStep("rearrange", () => SelectedRoom.Value!.Playlist = SelectedRoom.Value!.Playlist.Skip(1).Append(SelectedRoom.Value!.Playlist[0]).ToArray());
 
-            AddStep("create new item", () => songSelect.BeatmapDetails.CreateNewItem());
-            AddAssert("new item has id 2", () => SelectedRoom.Value.Playlist.Last().ID == 2);
+            AddStep("create new item", () => songSelect.BeatmapDetails.CreateNewItem!());
+            AddAssert("new item has id 2", () => SelectedRoom.Value!.Playlist.Last().ID == 2);
         }
 
         /// <summary>
@@ -117,19 +109,19 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public void TestNewItemHasNewModInstances()
         {
             AddStep("set dt mod", () => SelectedMods.Value = new[] { new OsuModDoubleTime() });
-            AddStep("create item", () => songSelect.BeatmapDetails.CreateNewItem());
+            AddStep("create item", () => songSelect.BeatmapDetails.CreateNewItem!());
             AddStep("change mod rate", () => ((OsuModDoubleTime)SelectedMods.Value[0]).SpeedChange.Value = 2);
-            AddStep("create item", () => songSelect.BeatmapDetails.CreateNewItem());
+            AddStep("create item", () => songSelect.BeatmapDetails.CreateNewItem!());
 
             AddAssert("item 1 has rate 1.5", () =>
             {
-                var mod = (OsuModDoubleTime)SelectedRoom.Value.Playlist.First().RequiredMods[0].ToMod(new OsuRuleset());
+                var mod = (OsuModDoubleTime)SelectedRoom.Value!.Playlist.First().RequiredMods[0].ToMod(new OsuRuleset());
                 return Precision.AlmostEquals(1.5, mod.SpeedChange.Value);
             });
 
             AddAssert("item 2 has rate 2", () =>
             {
-                var mod = (OsuModDoubleTime)SelectedRoom.Value.Playlist.Last().RequiredMods[0].ToMod(new OsuRuleset());
+                var mod = (OsuModDoubleTime)SelectedRoom.Value!.Playlist.Last().RequiredMods[0].ToMod(new OsuRuleset());
                 return Precision.AlmostEquals(2, mod.SpeedChange.Value);
             });
         }
@@ -140,7 +132,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestGlobalModInstancesNotRetained()
         {
-            OsuModDoubleTime mod = null;
+            OsuModDoubleTime mod = null!;
 
             AddStep("set dt mod and store", () =>
             {
@@ -150,12 +142,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 mod = (OsuModDoubleTime)SelectedMods.Value[0];
             });
 
-            AddStep("create item", () => songSelect.BeatmapDetails.CreateNewItem());
+            AddStep("create item", () => songSelect.BeatmapDetails.CreateNewItem!());
 
             AddStep("change stored mod rate", () => mod.SpeedChange.Value = 2);
             AddAssert("item has rate 1.5", () =>
             {
-                var m = (OsuModDoubleTime)SelectedRoom.Value.Playlist.First().RequiredMods[0].ToMod(new OsuRuleset());
+                var m = (OsuModDoubleTime)SelectedRoom.Value!.Playlist.First().RequiredMods[0].ToMod(new OsuRuleset());
                 return Precision.AlmostEquals(1.5, m.SpeedChange.Value);
             });
         }

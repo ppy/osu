@@ -8,11 +8,16 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Allocation;
-using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
-using osu.Game.Extensions;
+using osu.Game.Database;
+using osu.Game.Graphics.Sprites;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
+using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Overlays;
+using osu.Game.Overlays.BeatmapListing;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Mania;
@@ -20,30 +25,38 @@ using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Taiko;
 using osu.Game.Tests.Resources;
 using osu.Game.Users;
+using osu.Game.Utils;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.SongSelect
 {
     public partial class TestSceneBeatmapRecommendations : OsuGameTestScene
     {
-        [Resolved]
-        private IRulesetStore rulesetStore { get; set; }
-
         [SetUpSteps]
         public override void SetUpSteps()
         {
             AddStep("populate ruleset statistics", () =>
             {
-                Dictionary<string, UserStatistics> rulesetStatistics = new Dictionary<string, UserStatistics>();
-
-                rulesetStore.AvailableRulesets.Where(ruleset => ruleset.IsLegacyRuleset()).ForEach(rulesetInfo =>
+                ((DummyAPIAccess)API).HandleRequest = r =>
                 {
-                    rulesetStatistics[rulesetInfo.ShortName] = new UserStatistics
+                    switch (r)
                     {
-                        PP = getNecessaryPP(rulesetInfo.OnlineID)
-                    };
-                });
+                        case GetUserRequest userRequest:
+                            userRequest.TriggerSuccess(new APIUser
+                            {
+                                Id = 99,
+                                Statistics = new UserStatistics
+                                {
+                                    PP = getNecessaryPP(userRequest.Ruleset?.OnlineID ?? 0)
+                                }
+                            });
 
-                API.LocalUser.Value.RulesetsStatistics = rulesetStatistics;
+                            return true;
+
+                        default:
+                            return false;
+                    }
+                };
             });
 
             decimal getNecessaryPP(int? rulesetID)
@@ -54,7 +67,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                         return 336; // recommended star rating of 2
 
                     case 1:
-                        return 928; // SR 3
+                        return 973; // SR 3
 
                     case 2:
                         return 1905; // SR 4
@@ -71,6 +84,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
+        [FlakyTest]
         public void TestPresentedBeatmapIsRecommended()
         {
             List<BeatmapSetInfo> beatmapSets = null;
@@ -92,6 +106,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
+        [FlakyTest]
         public void TestCurrentRulesetIsRecommended()
         {
             BeatmapSetInfo catchSet = null, mixedSet = null;
@@ -128,6 +143,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
+        [FlakyTest]
         public void TestSecondBestRulesetIsRecommended()
         {
             BeatmapSetInfo osuSet = null, mixedSet = null;
@@ -145,6 +161,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
+        [FlakyTest]
         public void TestCorrectStarRatingIsUsed()
         {
             BeatmapSetInfo osuSet = null, maniaSet = null;
@@ -159,6 +176,46 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             // Present mania set, expect the difficulty that matches recommended mania star rating
             presentAndConfirm(() => maniaSet, 5);
+        }
+
+        [Test]
+        [FlakyTest]
+        public void TestBeatmapListingFilter()
+        {
+            AddStep("set playmode to taiko", () => ((DummyAPIAccess)API).LocalUser.Value.PlayMode = "taiko");
+
+            AddStep("open beatmap listing", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.PressKey(Key.B);
+                InputManager.ReleaseKey(Key.B);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+
+            AddUntilStep("wait for load", () => Game.ChildrenOfType<BeatmapListingOverlay>().SingleOrDefault()?.IsLoaded, () => Is.True);
+
+            checkRecommendedDifficulty(3);
+
+            AddStep("change mode filter to osu!", () => Game.ChildrenOfType<BeatmapSearchRulesetFilterRow>().Single().ChildrenOfType<FilterTabItem<RulesetInfo>>().ElementAt(1).TriggerClick());
+
+            checkRecommendedDifficulty(2);
+
+            AddStep("change mode filter to osu!taiko", () => Game.ChildrenOfType<BeatmapSearchRulesetFilterRow>().Single().ChildrenOfType<FilterTabItem<RulesetInfo>>().ElementAt(2).TriggerClick());
+
+            checkRecommendedDifficulty(3);
+
+            AddStep("change mode filter to osu!catch", () => Game.ChildrenOfType<BeatmapSearchRulesetFilterRow>().Single().ChildrenOfType<FilterTabItem<RulesetInfo>>().ElementAt(3).TriggerClick());
+
+            checkRecommendedDifficulty(4);
+
+            AddStep("change mode filter to osu!mania", () => Game.ChildrenOfType<BeatmapSearchRulesetFilterRow>().Single().ChildrenOfType<FilterTabItem<RulesetInfo>>().ElementAt(4).TriggerClick());
+
+            checkRecommendedDifficulty(5);
+
+            void checkRecommendedDifficulty(double starRating)
+                => AddAssert($"recommended difficulty is {starRating}",
+                    () => Game.ChildrenOfType<BeatmapSearchGeneralFilterRow>().Single().ChildrenOfType<OsuSpriteText>().ElementAt(1).Text.ToString(),
+                    () => Is.EqualTo($"Recommended difficulty ({starRating.FormatStarRating()})"));
         }
 
         private BeatmapSetInfo importBeatmapSet(IEnumerable<RulesetInfo> difficultyRulesets)
@@ -191,8 +248,39 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             AddStep("present beatmap", () => Game.PresentBeatmap(getImport()));
 
-            AddUntilStep("wait for song select", () => Game.ScreenStack.CurrentScreen is Screens.Select.SongSelect);
-            AddUntilStep("recommended beatmap displayed", () => Game.Beatmap.Value.BeatmapInfo.MatchesOnlineID(getImport().Beatmaps[expectedDiff - 1]));
+            AddUntilStep("wait for song select", () => Game.ScreenStack.CurrentScreen is Screens.Select.SongSelect select && select.BeatmapSetsLoaded);
+            AddUntilStep("recommended beatmap displayed", () => Game.Beatmap.Value.BeatmapInfo.OnlineID, () => Is.EqualTo(getImport().Beatmaps[expectedDiff - 1].OnlineID));
+        }
+
+        protected override TestOsuGame CreateTestGame() => new NoBeatmapUpdateGame(LocalStorage, API);
+
+        private partial class NoBeatmapUpdateGame : TestOsuGame
+        {
+            public NoBeatmapUpdateGame(Storage storage, IAPIProvider api, string[] args = null)
+                : base(storage, api, args)
+            {
+            }
+
+            protected override IBeatmapUpdater CreateBeatmapUpdater() => new TestBeatmapUpdater();
+
+            private class TestBeatmapUpdater : IBeatmapUpdater
+            {
+                public void Queue(Live<BeatmapSetInfo> beatmapSet, MetadataLookupScope lookupScope = MetadataLookupScope.LocalCacheFirst)
+                {
+                }
+
+                public void Process(BeatmapSetInfo beatmapSet, MetadataLookupScope lookupScope = MetadataLookupScope.LocalCacheFirst)
+                {
+                }
+
+                public void ProcessObjectCounts(BeatmapInfo beatmapInfo, MetadataLookupScope lookupScope = MetadataLookupScope.LocalCacheFirst)
+                {
+                }
+
+                public void Dispose()
+                {
+                }
+            }
         }
     }
 }

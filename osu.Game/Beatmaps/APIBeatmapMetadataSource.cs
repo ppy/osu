@@ -33,7 +33,7 @@ namespace osu.Game.Beatmaps
 
             Debug.Assert(beatmapInfo.BeatmapSet != null);
 
-            var req = new GetBeatmapRequest(beatmapInfo);
+            var req = new GetBeatmapRequest(md5Hash: beatmapInfo.MD5Hash, filename: beatmapInfo.Path);
 
             try
             {

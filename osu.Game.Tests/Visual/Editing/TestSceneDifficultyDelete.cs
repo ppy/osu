@@ -13,6 +13,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Edit;
+using osu.Game.Screens.Edit.Components.Menus;
 using osu.Game.Storyboards;
 using osu.Game.Tests.Beatmaps.IO;
 using osuTK.Input;
@@ -60,7 +61,7 @@ namespace osu.Game.Tests.Visual.Editing
                     beatmapSetHashBefore = Beatmap.Value.BeatmapSetInfo.Hash;
                 });
 
-                AddStep("click File", () => this.ChildrenOfType<DrawableOsuMenuItem>().First().TriggerClick());
+                AddStep("click File", () => this.ChildrenOfType<EditorMenuBar.DrawableEditorBarMenuItem>().First().TriggerClick());
 
                 if (i == 11)
                 {
@@ -107,7 +108,7 @@ namespace osu.Game.Tests.Visual.Editing
                 EditorBeatmap.EndChange();
             });
 
-            AddStep("click File", () => this.ChildrenOfType<DrawableOsuMenuItem>().First().TriggerClick());
+            AddStep("click File", () => this.ChildrenOfType<EditorMenuBar.DrawableEditorBarMenuItem>().First().TriggerClick());
 
             AddStep("click delete", () => getDeleteMenuItem().TriggerClick());
             AddUntilStep("wait for dialog", () => DialogOverlay.CurrentDialog != null);

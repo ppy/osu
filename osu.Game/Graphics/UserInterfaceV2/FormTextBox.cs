@@ -202,6 +202,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             }
             else
             {
+                BorderThickness = 0;
                 background.Colour = colourProvider.Background4;
             }
         }

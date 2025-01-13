@@ -14,9 +14,8 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Legacy;
-using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Screens.Select;
-using osuTK;
+using osu.Game.Screens.SelectV2;
 
 namespace osu.Game.Tests.Visual.SongSelectV2
 {
@@ -209,11 +208,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             public new WedgeInfoText? Info => base.Info;
         }
 
-        private class TestHitObject : ConvertHitObject, IHasPosition
-        {
-            public float X => 0;
-            public float Y => 0;
-            public Vector2 Position { get; } = Vector2.Zero;
-        }
+        private class TestHitObject : ConvertHitObject;
     }
 }
