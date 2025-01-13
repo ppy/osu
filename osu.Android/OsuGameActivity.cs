@@ -49,9 +49,23 @@ namespace osu.Android
         /// <remarks>Adjusted on startup to match expected UX for the current device type (phone/tablet).</remarks>
         public ScreenOrientation DefaultOrientation = ScreenOrientation.Unspecified;
 
-        private OsuGameAndroid game = null!;
+        private readonly OsuGameAndroid game;
 
-        protected override Framework.Game CreateGame() => game = new OsuGameAndroid(this);
+        private bool gameCreated;
+
+        protected override Framework.Game CreateGame()
+        {
+            if (gameCreated)
+                throw new InvalidOperationException("Framework tried to create a game twice.");
+
+            gameCreated = true;
+            return game;
+        }
+
+        public OsuGameActivity()
+        {
+            game = new OsuGameAndroid(this);
+        }
 
         protected override void OnCreate(Bundle? savedInstanceState)
         {
