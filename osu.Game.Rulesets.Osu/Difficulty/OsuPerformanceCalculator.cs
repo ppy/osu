@@ -203,7 +203,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             }
 
             aimValue *= SpecialFunctions.Erf(25.0 / (Math.Sqrt(2) * deviation.Value));
-            aimValue *= 0.98 + Math.Pow(100.0 / 9, 2) / 2500; // OD 11 SS stays the same.
+            aimValue *= 1.02; // Keeps OD 11 SS staying roughly the same
 
             return aimValue;
         }
