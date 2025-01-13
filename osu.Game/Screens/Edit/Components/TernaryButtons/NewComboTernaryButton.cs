@@ -147,19 +147,19 @@ namespace osu.Game.Screens.Edit.Components.TernaryButtons
 
             private void updateState()
             {
-                if (SelectedHitObject.Value == null)
+                Enabled.Value = SelectedHitObject.Value != null;
+
+                if (SelectedHitObject.Value == null || SelectedHitObject.Value.ComboOffset == 0)
                 {
                     BackgroundColour = colourProvider.Background3;
                     icon.Colour = BackgroundColour.Darken(0.5f);
                     icon.Blending = BlendingParameters.Additive;
-                    Enabled.Value = false;
                 }
                 else
                 {
                     BackgroundColour = ComboColours[comboIndexFor(SelectedHitObject.Value, ComboColours)];
                     icon.Colour = OsuColour.ForegroundTextColourFor(BackgroundColour);
                     icon.Blending = BlendingParameters.Inherit;
-                    Enabled.Value = true;
                 }
             }
 
