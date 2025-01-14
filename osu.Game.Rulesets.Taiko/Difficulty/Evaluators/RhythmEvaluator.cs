@@ -1,3 +1,4 @@
+
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
@@ -22,30 +23,42 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
         }
 
         /// <summary>
+        /// To prevent against infinite ratio values where maps breach regular mapping conditions, we validate the ratio.
+        /// </summary>
+        private static double validateRatio(double ratio)
+        {
+            return double.IsInfinity(ratio) || double.IsNaN(ratio) ? 0 : ratio;
+        }
+
+        /// <summary>
         /// Calculates the difficulty of a given ratio using a combination of periodic penalties and bonuses.
         /// </summary>
         private static double ratioDifficulty(double ratio, int terms = 8)
         {
             double difficulty = 0;
+            ratio = validateRatio(ratio);
 
             for (int i = 1; i <= terms; ++i)
             {
-                difficulty += termPenalty(ratio, i, 2, 1);
+                difficulty += termPenalty(ratio, i, 4, 1);
             }
 
-            difficulty += terms;
+            difficulty += terms / (1 + ratio);
 
             // Give bonus to near-1 ratios
-            difficulty += DifficultyCalculationUtils.BellCurve(ratio, 1, 0.7);
+            difficulty += DifficultyCalculationUtils.BellCurve(ratio, 1, 0.5);
 
             // Penalize ratios that are VERY near 1
-            difficulty -= DifficultyCalculationUtils.BellCurve(ratio, 1, 0.5);
+            difficulty -= DifficultyCalculationUtils.BellCurve(ratio, 1, 0.3);
 
-            return difficulty / Math.Sqrt(8);
+            difficulty = Math.Max(difficulty, 0);
+            difficulty /= Math.Sqrt(8);
+
+            return difficulty;
         }
 
         /// <summary>
-        /// Determines if the changes in hit object intervals are consistent based on a given threshold.
+        /// Determines if the changes in hit object intervals is consistent based on a given threshold.
         /// </summary>
         private static double repeatedIntervalPenalty(SameRhythmHitObjects sameRhythmHitObjects, double hitWindow, double threshold = 0.1)
         {
@@ -55,53 +68,38 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
                 ? sameInterval(sameRhythmHitObjects, 4)
                 : 1.0; // Returns a non-penalty if there are 6 or more notes within an interval.
 
-            // Scale penalties dynamically based on hit object duration relative to hitWindow.
-            double penaltyScaling = Math.Max(1 - sameRhythmHitObjects.Duration / (hitWindow * 2), 0.5);
+            // The duration penalty is based on hit object duration relative to hitWindow.
+            double durationPenalty = Math.Max(1 - sameRhythmHitObjects.Duration * 2 / hitWindow, 0.5);
 
-            return Math.Min(longIntervalPenalty, shortIntervalPenalty) * penaltyScaling;
+            return Math.Min(longIntervalPenalty, shortIntervalPenalty) * durationPenalty;
 
             double sameInterval(SameRhythmHitObjects startObject, int intervalCount)
             {
-                List<double?> intervalRatios = new List<double?>();
                 List<double?> intervals = new List<double?>();
                 var currentObject = startObject;
 
                 for (int i = 0; i < intervalCount && currentObject != null; i++)
                 {
-                    intervalRatios.Add(currentObject.HitObjectIntervalRatio);
                     intervals.Add(currentObject.HitObjectInterval);
                     currentObject = currentObject.Previous;
                 }
 
-                intervalRatios.RemoveAll(interval => interval == null);
                 intervals.RemoveAll(interval => interval == null);
 
-                if (intervalRatios.Count < intervalCount || intervals.Count < intervalCount)
+                if (intervals.Count < intervalCount)
                     return 1.0; // No penalty if there aren't enough valid intervals.
 
-                // Check for penalties based on HitObjectIntervalRatio
-                for (int i = 0; i < intervalRatios.Count; i++)
-                {
-                    for (int j = i + 1; j < intervalRatios.Count; j++)
-                    {
-                        double ratio = intervalRatios[i]!.Value / intervalRatios[j]!.Value;
-                        if (Math.Abs(1 - ratio) <= threshold) // If any two ratios are similar
-                            return 0.0;
-                    }
-                }
-
-                // Check for penalties based on HitObjectInterval
                 for (int i = 0; i < intervals.Count; i++)
                 {
                     for (int j = i + 1; j < intervals.Count; j++)
                     {
-                        double difference = Math.Abs(intervals[i]!.Value - intervals[j]!.Value);
-                        if (difference <= hitWindow) // If any two intervals are close
-                            return 0.5;
+                        double ratio = intervals[i]!.Value / intervals[j]!.Value;
+                        if (Math.Abs(1 - ratio) <= threshold) // If any two intervals are similar, apply a penalty.
+                            return 0.80;
                     }
                 }
 
-                return 1.0; // No penalty if all intervals are sufficiently different.
+                return 1.0; // No penalty if all intervals are different.
             }
         }
 
@@ -109,6 +107,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
         {
             double intervalDifficulty = ratioDifficulty(sameRhythmHitObjects.HitObjectIntervalRatio);
             double? previousInterval = sameRhythmHitObjects.Previous?.HitObjectInterval;
+
+            intervalDifficulty *= repeatedIntervalPenalty(sameRhythmHitObjects, hitWindow);
 
             // If a previous interval exists and there are multiple hit objects in the sequence:
             if (previousInterval != null && sameRhythmHitObjects.Children.Count > 1)
@@ -125,9 +125,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
                         maxValue: 1);
                 }
             }
-
-            // Apply consistency penalty.
-            intervalDifficulty *= repeatedIntervalPenalty(sameRhythmHitObjects, hitWindow);
 
             // Penalise patterns that can be hit within a single hit window.
             intervalDifficulty *= DifficultyCalculationUtils.Logistic(
@@ -152,11 +149,20 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
             TaikoDifficultyHitObjectRhythm rhythm = ((TaikoDifficultyHitObject)hitObject).Rhythm;
             double difficulty = 0.0d;
 
+            double sameRhythm = 0;
+            double samePattern = 0;
+            double intervalPenalty = 0;
+
             if (rhythm.SameRhythmHitObjects?.FirstHitObject == hitObject) // Difficulty for SameRhythmHitObjects
-                difficulty += evaluateDifficultyOf(rhythm.SameRhythmHitObjects, hitWindow);
+            {
+                sameRhythm += 10.0 * evaluateDifficultyOf(rhythm.SameRhythmHitObjects, hitWindow);
+                intervalPenalty = repeatedIntervalPenalty(rhythm.SameRhythmHitObjects, hitWindow);
+            }
 
             if (rhythm.SamePatterns?.FirstHitObject == hitObject) // Difficulty for SamePatterns
-                difficulty += 0.5 * evaluateDifficultyOf(rhythm.SamePatterns);
+                samePattern += 1.15 * evaluateDifficultyOf(rhythm.SamePatterns);
+
+            difficulty += Math.Max(sameRhythm, samePattern) * intervalPenalty;
 
             return difficulty;
         }
