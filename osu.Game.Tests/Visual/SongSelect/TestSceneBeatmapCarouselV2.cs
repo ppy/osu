@@ -33,7 +33,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         private BeatmapStore store;
 
         private OsuTextFlowContainer stats = null!;
-        private BeatmapCarouselV2 carousel = null!;
+        private BeatmapCarousel carousel = null!;
 
         private OsuScrollContainer scroll => carousel.ChildrenOfType<OsuScrollContainer>().Single();
 
@@ -92,7 +92,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                             },
                             new Drawable[]
                             {
-                                carousel = new BeatmapCarouselV2
+                                carousel = new BeatmapCarousel
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
