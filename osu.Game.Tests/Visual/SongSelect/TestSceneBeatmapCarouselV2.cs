@@ -17,10 +17,13 @@ using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Graphics.Containers;
+using osu.Game.Screens.Select;
+using osu.Game.Screens.Select.Filter;
 using osu.Game.Screens.SelectV2;
 using osu.Game.Tests.Beatmaps;
 using osu.Game.Tests.Resources;
 using osuTK.Graphics;
+using BeatmapCarousel = osu.Game.Screens.SelectV2.BeatmapCarousel;
 
 namespace osu.Game.Tests.Visual.SongSelect
 {
@@ -123,6 +126,11 @@ namespace osu.Game.Tests.Visual.SongSelect
                     },
                 };
             });
+
+            AddStep("sort by title", () =>
+            {
+                carousel.Filter(new FilterCriteria { Sort = SortMode.Title });
+            });
         }
 
         [Test]
@@ -137,6 +145,26 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("add 1 beatmap", () => beatmapSets.Add(TestResources.CreateTestBeatmapSetInfo(RNG.Next(1, 4))));
 
             AddStep("remove all beatmaps", () => beatmapSets.Clear());
+        }
+
+        [Test]
+        public void TestSorting()
+        {
+            AddStep("add 10 beatmaps", () =>
+            {
+                for (int i = 0; i < 10; i++)
+                    beatmapSets.Add(TestResources.CreateTestBeatmapSetInfo(RNG.Next(1, 4)));
+            });
+
+            AddStep("sort by difficulty", () =>
+            {
+                carousel.Filter(new FilterCriteria { Sort = SortMode.Difficulty });
+            });
+
+            AddStep("sort by artist", () =>
+            {
+                carousel.Filter(new FilterCriteria { Sort = SortMode.Artist });
+            });
         }
 
         [Test]

@@ -29,7 +29,7 @@ namespace osu.Game.Screens.SelectV2
         /// <summary>
         /// A collection of filters which should be run each time a <see cref="QueueFilter"/> is executed.
         /// </summary>
-        public IEnumerable<ICarouselFilter> Filters { get; init; } = Enumerable.Empty<ICarouselFilter>();
+        protected IEnumerable<ICarouselFilter> Filters { get; init; } = Enumerable.Empty<ICarouselFilter>();
 
         /// <summary>
         /// Height of the area above the carousel that should be treated as visible due to transparency of elements in front of it.

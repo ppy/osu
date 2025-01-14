@@ -31,8 +31,8 @@ namespace osu.Game.Screens.SelectV2
 
             Filters = new ICarouselFilter[]
             {
-                new BeatmapCarouselFilterSorting(),
-                new BeatmapCarouselFilterGrouping(),
+                new BeatmapCarouselFilterSorting(() => Criteria),
+                new BeatmapCarouselFilterGrouping(() => Criteria),
             };
 
             AddInternal(carouselPanelPool);
