@@ -533,6 +533,16 @@ namespace osu.Game.Beatmaps
             }
         }
 
+        public void MarkPlayed(BeatmapInfo beatmapSetInfo) => Realm.Run(r =>
+        {
+            using var transaction = r.BeginWrite();
+
+            var beatmap = r.Find<BeatmapInfo>(beatmapSetInfo.ID)!;
+            beatmap.LastPlayed = DateTimeOffset.Now;
+
+            transaction.Commit();
+        });
+
         #region Implementation of ICanAcceptFiles
 
         public Task Import(params string[] paths) => beatmapImporter.Import(paths);
