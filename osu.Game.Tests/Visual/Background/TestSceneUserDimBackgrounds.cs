@@ -481,7 +481,7 @@ namespace osu.Game.Tests.Visual.Background
             }
         }
 
-        private class UpdateCounter : Drawable
+        private partial class UpdateCounter : Drawable
         {
             public double StoryboardContentLastUpdated;
 
