@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace osu.Game.Rulesets.Difficulty.Utils
 {
-    public static class DifficultyCalculationUtils
+    public static partial class DifficultyCalculationUtils
     {
         /// <summary>
         /// Converts BPM value into milliseconds
