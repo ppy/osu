@@ -120,7 +120,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double aimValue = computeAimValue(score, osuAttributes);
             double speedValue = computeSpeedValue(score, osuAttributes);
-            double accuracyValue = computeAccuracyValue(score, osuAttributes);
+            double accuracyValue = computeAccuracyValue(score);
             double flashlightValue = computeFlashlightValue(score, osuAttributes);
 
             double totalValue =
@@ -269,7 +269,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return speedValue;
         }
 
-        private double computeAccuracyValue(ScoreInfo score, OsuDifficultyAttributes attributes)
+        private double computeAccuracyValue(ScoreInfo score)
         {
             if (score.Mods.Any(h => h is OsuModRelax) || deviation == null)
                 return 0.0;
@@ -290,7 +290,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double computeFlashlightValue(ScoreInfo score, OsuDifficultyAttributes attributes)
         {
-            if (!score.Mods.Any(h => h is OsuModFlashlight))
+            if (!score.Mods.Any(h => h is OsuModFlashlight) || deviation == null)
                 return 0.0;
 
             double flashlightValue = Flashlight.DifficultyToPerformance(attributes.FlashlightDifficulty);
@@ -315,10 +315,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         /// Estimates player's deviation on speed notes.
         /// Treats all speed notes as hit circles.
         /// </summary>
-        private double calculateSpeedDeviation(OsuDifficultyAttributes attributes)
+        private double? calculateSpeedDeviation(OsuDifficultyAttributes attributes)
         {
             if (totalSuccessfulHits == 0)
-                return double.PositiveInfinity;
+                return null;
 
             double hitWindow300 = attributes.GreatHitWindow;
             double hitWindow100 = attributes.OkHitWindow;
@@ -354,7 +354,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 return deviationOnCircles;
             }
 
-            return double.PositiveInfinity;
+            return null;
         }
 
         /// <summary>
