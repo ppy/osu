@@ -612,14 +612,14 @@ namespace osu.Game.Online.API
             friendsReq.Failure += _ => state.Value = APIState.Failing;
             friendsReq.Success += res =>
             {
-                // Add new friends into local list.
-                HashSet<int> friendsSet = friends.Select(f => f.TargetID).ToHashSet();
-                friends.AddRange(res.Where(f => !friendsSet.Contains(f.TargetID)));
+                var existingFriends = friends.Select(f => f.TargetID).ToHashSet();
+                var updatedFriends = res.Select(f => f.TargetID).ToHashSet();
 
-                // Remove non-friends from local lists.
-                friendsSet.Clear();
-                friendsSet.AddRange(res.Select(f => f.TargetID));
-                friends.RemoveAll(f => !friendsSet.Contains(f.TargetID));
+                // Add new friends into local list.
+                friends.AddRange(res.Where(r => !existingFriends.Contains(r.TargetID)));
+
+                // Remove non-friends from local list.
+                friends.RemoveAll(f => !updatedFriends.Contains(f.TargetID));
             };
 
             Queue(friendsReq);
