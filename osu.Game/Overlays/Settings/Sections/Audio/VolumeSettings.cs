@@ -20,7 +20,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, OsuConfigManager config)
         {
-            config.BindWith(OsuSetting.VolumeInactive, volumeInactive.Real);
+            config.BindWith(OsuSetting.VolumeInactive, volumeInactive.Linear);
             volumeInactive.Scale();
 
             Children = new Drawable[]
@@ -28,27 +28,27 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                 new VolumeAdjustSlider
                 {
                     LabelText = AudioSettingsStrings.MasterVolume,
-                    Current = audio.Volume.Scaled,
+                    Current = audio.Volume.Decibel,
                     KeyboardStep = (float)BindableVolume.STEP,
                 },
                 new VolumeAdjustSlider
                 {
                     LabelText = AudioSettingsStrings.MasterVolumeInactive,
-                    Current = volumeInactive.Scaled,
+                    Current = volumeInactive.Decibel,
                     KeyboardStep = (float)BindableVolume.STEP,
                     PlaySamplesOnAdjust = true,
                 },
                 new VolumeAdjustSlider
                 {
                     LabelText = AudioSettingsStrings.EffectVolume,
-                    Current = audio.VolumeSample.Scaled,
+                    Current = audio.VolumeSample.Decibel,
                     KeyboardStep = (float)BindableVolume.STEP,
                 },
 
                 new VolumeAdjustSlider
                 {
                     LabelText = AudioSettingsStrings.MusicVolume,
-                    Current = audio.VolumeTrack.Scaled,
+                    Current = audio.VolumeTrack.Decibel,
                     KeyboardStep = (float)BindableVolume.STEP,
                 },
             };
