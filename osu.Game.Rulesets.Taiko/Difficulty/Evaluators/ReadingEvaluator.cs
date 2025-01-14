@@ -40,20 +40,18 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
 			var midVelocity = new VelocityRange(360, 480);
             var highVelocity = new VelocityRange(480, 640);
 			
-			double midVelDifficulty = 0.5 * DifficultyCalculationUtils.Logistic(effectiveBPM, midVelocity.Center, 1.0 / (midVelocity.Range / 10));
+			double midVelocityDifficulty = 0.5 * DifficultyCalculationUtils.Logistic(effectiveBPM, midVelocity.Center, 1.0 / (midVelocity.Range / 10));
 
 			// Density refers to an object's deltatime relative to its expected deltatime
-			double density = expectedDeltaTime / Math.Max(1.0, noteObject.DeltaTime);
+			double objectDensity = expectedDeltaTime / Math.Max(1.0, noteObject.DeltaTime);
 			
 			// Dense notes are penalised at high velocities
 			// https://www.desmos.com/calculator/u63f3ntdsi
-			double densityPenalty = DifficultyCalculationUtils.Logistic(density, 0.925, 15);
+			double densityPenalty = DifficultyCalculationUtils.Logistic(objectDensity, 0.925, 15);
 			
-			double midpointOffset = highVelocity.Center + 8 * densityPenalty;
-			double multiplier = (1.0 + 0.5 * densityPenalty) / (highVelocity.Range / 10);
-			double highVelDifficulty = (1.0 - 0.33 * densityPenalty) * DifficultyCalculationUtils.Logistic(effectiveBPM, midpointOffset, multiplier);
+			double highVelocityDifficulty = (1.0 - 0.33 * densityPenalty) * DifficultyCalculationUtils.Logistic(effectiveBPM, highVelocity.Center + 8 * densityPenalty, (1.0 + 0.5 * densityPenalty) / (highVelocity.Range / 10));
 			
-            return midVelDifficulty + highVelDifficulty;
+            return midVelocityDifficulty + highVelocityDifficulty;
         }
     }
 }
