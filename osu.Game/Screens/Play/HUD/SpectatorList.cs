@@ -13,9 +13,9 @@ using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Chat;
-using osu.Game.Users;
 using osu.Game.Localisation.HUD;
 using osu.Game.Localisation.SkinComponents;
+using osu.Game.Online.Spectator;
 
 namespace osu.Game.Screens.Play.HUD
 {
@@ -23,7 +23,7 @@ namespace osu.Game.Screens.Play.HUD
     {
         private const int max_spectators_displayed = 10;
 
-        public BindableList<Spectator> Spectators { get; } = new BindableList<Spectator>();
+        public BindableList<SpectatorUser> Spectators { get; } = new BindableList<SpectatorUser>();
         public Bindable<LocalUserPlayingState> UserPlayingState { get; } = new Bindable<LocalUserPlayingState>();
 
         [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.Font), nameof(SkinnableComponentStrings.FontDescription))]
@@ -91,7 +91,7 @@ namespace osu.Game.Screens.Play.HUD
                 {
                     for (int i = 0; i < e.NewItems!.Count; i++)
                     {
-                        var spectator = (Spectator)e.NewItems![i]!;
+                        var spectator = (SpectatorUser)e.NewItems![i]!;
                         int index = e.NewStartingIndex + i;
 
                         if (index >= max_spectators_displayed)
@@ -157,7 +157,7 @@ namespace osu.Game.Screens.Play.HUD
 
         private partial class SpectatorListEntry : PoolableDrawable
         {
-            public Bindable<Spectator> Current { get; } = new Bindable<Spectator>();
+            public Bindable<SpectatorUser> Current { get; } = new Bindable<SpectatorUser>();
 
             private readonly BindableWithCurrent<LocalUserPlayingState> current = new BindableWithCurrent<LocalUserPlayingState>();
 
@@ -208,12 +208,6 @@ namespace osu.Game.Screens.Play.HUD
                 if (linkCompiler != null)
                     linkCompiler.Enabled.Value = UserPlayingState.Value != LocalUserPlayingState.Playing;
             }
-        }
-
-        public record Spectator(int OnlineID, string Username) : IUser
-        {
-            public CountryCode CountryCode => CountryCode.Unknown;
-            public bool IsBot => false;
         }
     }
 }

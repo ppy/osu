@@ -36,9 +36,14 @@ namespace osu.Game.Online.Spectator
         public abstract IBindable<bool> IsConnected { get; }
 
         /// <summary>
-        /// The states of all users currently being watched.
+        /// The states of all users currently being watched by the local user.
         /// </summary>
-        public virtual IBindableDictionary<int, SpectatorState> WatchedUserStates => watchedUserStates;
+        public IBindableDictionary<int, SpectatorState> WatchedUserStates => watchedUserStates;
+
+        /// <summary>
+        /// All users who are currently watching the local user.
+        /// </summary>
+        public IBindableList<SpectatorUser> WatchingUsers => watchingUsers;
 
         /// <summary>
         /// A global list of all players currently playing.
@@ -82,6 +87,7 @@ namespace osu.Game.Online.Spectator
 
         private readonly BindableDictionary<int, SpectatorState> watchedUserStates = new BindableDictionary<int, SpectatorState>();
 
+        private readonly BindableList<SpectatorUser> watchingUsers = new BindableList<SpectatorUser>();
         private readonly BindableList<int> playingUsers = new BindableList<int>();
         private readonly SpectatorState currentState = new SpectatorState();
 
@@ -127,6 +133,7 @@ namespace osu.Game.Online.Spectator
                 {
                     playingUsers.Clear();
                     watchedUserStates.Clear();
+                    watchingUsers.Clear();
                 }
             }), true);
         }
@@ -175,6 +182,30 @@ namespace osu.Game.Online.Spectator
         Task ISpectatorClient.UserScoreProcessed(int userId, long scoreId)
         {
             Schedule(() => OnUserScoreProcessed?.Invoke(userId, scoreId));
+
+            return Task.CompletedTask;
+        }
+
+        Task ISpectatorClient.UserStartedWatching(SpectatorUser[] users)
+        {
+            Schedule(() =>
+            {
+                foreach (var user in users)
+                {
+                    if (!watchingUsers.Contains(user))
+                        watchingUsers.Add(user);
+                }
+            });
+
+            return Task.CompletedTask;
+        }
+
+        Task ISpectatorClient.UserEndedWatching(int userId)
+        {
+            Schedule(() =>
+            {
+                watchingUsers.RemoveAll(u => u.OnlineID == userId);
+            });
 
             return Task.CompletedTask;
         }
