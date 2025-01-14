@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
+using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Osu.Difficulty.Skills;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Scoring;
@@ -41,7 +42,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         /// <summary>
         /// The bonus multiplier is a basic multiplier that indicate how strong the impact of Difficulty Factor is.
         /// </summary>
-        private const double bonus_multiplier = 0.1;
+        private const double bonus_multiplier = 0.15;
 
         /// <summary>
         /// Amount of missed slider tails that don't break combo. Will only be correct on non-classic scores
@@ -127,14 +128,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             speedDeviation = calculateSpeedDeviation(osuAttributes);
 
-            if (totalHits > 2000)
-            {
-                lengthBonusBase = 1.3 * Math.Max((Math.Log(10.0 + totalHits / 1000.0) - 1.35) * 0.45 + 0.5, 1.0);
-            }
-            else
-            {
-                lengthBonusBase = Math.Max((Math.Log(10.0 + totalHits / 1000.0) - 1.35) * 0.45 + 0.5, 1.0);
-            }
+            lengthBonusBase = Math.Log(10.0 + totalHits / 1000.0) - 1.2;
 
             double aimValue = computeAimValue(score, osuAttributes);
             double speedValue = computeSpeedValue(score, osuAttributes);
@@ -191,9 +185,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double aimValue = OsuStrainSkill.DifficultyToPerformance(aimDifficulty);
 
-            double approachRateBonus = score.Mods.Any(h => h is OsuModRelax) ? 0.0 : attributes.ApproachRate > 10.33 ? 0.3 * (attributes.ApproachRate - 10.33) : attributes.ApproachRate < 8.0 ? 0.05 * (8.0 - attributes.ApproachRate) : 0.0; //AR bonus for higher and lower AR
+            double approachRateBonus = score.Mods.Any(h => h is OsuModRelax) ? 0.0 : attributes.ApproachRate > 10.33 ? 0.2 * (attributes.ApproachRate - 10.33) : attributes.ApproachRate < 8.0 ? 0.02 * (8.0 - attributes.ApproachRate) : 0.0; //AR bonus for higher and lower AR
 
-            aimValue *= LengthBonusMultiplier(lengthBonusBase + approachRateBonus, attributes.AimDifficultyFactor, bonus_multiplier);
+            aimValue *= LengthBonusMultiplier(lengthBonusBase, attributes.SpeedDifficultyFactor, bonus_multiplier) * (1.0 + approachRateBonus);
 
             if (effectiveMissCount > 0)
                 aimValue *= calculateMissPenalty(effectiveMissCount, attributes.AimDifficultStrainCount);
@@ -220,9 +214,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double speedValue = OsuStrainSkill.DifficultyToPerformance(attributes.SpeedDifficulty);
 
-            double approachRateBonus = attributes.ApproachRate > 10.33 ? 0.3 * (attributes.ApproachRate - 10.33) : 0.0;
+            double approachRateBonus = attributes.ApproachRate > 10.33 ? 0.2 * (attributes.ApproachRate - 10.33) : 0.0;
 
-            speedValue *= LengthBonusMultiplier(lengthBonusBase + approachRateBonus, attributes.SpeedDifficultyFactor, bonus_multiplier);
+            speedValue *= LengthBonusMultiplier(lengthBonusBase, attributes.SpeedDifficultyFactor, bonus_multiplier) * (1.0 + approachRateBonus);
 
             if (effectiveMissCount > 0)
                 speedValue *= calculateMissPenalty(effectiveMissCount, attributes.SpeedDifficultStrainCount);
@@ -413,8 +407,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             const double scale = 50;
             double adjustedSpeedValue = scale * (Math.Log((speedValue - excessSpeedDifficultyCutoff) / scale + 1) + excessSpeedDifficultyCutoff / scale);
 
-            // 200 UR and less are considered tapped correctly to ensure that normal scores will be punished as little as possible
-            double lerp = 1 - Math.Clamp((speedDeviation.Value - 20) / (24 - 20), 0, 1);
+            // 220 UR and less are considered tapped correctly to ensure that normal scores will be punished as little as possible
+            double lerp = 1 - DifficultyCalculationUtils.ReverseLerp(speedDeviation.Value, 22.0, 27.0);
             adjustedSpeedValue = double.Lerp(adjustedSpeedValue, speedValue, lerp);
 
             return adjustedSpeedValue / speedValue;

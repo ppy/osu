@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Game.Beatmaps;
@@ -36,6 +37,6 @@ namespace osu.Game.Rulesets.Difficulty
         /// <summary>
         /// Calculating the length bonus as a multiplier considering also the Difficulty Factor.
         /// </summary>
-        protected virtual double LengthBonusMultiplier(double offsetLengthBonus, double difficultyFactor, double multiplierDifficultyFactor) => offsetLengthBonus + difficultyFactor * multiplierDifficultyFactor;
+        protected virtual double LengthBonusMultiplier(double lengthBonusBase, double difficultyFactor, double multiplierDifficultyFactor) => Math.Max(lengthBonusBase * (0.95 + difficultyFactor * multiplierDifficultyFactor), 1.0);
     }
 }
