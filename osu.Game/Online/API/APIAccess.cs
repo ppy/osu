@@ -13,6 +13,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using osu.Framework.Bindables;
+using osu.Framework.Development;
 using osu.Framework.Extensions.ExceptionExtensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
@@ -110,6 +111,9 @@ namespace osu.Game.Online.API
 
             config.BindWith(OsuSetting.UserOnlineStatus, configStatus);
 
+            // Early call to ensure the local user / "logged in" state is correct immediately.
+            setPlaceholderLocalUser();
+
             localUser.BindValueChanged(u =>
             {
                 u.OldValue?.Activity.UnbindFrom(activity);
@@ -193,7 +197,7 @@ namespace osu.Game.Online.API
 
                 Debug.Assert(HasLogin);
 
-                // Ensure that we are in an online state. If not, attempt a connect.
+                // Ensure that we are in an online state. If not, attempt to connect.
                 if (state.Value != APIState.Online)
                 {
                     attemptConnect();
@@ -247,17 +251,7 @@ namespace osu.Game.Online.API
         /// <returns>Whether the connection attempt was successful.</returns>
         private void attemptConnect()
         {
-            if (localUser.IsDefault)
-            {
-                // Show a placeholder user if saved credentials are available.
-                // This is useful for storing local scores and showing a placeholder username after starting the game,
-                // until a valid connection has been established.
-                setLocalUser(new APIUser
-                {
-                    Username = ProvidedUsername,
-                    Status = { Value = configStatus.Value ?? UserStatus.Online }
-                });
-            }
+            Scheduler.Add(setPlaceholderLocalUser, false);
 
             // save the username at this point, if the user requested for it to be.
             config.SetValue(OsuSetting.Username, config.Get<bool>(OsuSetting.SaveUsername) ? ProvidedUsername : string.Empty);
@@ -339,9 +333,11 @@ namespace osu.Game.Online.API
 
                     userReq.Success += me =>
                     {
+                        Debug.Assert(ThreadSafety.IsUpdateThread);
+
                         me.Status.Value = configStatus.Value ?? UserStatus.Online;
 
-                        setLocalUser(me);
+                        localUser.Value = me;
 
                         state.Value = me.SessionVerified ? APIState.Online : APIState.RequiresSecondFactorAuth;
                         failureCount = 0;
@@ -364,6 +360,23 @@ namespace osu.Game.Online.API
             // before actually going online.
             while (State.Value == APIState.Connecting && !cancellationToken.IsCancellationRequested)
                 Thread.Sleep(500);
+        }
+
+        /// <summary>
+        /// Show a placeholder user if saved credentials are available.
+        /// This is useful for storing local scores and showing a placeholder username after starting the game,
+        /// until a valid connection has been established.
+        /// </summary>
+        private void setPlaceholderLocalUser()
+        {
+            if (!localUser.IsDefault)
+                return;
+
+            localUser.Value = new APIUser
+            {
+                Username = ProvidedUsername,
+                Status = { Value = configStatus.Value ?? UserStatus.Online }
+            };
         }
 
         public void Perform(APIRequest request)
@@ -593,7 +606,7 @@ namespace osu.Game.Online.API
             // Scheduled prior to state change such that the state changed event is invoked with the correct user and their friends present
             Schedule(() =>
             {
-                setLocalUser(createGuestUser());
+                localUser.Value = createGuestUser();
                 friends.Clear();
             });
 
@@ -618,8 +631,6 @@ namespace osu.Game.Online.API
         }
 
         private static APIUser createGuestUser() => new GuestUser();
-
-        private void setLocalUser(APIUser user) => Scheduler.Add(() => localUser.Value = user, false);
 
         protected override void Dispose(bool isDisposing)
         {
