@@ -56,6 +56,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
                 return 0.0;
             }
 
+            // Find the previous hit object hit by the current finger, which is n notes prior, n being the number of
+            // available fingers.
             TaikoDifficultyHitObject taikoCurrent = (TaikoDifficultyHitObject)current;
             TaikoDifficultyHitObject? taikoPrevious = current.Previous(1) as TaikoDifficultyHitObject;
             TaikoDifficultyHitObject? previousMono = taikoCurrent.PreviousMono(availableFingersFor(taikoCurrent) - 1);
