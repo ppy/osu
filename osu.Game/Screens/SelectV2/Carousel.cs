@@ -291,6 +291,14 @@ namespace osu.Game.Screens.SelectV2
 
                 updateDisplayedRange(range);
             }
+
+            foreach (var panel in scroll.Panels)
+            {
+                var carouselPanel = (ICarouselPanel)panel;
+
+                if (panel.Depth != carouselPanel.DrawYPosition)
+                    scroll.Panels.ChangeChildDepth(panel, (float)carouselPanel.DrawYPosition);
+            }
         }
 
         private DisplayRange getDisplayRange()
@@ -415,7 +423,7 @@ namespace osu.Game.Screens.SelectV2
                 if (d is not ICarouselPanel panel)
                     return base.GetChildPosInContent(d, offset);
 
-                return panel.YPosition + offset.X;
+                return panel.DrawYPosition + offset.X;
             }
 
             protected override void ApplyCurrentToContent()
@@ -425,7 +433,7 @@ namespace osu.Game.Screens.SelectV2
                 double scrollableExtent = -Current + ScrollableExtent * ScrollContent.RelativeAnchorPosition.Y;
 
                 foreach (var d in Panels)
-                    d.Y = (float)(((ICarouselPanel)d).YPosition + scrollableExtent);
+                    d.Y = (float)(((ICarouselPanel)d).DrawYPosition + scrollableExtent);
             }
         }
 

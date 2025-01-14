@@ -13,7 +13,7 @@ namespace osu.Game.Screens.SelectV2
         /// <summary>
         /// The Y position which should be used for displaying this item within the carousel.
         /// </summary>
-        double YPosition => Item!.CarouselYPosition;
+        double DrawYPosition { get; }
 
         /// <summary>
         /// The carousel item this drawable is representing. This is managed by <see cref="Carousel{T}"/> and should not be set manually.
