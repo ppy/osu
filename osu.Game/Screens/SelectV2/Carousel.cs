@@ -45,13 +45,13 @@ namespace osu.Game.Screens.SelectV2
         /// The number of pixels outside the carousel's vertical bounds to manifest drawables.
         /// This allows preloading content before it scrolls into view.
         /// </summary>
-        public float DistanceOffscreenToPreload { get; set; } = 0;
+        public float DistanceOffscreenToPreload { get; set; }
 
         /// <summary>
         /// When a new request arrives to change filtering, the number of milliseconds to wait before performing the filter.
         /// Regardless of any external debouncing, this is a safety measure to avoid triggering too many threaded operations.
         /// </summary>
-        public int DebounceDelay { get; set; } = 0;
+        public int DebounceDelay { get; set; }
 
         /// <summary>
         /// Whether an asynchronous filter / group operation is currently underway.
