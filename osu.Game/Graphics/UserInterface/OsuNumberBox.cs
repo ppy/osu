@@ -13,7 +13,5 @@ namespace osu.Game.Graphics.UserInterface
 
             SelectAllOnFocus = true;
         }
-
-        protected override bool CanAddCharacter(char character) => char.IsAsciiDigit(character);
     }
 }
