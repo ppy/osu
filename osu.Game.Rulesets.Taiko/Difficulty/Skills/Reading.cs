@@ -3,6 +3,7 @@
 
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
+using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Taiko.Difficulty.Evaluators;
 using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing;
@@ -34,6 +35,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             }
 
             var taikoObject = (TaikoDifficultyHitObject)current;
+            int index = taikoObject.Colour.MonoStreak?.HitObjects.IndexOf(taikoObject) ?? 0;
+
+            currentStrain *= DifficultyCalculationUtils.Logistic(index, 4, -1 / 25.0, 0.5) + 0.5;
 
             currentStrain *= StrainDecayBase;
             currentStrain += ReadingEvaluator.EvaluateDifficultyOf(taikoObject) * SkillMultiplier;
