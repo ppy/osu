@@ -111,8 +111,14 @@ namespace osu.Game.Online.API
 
             config.BindWith(OsuSetting.UserOnlineStatus, configStatus);
 
-            // Early call to ensure the local user / "logged in" state is correct immediately.
-            setPlaceholderLocalUser();
+            if (HasLogin)
+            {
+                // Early call to ensure the local user / "logged in" state is correct immediately.
+                prepareForConnect();
+
+                // This is required so that Queue() requests during startup sequence don't fail due to "not logged in".
+                state.Value = APIState.Connecting;
+            }
 
             localUser.BindValueChanged(u =>
             {
@@ -251,7 +257,7 @@ namespace osu.Game.Online.API
         /// <returns>Whether the connection attempt was successful.</returns>
         private void attemptConnect()
         {
-            Scheduler.Add(setPlaceholderLocalUser, false);
+            Scheduler.Add(prepareForConnect, false);
 
             // save the username at this point, if the user requested for it to be.
             config.SetValue(OsuSetting.Username, config.Get<bool>(OsuSetting.SaveUsername) ? ProvidedUsername : string.Empty);
@@ -367,7 +373,7 @@ namespace osu.Game.Online.API
         /// This is useful for storing local scores and showing a placeholder username after starting the game,
         /// until a valid connection has been established.
         /// </summary>
-        private void setPlaceholderLocalUser()
+        private void prepareForConnect()
         {
             if (!localUser.IsDefault)
                 return;
