@@ -37,8 +37,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             const int radius = OsuDifficultyHitObject.NORMALISED_RADIUS;
             const int diameter = OsuDifficultyHitObject.NORMALISED_DIAMETER;
 
+            double doubletapAdjust = calcAimDoubletapStrainTimeAdjust(current);
+
             // Calculate the velocity to the current hitobject, which starts with a base distance / time assuming the last object is a hitcircle.
-            double currVelocity = osuCurrObj.LazyJumpDistance / osuCurrObj.StrainTime;
+            double currVelocity = osuCurrObj.LazyJumpDistance / (osuCurrObj.StrainTime + doubletapAdjust);
 
             // But if the last object is a slider, then we extend the travel velocity through the slider into the current object.
             if (osuLastObj.BaseObject is Slider && withSliderTravelDistance)
@@ -130,6 +132,41 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 aimStrain += sliderBonus * slider_multiplier;
 
             return aimStrain;
+        }
+
+        private static double calcAimDoubletapStrainTimeAdjust(DifficultyHitObject current)
+        {
+            // Use 4 objects to be sure that only many doubletaps in a row would be nerfed
+            var osuCurrObj = (OsuDifficultyHitObject)current;
+            var osuLast0Obj = (OsuDifficultyHitObject)current.Previous(0);
+            var osuLast1Obj = (OsuDifficultyHitObject)current.Previous(1);
+            var osuLast2Obj = (OsuDifficultyHitObject)current.Previous(2);
+
+            if (osuLast0Obj == null || osuLast1Obj == null || osuLast2Obj == null)
+                return 0;
+
+            const int radius = OsuDifficultyHitObject.NORMALISED_RADIUS;
+            const int diameter = OsuDifficultyHitObject.NORMALISED_DIAMETER;
+
+            // Two doubletaps in a row
+            double doubletappability = DifficultyCalculationUtils.Smoothstep(osuLast0Obj.LazyJumpDistance, diameter, radius)
+                * DifficultyCalculationUtils.Smoothstep(osuLast2Obj.LazyJumpDistance, diameter, radius);
+
+            // This part is not great, but it keeps stream maps and alt maps with doubles from being nerfed
+            doubletappability *= DifficultyCalculationUtils.ReverseLerp(osuCurrObj.LazyJumpDistance, diameter * 1.5, diameter * 3)
+                * DifficultyCalculationUtils.ReverseLerp(osuLast1Obj.LazyJumpDistance, diameter * 1.5, diameter * 3);
+
+            // Start from hitwindow
+            double doubletapHitWindow = osuCurrObj.HitWindowGreat;
+
+            // If strain time is too high for this hitwindow - don't punish it
+            double relevantStrainTime = Math.Max(osuLast0Obj.StrainTime, osuLast2Obj.StrainTime);
+            doubletapHitWindow *= DifficultyCalculationUtils.Smoothstep(doubletapHitWindow, relevantStrainTime / 2, relevantStrainTime);
+
+            // Divide by 2 because only half of hitwindow is used to abuse consecutive jumps
+            double result = doubletappability * doubletapHitWindow / 2;
+
+            return result;
         }
 
         private static double calcWideAngleBonus(double angle) => Math.Pow(Math.Sin(3.0 / 4 * (Math.Min(5.0 / 6 * Math.PI, Math.Max(Math.PI / 6, angle)) - Math.PI / 6)), 2);
