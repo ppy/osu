@@ -16,6 +16,8 @@ using osu.Game.Online.Chat;
 using osu.Game.Localisation.HUD;
 using osu.Game.Localisation.SkinComponents;
 using osu.Game.Online.Spectator;
+using osu.Game.Skinning;
+using osuTK;
 
 namespace osu.Game.Screens.Play.HUD
 {
@@ -43,8 +45,9 @@ namespace osu.Game.Screens.Play.HUD
         {
             AutoSizeAxes = Axes.Both;
 
-            InternalChildren = new Drawable[]
+            InternalChildren = new[]
             {
+                Empty().With(t => t.Size = new Vector2(100, 50)),
                 mainFlow = new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Both,
@@ -208,6 +211,18 @@ namespace osu.Game.Screens.Play.HUD
                 if (linkCompiler != null)
                     linkCompiler.Enabled.Value = UserPlayingState.Value != LocalUserPlayingState.Playing;
             }
+        }
+    }
+
+    public partial class SkinnableSpectatorList : SpectatorList, ISerialisableDrawable
+    {
+        public bool UsesFixedAnchor { get; set; }
+
+        [BackgroundDependencyLoader]
+        private void load(SpectatorClient client, Player player)
+        {
+            ((IBindableList<SpectatorUser>)Spectators).BindTo(client.WatchingUsers);
+            ((IBindable<LocalUserPlayingState>)UserPlayingState).BindTo(player.PlayingState);
         }
     }
 }
