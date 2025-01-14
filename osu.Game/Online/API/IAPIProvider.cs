@@ -25,9 +25,14 @@ namespace osu.Game.Online.API
         IBindableList<APIRelation> Friends { get; }
 
         /// <summary>
+        /// The current user's status.
+        /// </summary>
+        Bindable<UserStatus> Status { get; }
+
+        /// <summary>
         /// The current user's activity.
         /// </summary>
-        IBindable<UserActivity> Activity { get; }
+        IBindable<UserActivity?> Activity { get; }
 
         /// <summary>
         /// The language supplied by this provider to API requests.

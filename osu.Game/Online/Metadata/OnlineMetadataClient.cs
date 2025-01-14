@@ -37,8 +37,9 @@ namespace osu.Game.Online.Metadata
         private IHubClientConnector? connector;
         private Bindable<int> lastQueueId = null!;
         private IBindable<APIUser> localUser = null!;
+
+        private IBindable<UserStatus> userStatus = null!;
         private IBindable<UserActivity?> userActivity = null!;
-        private IBindable<UserStatus?>? userStatus;
 
         private HubConnection? connection => connector?.CurrentConnection;
 
@@ -75,22 +76,20 @@ namespace osu.Game.Online.Metadata
             lastQueueId = config.GetBindable<int>(OsuSetting.LastProcessedMetadataId);
 
             localUser = api.LocalUser.GetBoundCopy();
+            userStatus = api.Status.GetBoundCopy();
             userActivity = api.Activity.GetBoundCopy()!;
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            localUser.BindValueChanged(_ =>
+
+            userStatus.BindValueChanged(status =>
             {
                 if (localUser.Value is not GuestUser)
-                {
-                    userStatus = localUser.Value.Status.GetBoundCopy();
-                    userStatus.BindValueChanged(status => UpdateStatus(status.NewValue), true);
-                }
-                else
-                    userStatus = null;
+                    UpdateStatus(status.NewValue);
             }, true);
+
             userActivity.BindValueChanged(activity =>
             {
                 if (localUser.Value is not GuestUser)
@@ -117,7 +116,7 @@ namespace osu.Game.Online.Metadata
             if (localUser.Value is not GuestUser)
             {
                 UpdateActivity(userActivity.Value);
-                UpdateStatus(userStatus?.Value);
+                UpdateStatus(userStatus.Value);
             }
 
             if (lastQueueId.Value >= 0)
