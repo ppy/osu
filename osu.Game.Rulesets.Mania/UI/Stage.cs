@@ -103,7 +103,7 @@ namespace osu.Game.Rulesets.Mania.UI
                             Width = 1366, // Bar lines should only be masked on the vertical axis
                             BypassAutoSizeAxes = Axes.Both,
                             Masking = true,
-                            Child = barLineContainer = new HitObjectArea(HitObjectContainer)
+                            Child = barLineContainer = new HitPositionPaddedContainer(HitObjectContainer)
                             {
                                 Name = "Bar lines",
                                 Anchor = Anchor.TopCentre,
@@ -119,12 +119,12 @@ namespace osu.Game.Rulesets.Mania.UI
                         {
                             RelativeSizeAxes = Axes.Both
                         },
-                        judgements = new JudgementContainer<DrawableManiaJudgement>
+                        new HitPositionPaddedContainer(judgements = new JudgementContainer<DrawableManiaJudgement>
                         {
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.Centre,
                             RelativeSizeAxes = Axes.Both,
-                            Y = HIT_TARGET_POSITION + 150
+                        })
+                        {
+                            RelativeSizeAxes = Axes.Both,
                         },
                         topLevelContainer = new Container { RelativeSizeAxes = Axes.Both }
                     }
@@ -218,7 +218,7 @@ namespace osu.Game.Rulesets.Mania.UI
             {
                 j.Apply(result, judgedObject);
 
-                j.Anchor = Anchor.Centre;
+                j.Anchor = Anchor.BottomCentre;
                 j.Origin = Anchor.Centre;
             })!);
         }

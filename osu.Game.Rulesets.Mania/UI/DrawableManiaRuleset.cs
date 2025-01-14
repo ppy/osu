@@ -32,7 +32,6 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
-    [Cached]
     public partial class DrawableManiaRuleset : DrawableScrollingRuleset<ManiaHitObject>
     {
         /// <summary>
@@ -50,6 +49,8 @@ namespace osu.Game.Rulesets.Mania.UI
         public new ManiaBeatmap Beatmap => (ManiaBeatmap)base.Beatmap;
 
         public IEnumerable<BarLine> BarLines;
+
+        public override bool RequiresPortraitOrientation => Beatmap.Stages.Count == 1;
 
         protected override bool RelativeScaleBeatLengths => true;
 
@@ -110,8 +111,6 @@ namespace osu.Game.Rulesets.Mania.UI
             configScrollSpeed.BindValueChanged(speed => TargetTimeRange = ComputeScrollTime(speed.NewValue));
 
             TimeRange.Value = TargetTimeRange = currentTimeRange = ComputeScrollTime(configScrollSpeed.Value);
-
-            KeyBindingInputManager.Add(new ManiaTouchInputArea());
         }
 
         protected override void AdjustScrollSpeed(int amount) => configScrollSpeed.Value += amount;

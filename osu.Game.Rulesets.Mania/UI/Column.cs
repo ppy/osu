@@ -180,5 +180,29 @@ namespace osu.Game.Rulesets.Mania.UI
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
             // This probably shouldn't exist as is, but the columns in the stage are separated by a 1px border
             => DrawRectangle.Inflate(new Vector2(Stage.COLUMN_SPACING / 2, 0)).Contains(ToLocalSpace(screenSpacePos));
+
+        #region Touch Input
+
+        [Resolved(canBeNull: true)]
+        private ManiaInputManager maniaInputManager { get; set; }
+
+        private int touchActivationCount;
+
+        protected override bool OnTouchDown(TouchDownEvent e)
+        {
+            maniaInputManager.KeyBindingContainer.TriggerPressed(Action.Value);
+            touchActivationCount++;
+            return true;
+        }
+
+        protected override void OnTouchUp(TouchUpEvent e)
+        {
+            touchActivationCount--;
+
+            if (touchActivationCount == 0)
+                maniaInputManager.KeyBindingContainer.TriggerReleased(Action.Value);
+        }
+
+        #endregion
     }
 }
