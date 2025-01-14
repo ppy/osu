@@ -35,7 +35,7 @@ namespace osu.Game.Graphics.Containers
         {
         }
 
-        protected override void OnUserScroll(float value, bool animated = true, double? distanceDecay = default)
+        protected override void OnUserScroll(double value, bool animated = true, double? distanceDecay = default)
         {
             UserScrolling = true;
             base.OnUserScroll(value, animated, distanceDecay);
@@ -53,7 +53,7 @@ namespace osu.Game.Graphics.Containers
             base.ScrollFromMouseEvent(e);
         }
 
-        public new void ScrollTo(float value, bool animated = true, double? distanceDecay = null)
+        public new void ScrollTo(double value, bool animated = true, double? distanceDecay = null)
         {
             UserScrolling = false;
             base.ScrollTo(value, animated, distanceDecay);
