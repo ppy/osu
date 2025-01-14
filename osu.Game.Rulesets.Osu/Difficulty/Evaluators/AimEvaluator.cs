@@ -38,10 +38,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             const int radius = OsuDifficultyHitObject.NORMALISED_RADIUS;
             const int diameter = OsuDifficultyHitObject.NORMALISED_DIAMETER;
 
-            double doubletapAdjust = calcAimDoubletapStrainTimeAdjust(current);
-
             // Calculate the velocity to the current hitobject, which starts with a base distance / time assuming the last object is a hitcircle.
-            double currVelocity = osuCurrObj.LazyJumpDistance / (osuCurrObj.StrainTime + doubletapAdjust);
+            double currVelocity = osuCurrObj.LazyJumpDistance / osuCurrObj.StrainTime;
 
             // But if the last object is a slider, then we extend the travel velocity through the slider into the current object.
             if (osuLastObj.BaseObject is Slider && withSliderTravelDistance)
@@ -70,6 +68,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double wiggleBonus = 0;
 
             double aimStrain = currVelocity; // Start strain with regular velocity.
+            aimStrain *= calcAimDoubletapMultiplier(current);
 
             if (Math.Max(osuCurrObj.StrainTime, osuLastObj.StrainTime) < 1.25 * Math.Min(osuCurrObj.StrainTime, osuLastObj.StrainTime)) // If rhythms are the same.
             {
@@ -144,7 +143,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             return aimStrain;
         }
 
-        private static double calcAimDoubletapStrainTimeAdjust(DifficultyHitObject current)
+        private static double calcAimDoubletapMultiplier(DifficultyHitObject current)
         {
             // Use 4 objects to be sure that only many doubletaps in a row would be nerfed
             var osuCurrObj = (OsuDifficultyHitObject)current;
@@ -174,9 +173,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             doubletapHitWindow *= DifficultyCalculationUtils.Smoothstep(doubletapHitWindow, relevantStrainTime / 2, relevantStrainTime);
 
             // Divide by 2 because only half of hitwindow is used to abuse consecutive jumps
-            double result = doubletappability * doubletapHitWindow / 2;
+            double strainTimeAdjust = doubletappability * doubletapHitWindow / 2;
 
-            return result;
+            return osuCurrObj.StrainTime / (osuCurrObj.StrainTime + strainTimeAdjust);
         }
 
         private static double calcWideAngleBonus(double angle) => DifficultyCalculationUtils.Smoothstep(angle, double.DegreesToRadians(40), double.DegreesToRadians(140));
