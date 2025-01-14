@@ -60,6 +60,7 @@ namespace osu.Game.Online.API
 
         public IBindable<APIUser> LocalUser => localUser;
         public IBindableList<APIRelation> Friends => friends;
+        public Bindable<UserStatus> Status { get; } = new Bindable<UserStatus>(UserStatus.Online);
         public IBindable<UserActivity> Activity => activity;
 
         public INotificationsClient NotificationsClient { get; }
@@ -73,7 +74,6 @@ namespace osu.Game.Online.API
         private Bindable<UserActivity> activity { get; } = new Bindable<UserActivity>();
 
         private Bindable<UserStatus?> configStatus { get; } = new Bindable<UserStatus?>();
-        private Bindable<UserStatus?> localUserStatus { get; } = new Bindable<UserStatus?>();
 
         protected bool HasLogin => authentication.Token.Value != null || (!string.IsNullOrEmpty(ProvidedUsername) && !string.IsNullOrEmpty(password));
 
@@ -120,17 +120,6 @@ namespace osu.Game.Online.API
                 // This is required so that Queue() requests during startup sequence don't fail due to "not logged in".
                 state.Value = APIState.Connecting;
             }
-
-            localUser.BindValueChanged(u =>
-            {
-                u.OldValue?.Activity.UnbindFrom(activity);
-                u.NewValue.Activity.BindTo(activity);
-
-                u.OldValue?.Status.UnbindFrom(localUserStatus);
-                u.NewValue.Status.BindTo(localUserStatus);
-            }, true);
-
-            localUserStatus.BindTo(configStatus);
 
             var thread = new Thread(run)
             {
@@ -342,9 +331,8 @@ namespace osu.Game.Online.API
                     {
                         Debug.Assert(ThreadSafety.IsUpdateThread);
 
-                        me.Status.Value = configStatus.Value ?? UserStatus.Online;
-
                         localUser.Value = me;
+                        Status.Value = configStatus.Value ?? UserStatus.Online;
 
                         state.Value = me.SessionVerified ? APIState.Online : APIState.RequiresSecondFactorAuth;
                         failureCount = 0;
@@ -381,9 +369,10 @@ namespace osu.Game.Online.API
 
             localUser.Value = new APIUser
             {
-                Username = ProvidedUsername,
-                Status = { Value = configStatus.Value ?? UserStatus.Online }
+                Username = ProvidedUsername
             };
+
+            Status.Value = configStatus.Value ?? UserStatus.Online;
         }
 
         public void Perform(APIRequest request)

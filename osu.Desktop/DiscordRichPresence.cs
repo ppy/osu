@@ -54,8 +54,8 @@ namespace osu.Desktop
         [Resolved]
         private OsuConfigManager config { get; set; } = null!;
 
-        private readonly IBindable<UserStatus?> status = new Bindable<UserStatus?>();
-        private readonly IBindable<UserActivity> activity = new Bindable<UserActivity>();
+        private readonly IBindable<UserStatus> status = new Bindable<UserStatus>();
+        private readonly IBindable<UserActivity?> activity = new Bindable<UserActivity?>();
         private readonly Bindable<DiscordRichPresenceMode> privacyMode = new Bindable<DiscordRichPresenceMode>();
 
         private readonly RichPresence presence = new RichPresence
@@ -108,14 +108,8 @@ namespace osu.Desktop
             config.BindWith(OsuSetting.DiscordRichPresence, privacyMode);
 
             user = api.LocalUser.GetBoundCopy();
-            user.BindValueChanged(u =>
-            {
-                status.UnbindBindings();
-                status.BindTo(u.NewValue.Status);
-
-                activity.UnbindBindings();
-                activity.BindTo(u.NewValue.Activity);
-            }, true);
+            status.BindTo(api.Status);
+            activity.BindTo(api.Activity);
 
             ruleset.BindValueChanged(_ => schedulePresenceUpdate());
             status.BindValueChanged(_ => schedulePresenceUpdate());

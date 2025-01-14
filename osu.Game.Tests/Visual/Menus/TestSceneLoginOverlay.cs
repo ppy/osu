@@ -89,7 +89,7 @@ namespace osu.Game.Tests.Visual.Menus
             AddStep("clear handler", () => dummyAPI.HandleRequest = null);
 
             assertDropdownState(UserAction.Online);
-            AddStep("change user state", () => dummyAPI.LocalUser.Value.Status.Value = UserStatus.DoNotDisturb);
+            AddStep("change user state", () => dummyAPI.Status.Value = UserStatus.DoNotDisturb);
             assertDropdownState(UserAction.DoNotDisturb);
         }
 
