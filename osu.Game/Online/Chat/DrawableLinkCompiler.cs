@@ -14,6 +14,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Online.Chat
 {
@@ -26,6 +27,18 @@ namespace osu.Game.Online.Chat
         /// Each word part of a chat link (split for word-wrap support).
         /// </summary>
         public readonly SlimReadOnlyListWrapper<Drawable> Parts;
+
+        public new Color4 IdleColour
+        {
+            get => base.IdleColour;
+            set => base.IdleColour = value;
+        }
+
+        public new Color4 HoverColour
+        {
+            get => base.HoverColour;
+            set => base.HoverColour = value;
+        }
 
         [Resolved]
         private OverlayColourProvider? overlayColourProvider { get; set; }
@@ -56,7 +69,8 @@ namespace osu.Game.Online.Chat
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            IdleColour = overlayColourProvider?.Light2 ?? colours.Blue;
+            if (IdleColour == default)
+                IdleColour = overlayColourProvider?.Light2 ?? colours.Blue;
         }
 
         protected override IEnumerable<Drawable> EffectTargets => Parts;
