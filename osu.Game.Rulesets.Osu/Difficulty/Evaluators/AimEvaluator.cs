@@ -159,11 +159,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             // Two doubletaps in a row
             double doubletappability = DifficultyCalculationUtils.Smoothstep(osuLast0Obj.LazyJumpDistance, diameter, radius)
-                * DifficultyCalculationUtils.Smoothstep(osuLast2Obj.LazyJumpDistance, diameter, radius);
+                                       * DifficultyCalculationUtils.Smoothstep(osuLast2Obj.LazyJumpDistance, diameter, radius);
 
             // This part is not great, but it keeps stream maps and alt maps with doubles from being nerfed
             doubletappability *= DifficultyCalculationUtils.ReverseLerp(osuCurrObj.LazyJumpDistance, diameter * 1.5, diameter * 3)
-                * DifficultyCalculationUtils.ReverseLerp(osuLast1Obj.LazyJumpDistance, diameter * 1.5, diameter * 3);
+                                 * DifficultyCalculationUtils.ReverseLerp(osuLast1Obj.LazyJumpDistance, diameter * 1.5, diameter * 3);
 
             // Start from hitwindow
             double doubletapHitWindow = osuCurrObj.HitWindowGreat;
