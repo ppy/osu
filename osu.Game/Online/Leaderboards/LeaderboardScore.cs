@@ -101,6 +101,7 @@ namespace osu.Game.Online.Leaderboards
         private void load(IAPIProvider api, OsuColour colour)
         {
             var user = Score.User;
+            bool isUserFriend = api.Friends.Any(friend => friend.TargetID == user.OnlineID);
 
             statisticsLabels = GetStatistics(Score).Select(s => new ScoreComponentLabel(s)).ToList();
 
@@ -129,7 +130,7 @@ namespace osu.Game.Online.Leaderboards
                                 background = new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Colour = user.OnlineID == api.LocalUser.Value.Id && isOnlineScope ? colour.Green : Color4.Black,
+                                    Colour = isUserFriend ? colour.Yellow : (user.OnlineID == api.LocalUser.Value.Id && isOnlineScope ? colour.Green : Color4.Black),
                                     Alpha = background_alpha,
                                 },
                             },

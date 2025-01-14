@@ -22,6 +22,9 @@ namespace osu.Game.Tests.Visual.Metadata
         public override IBindableDictionary<int, UserPresence> UserStates => userStates;
         private readonly BindableDictionary<int, UserPresence> userStates = new BindableDictionary<int, UserPresence>();
 
+        public override IBindableDictionary<int, UserPresence> FriendStates => friendStates;
+        private readonly BindableDictionary<int, UserPresence> friendStates = new BindableDictionary<int, UserPresence>();
+
         public override Bindable<DailyChallengeInfo?> DailyChallengeInfo => dailyChallengeInfo;
         private readonly Bindable<DailyChallengeInfo?> dailyChallengeInfo = new Bindable<DailyChallengeInfo?>();
 
@@ -73,6 +76,16 @@ namespace osu.Game.Tests.Visual.Metadata
                 else
                     userStates.Remove(userId);
             }
+
+            return Task.CompletedTask;
+        }
+
+        public override Task FriendPresenceUpdated(int userId, UserPresence? presence)
+        {
+            if (presence.HasValue)
+                friendStates[userId] = presence.Value;
+            else
+                friendStates.Remove(userId);
 
             return Task.CompletedTask;
         }

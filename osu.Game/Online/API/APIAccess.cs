@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Sockets;
@@ -629,8 +630,14 @@ namespace osu.Game.Online.API
             friendsReq.Failure += _ => state.Value = APIState.Failing;
             friendsReq.Success += res =>
             {
-                friends.Clear();
-                friends.AddRange(res);
+                var existingFriends = friends.Select(f => f.TargetID).ToHashSet();
+                var updatedFriends = res.Select(f => f.TargetID).ToHashSet();
+
+                // Add new friends into local list.
+                friends.AddRange(res.Where(r => !existingFriends.Contains(r.TargetID)));
+
+                // Remove non-friends from local list.
+                friends.RemoveAll(f => !updatedFriends.Contains(f.TargetID));
             };
 
             Queue(friendsReq);

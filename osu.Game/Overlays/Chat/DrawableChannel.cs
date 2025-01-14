@@ -117,7 +117,7 @@ namespace osu.Game.Overlays.Chat
             if (chatLine == null)
                 return;
 
-            float center = scroll.GetChildPosInContent(chatLine, chatLine.DrawSize / 2) - scroll.DisplayableContent / 2;
+            double center = scroll.GetChildPosInContent(chatLine, chatLine.DrawSize / 2) - scroll.DisplayableContent / 2;
             scroll.ScrollTo(Math.Clamp(center, 0, scroll.ScrollableExtent));
             chatLine.Highlight();
 
