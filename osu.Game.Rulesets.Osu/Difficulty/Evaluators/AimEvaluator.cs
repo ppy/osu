@@ -152,7 +152,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             var osuLast2Obj = (OsuDifficultyHitObject)current.Previous(2);
 
             if (osuLast0Obj == null || osuLast1Obj == null || osuLast2Obj == null)
-                return 0;
+                return 1.0;
 
             const int radius = OsuDifficultyHitObject.NORMALISED_RADIUS;
             const int diameter = OsuDifficultyHitObject.NORMALISED_DIAMETER;
