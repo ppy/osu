@@ -123,53 +123,21 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         /// </summary>
         private double? computeDeviationUpperBound(TaikoDifficultyAttributes attributes)
         {
-            if (totalSuccessfulHits == 0 || attributes.GreatHitWindow <= 0)
+            if (countGreat == 0 || attributes.GreatHitWindow <= 0)
                 return null;
-
-            double h300 = attributes.GreatHitWindow;
-            double h100 = attributes.OkHitWindow;
 
             const double z = 2.32634787404; // 99% critical value for the normal distribution (one-tailed).
 
-            double? deviationGreatWindow = calcDeviationGreatWindow();
-            double? deviationGoodWindow = calcDeviationGoodWindow();
+            double n = totalHits;
 
-            return deviationGreatWindow is null ? deviationGoodWindow : Math.Min(deviationGreatWindow.Value, deviationGoodWindow!.Value);
+            // Proportion of greats hit.
+            double p = countGreat / n;
 
-            // The upper bound on deviation, calculated with the ratio of 300s to objects, and the great hit window.
-            double? calcDeviationGreatWindow()
-            {
-                if (countGreat == 0) return null;
+            // We can be 99% confident that p is at least this value.
+            double pLowerBound = (n * p + z * z / 2) / (n + z * z) - z / (n + z * z) * Math.Sqrt(n * p * (1 - p) + z * z / 4);
 
-                double n = totalHits;
-
-                // Proportion of greats hit.
-                double p = countGreat / n;
-
-                // We can be 99% confident that p is at least this value.
-                double pLowerBound = (n * p + z * z / 2) / (n + z * z) - z / (n + z * z) * Math.Sqrt(n * p * (1 - p) + z * z / 4);
-
-                // We can be 99% confident that the deviation is not higher than:
-                return h300 / (Math.Sqrt(2) * SpecialFunctions.ErfInv(pLowerBound));
-            }
-
-            // The upper bound on deviation, calculated with the ratio of 300s + 100s to objects, and the good hit window.
-            // This will return a lower value than the first method when the number of 100s is high, but the miss count is low.
-            double? calcDeviationGoodWindow()
-            {
-                if (totalSuccessfulHits == 0) return null;
-
-                double n = totalHits;
-
-                // Proportion of greats + goods hit.
-                double p = Math.Max(0, totalSuccessfulHits - 0.0005 * countOk) / n;
-
-                // We can be 99% confident that p is at least this value.
-                double pLowerBound = (n * p + z * z / 2) / (n + z * z) - z / (n + z * z) * Math.Sqrt(n * p * (1 - p) + z * z / 4);
-
-                // We can be 99% confident that the deviation is not higher than:
-                return h100 / (Math.Sqrt(2) * SpecialFunctions.ErfInv(pLowerBound));
-            }
+            // We can be 99% confident that the deviation is not higher than:
+            return attributes.GreatHitWindow / (Math.Sqrt(2) * SpecialFunctions.ErfInv(pLowerBound));
         }
 
         private int totalHits => countGreat + countOk + countMeh + countMiss;
