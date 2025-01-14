@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Osu.Edit
     public partial class OsuSelectionRotationHandler : SelectionRotationHandler
     {
         [Resolved]
-        private NewBeatmapEditorChangeHandler? changeHandler { get; set; }
+        private HitObjectChangeHandler? changeHandler { get; set; }
 
         private BindableList<HitObject> selectedItems { get; } = new BindableList<HitObject>();
 

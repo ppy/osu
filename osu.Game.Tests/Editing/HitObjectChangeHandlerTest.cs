@@ -11,7 +11,7 @@ using osu.Game.Screens.Edit.Changes;
 namespace osu.Game.Tests.Editing
 {
     [TestFixture]
-    public class NewBeatmapEditorChangeHandlerTest
+    public class HitObjectChangeHandlerTest
     {
         private int stateChangedFired;
 
@@ -146,7 +146,7 @@ namespace osu.Game.Tests.Editing
             Assert.That(stateChangedFired, Is.EqualTo(2));
         }
 
-        private (NewBeatmapEditorChangeHandler, EditorBeatmap) createChangeHandler()
+        private (HitObjectChangeHandler, EditorBeatmap) createChangeHandler()
         {
             var beatmap = new EditorBeatmap(new OsuBeatmap
             {
@@ -156,7 +156,7 @@ namespace osu.Game.Tests.Editing
                 },
             });
 
-            var changeHandler = new NewBeatmapEditorChangeHandler(beatmap);
+            var changeHandler = new HitObjectChangeHandler(beatmap);
 
             beatmap.AddChangeHandler(changeHandler);
 
@@ -164,7 +164,7 @@ namespace osu.Game.Tests.Editing
             return (changeHandler, beatmap);
         }
 
-        private void addArbitraryChange(NewBeatmapEditorChangeHandler changeHandler, EditorBeatmap beatmap)
+        private void addArbitraryChange(HitObjectChangeHandler changeHandler, EditorBeatmap beatmap)
         {
             new AddHitObjectChange(beatmap, new HitCircle { StartTime = 2760 }).Apply(changeHandler, true);
         }

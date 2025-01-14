@@ -27,7 +27,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected EditorBeatmap Beatmap { get; private set; }
 
         [Resolved(canBeNull: true)]
-        private NewBeatmapEditorChangeHandler changeHandler { get; set; }
+        private HitObjectChangeHandler changeHandler { get; set; }
 
         protected readonly HitObjectComposer Composer;
 

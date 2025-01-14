@@ -210,7 +210,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             private EditorBeatmap beatmap { get; set; } = null!;
 
             [Resolved]
-            private NewBeatmapEditorChangeHandler? changeHandler { get; set; }
+            private HitObjectChangeHandler? changeHandler { get; set; }
 
             public SampleEditPopover(HitObject hitObject)
             {

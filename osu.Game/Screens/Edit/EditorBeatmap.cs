@@ -135,7 +135,7 @@ namespace osu.Game.Screens.Edit
             });
         }
 
-        public void AddChangeHandler(NewBeatmapEditorChangeHandler changeHandler)
+        public void AddChangeHandler(HitObjectChangeHandler changeHandler)
         {
             beatmapProcessor = new EditorBeatmapProcessor(this, PlayableBeatmap.BeatmapInfo.Ruleset.CreateInstance(), changeHandler);
         }

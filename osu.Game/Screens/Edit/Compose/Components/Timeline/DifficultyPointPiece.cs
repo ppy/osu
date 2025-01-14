@@ -66,7 +66,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             private EditorBeatmap beatmap { get; set; }
 
             [Resolved(canBeNull: true)]
-            private NewBeatmapEditorChangeHandler changeHandler { get; set; }
+            private HitObjectChangeHandler changeHandler { get; set; }
 
             public DifficultyEditPopover(HitObject hitObject)
             {

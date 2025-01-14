@@ -47,7 +47,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private IPositionSnapProvider snapProvider { get; set; }
 
         [Resolved(CanBeNull = true)]
-        private NewBeatmapEditorChangeHandler changeHandler { get; set; }
+        private HitObjectChangeHandler changeHandler { get; set; }
 
         protected readonly BindableList<T> SelectedItems = new BindableList<T>();
 

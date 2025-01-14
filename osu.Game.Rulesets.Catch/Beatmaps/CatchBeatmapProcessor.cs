@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
 
         public bool HardRockOffsets { get; set; }
 
-        public CatchBeatmapProcessor(IBeatmap beatmap, NewBeatmapEditorChangeHandler? changeHandler = null)
+        public CatchBeatmapProcessor(IBeatmap beatmap, HitObjectChangeHandler? changeHandler = null)
             : base(beatmap, changeHandler)
         {
         }

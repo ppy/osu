@@ -11,7 +11,12 @@ using osu.Game.Screens.Edit.Changes;
 
 namespace osu.Game.Screens.Edit
 {
-    public partial class NewBeatmapEditorChangeHandler : TransactionalCommitComponent
+    /// <summary>
+    /// A change handler for handling hit object changes in an <see cref="EditorBeatmap"/> using the command design pattern.
+    /// This is supposed to eventually replace the <see cref="EditorChangeHandler"/> and its inheritors once all the editor operations have been refactored.
+    /// </summary>
+    /// <inheritdoc/>
+    public partial class HitObjectChangeHandler : TransactionalCommitComponent
     {
         private readonly EditorBeatmap editorBeatmap;
 
@@ -39,7 +44,7 @@ namespace osu.Game.Screens.Edit
 
         private bool isRestoring;
 
-        public NewBeatmapEditorChangeHandler(EditorBeatmap editorBeatmap, EditorChangeHandler? changeHandler = null)
+        public HitObjectChangeHandler(EditorBeatmap editorBeatmap, EditorChangeHandler? changeHandler = null)
         {
             currentTransaction = new Transaction();
             this.editorBeatmap = editorBeatmap;

@@ -52,7 +52,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected SelectionBox SelectionBox { get; private set; } = null!;
 
         [Resolved(CanBeNull = true)]
-        protected NewBeatmapEditorChangeHandler? ChangeHandler { get; private set; }
+        protected HitObjectChangeHandler? ChangeHandler { get; private set; }
 
         public SelectionRotationHandler RotationHandler { get; private set; } = null!;
 

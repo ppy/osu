@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
     public partial class HoldNoteSelectionBlueprint : ManiaSelectionBlueprint<HoldNote>
     {
         [Resolved]
-        private NewBeatmapEditorChangeHandler? changeHandler { get; set; }
+        private HitObjectChangeHandler? changeHandler { get; set; }
 
         [Resolved]
         private EditorBeatmap? editorBeatmap { get; set; }

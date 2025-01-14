@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
         protected EditorBeatmap? EditorBeatmap { get; private set; }
 
         [Resolved]
-        protected NewBeatmapEditorChangeHandler? ChangeHandler { get; private set; }
+        protected HitObjectChangeHandler? ChangeHandler { get; private set; }
 
         protected EditablePath(Func<float, double> positionToTime)
         {

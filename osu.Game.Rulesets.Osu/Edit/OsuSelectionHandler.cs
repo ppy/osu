@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         }
 
         [Resolved(canBeNull: true)]
-        private NewBeatmapEditorChangeHandler? changeHandler { get; set; }
+        private HitObjectChangeHandler? changeHandler { get; set; }
 
         public override bool HandleMovement(MoveSelectionEvent<HitObject> moveEvent)
         {

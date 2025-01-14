@@ -58,7 +58,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
         private EditorBeatmap? editorBeatmap { get; set; }
 
         [Resolved]
-        private NewBeatmapEditorChangeHandler? changeHandler { get; set; }
+        private HitObjectChangeHandler? changeHandler { get; set; }
 
         [Resolved]
         private BindableBeatDivisor? beatDivisor { get; set; }

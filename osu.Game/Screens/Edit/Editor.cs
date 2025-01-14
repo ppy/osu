@@ -168,7 +168,7 @@ namespace osu.Game.Screens.Edit
         [CanBeNull] // Should be non-null once it can support custom rulesets.
         private EditorChangeHandler changeHandler;
 
-        private NewBeatmapEditorChangeHandler newChangeHandler;
+        private HitObjectChangeHandler newChangeHandler;
 
         private DependencyContainer dependencies;
 
@@ -296,7 +296,7 @@ namespace osu.Game.Screens.Edit
                 dependencies.CacheAs<IEditorChangeHandler>(changeHandler);
             }
 
-            newChangeHandler = new NewBeatmapEditorChangeHandler(editorBeatmap, changeHandler);
+            newChangeHandler = new HitObjectChangeHandler(editorBeatmap, changeHandler);
             dependencies.CacheAs(newChangeHandler);
             AddInternal(newChangeHandler);
 

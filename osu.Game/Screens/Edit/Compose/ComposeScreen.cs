@@ -33,7 +33,7 @@ namespace osu.Game.Screens.Edit.Compose
         private IGameplaySettings globalGameplaySettings { get; set; }
 
         [Resolved(canBeNull: true)]
-        private NewBeatmapEditorChangeHandler changeHandler { get; set; }
+        private HitObjectChangeHandler changeHandler { get; set; }
 
         private Bindable<string> clipboard { get; set; }
 

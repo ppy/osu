@@ -323,7 +323,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             private Timeline timeline { get; set; } = null!;
 
             [Resolved]
-            private NewBeatmapEditorChangeHandler? changeHandler { get; set; }
+            private HitObjectChangeHandler? changeHandler { get; set; }
 
             private ScheduledDelegate? dragOperation;
 

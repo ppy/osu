@@ -69,7 +69,7 @@ namespace osu.Game.Rulesets.Edit
         private OverlayColourProvider colourProvider { get; set; }
 
         [Resolved(canBeNull: true)]
-        private NewBeatmapEditorChangeHandler changeHandler { get; set; }
+        private HitObjectChangeHandler changeHandler { get; set; }
 
         public override ComposeBlueprintContainer BlueprintContainer => blueprintContainer;
         private ComposeBlueprintContainer blueprintContainer;

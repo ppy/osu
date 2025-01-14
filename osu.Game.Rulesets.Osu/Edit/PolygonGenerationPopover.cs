@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         private EditorBeatmap editorBeatmap { get; set; } = null!;
 
         [Resolved]
-        private NewBeatmapEditorChangeHandler? changeHandler { get; set; }
+        private HitObjectChangeHandler? changeHandler { get; set; }
 
         [Resolved]
         private HitObjectComposer composer { get; set; } = null!;
