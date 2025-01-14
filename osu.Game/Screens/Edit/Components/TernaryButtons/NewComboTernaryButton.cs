@@ -54,7 +54,6 @@ namespace osu.Game.Screens.Edit.Components.TernaryButtons
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Padding = new MarginPadding { Right = 30 },
                     Child = new DrawableTernaryButton
                     {
                         Current = Current,
@@ -66,6 +65,7 @@ namespace osu.Game.Screens.Edit.Components.TernaryButtons
                 {
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
+                    Alpha = 0,
                     Width = 25,
                     ComboColours = { BindTarget = comboColours }
                 }
