@@ -611,12 +611,12 @@ namespace osu.Game.Screens.Select
         /// <summary>
         /// The position of the lower visible bound with respect to the current scroll position.
         /// </summary>
-        private float visibleBottomBound => Scroll.Current + DrawHeight + BleedBottom;
+        private float visibleBottomBound => (float)(Scroll.Current + DrawHeight + BleedBottom);
 
         /// <summary>
         /// The position of the upper visible bound with respect to the current scroll position.
         /// </summary>
-        private float visibleUpperBound => Scroll.Current - BleedTop;
+        private float visibleUpperBound => (float)(Scroll.Current - BleedTop);
 
         public void FlushPendingFilterOperations()
         {
@@ -1006,7 +1006,7 @@ namespace osu.Game.Screens.Select
                         // we take the difference in scroll height and apply to all visible panels.
                         // this avoids edge cases like when the visible panels is reduced suddenly, causing ScrollContainer
                         // to enter clamp-special-case mode where it animates completely differently to normal.
-                        float scrollChange = scrollTarget.Value - Scroll.Current;
+                        float scrollChange = (float)(scrollTarget.Value - Scroll.Current);
                         Scroll.ScrollTo(scrollTarget.Value, false);
                         foreach (var i in Scroll)
                             i.Y += scrollChange;
@@ -1217,12 +1217,12 @@ namespace osu.Game.Screens.Select
             private const float top_padding = 10;
             private const float bottom_padding = 70;
 
-            protected override float ToScrollbarPosition(float scrollPosition)
+            protected override float ToScrollbarPosition(double scrollPosition)
             {
                 if (Precision.AlmostEquals(0, ScrollableExtent))
                     return 0;
 
-                return top_padding + (ScrollbarMovementExtent - (top_padding + bottom_padding)) * (scrollPosition / ScrollableExtent);
+                return (float)(top_padding + (ScrollbarMovementExtent - (top_padding + bottom_padding)) * (scrollPosition / ScrollableExtent));
             }
 
             protected override float FromScrollbarPosition(float scrollbarPosition)
@@ -1230,7 +1230,7 @@ namespace osu.Game.Screens.Select
                 if (Precision.AlmostEquals(0, ScrollbarMovementExtent))
                     return 0;
 
-                return ScrollableExtent * ((scrollbarPosition - top_padding) / (ScrollbarMovementExtent - (top_padding + bottom_padding)));
+                return (float)(ScrollableExtent * ((scrollbarPosition - top_padding) / (ScrollbarMovementExtent - (top_padding + bottom_padding))));
             }
         }
     }
