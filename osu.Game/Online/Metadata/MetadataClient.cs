@@ -42,6 +42,11 @@ namespace osu.Game.Online.Metadata
         /// </summary>
         public abstract IBindableDictionary<int, UserPresence> UserStates { get; }
 
+        /// <summary>
+        /// Dictionary keyed by user ID containing all of the <see cref="UserPresence"/> information about currently online friends received from the server.
+        /// </summary>
+        public abstract IBindableDictionary<int, UserPresence> FriendStates { get; }
+
         /// <inheritdoc/>
         public abstract Task UpdateActivity(UserActivity? activity);
 
@@ -56,6 +61,9 @@ namespace osu.Game.Online.Metadata
 
         /// <inheritdoc/>
         public abstract Task UserPresenceUpdated(int userId, UserPresence? presence);
+
+        /// <inheritdoc/>
+        public abstract Task FriendPresenceUpdated(int userId, UserPresence? presence);
 
         #endregion
 
