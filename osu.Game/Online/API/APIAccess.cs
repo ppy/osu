@@ -73,8 +73,6 @@ namespace osu.Game.Online.API
 
         private Bindable<UserActivity> activity { get; } = new Bindable<UserActivity>();
 
-        private Bindable<UserStatus?> configStatus { get; } = new Bindable<UserStatus?>();
-
         protected bool HasLogin => authentication.Token.Value != null || (!string.IsNullOrEmpty(ProvidedUsername) && !string.IsNullOrEmpty(password));
 
         private readonly CancellationTokenSource cancellationToken = new CancellationTokenSource();
@@ -110,7 +108,7 @@ namespace osu.Game.Online.API
             authentication.TokenString = config.Get<string>(OsuSetting.Token);
             authentication.Token.ValueChanged += onTokenChanged;
 
-            config.BindWith(OsuSetting.UserOnlineStatus, configStatus);
+            config.BindWith(OsuSetting.UserOnlineStatus, Status);
 
             if (HasLogin)
             {
@@ -332,8 +330,6 @@ namespace osu.Game.Online.API
                         Debug.Assert(ThreadSafety.IsUpdateThread);
 
                         localUser.Value = me;
-                        Status.Value = configStatus.Value ?? UserStatus.Online;
-
                         state.Value = me.SessionVerified ? APIState.Online : APIState.RequiresSecondFactorAuth;
                         failureCount = 0;
                     };
@@ -371,8 +367,6 @@ namespace osu.Game.Online.API
             {
                 Username = ProvidedUsername
             };
-
-            Status.Value = configStatus.Value ?? UserStatus.Online;
         }
 
         public void Perform(APIRequest request)
@@ -597,7 +591,7 @@ namespace osu.Game.Online.API
             password = null;
             SecondFactorCode = null;
             authentication.Clear();
-            configStatus.Value = UserStatus.Online;
+            Status.Value = UserStatus.Online;
 
             // Scheduled prior to state change such that the state changed event is invoked with the correct user and their friends present
             Schedule(() =>

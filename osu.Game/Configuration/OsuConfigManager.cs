@@ -211,7 +211,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.LastProcessedMetadataId, -1);
 
             SetDefault(OsuSetting.ComboColourNormalisationAmount, 0.2f, 0f, 1f, 0.01f);
-            SetDefault<UserStatus?>(OsuSetting.UserOnlineStatus, null);
+            SetDefault(OsuSetting.UserOnlineStatus, UserStatus.Online);
 
             SetDefault(OsuSetting.EditorTimelineShowTimingChanges, true);
             SetDefault(OsuSetting.EditorTimelineShowBreaks, true);
