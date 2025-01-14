@@ -45,13 +45,7 @@ namespace osu.Game.Screens.SelectV2
             detachedBeatmaps.BindCollectionChanged(beatmapSetsChanged, true);
         }
 
-        protected override Drawable GetDrawableForDisplay(CarouselItem item)
-        {
-            var drawable = carouselPanelPool.Get();
-            drawable.FlashColour(Color4.Red, 2000);
-
-            return drawable;
-        }
+        protected override Drawable GetDrawableForDisplay(CarouselItem item) => carouselPanelPool.Get();
 
         protected override CarouselItem CreateCarouselItemForModel(BeatmapInfo model) => new BeatmapCarouselItem(model);
 

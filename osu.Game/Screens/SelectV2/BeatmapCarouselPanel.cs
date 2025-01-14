@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Pooling;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
 using osuTK;
@@ -67,6 +68,8 @@ namespace osu.Game.Screens.SelectV2
 
             Debug.Assert(Item != null);
 
+            DrawYPosition = Item.CarouselYPosition;
+
             Size = new Vector2(500, Item.DrawHeight);
             Masking = true;
 
@@ -85,6 +88,8 @@ namespace osu.Game.Screens.SelectV2
                     Origin = Anchor.CentreLeft,
                 }
             };
+
+            this.FadeInFromZero(500, Easing.OutQuint);
         }
 
         protected override bool OnClick(ClickEvent e)
@@ -92,5 +97,19 @@ namespace osu.Game.Screens.SelectV2
             carousel.CurrentSelection = Item!.Model;
             return true;
         }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            Debug.Assert(Item != null);
+
+            if (DrawYPosition != Item.CarouselYPosition)
+            {
+                DrawYPosition = Interpolation.DampContinuously(DrawYPosition, Item.CarouselYPosition, 50, Time.Elapsed);
+            }
+        }
+
+        public double DrawYPosition { get; private set; }
     }
 }
