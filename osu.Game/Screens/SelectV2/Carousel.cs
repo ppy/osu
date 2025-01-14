@@ -27,7 +27,7 @@ namespace osu.Game.Screens.SelectV2
     public abstract partial class Carousel<T> : CompositeDrawable
     {
         /// <summary>
-        /// A collection of filters which should be run each time a <see cref="QueueFilter"/> is executed.
+        /// A collection of filters which should be run each time a <see cref="FilterAsync"/> is executed.
         /// </summary>
         protected IEnumerable<ICarouselFilter> Filters { get; init; } = Enumerable.Empty<ICarouselFilter>();
 
@@ -75,7 +75,7 @@ namespace osu.Game.Screens.SelectV2
 
         /// <summary>
         /// All items which are to be considered for display in this carousel.
-        /// Mutating this list will automatically queue a <see cref="QueueFilter"/>.
+        /// Mutating this list will automatically queue a <see cref="FilterAsync"/>.
         /// </summary>
         /// <remarks>
         /// Note that an <see cref="ICarouselFilter"/> may add new items which are displayed but not tracked in this list.
@@ -125,13 +125,13 @@ namespace osu.Game.Screens.SelectV2
                 }
             };
 
-            Items.BindCollectionChanged((_, _) => QueueFilter());
+            Items.BindCollectionChanged((_, _) => FilterAsync());
         }
 
         /// <summary>
         /// Queue an asynchronous filter operation.
         /// </summary>
-        public void QueueFilter() => Scheduler.AddOnce(() => filterTask = performFilter());
+        protected virtual Task FilterAsync() => filterTask = performFilter();
 
         /// <summary>
         /// Create a drawable for the given carousel item so it can be displayed.
@@ -159,6 +159,7 @@ namespace osu.Game.Screens.SelectV2
         {
             Debug.Assert(SynchronizationContext.Current != null);
 
+            Stopwatch stopwatch = Stopwatch.StartNew();
             var cts = new CancellationTokenSource();
 
             lock (this)
@@ -167,19 +168,20 @@ namespace osu.Game.Screens.SelectV2
                 cancellationSource = cts;
             }
 
-            Stopwatch stopwatch = Stopwatch.StartNew();
+            if (DebounceDelay > 0)
+            {
+                log($"Filter operation queued, waiting for {DebounceDelay} ms debounce");
+                await Task.Delay(DebounceDelay, cts.Token).ConfigureAwait(true);
+            }
+
+            // Copy must be performed on update thread for now (see ConfigureAwait above).
+            // Could potentially be optimised in the future if it becomes an issue.
             IEnumerable<CarouselItem> items = new List<CarouselItem>(Items.Select(CreateCarouselItemForModel));
 
             await Task.Run(async () =>
             {
                 try
                 {
-                    if (DebounceDelay > 0)
-                    {
-                        log($"Filter operation queued, waiting for {DebounceDelay} ms debounce");
-                        await Task.Delay(DebounceDelay, cts.Token).ConfigureAwait(false);
-                    }
-
                     foreach (var filter in Filters)
                     {
                         log($"Performing {filter.GetType().ReadableName()}");
