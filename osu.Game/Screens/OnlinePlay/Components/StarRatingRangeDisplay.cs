@@ -14,7 +14,6 @@ using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Online.Rooms;
 using osuTK;
-using Container = osu.Framework.Graphics.Containers.Container;
 
 namespace osu.Game.Screens.OnlinePlay.Components
 {
@@ -30,6 +29,8 @@ namespace osu.Game.Screens.OnlinePlay.Components
         private StarRatingDisplay maxDisplay = null!;
         private Drawable maxBackground = null!;
 
+        private BufferedContainer bufferedContent = null!;
+
         public StarRatingRangeDisplay(Room room)
         {
             this.room = room;
@@ -41,38 +42,43 @@ namespace osu.Game.Screens.OnlinePlay.Components
         {
             InternalChildren = new Drawable[]
             {
-                new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Masking = true,
-                    CornerRadius = 1,
-                    Children = new[]
-                    {
-                        minBackground = new Box
-                        {
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre,
-                            RelativeSizeAxes = Axes.Both,
-                            Size = new Vector2(0.5f),
-                        },
-                        maxBackground = new Box
-                        {
-                            Anchor = Anchor.BottomCentre,
-                            Origin = Anchor.BottomCentre,
-                            RelativeSizeAxes = Axes.Both,
-                            Size = new Vector2(0.5f),
-                        },
-                    }
-                },
-                new FillFlowContainer
+                new CircularContainer
                 {
                     AutoSizeAxes = Axes.Both,
-                    Children = new Drawable[]
+                    Masking = true,
+                    // Stops artifacting from boxes drawn behind wrong colour boxes (and edge pixels adding up to higher opacity).
+                    Padding = new MarginPadding(-0.1f),
+                    Child = bufferedContent = new BufferedContainer(pixelSnapping: true, cachedFrameBuffer: true)
                     {
-                        minDisplay = new StarRatingDisplay(default, StarRatingDisplaySize.Range),
-                        maxDisplay = new StarRatingDisplay(default, StarRatingDisplaySize.Range)
+                        AutoSizeAxes = Axes.Both,
+                        Children = new[]
+                        {
+                            minBackground = new Box
+                            {
+                                Anchor = Anchor.TopCentre,
+                                Origin = Anchor.TopCentre,
+                                RelativeSizeAxes = Axes.Both,
+                                Size = new Vector2(1, 0.5f),
+                            },
+                            maxBackground = new Box
+                            {
+                                Anchor = Anchor.BottomCentre,
+                                Origin = Anchor.BottomCentre,
+                                RelativeSizeAxes = Axes.Both,
+                                Size = new Vector2(1, 0.5f),
+                            },
+                            new FillFlowContainer
+                            {
+                                AutoSizeAxes = Axes.Both,
+                                Children = new Drawable[]
+                                {
+                                    minDisplay = new StarRatingDisplay(default, StarRatingDisplaySize.Range),
+                                    maxDisplay = new StarRatingDisplay(default, StarRatingDisplaySize.Range)
+                                }
+                            }
+                        }
                     }
-                }
+                },
             };
         }
 
@@ -121,6 +127,8 @@ namespace osu.Game.Screens.OnlinePlay.Components
 
             minBackground.Colour = colours.ForStarDifficulty(minDifficulty.Stars);
             maxBackground.Colour = colours.ForStarDifficulty(maxDifficulty.Stars);
+
+            bufferedContent.ForceRedraw();
         }
 
         protected override void Dispose(bool isDisposing)

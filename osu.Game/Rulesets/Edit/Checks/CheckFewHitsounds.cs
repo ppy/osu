@@ -114,7 +114,7 @@ namespace osu.Game.Rulesets.Edit.Checks
                 ++objectsWithoutHitsounds;
         }
 
-        private bool isHitsound(HitSampleInfo sample) => HitSampleInfo.AllAdditions.Any(sample.Name.Contains);
+        private bool isHitsound(HitSampleInfo sample) => HitSampleInfo.ALL_ADDITIONS.Any(sample.Name.Contains);
         private bool isHitnormal(HitSampleInfo sample) => sample.Name.Contains(HitSampleInfo.HIT_NORMAL);
 
         public abstract class IssueTemplateLongPeriod : IssueTemplate
