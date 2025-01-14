@@ -11,7 +11,19 @@ namespace osu.Game.Screens.SelectV2
     {
         public readonly Guid ID;
 
-        public override float DrawHeight => Model is BeatmapInfo ? 40 : 80;
+        /// <summary>
+        /// Whether this item has a header providing extra information for it.
+        /// When displaying items which don't have header, we should make sure enough information is included inline.
+        /// </summary>
+        public bool HasGroupHeader { get; set; }
+
+        /// <summary>
+        /// Whether this item is a group header.
+        /// Group headers are generally larger in display. Setting this will account for the size difference.
+        /// </summary>
+        public bool IsGroupHeader { get; set; }
+
+        public override float DrawHeight => IsGroupHeader ? 80 : 40;
 
         public BeatmapCarouselItem(object model)
             : base(model)
