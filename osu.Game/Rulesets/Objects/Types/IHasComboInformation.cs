@@ -50,6 +50,9 @@ namespace osu.Game.Rulesets.Objects.Types
         /// </summary>
         new bool NewCombo { get; set; }
 
+        /// <inheritdoc cref="IHasCombo.ComboOffset"/>
+        new int ComboOffset { get; set; }
+
         /// <summary>
         /// Bindable exposure of <see cref="LastInCombo"/>.
         /// </summary>
