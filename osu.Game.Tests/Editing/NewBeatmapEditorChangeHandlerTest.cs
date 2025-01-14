@@ -106,7 +106,8 @@ namespace osu.Game.Tests.Editing
 
             addArbitraryChange(handler, beatmap);
             handler.SaveState();
-            Assert.That(state, Is.EqualTo(handler.CurrentState));
+            // The change handler does not know that it is the same change applied again, so it will assume a new state.
+            Assert.That(state, Is.Not.EqualTo(handler.CurrentState));
         }
 
         [Test]
