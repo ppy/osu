@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         /// <item><description>and slider difficulty.</description></item>
         /// </list>
         /// </summary>
-        public static double EvaluateDifficultyOf(DifficultyHitObject current, bool withSliderTravelDistance)
+        public static double EvaluateDifficultyOf(DifficultyHitObject current, bool withSliderTravelDistance, bool withCheesability)
         {
             if (current.BaseObject is Spinner || current.Index <= 1 || current.Previous(0).BaseObject is Spinner)
                 return 0;
@@ -84,7 +84,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                     // Penalize angle repetition.
                     wideAngleBonus *= 1 - Math.Min(wideAngleBonus, Math.Pow(calcWideAngleBonus(lastAngle), 3));
-                    acuteAngleBonus *= 0.1 + 0.9 * (1 - Math.Min(acuteAngleBonus, Math.Pow(calcAcuteAngleBonus(lastAngle), 3)));
+                    acuteAngleBonus *= 0.08 + 0.92 * (1 - Math.Min(acuteAngleBonus, Math.Pow(calcAcuteAngleBonus(lastAngle), 3)));
 
                     // Apply full wide angle bonus for distance more than one diameter
                     wideAngleBonus *= angleBonus * DifficultyCalculationUtils.Smootherstep(osuCurrObj.LazyJumpDistance, 0, diameter);
@@ -138,6 +138,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             // Add in additional slider velocity bonus.
             if (withSliderTravelDistance)
                 aimStrain += sliderBonus * slider_multiplier;
+
+            if (withCheesability)
+            {
+                double cheesability = Math.Min(1, osuCurrObj.LazyJumpDistance / 100)
+                    * (1 - Math.Min(1, osuLastObj.LazyJumpDistance / 100))
+                    * Math.Min(1, osuLastObj.StrainTime / osuCurrObj.StrainTime);
+                aimStrain *= 1 - cheesability;
+            }
 
             return aimStrain;
         }

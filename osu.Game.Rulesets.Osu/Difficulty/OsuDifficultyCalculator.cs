@@ -38,15 +38,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double aimRating = Math.Sqrt(skills[0].DifficultyValue()) * difficulty_multiplier;
             double aimRatingNoSliders = Math.Sqrt(skills[1].DifficultyValue()) * difficulty_multiplier;
+            double cheesedAimRating = Math.Sqrt(skills[3].DifficultyValue()) * difficulty_multiplier;
             double speedRating = Math.Sqrt(skills[2].DifficultyValue()) * difficulty_multiplier;
             double speedNotes = ((Speed)skills[2]).RelevantNoteCount();
             double difficultSliders = ((Aim)skills[0]).GetDifficultSliders();
             double flashlightRating = 0.0;
 
             if (mods.Any(h => h is OsuModFlashlight))
-                flashlightRating = Math.Sqrt(skills[3].DifficultyValue()) * difficulty_multiplier;
+                flashlightRating = Math.Sqrt(skills[4].DifficultyValue()) * difficulty_multiplier;
 
             double sliderFactor = aimRating > 0 ? aimRatingNoSliders / aimRating : 1;
+            double cheeseFactor = aimRating > 0 ? cheesedAimRating / aimRating : 1;
 
             double aimDifficultyStrainCount = ((OsuStrainSkill)skills[0]).CountTopWeightedStrains();
             double speedDifficultyStrainCount = ((OsuStrainSkill)skills[2]).CountTopWeightedStrains();
@@ -98,9 +100,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             HitWindows hitWindows = new OsuHitWindows();
             hitWindows.SetDifficulty(beatmap.Difficulty.OverallDifficulty);
 
-            double hitWindowGreat = hitWindows.WindowFor(HitResult.Great) / clockRate;
-            double hitWindowOk = hitWindows.WindowFor(HitResult.Ok) / clockRate;
-            double hitWindowMeh = hitWindows.WindowFor(HitResult.Meh) / clockRate;
+            double hitWindowGreat, hitWindowOk, hitWindowMeh;
+
+            hitWindowGreat = hitWindows.WindowFor(HitResult.Great) / clockRate;
+            hitWindowOk = hitWindows.WindowFor(HitResult.Ok) / clockRate;
+            hitWindowMeh = hitWindows.WindowFor(HitResult.Meh) / clockRate;
+
+            if (mods.Any(h => h is OsuModClassic))
+            {
+                hitWindowGreat = (Math.Floor(hitWindowGreat * clockRate) - 0.5) / clockRate;
+                hitWindowOk = (Math.Floor(hitWindowOk * clockRate) - 0.5) / clockRate;
+                hitWindowMeh = (Math.Floor(hitWindowMeh * clockRate) - 0.5) / clockRate;
+            }
 
             OsuDifficultyAttributes attributes = new OsuDifficultyAttributes
             {
@@ -112,10 +123,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 SpeedNoteCount = speedNotes,
                 FlashlightDifficulty = flashlightRating,
                 SliderFactor = sliderFactor,
+                CheeseFactor = cheeseFactor,
                 AimDifficultStrainCount = aimDifficultyStrainCount,
                 SpeedDifficultStrainCount = speedDifficultyStrainCount,
                 ApproachRate = preempt > 1200 ? (1800 - preempt) / 120 : (1200 - preempt) / 150 + 5,
-                OverallDifficulty = (80 - hitWindowGreat) / 6,
+                OverallDifficulty = (80 - hitWindows.WindowFor(HitResult.Great) / clockRate) / 6,
                 GreatHitWindow = hitWindowGreat,
                 OkHitWindow = hitWindowOk,
                 MehHitWindow = hitWindowMeh,
@@ -148,9 +160,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
             var skills = new List<Skill>
             {
-                new Aim(mods, true),
-                new Aim(mods, false),
-                new Speed(mods)
+                new Aim(mods, true, false),
+                new Aim(mods, false, false),
+                new Speed(mods),
+                new Aim(mods, true, true),
             };
 
             if (mods.Any(h => h is OsuModFlashlight))
