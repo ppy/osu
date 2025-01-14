@@ -1,59 +1,43 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using osu.Framework.IO.Network;
 using osu.Game.Extensions;
 using osu.Game.Online.API;
-using osu.Game.Online.Rooms.RoomStatuses;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
 
 namespace osu.Game.Online.Rooms
 {
     public class GetRoomsRequest : APIRequest<List<Room>>
     {
-        private readonly RoomStatusFilter status;
+        private readonly RoomModeFilter mode;
+        private readonly RoomStatusFilter? status;
         private readonly string category;
 
-        public GetRoomsRequest(RoomStatusFilter status, string category)
+        public GetRoomsRequest(FilterCriteria filterCriteria)
         {
-            this.status = status;
-            this.category = category;
+            mode = filterCriteria.Mode;
+            category = filterCriteria.Category;
+            status = filterCriteria.Status;
         }
 
         protected override WebRequest CreateWebRequest()
         {
             var req = base.CreateWebRequest();
 
-            if (status != RoomStatusFilter.Open)
-                req.AddParameter("mode", status.ToString().ToSnakeCase().ToLowerInvariant());
+            if (mode != RoomModeFilter.Open)
+                req.AddParameter(@"mode", mode.ToString().ToSnakeCase().ToLowerInvariant());
+
+            if (status != null)
+                req.AddParameter(@"status", status.Value.ToString().ToSnakeCase().ToLowerInvariant());
 
             if (!string.IsNullOrEmpty(category))
-                req.AddParameter("category", category);
+                req.AddParameter(@"category", category);
 
             return req;
         }
 
-        protected override void PostProcess()
-        {
-            base.PostProcess();
-
-            if (Response != null)
-            {
-                // API doesn't populate status so let's do it here.
-                foreach (var room in Response)
-                {
-                    if (room.EndDate.Value != null && DateTimeOffset.Now >= room.EndDate.Value)
-                        room.Status.Value = new RoomStatusEnded();
-                    else if (room.HasPassword.Value)
-                        room.Status.Value = new RoomStatusOpenPrivate();
-                    else
-                        room.Status.Value = new RoomStatusOpen();
-                }
-            }
-        }
-
-        protected override string Target => "rooms";
+        protected override string Target => @"rooms";
     }
 }

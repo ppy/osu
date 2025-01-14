@@ -16,7 +16,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
     /// <summary>
     /// A header used in the multiplayer interface which shows text / details beneath a line.
     /// </summary>
-    public partial class OverlinedHeader : OnlinePlayComposite
+    public partial class OverlinedHeader : CompositeDrawable
     {
         private bool showLine = true;
 

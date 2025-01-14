@@ -60,7 +60,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
             CreateModTest(new ModTestData
             {
                 Autoplay = true,
-                Beatmap = new Beatmap
+                CreateBeatmap = () => new Beatmap
                 {
                     HitObjects = new List<HitObject>
                     {
@@ -90,7 +90,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
             {
                 Autoplay = true,
                 Mod = mod,
-                Beatmap = new Beatmap
+                CreateBeatmap = () => new Beatmap
                 {
                     HitObjects =
                     {

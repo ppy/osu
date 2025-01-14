@@ -19,6 +19,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
     {
         public readonly Bindable<MultiplayerPlaylistDisplayMode> DisplayMode = new Bindable<MultiplayerPlaylistDisplayMode>();
 
+        public required Bindable<PlaylistItem?> SelectedItem
+        {
+            get => selectedItem;
+            set => selectedItem.Current = value;
+        }
+
         /// <summary>
         /// Invoked when an item requests to be edited.
         /// </summary>
@@ -27,13 +33,17 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
         [Resolved]
         private MultiplayerClient client { get; set; } = null!;
 
-        [Resolved]
-        private IBindable<PlaylistItem?> currentItem { get; set; } = null!;
-
+        private readonly Room room;
+        private readonly BindableWithCurrent<PlaylistItem?> selectedItem = new BindableWithCurrent<PlaylistItem?>();
         private MultiplayerPlaylistTabControl playlistTabControl = null!;
         private MultiplayerQueueList queueList = null!;
         private MultiplayerHistoryList historyList = null!;
         private bool firstPopulation = true;
+
+        public MultiplayerPlaylist(Room room)
+        {
+            this.room = room;
+        }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -55,17 +65,17 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
                     Masking = true,
                     Children = new Drawable[]
                     {
-                        queueList = new MultiplayerQueueList
+                        queueList = new MultiplayerQueueList(room)
                         {
                             RelativeSizeAxes = Axes.Both,
-                            SelectedItem = { BindTarget = currentItem },
+                            SelectedItem = { BindTarget = selectedItem },
                             RequestEdit = item => RequestEdit?.Invoke(item)
                         },
                         historyList = new MultiplayerHistoryList
                         {
                             RelativeSizeAxes = Axes.Both,
                             Alpha = 0,
-                            SelectedItem = { BindTarget = currentItem }
+                            SelectedItem = { BindTarget = selectedItem }
                         }
                     }
                 }

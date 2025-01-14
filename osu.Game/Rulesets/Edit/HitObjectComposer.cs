@@ -537,22 +537,23 @@ namespace osu.Game.Rulesets.Edit
 
         #region IPlacementHandler
 
-        public void BeginPlacement(HitObject hitObject)
+        public void ShowPlacement(HitObject hitObject)
         {
             EditorBeatmap.PlacementObject.Value = hitObject;
         }
 
-        public void EndPlacement(HitObject hitObject, bool commit)
+        public void HidePlacement()
         {
             EditorBeatmap.PlacementObject.Value = null;
+        }
 
-            if (commit)
-            {
-                EditorBeatmap.Add(hitObject);
+        public void CommitPlacement(HitObject hitObject)
+        {
+            EditorBeatmap.PlacementObject.Value = null;
+            EditorBeatmap.Add(hitObject);
 
-                if (autoSeekOnPlacement.Value && EditorClock.CurrentTime < hitObject.StartTime)
-                    EditorClock.SeekSmoothlyTo(hitObject.StartTime);
-            }
+            if (autoSeekOnPlacement.Value && EditorClock.CurrentTime < hitObject.StartTime)
+                EditorClock.SeekSmoothlyTo(hitObject.StartTime);
         }
 
         public void Delete(HitObject hitObject) => EditorBeatmap.Remove(hitObject);
