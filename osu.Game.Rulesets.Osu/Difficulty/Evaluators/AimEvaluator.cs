@@ -75,6 +75,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 {
                     double currAngle = osuCurrObj.Angle.Value;
                     double lastAngle = osuLastObj.Angle.Value;
+                    double lastLastAngle = osuLastLastObj.Angle.Value;
 
                     // Rewarding angles, take the smaller velocity as base.
                     double angleBonus = Math.Min(currVelocity, prevVelocity);
@@ -102,7 +103,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                                   * DifficultyCalculationUtils.Smootherstep(currAngle, double.DegreesToRadians(110), double.DegreesToRadians(60))
                                   * DifficultyCalculationUtils.Smootherstep(osuLastObj.LazyJumpDistance, radius, diameter)
                                   * Math.Pow(DifficultyCalculationUtils.ReverseLerp(osuLastObj.LazyJumpDistance, diameter * 3, diameter), 1.8)
-                                  * DifficultyCalculationUtils.Smootherstep(lastAngle, double.DegreesToRadians(110), double.DegreesToRadians(60));
+                                  * DifficultyCalculationUtils.Smootherstep(Math.Min(lastAngle, lastLastAngle), double.DegreesToRadians(110), double.DegreesToRadians(60));
                 }
             }
 
