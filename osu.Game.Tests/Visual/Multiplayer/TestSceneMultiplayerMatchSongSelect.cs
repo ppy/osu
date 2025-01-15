@@ -60,14 +60,15 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private void setUp()
         {
-            AddStep("reset", () =>
+            AddStep("create song select", () =>
             {
                 Ruleset.Value = new OsuRuleset().RulesetInfo;
                 Beatmap.SetDefault();
                 SelectedMods.SetDefault();
+
+                LoadScreen(songSelect = new TestMultiplayerMatchSongSelect(SelectedRoom.Value!));
             });
 
-            AddStep("create song select", () => LoadScreen(songSelect = new TestMultiplayerMatchSongSelect(SelectedRoom.Value!)));
             AddUntilStep("wait for present", () => songSelect.IsCurrentScreen() && songSelect.BeatmapSetsLoaded);
         }
 

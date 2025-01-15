@@ -335,6 +335,23 @@ namespace osu.Game.Tests.Visual.Multiplayer
             return Task.CompletedTask;
         }
 
+        public override Task ChangeUserStyle(int? beatmapId, int? rulesetId)
+        {
+            ChangeUserStyle(api.LocalUser.Value.Id, beatmapId, rulesetId);
+            return Task.CompletedTask;
+        }
+
+        public void ChangeUserStyle(int userId, int? beatmapId, int? rulesetId)
+        {
+            Debug.Assert(ServerRoom != null);
+
+            var user = ServerRoom.Users.Single(u => u.UserID == userId);
+            user.BeatmapId = beatmapId;
+            user.RulesetId = rulesetId;
+
+            ((IMultiplayerClient)this).UserStyleChanged(userId, beatmapId, rulesetId);
+        }
+
         public void ChangeUserMods(int userId, IEnumerable<Mod> newMods)
             => ChangeUserMods(userId, newMods.Select(m => new APIMod(m)));
 

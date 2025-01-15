@@ -57,7 +57,7 @@ namespace osu.Game.Screens.Select
         [CanBeNull]
         private FilterCriteria currentCriteria;
 
-        public FilterCriteria CreateCriteria()
+        public virtual FilterCriteria CreateCriteria()
         {
             string query = searchTextBox.Text;
 

@@ -58,6 +58,13 @@ namespace osu.Game.Online.Multiplayer
         Task ChangeBeatmapAvailability(BeatmapAvailability newBeatmapAvailability);
 
         /// <summary>
+        /// Change the local user's style in the currently joined room.
+        /// </summary>
+        /// <param name="beatmapId">The beatmap.</param>
+        /// <param name="rulesetId">The ruleset.</param>
+        Task ChangeUserStyle(int? beatmapId, int? rulesetId);
+
+        /// <summary>
         /// Change the local user's mods in the currently joined room.
         /// </summary>
         /// <param name="newMods">The proposed new mods, excluding any required by the room itself.</param>
