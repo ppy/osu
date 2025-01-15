@@ -206,7 +206,7 @@ namespace osu.Game.Screens.SelectV2
 
             updateSelection();
 
-            void log(string text) => Logger.Log($"Carousel[op {cts.GetHashCode().ToString().Substring(0, 5)}] {stopwatch.ElapsedMilliseconds} ms: {text}");
+            void log(string text) => Logger.Log($"Carousel[op {cts.GetHashCode().ToString()}] {stopwatch.ElapsedMilliseconds} ms: {text}");
         }
 
         private async Task updateYPositions(IEnumerable<CarouselItem> carouselItems, CancellationToken cancellationToken) => await Task.Run(() =>
