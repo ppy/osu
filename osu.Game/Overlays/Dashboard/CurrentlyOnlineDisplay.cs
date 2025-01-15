@@ -196,8 +196,8 @@ namespace osu.Game.Overlays.Dashboard
 
             public IEnumerable<LocalisableString> FilterTerms { get; }
 
-            [Resolved(canBeNull: true)]
-            private IPerformFromScreenRunner performer { get; set; }
+            [Resolved]
+            private IPerformFromScreenRunner? performer { get; set; }
 
             public bool FilteringActive { set; get; }
 
