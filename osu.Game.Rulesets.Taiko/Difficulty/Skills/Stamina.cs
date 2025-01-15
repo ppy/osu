@@ -4,6 +4,7 @@
 using System;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
+using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Taiko.Difficulty.Evaluators;
 using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing;
@@ -44,10 +45,12 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             var currentObject = current as TaikoDifficultyHitObject;
             int index = currentObject?.Colour.MonoStreak?.HitObjects.IndexOf(currentObject) ?? 0;
 
-            if (singleColourStamina)
-                return currentStrain / (1 + Math.Exp(-(index - 10) / 2.0));
+            double monolengthBonus = 1 + Math.Min(Math.Max((index - 5) / 50.0, 0), 0.30);
 
-            return currentStrain;
+            if (singleColourStamina)
+                return DifficultyCalculationUtils.Logistic(-(index - 10) / 2.0, currentStrain);
+
+            return currentStrain * monolengthBonus;
         }
 
         protected override double CalculateInitialStrain(double time, DifficultyHitObject current) => singleColourStamina ? 0 : currentStrain * strainDecay(time - current.Previous(0).StartTime);
