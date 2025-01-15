@@ -81,7 +81,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 difficultyValue *= Math.Max(1, 1.050 - Math.Min(attributes.MonoStaminaFactor / 50, 1));
 
             // We need to divide the effectiveMissCount by 1 + DifficultyFactor to account for the miss count while considering map consistency.
-            effectiveMissCount /= 1.0 + attributes.TotalDifficultyFactor;
+            effectiveMissCount /= 1.0 + attributes.TotalConsistencyFactor;
 
             difficultyValue *= Math.Pow(0.986, effectiveMissCount);
 
