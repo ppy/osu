@@ -47,8 +47,8 @@ namespace osu.Game.Rulesets.Difficulty
         /// <summary>
         /// The factor corresponding to the consistency of each skill.
         /// </summary>
-        [JsonProperty("total_difficulty_factor")]
-        public double TotalDifficultyFactor { get; set; }
+        [JsonProperty("total_consistency_factor")]
+        public double TotalConsistencyFactor { get; set; }
 
         /// <summary>
         /// The maximum achievable combo.
