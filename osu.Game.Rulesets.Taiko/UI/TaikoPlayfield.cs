@@ -7,17 +7,18 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Pooling;
 using osu.Game.Graphics;
-using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Rulesets.UI;
-using osu.Game.Rulesets.UI.Scrolling;
-using osu.Game.Rulesets.Taiko.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Judgements;
 using osu.Game.Rulesets.Taiko.Objects;
+using osu.Game.Rulesets.Taiko.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Scoring;
+using osu.Game.Rulesets.UI;
+using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Taiko.UI
@@ -41,6 +42,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         private JudgementPooler<DrawableTaikoJudgement> judgementPooler = null!;
         private readonly IDictionary<HitResult, HitExplosionPool> explosionPools = new Dictionary<HitResult, HitExplosionPool>();
+        private readonly IDictionary<HitType, KiaiHitExplosionPool> kiaiExplosionPools = new Dictionary<HitType, KiaiHitExplosionPool>();
 
         private ProxyContainer topLevelHitContainer = null!;
         private InputDrum inputDrum = null!;
@@ -180,7 +182,6 @@ namespace osu.Game.Rulesets.Taiko.UI
                 inputDrum,
             };
 
-            RegisterPool<Hit, DrawableHit>(50);
             RegisterPool<Hit.StrongNestedHit, DrawableHit.StrongNestedHit>(50);
 
             RegisterPool<DrumRoll, DrawableDrumRoll>(5);
@@ -194,13 +195,39 @@ namespace osu.Game.Rulesets.Taiko.UI
 
             var hitWindows = new TaikoHitWindows();
 
-            HitResult[] usableHitResults = Enum.GetValues<HitResult>().Where(r => hitWindows.IsHitResultAllowed(r)).ToArray();
+            HitResult[] usableHitResults = Enum.GetValues<HitResult>().Where(hitWindows.IsHitResultAllowed).ToArray();
 
             AddInternal(judgementPooler = new JudgementPooler<DrawableTaikoJudgement>(usableHitResults));
 
             foreach (var result in usableHitResults)
                 explosionPools.Add(result, new HitExplosionPool(result));
             AddRangeInternal(explosionPools.Values);
+
+            foreach (var type in Enum.GetValues<HitType>())
+                kiaiExplosionPools.Add(type, new KiaiHitExplosionPool(type));
+            AddRangeInternal(kiaiExplosionPools.Values);
+
+            AddRangeInternal(poolsHit.Values);
+        }
+
+        /// <summary><see cref="Hit"/> to <see cref="DrawableHit"/> pools based on its <c>(HitType, IsStrong)</c> properties.</summary>
+        private readonly IDictionary<(HitType, bool), HitPool> poolsHit = new Dictionary<(HitType, bool), HitPool>()
+        {
+            // Non strong (pool size is 50 for each type):
+            {(HitType.Centre, false), new HitPool(50, HitType.Centre, false)},
+            {(HitType.Rim, false), new HitPool(50, HitType.Rim, false)},
+            // Strong (pool size is 20 for each type):
+            {(HitType.Centre, true), new HitPool(20, HitType.Centre, true)},
+            {(HitType.Rim, true), new HitPool(20, HitType.Rim, true)},
+        };
+        protected override IDrawablePool? PropertyBasedDrawableHitObjectPool(HitObject hitObject)
+        {
+            switch (hitObject)
+            {
+                // IDrawablePool for `Hit` object determined by its `HitType` & `IsStrong` properties.
+                case Hit hit: return poolsHit[(hit.Type, hit.IsStrong)];
+                default: return null;
+            }
         }
 
         protected override void LoadComplete()
@@ -300,7 +327,11 @@ namespace osu.Game.Rulesets.Taiko.UI
             {
                 case TaikoStrongJudgement:
                     if (result.IsHit)
+                    {
                         hitExplosionContainer.Children.FirstOrDefault(e => e.JudgedObject == ((DrawableStrongNestedHit)judgedObject).ParentHitObject)?.VisualiseSecondHit(result);
+                        if (result.HitObject.Kiai)
+                            kiaiExplosionContainer.Children.FirstOrDefault(e => e.JudgedObject == ((DrawableStrongNestedHit)judgedObject).ParentHitObject)?.VisualiseSecondHit(result);
+                    }
                     break;
 
                 case TaikoDrumRollTickJudgement:
@@ -336,8 +367,12 @@ namespace osu.Game.Rulesets.Taiko.UI
         {
             hitExplosionContainer.Add(explosionPools[result]
                 .Get(explosion => explosion.Apply(drawableObject)));
-            if (drawableObject.HitObject.Kiai)
-                kiaiExplosionContainer.Add(new KiaiHitExplosion(drawableObject, type));
+
+            //TODO: should we check `result.IsHit` ?
+            if (drawableObject.HitObject.Kiai && result.IsHit())
+                kiaiExplosionContainer.Add(
+                    kiaiExplosionPools[type].Get(
+                        explosion => explosion.Apply(drawableObject)));
         }
 
         private partial class ProxyContainer : LifetimeManagementContainer
