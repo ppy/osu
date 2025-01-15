@@ -24,7 +24,7 @@ namespace osu.Game.Overlays
 
         private readonly Bindable<string> path = new Bindable<string>(INDEX_PATH);
         private readonly Bindable<APIWikiPage?> wikiData = new Bindable<APIWikiPage?>();
-        private readonly IBindable<Language> language = new Bindable<Language>();
+        private readonly Bindable<Language> language = new Bindable<Language>();
 
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
@@ -37,6 +37,8 @@ namespace osu.Game.Overlays
         private WikiArticlePage? articlePage;
 
         private bool displayUpdateRequired = true;
+
+        private string lastValidPath = INDEX_PATH;
 
         public WikiOverlay()
             : base(OverlayColourScheme.Orange, false)
@@ -145,12 +147,13 @@ namespace osu.Game.Overlays
         private void onLangChanged(ValueChangedEvent<Language> e)
         {
             // Path unmodified, just reload the page with new language value.
-            loadPage(path.Value, e.NewValue);
+            loadPage(path.Value == "error" ? lastValidPath : path.Value, e.NewValue);
         }
 
         private void onSuccess(APIWikiPage response)
         {
             wikiData.Value = response;
+            lastValidPath = response.Path;
             path.Value = response.Path;
 
             if (response.Layout.Equals(INDEX_PATH, StringComparison.OrdinalIgnoreCase))
@@ -177,7 +180,8 @@ namespace osu.Game.Overlays
             path.Value = "error";
 
             LoadDisplay(articlePage = new WikiArticlePage($@"{api.WebsiteRootUrl}/wiki/",
-                $"Something went wrong when trying to fetch page \"{originalPath}\".\n\n[Return to the main page]({INDEX_PATH})."));
+                $"{WikiOverlayStrings.PageErrorDescription(originalPath)}\n\n"
+                + $"{WikiOverlayStrings.ReloadPageLink(originalPath)}\n{WikiOverlayStrings.ReturnToMainPageLink(INDEX_PATH)}"));
         }
 
         private void showParentPage()
