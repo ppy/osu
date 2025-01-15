@@ -9,7 +9,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Pooling;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
-using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
 using osuTK;
@@ -98,18 +97,6 @@ namespace osu.Game.Screens.SelectV2
             return true;
         }
 
-        protected override void Update()
-        {
-            base.Update();
-
-            Debug.Assert(Item != null);
-
-            if (DrawYPosition != Item.CarouselYPosition)
-            {
-                DrawYPosition = Interpolation.DampContinuously(DrawYPosition, Item.CarouselYPosition, 50, Time.Elapsed);
-            }
-        }
-
-        public double DrawYPosition { get; private set; }
+        public double DrawYPosition { get; set; }
     }
 }

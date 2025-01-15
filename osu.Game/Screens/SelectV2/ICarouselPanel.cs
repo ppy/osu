@@ -11,9 +11,9 @@ namespace osu.Game.Screens.SelectV2
     public interface ICarouselPanel
     {
         /// <summary>
-        /// The Y position which should be used for displaying this item within the carousel.
+        /// The Y position which should be used for displaying this item within the carousel. This is managed by <see cref="Carousel{T}"/> and should not be set manually.
         /// </summary>
-        double DrawYPosition { get; }
+        double DrawYPosition { get; set; }
 
         /// <summary>
         /// The carousel item this drawable is representing. This is managed by <see cref="Carousel{T}"/> and should not be set manually.
