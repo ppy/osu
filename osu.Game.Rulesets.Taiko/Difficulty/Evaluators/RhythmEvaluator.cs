@@ -22,11 +22,11 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
         }
 
         /// <summary>
-        /// To prevent against infinite ratio values where maps breach regular mapping conditions, we validate the ratio.
+        /// Validates the ratio by ensuring it is a normal number in cases where maps breach regular mapping conditions.
         /// </summary>
         private static double validateRatio(double ratio)
         {
-            return double.IsInfinity(ratio) || double.IsNaN(ratio) ? 0 : ratio;
+            return double.IsNormal(ratio) ? ratio : 0;
         }
 
         /// <summary>
