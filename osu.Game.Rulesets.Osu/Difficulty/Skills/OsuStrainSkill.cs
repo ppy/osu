@@ -7,6 +7,8 @@ using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
 using System.Linq;
 using osu.Framework.Utils;
+using SharpCompress;
+using osu.Framework.Extensions.ObjectExtensions;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
@@ -39,12 +41,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             List<double> strains = peaks.OrderDescending().ToList();
 
-            // We are reducing the highest strains first to account for extreme difficulty spikes
-            for (int i = 0; i < Math.Min(strains.Count, ReducedSectionCount); i++)
-            {
-                double scale = Math.Log10(Interpolation.Lerp(1, 10, Math.Clamp((float)i / ReducedSectionCount, 0, 1)));
-                strains[i] *= Interpolation.Lerp(ReducedStrainBaseline, 1.0, scale);
-            }
+            // We select only the hardest 20% of picks in strains to ensure greater value in the most difficult sections of the map.
+            List<double> hardStrains = strains.OrderDescending().ToList().GetRange(0, strains.Count / 10 * 2);
+
+            //We select only the moderate 20% of picks in strains to provide greater value in the more moderate sections of the map.
+            List<double> midStrains = strains.OrderDescending().ToList().GetRange(strains.Count / 10 * 4, strains.Count / 10 * 6);
+
+            // We can calculate the difficulty factor by doing average pick difficulty / max peak difficulty.
+            // It resoult in a value that rappresent the consistency for all peaks (0 excluded) in a range number from 0 to 1.
+            ConsistencyFactor = midStrains.Average() / hardStrains.Average();
 
             // Difficulty is the weighted sum of the highest strains from every section.
             // We're sorting from highest to lowest strain.
@@ -56,7 +61,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             return difficulty;
         }
-
         public static double DifficultyToPerformance(double difficulty) => Math.Pow(5.0 * Math.Max(1.0, difficulty / 0.0675) - 4.0, 3.0) / 100000.0;
     }
 }
