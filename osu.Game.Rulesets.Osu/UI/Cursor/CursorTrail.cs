@@ -18,7 +18,6 @@ using osu.Framework.Graphics.Visualisation;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Framework.Timing;
-using osu.Game.Rulesets.Osu.Skinning.Legacy;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Graphics.ES30;
@@ -41,6 +40,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         private double timeOffset;
         private float time;
         protected bool Spin { get; set; }
+        public float PartRotation { get; set; }
 
         /// <summary>
         /// The scale used on creation of a new trail part.
@@ -80,12 +80,9 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             shader = shaders.Load(@"CursorTrail", FragmentShaderDescriptor.TEXTURE);
         }
 
-        private double loadCompleteTime;
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            loadCompleteTime = Parent!.Clock.CurrentTime; // using parent's clock since our is overridden
             resetTime();
         }
 
@@ -245,8 +242,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 texture = Source.texture;
                 time = Source.time;
                 fadeExponent = Source.FadeExponent;
-                // The goal is to sync trail rotation with the cursor. Cursor uses spin transform which starts rotation at LoadComplete time.
-                angle = Source.Spin ? (float)((Source.Parent!.Clock.CurrentTime - Source.loadCompleteTime) * 2 * Math.PI / LegacyCursor.REVOLUTION_DURATION) : 0;
+                angle = Source.Spin ? float.DegreesToRadians(Source.PartRotation) : 0;
 
                 originPosition = Vector2.Zero;
 
