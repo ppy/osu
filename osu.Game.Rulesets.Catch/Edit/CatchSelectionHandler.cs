@@ -5,11 +5,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Game.Rulesets.Catch.Edit.Changes;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
+using osu.Game.Screens.Edit.Changes;
 using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
 using Direction = osu.Framework.Graphics.Direction;
@@ -42,11 +44,11 @@ namespace osu.Game.Rulesets.Catch.Edit
             {
                 if (!(h is CatchHitObject catchObject)) return;
 
-                catchObject.OriginalX += deltaX;
+                new OriginalXChange(catchObject, catchObject.OriginalX + deltaX).Apply(ChangeHandler);
 
                 // Move the nested hit objects to give an instant result before nested objects are recreated.
                 foreach (var nested in catchObject.NestedHitObjects.OfType<CatchHitObject>())
-                    nested.OriginalX += deltaX;
+                    new OriginalXChange(nested, nested.OriginalX + deltaX).Apply(ChangeHandler);
             });
 
             return true;
@@ -91,14 +93,16 @@ namespace osu.Game.Rulesets.Catch.Edit
 
             foreach (var h in hitObjects)
             {
-                h.StartTime = selectionEndTime - (h.GetEndTime() - selectionStartTime);
+                new StartTimeChange(h, selectionEndTime - (h.GetEndTime() - selectionStartTime)).Apply(ChangeHandler);
 
                 if (h is JuiceStream juiceStream)
                 {
-                    juiceStream.Path.Reverse(out Vector2 positionalOffset);
-                    juiceStream.OriginalX += positionalOffset.X;
-                    juiceStream.LegacyConvertedY += positionalOffset.Y;
+                    var reverse = new ReverseSliderPathChange(juiceStream.Path);
+                    reverse.Apply();
+                    new OriginalXChange(juiceStream, juiceStream.OriginalX + reverse.PositionalOffset.X).Apply(ChangeHandler);
+                    new LegacyConvertedYChange(juiceStream, juiceStream.LegacyConvertedY + reverse.PositionalOffset.Y).Apply(ChangeHandler);
                     EditorBeatmap.Update(juiceStream);
+                    ChangeHandler?.RecordUpdate(juiceStream);
                 }
             }
 
@@ -106,7 +110,7 @@ namespace osu.Game.Rulesets.Catch.Edit
             hitObjects = hitObjects.OrderBy(obj => obj.StartTime).ToList();
 
             for (int i = 0; i < hitObjects.Count; ++i)
-                hitObjects[i].NewCombo = newComboOrder[i];
+                new NewComboChange(hitObjects[i], newComboOrder[i]).Apply(ChangeHandler);
 
             return true;
         }
@@ -150,16 +154,17 @@ namespace osu.Game.Rulesets.Catch.Edit
                     return false;
 
                 case JuiceStream juiceStream:
-                    juiceStream.OriginalX = getFlippedPosition(juiceStream.OriginalX);
+                    new OriginalXChange(juiceStream, getFlippedPosition(juiceStream.OriginalX)).Apply(ChangeHandler);
 
                     foreach (var point in juiceStream.Path.ControlPoints)
-                        point.Position *= new Vector2(-1, 1);
+                        new PathControlPointPositionChange(point, point.Position * new Vector2(-1, 1)).Apply(ChangeHandler);
 
                     EditorBeatmap.Update(juiceStream);
+                    ChangeHandler?.RecordUpdate(juiceStream);
                     return true;
 
                 default:
-                    hitObject.OriginalX = getFlippedPosition(hitObject.OriginalX);
+                    new OriginalXChange(hitObject, getFlippedPosition(hitObject.OriginalX)).Apply(ChangeHandler);
                     return true;
             }
 

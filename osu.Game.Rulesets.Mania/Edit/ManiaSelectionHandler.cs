@@ -6,8 +6,10 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Mania.Edit.Changes;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Screens.Edit.Changes;
 using osu.Game.Screens.Edit.Compose.Components;
 
 namespace osu.Game.Rulesets.Mania.Edit
@@ -56,9 +58,9 @@ namespace osu.Game.Rulesets.Mania.Edit
 
                     performOnSelection(maniaObject =>
                     {
-                        maniaPlayfield.Remove(maniaObject);
-                        maniaObject.Column = firstColumn + (lastColumn - maniaObject.Column);
-                        maniaPlayfield.Add(maniaObject);
+                        new RemoveManiaObjectChange(maniaPlayfield, maniaObject).Apply(ChangeHandler);
+                        new ColumnChange(maniaObject, firstColumn + (lastColumn - maniaObject.Column)).Apply(ChangeHandler);
+                        new AddManiaObjectChange(maniaPlayfield, maniaObject).Apply(ChangeHandler);
                     });
 
                     return true;
@@ -72,7 +74,7 @@ namespace osu.Game.Rulesets.Mania.Edit
 
                     performOnSelection(hitObject =>
                     {
-                        hitObject.StartTime = selectionStartTime + (selectionEndTime - hitObject.GetEndTime());
+                        new StartTimeChange(hitObject, selectionStartTime + (selectionEndTime - hitObject.GetEndTime())).Apply(ChangeHandler);
                     });
 
                     return true;
@@ -118,9 +120,9 @@ namespace osu.Game.Rulesets.Mania.Edit
 
             performOnSelection(h =>
             {
-                maniaPlayfield.Remove(h);
-                h.Column += columnDelta;
-                maniaPlayfield.Add(h);
+                new RemoveManiaObjectChange(maniaPlayfield, h).Apply(ChangeHandler);
+                new ColumnChange(h, h.Column + columnDelta).Apply(ChangeHandler);
+                new AddManiaObjectChange(maniaPlayfield, h).Apply(ChangeHandler);
             });
         }
 

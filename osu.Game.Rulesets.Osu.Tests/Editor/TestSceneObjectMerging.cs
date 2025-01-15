@@ -397,7 +397,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         {
             foreach (var hitObject in objects)
             {
-                if (EditorBeatmap.HitObjects.Contains(hitObject))
+                if (!EditorBeatmap.HitObjects.Contains(hitObject))
                     return false;
             }
 

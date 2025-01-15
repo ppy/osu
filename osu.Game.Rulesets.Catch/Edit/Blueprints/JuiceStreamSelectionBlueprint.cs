@@ -17,6 +17,7 @@ using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Screens.Edit;
+using osu.Game.Screens.Edit.Changes;
 using osuTK;
 using osuTK.Input;
 
@@ -57,7 +58,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
         private EditorBeatmap? editorBeatmap { get; set; }
 
         [Resolved]
-        private IEditorChangeHandler? changeHandler { get; set; }
+        private HitObjectChangeHandler? changeHandler { get; set; }
 
         [Resolved]
         private BindableBeatDivisor? beatDivisor { get; set; }
@@ -185,6 +186,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
         {
             editablePath.UpdateHitObjectFromPath(HitObject);
             editorBeatmap?.Update(HitObject);
+            changeHandler?.RecordUpdate(HitObject);
 
             lastEditablePathId = editablePath.PathId;
             lastSliderPathVersion = HitObject.Path.Version.Value;
@@ -217,19 +219,19 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
 
                 float fruitXValue = HitObject.OriginalX + HitObject.Path.PositionAt(pathPosition).X;
 
-                editorBeatmap.Add(new Fruit
+                new AddHitObjectChange(editorBeatmap, new Fruit
                 {
                     StartTime = time,
                     OriginalX = fruitXValue,
                     NewCombo = i == 0 && HitObject.NewCombo,
                     Samples = HitObject.Samples.Select(s => s.With()).ToList()
-                });
+                }).Apply(changeHandler);
 
                 i += 1;
                 time = HitObject.StartTime + i * streamSpacing;
             }
 
-            editorBeatmap.Remove(HitObject);
+            new RemoveHitObjectChange(editorBeatmap, HitObject).Apply(changeHandler);
 
             changeHandler?.EndChange();
         }

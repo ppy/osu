@@ -9,6 +9,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Catch.Objects;
+using osu.Game.Screens.Edit.Changes;
 using osuTK;
 using osuTK.Input;
 
@@ -143,8 +144,8 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
         {
             base.UpdateHitObjectFromPath(hitObject);
 
-            if (hitObject.Path.ControlPoints.Count <= 1 || !hitObject.Path.HasValidLength)
-                EditorBeatmap?.Remove(hitObject);
+            if ((hitObject.Path.ControlPoints.Count <= 1 || !hitObject.Path.HasValidLength) && EditorBeatmap != null)
+                new RemoveHitObjectChange(EditorBeatmap, hitObject).Apply(ChangeHandler, true);
         }
     }
 }
