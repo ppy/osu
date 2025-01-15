@@ -47,6 +47,22 @@ namespace osu.Game.Online.Metadata
         /// </summary>
         public abstract IBindableDictionary<int, UserPresence> FriendStates { get; }
 
+        /// <summary>
+        /// Attempts to retrieve the presence of a user.
+        /// </summary>
+        /// <param name="userId">The user ID.</param>
+        /// <returns>The user presence, or null if not available or the user's offline.</returns>
+        public UserPresence? GetPresence(int userId)
+        {
+            if (FriendStates.TryGetValue(userId, out UserPresence presence))
+                return presence;
+
+            if (UserStates.TryGetValue(userId, out presence))
+                return presence;
+
+            return null;
+        }
+
         /// <inheritdoc/>
         public abstract Task UpdateActivity(UserActivity? activity);
 
