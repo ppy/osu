@@ -114,6 +114,15 @@ namespace osu.Game.Beatmaps
                     }
                 }
             }
+            catch (SqliteException sqliteException) when (sqliteException.SqliteErrorCode == 11 || sqliteException.SqliteErrorCode == 26) // SQLITE_CORRUPT, SQLITE_NOTADB
+            {
+                // only attempt purge & refetch if there is no other refetch in progress
+                if (cacheDownloadRequest == null)
+                {
+                    tryPurgeCache();
+                    prepareLocalCache();
+                }
+            }
             catch (Exception ex)
             {
                 logForModel(beatmapInfo.BeatmapSet, $@"Cached local retrieval for {beatmapInfo} failed with {ex}.");
@@ -123,6 +132,22 @@ namespace osu.Game.Beatmaps
 
             onlineMetadata = null;
             return false;
+        }
+
+        private void tryPurgeCache()
+        {
+            log(@"Local metadata cache is corrupted; attempting purge.");
+
+            try
+            {
+                File.Delete(storage.GetFullPath(cache_database_name));
+            }
+            catch (Exception ex)
+            {
+                log($@"Failed to purge local metadata cache: {ex}");
+            }
+
+            log(@"Local metadata cache purged due to corruption.");
         }
 
         private SqliteConnection getConnection() =>
