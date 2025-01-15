@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -10,13 +8,16 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Scoring;
 using osu.Game.Screens.Select.Leaderboards;
 
 namespace osu.Game.Screens.Select
 {
     public partial class PlayBeatmapDetailArea : BeatmapDetailArea
     {
-        public readonly BeatmapLeaderboard Leaderboard;
+        private readonly BeatmapLeaderboardScoresProvider scoresProvider;
+
+        private readonly BeatmapLeaderboard leaderboard;
 
         public override WorkingBeatmap Beatmap
         {
@@ -25,17 +26,23 @@ namespace osu.Game.Screens.Select
             {
                 base.Beatmap = value;
 
-                Leaderboard.BeatmapInfo = value is DummyWorkingBeatmap ? null : value?.BeatmapInfo;
+                scoresProvider.BeatmapInfo = value is DummyWorkingBeatmap ? null : value.BeatmapInfo;
             }
         }
 
-        private Bindable<TabType> selectedTab;
+        private Bindable<TabType> selectedTab = null!;
 
-        private Bindable<bool> selectedModsFilter;
+        private Bindable<bool> selectedModsFilter = null!;
 
-        public PlayBeatmapDetailArea()
+        public PlayBeatmapDetailArea(BeatmapLeaderboardScoresProvider scoresProvider, Action<ScoreInfo>? onScoreSelected = null)
         {
-            Add(Leaderboard = new BeatmapLeaderboard { RelativeSizeAxes = Axes.Both });
+            this.scoresProvider = scoresProvider;
+
+            Add(leaderboard = new BeatmapLeaderboard(scoresProvider)
+            {
+                ScoreSelected = onScoreSelected,
+                RelativeSizeAxes = Axes.Both
+            });
         }
 
         [BackgroundDependencyLoader]
@@ -55,24 +62,24 @@ namespace osu.Game.Screens.Select
         {
             base.Refresh();
 
-            Leaderboard.RefetchScores();
+            scoresProvider.RefetchScores();
         }
 
         protected override void OnTabChanged(BeatmapDetailAreaTabItem tab, bool selectedMods)
         {
             base.OnTabChanged(tab, selectedMods);
 
-            Leaderboard.FilterMods = selectedMods;
+            scoresProvider.FilterMods = selectedMods;
 
             switch (tab)
             {
-                case BeatmapDetailAreaLeaderboardTabItem<BeatmapLeaderboardScope> leaderboard:
-                    Leaderboard.Scope = leaderboard.Scope;
-                    Leaderboard.Show();
+                case BeatmapDetailAreaLeaderboardTabItem<BeatmapLeaderboardScope> leaderboardTab:
+                    scoresProvider.Scope = leaderboardTab.Scope;
+                    leaderboard.Show();
                     break;
 
                 default:
-                    Leaderboard.Hide();
+                    leaderboard.Hide();
                     break;
             }
         }

@@ -120,7 +120,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             return true;
         }
 
-        protected override BeatmapDetailArea CreateBeatmapDetailArea() => new PlayBeatmapDetailArea();
+        protected override BeatmapDetailArea CreateBeatmapDetailArea() => new PlayBeatmapDetailArea(ScoresProvider);
 
         protected override bool IsValidMod(Mod mod) => base.IsValidMod(mod) && mod.ValidForMultiplayer;
 

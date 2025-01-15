@@ -63,13 +63,21 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 SelectedRoom.Value = new Room { RoomID = 3 };
 
-                Child = new MatchLeaderboard(SelectedRoom.Value)
+                MatchLeaderboardScoresProvider scoresProvider;
+
+                AddRange(new Drawable[]
                 {
-                    Origin = Anchor.Centre,
-                    Anchor = Anchor.Centre,
-                    Size = new Vector2(550f, 450f),
-                    Scope = MatchLeaderboardScope.Overall,
-                };
+                    scoresProvider = new MatchLeaderboardScoresProvider(SelectedRoom.Value)
+                    {
+                        Scope = MatchLeaderboardScope.Overall,
+                    },
+                    new MatchLeaderboard(scoresProvider)
+                    {
+                        Origin = Anchor.Centre,
+                        Anchor = Anchor.Centre,
+                        Size = new Vector2(550f, 450f),
+                    }
+                });
             });
         }
     }
