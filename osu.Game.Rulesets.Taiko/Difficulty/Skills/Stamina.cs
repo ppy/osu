@@ -4,6 +4,7 @@
 using System;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
+using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Taiko.Difficulty.Evaluators;
 using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing;
@@ -47,7 +48,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             double monolengthBonus = 1 + Math.Min(Math.Max((index - 5) / 50.0, 0), 0.30);
 
             if (singleColourStamina)
-                return (currentStrain) / (1 + Math.Exp(-(index - 10) / 2.0));
+                return DifficultyCalculationUtils.Logistic(-(index - 10) / 2.0, currentStrain);
 
             return currentStrain * monolengthBonus;
         }
