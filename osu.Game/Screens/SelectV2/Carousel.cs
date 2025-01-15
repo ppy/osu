@@ -14,6 +14,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Pooling;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Logging;
+using osu.Framework.Utils;
 using osu.Game.Graphics.Containers;
 using osuTK;
 using osuTK.Graphics;
@@ -107,7 +108,7 @@ namespace osu.Game.Screens.SelectV2
 
         private List<CarouselItem>? displayedCarouselItems;
 
-        private readonly DoublePrecisionScroll scroll;
+        private readonly CarouselScrollContainer scroll;
 
         protected Carousel()
         {
@@ -118,7 +119,7 @@ namespace osu.Game.Screens.SelectV2
                     Colour = Color4.Black,
                     RelativeSizeAxes = Axes.Both,
                 },
-                scroll = new DoublePrecisionScroll
+                scroll = new CarouselScrollContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Masking = false,
@@ -389,13 +390,13 @@ namespace osu.Game.Screens.SelectV2
         /// Implementation of scroll container which handles very large vertical lists by internally using <c>double</c> precision
         /// for pre-display Y values.
         /// </summary>
-        private partial class DoublePrecisionScroll : OsuScrollContainer
+        private partial class CarouselScrollContainer : OsuScrollContainer
         {
             public readonly Container Panels;
 
             public void SetLayoutHeight(float height) => Panels.Height = height;
 
-            public DoublePrecisionScroll()
+            public CarouselScrollContainer()
             {
                 // Managing our own custom layout within ScrollContent causes feedback with public ScrollContainer calculations,
                 // so we must maintain one level of separation from ScrollContent.
@@ -404,6 +405,33 @@ namespace osu.Game.Screens.SelectV2
                     Name = "Layout content",
                     RelativeSizeAxes = Axes.X,
                 });
+            }
+
+            public override void OffsetScrollPosition(double offset)
+            {
+                base.OffsetScrollPosition(offset);
+
+                foreach (var panel in Panels)
+                {
+                    var c = (ICarouselPanel)panel;
+                    Debug.Assert(c.Item != null);
+
+                    c.DrawYPosition += offset;
+                }
+            }
+
+            protected override void Update()
+            {
+                base.Update();
+
+                foreach (var panel in Panels)
+                {
+                    var c = (ICarouselPanel)panel;
+                    Debug.Assert(c.Item != null);
+
+                    if (c.DrawYPosition != c.Item.CarouselYPosition)
+                        c.DrawYPosition = Interpolation.DampContinuously(c.DrawYPosition, c.Item.CarouselYPosition, 50, Time.Elapsed);
+                }
             }
 
             public override void Clear(bool disposeChildren)

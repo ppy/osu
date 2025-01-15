@@ -168,7 +168,33 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
-        public void TestScrollPositionVelocityMaintained()
+        public void TestScrollPositionMaintainedOnAddSecondSelected()
+        {
+            Quad positionBefore = default;
+
+            AddStep("add 10 beatmaps", () =>
+            {
+                for (int i = 0; i < 10; i++)
+                    beatmapSets.Add(TestResources.CreateTestBeatmapSetInfo(RNG.Next(1, 4)));
+            });
+
+            AddUntilStep("visual item added", () => carousel.ChildrenOfType<BeatmapCarouselPanel>().Count(), () => Is.GreaterThan(0));
+
+            AddStep("select middle beatmap", () => carousel.CurrentSelection = beatmapSets.ElementAt(beatmapSets.Count - 2));
+            AddStep("scroll to selected item", () => scroll.ScrollTo(scroll.ChildrenOfType<BeatmapCarouselPanel>().Single(p => p.Item!.Selected.Value)));
+
+            AddUntilStep("wait for scroll finished", () => scroll.Current, () => Is.EqualTo(scroll.Target));
+
+            AddStep("save selected screen position", () => positionBefore = carousel.ChildrenOfType<BeatmapCarouselPanel>().FirstOrDefault(p => p.Item!.Selected.Value)!.ScreenSpaceDrawQuad);
+
+            AddStep("remove first beatmap", () => beatmapSets.Remove(beatmapSets.Last()));
+            AddUntilStep("sorting finished", () => carousel.IsFiltering, () => Is.False);
+            AddAssert("select screen position unchanged", () => carousel.ChildrenOfType<BeatmapCarouselPanel>().Single(p => p.Item!.Selected.Value).ScreenSpaceDrawQuad,
+                () => Is.EqualTo(positionBefore));
+        }
+
+        [Test]
+        public void TestScrollPositionMaintainedOnAddLastSelected()
         {
             Quad positionBefore = default;
 
