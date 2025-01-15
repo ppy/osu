@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
 			// Density refers to an object's deltatime relative to its expected deltatime
 			double objectDensity = expectedDeltaTime / Math.Max(1.0, noteObject.DeltaTime);
 			
-			// Dense notes are penalised at high velocities
+			// High density is penalised at high velocity as it is generally considered easier to read
 			// https://www.desmos.com/calculator/u63f3ntdsi
 			double densityPenalty = DifficultyCalculationUtils.Logistic(objectDensity, 0.925, 15);
 			
