@@ -284,11 +284,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // Increasing the accuracy value by object count for Blinds isn't ideal, so the minimum buff is given.
             if (score.Mods.Any(m => m is OsuModBlinds))
                 accuracyValue *= 1.14;
+            // Use different multiplier when adding hidden or traceable to flashlight.
+            else if (score.Mods.Any(m => m is OsuModFlashlight))
+                accuracyValue *= score.Mods.Any(m => m is OsuModHidden || m is OsuModTraceable) ? 1.12 : 1.08;
             else if (score.Mods.Any(m => m is OsuModHidden || m is OsuModTraceable))
                 accuracyValue *= 1.08;
-
-            if (score.Mods.Any(m => m is OsuModFlashlight))
-                accuracyValue *= 1.02;
 
             return accuracyValue;
         }
@@ -298,6 +298,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (!score.Mods.Any(h => h is OsuModFlashlight))
                 return 0.0;
 
+            var osuModFlashlight = (OsuModFlashlight)score.Mods.Single(m => m is OsuModFlashlight);
+
             double flashlightValue = Flashlight.DifficultyToPerformance(attributes.FlashlightDifficulty);
 
             // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
@@ -306,9 +308,32 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             flashlightValue *= getComboScalingFactor(attributes);
 
-            // Account for shorter maps having a higher ratio of 0 combo/100 combo flashlight radius.
-            flashlightValue *= 0.7 + 0.1 * Math.Min(1.0, totalHits / 200.0) +
-                               (totalHits > 200 ? 0.2 * Math.Min(1.0, (totalHits - 200) / 200.0) : 0.0);
+            // Account for shorter maps having more time played at a larger flashlight radius, and being generally more easily retryable.
+            flashlightValue *= Math.Min(1.2 - Math.Pow(0.997, attributes.MaxCombo), 1);
+
+            // Calculate time spent at each flashlight radius to account for scores where the radius increased due to misses.
+            double maximumSizePercentage = 1.0;
+            double mediumSizePercentage = 0.0;
+            double minimumSizePercentage = 0.0;
+
+            if (osuModFlashlight.ComboBasedSize.Value)
+            {
+                int missingCombo = attributes.MaxCombo - scoreMaxCombo;
+                double missingComboPercentage = (double)missingCombo / attributes.MaxCombo;
+
+                // For balancing purposes, assume the player made 3 misses for every memorisation mistake.
+                double averageMissingComboLength = Math.Max(missingCombo, 1) / Math.Max(effectiveMissCount / 3, 1);
+
+                maximumSizePercentage = Math.Clamp(averageMissingComboLength, 0, 100) / averageMissingComboLength * missingComboPercentage;
+                mediumSizePercentage = Math.Clamp(averageMissingComboLength - 100, 0, 100) / averageMissingComboLength * missingComboPercentage;
+                minimumSizePercentage = 1.0 - mediumSizePercentage - maximumSizePercentage;
+            }
+
+            double maximumSizeScalingFactor = flashlightRadiusScalingFactor(osuModFlashlight.SizeMultiplier.Value);
+            double mediumSizeScalingFactor = flashlightRadiusScalingFactor(0.8125f * osuModFlashlight.SizeMultiplier.Value);
+            double minimumSizeScalingFactor = flashlightRadiusScalingFactor(0.625f * osuModFlashlight.SizeMultiplier.Value);
+
+            flashlightValue *= maximumSizeScalingFactor * maximumSizePercentage + mediumSizeScalingFactor * mediumSizePercentage + minimumSizeScalingFactor * minimumSizePercentage;
 
             // Scale the flashlight value with accuracy _slightly_.
             flashlightValue *= 0.5 + accuracy / 2.0;
@@ -425,6 +450,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         // to make it more punishing on maps with lower amount of hard sections.
         private double calculateMissPenalty(double missCount, double difficultStrainCount) => 0.96 / ((missCount / (4 * Math.Pow(Math.Log(difficultStrainCount), 0.94))) + 1);
         private double getComboScalingFactor(OsuDifficultyAttributes attributes) => attributes.MaxCombo <= 0 ? 1.0 : Math.Min(Math.Pow(scoreMaxCombo, 0.8) / Math.Pow(attributes.MaxCombo, 0.8), 1.0);
+        private double flashlightRadiusScalingFactor(double sizeMultiplier) => 1.2 / (1 + Math.Exp(8.58367 * (sizeMultiplier - 0.8125)));
 
         private int totalHits => countGreat + countOk + countMeh + countMiss;
         private int totalSuccessfulHits => countGreat + countOk + countMeh;
