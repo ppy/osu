@@ -59,7 +59,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             new TaikoModHardRock(),
         };
 
-        protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
+        protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, Mod[] mods, double clockRate)
         {
             var hitWindows = new HitWindows();
             hitWindows.SetDifficulty(beatmap.Difficulty.OverallDifficulty);
