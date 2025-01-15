@@ -15,50 +15,62 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
     {
         protected override LocalisableString Header => AudioSettingsStrings.VolumeHeader;
 
+        private readonly BindableVolume volumeInactive = new BindableVolume();
+
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, OsuConfigManager config)
         {
+            config.BindWith(OsuSetting.VolumeInactive, volumeInactive.Linear);
+            volumeInactive.Scale();
+
             Children = new Drawable[]
             {
                 new VolumeAdjustSlider
                 {
                     LabelText = AudioSettingsStrings.MasterVolume,
-                    Current = audio.Volume,
-                    KeyboardStep = 0.01f,
-                    DisplayAsPercentage = true
+                    Current = audio.Volume.Decibel,
+                    KeyboardStep = (float)BindableVolume.STEP,
                 },
-                new SettingsSlider<double>
+                new VolumeAdjustSlider
                 {
                     LabelText = AudioSettingsStrings.MasterVolumeInactive,
-                    Current = config.GetBindable<double>(OsuSetting.VolumeInactive),
-                    KeyboardStep = 0.01f,
-                    DisplayAsPercentage = true
+                    Current = volumeInactive.Decibel,
+                    KeyboardStep = (float)BindableVolume.STEP,
+                    PlaySamplesOnAdjust = true,
                 },
                 new VolumeAdjustSlider
                 {
                     LabelText = AudioSettingsStrings.EffectVolume,
-                    Current = audio.VolumeSample,
-                    KeyboardStep = 0.01f,
-                    DisplayAsPercentage = true
+                    Current = audio.VolumeSample.Decibel,
+                    KeyboardStep = (float)BindableVolume.STEP,
                 },
 
                 new VolumeAdjustSlider
                 {
                     LabelText = AudioSettingsStrings.MusicVolume,
-                    Current = audio.VolumeTrack,
-                    KeyboardStep = 0.01f,
-                    DisplayAsPercentage = true
+                    Current = audio.VolumeTrack.Decibel,
+                    KeyboardStep = (float)BindableVolume.STEP,
                 },
             };
         }
 
+        private partial class DecibelSliderBar : RoundedSliderBar<double>
+        {
+            public override LocalisableString TooltipText => (Current.Value <= BindableVolume.MIN ? "-∞" : Current.Value.ToString("+#0.0;-#0.0;+0.0")) + " dB";
+        }
+
         private partial class VolumeAdjustSlider : SettingsSlider<double>
         {
-            protected override Drawable CreateControl()
+            protected override Drawable CreateControl() => new DecibelSliderBar
             {
-                var sliderBar = (RoundedSliderBar<double>)base.CreateControl();
-                sliderBar.PlaySamplesOnAdjust = false;
-                return sliderBar;
+                RelativeSizeAxes = Axes.X,
+                PlaySamplesOnAdjust = false,
+            };
+
+            public bool PlaySamplesOnAdjust
+            {
+                get => ((DecibelSliderBar)Control).PlaySamplesOnAdjust;
+                set => ((DecibelSliderBar)Control).PlaySamplesOnAdjust = value;
             }
         }
     }
