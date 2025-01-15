@@ -52,6 +52,11 @@ namespace osu.Game.Screens.SelectV2
         public float DistanceOffscreenToPreload { get; set; }
 
         /// <summary>
+        /// Vertical space between panel layout. Negative value can be used to create an overlapping effect.
+        /// </summary>
+        protected float SpacingBetweenPanels { get; set; } = -5;
+
+        /// <summary>
         /// When a new request arrives to change filtering, the number of milliseconds to wait before performing the filter.
         /// Regardless of any external debouncing, this is a safety measure to avoid triggering too many threaded operations.
         /// </summary>
@@ -207,13 +212,12 @@ namespace osu.Game.Screens.SelectV2
 
         private async Task updateYPositions(IEnumerable<CarouselItem> carouselItems, CancellationToken cancellationToken) => await Task.Run(() =>
         {
-            const float spacing = 10;
             float yPos = 0;
 
             foreach (var item in carouselItems)
             {
                 item.CarouselYPosition = yPos;
-                yPos += item.DrawHeight + spacing;
+                yPos += item.DrawHeight + SpacingBetweenPanels;
             }
         }, cancellationToken).ConfigureAwait(false);
 
