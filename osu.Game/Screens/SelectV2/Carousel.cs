@@ -212,7 +212,7 @@ namespace osu.Game.Screens.SelectV2
 
         private async Task updateYPositions(IEnumerable<CarouselItem> carouselItems, CancellationToken cancellationToken) => await Task.Run(() =>
         {
-            float yPos = 0;
+            float yPos = visibleHalfHeight;
 
             foreach (var item in carouselItems)
             {
@@ -398,7 +398,7 @@ namespace osu.Game.Screens.SelectV2
             if (displayedCarouselItems.Count > 0)
             {
                 var lastItem = displayedCarouselItems[^1];
-                scroll.SetLayoutHeight((float)(lastItem.CarouselYPosition + lastItem.DrawHeight));
+                scroll.SetLayoutHeight((float)(lastItem.CarouselYPosition + lastItem.DrawHeight + visibleHalfHeight));
             }
             else
                 scroll.SetLayoutHeight(0);
