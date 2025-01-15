@@ -3,7 +3,6 @@
 
 // All code is referenced from the following:
 // https://github.com/mathnet/mathnet-numerics/blob/master/src/Numerics/SpecialFunctions/Erf.cs
-// https://github.com/mathnet/mathnet-numerics/blob/master/src/Numerics/Optimization/NelderMeadSimplex.cs
 
 /*
  Copyright (c) 2002-2022 Math.NET
@@ -14,12 +13,10 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 using System;
 
-namespace osu.Game.Utils
+namespace osu.Game.Rulesets.Difficulty.Utils
 {
-    public class SpecialFunctions
+    public partial class DifficultyCalculationUtils
     {
-        private const double sqrt2_pi = 2.5066282746310005024157652848110452530069867406099d;
-
         /// <summary>
         /// **************************************
         /// COEFFICIENTS FOR METHOD ErfImp       *
