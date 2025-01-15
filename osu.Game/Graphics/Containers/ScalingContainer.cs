@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -99,6 +100,10 @@ namespace osu.Game.Graphics.Containers
                 this.applyUIScale = applyUIScale;
             }
 
+            [Resolved(canBeNull: true)]
+            [CanBeNull]
+            private OsuGame game { get; set; }
+
             [BackgroundDependencyLoader]
             private void load(OsuConfigManager osuConfig)
             {
@@ -111,6 +116,7 @@ namespace osu.Game.Graphics.Containers
 
             protected override void Update()
             {
+                TargetDrawSize = new Vector2(1024, 1024 / (game?.BaseAspectRatio ?? 1f));
                 Scale = new Vector2(CurrentScale);
                 Size = new Vector2(1 / CurrentScale);
 
