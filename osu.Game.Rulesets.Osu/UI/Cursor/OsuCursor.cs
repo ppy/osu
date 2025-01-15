@@ -36,6 +36,11 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         /// </summary>
         public Vector2 CurrentExpandedScale => skinnableCursor.ExpandTarget?.Scale ?? Vector2.One;
 
+        /// <summary>
+        /// The current rotation of the cursor.
+        /// </summary>
+        public float CurrentRotation => skinnableCursor.ExpandTarget?.Rotation ?? 0;
+
         public IBindable<float> CursorScale => cursorScale;
 
         /// <summary>

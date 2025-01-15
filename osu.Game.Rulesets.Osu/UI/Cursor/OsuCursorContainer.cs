@@ -83,7 +83,10 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             base.Update();
 
             if (cursorTrail.Drawable is CursorTrail trail)
+            {
                 trail.NewPartScale = ActiveCursor.CurrentExpandedScale;
+                trail.PartRotation = ActiveCursor.CurrentRotation;
+            }
         }
 
         public bool OnPressed(KeyBindingPressEvent<OsuAction> e)
