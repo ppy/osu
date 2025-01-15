@@ -37,8 +37,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
 			// to be spaced equally to a base SV 1/4 note
 			double expectedDeltaTime = 21000.0 / effectiveBPM;
 
+			var highVelocity = new VelocityRange(480, 640);
 			var midVelocity = new VelocityRange(360, 480);
-            var highVelocity = new VelocityRange(480, 640);
 			
 			double midVelocityDifficulty = 0.5 * DifficultyCalculationUtils.Logistic(effectiveBPM, midVelocity.Center, 1.0 / (midVelocity.Range / 10));
 
