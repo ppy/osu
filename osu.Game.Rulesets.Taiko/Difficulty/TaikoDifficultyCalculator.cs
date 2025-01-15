@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         private const double stamina_skill_multiplier = 0.375 * difficulty_multiplier;
 
         //The bonus multiplier is a basic multiplier that indicate how strong the impact of Difficulty Factor is.
-        private const double bonus_multiplier = 0.3;
+        private const double bonus_multiplier = 0.4;
 
 
         // The difficulty factor for all the skills interpolated.
@@ -114,7 +114,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             bool isFlashlight = mods.Any(h => h is TaikoModFlashlight);
             bool isHidden = mods.Any(h => h is TaikoModHidden);
 
-            bool isConvert = beatmap.BeatmapInfo.OnlineInfo!.Ruleset.OnlineID != 1;
+            bool isConvert = beatmap.BeatmapInfo.OnlineID != 1;
 
             Rhythm rhythm = (Rhythm)skills.First(x => x is Rhythm);
             Reading reading = (Reading)skills.First(x => x is Reading);
