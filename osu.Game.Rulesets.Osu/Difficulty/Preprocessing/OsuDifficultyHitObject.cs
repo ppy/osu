@@ -215,6 +215,23 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
                 float tailJumpDistance = Vector2.Subtract(lastSlider.TailCircle.StackedPosition, BaseObject.StackedPosition).Length * scalingFactor;
                 MinimumJumpDistance = Math.Max(0, Math.Min(LazyJumpDistance - (maximum_slider_radius - assumed_slider_radius), tailJumpDistance - maximum_slider_radius));
+
+                float distanceBetweenStartPositions = (BaseObject.StackedPosition * scalingFactor - lastObject.StackedPosition * scalingFactor).Length;
+
+                if (MinimumJumpDistance < distanceBetweenStartPositions)
+                {
+                    // MinimumJumpDistance can be sometimes calculated to be ~0 in cases where the player wouldn't move the cursor anywhere and treat the slider as just a normal circle.
+                    //
+                    //        o---<s===>  ← slider (s - start, length smaller than the followcircle)
+                    //        ↑
+                    //    next object
+                    //
+                    // In this case MinimumJumpDistance is calculated to be less than the jump from start of the object to the start of the next one which is impossible.
+                    // Therefore, we set minimal distance and time to be that of a normal start-to-start jump.
+
+                    MinimumJumpTime = StrainTime;
+                    MinimumJumpDistance = Math.Min(LazyJumpDistance, distanceBetweenStartPositions);
+                }
             }
 
             if (lastLastObject != null && !(lastLastObject is Spinner))
