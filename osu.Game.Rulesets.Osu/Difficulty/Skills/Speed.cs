@@ -23,10 +23,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         protected override int ReducedSectionCount => 5;
 
-        public Speed(Mod[] mods)
+        public Speed(Mod[] mods, bool withTapping)
             : base(mods)
         {
+            this.withTapping = withTapping;
         }
+
+        private readonly bool withTapping;
 
         private double strainDecay(double ms) => Math.Pow(strainDecayBase, ms / 1000);
 
@@ -35,7 +38,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         protected override double StrainValueAt(DifficultyHitObject current)
         {
             currentStrain *= strainDecay(((OsuDifficultyHitObject)current).StrainTime);
-            currentStrain += SpeedEvaluator.EvaluateDifficultyOf(current, Mods) * skillMultiplier;
+            currentStrain += SpeedEvaluator.EvaluateDifficultyOf(current, withTapping, Mods) * skillMultiplier;
+
+            if (!withTapping) return currentStrain;
 
             currentRhythm = RhythmEvaluator.EvaluateDifficultyOf(current);
 
