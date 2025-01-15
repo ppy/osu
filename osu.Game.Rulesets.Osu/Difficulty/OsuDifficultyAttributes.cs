@@ -23,8 +23,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         /// <summary>
         /// The difficulty factor corresponding to the aim skill.
         /// </summary>
-        [JsonProperty("aim_difficulty_factor")]
-        public double AimDifficultyFactor { get; set; }
+        [JsonProperty("aim_consistency_factor")]
+        public double AimConsistencyFactor { get; set; }
 
         /// <summary>
         /// The number of <see cref="Slider"/>s weighted by difficulty.
@@ -41,8 +41,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         /// <summary>
         /// The difficulty factor corresponding to the speed skill.
         /// </summary>
-        [JsonProperty("speed_difficulty_factor")]
-        public double SpeedDifficultyFactor { get; set; }
+        [JsonProperty("speed_consistency_factor")]
+        public double SpeedConsistencyFactor { get; set; }
 
         /// <summary>
         /// The number of clickable objects weighted by difficulty.

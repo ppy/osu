@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         /// <summary>
         /// The bonus multiplier is a basic multiplier that indicate how strong the impact of Difficulty Factor is.
         /// </summary>
-        private const double bonus_multiplier = 0.15;
+        private const double bonus_multiplier = 0.3;
 
         /// <summary>
         /// Amount of missed slider tails that don't break combo. Will only be correct on non-classic scores
@@ -187,7 +187,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double approachRateBonus = score.Mods.Any(h => h is OsuModRelax) ? 0.0 : attributes.ApproachRate > 10.33 ? 0.2 * (attributes.ApproachRate - 10.33) : attributes.ApproachRate < 8.0 ? 0.02 * (8.0 - attributes.ApproachRate) : 0.0; //AR bonus for higher and lower AR
 
-            aimValue *= LengthBonusMultiplier(lengthBonusBase, attributes.SpeedDifficultyFactor, bonus_multiplier) * (1.0 + approachRateBonus);
+            aimValue *= lengthBonusBase * LengthBonusMultiplier(0.95, attributes.AimConsistencyFactor, bonus_multiplier) * (1.0 + approachRateBonus);
 
             if (effectiveMissCount > 0)
                 aimValue *= calculateMissPenalty(effectiveMissCount, attributes.AimDifficultStrainCount);
@@ -216,7 +216,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double approachRateBonus = attributes.ApproachRate > 10.33 ? 0.2 * (attributes.ApproachRate - 10.33) : 0.0;
 
-            speedValue *= LengthBonusMultiplier(lengthBonusBase, attributes.SpeedDifficultyFactor, bonus_multiplier) * (1.0 + approachRateBonus);
+            speedValue *= LengthBonusMultiplier(lengthBonusBase, attributes.SpeedConsistencyFactor, bonus_multiplier) * (1.0 + approachRateBonus);
 
             if (effectiveMissCount > 0)
                 speedValue *= calculateMissPenalty(effectiveMissCount, attributes.SpeedDifficultStrainCount);
