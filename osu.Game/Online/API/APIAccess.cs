@@ -112,8 +112,14 @@ namespace osu.Game.Online.API
 
             config.BindWith(OsuSetting.UserOnlineStatus, configStatus);
 
-            // Early call to ensure the local user / "logged in" state is correct immediately.
-            setPlaceholderLocalUser();
+            if (HasLogin)
+            {
+                // Early call to ensure the local user / "logged in" state is correct immediately.
+                setPlaceholderLocalUser();
+
+                // This is required so that Queue() requests during startup sequence don't fail due to "not logged in".
+                state.Value = APIState.Connecting;
+            }
 
             localUser.BindValueChanged(u =>
             {
