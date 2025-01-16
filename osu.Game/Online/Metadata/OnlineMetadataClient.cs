@@ -37,7 +37,6 @@ namespace osu.Game.Online.Metadata
         private IHubClientConnector? connector;
         private Bindable<int> lastQueueId = null!;
         private IBindable<APIUser> localUser = null!;
-
         private IBindable<UserStatus> userStatus = null!;
         private IBindable<UserActivity?> userActivity = null!;
 

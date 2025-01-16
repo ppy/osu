@@ -25,12 +25,12 @@ namespace osu.Game.Online.API
         IBindableList<APIRelation> Friends { get; }
 
         /// <summary>
-        /// The current user's status.
+        /// The status for the current user that's broadcast to other players.
         /// </summary>
-        Bindable<UserStatus> Status { get; }
+        IBindable<UserStatus> Status { get; }
 
         /// <summary>
-        /// The current user's activity.
+        /// The activity for the current user that's broadcast to other players.
         /// </summary>
         IBindable<UserActivity?> Activity { get; }
 
