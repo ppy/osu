@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Development;
@@ -38,7 +39,8 @@ namespace osu.Game.Online.Spectator
         /// <summary>
         /// The states of all users currently being watched by the local user.
         /// </summary>
-        public IBindableDictionary<int, SpectatorState> WatchedUserStates => watchedUserStates;
+        [UsedImplicitly] // Marked virtual due to mock use in testing
+        public virtual IBindableDictionary<int, SpectatorState> WatchedUserStates => watchedUserStates;
 
         /// <summary>
         /// All users who are currently watching the local user.
@@ -58,6 +60,7 @@ namespace osu.Game.Online.Spectator
         /// <summary>
         /// Called whenever new frames arrive from the server.
         /// </summary>
+        [UsedImplicitly] // Marked virtual due to mock use in testing
         public virtual event Action<int, FrameDataBundle>? OnNewFrames;
 
         /// <summary>
