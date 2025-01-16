@@ -11,13 +11,18 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Pooling;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Framework.Logging;
 using osu.Framework.Utils;
 using osu.Game.Graphics.Containers;
+using osu.Game.Input.Bindings;
 using osuTK;
 using osuTK.Graphics;
+using osuTK.Input;
 
 namespace osu.Game.Screens.SelectV2
 {
@@ -121,7 +126,6 @@ namespace osu.Game.Screens.SelectV2
                 },
                 scroll = new CarouselScrollContainer
                 {
-                    RightMouseScrollbar = true,
                     RelativeSizeAxes = Axes.Both,
                     Masking = false,
                 }
@@ -391,7 +395,7 @@ namespace osu.Game.Screens.SelectV2
         /// Implementation of scroll container which handles very large vertical lists by internally using <c>double</c> precision
         /// for pre-display Y values.
         /// </summary>
-        private partial class CarouselScrollContainer : UserTrackingScrollContainer
+        private partial class CarouselScrollContainer : UserTrackingScrollContainer, IKeyBindingHandler<GlobalAction>
         {
             public readonly Container Panels;
 
@@ -466,6 +470,55 @@ namespace osu.Game.Screens.SelectV2
                 foreach (var d in Panels)
                     d.Y = (float)(((ICarouselPanel)d).DrawYPosition + scrollableExtent);
             }
+
+            #region Absolute scrolling
+
+            private bool absoluteScrolling;
+
+            protected override bool IsDragging => base.IsDragging || absoluteScrolling;
+
+            public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+            {
+                switch (e.Action)
+                {
+                    case GlobalAction.AbsoluteScrollSongList:
+
+                        // The default binding for absolute scroll is right mouse button.
+                        // To avoid conflicts with context menus, disallow absolute scroll completely if it looks like things will fall over.
+                        if (e.CurrentState.Mouse.Buttons.Contains(MouseButton.Right)
+                            && GetContainingInputManager()!.HoveredDrawables.OfType<IHasContextMenu>().Any())
+                            return false;
+
+                        ScrollToAbsolutePosition(e.CurrentState.Mouse.Position);
+                        absoluteScrolling = true;
+                        return true;
+                }
+
+                return false;
+            }
+
+            public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
+            {
+                switch (e.Action)
+                {
+                    case GlobalAction.AbsoluteScrollSongList:
+                        absoluteScrolling = false;
+                        break;
+                }
+            }
+
+            protected override bool OnMouseMove(MouseMoveEvent e)
+            {
+                if (absoluteScrolling)
+                {
+                    ScrollToAbsolutePosition(e.CurrentState.Mouse.Position);
+                    return true;
+                }
+
+                return base.OnMouseMove(e);
+            }
+
+            #endregion
         }
 
         private class BoundsCarouselItem : CarouselItem

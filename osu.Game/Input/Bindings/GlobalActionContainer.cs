@@ -204,6 +204,7 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(InputKey.BackSpace, GlobalAction.DeselectAllMods),
             new KeyBinding(new[] { InputKey.Control, InputKey.Up }, GlobalAction.IncreaseModSpeed),
             new KeyBinding(new[] { InputKey.Control, InputKey.Down }, GlobalAction.DecreaseModSpeed),
+            new KeyBinding(new[] { InputKey.MouseRight }, GlobalAction.AbsoluteScrollSongList),
         };
 
         private static IEnumerable<KeyBinding> audioControlKeyBindings => new[]
@@ -490,6 +491,9 @@ namespace osu.Game.Input.Bindings
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorSeekToNextBookmark))]
         EditorSeekToNextBookmark,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.AbsoluteScrollSongList))]
+        AbsoluteScrollSongList
     }
 
     public enum GlobalActionCategory
