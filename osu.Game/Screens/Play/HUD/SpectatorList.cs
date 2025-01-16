@@ -242,10 +242,10 @@ namespace osu.Game.Screens.Play.HUD
         public bool UsesFixedAnchor { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load(SpectatorClient client, Player player)
+        private void load(SpectatorClient client, GameplayState gameplayState)
         {
             ((IBindableList<SpectatorUser>)Spectators).BindTo(client.WatchingUsers);
-            ((IBindable<LocalUserPlayingState>)UserPlayingState).BindTo(player.PlayingState);
+            ((IBindable<LocalUserPlayingState>)UserPlayingState).BindTo(gameplayState.Playing);
         }
     }
 }
