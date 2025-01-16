@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Input.Events;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -37,11 +38,14 @@ namespace osu.Game.Overlays.Login
         /// </summary>
         public Action? RequestHide;
 
-        private readonly Bindable<UserStatus> status = new Bindable<UserStatus>();
         private readonly IBindable<APIState> apiState = new Bindable<APIState>();
+        private readonly Bindable<UserStatus> configUserStatus = new Bindable<UserStatus>();
 
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
+
+        [Resolved]
+        private OsuConfigManager config { get; set; } = null!;
 
         public override RectangleF BoundingBox => bounding ? base.BoundingBox : RectangleF.Empty;
 
@@ -65,11 +69,11 @@ namespace osu.Game.Overlays.Login
         {
             base.LoadComplete();
 
+            config.BindWith(OsuSetting.UserOnlineStatus, configUserStatus);
+            configUserStatus.BindValueChanged(e => updateDropdownCurrent(e.NewValue), true);
+
             apiState.BindTo(api.State);
             apiState.BindValueChanged(onlineStateChanged, true);
-
-            status.BindTo(api.Status);
-            status.BindValueChanged(e => updateDropdownCurrent(e.NewValue), true);
         }
 
         private void onlineStateChanged(ValueChangedEvent<APIState> state) => Schedule(() =>
@@ -148,23 +152,23 @@ namespace osu.Game.Overlays.Login
                         },
                     };
 
-                    updateDropdownCurrent(status.Value);
+                    updateDropdownCurrent(configUserStatus.Value);
                     dropdown.Current.BindValueChanged(action =>
                     {
                         switch (action.NewValue)
                         {
                             case UserAction.Online:
-                                status.Value = UserStatus.Online;
+                                configUserStatus.Value = UserStatus.Online;
                                 dropdown.StatusColour = colours.Green;
                                 break;
 
                             case UserAction.DoNotDisturb:
-                                status.Value = UserStatus.DoNotDisturb;
+                                configUserStatus.Value = UserStatus.DoNotDisturb;
                                 dropdown.StatusColour = colours.Red;
                                 break;
 
                             case UserAction.AppearOffline:
-                                status.Value = UserStatus.Offline;
+                                configUserStatus.Value = UserStatus.Offline;
                                 dropdown.StatusColour = colours.Gray7;
                                 break;
 

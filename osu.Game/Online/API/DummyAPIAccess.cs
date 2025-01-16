@@ -28,7 +28,7 @@ namespace osu.Game.Online.API
 
         public BindableList<APIRelation> Friends { get; } = new BindableList<APIRelation>();
 
-        public Bindable<UserStatus> Status { get; } = new Bindable<UserStatus>(UserStatus.Online);
+        public IBindable<UserStatus> Status { get; } = new Bindable<UserStatus>(UserStatus.Online);
 
         public Bindable<UserActivity?> Activity { get; } = new Bindable<UserActivity?>();
 

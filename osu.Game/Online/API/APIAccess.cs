@@ -60,7 +60,7 @@ namespace osu.Game.Online.API
 
         public IBindable<APIUser> LocalUser => localUser;
         public IBindableList<APIRelation> Friends => friends;
-        public Bindable<UserStatus> Status { get; } = new Bindable<UserStatus>(UserStatus.Online);
+        public IBindable<UserStatus> Status => configStatus;
         public IBindable<UserActivity> Activity => activity;
 
         public INotificationsClient NotificationsClient { get; }
@@ -75,8 +75,8 @@ namespace osu.Game.Online.API
 
         protected bool HasLogin => authentication.Token.Value != null || (!string.IsNullOrEmpty(ProvidedUsername) && !string.IsNullOrEmpty(password));
 
+        private readonly Bindable<UserStatus> configStatus = new Bindable<UserStatus>();
         private readonly CancellationTokenSource cancellationToken = new CancellationTokenSource();
-
         private readonly Logger log;
 
         public APIAccess(OsuGameBase game, OsuConfigManager config, EndpointConfiguration endpointConfiguration, string versionHash)
@@ -108,7 +108,7 @@ namespace osu.Game.Online.API
             authentication.TokenString = config.Get<string>(OsuSetting.Token);
             authentication.Token.ValueChanged += onTokenChanged;
 
-            config.BindWith(OsuSetting.UserOnlineStatus, Status);
+            config.BindWith(OsuSetting.UserOnlineStatus, configStatus);
 
             if (HasLogin)
             {
@@ -591,7 +591,9 @@ namespace osu.Game.Online.API
             password = null;
             SecondFactorCode = null;
             authentication.Clear();
-            Status.Value = UserStatus.Online;
+
+            // Reset the status to be broadcast on the next login, in case multiple players share the same system.
+            configStatus.Value = UserStatus.Online;
 
             // Scheduled prior to state change such that the state changed event is invoked with the correct user and their friends present
             Schedule(() =>
