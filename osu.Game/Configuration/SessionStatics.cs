@@ -10,6 +10,7 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
 using osu.Game.Scoring;
+using osu.Game.Users;
 
 namespace osu.Game.Configuration
 {
@@ -30,6 +31,7 @@ namespace osu.Game.Configuration
             SetDefault(Static.TouchInputActive, RuntimeInfo.IsMobile);
             SetDefault<ScoreInfo>(Static.LastLocalUserScore, null);
             SetDefault<ScoreInfo>(Static.LastAppliedOffsetScore, null);
+            SetDefault<UserActivity>(Static.UserOnlineActivity, null);
         }
 
         /// <summary>
@@ -92,5 +94,7 @@ namespace osu.Game.Configuration
         /// This is reset when a new challenge is up.
         /// </summary>
         DailyChallengeIntroPlayed,
+
+        UserOnlineActivity,
     }
 }

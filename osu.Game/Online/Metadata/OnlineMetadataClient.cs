@@ -34,6 +34,9 @@ namespace osu.Game.Online.Metadata
 
         private readonly string endpoint;
 
+        [Resolved]
+        private IAPIProvider api { get; set; } = null!;
+
         private IHubClientConnector? connector;
         private Bindable<int> lastQueueId = null!;
         private IBindable<APIUser> localUser = null!;
@@ -48,7 +51,7 @@ namespace osu.Game.Online.Metadata
         }
 
         [BackgroundDependencyLoader]
-        private void load(IAPIProvider api, OsuConfigManager config)
+        private void load(OsuConfigManager config, SessionStatics session)
         {
             // Importantly, we are intentionally not using MessagePack here to correctly support derived class serialization.
             // More information on the limitations / reasoning can be found in osu-server-spectator's initialisation code.
@@ -72,11 +75,10 @@ namespace osu.Game.Online.Metadata
                 IsConnected.BindValueChanged(isConnectedChanged, true);
             }
 
-            lastQueueId = config.GetBindable<int>(OsuSetting.LastProcessedMetadataId);
-
             localUser = api.LocalUser.GetBoundCopy();
-            userStatus = api.Status.GetBoundCopy();
-            userActivity = api.Activity.GetBoundCopy()!;
+            lastQueueId = config.GetBindable<int>(OsuSetting.LastProcessedMetadataId);
+            userStatus = config.GetBindable<UserStatus>(OsuSetting.UserOnlineStatus);
+            userActivity = session.GetBindable<UserActivity?>(Static.UserOnlineActivity);
         }
 
         protected override void LoadComplete()
@@ -240,7 +242,14 @@ namespace osu.Game.Online.Metadata
                     throw new OperationCanceledException();
 
                 // must be scheduled before any remote calls to avoid mis-ordering.
-                Schedule(() => userStates.Clear());
+                Schedule(() =>
+                {
+                    bool hadLocalUserState = userStates.TryGetValue(api.LocalUser.Value.OnlineID, out var presence);
+                    userStates.Clear();
+                    if (hadLocalUserState)
+                        userStates[api.LocalUser.Value.OnlineID] = presence;
+                });
+
                 Debug.Assert(connection != null);
                 await connection.InvokeAsync(nameof(IMetadataServer.EndWatchingUserPresence)).ConfigureAwait(false);
                 Logger.Log($@"{nameof(OnlineMetadataClient)} stopped watching user presence", LoggingTarget.Network);
