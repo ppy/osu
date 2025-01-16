@@ -12,7 +12,6 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Online.Notifications.WebSocket;
 using osu.Game.Tests;
-using osu.Game.Users;
 
 namespace osu.Game.Online.API
 {
@@ -27,10 +26,6 @@ namespace osu.Game.Online.API
         });
 
         public BindableList<APIRelation> Friends { get; } = new BindableList<APIRelation>();
-
-        public Bindable<UserStatus> Status { get; } = new Bindable<UserStatus>(UserStatus.Online);
-
-        public Bindable<UserActivity?> Activity { get; } = new Bindable<UserActivity?>();
 
         public DummyNotificationsClient NotificationsClient { get; } = new DummyNotificationsClient();
         INotificationsClient IAPIProvider.NotificationsClient => NotificationsClient;
@@ -197,8 +192,6 @@ namespace osu.Game.Online.API
 
         IBindable<APIUser> IAPIProvider.LocalUser => LocalUser;
         IBindableList<APIRelation> IAPIProvider.Friends => Friends;
-        IBindable<UserStatus> IAPIProvider.Status => Status;
-        IBindable<UserActivity?> IAPIProvider.Activity => Activity;
 
         /// <summary>
         /// Skip 2FA requirement for next login.

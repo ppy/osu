@@ -60,8 +60,6 @@ namespace osu.Game.Online.API
 
         public IBindable<APIUser> LocalUser => localUser;
         public IBindableList<APIRelation> Friends => friends;
-        public IBindable<UserStatus> Status => configStatus;
-        public IBindable<UserActivity> Activity => activity;
 
         public INotificationsClient NotificationsClient { get; }
 
@@ -70,8 +68,6 @@ namespace osu.Game.Online.API
         private Bindable<APIUser> localUser { get; } = new Bindable<APIUser>(createGuestUser());
 
         private BindableList<APIRelation> friends { get; } = new BindableList<APIRelation>();
-
-        private Bindable<UserActivity> activity { get; } = new Bindable<UserActivity>();
 
         protected bool HasLogin => authentication.Token.Value != null || (!string.IsNullOrEmpty(ProvidedUsername) && !string.IsNullOrEmpty(password));
 
