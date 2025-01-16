@@ -41,7 +41,7 @@ namespace osu.Game.Screens.Play.HUD
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            AutoSizeAxes = Axes.Both;
+            AutoSizeAxes = Axes.Y;
 
             InternalChildren = new Drawable[]
             {
@@ -153,6 +153,8 @@ namespace osu.Game.Screens.Play.HUD
         {
             Header.Font = OsuFont.GetFont(Font.Value, 12, FontWeight.Bold);
             Header.Colour = HeaderColour.Value;
+
+            Width = Header.DrawWidth;
         }
 
         private partial class SpectatorListEntry : PoolableDrawable
