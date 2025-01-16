@@ -28,11 +28,6 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         }
 
         /// <summary>
-        /// Value that rappresent the consistency for all <see cref="DifficultyHitObject"/>s that have been processed up to this point in a range number from 0 to 1.
-        /// </summary>
-        public double ConsistencyFactor;
-
-        /// <summary>
         /// Process a <see cref="DifficultyHitObject"/>.
         /// </summary>
         /// <param name="current">The <see cref="DifficultyHitObject"/> to process.</param>

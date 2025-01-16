@@ -80,8 +80,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             if (score.Mods.Any(m => m is ModFlashlight<TaikoHitObject>))
                 difficultyValue *= Math.Max(1, 1.050 - Math.Min(attributes.MonoStaminaFactor / 50, 1));
 
+            //### Commentent for future implementation, consider this as an idea. ###
             // We need to divide the effectiveMissCount by 1 + DifficultyFactor to account for the miss count while considering map consistency.
-            effectiveMissCount /= 1.0 + attributes.TotalConsistencyFactor;
+            //effectiveMissCount /= 1.0 + attributes.TotalConsistencyFactor;
 
             difficultyValue *= Math.Pow(0.986, effectiveMissCount);
 

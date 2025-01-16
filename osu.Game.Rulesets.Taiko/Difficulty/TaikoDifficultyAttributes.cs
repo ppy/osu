@@ -76,6 +76,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             yield return (ATTRIB_ID_GREAT_HIT_WINDOW, GreatHitWindow);
             yield return (ATTRIB_ID_OK_HIT_WINDOW, OkHitWindow);
             yield return (ATTRIB_ID_MONO_STAMINA_FACTOR, MonoStaminaFactor);
+            yield return (ATTRB_ID_TOTAL_CONSISTENCY_FACTOR, TotalConsistencyFactor);
         }
 
         public override void FromDatabaseAttributes(IReadOnlyDictionary<int, double> values, IBeatmapOnlineInfo onlineInfo)

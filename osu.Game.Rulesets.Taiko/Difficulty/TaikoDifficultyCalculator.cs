@@ -108,9 +108,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 return new TaikoDifficultyAttributes { Mods = mods };
 
             bool isRelax = mods.Any(h => h is TaikoModRelax);
-            bool isFlashlight = mods.Any(h => h is TaikoModFlashlight);
-            bool isHidden = mods.Any(h => h is TaikoModHidden);
-
             bool isConvert = beatmap.BeatmapInfo.OnlineID != 1;
 
             Rhythm rhythm = (Rhythm)skills.First(x => x is Rhythm);
@@ -129,11 +126,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             double colourDifficultStrains = colour.CountTopWeightedStrains();
             double readingDifficultStrains = reading.CountTopWeightedStrains();
             double staminaDifficultStrains = stamina.CountTopWeightedStrains();
-
-            rhythmRating *= Math.Pow(beatmap.HitObjects.Count * (0.75 + rhythm.ConsistencyFactor * bonus_multiplier), 0.57) / 1500 + 1.07;
-            readingRating *= Math.Pow(beatmap.HitObjects.Count * (0.75 + reading.ConsistencyFactor * bonus_multiplier), 0.57) / 1500 + 1.07;
-            colourRating *= Math.Pow(beatmap.HitObjects.Count * (0.75 + colour.ConsistencyFactor * bonus_multiplier), 0.57) / 1500 + 1.07;
-            staminaRating *= Math.Pow(beatmap.HitObjects.Count * (0.75 + stamina.ConsistencyFactor * bonus_multiplier), 0.57) / 1500 + 1.07;
 
             double combinedRating = combinedDifficultyValue(rhythm, reading, colour, stamina, isRelax);
             double starRating = rescale(combinedRating * 1.4);
@@ -211,14 +203,14 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                     peaks.Add(peak);
             }
 
-            // We select only the hardest 20% of picks in strains to ensure greater value in the most difficult sections of the map.
+            // We are taking 20% of the top weight spikes in strains to achieve a good perception of the map's peak sections.
             List<double> hardStrains = peaks.OrderDescending().ToList().GetRange(0, peaks.Count / 10 * 2);
 
-            //We select only the moderate 20% of picks in strains to provide greater value in the more moderate sections of the map.
-            List<double> midStrains = peaks.OrderDescending().ToList().GetRange(peaks.Count / 10 * 4, peaks.Count / 10 * 6);
+            // We are taking 20% of the middle weight spikes in strains to achieve a good perception of the map's overall progression.
+            List<double> midStrains = peaks.OrderDescending().ToList().GetRange(peaks.Count / 10 * 4, peaks.Count / 10 * 2);
 
-            // We can calculate the difficulty factor by doing average pick difficulty / max peak difficulty.
-            // It resoult in a value that rappresent the consistency for all peaks (0 excluded) in a range number from 0 to 1.
+            // We can calculate the consitency factor by doing middle weight spikes / most weight spikes.
+            // It resoult in a value that rappresent the consistency for all peaks in a range number from 0 to 1.
             totalConsistencyFactor = midStrains.Average() / hardStrains.Average();
 
             double difficulty = 0;
