@@ -95,7 +95,7 @@ namespace osu.Game.Screens.Play.HUD
                     for (int i = 0; i < e.NewItems!.Count; i++)
                     {
                         var spectator = (Spectator)e.NewItems![i]!;
-                        int index = e.NewStartingIndex + i;
+                        int index = Math.Max(e.NewStartingIndex, 0) + i;
 
                         if (index >= max_spectators_displayed)
                             break;
