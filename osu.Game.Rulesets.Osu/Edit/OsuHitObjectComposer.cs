@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         protected override Drawable CreateHitObjectInspector() => new OsuHitObjectInspector();
 
-        protected override IEnumerable<DrawableTernaryButton> CreateTernaryButtons()
+        protected override IEnumerable<Drawable> CreateTernaryButtons()
             => base.CreateTernaryButtons()
                    .Append(new DrawableTernaryButton
                    {

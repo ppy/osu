@@ -237,22 +237,17 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <summary>
         /// A collection of states which will be displayed to the user in the toolbox.
         /// </summary>
-        public DrawableTernaryButton[] MainTernaryStates { get; private set; }
+        public Drawable[] MainTernaryStates { get; private set; }
 
         public SampleBankTernaryButton[] SampleBankTernaryStates { get; private set; }
 
         /// <summary>
         /// Create all ternary states required to be displayed to the user.
         /// </summary>
-        protected virtual IEnumerable<DrawableTernaryButton> CreateTernaryButtons()
+        protected virtual IEnumerable<Drawable> CreateTernaryButtons()
         {
             //TODO: this should only be enabled (visible?) for rulesets that provide combo-supporting HitObjects.
-            yield return new DrawableTernaryButton
-            {
-                Current = NewCombo,
-                Description = "New combo",
-                CreateIcon = () => new SpriteIcon { Icon = OsuIcon.EditorNewComboA },
-            };
+            yield return new NewComboTernaryButton { Current = NewCombo };
 
             foreach (var kvp in SelectionHandler.SelectionSampleStates)
             {

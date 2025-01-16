@@ -88,7 +88,7 @@ namespace osu.Game.Overlays
             base.UpdateAfterChildren();
 
             // don't block header by applying padding equal to the visible header height
-            loadingContainer.Padding = new MarginPadding { Top = Math.Max(0, Header.Height - ScrollFlow.Current) };
+            loadingContainer.Padding = new MarginPadding { Top = (float)Math.Max(0, Header.Height - ScrollFlow.Current) };
         }
     }
 }

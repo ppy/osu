@@ -4,6 +4,7 @@
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterfaceV2;
@@ -136,7 +137,10 @@ namespace osu.Game.Screens.Edit.Setup
 
             private partial class RomanisedTextBox : InnerTextBox
             {
-                protected override bool AllowIme => false;
+                public RomanisedTextBox()
+                {
+                    InputProperties = new TextInputProperties(TextInputType.Text, false);
+                }
 
                 protected override bool CanAddCharacter(char character)
                     => MetadataUtils.IsRomanised(character);
