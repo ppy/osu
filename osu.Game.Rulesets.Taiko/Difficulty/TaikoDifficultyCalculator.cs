@@ -120,6 +120,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
             double colourDifficultStrains = colour.CountTopWeightedStrains();
             double rhythmDifficultStrains = rhythm.CountTopWeightedStrains();
+            // Due to constraints of strain in cases where difficult strain values don't shift with range changes, we manually apply clockrate.
             double staminaDifficultStrains = stamina.CountTopWeightedStrains() * clockRate;
 
             // As we don't have pattern integration in osu!taiko, we apply the other two skills relative to rhythm.
