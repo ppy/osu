@@ -26,15 +26,16 @@ namespace osu.Game.Online.Metadata
         public override IBindableDictionary<int, UserPresence> UserStates => userStates;
         private readonly BindableDictionary<int, UserPresence> userStates = new BindableDictionary<int, UserPresence>();
 
+        public override IBindableDictionary<int, UserPresence> FriendStates => friendStates;
+        private readonly BindableDictionary<int, UserPresence> friendStates = new BindableDictionary<int, UserPresence>();
+
         public override IBindable<DailyChallengeInfo?> DailyChallengeInfo => dailyChallengeInfo;
         private readonly Bindable<DailyChallengeInfo?> dailyChallengeInfo = new Bindable<DailyChallengeInfo?>();
 
         private readonly string endpoint;
 
         private IHubClientConnector? connector;
-
         private Bindable<int> lastQueueId = null!;
-
         private IBindable<APIUser> localUser = null!;
         private IBindable<UserActivity?> userActivity = null!;
         private IBindable<UserStatus?>? userStatus;
@@ -61,6 +62,7 @@ namespace osu.Game.Online.Metadata
                     // https://github.com/dotnet/aspnetcore/issues/15198
                     connection.On<BeatmapUpdates>(nameof(IMetadataClient.BeatmapSetsUpdated), ((IMetadataClient)this).BeatmapSetsUpdated);
                     connection.On<int, UserPresence?>(nameof(IMetadataClient.UserPresenceUpdated), ((IMetadataClient)this).UserPresenceUpdated);
+                    connection.On<int, UserPresence?>(nameof(IMetadataClient.FriendPresenceUpdated), ((IMetadataClient)this).FriendPresenceUpdated);
                     connection.On<DailyChallengeInfo?>(nameof(IMetadataClient.DailyChallengeUpdated), ((IMetadataClient)this).DailyChallengeUpdated);
                     connection.On<MultiplayerRoomScoreSetEvent>(nameof(IMetadataClient.MultiplayerRoomScoreSet), ((IMetadataClient)this).MultiplayerRoomScoreSet);
                     connection.On(nameof(IStatefulUserHubClient.DisconnectRequested), ((IMetadataClient)this).DisconnectRequested);
@@ -106,6 +108,7 @@ namespace osu.Game.Online.Metadata
                 {
                     isWatchingUserPresence.Value = false;
                     userStates.Clear();
+                    friendStates.Clear();
                     dailyChallengeInfo.Value = null;
                 });
                 return;
@@ -202,6 +205,19 @@ namespace osu.Game.Online.Metadata
                     userStates[userId] = presence.Value;
                 else
                     userStates.Remove(userId);
+            });
+
+            return Task.CompletedTask;
+        }
+
+        public override Task FriendPresenceUpdated(int userId, UserPresence? presence)
+        {
+            Schedule(() =>
+            {
+                if (presence?.Status != null)
+                    friendStates[userId] = presence.Value;
+                else
+                    friendStates.Remove(userId);
             });
 
             return Task.CompletedTask;

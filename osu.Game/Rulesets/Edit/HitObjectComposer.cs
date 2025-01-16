@@ -16,6 +16,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Framework.Logging;
+using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
@@ -371,7 +372,7 @@ namespace osu.Game.Rulesets.Edit
         /// <summary>
         /// Create all ternary states required to be displayed to the user.
         /// </summary>
-        protected virtual IEnumerable<DrawableTernaryButton> CreateTernaryButtons() => BlueprintContainer.MainTernaryStates;
+        protected virtual IEnumerable<Drawable> CreateTernaryButtons() => BlueprintContainer.MainTernaryStates;
 
         /// <summary>
         /// Construct a relevant blueprint container. This will manage hitobject selection/placement input handling and display logic.
@@ -430,7 +431,7 @@ namespace osu.Game.Rulesets.Edit
                 }
                 else
                 {
-                    if (togglesCollection.ElementAtOrDefault(rightIndex) is DrawableTernaryButton button)
+                    if (togglesCollection.ChildrenOfType<DrawableTernaryButton>().ElementAtOrDefault(rightIndex) is DrawableTernaryButton button)
                     {
                         button.Toggle();
                         return true;
