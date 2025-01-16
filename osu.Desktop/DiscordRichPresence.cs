@@ -145,7 +145,7 @@ namespace osu.Desktop
                 if (!client.IsInitialized)
                     return;
 
-                if (status.Value == UserStatus.Offline || privacyMode.Value == DiscordRichPresenceMode.Off)
+                if (!api.IsLoggedIn || status.Value == UserStatus.Offline || privacyMode.Value == DiscordRichPresenceMode.Off)
                 {
                     client.ClearPresence();
                     return;
