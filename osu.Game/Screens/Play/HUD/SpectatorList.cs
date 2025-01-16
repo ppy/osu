@@ -5,8 +5,10 @@ using System;
 using System.Collections.Specialized;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Pooling;
 using osu.Game.Configuration;
@@ -18,6 +20,7 @@ using osu.Game.Localisation.SkinComponents;
 using osu.Game.Online.Spectator;
 using osu.Game.Skinning;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play.HUD
 {
@@ -43,7 +46,7 @@ namespace osu.Game.Screens.Play.HUD
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            AutoSizeAxes = Axes.Both;
+            AutoSizeAxes = Axes.Y;
 
             InternalChildren = new[]
             {
@@ -51,8 +54,6 @@ namespace osu.Game.Screens.Play.HUD
                 mainFlow = new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Both,
-                    AutoSizeDuration = 250,
-                    AutoSizeEasing = Easing.OutQuint,
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
@@ -84,6 +85,8 @@ namespace osu.Game.Screens.Play.HUD
             Font.BindValueChanged(_ => updateAppearance());
             HeaderColour.BindValueChanged(_ => updateAppearance(), true);
             FinishTransforms(true);
+
+            this.FadeInFromZero(200, Easing.OutQuint);
         }
 
         private void onSpectatorsChanged(object? sender, NotifyCollectionChangedEventArgs e)
@@ -95,16 +98,12 @@ namespace osu.Game.Screens.Play.HUD
                     for (int i = 0; i < e.NewItems!.Count; i++)
                     {
                         var spectator = (SpectatorUser)e.NewItems![i]!;
-                        int index = e.NewStartingIndex + i;
+                        int index = Math.Max(e.NewStartingIndex, 0) + i;
 
                         if (index >= max_spectators_displayed)
                             break;
 
-                        spectatorsFlow.Insert(e.NewStartingIndex + i, pool.Get(entry =>
-                        {
-                            entry.Current.Value = spectator;
-                            entry.UserPlayingState = UserPlayingState;
-                        }));
+                        addNewSpectatorToList(index, spectator);
                     }
 
                     break;
@@ -120,14 +119,7 @@ namespace osu.Game.Screens.Play.HUD
                     if (Spectators.Count >= max_spectators_displayed && spectatorsFlow.Count < max_spectators_displayed)
                     {
                         for (int i = spectatorsFlow.Count; i < max_spectators_displayed; i++)
-                        {
-                            var spectator = Spectators[i];
-                            spectatorsFlow.Insert(i, pool.Get(entry =>
-                            {
-                                entry.Current.Value = spectator;
-                                entry.UserPlayingState = UserPlayingState;
-                            }));
-                        }
+                            addNewSpectatorToList(i, Spectators[i]);
                     }
 
                     break;
@@ -145,6 +137,24 @@ namespace osu.Game.Screens.Play.HUD
 
             Header.Text = SpectatorListStrings.SpectatorCount(Spectators.Count).ToUpper();
             updateVisibility();
+
+            for (int i = 0; i < spectatorsFlow.Count; i++)
+            {
+                spectatorsFlow[i].Colour = i < max_spectators_displayed - 1
+                    ? Color4.White
+                    : ColourInfo.GradientVertical(Color4.White, Color4.White.Opacity(0));
+            }
+        }
+
+        private void addNewSpectatorToList(int i, SpectatorUser spectator)
+        {
+            var entry = pool.Get(entry =>
+            {
+                entry.Current.Value = spectator;
+                entry.UserPlayingState = UserPlayingState;
+            });
+
+            spectatorsFlow.Insert(i, entry);
         }
 
         private void updateVisibility()
@@ -156,6 +166,8 @@ namespace osu.Game.Screens.Play.HUD
         {
             Header.Font = OsuFont.GetFont(Font.Value, 12, FontWeight.Bold);
             Header.Colour = HeaderColour.Value;
+
+            Width = Header.DrawWidth;
         }
 
         private partial class SpectatorListEntry : PoolableDrawable
@@ -192,6 +204,17 @@ namespace osu.Game.Screens.Play.HUD
                 base.LoadComplete();
                 UserPlayingState.BindValueChanged(_ => updateEnabledState());
                 Current.BindValueChanged(_ => updateState(), true);
+            }
+
+            protected override void PrepareForUse()
+            {
+                base.PrepareForUse();
+
+                username.MoveToX(10)
+                        .Then()
+                        .MoveToX(0, 400, Easing.OutQuint);
+
+                this.FadeInFromZero(400, Easing.OutQuint);
             }
 
             private void updateState()
