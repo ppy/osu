@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
-using osu.Framework.Input.Events;
+using osuTK;
 
 namespace osu.Game.Graphics.Containers
 {
@@ -47,10 +47,10 @@ namespace osu.Game.Graphics.Containers
             base.ScrollIntoView(target, animated);
         }
 
-        protected override void ScrollFromMouseEvent(MouseEvent e)
+        protected override void ScrollToAbsolutePosition(Vector2 screenSpacePosition)
         {
             UserScrolling = true;
-            base.ScrollFromMouseEvent(e);
+            base.ScrollToAbsolutePosition(screenSpacePosition);
         }
 
         public new void ScrollTo(double value, bool animated = true, double? distanceDecay = null)

@@ -14,6 +14,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Pooling;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
@@ -208,7 +209,6 @@ namespace osu.Game.Screens.Select
                     setPool,
                     Scroll = new CarouselScrollContainer
                     {
-                        RightMouseScrollbar = true,
                         RelativeSizeAxes = Axes.Both,
                     },
                     noResultsPlaceholder = new NoResultsPlaceholder()
@@ -1157,10 +1157,8 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        public partial class CarouselScrollContainer : UserTrackingScrollContainer<DrawableCarouselItem>
+        public partial class CarouselScrollContainer : UserTrackingScrollContainer<DrawableCarouselItem>, IKeyBindingHandler<GlobalAction>
         {
-            private bool rightMouseScrollBlocked;
-
             public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
             public CarouselScrollContainer()
@@ -1172,30 +1170,53 @@ namespace osu.Game.Screens.Select
                 Masking = false;
             }
 
-            protected override bool OnMouseDown(MouseDownEvent e)
+            #region Absolute scrolling
+
+            private bool absoluteScrolling;
+
+            protected override bool IsDragging => base.IsDragging || absoluteScrolling;
+
+            public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
             {
-                if (e.Button == MouseButton.Right)
+                switch (e.Action)
                 {
-                    // we need to block right click absolute scrolling when hovering a carousel item so context menus can display.
-                    // this can be reconsidered when we have an alternative to right click scrolling.
-                    if (GetContainingInputManager()!.HoveredDrawables.OfType<DrawableCarouselItem>().Any())
-                    {
-                        rightMouseScrollBlocked = true;
-                        return false;
-                    }
+                    case GlobalAction.AbsoluteScrollSongList:
+                        // The default binding for absolute scroll is right mouse button.
+                        // To avoid conflicts with context menus, disallow absolute scroll completely if it looks like things will fall over.
+                        if (e.CurrentState.Mouse.Buttons.Contains(MouseButton.Right)
+                            && GetContainingInputManager()!.HoveredDrawables.OfType<IHasContextMenu>().Any())
+                            return false;
+
+                        ScrollToAbsolutePosition(e.CurrentState.Mouse.Position);
+                        absoluteScrolling = true;
+                        return true;
                 }
 
-                rightMouseScrollBlocked = false;
-                return base.OnMouseDown(e);
+                return false;
             }
 
-            protected override bool OnDragStart(DragStartEvent e)
+            public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
             {
-                if (rightMouseScrollBlocked)
-                    return false;
-
-                return base.OnDragStart(e);
+                switch (e.Action)
+                {
+                    case GlobalAction.AbsoluteScrollSongList:
+                        absoluteScrolling = false;
+                        break;
+                }
             }
+
+            protected override bool OnMouseMove(MouseMoveEvent e)
+            {
+                if (absoluteScrolling)
+                {
+                    ScrollToAbsolutePosition(e.CurrentState.Mouse.Position);
+                    return true;
+                }
+
+                return base.OnMouseMove(e);
+            }
+
+            #endregion
 
             protected override ScrollbarContainer CreateScrollbar(Direction direction)
             {
