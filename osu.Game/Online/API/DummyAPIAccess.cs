@@ -197,6 +197,7 @@ namespace osu.Game.Online.API
 
         IBindable<APIUser> IAPIProvider.LocalUser => LocalUser;
         IBindableList<APIRelation> IAPIProvider.Friends => Friends;
+        IBindable<UserStatus> IAPIProvider.Status => Status;
         IBindable<UserActivity?> IAPIProvider.Activity => Activity;
 
         /// <summary>

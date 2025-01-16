@@ -443,7 +443,12 @@ namespace osu.Game.Configuration
         EditorShowSpeedChanges,
         TouchDisableGameplayTaps,
         ModSelectTextSearchStartsActive,
+
+        /// <summary>
+        /// The status for the current user to broadcast to other players.
+        /// </summary>
         UserOnlineStatus,
+
         MultiplayerRoomFilter,
         HideCountryFlags,
         EditorTimelineShowTimingChanges,
