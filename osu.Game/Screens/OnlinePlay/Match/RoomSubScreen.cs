@@ -523,19 +523,21 @@ namespace osu.Game.Screens.OnlinePlay.Match
             if (!this.IsCurrentScreen() || SelectedItem.Value is not PlaylistItem)
                 return;
 
-            if (UserStyleDisplayContainer != null)
-            {
-                PlaylistItem gameplayItem = SelectedItem.Value.With(
-                    ruleset: GetGameplayRuleset().OnlineID,
-                    beatmap: new Optional<IBeatmapInfo>(GetGameplayBeatmap()));
+            if (UserStyleDisplayContainer == null)
+                return;
 
-                UserStyleDisplayContainer.Child = new DrawableRoomPlaylistItem(gameplayItem)
-                {
-                    AllowReordering = false,
-                    AllowEditing = true,
-                    RequestEdit = _ => OpenStyleSelection()
-                };
-            }
+            PlaylistItem gameplayItem = SelectedItem.Value.With(ruleset: GetGameplayRuleset().OnlineID, beatmap: new Optional<IBeatmapInfo>(GetGameplayBeatmap()));
+            PlaylistItem? currentItem = UserStyleDisplayContainer.SingleOrDefault()?.Item;
+
+            if (gameplayItem.Equals(currentItem))
+                return;
+
+            UserStyleDisplayContainer.Child = new DrawableRoomPlaylistItem(gameplayItem)
+            {
+                AllowReordering = false,
+                AllowEditing = true,
+                RequestEdit = _ => OpenStyleSelection()
+            };
         }
 
         protected virtual APIMod[] GetGameplayMods()
