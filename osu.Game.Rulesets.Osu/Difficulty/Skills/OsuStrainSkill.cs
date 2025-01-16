@@ -6,25 +6,11 @@ using System.Collections.Generic;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
 using System.Linq;
-using osu.Framework.Utils;
-using SharpCompress;
-using osu.Framework.Extensions.ObjectExtensions;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
     public abstract class OsuStrainSkill : StrainSkill
     {
-        /// <summary>
-        /// The number of sections with the highest strains, which the peak strain reductions will apply to.
-        /// This is done in order to decrease their impact on the overall difficulty of the map for this skill.
-        /// </summary>
-        protected virtual int ReducedSectionCount => 10;
-
-        /// <summary>
-        /// The baseline multiplier applied to the section with the biggest strain.
-        /// </summary>
-        protected virtual double ReducedStrainBaseline => 0.75;
-
         protected OsuStrainSkill(Mod[] mods)
             : base(mods)
         {
@@ -39,21 +25,19 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             // These sections will not contribute to the difficulty.
             var peaks = GetCurrentStrainPeaks().Where(p => p > 0);
 
-            List<double> strains = peaks.OrderDescending().ToList();
+            // We are taking 20% of the top weight spikes in strains to achieve a good perception of the map's peak sections.
+            List<double> hardStrains = peaks.OrderDescending().ToList().GetRange(0, peaks.Count() / 10 * 2);
 
-            // We select only the hardest 20% of picks in strains to ensure greater value in the most difficult sections of the map.
-            List<double> hardStrains = strains.OrderDescending().ToList().GetRange(0, strains.Count / 10 * 2);
+            // We are taking 20% of the middle weight spikes in strains to achieve a good perception of the map's overall progression.
+            List<double> midStrains = peaks.OrderDescending().ToList().GetRange(peaks.Count() / 10 * 4, peaks.Count() / 10 * 2);
 
-            //We select only the moderate 20% of picks in strains to provide greater value in the more moderate sections of the map.
-            List<double> midStrains = strains.OrderDescending().ToList().GetRange(strains.Count / 10 * 4, strains.Count / 10 * 6);
-
-            // We can calculate the difficulty factor by doing average pick difficulty / max peak difficulty.
-            // It resoult in a value that rappresent the consistency for all peaks (0 excluded) in a range number from 0 to 1.
+            // We can calculate the consitency factor by doing middle weight spikes / most weight spikes.
+            // It resoult in a value that rappresent the consistency for all peaks in a range number from 0 to 1.
             ConsistencyFactor = midStrains.Average() / hardStrains.Average();
 
             // Difficulty is the weighted sum of the highest strains from every section.
             // We're sorting from highest to lowest strain.
-            foreach (double strain in strains.OrderDescending())
+            foreach (double strain in peaks.OrderDescending())
             {
                 difficulty += strain * weight;
                 weight *= DecayWeight;

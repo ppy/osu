@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Game.Beatmaps;
@@ -33,10 +32,5 @@ namespace osu.Game.Rulesets.Difficulty
         /// <param name="score">The score to create the attributes for.</param>
         /// <param name="attributes">The difficulty attributes for the beatmap relating to the score.</param>
         protected abstract PerformanceAttributes CreatePerformanceAttributes(ScoreInfo score, DifficultyAttributes attributes);
-
-        /// <summary>
-        /// Calculating the length bonus as a multiplier considering also the Difficulty Factor.
-        /// </summary>
-        protected virtual double LengthBonusMultiplier(double lengthBonusBase, double difficultyFactor, double multiplierDifficultyFactor) => Math.Max(lengthBonusBase * (0.95 + difficultyFactor * multiplierDifficultyFactor), 1.0);
     }
 }

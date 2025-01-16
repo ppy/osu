@@ -128,10 +128,6 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             // These sections will not contribute to the difficulty.
             var peaks = GetCurrentStrainPeaks().Where(p => p > 0);
 
-            // We can calculate the difficulty factor by doing average pick difficulty / max peak difficulty.
-            // It resoult in a value that rappresent the consistency for all peaks (0 excluded) in a range number from 0 to 1.
-            ConsistencyFactor = peaks.Average() / peaks.Max();
-
             // Difficulty is the weighted sum of the highest strains from every section.
             // We're sorting from highest to lowest strain.
             foreach (double strain in peaks.OrderDescending())

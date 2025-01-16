@@ -25,11 +25,6 @@ namespace osu.Game.Rulesets.Difficulty
     public abstract class DifficultyCalculator
     {
         /// <summary>
-        /// Calculating the length bonus as a multiplier considering also the Difficulty Factor.
-        /// </summary>
-        protected virtual double LengthBonusMultiplier(double offsetLengthBonus, double difficultyFactor, double multiplierDifficultyFactor) => offsetLengthBonus + difficultyFactor * multiplierDifficultyFactor;
-
-        /// <summary>
         /// The beatmap for which difficulty will be calculated.
         /// </summary>
         protected IBeatmap Beatmap { get; private set; }

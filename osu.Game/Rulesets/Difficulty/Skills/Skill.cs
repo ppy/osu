@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         }
 
         /// <summary>
-        /// Value that rappresent the consistency for all <see cref="DifficultyHitObject"/>s (0 excluded) that have been processed up to this point in a range number from 0 to 1.
+        /// Value that rappresent the consistency for all <see cref="DifficultyHitObject"/>s that have been processed up to this point in a range number from 0 to 1.
         /// </summary>
         public double ConsistencyFactor;
 

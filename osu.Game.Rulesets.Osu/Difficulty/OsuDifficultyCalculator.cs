@@ -24,6 +24,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
     {
         private const double difficulty_multiplier = 0.0675;
 
+        //The bonus multiplier is a basic multiplier that indicate how strong the impact of Difficulty Factor is.
+        private const double bonus_multiplier = 0.6;
+
         public override int Version => 20241007;
 
         public OsuDifficultyCalculator(IRulesetInfo ruleset, IWorkingBeatmap beatmap)
@@ -48,6 +51,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             if (mods.Any(h => h is OsuModFlashlight))
                 flashlightRating = Math.Sqrt(skills[3].DifficultyValue()) * difficulty_multiplier;
+
+            double speedApproachRateBonus = beatmap.Difficulty.ApproachRate > 10.33 ? 0.2 * (beatmap.Difficulty.ApproachRate - 10.33) : 0.0; //AR bonus for higher AR;
+            double aimApproachRateBonus = beatmap.Difficulty.ApproachRate > 10.33 ? 0.2 * (beatmap.Difficulty.ApproachRate - 10.33) : beatmap.Difficulty.ApproachRate < 8.0 ? 0.02 * (8.0 - beatmap.Difficulty.ApproachRate) : 0.0; //AR bonus for higher and lower AR;
+
+            aimRating *= (Math.Pow(beatmap.HitObjects.Count * (0.7 + skills[0].ConsistencyFactor * bonus_multiplier), 0.54) / 1500 + 1.0) * (1.0 + aimApproachRateBonus);
+            aimRatingNoSliders *= (Math.Pow(beatmap.HitObjects.Count * (0.7 + skills[1].ConsistencyFactor * bonus_multiplier), 0.54) / 1500 + 1.0) * (1.0 + aimApproachRateBonus);
+            speedRating *= (Math.Pow(beatmap.HitObjects.Count * (0.7 + skills[2].ConsistencyFactor * bonus_multiplier), 0.54) / 1500 + 1.07) * (1.0 + speedApproachRateBonus);
+            if (mods.Any(h => h is OsuModFlashlight))
+                flashlightRating *= Math.Pow(beatmap.HitObjects.Count * (0.7 + skills[3].ConsistencyFactor * bonus_multiplier), 0.53) / 1500 + 1.0;
 
             double sliderFactor = aimRating > 0 ? aimRatingNoSliders / aimRating : 1;
 
@@ -110,10 +122,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 StarRating = starRating,
                 Mods = mods,
                 AimDifficulty = aimRating,
-                AimConsistencyFactor = aimConsistencyFactor,
+                AimConsistencyFactor = skills[0].ConsistencyFactor,
                 AimDifficultSliderCount = difficultSliders,
                 SpeedDifficulty = speedRating,
-                SpeedConsistencyFactor = speedConsistencyFactor,
+                SpeedConsistencyFactor = skills[2].ConsistencyFactor,
                 SpeedNoteCount = speedNotes,
                 FlashlightDifficulty = flashlightRating,
                 SliderFactor = sliderFactor,
