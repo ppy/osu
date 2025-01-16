@@ -104,7 +104,18 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
         private double computeAccuracyValue(ScoreInfo score, TaikoDifficultyAttributes attributes, bool isConvert)
         {
-            return attributes.GreatHitWindow <= 0 || estimatedUnstableRate == null ? 0.0 : Math.Pow(70 / estimatedUnstableRate.Value, 1.1) * Math.Pow(attributes.StarRating, 0.4) * 100.0;
+            if (attributes.GreatHitWindow <= 0 || estimatedUnstableRate == null)
+                return 0;
+
+            double accuracyValue = Math.Pow(70 / estimatedUnstableRate.Value, 1.1) * Math.Pow(attributes.StarRating, 0.4) * 100.0;
+
+            double lengthBonus = Math.Min(1.15, Math.Pow(totalHits / 1500.0, 0.3));
+
+            // Slight HDFL Bonus for accuracy. A clamp is used to prevent against negative values.
+            if (score.Mods.Any(m => m is ModFlashlight<TaikoHitObject>) && score.Mods.Any(m => m is ModHidden) && !isConvert)
+                accuracyValue *= Math.Max(1.0, 1.05 * lengthBonus);
+
+            return accuracyValue;
         }
 
         /// <summary>
