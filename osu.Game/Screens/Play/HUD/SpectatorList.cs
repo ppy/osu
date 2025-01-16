@@ -5,8 +5,10 @@ using System;
 using System.Collections.Specialized;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Pooling;
 using osu.Game.Configuration;
@@ -16,6 +18,7 @@ using osu.Game.Online.Chat;
 using osu.Game.Users;
 using osu.Game.Localisation.HUD;
 using osu.Game.Localisation.SkinComponents;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play.HUD
 {
@@ -142,6 +145,13 @@ namespace osu.Game.Screens.Play.HUD
 
             Header.Text = SpectatorListStrings.SpectatorCount(Spectators.Count).ToUpper();
             updateVisibility();
+
+            for (int i = 0; i < spectatorsFlow.Count; i++)
+            {
+                spectatorsFlow[i].Colour = i < max_spectators_displayed - 1
+                    ? Color4.White
+                    : ColourInfo.GradientVertical(Color4.White, Color4.White.Opacity(0));
+            }
         }
 
         private void updateVisibility()
