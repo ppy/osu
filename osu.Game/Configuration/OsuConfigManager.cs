@@ -170,8 +170,6 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.ScreenshotFormat, ScreenshotFormat.Jpg);
             SetDefault(OsuSetting.ScreenshotCaptureMenuCursor, false);
 
-            SetDefault(OsuSetting.SongSelectRightMouseScroll, false);
-
             SetDefault(OsuSetting.Scaling, ScalingMode.Off);
             SetDefault(OsuSetting.SafeAreaConsiderations, true);
             SetDefault(OsuSetting.ScalingBackgroundDim, 0.9f, 0.5f, 1f, 0.01f);
@@ -401,7 +399,6 @@ namespace osu.Game.Configuration
         Skin,
         ScreenshotFormat,
         ScreenshotCaptureMenuCursor,
-        SongSelectRightMouseScroll,
         BeatmapSkins,
         BeatmapColours,
         BeatmapHitsounds,

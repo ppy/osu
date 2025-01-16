@@ -184,8 +184,6 @@ namespace osu.Game.Screens.Select
         private readonly Cached itemsCache = new Cached();
         private PendingScrollOperation pendingScrollOperation = PendingScrollOperation.None;
 
-        public Bindable<bool> RightClickScrollingEnabled = new Bindable<bool>();
-
         public Bindable<RandomSelectAlgorithm> RandomAlgorithm = new Bindable<RandomSelectAlgorithm>();
         private readonly List<CarouselBeatmapSet> previouslyVisitedRandomSets = new List<CarouselBeatmapSet>();
         private readonly List<CarouselBeatmap> randomSelectedBeatmaps = new List<CarouselBeatmap>();
@@ -210,6 +208,7 @@ namespace osu.Game.Screens.Select
                     setPool,
                     Scroll = new CarouselScrollContainer
                     {
+                        RightMouseScrollbar = true,
                         RelativeSizeAxes = Axes.Both,
                     },
                     noResultsPlaceholder = new NoResultsPlaceholder()
@@ -226,9 +225,6 @@ namespace osu.Game.Screens.Select
             randomSelectSample = audio.Samples.Get(@"SongSelect/select-random");
 
             config.BindWith(OsuSetting.RandomSelectAlgorithm, RandomAlgorithm);
-            config.BindWith(OsuSetting.SongSelectRightMouseScroll, RightClickScrollingEnabled);
-
-            RightClickScrollingEnabled.BindValueChanged(enabled => Scroll.RightMouseScrollbar = enabled.NewValue, true);
 
             detachedBeatmapSets = beatmaps.GetBeatmapSets(cancellationToken);
             detachedBeatmapSets.BindCollectionChanged(beatmapSetsChanged);
