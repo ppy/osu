@@ -121,6 +121,7 @@ namespace osu.Game.Screens.SelectV2
                 },
                 scroll = new CarouselScrollContainer
                 {
+                    RightMouseScrollbar = true,
                     RelativeSizeAxes = Axes.Both,
                     Masking = false,
                 }
@@ -390,7 +391,7 @@ namespace osu.Game.Screens.SelectV2
         /// Implementation of scroll container which handles very large vertical lists by internally using <c>double</c> precision
         /// for pre-display Y values.
         /// </summary>
-        private partial class CarouselScrollContainer : OsuScrollContainer
+        private partial class CarouselScrollContainer : UserTrackingScrollContainer
         {
             public readonly Container Panels;
 
