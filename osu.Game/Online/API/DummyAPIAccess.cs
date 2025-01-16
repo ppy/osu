@@ -28,7 +28,7 @@ namespace osu.Game.Online.API
 
         public BindableList<APIRelation> Friends { get; } = new BindableList<APIRelation>();
 
-        public IBindable<UserStatus> Status { get; } = new Bindable<UserStatus>(UserStatus.Online);
+        public Bindable<UserStatus> Status { get; } = new Bindable<UserStatus>(UserStatus.Online);
 
         public Bindable<UserActivity?> Activity { get; } = new Bindable<UserActivity?>();
 
@@ -197,6 +197,7 @@ namespace osu.Game.Online.API
 
         IBindable<APIUser> IAPIProvider.LocalUser => LocalUser;
         IBindableList<APIRelation> IAPIProvider.Friends => Friends;
+        IBindable<UserStatus> IAPIProvider.Status => Status;
         IBindable<UserActivity?> IAPIProvider.Activity => Activity;
 
         /// <summary>
