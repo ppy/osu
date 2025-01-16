@@ -33,17 +33,21 @@ namespace osu.Game.Tests.Visual.Gameplay
             });
 
             AddStep("start playing", () => localUserPlayingState.Value = LocalUserPlayingState.Playing);
-            AddStep("add a user", () =>
+
+            AddRepeatStep("add a user", () =>
             {
                 int id = Interlocked.Increment(ref counter);
                 spectators.Add(new SpectatorList.Spectator(id, $"User {id}"));
-            });
-            AddStep("remove random user", () => spectators.RemoveAt(RNG.Next(0, spectators.Count)));
-            AddStep("enter break", () => localUserPlayingState.Value = LocalUserPlayingState.Break);
-            AddStep("stop playing", () => localUserPlayingState.Value = LocalUserPlayingState.NotPlaying);
+            }, 10);
+
+            AddRepeatStep("remove random user", () => spectators.RemoveAt(RNG.Next(0, spectators.Count)), 5);
+
             AddStep("change font to venera", () => list.Font.Value = Typeface.Venera);
             AddStep("change font to torus", () => list.Font.Value = Typeface.Torus);
             AddStep("change header colour", () => list.HeaderColour.Value = new Colour4(RNG.NextSingle(), RNG.NextSingle(), RNG.NextSingle(), 1));
+
+            AddStep("enter break", () => localUserPlayingState.Value = LocalUserPlayingState.Break);
+            AddStep("stop playing", () => localUserPlayingState.Value = LocalUserPlayingState.NotPlaying);
         }
     }
 }
