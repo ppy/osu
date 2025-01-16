@@ -9,7 +9,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Online;
-using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Metadata;
 using osu.Game.Overlays;
@@ -188,33 +187,26 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestLocalUserActivity()
         {
-            AddStep("idle", () => setLocalUserPresence(UserStatus.Online, null));
-            AddStep("watching replay", () => setLocalUserPresence(UserStatus.Online, new UserActivity.WatchingReplay(createScore(@"nats"))));
-            AddStep("spectating user", () => setLocalUserPresence(UserStatus.Online, new UserActivity.SpectatingUser(createScore(@"mrekk"))));
-            AddStep("solo (osu!)", () => setLocalUserPresence(UserStatus.Online, soloGameStatusForRuleset(0)));
-            AddStep("solo (osu!taiko)", () => setLocalUserPresence(UserStatus.Online, soloGameStatusForRuleset(1)));
-            AddStep("solo (osu!catch)", () => setLocalUserPresence(UserStatus.Online, soloGameStatusForRuleset(2)));
-            AddStep("solo (osu!mania)", () => setLocalUserPresence(UserStatus.Online, soloGameStatusForRuleset(3)));
-            AddStep("choosing", () => setLocalUserPresence(UserStatus.Online, new UserActivity.ChoosingBeatmap()));
-            AddStep("editing beatmap", () => setLocalUserPresence(UserStatus.Online, new UserActivity.EditingBeatmap(new BeatmapInfo())));
-            AddStep("modding beatmap", () => setLocalUserPresence(UserStatus.Online, new UserActivity.ModdingBeatmap(new BeatmapInfo())));
-            AddStep("testing beatmap", () => setLocalUserPresence(UserStatus.Online, new UserActivity.TestingBeatmap(new BeatmapInfo())));
-            AddStep("set offline status", () => setLocalUserPresence(UserStatus.Offline, null));
+            AddStep("idle", () => setPresence(UserStatus.Online, null, API.LocalUser.Value.OnlineID));
+            AddStep("watching replay", () => setPresence(UserStatus.Online, new UserActivity.WatchingReplay(createScore(@"nats")), API.LocalUser.Value.OnlineID));
+            AddStep("spectating user", () => setPresence(UserStatus.Online, new UserActivity.SpectatingUser(createScore(@"mrekk")), API.LocalUser.Value.OnlineID));
+            AddStep("solo (osu!)", () => setPresence(UserStatus.Online, soloGameStatusForRuleset(0), API.LocalUser.Value.OnlineID));
+            AddStep("solo (osu!taiko)", () => setPresence(UserStatus.Online, soloGameStatusForRuleset(1), API.LocalUser.Value.OnlineID));
+            AddStep("solo (osu!catch)", () => setPresence(UserStatus.Online, soloGameStatusForRuleset(2), API.LocalUser.Value.OnlineID));
+            AddStep("solo (osu!mania)", () => setPresence(UserStatus.Online, soloGameStatusForRuleset(3), API.LocalUser.Value.OnlineID));
+            AddStep("choosing", () => setPresence(UserStatus.Online, new UserActivity.ChoosingBeatmap(), API.LocalUser.Value.OnlineID));
+            AddStep("editing beatmap", () => setPresence(UserStatus.Online, new UserActivity.EditingBeatmap(new BeatmapInfo()), API.LocalUser.Value.OnlineID));
+            AddStep("modding beatmap", () => setPresence(UserStatus.Online, new UserActivity.ModdingBeatmap(new BeatmapInfo()), API.LocalUser.Value.OnlineID));
+            AddStep("testing beatmap", () => setPresence(UserStatus.Online, new UserActivity.TestingBeatmap(new BeatmapInfo()), API.LocalUser.Value.OnlineID));
+            AddStep("set offline status", () => setPresence(UserStatus.Offline, null, API.LocalUser.Value.OnlineID));
         }
 
-        private void setPresence(UserStatus status, UserActivity? activity)
+        private void setPresence(UserStatus status, UserActivity? activity, int? userId = null)
         {
             if (status == UserStatus.Offline)
-                metadataClient.UserPresenceUpdated(panel.User.OnlineID, null);
+                metadataClient.UserPresenceUpdated(userId ?? panel.User.OnlineID, null);
             else
-                metadataClient.UserPresenceUpdated(panel.User.OnlineID, new UserPresence { Status = status, Activity = activity });
-        }
-
-        private void setLocalUserPresence(UserStatus status, UserActivity? activity)
-        {
-            DummyAPIAccess dummyAPI = (DummyAPIAccess)API;
-            dummyAPI.Status.Value = status;
-            dummyAPI.Activity.Value = activity;
+                metadataClient.UserPresenceUpdated(userId ?? panel.User.OnlineID, new UserPresence { Status = status, Activity = activity });
         }
 
         private UserActivity soloGameStatusForRuleset(int rulesetId) => new UserActivity.InSoloGame(new BeatmapInfo(), rulesetStore.GetRuleset(rulesetId)!);

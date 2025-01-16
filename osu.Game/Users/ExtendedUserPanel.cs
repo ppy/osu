@@ -94,13 +94,7 @@ namespace osu.Game.Users
 
         private void updatePresence()
         {
-            UserPresence? presence;
-
-            if (User.Equals(api?.LocalUser.Value))
-                presence = new UserPresence { Status = api.Status.Value, Activity = api.Activity.Value };
-            else
-                presence = metadata?.GetPresence(User.OnlineID);
-
+            UserPresence? presence = metadata?.GetPresence(User.OnlineID);
             UserStatus status = presence?.Status ?? UserStatus.Offline;
             UserActivity? activity = presence?.Activity;
 
