@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Online;
+using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Metadata;
 using osu.Game.Overlays;
@@ -112,7 +113,11 @@ namespace osu.Game.Tests.Visual.Online
                                 CountryCode = CountryCode.AU,
                                 CoverUrl = @"https://assets.ppy.sh/user-profile-covers/8195163/4a8e2ad5a02a2642b631438cfa6c6bd7e2f9db289be881cb27df18331f64144c.jpeg",
                                 Statistics = new UserStatistics { GlobalRank = null, CountryRank = null }
-                            }) { Width = 300 }
+                            }) { Width = 300 },
+                            new UserGridPanel(API.LocalUser.Value)
+                            {
+                                Width = 300
+                            }
                         }
                     }
                 }
@@ -180,12 +185,36 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("set statistics to empty", () => statisticsProvider.UpdateStatistics(new UserStatistics(), Ruleset.Value));
         }
 
+        [Test]
+        public void TestLocalUserActivity()
+        {
+            AddStep("idle", () => setLocalUserPresence(UserStatus.Online, null));
+            AddStep("watching replay", () => setLocalUserPresence(UserStatus.Online, new UserActivity.WatchingReplay(createScore(@"nats"))));
+            AddStep("spectating user", () => setLocalUserPresence(UserStatus.Online, new UserActivity.SpectatingUser(createScore(@"mrekk"))));
+            AddStep("solo (osu!)", () => setLocalUserPresence(UserStatus.Online, soloGameStatusForRuleset(0)));
+            AddStep("solo (osu!taiko)", () => setLocalUserPresence(UserStatus.Online, soloGameStatusForRuleset(1)));
+            AddStep("solo (osu!catch)", () => setLocalUserPresence(UserStatus.Online, soloGameStatusForRuleset(2)));
+            AddStep("solo (osu!mania)", () => setLocalUserPresence(UserStatus.Online, soloGameStatusForRuleset(3)));
+            AddStep("choosing", () => setLocalUserPresence(UserStatus.Online, new UserActivity.ChoosingBeatmap()));
+            AddStep("editing beatmap", () => setLocalUserPresence(UserStatus.Online, new UserActivity.EditingBeatmap(new BeatmapInfo())));
+            AddStep("modding beatmap", () => setLocalUserPresence(UserStatus.Online, new UserActivity.ModdingBeatmap(new BeatmapInfo())));
+            AddStep("testing beatmap", () => setLocalUserPresence(UserStatus.Online, new UserActivity.TestingBeatmap(new BeatmapInfo())));
+            AddStep("set offline status", () => setLocalUserPresence(UserStatus.Offline, null));
+        }
+
         private void setPresence(UserStatus status, UserActivity? activity)
         {
             if (status == UserStatus.Offline)
                 metadataClient.UserPresenceUpdated(panel.User.OnlineID, null);
             else
                 metadataClient.UserPresenceUpdated(panel.User.OnlineID, new UserPresence { Status = status, Activity = activity });
+        }
+
+        private void setLocalUserPresence(UserStatus status, UserActivity? activity)
+        {
+            DummyAPIAccess dummyAPI = (DummyAPIAccess)API;
+            dummyAPI.Status.Value = status;
+            dummyAPI.Activity.Value = activity;
         }
 
         private UserActivity soloGameStatusForRuleset(int rulesetId) => new UserActivity.InSoloGame(new BeatmapInfo(), rulesetStore.GetRuleset(rulesetId)!);
