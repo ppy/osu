@@ -30,10 +30,7 @@ namespace osu.Game.Screens.SelectV2
     /// </summary>
     public abstract partial class Carousel<T> : CompositeDrawable
     {
-        /// <summary>
-        /// A collection of filters which should be run each time a <see cref="FilterAsync"/> is executed.
-        /// </summary>
-        protected IEnumerable<ICarouselFilter> Filters { get; init; } = Enumerable.Empty<ICarouselFilter>();
+        #region Properties and methods for external usage
 
         /// <summary>
         /// Height of the area above the carousel that should be treated as visible due to transparency of elements in front of it.
@@ -83,15 +80,6 @@ namespace osu.Game.Screens.SelectV2
         public int VisibleItems => scroll.Panels.Count;
 
         /// <summary>
-        /// All items which are to be considered for display in this carousel.
-        /// Mutating this list will automatically queue a <see cref="FilterAsync"/>.
-        /// </summary>
-        /// <remarks>
-        /// Note that an <see cref="ICarouselFilter"/> may add new items which are displayed but not tracked in this list.
-        /// </remarks>
-        protected readonly BindableList<T> Items = new BindableList<T>();
-
-        /// <summary>
         /// The currently selected model.
         /// </summary>
         /// <remarks>
@@ -114,20 +102,31 @@ namespace osu.Game.Screens.SelectV2
             }
         }
 
-        private List<CarouselItem>? displayedCarouselItems;
+        #endregion
 
-        private readonly CarouselScrollContainer scroll;
+        #region Properties and methods concerning implementations
 
-        protected Carousel()
-        {
-            InternalChild = scroll = new CarouselScrollContainer
-            {
-                RelativeSizeAxes = Axes.Both,
-                Masking = false,
-            };
+        /// <summary>
+        /// A collection of filters which should be run each time a <see cref="FilterAsync"/> is executed.
+        /// </summary>
+        /// <remarks>
+        /// Implementations should add all required filters as part of their initialisation.
+        ///
+        /// Importantly, each filter is sequentially run in the order provided.
+        /// Each filter receives the output of the previous filter.
+        ///
+        /// A filter may add, mutate or remove items.
+        /// </remarks>
+        protected IEnumerable<ICarouselFilter> Filters { get; init; } = Enumerable.Empty<ICarouselFilter>();
 
-            Items.BindCollectionChanged((_, _) => FilterAsync());
-        }
+        /// <summary>
+        /// All items which are to be considered for display in this carousel.
+        /// Mutating this list will automatically queue a <see cref="FilterAsync"/>.
+        /// </summary>
+        /// <remarks>
+        /// Note that an <see cref="ICarouselFilter"/> may add new items which are displayed but not tracked in this list.
+        /// </remarks>
+        protected readonly BindableList<T> Items = new BindableList<T>();
 
         /// <summary>
         /// Queue an asynchronous filter operation.
@@ -151,7 +150,28 @@ namespace osu.Game.Screens.SelectV2
         /// <returns>A <see cref="CarouselItem"/> representing the model.</returns>
         protected abstract CarouselItem CreateCarouselItemForModel(T model);
 
+        #endregion
+
+        #region Initialisation
+
+        private readonly CarouselScrollContainer scroll;
+
+        protected Carousel()
+        {
+            InternalChild = scroll = new CarouselScrollContainer
+            {
+                RelativeSizeAxes = Axes.Both,
+                Masking = false,
+            };
+
+            Items.BindCollectionChanged((_, _) => FilterAsync());
+        }
+
+        #endregion
+
         #region Filtering and display preparation
+
+        private List<CarouselItem>? displayedCarouselItems;
 
         private Task filterTask = Task.CompletedTask;
         private CancellationTokenSource cancellationSource = new CancellationTokenSource();
