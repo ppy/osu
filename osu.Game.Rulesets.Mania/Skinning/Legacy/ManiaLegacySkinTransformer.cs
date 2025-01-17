@@ -97,7 +97,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                             return new DefaultSkinComponentsContainer(container =>
                             {
                                 var combo = container.ChildrenOfType<LegacyManiaComboCounter>().FirstOrDefault();
-                                var spectatorList = container.OfType<SkinnableSpectatorList>().FirstOrDefault();
+                                var spectatorList = container.OfType<SpectatorList>().FirstOrDefault();
 
                                 if (combo != null)
                                 {
@@ -115,7 +115,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                             })
                             {
                                 new LegacyManiaComboCounter(),
-                                new SkinnableSpectatorList(),
+                                new SpectatorList(),
                             };
                     }
 

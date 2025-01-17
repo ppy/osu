@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
                             return new DefaultSkinComponentsContainer(container =>
                             {
                                 var keyCounter = container.OfType<LegacyKeyCounterDisplay>().FirstOrDefault();
-                                var spectatorList = container.OfType<SkinnableSpectatorList>().FirstOrDefault();
+                                var spectatorList = container.OfType<SpectatorList>().FirstOrDefault();
 
                                 if (keyCounter != null)
                                 {
@@ -69,7 +69,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
                                 Children = new Drawable[]
                                 {
                                     new LegacyKeyCounterDisplay(),
-                                    new SkinnableSpectatorList(),
+                                    new SpectatorList(),
                                 }
                             };
                     }

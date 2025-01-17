@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                             return new DefaultSkinComponentsContainer(container =>
                             {
                                 var combo = container.ChildrenOfType<ArgonManiaComboCounter>().FirstOrDefault();
-                                var spectatorList = container.OfType<SkinnableSpectatorList>().FirstOrDefault();
+                                var spectatorList = container.OfType<SpectatorList>().FirstOrDefault();
 
                                 if (combo != null)
                                 {
@@ -56,7 +56,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                             })
                             {
                                 new ArgonManiaComboCounter(),
-                                new SkinnableSpectatorList
+                                new SpectatorList
                                 {
                                     Anchor = Anchor.BottomLeft,
                                     Origin = Anchor.BottomLeft,

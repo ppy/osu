@@ -367,7 +367,7 @@ namespace osu.Game.Skinning
                                 return new DefaultSkinComponentsContainer(container =>
                                 {
                                     var combo = container.OfType<LegacyDefaultComboCounter>().FirstOrDefault();
-                                    var spectatorList = container.OfType<SkinnableSpectatorList>().FirstOrDefault();
+                                    var spectatorList = container.OfType<SpectatorList>().FirstOrDefault();
 
                                     Vector2 pos = new Vector2();
 
@@ -389,7 +389,7 @@ namespace osu.Game.Skinning
                                 })
                                 {
                                     new LegacyDefaultComboCounter(),
-                                    new SkinnableSpectatorList(),
+                                    new SpectatorList(),
                                 };
                             }
 
