@@ -69,7 +69,22 @@ namespace osu.Game.Screens.Play
 
         protected override void LoadComplete()
         {
-            ShowStoryboard.BindValueChanged(_ => initializeStoryboard(true), true);
+            ShowStoryboard.BindValueChanged(show =>
+            {
+                initializeStoryboard(true);
+
+                if (drawableStoryboard != null)
+                {
+                    // Regardless of user dim setting, for the time being we need to ensure storyboards are still updated in the background (even if not displayed).
+                    // If we don't do this, an intensive storyboard will have a lot of catch-up work to do at the start of a break, causing a huge stutter.
+                    //
+                    // This can be reconsidered when https://github.com/ppy/osu-framework/issues/6491 is resolved.
+                    bool alwaysPresent = show.NewValue;
+
+                    Content.AlwaysPresent = alwaysPresent;
+                    drawableStoryboard.AlwaysPresent = alwaysPresent;
+                }
+            }, true);
             base.LoadComplete();
         }
 

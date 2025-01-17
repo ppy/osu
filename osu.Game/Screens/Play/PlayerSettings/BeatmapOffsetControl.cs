@@ -165,13 +165,14 @@ namespace osu.Game.Screens.Play.PlayerSettings
                     if (setInfo == null) // only the case for tests.
                         return;
 
-                    // Apply to all difficulties in a beatmap set for now (they generally always share timing).
+                    // Apply to all difficulties in a beatmap set if they have the same audio
+                    // (they generally always share timing).
                     foreach (var b in setInfo.Beatmaps)
                     {
                         BeatmapUserSettings userSettings = b.UserSettings;
                         double val = Current.Value;
 
-                        if (userSettings.Offset != val)
+                        if (userSettings.Offset != val && b.AudioEquals(beatmap.Value.BeatmapInfo))
                             userSettings.Offset = val;
                     }
                 });
