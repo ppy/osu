@@ -58,13 +58,7 @@ namespace osu.Game.Screens.Select
 
         protected override BeatmapDetailArea CreateBeatmapDetailArea()
         {
-            playBeatmapDetailArea = new PlayBeatmapDetailArea
-            {
-                Leaderboard =
-                {
-                    ScoreSelected = PresentScore
-                }
-            };
+            playBeatmapDetailArea = new PlayBeatmapDetailArea(ScoresProvider, PresentScore);
 
             return playBeatmapDetailArea;
         }
@@ -131,14 +125,14 @@ namespace osu.Game.Screens.Select
                 {
                     player = new ReplayPlayer((beatmap, mods) => replayGeneratingMod.CreateScoreFromReplayData(beatmap, mods))
                     {
-                        LeaderboardScores = { BindTarget = playBeatmapDetailArea.Leaderboard.Scores }
+                        LeaderboardScores = { BindTarget = ScoresProvider.Scores }
                     };
                 }
                 else
                 {
                     player = new SoloPlayer
                     {
-                        LeaderboardScores = { BindTarget = playBeatmapDetailArea.Leaderboard.Scores }
+                        LeaderboardScores = { BindTarget = ScoresProvider.Scores }
                     };
                 }
 
