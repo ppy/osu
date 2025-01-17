@@ -38,6 +38,11 @@ namespace osu.Game.Online.Metadata
         public abstract IBindable<bool> IsWatchingUserPresence { get; }
 
         /// <summary>
+        /// The <see cref="UserPresence"/> information about the current user.
+        /// </summary>
+        public abstract UserPresence LocalUserState { get; }
+
+        /// <summary>
         /// Dictionary keyed by user ID containing all of the <see cref="UserPresence"/> information about currently online users received from the server.
         /// </summary>
         public abstract IBindableDictionary<int, UserPresence> UserStates { get; }
