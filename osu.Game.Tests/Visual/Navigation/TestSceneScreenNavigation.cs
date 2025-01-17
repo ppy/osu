@@ -41,6 +41,7 @@ using osu.Game.Screens.OnlinePlay.Match.Components;
 using osu.Game.Screens.OnlinePlay.Playlists;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
+using osu.Game.Screens.Play.PlayerSettings;
 using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Carousel;
@@ -351,8 +352,13 @@ namespace osu.Game.Tests.Visual.Navigation
             AddStep("attempt adjust offset via keyboard", () => InputManager.Key(Key.Minus));
             checkOffset(-1);
 
-            void checkOffset(double offset) => AddUntilStep($"offset is {offset}", () => Game.BeatmapManager.QueryBeatmap(b => b.ID == Game.Beatmap.Value.BeatmapInfo.ID)!.UserSettings.Offset,
-                () => Is.EqualTo(offset));
+            void checkOffset(double offset)
+            {
+                AddUntilStep($"control offset is {offset}", () => this.ChildrenOfType<GameplayOffsetControl>().Single().ChildrenOfType<BeatmapOffsetControl>().Single().Current.Value,
+                    () => Is.EqualTo(offset));
+                AddUntilStep($"database offset is {offset}", () => Game.BeatmapManager.QueryBeatmap(b => b.ID == Game.Beatmap.Value.BeatmapInfo.ID)!.UserSettings.Offset,
+                    () => Is.EqualTo(offset));
+            }
         }
 
         [Test]
@@ -389,8 +395,13 @@ namespace osu.Game.Tests.Visual.Navigation
             AddStep("attempt adjust offset via keyboard", () => InputManager.Key(Key.Minus));
             checkOffset(-1);
 
-            void checkOffset(double offset) => AddUntilStep($"offset is {offset}", () => Game.BeatmapManager.QueryBeatmap(b => b.ID == Game.Beatmap.Value.BeatmapInfo.ID)!.UserSettings.Offset,
-                () => Is.EqualTo(offset));
+            void checkOffset(double offset)
+            {
+                AddUntilStep($"control offset is {offset}", () => this.ChildrenOfType<GameplayOffsetControl>().Single().ChildrenOfType<BeatmapOffsetControl>().Single().Current.Value,
+                    () => Is.EqualTo(offset));
+                AddUntilStep($"database offset is {offset}", () => Game.BeatmapManager.QueryBeatmap(b => b.ID == Game.Beatmap.Value.BeatmapInfo.ID)!.UserSettings.Offset,
+                    () => Is.EqualTo(offset));
+            }
         }
 
         [Test]
