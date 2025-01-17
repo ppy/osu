@@ -266,6 +266,31 @@ namespace osu.Game.Online.Multiplayer
             return connection.InvokeAsync(nameof(IMultiplayerServer.RemovePlaylistItem), playlistItemId);
         }
 
+        protected override async Task<MultiplayerRoom> CreateRoom(MultiplayerRoom room)
+        {
+            if (!IsConnected.Value)
+                throw new OperationCanceledException();
+
+            Debug.Assert(connection != null);
+
+            try
+            {
+                return await connection.InvokeAsync<MultiplayerRoom>(nameof(IMultiplayerServer.CreateRoom), room);
+            }
+            catch (HubException exception)
+            {
+                if (exception.GetHubExceptionMessage() == HubClientConnector.SERVER_SHUTDOWN_MESSAGE)
+                {
+                    Debug.Assert(connector != null);
+
+                    await connector.Reconnect().ConfigureAwait(false);
+                    return await CreateRoom(room).ConfigureAwait(false);
+                }
+
+                throw;
+            }
+        }
+
         public override Task DisconnectInternal()
         {
             if (connector == null)

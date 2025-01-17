@@ -10,6 +10,8 @@ namespace osu.Game.Online.Multiplayer
     /// </summary>
     public interface IMultiplayerLoungeServer
     {
+        Task<MultiplayerRoom> CreateRoom(MultiplayerRoom room);
+
         /// <summary>
         /// Request to join a multiplayer room.
         /// </summary>
