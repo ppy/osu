@@ -31,7 +31,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
         private CircularContainer completionMark = null!;
 
         [Resolved]
-        private IAPIProvider api { get; set; }
+        private IAPIProvider api { get; set; } = null!;
 
         [Resolved]
         private OsuColour colours { get; set; } = null!;
