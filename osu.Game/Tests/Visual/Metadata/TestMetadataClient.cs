@@ -48,11 +48,12 @@ namespace osu.Game.Tests.Visual.Metadata
 
         public override Task UpdateActivity(UserActivity? activity)
         {
+            localUserPresence = localUserPresence with { Activity = activity };
+
             if (isWatchingUserPresence.Value)
             {
-                userPresences.TryGetValue(api.LocalUser.Value.Id, out var localUserPresence);
-                localUserPresence = localUserPresence with { Activity = activity };
-                userPresences[api.LocalUser.Value.Id] = localUserPresence;
+                if (userPresences.ContainsKey(api.LocalUser.Value.Id))
+                    userPresences[api.LocalUser.Value.Id] = localUserPresence;
             }
 
             return Task.CompletedTask;
@@ -60,11 +61,12 @@ namespace osu.Game.Tests.Visual.Metadata
 
         public override Task UpdateStatus(UserStatus? status)
         {
+            localUserPresence = localUserPresence with { Status = status };
+
             if (isWatchingUserPresence.Value)
             {
-                userPresences.TryGetValue(api.LocalUser.Value.Id, out var localUserPresence);
-                localUserPresence = localUserPresence with { Status = status };
-                userPresences[api.LocalUser.Value.Id] = localUserPresence;
+                if (userPresences.ContainsKey(api.LocalUser.Value.Id))
+                    userPresences[api.LocalUser.Value.Id] = localUserPresence;
             }
 
             return Task.CompletedTask;
