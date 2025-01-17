@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
-using osu.Framework.Bindables;
 using osu.Game.Extensions;
 using osu.Game.Users;
 
@@ -55,10 +54,6 @@ namespace osu.Game.Online.API.Requests.Responses
             get => Enum.TryParse(countryCodeString, out CountryCode result) ? result : CountryCode.Unknown;
             set => countryCodeString = value.ToString();
         }
-
-        public readonly Bindable<UserStatus?> Status = new Bindable<UserStatus?>();
-
-        public readonly Bindable<UserActivity> Activity = new Bindable<UserActivity>();
 
         [JsonProperty(@"profile_colour")]
         public string Colour;
