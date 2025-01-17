@@ -45,17 +45,17 @@ namespace osu.Game.Online.Metadata
         /// <summary>
         /// The <see cref="UserPresence"/> information about the current user.
         /// </summary>
-        public abstract UserPresence LocalUserState { get; }
+        public abstract UserPresence LocalUserPresence { get; }
 
         /// <summary>
         /// Dictionary keyed by user ID containing all of the <see cref="UserPresence"/> information about currently online users received from the server.
         /// </summary>
-        public abstract IBindableDictionary<int, UserPresence> UserStates { get; }
+        public abstract IBindableDictionary<int, UserPresence> UserPresences { get; }
 
         /// <summary>
         /// Dictionary keyed by user ID containing all of the <see cref="UserPresence"/> information about currently online friends received from the server.
         /// </summary>
-        public abstract IBindableDictionary<int, UserPresence> FriendStates { get; }
+        public abstract IBindableDictionary<int, UserPresence> FriendPresences { get; }
 
         /// <summary>
         /// Attempts to retrieve the presence of a user.
@@ -65,12 +65,12 @@ namespace osu.Game.Online.Metadata
         public UserPresence? GetPresence(int userId)
         {
             if (userId == api.LocalUser.Value.OnlineID)
-                return LocalUserState;
+                return LocalUserPresence;
 
-            if (FriendStates.TryGetValue(userId, out UserPresence presence))
+            if (FriendPresences.TryGetValue(userId, out UserPresence presence))
                 return presence;
 
-            if (UserStates.TryGetValue(userId, out presence))
+            if (UserPresences.TryGetValue(userId, out presence))
                 return presence;
 
             return null;
