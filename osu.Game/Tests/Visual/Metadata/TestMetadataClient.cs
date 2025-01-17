@@ -19,6 +19,9 @@ namespace osu.Game.Tests.Visual.Metadata
         public override IBindable<bool> IsWatchingUserPresence => isWatchingUserPresence;
         private readonly BindableBool isWatchingUserPresence = new BindableBool();
 
+        public override UserPresence LocalUserState => localUserState;
+        private UserPresence localUserState;
+
         public override IBindableDictionary<int, UserPresence> UserStates => userStates;
         private readonly BindableDictionary<int, UserPresence> userStates = new BindableDictionary<int, UserPresence>();
 
@@ -71,10 +74,20 @@ namespace osu.Game.Tests.Visual.Metadata
         {
             if (isWatchingUserPresence.Value)
             {
-                if (presence.HasValue)
-                    userStates[userId] = presence.Value;
+                if (presence?.Status != null)
+                {
+                    if (userId == api.LocalUser.Value.OnlineID)
+                        localUserState = presence.Value;
+                    else
+                        userStates[userId] = presence.Value;
+                }
                 else
-                    userStates.Remove(userId);
+                {
+                    if (userId == api.LocalUser.Value.OnlineID)
+                        localUserState = default;
+                    else
+                        userStates.Remove(userId);
+                }
             }
 
             return Task.CompletedTask;

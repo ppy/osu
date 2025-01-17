@@ -23,6 +23,9 @@ namespace osu.Game.Online.Metadata
         public override IBindable<bool> IsWatchingUserPresence => isWatchingUserPresence;
         private readonly BindableBool isWatchingUserPresence = new BindableBool();
 
+        public override UserPresence LocalUserState => localUserState;
+        private UserPresence localUserState;
+
         public override IBindableDictionary<int, UserPresence> UserStates => userStates;
         private readonly BindableDictionary<int, UserPresence> userStates = new BindableDictionary<int, UserPresence>();
 
@@ -110,6 +113,7 @@ namespace osu.Game.Online.Metadata
                     userStates.Clear();
                     friendStates.Clear();
                     dailyChallengeInfo.Value = null;
+                    localUserState = default;
                 });
                 return;
             }
@@ -202,9 +206,19 @@ namespace osu.Game.Online.Metadata
             Schedule(() =>
             {
                 if (presence?.Status != null)
-                    userStates[userId] = presence.Value;
+                {
+                    if (userId == api.LocalUser.Value.OnlineID)
+                        localUserState = presence.Value;
+                    else
+                        userStates[userId] = presence.Value;
+                }
                 else
-                    userStates.Remove(userId);
+                {
+                    if (userId == api.LocalUser.Value.OnlineID)
+                        localUserState = default;
+                    else
+                        userStates.Remove(userId);
+                }
             });
 
             return Task.CompletedTask;
@@ -242,14 +256,7 @@ namespace osu.Game.Online.Metadata
                     throw new OperationCanceledException();
 
                 // must be scheduled before any remote calls to avoid mis-ordering.
-                Schedule(() =>
-                {
-                    bool hadLocalUserState = userStates.TryGetValue(api.LocalUser.Value.OnlineID, out var presence);
-                    userStates.Clear();
-                    if (hadLocalUserState)
-                        userStates[api.LocalUser.Value.OnlineID] = presence;
-                });
-
+                Schedule(() => userStates.Clear());
                 Debug.Assert(connection != null);
                 await connection.InvokeAsync(nameof(IMetadataServer.EndWatchingUserPresence)).ConfigureAwait(false);
                 Logger.Log($@"{nameof(OnlineMetadataClient)} stopped watching user presence", LoggingTarget.Network);
