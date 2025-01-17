@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 {
     public class OsuPerformanceCalculator : PerformanceCalculator
     {
-        public const double PERFORMANCE_BASE_MULTIPLIER = 1.047; // This is being adjusted to keep the final pp value scaled around what it used to be when changing things.
+        public const double PERFORMANCE_BASE_MULTIPLIER = 1.07; // This is being adjusted to keep the final pp value scaled around what it used to be when changing things.
 
         private bool usingClassicSliderAccuracy;
 
@@ -248,6 +248,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // Lots of arbitrary values from testing.
             // Considering to use derivation from perfect accuracy in a probabilistic manner - assume normal distribution.
             double accuracyValue = Math.Pow(1.52163, attributes.OverallDifficulty) * Math.Pow(betterAccuracyPercentage, 24) * 2.83;
+
+
+            //accuracyValue *= (0.45 + (attributes.AimConsistencyFactor + attributes.SpeedConsistencyFactor) / 2);
 
             // Bonus for many hitcircles - it's harder to keep good accuracy up for longer.
             accuracyValue *= Math.Min(1.15, Math.Pow(amountHitObjectsWithAccuracy / 1000.0, 0.3));

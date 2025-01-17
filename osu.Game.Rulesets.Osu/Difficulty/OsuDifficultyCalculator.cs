@@ -11,14 +11,12 @@ using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Difficulty.Skills;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Scoring;
-using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Difficulty
 {
@@ -27,7 +25,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private const double difficulty_multiplier = 0.0675;
 
         //The bonus multiplier is a basic multiplier that indicate how strong the impact of Difficulty Factor is.
-        private const double bonus_multiplier = 0.3;
+        private const double bonus_multiplier = 0.6;
 
         public override int Version => 20241007;
 
@@ -148,7 +146,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return attributes;
         }
 
-        private double computeLengthBonus(double hitObjects, double consistencyFactor, double approachRateBonus) => (Math.Pow(hitObjects * (0.8 + consistencyFactor * bonus_multiplier), 0.54) / 1500 + 1.0) * (1.0 + approachRateBonus);
+        private double computeLengthBonus(double hitObjects, double consistencyFactor, double approachRateBonus) => computeBasicLengthBonus(hitObjects, consistencyFactor) * (1.0 + approachRateBonus * computeBasicLengthBonus(hitObjects, consistencyFactor));
+
+        private double computeBasicLengthBonus(double hitObjects, double consistencyFactor) => Math.Pow(hitObjects * (0.8 + consistencyFactor * bonus_multiplier), 0.67) / 1500 + 1.0;
 
         protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
         {
