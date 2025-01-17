@@ -32,6 +32,11 @@ namespace osu.Game.Graphics.UserInterfaceV2
             set => slider.Current = value;
         }
 
+        public CompositeDrawable TabbableContentContainer
+        {
+            set => textBox.TabbableContentContainer = value;
+        }
+
         private bool instantaneous;
 
         /// <summary>
