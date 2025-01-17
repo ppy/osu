@@ -4,8 +4,10 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Game.Online.API;
 using osu.Game.Users;
 
 namespace osu.Game.Online.Metadata
@@ -13,6 +15,9 @@ namespace osu.Game.Online.Metadata
     public abstract partial class MetadataClient : Component, IMetadataClient, IMetadataServer
     {
         public abstract IBindable<bool> IsConnected { get; }
+
+        [Resolved]
+        private IAPIProvider api { get; set; } = null!;
 
         #region Beatmap metadata updates
 
@@ -59,6 +64,9 @@ namespace osu.Game.Online.Metadata
         /// <returns>The user presence, or null if not available or the user's offline.</returns>
         public UserPresence? GetPresence(int userId)
         {
+            if (userId == api.LocalUser.Value.OnlineID)
+                return LocalUserState;
+
             if (FriendStates.TryGetValue(userId, out UserPresence presence))
                 return presence;
 
