@@ -11,6 +11,6 @@ namespace osu.Game.Tests.Beatmaps
     internal partial class TestBeatmapStore : BeatmapStore
     {
         public readonly BindableList<BeatmapSetInfo> BeatmapSets = new BindableList<BeatmapSetInfo>();
-        public override IBindableList<BeatmapSetInfo> GetBeatmapSets(CancellationToken? cancellationToken) => BeatmapSets;
+        public override IBindableList<BeatmapSetInfo> GetBeatmapSets(CancellationToken? cancellationToken) => BeatmapSets.GetBoundCopy();
     }
 }
