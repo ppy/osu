@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
             // Interval is capped at a very small value to prevent infinite values.
             interval = Math.Max(interval, 1);
 
-            return 30 / interval;
+            return 20 / interval;
         }
 
         /// <summary>
@@ -59,16 +59,15 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
             // Find the previous hit object hit by the current finger, which is n notes prior, n being the number of
             // available fingers.
             TaikoDifficultyHitObject taikoCurrent = (TaikoDifficultyHitObject)current;
-            TaikoDifficultyHitObject? keyPrevious = taikoCurrent.PreviousMono(availableFingersFor(taikoCurrent) - 1);
-
-            if (keyPrevious == null)
-            {
-                // There is no previous hit object hit by the current finger
-                return 0.0;
-            }
+            TaikoDifficultyHitObject? taikoPrevious = current.Previous(1) as TaikoDifficultyHitObject;
+            TaikoDifficultyHitObject? previousMono = taikoCurrent.PreviousMono(availableFingersFor(taikoCurrent) - 1);
 
             double objectStrain = 0.5; // Add a base strain to all objects
-            objectStrain += speedBonus(taikoCurrent.StartTime - keyPrevious.StartTime);
+            if (taikoPrevious == null) return objectStrain;
+
+            if (previousMono != null)
+                objectStrain += speedBonus(taikoCurrent.StartTime - previousMono.StartTime) + 0.5 * speedBonus(taikoCurrent.StartTime - taikoPrevious.StartTime);
+
             return objectStrain;
         }
     }
