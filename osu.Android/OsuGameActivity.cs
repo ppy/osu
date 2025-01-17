@@ -49,7 +49,7 @@ namespace osu.Android
         /// <remarks>Adjusted on startup to match expected UX for the current device type (phone/tablet).</remarks>
         public ScreenOrientation DefaultOrientation = ScreenOrientation.Unspecified;
 
-        public bool IsTablet { get; private set; }
+        public new bool IsTablet { get; private set; }
 
         private readonly OsuGameAndroid game;
 
