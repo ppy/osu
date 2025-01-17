@@ -16,6 +16,7 @@ using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
@@ -117,12 +118,11 @@ namespace osu.Game.Tests.Visual.SongSelect
                             }
                         }
                     },
-                    stats = new OsuTextFlowContainer(cp => cp.Font = FrameworkFont.Regular.With())
+                    stats = new OsuTextFlowContainer
                     {
+                        AutoSizeAxes = Axes.Both,
                         Padding = new MarginPadding(10),
                         TextAnchor = Anchor.CentreLeft,
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
                     },
                 };
             });
@@ -258,16 +258,29 @@ namespace osu.Game.Tests.Visual.SongSelect
             if (carousel.IsNull())
                 return;
 
-            stats.Text = $"""
-                                        store
-                                          sets: {beatmapSets.Count}
-                                          beatmaps: {beatmapCount}
-                                        carousel:
-                                          sorting: {carousel.IsFiltering}
-                                          tracked: {carousel.ItemsTracked}
-                                          displayable: {carousel.DisplayableItems}
-                                          displayed: {carousel.VisibleItems}
-                          """;
+            stats.Clear();
+            createHeader("beatmap store");
+            stats.AddParagraph($"""
+                                sets: {beatmapSets.Count}
+                                beatmaps: {beatmapCount}
+                                """);
+            createHeader("carousel");
+            stats.AddParagraph($"""
+                                sorting: {carousel.IsFiltering}
+                                tracked: {carousel.ItemsTracked}
+                                displayable: {carousel.DisplayableItems}
+                                displayed: {carousel.VisibleItems}
+                                selected: {carousel.CurrentSelection}
+                                """);
+
+            void createHeader(string text)
+            {
+                stats.AddParagraph(string.Empty);
+                stats.AddParagraph(text, cp =>
+                {
+                    cp.Font = cp.Font.With(size: 18, weight: FontWeight.Bold);
+                });
+            }
         }
     }
 }
