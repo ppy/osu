@@ -159,6 +159,7 @@ namespace osu.Game.Screens.Play.HUD
 
         private void updateVisibility()
         {
+            // We don't want to show spectators when we are watching a replay.
             mainFlow.FadeTo(Spectators.Count > 0 && UserPlayingState.Value != LocalUserPlayingState.NotPlaying ? 1 : 0, 250, Easing.OutQuint);
         }
 
