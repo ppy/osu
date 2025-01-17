@@ -38,7 +38,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         private OsuTextFlowContainer stats = null!;
         private BeatmapCarousel carousel = null!;
 
-        private OsuScrollContainer scroll => carousel.ChildrenOfType<OsuScrollContainer>().Single();
+        private OsuScrollContainer<Drawable> scroll => carousel.ChildrenOfType<OsuScrollContainer<Drawable>>().Single();
 
         private int beatmapCount;
 
