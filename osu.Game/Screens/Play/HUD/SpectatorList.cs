@@ -24,7 +24,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public partial class SpectatorList : CompositeDrawable
+    public partial class SpectatorList : CompositeDrawable, ISerialisableDrawable
     {
         private const int max_spectators_displayed = 10;
 
@@ -44,7 +44,7 @@ namespace osu.Game.Screens.Play.HUD
         private DrawablePool<SpectatorListEntry> pool = null!;
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, SpectatorClient client, GameplayState gameplayState)
         {
             AutoSizeAxes = Axes.Y;
 
@@ -73,6 +73,9 @@ namespace osu.Game.Screens.Play.HUD
             };
 
             HeaderColour.Value = Header.Colour;
+
+            ((IBindableList<SpectatorUser>)Spectators).BindTo(client.WatchingUsers);
+            ((IBindable<LocalUserPlayingState>)UserPlayingState).BindTo(gameplayState.PlayingState);
         }
 
         protected override void LoadComplete()
@@ -236,17 +239,7 @@ namespace osu.Game.Screens.Play.HUD
                     linkCompiler.Enabled.Value = UserPlayingState.Value != LocalUserPlayingState.Playing;
             }
         }
-    }
 
-    public partial class SkinnableSpectatorList : SpectatorList, ISerialisableDrawable
-    {
         public bool UsesFixedAnchor { get; set; }
-
-        [BackgroundDependencyLoader]
-        private void load(SpectatorClient client, GameplayState gameplayState)
-        {
-            ((IBindableList<SpectatorUser>)Spectators).BindTo(client.WatchingUsers);
-            ((IBindable<LocalUserPlayingState>)UserPlayingState).BindTo(gameplayState.PlayingState);
-        }
     }
 }

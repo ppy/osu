@@ -71,7 +71,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                                 }
 
                                 var combo = container.OfType<LegacyDefaultComboCounter>().FirstOrDefault();
-                                var spectatorList = container.OfType<SkinnableSpectatorList>().FirstOrDefault();
+                                var spectatorList = container.OfType<SpectatorList>().FirstOrDefault();
 
                                 Vector2 pos = new Vector2();
 
@@ -96,7 +96,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                                 {
                                     new LegacyDefaultComboCounter(),
                                     new LegacyKeyCounterDisplay(),
-                                    new SkinnableSpectatorList(),
+                                    new SpectatorList(),
                                 }
                             };
                     }

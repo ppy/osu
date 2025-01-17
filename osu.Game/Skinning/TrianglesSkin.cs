@@ -91,7 +91,7 @@ namespace osu.Game.Skinning
                                 var ppCounter = container.OfType<PerformancePointsCounter>().FirstOrDefault();
                                 var songProgress = container.OfType<DefaultSongProgress>().FirstOrDefault();
                                 var keyCounter = container.OfType<DefaultKeyCounterDisplay>().FirstOrDefault();
-                                var spectatorList = container.OfType<SkinnableSpectatorList>().FirstOrDefault();
+                                var spectatorList = container.OfType<SpectatorList>().FirstOrDefault();
 
                                 if (score != null)
                                 {
@@ -177,7 +177,7 @@ namespace osu.Game.Skinning
                                     new BarHitErrorMeter(),
                                     new BarHitErrorMeter(),
                                     new TrianglesPerformancePointsCounter(),
-                                    new SkinnableSpectatorList(),
+                                    new SpectatorList(),
                                 }
                             };
 

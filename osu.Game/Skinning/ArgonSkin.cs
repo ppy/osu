@@ -112,7 +112,7 @@ namespace osu.Game.Skinning
                                 return new DefaultSkinComponentsContainer(container =>
                                 {
                                     var comboCounter = container.OfType<ArgonComboCounter>().FirstOrDefault();
-                                    var spectatorList = container.OfType<SkinnableSpectatorList>().FirstOrDefault();
+                                    var spectatorList = container.OfType<SpectatorList>().FirstOrDefault();
 
                                     Vector2 pos = new Vector2(36, -66);
 
@@ -135,7 +135,7 @@ namespace osu.Game.Skinning
                                             Origin = Anchor.BottomLeft,
                                             Scale = new Vector2(1.3f),
                                         },
-                                        new SkinnableSpectatorList
+                                        new SpectatorList
                                         {
                                             Anchor = Anchor.BottomLeft,
                                             Origin = Anchor.BottomLeft,
