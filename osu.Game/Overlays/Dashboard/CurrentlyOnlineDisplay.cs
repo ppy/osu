@@ -37,7 +37,7 @@ namespace osu.Game.Overlays.Dashboard
         private const float padding = 10;
 
         private readonly IBindableList<int> playingUsers = new BindableList<int>();
-        private readonly IBindableDictionary<int, UserPresence> onlineUsers = new BindableDictionary<int, UserPresence>();
+        private readonly IBindableDictionary<int, UserPresence> onlineUserPresences = new BindableDictionary<int, UserPresence>();
         private readonly Dictionary<int, OnlineUserPanel> userPanels = new Dictionary<int, OnlineUserPanel>();
 
         private SearchContainer<OnlineUserPanel> userFlow;
@@ -106,8 +106,8 @@ namespace osu.Game.Overlays.Dashboard
         {
             base.LoadComplete();
 
-            onlineUsers.BindTo(metadataClient.UserPresences);
-            onlineUsers.BindCollectionChanged(onUserUpdated, true);
+            onlineUserPresences.BindTo(metadataClient.UserPresences);
+            onlineUserPresences.BindCollectionChanged(onUserPresenceUpdated, true);
 
             playingUsers.BindTo(spectatorClient.PlayingUsers);
             playingUsers.BindCollectionChanged(onPlayingUsersChanged, true);
@@ -120,7 +120,7 @@ namespace osu.Game.Overlays.Dashboard
             searchTextBox.TakeFocus();
         }
 
-        private void onUserUpdated(object sender, NotifyDictionaryChangedEventArgs<int, UserPresence> e) => Schedule(() =>
+        private void onUserPresenceUpdated(object sender, NotifyDictionaryChangedEventArgs<int, UserPresence> e) => Schedule(() =>
         {
             switch (e.Action)
             {
@@ -142,8 +142,10 @@ namespace osu.Game.Overlays.Dashboard
                             {
                                 userFlow.Add(userPanels[userId] = createUserPanel(user).With(p =>
                                 {
-                                    p.Status.Value = onlineUsers.GetValueOrDefault(userId).Status;
-                                    p.Activity.Value = onlineUsers.GetValueOrDefault(userId).Activity;
+                                    var presence = onlineUserPresences.GetValueOrDefault(userId);
+
+                                    p.Status.Value = presence.Status;
+                                    p.Activity.Value = presence.Activity;
                                 }));
                             });
                         });
