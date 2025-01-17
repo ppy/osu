@@ -12,7 +12,6 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Users.Drawables;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
-using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Metadata;
 
@@ -27,9 +26,6 @@ namespace osu.Game.Users
 
         [Resolved]
         private MetadataClient? metadata { get; set; }
-
-        [Resolved]
-        private IAPIProvider? api { get; set; }
 
         private UserStatus? lastStatus;
         private UserActivity? lastActivity;
