@@ -81,7 +81,7 @@ namespace osu.Game.Screens
         /// </summary>
         protected readonly Bindable<UserActivity> Activity = new Bindable<UserActivity>();
 
-        IBindable<UserActivity> IOsuScreen.Activity => Activity;
+        Bindable<UserActivity> IOsuScreen.Activity => Activity;
 
         /// <summary>
         /// Whether to disallow changes to game-wise Beatmap/Ruleset bindables for this screen (and all children).
