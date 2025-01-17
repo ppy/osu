@@ -19,14 +19,14 @@ namespace osu.Game.Tests.Visual.Metadata
         public override IBindable<bool> IsWatchingUserPresence => isWatchingUserPresence;
         private readonly BindableBool isWatchingUserPresence = new BindableBool();
 
-        public override UserPresence LocalUserState => localUserState;
-        private UserPresence localUserState;
+        public override UserPresence LocalUserPresence => localUserPresence;
+        private UserPresence localUserPresence;
 
-        public override IBindableDictionary<int, UserPresence> UserStates => userStates;
-        private readonly BindableDictionary<int, UserPresence> userStates = new BindableDictionary<int, UserPresence>();
+        public override IBindableDictionary<int, UserPresence> UserPresences => userPresences;
+        private readonly BindableDictionary<int, UserPresence> userPresences = new BindableDictionary<int, UserPresence>();
 
-        public override IBindableDictionary<int, UserPresence> FriendStates => friendStates;
-        private readonly BindableDictionary<int, UserPresence> friendStates = new BindableDictionary<int, UserPresence>();
+        public override IBindableDictionary<int, UserPresence> FriendPresences => friendPresences;
+        private readonly BindableDictionary<int, UserPresence> friendPresences = new BindableDictionary<int, UserPresence>();
 
         public override Bindable<DailyChallengeInfo?> DailyChallengeInfo => dailyChallengeInfo;
         private readonly Bindable<DailyChallengeInfo?> dailyChallengeInfo = new Bindable<DailyChallengeInfo?>();
@@ -50,9 +50,9 @@ namespace osu.Game.Tests.Visual.Metadata
         {
             if (isWatchingUserPresence.Value)
             {
-                userStates.TryGetValue(api.LocalUser.Value.Id, out var localUserPresence);
+                userPresences.TryGetValue(api.LocalUser.Value.Id, out var localUserPresence);
                 localUserPresence = localUserPresence with { Activity = activity };
-                userStates[api.LocalUser.Value.Id] = localUserPresence;
+                userPresences[api.LocalUser.Value.Id] = localUserPresence;
             }
 
             return Task.CompletedTask;
@@ -62,9 +62,9 @@ namespace osu.Game.Tests.Visual.Metadata
         {
             if (isWatchingUserPresence.Value)
             {
-                userStates.TryGetValue(api.LocalUser.Value.Id, out var localUserPresence);
+                userPresences.TryGetValue(api.LocalUser.Value.Id, out var localUserPresence);
                 localUserPresence = localUserPresence with { Status = status };
-                userStates[api.LocalUser.Value.Id] = localUserPresence;
+                userPresences[api.LocalUser.Value.Id] = localUserPresence;
             }
 
             return Task.CompletedTask;
@@ -77,16 +77,16 @@ namespace osu.Game.Tests.Visual.Metadata
                 if (presence?.Status != null)
                 {
                     if (userId == api.LocalUser.Value.OnlineID)
-                        localUserState = presence.Value;
+                        localUserPresence = presence.Value;
                     else
-                        userStates[userId] = presence.Value;
+                        userPresences[userId] = presence.Value;
                 }
                 else
                 {
                     if (userId == api.LocalUser.Value.OnlineID)
-                        localUserState = default;
+                        localUserPresence = default;
                     else
-                        userStates.Remove(userId);
+                        userPresences.Remove(userId);
                 }
             }
 
@@ -96,9 +96,9 @@ namespace osu.Game.Tests.Visual.Metadata
         public override Task FriendPresenceUpdated(int userId, UserPresence? presence)
         {
             if (presence.HasValue)
-                friendStates[userId] = presence.Value;
+                friendPresences[userId] = presence.Value;
             else
-                friendStates.Remove(userId);
+                friendPresences.Remove(userId);
 
             return Task.CompletedTask;
         }

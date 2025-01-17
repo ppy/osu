@@ -106,7 +106,7 @@ namespace osu.Game.Overlays.Dashboard
         {
             base.LoadComplete();
 
-            onlineUsers.BindTo(metadataClient.UserStates);
+            onlineUsers.BindTo(metadataClient.UserPresences);
             onlineUsers.BindCollectionChanged(onUserUpdated, true);
 
             playingUsers.BindTo(spectatorClient.PlayingUsers);
