@@ -38,6 +38,10 @@ namespace osu.Game.Tests.Visual.Online
             AddSliderStep("top 10%", 0, 999, 0, v => update(s => s.Top10PercentPlacements = v));
             AddSliderStep("top 50%", 0, 999, 0, v => update(s => s.Top50PercentPlacements = v));
             AddSliderStep("playcount", 0, 1500, 1, v => update(s => s.PlayCount = v));
+            AddStep("user played today", () => update(s => s.LastUpdate = DateTimeOffset.UtcNow.Date));
+            AddStep("user played yesterday", () => update(s => s.LastUpdate = DateTimeOffset.UtcNow.Date.AddDays(-1)));
+            AddStep("user is local user", () => update(s => s.UserID = API.LocalUser.Value.Id));
+            AddStep("user is not local user", () => update(s => s.UserID = API.LocalUser.Value.Id + 1000));
             AddStep("create", () =>
             {
                 Clear();
