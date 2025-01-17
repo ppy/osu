@@ -13,7 +13,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Pooling;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Logging;
@@ -21,7 +20,6 @@ using osu.Framework.Utils;
 using osu.Game.Graphics.Containers;
 using osu.Game.Input.Bindings;
 using osuTK;
-using osuTK.Graphics;
 using osuTK.Input;
 
 namespace osu.Game.Screens.SelectV2
@@ -52,6 +50,11 @@ namespace osu.Game.Screens.SelectV2
         /// This allows preloading content before it scrolls into view.
         /// </summary>
         public float DistanceOffscreenToPreload { get; set; }
+
+        /// <summary>
+        /// Vertical space between panel layout. Negative value can be used to create an overlapping effect.
+        /// </summary>
+        protected float SpacingBetweenPanels { get; set; } = -5;
 
         /// <summary>
         /// When a new request arrives to change filtering, the number of milliseconds to wait before performing the filter.
@@ -117,18 +120,10 @@ namespace osu.Game.Screens.SelectV2
 
         protected Carousel()
         {
-            InternalChildren = new Drawable[]
+            InternalChild = scroll = new CarouselScrollContainer
             {
-                new Box
-                {
-                    Colour = Color4.Black,
-                    RelativeSizeAxes = Axes.Both,
-                },
-                scroll = new CarouselScrollContainer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Masking = false,
-                }
+                RelativeSizeAxes = Axes.Both,
+                Masking = false,
             };
 
             Items.BindCollectionChanged((_, _) => FilterAsync());
@@ -217,13 +212,12 @@ namespace osu.Game.Screens.SelectV2
 
         private async Task updateYPositions(IEnumerable<CarouselItem> carouselItems, CancellationToken cancellationToken) => await Task.Run(() =>
         {
-            const float spacing = 10;
-            float yPos = 0;
+            float yPos = visibleHalfHeight;
 
             foreach (var item in carouselItems)
             {
                 item.CarouselYPosition = yPos;
-                yPos += item.DrawHeight + spacing;
+                yPos += item.DrawHeight + SpacingBetweenPanels;
             }
         }, cancellationToken).ConfigureAwait(false);
 
@@ -283,6 +277,11 @@ namespace osu.Game.Screens.SelectV2
         /// </summary>
         private float visibleUpperBound => (float)(scroll.Current - BleedTop);
 
+        /// <summary>
+        /// Half the height of the visible content.
+        /// </summary>
+        private float visibleHalfHeight => (DrawHeight + BleedBottom + BleedTop) / 2;
+
         protected override void Update()
         {
             base.Update();
@@ -302,11 +301,37 @@ namespace osu.Game.Screens.SelectV2
 
             foreach (var panel in scroll.Panels)
             {
-                var carouselPanel = (ICarouselPanel)panel;
+                var c = (ICarouselPanel)panel;
 
-                if (panel.Depth != carouselPanel.DrawYPosition)
-                    scroll.Panels.ChangeChildDepth(panel, (float)carouselPanel.DrawYPosition);
+                if (panel.Depth != c.DrawYPosition)
+                    scroll.Panels.ChangeChildDepth(panel, (float)c.DrawYPosition);
+
+                Debug.Assert(c.Item != null);
+
+                if (c.DrawYPosition != c.Item.CarouselYPosition)
+                    c.DrawYPosition = Interpolation.DampContinuously(c.DrawYPosition, c.Item.CarouselYPosition, 50, Time.Elapsed);
+
+                Vector2 posInScroll = scroll.ToLocalSpace(panel.ScreenSpaceDrawQuad.Centre);
+                float dist = Math.Abs(1f - posInScroll.Y / visibleHalfHeight);
+
+                panel.X = offsetX(dist, visibleHalfHeight);
             }
+        }
+
+        /// <summary>
+        /// Computes the x-offset of currently visible items. Makes the carousel appear round.
+        /// </summary>
+        /// <param name="dist">
+        /// Vertical distance from the center of the carousel container
+        /// ranging from -1 to 1.
+        /// </param>
+        /// <param name="halfHeight">Half the height of the carousel container.</param>
+        private static float offsetX(float dist, float halfHeight)
+        {
+            // The radius of the circle the carousel moves on.
+            const float circle_radius = 3;
+            float discriminant = MathF.Max(0, circle_radius * circle_radius - dist * dist);
+            return (circle_radius - MathF.Sqrt(discriminant)) * halfHeight;
         }
 
         private DisplayRange getDisplayRange()
@@ -373,7 +398,7 @@ namespace osu.Game.Screens.SelectV2
             if (displayedCarouselItems.Count > 0)
             {
                 var lastItem = displayedCarouselItems[^1];
-                scroll.SetLayoutHeight((float)(lastItem.CarouselYPosition + lastItem.DrawHeight));
+                scroll.SetLayoutHeight((float)(lastItem.CarouselYPosition + lastItem.DrawHeight + visibleHalfHeight));
             }
             else
                 scroll.SetLayoutHeight(0);
@@ -422,20 +447,6 @@ namespace osu.Game.Screens.SelectV2
                     Debug.Assert(c.Item != null);
 
                     c.DrawYPosition += offset;
-                }
-            }
-
-            protected override void Update()
-            {
-                base.Update();
-
-                foreach (var panel in Panels)
-                {
-                    var c = (ICarouselPanel)panel;
-                    Debug.Assert(c.Item != null);
-
-                    if (c.DrawYPosition != c.Item.CarouselYPosition)
-                        c.DrawYPosition = Interpolation.DampContinuously(c.DrawYPosition, c.Item.CarouselYPosition, 50, Time.Elapsed);
                 }
             }
 
