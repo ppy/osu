@@ -82,7 +82,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     acuteAngleBonus = calcAcuteAngleBonus(currAngle);
 
                     // Penalize angle repetition.
-                    acuteAngleBonus *= 0.1 + 0.9 * (1 - Math.Min(acuteAngleBonus, Math.Pow(calcAcuteAngleBonus(lastAngle), 3)));
+                    acuteAngleBonus *= 0.08 + 0.92 * (1 - Math.Min(acuteAngleBonus, Math.Pow(calcAcuteAngleBonus(lastAngle), 3)));
 
                     // Apply acute angle bonus for BPM above 300 1/2 and distance more than one diameter
                     acuteAngleBonus *= angleBonus *
