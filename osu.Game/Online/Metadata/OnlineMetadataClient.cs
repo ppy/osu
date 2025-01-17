@@ -23,14 +23,14 @@ namespace osu.Game.Online.Metadata
         public override IBindable<bool> IsWatchingUserPresence => isWatchingUserPresence;
         private readonly BindableBool isWatchingUserPresence = new BindableBool();
 
-        public override UserPresence LocalUserState => localUserState;
-        private UserPresence localUserState;
+        public override UserPresence LocalUserPresence => localUserPresence;
+        private UserPresence localUserPresence;
 
-        public override IBindableDictionary<int, UserPresence> UserStates => userStates;
-        private readonly BindableDictionary<int, UserPresence> userStates = new BindableDictionary<int, UserPresence>();
+        public override IBindableDictionary<int, UserPresence> UserPresences => userPresences;
+        private readonly BindableDictionary<int, UserPresence> userPresences = new BindableDictionary<int, UserPresence>();
 
-        public override IBindableDictionary<int, UserPresence> FriendStates => friendStates;
-        private readonly BindableDictionary<int, UserPresence> friendStates = new BindableDictionary<int, UserPresence>();
+        public override IBindableDictionary<int, UserPresence> FriendPresences => friendPresences;
+        private readonly BindableDictionary<int, UserPresence> friendPresences = new BindableDictionary<int, UserPresence>();
 
         public override IBindable<DailyChallengeInfo?> DailyChallengeInfo => dailyChallengeInfo;
         private readonly Bindable<DailyChallengeInfo?> dailyChallengeInfo = new Bindable<DailyChallengeInfo?>();
@@ -110,10 +110,10 @@ namespace osu.Game.Online.Metadata
                 Schedule(() =>
                 {
                     isWatchingUserPresence.Value = false;
-                    userStates.Clear();
-                    friendStates.Clear();
+                    userPresences.Clear();
+                    friendPresences.Clear();
                     dailyChallengeInfo.Value = null;
-                    localUserState = default;
+                    localUserPresence = default;
                 });
                 return;
             }
@@ -208,16 +208,16 @@ namespace osu.Game.Online.Metadata
                 if (presence?.Status != null)
                 {
                     if (userId == api.LocalUser.Value.OnlineID)
-                        localUserState = presence.Value;
+                        localUserPresence = presence.Value;
                     else
-                        userStates[userId] = presence.Value;
+                        userPresences[userId] = presence.Value;
                 }
                 else
                 {
                     if (userId == api.LocalUser.Value.OnlineID)
-                        localUserState = default;
+                        localUserPresence = default;
                     else
-                        userStates.Remove(userId);
+                        userPresences.Remove(userId);
                 }
             });
 
@@ -229,9 +229,9 @@ namespace osu.Game.Online.Metadata
             Schedule(() =>
             {
                 if (presence?.Status != null)
-                    friendStates[userId] = presence.Value;
+                    friendPresences[userId] = presence.Value;
                 else
-                    friendStates.Remove(userId);
+                    friendPresences.Remove(userId);
             });
 
             return Task.CompletedTask;
@@ -256,7 +256,7 @@ namespace osu.Game.Online.Metadata
                     throw new OperationCanceledException();
 
                 // must be scheduled before any remote calls to avoid mis-ordering.
-                Schedule(() => userStates.Clear());
+                Schedule(() => userPresences.Clear());
                 Debug.Assert(connection != null);
                 await connection.InvokeAsync(nameof(IMetadataServer.EndWatchingUserPresence)).ConfigureAwait(false);
                 Logger.Log($@"{nameof(OnlineMetadataClient)} stopped watching user presence", LoggingTarget.Network);
