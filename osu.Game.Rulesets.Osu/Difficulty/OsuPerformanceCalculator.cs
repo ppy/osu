@@ -10,7 +10,6 @@ using osu.Game.Rulesets.Osu.Difficulty.Skills;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
-using osu.Game.Utils;
 
 namespace osu.Game.Rulesets.Osu.Difficulty
 {
@@ -371,10 +370,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             // Compute the deviation assuming greats and oks are normally distributed, and mehs are uniformly distributed.
             // Begin with greats and oks first. Ignoring mehs, we can be 99% confident that the deviation is not higher than:
-            double deviation = hitWindowGreat / (Math.Sqrt(2) * SpecialFunctions.ErfInv(pLowerBound));
+            double deviation = hitWindowGreat / (Math.Sqrt(2) * DifficultyCalculationUtils.ErfInv(pLowerBound));
 
             double randomValue = Math.Sqrt(2 / Math.PI) * hitWindowOk * Math.Exp(-0.5 * Math.Pow(hitWindowOk / deviation, 2))
-                                 / (deviation * SpecialFunctions.Erf(hitWindowOk / (Math.Sqrt(2) * deviation)));
+                                 / (deviation * DifficultyCalculationUtils.Erf(hitWindowOk / (Math.Sqrt(2) * deviation)));
 
             deviation *= Math.Sqrt(1 - randomValue);
 
