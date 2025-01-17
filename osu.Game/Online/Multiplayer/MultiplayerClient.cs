@@ -165,6 +165,15 @@ namespace osu.Game.Online.Multiplayer
         private readonly TaskChain joinOrLeaveTaskChain = new TaskChain();
         private CancellationTokenSource? joinCancellationSource;
 
+        public async Task CreateRoom(Room room)
+        {
+            if (Room != null)
+                throw new InvalidOperationException("Cannot join a multiplayer room while already in one.");
+
+            var cancellationSource = joinCancellationSource = new CancellationTokenSource();
+            await initRoom(room, r => CreateRoom(new MultiplayerRoom(room)), cancellationSource.Token);
+        }
+
         /// <summary>
         /// Joins the <see cref="MultiplayerRoom"/> for a given API <see cref="Room"/>.
         /// </summary>
@@ -175,34 +184,34 @@ namespace osu.Game.Online.Multiplayer
             if (Room != null)
                 throw new InvalidOperationException("Cannot join a multiplayer room while already in one.");
 
-            var cancellationSource = joinCancellationSource = new CancellationTokenSource();
+            Debug.Assert(room.RoomID != null);
 
+            var cancellationSource = joinCancellationSource = new CancellationTokenSource();
+            await initRoom(room, r => JoinRoom(room.RoomID.Value, password ?? room.Password), cancellationSource.Token);
+        }
+
+        private async Task initRoom(Room room, Func<Room, Task<MultiplayerRoom>> initFunc, CancellationToken cancellationToken)
+        {
             await joinOrLeaveTaskChain.Add(async () =>
             {
-                Debug.Assert(room.RoomID != null);
-
-                // Join the server-side room.
-                var joinedRoom = await JoinRoom(room.RoomID.Value, password ?? room.Password).ConfigureAwait(false);
-                Debug.Assert(joinedRoom != null);
+                // Initialise the server-side room.
+                MultiplayerRoom joinedRoom = await initFunc(room).ConfigureAwait(false);
 
                 // Populate users.
-                Debug.Assert(joinedRoom.Users != null);
                 await PopulateUsers(joinedRoom.Users).ConfigureAwait(false);
 
                 // Update the stored room (must be done on update thread for thread-safety).
                 await runOnUpdateThreadAsync(() =>
                 {
                     Debug.Assert(Room == null);
+                    Debug.Assert(APIRoom == null);
 
                     Room = joinedRoom;
                     APIRoom = room;
 
-                    Debug.Assert(joinedRoom.Playlist.Count > 0);
-
+                    APIRoom.RoomID = joinedRoom.RoomID;
                     APIRoom.Playlist = joinedRoom.Playlist.Select(item => new PlaylistItem(item)).ToArray();
                     APIRoom.CurrentPlaylistItem = APIRoom.Playlist.Single(item => item.ID == joinedRoom.Settings.PlaylistItemId);
-
-                    // The server will null out the end date upon the host joining the room, but the null value is never communicated to the client.
                     APIRoom.EndDate = null;
 
                     Debug.Assert(LocalUser != null);
@@ -216,8 +225,8 @@ namespace osu.Game.Online.Multiplayer
                     postServerShuttingDownNotification();
 
                     OnRoomJoined();
-                }, cancellationSource.Token).ConfigureAwait(false);
-            }, cancellationSource.Token).ConfigureAwait(false);
+                }, cancellationToken).ConfigureAwait(false);
+            }, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -226,6 +235,13 @@ namespace osu.Game.Online.Multiplayer
         protected virtual void OnRoomJoined()
         {
         }
+
+        /// <summary>
+        /// Creates the <see cref="MultiplayerRoom"/> with the given settings.
+        /// </summary>
+        /// <param name="room">The room.</param>
+        /// <returns>The joined <see cref="MultiplayerRoom"/></returns>
+        protected abstract Task<MultiplayerRoom> CreateRoom(MultiplayerRoom room);
 
         /// <summary>
         /// Joins the <see cref="MultiplayerRoom"/> with a given ID.

@@ -233,10 +233,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             SelectedItem = SelectedItem
         };
 
-        protected override RoomSettingsOverlay CreateRoomSettingsOverlay(Room room) => new MultiplayerMatchSettingsOverlay(room)
-        {
-            SelectedItem = SelectedItem
-        };
+        protected override RoomSettingsOverlay CreateRoomSettingsOverlay(Room room) => new MultiplayerMatchSettingsOverlay(room);
 
         protected override void UpdateMods()
         {

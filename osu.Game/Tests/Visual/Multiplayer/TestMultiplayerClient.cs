@@ -483,6 +483,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         public override Task RemovePlaylistItem(long playlistItemId) => RemoveUserPlaylistItem(api.LocalUser.Value.OnlineID, clone(playlistItemId));
 
+        protected override Task<MultiplayerRoom> CreateRoom(MultiplayerRoom room)
+        {
+            throw new NotImplementedException();
+        }
+
         private async Task changeMatchType(MatchType type)
         {
             Debug.Assert(ServerRoom != null);

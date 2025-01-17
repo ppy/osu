@@ -29,12 +29,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 {
     public partial class MultiplayerMatchSettingsOverlay : RoomSettingsOverlay
     {
-        public required Bindable<PlaylistItem?> SelectedItem
-        {
-            get => selectedItem;
-            set => selectedItem.Current = value;
-        }
-
         protected override OsuButton SubmitButton => settings.ApplyButton;
         protected override bool IsLoading => ongoingOperationTracker.InProgress.Value;
 
@@ -56,7 +50,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             RelativeSizeAxes = Axes.Both,
             RelativePositionAxes = Axes.Y,
             SettingsApplied = Hide,
-            SelectedItem = { BindTarget = SelectedItem }
         };
 
         protected partial class MatchSettings : CompositeDrawable
@@ -65,7 +58,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
             public override bool IsPresent => base.IsPresent || Scheduler.HasPendingTasks;
 
-            public readonly Bindable<PlaylistItem?> SelectedItem = new Bindable<PlaylistItem?>();
             public Action? SettingsApplied;
 
             public OsuTextBox NameField = null!;
@@ -85,9 +77,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
             [Resolved]
             private MultiplayerMatchSubScreen matchSubScreen { get; set; } = null!;
-
-            [Resolved]
-            private IRoomManager manager { get; set; } = null!;
 
             [Resolved]
             private MultiplayerClient client { get; set; } = null!;
@@ -279,7 +268,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                                         {
                                                             RelativeSizeAxes = Axes.X,
                                                             Height = DrawableRoomPlaylistItem.HEIGHT,
-                                                            SelectedItem = { BindTarget = SelectedItem }
                                                         },
                                                         selectBeatmapButton = new RoundedButton
                                                         {
@@ -482,19 +470,27 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 }
                 else
                 {
-                    room.Name = NameField.Text;
-                    room.Type = TypePicker.Current.Value;
-                    room.Password = PasswordTextBox.Current.Value;
-                    room.QueueMode = QueueModeDropdown.Current.Value;
-                    room.AutoStartDuration = TimeSpan.FromSeconds((int)startModeDropdown.Current.Value);
-                    room.AutoSkip = AutoSkipCheckbox.Current.Value;
+                    client.CreateRoom(room).ContinueWith(t => Schedule(() =>
+                    {
+                        if (t.IsCompleted)
+                            onSuccess(room);
+                        else if (t.IsFaulted)
+                        {
+                            Exception? exception = t.Exception;
 
-                    if (int.TryParse(MaxParticipantsField.Text, out int max))
-                        room.MaxParticipants = max;
-                    else
-                        room.MaxParticipants = null;
+                            if (exception is AggregateException ae)
+                                exception = ae.InnerException;
 
-                    manager.CreateRoom(room, onSuccess, onError);
+                            Debug.Assert(exception != null);
+
+                            if (exception.GetHubExceptionMessage() is string message)
+                                onError(message);
+                            else
+                                onError($"Error creating room: {exception}");
+                        }
+                        else
+                            onError("Error creating room.");
+                    }));
                 }
             }
 
@@ -520,7 +516,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 if (text.StartsWith(not_found_prefix, StringComparison.Ordinal))
                 {
                     ErrorText.Text = "The selected beatmap is not available online.";
-                    SelectedItem.Value?.MarkInvalid();
+                    room.Playlist.SingleOrDefault()?.MarkInvalid();
                 }
                 else
                 {
