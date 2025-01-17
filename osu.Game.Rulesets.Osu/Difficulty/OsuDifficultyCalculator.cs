@@ -11,12 +11,14 @@ using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Difficulty.Skills;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Scoring;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Difficulty
 {
@@ -25,7 +27,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private const double difficulty_multiplier = 0.0675;
 
         //The bonus multiplier is a basic multiplier that indicate how strong the impact of Difficulty Factor is.
-        private const double bonus_multiplier = 0.6;
+        private const double bonus_multiplier = 0.3;
 
         public override int Version => 20241007;
 
@@ -55,11 +57,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double speedApproachRateBonus = beatmap.Difficulty.ApproachRate > 10.33 ? 0.2 * (beatmap.Difficulty.ApproachRate - 10.33) : 0.0; //AR bonus for higher AR;
             double aimApproachRateBonus = beatmap.Difficulty.ApproachRate > 10.33 ? 0.2 * (beatmap.Difficulty.ApproachRate - 10.33) : beatmap.Difficulty.ApproachRate < 8.0 ? 0.02 * (8.0 - beatmap.Difficulty.ApproachRate) : 0.0; //AR bonus for higher and lower AR;
 
-            aimRating *= (Math.Pow(beatmap.HitObjects.Count * (0.7 + skills[0].ConsistencyFactor * bonus_multiplier), 0.54) / 1500 + 1.0) * (1.0 + aimApproachRateBonus);
-            aimRatingNoSliders *= (Math.Pow(beatmap.HitObjects.Count * (0.7 + skills[1].ConsistencyFactor * bonus_multiplier), 0.54) / 1500 + 1.0) * (1.0 + aimApproachRateBonus);
-            speedRating *= (Math.Pow(beatmap.HitObjects.Count * (0.7 + skills[2].ConsistencyFactor * bonus_multiplier), 0.54) / 1500 + 1.07) * (1.0 + speedApproachRateBonus);
+            aimRating *= computeLengthBonus(beatmap.HitObjects.Count, skills[0].ConsistencyFactor, aimApproachRateBonus);
+            aimRatingNoSliders *= computeLengthBonus(beatmap.HitObjects.Count, skills[1].ConsistencyFactor, aimApproachRateBonus);
+            aimRating *= computeLengthBonus(beatmap.HitObjects.Count, skills[2].ConsistencyFactor, speedApproachRateBonus);
+
             if (mods.Any(h => h is OsuModFlashlight))
-                flashlightRating *= Math.Pow(beatmap.HitObjects.Count * (0.7 + skills[3].ConsistencyFactor * bonus_multiplier), 0.53) / 1500 + 1.0;
+                flashlightRating *= computeLengthBonus(beatmap.HitObjects.Count, skills[3].ConsistencyFactor, 0.0);
 
             double sliderFactor = aimRating > 0 ? aimRatingNoSliders / aimRating : 1;
 
@@ -142,9 +145,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 SliderCount = sliderCount,
                 SpinnerCount = spinnerCount,
             };
-
             return attributes;
         }
+
+        private double computeLengthBonus(double hitObjects, double consistencyFactor, double approachRateBonus) => (Math.Pow(hitObjects * (0.8 + consistencyFactor * bonus_multiplier), 0.54) / 1500 + 1.0) * (1.0 + approachRateBonus);
 
         protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
         {
