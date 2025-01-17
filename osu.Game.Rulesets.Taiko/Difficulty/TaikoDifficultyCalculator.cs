@@ -219,7 +219,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 weight *= 0.9;
             }
 
-            // We can calculate the consitency factor by doing middle weight spikes / most weight spikes.
+            // We can calculate the consitency factor by doing average of spikes / most weight spikes.
             // It result in a value that represent the consistency for all peaks in a range number from 0 to 1.
             totalConsistencyFactor = peaks.Average() / hardStrains.Average();
 
