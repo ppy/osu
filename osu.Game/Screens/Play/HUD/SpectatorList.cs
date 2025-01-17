@@ -245,7 +245,7 @@ namespace osu.Game.Screens.Play.HUD
         private void load(SpectatorClient client, GameplayState gameplayState)
         {
             ((IBindableList<SpectatorUser>)Spectators).BindTo(client.WatchingUsers);
-            ((IBindable<LocalUserPlayingState>)UserPlayingState).BindTo(gameplayState.Playing);
+            ((IBindable<LocalUserPlayingState>)UserPlayingState).BindTo(gameplayState.PlayingState);
         }
     }
 }
