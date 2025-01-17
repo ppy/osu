@@ -26,25 +26,11 @@ namespace osu.Game.Graphics.Containers
         }
     }
 
-    public partial class OsuScrollContainer<T> : ScrollContainer<T> where T : Drawable
+    public partial class OsuScrollContainer<T> : ScrollContainer<T>
+        where T : Drawable
     {
         public const float SCROLL_BAR_WIDTH = 10;
         public const float SCROLL_BAR_PADDING = 3;
-
-        /// <summary>
-        /// Allows controlling the scroll bar from any position in the container using the right mouse button.
-        /// Uses the value of <see cref="DistanceDecayOnRightMouseScrollbar"/> to smoothly scroll to the dragged location.
-        /// </summary>
-        public bool RightMouseScrollbar;
-
-        /// <summary>
-        /// Controls the rate with which the target position is approached when performing a relative drag. Default is 0.02.
-        /// </summary>
-        public double DistanceDecayOnRightMouseScrollbar = 0.02;
-
-        private bool rightMouseDragging;
-
-        protected override bool IsDragging => base.IsDragging || rightMouseDragging;
 
         public OsuScrollContainer(Direction scrollDirection = Direction.Vertical)
             : base(scrollDirection)
@@ -71,50 +57,6 @@ namespace osu.Game.Graphics.Containers
                 ScrollTo(maxPos - DisplayableContent + extraScroll, animated);
         }
 
-        protected override bool OnMouseDown(MouseDownEvent e)
-        {
-            if (shouldPerformRightMouseScroll(e))
-            {
-                ScrollFromMouseEvent(e);
-                return true;
-            }
-
-            return base.OnMouseDown(e);
-        }
-
-        protected override void OnDrag(DragEvent e)
-        {
-            if (rightMouseDragging)
-            {
-                ScrollFromMouseEvent(e);
-                return;
-            }
-
-            base.OnDrag(e);
-        }
-
-        protected override bool OnDragStart(DragStartEvent e)
-        {
-            if (shouldPerformRightMouseScroll(e))
-            {
-                rightMouseDragging = true;
-                return true;
-            }
-
-            return base.OnDragStart(e);
-        }
-
-        protected override void OnDragEnd(DragEndEvent e)
-        {
-            if (rightMouseDragging)
-            {
-                rightMouseDragging = false;
-                return;
-            }
-
-            base.OnDragEnd(e);
-        }
-
         protected override bool OnScroll(ScrollEvent e)
         {
             // allow for controlling volume when alt is held.
@@ -124,15 +66,22 @@ namespace osu.Game.Graphics.Containers
             return base.OnScroll(e);
         }
 
-        protected virtual void ScrollFromMouseEvent(MouseEvent e)
+        #region Absolute scrolling
+
+        /// <summary>
+        /// Controls the rate with which the target position is approached when performing a relative drag. Default is 0.02.
+        /// </summary>
+        public double DistanceDecayOnAbsoluteScroll = 0.02;
+
+        protected virtual void ScrollToAbsolutePosition(Vector2 screenSpacePosition)
         {
-            float fromScrollbarPosition = FromScrollbarPosition(ToLocalSpace(e.ScreenSpaceMousePosition)[ScrollDim]);
+            float fromScrollbarPosition = FromScrollbarPosition(ToLocalSpace(screenSpacePosition)[ScrollDim]);
             float scrollbarCentreOffset = FromScrollbarPosition(Scrollbar.DrawHeight) * 0.5f;
 
-            ScrollTo(Clamp(fromScrollbarPosition - scrollbarCentreOffset), true, DistanceDecayOnRightMouseScrollbar);
+            ScrollTo(Clamp(fromScrollbarPosition - scrollbarCentreOffset), true, DistanceDecayOnAbsoluteScroll);
         }
 
-        private bool shouldPerformRightMouseScroll(MouseButtonEvent e) => RightMouseScrollbar && e.Button == MouseButton.Right;
+        #endregion
 
         protected override ScrollbarContainer CreateScrollbar(Direction direction) => new OsuScrollbar(direction);
 

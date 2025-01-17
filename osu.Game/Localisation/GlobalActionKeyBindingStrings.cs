@@ -449,6 +449,11 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString EditorSeekToNextBookmark => new TranslatableString(getKey(@"editor_seek_to_next_bookmark"), @"Seek to next bookmark");
 
+        /// <summary>
+        /// "Absolute scroll song list"
+        /// </summary>
+        public static LocalisableString AbsoluteScrollSongList => new TranslatableString(getKey(@"absolute_scroll_song_list"), @"Absolute scroll song list");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
