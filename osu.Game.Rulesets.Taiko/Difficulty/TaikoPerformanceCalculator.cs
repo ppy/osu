@@ -97,7 +97,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
             // Scale accuracy more harshly on nearly-completely mono (single coloured) speed maps.
             double accScalingExponent = 2 + attributes.MonoStaminaFactor;
-            double accScalingShift = 500 - 100 * attributes.MonoStaminaFactor;
+            double accScalingShift = 500 - 100 * (attributes.MonoStaminaFactor * 3);
 
             return difficultyValue * Math.Pow(SpecialFunctions.Erf(accScalingShift / (Math.Sqrt(2) * estimatedUnstableRate.Value)), accScalingExponent);
         }
