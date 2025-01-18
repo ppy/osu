@@ -2,11 +2,14 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Aggregation;
 using osu.Game.Rulesets.Osu.Difficulty.Evaluators;
-using osu.Game.Utils;
+using osu.Game.Rulesets.Difficulty.Utils;
+using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
@@ -28,12 +31,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private double skillMultiplier => 132;
         private double strainDecayBase => 0.15;
 
+        private readonly List<double> sliderStrains = new List<double>();
+
         protected override double HitProbability(double skill, double difficulty)
         {
             if (difficulty <= 0) return 1;
             if (skill <= 0) return 0;
 
-            return SpecialFunctions.Erf(skill / (Math.Sqrt(2) * difficulty));
+            return DifficultyCalculationUtils.Erf(skill / (Math.Sqrt(2) * difficulty));
         }
 
         private double strainDecay(double ms) => Math.Pow(strainDecayBase, ms / 1000);
@@ -43,7 +48,26 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             currentStrain *= strainDecay(current.DeltaTime);
             currentStrain += AimEvaluator.EvaluateDifficultyOf(current, withSliders) * skillMultiplier;
 
+            if (current.BaseObject is Slider)
+            {
+                sliderStrains.Add(currentStrain);
+            }
+
             return currentStrain;
+        }
+
+        public double GetDifficultSliders()
+        {
+            if (sliderStrains.Count == 0)
+                return 0;
+
+            double[] sortedStrains = sliderStrains.OrderDescending().ToArray();
+
+            double maxSliderStrain = sortedStrains.Max();
+            if (maxSliderStrain == 0)
+                return 0;
+
+            return sortedStrains.Sum(strain => 1.0 / (1.0 + Math.Exp(-(strain / maxSliderStrain * 12.0 - 6.0))));
         }
     }
 }

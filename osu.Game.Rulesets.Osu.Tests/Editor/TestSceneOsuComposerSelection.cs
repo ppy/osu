@@ -231,6 +231,36 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             AddAssert("slider still has 2 anchors", () => secondSlider.Path.ControlPoints.Count, () => Is.EqualTo(2));
         }
 
+        [Test]
+        public void TestControlClickDoesNotDiscardExistingSelectionEvenIfNothingHit()
+        {
+            var firstSlider = new Slider
+            {
+                StartTime = 0,
+                Position = new Vector2(0, 0),
+                Path = new SliderPath
+                {
+                    ControlPoints =
+                    {
+                        new PathControlPoint(),
+                        new PathControlPoint(new Vector2(100))
+                    }
+                }
+            };
+
+            AddStep("add object", () => EditorBeatmap.AddRange([firstSlider]));
+            AddStep("select first slider", () => EditorBeatmap.SelectedHitObjects.AddRange([firstSlider]));
+
+            AddStep("move mouse to middle of playfield", () => InputManager.MoveMouseTo(blueprintContainer.ScreenSpaceDrawQuad.Centre));
+            AddStep("control-click left mouse", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.Click(MouseButton.Left);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+            AddAssert("selection preserved", () => EditorBeatmap.SelectedHitObjects.Count, () => Is.EqualTo(1));
+        }
+
         private ComposeBlueprintContainer blueprintContainer
             => Editor.ChildrenOfType<ComposeBlueprintContainer>().First();
 

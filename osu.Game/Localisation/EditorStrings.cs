@@ -154,6 +154,36 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString TimelineShowTicks => new TranslatableString(getKey(@"timeline_show_ticks"), @"Show ticks");
 
+        /// <summary>
+        /// "Bookmarks"
+        /// </summary>
+        public static LocalisableString Bookmarks => new TranslatableString(getKey(@"bookmarks"), @"Bookmarks");
+
+        /// <summary>
+        /// "Add bookmark"
+        /// </summary>
+        public static LocalisableString AddBookmark => new TranslatableString(getKey(@"add_bookmark"), @"Add bookmark");
+
+        /// <summary>
+        /// "Remove closest bookmark"
+        /// </summary>
+        public static LocalisableString RemoveClosestBookmark => new TranslatableString(getKey(@"remove_closest_bookmark"), @"Remove closest bookmark");
+
+        /// <summary>
+        /// "Seek to previous bookmark"
+        /// </summary>
+        public static LocalisableString SeekToPreviousBookmark => new TranslatableString(getKey(@"seek_to_previous_bookmark"), @"Seek to previous bookmark");
+
+        /// <summary>
+        /// "Seek to next bookmark"
+        /// </summary>
+        public static LocalisableString SeekToNextBookmark => new TranslatableString(getKey(@"seek_to_next_bookmark"), @"Seek to next bookmark");
+
+        /// <summary>
+        /// "Reset bookmarks"
+        /// </summary>
+        public static LocalisableString ResetBookmarks => new TranslatableString(getKey(@"reset_bookmarks"), @"Reset bookmarks");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
