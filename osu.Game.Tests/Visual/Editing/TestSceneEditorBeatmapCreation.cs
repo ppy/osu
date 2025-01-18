@@ -203,12 +203,19 @@ namespace osu.Game.Tests.Visual.Editing
         [Test]
         public void TestCreateNewDifficultyWithScrollSpeed_SameRuleset()
         {
-            string firstDifficultyName = Guid.NewGuid().ToString();
+            string previousDifficultyName = null!;
 
+            AddStep("set unique difficulty name", () => EditorBeatmap.BeatmapInfo.DifficultyName = previousDifficultyName = Guid.NewGuid().ToString());
             AddStep("save beatmap", () => Editor.Save());
             AddStep("create new difficulty", () => Editor.CreateNewDifficulty(new ManiaRuleset().RulesetInfo));
 
-            AddStep("set unique difficulty name", () => EditorBeatmap.BeatmapInfo.DifficultyName = firstDifficultyName);
+            AddUntilStep("wait for created", () =>
+            {
+                string? difficultyName = Editor.ChildrenOfType<EditorBeatmap>().SingleOrDefault()?.BeatmapInfo.DifficultyName;
+                return difficultyName != null && difficultyName != previousDifficultyName;
+            });
+
+            AddStep("set unique difficulty name", () => EditorBeatmap.BeatmapInfo.DifficultyName = previousDifficultyName = Guid.NewGuid().ToString());
             AddStep("add timing point", () => EditorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = 1000 }));
             AddStep("add effect points", () =>
             {
@@ -229,7 +236,7 @@ namespace osu.Game.Tests.Visual.Editing
             AddUntilStep("wait for created", () =>
             {
                 string? difficultyName = Editor.ChildrenOfType<EditorBeatmap>().SingleOrDefault()?.BeatmapInfo.DifficultyName;
-                return difficultyName != null && difficultyName != firstDifficultyName;
+                return difficultyName != null && difficultyName != previousDifficultyName;
             });
 
             AddAssert("created difficulty has timing point", () =>

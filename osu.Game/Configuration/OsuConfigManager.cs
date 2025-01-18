@@ -202,6 +202,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.HideCountryFlags, false);
 
             SetDefault(OsuSetting.MultiplayerRoomFilter, RoomPermissionsFilter.All);
+            SetDefault(OsuSetting.MultiplayerShowInProgressFilter, true);
 
             SetDefault(OsuSetting.LastProcessedMetadataId, -1);
 
@@ -447,6 +448,7 @@ namespace osu.Game.Configuration
         EditorRotationOrigin,
         EditorTimelineShowBreaks,
         EditorAdjustExistingObjectsOnTimingChanges,
-        AlwaysRequireHoldingForPause
+        AlwaysRequireHoldingForPause,
+        MultiplayerShowInProgressFilter,
     }
 }
