@@ -3,7 +3,7 @@
 
 using System;
 using System.Collections.Generic;
-using osu.Game.Utils;
+using osu.Game.Rulesets.Difficulty.Utils;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Utils
 {
@@ -112,7 +112,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Utils
             double k = (count + 0.5 - mu) / sigma;
 
             // see equation (14) of the cited paper
-            double result = SpecialFunctions.NormalCdf(0, 1, k) + v * (1 - k * k) * SpecialFunctions.NormalPdf(0, 1, k);
+            double result = DifficultyCalculationUtils.NormalCdf(0, 1, k) + v * (1 - k * k) * DifficultyCalculationUtils.NormalPdf(0, 1, k);
 
             return Math.Clamp(result, 0, 1);
         }
