@@ -57,6 +57,7 @@ jobs:
   test:
     name: Test
     runs-on: ${{matrix.os.fullname}}
+    if: github.event.pull_request.base.ref != 'pp-dev'
     env:
       OSU_EXECUTION_MODE: ${{matrix.threadingMode}}
     strategy:
@@ -97,6 +98,7 @@ jobs:
   build-only-android:
     name: Build only (Android)
     runs-on: windows-latest
+    if: github.event.pull_request.base.ref != 'pp-dev'
     timeout-minutes: 60
     steps:
       - name: Checkout
@@ -125,6 +127,7 @@ jobs:
   build-only-ios:
     name: Build only (iOS)
     runs-on: macos-latest
+    if: github.event.pull_request.base.ref != 'pp-dev'
     timeout-minutes: 60
     steps:
       - name: Checkout
