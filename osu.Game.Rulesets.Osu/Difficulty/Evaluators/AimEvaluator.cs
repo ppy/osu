@@ -151,10 +151,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             Slider? sliderCurr = osuLastObj.BaseObject as Slider;
             Slider? sliderLast = osuLastLastObj.BaseObject as Slider;
 
+            // Any of 2 previous objects should be a slider to buff alternating sliderjump-jump-sliderjump-jump case as much as normal sliderjumps
             if (sliderCurr == null && sliderLast == null)
                 return 0.0;
 
-            // Take the sliderless difficulty as a base
             double sliderJumpBonus = 1.0;
 
             // Punish the cases where 1/2 slider going into 1/2 note
