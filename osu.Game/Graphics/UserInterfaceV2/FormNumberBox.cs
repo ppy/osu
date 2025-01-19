@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Globalization;
-using osu.Framework.Input;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
@@ -19,11 +18,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
         internal partial class InnerNumberBox : InnerTextBox
         {
             public bool AllowDecimals { get; init; }
-
-            public InnerNumberBox()
-            {
-                InputProperties = new TextInputProperties(TextInputType.Number, false);
-            }
 
             protected override bool CanAddCharacter(char character)
                 => char.IsAsciiDigit(character) || (AllowDecimals && CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator.Contains(character));
