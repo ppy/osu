@@ -29,8 +29,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         {
             double difficulty = RhythmEvaluator.EvaluateDifficultyOf(current, greatHitWindow);
 
-            // To prevent abuse of exceedingly long intervals between awkward rhythms, we penalise its difficulty.
-            difficulty *= DifficultyCalculationUtils.Logistic(current.DeltaTime, 350, -1 / 25.0, 0.5) + 0.5;
+			// To prevent abuse of exceedingly long intervals between awkward rhythms, we penalise its difficulty.
+			double staminaDifficulty = StaminaEvaluator.EvaluateDifficultyOf(current) - 0.5; // Remove base strain
+			difficulty *= DifficultyCalculationUtils.Logistic(staminaDifficulty, 1 / 15.0, 50.0);
 
             return difficulty;
         }
