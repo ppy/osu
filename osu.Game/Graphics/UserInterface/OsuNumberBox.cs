@@ -5,8 +5,6 @@ namespace osu.Game.Graphics.UserInterface
 {
     public partial class OsuNumberBox : OsuTextBox
     {
-        protected override bool AllowIme => false;
-
         public OsuNumberBox()
         {
             SelectAllOnFocus = true;

@@ -66,8 +66,6 @@ namespace osu.Game.Overlays.Settings
 
         private partial class OutlinedNumberBox : OutlinedTextBox
         {
-            protected override bool AllowIme => false;
-
             protected override bool CanAddCharacter(char character) => char.IsAsciiDigit(character);
 
             public new void NotifyInputError() => base.NotifyInputError();
