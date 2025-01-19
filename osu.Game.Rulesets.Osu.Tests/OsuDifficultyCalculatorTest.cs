@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         public void Test(double expectedStarRating, int expectedMaxCombo, string name)
             => base.Test(expectedStarRating, expectedMaxCombo, name);
 
-        [TestCase(9.6779397290273756d, 239, "diffcalc-test")]
+        [TestCase(9.6779746353001634d, 239, "diffcalc-test")]
         [TestCase(1.7691451263718989d, 54, "zero-length-sliders")]
         [TestCase(0.55785578988249407d, 4, "very-fast-slider")]
         public void TestClockRateAdjusted(double expectedStarRating, int expectedMaxCombo, string name)
