@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         public double AimDifficulty { get; set; }
 
         /// <summary>
-        /// The difficulty factor corresponding to the aim skill.
+        /// The consistency factor corresponding to the aim skill.
         /// </summary>
         [JsonProperty("aim_consistency_factor")]
         public double AimConsistencyFactor { get; set; }
@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         public double SpeedDifficulty { get; set; }
 
         /// <summary>
-        /// The difficulty factor corresponding to the speed skill.
+        /// The consistency factor corresponding to the speed skill.
         /// </summary>
         [JsonProperty("speed_consistency_factor")]
         public double SpeedConsistencyFactor { get; set; }
@@ -56,6 +56,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         /// </summary>
         [JsonProperty("flashlight_difficulty")]
         public double FlashlightDifficulty { get; set; }
+
+        /// <summary>
+        /// The consistency factor corresponding to the flashlight skill.
+        /// </summary>
+        [JsonProperty("flashlight_consistency_factor")]
+        public double FlashlightConsistencyFactor { get; set; }
 
         /// <summary>
         /// Describes how much of <see cref="AimDifficulty"/> is contributed to by hitcircles or sliders.

@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 {
     public class OsuPerformanceCalculator : PerformanceCalculator
     {
-        public const double PERFORMANCE_BASE_MULTIPLIER = 1.07; // This is being adjusted to keep the final pp value scaled around what it used to be when changing things.
+        public const double PERFORMANCE_BASE_MULTIPLIER = 1.15; // This is being adjusted to keep the final pp value scaled around what it used to be when changing things.
 
         private bool usingClassicSliderAccuracy;
 
@@ -170,6 +170,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double aimValue = OsuStrainSkill.DifficultyToPerformance(aimDifficulty);
 
+            double approachRateBonus = attributes.ApproachRate > 10.33 ? 0.2 * (attributes.ApproachRate - 10.33) : attributes.ApproachRate < 8.0 ? 0.02 * (8.0 - attributes.ApproachRate) : 0.0;
+
+            aimValue *= OsuStrainSkill.CalculateLengthBonus(totalHits, attributes.AimConsistencyFactor, approachRateBonus);
+
             if (effectiveMissCount > 0)
                 aimValue *= calculateMissPenalty(effectiveMissCount, attributes.AimDifficultStrainCount);
 
@@ -211,6 +215,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double speedHighDeviationMultiplier = calculateSpeedHighDeviationNerf(attributes);
             speedValue *= speedHighDeviationMultiplier;
+
+            double approachRateBonus = attributes.ApproachRate > 10.33 ? 0.2 * (attributes.ApproachRate - 10.33) : 0.0;
+
+            speedValue *= OsuStrainSkill.CalculateLengthBonus(totalHits, attributes.SpeedConsistencyFactor, approachRateBonus);
 
             // Calculate accuracy assuming the worst case scenario
             double relevantTotalDiff = totalHits - attributes.SpeedNoteCount;
@@ -280,9 +288,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             flashlightValue *= getComboScalingFactor(attributes);
 
-            // Account for shorter maps having a higher ratio of 0 combo/100 combo flashlight radius.
-            flashlightValue *= 0.7 + 0.1 * Math.Min(1.0, totalHits / 200.0) +
-                               (totalHits > 200 ? 0.2 * Math.Min(1.0, (totalHits - 200) / 200.0) : 0.0);
+            flashlightValue *= Flashlight.CalculateLengthBonus(totalHits, attributes.FlashlightConsistencyFactor, 0.0);
 
             // Scale the flashlight value with accuracy _slightly_.
             flashlightValue *= 0.5 + accuracy / 2.0;

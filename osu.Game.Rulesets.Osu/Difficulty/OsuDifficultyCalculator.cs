@@ -52,16 +52,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (mods.Any(h => h is OsuModFlashlight))
                 flashlightRating = Math.Sqrt(skills[3].DifficultyValue()) * difficulty_multiplier;
 
-            double speedApproachRateBonus = beatmap.Difficulty.ApproachRate > 10.33 ? 0.2 * (beatmap.Difficulty.ApproachRate - 10.33) : 0.0; //AR bonus for higher AR;
-            double aimApproachRateBonus = beatmap.Difficulty.ApproachRate > 10.33 ? 0.2 * (beatmap.Difficulty.ApproachRate - 10.33) : beatmap.Difficulty.ApproachRate < 8.0 ? 0.02 * (8.0 - beatmap.Difficulty.ApproachRate) : 0.0; //AR bonus for higher and lower AR;
-
-            aimRating *= computeLengthBonus(beatmap.HitObjects.Count, skills[0].ConsistencyFactor, aimApproachRateBonus);
-            aimRatingNoSliders *= computeLengthBonus(beatmap.HitObjects.Count, skills[1].ConsistencyFactor, aimApproachRateBonus);
-            aimRating *= computeLengthBonus(beatmap.HitObjects.Count, skills[2].ConsistencyFactor, speedApproachRateBonus);
-
-            if (mods.Any(h => h is OsuModFlashlight))
-                flashlightRating *= computeLengthBonus(beatmap.HitObjects.Count, skills[3].ConsistencyFactor, 0.0);
-
             double sliderFactor = aimRating > 0 ? aimRatingNoSliders / aimRating : 1;
 
             double aimDifficultyStrainCount = ((OsuStrainSkill)skills[0]).CountTopWeightedStrains();
@@ -86,12 +76,23 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 flashlightRating *= 0.4;
             }
 
+            double speedApproachRateBonus = beatmap.Difficulty.ApproachRate > 10.33 ? 0.2 * (beatmap.Difficulty.ApproachRate - 10.33) : 0.0; //AR bonus for higher AR;
+            double aimApproachRateBonus = beatmap.Difficulty.ApproachRate > 10.33 ? 0.2 * (beatmap.Difficulty.ApproachRate - 10.33) : beatmap.Difficulty.ApproachRate < 8.0 ? 0.02 * (8.0 - beatmap.Difficulty.ApproachRate) : 0.0; //AR bonus for higher and lower AR;
+
             double baseAimPerformance = OsuStrainSkill.DifficultyToPerformance(aimRating);
+            baseAimPerformance *= OsuStrainSkill.CalculateLengthBonus(beatmap.HitObjects.Count, skills[0].ConsistencyFactor, aimApproachRateBonus);
             double baseSpeedPerformance = OsuStrainSkill.DifficultyToPerformance(speedRating);
+            baseSpeedPerformance *= OsuStrainSkill.CalculateLengthBonus(beatmap.HitObjects.Count, skills[2].ConsistencyFactor, speedApproachRateBonus);
             double baseFlashlightPerformance = 0.0;
 
+            double flashligthConsistencyFactor = 0.0;
+
             if (mods.Any(h => h is OsuModFlashlight))
+            {
+                flashligthConsistencyFactor = skills[3].ConsistencyFactor;
                 baseFlashlightPerformance = Flashlight.DifficultyToPerformance(flashlightRating);
+                baseFlashlightPerformance *= Flashlight.CalculateLengthBonus(beatmap.HitObjects.Count, flashligthConsistencyFactor, 0.0);
+            }
 
             double basePerformance =
                 Math.Pow(
@@ -129,6 +130,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 SpeedConsistencyFactor = skills[2].ConsistencyFactor,
                 SpeedNoteCount = speedNotes,
                 FlashlightDifficulty = flashlightRating,
+                FlashlightConsistencyFactor = flashligthConsistencyFactor,
                 SliderFactor = sliderFactor,
                 AimDifficultStrainCount = aimDifficultyStrainCount,
                 SpeedDifficultStrainCount = speedDifficultyStrainCount,
@@ -145,10 +147,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             };
             return attributes;
         }
-
-        private double computeLengthBonus(double hitObjects, double consistencyFactor, double approachRateBonus) => computeBasicLengthBonus(hitObjects, consistencyFactor) * (1.0 + approachRateBonus * computeBasicLengthBonus(hitObjects, consistencyFactor));
-
-        private double computeBasicLengthBonus(double hitObjects, double consistencyFactor) => Math.Pow(hitObjects * (0.8 + consistencyFactor * bonus_multiplier), 0.67) / 1500 + 1.0;
 
         protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
         {

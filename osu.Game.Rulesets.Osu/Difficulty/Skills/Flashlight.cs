@@ -44,5 +44,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         public override double DifficultyValue() => GetCurrentStrainPeaks().Sum();
 
         public static double DifficultyToPerformance(double difficulty) => 25 * Math.Pow(difficulty, 2);
+
+        public static double CalculateLengthBonus(double totalHits, double consistencyFactor, double approachRateBonus) => computeBasicLengthBonus(totalHits, consistencyFactor) * (1.0 + approachRateBonus * computeBasicLengthBonus(totalHits, consistencyFactor));
+        private static double computeBasicLengthBonus(double totalHits, double consistencyFactor) => Math.Pow(totalHits * (Math.Pow(1.0 + consistencyFactor, 2) - 0.5), 0.64) / 500 + 1.0;
     }
 }
