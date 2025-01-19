@@ -1176,33 +1176,37 @@ namespace osu.Game.Screens.Select
 
             protected override bool IsDragging => base.IsDragging || absoluteScrolling;
 
-            public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+            protected override bool OnMouseDown(MouseDownEvent e)
             {
-                switch (e.Action)
+                if (e.Button == MouseButton.Right)
                 {
-                    case GlobalAction.AbsoluteScrollSongList:
-                        // The default binding for absolute scroll is right mouse button.
-                        // To avoid conflicts with context menus, disallow absolute scroll completely if it looks like things will fall over.
-                        if (e.CurrentState.Mouse.Buttons.Contains(MouseButton.Right)
-                            && GetContainingInputManager()!.HoveredDrawables.OfType<IHasContextMenu>().Any())
-                            return false;
+                    // The default binding for absolute scroll is right mouse button.
+                    // To avoid conflicts with context menus, disallow absolute scroll completely if it looks like things will fall over.
+                    if (e.CurrentState.Mouse.Buttons.Contains(MouseButton.Right)
+                        && GetContainingInputManager()!.HoveredDrawables.OfType<IHasContextMenu>().Any())
+                        return false;
 
-                        ScrollToAbsolutePosition(e.CurrentState.Mouse.Position);
-                        absoluteScrolling = true;
-                        return true;
+                    ScrollToAbsolutePosition(e.CurrentState.Mouse.Position);
+                    absoluteScrolling = true;
+                    return true;
                 }
 
+                return base.OnMouseDown(e);
+            }
+
+            protected override void OnMouseUp(MouseUpEvent e)
+            {
+                absoluteScrolling = false;
+                base.OnMouseUp(e);
+            }
+
+            public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+            {
                 return false;
             }
 
             public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
             {
-                switch (e.Action)
-                {
-                    case GlobalAction.AbsoluteScrollSongList:
-                        absoluteScrolling = false;
-                        break;
-                }
             }
 
             protected override bool OnMouseMove(MouseMoveEvent e)
