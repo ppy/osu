@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
                 return 2;
             }
 
-            return 4;
+            return 8;
         }
 
         /// <summary>
