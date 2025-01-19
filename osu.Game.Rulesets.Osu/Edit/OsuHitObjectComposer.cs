@@ -178,7 +178,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                 return;
 
             List<OsuHitObject> remainingHitObjects = EditorBeatmap.HitObjects.Cast<OsuHitObject>().Where(h => h.StartTime >= timestamp).ToList();
-            string[] splitDescription = objectDescription.Split(',').ToArray();
+            string[] splitDescription = objectDescription.Split(',');
 
             for (int i = 0; i < splitDescription.Length; i++)
             {
