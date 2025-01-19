@@ -164,10 +164,10 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 
         private Drawable getResult(HitResult result)
         {
-            if (!hit_result_mapping.ContainsKey(result))
+            if (!hit_result_mapping.TryGetValue(result, out var value))
                 return null;
 
-            string filename = this.GetManiaSkinConfig<string>(hit_result_mapping[result])?.Value
+            string filename = this.GetManiaSkinConfig<string>(value)?.Value
                               ?? default_hit_result_skin_filenames[result];
 
             var animation = this.GetAnimation(filename, true, true, frameLength: 1000 / 20d);

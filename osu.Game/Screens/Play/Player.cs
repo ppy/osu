@@ -57,7 +57,7 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public event Action OnGameplayStarted;
 
-        public override bool AllowBackButton => false; // handled by HoldForMenuButton
+        public override bool AllowUserExit => false; // handled by HoldForMenuButton
 
         protected override bool PlayExitSound => !isRestarting;
 
@@ -83,9 +83,10 @@ namespace osu.Game.Screens.Play
         /// </summary>
         protected virtual bool PauseOnFocusLost => true;
 
-        public Action<bool> RestartRequested;
+        public Action<bool> PrepareLoaderForRestart;
 
         private bool isRestarting;
+        private bool skipExitTransition;
 
         private Bindable<bool> mouseWheelDisabled;
 
@@ -289,7 +290,7 @@ namespace osu.Game.Screens.Play
                 {
                     SaveReplay = async () => await prepareAndImportScoreAsync(true).ConfigureAwait(false),
                     OnRetry = Configuration.AllowUserInteraction ? () => Restart() : null,
-                    OnQuit = () => PerformExit(true),
+                    OnQuit = () => PerformExitWithConfirmation(),
                 },
                 new HotkeyExitOverlay
                 {
@@ -297,10 +298,7 @@ namespace osu.Game.Screens.Play
                     {
                         if (!this.IsCurrentScreen()) return;
 
-                        if (PerformExit(false))
-                            // The hotkey overlay dims the screen.
-                            // If the operation succeeds, we want to make sure we stay dimmed to keep continuity.
-                            fadeOut(true);
+                        PerformExit(skipTransition: true);
                     },
                 },
             });
@@ -318,10 +316,7 @@ namespace osu.Game.Screens.Play
                         {
                             if (!this.IsCurrentScreen()) return;
 
-                            if (Restart(true))
-                                // The hotkey overlay dims the screen.
-                                // If the operation succeeds, we want to make sure we stay dimmed to keep continuity.
-                                fadeOut(true);
+                            Restart(true);
                         },
                     },
                 });
@@ -448,7 +443,7 @@ namespace osu.Game.Screens.Play
                     {
                         HoldToQuit =
                         {
-                            Action = () => PerformExit(true),
+                            Action = () => PerformExitWithConfirmation(),
                             IsPaused = { BindTarget = GameplayClockContainer.IsPaused },
                             ReplayLoaded = { BindTarget = DrawableRuleset.HasReplayLoaded },
                         },
@@ -462,7 +457,7 @@ namespace osu.Game.Screens.Play
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre
                     },
-                    BreakOverlay = new BreakOverlay(working.Beatmap.BeatmapInfo.LetterboxInBreaks, ScoreProcessor)
+                    BreakOverlay = new BreakOverlay(working.Beatmap.LetterboxInBreaks, ScoreProcessor)
                     {
                         Clock = DrawableRuleset.FrameStableClock,
                         ProcessCustomClock = false,
@@ -485,7 +480,7 @@ namespace osu.Game.Screens.Play
                         OnResume = Resume,
                         Retries = RestartCount,
                         OnRetry = () => Restart(),
-                        OnQuit = () => PerformExit(true),
+                        OnQuit = () => PerformExitWithConfirmation(),
                     },
                 },
             };
@@ -588,25 +583,24 @@ namespace osu.Game.Screens.Play
         }
 
         /// <summary>
-        /// Attempts to complete a user request to exit gameplay.
+        /// Attempts to complete a user request to exit gameplay, with confirmation.
         /// </summary>
         /// <remarks>
         /// <list type="bullet">
         /// <item>This should only be called in response to a user interaction. Exiting is not guaranteed.</item>
         /// <item>This will interrupt any pending progression to the results screen, even if the transition has begun.</item>
         /// </list>
+        ///
+        /// This method will show the pause or fail dialog before performing an exit.
+        /// If a dialog is not yet displayed, the exit will be blocked and the relevant dialog will display instead.
         /// </remarks>
-        /// <param name="showDialogFirst">
-        /// Whether the pause or fail dialog should be shown before performing an exit.
-        /// If <see langword="true"/> and a dialog is not yet displayed, the exit will be blocked and the relevant dialog will display instead.
-        /// </param>
         /// <returns>Whether this call resulted in a final exit.</returns>
-        protected bool PerformExit(bool showDialogFirst)
+        protected bool PerformExitWithConfirmation()
         {
             bool pauseOrFailDialogVisible =
                 PauseOverlay.State.Value == Visibility.Visible || FailOverlay.State.Value == Visibility.Visible;
 
-            if (showDialogFirst && !pauseOrFailDialogVisible)
+            if (!pauseOrFailDialogVisible)
             {
                 // if the fail animation is currently in progress, accelerate it (it will show the pause dialog on completion).
                 if (ValidForResume && GameplayState.HasFailed)
@@ -625,6 +619,22 @@ namespace osu.Game.Screens.Play
                 }
             }
 
+            return PerformExit();
+        }
+
+        /// <summary>
+        /// Attempts to complete a user request to exit gameplay.
+        /// </summary>
+        /// <remarks>
+        /// <list type="bullet">
+        /// <item>This should only be called in response to a user interaction. Exiting is not guaranteed.</item>
+        /// <item>This will interrupt any pending progression to the results screen, even if the transition has begun.</item>
+        /// </list>
+        /// </remarks>
+        /// <param name="skipTransition">Whether the exit should perform without a transition, because the screen had faded to black already.</param>
+        /// <returns>Whether this call resulted in a final exit.</returns>
+        protected bool PerformExit(bool skipTransition = false)
+        {
             // Matching osu!stable behaviour, if the results screen is pending and the user requests an exit,
             // show the results instead.
             if (GameplayState.HasPassed && !isRestarting)
@@ -636,14 +646,21 @@ namespace osu.Game.Screens.Play
             // import current score if possible.
             prepareAndImportScoreAsync();
 
-            // Screen may not be current if a restart has been performed.
             if (this.IsCurrentScreen())
             {
+                skipExitTransition = skipTransition;
+
                 // The actual exit is performed if
                 // - the pause / fail dialog was not requested
                 // - the pause / fail dialog was requested but is already displayed (user showing intention to exit).
                 // - the pause / fail dialog was requested but couldn't be displayed due to the type or state of this Player instance.
                 this.Exit();
+            }
+            else
+            {
+                // May be restarting from results screen.
+                if (this.GetChildScreen() != null)
+                    this.MakeCurrent();
             }
 
             return true;
@@ -707,9 +724,10 @@ namespace osu.Game.Screens.Play
             // stopping here is to ensure music doesn't become audible after exiting back to PlayerLoader.
             musicController.Stop();
 
-            RestartRequested?.Invoke(quickRestart);
+            skipExitTransition = quickRestart;
+            PrepareLoaderForRestart?.Invoke(quickRestart);
 
-            return PerformExit(false);
+            return PerformExit(quickRestart);
         }
 
         /// <summary>
@@ -959,7 +977,9 @@ namespace osu.Game.Screens.Play
                 if (PauseOverlay.State.Value == Visibility.Visible)
                     PauseOverlay.Hide();
 
-                failAnimationContainer.Start();
+                bool restartOnFail = GameplayState.Mods.OfType<IApplicableFailOverride>().Any(m => m.RestartOnFail);
+                if (!restartOnFail)
+                    failAnimationContainer.Start();
 
                 // Failures can be triggered either by a judgement, or by a mod.
                 //
@@ -973,7 +993,7 @@ namespace osu.Game.Screens.Play
                     ScoreProcessor.FailScore(Score.ScoreInfo);
                     OnFail();
 
-                    if (GameplayState.Mods.OfType<IApplicableFailOverride>().Any(m => m.RestartOnFail))
+                    if (restartOnFail)
                         Restart(true);
                 });
             }
@@ -1254,10 +1274,10 @@ namespace osu.Game.Screens.Play
             ShowUserStatistics = true,
         };
 
-        private void fadeOut(bool instant = false)
+        private void fadeOut()
         {
-            float fadeOutDuration = instant ? 0 : 250;
-            this.FadeOut(fadeOutDuration);
+            if (!skipExitTransition)
+                this.FadeOut(250);
 
             if (this.IsCurrentScreen())
             {

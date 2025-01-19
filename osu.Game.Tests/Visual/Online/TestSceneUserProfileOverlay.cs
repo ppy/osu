@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
@@ -55,6 +56,16 @@ namespace osu.Game.Tests.Visual.Online
                     if (req is GetUserRequest getUserRequest)
                     {
                         getUserRequest.TriggerSuccess(TEST_USER);
+                        return true;
+                    }
+
+                    if (req is GetUserBeatmapsRequest getUserBeatmapsRequest)
+                    {
+                        getUserBeatmapsRequest.TriggerSuccess(new List<APIBeatmapSet>
+                        {
+                            CreateAPIBeatmapSet(),
+                            CreateAPIBeatmapSet()
+                        });
                         return true;
                     }
 

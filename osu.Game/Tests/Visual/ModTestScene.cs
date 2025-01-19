@@ -40,7 +40,7 @@ namespace osu.Game.Tests.Visual
             base.TearDownSteps();
         }
 
-        protected sealed override IBeatmap CreateBeatmap(RulesetInfo ruleset) => CurrentTestData?.Beatmap ?? base.CreateBeatmap(ruleset);
+        protected sealed override IBeatmap CreateBeatmap(RulesetInfo ruleset) => CurrentTestData?.CreateBeatmap?.Invoke() ?? base.CreateBeatmap(ruleset);
 
         protected sealed override TestPlayer CreatePlayer(Ruleset ruleset)
         {
@@ -93,7 +93,7 @@ namespace osu.Game.Tests.Visual
         protected class ModTestData
         {
             /// <summary>
-            /// Whether to use a replay to simulate an auto-play. True by default.
+            /// Whether to use a replay to simulate an autoplay. True by default.
             /// </summary>
             public bool Autoplay = true;
 
@@ -104,10 +104,11 @@ namespace osu.Game.Tests.Visual
             public List<ReplayFrame> ReplayFrames;
 
             /// <summary>
-            /// The beatmap for this test case.
+            /// A function which should create a new instance of a beatmap containing relevant
+            /// content to the test.
             /// </summary>
             [CanBeNull]
-            public IBeatmap Beatmap;
+            public Func<IBeatmap> CreateBeatmap;
 
             /// <summary>
             /// The conditions that cause this test case to pass.

@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
         {
             Mod = new OsuModStrictTracking(),
             Autoplay = false,
-            Beatmap = new Beatmap
+            CreateBeatmap = () => new Beatmap
             {
                 HitObjects = new List<HitObject>
                 {
