@@ -30,6 +30,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double lowBpmPenalty = Math.Clamp(1 + (DifficultyCalculationUtils.BPMToMilliseconds(200) - strainTime) / 70, 0.0, 1.0);
             finalValue *= lowBpmPenalty;
 
+            double doubletapness = 1.0 - osuCurrObj.GetDoubletapness((OsuDifficultyHitObject?)osuCurrObj.Next(0));
+            finalValue *= doubletapness;
+
             return finalValue;
         }
     }
