@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             double finalValue = (1 + speedBonus) * 1000 / strainTime;
 
-            double lowBpmPenalty = Math.Min(1.0, DifficultyCalculationUtils.BPMToMilliseconds(220) / strainTime);
+            double lowBpmPenalty = Math.Clamp(1 + (DifficultyCalculationUtils.BPMToMilliseconds(220) - strainTime) / 95, 0.0, 1.0);
             finalValue *= lowBpmPenalty;
 
             return finalValue;
