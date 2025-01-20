@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         public Stamina(Mod[] mods, bool singleColourStamina, bool isConvert)
             : base(mods)
         {
-            this.SingleColourStamina = singleColourStamina;
+            SingleColourStamina = singleColourStamina;
             this.isConvert = isConvert;
         }
 
