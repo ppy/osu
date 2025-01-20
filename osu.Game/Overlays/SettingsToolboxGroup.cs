@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Framework.Layout;
 using osu.Game.Graphics;
@@ -53,6 +54,8 @@ namespace osu.Game.Overlays
         private Box background = null!;
 
         private IconButton expandButton = null!;
+
+        private InputManager inputManager = null!;
 
         /// <summary>
         /// Create a new instance.
@@ -125,6 +128,8 @@ namespace osu.Game.Overlays
         {
             base.LoadComplete();
 
+            inputManager = GetContainingInputManager()!;
+
             Expanded.BindValueChanged(_ => updateExpandedState(true));
             updateExpandedState(false);
 
@@ -172,7 +177,9 @@ namespace osu.Game.Overlays
             // potentially continuing to get processed while content has changed to autosize.
             content.ClearTransforms();
 
-            if (Expanded.Value || IsHovered)
+            bool sliderDraggedInHimself = inputManager.DraggedDrawable.IsRootedAt(this);
+
+            if (Expanded.Value || IsHovered || sliderDraggedInHimself)
             {
                 content.AutoSizeAxes = Axes.Y;
                 content.AutoSizeDuration = animate ? transition_duration : 0;
