@@ -454,6 +454,11 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString AbsoluteScrollSongList => new TranslatableString(getKey(@"absolute_scroll_song_list"), @"Absolute scroll song list");
 
+        /// <summary>
+        /// "Toggle movement control"
+        /// </summary>
+        public static LocalisableString EditorToggleMoveControl => new TranslatableString(getKey(@"editor_toggle_move_control"), @"Toggle movement control");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
