@@ -39,6 +39,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             var aim = skills.OfType<Aim>().Single(a => a.IncludeSliders);
             double aimRating = Math.Sqrt(aim.DifficultyValue()) * difficulty_multiplier;
             double aimDifficultyStrainCount = aim.CountTopWeightedStrains();
+            double difficultSliders = aim.GetDifficultSliders();
 
             var aimWithoutSliders = skills.OfType<Aim>().Single(a => !a.IncludeSliders);
             double aimRatingNoSliders = Math.Sqrt(aimWithoutSliders.DifficultyValue()) * difficulty_multiplier;
@@ -63,6 +64,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 aimRating *= 0.9;
                 speedRating = 0.0;
                 flashlightRating *= 0.7;
+            }
+            else if (mods.Any(h => h is OsuModAutopilot))
+            {
+                speedRating *= 0.5;
+                aimRating = 0.0;
+                flashlightRating *= 0.4;
             }
 
             double baseAimPerformance = OsuStrainSkill.DifficultyToPerformance(aimRating);
@@ -94,12 +101,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             hitWindows.SetDifficulty(beatmap.Difficulty.OverallDifficulty);
 
             double hitWindowGreat = hitWindows.WindowFor(HitResult.Great) / clockRate;
+            double hitWindowOk = hitWindows.WindowFor(HitResult.Ok) / clockRate;
+            double hitWindowMeh = hitWindows.WindowFor(HitResult.Meh) / clockRate;
 
             OsuDifficultyAttributes attributes = new OsuDifficultyAttributes
             {
                 StarRating = starRating,
                 Mods = mods,
                 AimDifficulty = aimRating,
+                AimDifficultSliderCount = difficultSliders,
                 SpeedDifficulty = speedRating,
                 SpeedNoteCount = speedNotes,
                 FlashlightDifficulty = flashlightRating,
@@ -108,6 +118,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 SpeedDifficultStrainCount = speedDifficultyStrainCount,
                 ApproachRate = preempt > 1200 ? (1800 - preempt) / 120 : (1200 - preempt) / 150 + 5,
                 OverallDifficulty = (80 - hitWindowGreat) / 6,
+                GreatHitWindow = hitWindowGreat,
+                OkHitWindow = hitWindowOk,
+                MehHitWindow = hitWindowMeh,
                 DrainRate = drainRate,
                 MaxCombo = beatmap.GetMaxCombo(),
                 HitCircleCount = hitCirclesCount,

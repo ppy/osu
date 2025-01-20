@@ -4,6 +4,7 @@
 using System;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
+using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Taiko.Difficulty.Evaluators;
 using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing;
@@ -15,10 +16,11 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
     /// </summary>
     public class Stamina : StrainSkill
     {
-        public readonly bool MonoColour;
-
         private double skillMultiplier => 1.1;
         private double strainDecayBase => 0.4;
+
+        public readonly bool SingleColourStamina;
+        private readonly bool isConvert;
 
         private double currentStrain;
 
@@ -26,11 +28,13 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         /// Creates a <see cref="Stamina"/> skill.
         /// </summary>
         /// <param name="mods">Mods for use in skill calculations.</param>
-        /// <param name="monoColour">Reads when Stamina is from a single coloured pattern.</param>
-        public Stamina(Mod[] mods, bool monoColour)
+        /// <param name="singleColourStamina">Reads when Stamina is from a single coloured pattern.</param>
+        /// <param name="isConvert">Determines if the currently evaluated beatmap is converted.</param>
+        public Stamina(Mod[] mods, bool singleColourStamina, bool isConvert)
             : base(mods)
         {
-            MonoColour = monoColour;
+            this.SingleColourStamina = singleColourStamina;
+            this.isConvert = isConvert;
         }
 
         private double strainDecay(double ms) => Math.Pow(strainDecayBase, ms / 1000);
@@ -44,12 +48,14 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             var currentObject = current as TaikoDifficultyHitObject;
             int index = currentObject?.Colour.MonoStreak?.HitObjects.IndexOf(currentObject) ?? 0;
 
-            if (MonoColour)
-                return currentStrain / (1 + Math.Exp(-(index - 10) / 2.0));
+            double monolengthBonus = isConvert ? 1 : 1 + Math.Min(Math.Max((index - 5) / 50.0, 0), 0.30);
 
-            return currentStrain;
+            if (SingleColourStamina)
+                return DifficultyCalculationUtils.Logistic(-(index - 10) / 2.0, currentStrain);
+
+            return currentStrain * monolengthBonus;
         }
 
-        protected override double CalculateInitialStrain(double time, DifficultyHitObject current) => MonoColour ? 0 : currentStrain * strainDecay(time - current.Previous(0).StartTime);
+        protected override double CalculateInitialStrain(double time, DifficultyHitObject current) => SingleColourStamina ? 0 : currentStrain * strainDecay(time - current.Previous(0).StartTime);
     }
 }
