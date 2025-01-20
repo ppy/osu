@@ -60,6 +60,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
                                 Children = new Drawable[]
                                 {
                                     new LegacyKeyCounterDisplay(),
+                                    new LegacyHealthDisplay(),
                                 }
                             };
                     }

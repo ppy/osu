@@ -39,7 +39,10 @@ namespace osu.Game.Skinning
 
         public bool Protected { get; set; }
 
-        public virtual Skin CreateInstance(IStorageResourceProvider resources)
+        /// <summary>
+        /// Returns the specific subtype of <see cref="Skin"/> that will be constructed on calling <see cref="CreateInstance"/>.
+        /// </summary>
+        internal Type GetInstanceType()
         {
             var type = string.IsNullOrEmpty(InstantiationInfo)
                 // handle the case of skins imported before InstantiationInfo was added.
@@ -52,11 +55,13 @@ namespace osu.Game.Skinning
                 // for user modified skins. This aims to amicably handle that.
                 // If we ever add more default skins in the future this will need some kind of proper migration rather than
                 // a single fallback.
-                return new TrianglesSkin(this, resources);
+                return typeof(TrianglesSkin);
             }
 
-            return (Skin)Activator.CreateInstance(type, this, resources)!;
+            return type;
         }
+
+        public virtual Skin CreateInstance(IStorageResourceProvider resources) => (Skin)Activator.CreateInstance(GetInstanceType(), this, resources)!;
 
         public IList<RealmNamedFileUsage> Files { get; } = null!;
 
