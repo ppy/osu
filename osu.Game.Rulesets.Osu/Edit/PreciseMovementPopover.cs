@@ -85,11 +85,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
             base.LoadComplete();
 
-            ScheduleAfterChildren(() =>
-            {
-                xInput.TakeFocus();
-                xInput.SelectAll();
-            });
+            ScheduleAfterChildren(() => xInput.TakeFocus());
         }
 
         protected override void PopIn()

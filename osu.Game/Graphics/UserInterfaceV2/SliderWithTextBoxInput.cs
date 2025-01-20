@@ -74,6 +74,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                         textBox = new LabelledTextBox
                         {
                             Label = labelText,
+                            SelectAllOnFocus = true,
                         },
                         slider = new SettingsSlider<T>
                         {
@@ -91,8 +92,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
         }
 
         public bool TakeFocus() => GetContainingFocusManager()?.ChangeFocus(textBox) == true;
-
-        public bool SelectAll() => textBox.SelectAll();
 
         private bool updatingFromTextBox;
 
