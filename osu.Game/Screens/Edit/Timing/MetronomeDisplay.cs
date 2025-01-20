@@ -262,6 +262,8 @@ namespace osu.Game.Screens.Edit.Timing
 
         private void updateBpmText()
         {
+            // While interpolating between two integer values, showing the decimal places would look a bit odd
+            // so rounding is applied until we're close to the final value.
             double bpm = Precision.AlmostEquals(interpolatedBpm.Value, effectiveBpm, 1.0)
                 ? effectiveBpm
                 : Math.Round(interpolatedBpm.Value);
