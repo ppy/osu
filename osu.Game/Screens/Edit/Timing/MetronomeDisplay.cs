@@ -262,10 +262,9 @@ namespace osu.Game.Screens.Edit.Timing
 
         private void updateBpmText()
         {
-            double bpm = Math.Round(interpolatedBpm.Value);
-
-            if (Precision.AlmostEquals(bpm, effectiveBpm, 1.0))
-                bpm = effectiveBpm;
+            double bpm = Precision.AlmostEquals(interpolatedBpm.Value, effectiveBpm, 1.0)
+                ? effectiveBpm
+                : Math.Round(interpolatedBpm.Value);
 
             bpmText.Text = bpm.ToLocalisableString("0.##");
         }
