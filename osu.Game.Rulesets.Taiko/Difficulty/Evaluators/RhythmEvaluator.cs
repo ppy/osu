@@ -120,7 +120,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
                     intervalDifficulty *= DifficultyCalculationUtils.Logistic(
                         durationDifference / hitWindow,
                         midpointOffset: 0.7,
-                        multiplier: 1.5,
+                        multiplier: 1.0,
                         maxValue: 1);
                 }
             }
