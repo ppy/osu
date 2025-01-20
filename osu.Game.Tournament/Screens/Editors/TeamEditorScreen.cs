@@ -185,19 +185,18 @@ namespace osu.Game.Tournament.Screens.Editors
 
                 Model.Acronym.BindValueChanged(acronym =>
                 {
-                    var matchingTeams = ladderInfo.Teams
-                                                  .Where(t => t.Acronym.Value == acronym.NewValue && t != Model)
-                                                  .ToList();
+                    var teamsWithSameAcronym = ladderInfo.Teams
+                                                         .Where(t => t.Acronym.Value == acronym.NewValue && t != Model)
+                                                         .ToList();
 
-                    if (matchingTeams.Count > 0)
+                    if (teamsWithSameAcronym.Count > 0)
                     {
                         acronymTextBox.SetNoticeText(
-                            $"Acronym '{acronym.NewValue}' is already in use by team{(matchingTeams.Count > 1 ? "s" : "")}:\n"
-                            + $"{string.Join(",\n", matchingTeams)}", true);
-                        return;
+                            $"Acronym '{acronym.NewValue}' is already in use by team{(teamsWithSameAcronym.Count > 1 ? "s" : "")}:\n"
+                            + $"{string.Join(",\n", teamsWithSameAcronym)}", true);
                     }
-
-                    acronymTextBox.ClearNoticeText();
+                    else
+                        acronymTextBox.ClearNoticeText();
                 }, true);
             }
 
