@@ -16,8 +16,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     public class Speed : OsuStrainSkill
     {
         private double totalMultiplier => 1.0;
-        private double burstMultiplier => 1.9;
-        private double staminaMultiplier => 0.025;
+        private double burstMultiplier => 1.87;
+        private double staminaMultiplier => 0.03;
 
         private double currentBurstStrain;
         private double currentStaminaStrain;
@@ -29,9 +29,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         }
 
         private double strainDecayBurst(double ms) => Math.Pow(0.15, ms / 1000);
-        private double strainDecayStamina(double ms) => Math.Pow(0.1, Math.Pow(ms / 1000, 3.0));
+        private double strainDecayStamina(double ms) => Math.Pow(0.1, Math.Pow(ms / 1000, 2.6));
 
-        protected override double CalculateInitialStrain(double time, DifficultyHitObject current) => (currentBurstStrain * currentRhythm) * strainDecayBurst(time - current.Previous(0).StartTime);
+        protected override double CalculateInitialStrain(double time, DifficultyHitObject current)
+        {
+            return currentBurstStrain * currentRhythm * strainDecayBurst(time - current.Previous(0).StartTime) +
+                   currentStaminaStrain * strainDecayStamina(time - current.Previous(0).StartTime);
+        }
 
         protected override double StrainValueAt(DifficultyHitObject current)
         {

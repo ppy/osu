@@ -22,12 +22,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double strainTime = osuCurrObj.StrainTime;
             double speedBonus = 0.0;
 
-            if (DifficultyCalculationUtils.MillisecondsToBPM(strainTime) > 220)
-                speedBonus = Math.Pow((DifficultyCalculationUtils.BPMToMilliseconds(220) - strainTime) / 40, 2);
+            if (DifficultyCalculationUtils.MillisecondsToBPM(strainTime) > 240)
+                speedBonus = Math.Pow((DifficultyCalculationUtils.BPMToMilliseconds(240) - strainTime) / 15.0, 2);
 
             double finalValue = (1 + speedBonus) * 1000 / strainTime;
 
-            double lowBpmPenalty = Math.Min(1.0, Math.Sqrt(strainTime / DifficultyCalculationUtils.BPMToMilliseconds(220)));
+            double lowBpmPenalty = Math.Min(1.0, DifficultyCalculationUtils.BPMToMilliseconds(220) / strainTime);
             finalValue *= lowBpmPenalty;
 
             return finalValue;
