@@ -16,17 +16,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     /// </summary>
     public class Aim : OsuStrainSkill
     {
-        public Aim(Mod[] mods, bool withSliders)
+        public readonly bool IncludeSliders;
+
+        public Aim(Mod[] mods, bool includeSliders)
             : base(mods)
         {
-            this.withSliders = withSliders;
+            IncludeSliders = includeSliders;
         }
-
-        private readonly bool withSliders;
 
         private double currentStrain;
 
-        private double skillMultiplier => 25.18;
+        private double skillMultiplier => 25.6;
         private double strainDecayBase => 0.15;
 
         private readonly List<double> sliderStrains = new List<double>();
@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         protected override double StrainValueAt(DifficultyHitObject current)
         {
             currentStrain *= strainDecay(current.DeltaTime);
-            currentStrain += AimEvaluator.EvaluateDifficultyOf(current, withSliders) * skillMultiplier;
+            currentStrain += AimEvaluator.EvaluateDifficultyOf(current, IncludeSliders) * skillMultiplier;
 
             if (current.BaseObject is Slider)
             {

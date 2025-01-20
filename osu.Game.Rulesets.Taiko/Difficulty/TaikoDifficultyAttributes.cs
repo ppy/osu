@@ -40,8 +40,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         [JsonProperty("mono_stamina_factor")]
         public double MonoStaminaFactor { get; set; }
 
-        [JsonProperty("reading_difficult_strains")]
-        public double ReadingTopStrains { get; set; }
+        [JsonProperty("rhythm_difficult_strains")]
+        public double RhythmTopStrains { get; set; }
 
         [JsonProperty("colour_difficult_strains")]
         public double ColourTopStrains { get; set; }
