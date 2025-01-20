@@ -161,12 +161,21 @@ namespace osu.Game.Overlays.Profile.Header.Components
 
             if (playedToday && userIsOnOwnProfile)
             {
-                completionMark.Alpha = 1;
+                if (completionMark.Alpha > 0.8f)
+                {
+                    completionMark.ScaleTo(1.2f).ScaleTo(1, 800, Easing.OutElastic);
+                }
+                else
+                {
+                    completionMark.FadeIn(500, Easing.OutExpo);
+                    completionMark.ScaleTo(1.6f).ScaleTo(1, 500, Easing.OutExpo);
+                }
+
                 content.BorderColour = colours.Lime1;
             }
             else
             {
-                completionMark.Alpha = 0;
+                completionMark.FadeOut(50);
                 content.BorderColour = colourProvider.Background4;
             }
 
