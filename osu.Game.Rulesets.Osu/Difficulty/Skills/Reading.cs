@@ -32,8 +32,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             double densityReadingDifficulty = ReadingEvaluator.EvaluateDifficultyOf(current);
             double densityAimingFactor = ReadingEvaluator.EvaluateAimingDensityFactorOf(current);
 
+            // Reward slideraim but not bigger than 2 * sliderless aim
+            double aimDifficulty = Math.Max(AimEvaluator.EvaluateDifficultyOf(current, true), 2 * AimEvaluator.EvaluateDifficultyOf(current, true));
+
             currentDensityAimStrain *= strainDecay(current.DeltaTime);
-            currentDensityAimStrain += densityAimingFactor * AimEvaluator.EvaluateDifficultyOf(current, true) * aimComponentMultiplier;
+            currentDensityAimStrain += densityAimingFactor * aimDifficulty * aimComponentMultiplier;
 
             double totalDensityDifficulty = (currentDensityAimStrain + densityReadingDifficulty) * skillMultiplier;
             return totalDensityDifficulty;
