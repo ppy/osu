@@ -203,9 +203,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         /// Applies a final re-scaling of the star rating.
         /// </summary>
         /// <param name="sr">The raw star rating value before re-scaling.</param>
-        private double rescale(double sr)
+        private static double rescale(double sr)
         {
-            if (sr < 0) return sr;
+            if (sr < 0)
+                return sr;
 
             return 10.43 * Math.Log(sr / 8 + 1);
         }
