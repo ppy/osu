@@ -37,7 +37,7 @@ namespace osu.Game.Screens
 
         public string Description => Title;
 
-        public virtual bool AllowBackButton => true;
+        public virtual bool AllowUserExit => true;
 
         public virtual bool ShowFooter => false;
 
@@ -56,6 +56,15 @@ namespace osu.Game.Screens
 
         IBindable<OverlayActivation> IOsuScreen.OverlayActivationMode => OverlayActivationMode;
 
+        /// <summary>
+        /// The initial visibility state of the back button when this screen is entered for the first time.
+        /// </summary>
+        protected virtual bool InitialBackButtonVisibility => AllowUserExit;
+
+        public readonly Bindable<bool> BackButtonVisibility;
+
+        IBindable<bool> IOsuScreen.BackButtonVisibility => BackButtonVisibility;
+
         public virtual bool CursorVisible => true;
 
         protected new OsuGameBase Game => base.Game as OsuGameBase;
@@ -72,7 +81,7 @@ namespace osu.Game.Screens
         /// </summary>
         protected readonly Bindable<UserActivity> Activity = new Bindable<UserActivity>();
 
-        IBindable<UserActivity> IOsuScreen.Activity => Activity;
+        Bindable<UserActivity> IOsuScreen.Activity => Activity;
 
         /// <summary>
         /// Whether to disallow changes to game-wise Beatmap/Ruleset bindables for this screen (and all children).
@@ -154,6 +163,7 @@ namespace osu.Game.Screens
             Origin = Anchor.Centre;
 
             OverlayActivationMode = new Bindable<OverlayActivation>(InitialOverlayActivationMode);
+            BackButtonVisibility = new Bindable<bool>(InitialBackButtonVisibility);
         }
 
         [BackgroundDependencyLoader(true)]

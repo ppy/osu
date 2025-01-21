@@ -53,13 +53,13 @@ namespace osu.Game.Tests.Visual.UserInterface
                         beatmap.OnlineID = 1001;
                         getRoomRequest.TriggerSuccess(new Room
                         {
-                            RoomID = { Value = 1234 },
+                            RoomID = 1234,
                             Playlist =
-                            {
+                            [
                                 new PlaylistItem(beatmap)
-                            },
-                            StartDate = { Value = DateTimeOffset.Now.AddMinutes(-5) },
-                            EndDate = { Value = DateTimeOffset.Now.AddSeconds(30) }
+                            ],
+                            StartDate = DateTimeOffset.Now.AddMinutes(-5),
+                            EndDate = DateTimeOffset.Now.AddSeconds(30)
                         });
                         return true;
 
@@ -131,13 +131,13 @@ namespace osu.Game.Tests.Visual.UserInterface
                         beatmap.OnlineID = 1001;
                         getRoomRequest.TriggerSuccess(new Room
                         {
-                            RoomID = { Value = 1234 },
+                            RoomID = 1234,
                             Playlist =
-                            {
+                            [
                                 new PlaylistItem(beatmap)
-                            },
-                            StartDate = { Value = DateTimeOffset.Now.AddMinutes(-50) },
-                            EndDate = { Value = DateTimeOffset.Now.AddSeconds(30) }
+                            ],
+                            StartDate = DateTimeOffset.Now.AddMinutes(-50),
+                            EndDate = DateTimeOffset.Now.AddSeconds(30)
                         });
                         return true;
 

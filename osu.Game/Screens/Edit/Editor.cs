@@ -45,6 +45,7 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Edit.Components.Menus;
 using osu.Game.Screens.Edit.Compose;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
@@ -54,7 +55,6 @@ using osu.Game.Screens.Edit.Setup;
 using osu.Game.Screens.Edit.Timing;
 using osu.Game.Screens.Edit.Verify;
 using osu.Game.Screens.OnlinePlay;
-using osu.Game.Screens.Play;
 using osu.Game.Users;
 using osuTK.Input;
 using WebCommonStrings = osu.Game.Resources.Localisation.Web.CommonStrings;
@@ -63,7 +63,7 @@ namespace osu.Game.Screens.Edit
 {
     [Cached(typeof(IBeatSnapProvider))]
     [Cached]
-    public partial class Editor : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>, IKeyBindingHandler<PlatformAction>, IBeatSnapProvider, ISamplePlaybackDisabler, IBeatSyncProvider
+    public partial class Editor : OsuScreen, IKeyBindingHandler<GlobalAction>, IKeyBindingHandler<PlatformAction>, IBeatSnapProvider, ISamplePlaybackDisabler, IBeatSyncProvider
     {
         /// <summary>
         /// An offset applied to waveform visuals to align them with expectations.
@@ -79,8 +79,6 @@ namespace osu.Game.Screens.Edit
         public const float WAVEFORM_VISUAL_OFFSET = 20;
 
         public override float BackgroundParallaxAmount => 0.1f;
-
-        public override bool AllowBackButton => false;
 
         public override bool HideOverlaysOnEnter => true;
 
@@ -194,6 +192,8 @@ namespace osu.Game.Screens.Edit
             }
         }
 
+        protected override bool InitialBackButtonVisibility => false;
+
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
             => dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
@@ -210,6 +210,7 @@ namespace osu.Game.Screens.Edit
         private OnScreenDisplay onScreenDisplay { get; set; }
 
         private Bindable<float> editorBackgroundDim;
+        private Bindable<bool> editorShowStoryboard;
         private Bindable<bool> editorHitMarkers;
         private Bindable<bool> editorAutoSeekOnPlacement;
         private Bindable<bool> editorLimitedDistanceSnap;
@@ -320,6 +321,7 @@ namespace osu.Game.Screens.Edit
             OsuMenuItem redoMenuItem;
 
             editorBackgroundDim = config.GetBindable<float>(OsuSetting.EditorDim);
+            editorShowStoryboard = config.GetBindable<bool>(OsuSetting.EditorShowStoryboard);
             editorHitMarkers = config.GetBindable<bool>(OsuSetting.EditorShowHitMarkers);
             editorAutoSeekOnPlacement = config.GetBindable<bool>(OsuSetting.EditorAutoSeekOnPlacement);
             editorLimitedDistanceSnap = config.GetBindable<bool>(OsuSetting.EditorLimitedDistanceSnap);
@@ -398,7 +400,13 @@ namespace osu.Game.Screens.Edit
                                                     },
                                                 ]
                                             },
+                                            new OsuMenuItemSpacer(),
                                             new BackgroundDimMenuItem(editorBackgroundDim),
+                                            new ToggleMenuItem("Show storyboard")
+                                            {
+                                                State = { BindTarget = editorShowStoryboard },
+                                            },
+                                            new OsuMenuItemSpacer(),
                                             new ToggleMenuItem(EditorStrings.ShowHitMarkers)
                                             {
                                                 State = { BindTarget = editorHitMarkers },
@@ -422,6 +430,29 @@ namespace osu.Game.Screens.Edit
                                         Items = new MenuItem[]
                                         {
                                             new EditorMenuItem(EditorStrings.SetPreviewPointToCurrent, MenuItemType.Standard, SetPreviewPointToCurrentTime),
+                                            new EditorMenuItem(EditorStrings.Bookmarks)
+                                            {
+                                                Items = new MenuItem[]
+                                                {
+                                                    new EditorMenuItem(EditorStrings.AddBookmark, MenuItemType.Standard, addBookmarkAtCurrentTime)
+                                                    {
+                                                        Hotkey = new Hotkey(GlobalAction.EditorAddBookmark),
+                                                    },
+                                                    new EditorMenuItem(EditorStrings.RemoveClosestBookmark, MenuItemType.Destructive, removeBookmarksInProximityToCurrentTime)
+                                                    {
+                                                        Hotkey = new Hotkey(GlobalAction.EditorRemoveClosestBookmark)
+                                                    },
+                                                    new EditorMenuItem(EditorStrings.SeekToPreviousBookmark, MenuItemType.Standard, () => seekBookmark(-1))
+                                                    {
+                                                        Hotkey = new Hotkey(GlobalAction.EditorSeekToPreviousBookmark)
+                                                    },
+                                                    new EditorMenuItem(EditorStrings.SeekToNextBookmark, MenuItemType.Standard, () => seekBookmark(1))
+                                                    {
+                                                        Hotkey = new Hotkey(GlobalAction.EditorSeekToNextBookmark)
+                                                    },
+                                                    new EditorMenuItem(EditorStrings.ResetBookmarks, MenuItemType.Destructive, () => editorBeatmap.Bookmarks.Clear())
+                                                }
+                                            }
                                         }
                                     }
                                 }
@@ -443,11 +474,13 @@ namespace osu.Game.Screens.Edit
             changeHandler?.CanUndo.BindValueChanged(v => undoMenuItem.Action.Disabled = !v.NewValue, true);
             changeHandler?.CanRedo.BindValueChanged(v => redoMenuItem.Action.Disabled = !v.NewValue, true);
 
-            editorBackgroundDim.BindValueChanged(_ => dimBackground());
+            editorBackgroundDim.BindValueChanged(_ => setUpBackground());
         }
 
         [Resolved]
         private MusicController musicController { get; set; }
+
+        protected override BackgroundScreen CreateBackground() => new EditorBackgroundScreen(Beatmap.Value);
 
         protected override void LoadComplete()
         {
@@ -500,6 +533,8 @@ namespace osu.Game.Screens.Edit
 
         public void TestGameplay()
         {
+            clock.Stop();
+
             if (HasUnsavedChanges)
             {
                 dialogOverlay.Push(new SaveRequiredPopupDialog(() => attemptMutationOperation(() =>
@@ -753,6 +788,14 @@ namespace osu.Game.Screens.Edit
                 case GlobalAction.EditorSeekToNextSamplePoint:
                     seekSamplePoint(1);
                     return true;
+
+                case GlobalAction.EditorSeekToPreviousBookmark:
+                    seekBookmark(-1);
+                    return true;
+
+                case GlobalAction.EditorSeekToNextBookmark:
+                    seekBookmark(1);
+                    return true;
             }
 
             if (e.Repeat)
@@ -760,9 +803,12 @@ namespace osu.Game.Screens.Edit
 
             switch (e.Action)
             {
-                case GlobalAction.Back:
-                    // as we don't want to display the back button, manual handling of exit action is required.
-                    this.Exit();
+                case GlobalAction.EditorAddBookmark:
+                    addBookmarkAtCurrentTime();
+                    return true;
+
+                case GlobalAction.EditorRemoveClosestBookmark:
+                    removeBookmarksInProximityToCurrentTime();
                     return true;
 
                 case GlobalAction.EditorCloneSelection:
@@ -797,6 +843,19 @@ namespace osu.Game.Screens.Edit
             return false;
         }
 
+        private void addBookmarkAtCurrentTime()
+        {
+            int bookmark = (int)clock.CurrentTimeAccurate;
+            int idx = editorBeatmap.Bookmarks.BinarySearch(bookmark);
+            if (idx < 0)
+                editorBeatmap.Bookmarks.Insert(~idx, bookmark);
+        }
+
+        private void removeBookmarksInProximityToCurrentTime()
+        {
+            editorBeatmap.Bookmarks.RemoveAll(b => Math.Abs(b - clock.CurrentTimeAccurate) < 2000);
+        }
+
         public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
         }
@@ -804,23 +863,23 @@ namespace osu.Game.Screens.Edit
         public override void OnEntering(ScreenTransitionEvent e)
         {
             base.OnEntering(e);
-            dimBackground();
+            setUpBackground();
             resetTrack(true);
         }
 
         public override void OnResuming(ScreenTransitionEvent e)
         {
             base.OnResuming(e);
-            dimBackground();
+            setUpBackground();
+            clock.BindAdjustments();
         }
 
-        private void dimBackground()
+        private void setUpBackground()
         {
             ApplyToBackground(b =>
             {
-                b.IgnoreUserSettings.Value = true;
-                b.DimWhenUserSettingsIgnored.Value = editorBackgroundDim.Value;
-                b.BlurAmount.Value = 0;
+                var editorBackground = (EditorBackgroundScreen)b;
+                editorBackground.ChangeClockSource(clock);
             });
         }
 
@@ -859,11 +918,6 @@ namespace osu.Game.Screens.Edit
                     beatmap.EditorTimestamp = clock.CurrentTime;
             });
 
-            ApplyToBackground(b =>
-            {
-                b.DimWhenUserSettingsIgnored.Value = 0;
-            });
-
             resetTrack();
 
             refetchBeatmap();
@@ -876,6 +930,10 @@ namespace osu.Game.Screens.Edit
             base.OnSuspending(e);
             clock.Stop();
             refetchBeatmap();
+            // unfortunately ordering matters here.
+            // this unbind MUST happen after `refetchBeatmap()`, because along other things, `refetchBeatmap()` causes a global working beatmap change,
+            // which causes `EditorClock` to reload the track and automatically reapply adjustments to it.
+            clock.UnbindAdjustments();
         }
 
         private void refetchBeatmap()
@@ -1132,6 +1190,16 @@ namespace osu.Game.Screens.Edit
                 clock.SeekSmoothlyTo(found.StartTime);
         }
 
+        private void seekBookmark(int direction)
+        {
+            int? targetBookmark = direction < 1
+                ? editorBeatmap.Bookmarks.Cast<int?>().LastOrDefault(b => b < clock.CurrentTimeAccurate)
+                : editorBeatmap.Bookmarks.Cast<int?>().FirstOrDefault(b => b > clock.CurrentTimeAccurate);
+
+            if (targetBookmark != null)
+                clock.SeekSmoothlyTo(targetBookmark.Value);
+        }
+
         private void seekSamplePoint(int direction)
         {
             double currentTime = clock.CurrentTimeAccurate;
@@ -1220,12 +1288,15 @@ namespace osu.Game.Screens.Edit
             saveRelatedMenuItems.Add(save);
             yield return save;
 
-            if (RuntimeInfo.IsDesktop)
+            if (RuntimeInfo.OS != RuntimeInfo.Platform.Android)
             {
                 var export = createExportMenu();
                 saveRelatedMenuItems.AddRange(export.Items);
                 yield return export;
+            }
 
+            if (RuntimeInfo.IsDesktop)
+            {
                 var externalEdit = new EditorMenuItem("Edit externally", MenuItemType.Standard, editExternally);
                 saveRelatedMenuItems.Add(externalEdit);
                 yield return externalEdit;

@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
@@ -134,12 +135,14 @@ namespace osu.Game.Rulesets.Mania.UI
             {
                 bool isSpecial = definition.IsSpecialColumn(i);
 
-                var column = new Column(firstColumnIndex + i, isSpecial)
+                var action = columnStartAction;
+                columnStartAction++;
+                var column = CreateColumn(firstColumnIndex + i, isSpecial).With(c =>
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Width = 1,
-                    Action = { Value = columnStartAction++ }
-                };
+                    c.RelativeSizeAxes = Axes.Both;
+                    c.Width = 1;
+                    c.Action.Value = action;
+                });
 
                 topLevelContainer.Add(column.TopLevelContainer.CreateProxy());
                 columnBackgrounds.Add(column.BackgroundContainer.CreateProxy());
@@ -153,6 +156,9 @@ namespace osu.Game.Rulesets.Mania.UI
 
             RegisterPool<BarLine, DrawableBarLine>(50, 200);
         }
+
+        [Pure]
+        protected virtual Column CreateColumn(int index, bool isSpecial) => new Column(index, isSpecial);
 
         [BackgroundDependencyLoader]
         private void load(ISkinSource skin)

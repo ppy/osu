@@ -35,6 +35,11 @@ namespace osu.Game.Screens.Play.HUD
         public IBindable<int> ActivationCount => activationCount;
 
         /// <summary>
+        /// Whether this <see cref="InputTrigger"/> is currently active.
+        /// </summary>
+        public bool IsActive { get; private set; }
+
+        /// <summary>
         /// Whether any activation or deactivation of this <see cref="InputTrigger"/> impacts its <see cref="ActivationCount"/>
         /// </summary>
         public IBindable<bool> IsCounting => isCounting;
@@ -49,6 +54,7 @@ namespace osu.Game.Screens.Play.HUD
             if (forwardPlayback && isCounting.Value)
                 activationCount.Value++;
 
+            IsActive = true;
             OnActivate?.Invoke(forwardPlayback);
         }
 
@@ -57,6 +63,7 @@ namespace osu.Game.Screens.Play.HUD
             if (!forwardPlayback && isCounting.Value)
                 activationCount.Value--;
 
+            IsActive = false;
             OnDeactivate?.Invoke(forwardPlayback);
         }
     }

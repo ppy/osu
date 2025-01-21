@@ -191,8 +191,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         {
             var scoreInfos = scores.Select(s => s.CreateScoreInfo(ScoreManager, Rulesets, PlaylistItem, Beatmap.Value.BeatmapInfo)).OrderByTotalScore().ToArray();
 
-            // Invoke callback to add the scores.
-            callback.Invoke(scoreInfos);
+            // Invoke callback to add the scores. Exclude the score provided to this screen since it's added already.
+            callback.Invoke(scoreInfos.Where(s => s.OnlineID != Score?.OnlineID));
 
             return scoreInfos;
         }

@@ -79,7 +79,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// </summary>
         private void createStateBindables()
         {
-            foreach (string bankName in HitSampleInfo.AllBanks.Prepend(HIT_BANK_AUTO))
+            foreach (string bankName in HitSampleInfo.ALL_BANKS.Prepend(HIT_BANK_AUTO))
             {
                 var bindable = new Bindable<TernaryState>
                 {
@@ -143,7 +143,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 SelectionBankStates[bankName] = bindable;
             }
 
-            foreach (string bankName in HitSampleInfo.AllBanks.Prepend(HIT_BANK_AUTO))
+            foreach (string bankName in HitSampleInfo.ALL_BANKS.Prepend(HIT_BANK_AUTO))
             {
                 var bindable = new Bindable<TernaryState>
                 {
@@ -216,7 +216,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             resetTernaryStates();
 
-            foreach (string sampleName in HitSampleInfo.AllAdditions)
+            foreach (string sampleName in HitSampleInfo.ALL_ADDITIONS)
             {
                 var bindable = new Bindable<TernaryState>
                 {
@@ -258,8 +258,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void resetTernaryStates()
         {
-            if (SelectionNewComboState.Value == TernaryState.Indeterminate)
-                SelectionNewComboState.Value = TernaryState.False;
+            if (SelectedItems.Count > 0)
+                return;
+
+            SelectionNewComboState.Value = TernaryState.False;
             AutoSelectionBankEnabled.Value = true;
             SelectionAdditionBanksEnabled.Value = true;
             SelectionBankStates[HIT_BANK_AUTO].Value = TernaryState.True;

@@ -37,19 +37,25 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (beatmap.HitObjects.Count == 0)
                 return new OsuDifficultyAttributes { Mods = mods };
 
-            double aimRating = Math.Sqrt(skills[0].DifficultyValue()) * difficulty_multiplier;
-            double aimRatingNoSliders = Math.Sqrt(skills[1].DifficultyValue()) * difficulty_multiplier;
-            double speedRating = Math.Sqrt(skills.OfType<Speed>().First().DifficultyValue()) * difficulty_multiplier;
-            double speedNotes = skills.OfType<Speed>().First().RelevantNoteCount();
+            var aim = skills.OfType<Aim>().Single(a => a.IncludeSliders);
+            double aimRating = Math.Sqrt(aim.DifficultyValue()) * difficulty_multiplier;
+            double aimDifficultyStrainCount = aim.CountTopWeightedStrains();
+            double difficultSliders = aim.GetDifficultSliders();
 
-            double flashlightRating = Math.Sqrt(skills.OfType<Flashlight>().First().DifficultyValue()) * difficulty_multiplier;
-            double readingLowArRating = Math.Sqrt(skills.OfType<ReadingLowAr>().First().DifficultyValue()) * difficulty_multiplier;
-
+            var aimWithoutSliders = skills.OfType<Aim>().Single(a => !a.IncludeSliders);
+            double aimRatingNoSliders = Math.Sqrt(aimWithoutSliders.DifficultyValue()) * difficulty_multiplier;
             double sliderFactor = aimRating > 0 ? aimRatingNoSliders / aimRating : 1;
+            
+            var speed = skills.OfType<Speed>().Single();
+            double speedRating = Math.Sqrt(speed.DifficultyValue()) * difficulty_multiplier;
+            double speedNotes = speed.RelevantNoteCount();
+            double speedDifficultyStrainCount = speed.CountTopWeightedStrains();
 
-            double aimDifficultyStrainCount = skills.OfType<Aim>().First().CountTopWeightedStrains();
-            double speedDifficultyStrainCount = skills.OfType<Speed>().First().CountTopWeightedStrains();
-            double lowArDifficultyStrainCount = skills.OfType<ReadingLowAr>().First().CountTopWeightedStrains();
+            var readingLowAr = skills.OfType<ReadingLowAr>().Single();
+            double readingLowArRating = Math.Sqrt(readingLowAr.DifficultyValue()) * difficulty_multiplier;
+            double lowArDifficultyStrainCount = readingLowAr.CountTopWeightedStrains();
+
+            double flashlightRating = Math.Sqrt(skills.OfType<Flashlight>().Single().DifficultyValue()) * difficulty_multiplier;
 
             if (mods.Any(m => m is OsuModTouchDevice))
             {
@@ -64,6 +70,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 speedRating = 0.0;
                 flashlightRating *= 0.7;
                 readingLowArRating *= 0.95;
+            }
+            else if (mods.Any(h => h is OsuModAutopilot))
+            {
+                speedRating *= 0.5;
+                aimRating = 0.0;
+                flashlightRating *= 0.4;
             }
 
             double aimPerformance = OsuStrainSkill.DifficultyToPerformance(aimRating);
@@ -101,12 +113,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             hitWindows.SetDifficulty(beatmap.Difficulty.OverallDifficulty);
 
             double hitWindowGreat = hitWindows.WindowFor(HitResult.Great) / clockRate;
+            double hitWindowOk = hitWindows.WindowFor(HitResult.Ok) / clockRate;
+            double hitWindowMeh = hitWindows.WindowFor(HitResult.Meh) / clockRate;
 
             OsuDifficultyAttributes attributes = new OsuDifficultyAttributes
             {
                 StarRating = starRating,
                 Mods = mods,
                 AimDifficulty = aimRating,
+                AimDifficultSliderCount = difficultSliders,
                 SpeedDifficulty = speedRating,
                 SpeedNoteCount = speedNotes,
                 ReadingDifficultyLowAr = readingLowArRating,
@@ -117,6 +132,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 LowArDifficultStrainCount = lowArDifficultyStrainCount,
                 ApproachRate = IBeatmapDifficultyInfo.InverseDifficultyRange(preempt, 1800, 1200, 450),
                 OverallDifficulty = (80 - hitWindowGreat) / 6,
+                GreatHitWindow = hitWindowGreat,
+                OkHitWindow = hitWindowOk,
+                MehHitWindow = hitWindowMeh,
                 DrainRate = drainRate,
                 MaxCombo = beatmap.GetMaxCombo(),
                 HitCircleCount = hitCirclesCount,

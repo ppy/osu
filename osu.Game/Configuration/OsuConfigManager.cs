@@ -3,6 +3,7 @@
 
 using System;
 using System.Diagnostics;
+using osu.Framework;
 using osu.Framework.Bindables;
 using osu.Framework.Configuration;
 using osu.Framework.Configuration.Tracking;
@@ -54,9 +55,10 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.ModSelectHotkeyStyle, ModSelectHotkeyStyle.Sequential);
             SetDefault(OsuSetting.ModSelectTextSearchStartsActive, true);
 
-            SetDefault(OsuSetting.ChatDisplayHeight, ChatOverlay.DEFAULT_HEIGHT, 0.2f, 1f);
+            SetDefault(OsuSetting.ChatDisplayHeight, ChatOverlay.DEFAULT_HEIGHT, 0.2f, 1f, 0.01f);
 
             SetDefault(OsuSetting.BeatmapListingCardSize, BeatmapCardSize.Normal);
+            SetDefault(OsuSetting.BeatmapListingFeaturedArtistFilter, true);
 
             SetDefault(OsuSetting.ProfileCoverExpanded, true);
 
@@ -94,6 +96,7 @@ namespace osu.Game.Configuration
 
             SetDefault(OsuSetting.NotifyOnUsernameMentioned, true);
             SetDefault(OsuSetting.NotifyOnPrivateMessage, true);
+            SetDefault(OsuSetting.NotifyOnFriendPresenceChange, true);
 
             // Audio
             SetDefault(OsuSetting.VolumeInactive, 0.25, 0, 1, 0.01);
@@ -132,12 +135,13 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.Prefer24HourTime, !CultureInfoHelper.SystemCulture.DateTimeFormat.ShortTimePattern.Contains(@"tt"));
 
             // Gameplay
-            SetDefault(OsuSetting.PositionalHitsoundsLevel, 0.2f, 0, 1);
+            SetDefault(OsuSetting.PositionalHitsoundsLevel, 0.2f, 0, 1, 0.01f);
             SetDefault(OsuSetting.DimLevel, 0.7, 0, 1, 0.01);
             SetDefault(OsuSetting.BlurLevel, 0, 0, 1, 0.01);
             SetDefault(OsuSetting.LightenDuringBreaks, true);
 
             SetDefault(OsuSetting.HitLighting, true);
+            SetDefault(OsuSetting.StarFountains, true);
 
             SetDefault(OsuSetting.HUDVisibilityMode, HUDVisibilityMode.Always);
             SetDefault(OsuSetting.ShowHealthDisplayWhenCantFail, true);
@@ -161,21 +165,20 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.Version, string.Empty);
 
             SetDefault(OsuSetting.ShowFirstRunSetup, true);
+            SetDefault(OsuSetting.ShowMobileDisclaimer, RuntimeInfo.IsMobile);
 
             SetDefault(OsuSetting.ScreenshotFormat, ScreenshotFormat.Jpg);
             SetDefault(OsuSetting.ScreenshotCaptureMenuCursor, false);
 
-            SetDefault(OsuSetting.SongSelectRightMouseScroll, false);
-
             SetDefault(OsuSetting.Scaling, ScalingMode.Off);
             SetDefault(OsuSetting.SafeAreaConsiderations, true);
-            SetDefault(OsuSetting.ScalingBackgroundDim, 0.9f, 0.5f, 1f);
+            SetDefault(OsuSetting.ScalingBackgroundDim, 0.9f, 0.5f, 1f, 0.01f);
 
-            SetDefault(OsuSetting.ScalingSizeX, 0.8f, 0.2f, 1f);
-            SetDefault(OsuSetting.ScalingSizeY, 0.8f, 0.2f, 1f);
+            SetDefault(OsuSetting.ScalingSizeX, 0.8f, 0.2f, 1f, 0.01f);
+            SetDefault(OsuSetting.ScalingSizeY, 0.8f, 0.2f, 1f, 0.01f);
 
-            SetDefault(OsuSetting.ScalingPositionX, 0.5f, 0f, 1f);
-            SetDefault(OsuSetting.ScalingPositionY, 0.5f, 0f, 1f);
+            SetDefault(OsuSetting.ScalingPositionX, 0.5f, 0f, 1f, 0.01f);
+            SetDefault(OsuSetting.ScalingPositionY, 0.5f, 0f, 1f, 0.01f);
 
             SetDefault(OsuSetting.UIScale, 1f, 0.8f, 1.6f, 0.01f);
 
@@ -201,11 +204,12 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.HideCountryFlags, false);
 
             SetDefault(OsuSetting.MultiplayerRoomFilter, RoomPermissionsFilter.All);
+            SetDefault(OsuSetting.MultiplayerShowInProgressFilter, true);
 
             SetDefault(OsuSetting.LastProcessedMetadataId, -1);
 
             SetDefault(OsuSetting.ComboColourNormalisationAmount, 0.2f, 0f, 1f, 0.01f);
-            SetDefault<UserStatus?>(OsuSetting.UserOnlineStatus, null);
+            SetDefault(OsuSetting.UserOnlineStatus, UserStatus.Online);
 
             SetDefault(OsuSetting.EditorTimelineShowTimingChanges, true);
             SetDefault(OsuSetting.EditorTimelineShowBreaks, true);
@@ -214,6 +218,8 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.EditorContractSidebars, false);
 
             SetDefault(OsuSetting.AlwaysShowHoldForMenuButton, false);
+            SetDefault(OsuSetting.AlwaysRequireHoldingForPause, false);
+            SetDefault(OsuSetting.EditorShowStoryboard, true);
         }
 
         protected override bool CheckLookupContainsPrivateInformation(OsuSetting lookup)
@@ -393,7 +399,6 @@ namespace osu.Game.Configuration
         Skin,
         ScreenshotFormat,
         ScreenshotCaptureMenuCursor,
-        SongSelectRightMouseScroll,
         BeatmapSkins,
         BeatmapColours,
         BeatmapHitsounds,
@@ -411,8 +416,10 @@ namespace osu.Game.Configuration
         IntroSequence,
         NotifyOnUsernameMentioned,
         NotifyOnPrivateMessage,
+        NotifyOnFriendPresenceChange,
         UIHoldActivationDelay,
         HitLighting,
+        StarFountains,
         MenuBackgroundSource,
         GameplayDisableWinKey,
         SeasonalBackgroundMode,
@@ -433,7 +440,12 @@ namespace osu.Game.Configuration
         EditorShowSpeedChanges,
         TouchDisableGameplayTaps,
         ModSelectTextSearchStartsActive,
+
+        /// <summary>
+        /// The status for the current user to broadcast to other players.
+        /// </summary>
         UserOnlineStatus,
+
         MultiplayerRoomFilter,
         HideCountryFlags,
         EditorTimelineShowTimingChanges,
@@ -444,5 +456,10 @@ namespace osu.Game.Configuration
         EditorRotationOrigin,
         EditorTimelineShowBreaks,
         EditorAdjustExistingObjectsOnTimingChanges,
+        AlwaysRequireHoldingForPause,
+        MultiplayerShowInProgressFilter,
+        BeatmapListingFeaturedArtistFilter,
+        ShowMobileDisclaimer,
+        EditorShowStoryboard,
     }
 }

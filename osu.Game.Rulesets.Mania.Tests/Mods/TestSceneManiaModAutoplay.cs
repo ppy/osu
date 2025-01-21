@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
             CreateModTest(new ModTestData
             {
                 Autoplay = true,
-                Beatmap = new ManiaBeatmap(new StageDefinition(1))
+                CreateBeatmap = () => new ManiaBeatmap(new StageDefinition(1))
                 {
                     HitObjects = new List<ManiaHitObject>
                     {

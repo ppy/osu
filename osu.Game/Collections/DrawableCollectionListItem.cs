@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -10,6 +11,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -23,7 +25,7 @@ namespace osu.Game.Collections
     /// <summary>
     /// Visualises a <see cref="BeatmapCollection"/> inside a <see cref="DrawableCollectionList"/>.
     /// </summary>
-    public partial class DrawableCollectionListItem : OsuRearrangeableListItem<Live<BeatmapCollection>>
+    public partial class DrawableCollectionListItem : OsuRearrangeableListItem<Live<BeatmapCollection>>, IFilterable
     {
         private const float item_height = 35;
         private const float button_width = item_height * 0.75f;
@@ -207,5 +209,25 @@ namespace osu.Game.Collections
 
             private void deleteCollection() => collection.PerformWrite(c => c.Realm!.Remove(c));
         }
+
+        public IEnumerable<LocalisableString> FilterTerms => [(LocalisableString)Model.Value.Name];
+
+        private bool matchingFilter = true;
+
+        public bool MatchingFilter
+        {
+            get => matchingFilter;
+            set
+            {
+                matchingFilter = value;
+
+                if (matchingFilter)
+                    this.FadeIn(200);
+                else
+                    Hide();
+            }
+        }
+
+        public bool FilteringActive { get; set; }
     }
 }
