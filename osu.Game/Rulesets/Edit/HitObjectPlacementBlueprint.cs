@@ -90,7 +90,7 @@ namespace osu.Game.Rulesets.Edit
         /// Updates the time and position of this <see cref="PlacementBlueprint"/> based on the provided snap information.
         /// </summary>
         /// <param name="result">The snap result information.</param>
-        public override void UpdateTimeAndPosition(SnapResult result)
+        public void UpdateTimeAndPosition(SnapResult result)
         {
             if (PlacementActive == PlacementState.Waiting)
             {
