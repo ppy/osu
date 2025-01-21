@@ -43,8 +43,14 @@ namespace osu.Game.Screens.Play.HUD
         private FillFlowContainer<SpectatorListEntry> spectatorsFlow = null!;
         private DrawablePool<SpectatorListEntry> pool = null!;
 
+        [Resolved]
+        private SpectatorClient client { get; set; } = null!;
+
+        [Resolved]
+        private GameplayState gameplayState { get; set; } = null!;
+
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, SpectatorClient client, GameplayState gameplayState)
+        private void load(OsuColour colours)
         {
             AutoSizeAxes = Axes.Y;
 
@@ -73,14 +79,14 @@ namespace osu.Game.Screens.Play.HUD
             };
 
             HeaderColour.Value = Header.Colour;
-
-            ((IBindableList<SpectatorUser>)Spectators).BindTo(client.WatchingUsers);
-            ((IBindable<LocalUserPlayingState>)UserPlayingState).BindTo(gameplayState.PlayingState);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            ((IBindableList<SpectatorUser>)Spectators).BindTo(client.WatchingUsers);
+            ((IBindable<LocalUserPlayingState>)UserPlayingState).BindTo(gameplayState.PlayingState);
 
             Spectators.BindCollectionChanged(onSpectatorsChanged, true);
             UserPlayingState.BindValueChanged(_ => updateVisibility());
