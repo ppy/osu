@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
@@ -17,12 +19,13 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
     {
         protected override LocalisableString Header => CommonStrings.General;
 
-        private SystemFileImportComponent systemFileImport = null!;
+        private ISystemFileSelector? selector;
 
         [BackgroundDependencyLoader]
         private void load(OsuGameBase game, GameHost host, IPerformFromScreenRunner? performer)
         {
-            Add(systemFileImport = new SystemFileImportComponent(game, host));
+            if ((selector = host.CreateSystemFileSelector(game.HandledExtensions.ToArray())) != null)
+                selector.Selected += f => Task.Run(() => game.Import(f.FullName));
 
             AddRange(new Drawable[]
             {
@@ -31,10 +34,10 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                     Text = DebugSettingsStrings.ImportFiles,
                     Action = () =>
                     {
-                        if (systemFileImport.PresentIfAvailable())
-                            return;
-
-                        performer?.PerformFromScreen(menu => menu.Push(new FileImportScreen()));
+                        if (selector != null)
+                            selector.Present();
+                        else
+                            performer?.PerformFromScreen(menu => menu.Push(new FileImportScreen()));
                     },
                 },
                 new SettingsButton
