@@ -37,7 +37,7 @@ namespace osu.Game.Overlays.Dashboard
         private const float padding = 10;
 
         private readonly IBindableList<int> playingUsers = new BindableList<int>();
-        private readonly IBindableDictionary<int, UserPresence> onlineUsers = new BindableDictionary<int, UserPresence>();
+        private readonly IBindableDictionary<int, UserPresence> onlineUserPresences = new BindableDictionary<int, UserPresence>();
         private readonly Dictionary<int, OnlineUserPanel> userPanels = new Dictionary<int, OnlineUserPanel>();
 
         private SearchContainer<OnlineUserPanel> userFlow;
@@ -106,8 +106,8 @@ namespace osu.Game.Overlays.Dashboard
         {
             base.LoadComplete();
 
-            onlineUsers.BindTo(metadataClient.UserStates);
-            onlineUsers.BindCollectionChanged(onUserUpdated, true);
+            onlineUserPresences.BindTo(metadataClient.UserPresences);
+            onlineUserPresences.BindCollectionChanged(onUserPresenceUpdated, true);
 
             playingUsers.BindTo(spectatorClient.PlayingUsers);
             playingUsers.BindCollectionChanged(onPlayingUsersChanged, true);
@@ -120,7 +120,7 @@ namespace osu.Game.Overlays.Dashboard
             searchTextBox.TakeFocus();
         }
 
-        private void onUserUpdated(object sender, NotifyDictionaryChangedEventArgs<int, UserPresence> e) => Schedule(() =>
+        private void onUserPresenceUpdated(object sender, NotifyDictionaryChangedEventArgs<int, UserPresence> e) => Schedule(() =>
         {
             switch (e.Action)
             {
@@ -140,15 +140,13 @@ namespace osu.Game.Overlays.Dashboard
 
                             Schedule(() =>
                             {
-                                // explicitly refetch the user's status.
-                                // things may have changed in between the time of scheduling and the time of actual execution.
-                                if (onlineUsers.TryGetValue(userId, out var updatedStatus))
+                                userFlow.Add(userPanels[userId] = createUserPanel(user).With(p =>
                                 {
-                                    user.Activity.Value = updatedStatus.Activity;
-                                    user.Status.Value = updatedStatus.Status;
-                                }
+                                    var presence = onlineUserPresences.GetValueOrDefault(userId);
 
-                                userFlow.Add(userPanels[userId] = createUserPanel(user));
+                                    p.Status.Value = presence.Status;
+                                    p.Activity.Value = presence.Activity;
+                                }));
                             });
                         });
                     }
@@ -162,8 +160,8 @@ namespace osu.Game.Overlays.Dashboard
                     {
                         if (userPanels.TryGetValue(kvp.Key, out var panel))
                         {
-                            panel.User.Activity.Value = kvp.Value.Activity;
-                            panel.User.Status.Value = kvp.Value.Status;
+                            panel.Activity.Value = kvp.Value.Activity;
+                            panel.Status.Value = kvp.Value.Status;
                         }
                     }
 
@@ -223,6 +221,9 @@ namespace osu.Game.Overlays.Dashboard
         {
             public readonly APIUser User;
 
+            public readonly Bindable<UserStatus?> Status = new Bindable<UserStatus?>();
+            public readonly Bindable<UserActivity> Activity = new Bindable<UserActivity>();
+
             public BindableBool CanSpectate { get; } = new BindableBool();
 
             public IEnumerable<LocalisableString> FilterTerms { get; }
@@ -271,8 +272,8 @@ namespace osu.Game.Overlays.Dashboard
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
                                 // this is SHOCKING
-                                Activity = { BindTarget = User.Activity },
-                                Status = { BindTarget = User.Status },
+                                Activity = { BindTarget = Activity },
+                                Status = { BindTarget = Status },
                             },
                             new PurpleRoundedButton
                             {
