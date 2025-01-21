@@ -21,13 +21,21 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
         public int ComboOffset { get; set; }
 
-        public float X => Position.X;
+        public float X
+        {
+            get => Position.X;
+            set => Position = new Vector2(value, Position.Y);
+        }
 
-        public float Y => Position.Y;
+        public float Y
+        {
+            get => Position.Y;
+            set => Position = new Vector2(Position.X, value);
+        }
 
         public Vector2 Position { get; set; }
 
-        public LegacyHitObjectType LegacyType { get; set; }
+        public LegacyHitObjectType LegacyType { get; set; } = LegacyHitObjectType.Circle;
 
         public override Judgement CreateJudgement() => new IgnoreJudgement();
 

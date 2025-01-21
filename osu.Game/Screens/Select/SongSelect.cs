@@ -31,6 +31,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
+using osu.Game.Overlays.Volume;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Backgrounds;
@@ -169,10 +170,12 @@ namespace osu.Game.Screens.Select
 
             AddRangeInternal(new Drawable[]
             {
+                new GlobalScrollAdjustsVolume(),
                 new VerticalMaskingContainer
                 {
                     Children = new Drawable[]
                     {
+                        new GlobalScrollAdjustsVolume(),
                         new GridContainer // used for max width implementation
                         {
                             RelativeSizeAxes = Axes.Both,
@@ -375,7 +378,7 @@ namespace osu.Game.Screens.Select
 
                 BeatmapOptions.AddButton(@"Manage", @"collections", FontAwesome.Solid.Book, colours.Green, () => manageCollectionsDialog?.Show());
                 BeatmapOptions.AddButton(@"Delete", @"all difficulties", FontAwesome.Solid.Trash, colours.Pink, () => DeleteBeatmap(Beatmap.Value.BeatmapSetInfo));
-                BeatmapOptions.AddButton(@"Remove", @"from unplayed", FontAwesome.Regular.TimesCircle, colours.Purple, null);
+                BeatmapOptions.AddButton(@"Mark", @"as played", FontAwesome.Regular.TimesCircle, colours.Purple, () => beatmaps.MarkPlayed(Beatmap.Value.BeatmapInfo));
                 BeatmapOptions.AddButton(@"Clear", @"local scores", FontAwesome.Solid.Eraser, colours.Purple, () => ClearScores(Beatmap.Value.BeatmapInfo));
             }
 

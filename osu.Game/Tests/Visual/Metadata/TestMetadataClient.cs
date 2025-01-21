@@ -19,8 +19,14 @@ namespace osu.Game.Tests.Visual.Metadata
         public override IBindable<bool> IsWatchingUserPresence => isWatchingUserPresence;
         private readonly BindableBool isWatchingUserPresence = new BindableBool();
 
-        public override IBindableDictionary<int, UserPresence> UserStates => userStates;
-        private readonly BindableDictionary<int, UserPresence> userStates = new BindableDictionary<int, UserPresence>();
+        public override UserPresence LocalUserPresence => localUserPresence;
+        private UserPresence localUserPresence;
+
+        public override IBindableDictionary<int, UserPresence> UserPresences => userPresences;
+        private readonly BindableDictionary<int, UserPresence> userPresences = new BindableDictionary<int, UserPresence>();
+
+        public override IBindableDictionary<int, UserPresence> FriendPresences => friendPresences;
+        private readonly BindableDictionary<int, UserPresence> friendPresences = new BindableDictionary<int, UserPresence>();
 
         public override Bindable<DailyChallengeInfo?> DailyChallengeInfo => dailyChallengeInfo;
         private readonly Bindable<DailyChallengeInfo?> dailyChallengeInfo = new Bindable<DailyChallengeInfo?>();
@@ -42,11 +48,12 @@ namespace osu.Game.Tests.Visual.Metadata
 
         public override Task UpdateActivity(UserActivity? activity)
         {
+            localUserPresence = localUserPresence with { Activity = activity };
+
             if (isWatchingUserPresence.Value)
             {
-                userStates.TryGetValue(api.LocalUser.Value.Id, out var localUserPresence);
-                localUserPresence = localUserPresence with { Activity = activity };
-                userStates[api.LocalUser.Value.Id] = localUserPresence;
+                if (userPresences.ContainsKey(api.LocalUser.Value.Id))
+                    userPresences[api.LocalUser.Value.Id] = localUserPresence;
             }
 
             return Task.CompletedTask;
@@ -54,11 +61,12 @@ namespace osu.Game.Tests.Visual.Metadata
 
         public override Task UpdateStatus(UserStatus? status)
         {
+            localUserPresence = localUserPresence with { Status = status };
+
             if (isWatchingUserPresence.Value)
             {
-                userStates.TryGetValue(api.LocalUser.Value.Id, out var localUserPresence);
-                localUserPresence = localUserPresence with { Status = status };
-                userStates[api.LocalUser.Value.Id] = localUserPresence;
+                if (userPresences.ContainsKey(api.LocalUser.Value.Id))
+                    userPresences[api.LocalUser.Value.Id] = localUserPresence;
             }
 
             return Task.CompletedTask;
@@ -68,11 +76,31 @@ namespace osu.Game.Tests.Visual.Metadata
         {
             if (isWatchingUserPresence.Value)
             {
-                if (presence.HasValue)
-                    userStates[userId] = presence.Value;
+                if (presence?.Status != null)
+                {
+                    if (userId == api.LocalUser.Value.OnlineID)
+                        localUserPresence = presence.Value;
+                    else
+                        userPresences[userId] = presence.Value;
+                }
                 else
-                    userStates.Remove(userId);
+                {
+                    if (userId == api.LocalUser.Value.OnlineID)
+                        localUserPresence = default;
+                    else
+                        userPresences.Remove(userId);
+                }
             }
+
+            return Task.CompletedTask;
+        }
+
+        public override Task FriendPresenceUpdated(int userId, UserPresence? presence)
+        {
+            if (presence.HasValue)
+                friendPresences[userId] = presence.Value;
+            else
+                friendPresences.Remove(userId);
 
             return Task.CompletedTask;
         }

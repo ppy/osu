@@ -74,7 +74,7 @@ namespace osu.Game.Screens
         /// <summary>
         /// The current <see cref="UserActivity"/> for this screen.
         /// </summary>
-        IBindable<UserActivity> Activity { get; }
+        Bindable<UserActivity> Activity { get; }
 
         /// <summary>
         /// The amount of parallax to be applied while this screen is displayed.

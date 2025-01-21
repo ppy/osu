@@ -710,13 +710,13 @@ namespace osu.Game.Overlays.Mods
 
                 // the bounds below represent the horizontal range of scroll items to be considered fully visible/active, in the scroll's internal coordinate space.
                 // note that clamping is applied to the left scroll bound to ensure scrolling past extents does not change the set of active columns.
-                float leftVisibleBound = Math.Clamp(Current, 0, ScrollableExtent);
-                float rightVisibleBound = leftVisibleBound + DrawWidth;
+                double leftVisibleBound = Math.Clamp(Current, 0, ScrollableExtent);
+                double rightVisibleBound = leftVisibleBound + DrawWidth;
 
                 // if a movement is occurring at this time, the bounds below represent the full range of columns that the scroll movement will encompass.
                 // this will be used to ensure that columns do not change state from active to inactive back and forth until they are fully scrolled past.
-                float leftMovementBound = Math.Min(Current, Target);
-                float rightMovementBound = Math.Max(Current, Target) + DrawWidth;
+                double leftMovementBound = Math.Min(Current, Target);
+                double rightMovementBound = Math.Max(Current, Target) + DrawWidth;
 
                 foreach (var column in Child)
                 {

@@ -53,9 +53,14 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         protected override Drawable CreateHitObjectInspector() => new OsuHitObjectInspector();
 
-        protected override IEnumerable<TernaryButton> CreateTernaryButtons()
+        protected override IEnumerable<Drawable> CreateTernaryButtons()
             => base.CreateTernaryButtons()
-                   .Append(new TernaryButton(rectangularGridSnapToggle, "Grid Snap", () => new SpriteIcon { Icon = OsuIcon.EditorGridSnap }))
+                   .Append(new DrawableTernaryButton
+                   {
+                       Current = rectangularGridSnapToggle,
+                       Description = "Grid Snap",
+                       CreateIcon = () => new SpriteIcon { Icon = OsuIcon.EditorGridSnap },
+                   })
                    .Concat(DistanceSnapProvider.CreateTernaryButtons());
 
         private BindableList<HitObject> selectedHitObjects;
@@ -173,7 +178,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                 return;
 
             List<OsuHitObject> remainingHitObjects = EditorBeatmap.HitObjects.Cast<OsuHitObject>().Where(h => h.StartTime >= timestamp).ToList();
-            string[] splitDescription = objectDescription.Split(',').ToArray();
+            string[] splitDescription = objectDescription.Split(',');
 
             for (int i = 0; i < splitDescription.Length; i++)
             {
