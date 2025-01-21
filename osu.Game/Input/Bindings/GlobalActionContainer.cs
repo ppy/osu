@@ -205,7 +205,7 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(InputKey.BackSpace, GlobalAction.DeselectAllMods),
             new KeyBinding(new[] { InputKey.Control, InputKey.Up }, GlobalAction.IncreaseModSpeed),
             new KeyBinding(new[] { InputKey.Control, InputKey.Down }, GlobalAction.DecreaseModSpeed),
-            new KeyBinding(new[] { InputKey.MouseRight }, GlobalAction.AbsoluteScrollSongList),
+            new KeyBinding(InputKey.None, GlobalAction.AbsoluteScrollSongList),
         };
 
         private static IEnumerable<KeyBinding> audioControlKeyBindings => new[]
