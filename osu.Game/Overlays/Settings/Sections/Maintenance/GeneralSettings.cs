@@ -20,7 +20,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         private SystemFileImportComponent systemFileImport = null!;
 
         [BackgroundDependencyLoader]
-        private void load(OsuGame game, GameHost host, IPerformFromScreenRunner? performer)
+        private void load(OsuGameBase game, GameHost host, IPerformFromScreenRunner? performer)
         {
             Add(systemFileImport = new SystemFileImportComponent(game, host));
 

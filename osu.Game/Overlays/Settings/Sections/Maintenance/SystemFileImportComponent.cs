@@ -10,12 +10,12 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
 {
     public partial class SystemFileImportComponent : Component
     {
-        private readonly OsuGame game;
+        private readonly OsuGameBase game;
         private readonly GameHost host;
 
         private ISystemFileSelector? selector;
 
-        public SystemFileImportComponent(OsuGame game, GameHost host)
+        public SystemFileImportComponent(OsuGameBase game, GameHost host)
         {
             this.game = game;
             this.host = host;
