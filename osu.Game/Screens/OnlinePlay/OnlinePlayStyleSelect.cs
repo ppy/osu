@@ -45,7 +45,7 @@ namespace osu.Game.Screens.OnlinePlay
 
         protected override FilterControl CreateFilterControl() => new DifficultySelectFilterControl(item);
 
-        protected override IEnumerable<(FooterButton, OverlayContainer?)> CreateSongSelectFooterButtons()
+        protected override IEnumerable<(FooterButton button, OverlayContainer? overlay)> CreateSongSelectFooterButtons()
         {
             // Required to create the drawable components.
             base.CreateSongSelectFooterButtons();

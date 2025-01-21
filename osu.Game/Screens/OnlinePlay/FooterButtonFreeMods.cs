@@ -18,6 +18,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Select;
 using osuTK;
+using osu.Game.Localisation;
 
 namespace osu.Game.Screens.OnlinePlay
 {
@@ -95,6 +96,8 @@ namespace osu.Game.Screens.OnlinePlay
             SelectedColour = colours.Yellow;
             DeselectedColour = SelectedColour.Opacity(0.5f);
             Text = @"freemods";
+
+            TooltipText = MultiplayerMatchStrings.FreeModsButtonTooltip;
         }
 
         protected override void LoadComplete()

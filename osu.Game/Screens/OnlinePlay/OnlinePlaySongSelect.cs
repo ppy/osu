@@ -21,6 +21,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Select;
 using osu.Game.Users;
 using osu.Game.Utils;
+using osu.Game.Localisation;
 
 namespace osu.Game.Screens.OnlinePlay
 {
@@ -196,14 +197,16 @@ namespace osu.Game.Screens.OnlinePlay
             IsValidMod = IsValidMod
         };
 
-        protected override IEnumerable<(FooterButton, OverlayContainer?)> CreateSongSelectFooterButtons()
+        protected override IEnumerable<(FooterButton button, OverlayContainer? overlay)> CreateSongSelectFooterButtons()
         {
             var baseButtons = base.CreateSongSelectFooterButtons().ToList();
+
+            baseButtons.Single(i => i.button is FooterButtonMods).button.TooltipText = MultiplayerMatchStrings.RequiredModsButtonTooltip;
 
             freeModsFooterButton = new FooterButtonFreeMods(freeModSelect) { Current = FreeMods };
             var freeStyleButton = new FooterButtonFreeStyle { Current = FreeStyle };
 
-            baseButtons.InsertRange(baseButtons.FindIndex(b => b.Item1 is FooterButtonMods) + 1, new (FooterButton, OverlayContainer?)[]
+            baseButtons.InsertRange(baseButtons.FindIndex(b => b.button is FooterButtonMods) + 1, new (FooterButton, OverlayContainer?)[]
             {
                 (freeModsFooterButton, null),
                 (freeStyleButton, null)
