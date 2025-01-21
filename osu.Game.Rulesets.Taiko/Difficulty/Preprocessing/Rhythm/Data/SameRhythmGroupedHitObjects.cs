@@ -9,11 +9,11 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Rhythm.Data
     /// <summary>
     /// Represents a group of <see cref="TaikoDifficultyHitObject"/>s with no rhythm variation.
     /// </summary>
-    public class SameRhythmHitObjects : SameRhythm<TaikoDifficultyHitObject>, IHasInterval
+    public class SameRhythmGroupedHitObjects : IntervalGroupedHitObjects<TaikoDifficultyHitObject>, IHasInterval
     {
         public TaikoDifficultyHitObject FirstHitObject => Children[0];
 
-        public SameRhythmHitObjects? Previous;
+        public SameRhythmGroupedHitObjects? Previous;
 
         /// <summary>
         /// <see cref="DifficultyHitObject.StartTime"/> of the first hit object.
@@ -26,30 +26,28 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Rhythm.Data
         public double Duration => Children[^1].StartTime - Children[0].StartTime;
 
         /// <summary>
-        /// The interval in ms of each hit object in this <see cref="SameRhythmHitObjects"/>. This is only defined if there is
-        /// more than two hit objects in this <see cref="SameRhythmHitObjects"/>.
+        /// The interval in ms of each hit object in this <see cref="SameRhythmGroupedHitObjects"/>. This is only defined if there is
+        /// more than two hit objects in this <see cref="SameRhythmGroupedHitObjects"/>.
         /// </summary>
         public double? HitObjectInterval;
 
         /// <summary>
-        /// The ratio of <see cref="HitObjectInterval"/> between this and the previous <see cref="SameRhythmHitObjects"/>. In the
+        /// The ratio of <see cref="HitObjectInterval"/> between this and the previous <see cref="SameRhythmGroupedHitObjects"/>. In the
         /// case where one or both of the <see cref="HitObjectInterval"/> is undefined, this will have a value of 1.
         /// </summary>
         public double HitObjectIntervalRatio = 1;
 
-        /// <summary>
-        /// The interval between the <see cref="StartTime"/> of this and the previous <see cref="SameRhythmHitObjects"/>.
-        /// </summary>
-        public double Interval { get; private set; } = double.PositiveInfinity;
+        /// <inheritdoc/>
+        public double Interval { get; private set; }
 
-        public SameRhythmHitObjects(SameRhythmHitObjects? previous, List<TaikoDifficultyHitObject> data, ref int i)
+        public SameRhythmGroupedHitObjects(SameRhythmGroupedHitObjects? previous, List<TaikoDifficultyHitObject> data, ref int i)
             : base(data, ref i, 5)
         {
             Previous = previous;
 
             foreach (var hitObject in Children)
             {
-                hitObject.Rhythm.SameRhythmHitObjects = this;
+                hitObject.Rhythm.SameRhythmGroupedHitObjects = this;
 
                 // Pass the HitObjectInterval to each child.
                 hitObject.HitObjectInterval = HitObjectInterval;
@@ -58,15 +56,15 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Rhythm.Data
             calculateIntervals();
         }
 
-        public static List<SameRhythmHitObjects> GroupHitObjects(List<TaikoDifficultyHitObject> data)
+        public static List<SameRhythmGroupedHitObjects> GroupHitObjects(List<TaikoDifficultyHitObject> data)
         {
-            List<SameRhythmHitObjects> flatPatterns = new List<SameRhythmHitObjects>();
+            List<SameRhythmGroupedHitObjects> flatPatterns = new List<SameRhythmGroupedHitObjects>();
 
-            // Index does not need to be incremented, as it is handled within SameRhythm's constructor.
+            // Index does not need to be incremented, as it is handled within IntervalGroupedHitObjects's constructor.
             for (int i = 0; i < data.Count;)
             {
-                SameRhythmHitObjects? previous = flatPatterns.Count > 0 ? flatPatterns[^1] : null;
-                flatPatterns.Add(new SameRhythmHitObjects(previous, data, ref i));
+                SameRhythmGroupedHitObjects? previous = flatPatterns.Count > 0 ? flatPatterns[^1] : null;
+                flatPatterns.Add(new SameRhythmGroupedHitObjects(previous, data, ref i));
             }
 
             return flatPatterns;

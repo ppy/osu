@@ -15,12 +15,12 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Rhythm
         /// <summary>
         /// The group of hit objects with consistent rhythm that this object belongs to.
         /// </summary>
-        public SameRhythmHitObjects? SameRhythmHitObjects;
+        public SameRhythmGroupedHitObjects? SameRhythmGroupedHitObjects;
 
         /// <summary>
         /// The larger pattern of rhythm groups that this object is part of.
         /// </summary>
-        public SamePatterns? SamePatterns;
+        public SamePatternsGroupedHitObjects? SamePatternsGroupedHitObjects;
 
         /// <summary>
         /// The ratio of current <see cref="Rulesets.Difficulty.Preprocessing.DifficultyHitObject.DeltaTime"/>
