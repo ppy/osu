@@ -59,6 +59,9 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
 
+        [Resolved]
+        private OsuGame? game { get; set; } = null!;
+
         private readonly BindableWithCurrent<Room?> selectedRoom = new BindableWithCurrent<Room?>();
         private Sample? sampleSelect;
         private Sample? sampleJoin;
@@ -167,6 +170,17 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                     })
                 };
 
+                if (Room.RoomID.HasValue)
+                {
+                    items.AddRange([new OsuMenuItem("View in browser", MenuItemType.Standard, () =>
+                    {
+                        game?.OpenUrlExternally(formatRoomUrl(Room.RoomID.Value));
+                    }), new OsuMenuItem("Copy link", MenuItemType.Standard, () =>
+                    {
+                        game?.CopyUrlToClipboard(formatRoomUrl(Room.RoomID.Value));
+                    })]);
+                }
+
                 if (Room.Type == MatchType.Playlists && Room.Host?.Id == api.LocalUser.Value.Id && Room.StartDate?.AddMinutes(5) >= DateTimeOffset.Now && !Room.HasEnded)
                 {
                     items.Add(new OsuMenuItem("Close playlist", MenuItemType.Destructive, () =>
@@ -233,6 +247,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             base.Dispose(isDisposing);
             Room.PropertyChanged -= onRoomPropertyChanged;
         }
+
+        private string formatRoomUrl(long id) => $@"{api.WebsiteRootUrl}/multiplayer/rooms/{id}";
 
         public partial class PasswordEntryPopover : OsuPopover
         {
