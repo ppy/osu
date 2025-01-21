@@ -433,7 +433,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             {
                 // Special handling for selections containing head control point - the position of the hit object changes which means the snapped position and time have to be taken into account
                 Vector2 newHeadPosition = Parent!.ToScreenSpace(e.MousePosition + (dragStartPositions[0] - dragStartPositions[draggedControlPointIndex]));
-                SnapResult result = positionSnapProvider?.TrySnapToNearbyObjects(newHeadPosition)
+                SnapResult result = positionSnapProvider?.TrySnapToNearbyObjects(newHeadPosition, oldStartTime)
                                     ?? positionSnapProvider?.TrySnapToDistanceGrid(newHeadPosition)
                                     ?? positionSnapProvider?.TrySnapToPositionGrid(newHeadPosition);
 
