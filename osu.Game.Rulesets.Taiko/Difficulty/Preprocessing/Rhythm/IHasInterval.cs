@@ -8,6 +8,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Rhythm
     /// </summary>
     public interface IHasInterval
     {
+        /// <summary>
+        /// The interval between 2 objects start times.
+        /// </summary>
         double Interval { get; }
     }
 }
