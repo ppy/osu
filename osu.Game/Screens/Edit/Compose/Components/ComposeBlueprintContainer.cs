@@ -33,7 +33,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
     /// <summary>
     /// A blueprint container generally displayed as an overlay to a ruleset's playfield.
     /// </summary>
-    public partial class ComposeBlueprintContainer : EditorBlueprintContainer
+    public abstract partial class ComposeBlueprintContainer : EditorBlueprintContainer
     {
         private readonly Container<PlacementBlueprint> placementBlueprintContainer;
 
@@ -52,7 +52,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// </remarks>
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => editorScreen?.MainContent.ReceivePositionalInputAt(screenSpacePos) ?? base.ReceivePositionalInputAt(screenSpacePos);
 
-        public ComposeBlueprintContainer(HitObjectComposer composer)
+        protected ComposeBlueprintContainer(HitObjectComposer composer)
             : base(composer)
         {
             placementBlueprintContainer = new Container<PlacementBlueprint>
@@ -340,7 +340,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void updatePlacementTimeAndPosition()
         {
-            var snapResult = Composer.FindSnappedPositionAndTime(InputManager.CurrentState.Mouse.Position, CurrentPlacement.SnapType);
+            SnapResult snapResult = new SnapResult(InputManager.CurrentState.Mouse.Position, null); // Composer.FindSnappedPositionAndTime(InputManager.CurrentState.Mouse.Position, CurrentPlacement.SnapType); TODO
 
             // if no time was found from positional snapping, we should still quantize to the beat.
             snapResult.Time ??= Beatmap.SnapTime(EditorClock.CurrentTime, null);
