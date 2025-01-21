@@ -25,32 +25,32 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
             double samePattern = 0;
             double intervalPenalty = 0;
 
-            if (rhythm.SameRhythmHitObjects?.FirstHitObject == hitObject) // Difficulty for SameRhythmHitObjects
+            if (rhythm.SameRhythmGroupedHitObjects?.FirstHitObject == hitObject) // Difficulty for SameRhythmGroupedHitObjects
             {
-                sameRhythm += 10.0 * evaluateDifficultyOf(rhythm.SameRhythmHitObjects, hitWindow);
-                intervalPenalty = repeatedIntervalPenalty(rhythm.SameRhythmHitObjects, hitWindow);
+                sameRhythm += 10.0 * evaluateDifficultyOf(rhythm.SameRhythmGroupedHitObjects, hitWindow);
+                intervalPenalty = repeatedIntervalPenalty(rhythm.SameRhythmGroupedHitObjects, hitWindow);
             }
 
-            if (rhythm.SamePatterns?.FirstHitObject == hitObject) // Difficulty for SamePatterns
-                samePattern += 1.15 * ratioDifficulty(rhythm.SamePatterns.IntervalRatio);
+            if (rhythm.SamePatternsGroupedHitObjects?.FirstHitObject == hitObject) // Difficulty for SamePatternsGroupedHitObjects
+                samePattern += 1.15 * ratioDifficulty(rhythm.SamePatternsGroupedHitObjects.IntervalRatio);
 
             difficulty += Math.Max(sameRhythm, samePattern) * intervalPenalty;
 
             return difficulty;
         }
 
-        private static double evaluateDifficultyOf(SameRhythmHitObjects sameRhythmHitObjects, double hitWindow)
+        private static double evaluateDifficultyOf(SameRhythmGroupedHitObjects sameRhythmGroupedHitObjects, double hitWindow)
         {
-            double intervalDifficulty = ratioDifficulty(sameRhythmHitObjects.HitObjectIntervalRatio);
-            double? previousInterval = sameRhythmHitObjects.Previous?.HitObjectInterval;
+            double intervalDifficulty = ratioDifficulty(sameRhythmGroupedHitObjects.HitObjectIntervalRatio);
+            double? previousInterval = sameRhythmGroupedHitObjects.Previous?.HitObjectInterval;
 
-            intervalDifficulty *= repeatedIntervalPenalty(sameRhythmHitObjects, hitWindow);
+            intervalDifficulty *= repeatedIntervalPenalty(sameRhythmGroupedHitObjects, hitWindow);
 
             // If a previous interval exists and there are multiple hit objects in the sequence:
-            if (previousInterval != null && sameRhythmHitObjects.Children.Count > 1)
+            if (previousInterval != null && sameRhythmGroupedHitObjects.Children.Count > 1)
             {
-                double expectedDurationFromPrevious = (double)previousInterval * sameRhythmHitObjects.Children.Count;
-                double durationDifference = sameRhythmHitObjects.Duration - expectedDurationFromPrevious;
+                double expectedDurationFromPrevious = (double)previousInterval * sameRhythmGroupedHitObjects.Children.Count;
+                double durationDifference = sameRhythmGroupedHitObjects.Duration - expectedDurationFromPrevious;
 
                 if (durationDifference > 0)
                 {
@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
 
             // Penalise patterns that can be hit within a single hit window.
             intervalDifficulty *= DifficultyCalculationUtils.Logistic(
-                sameRhythmHitObjects.Duration / hitWindow,
+                sameRhythmGroupedHitObjects.Duration / hitWindow,
                 midpointOffset: 0.6,
                 multiplier: 1,
                 maxValue: 1);
@@ -75,20 +75,20 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
         /// <summary>
         /// Determines if the changes in hit object intervals is consistent based on a given threshold.
         /// </summary>
-        private static double repeatedIntervalPenalty(SameRhythmHitObjects sameRhythmHitObjects, double hitWindow, double threshold = 0.1)
+        private static double repeatedIntervalPenalty(SameRhythmGroupedHitObjects sameRhythmGroupedHitObjects, double hitWindow, double threshold = 0.1)
         {
-            double longIntervalPenalty = sameInterval(sameRhythmHitObjects, 3);
+            double longIntervalPenalty = sameInterval(sameRhythmGroupedHitObjects, 3);
 
-            double shortIntervalPenalty = sameRhythmHitObjects.Children.Count < 6
-                ? sameInterval(sameRhythmHitObjects, 4)
+            double shortIntervalPenalty = sameRhythmGroupedHitObjects.Children.Count < 6
+                ? sameInterval(sameRhythmGroupedHitObjects, 4)
                 : 1.0; // Returns a non-penalty if there are 6 or more notes within an interval.
 
             // The duration penalty is based on hit object duration relative to hitWindow.
-            double durationPenalty = Math.Max(1 - sameRhythmHitObjects.Duration * 2 / hitWindow, 0.5);
+            double durationPenalty = Math.Max(1 - sameRhythmGroupedHitObjects.Duration * 2 / hitWindow, 0.5);
 
             return Math.Min(longIntervalPenalty, shortIntervalPenalty) * durationPenalty;
 
-            double sameInterval(SameRhythmHitObjects startObject, int intervalCount)
+            double sameInterval(SameRhythmGroupedHitObjects startObject, int intervalCount)
             {
                 List<double?> intervals = new List<double?>();
                 var currentObject = startObject;
