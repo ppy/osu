@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using NUnit.Framework;
 using osu.Framework.Extensions;
 using osu.Game.Configuration;
@@ -58,7 +56,11 @@ namespace osu.Game.Tests.Visual.Navigation
 
             // First scroll makes volume controls appear, second adjusts volume.
             AddRepeatStep("Adjust volume using mouse wheel", () => InputManager.ScrollVerticalBy(5), 10);
-            AddAssert("Volume is still zero", () => Game.Audio.Volume.Value == 0);
+            AddAssert("Volume is still zero", () => Game.Audio.Volume.Value, () => Is.Zero);
+
+            AddStep("Pause", () => InputManager.PressKey(Key.Escape));
+            AddRepeatStep("Adjust volume using mouse wheel", () => InputManager.ScrollVerticalBy(5), 10);
+            AddAssert("Volume is above zero", () => Game.Audio.Volume.Value > 0);
         }
 
         [Test]
@@ -80,8 +82,8 @@ namespace osu.Game.Tests.Visual.Navigation
 
         private void loadToPlayerNonBreakTime()
         {
-            Player player = null;
-            Screens.Select.SongSelect songSelect = null;
+            Player? player = null;
+            Screens.Select.SongSelect songSelect = null!;
             PushAndConfirm(() => songSelect = new TestSceneScreenNavigation.TestPlaySongSelect());
             AddUntilStep("wait for song select", () => songSelect.BeatmapSetsLoaded);
 
@@ -95,7 +97,7 @@ namespace osu.Game.Tests.Visual.Navigation
                 return (player = Game.ScreenStack.CurrentScreen as Player) != null;
             });
 
-            AddUntilStep("wait for play time active", () => !player.IsBreakTime.Value);
+            AddUntilStep("wait for play time active", () => player!.IsBreakTime.Value, () => Is.False);
         }
     }
 }

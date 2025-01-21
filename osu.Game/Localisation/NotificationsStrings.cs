@@ -84,12 +84,12 @@ Please try changing your audio device to a working setting.");
         public static LocalisableString LinkTypeNotSupported => new TranslatableString(getKey(@"unsupported_link_type"), @"This link type is not yet supported!");
 
         /// <summary>
-        /// "You received a private message from '{0}'. Click to read it!"
+        /// "You received a private message from &#39;{0}&#39;. Click to read it!"
         /// </summary>
         public static LocalisableString PrivateMessageReceived(string username) => new TranslatableString(getKey(@"private_message_received"), @"You received a private message from '{0}'. Click to read it!", username);
 
         /// <summary>
-        /// "Your name was mentioned in chat by '{0}'. Click to find out why!"
+        /// "Your name was mentioned in chat by &#39;{0}&#39;. Click to find out why!"
         /// </summary>
         public static LocalisableString YourNameWasMentioned(string username) => new TranslatableString(getKey(@"your_name_was_mentioned"), @"Your name was mentioned in chat by '{0}'. Click to find out why!", username);
 
@@ -115,7 +115,7 @@ Please try changing your audio device to a working setting.");
 
         /// <summary>
         /// "You are now running osu! {0}.
-        /// Click to see what's new!"
+        /// Click to see what&#39;s new!"
         /// </summary>
         public static LocalisableString GameVersionAfterUpdate(string version) => new TranslatableString(getKey(@"game_version_after_update"), @"You are now running osu! {0}.
 Click to see what's new!", version);

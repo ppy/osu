@@ -41,6 +41,7 @@ namespace osu.Game.Screens.Edit
             rulesetBeatmapProcessor?.PostProcess();
 
             autoGenerateBreaks();
+            ensureNewComboAfterBreaks();
         }
 
         private void autoGenerateBreaks()
@@ -98,6 +99,41 @@ namespace osu.Game.Screens.Edit
                     continue;
 
                 Beatmap.Breaks.Add(breakPeriod);
+            }
+        }
+
+        private void ensureNewComboAfterBreaks()
+        {
+            var breakEnds = Beatmap.Breaks.Select(b => b.EndTime).OrderBy(t => t).ToList();
+
+            if (breakEnds.Count == 0)
+                return;
+
+            int currentBreak = 0;
+
+            IHasComboInformation? lastObj = null;
+            bool comboInformationUpdateRequired = false;
+
+            foreach (var hitObject in Beatmap.HitObjects)
+            {
+                if (hitObject is not IHasComboInformation hasCombo)
+                    continue;
+
+                if (currentBreak < breakEnds.Count && hitObject.StartTime >= breakEnds[currentBreak])
+                {
+                    if (!hasCombo.NewCombo)
+                    {
+                        hasCombo.NewCombo = true;
+                        comboInformationUpdateRequired = true;
+                    }
+
+                    currentBreak += 1;
+                }
+
+                if (comboInformationUpdateRequired)
+                    hasCombo.UpdateComboInformation(lastObj);
+
+                lastObj = hasCombo;
             }
         }
     }

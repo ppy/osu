@@ -8,7 +8,6 @@ using osu.Framework.Extensions.ExceptionExtensions;
 using osu.Framework.Logging;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
-using osu.Game.Online.Rooms.RoomStatuses;
 using osu.Game.Screens.OnlinePlay.Components;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer
@@ -31,7 +30,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             // this is done here as a pre-check to avoid clicking on already closed rooms in the lounge from triggering a server join.
             // should probably be done at a higher level, but due to the current structure of things this is the easiest place for now.
-            if (room.Status is RoomStatusEnded)
+            if (room.HasEnded)
             {
                 onError?.Invoke("Cannot join an ended room.");
                 return;

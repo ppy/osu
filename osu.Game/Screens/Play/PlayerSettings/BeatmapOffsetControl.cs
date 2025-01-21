@@ -15,6 +15,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -35,6 +36,8 @@ namespace osu.Game.Screens.Play.PlayerSettings
     public partial class BeatmapOffsetControl : CompositeDrawable, IKeyBindingHandler<GlobalAction>
     {
         public Bindable<ScoreInfo?> ReferenceScore { get; } = new Bindable<ScoreInfo?>();
+
+        private Bindable<ScoreInfo?> lastAppliedScore { get; } = new Bindable<ScoreInfo?>();
 
         public BindableDouble Current { get; } = new BindableDouble
         {
@@ -100,6 +103,12 @@ namespace osu.Game.Screens.Play.PlayerSettings
             };
         }
 
+        [BackgroundDependencyLoader]
+        private void load(SessionStatics statics)
+        {
+            statics.BindWith(Static.LastAppliedOffsetScore, lastAppliedScore);
+        }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -156,13 +165,14 @@ namespace osu.Game.Screens.Play.PlayerSettings
                     if (setInfo == null) // only the case for tests.
                         return;
 
-                    // Apply to all difficulties in a beatmap set for now (they generally always share timing).
+                    // Apply to all difficulties in a beatmap set if they have the same audio
+                    // (they generally always share timing).
                     foreach (var b in setInfo.Beatmaps)
                     {
                         BeatmapUserSettings userSettings = b.UserSettings;
                         double val = Current.Value;
 
-                        if (userSettings.Offset != val)
+                        if (userSettings.Offset != val && b.AudioEquals(beatmap.Value.BeatmapInfo))
                             userSettings.Offset = val;
                     }
                 });
@@ -174,6 +184,9 @@ namespace osu.Game.Screens.Play.PlayerSettings
             referenceScoreContainer.Clear();
 
             if (score.NewValue == null)
+                return;
+
+            if (score.NewValue.Equals(lastAppliedScore.Value))
                 return;
 
             if (!score.NewValue.BeatmapInfo.AsNonNull().Equals(beatmap.Value.BeatmapInfo))
@@ -230,7 +243,11 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 useAverageButton = new SettingsButton
                 {
                     Text = BeatmapOffsetControlStrings.CalibrateUsingLastPlay,
-                    Action = () => Current.Value = lastPlayBeatmapOffset - lastPlayAverage,
+                    Action = () =>
+                    {
+                        Current.Value = lastPlayBeatmapOffset - lastPlayAverage;
+                        lastAppliedScore.Value = ReferenceScore.Value;
+                    },
                     Enabled = { Value = !Precision.AlmostEquals(lastPlayAverage, 0, Current.Precision / 2) }
                 },
                 globalOffsetText = new LinkFlowContainer
@@ -257,20 +274,36 @@ namespace osu.Game.Screens.Play.PlayerSettings
             beatmapOffsetSubscription?.Dispose();
         }
 
+        protected override void Update()
+        {
+            base.Update();
+            Current.Disabled = !allowOffsetAdjust;
+        }
+
+        private bool allowOffsetAdjust
+        {
+            get
+            {
+                // General limitations to ensure players don't do anything too weird.
+                // These match stable for now.
+                if (player is SubmittingPlayer)
+                {
+                    Debug.Assert(gameplayClock != null);
+
+                    // TODO: the blocking conditions should probably display a message.
+                    if (!player.IsBreakTime.Value && gameplayClock.CurrentTime - gameplayClock.StartTime > 10000)
+                        return false;
+
+                    if (gameplayClock.IsPaused.Value)
+                        return false;
+                }
+
+                return true;
+            }
+        }
+
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
-            // General limitations to ensure players don't do anything too weird.
-            // These match stable for now.
-            if (player is SubmittingPlayer)
-            {
-                // TODO: the blocking conditions should probably display a message.
-                if (player?.IsBreakTime.Value == false && gameplayClock?.CurrentTime - gameplayClock?.StartTime > 10000)
-                    return false;
-
-                if (gameplayClock?.IsPaused.Value == true)
-                    return false;
-            }
-
             // To match stable, this should adjust by 5 ms, or 1 ms when holding alt.
             // But that is hard to make work with global actions due to the operating mode.
             // Let's use the more precise as a default for now.
@@ -279,11 +312,13 @@ namespace osu.Game.Screens.Play.PlayerSettings
             switch (e.Action)
             {
                 case GlobalAction.IncreaseOffset:
-                    Current.Value += amount;
+                    if (!Current.Disabled)
+                        Current.Value += amount;
                     return true;
 
                 case GlobalAction.DecreaseOffset:
-                    Current.Value -= amount;
+                    if (!Current.Disabled)
+                        Current.Value -= amount;
                     return true;
             }
 
