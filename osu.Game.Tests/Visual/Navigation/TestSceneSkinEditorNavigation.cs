@@ -5,6 +5,7 @@
 
 using System;
 using System.Linq;
+using Newtonsoft.Json;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
@@ -23,6 +24,7 @@ using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Play.HUD.HitErrorMeters;
 using osu.Game.Skinning;
 using osu.Game.Tests.Beatmaps.IO;
@@ -99,6 +101,77 @@ namespace osu.Game.Tests.Visual.Navigation
 
             openSkinEditor();
             AddUntilStep("current skin is mutable", () => !Game.Dependencies.Get<SkinManager>().CurrentSkin.Value.SkinInfo.Value.Protected);
+        }
+
+        [Test]
+        public void TestMutateProtectedSkinFromMainMenu_UndoToInitialStateIsCorrect()
+        {
+            AddStep("set default skin", () => Game.Dependencies.Get<SkinManager>().CurrentSkinInfo.SetDefault());
+            AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).WaitSafely());
+
+            openSkinEditor();
+            AddUntilStep("current skin is mutable", () => !Game.Dependencies.Get<SkinManager>().CurrentSkin.Value.SkinInfo.Value.Protected);
+
+            AddUntilStep("wait for player", () =>
+            {
+                DismissAnyNotifications();
+                return Game.ScreenStack.CurrentScreen is Player;
+            });
+
+            string state = string.Empty;
+
+            AddUntilStep("wait for accuracy counter", () => Game.ChildrenOfType<ArgonAccuracyCounter>().Any(counter => counter.Position != new Vector2()));
+            AddStep("dump state of accuracy meter", () => state = JsonConvert.SerializeObject(Game.ChildrenOfType<ArgonAccuracyCounter>().First().CreateSerialisedInfo()));
+            AddStep("add any component", () => Game.ChildrenOfType<SkinComponentToolbox.ToolboxComponentButton>().First().TriggerClick());
+            AddStep("undo", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.Key(Key.Z);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+            AddUntilStep("only one accuracy meter left",
+                () => Game.ChildrenOfType<Player>().Single().ChildrenOfType<ArgonAccuracyCounter>().Count(),
+                () => Is.EqualTo(1));
+            AddAssert("accuracy meter state unchanged",
+                () => JsonConvert.SerializeObject(Game.ChildrenOfType<ArgonAccuracyCounter>().First().CreateSerialisedInfo()),
+                () => Is.EqualTo(state));
+        }
+
+        [Test]
+        public void TestMutateProtectedSkinFromPlayer_UndoToInitialStateIsCorrect()
+        {
+            AddStep("set default skin", () => Game.Dependencies.Get<SkinManager>().CurrentSkinInfo.SetDefault());
+            AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).WaitSafely());
+            advanceToSongSelect();
+            AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
+
+            AddStep("enable NF", () => Game.SelectedMods.Value = new[] { new OsuModNoFail() });
+            AddStep("enter gameplay", () => InputManager.Key(Key.Enter));
+
+            AddUntilStep("wait for player", () =>
+            {
+                DismissAnyNotifications();
+                return Game.ScreenStack.CurrentScreen is Player;
+            });
+            openSkinEditor();
+
+            string state = string.Empty;
+
+            AddUntilStep("wait for accuracy counter", () => Game.ChildrenOfType<ArgonAccuracyCounter>().Any(counter => counter.Position != new Vector2()));
+            AddStep("dump state of accuracy meter", () => state = JsonConvert.SerializeObject(Game.ChildrenOfType<ArgonAccuracyCounter>().First().CreateSerialisedInfo()));
+            AddStep("add any component", () => Game.ChildrenOfType<SkinComponentToolbox.ToolboxComponentButton>().First().TriggerClick());
+            AddStep("undo", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.Key(Key.Z);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+            AddUntilStep("only one accuracy meter left",
+                () => Game.ChildrenOfType<Player>().Single().ChildrenOfType<ArgonAccuracyCounter>().Count(),
+                () => Is.EqualTo(1));
+            AddAssert("accuracy meter state unchanged",
+                () => JsonConvert.SerializeObject(Game.ChildrenOfType<ArgonAccuracyCounter>().First().CreateSerialisedInfo()),
+                () => Is.EqualTo(state));
         }
 
         [Test]
@@ -210,6 +283,33 @@ namespace osu.Game.Tests.Visual.Navigation
             switchToGameplayScene();
 
             AddAssert("no mod selected", () => !((Player)Game.ScreenStack.CurrentScreen).Mods.Value.Any());
+        }
+
+        [Test]
+        public void TestGameplaySettingsDoesNotExpandWhenSkinOverlayPresent()
+        {
+            advanceToSongSelect();
+            openSkinEditor();
+            AddStep("select autoplay", () => Game.SelectedMods.Value = new Mod[] { new OsuModAutoplay() });
+            AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).WaitSafely());
+            AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
+            switchToGameplayScene();
+
+            AddUntilStep("wait for settings", () => getPlayerSettingsOverlay() != null);
+            AddAssert("settings not visible", () => getPlayerSettingsOverlay().DrawWidth, () => Is.EqualTo(0));
+
+            AddStep("move cursor to right of screen", () => InputManager.MoveMouseTo(InputManager.ScreenSpaceDrawQuad.TopRight));
+            AddAssert("settings not visible", () => getPlayerSettingsOverlay().DrawWidth, () => Is.EqualTo(0));
+
+            toggleSkinEditor();
+
+            AddStep("move cursor slightly", () => InputManager.MoveMouseTo(InputManager.ScreenSpaceDrawQuad.TopRight + new Vector2(1)));
+            AddUntilStep("settings visible", () => getPlayerSettingsOverlay().DrawWidth, () => Is.GreaterThan(0));
+
+            AddStep("move cursor to right of screen too far", () => InputManager.MoveMouseTo(InputManager.ScreenSpaceDrawQuad.TopRight + new Vector2(10240, 0)));
+            AddUntilStep("settings not visible", () => getPlayerSettingsOverlay().DrawWidth, () => Is.EqualTo(0));
+
+            PlayerSettingsOverlay getPlayerSettingsOverlay() => ((Player)Game.ScreenStack.CurrentScreen).ChildrenOfType<PlayerSettingsOverlay>().SingleOrDefault();
         }
 
         [Test]
