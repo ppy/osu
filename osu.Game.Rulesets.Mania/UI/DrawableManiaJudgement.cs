@@ -6,6 +6,7 @@
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
+using osuTK;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
@@ -35,8 +36,20 @@ namespace osu.Game.Rulesets.Mania.UI
                 switch (Result)
                 {
                     case HitResult.None:
+                        this.FadeOutFromOne(800);
+                        break;
+
                     case HitResult.Miss:
-                        base.PlayAnimation();
+                        this.ScaleTo(1.6f);
+                        this.ScaleTo(1, 100, Easing.In);
+
+                        this.MoveToY(judgement_y_position);
+                        this.MoveToOffset(new Vector2(0, 100), 800, Easing.InQuint);
+
+                        this.RotateTo(0);
+                        this.RotateTo(40, 800, Easing.InQuint);
+
+                        this.FadeOutFromOne(800);
                         break;
 
                     default:
