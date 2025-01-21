@@ -11,6 +11,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Online.Chat;
 using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Profile.Header.Components
@@ -87,7 +88,8 @@ namespace osu.Game.Overlays.Profile.Header.Components
         {
             background.Colour = colours.Pink;
 
-            Action = () => game?.OpenUrlExternally(@"/home/support");
+            // Easy to accidentally click so let's always show the open URL popup.
+            Action = () => game?.OpenUrlExternally(@"/home/support", LinkWarnMode.AlwaysWarn);
         }
 
         protected override bool OnHover(HoverEvent e)

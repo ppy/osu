@@ -41,7 +41,6 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 AutoSizeAxes = Axes.Y,
                 AutoSizeDuration = 200,
                 AutoSizeEasing = Easing.OutQuint,
-                Masking = true,
                 Direction = FillDirection.Vertical,
                 Spacing = new Vector2(0, 15),
                 Children = new Drawable[]

@@ -56,7 +56,12 @@ namespace osu.Game.Rulesets.Edit
                         Spacing = new Vector2(0, 5),
                         Children = new[]
                         {
-                            new DrawableTernaryButton(new TernaryButton(showSpeedChanges, "Show speed changes", () => new SpriteIcon { Icon = FontAwesome.Solid.TachometerAlt }))
+                            new DrawableTernaryButton
+                            {
+                                Current = showSpeedChanges,
+                                Description = "Show speed changes",
+                                CreateIcon = () => new SpriteIcon { Icon = FontAwesome.Solid.TachometerAlt },
+                            }
                         }
                     },
                 });

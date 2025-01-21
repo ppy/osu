@@ -38,9 +38,19 @@ namespace osu.Game.Online.Metadata
         public abstract IBindable<bool> IsWatchingUserPresence { get; }
 
         /// <summary>
+        /// The <see cref="UserPresence"/> information about the current user.
+        /// </summary>
+        public abstract UserPresence LocalUserPresence { get; }
+
+        /// <summary>
         /// Dictionary keyed by user ID containing all of the <see cref="UserPresence"/> information about currently online users received from the server.
         /// </summary>
-        public abstract IBindableDictionary<int, UserPresence> UserStates { get; }
+        public abstract IBindableDictionary<int, UserPresence> UserPresences { get; }
+
+        /// <summary>
+        /// Dictionary keyed by user ID containing all of the <see cref="UserPresence"/> information about currently online friends received from the server.
+        /// </summary>
+        public abstract IBindableDictionary<int, UserPresence> FriendPresences { get; }
 
         /// <inheritdoc/>
         public abstract Task UpdateActivity(UserActivity? activity);
@@ -56,6 +66,9 @@ namespace osu.Game.Online.Metadata
 
         /// <inheritdoc/>
         public abstract Task UserPresenceUpdated(int userId, UserPresence? presence);
+
+        /// <inheritdoc/>
+        public abstract Task FriendPresenceUpdated(int userId, UserPresence? presence);
 
         #endregion
 
