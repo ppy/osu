@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             if (mods.OfType<OsuModAutopilot>().Any())
                 distanceBonus = 0;
 
-            double sliderStreamBonus = getSliderStreamBonus(current) * sliderstream_multiplier;
+            double sliderStreamBonus = getSliderStreamBonus(osuCurrObj, osuPrevObj) * sliderstream_multiplier;
 
             // Base difficulty with all bonuses
             double difficulty = (1 + speedBonus + distanceBonus) * (1 + sliderStreamBonus) * 1000 / strainTime;
@@ -73,12 +73,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             return difficulty * doubletapness;
         }
 
-        private static double getSliderStreamBonus(DifficultyHitObject current)
+        private static double getSliderStreamBonus(OsuDifficultyHitObject osuCurrObj, OsuDifficultyHitObject? osuLastObj)
         {
-            var osuCurrObj = (OsuDifficultyHitObject)current;
-            var osuLastObj = (OsuDifficultyHitObject)current.Previous(0);
-            var osuLastLastObj = (OsuDifficultyHitObject)current.Previous(1);
-
             if (osuCurrObj.BaseObject is not Slider slider || osuLastObj?.BaseObject is not Slider)
                 return 0;
 
