@@ -131,6 +131,7 @@ namespace osu.Game.Skinning
                                 var score = container.OfType<ArgonScoreCounter>().FirstOrDefault();
                                 var accuracy = container.OfType<ArgonAccuracyCounter>().FirstOrDefault();
                                 var performancePoints = container.OfType<ArgonPerformancePointsCounter>().FirstOrDefault();
+                                var hitError = container.OfType<HitErrorMeter>().FirstOrDefault();
                                 var songProgress = container.OfType<ArgonSongProgress>().FirstOrDefault();
                                 var keyCounter = container.OfType<ArgonKeyCounterDisplay>().FirstOrDefault();
 
@@ -178,22 +179,12 @@ namespace osu.Game.Skinning
                                         performancePoints.Origin = Anchor.TopRight;
                                     }
 
-                                    var hitError = container.OfType<HitErrorMeter>().FirstOrDefault();
-
                                     if (hitError != null)
                                     {
-                                        hitError.Anchor = Anchor.CentreLeft;
+                                        hitError.Position = new Vector2(0, -20);
+                                        hitError.Anchor = Anchor.BottomCentre;
                                         hitError.Origin = Anchor.CentreLeft;
-                                    }
-
-                                    var hitError2 = container.OfType<HitErrorMeter>().LastOrDefault();
-
-                                    if (hitError2 != null)
-                                    {
-                                        hitError2.Anchor = Anchor.CentreRight;
-                                        hitError2.Scale = new Vector2(-1, 1);
-                                        // origin flipped to match scale above.
-                                        hitError2.Origin = Anchor.CentreLeft;
+                                        hitError.Rotation = -90;
                                     }
 
                                     if (songProgress != null)
@@ -240,7 +231,6 @@ namespace osu.Game.Skinning
                                     {
                                         Scale = new Vector2(0.8f),
                                     },
-                                    new BarHitErrorMeter(),
                                     new BarHitErrorMeter(),
                                     new ArgonSongProgress(),
                                     new ArgonKeyCounterDisplay(),
