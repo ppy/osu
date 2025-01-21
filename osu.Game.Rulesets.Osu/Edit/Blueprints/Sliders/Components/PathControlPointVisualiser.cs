@@ -21,6 +21,7 @@ using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
+using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
@@ -55,6 +56,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         [Resolved(CanBeNull = true)]
         private IDistanceSnapProvider distanceSnapProvider { get; set; }
 
+        private Bindable<bool> limitedDistanceSnap { get; set; } = null!;
+
         public PathControlPointVisualiser(T hitObject, bool allowSelection)
         {
             this.hitObject = hitObject;
@@ -67,6 +70,12 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                 new PathControlPointConnection<T>(hitObject),
                 Pieces = new Container<PathControlPointPiece<T>> { RelativeSizeAxes = Axes.Both }
             };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
+        {
+            limitedDistanceSnap = config.GetBindable<bool>(OsuSetting.EditorLimitedDistanceSnap);
         }
 
         protected override void LoadComplete()
@@ -437,7 +446,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                 Vector2 newHeadPosition = Parent!.ToScreenSpace(e.MousePosition + (dragStartPositions[0] - dragStartPositions[draggedControlPointIndex]));
 
                 var result = positionSnapProvider?.TrySnapToNearbyObjects(newHeadPosition, oldStartTime);
-                result ??= positionSnapProvider?.TrySnapToDistanceGrid(newHeadPosition);
+                result ??= positionSnapProvider?.TrySnapToDistanceGrid(newHeadPosition, limitedDistanceSnap.Value ? oldStartTime : null);
                 if (positionSnapProvider?.TrySnapToPositionGrid(result?.ScreenSpacePosition ?? newHeadPosition, result?.Time ?? oldStartTime) is SnapResult gridSnapResult)
                     result = gridSnapResult;
                 result ??= new SnapResult(newHeadPosition, oldStartTime);
