@@ -71,7 +71,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
                 difficulty += evaluateAlternatingMonoPatternDifficulty(colour.AlternatingMonoPattern);
 
             if (colour.RepeatingHitPattern?.FirstHitObject == hitObject) // Difficulty for RepeatingHitPattern
-                difficulty += evaluateReadingHitPatternDifficulty(colour.RepeatingHitPattern);
+                difficulty += evaluateRepeatingHitPatternsDifficulty(colour.RepeatingHitPattern);
 
             double consistencyPenalty = consistentRatioPenalty(taikoObject);
             difficulty *= consistencyPenalty;
@@ -83,9 +83,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
             DifficultyCalculationUtils.Logistic(exponent: Math.E * monoStreak.Index - 2 * Math.E) * evaluateAlternatingMonoPatternDifficulty(monoStreak.Parent) * 0.5;
 
         private static double evaluateAlternatingMonoPatternDifficulty(AlternatingMonoPattern alternatingMonoPattern) =>
-            DifficultyCalculationUtils.Logistic(exponent: Math.E * alternatingMonoPattern.Index - 2 * Math.E) * evaluateReadingHitPatternDifficulty(alternatingMonoPattern.Parent);
+            DifficultyCalculationUtils.Logistic(exponent: Math.E * alternatingMonoPattern.Index - 2 * Math.E) * evaluateRepeatingHitPatternsDifficulty(alternatingMonoPattern.Parent);
 
-        private static double evaluateReadingHitPatternDifficulty(RepeatingHitPatterns repeatingHitPattern) =>
+        private static double evaluateRepeatingHitPatternsDifficulty(RepeatingHitPatterns repeatingHitPattern) =>
             2 * (1 - DifficultyCalculationUtils.Logistic(exponent: Math.E * repeatingHitPattern.RepetitionInterval - 2 * Math.E));
     }
 }
