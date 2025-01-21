@@ -61,29 +61,38 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             // Max distance bonus is 1 * `distance_multiplier` at single_spacing_threshold
             double distanceBonus = Math.Pow(distance / single_spacing_threshold, 3.95) * distance_multiplier;
 
-            double sliderStreamBonus = 0;
-
-            if (osuCurrObj.BaseObject is Slider slider && osuPrevObj?.BaseObject is Slider)
-            {
-                sliderStreamBonus = sliderstream_multiplier;
-
-                // Don't buff burst into 2 sliders case
-                sliderStreamBonus *= DifficultyCalculationUtils.ReverseLerp(osuPrevObj.StrainTime, osuCurrObj.StrainTime * 0.55, osuCurrObj.StrainTime * 0.75);
-
-                // Punish too short sliders to prevent cheesing
-                double sliderLength = slider.Velocity * slider.SpanDuration;
-                if (sliderLength < slider.Radius / 2)
-                    sliderStreamBonus *= sliderLength / (slider.Radius / 2);
-            }
-
             if (mods.OfType<OsuModAutopilot>().Any())
                 distanceBonus = 0;
+
+            double sliderStreamBonus = getSliderStreamBonus(current) * sliderstream_multiplier;
 
             // Base difficulty with all bonuses
             double difficulty = (1 + speedBonus + distanceBonus) * (1 + sliderStreamBonus) * 1000 / strainTime;
 
             // Apply penalty if there's doubletappable doubles
             return difficulty * doubletapness;
+        }
+
+        private static double getSliderStreamBonus(DifficultyHitObject current)
+        {
+            var osuCurrObj = (OsuDifficultyHitObject)current;
+            var osuLastObj = (OsuDifficultyHitObject)current.Previous(0);
+            var osuLastLastObj = (OsuDifficultyHitObject)current.Previous(1);
+
+            if (osuCurrObj.BaseObject is not Slider slider || osuLastObj?.BaseObject is not Slider)
+                return 0;
+
+            double sliderStreamBonus = 1.0;
+
+            // Don't buff burst into 2 sliders case
+            sliderStreamBonus *= DifficultyCalculationUtils.ReverseLerp(osuLastObj.StrainTime, osuCurrObj.StrainTime * 0.55, osuCurrObj.StrainTime * 0.75);
+
+            // Punish too short sliders to prevent cheesing
+            double sliderLength = slider.Velocity * slider.SpanDuration;
+            if (sliderLength < slider.Radius / 2)
+                sliderStreamBonus *= sliderLength / (slider.Radius / 2);
+
+            return sliderStreamBonus;
         }
     }
 }
