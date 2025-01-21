@@ -12,6 +12,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Screens.Select;
+using osu.Game.Localisation;
 
 namespace osu.Game.Screens.OnlinePlay
 {
@@ -72,6 +73,8 @@ namespace osu.Game.Screens.OnlinePlay
             SelectedColour = colours.Yellow;
             DeselectedColour = SelectedColour.Opacity(0.5f);
             Text = @"freestyle";
+
+            TooltipText = MultiplayerMatchStrings.FreestyleButtonTooltip;
         }
 
         protected override void LoadComplete()

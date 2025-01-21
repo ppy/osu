@@ -415,7 +415,7 @@ namespace osu.Game.Screens.Select
         /// Creates the buttons to be displayed in the footer.
         /// </summary>
         /// <returns>A set of <see cref="FooterButton"/> and an optional <see cref="OverlayContainer"/> which the button opens when pressed.</returns>
-        protected virtual IEnumerable<(FooterButton, OverlayContainer?)> CreateSongSelectFooterButtons() => new (FooterButton, OverlayContainer?)[]
+        protected virtual IEnumerable<(FooterButton button, OverlayContainer? overlay)> CreateSongSelectFooterButtons() => new (FooterButton, OverlayContainer?)[]
         {
             (ModsFooterButton = new FooterButtonMods { Current = Mods }, ModSelect),
             (new FooterButtonRandom
