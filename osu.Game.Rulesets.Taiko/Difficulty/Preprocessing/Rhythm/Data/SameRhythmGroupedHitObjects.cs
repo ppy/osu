@@ -3,14 +3,17 @@
 
 using System.Collections.Generic;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Taiko.Difficulty.Utils;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Rhythm.Data
 {
     /// <summary>
     /// Represents a group of <see cref="TaikoDifficultyHitObject"/>s with no rhythm variation.
     /// </summary>
-    public class SameRhythmGroupedHitObjects : IntervalGroupedHitObjects<TaikoDifficultyHitObject>, IHasInterval
+    public class SameRhythmGroupedHitObjects : IHasInterval
     {
+        public List<TaikoDifficultyHitObject> Children { get; private set; }
+
         public TaikoDifficultyHitObject FirstHitObject => Children[0];
 
         public SameRhythmGroupedHitObjects? Previous;
@@ -40,53 +43,21 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Rhythm.Data
         /// <inheritdoc/>
         public double Interval { get; private set; }
 
-        public SameRhythmGroupedHitObjects(SameRhythmGroupedHitObjects? previous, List<TaikoDifficultyHitObject> data, ref int i)
-            : base(data, ref i, 5)
+        public SameRhythmGroupedHitObjects(SameRhythmGroupedHitObjects? previous, List<TaikoDifficultyHitObject> children)
         {
             Previous = previous;
+            Children = children;
 
-            foreach (var hitObject in Children)
-            {
-                hitObject.Rhythm.SameRhythmGroupedHitObjects = this;
+            // Calculate the average interval between hitobjects, or null if there are fewer than two
+            HitObjectInterval = Children.Count < 2 ? null : Duration / (Children.Count - 1);
 
-                // Pass the HitObjectInterval to each child.
-                hitObject.HitObjectInterval = HitObjectInterval;
-            }
+            // Calculate the ratio between this group's interval and the previous group's interval
+            HitObjectIntervalRatio = Previous?.HitObjectInterval != null && HitObjectInterval != null
+                ? HitObjectInterval.Value / Previous.HitObjectInterval.Value
+                : 1;
 
-            calculateIntervals();
-        }
-
-        public static List<SameRhythmGroupedHitObjects> GroupHitObjects(List<TaikoDifficultyHitObject> data)
-        {
-            List<SameRhythmGroupedHitObjects> flatPatterns = new List<SameRhythmGroupedHitObjects>();
-
-            // Index does not need to be incremented, as it is handled within IntervalGroupedHitObjects's constructor.
-            for (int i = 0; i < data.Count;)
-            {
-                SameRhythmGroupedHitObjects? previous = flatPatterns.Count > 0 ? flatPatterns[^1] : null;
-                flatPatterns.Add(new SameRhythmGroupedHitObjects(previous, data, ref i));
-            }
-
-            return flatPatterns;
-        }
-
-        private void calculateIntervals()
-        {
-            // Calculate the average interval between hitobjects, or null if there are fewer than two.
-            HitObjectInterval = Children.Count < 2 ? null : (Children[^1].StartTime - Children[0].StartTime) / (Children.Count - 1);
-
-            // If both the current and previous intervals are available, calculate the ratio.
-            if (Previous?.HitObjectInterval != null && HitObjectInterval != null)
-            {
-                HitObjectIntervalRatio = HitObjectInterval.Value / Previous.HitObjectInterval.Value;
-            }
-
-            if (Previous == null)
-            {
-                return;
-            }
-
-            Interval = StartTime - Previous.StartTime;
+            // Calculate the interval from the previous group's start time
+            Interval = Previous != null ? StartTime - Previous.StartTime : 0;
         }
     }
 }
