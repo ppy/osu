@@ -275,7 +275,7 @@ namespace osu.Game.Online.Multiplayer
 
             try
             {
-                return await connection.InvokeAsync<MultiplayerRoom>(nameof(IMultiplayerServer.CreateRoom), room);
+                return await connection.InvokeAsync<MultiplayerRoom>(nameof(IMultiplayerServer.CreateRoom), room).ConfigureAwait(false);
             }
             catch (HubException exception)
             {
