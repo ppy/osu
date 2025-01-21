@@ -225,10 +225,12 @@ namespace osu.Game.Rulesets.Osu.Edit
         }
 
         [CanBeNull]
-        public SnapResult TrySnapToNearbyObjects(Vector2 screenSpacePosition)
+        public SnapResult TrySnapToNearbyObjects(Vector2 screenSpacePosition, double? fallbackTime = null)
         {
             if (!snapToVisibleBlueprints(screenSpacePosition, out var snapResult))
                 return null;
+
+            snapResult.Time ??= fallbackTime;
 
             if (DistanceSnapProvider.DistanceSnapToggle.Value != TernaryState.True || distanceSnapGrid == null)
                 return snapResult;

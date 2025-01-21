@@ -95,12 +95,12 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints
             base.OnDragEnd(e);
         }
 
-        public override SnapResult UpdateTimeAndPosition(Vector2 screenSpacePosition, double referenceTime)
+        public override SnapResult UpdateTimeAndPosition(Vector2 screenSpacePosition, double fallbackTime)
         {
             if (State.Value == Visibility.Hidden)
-                return new SnapResult(screenSpacePosition, referenceTime);
+                return new SnapResult(screenSpacePosition, fallbackTime);
 
-            var result = hitObjectComposer?.TrySnapToNearbyObjects(screenSpacePosition) ?? new SnapResult(screenSpacePosition, referenceTime);
+            var result = hitObjectComposer?.TrySnapToNearbyObjects(screenSpacePosition) ?? new SnapResult(screenSpacePosition, fallbackTime);
 
             var pos = ToLocalSpace(result.ScreenSpacePosition);
 

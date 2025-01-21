@@ -113,7 +113,12 @@ namespace osu.Game.Overlays.SkinEditor
 
         protected override bool TryMoveBlueprints(DragEvent e, IList<(SelectionBlueprint<ISerialisableDrawable> blueprint, Vector2[] originalSnapPositions)> blueprints)
         {
-            throw new System.NotImplementedException();
+            Vector2 distanceTravelled = e.ScreenSpaceMousePosition - e.ScreenSpaceMouseDownPosition;
+
+            // The final movement position, relative to movementBlueprintOriginalPosition.
+            var referenceBlueprint = blueprints.First().blueprint;
+            Vector2 movePosition = blueprints.First().originalSnapPositions.First() + distanceTravelled;
+            return SelectionHandler.HandleMovement(new MoveSelectionEvent<ISerialisableDrawable>(referenceBlueprint, movePosition - referenceBlueprint.ScreenSpaceSelectionPoint));
         }
 
         /// <summary>
