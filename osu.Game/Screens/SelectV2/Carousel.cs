@@ -493,15 +493,7 @@ namespace osu.Game.Screens.SelectV2
                 switch (e.Action)
                 {
                     case GlobalAction.AbsoluteScrollSongList:
-
-                        // The default binding for absolute scroll is right mouse button.
-                        // To avoid conflicts with context menus, disallow absolute scroll completely if it looks like things will fall over.
-                        if (e.CurrentState.Mouse.Buttons.Contains(MouseButton.Right)
-                            && GetContainingInputManager()!.HoveredDrawables.OfType<IHasContextMenu>().Any())
-                            return false;
-
-                        ScrollToAbsolutePosition(e.CurrentState.Mouse.Position);
-                        absoluteScrolling = true;
+                        beginAbsoluteScrolling(e);
                         return true;
                 }
 
@@ -513,9 +505,30 @@ namespace osu.Game.Screens.SelectV2
                 switch (e.Action)
                 {
                     case GlobalAction.AbsoluteScrollSongList:
-                        absoluteScrolling = false;
+                        endAbsoluteScrolling();
                         break;
                 }
+            }
+
+            protected override bool OnMouseDown(MouseDownEvent e)
+            {
+                if (e.Button == MouseButton.Right)
+                {
+                    // To avoid conflicts with context menus, disallow absolute scroll if it looks like things will fall over.
+                    if (GetContainingInputManager()!.HoveredDrawables.OfType<IHasContextMenu>().Any())
+                        return false;
+
+                    beginAbsoluteScrolling(e);
+                }
+
+                return base.OnMouseDown(e);
+            }
+
+            protected override void OnMouseUp(MouseUpEvent e)
+            {
+                if (e.Button == MouseButton.Right)
+                    endAbsoluteScrolling();
+                base.OnMouseUp(e);
             }
 
             protected override bool OnMouseMove(MouseMoveEvent e)
@@ -528,6 +541,14 @@ namespace osu.Game.Screens.SelectV2
 
                 return base.OnMouseMove(e);
             }
+
+            private void beginAbsoluteScrolling(UIEvent e)
+            {
+                ScrollToAbsolutePosition(e.CurrentState.Mouse.Position);
+                absoluteScrolling = true;
+            }
+
+            private void endAbsoluteScrolling() => absoluteScrolling = false;
 
             #endregion
         }
