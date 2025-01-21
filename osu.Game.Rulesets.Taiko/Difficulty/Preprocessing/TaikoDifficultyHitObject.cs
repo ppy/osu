@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Taiko.Objects;
@@ -76,11 +77,15 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
         /// <param name="rimHitObjects">The list of rim (kat) <see cref="DifficultyHitObject"/>s in the current beatmap.</param>
         /// <param name="noteObjects">The list of <see cref="DifficultyHitObject"/>s that is a hit (i.e. not a drumroll or swell) in the current beatmap.</param>
         /// <param name="index">The position of this <see cref="DifficultyHitObject"/> in the <paramref name="objects"/> list.</param>
+        /// <param name="controlPointInfo">The control point info of the beatmap.</param>
+        /// <param name="globalSliderVelocity">The global slider velocity of the beatmap.</param>
         public TaikoDifficultyHitObject(HitObject hitObject, HitObject lastObject, HitObject lastLastObject, double clockRate,
                                         List<DifficultyHitObject> objects,
                                         List<TaikoDifficultyHitObject> centreHitObjects,
                                         List<TaikoDifficultyHitObject> rimHitObjects,
-                                        List<TaikoDifficultyHitObject> noteObjects, int index)
+                                        List<TaikoDifficultyHitObject> noteObjects, int index,
+                                        ControlPointInfo controlPointInfo,
+                                        double globalSliderVelocity)
             : base(hitObject, lastObject, clockRate, objects, index)
         {
             noteDifficultyHitObjects = noteObjects;
@@ -111,6 +116,26 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
                 NoteIndex = noteObjects.Count;
                 noteObjects.Add(this);
             }
+
+            double startTime = hitObject.StartTime * clockRate;
+
+            // Retrieve the timing point at the note's start time
+            TimingControlPoint currentControlPoint = controlPointInfo.TimingPointAt(startTime);
+
+            // Calculate the slider velocity at the note's start time.
+            double currentSliderVelocity = calculateSliderVelocity(controlPointInfo, globalSliderVelocity, startTime, clockRate);
+            CurrentSliderVelocity = currentSliderVelocity;
+
+            EffectiveBPM = currentControlPoint.BPM * currentSliderVelocity;
+        }
+
+        /// <summary>
+        /// Calculates the slider velocity based on control point info and clock rate.
+        /// </summary>
+        private static double calculateSliderVelocity(ControlPointInfo controlPointInfo, double globalSliderVelocity, double startTime, double clockRate)
+        {
+            var activeEffectControlPoint = controlPointInfo.EffectPointAt(startTime);
+            return globalSliderVelocity * (activeEffectControlPoint.ScrollSpeed) * clockRate;
         }
 
         public TaikoDifficultyHitObject? PreviousMono(int backwardsIndex) => monoDifficultyHitObjects?.ElementAtOrDefault(MonoIndex - (backwardsIndex + 1));
