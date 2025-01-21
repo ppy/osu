@@ -13,7 +13,6 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour;
-using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Reading;
 using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Rhythm.Data;
 using osu.Game.Rulesets.Taiko.Difficulty.Skills;
 using osu.Game.Rulesets.Taiko.Mods;
@@ -72,7 +71,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             var centreObjects = new List<TaikoDifficultyHitObject>();
             var rimObjects = new List<TaikoDifficultyHitObject>();
             var noteObjects = new List<TaikoDifficultyHitObject>();
-            EffectiveBPMPreprocessor bpmLoader = new EffectiveBPMPreprocessor(beatmap, noteObjects);
 
             // Generate TaikoDifficultyHitObjects from the beatmap's hit objects.
             for (int i = 2; i < beatmap.HitObjects.Count; i++)
@@ -86,15 +84,16 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                     centreObjects,
                     rimObjects,
                     noteObjects,
-                    difficultyHitObjects.Count
+                    difficultyHitObjects.Count,
+                    beatmap.ControlPointInfo,
+                    beatmap.Difficulty.SliderMultiplier
                 ));
             }
 
-            var groupedHitObjects = SameRhythmHitObjects.GroupHitObjects(noteObjects);
-
             TaikoColourDifficultyPreprocessor.ProcessAndAssign(difficultyHitObjects);
-            SamePatterns.GroupPatterns(groupedHitObjects);
-            bpmLoader.ProcessEffectiveBPM(beatmap.ControlPointInfo, clockRate);
+
+            var groupedHitObjects = SameRhythmGroupedHitObjects.GroupHitObjects(noteObjects);
+            SamePatternsGroupedHitObjects.GroupPatterns(groupedHitObjects);
 
             return difficultyHitObjects;
         }
