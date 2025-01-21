@@ -89,6 +89,7 @@ namespace osu.Game.Screens.OnlinePlay
 
                 // Must be from the same set as the playlist item.
                 criteria.BeatmapSetId = beatmapSetId;
+                criteria.HasOnlineID = true;
 
                 // Must be within 30s of the playlist item.
                 criteria.Length.Min = itemLength - 30000;

@@ -58,6 +58,8 @@ namespace osu.Game.Screens.Select
         public bool AllowConvertedBeatmaps;
         public int? BeatmapSetId;
 
+        public bool? HasOnlineID;
+
         private string searchText = string.Empty;
 
         /// <summary>
