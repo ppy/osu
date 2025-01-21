@@ -46,16 +46,16 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
         {
-            DetachedBeatmapStore detachedBeatmapStore;
+            BeatmapStore beatmapStore;
 
             Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
             Dependencies.Cache(manager = new BeatmapManager(LocalStorage, Realm, null, audio, Resources, host, Beatmap.Default));
-            Dependencies.Cache(detachedBeatmapStore = new DetachedBeatmapStore());
+            Dependencies.CacheAs(beatmapStore = new RealmDetachedBeatmapStore());
             Dependencies.Cache(Realm);
 
             importedBeatmapSet = manager.Import(TestResources.CreateTestBeatmapSetInfo(8, rulesets.AvailableRulesets.ToArray()))!;
 
-            Add(detachedBeatmapStore);
+            Add(beatmapStore);
         }
 
         private void setUp()
