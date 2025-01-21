@@ -69,6 +69,11 @@ namespace osu.Game.Screens.Play
 
         private readonly Bindable<JudgementResult> lastJudgementResult = new Bindable<JudgementResult>();
 
+        /// <summary>
+        /// The local user's playing state (whether actively playing, paused, or not playing due to watching a replay or similar).
+        /// </summary>
+        public IBindable<LocalUserPlayingState> PlayingState { get; } = new Bindable<LocalUserPlayingState>();
+
         public GameplayState(
             IBeatmap beatmap,
             Ruleset ruleset,
@@ -76,7 +81,8 @@ namespace osu.Game.Screens.Play
             Score? score = null,
             ScoreProcessor? scoreProcessor = null,
             HealthProcessor? healthProcessor = null,
-            Storyboard? storyboard = null)
+            Storyboard? storyboard = null,
+            IBindable<LocalUserPlayingState>? localUserPlayingState = null)
         {
             Beatmap = beatmap;
             Ruleset = ruleset;
@@ -92,6 +98,9 @@ namespace osu.Game.Screens.Play
             ScoreProcessor = scoreProcessor ?? ruleset.CreateScoreProcessor();
             HealthProcessor = healthProcessor ?? ruleset.CreateHealthProcessor(beatmap.HitObjects[0].StartTime);
             Storyboard = storyboard ?? new Storyboard();
+
+            if (localUserPlayingState != null)
+                PlayingState.BindTo(localUserPlayingState);
         }
 
         /// <summary>
