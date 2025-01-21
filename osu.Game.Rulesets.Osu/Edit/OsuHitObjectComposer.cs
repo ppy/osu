@@ -250,13 +250,13 @@ namespace osu.Game.Rulesets.Osu.Edit
         }
 
         [CanBeNull]
-        public SnapResult TrySnapToDistanceGrid(Vector2 screenSpacePosition)
+        public SnapResult TrySnapToDistanceGrid(Vector2 screenSpacePosition, double? fixedTime = null)
         {
             if (DistanceSnapProvider.DistanceSnapToggle.Value != TernaryState.True || distanceSnapGrid == null)
                 return null;
 
             var playfield = PlayfieldAtScreenSpacePosition(screenSpacePosition);
-            (Vector2 pos, double time) = distanceSnapGrid.GetSnappedPosition(distanceSnapGrid.ToLocalSpace(screenSpacePosition));
+            (Vector2 pos, double time) = distanceSnapGrid.GetSnappedPosition(distanceSnapGrid.ToLocalSpace(screenSpacePosition), fixedTime);
             return new SnapResult(distanceSnapGrid.ToScreenSpace(pos), time, playfield);
         }
 
