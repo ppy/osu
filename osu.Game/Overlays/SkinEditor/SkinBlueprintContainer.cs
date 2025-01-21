@@ -111,6 +111,11 @@ namespace osu.Game.Overlays.SkinEditor
             SelectedItems.AddRange(targetComponents.SelectMany(list => list).Except(SelectedItems).ToArray());
         }
 
+        protected override bool TryMoveBlueprints(DragEvent e, IList<(SelectionBlueprint<ISerialisableDrawable> blueprint, Vector2[] originalSnapPositions)> blueprints)
+        {
+            throw new System.NotImplementedException();
+        }
+
         /// <summary>
         /// Move the current selection spatially by the specified delta, in screen coordinates (ie. the same coordinates as the blueprints).
         /// </summary>

@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         public Action<List<PathControlPoint>> SplitControlPointsRequested;
 
         [Resolved(CanBeNull = true)]
-        private IPositionSnapProvider positionSnapProvider { get; set; }
+        private OsuHitObjectComposer positionSnapProvider { get; set; }
 
         [Resolved(CanBeNull = true)]
         private IDistanceSnapProvider distanceSnapProvider { get; set; }
@@ -433,7 +433,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             {
                 // Special handling for selections containing head control point - the position of the hit object changes which means the snapped position and time have to be taken into account
                 Vector2 newHeadPosition = Parent!.ToScreenSpace(e.MousePosition + (dragStartPositions[0] - dragStartPositions[draggedControlPointIndex]));
-                SnapResult result = positionSnapProvider?.FindSnappedPositionAndTime(newHeadPosition);
+                SnapResult result = positionSnapProvider?.TrySnapToNearbyObjects(newHeadPosition)
+                                    ?? positionSnapProvider?.TrySnapToDistanceGrid(newHeadPosition)
+                                    ?? positionSnapProvider?.TrySnapToPositionGrid(newHeadPosition);
 
                 Vector2 movementDelta = Parent!.ToLocalSpace(result?.ScreenSpacePosition ?? newHeadPosition) - hitObject.Position;
 
@@ -453,7 +455,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             }
             else
             {
-                SnapResult result = positionSnapProvider?.FindSnappedPositionAndTime(Parent!.ToScreenSpace(e.MousePosition), SnapType.GlobalGrids);
+                SnapResult result = positionSnapProvider?.TrySnapToPositionGrid(Parent!.ToScreenSpace(e.MousePosition));
 
                 Vector2 movementDelta = Parent!.ToLocalSpace(result?.ScreenSpacePosition ?? Parent!.ToScreenSpace(e.MousePosition)) - dragStartPositions[draggedControlPointIndex] - hitObject.Position;
 
