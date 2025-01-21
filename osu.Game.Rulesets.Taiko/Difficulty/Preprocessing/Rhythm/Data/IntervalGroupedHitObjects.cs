@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Rhythm.Data
                 // An interval change occured, add the current data if the next interval is larger.
                 if (!Precision.AlmostEquals(data[i].Interval, data[i + 1].Interval, marginOfError))
                 {
-                    if (Precision.DefinitelyBigger(data[i].Interval, data[i + 1].Interval, marginOfError))
+                    if (data[i + 1].Interval > data[i].Interval + marginOfError)
                     {
                         children.Add(data[i]);
                         i++;
