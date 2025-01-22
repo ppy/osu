@@ -149,7 +149,7 @@ namespace osu.Game.Screens.Edit.Components.TernaryButtons
             {
                 Enabled.Value = SelectedHitObject.Value != null;
 
-                if (SelectedHitObject.Value == null || SelectedHitObject.Value.ComboOffset == 0)
+                if (SelectedHitObject.Value == null || SelectedHitObject.Value.ComboOffset == 0 || ComboColours.Count <= 1)
                 {
                     BackgroundColour = colourProvider.Background3;
                     icon.Colour = BackgroundColour.Darken(0.5f);
