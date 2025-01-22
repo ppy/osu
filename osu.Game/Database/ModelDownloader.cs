@@ -131,8 +131,6 @@ namespace osu.Game.Database
 
         private partial class DownloadNotification : ProgressNotification
         {
-            public override bool IsImportant => false;
-
             protected override Notification CreateCompletionNotification() => new SilencedProgressCompletionNotification
             {
                 Activated = CompletionClickAction,
@@ -141,7 +139,10 @@ namespace osu.Game.Database
 
             private partial class SilencedProgressCompletionNotification : ProgressCompletionNotification
             {
-                public override bool IsImportant => false;
+                public SilencedProgressCompletionNotification()
+                {
+                    IsImportant = false;
+                }
             }
         }
     }
