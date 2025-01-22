@@ -169,6 +169,8 @@ namespace osu.Game.Online
 
             notifications.Post(new SimpleNotification
             {
+                Transient = true,
+                IsImportant = false,
                 Icon = FontAwesome.Solid.UserPlus,
                 Text = $"Online: {string.Join(@", ", onlineAlertQueue.Select(u => u.Username))}",
                 IconColour = colours.Green,
@@ -204,6 +206,8 @@ namespace osu.Game.Online
 
             notifications.Post(new SimpleNotification
             {
+                Transient = true,
+                IsImportant = false,
                 Icon = FontAwesome.Solid.UserMinus,
                 Text = $"Offline: {string.Join(@", ", offlineAlertQueue.Select(u => u.Username))}",
                 IconColour = colours.Red
