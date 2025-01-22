@@ -668,12 +668,18 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private partial class BackgroundNotification : SimpleNotification
         {
-            public override bool IsImportant => false;
+            public BackgroundNotification()
+            {
+                IsImportant = false;
+            }
         }
 
         private partial class BackgroundProgressNotification : ProgressNotification
         {
-            public override bool IsImportant => false;
+            public BackgroundProgressNotification()
+            {
+                IsImportant = false;
+            }
         }
     }
 }
