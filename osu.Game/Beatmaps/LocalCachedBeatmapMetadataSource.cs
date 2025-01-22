@@ -113,9 +113,14 @@ namespace osu.Game.Beatmaps
                             return queryCacheVersion2(db, beatmapInfo, out onlineMetadata);
                     }
                 }
+
+                onlineMetadata = null;
+                return false;
             }
             catch (SqliteException sqliteException)
             {
+                onlineMetadata = null;
+
                 // There have been cases where the user's local database is corrupt.
                 // Let's attempt to identify these cases and re-initialise the local cache.
                 switch (sqliteException.SqliteErrorCode)
@@ -124,15 +129,15 @@ namespace osu.Game.Beatmaps
                     case 11: // SQLITE_CORRUPT
                         // only attempt purge & re-download if there is no other refetch in progress
                         if (cacheDownloadRequest != null)
-                            throw;
+                            return false;
 
                         tryPurgeCache();
                         prepareLocalCache();
-                        onlineMetadata = null;
                         return false;
                 }
 
-                throw;
+                logForModel(beatmapInfo.BeatmapSet, $@"Cached local retrieval for {beatmapInfo} failed with unhandled sqlite error {sqliteException}.");
+                return false;
             }
             catch (Exception ex)
             {
@@ -140,9 +145,6 @@ namespace osu.Game.Beatmaps
                 onlineMetadata = null;
                 return false;
             }
-
-            onlineMetadata = null;
-            return false;
         }
 
         private void tryPurgeCache()
