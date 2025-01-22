@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Rhythm.Data;
+using osu.Game.Rulesets.Taiko.Difficulty.Utils;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Rhythm
 {
