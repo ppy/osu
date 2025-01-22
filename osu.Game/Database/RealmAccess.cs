@@ -11,7 +11,6 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Development;
 using osu.Framework.Extensions;
@@ -413,18 +412,7 @@ namespace osu.Game.Database
         /// Compact this realm.
         /// </summary>
         /// <returns></returns>
-        public bool Compact()
-        {
-            try
-            {
-                return Realm.Compact(getConfiguration());
-            }
-            // Catch can be removed along with entity framework. Is specifically to allow a failure message to arrive to the user (see similar catches in EFToRealmMigrator).
-            catch (AggregateException ae) when (RuntimeInfo.OS == RuntimeInfo.Platform.macOS && ae.Flatten().InnerException is TypeInitializationException)
-            {
-                return true;
-            }
-        }
+        public bool Compact() => Realm.Compact(getConfiguration());
 
         /// <summary>
         /// Run work on realm with a return value.
@@ -719,11 +707,6 @@ namespace osu.Game.Database
                 realm_instances_created.Value++;
 
                 return Realm.GetInstance(getConfiguration());
-            }
-            // Catch can be removed along with entity framework. Is specifically to allow a failure message to arrive to the user (see similar catches in EFToRealmMigrator).
-            catch (AggregateException ae) when (RuntimeInfo.OS == RuntimeInfo.Platform.macOS && ae.Flatten().InnerException is TypeInitializationException)
-            {
-                return Realm.GetInstance();
             }
             finally
             {
