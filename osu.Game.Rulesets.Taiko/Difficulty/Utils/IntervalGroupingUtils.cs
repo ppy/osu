@@ -3,9 +3,8 @@
 
 using System.Collections.Generic;
 using osu.Framework.Utils;
-using osu.Game.Rulesets.Taiko.Difficulty.Utils;
 
-namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Rhythm.Data
+namespace osu.Game.Rulesets.Taiko.Difficulty.Utils
 {
     public static class IntervalGroupingUtils
     {
