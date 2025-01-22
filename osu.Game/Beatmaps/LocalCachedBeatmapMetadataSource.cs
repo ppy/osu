@@ -114,14 +114,25 @@ namespace osu.Game.Beatmaps
                     }
                 }
             }
-            catch (SqliteException sqliteException) when (sqliteException.SqliteErrorCode == 11 || sqliteException.SqliteErrorCode == 26) // SQLITE_CORRUPT, SQLITE_NOTADB
+            catch (SqliteException sqliteException)
             {
-                // only attempt purge & refetch if there is no other refetch in progress
-                if (cacheDownloadRequest == null)
+                // There have been cases where the user's local database is corrupt.
+                // Let's attempt to identify these cases and re-initialise the local cache.
+                switch (sqliteException.SqliteErrorCode)
                 {
-                    tryPurgeCache();
-                    prepareLocalCache();
+                    case 26: // SQLITE_NOTADB
+                    case 11: // SQLITE_CORRUPT
+                        // only attempt purge & re-download if there is no other refetch in progress
+                        if (cacheDownloadRequest != null)
+                            throw;
+
+                        tryPurgeCache();
+                        prepareLocalCache();
+                        onlineMetadata = null;
+                        return false;
                 }
+
+                throw;
             }
             catch (Exception ex)
             {
