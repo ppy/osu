@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -14,7 +13,6 @@ using osu.Framework.Graphics.Pooling;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.Select;
 
 namespace osu.Game.Screens.SelectV2
@@ -93,14 +91,8 @@ namespace osu.Game.Screens.SelectV2
         public void Filter(FilterCriteria criteria)
         {
             Criteria = criteria;
-            FilterAsync().FireAndForget();
-        }
-
-        protected override async Task FilterAsync()
-        {
             loading.Show();
-            await base.FilterAsync().ConfigureAwait(true);
-            loading.Hide();
+            FilterAsync().ContinueWith(_ => Schedule(() => loading.Hide()));
         }
     }
 }
