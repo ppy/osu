@@ -15,8 +15,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
     {
         private const int history_time_max = 5 * 1000; // 5 seconds
         private const int history_objects_max = 32;
-        private const double rhythm_overall_multiplier = 0.9;
-        private const double rhythm_ratio_multiplier = 5.7;
+        private const double rhythm_overall_multiplier = 1.0;
+        private const double rhythm_ratio_multiplier = 12.0;
 
         /// <summary>
         /// Calculates a rhythm multiplier for the difficulty of the tap associated with historic data of the current <see cref="OsuDifficultyHitObject"/>.
