@@ -8,7 +8,6 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Lounge;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Tests.Visual.OnlinePlay;
@@ -21,23 +20,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
         protected new TestRoomManager RoomManager => (TestRoomManager)base.RoomManager;
 
         private LoungeSubScreen loungeScreen = null!;
-        private Room? lastJoinedRoom;
-        private string? lastJoinedPassword;
 
         public override void SetUpSteps()
         {
             base.SetUpSteps();
 
             AddStep("push screen", () => LoadScreen(loungeScreen = new MultiplayerLoungeSubScreen()));
-
             AddUntilStep("wait for present", () => loungeScreen.IsCurrentScreen());
-
-            AddStep("bind to event", () =>
-            {
-                lastJoinedRoom = null;
-                lastJoinedPassword = null;
-                RoomManager.JoinRoomRequested = onRoomJoined;
-            });
         }
 
         [Test]
@@ -46,9 +35,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("add room", () => RoomManager.AddRooms(1, withPassword: false));
             AddStep("select room", () => InputManager.Key(Key.Down));
             AddStep("join room", () => InputManager.Key(Key.Enter));
-
-            AddAssert("room join requested", () => lastJoinedRoom == RoomManager.Rooms.First());
-            AddAssert("room join password correct", () => lastJoinedPassword == null);
         }
 
         [Test]
@@ -126,9 +112,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("password prompt appeared", () => (passwordEntryPopover = InputManager.ChildrenOfType<DrawableLoungeRoom.PasswordEntryPopover>().FirstOrDefault()) != null);
             AddStep("enter password in text box", () => passwordEntryPopover.ChildrenOfType<TextBox>().First().Text = "password");
             AddStep("press join room button", () => passwordEntryPopover.ChildrenOfType<OsuButton>().First().TriggerClick());
-
-            AddAssert("room join requested", () => lastJoinedRoom == RoomManager.Rooms.First());
-            AddAssert("room join password correct", () => lastJoinedPassword == "password");
         }
 
         [Test]
@@ -142,15 +125,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("password prompt appeared", () => (passwordEntryPopover = InputManager.ChildrenOfType<DrawableLoungeRoom.PasswordEntryPopover>().FirstOrDefault()) != null);
             AddStep("enter password in text box", () => passwordEntryPopover.ChildrenOfType<TextBox>().First().Text = "password");
             AddStep("press enter", () => InputManager.Key(Key.Enter));
-
-            AddAssert("room join requested", () => lastJoinedRoom == RoomManager.Rooms.First());
-            AddAssert("room join password correct", () => lastJoinedPassword == "password");
-        }
-
-        private void onRoomJoined(Room room, string? password)
-        {
-            lastJoinedRoom = room;
-            lastJoinedPassword = password;
         }
     }
 }

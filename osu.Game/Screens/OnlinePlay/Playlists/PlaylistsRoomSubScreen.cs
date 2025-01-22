@@ -290,6 +290,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             }));
         }
 
+        protected override void PartRoom() => api.Queue(new PartRoomRequest(Room));
+
         protected override Screen CreateGameplayScreen(PlaylistItem selectedItem)
         {
             return new PlayerLoader(() => new PlaylistsPlayer(Room, selectedItem)
