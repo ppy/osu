@@ -34,7 +34,7 @@ using osuTK.Input;
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 {
     public partial class PathControlPointVisualiser<T> : CompositeDrawable, IKeyBindingHandler<PlatformAction>, IHasContextMenu
-        where T : OsuHitObject, IHasPath
+        where T : OsuHitObject, IHasPath, IHasSliderVelocity
     {
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true; // allow context menu to appear outside the playfield.
 
