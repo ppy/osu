@@ -2,7 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Allocation;
 using osu.Game.Beatmaps;
+using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
@@ -15,15 +17,10 @@ namespace osu.Game.Tests.Visual.OnlinePlay
     /// </summary>
     public partial class TestRoomManager : RoomManager
     {
-        public Action<Room, string?>? JoinRoomRequested;
-
         private int currentRoomId;
 
-        public override void JoinRoom(Room room, string? password = null, Action<Room>? onSuccess = null, Action<string>? onError = null)
-        {
-            JoinRoomRequested?.Invoke(room, password);
-            base.JoinRoom(room, password, onSuccess, onError);
-        }
+        [Resolved]
+        private IAPIProvider api { get; set; } = null!;
 
         public void AddRooms(int count, RulesetInfo? ruleset = null, bool withPassword = false, bool withSpotlightRooms = false)
         {
@@ -49,7 +46,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
         public void AddRoom(Room room)
         {
             room.RoomID = -currentRoomId;
-            CreateRoom(room);
+            api.Queue(new CreateRoomRequest(room));
             currentRoomId++;
         }
     }

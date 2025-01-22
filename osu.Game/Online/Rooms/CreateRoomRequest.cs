@@ -15,6 +15,7 @@ namespace osu.Game.Online.Rooms
         public CreateRoomRequest(Room room)
         {
             Room = room;
+            Success += r => Room.CopyFrom(r);
         }
 
         protected override WebRequest CreateWebRequest()
@@ -23,7 +24,6 @@ namespace osu.Game.Online.Rooms
 
             req.ContentType = "application/json";
             req.Method = HttpMethod.Post;
-
             req.AddRaw(JsonConvert.SerializeObject(Room));
 
             return req;

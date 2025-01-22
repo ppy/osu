@@ -56,7 +56,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 AddStep("join room", () =>
                 {
                     SelectedRoom.Value = CreateRoom();
-                    RoomManager.CreateRoom(SelectedRoom.Value);
+                    API.Queue(new CreateRoomRequest(SelectedRoom.Value));
                 });
 
                 AddUntilStep("wait for room join", () => RoomJoined);

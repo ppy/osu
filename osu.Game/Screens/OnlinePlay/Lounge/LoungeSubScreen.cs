@@ -263,6 +263,9 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             music.EnsurePlayingSomething();
 
             onReturning();
+
+            // Poll for any newly-created rooms (including potentially the user's own).
+            ListingPollingComponent.PollImmediately();
         }
 
         public override bool OnExiting(ScreenExitEvent e)
@@ -297,14 +300,14 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             popoverContainer.HidePopover();
         }
 
-        public virtual void Join(Room room, string? password, Action<Room>? onSuccess = null, Action<string>? onFailure = null) => Schedule(() =>
+        public void Join(Room room, string? password, Action<Room>? onSuccess = null, Action<string>? onFailure = null) => Schedule(() =>
         {
             if (joiningRoomOperation != null)
                 return;
 
             joiningRoomOperation = ongoingOperationTracker?.BeginOperation();
 
-            RoomManager?.JoinRoom(room, password, _ =>
+            TryJoin(room, password, r =>
             {
                 Open(room);
                 joiningRoomOperation?.Dispose();
@@ -317,6 +320,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                 onFailure?.Invoke(error);
             });
         });
+
+        protected abstract void TryJoin(Room room, string? password, Action<Room> onSuccess, Action<string> onFailure);
 
         /// <summary>
         /// Copies a room and opens it as a fresh (not-yet-created) one.

@@ -16,6 +16,7 @@ namespace osu.Game.Online.Rooms
         {
             Room = room;
             Password = password;
+            Success += r => Room.CopyFrom(r);
         }
 
         protected override WebRequest CreateWebRequest()

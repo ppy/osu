@@ -278,6 +278,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             return base.OnExiting(e);
         }
 
+        protected override void PartRoom() => client.LeaveRoom();
+
         private ModSettingChangeTracker? modSettingChangeTracker;
         private ScheduledDelegate? debouncedModSettingsUpdate;
 

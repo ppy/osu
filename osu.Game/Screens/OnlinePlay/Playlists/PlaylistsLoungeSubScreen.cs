@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -57,6 +58,20 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             }
 
             return criteria;
+        }
+
+        protected override void TryJoin(Room room, string? password, Action<Room> onSuccess, Action<string> onFailure)
+        {
+            var joinRoomRequest = new JoinRoomRequest(room, password);
+
+            joinRoomRequest.Success += r => onSuccess(r);
+            joinRoomRequest.Failure += exception =>
+            {
+                if (exception is not OperationCanceledException)
+                    onFailure(exception.Message);
+            };
+
+            api.Queue(joinRoomRequest);
         }
 
         protected override OsuButton CreateNewRoomButton() => new CreatePlaylistsRoomButton();
