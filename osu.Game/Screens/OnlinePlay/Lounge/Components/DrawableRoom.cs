@@ -44,7 +44,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         private IAPIProvider api { get; set; } = null!;
 
         [Resolved]
-        private OsuGame? game { get; set; } = null!;
+        private OsuGame? game { get; set; }
 
         public readonly Room Room;
 
@@ -348,13 +348,16 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
                 if (Room.RoomID.HasValue)
                 {
-                    items.AddRange([new OsuMenuItem("View in browser", MenuItemType.Standard, () =>
-                    {
-                        game?.OpenUrlExternally(formatRoomUrl(Room.RoomID.Value));
-                    }), new OsuMenuItem("Copy link", MenuItemType.Standard, () =>
-                    {
-                        game?.CopyUrlToClipboard(formatRoomUrl(Room.RoomID.Value));
-                    })]);
+                    items.AddRange([
+                        new OsuMenuItem("View in browser", MenuItemType.Standard, () =>
+                        {
+                            game?.OpenUrlExternally(formatRoomUrl(Room.RoomID.Value));
+                        }),
+                        new OsuMenuItem("Copy link", MenuItemType.Standard, () =>
+                        {
+                            game?.CopyUrlToClipboard(formatRoomUrl(Room.RoomID.Value));
+                        })
+                    ]);
                 }
 
                 return items.ToArray();
