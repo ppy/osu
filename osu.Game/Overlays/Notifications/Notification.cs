@@ -37,7 +37,7 @@ namespace osu.Game.Overlays.Notifications
         /// Important notifications display for longer, and announce themselves at an OS level (ie flashing the taskbar).
         /// This defaults to <c>true</c>.
         /// </summary>
-        public virtual bool IsImportant => true;
+        public bool IsImportant { get; init; } = true;
 
         /// <summary>
         /// Transient notifications only show as a toast, and do not linger in notification history.
