@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Sockets;
@@ -13,6 +14,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using osu.Framework.Bindables;
+using osu.Framework.Development;
 using osu.Framework.Extensions.ExceptionExtensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
@@ -58,7 +60,6 @@ namespace osu.Game.Online.API
 
         public IBindable<APIUser> LocalUser => localUser;
         public IBindableList<APIRelation> Friends => friends;
-        public IBindable<UserActivity> Activity => activity;
 
         public INotificationsClient NotificationsClient { get; }
 
@@ -68,15 +69,10 @@ namespace osu.Game.Online.API
 
         private BindableList<APIRelation> friends { get; } = new BindableList<APIRelation>();
 
-        private Bindable<UserActivity> activity { get; } = new Bindable<UserActivity>();
-
-        private Bindable<UserStatus?> configStatus { get; } = new Bindable<UserStatus?>();
-        private Bindable<UserStatus?> localUserStatus { get; } = new Bindable<UserStatus?>();
-
         protected bool HasLogin => authentication.Token.Value != null || (!string.IsNullOrEmpty(ProvidedUsername) && !string.IsNullOrEmpty(password));
 
+        private readonly Bindable<UserStatus> configStatus = new Bindable<UserStatus>();
         private readonly CancellationTokenSource cancellationToken = new CancellationTokenSource();
-
         private readonly Logger log;
 
         public APIAccess(OsuGameBase game, OsuConfigManager config, EndpointConfiguration endpointConfiguration, string versionHash)
@@ -110,16 +106,14 @@ namespace osu.Game.Online.API
 
             config.BindWith(OsuSetting.UserOnlineStatus, configStatus);
 
-            localUser.BindValueChanged(u =>
+            if (HasLogin)
             {
-                u.OldValue?.Activity.UnbindFrom(activity);
-                u.NewValue.Activity.BindTo(activity);
+                // Early call to ensure the local user / "logged in" state is correct immediately.
+                setPlaceholderLocalUser();
 
-                u.OldValue?.Status.UnbindFrom(localUserStatus);
-                u.NewValue.Status.BindTo(localUserStatus);
-            }, true);
-
-            localUserStatus.BindTo(configStatus);
+                // This is required so that Queue() requests during startup sequence don't fail due to "not logged in".
+                state.Value = APIState.Connecting;
+            }
 
             var thread = new Thread(run)
             {
@@ -193,7 +187,7 @@ namespace osu.Game.Online.API
 
                 Debug.Assert(HasLogin);
 
-                // Ensure that we are in an online state. If not, attempt a connect.
+                // Ensure that we are in an online state. If not, attempt to connect.
                 if (state.Value != APIState.Online)
                 {
                     attemptConnect();
@@ -247,17 +241,7 @@ namespace osu.Game.Online.API
         /// <returns>Whether the connection attempt was successful.</returns>
         private void attemptConnect()
         {
-            if (localUser.IsDefault)
-            {
-                // Show a placeholder user if saved credentials are available.
-                // This is useful for storing local scores and showing a placeholder username after starting the game,
-                // until a valid connection has been established.
-                setLocalUser(new APIUser
-                {
-                    Username = ProvidedUsername,
-                    Status = { Value = configStatus.Value ?? UserStatus.Online }
-                });
-            }
+            Scheduler.Add(setPlaceholderLocalUser, false);
 
             // save the username at this point, if the user requested for it to be.
             config.SetValue(OsuSetting.Username, config.Get<bool>(OsuSetting.SaveUsername) ? ProvidedUsername : string.Empty);
@@ -339,10 +323,9 @@ namespace osu.Game.Online.API
 
                     userReq.Success += me =>
                     {
-                        me.Status.Value = configStatus.Value ?? UserStatus.Online;
+                        Debug.Assert(ThreadSafety.IsUpdateThread);
 
-                        setLocalUser(me);
-
+                        localUser.Value = me;
                         state.Value = me.SessionVerified ? APIState.Online : APIState.RequiresSecondFactorAuth;
                         failureCount = 0;
                     };
@@ -364,6 +347,22 @@ namespace osu.Game.Online.API
             // before actually going online.
             while (State.Value == APIState.Connecting && !cancellationToken.IsCancellationRequested)
                 Thread.Sleep(500);
+        }
+
+        /// <summary>
+        /// Show a placeholder user if saved credentials are available.
+        /// This is useful for storing local scores and showing a placeholder username after starting the game,
+        /// until a valid connection has been established.
+        /// </summary>
+        private void setPlaceholderLocalUser()
+        {
+            if (!localUser.IsDefault)
+                return;
+
+            localUser.Value = new APIUser
+            {
+                Username = ProvidedUsername
+            };
         }
 
         public void Perform(APIRequest request)
@@ -588,12 +587,14 @@ namespace osu.Game.Online.API
             password = null;
             SecondFactorCode = null;
             authentication.Clear();
+
+            // Reset the status to be broadcast on the next login, in case multiple players share the same system.
             configStatus.Value = UserStatus.Online;
 
             // Scheduled prior to state change such that the state changed event is invoked with the correct user and their friends present
             Schedule(() =>
             {
-                setLocalUser(createGuestUser());
+                localUser.Value = createGuestUser();
                 friends.Clear();
             });
 
@@ -610,16 +611,20 @@ namespace osu.Game.Online.API
             friendsReq.Failure += _ => state.Value = APIState.Failing;
             friendsReq.Success += res =>
             {
-                friends.Clear();
-                friends.AddRange(res);
+                var existingFriends = friends.Select(f => f.TargetID).ToHashSet();
+                var updatedFriends = res.Select(f => f.TargetID).ToHashSet();
+
+                // Add new friends into local list.
+                friends.AddRange(res.Where(r => !existingFriends.Contains(r.TargetID)));
+
+                // Remove non-friends from local list.
+                friends.RemoveAll(f => !updatedFriends.Contains(f.TargetID));
             };
 
             Queue(friendsReq);
         }
 
         private static APIUser createGuestUser() => new GuestUser();
-
-        private void setLocalUser(APIUser user) => Scheduler.Add(() => localUser.Value = user, false);
 
         protected override void Dispose(bool isDisposing)
         {
