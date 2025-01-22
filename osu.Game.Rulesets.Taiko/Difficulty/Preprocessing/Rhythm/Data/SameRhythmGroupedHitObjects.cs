@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Rhythm.Data
                 : 1;
 
             // Calculate the interval from the previous group's start time
-            Interval = Previous != null ? StartTime - Previous.StartTime : 0;
+            Interval = Previous != null ? StartTime - Previous.StartTime : double.PositiveInfinity;
         }
     }
 }
