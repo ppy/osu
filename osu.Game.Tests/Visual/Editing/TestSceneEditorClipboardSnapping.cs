@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Utils;
@@ -68,14 +66,14 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("paste hitobjects", () => Editor.Paste());
 
             AddAssert("first object is snapped", () => Precision.AlmostEquals(
-                EditorBeatmap.SelectedHitObjects.MinBy(h => h.StartTime).StartTime,
+                EditorBeatmap.SelectedHitObjects.MinBy(h => h.StartTime)!.StartTime,
                 EditorBeatmap.ControlPointInfo.GetClosestSnappedTime(paste_time, divisor)
             ));
 
             AddAssert("duration between pasted objects is same", () =>
             {
-                var firstObject = EditorBeatmap.SelectedHitObjects.MinBy(h => h.StartTime);
-                var secondObject = EditorBeatmap.SelectedHitObjects.MaxBy(h => h.StartTime);
+                var firstObject = EditorBeatmap.SelectedHitObjects.MinBy(h => h.StartTime)!;
+                var secondObject = EditorBeatmap.SelectedHitObjects.MaxBy(h => h.StartTime)!;
 
                 return Precision.AlmostEquals(secondObject.StartTime - firstObject.StartTime, addedObjects[1].StartTime - addedObjects[0].StartTime);
             });
