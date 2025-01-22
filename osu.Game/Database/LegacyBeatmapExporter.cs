@@ -42,7 +42,10 @@ namespace osu.Game.Database
                 return null;
 
             using var contentStreamReader = new LineBufferedReader(contentStream);
-            var beatmapContent = new LegacyBeatmapDecoder().Decode(contentStreamReader);
+
+            // FIRST_LAZER_VERSION is specified here to avoid flooring object coordinates on decode via `(int)` casts.
+            // we will be making integers out of them lower down, but in a slightly different manner (rounding rather than truncating)
+            var beatmapContent = new LegacyBeatmapDecoder(LegacyBeatmapEncoder.FIRST_LAZER_VERSION).Decode(contentStreamReader);
 
             var workingBeatmap = new FlatWorkingBeatmap(beatmapContent);
             var playableBeatmap = workingBeatmap.GetPlayableBeatmap(beatmapInfo.Ruleset);
@@ -92,6 +95,12 @@ namespace osu.Game.Database
                     hasDuration.Duration = Math.Floor(hasDuration.EndTime) - Math.Floor(hitObject.StartTime);
 
                 hitObject.StartTime = Math.Floor(hitObject.StartTime);
+
+                if (hitObject is IHasXPosition hasXPosition)
+                    hasXPosition.X = MathF.Round(hasXPosition.X);
+
+                if (hitObject is IHasYPosition hasYPosition)
+                    hasYPosition.Y = MathF.Round(hasYPosition.Y);
 
                 if (hitObject is not IHasPath hasPath) continue;
 

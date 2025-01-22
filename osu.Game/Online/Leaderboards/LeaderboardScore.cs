@@ -54,6 +54,7 @@ namespace osu.Game.Online.Leaderboards
 
         private readonly int? rank;
         private readonly bool isOnlineScope;
+        private readonly bool highlightFriend;
 
         private Box background;
         private Container content;
@@ -86,12 +87,13 @@ namespace osu.Game.Online.Leaderboards
         [Resolved]
         private ScoreManager scoreManager { get; set; } = null!;
 
-        public LeaderboardScore(ScoreInfo score, int? rank, bool isOnlineScope = true)
+        public LeaderboardScore(ScoreInfo score, int? rank, bool isOnlineScope = true, bool highlightFriend = true)
         {
             Score = score;
 
             this.rank = rank;
             this.isOnlineScope = isOnlineScope;
+            this.highlightFriend = highlightFriend;
 
             RelativeSizeAxes = Axes.X;
             Height = HEIGHT;
@@ -101,6 +103,7 @@ namespace osu.Game.Online.Leaderboards
         private void load(IAPIProvider api, OsuColour colour)
         {
             var user = Score.User;
+            bool isUserFriend = api.Friends.Any(friend => friend.TargetID == user.OnlineID);
 
             statisticsLabels = GetStatistics(Score).Select(s => new ScoreComponentLabel(s)).ToList();
 
@@ -129,7 +132,7 @@ namespace osu.Game.Online.Leaderboards
                                 background = new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Colour = user.OnlineID == api.LocalUser.Value.Id && isOnlineScope ? colour.Green : Color4.Black,
+                                    Colour = (highlightFriend && isUserFriend) ? colour.Yellow : (user.OnlineID == api.LocalUser.Value.Id && isOnlineScope ? colour.Green : Color4.Black),
                                     Alpha = background_alpha,
                                 },
                             },

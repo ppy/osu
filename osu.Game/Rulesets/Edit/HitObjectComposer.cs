@@ -16,6 +16,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Framework.Logging;
+using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
@@ -269,10 +270,9 @@ namespace osu.Game.Rulesets.Edit
                 };
             }
 
-            TernaryStates = CreateTernaryButtons().ToArray();
-            togglesCollection.AddRange(TernaryStates.Select(b => new DrawableTernaryButton(b)));
+            togglesCollection.AddRange(CreateTernaryButtons().ToArray());
 
-            sampleBankTogglesCollection.AddRange(BlueprintContainer.SampleBankTernaryStates.Zip(BlueprintContainer.SampleAdditionBankTernaryStates).Select(b => new SampleBankTernaryButton(b.First, b.Second)));
+            sampleBankTogglesCollection.AddRange(BlueprintContainer.SampleBankTernaryStates);
 
             SetSelectTool();
 
@@ -369,14 +369,9 @@ namespace osu.Game.Rulesets.Edit
         protected abstract IReadOnlyList<CompositionTool> CompositionTools { get; }
 
         /// <summary>
-        /// A collection of states which will be displayed to the user in the toolbox.
-        /// </summary>
-        public TernaryButton[] TernaryStates { get; private set; }
-
-        /// <summary>
         /// Create all ternary states required to be displayed to the user.
         /// </summary>
-        protected virtual IEnumerable<TernaryButton> CreateTernaryButtons() => BlueprintContainer.MainTernaryStates;
+        protected virtual IEnumerable<Drawable> CreateTernaryButtons() => BlueprintContainer.MainTernaryStates;
 
         /// <summary>
         /// Construct a relevant blueprint container. This will manage hitobject selection/placement input handling and display logic.
@@ -435,9 +430,9 @@ namespace osu.Game.Rulesets.Edit
                 }
                 else
                 {
-                    if (togglesCollection.ElementAtOrDefault(rightIndex) is DrawableTernaryButton button)
+                    if (togglesCollection.ChildrenOfType<DrawableTernaryButton>().ElementAtOrDefault(rightIndex) is DrawableTernaryButton button)
                     {
-                        button.Button.Toggle();
+                        button.Toggle();
                         return true;
                     }
                 }

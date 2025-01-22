@@ -14,46 +14,62 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
     public class RhythmEvaluator
     {
         /// <summary>
-        /// Multiplier for a given denominator term.
+        /// Evaluate the difficulty of a hitobject considering its interval change.
         /// </summary>
-        private static double termPenalty(double ratio, int denominator, double power, double multiplier)
+        public static double EvaluateDifficultyOf(DifficultyHitObject hitObject, double hitWindow)
         {
-            return -multiplier * Math.Pow(Math.Cos(denominator * Math.PI * ratio), power);
-        }
+            TaikoDifficultyHitObjectRhythm rhythm = ((TaikoDifficultyHitObject)hitObject).Rhythm;
+            double difficulty = 0.0d;
 
-        /// <summary>
-        /// Validates the ratio by ensuring it is a normal number in cases where maps breach regular mapping conditions.
-        /// </summary>
-        private static double validateRatio(double ratio)
-        {
-            return double.IsNormal(ratio) ? ratio : 0;
-        }
+            double sameRhythm = 0;
+            double samePattern = 0;
+            double intervalPenalty = 0;
 
-        /// <summary>
-        /// Calculates the difficulty of a given ratio using a combination of periodic penalties and bonuses.
-        /// </summary>
-        private static double ratioDifficulty(double ratio, int terms = 8)
-        {
-            double difficulty = 0;
-            ratio = validateRatio(ratio);
-
-            for (int i = 1; i <= terms; ++i)
+            if (rhythm.SameRhythmHitObjects?.FirstHitObject == hitObject) // Difficulty for SameRhythmHitObjects
             {
-                difficulty += termPenalty(ratio, i, 4, 1);
+                sameRhythm += 10.0 * evaluateDifficultyOf(rhythm.SameRhythmHitObjects, hitWindow);
+                intervalPenalty = repeatedIntervalPenalty(rhythm.SameRhythmHitObjects, hitWindow);
             }
 
-            difficulty += terms / (1 + ratio);
+            if (rhythm.SamePatterns?.FirstHitObject == hitObject) // Difficulty for SamePatterns
+                samePattern += 1.15 * ratioDifficulty(rhythm.SamePatterns.IntervalRatio);
 
-            // Give bonus to near-1 ratios
-            difficulty += DifficultyCalculationUtils.BellCurve(ratio, 1, 0.5);
-
-            // Penalize ratios that are VERY near 1
-            difficulty -= DifficultyCalculationUtils.BellCurve(ratio, 1, 0.3);
-
-            difficulty = Math.Max(difficulty, 0);
-            difficulty /= Math.Sqrt(8);
+            difficulty += Math.Max(sameRhythm, samePattern) * intervalPenalty;
 
             return difficulty;
+        }
+
+        private static double evaluateDifficultyOf(SameRhythmHitObjects sameRhythmHitObjects, double hitWindow)
+        {
+            double intervalDifficulty = ratioDifficulty(sameRhythmHitObjects.HitObjectIntervalRatio);
+            double? previousInterval = sameRhythmHitObjects.Previous?.HitObjectInterval;
+
+            intervalDifficulty *= repeatedIntervalPenalty(sameRhythmHitObjects, hitWindow);
+
+            // If a previous interval exists and there are multiple hit objects in the sequence:
+            if (previousInterval != null && sameRhythmHitObjects.Children.Count > 1)
+            {
+                double expectedDurationFromPrevious = (double)previousInterval * sameRhythmHitObjects.Children.Count;
+                double durationDifference = sameRhythmHitObjects.Duration - expectedDurationFromPrevious;
+
+                if (durationDifference > 0)
+                {
+                    intervalDifficulty *= DifficultyCalculationUtils.Logistic(
+                        durationDifference / hitWindow,
+                        midpointOffset: 0.7,
+                        multiplier: 1.0,
+                        maxValue: 1);
+                }
+            }
+
+            // Penalise patterns that can be hit within a single hit window.
+            intervalDifficulty *= DifficultyCalculationUtils.Logistic(
+                sameRhythmHitObjects.Duration / hitWindow,
+                midpointOffset: 0.6,
+                multiplier: 1,
+                maxValue: 1);
+
+            return Math.Pow(intervalDifficulty, 0.75);
         }
 
         /// <summary>
@@ -102,68 +118,39 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
             }
         }
 
-        private static double evaluateDifficultyOf(SameRhythmHitObjects sameRhythmHitObjects, double hitWindow)
-        {
-            double intervalDifficulty = ratioDifficulty(sameRhythmHitObjects.HitObjectIntervalRatio);
-            double? previousInterval = sameRhythmHitObjects.Previous?.HitObjectInterval;
-
-            intervalDifficulty *= repeatedIntervalPenalty(sameRhythmHitObjects, hitWindow);
-
-            // If a previous interval exists and there are multiple hit objects in the sequence:
-            if (previousInterval != null && sameRhythmHitObjects.Children.Count > 1)
-            {
-                double expectedDurationFromPrevious = (double)previousInterval * sameRhythmHitObjects.Children.Count;
-                double durationDifference = sameRhythmHitObjects.Duration - expectedDurationFromPrevious;
-
-                if (durationDifference > 0)
-                {
-                    intervalDifficulty *= DifficultyCalculationUtils.Logistic(
-                        durationDifference / hitWindow,
-                        midpointOffset: 0.7,
-                        multiplier: 1.0,
-                        maxValue: 1);
-                }
-            }
-
-            // Penalise patterns that can be hit within a single hit window.
-            intervalDifficulty *= DifficultyCalculationUtils.Logistic(
-                sameRhythmHitObjects.Duration / hitWindow,
-                midpointOffset: 0.6,
-                multiplier: 1,
-                maxValue: 1);
-
-            return Math.Pow(intervalDifficulty, 0.75);
-        }
-
-        private static double evaluateDifficultyOf(SamePatterns samePatterns)
-        {
-            return ratioDifficulty(samePatterns.IntervalRatio);
-        }
-
         /// <summary>
-        /// Evaluate the difficulty of a hitobject considering its interval change.
+        /// Calculates the difficulty of a given ratio using a combination of periodic penalties and bonuses.
         /// </summary>
-        public static double EvaluateDifficultyOf(DifficultyHitObject hitObject, double hitWindow)
+        private static double ratioDifficulty(double ratio, int terms = 8)
         {
-            TaikoDifficultyHitObjectRhythm rhythm = ((TaikoDifficultyHitObject)hitObject).Rhythm;
-            double difficulty = 0.0d;
+            double difficulty = 0;
 
-            double sameRhythm = 0;
-            double samePattern = 0;
-            double intervalPenalty = 0;
+            // Validate the ratio by ensuring it is a normal number in cases where maps breach regular mapping conditions.
+            ratio = double.IsNormal(ratio) ? ratio : 0;
 
-            if (rhythm.SameRhythmHitObjects?.FirstHitObject == hitObject) // Difficulty for SameRhythmHitObjects
+            for (int i = 1; i <= terms; ++i)
             {
-                sameRhythm += 10.0 * evaluateDifficultyOf(rhythm.SameRhythmHitObjects, hitWindow);
-                intervalPenalty = repeatedIntervalPenalty(rhythm.SameRhythmHitObjects, hitWindow);
+                difficulty += termPenalty(ratio, i, 4, 1);
             }
 
-            if (rhythm.SamePatterns?.FirstHitObject == hitObject) // Difficulty for SamePatterns
-                samePattern += 1.15 * evaluateDifficultyOf(rhythm.SamePatterns);
+            difficulty += terms / (1 + ratio);
 
-            difficulty += Math.Max(sameRhythm, samePattern) * intervalPenalty;
+            // Give bonus to near-1 ratios
+            difficulty += DifficultyCalculationUtils.BellCurve(ratio, 1, 0.5);
+
+            // Penalize ratios that are VERY near 1
+            difficulty -= DifficultyCalculationUtils.BellCurve(ratio, 1, 0.3);
+
+            difficulty = Math.Max(difficulty, 0);
+            difficulty /= Math.Sqrt(8);
 
             return difficulty;
         }
+
+        /// <summary>
+        /// Multiplier for a given denominator term.
+        /// </summary>
+        private static double termPenalty(double ratio, int denominator, double power, double multiplier) =>
+            -multiplier * Math.Pow(Math.Cos(denominator * Math.PI * ratio), power);
     }
 }
