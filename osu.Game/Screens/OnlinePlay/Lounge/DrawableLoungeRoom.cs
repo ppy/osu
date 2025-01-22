@@ -60,7 +60,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         private IAPIProvider api { get; set; } = null!;
 
         [Resolved]
-        private OsuGame? game { get; set; } = null!;
+        private OsuGame? game { get; set; }
 
         private readonly BindableWithCurrent<Room?> selectedRoom = new BindableWithCurrent<Room?>();
         private Sample? sampleSelect;
@@ -158,7 +158,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
         public Popover GetPopover() => new PasswordEntryPopover(Room);
 
-        public MenuItem[] ContextMenuItems
+        public new MenuItem[] ContextMenuItems
         {
             get
             {
@@ -172,13 +172,16 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
                 if (Room.RoomID.HasValue)
                 {
-                    items.AddRange([new OsuMenuItem("View in browser", MenuItemType.Standard, () =>
-                    {
-                        game?.OpenUrlExternally(formatRoomUrl(Room.RoomID.Value));
-                    }), new OsuMenuItem("Copy link", MenuItemType.Standard, () =>
-                    {
-                        game?.CopyUrlToClipboard(formatRoomUrl(Room.RoomID.Value));
-                    })]);
+                    items.AddRange([
+                        new OsuMenuItem("View in browser", MenuItemType.Standard, () =>
+                        {
+                            game?.OpenUrlExternally(formatRoomUrl(Room.RoomID.Value));
+                        }),
+                        new OsuMenuItem("Copy link", MenuItemType.Standard, () =>
+                        {
+                            game?.CopyUrlToClipboard(formatRoomUrl(Room.RoomID.Value));
+                        })
+                    ]);
                 }
 
                 if (Room.Type == MatchType.Playlists && Room.Host?.Id == api.LocalUser.Value.Id && Room.StartDate?.AddMinutes(5) >= DateTimeOffset.Now && !Room.HasEnded)
