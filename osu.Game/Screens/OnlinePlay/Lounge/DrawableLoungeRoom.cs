@@ -158,7 +158,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
         public Popover GetPopover() => new PasswordEntryPopover(Room);
 
-        public new MenuItem[] ContextMenuItems
+        public override MenuItem[] ContextMenuItems
         {
             get
             {
@@ -170,19 +170,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                     })
                 };
 
-                if (Room.RoomID.HasValue)
-                {
-                    items.AddRange([
-                        new OsuMenuItem("View in browser", MenuItemType.Standard, () =>
-                        {
-                            game?.OpenUrlExternally(formatRoomUrl(Room.RoomID.Value));
-                        }),
-                        new OsuMenuItem("Copy link", MenuItemType.Standard, () =>
-                        {
-                            game?.CopyUrlToClipboard(formatRoomUrl(Room.RoomID.Value));
-                        })
-                    ]);
-                }
+                items.AddRange(base.ContextMenuItems);
 
                 if (Room.Type == MatchType.Playlists && Room.Host?.Id == api.LocalUser.Value.Id && Room.StartDate?.AddMinutes(5) >= DateTimeOffset.Now && !Room.HasEnded)
                 {
