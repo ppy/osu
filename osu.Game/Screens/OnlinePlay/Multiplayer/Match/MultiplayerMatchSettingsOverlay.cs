@@ -476,12 +476,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                             onSuccess(room);
                         else if (t.IsFaulted)
                         {
-                            Exception? exception = t.Exception;
-
-                            if (exception is AggregateException ae)
-                                exception = ae.InnerException;
-
-                            Debug.Assert(exception != null);
+                            Debug.Assert(t.Exception != null);
+                            Exception exception = t.Exception.AsSingular();
 
                             if (exception.GetHubExceptionMessage() is string message)
                                 onError(message);
