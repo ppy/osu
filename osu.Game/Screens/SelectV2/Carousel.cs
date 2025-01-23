@@ -97,9 +97,10 @@ namespace osu.Game.Screens.SelectV2
         }
 
         /// <summary>
-        /// Activate the current selection, if a selection exists.
+        /// Activate the current selection, if a selection exists and matches keyboard selection.
+        /// If keyboard selection does not match selection, this will transfer the selection on first invocation.
         /// </summary>
-        public void ActivateSelection()
+        public void TryActivateSelection()
         {
             if (currentSelection.CarouselItem != currentKeyboardSelection.CarouselItem)
             {
@@ -295,7 +296,7 @@ namespace osu.Game.Screens.SelectV2
             switch (e.Action)
             {
                 case GlobalAction.Select:
-                    ActivateSelection();
+                    TryActivateSelection();
                     return true;
 
                 case GlobalAction.SelectNext:
@@ -342,7 +343,7 @@ namespace osu.Game.Screens.SelectV2
             // group selection, first transfer the keyboard selection to actual selection.
             if (isGroupSelection && currentSelection.CarouselItem != currentKeyboardSelection.CarouselItem)
             {
-                ActivateSelection();
+                TryActivateSelection();
                 return true;
             }
 
