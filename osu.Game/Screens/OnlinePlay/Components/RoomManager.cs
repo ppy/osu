@@ -13,6 +13,7 @@ using osu.Game.Online.Rooms;
 
 namespace osu.Game.Screens.OnlinePlay.Components
 {
+    // Todo: This class should be inlined into the lounge.
     public partial class RoomManager : Component, IRoomManager
     {
         public event Action? RoomsUpdated;
