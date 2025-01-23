@@ -39,7 +39,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
     /// <summary>
     /// A <see cref="DrawableRoom"/> with lounge-specific interactions such as selection and hover sounds.
     /// </summary>
-    public partial class DrawableLoungeRoom : DrawableRoom, IFilterable, IHasContextMenu, IHasPopover, IKeyBindingHandler<GlobalAction>
+    public partial class DrawableLoungeRoom : DrawableRoom, IFilterable, IHasPopover, IKeyBindingHandler<GlobalAction>
     {
         private const float transition_duration = 60;
         private const float selection_border_width = 4;
@@ -58,9 +58,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
-
-        [Resolved]
-        private OsuGame? game { get; set; }
 
         private readonly BindableWithCurrent<Room?> selectedRoom = new BindableWithCurrent<Room?>();
         private Sample? sampleSelect;
