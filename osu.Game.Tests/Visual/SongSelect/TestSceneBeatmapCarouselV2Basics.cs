@@ -28,8 +28,8 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             AddBeatmaps(1);
             AddBeatmaps(10);
-            RemoveLastBeatmap();
-            AddStep("remove all beatmaps", () => BeatmapSets.Clear());
+            RemoveFirstBeatmap();
+            RemoveAllBeatmaps();
         }
 
         [Test]
@@ -62,7 +62,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddStep("save selected screen position", () => positionBefore = Carousel.ChildrenOfType<BeatmapCarouselPanel>().FirstOrDefault(p => p.Selected.Value)!.ScreenSpaceDrawQuad);
 
-            RemoveLastBeatmap();
+            RemoveFirstBeatmap();
             WaitForSorting();
 
             AddAssert("select screen position unchanged", () => Carousel.ChildrenOfType<BeatmapCarouselPanel>().Single(p => p.Selected.Value).ScreenSpaceDrawQuad,
@@ -79,13 +79,13 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddStep("scroll to last item", () => Scroll.ScrollToEnd(false));
 
-            AddStep("select last beatmap", () => Carousel.CurrentSelection = BeatmapSets.First());
+            AddStep("select last beatmap", () => Carousel.CurrentSelection = BeatmapSets.Last());
 
             WaitForScrolling();
 
             AddStep("save selected screen position", () => positionBefore = Carousel.ChildrenOfType<BeatmapCarouselPanel>().FirstOrDefault(p => p.Selected.Value)!.ScreenSpaceDrawQuad);
 
-            RemoveLastBeatmap();
+            RemoveFirstBeatmap();
             WaitForSorting();
             AddAssert("select screen position unchanged", () => Carousel.ChildrenOfType<BeatmapCarouselPanel>().Single(p => p.Selected.Value).ScreenSpaceDrawQuad,
                 () => Is.EqualTo(positionBefore));

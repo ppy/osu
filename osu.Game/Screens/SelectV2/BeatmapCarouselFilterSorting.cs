@@ -26,7 +26,7 @@ namespace osu.Game.Screens.SelectV2
         {
             var criteria = getCriteria();
 
-            return items.OrderDescending(Comparer<CarouselItem>.Create((a, b) =>
+            return items.Order(Comparer<CarouselItem>.Create((a, b) =>
             {
                 int comparison;
 
