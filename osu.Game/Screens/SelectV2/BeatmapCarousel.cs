@@ -92,19 +92,6 @@ namespace osu.Game.Screens.SelectV2
 
         #region Selection handling
 
-        protected override void HandleItemDeselected(object? model)
-        {
-            base.HandleItemDeselected(model);
-
-            var deselectedSet = model as BeatmapSetInfo ?? (model as BeatmapInfo)?.BeatmapSet;
-
-            if (grouping.SetItems.TryGetValue(deselectedSet!, out var group))
-            {
-                foreach (var i in group)
-                    i.IsVisible = false;
-            }
-        }
-
         protected override void HandleItemSelected(object? model)
         {
             base.HandleItemSelected(model);
@@ -116,15 +103,24 @@ namespace osu.Game.Screens.SelectV2
                 return;
             }
 
-            var currentSelectionSet = (model as BeatmapInfo)?.BeatmapSet;
+            if (model is BeatmapInfo beatmapInfo)
+                setVisibilityOfSetItems(beatmapInfo.BeatmapSet!, true);
+        }
 
-            if (currentSelectionSet == null)
-                return;
+        protected override void HandleItemDeselected(object? model)
+        {
+            base.HandleItemDeselected(model);
 
-            if (grouping.SetItems.TryGetValue(currentSelectionSet, out var group))
+            if (model is BeatmapInfo beatmapInfo)
+                setVisibilityOfSetItems(beatmapInfo.BeatmapSet!, false);
+        }
+
+        private void setVisibilityOfSetItems(BeatmapSetInfo set, bool visible)
+        {
+            if (grouping.SetItems.TryGetValue(set, out var group))
             {
                 foreach (var i in group)
-                    i.IsVisible = true;
+                    i.IsVisible = visible;
             }
         }
 
