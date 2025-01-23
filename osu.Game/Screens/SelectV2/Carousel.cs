@@ -366,8 +366,8 @@ namespace osu.Game.Screens.SelectV2
 
             Debug.Assert(selectionItem != null);
 
-            // As a second special case, if we're group selecting backwards and the current selection isn't
-            // a group, base this selection operation from the closest previous group.
+            // As a second special case, if we're group selecting backwards and the current selection isn't a group,
+            // make sure to go back to the group header this item belongs to, so that the block below doesn't find it and stop too early.
             if (isGroupSelection && direction < 0)
             {
                 while (!carouselItems[selectionIndex].IsGroupSelectionTarget)
@@ -423,8 +423,8 @@ namespace osu.Game.Screens.SelectV2
             currentSelection = currentKeyboardSelection = new Selection(model);
             HandleItemSelected(currentSelection.Model);
 
-            // ensure the selection hasn't changed in the handling of selection.
-            // if it's changed, avoid a second update of selection/scroll.
+            // `HandleItemSelected` can alter `CurrentSelection`, which will recursively call `setSelection()` again.
+            // if that happens, the rest of this method should be a no-op.
             if (currentSelection.Model != model)
                 return;
 
