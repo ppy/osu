@@ -13,6 +13,7 @@ using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Lounge;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Screens.OnlinePlay.Match;
+using osu.Game.Screens.OnlinePlay.Match.Components;
 
 namespace osu.Game.Screens.OnlinePlay.Tournaments
 {
@@ -58,7 +59,10 @@ namespace osu.Game.Screens.OnlinePlay.Tournaments
             return criteria;
         }
 
-        protected override OsuButton CreateNewRoomButton() => new CreateTournamentsRoomButton();
+        protected override OsuButton CreateNewRoomButton() => new CreateRoomButton()
+        {
+            Text = "Create tournament!"
+        };
 
         protected override Room CreateNewRoom()
         {
