@@ -463,9 +463,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                           .ContinueWith(t => Schedule(() =>
                           {
                               if (t.IsCompletedSuccessfully)
-                                  onSuccess(room);
+                                  onSuccess();
                               else
-                                  onError(t.Exception?.AsSingular().Message ?? "Error changing settings.");
+                                  onError(t.Exception, "Error changing settings");
                           }));
                 }
                 else
@@ -473,26 +473,16 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                     client.CreateRoom(room).ContinueWith(t => Schedule(() =>
                     {
                         if (t.IsCompletedSuccessfully)
-                            onSuccess(room);
-                        else if (t.IsFaulted)
-                        {
-                            Debug.Assert(t.Exception != null);
-                            Exception exception = t.Exception.AsSingular();
-
-                            if (exception.GetHubExceptionMessage() is string message)
-                                onError(message);
-                            else
-                                onError($"Error creating room: {exception}");
-                        }
+                            onSuccess();
                         else
-                            onError("Error creating room.");
+                            onError(t.Exception, "Error creating room");
                     }));
                 }
             }
 
             private void hideError() => ErrorText.FadeOut(50);
 
-            private void onSuccess(Room room) => Schedule(() =>
+            private void onSuccess() => Schedule(() =>
             {
                 Debug.Assert(applyingSettingsOperation != null);
 
@@ -502,28 +492,34 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 applyingSettingsOperation = null;
             });
 
-            private void onError(string text) => Schedule(() =>
+            private void onError(Exception? exception, string description)
             {
-                Debug.Assert(applyingSettingsOperation != null);
+                if (exception is AggregateException aggregateException)
+                    exception = aggregateException.AsSingular();
 
-                // see https://github.com/ppy/osu-web/blob/2c97aaeb64fb4ed97c747d8383a35b30f57428c7/app/Models/Multiplayer/PlaylistItem.php#L48.
-                const string not_found_prefix = "beatmaps not found:";
+                string message = exception?.GetHubExceptionMessage() ?? $"{description} ({exception?.Message})";
 
-                if (text.StartsWith(not_found_prefix, StringComparison.Ordinal))
+                Schedule(() =>
                 {
-                    ErrorText.Text = "The selected beatmap is not available online.";
-                    room.Playlist.SingleOrDefault()?.MarkInvalid();
-                }
-                else
-                {
-                    ErrorText.Text = text;
-                }
+                    Debug.Assert(applyingSettingsOperation != null);
 
-                ErrorText.FadeIn(50);
+                    // see https://github.com/ppy/osu-web/blob/2c97aaeb64fb4ed97c747d8383a35b30f57428c7/app/Models/Multiplayer/PlaylistItem.php#L48.
+                    const string not_found_prefix = "beatmaps not found:";
 
-                applyingSettingsOperation.Dispose();
-                applyingSettingsOperation = null;
-            });
+                    if (message.StartsWith(not_found_prefix, StringComparison.Ordinal))
+                    {
+                        ErrorText.Text = "The selected beatmap is not available online.";
+                        room.Playlist.SingleOrDefault()?.MarkInvalid();
+                    }
+                    else
+                        ErrorText.Text = message;
+
+                    ErrorText.FadeIn(50);
+
+                    applyingSettingsOperation.Dispose();
+                    applyingSettingsOperation = null;
+                });
+            }
 
             protected override void Dispose(bool isDisposing)
             {
