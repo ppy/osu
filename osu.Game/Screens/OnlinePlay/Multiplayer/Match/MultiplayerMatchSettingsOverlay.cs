@@ -472,7 +472,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 {
                     client.CreateRoom(room).ContinueWith(t => Schedule(() =>
                     {
-                        if (t.IsCompleted)
+                        if (t.IsCompletedSuccessfully)
                             onSuccess(room);
                         else if (t.IsFaulted)
                         {
