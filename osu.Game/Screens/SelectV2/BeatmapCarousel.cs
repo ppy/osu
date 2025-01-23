@@ -22,8 +22,6 @@ namespace osu.Game.Screens.SelectV2
     {
         private IBindableList<BeatmapSetInfo> detachedBeatmaps = null!;
 
-        private readonly DrawablePool<BeatmapCarouselPanel> carouselPanelPool = new DrawablePool<BeatmapCarouselPanel>(100);
-
         private readonly LoadingLayer loading;
 
         private readonly BeatmapCarouselFilterGrouping grouping;
@@ -39,19 +37,60 @@ namespace osu.Game.Screens.SelectV2
                 grouping = new BeatmapCarouselFilterGrouping(() => Criteria),
             };
 
-            AddInternal(carouselPanelPool);
-
             AddInternal(loading = new LoadingLayer(dimBackground: true));
         }
 
         [BackgroundDependencyLoader]
         private void load(BeatmapStore beatmapStore, CancellationToken? cancellationToken)
         {
+            setupPools();
+            setupBeatmaps(beatmapStore, cancellationToken);
+        }
+
+        #region Beatmap source hookup
+
+        private void setupBeatmaps(BeatmapStore beatmapStore, CancellationToken? cancellationToken)
+        {
             detachedBeatmaps = beatmapStore.GetBeatmapSets(cancellationToken);
             detachedBeatmaps.BindCollectionChanged(beatmapSetsChanged, true);
         }
 
-        protected override Drawable GetDrawableForDisplay(CarouselItem item) => carouselPanelPool.Get();
+        private void beatmapSetsChanged(object? beatmaps, NotifyCollectionChangedEventArgs changed)
+        {
+            // TODO: moving management of BeatmapInfo tracking to BeatmapStore might be something we want to consider.
+            // right now we are managing this locally which is a bit of added overhead.
+            IEnumerable<BeatmapSetInfo>? newBeatmapSets = changed.NewItems?.Cast<BeatmapSetInfo>();
+            IEnumerable<BeatmapSetInfo>? beatmapSetInfos = changed.OldItems?.Cast<BeatmapSetInfo>();
+
+            switch (changed.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                    Items.AddRange(newBeatmapSets!.SelectMany(s => s.Beatmaps));
+                    break;
+
+                case NotifyCollectionChangedAction.Remove:
+
+                    foreach (var set in beatmapSetInfos!)
+                    {
+                        foreach (var beatmap in set.Beatmaps)
+                            Items.RemoveAll(i => i is BeatmapInfo bi && beatmap.Equals(bi));
+                    }
+
+                    break;
+
+                case NotifyCollectionChangedAction.Move:
+                case NotifyCollectionChangedAction.Replace:
+                    throw new NotImplementedException();
+
+                case NotifyCollectionChangedAction.Reset:
+                    Items.Clear();
+                    break;
+            }
+        }
+
+        #endregion
+
+        #region Selection handling
 
         protected override void HandleItemDeselected(object? model)
         {
@@ -98,38 +137,9 @@ namespace osu.Game.Screens.SelectV2
                 drawable.FlashFromActivation();
         }
 
-        private void beatmapSetsChanged(object? beatmaps, NotifyCollectionChangedEventArgs changed)
-        {
-            // TODO: moving management of BeatmapInfo tracking to BeatmapStore might be something we want to consider.
-            // right now we are managing this locally which is a bit of added overhead.
-            IEnumerable<BeatmapSetInfo>? newBeatmapSets = changed.NewItems?.Cast<BeatmapSetInfo>();
-            IEnumerable<BeatmapSetInfo>? beatmapSetInfos = changed.OldItems?.Cast<BeatmapSetInfo>();
+        #endregion
 
-            switch (changed.Action)
-            {
-                case NotifyCollectionChangedAction.Add:
-                    Items.AddRange(newBeatmapSets!.SelectMany(s => s.Beatmaps));
-                    break;
-
-                case NotifyCollectionChangedAction.Remove:
-
-                    foreach (var set in beatmapSetInfos!)
-                    {
-                        foreach (var beatmap in set.Beatmaps)
-                            Items.RemoveAll(i => i is BeatmapInfo bi && beatmap.Equals(bi));
-                    }
-
-                    break;
-
-                case NotifyCollectionChangedAction.Move:
-                case NotifyCollectionChangedAction.Replace:
-                    throw new NotImplementedException();
-
-                case NotifyCollectionChangedAction.Reset:
-                    Items.Clear();
-                    break;
-            }
-        }
+        #region Filtering
 
         public FilterCriteria Criteria { get; private set; } = new FilterCriteria();
 
@@ -139,5 +149,20 @@ namespace osu.Game.Screens.SelectV2
             loading.Show();
             FilterAsync().ContinueWith(_ => Schedule(() => loading.Hide()));
         }
+
+        #endregion
+
+        #region Drawable pooling
+
+        private readonly DrawablePool<BeatmapCarouselPanel> carouselPanelPool = new DrawablePool<BeatmapCarouselPanel>(100);
+
+        private void setupPools()
+        {
+            AddInternal(carouselPanelPool);
+        }
+
+        protected override Drawable GetDrawableForDisplay(CarouselItem item) => carouselPanelPool.Get();
+
+        #endregion
     }
 }
