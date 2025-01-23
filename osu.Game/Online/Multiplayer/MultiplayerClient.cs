@@ -171,7 +171,7 @@ namespace osu.Game.Online.Multiplayer
                 throw new InvalidOperationException("Cannot join a multiplayer room while already in one.");
 
             var cancellationSource = joinCancellationSource = new CancellationTokenSource();
-            await initRoom(room, r => CreateRoom(new MultiplayerRoom(room)), cancellationSource.Token).ConfigureAwait(false);
+            await initRoom(room, r => CreateRoomInternal(new MultiplayerRoom(room)), cancellationSource.Token).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -187,7 +187,7 @@ namespace osu.Game.Online.Multiplayer
             Debug.Assert(room.RoomID != null);
 
             var cancellationSource = joinCancellationSource = new CancellationTokenSource();
-            await initRoom(room, r => JoinRoom(room.RoomID.Value, password ?? room.Password), cancellationSource.Token).ConfigureAwait(false);
+            await initRoom(room, r => JoinRoomInternal(room.RoomID.Value, password ?? room.Password), cancellationSource.Token).ConfigureAwait(false);
         }
 
         private async Task initRoom(Room room, Func<Room, Task<MultiplayerRoom>> initFunc, CancellationToken cancellationToken)
@@ -236,21 +236,6 @@ namespace osu.Game.Online.Multiplayer
         {
         }
 
-        /// <summary>
-        /// Creates the <see cref="MultiplayerRoom"/> with the given settings.
-        /// </summary>
-        /// <param name="room">The room.</param>
-        /// <returns>The joined <see cref="MultiplayerRoom"/></returns>
-        protected abstract Task<MultiplayerRoom> CreateRoom(MultiplayerRoom room);
-
-        /// <summary>
-        /// Joins the <see cref="MultiplayerRoom"/> with a given ID.
-        /// </summary>
-        /// <param name="roomId">The room ID.</param>
-        /// <param name="password">An optional password to use when joining the room.</param>
-        /// <returns>The joined <see cref="MultiplayerRoom"/>.</returns>
-        protected abstract Task<MultiplayerRoom> JoinRoom(long roomId, string? password = null);
-
         public Task LeaveRoom()
         {
             if (Room == null)
@@ -279,6 +264,24 @@ namespace osu.Game.Online.Multiplayer
             });
         }
 
+        /// <summary>
+        /// Creates the <see cref="MultiplayerRoom"/> with the given settings.
+        /// </summary>
+        /// <param name="room">The room.</param>
+        /// <returns>The joined <see cref="MultiplayerRoom"/></returns>
+        protected abstract Task<MultiplayerRoom> CreateRoomInternal(MultiplayerRoom room);
+
+        /// <summary>
+        /// Joins the <see cref="MultiplayerRoom"/> with a given ID.
+        /// </summary>
+        /// <param name="roomId">The room ID.</param>
+        /// <param name="password">An optional password to use when joining the room.</param>
+        /// <returns>The joined <see cref="MultiplayerRoom"/>.</returns>
+        protected abstract Task<MultiplayerRoom> JoinRoomInternal(long roomId, string? password = null);
+
+        /// <summary>
+        /// Leaves the currently-joined <see cref="MultiplayerRoom"/>.
+        /// </summary>
         protected abstract Task LeaveRoomInternal();
 
         public abstract Task InvitePlayer(int userId);
