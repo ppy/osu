@@ -55,7 +55,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         [SetUpSteps]
         public void SetUpSteps()
         {
-            AddStep("reset beatmaps", () => BeatmapSets.Clear());
+            RemoveAllBeatmaps();
 
             CreateCarousel();
 
@@ -146,12 +146,14 @@ namespace osu.Game.Tests.Visual.SongSelect
                 BeatmapSets.Add(TestResources.CreateTestBeatmapSetInfo(fixedDifficultiesPerSet ?? RNG.Next(1, 4)));
         });
 
-        protected void RemoveLastBeatmap() =>
-            AddStep("remove last beatmap", () =>
+        protected void RemoveAllBeatmaps() => AddStep("clear all beatmaps", () => BeatmapSets.Clear());
+
+        protected void RemoveFirstBeatmap() =>
+            AddStep("remove first beatmap", () =>
             {
                 if (BeatmapSets.Count == 0) return;
 
-                BeatmapSets.Remove(BeatmapSets.Last());
+                BeatmapSets.Remove(BeatmapSets.First());
             });
 
         private void updateStats()
