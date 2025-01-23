@@ -35,7 +35,13 @@ namespace osu.Game.Tests.Visual.Playlists
         [Test]
         public void TestManyRooms()
         {
-            AddStep("add rooms", () => RoomManager.AddRooms(500));
+            AddStep("add rooms", () =>
+            {
+                RoomManager.AddRooms(500);
+                loungeScreen.RefreshRooms();
+            });
+
+            AddUntilStep("wait for rooms", () => roomsContainer.Rooms.Count == 500);
         }
 
         [Test]
@@ -43,7 +49,12 @@ namespace osu.Game.Tests.Visual.Playlists
         {
             AddStep("reset mouse", () => InputManager.ReleaseButton(MouseButton.Left));
 
-            AddStep("add rooms", () => RoomManager.AddRooms(30));
+            AddStep("add rooms", () =>
+            {
+                RoomManager.AddRooms(30);
+                loungeScreen.RefreshRooms();
+            });
+
             AddUntilStep("wait for rooms", () => roomsContainer.Rooms.Count == 30);
 
             AddUntilStep("first room is not masked", () => checkRoomVisible(roomsContainer.Rooms[0]));
@@ -60,7 +71,12 @@ namespace osu.Game.Tests.Visual.Playlists
         [Test]
         public void TestScrollSelectedIntoView()
         {
-            AddStep("add rooms", () => RoomManager.AddRooms(30));
+            AddStep("add rooms", () =>
+            {
+                RoomManager.AddRooms(30);
+                loungeScreen.RefreshRooms();
+            });
+
             AddUntilStep("wait for rooms", () => roomsContainer.Rooms.Count == 30);
 
             AddUntilStep("first room is not masked", () => checkRoomVisible(roomsContainer.Rooms[0]));
@@ -74,7 +90,13 @@ namespace osu.Game.Tests.Visual.Playlists
         [Test]
         public void TestEnteringRoomTakesLeaseOnSelection()
         {
-            AddStep("add rooms", () => RoomManager.AddRooms(1));
+            AddStep("add rooms", () =>
+            {
+                RoomManager.AddRooms(1);
+                loungeScreen.RefreshRooms();
+            });
+
+            AddUntilStep("wait for rooms", () => roomsContainer.Rooms.Count == 1);
 
             AddAssert("selected room is not disabled", () => !loungeScreen.SelectedRoom.Disabled);
 

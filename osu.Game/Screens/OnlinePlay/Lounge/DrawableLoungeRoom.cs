@@ -24,7 +24,6 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Input.Bindings;
 using osu.Game.Online.API;
-using osu.Game.Online.API.Requests;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Screens.OnlinePlay.Components;
@@ -51,7 +50,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         }
 
         [Resolved(canBeNull: true)]
-        private LoungeSubScreen? lounge { get; set; }
+        private IOnlinePlayLounge? lounge { get; set; }
 
         [Resolved]
         private IDialogOverlay? dialogOverlay { get; set; }
@@ -163,7 +162,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                 {
                     new OsuMenuItem("Create copy", MenuItemType.Standard, () =>
                     {
-                        lounge?.OpenCopy(Room);
+                        lounge?.Clone(Room);
                     })
                 };
 
@@ -171,12 +170,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                 {
                     items.Add(new OsuMenuItem("Close playlist", MenuItemType.Destructive, () =>
                     {
-                        dialogOverlay?.Push(new ClosePlaylistDialog(Room, () =>
-                        {
-                            var request = new ClosePlaylistRequest(Room.RoomID!.Value);
-                            request.Success += () => lounge?.RefreshRooms();
-                            api.Queue(request);
-                        }));
+                        dialogOverlay?.Push(new ClosePlaylistDialog(Room, () => lounge?.Close(Room)));
                     }));
                 }
 
@@ -239,7 +233,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             private readonly Room room;
 
             [Resolved(canBeNull: true)]
-            private LoungeSubScreen? lounge { get; set; }
+            private IOnlinePlayLounge? lounge { get; set; }
 
             public override bool HandleNonPositionalInput => true;
 
