@@ -208,7 +208,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             ((IMultiplayerClient)this).UserBeatmapAvailabilityChanged(clone(userId), clone(user.BeatmapAvailability));
         }
 
-        protected override async Task<MultiplayerRoom> JoinRoom(long roomId, string? password = null)
+        protected override async Task<MultiplayerRoom> JoinRoomInternal(long roomId, string? password = null)
         {
             if (RoomJoined || ServerAPIRoom != null)
                 throw new InvalidOperationException("Already joined a room");
@@ -485,7 +485,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         public override Task RemovePlaylistItem(long playlistItemId) => RemoveUserPlaylistItem(api.LocalUser.Value.OnlineID, clone(playlistItemId));
 
-        protected override Task<MultiplayerRoom> CreateRoom(MultiplayerRoom room)
+        protected override Task<MultiplayerRoom> CreateRoomInternal(MultiplayerRoom room)
         {
             Room apiRoom = new Room(room)
             {
@@ -495,7 +495,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             };
 
             AddServerSideRoom(apiRoom, api.LocalUser.Value);
-            return JoinRoom(apiRoom.RoomID!.Value, room.Settings.Password);
+            return JoinRoomInternal(apiRoom.RoomID!.Value, room.Settings.Password);
         }
 
         private async Task changeMatchType(MatchType type)
