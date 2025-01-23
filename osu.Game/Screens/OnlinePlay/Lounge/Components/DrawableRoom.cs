@@ -340,7 +340,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             }
         }
 
-        public MenuItem[] ContextMenuItems
+        public virtual MenuItem[] ContextMenuItems
         {
             get
             {
