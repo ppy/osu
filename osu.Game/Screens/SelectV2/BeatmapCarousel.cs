@@ -26,6 +26,8 @@ namespace osu.Game.Screens.SelectV2
 
         private readonly LoadingLayer loading;
 
+        private readonly BeatmapCarouselFilterGrouping grouping;
+
         public BeatmapCarousel()
         {
             DebounceDelay = 100;
@@ -34,7 +36,7 @@ namespace osu.Game.Screens.SelectV2
             Filters = new ICarouselFilter[]
             {
                 new BeatmapCarouselFilterSorting(() => Criteria),
-                new BeatmapCarouselFilterGrouping(() => Criteria),
+                grouping = new BeatmapCarouselFilterGrouping(() => Criteria),
             };
 
             AddInternal(carouselPanelPool);
@@ -51,7 +53,50 @@ namespace osu.Game.Screens.SelectV2
 
         protected override Drawable GetDrawableForDisplay(CarouselItem item) => carouselPanelPool.Get();
 
-        protected override CarouselItem CreateCarouselItemForModel(BeatmapInfo model) => new BeatmapCarouselItem(model);
+        protected override void HandleItemDeselected(object? model)
+        {
+            base.HandleItemDeselected(model);
+
+            var deselectedSet = model as BeatmapSetInfo ?? (model as BeatmapInfo)?.BeatmapSet;
+
+            if (grouping.SetItems.TryGetValue(deselectedSet!, out var group))
+            {
+                foreach (var i in group)
+                    i.IsVisible = false;
+            }
+        }
+
+        protected override void HandleItemSelected(object? model)
+        {
+            base.HandleItemSelected(model);
+
+            // Selecting a set isn't valid – let's re-select the first difficulty.
+            if (model is BeatmapSetInfo setInfo)
+            {
+                CurrentSelection = setInfo.Beatmaps.First();
+                return;
+            }
+
+            var currentSelectionSet = (model as BeatmapInfo)?.BeatmapSet;
+
+            if (currentSelectionSet == null)
+                return;
+
+            if (grouping.SetItems.TryGetValue(currentSelectionSet, out var group))
+            {
+                foreach (var i in group)
+                    i.IsVisible = true;
+            }
+        }
+
+        protected override void HandleItemActivated(CarouselItem item)
+        {
+            base.HandleItemActivated(item);
+
+            // TODO: maybe this should be handled by the panel itself?
+            if (GetMaterialisedDrawableForItem(item) is BeatmapCarouselPanel drawable)
+                drawable.FlashFromActivation();
+        }
 
         private void beatmapSetsChanged(object? beatmaps, NotifyCollectionChangedEventArgs changed)
         {
