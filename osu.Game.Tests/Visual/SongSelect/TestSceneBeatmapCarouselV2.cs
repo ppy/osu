@@ -181,15 +181,15 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddUntilStep("visual item added", () => carousel.ChildrenOfType<BeatmapCarouselPanel>().Count(), () => Is.GreaterThan(0));
 
             AddStep("select middle beatmap", () => carousel.CurrentSelection = beatmapSets.ElementAt(beatmapSets.Count - 2));
-            AddStep("scroll to selected item", () => scroll.ScrollTo(scroll.ChildrenOfType<BeatmapCarouselPanel>().Single(p => p.Item!.Selected.Value)));
+            AddStep("scroll to selected item", () => scroll.ScrollTo(scroll.ChildrenOfType<BeatmapCarouselPanel>().Single(p => p.Selected.Value)));
 
             AddUntilStep("wait for scroll finished", () => scroll.Current, () => Is.EqualTo(scroll.Target));
 
-            AddStep("save selected screen position", () => positionBefore = carousel.ChildrenOfType<BeatmapCarouselPanel>().FirstOrDefault(p => p.Item!.Selected.Value)!.ScreenSpaceDrawQuad);
+            AddStep("save selected screen position", () => positionBefore = carousel.ChildrenOfType<BeatmapCarouselPanel>().FirstOrDefault(p => p.Selected.Value)!.ScreenSpaceDrawQuad);
 
             AddStep("remove first beatmap", () => beatmapSets.Remove(beatmapSets.Last()));
             AddUntilStep("sorting finished", () => carousel.IsFiltering, () => Is.False);
-            AddAssert("select screen position unchanged", () => carousel.ChildrenOfType<BeatmapCarouselPanel>().Single(p => p.Item!.Selected.Value).ScreenSpaceDrawQuad,
+            AddAssert("select screen position unchanged", () => carousel.ChildrenOfType<BeatmapCarouselPanel>().Single(p => p.Selected.Value).ScreenSpaceDrawQuad,
                 () => Is.EqualTo(positionBefore));
         }
 
@@ -212,11 +212,11 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddUntilStep("wait for scroll finished", () => scroll.Current, () => Is.EqualTo(scroll.Target));
 
-            AddStep("save selected screen position", () => positionBefore = carousel.ChildrenOfType<BeatmapCarouselPanel>().FirstOrDefault(p => p.Item!.Selected.Value)!.ScreenSpaceDrawQuad);
+            AddStep("save selected screen position", () => positionBefore = carousel.ChildrenOfType<BeatmapCarouselPanel>().FirstOrDefault(p => p.Selected.Value)!.ScreenSpaceDrawQuad);
 
             AddStep("remove first beatmap", () => beatmapSets.Remove(beatmapSets.Last()));
             AddUntilStep("sorting finished", () => carousel.IsFiltering, () => Is.False);
-            AddAssert("select screen position unchanged", () => carousel.ChildrenOfType<BeatmapCarouselPanel>().Single(p => p.Item!.Selected.Value).ScreenSpaceDrawQuad,
+            AddAssert("select screen position unchanged", () => carousel.ChildrenOfType<BeatmapCarouselPanel>().Single(p => p.Selected.Value).ScreenSpaceDrawQuad,
                 () => Is.EqualTo(positionBefore));
         }
 

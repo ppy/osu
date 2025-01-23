@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 
 namespace osu.Game.Screens.SelectV2
@@ -10,6 +11,18 @@ namespace osu.Game.Screens.SelectV2
     /// </summary>
     public interface ICarouselPanel
     {
+        /// <summary>
+        /// Whether this item has selection.
+        /// This is managed by <see cref="Carousel{T}"/> and should not be set manually.
+        /// </summary>
+        BindableBool Selected { get; }
+
+        /// <summary>
+        /// Whether this item has keyboard selection.
+        /// This is managed by <see cref="Carousel{T}"/> and should not be set manually.
+        /// </summary>
+        BindableBool KeyboardSelected { get; }
+
         /// <summary>
         /// The Y position which should be used for displaying this item within the carousel. This is managed by <see cref="Carousel{T}"/> and should not be set manually.
         /// </summary>

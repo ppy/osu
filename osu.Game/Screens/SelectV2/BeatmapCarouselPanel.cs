@@ -21,27 +21,41 @@ namespace osu.Game.Screens.SelectV2
         [Resolved]
         private BeatmapCarousel carousel { get; set; } = null!;
 
-        public CarouselItem? Item
-        {
-            get => item;
-            set
-            {
-                item = value;
-
-                selected.UnbindBindings();
-
-                if (item != null)
-                    selected.BindTo(item.Selected);
-            }
-        }
-
-        private readonly BindableBool selected = new BindableBool();
-        private CarouselItem? item;
+        private Box activationFlash = null!;
+        private Box background = null!;
+        private OsuSpriteText text = null!;
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            selected.BindValueChanged(value =>
+            InternalChildren = new Drawable[]
+            {
+                background = new Box
+                {
+                    Alpha = 0.8f,
+                    RelativeSizeAxes = Axes.Both,
+                },
+                activationFlash = new Box
+                {
+                    Colour = Color4.White,
+                    Blending = BlendingParameters.Additive,
+                    Alpha = 0,
+                    RelativeSizeAxes = Axes.Both,
+                },
+                text = new OsuSpriteText
+                {
+                    Padding = new MarginPadding(5),
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                }
+            };
+
+            Selected.BindValueChanged(value =>
+            {
+                activationFlash.FadeTo(value.NewValue ? 0.2f : 0, 500, Easing.OutQuint);
+            });
+
+            KeyboardSelected.BindValueChanged(value =>
             {
                 if (value.NewValue)
                 {
@@ -59,6 +73,8 @@ namespace osu.Game.Screens.SelectV2
         {
             base.FreeAfterUse();
             Item = null;
+            Selected.Value = false;
+            KeyboardSelected.Value = false;
         }
 
         protected override void PrepareForUse()
@@ -72,31 +88,44 @@ namespace osu.Game.Screens.SelectV2
             Size = new Vector2(500, Item.DrawHeight);
             Masking = true;
 
-            InternalChildren = new Drawable[]
-            {
-                new Box
-                {
-                    Colour = (Item.Model is BeatmapInfo ? Color4.Aqua : Color4.Yellow).Darken(5),
-                    RelativeSizeAxes = Axes.Both,
-                },
-                new OsuSpriteText
-                {
-                    Text = Item.ToString() ?? string.Empty,
-                    Padding = new MarginPadding(5),
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreLeft,
-                }
-            };
+            background.Colour = (Item.Model is BeatmapInfo ? Color4.Aqua : Color4.Yellow).Darken(5);
+            text.Text = getTextFor(Item.Model);
 
             this.FadeInFromZero(500, Easing.OutQuint);
         }
 
+        private string getTextFor(object item)
+        {
+            switch (item)
+            {
+                case BeatmapInfo bi:
+                    return $"Difficulty: {bi.DifficultyName} ({bi.StarRating:N1}*)";
+
+                case BeatmapSetInfo si:
+                    return $"{si.Metadata}";
+            }
+
+            return "unknown";
+        }
+
         protected override bool OnClick(ClickEvent e)
         {
-            carousel.CurrentSelection = Item!.Model;
+            if (carousel.CurrentSelection == Item!.Model)
+                carousel.ActivateSelection();
+            else
+                carousel.CurrentSelection = Item!.Model;
             return true;
         }
 
+        public CarouselItem? Item { get; set; }
+        public BindableBool Selected { get; } = new BindableBool();
+        public BindableBool KeyboardSelected { get; } = new BindableBool();
+
         public double DrawYPosition { get; set; }
+
+        public void FlashFromActivation()
+        {
+            activationFlash.FadeOutFromOne(500, Easing.OutQuint);
+        }
     }
 }
