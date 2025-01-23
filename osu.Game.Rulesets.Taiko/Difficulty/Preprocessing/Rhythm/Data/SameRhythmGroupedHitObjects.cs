@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Rhythm.Data
         /// The ratio of <see cref="HitObjectInterval"/> between this and the previous <see cref="SameRhythmGroupedHitObjects"/>. In the
         /// case where one or both of the <see cref="HitObjectInterval"/> is undefined, this will have a value of 1.
         /// </summary>
-        public double HitObjectIntervalRatio = 1;
+        public double HitObjectIntervalRatio;
 
         /// <inheritdoc/>
         public double Interval { get; private set; }
