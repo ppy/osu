@@ -220,8 +220,6 @@ namespace osu.Game.Screens.OnlinePlay
 
         protected abstract string ScreenTitle { get; }
 
-        protected virtual RoomManager CreateRoomManager() => new RoomManager();
-
         protected abstract LoungeSubScreen CreateLounge();
 
         ScreenStack IHasSubScreenStack.SubScreenStack => screenStack;

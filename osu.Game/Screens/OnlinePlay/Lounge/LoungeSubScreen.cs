@@ -21,6 +21,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
@@ -33,7 +34,8 @@ using osuTK;
 namespace osu.Game.Screens.OnlinePlay.Lounge
 {
     [Cached]
-    public abstract partial class LoungeSubScreen : OnlinePlaySubScreen
+    [Cached(typeof(IOnlinePlayLounge))]
+    public abstract partial class LoungeSubScreen : OnlinePlaySubScreen, IOnlinePlayLounge
     {
         public override string Title => "Lounge";
 
@@ -323,11 +325,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
         protected abstract void TryJoin(Room room, string? password, Action<Room> onSuccess, Action<string> onFailure);
 
-        /// <summary>
-        /// Copies a room and opens it as a fresh (not-yet-created) one.
-        /// </summary>
-        /// <param name="room">The room to copy.</param>
-        public void OpenCopy(Room room)
+        public void Clone(Room room)
         {
             Debug.Assert(room.RoomID != null);
 
@@ -361,6 +359,15 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             };
 
             api.Queue(req);
+        }
+
+        public void Close(Room room)
+        {
+            Debug.Assert(room.RoomID != null);
+
+            var request = new ClosePlaylistRequest(room.RoomID.Value);
+            request.Success += RefreshRooms;
+            api.Queue(request);
         }
 
         /// <summary>

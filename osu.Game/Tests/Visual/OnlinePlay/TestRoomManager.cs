@@ -22,8 +22,14 @@ namespace osu.Game.Tests.Visual.OnlinePlay
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
 
+        [Resolved]
+        private RulesetStore rulesets { get; set; } = null!;
+
         public void AddRooms(int count, RulesetInfo? ruleset = null, bool withPassword = false, bool withSpotlightRooms = false)
         {
+            // Can't reference Osu ruleset project here.
+            ruleset ??= rulesets.GetRuleset(0)!;
+
             for (int i = 0; i < count; i++)
             {
                 AddRoom(new Room
@@ -33,12 +39,8 @@ namespace osu.Game.Tests.Visual.OnlinePlay
                     Duration = TimeSpan.FromSeconds(10),
                     Category = withSpotlightRooms && i % 2 == 0 ? RoomCategory.Spotlight : RoomCategory.Normal,
                     Password = withPassword ? @"password" : null,
-                    PlaylistItemStats = ruleset == null
-                        ? null
-                        : new Room.RoomPlaylistItemStats { RulesetIDs = [ruleset.OnlineID] },
-                    Playlist = ruleset == null
-                        ? Array.Empty<PlaylistItem>()
-                        : [new PlaylistItem(new BeatmapInfo { Metadata = new BeatmapMetadata() }) { RulesetID = ruleset.OnlineID }]
+                    PlaylistItemStats = new Room.RoomPlaylistItemStats { RulesetIDs = [ruleset.OnlineID] },
+                    Playlist = [new PlaylistItem(new BeatmapInfo { Metadata = new BeatmapMetadata() }) { RulesetID = ruleset.OnlineID }]
                 });
             }
         }
@@ -46,7 +48,11 @@ namespace osu.Game.Tests.Visual.OnlinePlay
         public void AddRoom(Room room)
         {
             room.RoomID = -currentRoomId;
-            api.Queue(new CreateRoomRequest(room));
+
+            var req = new CreateRoomRequest(room);
+            req.Success += AddOrUpdateRoom;
+            api.Queue(req);
+
             currentRoomId++;
         }
     }

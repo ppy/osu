@@ -10,6 +10,7 @@ using MessagePack;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
+using osu.Game.Beatmaps;
 using osu.Game.Online;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
@@ -17,6 +18,7 @@ using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.TeamVersus;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Tests.Visual.OnlinePlay;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
@@ -65,15 +67,15 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
 
-        private readonly TestMultiplayerRoomManager roomManager;
-
         private MultiplayerPlaylistItem? currentItem => ServerRoom?.Playlist[currentIndex];
         private int currentIndex;
         private long lastPlaylistItemId;
 
-        public TestMultiplayerClient(TestMultiplayerRoomManager roomManager)
+        private readonly TestRoomRequestsHandler apiRequestHandler;
+
+        public TestMultiplayerClient(TestRoomRequestsHandler? apiRequestHandler = null)
         {
-            this.roomManager = roomManager;
+            this.apiRequestHandler = apiRequestHandler ?? new TestRoomRequestsHandler();
         }
 
         public void Connect() => isConnected.Value = true;
@@ -214,7 +216,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             roomId = clone(roomId);
             password = clone(password);
 
-            ServerAPIRoom = roomManager.ServerSideRooms.Single(r => r.RoomID == roomId);
+            ServerAPIRoom = ServerSideRooms.Single(r => r.RoomID == roomId);
 
             if (password != ServerAPIRoom.Password)
                 throw new InvalidOperationException("Invalid password.");
@@ -485,7 +487,15 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         protected override Task<MultiplayerRoom> CreateRoom(MultiplayerRoom room)
         {
-            throw new NotImplementedException();
+            Room apiRoom = new Room(room)
+            {
+                Type = room.Settings.MatchType == MatchType.Playlists
+                    ? MatchType.HeadToHead
+                    : room.Settings.MatchType
+            };
+
+            AddServerSideRoom(apiRoom, api.LocalUser.Value);
+            return JoinRoom(apiRoom.RoomID!.Value, room.Settings.Password);
         }
 
         private async Task changeMatchType(MatchType type)
@@ -680,5 +690,18 @@ namespace osu.Game.Tests.Visual.Multiplayer
             isConnected.Value = false;
             return Task.CompletedTask;
         }
+
+        #region API Room Handling
+
+        public IReadOnlyList<Room> ServerSideRooms
+            => apiRequestHandler.ServerSideRooms;
+
+        public void AddServerSideRoom(Room room, APIUser host)
+            => apiRequestHandler.AddServerSideRoom(room, host);
+
+        public bool HandleRequest(APIRequest request, APIUser localUser, BeatmapManager beatmapManager)
+            => apiRequestHandler.HandleRequest(request, localUser, beatmapManager);
+
+        #endregion
     }
 }
