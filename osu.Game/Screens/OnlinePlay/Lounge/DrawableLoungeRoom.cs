@@ -236,8 +236,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             Room.PropertyChanged -= onRoomPropertyChanged;
         }
 
-        private string formatRoomUrl(long id) => $@"{api.WebsiteRootUrl}/multiplayer/rooms/{id}";
-
         public partial class PasswordEntryPopover : OsuPopover
         {
             private readonly Room room;
