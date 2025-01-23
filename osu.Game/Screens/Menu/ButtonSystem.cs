@@ -47,6 +47,7 @@ namespace osu.Game.Screens.Menu
         public Action? OnSettings;
         public Action? OnMultiplayer;
         public Action? OnPlaylists;
+        public Action? OnTournaments;
         public Action<Room>? OnDailyChallenge;
 
         private readonly IBindable<bool> isIdle = new BindableBool();
@@ -138,6 +139,7 @@ namespace osu.Game.Screens.Menu
             });
             buttonsPlay.Add(new MainMenuButton(ButtonSystemStrings.Multi, @"button-default-select", OsuIcon.Online, new Color4(94, 63, 186, 255), onMultiplayer, Key.M));
             buttonsPlay.Add(new MainMenuButton(ButtonSystemStrings.Playlists, @"button-default-select", OsuIcon.Tournament, new Color4(94, 63, 186, 255), onPlaylists, Key.L));
+            buttonsPlay.Add(new MainMenuButton(ButtonSystemStrings.Tournaments, @"button-default-select", OsuIcon.Tournament, new Color4(94, 63, 186, 255), onTournaments, Key.T));
             buttonsPlay.Add(new DailyChallengeButton(@"button-daily-select", new Color4(94, 63, 186, 255), onDailyChallenge, Key.D));
             buttonsPlay.ForEach(b => b.VisibleState = ButtonSystemState.Play);
 
@@ -199,6 +201,17 @@ namespace osu.Game.Screens.Menu
             }
 
             OnPlaylists?.Invoke();
+        }
+
+        private void onTournaments(MainMenuButton mainMenuButton, UIEvent uiEvent)
+        {
+            if (api.State.Value != APIState.Online)
+            {
+                loginOverlay?.Show();
+                return;
+            }
+
+            OnTournaments?.Invoke();
         }
 
         private void onDailyChallenge(MainMenuButton button, UIEvent uiEvent)

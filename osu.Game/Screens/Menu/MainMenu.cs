@@ -42,6 +42,7 @@ using osu.Game.Seasonal;
 using osuTK;
 using osuTK.Graphics;
 using osu.Game.Localisation;
+using osu.Game.Screens.OnlinePlay.Tournaments;
 
 namespace osu.Game.Screens.Menu
 {
@@ -152,6 +153,7 @@ namespace osu.Game.Screens.Menu
                             OnSolo = loadSoloSongSelect,
                             OnMultiplayer = () => this.Push(new Multiplayer()),
                             OnPlaylists = () => this.Push(new Playlists()),
+                            OnTournaments = () => this.Push(new Tournaments()),
                             OnDailyChallenge = room =>
                             {
                                 if (statics.Get<bool>(Static.DailyChallengeIntroPlayed))
