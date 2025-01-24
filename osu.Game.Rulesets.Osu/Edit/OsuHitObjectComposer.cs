@@ -261,7 +261,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         }
 
         [CanBeNull]
-        public SnapResult TrySnapToPositionGrid(Vector2 screenSpacePosition)
+        public SnapResult TrySnapToPositionGrid(Vector2 screenSpacePosition, double? fallbackTime = null)
         {
             if (rectangularGridSnapToggle.Value != TernaryState.True)
                 return null;

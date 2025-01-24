@@ -60,7 +60,11 @@ namespace osu.Game.Rulesets.Osu.Edit
             Vector2 movePosition = blueprints.First().originalSnapPositions.First() + distanceTravelled;
 
             // Retrieve a snapped position.
-            var result = Composer.TrySnapToDistanceGrid(movePosition) ?? Composer.TrySnapToPositionGrid(movePosition) ?? new SnapResult(movePosition, null);
+            var result = Composer.TrySnapToNearbyObjects(movePosition);
+            result ??= Composer.TrySnapToDistanceGrid(movePosition);
+            if (Composer.TrySnapToPositionGrid(result?.ScreenSpacePosition ?? movePosition, result?.Time) is SnapResult gridSnapResult)
+                result = gridSnapResult;
+            result ??= new SnapResult(movePosition, null);
 
             var referenceBlueprint = blueprints.First().blueprint;
             bool moved = SelectionHandler.HandleMovement(new MoveSelectionEvent<HitObject>(referenceBlueprint, result.ScreenSpacePosition - referenceBlueprint.ScreenSpaceSelectionPoint));
