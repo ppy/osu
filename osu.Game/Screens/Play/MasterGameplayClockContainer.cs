@@ -72,17 +72,17 @@ namespace osu.Game.Screens.Play
 
             track = beatmap.Track;
 
-            StartTime = findEarliestStartTime();
             GameplayStartTime = gameplayStartTime;
+            StartTime = findEarliestStartTime(gameplayStartTime, beatmap);
         }
 
-        private double findEarliestStartTime()
+        private static double findEarliestStartTime(double gameplayStartTime, WorkingBeatmap beatmap)
         {
             // here we are trying to find the time to start playback from the "zero" point.
             // generally this is either zero, or some point earlier than zero in the case of storyboards, lead-ins etc.
 
             // start with the originally provided latest time (if before zero).
-            double time = Math.Min(0, GameplayStartTime);
+            double time = Math.Min(0, gameplayStartTime);
 
             // if a storyboard is present, it may dictate the appropriate start time by having events in negative time space.
             // this is commonly used to display an intro before the audio track start.
