@@ -205,7 +205,6 @@ namespace osu.Game.Screens.SelectV2
             InternalChild = scroll = new CarouselScrollContainer
             {
                 RelativeSizeAxes = Axes.Both,
-                Masking = false,
             };
 
             Items.BindCollectionChanged((_, _) => FilterAsync());
