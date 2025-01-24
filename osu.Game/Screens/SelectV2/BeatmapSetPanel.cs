@@ -24,7 +24,6 @@ namespace osu.Game.Screens.SelectV2
         [Resolved]
         private BeatmapCarousel carousel { get; set; } = null!;
 
-        private Box activationFlash = null!;
         private OsuSpriteText text = null!;
 
         [BackgroundDependencyLoader]
@@ -39,13 +38,6 @@ namespace osu.Game.Screens.SelectV2
                 {
                     Colour = Color4.Yellow.Darken(5),
                     Alpha = 0.8f,
-                    RelativeSizeAxes = Axes.Both,
-                },
-                activationFlash = new Box
-                {
-                    Colour = Color4.White,
-                    Blending = BlendingParameters.Additive,
-                    Alpha = 0,
                     RelativeSizeAxes = Axes.Both,
                 },
                 text = new OsuSpriteText
