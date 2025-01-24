@@ -167,7 +167,7 @@ namespace osu.Game.Online
 
             APIUser? singleUser = onlineAlertQueue.Count == 1 ? onlineAlertQueue.Single() : null;
 
-            notifications.Post(new SimpleNotification
+            notifications.Post(new FriendOnlineNotification
             {
                 Transient = true,
                 IsImportant = false,
@@ -204,7 +204,7 @@ namespace osu.Game.Online
                 return;
             }
 
-            notifications.Post(new SimpleNotification
+            notifications.Post(new FriendOfflineNotification
             {
                 Transient = true,
                 IsImportant = false,
