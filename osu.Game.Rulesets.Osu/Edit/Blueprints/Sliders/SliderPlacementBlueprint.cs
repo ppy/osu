@@ -108,10 +108,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         public override SnapResult UpdateTimeAndPosition(Vector2 screenSpacePosition, double fallbackTime)
         {
-            var result = composer?.TrySnapToNearbyObjects(screenSpacePosition, fallbackTime)
-                         ?? composer?.TrySnapToDistanceGrid(screenSpacePosition)
-                         ?? composer?.TrySnapToPositionGrid(screenSpacePosition)
-                         ?? new SnapResult(screenSpacePosition, fallbackTime);
+            var result = composer?.TrySnapToNearbyObjects(screenSpacePosition, fallbackTime);
+            result ??= composer?.TrySnapToDistanceGrid(screenSpacePosition);
+            if (composer?.TrySnapToPositionGrid(result?.ScreenSpacePosition ?? screenSpacePosition, result?.Time ?? fallbackTime) is SnapResult gridSnapResult)
+                result = gridSnapResult;
+            result ??= new SnapResult(screenSpacePosition, fallbackTime);
 
             UpdateTimeAndPosition(result);
 
