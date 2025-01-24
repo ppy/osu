@@ -245,6 +245,9 @@ namespace osu.Game.Screens.Play.PlayerSettings
                     Text = BeatmapOffsetControlStrings.CalibrateUsingLastPlay,
                     Action = () =>
                     {
+                        if (Current.Disabled)
+                            return;
+
                         Current.Value = lastPlayBeatmapOffset - lastPlayAverage;
                         lastAppliedScore.Value = ReferenceScore.Value;
                     },
@@ -277,6 +280,9 @@ namespace osu.Game.Screens.Play.PlayerSettings
         protected override void Update()
         {
             base.Update();
+
+            if (useAverageButton != null)
+                useAverageButton.Enabled.Value = allowOffsetAdjust;
             Current.Disabled = !allowOffsetAdjust;
         }
 
