@@ -89,7 +89,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// <summary>
         /// Selective bonus for maps with higher circle size.
         /// </summary>
-        public double SmallCircleBonus { get; private set; } = 1.0;
+        public double SmallCircleBonus { get; private set; };
 
         private readonly OsuHitObject? lastLastObject;
         private readonly OsuHitObject lastObject;
