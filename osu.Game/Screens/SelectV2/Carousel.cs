@@ -540,10 +540,12 @@ namespace osu.Game.Screens.SelectV2
             {
                 var c = (ICarouselPanel)panel;
 
+                // panel in the process of expiring, ignore it.
+                if (c.Item == null)
+                    continue;
+
                 if (panel.Depth != c.DrawYPosition)
                     scroll.Panels.ChangeChildDepth(panel, (float)c.DrawYPosition);
-
-                Debug.Assert(c.Item != null);
 
                 if (c.DrawYPosition != c.Item.CarouselYPosition)
                     c.DrawYPosition = Interpolation.DampContinuously(c.DrawYPosition, c.Item.CarouselYPosition, 50, Time.Elapsed);
@@ -631,7 +633,9 @@ namespace osu.Game.Screens.SelectV2
                 if (drawable is not ICarouselPanel carouselPanel)
                     throw new InvalidOperationException($"Carousel panel drawables must implement {typeof(ICarouselPanel)}");
 
+                carouselPanel.DrawYPosition = item.CarouselYPosition;
                 carouselPanel.Item = item;
+
                 scroll.Add(drawable);
             }
 
@@ -650,6 +654,12 @@ namespace osu.Game.Screens.SelectV2
         {
             panel.FinishTransforms();
             panel.Expire();
+
+            var carouselPanel = (ICarouselPanel)panel;
+
+            carouselPanel.Item = null;
+            carouselPanel.Selected.Value = false;
+            carouselPanel.KeyboardSelected.Value = false;
         }
 
         #endregion
