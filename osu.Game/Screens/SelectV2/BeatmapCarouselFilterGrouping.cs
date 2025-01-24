@@ -18,7 +18,13 @@ namespace osu.Game.Screens.SelectV2
         /// </summary>
         public IDictionary<BeatmapSetInfo, HashSet<CarouselItem>> SetItems => setItems;
 
+        /// <summary>
+        /// Groups contain children which are group-selectable. This dictionary holds the relationships between groups-panels to allow expanding them on selection.
+        /// </summary>
+        public IDictionary<GroupDefinition, HashSet<CarouselItem>> GroupItems => groupItems;
+
         private readonly Dictionary<BeatmapSetInfo, HashSet<CarouselItem>> setItems = new Dictionary<BeatmapSetInfo, HashSet<CarouselItem>>();
+        private readonly Dictionary<GroupDefinition, HashSet<CarouselItem>> groupItems = new Dictionary<GroupDefinition, HashSet<CarouselItem>>();
 
         private readonly Func<FilterCriteria> getCriteria;
 
@@ -31,15 +37,40 @@ namespace osu.Game.Screens.SelectV2
         {
             var criteria = getCriteria();
 
+            int starGroup = int.MinValue;
+
             if (criteria.SplitOutDifficulties)
             {
+                var diffItems = new List<CarouselItem>(items.Count());
+
+                GroupDefinition? group = null;
+
                 foreach (var item in items)
                 {
-                    item.IsVisible = true;
+                    var b = (BeatmapInfo)item.Model;
+
+                    if (b.StarRating > starGroup)
+                    {
+                        starGroup = (int)Math.Floor(b.StarRating);
+                        group = new GroupDefinition($"{starGroup} - {++starGroup} *");
+                        diffItems.Add(new CarouselItem(group)
+                        {
+                            DrawHeight = GroupPanel.HEIGHT,
+                            IsGroupSelectionTarget = true
+                        });
+                    }
+
+                    if (!groupItems.TryGetValue(group!, out var related))
+                        groupItems[group!] = related = new HashSet<CarouselItem>();
+                    related.Add(item);
+
+                    diffItems.Add(item);
+
+                    item.IsVisible = false;
                     item.IsGroupSelectionTarget = true;
                 }
 
-                return items;
+                return diffItems;
             }
 
             CarouselItem? lastItem = null;
@@ -64,7 +95,6 @@ namespace osu.Game.Screens.SelectV2
 
                     if (!setItems.TryGetValue(b.BeatmapSet!, out var related))
                         setItems[b.BeatmapSet!] = related = new HashSet<CarouselItem>();
-
                     related.Add(item);
                 }
 

@@ -92,34 +92,56 @@ namespace osu.Game.Screens.SelectV2
 
         #region Selection handling
 
+        private GroupDefinition? lastSelectedGroup;
+        private BeatmapInfo? lastSelectedBeatmap;
+
         protected override void HandleItemSelected(object? model)
         {
             base.HandleItemSelected(model);
 
-            // Selecting a set isn't valid – let's re-select the first difficulty.
-            if (model is BeatmapSetInfo setInfo)
+            switch (model)
             {
-                CurrentSelection = setInfo.Beatmaps.First();
-                return;
-            }
+                case GroupDefinition group:
+                    if (lastSelectedGroup != null)
+                        setVisibilityOfGroupItems(lastSelectedGroup, false);
+                    lastSelectedGroup = group;
 
-            if (model is BeatmapInfo beatmapInfo)
-                setVisibilityOfSetItems(beatmapInfo.BeatmapSet!, true);
+                    setVisibilityOfGroupItems(group, true);
+
+                    // In stable, you can kinda select a group (expand without changing selection)
+                    // For simplicity, let's not do that for now and handle similar to a beatmap set header.
+                    CurrentSelection = grouping.GroupItems[group].First().Model;
+                    return;
+
+                case BeatmapSetInfo setInfo:
+                    // Selecting a set isn't valid – let's re-select the first difficulty.
+                    CurrentSelection = setInfo.Beatmaps.First();
+                    return;
+
+                case BeatmapInfo beatmapInfo:
+                    if (lastSelectedBeatmap != null)
+                        setVisibilityOfSetItems(lastSelectedBeatmap.BeatmapSet!, false);
+                    lastSelectedBeatmap = beatmapInfo;
+
+                    setVisibilityOfSetItems(beatmapInfo.BeatmapSet!, true);
+                    break;
+            }
         }
 
-        protected override void HandleItemDeselected(object? model)
+        private void setVisibilityOfGroupItems(GroupDefinition group, bool visible)
         {
-            base.HandleItemDeselected(model);
-
-            if (model is BeatmapInfo beatmapInfo)
-                setVisibilityOfSetItems(beatmapInfo.BeatmapSet!, false);
+            if (grouping.GroupItems.TryGetValue(group, out var items))
+            {
+                foreach (var i in items)
+                    i.IsVisible = visible;
+            }
         }
 
         private void setVisibilityOfSetItems(BeatmapSetInfo set, bool visible)
         {
-            if (grouping.SetItems.TryGetValue(set, out var group))
+            if (grouping.SetItems.TryGetValue(set, out var items))
             {
-                foreach (var i in group)
+                foreach (var i in items)
                     i.IsVisible = visible;
             }
         }
@@ -143,9 +165,11 @@ namespace osu.Game.Screens.SelectV2
 
         private readonly DrawablePool<BeatmapPanel> beatmapPanelPool = new DrawablePool<BeatmapPanel>(100);
         private readonly DrawablePool<BeatmapSetPanel> setPanelPool = new DrawablePool<BeatmapSetPanel>(100);
+        private readonly DrawablePool<GroupPanel> groupPanelPool = new DrawablePool<GroupPanel>(100);
 
         private void setupPools()
         {
+            AddInternal(groupPanelPool);
             AddInternal(beatmapPanelPool);
             AddInternal(setPanelPool);
         }
@@ -154,7 +178,12 @@ namespace osu.Game.Screens.SelectV2
         {
             switch (item.Model)
             {
+                case GroupDefinition:
+                    return groupPanelPool.Get();
+
                 case BeatmapInfo:
+                    // TODO: if beatmap is a group selection target, it needs to be a different drawable
+                    // with more information attached.
                     return beatmapPanelPool.Get();
 
                 case BeatmapSetInfo:
@@ -166,4 +195,6 @@ namespace osu.Game.Screens.SelectV2
 
         #endregion
     }
+
+    public record GroupDefinition(string Title);
 }
