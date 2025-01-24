@@ -30,6 +30,12 @@ namespace osu.Game.Rulesets.Taiko
                 {
                     LabelText = RulesetSettingsStrings.TouchControlScheme,
                     Current = config.GetBindable<TaikoTouchControlScheme>(TaikoRulesetSetting.TouchControlScheme)
+                },
+                new SettingsEnumDropdown<TaikoHitFlyingEnable>
+                {
+                    ClassicDefault = TaikoHitFlyingEnable.HUD,
+                    LabelText = RulesetSettingsStrings.FlyingHitEnable,
+                    Current = config.GetBindable<TaikoHitFlyingEnable>(TaikoRulesetSetting.HitFlyingEnable)
                 }
             };
         }

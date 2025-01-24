@@ -7,11 +7,14 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Taiko.Configuration;
 using osu.Game.Rulesets.Taiko.Skinning.Default;
 using osu.Game.Skinning;
 using osuTK;
@@ -39,6 +42,9 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         private double? lastPressHandleTime;
 
         private readonly Bindable<HitType> type = new Bindable<HitType>();
+        private readonly Bindable<TaikoHitFlyingEnable> hitFlyingEnableSetting = new Bindable<TaikoHitFlyingEnable>();
+        private readonly Bindable<HUDVisibilityMode> hudVisible = new Bindable<HUDVisibilityMode>();
+        protected bool ShowFlyingHits;
 
         public DrawableHit()
             : this(null)
@@ -49,6 +55,23 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             : base(hit)
         {
             FillMode = FillMode.Fit;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(TaikoRulesetConfigManager rulesetConfig, OsuConfigManager osuConfig)
+        {
+            rulesetConfig.BindWith(TaikoRulesetSetting.HitFlyingEnable, hitFlyingEnableSetting);
+            hitFlyingEnableSetting.BindValueChanged(_ => updateHitFlying());
+            osuConfig.BindWith(OsuSetting.HUDVisibilityMode, hudVisible);
+            hudVisible.BindValueChanged(_ => updateHitFlying(), true);
+        }
+
+        private void updateHitFlying()
+        {
+            var hitFlyingEnable = hitFlyingEnableSetting.Value;
+            var showHud = hudVisible.Value;
+            ShowFlyingHits = hitFlyingEnable == TaikoHitFlyingEnable.Always ||
+                             (hitFlyingEnable == TaikoHitFlyingEnable.HUD && showHud == HUDVisibilityMode.Always);
         }
 
         protected override void OnApply()
@@ -168,13 +191,21 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                     if (SnapJudgementLocation)
                         MainPiece.MoveToX(-X);
 
-                    this.ScaleTo(0.8f, gravity_time * 2, Easing.OutQuad);
+                    if (ShowFlyingHits)
+                    {
+                        this.ScaleTo(0.8f, gravity_time * 2, Easing.OutQuad);
 
-                    this.MoveToY(-gravity_travel_height, gravity_time, Easing.Out)
-                        .Then()
-                        .MoveToY(gravity_travel_height * 2, gravity_time * 2, Easing.In);
+                        this.MoveToY(-gravity_travel_height, gravity_time, Easing.Out)
+                            .Then()
+                            .MoveToY(gravity_travel_height * 2, gravity_time * 2, Easing.In);
 
-                    this.FadeOut(800);
+                        this.FadeOut(800);
+                    }
+                    else
+                    {
+                        Hide();
+                    }
+
                     break;
             }
         }
