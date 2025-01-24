@@ -123,8 +123,8 @@ namespace osu.Game.Screens.Play.PlayerSettings
                     if (realmWriteTask == null)
                     {
                         Current.Disabled = false;
-                        Current.Disabled = allowOffsetAdjust;
                         Current.Value = val;
+                        Current.Disabled = allowOffsetAdjust;
                     }
 
                     if (realmWriteTask?.IsCompleted == true)
