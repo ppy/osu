@@ -18,6 +18,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Screens;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.Cursor;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
@@ -156,10 +157,15 @@ namespace osu.Game.Screens.OnlinePlay.Match
                                             {
                                                 new Drawable[]
                                                 {
-                                                    new DrawableMatchRoom(Room, allowEdit)
+                                                    new OsuContextMenuContainer
                                                     {
-                                                        OnEdit = () => settingsOverlay.Show(),
-                                                        SelectedItem = SelectedItem
+                                                        RelativeSizeAxes = Axes.X,
+                                                        AutoSizeAxes = Axes.Y,
+                                                        Child = new DrawableMatchRoom(Room, allowEdit)
+                                                        {
+                                                            OnEdit = () => settingsOverlay.Show(),
+                                                            SelectedItem = SelectedItem
+                                                        }
                                                     }
                                                 },
                                                 null,
