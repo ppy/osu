@@ -30,9 +30,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             currentStrain *= strainDecay(((OsuDifficultyHitObject)current).StrainTime);
             currentStrain += StaminaEvaluator.EvaluateDifficultyOf(current) * skillMultiplier;
 
-            double totalStrain = currentStrain;
-
-            return totalStrain;
+            return currentStrain;
         }
     }
 }
