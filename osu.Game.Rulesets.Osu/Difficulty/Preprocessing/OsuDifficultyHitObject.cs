@@ -103,6 +103,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             // Capped to 25ms to prevent difficulty calculation breaking from simultaneous objects.
             StrainTime = Math.Max(DeltaTime, MIN_DELTA_TIME);
 
+            SmallCircleBonus = Math.Max(1.0, 1.0 + (30 - BaseObject.Radius) / 40);
+
             if (BaseObject is Slider sliderObject)
             {
                 HitWindowGreat = 2 * sliderObject.HeadCircle.HitWindows.WindowFor(HitResult.Great) / clockRate;
@@ -178,11 +180,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             // We will scale distances by this factor, so we can assume a uniform CircleSize among beatmaps.
             float scalingFactor = NORMALISED_RADIUS / (float)BaseObject.Radius;
-
-            if (BaseObject.Radius < 30)
-            {
-                SmallCircleBonus = 1.0 + Math.Min(30 - BaseObject.Radius, 30) / 38;
-            }
 
             Vector2 lastCursorPosition = getEndCursorPosition(lastObject);
 

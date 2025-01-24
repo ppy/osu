@@ -105,16 +105,19 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                                   * Math.Pow(DifficultyCalculationUtils.ReverseLerp(osuLastObj.LazyJumpDistance, diameter * 3, diameter), 1.8)
                                   * DifficultyCalculationUtils.Smootherstep(lastAngle, double.DegreesToRadians(110), double.DegreesToRadians(60));
 
-                    // If objects just go back and forth through a middle point - don't give as much wide bonus
-                    // Use Previous(2) and Previous(0) because angles calculation is done prevprev-prev-curr, so any object's angle's center point is always the previous object
-                    var lastBaseObject = (OsuHitObject)osuLastObj.BaseObject;
-                    var last2BaseObject = (OsuHitObject)osuLast2Obj.BaseObject;
-
-                    float distance = (last2BaseObject.StackedPosition - lastBaseObject.StackedPosition).Length;
-
-                    if (distance < 1)
+                    if (osuLast2Obj != null)
                     {
-                        wideAngleBonus *= 1 - 0.35 * (1 - distance);
+                        // If objects just go back and forth through a middle point - don't give as much wide bonus
+                        // Use Previous(2) and Previous(0) because angles calculation is done prevprev-prev-curr, so any object's angle's center point is always the previous object
+                        var lastBaseObject = (OsuHitObject)osuLastObj.BaseObject;
+                        var last2BaseObject = (OsuHitObject)osuLast2Obj.BaseObject;
+
+                        float distance = (last2BaseObject.StackedPosition - lastBaseObject.StackedPosition).Length;
+
+                        if (distance < 1)
+                        {
+                            wideAngleBonus *= 1 - 0.35 * (1 - distance);
+                        }
                     }
                 }
             }
