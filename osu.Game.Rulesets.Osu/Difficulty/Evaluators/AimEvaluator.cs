@@ -155,7 +155,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             if (withSliderTravelDistance)
                 aimStrain += sliderBonus * slider_multiplier;
 
-            return osuCurrObj.SmallCircleBonus * aimStrain;
+            // Apply high circle size bonus
+            aimStrain *= osuCurrObj.SmallCircleBonus;
+
+            return aimStrain;
         }
 
         private static double calcWideAngleBonus(double angle) => DifficultyCalculationUtils.Smoothstep(angle, double.DegreesToRadians(40), double.DegreesToRadians(140));
