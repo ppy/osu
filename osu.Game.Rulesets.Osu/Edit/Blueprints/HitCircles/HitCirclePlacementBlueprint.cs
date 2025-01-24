@@ -58,7 +58,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles
                 result = gridSnapResult;
             result ??= new SnapResult(screenSpacePosition, fallbackTime);
 
-            UpdateTimeAndPosition(result);
+            base.UpdateTimeAndPosition(result.ScreenSpacePosition, result.Time ?? fallbackTime);
             HitObject.Position = ToLocalSpace(result.ScreenSpacePosition);
             return result;
         }

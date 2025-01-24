@@ -9,7 +9,6 @@ using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners.Components;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.UI;
-using osuTK;
 using osuTK.Input;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners
@@ -70,13 +69,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners
             HitObject.EndTime = beatSnapProvider == null
                 ? Math.Max(HitObject.StartTime, EditorClock.CurrentTime)
                 : Math.Max(HitObject.StartTime + beatSnapProvider.GetBeatLengthAtTime(HitObject.StartTime), beatSnapProvider.SnapTime(EditorClock.CurrentTime));
-        }
-
-        public override SnapResult UpdateTimeAndPosition(Vector2 screenSpacePosition, double fallbackTime)
-        {
-            var result = new SnapResult(screenSpacePosition, fallbackTime);
-            UpdateTimeAndPosition(result);
-            return result;
         }
     }
 }

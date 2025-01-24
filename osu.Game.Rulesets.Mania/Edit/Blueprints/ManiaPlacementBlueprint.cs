@@ -62,7 +62,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
         {
             var result = composer?.FindSnappedPositionAndTime(screenSpacePosition) ?? new SnapResult(screenSpacePosition, fallbackTime);
 
-            UpdateTimeAndPosition(result);
+            base.UpdateTimeAndPosition(result.ScreenSpacePosition, result.Time ?? fallbackTime);
 
             if (result.Playfield is Column col)
             {

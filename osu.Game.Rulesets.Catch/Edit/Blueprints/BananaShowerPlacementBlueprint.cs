@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
         {
             var result = Composer?.FindSnappedPositionAndTime(screenSpacePosition) ?? new SnapResult(screenSpacePosition, fallbackTime);
 
-            base.UpdateTimeAndPosition(result);
+            base.UpdateTimeAndPosition(result.ScreenSpacePosition, result.Time ?? fallbackTime);
 
             if (!(result.Time is double time)) return result;
 
