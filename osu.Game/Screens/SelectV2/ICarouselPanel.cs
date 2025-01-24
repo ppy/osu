@@ -24,6 +24,11 @@ namespace osu.Game.Screens.SelectV2
         BindableBool KeyboardSelected { get; }
 
         /// <summary>
+        /// Called when the panel is activated. Should be used to update the panel's visual state.
+        /// </summary>
+        void Activated();
+
+        /// <summary>
         /// The Y position used internally for positioning in the carousel.
         /// </summary>
         double DrawYPosition { get; set; }
