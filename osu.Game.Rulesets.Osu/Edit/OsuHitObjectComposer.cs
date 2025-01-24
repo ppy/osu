@@ -230,8 +230,6 @@ namespace osu.Game.Rulesets.Osu.Edit
             if (!snapToVisibleBlueprints(screenSpacePosition, out var snapResult))
                 return null;
 
-            snapResult.Time ??= fallbackTime;
-
             if (DistanceSnapProvider.DistanceSnapToggle.Value != TernaryState.True || distanceSnapGrid == null)
                 return snapResult;
 
@@ -244,8 +242,9 @@ namespace osu.Game.Rulesets.Osu.Edit
             // The easiest way to ensure this is to attempt application of distance snap after a nearby object is found, and copy over
             // the time value if the proposed positions are roughly the same.
             (Vector2 distanceSnappedPosition, double distanceSnappedTime) = distanceSnapGrid.GetSnappedPosition(distanceSnapGrid.ToLocalSpace(snapResult.ScreenSpacePosition));
-            if (Precision.AlmostEquals(distanceSnapGrid.ToScreenSpace(distanceSnappedPosition), snapResult.ScreenSpacePosition, 1))
-                snapResult.Time = distanceSnappedTime;
+            snapResult.Time = Precision.AlmostEquals(distanceSnapGrid.ToScreenSpace(distanceSnappedPosition), snapResult.ScreenSpacePosition, 1)
+                ? distanceSnappedTime
+                : fallbackTime;
 
             return snapResult;
         }
