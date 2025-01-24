@@ -291,7 +291,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                     Debug.Assert(gameplayClock != null);
 
                     // TODO: the blocking conditions should probably display a message.
-                    if (!player.IsBreakTime.Value && gameplayClock.CurrentTime - gameplayClock.StartTime > 10000)
+                    if (!player.IsBreakTime.Value && gameplayClock.CurrentTime - gameplayClock.GameplayStartTime > 10000)
                         return false;
 
                     if (gameplayClock.IsPaused.Value)
