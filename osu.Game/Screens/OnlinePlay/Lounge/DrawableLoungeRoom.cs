@@ -159,15 +159,12 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         {
             get
             {
-                var items = new List<MenuItem>
-                {
-                    new OsuMenuItem("Create copy", MenuItemType.Standard, () =>
-                    {
-                        lounge?.OpenCopy(Room);
-                    })
-                };
+                var items = new List<MenuItem>();
 
                 items.AddRange(base.ContextMenuItems);
+
+                items.Add(new OsuMenuItemSpacer());
+                items.Add(new OsuMenuItem("Create copy", MenuItemType.Standard, () => lounge?.OpenCopy(Room)));
 
                 if (Room.Type == MatchType.Playlists && Room.Host?.Id == api.LocalUser.Value.Id && Room.StartDate?.AddMinutes(5) >= DateTimeOffset.Now && !Room.HasEnded)
                 {

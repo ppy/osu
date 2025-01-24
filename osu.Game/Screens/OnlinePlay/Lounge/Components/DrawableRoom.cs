@@ -349,22 +349,16 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 if (Room.RoomID.HasValue)
                 {
                     items.AddRange([
-                        new OsuMenuItem("View in browser", MenuItemType.Standard, () =>
-                        {
-                            game?.OpenUrlExternally(formatRoomUrl(Room.RoomID.Value));
-                        }),
-                        new OsuMenuItem("Copy link", MenuItemType.Standard, () =>
-                        {
-                            game?.CopyUrlToClipboard(formatRoomUrl(Room.RoomID.Value));
-                        })
+                        new OsuMenuItem("View in browser", MenuItemType.Standard, () => game?.OpenUrlExternally(formatRoomUrl(Room.RoomID.Value))),
+                        new OsuMenuItem("Copy link", MenuItemType.Standard, () => game?.CopyUrlToClipboard(formatRoomUrl(Room.RoomID.Value)))
                     ]);
                 }
 
                 return items.ToArray();
+
+                string formatRoomUrl(long id) => $@"{api.WebsiteRootUrl}/multiplayer/rooms/{id}";
             }
         }
-
-        private string formatRoomUrl(long id) => $@"{api.WebsiteRootUrl}/multiplayer/rooms/{id}";
 
         protected virtual UpdateableBeatmapBackgroundSprite CreateBackground() => new UpdateableBeatmapBackgroundSprite();
 
