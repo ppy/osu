@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace osu.Game.Rulesets.Difficulty.Utils
 {
-    public static class DifficultyCalculationUtils
+    public static partial class DifficultyCalculationUtils
     {
         /// <summary>
         /// Converts BPM value into milliseconds
@@ -65,6 +65,19 @@ namespace osu.Game.Rulesets.Difficulty.Utils
         /// <param name="multiplier">Multiplier to adjust the curve's height</param>
         /// <returns>The output of the bell curve function of <paramref name="x"/></returns>
         public static double BellCurve(double x, double mean, double width, double multiplier = 1.0) => multiplier * Math.Exp(Math.E * -(Math.Pow(x - mean, 2) / Math.Pow(width, 2)));
+
+        /// <summary>
+        /// Smoothstep function (https://en.wikipedia.org/wiki/Smoothstep)
+        /// </summary>
+        /// <param name="x">Value to calculate the function for</param>
+        /// <param name="start">Value at which function returns 0</param>
+        /// <param name="end">Value at which function returns 1</param>
+        public static double Smoothstep(double x, double start, double end)
+        {
+            x = Math.Clamp((x - start) / (end - start), 0.0, 1.0);
+
+            return x * x * (3.0 - 2.0 * x);
+        }
 
         /// <summary>
         /// Smootherstep function (https://en.wikipedia.org/wiki/Smoothstep#Variations)

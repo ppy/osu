@@ -75,7 +75,9 @@ namespace osu.Game.Overlays.Dialog
                     return;
 
                 bodyText = value;
+
                 body.Text = value;
+                body.TextAnchor = bodyText.ToString().Contains('\n') ? Anchor.TopLeft : Anchor.TopCentre;
             }
         }
 
@@ -210,13 +212,12 @@ namespace osu.Game.Overlays.Dialog
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
                                     TextAnchor = Anchor.TopCentre,
-                                    Padding = new MarginPadding { Horizontal = 15 },
+                                    Padding = new MarginPadding { Horizontal = 15, Bottom = 10 },
                                 },
                                 body = new OsuTextFlowContainer(t => t.Font = t.Font.With(size: 18))
                                 {
                                     Origin = Anchor.TopCentre,
                                     Anchor = Anchor.TopCentre,
-                                    TextAnchor = Anchor.TopCentre,
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
                                     Padding = new MarginPadding { Horizontal = 15 },
@@ -301,6 +302,7 @@ namespace osu.Game.Overlays.Dialog
             {
                 content.ScaleTo(0.7f);
                 ring.ResizeTo(ringMinifiedSize);
+                icon.ScaleTo(0f);
             }
 
             content
@@ -308,6 +310,7 @@ namespace osu.Game.Overlays.Dialog
                 .FadeIn(ENTER_DURATION, Easing.OutQuint);
 
             ring.ResizeTo(ringSize, ENTER_DURATION * 1.5f, Easing.OutQuint);
+            icon.Delay(100).ScaleTo(1, ENTER_DURATION * 1.5f, Easing.OutQuint);
         }
 
         protected override void PopOut()
