@@ -121,7 +121,11 @@ namespace osu.Game.Screens.Play.PlayerSettings
                     // At the point we reach here, it's not guaranteed that all realm writes have taken place (there may be some in-flight).
                     // We are only aware of writes that originated from our own flow, so if we do see one that's active we can avoid handling the feedback value arriving.
                     if (realmWriteTask == null)
+                    {
+                        Current.Disabled = false;
+                        Current.Disabled = allowOffsetAdjust;
                         Current.Value = val;
+                    }
 
                     if (realmWriteTask?.IsCompleted == true)
                     {
