@@ -666,8 +666,6 @@ namespace osu.Game.Screens.Play
 
         private partial class MutedNotification : SimpleNotification
         {
-            public override bool IsImportant => true;
-
             public MutedNotification()
             {
                 Text = NotificationsStrings.GameVolumeTooLow;
@@ -719,8 +717,6 @@ namespace osu.Game.Screens.Play
 
         private partial class BatteryWarningNotification : SimpleNotification
         {
-            public override bool IsImportant => true;
-
             public BatteryWarningNotification()
             {
                 Text = NotificationsStrings.BatteryLow;
