@@ -33,6 +33,13 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
+        public void TestOffScreenLoading()
+        {
+            AddStep("disable masking", () => Scroll.Masking = false);
+            AddStep("enable masking", () => Scroll.Masking = true);
+        }
+
+        [Test]
         public void TestAddRemoveOneByOne()
         {
             AddRepeatStep("add beatmaps", () => BeatmapSets.Add(TestResources.CreateTestBeatmapSetInfo(RNG.Next(1, 4))), 20);
