@@ -15,18 +15,20 @@ using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Chat;
-using osu.Game.Users;
 using osu.Game.Localisation.HUD;
 using osu.Game.Localisation.SkinComponents;
+using osu.Game.Online.Spectator;
+using osu.Game.Skinning;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public partial class SpectatorList : CompositeDrawable
+    public partial class SpectatorList : CompositeDrawable, ISerialisableDrawable
     {
         private const int max_spectators_displayed = 10;
 
-        public BindableList<Spectator> Spectators { get; } = new BindableList<Spectator>();
+        public BindableList<SpectatorUser> Spectators { get; } = new BindableList<SpectatorUser>();
         public Bindable<LocalUserPlayingState> UserPlayingState { get; } = new Bindable<LocalUserPlayingState>();
 
         [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.Font), nameof(SkinnableComponentStrings.FontDescription))]
@@ -41,13 +43,20 @@ namespace osu.Game.Screens.Play.HUD
         private FillFlowContainer<SpectatorListEntry> spectatorsFlow = null!;
         private DrawablePool<SpectatorListEntry> pool = null!;
 
+        [Resolved]
+        private SpectatorClient client { get; set; } = null!;
+
+        [Resolved]
+        private GameplayState gameplayState { get; set; } = null!;
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
             AutoSizeAxes = Axes.Y;
 
-            InternalChildren = new Drawable[]
+            InternalChildren = new[]
             {
+                Empty().With(t => t.Size = new Vector2(100, 50)),
                 mainFlow = new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Both,
@@ -76,6 +85,9 @@ namespace osu.Game.Screens.Play.HUD
         {
             base.LoadComplete();
 
+            ((IBindableList<SpectatorUser>)Spectators).BindTo(client.WatchingUsers);
+            ((IBindable<LocalUserPlayingState>)UserPlayingState).BindTo(gameplayState.PlayingState);
+
             Spectators.BindCollectionChanged(onSpectatorsChanged, true);
             UserPlayingState.BindValueChanged(_ => updateVisibility());
 
@@ -94,7 +106,7 @@ namespace osu.Game.Screens.Play.HUD
                 {
                     for (int i = 0; i < e.NewItems!.Count; i++)
                     {
-                        var spectator = (Spectator)e.NewItems![i]!;
+                        var spectator = (SpectatorUser)e.NewItems![i]!;
                         int index = Math.Max(e.NewStartingIndex, 0) + i;
 
                         if (index >= max_spectators_displayed)
@@ -143,7 +155,7 @@ namespace osu.Game.Screens.Play.HUD
             }
         }
 
-        private void addNewSpectatorToList(int i, Spectator spectator)
+        private void addNewSpectatorToList(int i, SpectatorUser spectator)
         {
             var entry = pool.Get(entry =>
             {
@@ -156,6 +168,7 @@ namespace osu.Game.Screens.Play.HUD
 
         private void updateVisibility()
         {
+            // We don't want to show spectators when we are watching a replay.
             mainFlow.FadeTo(Spectators.Count > 0 && UserPlayingState.Value != LocalUserPlayingState.NotPlaying ? 1 : 0, 250, Easing.OutQuint);
         }
 
@@ -169,7 +182,7 @@ namespace osu.Game.Screens.Play.HUD
 
         private partial class SpectatorListEntry : PoolableDrawable
         {
-            public Bindable<Spectator> Current { get; } = new Bindable<Spectator>();
+            public Bindable<SpectatorUser> Current { get; } = new Bindable<SpectatorUser>();
 
             private readonly BindableWithCurrent<LocalUserPlayingState> current = new BindableWithCurrent<LocalUserPlayingState>();
 
@@ -233,10 +246,6 @@ namespace osu.Game.Screens.Play.HUD
             }
         }
 
-        public record Spectator(int OnlineID, string Username) : IUser
-        {
-            public CountryCode CountryCode => CountryCode.Unknown;
-            public bool IsBot => false;
-        }
+        public bool UsesFixedAnchor { get; set; }
     }
 }
