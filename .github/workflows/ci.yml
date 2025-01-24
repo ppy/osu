@@ -96,7 +96,7 @@ jobs:
 
   build-only-android:
     name: Build only (Android)
-    runs-on: windows-latest
+    runs-on: windows-2019
     timeout-minutes: 60
     steps:
       - name: Checkout

@@ -41,7 +41,7 @@ namespace osu.Game.Overlays
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
-        public Action<Notification>? ForwardNotificationToPermanentStore { get; set; }
+        public required Action<Notification> ForwardNotificationToPermanentStore { get; init; }
 
         public int UnreadCount => Notifications.Count(n => !n.WasClosed && !n.Read);
 
@@ -142,8 +142,15 @@ namespace osu.Game.Overlays
             notification.MoveToOffset(new Vector2(400, 0), NotificationOverlay.TRANSITION_LENGTH, Easing.OutQuint);
             notification.FadeOut(NotificationOverlay.TRANSITION_LENGTH, Easing.OutQuint).OnComplete(_ =>
             {
+                if (notification.Transient)
+                {
+                    notification.IsInToastTray = false;
+                    notification.Close(false);
+                    return;
+                }
+
                 RemoveInternal(notification, false);
-                ForwardNotificationToPermanentStore?.Invoke(notification);
+                ForwardNotificationToPermanentStore(notification);
 
                 notification.FadeIn(300, Easing.OutQuint);
             });
