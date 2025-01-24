@@ -30,10 +30,7 @@ namespace osu.Game.Screens.SelectV2
     /// </summary>
     public abstract partial class Carousel<T> : CompositeDrawable
     {
-        /// <summary>
-        /// A collection of filters which should be run each time a <see cref="FilterAsync"/> is executed.
-        /// </summary>
-        protected IEnumerable<ICarouselFilter> Filters { get; init; } = Enumerable.Empty<ICarouselFilter>();
+        #region Properties and methods for external usage
 
         /// <summary>
         /// Height of the area above the carousel that should be treated as visible due to transparency of elements in front of it.
@@ -75,21 +72,12 @@ namespace osu.Game.Screens.SelectV2
         /// <summary>
         /// The number of carousel items currently in rotation for display.
         /// </summary>
-        public int DisplayableItems => displayedCarouselItems?.Count ?? 0;
+        public int DisplayableItems => carouselItems?.Count ?? 0;
 
         /// <summary>
         /// The number of items currently actualised into drawables.
         /// </summary>
         public int VisibleItems => scroll.Panels.Count;
-
-        /// <summary>
-        /// All items which are to be considered for display in this carousel.
-        /// Mutating this list will automatically queue a <see cref="FilterAsync"/>.
-        /// </summary>
-        /// <remarks>
-        /// Note that an <see cref="ICarouselFilter"/> may add new items which are displayed but not tracked in this list.
-        /// </remarks>
-        protected readonly BindableList<T> Items = new BindableList<T>();
 
         /// <summary>
         /// The currently selected model.
@@ -114,20 +102,31 @@ namespace osu.Game.Screens.SelectV2
             }
         }
 
-        private List<CarouselItem>? displayedCarouselItems;
+        #endregion
 
-        private readonly CarouselScrollContainer scroll;
+        #region Properties and methods concerning implementations
 
-        protected Carousel()
-        {
-            InternalChild = scroll = new CarouselScrollContainer
-            {
-                RelativeSizeAxes = Axes.Both,
-                Masking = false,
-            };
+        /// <summary>
+        /// A collection of filters which should be run each time a <see cref="FilterAsync"/> is executed.
+        /// </summary>
+        /// <remarks>
+        /// Implementations should add all required filters as part of their initialisation.
+        ///
+        /// Importantly, each filter is sequentially run in the order provided.
+        /// Each filter receives the output of the previous filter.
+        ///
+        /// A filter may add, mutate or remove items.
+        /// </remarks>
+        protected IEnumerable<ICarouselFilter> Filters { get; init; } = Enumerable.Empty<ICarouselFilter>();
 
-            Items.BindCollectionChanged((_, _) => FilterAsync());
-        }
+        /// <summary>
+        /// All items which are to be considered for display in this carousel.
+        /// Mutating this list will automatically queue a <see cref="FilterAsync"/>.
+        /// </summary>
+        /// <remarks>
+        /// Note that an <see cref="ICarouselFilter"/> may add new items which are displayed but not tracked in this list.
+        /// </remarks>
+        protected readonly BindableList<T> Items = new BindableList<T>();
 
         /// <summary>
         /// Queue an asynchronous filter operation.
@@ -151,7 +150,28 @@ namespace osu.Game.Screens.SelectV2
         /// <returns>A <see cref="CarouselItem"/> representing the model.</returns>
         protected abstract CarouselItem CreateCarouselItemForModel(T model);
 
+        #endregion
+
+        #region Initialisation
+
+        private readonly CarouselScrollContainer scroll;
+
+        protected Carousel()
+        {
+            InternalChild = scroll = new CarouselScrollContainer
+            {
+                RelativeSizeAxes = Axes.Both,
+                Masking = false,
+            };
+
+            Items.BindCollectionChanged((_, _) => FilterAsync());
+        }
+
+        #endregion
+
         #region Filtering and display preparation
+
+        private List<CarouselItem>? carouselItems;
 
         private Task filterTask = Task.CompletedTask;
         private CancellationTokenSource cancellationSource = new CancellationTokenSource();
@@ -202,7 +222,7 @@ namespace osu.Game.Screens.SelectV2
                 return;
 
             log("Items ready for display");
-            displayedCarouselItems = items.ToList();
+            carouselItems = items.ToList();
             displayedRange = null;
 
             updateSelection();
@@ -233,9 +253,9 @@ namespace osu.Game.Screens.SelectV2
         {
             currentSelectionCarouselItem = null;
 
-            if (displayedCarouselItems == null) return;
+            if (carouselItems == null) return;
 
-            foreach (var item in displayedCarouselItems)
+            foreach (var item in carouselItems)
             {
                 bool isSelected = item.Model == currentSelection;
 
@@ -286,7 +306,7 @@ namespace osu.Game.Screens.SelectV2
         {
             base.Update();
 
-            if (displayedCarouselItems == null)
+            if (carouselItems == null)
                 return;
 
             var range = getDisplayRange();
@@ -336,15 +356,15 @@ namespace osu.Game.Screens.SelectV2
 
         private DisplayRange getDisplayRange()
         {
-            Debug.Assert(displayedCarouselItems != null);
+            Debug.Assert(carouselItems != null);
 
             // Find index range of all items that should be on-screen
             carouselBoundsItem.CarouselYPosition = visibleUpperBound - DistanceOffscreenToPreload;
-            int firstIndex = displayedCarouselItems.BinarySearch(carouselBoundsItem);
+            int firstIndex = carouselItems.BinarySearch(carouselBoundsItem);
             if (firstIndex < 0) firstIndex = ~firstIndex;
 
             carouselBoundsItem.CarouselYPosition = visibleBottomBound + DistanceOffscreenToPreload;
-            int lastIndex = displayedCarouselItems.BinarySearch(carouselBoundsItem);
+            int lastIndex = carouselItems.BinarySearch(carouselBoundsItem);
             if (lastIndex < 0) lastIndex = ~lastIndex;
 
             firstIndex = Math.Max(0, firstIndex - 1);
@@ -355,11 +375,11 @@ namespace osu.Game.Screens.SelectV2
 
         private void updateDisplayedRange(DisplayRange range)
         {
-            Debug.Assert(displayedCarouselItems != null);
+            Debug.Assert(carouselItems != null);
 
             List<CarouselItem> toDisplay = range.Last - range.First == 0
                 ? new List<CarouselItem>()
-                : displayedCarouselItems.GetRange(range.First, range.Last - range.First + 1);
+                : carouselItems.GetRange(range.First, range.Last - range.First + 1);
 
             // Iterate over all panels which are already displayed and figure which need to be displayed / removed.
             foreach (var panel in scroll.Panels)
@@ -395,9 +415,9 @@ namespace osu.Game.Screens.SelectV2
 
             // Update the total height of all items (to make the scroll container scrollable through the full height even though
             // most items are not displayed / loaded).
-            if (displayedCarouselItems.Count > 0)
+            if (carouselItems.Count > 0)
             {
-                var lastItem = displayedCarouselItems[^1];
+                var lastItem = carouselItems[^1];
                 scroll.SetLayoutHeight((float)(lastItem.CarouselYPosition + lastItem.DrawHeight + visibleHalfHeight));
             }
             else
@@ -493,15 +513,7 @@ namespace osu.Game.Screens.SelectV2
                 switch (e.Action)
                 {
                     case GlobalAction.AbsoluteScrollSongList:
-
-                        // The default binding for absolute scroll is right mouse button.
-                        // To avoid conflicts with context menus, disallow absolute scroll completely if it looks like things will fall over.
-                        if (e.CurrentState.Mouse.Buttons.Contains(MouseButton.Right)
-                            && GetContainingInputManager()!.HoveredDrawables.OfType<IHasContextMenu>().Any())
-                            return false;
-
-                        ScrollToAbsolutePosition(e.CurrentState.Mouse.Position);
-                        absoluteScrolling = true;
+                        beginAbsoluteScrolling(e);
                         return true;
                 }
 
@@ -513,9 +525,30 @@ namespace osu.Game.Screens.SelectV2
                 switch (e.Action)
                 {
                     case GlobalAction.AbsoluteScrollSongList:
-                        absoluteScrolling = false;
+                        endAbsoluteScrolling();
                         break;
                 }
+            }
+
+            protected override bool OnMouseDown(MouseDownEvent e)
+            {
+                if (e.Button == MouseButton.Right)
+                {
+                    // To avoid conflicts with context menus, disallow absolute scroll if it looks like things will fall over.
+                    if (GetContainingInputManager()!.HoveredDrawables.OfType<IHasContextMenu>().Any())
+                        return false;
+
+                    beginAbsoluteScrolling(e);
+                }
+
+                return base.OnMouseDown(e);
+            }
+
+            protected override void OnMouseUp(MouseUpEvent e)
+            {
+                if (e.Button == MouseButton.Right)
+                    endAbsoluteScrolling();
+                base.OnMouseUp(e);
             }
 
             protected override bool OnMouseMove(MouseMoveEvent e)
@@ -528,6 +561,14 @@ namespace osu.Game.Screens.SelectV2
 
                 return base.OnMouseMove(e);
             }
+
+            private void beginAbsoluteScrolling(UIEvent e)
+            {
+                ScrollToAbsolutePosition(e.CurrentState.Mouse.Position);
+                absoluteScrolling = true;
+            }
+
+            private void endAbsoluteScrolling() => absoluteScrolling = false;
 
             #endregion
         }

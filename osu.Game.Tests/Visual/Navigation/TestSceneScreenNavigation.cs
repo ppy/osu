@@ -48,6 +48,7 @@ using osu.Game.Screens.Select.Carousel;
 using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Screens.Select.Options;
 using osu.Game.Tests.Beatmaps.IO;
+using osu.Game.Tests.Resources;
 using osu.Game.Utils;
 using osuTK;
 using osuTK.Input;
@@ -200,6 +201,38 @@ namespace osu.Game.Tests.Visual.Navigation
             ConfirmAtMainMenu();
 
             TextBox filterControlTextBox() => songSelect.ChildrenOfType<FilterControl.FilterControlTextBox>().Single();
+        }
+
+        [Test]
+        public void TestSongSelectRandomRewindButton()
+        {
+            Guid? originalSelection = null;
+            TestPlaySongSelect songSelect = null;
+
+            PushAndConfirm(() => songSelect = new TestPlaySongSelect());
+            AddUntilStep("wait for song select", () => songSelect.BeatmapSetsLoaded);
+
+            AddStep("Add two beatmaps", () =>
+            {
+                Game.BeatmapManager.Import(TestResources.CreateTestBeatmapSetInfo(8));
+                Game.BeatmapManager.Import(TestResources.CreateTestBeatmapSetInfo(8));
+            });
+
+            AddUntilStep("wait for selected", () =>
+            {
+                originalSelection = Game.Beatmap.Value.BeatmapInfo.ID;
+                return !Game.Beatmap.IsDefault;
+            });
+
+            AddStep("hit random", () =>
+            {
+                InputManager.MoveMouseTo(Game.ChildrenOfType<FooterButtonRandom>().Single());
+                InputManager.Click(MouseButton.Left);
+            });
+            AddUntilStep("wait for selection changed", () => Game.Beatmap.Value.BeatmapInfo.ID, () => Is.Not.EqualTo(originalSelection));
+
+            AddStep("hit random rewind", () => InputManager.Click(MouseButton.Right));
+            AddUntilStep("wait for selection reverted", () => Game.Beatmap.Value.BeatmapInfo.ID, () => Is.EqualTo(originalSelection));
         }
 
         [Test]
