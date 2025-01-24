@@ -57,8 +57,6 @@ namespace osu.Game.Screens.Play
 
         private Track track;
 
-        private readonly double skipTargetTime;
-
         [Resolved]
         private MusicController musicController { get; set; } = null!;
 
@@ -66,16 +64,16 @@ namespace osu.Game.Screens.Play
         /// Create a new master gameplay clock container.
         /// </summary>
         /// <param name="beatmap">The beatmap to be used for time and metadata references.</param>
-        /// <param name="skipTargetTime">The latest time which should be used when introducing gameplay. Will be used when skipping forward.</param>
-        public MasterGameplayClockContainer(WorkingBeatmap beatmap, double skipTargetTime)
+        /// <param name="gameplayStartTime">The latest time which should be used when introducing gameplay. Will be used when skipping forward.</param>
+        public MasterGameplayClockContainer(WorkingBeatmap beatmap, double gameplayStartTime)
             : base(beatmap.Track, applyOffsets: true, requireDecoupling: true)
         {
             this.beatmap = beatmap;
-            this.skipTargetTime = skipTargetTime;
 
             track = beatmap.Track;
 
             StartTime = findEarliestStartTime();
+            GameplayStartTime = gameplayStartTime;
         }
 
         private double findEarliestStartTime()
@@ -84,7 +82,7 @@ namespace osu.Game.Screens.Play
             // generally this is either zero, or some point earlier than zero in the case of storyboards, lead-ins etc.
 
             // start with the originally provided latest time (if before zero).
-            double time = Math.Min(0, skipTargetTime);
+            double time = Math.Min(0, GameplayStartTime);
 
             // if a storyboard is present, it may dictate the appropriate start time by having events in negative time space.
             // this is commonly used to display an intro before the audio track start.
@@ -119,10 +117,10 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public void Skip()
         {
-            if (GameplayClock.CurrentTime > skipTargetTime - MINIMUM_SKIP_TIME)
+            if (GameplayClock.CurrentTime > GameplayStartTime - MINIMUM_SKIP_TIME)
                 return;
 
-            double skipTarget = skipTargetTime - MINIMUM_SKIP_TIME;
+            double skipTarget = GameplayStartTime - MINIMUM_SKIP_TIME;
 
             if (StartTime < -10000 && GameplayClock.CurrentTime < 0 && skipTarget > 6000)
                 // double skip exception for storyboards with very long intros
@@ -187,7 +185,8 @@ namespace osu.Game.Screens.Play
                     }
                     else
                     {
-                        Logger.Log($"Playback discrepancy detected ({playbackDiscrepancyCount} of allowed {allowed_playback_discrepancies}): {elapsedGameplayClockTime:N1} vs {elapsedValidationTime:N1}");
+                        Logger.Log(
+                            $"Playback discrepancy detected ({playbackDiscrepancyCount} of allowed {allowed_playback_discrepancies}): {elapsedGameplayClockTime:N1} vs {elapsedValidationTime:N1}");
                     }
 
                     elapsedValidationTime = null;
