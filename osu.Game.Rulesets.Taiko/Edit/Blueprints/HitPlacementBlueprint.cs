@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Taiko.Edit.Blueprints
         {
             var result = composer?.FindSnappedPositionAndTime(screenSpacePosition) ?? new SnapResult(screenSpacePosition, fallbackTime);
             piece.Position = ToLocalSpace(result.ScreenSpacePosition);
-            UpdateTimeAndPosition(result);
+            base.UpdateTimeAndPosition(result.ScreenSpacePosition, result.Time ?? fallbackTime);
             return result;
         }
     }

@@ -114,7 +114,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 result = gridSnapResult;
             result ??= new SnapResult(screenSpacePosition, fallbackTime);
 
-            UpdateTimeAndPosition(result);
+            base.UpdateTimeAndPosition(result.ScreenSpacePosition, result.Time ?? fallbackTime);
 
             switch (state)
             {

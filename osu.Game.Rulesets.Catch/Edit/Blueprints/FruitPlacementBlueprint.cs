@@ -52,7 +52,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
                 ? distanceSnapResult
                 : gridSnapResult;
 
-            UpdateTimeAndPosition(result);
+            base.UpdateTimeAndPosition(result.ScreenSpacePosition, result.Time ?? fallbackTime);
 
             HitObject.X = ToLocalSpace(result.ScreenSpacePosition).X;
             return result;
