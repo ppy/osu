@@ -141,14 +141,28 @@ namespace osu.Game.Screens.SelectV2
 
         #region Drawable pooling
 
-        private readonly DrawablePool<BeatmapCarouselPanel> carouselPanelPool = new DrawablePool<BeatmapCarouselPanel>(100);
+        private readonly DrawablePool<BeatmapPanel> beatmapPanelPool = new DrawablePool<BeatmapPanel>(100);
+        private readonly DrawablePool<BeatmapSetPanel> setPanelPool = new DrawablePool<BeatmapSetPanel>(100);
 
         private void setupPools()
         {
-            AddInternal(carouselPanelPool);
+            AddInternal(beatmapPanelPool);
+            AddInternal(setPanelPool);
         }
 
-        protected override Drawable GetDrawableForDisplay(CarouselItem item) => carouselPanelPool.Get();
+        protected override Drawable GetDrawableForDisplay(CarouselItem item)
+        {
+            switch (item.Model)
+            {
+                case BeatmapInfo:
+                    return beatmapPanelPool.Get();
+
+                case BeatmapSetInfo:
+                    return setPanelPool.Get();
+            }
+
+            throw new InvalidOperationException();
+        }
 
         #endregion
     }
