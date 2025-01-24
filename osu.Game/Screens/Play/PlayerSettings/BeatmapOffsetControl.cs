@@ -138,15 +138,15 @@ namespace osu.Game.Screens.Play.PlayerSettings
             ReferenceScore.BindValueChanged(scoreChanged, true);
         }
 
+        // the last play graph is relative to the offset at the point of the last play, so we need to factor that out for some usages.
+        private double adjustmentSinceLastPlay => lastPlayBeatmapOffset - Current.Value;
+
         private void currentChanged(ValueChangedEvent<double> offset)
         {
             Scheduler.AddOnce(updateOffset);
 
             void updateOffset()
             {
-                // the last play graph is relative to the offset at the point of the last play, so we need to factor that out.
-                double adjustmentSinceLastPlay = lastPlayBeatmapOffset - Current.Value;
-
                 // Negative is applied here because the play graph is considering a hit offset, not track (as we currently use for clocks).
                 lastPlayGraph?.UpdateOffset(-adjustmentSinceLastPlay);
 
@@ -155,11 +155,6 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 {
                     Scheduler.AddOnce(updateOffset);
                     return;
-                }
-
-                if (useAverageButton != null)
-                {
-                    useAverageButton.Enabled.Value = !Precision.AlmostEquals(lastPlayAverage, adjustmentSinceLastPlay, Current.Precision / 2);
                 }
 
                 realmWriteTask = realm.WriteAsync(r =>
@@ -255,7 +250,6 @@ namespace osu.Game.Screens.Play.PlayerSettings
                         Current.Value = lastPlayBeatmapOffset - lastPlayAverage;
                         lastAppliedScore.Value = ReferenceScore.Value;
                     },
-                    Enabled = { Value = !Precision.AlmostEquals(lastPlayAverage, 0, Current.Precision / 2) }
                 },
                 globalOffsetText = new LinkFlowContainer
                 {
@@ -285,9 +279,12 @@ namespace osu.Game.Screens.Play.PlayerSettings
         {
             base.Update();
 
+            bool allow = allowOffsetAdjust;
+
             if (useAverageButton != null)
-                useAverageButton.Enabled.Value = allowOffsetAdjust;
-            Current.Disabled = !allowOffsetAdjust;
+                useAverageButton.Enabled.Value = allow && !Precision.AlmostEquals(lastPlayAverage, adjustmentSinceLastPlay, Current.Precision / 2);
+
+            Current.Disabled = !allow;
         }
 
         private bool allowOffsetAdjust
