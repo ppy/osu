@@ -57,7 +57,7 @@ namespace osu.Game.Screens.SelectV2
                     {
                         newItems.Add(new CarouselItem(b.BeatmapSet!)
                         {
-                            DrawHeight = 80,
+                            DrawHeight = BeatmapSetPanel.HEIGHT,
                             IsGroupSelectionTarget = true
                         });
                     }

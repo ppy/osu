@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -16,22 +17,27 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.SelectV2
 {
-    public partial class BeatmapCarouselPanel : PoolableDrawable, ICarouselPanel
+    public partial class BeatmapSetPanel : PoolableDrawable, ICarouselPanel
     {
+        public const float HEIGHT = CarouselItem.DEFAULT_HEIGHT * 2;
+
         [Resolved]
         private BeatmapCarousel carousel { get; set; } = null!;
 
         private Box activationFlash = null!;
-        private Box background = null!;
         private OsuSpriteText text = null!;
 
         [BackgroundDependencyLoader]
         private void load()
         {
+            Size = new Vector2(500, HEIGHT);
+            Masking = true;
+
             InternalChildren = new Drawable[]
             {
-                background = new Box
+                new Box
                 {
+                    Colour = Color4.Yellow.Darken(5),
                     Alpha = 0.8f,
                     RelativeSizeAxes = Axes.Both,
                 },
@@ -69,53 +75,27 @@ namespace osu.Game.Screens.SelectV2
             });
         }
 
-        protected override void FreeAfterUse()
-        {
-            base.FreeAfterUse();
-            Item = null;
-            Selected.Value = false;
-            KeyboardSelected.Value = false;
-        }
-
         protected override void PrepareForUse()
         {
             base.PrepareForUse();
 
             Debug.Assert(Item != null);
+            Debug.Assert(Item.IsGroupSelectionTarget);
 
-            DrawYPosition = Item.CarouselYPosition;
+            var beatmapSetInfo = (BeatmapSetInfo)Item.Model;
 
-            Size = new Vector2(500, Item.DrawHeight);
-            Masking = true;
-
-            background.Colour = (Item.Model is BeatmapInfo ? Color4.Aqua : Color4.Yellow).Darken(5);
-            text.Text = getTextFor(Item.Model);
+            text.Text = $"{beatmapSetInfo.Metadata}";
 
             this.FadeInFromZero(500, Easing.OutQuint);
         }
 
-        private string getTextFor(object item)
-        {
-            switch (item)
-            {
-                case BeatmapInfo bi:
-                    return $"Difficulty: {bi.DifficultyName} ({bi.StarRating:N1}*)";
-
-                case BeatmapSetInfo si:
-                    return $"{si.Metadata}";
-            }
-
-            return "unknown";
-        }
-
         protected override bool OnClick(ClickEvent e)
         {
-            if (carousel.CurrentSelection == Item!.Model)
-                carousel.TryActivateSelection();
-            else
-                carousel.CurrentSelection = Item!.Model;
+            carousel.CurrentSelection = Item!.Model;
             return true;
         }
+
+        #region ICarouselPanel
 
         public CarouselItem? Item { get; set; }
         public BindableBool Selected { get; } = new BindableBool();
@@ -125,7 +105,10 @@ namespace osu.Game.Screens.SelectV2
 
         public void Activated()
         {
-            activationFlash.FadeOutFromOne(500, Easing.OutQuint);
+            // sets should never be activated.
+            throw new InvalidOperationException();
         }
+
+        #endregion
     }
 }
