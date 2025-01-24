@@ -109,7 +109,10 @@ namespace osu.Game.Screens.SelectV2
             }
 
             if (currentSelection.CarouselItem != null)
+            {
+                (GetMaterialisedDrawableForItem(currentSelection.CarouselItem) as ICarouselPanel)?.Activated();
                 HandleItemActivated(currentSelection.CarouselItem);
+            }
         }
 
         #endregion

@@ -124,15 +124,6 @@ namespace osu.Game.Screens.SelectV2
             }
         }
 
-        protected override void HandleItemActivated(CarouselItem item)
-        {
-            base.HandleItemActivated(item);
-
-            // TODO: maybe this should be handled by the panel itself?
-            if (GetMaterialisedDrawableForItem(item) is BeatmapCarouselPanel drawable)
-                drawable.FlashFromActivation();
-        }
-
         #endregion
 
         #region Filtering

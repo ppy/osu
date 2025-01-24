@@ -123,7 +123,7 @@ namespace osu.Game.Screens.SelectV2
 
         public double DrawYPosition { get; set; }
 
-        public void FlashFromActivation()
+        public void Activated()
         {
             activationFlash.FadeOutFromOne(500, Easing.OutQuint);
         }
