@@ -56,11 +56,6 @@ namespace osu.Game.Screens.SelectV2
                 }
             };
 
-            Selected.BindValueChanged(value =>
-            {
-                activationFlash.FadeTo(value.NewValue ? 0.2f : 0, 500, Easing.OutQuint);
-            });
-
             KeyboardSelected.BindValueChanged(value =>
             {
                 if (value.NewValue)
