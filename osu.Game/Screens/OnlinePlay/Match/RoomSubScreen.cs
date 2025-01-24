@@ -355,11 +355,11 @@ namespace osu.Game.Screens.OnlinePlay.Match
         public override void OnResuming(ScreenTransitionEvent e)
         {
             base.OnResuming(e);
+
             updateBeatmap();
+            updateSpecifics();
+
             beginHandlingTrack();
-            Scheduler.AddOnce(updateMods);
-            Scheduler.AddOnce(updateRuleset);
-            Scheduler.AddOnce(updateUserStyle);
         }
 
         protected bool ExitConfirmed { get; private set; }
@@ -448,9 +448,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
 
             updateUserMods();
             updateBeatmap();
-            updateMods();
-            updateRuleset();
-            updateUserStyle();
+            updateSpecifics();
 
             if (!item.AllowedMods.Any())
             {
@@ -501,43 +499,31 @@ namespace osu.Game.Screens.OnlinePlay.Match
             UserModsSelectOverlay.Beatmap.Value = Beatmap.Value;
         }
 
-        private void updateMods()
+        private void updateSpecifics()
         {
             if (!this.IsCurrentScreen() || SelectedItem.Value is not PlaylistItem)
                 return;
 
             var rulesetInstance = GetGameplayRuleset().CreateInstance();
             Mods.Value = GetGameplayMods().Select(m => m.ToMod(rulesetInstance)).ToArray();
-        }
-
-        private void updateRuleset()
-        {
-            if (!this.IsCurrentScreen() || SelectedItem.Value is not PlaylistItem)
-                return;
 
             Ruleset.Value = GetGameplayRuleset();
-        }
 
-        private void updateUserStyle()
-        {
-            if (!this.IsCurrentScreen() || SelectedItem.Value is not PlaylistItem)
-                return;
-
-            if (UserStyleDisplayContainer == null)
-                return;
-
-            PlaylistItem gameplayItem = SelectedItem.Value.With(ruleset: GetGameplayRuleset().OnlineID, beatmap: new Optional<IBeatmapInfo>(GetGameplayBeatmap()));
-            PlaylistItem? currentItem = UserStyleDisplayContainer.SingleOrDefault()?.Item;
-
-            if (gameplayItem.Equals(currentItem))
-                return;
-
-            UserStyleDisplayContainer.Child = new DrawableRoomPlaylistItem(gameplayItem)
+            if (UserStyleDisplayContainer != null)
             {
-                AllowReordering = false,
-                AllowEditing = true,
-                RequestEdit = _ => OpenStyleSelection()
-            };
+                PlaylistItem gameplayItem = SelectedItem.Value.With(ruleset: GetGameplayRuleset().OnlineID, beatmap: new Optional<IBeatmapInfo>(GetGameplayBeatmap()));
+                PlaylistItem? currentItem = UserStyleDisplayContainer.SingleOrDefault()?.Item;
+
+                if (gameplayItem.Equals(currentItem))
+                    return;
+
+                UserStyleDisplayContainer.Child = new DrawableRoomPlaylistItem(gameplayItem)
+                {
+                    AllowReordering = false,
+                    AllowEditing = true,
+                    RequestEdit = _ => OpenStyleSelection()
+                };
+            }
         }
 
         protected virtual APIMod[] GetGameplayMods()
