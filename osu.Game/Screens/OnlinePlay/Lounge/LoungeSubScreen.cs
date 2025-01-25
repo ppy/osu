@@ -309,7 +309,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
             joiningRoomOperation = ongoingOperationTracker?.BeginOperation();
 
-            TryJoin(room, password, r =>
+            JoinInternal(room, password, r =>
             {
                 Open(room);
                 joiningRoomOperation?.Dispose();
@@ -323,9 +323,9 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             });
         });
 
-        protected abstract void TryJoin(Room room, string? password, Action<Room> onSuccess, Action<string> onFailure);
+        protected abstract void JoinInternal(Room room, string? password, Action<Room> onSuccess, Action<string> onFailure);
 
-        public void Clone(Room room)
+        public void OpenCopy(Room room)
         {
             Debug.Assert(room.RoomID != null);
 

@@ -81,7 +81,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         protected override ListingPollingComponent CreatePollingComponent() => new MultiplayerListingPollingComponent();
 
-        protected override void TryJoin(Room room, string? password, Action<Room> onSuccess, Action<string> onFailure)
+        protected override void JoinInternal(Room room, string? password, Action<Room> onSuccess, Action<string> onFailure)
         {
             client.JoinRoom(room, password).ContinueWith(result =>
             {

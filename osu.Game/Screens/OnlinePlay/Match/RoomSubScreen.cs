@@ -353,6 +353,9 @@ namespace osu.Game.Screens.OnlinePlay.Match
             return base.OnExiting(e);
         }
 
+        /// <summary>
+        /// Parts from the current room.
+        /// </summary>
         protected abstract void PartRoom();
 
         private bool ensureExitConfirmed()

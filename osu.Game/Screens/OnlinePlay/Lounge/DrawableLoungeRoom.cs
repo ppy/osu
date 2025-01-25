@@ -162,7 +162,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                 {
                     new OsuMenuItem("Create copy", MenuItemType.Standard, () =>
                     {
-                        lounge?.Clone(Room);
+                        lounge?.OpenCopy(Room);
                     })
                 };
 
