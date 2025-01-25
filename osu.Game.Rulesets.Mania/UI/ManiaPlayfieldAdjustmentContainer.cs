@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.UI;
@@ -16,8 +15,11 @@ namespace osu.Game.Rulesets.Mania.UI
 
         private readonly DrawSizePreservingFillContainer scalingContainer;
 
-        public ManiaPlayfieldAdjustmentContainer()
+        private readonly DrawableManiaRuleset drawableManiaRuleset;
+
+        public ManiaPlayfieldAdjustmentContainer(DrawableManiaRuleset drawableManiaRuleset)
         {
+            this.drawableManiaRuleset = drawableManiaRuleset;
             InternalChild = scalingContainer = new DrawSizePreservingFillContainer
             {
                 Anchor = Anchor.Centre,
@@ -30,17 +32,12 @@ namespace osu.Game.Rulesets.Mania.UI
             };
         }
 
-        [Resolved]
-        private DrawableRuleset drawableRuleset { get; set; } = null!;
-
         protected override void Update()
         {
             base.Update();
 
             float aspectRatio = DrawWidth / DrawHeight;
             bool isPortrait = aspectRatio < 1f;
-
-            var drawableManiaRuleset = (DrawableManiaRuleset)drawableRuleset;
 
             if (isPortrait && drawableManiaRuleset.Beatmap.Stages.Count == 1)
             {
