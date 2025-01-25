@@ -4,52 +4,37 @@
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Mania.Skinning;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Mania.UI.Components
 {
-    public partial class HitPositionPaddedContainer : SkinReloadableDrawable
+    public partial class HitPositionPaddedContainer : Container
     {
         protected readonly IBindable<ScrollingDirection> Direction = new Bindable<ScrollingDirection>();
 
-        public HitPositionPaddedContainer(Drawable child)
-        {
-            InternalChild = child;
-        }
-
-        internal void Add(Drawable drawable)
-        {
-            base.AddInternal(drawable);
-        }
-
-        internal void Remove(Drawable drawable, bool disposeImmediately = true)
-        {
-            base.RemoveInternal(drawable, disposeImmediately);
-        }
+        [Resolved]
+        private ISkinSource skin { get; set; } = null!;
 
         [BackgroundDependencyLoader]
         private void load(IScrollingInfo scrollingInfo)
         {
             Direction.BindTo(scrollingInfo.Direction);
-            Direction.BindValueChanged(onDirectionChanged, true);
-        }
+            Direction.BindValueChanged(onDirectionChanged);
 
-        protected override void SkinChanged(ISkinSource skin)
-        {
-            base.SkinChanged(skin);
+            skin.SourceChanged += onSkinChanged;
+
             UpdateHitPosition();
         }
 
-        private void onDirectionChanged(ValueChangedEvent<ScrollingDirection> direction)
-        {
-            UpdateHitPosition();
-        }
+        private void onSkinChanged() => UpdateHitPosition();
+        private void onDirectionChanged(ValueChangedEvent<ScrollingDirection> direction) => UpdateHitPosition();
 
         protected virtual void UpdateHitPosition()
         {
-            float hitPosition = CurrentSkin.GetConfig<ManiaSkinConfigurationLookup, float>(
+            float hitPosition = skin.GetConfig<ManiaSkinConfigurationLookup, float>(
                                     new ManiaSkinConfigurationLookup(LegacyManiaSkinConfigurationLookups.HitPosition))?.Value
                                 ?? Stage.HIT_TARGET_POSITION;
 
