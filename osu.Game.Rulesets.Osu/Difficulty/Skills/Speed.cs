@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     {
         private double totalMultiplier => 1.0;
         private double burstMultiplier => 1.925;
-        private double staminaMultiplier => 0.023;
+        private double staminaMultiplier => 0.024;
 
         private double currentBurstStrain;
         private double currentStaminaStrain;
