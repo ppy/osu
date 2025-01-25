@@ -133,7 +133,6 @@ namespace osu.Game.Rulesets.Edit
             if (DrawableRuleset is IDrawableScrollingRuleset scrollingRuleset)
                 dependencies.CacheAs(scrollingRuleset.ScrollingInfo);
 
-            dependencies.CacheAs<DrawableRuleset>(drawableRulesetWrapper.DrawableRuleset);
             dependencies.CacheAs(Playfield);
 
             InternalChildren = new[]

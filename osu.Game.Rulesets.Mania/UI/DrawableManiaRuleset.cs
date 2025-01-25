@@ -161,7 +161,7 @@ namespace osu.Game.Rulesets.Mania.UI
         /// <returns>The scroll time.</returns>
         public static double ComputeScrollTime(double scrollSpeed) => MAX_TIME_RANGE / scrollSpeed;
 
-        public override PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new ManiaPlayfieldAdjustmentContainer();
+        public override PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new ManiaPlayfieldAdjustmentContainer(this);
 
         protected override Playfield CreatePlayfield() => new ManiaPlayfield(Beatmap.Stages);
 
