@@ -10,7 +10,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
-using osu.Framework.Input.StateChanges;
 using osu.Framework.Input.States;
 using osu.Framework.Testing;
 using osu.Framework.Timing;
@@ -225,19 +224,8 @@ namespace osu.Game.Rulesets.Osu.Tests
             });
         }
 
-        private void pressPen()
-        {
-            AddStep("Press pen", () =>
-            {
-                InputManager.MovePenTo(getSanePositionForPen(), TabletPenDeviceType.Direct);
-                InputManager.PressPen(TabletPenDeviceType.Direct);
-            });
-        }
-
-        private void releasePen()
-        {
-            AddStep("Release pen", () => InputManager.ReleasePen(TabletPenDeviceType.Direct));
-        }
+        private void pressPen() => beginTouch(TouchSource.PenTouch);
+        private void releasePen() => endTouch(TouchSource.PenTouch);
 
         private void beginTouch(TouchSource source, Vector2? screenSpacePosition = null) =>
             AddStep($"Begin touch for {source}", () => InputManager.BeginTouch(new Touch(source, screenSpacePosition ??= getSanePositionForTouch(source))));
@@ -245,16 +233,17 @@ namespace osu.Game.Rulesets.Osu.Tests
         private void endTouch(TouchSource source, Vector2? screenSpacePosition = null) =>
             AddStep($"Release touch for {source}", () => InputManager.EndTouch(new Touch(source, screenSpacePosition ??= getSanePositionForTouch(source))));
 
-        private Vector2 getSanePositionForPen()
+        private Vector2 getSanePositionForPen() => getSanePositionForTouch(TouchSource.PenTouch);
+
+        private Vector2 getSanePositionForTouch(TouchSource source)
         {
+            int index = source == TouchSource.PenTouch ? -1 : (int)source;
+
             return new Vector2(
-                osuInputManager.ScreenSpaceDrawQuad.Centre.X + osuInputManager.ScreenSpaceDrawQuad.Width * -1 / 8,
+                osuInputManager.ScreenSpaceDrawQuad.Centre.X + osuInputManager.ScreenSpaceDrawQuad.Width * index / 8,
                 osuInputManager.ScreenSpaceDrawQuad.Centre.Y - 100
             );
         }
-
-        private Vector2 getSanePositionForTouch(TouchSource source)
-            => getSanePositionForPen() + new Vector2(osuInputManager.ScreenSpaceDrawQuad.Width * (int)(1 + source) / 8, 0);
 
         private void checkPositionIsAtPen() =>
             AddAssert("Cursor position is correct", () => osuInputManager.CurrentState.Mouse.Position, () => Is.EqualTo(getSanePositionForPen()));
@@ -267,7 +256,6 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private void releaseAllInput()
         {
-            AddStep("Release pen", () => InputManager.ReleasePen());
             AddStep("Release all touches", () =>
             {
                 config.SetValue(OsuSetting.MouseDisableButtons, false);
@@ -309,7 +297,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         public partial class TouchVisualiser : CompositeDrawable
         {
-            private readonly Drawable?[] drawableTouches = new Drawable?[TouchState.MAX_TOUCH_COUNT];
+            private readonly Drawable?[] drawableTouches = new Drawable?[TouchState.MAX_SOURCES_COUNT];
 
             public TouchVisualiser()
             {
