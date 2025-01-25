@@ -67,7 +67,11 @@ namespace osu.Game.Rulesets.Mania.UI
             Width = COLUMN_WIDTH;
 
             hitPolicy = new OrderedHitPolicy(HitObjectContainer);
-            HitObjectArea = new ColumnHitObjectArea(HitObjectContainer) { RelativeSizeAxes = Axes.Both };
+            HitObjectArea = new ColumnHitObjectArea
+            {
+                RelativeSizeAxes = Axes.Both,
+                Child = HitObjectContainer,
+            };
         }
 
         [Resolved]
