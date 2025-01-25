@@ -40,7 +40,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestJoinRoomWithoutPassword()
         {
-            addRoom(false);
+            AddStep("add room", () => RoomManager.AddRooms(1, withPassword: false));
             AddStep("select room", () => InputManager.Key(Key.Down));
             AddStep("join room", () => InputManager.Key(Key.Enter));
 
@@ -50,7 +50,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestPopoverHidesOnBackButton()
         {
-            addRoom(true);
+            AddStep("add room", () => RoomManager.AddRooms(1, withPassword: true));
             AddStep("select room", () => InputManager.Key(Key.Down));
             AddStep("attempt join room", () => InputManager.Key(Key.Enter));
 
@@ -70,7 +70,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestPopoverHidesOnLeavingScreen()
         {
-            addRoom(true);
+            AddStep("add room", () => RoomManager.AddRooms(1, withPassword: true));
             AddStep("select room", () => InputManager.Key(Key.Down));
             AddStep("attempt join room", () => InputManager.Key(Key.Enter));
 
@@ -86,7 +86,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             DrawableLoungeRoom.PasswordEntryPopover? passwordEntryPopover = null;
 
-            addRoom(true);
+            AddStep("add room", () => RoomManager.AddRooms(1, withPassword: true));
             AddStep("select room", () => InputManager.Key(Key.Down));
             AddStep("attempt join room", () => InputManager.Key(Key.Enter));
             AddUntilStep("password prompt appeared", () => (passwordEntryPopover = InputManager.ChildrenOfType<DrawableLoungeRoom.PasswordEntryPopover>().FirstOrDefault()) != null);
@@ -105,7 +105,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             DrawableLoungeRoom.PasswordEntryPopover? passwordEntryPopover = null;
 
-            addRoom(true);
+            AddStep("add room", () => RoomManager.AddRooms(1, withPassword: true));
             AddStep("select room", () => InputManager.Key(Key.Down));
             AddStep("attempt join room", () => InputManager.Key(Key.Enter));
             AddUntilStep("password prompt appeared", () => (passwordEntryPopover = InputManager.ChildrenOfType<DrawableLoungeRoom.PasswordEntryPopover>().FirstOrDefault()) != null);
@@ -124,7 +124,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             DrawableLoungeRoom.PasswordEntryPopover? passwordEntryPopover = null;
 
-            addRoom(true);
+            AddStep("add room", () => RoomManager.AddRooms(1, withPassword: true));
             AddStep("select room", () => InputManager.Key(Key.Down));
             AddStep("attempt join room", () => InputManager.Key(Key.Enter));
             AddUntilStep("password prompt appeared", () => (passwordEntryPopover = InputManager.ChildrenOfType<DrawableLoungeRoom.PasswordEntryPopover>().FirstOrDefault()) != null);
@@ -139,7 +139,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             DrawableLoungeRoom.PasswordEntryPopover? passwordEntryPopover = null;
 
-            addRoom(true);
+            AddStep("add room", () => RoomManager.AddRooms(1, withPassword: true));
             AddStep("select room", () => InputManager.Key(Key.Down));
             AddStep("attempt join room", () => InputManager.Key(Key.Enter));
             AddUntilStep("password prompt appeared", () => (passwordEntryPopover = InputManager.ChildrenOfType<DrawableLoungeRoom.PasswordEntryPopover>().FirstOrDefault()) != null);
@@ -147,20 +147,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("press enter", () => InputManager.Key(Key.Enter));
 
             AddAssert("room joined", () => MultiplayerClient.RoomJoined);
-        }
-
-        private void addRoom(bool withPassword)
-        {
-            int initialRoomCount = 0;
-
-            AddStep("add room", () =>
-            {
-                initialRoomCount = roomsContainer.Rooms.Count;
-                RoomManager.AddRooms(1, withPassword: withPassword);
-                loungeScreen.RefreshRooms();
-            });
-
-            AddUntilStep("wait for room to appear", () => roomsContainer.Rooms.Count == initialRoomCount + 1);
         }
 
         protected override OnlinePlayTestSceneDependencies CreateOnlinePlayDependencies() => new MultiplayerTestSceneDependencies();

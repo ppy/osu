@@ -18,10 +18,10 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         void Join(Room room, string? password, Action<Room>? onSuccess = null, Action<string>? onFailure = null);
 
         /// <summary>
-        /// Clones the given room and opens it as a fresh (not-yet-created) one.
+        /// Copies the given room and opens it as a fresh (not-yet-created) one.
         /// </summary>
-        /// <param name="room">The room to clone.</param>
-        void Clone(Room room);
+        /// <param name="room">The room to copy.</param>
+        void OpenCopy(Room room);
 
         /// <summary>
         /// Closes the given room.

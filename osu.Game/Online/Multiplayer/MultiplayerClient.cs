@@ -168,7 +168,7 @@ namespace osu.Game.Online.Multiplayer
         public async Task CreateRoom(Room room)
         {
             if (Room != null)
-                throw new InvalidOperationException("Cannot join a multiplayer room while already in one.");
+                throw new InvalidOperationException("Cannot create a multiplayer room while already in one.");
 
             var cancellationSource = joinCancellationSource = new CancellationTokenSource();
             await initRoom(room, r => CreateRoomInternal(new MultiplayerRoom(room)), cancellationSource.Token).ConfigureAwait(false);
@@ -212,6 +212,7 @@ namespace osu.Game.Online.Multiplayer
                     APIRoom.RoomID = joinedRoom.RoomID;
                     APIRoom.Playlist = joinedRoom.Playlist.Select(item => new PlaylistItem(item)).ToArray();
                     APIRoom.CurrentPlaylistItem = APIRoom.Playlist.Single(item => item.ID == joinedRoom.Settings.PlaylistItemId);
+                    // The server will null out the end date upon the host joining the room, but the null value is never communicated to the client.
                     APIRoom.EndDate = null;
 
                     Debug.Assert(LocalUser != null);

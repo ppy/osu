@@ -60,7 +60,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             return criteria;
         }
 
-        protected override void TryJoin(Room room, string? password, Action<Room> onSuccess, Action<string> onFailure)
+        protected override void JoinInternal(Room room, string? password, Action<Room> onSuccess, Action<string> onFailure)
         {
             var joinRoomRequest = new JoinRoomRequest(room, password);
 
