@@ -18,7 +18,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Configuration;
-using osu.Framework.Extensions;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
@@ -212,6 +211,8 @@ namespace osu.Game
 
         private Bindable<float> uiScale;
 
+        private Bindable<UserActivity> configUserActivity;
+
         private Bindable<string> configSkin;
 
         private readonly string[] args;
@@ -220,6 +221,11 @@ namespace osu.Game
         private readonly List<OverlayContainer> externalOverlays = new List<OverlayContainer>();
 
         private readonly List<OverlayContainer> visibleBlockingOverlays = new List<OverlayContainer>();
+
+        /// <summary>
+        /// Whether the game should be limited to only display officially licensed content.
+        /// </summary>
+        public virtual bool HideUnlicensedContent => false;
 
         public OsuGame(string[] args = null)
         {
@@ -320,6 +326,7 @@ namespace osu.Game
 
             if (host.Window != null)
             {
+                host.Window.CursorState |= CursorState.Hidden;
                 host.Window.DragDrop += path =>
                 {
                     // on macOS/iOS, URL associations are handled via SDL_DROPFILE events.
@@ -385,6 +392,8 @@ namespace osu.Game
             }
 
             Ruleset.ValueChanged += r => configRuleset.Value = r.NewValue.ShortName;
+
+            configUserActivity = SessionStatics.GetBindable<UserActivity>(Static.UserOnlineActivity);
 
             configSkin = LocalConfig.GetBindable<string>(OsuSetting.Skin);
 
@@ -510,32 +519,7 @@ namespace osu.Game
             onScreenDisplay.Display(new CopyUrlToast());
         });
 
-        public void OpenUrlExternally(string url, bool forceBypassExternalUrlWarning = false) => waitForReady(() => externalLinkOpener, _ =>
-        {
-            bool isTrustedDomain;
-
-            if (url.StartsWith('/'))
-            {
-                url = $"{API.WebsiteRootUrl}{url}";
-                isTrustedDomain = true;
-            }
-            else
-            {
-                isTrustedDomain = url.StartsWith(API.WebsiteRootUrl, StringComparison.Ordinal);
-            }
-
-            if (!url.CheckIsValidUrl())
-            {
-                Notifications.Post(new SimpleErrorNotification
-                {
-                    Text = NotificationsStrings.UnsupportedOrDangerousUrlProtocol(url),
-                });
-
-                return;
-            }
-
-            externalLinkOpener.OpenUrlExternally(url, forceBypassExternalUrlWarning || isTrustedDomain);
-        });
+        public void OpenUrlExternally(string url, LinkWarnMode warnMode = LinkWarnMode.Default) => waitForReady(() => externalLinkOpener, _ => externalLinkOpener.OpenUrlExternally(url, warnMode));
 
         /// <summary>
         /// Open a specific channel in chat.
@@ -1145,6 +1129,7 @@ namespace osu.Game
             Add(externalLinkOpener = new ExternalLinkOpener());
             Add(new MusicKeyBindingHandler());
             Add(new OnlineStatusNotifier(() => ScreenStack.CurrentScreen));
+            Add(new FriendPresenceNotifier());
 
             // side overlays which cancel each other.
             var singleDisplaySideOverlays = new OverlayContainer[] { Settings, Notifications, FirstRunOverlay };
@@ -1334,7 +1319,7 @@ namespace osu.Game
                         IconColour = Colours.YellowDark,
                         Activated = () =>
                         {
-                            OpenUrlExternally("https://opentabletdriver.net/Tablets", true);
+                            OpenUrlExternally("https://opentabletdriver.net/Tablets", LinkWarnMode.NeverWarn);
                             return true;
                         }
                     }));
@@ -1422,24 +1407,25 @@ namespace osu.Game
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
-            if (e.Repeat)
-                return false;
-
-            if (introScreen == null) return false;
-
             switch (e.Action)
             {
                 case GlobalAction.DecreaseVolume:
                 case GlobalAction.IncreaseVolume:
                     return volume.Adjust(e.Action);
+            }
 
+            // All actions below this point don't allow key repeat.
+            if (e.Repeat)
+                return false;
+
+            // Wait until we're loaded at least to the intro before allowing various interactions.
+            if (introScreen == null) return false;
+
+            switch (e.Action)
+            {
                 case GlobalAction.ToggleMute:
                 case GlobalAction.NextVolumeMeter:
                 case GlobalAction.PreviousVolumeMeter:
-
-                    if (e.Repeat)
-                        return true;
-
                     return volume.Adjust(e.Action);
 
                 case GlobalAction.ToggleFPSDisplay:
@@ -1606,14 +1592,14 @@ namespace osu.Game
             {
                 backButtonVisibility.UnbindFrom(currentOsuScreen.BackButtonVisibility);
                 OverlayActivationMode.UnbindFrom(currentOsuScreen.OverlayActivationMode);
-                API.Activity.UnbindFrom(currentOsuScreen.Activity);
+                configUserActivity.UnbindFrom(currentOsuScreen.Activity);
             }
 
             if (newScreen is IOsuScreen newOsuScreen)
             {
                 backButtonVisibility.BindTo(newOsuScreen.BackButtonVisibility);
                 OverlayActivationMode.BindTo(newOsuScreen.OverlayActivationMode);
-                API.Activity.BindTo(newOsuScreen.Activity);
+                configUserActivity.BindTo(newOsuScreen.Activity);
 
                 GlobalCursorDisplay.MenuCursor.HideCursorOnNonMouseInput = newOsuScreen.HideMenuCursorOnNonMouseInput;
 

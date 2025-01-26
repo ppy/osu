@@ -14,6 +14,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Pooling;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
@@ -184,8 +185,6 @@ namespace osu.Game.Screens.Select
         private readonly Cached itemsCache = new Cached();
         private PendingScrollOperation pendingScrollOperation = PendingScrollOperation.None;
 
-        public Bindable<bool> RightClickScrollingEnabled = new Bindable<bool>();
-
         public Bindable<RandomSelectAlgorithm> RandomAlgorithm = new Bindable<RandomSelectAlgorithm>();
         private readonly List<CarouselBeatmapSet> previouslyVisitedRandomSets = new List<CarouselBeatmapSet>();
         private readonly List<CarouselBeatmap> randomSelectedBeatmaps = new List<CarouselBeatmap>();
@@ -226,9 +225,6 @@ namespace osu.Game.Screens.Select
             randomSelectSample = audio.Samples.Get(@"SongSelect/select-random");
 
             config.BindWith(OsuSetting.RandomSelectAlgorithm, RandomAlgorithm);
-            config.BindWith(OsuSetting.SongSelectRightMouseScroll, RightClickScrollingEnabled);
-
-            RightClickScrollingEnabled.BindValueChanged(enabled => Scroll.RightMouseScrollbar = enabled.NewValue, true);
 
             detachedBeatmapSets = beatmaps.GetBeatmapSets(cancellationToken);
             detachedBeatmapSets.BindCollectionChanged(beatmapSetsChanged);
@@ -611,12 +607,12 @@ namespace osu.Game.Screens.Select
         /// <summary>
         /// The position of the lower visible bound with respect to the current scroll position.
         /// </summary>
-        private float visibleBottomBound => Scroll.Current + DrawHeight + BleedBottom;
+        private float visibleBottomBound => (float)(Scroll.Current + DrawHeight + BleedBottom);
 
         /// <summary>
         /// The position of the upper visible bound with respect to the current scroll position.
         /// </summary>
-        private float visibleUpperBound => Scroll.Current - BleedTop;
+        private float visibleUpperBound => (float)(Scroll.Current - BleedTop);
 
         public void FlushPendingFilterOperations()
         {
@@ -1006,7 +1002,7 @@ namespace osu.Game.Screens.Select
                         // we take the difference in scroll height and apply to all visible panels.
                         // this avoids edge cases like when the visible panels is reduced suddenly, causing ScrollContainer
                         // to enter clamp-special-case mode where it animates completely differently to normal.
-                        float scrollChange = scrollTarget.Value - Scroll.Current;
+                        float scrollChange = (float)(scrollTarget.Value - Scroll.Current);
                         Scroll.ScrollTo(scrollTarget.Value, false);
                         foreach (var i in Scroll)
                             i.Y += scrollChange;
@@ -1161,10 +1157,8 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        public partial class CarouselScrollContainer : UserTrackingScrollContainer<DrawableCarouselItem>
+        public partial class CarouselScrollContainer : UserTrackingScrollContainer<DrawableCarouselItem>, IKeyBindingHandler<GlobalAction>
         {
-            private bool rightMouseScrollBlocked;
-
             public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
             public CarouselScrollContainer()
@@ -1176,30 +1170,75 @@ namespace osu.Game.Screens.Select
                 Masking = false;
             }
 
+            #region Absolute scrolling
+
+            private bool absoluteScrolling;
+
+            protected override bool IsDragging => base.IsDragging || absoluteScrolling;
+
+            public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+            {
+                switch (e.Action)
+                {
+                    case GlobalAction.AbsoluteScrollSongList:
+                        beginAbsoluteScrolling(e);
+                        return true;
+                }
+
+                return false;
+            }
+
+            public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
+            {
+                switch (e.Action)
+                {
+                    case GlobalAction.AbsoluteScrollSongList:
+                        endAbsoluteScrolling();
+                        break;
+                }
+            }
+
             protected override bool OnMouseDown(MouseDownEvent e)
             {
                 if (e.Button == MouseButton.Right)
                 {
-                    // we need to block right click absolute scrolling when hovering a carousel item so context menus can display.
-                    // this can be reconsidered when we have an alternative to right click scrolling.
-                    if (GetContainingInputManager()!.HoveredDrawables.OfType<DrawableCarouselItem>().Any())
-                    {
-                        rightMouseScrollBlocked = true;
+                    // To avoid conflicts with context menus, disallow absolute scroll if it looks like things will fall over.
+                    if (GetContainingInputManager()!.HoveredDrawables.OfType<IHasContextMenu>().Any())
                         return false;
-                    }
+
+                    beginAbsoluteScrolling(e);
                 }
 
-                rightMouseScrollBlocked = false;
                 return base.OnMouseDown(e);
             }
 
-            protected override bool OnDragStart(DragStartEvent e)
+            protected override void OnMouseUp(MouseUpEvent e)
             {
-                if (rightMouseScrollBlocked)
-                    return false;
-
-                return base.OnDragStart(e);
+                if (e.Button == MouseButton.Right)
+                    endAbsoluteScrolling();
+                base.OnMouseUp(e);
             }
+
+            protected override bool OnMouseMove(MouseMoveEvent e)
+            {
+                if (absoluteScrolling)
+                {
+                    ScrollToAbsolutePosition(e.CurrentState.Mouse.Position);
+                    return true;
+                }
+
+                return base.OnMouseMove(e);
+            }
+
+            private void beginAbsoluteScrolling(UIEvent e)
+            {
+                ScrollToAbsolutePosition(e.CurrentState.Mouse.Position);
+                absoluteScrolling = true;
+            }
+
+            private void endAbsoluteScrolling() => absoluteScrolling = false;
+
+            #endregion
 
             protected override ScrollbarContainer CreateScrollbar(Direction direction)
             {
@@ -1217,12 +1256,12 @@ namespace osu.Game.Screens.Select
             private const float top_padding = 10;
             private const float bottom_padding = 70;
 
-            protected override float ToScrollbarPosition(float scrollPosition)
+            protected override float ToScrollbarPosition(double scrollPosition)
             {
                 if (Precision.AlmostEquals(0, ScrollableExtent))
                     return 0;
 
-                return top_padding + (ScrollbarMovementExtent - (top_padding + bottom_padding)) * (scrollPosition / ScrollableExtent);
+                return (float)(top_padding + (ScrollbarMovementExtent - (top_padding + bottom_padding)) * (scrollPosition / ScrollableExtent));
             }
 
             protected override float FromScrollbarPosition(float scrollbarPosition)
@@ -1230,7 +1269,7 @@ namespace osu.Game.Screens.Select
                 if (Precision.AlmostEquals(0, ScrollbarMovementExtent))
                     return 0;
 
-                return ScrollableExtent * ((scrollbarPosition - top_padding) / (ScrollbarMovementExtent - (top_padding + bottom_padding)));
+                return (float)(ScrollableExtent * ((scrollbarPosition - top_padding) / (ScrollbarMovementExtent - (top_padding + bottom_padding))));
             }
         }
     }
