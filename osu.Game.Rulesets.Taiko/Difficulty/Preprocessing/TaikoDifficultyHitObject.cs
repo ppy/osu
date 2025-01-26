@@ -118,13 +118,11 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
                 noteObjects.Add(this);
             }
 
-            double startTime = hitObject.StartTime * clockRate;
-
             // Retrieve the timing point at the note's start time
-            TimingControlPoint currentControlPoint = controlPointInfo.TimingPointAt(startTime);
+            TimingControlPoint currentControlPoint = controlPointInfo.TimingPointAt(hitObject.StartTime);
 
             // Calculate the slider velocity at the note's start time.
-            double currentSliderVelocity = calculateSliderVelocity(controlPointInfo, globalSliderVelocity, startTime, clockRate);
+            double currentSliderVelocity = calculateSliderVelocity(controlPointInfo, globalSliderVelocity, hitObject.StartTime, clockRate);
             CurrentSliderVelocity = currentSliderVelocity;
 
             EffectiveBPM = currentControlPoint.BPM * currentSliderVelocity;
