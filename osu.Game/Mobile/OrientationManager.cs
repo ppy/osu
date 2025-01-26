@@ -50,30 +50,22 @@ namespace osu.Game.Mobile
             bool lockCurrentOrientation = localUserPlaying.Value == LocalUserPlayingState.Playing;
             bool lockToPortraitOnPhone = requiresPortraitOrientation.Value;
 
-            if (lockCurrentOrientation)
+            if (IsTablet)
             {
-                if (!IsTablet && lockToPortraitOnPhone && !IsCurrentOrientationPortrait)
-                    SetAllowedOrientations(GameOrientation.Portrait);
-                else if (!IsTablet && !lockToPortraitOnPhone && IsCurrentOrientationPortrait)
-                    SetAllowedOrientations(GameOrientation.Landscape);
-                else
-                {
-                    // if the orientation is already portrait/landscape according to the game's specifications,
-                    // then use Locked instead of Portrait/Landscape to handle the case where the device is
-                    // in landscape-left or reverse-portrait.
+                if (lockCurrentOrientation)
                     SetAllowedOrientations(GameOrientation.Locked);
-                }
-
-                return;
+                else
+                    SetAllowedOrientations(null);
             }
-
-            if (!IsTablet && lockToPortraitOnPhone)
+            else
             {
-                SetAllowedOrientations(GameOrientation.Portrait);
-                return;
+                if (lockToPortraitOnPhone)
+                    SetAllowedOrientations(GameOrientation.Portrait);
+                else if (lockCurrentOrientation)
+                    SetAllowedOrientations(GameOrientation.Locked);
+                else
+                    SetAllowedOrientations(null);
             }
-
-            SetAllowedOrientations(null);
         }
 
         /// <summary>
