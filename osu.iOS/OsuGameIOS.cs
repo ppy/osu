@@ -8,8 +8,10 @@ using osu.Framework.Graphics;
 using osu.Framework.iOS;
 using osu.Framework.Platform;
 using osu.Game;
+using osu.Game.Screens;
 using osu.Game.Updater;
 using osu.Game.Utils;
+using UIKit;
 
 namespace osu.iOS
 {
@@ -28,7 +30,36 @@ namespace osu.iOS
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            LoadComponentAsync(new IOSOrientationManager(appDelegate), Add);
+            UserPlayingState.BindValueChanged(_ => updateOrientation());
+        }
+
+        protected override void ScreenChanged(IOsuScreen? current, IOsuScreen? newScreen)
+        {
+            base.ScreenChanged(current, newScreen);
+
+            if (newScreen != null)
+                updateOrientation();
+        }
+
+        private void updateOrientation()
+        {
+            bool iPad = UIDevice.CurrentDevice.UserInterfaceIdiom == UIUserInterfaceIdiom.Pad;
+            var orientation = MobileUtils.GetOrientation(this, (IOsuScreen)ScreenStack.CurrentScreen, iPad);
+
+            switch (orientation)
+            {
+                case MobileUtils.Orientation.Locked:
+                    appDelegate.Orientations = (UIInterfaceOrientationMask)(1 << (int)appDelegate.CurrentOrientation);
+                    break;
+
+                case MobileUtils.Orientation.Portrait:
+                    appDelegate.Orientations = UIInterfaceOrientationMask.Portrait;
+                    break;
+
+                case MobileUtils.Orientation.Default:
+                    appDelegate.Orientations = null;
+                    break;
+            }
         }
 
         protected override UpdateManager CreateUpdateManager() => new MobileUpdateNotifier();
