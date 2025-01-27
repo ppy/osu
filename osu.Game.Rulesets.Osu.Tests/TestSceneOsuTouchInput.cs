@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         [SetUpSteps]
         public void SetUpSteps()
         {
-            releaseAllTouches();
+            resetState();
 
             AddStep("Create tests", () =>
             {
@@ -737,14 +737,19 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddAssert($"The right key was pressed {right} times", () => rightKeyCounter.CountPresses.Value, () => Is.EqualTo(right));
         }
 
-        private void releaseAllTouches()
+        private void resetState()
         {
-            AddStep("Release all touches", () =>
+            AddStep("Reset state", () =>
             {
                 config.SetValue(OsuSetting.MouseDisableButtons, false);
                 config.SetValue(OsuSetting.TouchDisableGameplayTaps, false);
                 foreach (TouchSource source in InputManager.CurrentState.Touch.ActiveSources)
                     InputManager.EndTouch(new Touch(source, osuInputManager.ScreenSpaceDrawQuad.Centre));
+
+                foreach (var button in InputManager.CurrentState.Mouse.Buttons)
+                    InputManager.ReleaseButton(button);
+
+                InputManager.MoveMouseTo(Vector2.Zero);
             });
         }
 
