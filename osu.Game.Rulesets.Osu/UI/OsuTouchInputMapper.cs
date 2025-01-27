@@ -61,7 +61,9 @@ namespace osu.Game.Rulesets.Osu.UI
 
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
-            if (!updatingMousePositionFromTouch)
+            // MouseMoveEvents that don't move the mouse are a fluke and not from a real mouse device. They are probably from PassTroughInputManager syncing state (seen in testing).
+            // Ignore them since the user is not actually using a mouse or pen for aiming.
+            if (!updatingMousePositionFromTouch && e.ScreenSpaceMousePosition != e.ScreenSpaceLastMousePosition)
             {
                 trackPositionOfIndirectTouches = false; // user is moving their mouse or pen, assume hovering play style -- position from mouse hover, clicking from touches.
                 positionTrackingTouch = null;
