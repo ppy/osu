@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
             return difficulty;
         }
 
-        private static double evaluateDifficultyOf(SameRhythmGroupedHitObjects sameRhythmGroupedHitObjects, double hitWindow)
+        private static double evaluateDifficultyOf(SameRhythmHitObjectGrouping sameRhythmGroupedHitObjects, double hitWindow)
         {
             double intervalDifficulty = ratioDifficulty(sameRhythmGroupedHitObjects.HitObjectIntervalRatio);
             double? previousInterval = sameRhythmGroupedHitObjects.Previous?.HitObjectInterval;
@@ -47,9 +47,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
             intervalDifficulty *= repeatedIntervalPenalty(sameRhythmGroupedHitObjects, hitWindow);
 
             // If a previous interval exists and there are multiple hit objects in the sequence:
-            if (previousInterval != null && sameRhythmGroupedHitObjects.Children.Count > 1)
+            if (previousInterval != null && sameRhythmGroupedHitObjects.HitObjects.Count > 1)
             {
-                double expectedDurationFromPrevious = (double)previousInterval * sameRhythmGroupedHitObjects.Children.Count;
+                double expectedDurationFromPrevious = (double)previousInterval * sameRhythmGroupedHitObjects.HitObjects.Count;
                 double durationDifference = sameRhythmGroupedHitObjects.Duration - expectedDurationFromPrevious;
 
                 if (durationDifference > 0)
@@ -75,11 +75,11 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
         /// <summary>
         /// Determines if the changes in hit object intervals is consistent based on a given threshold.
         /// </summary>
-        private static double repeatedIntervalPenalty(SameRhythmGroupedHitObjects sameRhythmGroupedHitObjects, double hitWindow, double threshold = 0.1)
+        private static double repeatedIntervalPenalty(SameRhythmHitObjectGrouping sameRhythmGroupedHitObjects, double hitWindow, double threshold = 0.1)
         {
             double longIntervalPenalty = sameInterval(sameRhythmGroupedHitObjects, 3);
 
-            double shortIntervalPenalty = sameRhythmGroupedHitObjects.Children.Count < 6
+            double shortIntervalPenalty = sameRhythmGroupedHitObjects.HitObjects.Count < 6
                 ? sameInterval(sameRhythmGroupedHitObjects, 4)
                 : 1.0; // Returns a non-penalty if there are 6 or more notes within an interval.
 
@@ -88,7 +88,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
 
             return Math.Min(longIntervalPenalty, shortIntervalPenalty) * durationPenalty;
 
-            double sameInterval(SameRhythmGroupedHitObjects startObject, int intervalCount)
+            double sameInterval(SameRhythmHitObjectGrouping startObject, int intervalCount)
             {
                 List<double?> intervals = new List<double?>();
                 var currentObject = startObject;

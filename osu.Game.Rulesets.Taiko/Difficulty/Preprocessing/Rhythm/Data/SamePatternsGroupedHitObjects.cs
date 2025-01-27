@@ -7,34 +7,34 @@ using System.Linq;
 namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Rhythm.Data
 {
     /// <summary>
-    /// Represents <see cref="SameRhythmGroupedHitObjects"/> grouped by their <see cref="SameRhythmGroupedHitObjects.StartTime"/>'s interval.
+    /// Represents <see cref="SameRhythmHitObjectGrouping"/> grouped by their <see cref="SameRhythmHitObjectGrouping.StartTime"/>'s interval.
     /// </summary>
     public class SamePatternsGroupedHitObjects
     {
-        public IReadOnlyList<SameRhythmGroupedHitObjects> Children { get; }
+        public IReadOnlyList<SameRhythmHitObjectGrouping> Groups { get; }
 
         public SamePatternsGroupedHitObjects? Previous { get; }
 
         /// <summary>
-        /// The <see cref="SameRhythmGroupedHitObjects.Interval"/> between children <see cref="SameRhythmGroupedHitObjects"/> within this group.
-        /// If there is only one child, this will have the value of the first child's <see cref="SameRhythmGroupedHitObjects.Interval"/>.
+        /// The <see cref="SameRhythmHitObjectGrouping.Interval"/> between groups <see cref="SameRhythmHitObjectGrouping"/>.
+        /// If there is only one group, this will have the value of the first group's <see cref="SameRhythmHitObjectGrouping.Interval"/>.
         /// </summary>
-        public double ChildrenInterval => Children.Count > 1 ? Children[1].Interval : Children[0].Interval;
+        public double GroupInterval => Groups.Count > 1 ? Groups[1].Interval : Groups[0].Interval;
 
         /// <summary>
-        /// The ratio of <see cref="ChildrenInterval"/> between this and the previous <see cref="SamePatternsGroupedHitObjects"/>. In the
+        /// The ratio of <see cref="GroupInterval"/> between this and the previous <see cref="SamePatternsGroupedHitObjects"/>. In the
         /// case where there is no previous <see cref="SamePatternsGroupedHitObjects"/>, this will have a value of 1.
         /// </summary>
-        public double IntervalRatio => ChildrenInterval / Previous?.ChildrenInterval ?? 1.0d;
+        public double IntervalRatio => GroupInterval / Previous?.GroupInterval ?? 1.0d;
 
-        public TaikoDifficultyHitObject FirstHitObject => Children[0].FirstHitObject;
+        public TaikoDifficultyHitObject FirstHitObject => Groups[0].FirstHitObject;
 
-        public IEnumerable<TaikoDifficultyHitObject> AllHitObjects => Children.SelectMany(child => child.Children);
+        public IEnumerable<TaikoDifficultyHitObject> AllHitObjects => Groups.SelectMany(hitObject => hitObject.HitObjects);
 
-        public SamePatternsGroupedHitObjects(SamePatternsGroupedHitObjects? previous, List<SameRhythmGroupedHitObjects> children)
+        public SamePatternsGroupedHitObjects(SamePatternsGroupedHitObjects? previous, List<SameRhythmHitObjectGrouping> groups)
         {
             Previous = previous;
-            Children = children;
+            Groups = groups;
         }
     }
 }

@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Rhythm
         /// <summary>
         /// The group of hit objects with consistent rhythm that this object belongs to.
         /// </summary>
-        public SameRhythmGroupedHitObjects? SameRhythmGroupedHitObjects;
+        public SameRhythmHitObjectGrouping? SameRhythmGroupedHitObjects;
 
         /// <summary>
         /// The larger pattern of rhythm groups that this object is part of.
