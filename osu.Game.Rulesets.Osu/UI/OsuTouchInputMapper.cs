@@ -31,6 +31,8 @@ namespace osu.Game.Rulesets.Osu.UI
 
         private TrackedTouch? positionTrackingTouch;
 
+        private bool updatingMousePositionFromTouch;
+
         private readonly OsuInputManager osuInputManager;
 
         private Bindable<bool> tapsDisabled = null!;
@@ -48,6 +50,16 @@ namespace osu.Game.Rulesets.Osu.UI
 
         // Required to handle touches outside of the playfield when screen scaling is enabled.
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
+
+        protected override bool OnMouseMove(MouseMoveEvent e)
+        {
+            if (!updatingMousePositionFromTouch)
+            {
+                positionTrackingTouch = null;
+            }
+
+            return base.OnMouseMove(e);
+        }
 
         protected override void OnTouchMove(TouchMoveEvent e)
         {
@@ -135,7 +147,9 @@ namespace osu.Game.Rulesets.Osu.UI
             if (!osuInputManager.AllowUserCursorMovement)
                 return;
 
+            updatingMousePositionFromTouch = true;
             new MousePositionAbsoluteInput { Position = touchEvent.ScreenSpaceTouch.Position }.Apply(osuInputManager.CurrentState, osuInputManager);
+            updatingMousePositionFromTouch = false;
         }
 
         protected override void OnTouchUp(TouchUpEvent e)
