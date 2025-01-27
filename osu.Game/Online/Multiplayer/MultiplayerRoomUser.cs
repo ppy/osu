@@ -38,13 +38,13 @@ namespace osu.Game.Online.Multiplayer
         public MatchUserState? MatchState { get; set; }
 
         /// <summary>
-        /// Any ruleset applicable only to the local user.
+        /// If not-null, a local override for this user's ruleset selection.
         /// </summary>
         [Key(5)]
         public int? RulesetId;
 
         /// <summary>
-        /// Any beatmap applicable only to the local user.
+        /// If not-null, a local override for this user's beatmap selection.
         /// </summary>
         [Key(6)]
         public int? BeatmapId;
