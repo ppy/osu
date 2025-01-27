@@ -597,6 +597,33 @@ namespace osu.Game.Rulesets.Osu.Tests
             checkPosition(TouchSource.Touch2);
         }
 
+        [Test]
+        public void TestMousePositionPriority()
+        {
+            moveMouseTo(TouchSource.Touch1);
+            checkPosition(TouchSource.Touch1);
+
+            // touch at a different position
+            beginTouch(TouchSource.Touch2);
+            endTouch(TouchSource.Touch2);
+
+            checkPosition(TouchSource.Touch1);
+        }
+
+        [Test]
+        public void TestTouchInputPriorityAfterTimeout()
+        {
+            moveMouseTo(TouchSource.Touch1);
+            checkPosition(TouchSource.Touch1);
+
+            AddWaitStep("wait for mouse priority timeout to expire", 10);
+
+            beginTouch(TouchSource.Touch2);
+            endTouch(TouchSource.Touch2);
+
+            checkPosition(TouchSource.Touch2);
+        }
+
         private void addHitCircleAt(TouchSource source)
         {
             AddStep($"Add circle at {source}", () =>
@@ -619,6 +646,9 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private void endTouch(TouchSource source, Vector2? screenSpacePosition = null) =>
             AddStep($"Release touch for {source}", () => InputManager.EndTouch(new Touch(source, screenSpacePosition ??= getSanePositionForSource(source))));
+
+        private void moveMouseTo(TouchSource source) =>
+            AddStep($"Mouse mouse to {source} position", () => InputManager.MoveMouseTo(getSanePositionForSource(source)));
 
         private Vector2 getSanePositionForSource(TouchSource source)
         {
