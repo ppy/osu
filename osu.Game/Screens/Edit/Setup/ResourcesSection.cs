@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays;
 using osu.Game.Localisation;
@@ -97,7 +98,17 @@ namespace osu.Game.Screens.Edit.Setup
             if (!source.Exists)
                 return false;
 
-            var tagSource = TagLib.File.Create(source.FullName);
+            TagLib.File? tagSource;
+
+            try
+            {
+                tagSource = TagLib.File.Create(source.FullName);
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, "The selected audio track appears to be corrupted. Please select another one.");
+                return false;
+            }
 
             changeResource(source, applyToAllDifficulties, @"audio",
                 metadata => metadata.AudioFile,
