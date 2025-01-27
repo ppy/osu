@@ -119,13 +119,13 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
             }
 
             // Using `hitObject.StartTime` causes floating point error differences
-            double normalizedStartTime = StartTime * clockRate;
+            double normalisedStartTime = StartTime * clockRate;
 
             // Retrieve the timing point at the note's start time
-            TimingControlPoint currentControlPoint = controlPointInfo.TimingPointAt(normalizedStartTime);
+            TimingControlPoint currentControlPoint = controlPointInfo.TimingPointAt(normalisedStartTime);
 
             // Calculate the slider velocity at the note's start time.
-            double currentSliderVelocity = calculateSliderVelocity(controlPointInfo, globalSliderVelocity, normalizedStartTime, clockRate);
+            double currentSliderVelocity = calculateSliderVelocity(controlPointInfo, globalSliderVelocity, normalisedStartTime, clockRate);
             CurrentSliderVelocity = currentSliderVelocity;
 
             EffectiveBPM = currentControlPoint.BPM * currentSliderVelocity;
