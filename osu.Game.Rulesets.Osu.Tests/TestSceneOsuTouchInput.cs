@@ -25,6 +25,7 @@ using osu.Game.Screens.Play.HUD;
 using osu.Game.Tests.Visual;
 using osuTK;
 using osuTK.Graphics;
+using osuTK.Input;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
@@ -597,6 +598,96 @@ namespace osu.Game.Rulesets.Osu.Tests
             checkPosition(TouchSource.Touch2);
         }
 
+        [Test]
+        public void TestMousePositionPriorityWhenIndirectTouch()
+        {
+            moveMouseTo(TouchSource.Touch1);
+            checkPosition(TouchSource.Touch1);
+
+            // touch at a different position
+            beginTouch(TouchSource.Touch2);
+            endTouch(TouchSource.Touch2);
+
+            checkPosition(TouchSource.Touch1);
+            assertKeyCounter(1, 0);
+        }
+
+        [Test]
+        public void TestTouchPositionPriorityWhenDirectTouch()
+        {
+            addHitCircleAt(TouchSource.Touch2);
+
+            moveMouseTo(TouchSource.Touch1);
+            checkPosition(TouchSource.Touch1);
+
+            // touch the hit circle
+            beginTouch(TouchSource.Touch2);
+            endTouch(TouchSource.Touch2);
+
+            checkPosition(TouchSource.Touch2);
+            assertKeyCounter(1, 0);
+        }
+
+        [Test]
+        public void TestFirstTouchBrokenWhenMousePressed() // mouse pressed is how pens are reported when contacting the tablet screen
+        {
+            addHitCircleAt(TouchSource.Touch1);
+            addHitCircleAt(TouchSource.Touch2);
+
+            moveMouseTo(TouchSource.Touch1);
+
+            pressMouse(MouseButton.Left);
+            checkPressed(OsuAction.LeftButton);
+            assertKeyCounter(1, 0);
+
+            moveMouseTo(TouchSource.Touch2);
+
+            beginTouch(TouchSource.Touch3);
+            checkPressed(OsuAction.LeftButton);
+            assertKeyCounter(1, 0); // strange, an indirect touch, but it's not registered
+
+            endTouch(TouchSource.Touch3);
+            checkNotPressed(OsuAction.LeftButton); // strange, the osu! left button is not pressed, even though the mouse left button is still pressed
+            assertKeyCounter(1, 0);
+
+            // further touches work fine
+            beginTouch(TouchSource.Touch3);
+            checkPressed(OsuAction.LeftButton);
+            assertKeyCounter(2, 0);
+
+            endTouch(TouchSource.Touch3);
+            checkNotPressed(OsuAction.LeftButton);
+        }
+
+        [Test]
+        public void TestFirstTouchWorksWhenMousePressedAndMouseButtonsDisabled()
+        {
+            AddStep("Disable mouse buttons", () => config.SetValue(OsuSetting.MouseDisableButtons, true));
+
+            addHitCircleAt(TouchSource.Touch1);
+            addHitCircleAt(TouchSource.Touch2);
+
+            moveMouseTo(TouchSource.Touch1);
+
+            pressMouse(MouseButton.Left);
+            checkNotPressed(OsuAction.LeftButton);
+            assertKeyCounter(0, 0);
+
+            moveMouseTo(TouchSource.Touch2);
+
+            beginTouch(TouchSource.Touch3);
+            checkPressed(OsuAction.LeftButton);
+            assertKeyCounter(1, 0);
+
+            endTouch(TouchSource.Touch3);
+            checkNotPressed(OsuAction.LeftButton);
+            assertKeyCounter(1, 0);
+
+            releaseMouse(MouseButton.Left);
+            checkNotPressed(OsuAction.LeftButton);
+            assertKeyCounter(1, 0);
+        }
+
         private void addHitCircleAt(TouchSource source)
         {
             AddStep($"Add circle at {source}", () =>
@@ -619,6 +710,15 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private void endTouch(TouchSource source, Vector2? screenSpacePosition = null) =>
             AddStep($"Release touch for {source}", () => InputManager.EndTouch(new Touch(source, screenSpacePosition ??= getSanePositionForSource(source))));
+
+        private void moveMouseTo(TouchSource source) =>
+            AddStep($"Mouse mouse to {source} position", () => InputManager.MoveMouseTo(getSanePositionForSource(source)));
+
+        private void pressMouse(MouseButton button) =>
+            AddStep($"press {button} button", () => InputManager.PressButton(button));
+
+        private void releaseMouse(MouseButton button) =>
+            AddStep($"release {button} button", () => InputManager.ReleaseButton(button));
 
         private Vector2 getSanePositionForSource(TouchSource source)
         {
