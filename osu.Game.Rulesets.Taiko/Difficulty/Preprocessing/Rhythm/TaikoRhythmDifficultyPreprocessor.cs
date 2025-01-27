@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Rhythm
 
             foreach (var rhythmGroup in rhythmGroups)
             {
-                foreach (var hitObject in rhythmGroup.Children)
+                foreach (var hitObject in rhythmGroup.HitObjects)
                 {
                     hitObject.Rhythm.SameRhythmGroupedHitObjects = rhythmGroup;
                     hitObject.HitObjectInterval = rhythmGroup.HitObjectInterval;
@@ -33,21 +33,21 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Rhythm
             }
         }
 
-        private static List<SameRhythmGroupedHitObjects> createSameRhythmGroupedHitObjects(List<TaikoDifficultyHitObject> hitObjects)
+        private static List<SameRhythmHitObjectGrouping> createSameRhythmGroupedHitObjects(List<TaikoDifficultyHitObject> hitObjects)
         {
-            var rhythmGroups = new List<SameRhythmGroupedHitObjects>();
+            var rhythmGroups = new List<SameRhythmHitObjectGrouping>();
             var groups = IntervalGroupingUtils.GroupByInterval(hitObjects);
 
             foreach (var group in groups)
             {
                 var previous = rhythmGroups.Count > 0 ? rhythmGroups[^1] : null;
-                rhythmGroups.Add(new SameRhythmGroupedHitObjects(previous, group));
+                rhythmGroups.Add(new SameRhythmHitObjectGrouping(previous, group));
             }
 
             return rhythmGroups;
         }
 
-        private static List<SamePatternsGroupedHitObjects> createSamePatternGroupedHitObjects(List<SameRhythmGroupedHitObjects> rhythmGroups)
+        private static List<SamePatternsGroupedHitObjects> createSamePatternGroupedHitObjects(List<SameRhythmHitObjectGrouping> rhythmGroups)
         {
             var patternGroups = new List<SamePatternsGroupedHitObjects>();
             var groups = IntervalGroupingUtils.GroupByInterval(rhythmGroups);
