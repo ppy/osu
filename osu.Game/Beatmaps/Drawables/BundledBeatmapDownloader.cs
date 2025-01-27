@@ -345,7 +345,6 @@ namespace osu.Game.Beatmaps.Drawables
             "1971951 James Landino - Shiba Paradise.osz",
             "1972518 Toromaru - Sleight of Hand.osz",
             "1982302 KINEMA106 - INVITE.osz",
-            "1983475 KNOWER - The Government Knows.osz",
             "2010165 Junk - Yellow Smile (bms edit).osz",
             "2022737 Andora - Euphoria (feat. WaMi).osz",
             "2025023 tephe - Genjitsu Escape.osz",
