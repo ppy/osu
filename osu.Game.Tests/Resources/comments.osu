@@ -1,9 +1,0 @@
-osu file format v14
-
-[Colours]
-
-// Combo1: 0, 0, 0
-//Combo2: 0, 0, 0
- // Combo3: 0, 0, 0
-
-Combo1: 100, 100, 100 // Comment at end of line
