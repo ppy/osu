@@ -4,11 +4,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Tests.Mods
@@ -25,8 +28,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                 {
                     Difficulty = new BeatmapDifficulty
                     {
-                        CircleSize = 8,
-                        ApproachRate = 5,
+                        CircleSize = 1,
+                        ApproachRate = 1,
                         OverallDifficulty = 9
                     }
                 },
@@ -92,7 +95,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
             Autoplay = true,
             PassCondition = () =>
             {
-                return Player.ScoreProcessor.Combo.Value == 9 && Player.ScoreProcessor.MaximumCombo == 9 && !this.ChildrenOfType<Slider>().Any();
+                return Player.ScoreProcessor.Combo.Value == 9 && Player.ScoreProcessor.MaximumCombo == 9 && !this.ChildrenOfType<Slider>().Any() && checkObjectsScale(0.78f) && checkObjectsPreempt(1680);
             }
         });
 
@@ -106,8 +109,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                 {
                     Difficulty = new BeatmapDifficulty
                     {
-                        CircleSize = 8,
-                        ApproachRate = 5,
+                        CircleSize = 10,
+                        ApproachRate = 10,
                         OverallDifficulty = 9
                     }
                 },
@@ -173,8 +176,25 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
             Autoplay = true,
             PassCondition = () =>
             {
-                return Player.ScoreProcessor.Combo.Value == 16 && Player.ScoreProcessor.MaximumCombo == 16 && !this.ChildrenOfType<Slider>().Any();
+                return Player.ScoreProcessor.Combo.Value == 16 && Player.ScoreProcessor.MaximumCombo == 16 && !this.ChildrenOfType<Slider>().Any() && checkObjectsScale(0.15f) && checkObjectsPreempt(450);
             }
         });
+
+        private bool checkObjectsPreempt(double target)
+        {
+            var objects = Player.ChildrenOfType<DrawableHitCircle>();
+            if (!objects.Any())
+                return false;
+
+            return objects.All(o => o.HitObject.TimePreempt == target);
+        }
+        private bool checkObjectsScale(float target)
+        {
+            var objects = Player.ChildrenOfType<DrawableHitCircle>();
+            if (!objects.Any())
+                return false;
+
+            return objects.All(o => Precision.AlmostEquals(o.ChildrenOfType<Container>().First().Scale.X, target));
+        }
     }
 }
