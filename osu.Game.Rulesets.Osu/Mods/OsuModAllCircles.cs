@@ -4,6 +4,7 @@
 using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Scoring;
@@ -18,40 +19,41 @@ namespace osu.Game.Rulesets.Osu.Mods
             if (beatmap is not OsuBeatmap osuBeatmap)
                 return;
 
-            for (int i = 0; i < osuBeatmap.HitObjects.Count; i++)
+            for (int index = 0; index < osuBeatmap.HitObjects.Count; index++)
             {
-                if (osuBeatmap.HitObjects[i] is not Slider slider)
+
+                if (index > 0 && !osuBeatmap.HitObjects[index].NewCombo)
+                { // Make sure objects are at the correct combo number in case previous sliders in the combo were converted
+                    osuBeatmap.HitObjects[index].IndexInCurrentCombo = osuBeatmap.HitObjects[index - 1].IndexInCurrentCombo + 1;
+                }
+
+                if (osuBeatmap.HitObjects[index] is not Slider slider)
+                {
                     continue;
+                }
 
-                HitCircle newCircle = convertToCircle(slider.HeadCircle, osuBeatmap);
+                HitCircle newCircle = convertToCircle(slider.HeadCircle, osuBeatmap, slider.HeadCircle);
 
-                osuBeatmap.HitObjects[i] = newCircle;
+                osuBeatmap.HitObjects[index] = newCircle;
 
                 if (!ConvertEnds.Value)
                     continue;
 
-                Vector2 otherEnd = slider.RepeatCount > 0 ? slider.NestedHitObjects.OfType<SliderRepeat>().First().Position : slider.EndPosition;
-                for (int k = 0; k <= slider.RepeatCount; k++)
+                int addedCircles = 0;
+                for (int k = 1; k < slider.NestedHitObjects.Count; k++) // We start at 1 to skip over the SliderHeadCircle
                 {
-                    HitCircle repeatCircle;
-                    if (k % 2 == 0)
-                    { // If this should be at the other end of the slider
-                        repeatCircle = convertToCircle(slider.HeadCircle, osuBeatmap);
+                    if (slider.NestedHitObjects.ElementAt(k) is not HitCircle circle)
+                        continue;
 
-                        repeatCircle.Position = otherEnd;
-                        repeatCircle.StartTime = slider.StartTime;
-                    }
-                    else
-                    { // If this should overlap with the beginning of the slider
-                        repeatCircle = convertToCircle(slider.HeadCircle, osuBeatmap);
-                    }
+                    HitCircle repeatCircle = convertToCircle(circle, osuBeatmap, newCircle);
+                    addedCircles += 1;
+                    repeatCircle.IndexInCurrentCombo = osuBeatmap.HitObjects[index + addedCircles - 1].IndexInCurrentCombo + 1;
 
-                    repeatCircle.IndexInCurrentCombo += k + 1;
-                    osuBeatmap.HitObjects.Insert(i + k + 1, repeatCircle);
+                    osuBeatmap.HitObjects.Insert(index + addedCircles, repeatCircle);
                 }
             }
         }
-        private HitCircle convertToCircle(HitCircle objectToConvert, OsuBeatmap osuBeatmap)
+        private HitCircle convertToCircle(HitCircle objectToConvert, OsuBeatmap osuBeatmap, HitCircle overrideCircle)
         {
             HitCircle newCircle = new HitCircle
             {
@@ -64,8 +66,8 @@ namespace osu.Game.Rulesets.Osu.Mods
                 Scale = objectToConvert.Scale,
                 StackHeight = objectToConvert.StackHeight,
                 StartTime = objectToConvert.StartTime,
-                TimeFadeIn = objectToConvert.TimeFadeIn,
-                TimePreempt = objectToConvert.TimePreempt,
+                TimeFadeIn = overrideCircle != null ? overrideCircle.TimeFadeIn : objectToConvert.TimeFadeIn,
+                TimePreempt = overrideCircle != null ? overrideCircle.TimePreempt : objectToConvert.TimePreempt,
                 HitWindows = new OsuHitWindows()
             };
             newCircle.HitWindows.SetDifficulty(osuBeatmap.Difficulty.OverallDifficulty);
