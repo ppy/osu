@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Bindables;
+using osu.Framework.Caching;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -170,9 +171,8 @@ namespace osu.Game.Screens.SelectV2
         /// <summary>
         /// Called when an item is "selected".
         /// </summary>
-        protected virtual void HandleItemSelected(object? model)
-        {
-        }
+        /// <returns>Whether the item should be selected.</returns>
+        protected virtual bool HandleItemSelected(object? model) => true;
 
         /// <summary>
         /// Called when an item is "deselected".
@@ -410,6 +410,8 @@ namespace osu.Game.Screens.SelectV2
 
         #region Selection handling
 
+        private readonly Cached selectionValid = new Cached();
+
         private Selection currentKeyboardSelection = new Selection();
         private Selection currentSelection = new Selection();
 
@@ -418,29 +420,21 @@ namespace osu.Game.Screens.SelectV2
             if (currentSelection.Model == model)
                 return;
 
-            var previousSelection = currentSelection;
+            if (HandleItemSelected(model))
+            {
+                if (currentSelection.Model != null)
+                    HandleItemDeselected(currentSelection.Model);
 
-            if (previousSelection.Model != null)
-                HandleItemDeselected(previousSelection.Model);
-
-            currentSelection = currentKeyboardSelection = new Selection(model);
-            HandleItemSelected(currentSelection.Model);
-
-            // `HandleItemSelected` can alter `CurrentSelection`, which will recursively call `setSelection()` again.
-            // if that happens, the rest of this method should be a no-op.
-            if (currentSelection.Model != model)
-                return;
-
-            refreshAfterSelection();
-            scrollToSelection();
+                currentKeyboardSelection = new Selection(model);
+                currentSelection = currentKeyboardSelection;
+                selectionValid.Invalidate();
+            }
         }
 
         private void setKeyboardSelection(object? model)
         {
             currentKeyboardSelection = new Selection(model);
-
-            refreshAfterSelection();
-            scrollToSelection();
+            selectionValid.Invalidate();
         }
 
         /// <summary>
@@ -524,6 +518,13 @@ namespace osu.Game.Screens.SelectV2
 
             if (carouselItems == null)
                 return;
+
+            if (!selectionValid.IsValid)
+            {
+                refreshAfterSelection();
+                scrollToSelection();
+                selectionValid.Validate();
+            }
 
             var range = getDisplayRange();
 

@@ -95,7 +95,7 @@ namespace osu.Game.Screens.SelectV2
         private GroupDefinition? lastSelectedGroup;
         private BeatmapInfo? lastSelectedBeatmap;
 
-        protected override void HandleItemSelected(object? model)
+        protected override bool HandleItemSelected(object? model)
         {
             base.HandleItemSelected(model);
 
@@ -104,6 +104,14 @@ namespace osu.Game.Screens.SelectV2
                 case GroupDefinition group:
                     if (lastSelectedGroup != null)
                         setVisibilityOfGroupItems(lastSelectedGroup, false);
+
+                    // Collapsing an open group.
+                    if (lastSelectedGroup == group)
+                    {
+                        lastSelectedGroup = null;
+                        return false;
+                    }
+
                     lastSelectedGroup = group;
 
                     setVisibilityOfGroupItems(group, true);
@@ -111,21 +119,34 @@ namespace osu.Game.Screens.SelectV2
                     // In stable, you can kinda select a group (expand without changing selection)
                     // For simplicity, let's not do that for now and handle similar to a beatmap set header.
                     CurrentSelection = grouping.GroupItems[group].First().Model;
-                    return;
+                    return false;
 
                 case BeatmapSetInfo setInfo:
                     // Selecting a set isn't valid – let's re-select the first difficulty.
                     CurrentSelection = setInfo.Beatmaps.First();
-                    return;
+                    return false;
 
                 case BeatmapInfo beatmapInfo:
                     if (lastSelectedBeatmap != null)
                         setVisibilityOfSetItems(lastSelectedBeatmap.BeatmapSet!, false);
                     lastSelectedBeatmap = beatmapInfo;
 
-                    setVisibilityOfSetItems(beatmapInfo.BeatmapSet!, true);
-                    break;
+                    // If we have groups, we need to account for them.
+                    if (grouping.GroupItems.Count > 0)
+                    {
+                        // Find the containing group. There should never be too many groups so iterating is efficient enough.
+                        var group = grouping.GroupItems.Single(kvp => kvp.Value.Any(i => ReferenceEquals(i.Model, beatmapInfo))).Key;
+                        setVisibilityOfGroupItems(group, true);
+                    }
+                    else
+                        setVisibilityOfSetItems(beatmapInfo.BeatmapSet!, true);
+
+                    // Ensure the group containing this beatmap is also visible.
+                    // TODO: need to update visibility of correct group?
+                    return true;
             }
+
+            return true;
         }
 
         private void setVisibilityOfGroupItems(GroupDefinition group, bool visible)

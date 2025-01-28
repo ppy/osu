@@ -35,6 +35,9 @@ namespace osu.Game.Screens.SelectV2
 
         public async Task<IEnumerable<CarouselItem>> Run(IEnumerable<CarouselItem> items, CancellationToken cancellationToken) => await Task.Run(() =>
         {
+            setItems.Clear();
+            groupItems.Clear();
+
             var criteria = getCriteria();
 
             int starGroup = int.MinValue;
