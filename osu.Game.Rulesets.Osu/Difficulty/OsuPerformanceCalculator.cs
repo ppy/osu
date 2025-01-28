@@ -328,7 +328,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return readingValue;
         }
 
-        private double calculateEffectiveMissCount(OsuDifficultyAttributes attributes)
         /// <summary>
         /// Estimates player's deviation on speed notes using <see cref="calculateDeviation"/>, assuming worst-case.
         /// Treats all speed notes as hit circles.

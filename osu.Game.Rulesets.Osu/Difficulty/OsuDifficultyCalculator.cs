@@ -40,7 +40,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double aimRating = Math.Sqrt(aim.DifficultyValue()) * difficulty_multiplier;
             double aimDifficultyStrainCount = aim.CountTopWeightedStrains();
             double difficultSliders = aim.GetDifficultSliders();
-            double readingRating = Math.Sqrt(skills[4].DifficultyValue()) * difficulty_multiplier;
 
             var aimWithoutSliders = skills.OfType<Aim>().Single(a => !a.IncludeSliders);
             double aimRatingNoSliders = Math.Sqrt(aimWithoutSliders.DifficultyValue()) * difficulty_multiplier;
@@ -53,6 +52,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             var flashlight = skills.OfType<Flashlight>().SingleOrDefault();
             double flashlightRating = flashlight == null ? 0.0 : Math.Sqrt(flashlight.DifficultyValue()) * difficulty_multiplier;
+
+            var reading = skills.OfType<Reading>().SingleOrDefault();
+            double readingRating = Math.Sqrt(reading.DifficultyValue()) * difficulty_multiplier;
 
             if (mods.Any(m => m is OsuModTouchDevice))
             {

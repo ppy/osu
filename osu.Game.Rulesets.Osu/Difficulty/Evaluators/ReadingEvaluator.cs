@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
@@ -24,7 +25,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double currVelocity = currObj.LazyJumpDistance / currObj.StrainTime;
 
             // Maybe I should just pass in clockrate...
-            var clockRateEstimate = current.BaseObject.StartTime / currObj.StartTime;
+            double clockRateEstimate = current.BaseObject.StartTime / currObj.StartTime;
 
             double pastObjectDifficultyInfluence = 1.0;
 
@@ -33,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double loopDifficulty = currObj.OpacityAt(loopObj.BaseObject.StartTime, false);
 
                 // Small distances means objects may be cheesed, so it doesn't matter whether they are arranged confusingly.
-                loopDifficulty *= logistic((loopObj.MinimumJumpDistance - 90) / 15);
+                loopDifficulty *= DifficultyCalculationUtils.Logistic((loopObj.MinimumJumpDistance - 90) / 15);
 
                 double timeBetweenCurrAndLoopObj = (currObj.BaseObject.StartTime - loopObj.BaseObject.StartTime) / clockRateEstimate;
                 loopDifficulty *= getTimeNerfFactor(timeBetweenCurrAndLoopObj);
@@ -143,7 +144,5 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         {
             return Math.Clamp(2 - deltaTime / (reading_window_size / 2), 0, 1);
         }
-
-        private static double logistic(double x) => 1 / (1 + Math.Pow(Math.E, -x));
     }
 }
