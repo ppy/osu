@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Mods
 
         public override LocalisableString Description => "Oops! All Circles! Sliders get changed into circles.";
 
-        public override double ScoreMultiplier => 0.5;
+        public override double ScoreMultiplier => ConvertEnds.Value ? 0.75 : 0.5;
 
         [SettingSource("Convert Ends", "Should slider repeats/ends be converted")]
         public virtual BindableBool ConvertEnds { get; } = new BindableBool();
