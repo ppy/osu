@@ -34,6 +34,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 return 0;
 
             // derive strainTime for calculation
+            var osuNextObj = (OsuDifficultyHitObject)current.Next(0);
             var osuCurrObj = (OsuDifficultyHitObject)current;
             var osuPrevObj = current.Index > 0 ? (OsuDifficultyHitObject)current.Previous(0) : null;
 
@@ -53,6 +54,22 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             double travelDistance = osuPrevObj?.TravelDistance ?? 0;
             double distance = travelDistance + osuCurrObj.MinimumJumpDistance;
+
+            // Buff accelerating patterns
+            double nextDistance = 0;
+            if (osuNextObj != null && osuPrevObj != null)
+            {
+                nextDistance = osuCurrObj.TravelDistance + osuNextObj.MinimumJumpDistance;
+
+                // Don't use increased distance from jumps
+                nextDistance *= DifficultyCalculationUtils.Smoothstep(osuNextObj.StrainTime, osuCurrObj.StrainTime * 1.75, osuCurrObj.StrainTime * 1.5);
+                nextDistance *= DifficultyCalculationUtils.Smoothstep(osuCurrObj.StrainTime, osuPrevObj.StrainTime * 1.75, osuPrevObj.StrainTime * 1.5);
+
+                // Have a threshold so very small changes aren't buffed
+                if (distance > 0) nextDistance *= DifficultyCalculationUtils.Smoothstep(nextDistance, distance, distance * 1.1);
+            }
+
+            distance = Math.Max(distance, nextDistance);
 
             // Cap distance at single_spacing_threshold
             distance = Math.Min(distance, single_spacing_threshold);
