@@ -66,7 +66,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 nextDistance *= DifficultyCalculationUtils.Smoothstep(osuCurrObj.StrainTime, osuPrevObj.StrainTime * 1.75, osuPrevObj.StrainTime * 1.5);
 
                 // Have a threshold so very small changes aren't buffed
-                if (distance > 0) nextDistance *= DifficultyCalculationUtils.Smoothstep(nextDistance, distance, distance * 1.1);
+                if (distance > 0) nextDistance *= DifficultyCalculationUtils.Smoothstep(nextDistance, distance, distance * 1.25);
             }
 
             distance = Math.Max(distance, nextDistance);
