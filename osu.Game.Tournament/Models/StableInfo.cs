@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.IO;
 using Newtonsoft.Json;
@@ -20,12 +18,12 @@ namespace osu.Game.Tournament.Models
         /// <summary>
         /// Path to the IPC directory used by the stable (cutting-edge) install.
         /// </summary>
-        public string StablePath { get; set; }
+        public string? StablePath { get; set; }
 
         /// <summary>
         /// Fired whenever stable info is successfully saved to file.
         /// </summary>
-        public event Action OnStableInfoSaved;
+        public event Action? OnStableInfoSaved;
 
         private const string config_path = "stable.json";
 

@@ -65,6 +65,47 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("clear playing users", () => playingUsers.Clear());
         }
 
+        [TestCase(1)]
+        [TestCase(4)]
+        [TestCase(9)]
+        public void TestGeneral(int count)
+        {
+            int[] userIds = getPlayerIds(count);
+
+            start(userIds);
+            loadSpectateScreen();
+
+            sendFrames(userIds, 1000);
+            AddWaitStep("wait a bit", 20);
+        }
+
+        [TestCase(2)]
+        [TestCase(16)]
+        public void TestTeams(int count)
+        {
+            int[] userIds = getPlayerIds(count);
+
+            start(userIds, teams: true);
+            loadSpectateScreen();
+
+            sendFrames(userIds, 1000);
+            AddWaitStep("wait a bit", 20);
+        }
+
+        [Test]
+        public void TestMultipleStartRequests()
+        {
+            int[] userIds = getPlayerIds(2);
+
+            start(userIds);
+            loadSpectateScreen();
+
+            sendFrames(userIds, 1000);
+            AddWaitStep("wait a bit", 20);
+
+            start(userIds);
+        }
+
         [Test]
         public void TestDelayedStart()
         {
@@ -86,18 +127,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddWaitStep("wait a bit", 10);
             AddStep("load player second_player_id", () => SpectatorClient.SendStartPlay(PLAYER_2_ID, importedBeatmapId));
             AddUntilStep("two players added", () => spectatorScreen.ChildrenOfType<Player>().Count() == 2);
-        }
-
-        [Test]
-        public void TestGeneral()
-        {
-            int[] userIds = getPlayerIds(4);
-
-            start(userIds);
-            loadSpectateScreen();
-
-            sendFrames(userIds, 1000);
-            AddWaitStep("wait a bit", 20);
         }
 
         [Test]
@@ -377,13 +406,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         /// <summary>
-        /// Tests spectating with a beatmap that has a high <see cref="BeatmapInfo.AudioLeadIn"/> value.
+        /// Tests spectating with a beatmap that has a high <see cref="IBeatmap.AudioLeadIn"/> value.
         ///
         /// This test is not intended not to check the correct initial time value, but only to guard against
         /// gameplay potentially getting stuck in a stopped state due to lead in time being present.
         /// </summary>
         [Test]
-        public void TestAudioLeadIn() => testLeadIn(b => b.BeatmapInfo.AudioLeadIn = 2000);
+        public void TestAudioLeadIn() => testLeadIn(b => b.Beatmap.AudioLeadIn = 2000);
 
         /// <summary>
         /// Tests spectating with a beatmap that has a storyboard element with a negative start time (i.e. intro storyboard element).
@@ -395,7 +424,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public void TestIntroStoryboardElement() => testLeadIn(b =>
         {
             var sprite = new StoryboardSprite("unknown", Anchor.TopLeft, Vector2.Zero);
-            sprite.TimelineGroup.Alpha.Add(Easing.None, -2000, 0, 0, 1);
+            sprite.Commands.AddAlpha(Easing.None, -2000, 0, 0, 1);
             b.Storyboard.GetLayer("Background").Add(sprite);
         });
 
@@ -426,7 +455,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                 applyToBeatmap?.Invoke(Beatmap.Value);
 
-                LoadScreen(spectatorScreen = new MultiSpectatorScreen(SelectedRoom.Value, playingUsers.ToArray()));
+                LoadScreen(spectatorScreen = new MultiSpectatorScreen(SelectedRoom.Value!, playingUsers.ToArray()));
             });
 
             AddUntilStep("wait for screen load", () => spectatorScreen.LoadState == LoadState.Loaded && (!waitForPlayerLoad || spectatorScreen.AllPlayersLoaded));
@@ -434,16 +463,18 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private void start(int userId, int? beatmapId = null) => start(new[] { userId }, beatmapId);
 
-        private void start(int[] userIds, int? beatmapId = null, APIMod[]? mods = null)
+        private void start(int[] userIds, int? beatmapId = null, APIMod[]? mods = null, bool teams = false)
         {
             AddStep("start play", () =>
             {
-                foreach (int id in userIds)
+                for (int i = 0; i < userIds.Length; i++)
                 {
+                    int id = userIds[i];
                     var user = new MultiplayerRoomUser(id)
                     {
                         User = new APIUser { Id = id },
                         Mods = mods ?? Array.Empty<APIMod>(),
+                        MatchState = teams ? new TeamVersusUserState { TeamID = i % 2 } : null,
                     };
 
                     OnlinePlayDependencies.MultiplayerClient.AddUser(user, true);

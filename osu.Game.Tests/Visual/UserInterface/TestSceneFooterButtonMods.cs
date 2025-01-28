@@ -5,10 +5,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens.Select;
+using osu.Game.Utils;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
@@ -66,6 +68,15 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert(@"Check empty multiplier", () => assertModsMultiplier(Array.Empty<Mod>()));
         }
 
+        [Test]
+        public void TestUnrankedBadge()
+        {
+            AddStep(@"Add unranked mod", () => changeMods(new[] { new OsuModDeflate() }));
+            AddAssert("Unranked badge shown", () => footerButtonMods.UnrankedBadge.Alpha == 1);
+            AddStep(@"Clear selected mod", () => changeMods(Array.Empty<Mod>()));
+            AddAssert("Unranked badge not shown", () => footerButtonMods.UnrankedBadge.Alpha == 0);
+        }
+
         private void changeMods(IReadOnlyList<Mod> mods)
         {
             footerButtonMods.Current.Value = mods;
@@ -74,7 +85,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         private bool assertModsMultiplier(IEnumerable<Mod> mods)
         {
             double multiplier = mods.Aggregate(1.0, (current, mod) => current * mod.ScoreMultiplier);
-            string expectedValue = multiplier.Equals(1.0) ? string.Empty : $"{multiplier:N2}x";
+            string expectedValue = multiplier == 1 ? string.Empty : ModUtils.FormatScoreMultiplier(multiplier).ToString();
 
             return expectedValue == footerButtonMods.MultiplierText.Current.Value;
         }
@@ -82,6 +93,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         private partial class TestFooterButtonMods : FooterButtonMods
         {
             public new OsuSpriteText MultiplierText => base.MultiplierText;
+            public new Drawable UnrankedBadge => base.UnrankedBadge;
         }
     }
 }

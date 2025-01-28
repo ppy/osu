@@ -6,7 +6,6 @@
 using System;
 using System.Diagnostics;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Rendering;
@@ -49,6 +48,18 @@ namespace osu.Game.Graphics
             this.maxDuration = maxDuration;
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            Active.BindValueChanged(active =>
+            {
+                // ensure that particles can be spawned immediately after the spewer becomes active.
+                if (active.NewValue)
+                    lastParticleAdded = null;
+            });
+        }
+
         protected override void Update()
         {
             base.Update();
@@ -56,12 +67,8 @@ namespace osu.Game.Graphics
             Invalidate(Invalidation.DrawNode);
 
             if (!Active.Value || !CanSpawnParticles)
-            {
-                lastParticleAdded = null;
                 return;
-            }
 
-            // Always want to spawn the first particle in an activation immediately.
             if (lastParticleAdded == null)
             {
                 lastParticleAdded = Time.Current;
@@ -182,9 +189,9 @@ namespace osu.Game.Graphics
                 float width = Texture.DisplayWidth * scale;
                 float height = Texture.DisplayHeight * scale;
 
-                if (relativePositionAxes.HasFlagFast(Axes.X))
+                if (relativePositionAxes.HasFlag(Axes.X))
                     position.X *= sourceSize.X;
-                if (relativePositionAxes.HasFlagFast(Axes.Y))
+                if (relativePositionAxes.HasFlag(Axes.Y))
                     position.Y *= sourceSize.Y;
 
                 return new RectangleF(

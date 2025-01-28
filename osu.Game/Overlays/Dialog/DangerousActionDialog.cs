@@ -23,22 +23,28 @@ namespace osu.Game.Overlays.Dialog
         /// </summary>
         protected Action? DangerousAction { get; set; }
 
+        /// <summary>
+        /// The action to perform if cancelled.
+        /// </summary>
+        protected Action? CancelAction { get; set; }
+
         protected DangerousActionDialog()
         {
-            HeaderText = DeleteConfirmationDialogStrings.HeaderText;
+            HeaderText = DialogStrings.CautionHeaderText;
 
-            Icon = FontAwesome.Regular.TrashAlt;
+            Icon = FontAwesome.Solid.ExclamationTriangle;
 
             Buttons = new PopupDialogButton[]
             {
                 new PopupDialogDangerousButton
                 {
-                    Text = DeleteConfirmationDialogStrings.Confirm,
+                    Text = DialogStrings.Confirm,
                     Action = () => DangerousAction?.Invoke()
                 },
                 new PopupDialogCancelButton
                 {
-                    Text = DeleteConfirmationDialogStrings.Cancel
+                    Text = DialogStrings.Cancel,
+                    Action = () => CancelAction?.Invoke()
                 }
             };
         }

@@ -14,6 +14,7 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Skinning.Default;
 using osu.Game.Skinning;
+using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
@@ -22,7 +23,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         /// <summary>
         /// A list of keys which can result in hits for this HitObject.
         /// </summary>
-        public TaikoAction[] HitActions { get; private set; }
+        public TaikoAction[] HitActions { get; internal set; }
 
         /// <summary>
         /// The action that caused this <see cref="DrawableHit"/> to be hit.
@@ -63,6 +64,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         {
             updateActionsFromType();
             base.RecreatePieces();
+            Size = new Vector2(HitObject.IsStrong ? TaikoStrongableHitObject.DEFAULT_STRONG_SIZE : TaikoHitObject.DEFAULT_SIZE);
         }
 
         protected override void OnFree()
@@ -99,7 +101,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             if (!userTriggered)
             {
                 if (!HitObject.HitWindows.CanBeHit(timeOffset))
-                    ApplyResult(r => r.Type = r.Judgement.MinResult);
+                    ApplyMinResult();
                 return;
             }
 
@@ -108,9 +110,9 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 return;
 
             if (!validActionPressed)
-                ApplyResult(r => r.Type = r.Judgement.MinResult);
+                ApplyMinResult();
             else
-                ApplyResult(r => r.Type = result);
+                ApplyResult(result);
         }
 
         public override bool OnPressed(KeyBindingPressEvent<TaikoAction> e)
@@ -209,19 +211,19 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
                 if (!ParentHitObject.Result.IsHit)
                 {
-                    ApplyResult(r => r.Type = r.Judgement.MinResult);
+                    ApplyMinResult();
                     return;
                 }
 
                 if (!userTriggered)
                 {
                     if (timeOffset - ParentHitObject.Result.TimeOffset > SECOND_HIT_WINDOW)
-                        ApplyResult(r => r.Type = r.Judgement.MinResult);
+                        ApplyMinResult();
                     return;
                 }
 
                 if (Math.Abs(timeOffset - ParentHitObject.Result.TimeOffset) <= SECOND_HIT_WINDOW)
-                    ApplyResult(r => r.Type = r.Judgement.MaxResult);
+                    ApplyMaxResult();
             }
 
             public override bool OnPressed(KeyBindingPressEvent<TaikoAction> e)

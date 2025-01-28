@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Skinning;
@@ -20,10 +21,12 @@ namespace osu.Game.Screens.Menu
         [BackgroundDependencyLoader]
         private void load()
         {
-            InternalChild = spewer = new StarFountainSpewer();
+            InternalChild = spewer = CreateSpewer();
         }
 
-        public void Shoot() => spewer.Shoot();
+        protected virtual StarFountainSpewer CreateSpewer() => new StarFountainSpewer();
+
+        public void Shoot(int direction) => spewer.Shoot(direction);
 
         protected override void SkinChanged(ISkinSource skin)
         {
@@ -37,19 +40,23 @@ namespace osu.Game.Screens.Menu
             private const int particle_duration_max = 1000;
 
             private double? lastShootTime;
-            private int lastShootDirection;
+
+            protected int LastShootDirection { get; private set; }
 
             protected override float ParticleGravity => 800;
 
-            private const double shoot_duration = 800;
-
-            protected override bool CanSpawnParticles => lastShootTime != null && Time.Current - lastShootTime < shoot_duration;
+            protected virtual double ShootDuration => 800;
 
             [Resolved]
             private ISkinSource skin { get; set; } = null!;
 
             public StarFountainSpewer()
-                : base(null, 240, particle_duration_max)
+                : this(240)
+            {
+            }
+
+            protected StarFountainSpewer(int perSecond)
+                : base(null, perSecond, particle_duration_max)
             {
             }
 
@@ -57,7 +64,6 @@ namespace osu.Game.Screens.Menu
             private void load(TextureStore textures)
             {
                 Texture = skin.GetTexture("Menu/fountain-star") ?? textures.Get("Menu/fountain-star");
-                Active.Value = true;
             }
 
             protected override FallingParticle CreateParticle()
@@ -69,22 +75,29 @@ namespace osu.Game.Screens.Menu
                     StartAngle = getRandomVariance(4),
                     EndAngle = getRandomVariance(2),
                     EndScale = 2.2f + getRandomVariance(0.4f),
-                    Velocity = new Vector2(getCurrentAngle(), -1400 + getRandomVariance(100)),
+                    Velocity = new Vector2(GetCurrentAngle(), -1400 + getRandomVariance(100)),
                 };
             }
 
-            private float getCurrentAngle()
+            protected virtual float GetCurrentAngle()
             {
-                const float x_velocity_from_direction = 500;
                 const float x_velocity_random_variance = 60;
+                const float x_velocity_from_direction = 500;
 
-                return lastShootDirection * x_velocity_from_direction * (float)(1 - 2 * (Clock.CurrentTime - lastShootTime!.Value) / shoot_duration) + getRandomVariance(x_velocity_random_variance);
+                return LastShootDirection * x_velocity_from_direction * (float)(1 - 2 * (Clock.CurrentTime - lastShootTime!.Value) / ShootDuration) + getRandomVariance(x_velocity_random_variance);
             }
 
-            public void Shoot()
+            private ScheduledDelegate? deactivateDelegate;
+
+            public void Shoot(int direction)
             {
+                Active.Value = true;
+
+                deactivateDelegate?.Cancel();
+                deactivateDelegate = Scheduler.AddDelayed(() => Active.Value = false, ShootDuration);
+
                 lastShootTime = Clock.CurrentTime;
-                lastShootDirection = RNG.Next(-1, 2);
+                LastShootDirection = direction;
             }
 
             private static float getRandomVariance(float variance) => RNG.NextSingle(-variance, variance);

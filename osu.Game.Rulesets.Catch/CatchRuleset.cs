@@ -3,8 +3,8 @@
 
 using System;
 using System.Collections.Generic;
-using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Localisation;
@@ -15,6 +15,7 @@ using osu.Game.Rulesets.Catch.Beatmaps;
 using osu.Game.Rulesets.Catch.Difficulty;
 using osu.Game.Rulesets.Catch.Edit;
 using osu.Game.Rulesets.Catch.Mods;
+using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Replays;
 using osu.Game.Rulesets.Catch.Scoring;
 using osu.Game.Rulesets.Catch.Skinning.Argon;
@@ -25,10 +26,13 @@ using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Scoring.Legacy;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
+using osu.Game.Screens.Edit.Setup;
 using osu.Game.Screens.Ranking.Statistics;
 using osu.Game.Skinning;
+using osuTK;
 
 namespace osu.Game.Rulesets.Catch
 {
@@ -37,6 +41,8 @@ namespace osu.Game.Rulesets.Catch
         public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod>? mods = null) => new DrawableCatchRuleset(this, beatmap, mods);
 
         public override ScoreProcessor CreateScoreProcessor() => new CatchScoreProcessor();
+
+        public override HealthProcessor CreateHealthProcessor(double drainStartTime) => new CatchHealthProcessor(drainStartTime);
 
         public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new CatchBeatmapConverter(beatmap, this);
 
@@ -53,48 +59,48 @@ namespace osu.Game.Rulesets.Catch
             new KeyBinding(InputKey.X, CatchAction.MoveRight),
             new KeyBinding(InputKey.Right, CatchAction.MoveRight),
             new KeyBinding(InputKey.Shift, CatchAction.Dash),
-            new KeyBinding(InputKey.Shift, CatchAction.Dash),
+            new KeyBinding(InputKey.MouseLeft, CatchAction.Dash),
         };
 
         public override IEnumerable<Mod> ConvertFromLegacyMods(LegacyMods mods)
         {
-            if (mods.HasFlagFast(LegacyMods.Nightcore))
+            if (mods.HasFlag(LegacyMods.Nightcore))
                 yield return new CatchModNightcore();
-            else if (mods.HasFlagFast(LegacyMods.DoubleTime))
+            else if (mods.HasFlag(LegacyMods.DoubleTime))
                 yield return new CatchModDoubleTime();
 
-            if (mods.HasFlagFast(LegacyMods.Perfect))
+            if (mods.HasFlag(LegacyMods.Perfect))
                 yield return new CatchModPerfect();
-            else if (mods.HasFlagFast(LegacyMods.SuddenDeath))
+            else if (mods.HasFlag(LegacyMods.SuddenDeath))
                 yield return new CatchModSuddenDeath();
 
-            if (mods.HasFlagFast(LegacyMods.Cinema))
+            if (mods.HasFlag(LegacyMods.Cinema))
                 yield return new CatchModCinema();
-            else if (mods.HasFlagFast(LegacyMods.Autoplay))
+            else if (mods.HasFlag(LegacyMods.Autoplay))
                 yield return new CatchModAutoplay();
 
-            if (mods.HasFlagFast(LegacyMods.Easy))
+            if (mods.HasFlag(LegacyMods.Easy))
                 yield return new CatchModEasy();
 
-            if (mods.HasFlagFast(LegacyMods.Flashlight))
+            if (mods.HasFlag(LegacyMods.Flashlight))
                 yield return new CatchModFlashlight();
 
-            if (mods.HasFlagFast(LegacyMods.HalfTime))
+            if (mods.HasFlag(LegacyMods.HalfTime))
                 yield return new CatchModHalfTime();
 
-            if (mods.HasFlagFast(LegacyMods.HardRock))
+            if (mods.HasFlag(LegacyMods.HardRock))
                 yield return new CatchModHardRock();
 
-            if (mods.HasFlagFast(LegacyMods.Hidden))
+            if (mods.HasFlag(LegacyMods.Hidden))
                 yield return new CatchModHidden();
 
-            if (mods.HasFlagFast(LegacyMods.NoFail))
+            if (mods.HasFlag(LegacyMods.NoFail))
                 yield return new CatchModNoFail();
 
-            if (mods.HasFlagFast(LegacyMods.Relax))
+            if (mods.HasFlag(LegacyMods.Relax))
                 yield return new CatchModRelax();
 
-            if (mods.HasFlagFast(LegacyMods.ScoreV2))
+            if (mods.HasFlag(LegacyMods.ScoreV2))
                 yield return new ModScoreV2();
         }
 
@@ -219,6 +225,30 @@ namespace osu.Game.Rulesets.Catch
 
         public override HitObjectComposer CreateHitObjectComposer() => new CatchHitObjectComposer(this);
 
+        public override IEnumerable<Drawable> CreateEditorSetupSections() =>
+        [
+            new MetadataSection(),
+            new DifficultySection(),
+            new FillFlowContainer
+            {
+                AutoSizeAxes = Axes.Y,
+                Direction = FillDirection.Vertical,
+                Spacing = new Vector2(SetupScreen.SPACING),
+                Children = new Drawable[]
+                {
+                    new ResourcesSection
+                    {
+                        RelativeSizeAxes = Axes.X,
+                    },
+                    new ColoursSection
+                    {
+                        RelativeSizeAxes = Axes.X,
+                    }
+                }
+            },
+            new DesignSection(),
+        ];
+
         public override IBeatmapVerifier CreateBeatmapVerifier() => new CatchBeatmapVerifier();
 
         public override StatisticItem[] CreateStatisticsForScore(ScoreInfo score, IBeatmap playableBeatmap)
@@ -232,5 +262,19 @@ namespace osu.Game.Rulesets.Catch
                 }),
             };
         }
+
+        /// <seealso cref="CatchHitObject.ApplyDefaultsToSelf"/>
+        public override BeatmapDifficulty GetRateAdjustedDisplayDifficulty(IBeatmapDifficultyInfo difficulty, double rate)
+        {
+            BeatmapDifficulty adjustedDifficulty = new BeatmapDifficulty(difficulty);
+
+            double preempt = IBeatmapDifficultyInfo.DifficultyRange(adjustedDifficulty.ApproachRate, CatchHitObject.PREEMPT_MAX, CatchHitObject.PREEMPT_MID, CatchHitObject.PREEMPT_MIN);
+            preempt /= rate;
+            adjustedDifficulty.ApproachRate = (float)IBeatmapDifficultyInfo.InverseDifficultyRange(preempt, CatchHitObject.PREEMPT_MAX, CatchHitObject.PREEMPT_MID, CatchHitObject.PREEMPT_MIN);
+
+            return adjustedDifficulty;
+        }
+
+        public override bool EditorShowScrollSpeed => false;
     }
 }

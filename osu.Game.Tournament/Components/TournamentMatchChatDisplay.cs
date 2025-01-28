@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -72,7 +73,13 @@ namespace osu.Game.Tournament.Components
 
         public void Contract() => this.FadeOut(200);
 
-        protected override ChatLine CreateMessage(Message message) => new MatchMessage(message, ladderInfo);
+        protected override ChatLine? CreateMessage(Message message)
+        {
+            if (message.Content.StartsWith("!mp", StringComparison.Ordinal))
+                return null;
+
+            return new MatchMessage(message, ladderInfo);
+        }
 
         protected override StandAloneDrawableChannel CreateDrawableChannel(Channel channel) => new MatchChannel(channel);
 
@@ -92,9 +99,9 @@ namespace osu.Game.Tournament.Components
             {
                 if (info.CurrentMatch.Value is TournamentMatch match)
                 {
-                    if (match.Team1.Value.Players.Any(u => u.OnlineID == Message.Sender.OnlineID))
+                    if (match.Team1.Value?.Players.Any(u => u.OnlineID == Message.Sender.OnlineID) == true)
                         UsernameColour = TournamentGame.COLOUR_RED;
-                    else if (match.Team2.Value.Players.Any(u => u.OnlineID == Message.Sender.OnlineID))
+                    else if (match.Team2.Value?.Players.Any(u => u.OnlineID == Message.Sender.OnlineID) == true)
                         UsernameColour = TournamentGame.COLOUR_BLUE;
                 }
             }

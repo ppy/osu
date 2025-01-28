@@ -4,7 +4,6 @@
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Testing;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play.HUD;
@@ -17,8 +16,9 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Cached]
         private ScoreProcessor scoreProcessor = new ScoreProcessor(new OsuRuleset());
 
+        protected override Drawable CreateArgonImplementation() => new ArgonComboCounter();
         protected override Drawable CreateDefaultImplementation() => new DefaultComboCounter();
-        protected override Drawable CreateLegacyImplementation() => new LegacyComboCounter();
+        protected override Drawable CreateLegacyImplementation() => new LegacyDefaultComboCounter();
 
         [Test]
         public void TestComboCounterIncrementing()
@@ -26,18 +26,6 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddRepeatStep("increase combo", () => scoreProcessor.Combo.Value++, 10);
 
             AddStep("reset combo", () => scoreProcessor.Combo.Value = 0);
-        }
-
-        [Test]
-        public void TestLegacyComboCounterHiddenByRulesetImplementation()
-        {
-            AddToggleStep("toggle legacy hidden by ruleset", visible =>
-            {
-                foreach (var legacyCounter in this.ChildrenOfType<LegacyComboCounter>())
-                    legacyCounter.HiddenByRulesetImplementation = visible;
-            });
-
-            AddRepeatStep("increase combo", () => scoreProcessor.Combo.Value++, 10);
         }
     }
 }

@@ -10,7 +10,9 @@ using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Settings;
 using osu.Game.Tournament.Models;
@@ -69,6 +71,8 @@ namespace osu.Game.Tournament.Screens.Editors
             [Resolved]
             private LadderInfo ladderInfo { get; set; } = null!;
 
+            private readonly SettingsTextBox acronymTextBox;
+
             public TeamRow(TournamentTeam team, TournamentScreen parent)
             {
                 Model = team;
@@ -110,7 +114,7 @@ namespace osu.Game.Tournament.Screens.Editors
                                 Width = 0.2f,
                                 Current = Model.FullName
                             },
-                            new SettingsTextBox
+                            acronymTextBox = new SettingsTextBox
                             {
                                 LabelText = "Acronym",
                                 Width = 0.2f,
@@ -128,7 +132,7 @@ namespace osu.Game.Tournament.Screens.Editors
                                 Width = 0.2f,
                                 Current = Model.Seed
                             },
-                            new SettingsSlider<int>
+                            new SettingsSlider<int, LastYearPlacementSlider>
                             {
                                 LabelText = "Last Year Placement",
                                 Width = 0.33f,
@@ -173,6 +177,32 @@ namespace osu.Game.Tournament.Screens.Editors
                         }
                     },
                 };
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                Model.Acronym.BindValueChanged(acronym =>
+                {
+                    var teamsWithSameAcronym = ladderInfo.Teams
+                                                         .Where(t => t.Acronym.Value == acronym.NewValue && t != Model)
+                                                         .ToList();
+
+                    if (teamsWithSameAcronym.Count > 0)
+                    {
+                        acronymTextBox.SetNoticeText(
+                            $"Acronym '{acronym.NewValue}' is already in use by team{(teamsWithSameAcronym.Count > 1 ? "s" : "")}:\n"
+                            + $"{string.Join(",\n", teamsWithSameAcronym)}", true);
+                    }
+                    else
+                        acronymTextBox.ClearNoticeText();
+                }, true);
+            }
+
+            private partial class LastYearPlacementSlider : RoundedSliderBar<int>
+            {
+                public override LocalisableString TooltipText => Current.Value == 0 ? "N/A" : base.TooltipText;
             }
 
             public partial class PlayerEditor : CompositeDrawable

@@ -30,6 +30,16 @@ namespace osu.Game.Localisation
         public static LocalisableString NotifyOnPrivateMessage => new TranslatableString(getKey(@"notify_on_private_message"), @"Show a notification when you receive a private message");
 
         /// <summary>
+        /// "Show notification popups when friends change status"
+        /// </summary>
+        public static LocalisableString NotifyOnFriendPresenceChange => new TranslatableString(getKey(@"notify_on_friend_presence_change"), @"Show notification popups when friends change status");
+
+        /// <summary>
+        /// "Notifications will be shown when friends go online/offline."
+        /// </summary>
+        public static LocalisableString NotifyOnFriendPresenceChangeTooltip => new TranslatableString(getKey(@"notify_on_friend_presence_change_tooltip"), @"Notifications will be shown when friends go online/offline.");
+
+        /// <summary>
         /// "Integrations"
         /// </summary>
         public static LocalisableString IntegrationsHeader => new TranslatableString(getKey(@"integrations_header"), @"Integrations");
@@ -55,9 +65,9 @@ namespace osu.Game.Localisation
         public static LocalisableString PreferNoVideo => new TranslatableString(getKey(@"prefer_no_video"), @"Prefer downloads without video");
 
         /// <summary>
-        /// "Automatically download beatmaps when spectating"
+        /// "Automatically download missing beatmaps"
         /// </summary>
-        public static LocalisableString AutomaticallyDownloadWhenSpectating => new TranslatableString(getKey(@"automatically_download_when_spectating"), @"Automatically download beatmaps when spectating");
+        public static LocalisableString AutomaticallyDownloadMissingBeatmaps => new TranslatableString(getKey(@"automatically_download_missing_beatmaps"), @"Automatically download missing beatmaps");
 
         /// <summary>
         /// "Show explicit content in search results"
@@ -79,6 +89,11 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString DiscordPresenceOff => new TranslatableString(getKey(@"discord_presence_off"), @"Off");
 
-        private static string getKey(string key) => $"{prefix}:{key}";
+        /// <summary>
+        /// "Hide country flags"
+        /// </summary>
+        public static LocalisableString HideCountryFlags => new TranslatableString(getKey(@"hide_country_flags"), @"Hide country flags");
+
+        private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

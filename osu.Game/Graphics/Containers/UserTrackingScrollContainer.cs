@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
+using osuTK;
 
 namespace osu.Game.Graphics.Containers
 {
@@ -34,7 +35,7 @@ namespace osu.Game.Graphics.Containers
         {
         }
 
-        protected override void OnUserScroll(float value, bool animated = true, double? distanceDecay = default)
+        protected override void OnUserScroll(double value, bool animated = true, double? distanceDecay = default)
         {
             UserScrolling = true;
             base.OnUserScroll(value, animated, distanceDecay);
@@ -46,7 +47,13 @@ namespace osu.Game.Graphics.Containers
             base.ScrollIntoView(target, animated);
         }
 
-        public new void ScrollTo(float value, bool animated = true, double? distanceDecay = null)
+        protected override void ScrollToAbsolutePosition(Vector2 screenSpacePosition)
+        {
+            UserScrolling = true;
+            base.ScrollToAbsolutePosition(screenSpacePosition);
+        }
+
+        public new void ScrollTo(double value, bool animated = true, double? distanceDecay = null)
         {
             UserScrolling = false;
             base.ScrollTo(value, animated, distanceDecay);

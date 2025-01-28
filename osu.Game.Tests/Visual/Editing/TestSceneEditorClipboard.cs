@@ -72,7 +72,7 @@ namespace osu.Game.Tests.Visual.Editing
                     ControlPoints =
                     {
                         new PathControlPoint(),
-                        new PathControlPoint(new Vector2(100, 0), PathType.Bezier)
+                        new PathControlPoint(new Vector2(100, 0), PathType.BEZIER)
                     }
                 }
             };

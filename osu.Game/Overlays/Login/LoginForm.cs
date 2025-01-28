@@ -7,6 +7,7 @@ using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
@@ -32,13 +33,7 @@ namespace osu.Game.Overlays.Login
 
         public Action? RequestHide;
 
-        private void performLogin()
-        {
-            if (!string.IsNullOrEmpty(username.Text) && !string.IsNullOrEmpty(password.Text))
-                api.Login(username.Text, password.Text);
-            else
-                shakeSignIn.Shake();
-        }
+        public override bool AcceptsFocus => true;
 
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load(OsuConfigManager config, AccountCreationOverlay accountCreation)
@@ -69,6 +64,7 @@ namespace osu.Game.Overlays.Login
                         },
                         username = new OsuTextBox
                         {
+                            InputProperties = new TextInputProperties(TextInputType.Username, false),
                             PlaceholderText = UsersStrings.LoginUsername.ToLower(),
                             RelativeSizeAxes = Axes.X,
                             Text = api.ProvidedUsername,
@@ -144,13 +140,19 @@ namespace osu.Game.Overlays.Login
             }
         }
 
-        public override bool AcceptsFocus => true;
+        private void performLogin()
+        {
+            if (!string.IsNullOrEmpty(username.Text) && !string.IsNullOrEmpty(password.Text))
+                api.Login(username.Text, password.Text);
+            else
+                shakeSignIn.Shake();
+        }
 
         protected override bool OnClick(ClickEvent e) => true;
 
         protected override void OnFocus(FocusEvent e)
         {
-            Schedule(() => { GetContainingInputManager().ChangeFocus(string.IsNullOrEmpty(username.Text) ? username : password); });
+            Schedule(() => { GetContainingFocusManager()!.ChangeFocus(string.IsNullOrEmpty(username.Text) ? username : password); });
         }
     }
 }

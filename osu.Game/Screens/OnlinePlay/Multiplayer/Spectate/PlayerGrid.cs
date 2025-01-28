@@ -7,6 +7,7 @@ using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 {
@@ -15,20 +16,21 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
     /// </summary>
     public partial class PlayerGrid : CompositeDrawable
     {
+        public const float ANIMATION_DELAY = 400;
+
         /// <summary>
         /// A temporary limitation on the number of players, because only layouts up to 16 players are supported for a single screen.
         /// Todo: Can be removed in the future with scrolling support + performance improvements.
         /// </summary>
         public const int MAX_PLAYERS = 16;
 
-        private const float player_spacing = 5;
+        private const float player_spacing = 6;
 
         /// <summary>
         /// The currently-maximised facade.
         /// </summary>
-        public Drawable MaximisedFacade => maximisedFacade;
+        public Facade MaximisedFacade { get; }
 
-        private readonly Facade maximisedFacade;
         private readonly Container paddingContainer;
         private readonly FillFlowContainer<Facade> facadeContainer;
         private readonly Container<Cell> cellContainer;
@@ -48,12 +50,18 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                             RelativeSizeAxes = Axes.Both,
                             Child = facadeContainer = new FillFlowContainer<Facade>
                             {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
                                 Spacing = new Vector2(player_spacing),
                             }
                         },
-                        maximisedFacade = new Facade { RelativeSizeAxes = Axes.Both }
+                        MaximisedFacade = new Facade
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Size = new Vector2(0.8f),
+                        }
                     }
                 },
                 cellContainer = new Container<Cell> { RelativeSizeAxes = Axes.Both }
@@ -75,8 +83,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             var facade = new Facade();
             facadeContainer.Add(facade);
 
-            var cell = new Cell(index, content) { ToggleMaximisationState = toggleMaximisationState };
-            cell.SetFacade(facade);
+            var cell = new Cell(index, content, facade) { ToggleMaximisationState = toggleMaximisationState };
 
             cellContainer.Add(cell);
         }
@@ -91,26 +98,28 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
         private void toggleMaximisationState(Cell target)
         {
-            // Iterate through all cells to ensure only one is maximised at any time.
-            foreach (var i in cellContainer.ToList())
-            {
-                if (i == target)
-                    i.IsMaximised = !i.IsMaximised;
-                else
-                    i.IsMaximised = false;
+            // in the case the target is the already maximised cell (or there is only one cell), no cell should be maximised.
+            bool hasMaximised = !target.IsMaximised && cellContainer.Count > 1;
 
-                if (i.IsMaximised)
+            // Iterate through all cells to ensure only one is maximised at any time.
+            foreach (var cell in cellContainer.ToList())
+            {
+                if (hasMaximised && cell == target)
                 {
                     // Transfer cell to the maximised facade.
-                    i.SetFacade(maximisedFacade);
-                    cellContainer.ChangeChildDepth(i, maximisedInstanceDepth -= 0.001f);
+                    cell.SetFacade(MaximisedFacade, true);
+                    cellContainer.ChangeChildDepth(cell, maximisedInstanceDepth -= 0.001f);
                 }
                 else
                 {
                     // Transfer cell back to its original facade.
-                    i.SetFacade(facadeContainer[i.FacadeIndex]);
+                    cell.SetFacade(facadeContainer[cell.FacadeIndex], false);
                 }
+
+                cell.FadeColour(hasMaximised && cell != target ? Color4.Gray : Color4.White, ANIMATION_DELAY, Easing.OutQuint);
             }
+
+            facadeContainer.ScaleTo(hasMaximised ? 0.95f : 1, ANIMATION_DELAY, Easing.OutQuint);
         }
 
         protected override void Update()
@@ -168,6 +177,18 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
             foreach (var cell in facadeContainer)
                 cell.Size = cellSize;
+        }
+
+        /// <summary>
+        /// A facade of the grid which is used as a dummy object to store the required position/size of cells.
+        /// </summary>
+        public partial class Facade : Drawable
+        {
+            public Facade()
+            {
+                Anchor = Anchor.Centre;
+                Origin = Anchor.Centre;
+            }
         }
     }
 }

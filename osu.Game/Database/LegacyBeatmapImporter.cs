@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
@@ -34,9 +33,9 @@ namespace osu.Game.Database
 
                     try
                     {
-                        if (!directoryStorage.GetFiles(string.Empty).ExcludeSystemFileNames().Any())
+                        if (!directoryStorage.GetFiles(string.Empty, "*.osu").Any())
                         {
-                            // if a directory doesn't contain files, attempt looking for beatmaps inside of that directory.
+                            // if a directory doesn't contain any beatmap files, look for further nested beatmap directories.
                             // this is a special behaviour in stable for beatmaps only, see https://github.com/ppy/osu/issues/18615.
                             foreach (string subDirectory in GetStableImportPaths(directoryStorage))
                                 paths.Add(subDirectory);

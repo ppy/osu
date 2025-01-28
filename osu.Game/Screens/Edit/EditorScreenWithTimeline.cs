@@ -4,22 +4,20 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Overlays;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
 
 namespace osu.Game.Screens.Edit
 {
+    [Cached]
     public abstract partial class EditorScreenWithTimeline : EditorScreen
     {
-        public const float PADDING = 10;
+        public TimelineArea TimelineArea { get; private set; } = null!;
 
-        private Container timelineContainer = null!;
-
-        private Container mainContent = null!;
+        public Container MainContent { get; private set; } = null!;
 
         private LoadingSpinner spinner = null!;
+        private Container timelineContent = null!;
 
         protected EditorScreenWithTimeline(EditorScreenMode type)
             : base(type)
@@ -27,7 +25,7 @@ namespace osu.Game.Screens.Edit
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OverlayColourProvider colourProvider)
+        private void load()
         {
             // Grid with only two rows.
             // First is the timeline area, which should be allowed to expand as required.
@@ -51,49 +49,38 @@ namespace osu.Game.Screens.Edit
                             AutoSizeAxes = Axes.Y,
                             Children = new Drawable[]
                             {
-                                new Box
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Colour = colourProvider.Background4
-                                },
-                                new Container
+                                new GridContainer
                                 {
                                     Name = "Timeline content",
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
-                                    Padding = new MarginPadding { Horizontal = PADDING, Top = PADDING },
-                                    Child = new GridContainer
+                                    Content = new[]
                                     {
-                                        RelativeSizeAxes = Axes.X,
-                                        AutoSizeAxes = Axes.Y,
-                                        Content = new[]
+                                        new Drawable[]
                                         {
-                                            new Drawable[]
+                                            timelineContent = new Container
                                             {
-                                                timelineContainer = new Container
-                                                {
-                                                    RelativeSizeAxes = Axes.X,
-                                                    AutoSizeAxes = Axes.Y,
-                                                },
+                                                RelativeSizeAxes = Axes.X,
+                                                AutoSizeAxes = Axes.Y,
                                             },
                                         },
-                                        RowDimensions = new[]
-                                        {
-                                            new Dimension(GridSizeMode.AutoSize),
-                                        },
-                                        ColumnDimensions = new[]
-                                        {
-                                            new Dimension(),
-                                            new Dimension(GridSizeMode.Absolute, 90),
-                                        }
                                     },
+                                    RowDimensions = new[]
+                                    {
+                                        new Dimension(GridSizeMode.AutoSize),
+                                    },
+                                    ColumnDimensions = new[]
+                                    {
+                                        new Dimension(),
+                                        new Dimension(GridSizeMode.Absolute, 90),
+                                    }
                                 }
                             }
                         },
                     },
                     new Drawable[]
                     {
-                        mainContent = new Container
+                        MainContent = new Container
                         {
                             Name = "Main content",
                             RelativeSizeAxes = Axes.Both,
@@ -116,11 +103,19 @@ namespace osu.Game.Screens.Edit
             {
                 spinner.State.Value = Visibility.Hidden;
 
-                mainContent.Add(content);
+                MainContent.Add(content);
                 content.FadeInFromZero(300, Easing.OutQuint);
 
-                LoadComponentAsync(new TimelineArea(CreateTimelineContent()), timelineContainer.Add);
+                LoadComponentAsync(TimelineArea = new TimelineArea(CreateTimelineContent()), timeline =>
+                {
+                    ConfigureTimeline(timeline);
+                    timelineContent.Add(timeline);
+                });
             });
+        }
+
+        protected virtual void ConfigureTimeline(TimelineArea timelineArea)
+        {
         }
 
         protected abstract Drawable CreateMainContent();

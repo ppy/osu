@@ -261,6 +261,12 @@ namespace osu.Game.Tests.Visual.Beatmaps
         }
 
         [Test]
+        public void TestNano()
+        {
+            createTestCase(beatmapSetInfo => new BeatmapCardNano(beatmapSetInfo));
+        }
+
+        [Test]
         public void TestNormal()
         {
             createTestCase(beatmapSetInfo => new BeatmapCardNormal(beatmapSetInfo));

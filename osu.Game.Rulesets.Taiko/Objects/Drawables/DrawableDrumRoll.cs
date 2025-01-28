@@ -31,6 +31,9 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         public override Quad ScreenSpaceDrawQuad => MainPiece.Drawable.ScreenSpaceDrawQuad;
 
+        // done strictly for editor purposes.
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => MainPiece.Drawable.ReceivePositionalInputAt(screenSpacePos);
+
         /// <summary>
         /// Rolling number of tick hits. This increases for hits and decreases for misses.
         /// </summary>
@@ -78,6 +81,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         {
             base.RecreatePieces();
             updateColour();
+            Height = HitObject.IsStrong ? TaikoStrongableHitObject.DEFAULT_STRONG_SIZE : TaikoHitObject.DEFAULT_SIZE;
         }
 
         protected override void OnFree()
@@ -143,7 +147,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             if (timeOffset < 0)
                 return;
 
-            ApplyResult(r => r.Type = r.Judgement.MaxResult);
+            ApplyMaxResult();
         }
 
         protected override void UpdateHitStateTransforms(ArmedState state)
@@ -192,7 +196,11 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 if (!ParentHitObject.Judged)
                     return;
 
-                ApplyResult(r => r.Type = ParentHitObject.IsHit ? r.Judgement.MaxResult : r.Judgement.MinResult);
+                ApplyResult(static (r, hitObject) =>
+                {
+                    var drumRoll = (StrongNestedHit)hitObject;
+                    r.Type = drumRoll.ParentHitObject!.IsHit ? r.Judgement.MaxResult : r.Judgement.MinResult;
+                });
             }
 
             public override bool OnPressed(KeyBindingPressEvent<TaikoAction> e) => false;

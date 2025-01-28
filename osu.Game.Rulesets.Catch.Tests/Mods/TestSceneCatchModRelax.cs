@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Catch.Tests.Mods
             Mod = new CatchModRelax(),
             Autoplay = false,
             PassCondition = passCondition,
-            Beatmap = new Beatmap
+            CreateBeatmap = () => new Beatmap
             {
                 HitObjects = new List<HitObject>
                 {
@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Catch.Tests.Mods
                     {
                         X = CatchPlayfield.CENTER_X,
                         StartTime = 3000,
-                        Path = new SliderPath(PathType.Linear, new[] { Vector2.Zero, Vector2.UnitY * 200 })
+                        Path = new SliderPath(PathType.LINEAR, new[] { Vector2.Zero, Vector2.UnitY * 200 })
                     }
                 }
             }

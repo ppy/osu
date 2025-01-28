@@ -17,7 +17,9 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Taiko.Skinning.Default;
+using osu.Game.Screens.Play;
 using osu.Game.Skinning;
+using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
@@ -33,12 +35,21 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         /// </summary>
         private const double ring_appear_offset = 100;
 
+        private Vector2 baseSize;
+
         private readonly Container<DrawableSwellTick> ticks;
         private readonly Container bodyContainer;
         private readonly CircularContainer targetRing;
         private readonly CircularContainer expandingRing;
 
+        private double? lastPressHandleTime;
+
         public override bool DisplayResult => false;
+
+        /// <summary>
+        /// Whether the player must alternate centre and rim hits.
+        /// </summary>
+        public bool MustAlternate { get; internal set; } = true;
 
         public DrawableSwell()
             : this(null)
@@ -133,6 +144,12 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 Origin = Anchor.Centre,
             });
 
+        protected override void RecreatePieces()
+        {
+            base.RecreatePieces();
+            Size = baseSize = new Vector2(TaikoHitObject.DEFAULT_SIZE);
+        }
+
         protected override void OnFree()
         {
             base.OnFree();
@@ -140,6 +157,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             UnproxyContent();
 
             lastWasCentre = null;
+            lastPressHandleTime = null;
         }
 
         protected override void AddNestedHitObject(DrawableHitObject hitObject)
@@ -202,7 +220,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 expandingRing.ScaleTo(1f + Math.Min(target_ring_scale - 1f, (target_ring_scale - 1f) * completion * 1.3f), 260, Easing.OutQuint);
 
                 if (numHits == HitObject.RequiredHits)
-                    ApplyResult(r => r.Type = r.Judgement.MaxResult);
+                    ApplyMaxResult();
             }
             else
             {
@@ -223,7 +241,10 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                         tick.TriggerResult(false);
                 }
 
-                ApplyResult(r => r.Type = numHits == HitObject.RequiredHits ? r.Judgement.MaxResult : r.Judgement.MinResult);
+                if (numHits == HitObject.RequiredHits)
+                    ApplyMaxResult();
+                else
+                    ApplyMinResult();
             }
         }
 
@@ -257,7 +278,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         {
             base.Update();
 
-            Size = BaseSize * Parent.RelativeChildSize;
+            Size = baseSize * Parent!.RelativeChildSize;
 
             // Make the swell stop at the hit target
             X = Math.Max(0, X);
@@ -266,6 +287,9 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 ProxyContent();
             else
                 UnproxyContent();
+
+            if ((Clock as IGameplayClock)?.IsRewinding == true)
+                lastPressHandleTime = null;
         }
 
         private bool? lastWasCentre;
@@ -282,10 +306,17 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             bool isCentre = e.Action == TaikoAction.LeftCentre || e.Action == TaikoAction.RightCentre;
 
             // Ensure alternating centre and rim hits
-            if (lastWasCentre == isCentre)
+            if (lastWasCentre == isCentre && MustAlternate)
                 return false;
 
+            // If we've already successfully judged a tick this frame, do not judge more.
+            // Note that the ordering is important here - this is intentionally placed after the alternating check.
+            // That is done to prevent accidental double inputs blocking simultaneous but legitimate hits from registering.
+            if (lastPressHandleTime == Time.Current)
+                return true;
+
             lastWasCentre = isCentre;
+            lastPressHandleTime = Time.Current;
 
             UpdateResult(true);
 

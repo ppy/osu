@@ -37,13 +37,17 @@ namespace osu.Game.Overlays.Notifications
             notifications.Insert((int)position, notification);
         }
 
-        public IEnumerable<Type> AcceptedNotificationTypes { get; }
+        /// <summary>
+        /// Enumerable of notification types accepted in this section.
+        /// If <see langword="null"/>, the section accepts any and all notifications.
+        /// </summary>
+        public IEnumerable<Type>? AcceptedNotificationTypes { get; }
 
         private readonly LocalisableString titleText;
 
-        public NotificationSection(LocalisableString title, IEnumerable<Type> acceptedNotificationTypes)
+        public NotificationSection(LocalisableString title, IEnumerable<Type>? acceptedNotificationTypes = null)
         {
-            AcceptedNotificationTypes = acceptedNotificationTypes.ToArray();
+            AcceptedNotificationTypes = acceptedNotificationTypes?.ToArray();
 
             titleText = title;
         }

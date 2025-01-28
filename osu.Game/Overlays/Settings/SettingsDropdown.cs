@@ -16,6 +16,18 @@ namespace osu.Game.Overlays.Settings
     {
         protected new OsuDropdown<T> Control => (OsuDropdown<T>)base.Control;
 
+        public bool AlwaysShowSearchBar
+        {
+            get => Control.AlwaysShowSearchBar;
+            set => Control.AlwaysShowSearchBar = value;
+        }
+
+        public bool AllowNonContiguousMatching
+        {
+            get => Control.AllowNonContiguousMatching;
+            set => Control.AllowNonContiguousMatching = value;
+        }
+
         public IEnumerable<T> Items
         {
             get => Control.Items;

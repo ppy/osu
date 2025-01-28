@@ -67,6 +67,7 @@ namespace osu.Game.Tests.Visual.Online
             Schedule(() =>
             {
                 API.Login("test", "test");
+                dummyAPI.AuthenticateSecondFactor("abcdefgh");
                 Child = commentsContainer = new CommentsContainer();
             });
         }
@@ -262,7 +263,7 @@ namespace osu.Game.Tests.Visual.Online
             AddAssert("Nothing happened", () => this.ChildrenOfType<ReportCommentPopover>().Any());
             AddStep("Set report data", () =>
             {
-                var field = this.ChildrenOfType<ReportCommentPopover>().Single().ChildrenOfType<OsuTextBox>().Single();
+                var field = this.ChildrenOfType<ReportCommentPopover>().Single().ChildrenOfType<OsuTextBox>().First();
                 field.Current.Value = report_text;
                 var reason = this.ChildrenOfType<OsuEnumDropdown<CommentReportReason>>().Single();
                 reason.Current.Value = CommentReportReason.Other;

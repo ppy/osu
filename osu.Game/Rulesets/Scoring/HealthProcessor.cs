@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Scoring
         public event Func<bool>? Failed;
 
         /// <summary>
-        /// Additional conditions on top of <see cref="DefaultFailCondition"/> that cause a failing state.
+        /// Additional conditions on top of <see cref="CheckDefaultFailCondition"/> that cause a failing state.
         /// </summary>
         public event Func<HealthProcessor, JudgementResult, bool>? FailConditions;
 
@@ -36,6 +36,9 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         public void TriggerFailure()
         {
+            if (HasFailed)
+                return;
+
             if (Failed?.Invoke() != false)
                 HasFailed = true;
         }
@@ -66,12 +69,13 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         /// <param name="result">The <see cref="JudgementResult"/>.</param>
         /// <returns>The health increase.</returns>
-        protected virtual double GetHealthIncreaseFor(JudgementResult result) => result.Judgement.HealthIncreaseFor(result);
+        protected virtual double GetHealthIncreaseFor(JudgementResult result) => result.HealthIncrease;
 
         /// <summary>
-        /// The default conditions for failing.
+        /// Checks whether the default conditions for failing are met.
         /// </summary>
-        protected virtual bool DefaultFailCondition => Precision.AlmostBigger(Health.MinValue, Health.Value);
+        /// <returns><see langword="true"/> if failure should be invoked.</returns>
+        protected virtual bool CheckDefaultFailCondition(JudgementResult result) => Precision.AlmostBigger(Health.MinValue, Health.Value);
 
         /// <summary>
         /// Whether the current state of <see cref="HealthProcessor"/> or the provided <paramref name="result"/> meets any fail condition.
@@ -79,7 +83,7 @@ namespace osu.Game.Rulesets.Scoring
         /// <param name="result">The judgement result.</param>
         private bool meetsAnyFailCondition(JudgementResult result)
         {
-            if (DefaultFailCondition)
+            if (CheckDefaultFailCondition(result))
                 return true;
 
             if (FailConditions != null)

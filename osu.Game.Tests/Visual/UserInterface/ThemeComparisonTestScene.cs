@@ -6,39 +6,64 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Overlays;
+using osuTK;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public abstract partial class ThemeComparisonTestScene : OsuGridTestScene
+    public abstract partial class ThemeComparisonTestScene : OsuManualInputManagerTestScene
     {
-        protected ThemeComparisonTestScene()
-            : base(1, 2)
+        private readonly bool showWithoutColourProvider;
+
+        public Container ContentContainer { get; private set; } = null!;
+
+        protected ThemeComparisonTestScene(bool showWithoutColourProvider = true)
         {
+            this.showWithoutColourProvider = showWithoutColourProvider;
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            Cell(0, 0).AddRange(new[]
+            Child = ContentContainer = new Container
             {
-                new Box
+                Anchor = Anchor.TopRight,
+                Origin = Anchor.TopRight,
+                RelativeSizeAxes = Axes.Both,
+            };
+
+            if (showWithoutColourProvider)
+            {
+                ContentContainer.Size = new Vector2(0.5f, 1f);
+
+                Add(new Container
                 {
+                    Anchor = Anchor.TopLeft,
+                    Origin = Anchor.TopLeft,
                     RelativeSizeAxes = Axes.Both,
-                    Colour = colours.GreySeaFoam
-                },
-                CreateContent()
-            });
+                    Size = new Vector2(0.5f, 1f),
+                    Children = new[]
+                    {
+                        new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = colours.GreySeaFoam
+                        },
+                        CreateContent()
+                    }
+                });
+            }
         }
 
         protected void CreateThemedContent(OverlayColourScheme colourScheme)
         {
             var colourProvider = new OverlayColourProvider(colourScheme);
 
-            Cell(0, 1).Clear();
-            Cell(0, 1).Add(new DependencyProvidingContainer
+            ContentContainer.Clear();
+            ContentContainer.Add(new DependencyProvidingContainer
             {
                 RelativeSizeAxes = Axes.Both,
                 CachedDependencies = new (Type, object)[]
@@ -50,7 +75,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = colourProvider.Background4
+                        Colour = colourProvider.Background3
                     },
                     CreateContent()
                 }

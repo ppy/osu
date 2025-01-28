@@ -1,12 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.IO;
 using System.Linq;
-using JetBrains.Annotations;
 using Microsoft.Win32;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.ObjectExtensions;
@@ -24,36 +21,35 @@ namespace osu.Game.Tournament.IPC
 {
     public partial class FileBasedIPC : MatchIPCInfo
     {
-        public Storage IPCStorage { get; private set; }
+        public Storage? IPCStorage { get; private set; }
 
         [Resolved]
-        protected IAPIProvider API { get; private set; }
+        protected IAPIProvider API { get; private set; } = null!;
 
         [Resolved]
-        protected IRulesetStore Rulesets { get; private set; }
+        protected IRulesetStore Rulesets { get; private set; } = null!;
 
         [Resolved]
-        private GameHost host { get; set; }
+        private GameHost host { get; set; } = null!;
 
         [Resolved]
-        private LadderInfo ladder { get; set; }
+        private LadderInfo ladder { get; set; } = null!;
 
         [Resolved]
-        private StableInfo stableInfo { get; set; }
+        private StableInfo stableInfo { get; set; } = null!;
 
         private int lastBeatmapId;
-        private ScheduledDelegate scheduled;
-        private GetBeatmapRequest beatmapLookupRequest;
+        private ScheduledDelegate? scheduled;
+        private GetBeatmapRequest? beatmapLookupRequest;
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            string stablePath = stableInfo.StablePath ?? findStablePath();
+            string? stablePath = stableInfo.StablePath ?? findStablePath();
             initialiseIPCStorage(stablePath);
         }
 
-        [CanBeNull]
-        private Storage initialiseIPCStorage(string path)
+        private Storage? initialiseIPCStorage(string? path)
         {
             scheduled?.Cancel();
 
@@ -89,14 +85,23 @@ namespace osu.Game.Tournament.IPC
 
                                     lastBeatmapId = beatmapId;
 
-                                    var existing = ladder.CurrentMatch.Value?.Round.Value?.Beatmaps.FirstOrDefault(b => b.ID == beatmapId && b.Beatmap != null);
+                                    var existing = ladder.CurrentMatch.Value?.Round.Value?.Beatmaps.FirstOrDefault(b => b.ID == beatmapId);
 
                                     if (existing != null)
                                         Beatmap.Value = existing.Beatmap;
                                     else
                                     {
                                         beatmapLookupRequest = new GetBeatmapRequest(new APIBeatmap { OnlineID = beatmapId });
-                                        beatmapLookupRequest.Success += b => Beatmap.Value = new TournamentBeatmap(b);
+                                        beatmapLookupRequest.Success += b =>
+                                        {
+                                            if (lastBeatmapId == beatmapId)
+                                                Beatmap.Value = new TournamentBeatmap(b);
+                                        };
+                                        beatmapLookupRequest.Failure += _ =>
+                                        {
+                                            if (lastBeatmapId == beatmapId)
+                                                Beatmap.Value = null;
+                                        };
                                         API.Queue(beatmapLookupRequest);
                                     }
                                 }
@@ -114,7 +119,7 @@ namespace osu.Game.Tournament.IPC
                             using (var stream = IPCStorage.GetStream(file_ipc_channel_filename))
                             using (var sr = new StreamReader(stream))
                             {
-                                ChatChannel.Value = sr.ReadLine();
+                                ChatChannel.Value = sr.ReadLine().AsNonNull();
                             }
                         }
                         catch (Exception)
@@ -140,8 +145,8 @@ namespace osu.Game.Tournament.IPC
                             using (var stream = IPCStorage.GetStream(file_ipc_scores_filename))
                             using (var sr = new StreamReader(stream))
                             {
-                                Score1.Value = int.Parse(sr.ReadLine());
-                                Score2.Value = int.Parse(sr.ReadLine());
+                                Score1.Value = int.Parse(sr.ReadLine().AsNonNull());
+                                Score2.Value = int.Parse(sr.ReadLine().AsNonNull());
                             }
                         }
                         catch (Exception)
@@ -164,7 +169,7 @@ namespace osu.Game.Tournament.IPC
         /// </summary>
         /// <param name="path">Path to the IPC directory</param>
         /// <returns>Whether the supplied path was a valid IPC directory.</returns>
-        public bool SetIPCLocation(string path)
+        public bool SetIPCLocation(string? path)
         {
             if (path == null || !ipcFileExistsInDirectory(path))
                 return false;
@@ -184,29 +189,28 @@ namespace osu.Game.Tournament.IPC
         /// <returns>Whether an IPC directory was successfully auto-detected.</returns>
         public bool AutoDetectIPCLocation() => SetIPCLocation(findStablePath());
 
-        private static bool ipcFileExistsInDirectory(string p) => p != null && File.Exists(Path.Combine(p, "ipc.txt"));
+        private static bool ipcFileExistsInDirectory(string? p) => p != null && File.Exists(Path.Combine(p, "ipc.txt"));
 
-        [CanBeNull]
-        private string findStablePath()
+        private string? findStablePath()
         {
-            string stableInstallPath = findFromEnvVar() ??
-                                       findFromRegistry() ??
-                                       findFromLocalAppData() ??
-                                       findFromDotFolder();
+            string? stableInstallPath = findFromEnvVar() ??
+                                        findFromRegistry() ??
+                                        findFromLocalAppData() ??
+                                        findFromDotFolder();
 
             Logger.Log($"Stable path for tourney usage: {stableInstallPath}");
             return stableInstallPath;
         }
 
-        private string findFromEnvVar()
+        private string? findFromEnvVar()
         {
             try
             {
                 Logger.Log("Trying to find stable with environment variables");
-                string stableInstallPath = Environment.GetEnvironmentVariable("OSU_STABLE_PATH");
+                string? stableInstallPath = Environment.GetEnvironmentVariable("OSU_STABLE_PATH");
 
                 if (ipcFileExistsInDirectory(stableInstallPath))
-                    return stableInstallPath;
+                    return stableInstallPath!;
             }
             catch
             {
@@ -215,7 +219,7 @@ namespace osu.Game.Tournament.IPC
             return null;
         }
 
-        private string findFromLocalAppData()
+        private string? findFromLocalAppData()
         {
             Logger.Log("Trying to find stable in %LOCALAPPDATA%");
             string stableInstallPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), @"osu!");
@@ -226,7 +230,7 @@ namespace osu.Game.Tournament.IPC
             return null;
         }
 
-        private string findFromDotFolder()
+        private string? findFromDotFolder()
         {
             Logger.Log("Trying to find stable in dotfolders");
             string stableInstallPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".osu");
@@ -237,16 +241,16 @@ namespace osu.Game.Tournament.IPC
             return null;
         }
 
-        private string findFromRegistry()
+        private string? findFromRegistry()
         {
             Logger.Log("Trying to find stable in registry");
 
             try
             {
-                string stableInstallPath;
+                string? stableInstallPath;
 
 #pragma warning disable CA1416
-                using (RegistryKey key = Registry.ClassesRoot.OpenSubKey("osu"))
+                using (RegistryKey? key = Registry.ClassesRoot.OpenSubKey("osu"))
                     stableInstallPath = key?.OpenSubKey(@"shell\open\command")?.GetValue(string.Empty)?.ToString()?.Split('"')[1].Replace("osu!.exe", "");
 #pragma warning restore CA1416
 

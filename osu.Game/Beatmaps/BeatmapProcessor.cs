@@ -24,12 +24,6 @@ namespace osu.Game.Beatmaps
 
             foreach (var obj in Beatmap.HitObjects.OfType<IHasComboInformation>())
             {
-                if (lastObj == null)
-                {
-                    // first hitobject should always be marked as a new combo for sanity.
-                    obj.NewCombo = true;
-                }
-
                 obj.UpdateComboInformation(lastObj);
                 lastObj = obj;
             }

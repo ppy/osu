@@ -18,7 +18,7 @@ namespace osu.Game.Screens.Ranking
 {
     public partial class ReplayDownloadButton : CompositeDrawable, IKeyBindingHandler<GlobalAction>
     {
-        public readonly Bindable<ScoreInfo> Score = new Bindable<ScoreInfo>();
+        public readonly Bindable<ScoreInfo?> Score = new Bindable<ScoreInfo?>();
 
         protected readonly Bindable<DownloadState> State = new Bindable<DownloadState>();
 
@@ -37,14 +37,14 @@ namespace osu.Game.Screens.Ranking
                 if (State.Value == DownloadState.LocallyAvailable)
                     return ReplayAvailability.Local;
 
-                if (Score.Value?.HasReplay == true)
+                if (Score.Value?.HasOnlineReplay == true)
                     return ReplayAvailability.Online;
 
                 return ReplayAvailability.NotAvailable;
             }
         }
 
-        public ReplayDownloadButton(ScoreInfo score)
+        public ReplayDownloadButton(ScoreInfo? score)
         {
             Score.Value = score;
             Size = new Vector2(50, 30);
@@ -67,11 +67,11 @@ namespace osu.Game.Screens.Ranking
                 switch (State.Value)
                 {
                     case DownloadState.LocallyAvailable:
-                        game?.PresentScore(Score.Value, ScorePresentType.Gameplay);
+                        game?.PresentScore(Score.Value!, ScorePresentType.Gameplay);
                         break;
 
                     case DownloadState.NotDownloaded:
-                        scoreDownloader.Download(Score.Value);
+                        scoreDownloader.Download(Score.Value!);
                         break;
 
                     case DownloadState.Importing:
@@ -83,7 +83,13 @@ namespace osu.Game.Screens.Ranking
 
             Score.BindValueChanged(score =>
             {
+                // An export may be pending from the last score.
+                // Reset this to meet user expectations (a new score which has just been switched to shouldn't export)
+                State.ValueChanged -= exportWhenReady;
+
                 downloadTracker?.RemoveAndDisposeImmediately();
+                downloadTracker = null;
+                State.SetDefault();
 
                 if (score.NewValue != null)
                 {
@@ -117,11 +123,17 @@ namespace osu.Game.Screens.Ranking
                     return true;
 
                 case GlobalAction.ExportReplay:
-                    State.BindValueChanged(exportWhenReady, true);
-
-                    // start the import via button
-                    if (State.Value != DownloadState.LocallyAvailable)
+                    if (State.Value == DownloadState.LocallyAvailable)
+                    {
+                        State.BindValueChanged(exportWhenReady, true);
+                    }
+                    else
+                    {
+                        // A download needs to be performed before we can export this replay.
                         button.TriggerClick();
+                        if (button.Enabled.Value)
+                            State.BindValueChanged(exportWhenReady, true);
+                    }
 
                     return true;
             }
@@ -137,7 +149,7 @@ namespace osu.Game.Screens.Ranking
         {
             if (state.NewValue != DownloadState.LocallyAvailable) return;
 
-            scoreManager.Export(Score.Value);
+            scoreManager.Export(Score.Value!);
 
             State.ValueChanged -= exportWhenReady;
         }

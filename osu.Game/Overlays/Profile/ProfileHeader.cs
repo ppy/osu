@@ -6,6 +6,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
+using osu.Game.Graphics;
 using osu.Game.Overlays.Profile.Header;
 using osu.Game.Overlays.Profile.Header.Components;
 using osu.Game.Resources.Localisation.Web;
@@ -86,7 +87,7 @@ namespace osu.Game.Overlays.Profile
             public ProfileHeaderTitle()
             {
                 Title = PageTitleStrings.MainUsersControllerDefault;
-                IconTexture = "Icons/Hexacons/profile";
+                Icon = OsuIcon.Player;
             }
         }
     }

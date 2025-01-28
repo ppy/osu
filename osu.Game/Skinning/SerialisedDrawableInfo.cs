@@ -33,11 +33,15 @@ namespace osu.Game.Skinning
 
         public float Rotation { get; set; }
 
-        public Vector2 Scale { get; set; }
+        public Vector2 Scale { get; set; } = Vector2.One;
 
-        public Anchor Anchor { get; set; }
+        public float? Width { get; set; }
 
-        public Anchor Origin { get; set; }
+        public float? Height { get; set; }
+
+        public Anchor Anchor { get; set; } = Anchor.TopLeft;
+
+        public Anchor Origin { get; set; } = Anchor.TopLeft;
 
         /// <inheritdoc cref="ISerialisableDrawable.UsesFixedAnchor"/>
         public bool UsesFixedAnchor { get; set; }
@@ -62,6 +66,13 @@ namespace osu.Game.Skinning
             Position = component.Position;
             Rotation = component.Rotation;
             Scale = component.Scale;
+
+            if ((component as CompositeDrawable)?.AutoSizeAxes.HasFlag(Axes.X) != true)
+                Width = component.Width;
+
+            if ((component as CompositeDrawable)?.AutoSizeAxes.HasFlag(Axes.Y) != true)
+                Height = component.Height;
+
             Anchor = component.Anchor;
             Origin = component.Origin;
 

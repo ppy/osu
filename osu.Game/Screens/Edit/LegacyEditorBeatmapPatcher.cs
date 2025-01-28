@@ -45,6 +45,8 @@ namespace osu.Game.Screens.Edit
             editorBeatmap.BeginChange();
             processHitObjects(result, () => newBeatmap ??= readBeatmap(newState));
             processTimingPoints(() => newBeatmap ??= readBeatmap(newState));
+            processBreaks(() => newBeatmap ??= readBeatmap(newState));
+            processBookmarks(() => newBeatmap ??= readBeatmap(newState));
             processHitObjectLocalData(() => newBeatmap ??= readBeatmap(newState));
             editorBeatmap.EndChange();
         }
@@ -72,6 +74,48 @@ namespace osu.Game.Screens.Edit
                     foreach (var point in newGroup.ControlPoints)
                         editorBeatmap.ControlPointInfo.Add(newGroup.Time, point);
                 }
+            }
+        }
+
+        private void processBreaks(Func<IBeatmap> getNewBeatmap)
+        {
+            var newBreaks = getNewBeatmap().Breaks.ToArray();
+
+            foreach (var oldBreak in editorBeatmap.Breaks.ToArray())
+            {
+                if (newBreaks.Any(b => b.Equals(oldBreak)))
+                    continue;
+
+                editorBeatmap.Breaks.Remove(oldBreak);
+            }
+
+            foreach (var newBreak in newBreaks)
+            {
+                if (editorBeatmap.Breaks.Any(b => b.Equals(newBreak)))
+                    continue;
+
+                editorBeatmap.Breaks.Add(newBreak);
+            }
+        }
+
+        private void processBookmarks(Func<IBeatmap> getNewBeatmap)
+        {
+            var newBookmarks = getNewBeatmap().Bookmarks.ToHashSet();
+
+            foreach (int oldBookmark in editorBeatmap.Bookmarks.ToArray())
+            {
+                if (newBookmarks.Contains(oldBookmark))
+                    continue;
+
+                editorBeatmap.Bookmarks.Remove(oldBookmark);
+            }
+
+            foreach (int newBookmark in newBookmarks)
+            {
+                if (editorBeatmap.Bookmarks.Contains(newBookmark))
+                    continue;
+
+                editorBeatmap.Bookmarks.Add(newBookmark);
             }
         }
 
@@ -114,7 +158,7 @@ namespace osu.Game.Screens.Edit
                     continue;
 
                 if (oldObject is IHasSliderVelocity oldWithVelocity && newObject is IHasSliderVelocity newWithVelocity)
-                    oldWithVelocity.SliderVelocity = newWithVelocity.SliderVelocity;
+                    oldWithVelocity.SliderVelocityMultiplier = newWithVelocity.SliderVelocityMultiplier;
 
                 oldObject.Samples = newObject.Samples;
 
@@ -123,6 +167,8 @@ namespace osu.Game.Screens.Edit
                     oldWithRepeats.NodeSamples.Clear();
                     oldWithRepeats.NodeSamples.AddRange(newWithRepeats.NodeSamples);
                 }
+
+                editorBeatmap.Update(oldObject);
             }
         }
 

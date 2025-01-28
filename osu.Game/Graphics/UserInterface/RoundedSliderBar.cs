@@ -2,20 +2,22 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osuTK;
+using System.Numerics;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Overlays;
+using Vector2 = osuTK.Vector2;
 
 namespace osu.Game.Graphics.UserInterface
 {
     public partial class RoundedSliderBar<T> : OsuSliderBar<T>
-        where T : struct, IEquatable<T>, IComparable<T>, IConvertible
+        where T : struct, INumber<T>, IMinMaxValue<T>
     {
         protected readonly Nub Nub;
         protected readonly Box LeftBox;
@@ -23,6 +25,8 @@ namespace osu.Game.Graphics.UserInterface
         private readonly Container nubContainer;
 
         private readonly HoverClickSounds hoverClickSounds;
+
+        private readonly Container mainContent;
 
         private Color4 accentColour;
 
@@ -61,7 +65,7 @@ namespace osu.Game.Graphics.UserInterface
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
                     Padding = new MarginPadding { Horizontal = 2 },
-                    Child = new CircularContainer
+                    Child = mainContent = new CircularContainer
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
@@ -93,11 +97,16 @@ namespace osu.Game.Graphics.UserInterface
                 nubContainer = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Child = Nub = new Nub
+                    Child = Nub = new SliderNub
                     {
                         Origin = Anchor.TopCentre,
                         RelativePositionAxes = Axes.X,
-                        Current = { Value = true }
+                        Current = { Value = true },
+                        OnDoubleClicked = () =>
+                        {
+                            if (!Current.Disabled)
+                                Current.SetDefault();
+                        },
                     },
                 },
                 hoverClickSounds = new HoverClickSounds()
@@ -127,6 +136,26 @@ namespace osu.Game.Graphics.UserInterface
                 Alpha = disabled ? 0.3f : 1;
                 hoverClickSounds.Enabled.Value = !disabled;
             }, true);
+        }
+
+        protected override void OnFocus(FocusEvent e)
+        {
+            base.OnFocus(e);
+
+            mainContent.EdgeEffect = new EdgeEffectParameters
+            {
+                Type = EdgeEffectType.Glow,
+                Colour = AccentColour.Darken(1),
+                Hollow = true,
+                Radius = 2,
+            };
+        }
+
+        protected override void OnFocusLost(FocusLostEvent e)
+        {
+            base.OnFocusLost(e);
+
+            mainContent.EdgeEffect = default;
         }
 
         protected override bool OnHover(HoverEvent e)
@@ -165,6 +194,19 @@ namespace osu.Game.Graphics.UserInterface
         protected override void UpdateValue(float value)
         {
             Nub.MoveToX(value, 250, Easing.OutQuint);
+        }
+
+        public partial class SliderNub : Nub
+        {
+            public Action? OnDoubleClicked { get; init; }
+
+            protected override bool OnClick(ClickEvent e) => true;
+
+            protected override bool OnDoubleClick(DoubleClickEvent e)
+            {
+                OnDoubleClicked?.Invoke();
+                return true;
+            }
         }
     }
 }

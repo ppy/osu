@@ -11,12 +11,12 @@ namespace osu.Game.Screens.Play.Break
 {
     public partial class LetterboxOverlay : CompositeDrawable
     {
-        private const int height = 350;
-
         private static readonly Color4 transparent_black = new Color4(0, 0, 0, 0);
 
         public LetterboxOverlay()
         {
+            const int height = 150;
+
             RelativeSizeAxes = Axes.Both;
             InternalChildren = new Drawable[]
             {

@@ -13,7 +13,6 @@ using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osuTK;
 
@@ -56,11 +55,6 @@ namespace osu.Game.Overlays
             }
         }
 
-        public RevertToDefaultButton()
-            : base(HoverSampleSet.Button)
-        {
-        }
-
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -93,6 +87,7 @@ namespace osu.Game.Overlays
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
             updateState();
             FinishTransforms(true);
         }
@@ -101,28 +96,50 @@ namespace osu.Game.Overlays
 
         protected override bool OnHover(HoverEvent e)
         {
-            UpdateState();
+            updateHover();
             return false;
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            UpdateState();
+            updateHover();
         }
 
         public void UpdateState() => Scheduler.AddOnce(updateState);
 
         private const double fade_duration = 200;
 
+        private bool? isDisplayed;
+
         private void updateState()
         {
             if (current == null)
                 return;
 
+            // Avoid running animations if we are already in an up-to-date state.
+            if (Enabled.Value == !current.Disabled && isDisplayed == !current.IsDefault)
+                return;
+
             Enabled.Value = !current.Disabled;
+            isDisplayed = !current.IsDefault;
 
-            this.FadeTo(current.Disabled ? 0.2f : (current.IsDefault ? 0 : 1), fade_duration, Easing.OutQuint);
+            updateHover();
 
+            if (isDisplayed == false)
+                this.FadeTo(0, fade_duration, Easing.OutQuint);
+            else if (current.Disabled)
+                this.FadeTo(0.2f, fade_duration, Easing.OutQuint);
+            else
+            {
+                icon.RotateTo(150).RotateTo(0, fade_duration * 2, Easing.OutQuint);
+                icon.ScaleTo(0.7f).ScaleTo(1, fade_duration * 2, Easing.OutQuint);
+
+                this.FadeTo(1, fade_duration, Easing.OutQuint);
+            }
+        }
+
+        private void updateHover()
+        {
             if (IsHovered && Enabled.Value)
             {
                 icon.RotateTo(-40, 500, Easing.OutQuint);

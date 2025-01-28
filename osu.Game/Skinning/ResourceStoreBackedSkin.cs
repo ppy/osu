@@ -33,7 +33,7 @@ namespace osu.Game.Skinning
 
         public ISample? GetSample(ISampleInfo sampleInfo)
         {
-            foreach (string? lookup in sampleInfo.LookupNames)
+            foreach (string lookup in sampleInfo.LookupNames)
             {
                 ISample? sample = samples.Get(lookup);
                 if (sample != null)
@@ -46,7 +46,10 @@ namespace osu.Game.Skinning
         public IBindable<TValue>? GetConfig<TLookup, TValue>(TLookup lookup)
             where TLookup : notnull
             where TValue : notnull
-            => null;
+        {
+            Skin.LogLookupDebug(this, lookup, Skin.LookupDebugType.Miss);
+            return null;
+        }
 
         public void Dispose()
         {

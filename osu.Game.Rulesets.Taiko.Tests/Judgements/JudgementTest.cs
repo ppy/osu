@@ -43,6 +43,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Judgements
             AddStep("load player", () =>
             {
                 Beatmap.Value = CreateWorkingBeatmap(beatmap);
+                Ruleset.Value = new TaikoRuleset().RulesetInfo;
                 SelectedMods.Value = mods ?? Array.Empty<Mod>();
 
                 var p = new ScoreAccessibleReplayPlayer(new Score { Replay = new Replay { Frames = frames } });

@@ -93,8 +93,7 @@ namespace osu.Game.Rulesets.Mania.UI
                 // For input purposes, the background is added at the highest depth, but is then proxied back below all other elements externally
                 // (see `Stage.columnBackgrounds`).
                 BackgroundContainer,
-                TopLevelContainer,
-                new ColumnTouchInputArea(this)
+                TopLevelContainer
             };
 
             var background = new SkinnableDrawable(new ManiaSkinComponentLookup(ManiaSkinComponents.ColumnBackground), _ => new DefaultColumnBackground())
@@ -112,7 +111,7 @@ namespace osu.Game.Rulesets.Mania.UI
             RegisterPool<HoldNote, DrawableHoldNote>(10, 50);
             RegisterPool<HeadNote, DrawableHoldNoteHead>(10, 50);
             RegisterPool<TailNote, DrawableHoldNoteTail>(10, 50);
-            RegisterPool<HoldNoteTick, DrawableHoldNoteTick>(50, 250);
+            RegisterPool<HoldNoteBody, DrawableHoldNoteBody>(10, 50);
         }
 
         private void onSourceChanged()
@@ -181,38 +180,5 @@ namespace osu.Game.Rulesets.Mania.UI
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
             // This probably shouldn't exist as is, but the columns in the stage are separated by a 1px border
             => DrawRectangle.Inflate(new Vector2(Stage.COLUMN_SPACING / 2, 0)).Contains(ToLocalSpace(screenSpacePos));
-
-        public partial class ColumnTouchInputArea : Drawable
-        {
-            private readonly Column column;
-
-            [Resolved(canBeNull: true)]
-            private ManiaInputManager maniaInputManager { get; set; }
-
-            private KeyBindingContainer<ManiaAction> keyBindingContainer;
-
-            public ColumnTouchInputArea(Column column)
-            {
-                RelativeSizeAxes = Axes.Both;
-
-                this.column = column;
-            }
-
-            protected override void LoadComplete()
-            {
-                keyBindingContainer = maniaInputManager?.KeyBindingContainer;
-            }
-
-            protected override bool OnTouchDown(TouchDownEvent e)
-            {
-                keyBindingContainer?.TriggerPressed(column.Action.Value);
-                return true;
-            }
-
-            protected override void OnTouchUp(TouchUpEvent e)
-            {
-                keyBindingContainer?.TriggerReleased(column.Action.Value);
-            }
-        }
     }
 }

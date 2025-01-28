@@ -10,6 +10,7 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Audio.Track;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
@@ -31,15 +32,13 @@ namespace osu.Game.Screens.Menu
     /// </summary>
     public partial class OsuLogo : BeatSyncedContainer
     {
-        public readonly Color4 OsuPink = Color4Extensions.FromHex(@"e967a1");
-
         private const double transition_length = 300;
 
         /// <summary>
         /// The osu! logo sprite has a shadow included in its texture.
         /// This adjustment vector is used to match the precise edge of the border of the logo.
         /// </summary>
-        public static readonly Vector2 SCALE_ADJUST = new Vector2(0.96f);
+        public static readonly Vector2 SCALE_ADJUST = new Vector2(0.94f);
 
         private readonly Sprite logo;
         private readonly CircularContainer logoContainer;
@@ -52,11 +51,17 @@ namespace osu.Game.Screens.Menu
         private readonly IntroSequence intro;
 
         private Sample sampleClick;
-        private Sample sampleBeat;
-        private Sample sampleDownbeat;
+        private SampleChannel sampleClickChannel;
+
+        protected virtual MenuLogoVisualisation CreateMenuLogoVisualisation() => new MenuLogoVisualisation();
+
+        protected virtual double BeatSampleVariance => 0.1;
+
+        protected Sample SampleBeat;
+        protected Sample SampleDownbeat;
 
         private readonly Container colourAndTriangles;
-        private readonly Triangles triangles;
+        private readonly TrianglesV2 triangles;
 
         /// <summary>
         /// Return value decides whether the logo should play its own sample for the click action.
@@ -150,15 +155,15 @@ namespace osu.Game.Screens.Menu
                                             AutoSizeAxes = Axes.Both,
                                             Children = new Drawable[]
                                             {
-                                                visualizer = new MenuLogoVisualisation
+                                                visualizer = CreateMenuLogoVisualisation().With(v =>
                                                 {
-                                                    RelativeSizeAxes = Axes.Both,
-                                                    Origin = Anchor.Centre,
-                                                    Anchor = Anchor.Centre,
-                                                    Alpha = visualizer_default_alpha,
-                                                    Size = SCALE_ADJUST
-                                                },
-                                                new Container
+                                                    v.RelativeSizeAxes = Axes.Both;
+                                                    v.Origin = Anchor.Centre;
+                                                    v.Anchor = Anchor.Centre;
+                                                    v.Alpha = visualizer_default_alpha;
+                                                    v.Size = SCALE_ADJUST;
+                                                }),
+                                                LogoElements = new Container
                                                 {
                                                     AutoSizeAxes = Axes.Both,
                                                     Children = new Drawable[]
@@ -182,13 +187,16 @@ namespace osu.Game.Screens.Menu
                                                                         new Box
                                                                         {
                                                                             RelativeSizeAxes = Axes.Both,
-                                                                            Colour = OsuPink,
+                                                                            Colour = ColourInfo.GradientVertical(Color4Extensions.FromHex(@"ff66ab"), Color4Extensions.FromHex(@"cc5289")),
                                                                         },
-                                                                        triangles = new Triangles
+                                                                        triangles = new TrianglesV2
                                                                         {
-                                                                            TriangleScale = 4,
-                                                                            ColourLight = Color4Extensions.FromHex(@"ff7db7"),
-                                                                            ColourDark = Color4Extensions.FromHex(@"de5b95"),
+                                                                            Anchor = Anchor.Centre,
+                                                                            Origin = Anchor.Centre,
+                                                                            Thickness = 0.009f,
+                                                                            ScaleAdjust = 3,
+                                                                            SpawnRatio = 1.4f,
+                                                                            Colour = ColourInfo.GradientVertical(Color4Extensions.FromHex(@"ff66ab"), Color4Extensions.FromHex(@"b6346f")),
                                                                             RelativeSizeAxes = Axes.Both,
                                                                         },
                                                                     }
@@ -239,6 +247,8 @@ namespace osu.Game.Screens.Menu
             };
         }
 
+        public Container LogoElements { get; private set; }
+
         /// <summary>
         /// Schedule a new external animation. Handled queueing and finishing previous animations in a sane way.
         /// </summary>
@@ -267,8 +277,9 @@ namespace osu.Game.Screens.Menu
         private void load(TextureStore textures, AudioManager audio)
         {
             sampleClick = audio.Samples.Get(@"Menu/osu-logo-select");
-            sampleBeat = audio.Samples.Get(@"Menu/osu-logo-heartbeat");
-            sampleDownbeat = audio.Samples.Get(@"Menu/osu-logo-downbeat");
+
+            SampleBeat = audio.Samples.Get(@"Menu/osu-logo-heartbeat");
+            SampleDownbeat = audio.Samples.Get(@"Menu/osu-logo-downbeat");
 
             logo.Texture = textures.Get(@"Menu/logo");
             ripple.Texture = textures.Get(@"Menu/logo");
@@ -294,12 +305,13 @@ namespace osu.Game.Screens.Menu
                 {
                     if (beatIndex % timingPoint.TimeSignature.Numerator == 0)
                     {
-                        sampleDownbeat?.Play();
+                        SampleDownbeat?.Play();
                     }
                     else
                     {
-                        var channel = sampleBeat.GetChannel();
-                        channel.Frequency.Value = 0.95 + RNG.NextDouble(0.1);
+                        var channel = SampleBeat.GetChannel();
+
+                        channel.Frequency.Value = 1 - BeatSampleVariance / 2 + RNG.NextDouble(BeatSampleVariance);
                         channel.Play();
                     }
                 });
@@ -391,7 +403,11 @@ namespace osu.Game.Screens.Menu
             flashLayer.FadeOut(1500, Easing.OutExpo);
 
             if (Action?.Invoke() == true)
-                sampleClick.Play();
+            {
+                StopSamplePlayback();
+                sampleClickChannel = sampleClick.GetChannel();
+                sampleClickChannel.Play();
+            }
 
             return true;
         }
@@ -440,6 +456,8 @@ namespace osu.Game.Screens.Menu
         private Container currentProxyTarget;
         private Drawable proxy;
 
+        public void StopSamplePlayback() => sampleClickChannel?.Stop();
+
         public Drawable ProxyToContainer(Container c)
         {
             if (currentProxyTarget != null)
@@ -475,6 +493,13 @@ namespace osu.Game.Screens.Menu
 
             defaultProxyTarget.Add(this);
             defaultProxyTarget.Add(proxy = CreateProxy());
+        }
+
+        public void ChangeAnchor(Anchor anchor)
+        {
+            var previousAnchor = AnchorPosition;
+            Anchor = anchor;
+            Position -= AnchorPosition - previousAnchor;
         }
     }
 }

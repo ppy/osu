@@ -210,6 +210,13 @@ namespace osu.Game.Tests.Visual.Editing
             switchPresets(-1);
             assertPreset(BeatDivisorType.Custom, 15);
             assertBeatSnap(15);
+
+            setDivisorViaInput(24);
+            assertPreset(BeatDivisorType.Custom, 24);
+            switchPresets(1);
+            assertPreset(BeatDivisorType.Common);
+            switchPresets(-2);
+            assertPreset(BeatDivisorType.Triplets);
         }
 
         private void switchBeatSnap(int direction) => AddRepeatStep($"move snap {(direction > 0 ? "forward" : "backward")}", () =>

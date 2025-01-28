@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Logging;
+using osu.Framework.Utils;
 using osu.Game.Online.API;
 
 namespace osu.Game.Online
@@ -30,6 +31,12 @@ namespace osu.Game.Online
         private readonly SemaphoreSlim connectionLock = new SemaphoreSlim(1);
         private CancellationTokenSource connectCancelSource = new CancellationTokenSource();
         private bool started;
+
+        /// <summary>
+        /// How much to delay before attempting to connect again, in milliseconds.
+        /// Subject to exponential back-off.
+        /// </summary>
+        private int retryDelay = 3000;
 
         /// <summary>
         /// Constructs a new <see cref="PersistentEndpointClientConnector"/>.
@@ -69,6 +76,7 @@ namespace osu.Game.Online
                     break;
 
                 case APIState.Online:
+                case APIState.RequiresSecondFactorAuth:
                     await connect().ConfigureAwait(true);
                     break;
             }
@@ -77,13 +85,15 @@ namespace osu.Game.Online
         private async Task connect()
         {
             cancelExistingConnect();
+            // reset retry delay to default.
+            retryDelay = 3000;
 
             if (!await connectionLock.WaitAsync(10000).ConfigureAwait(false))
                 throw new TimeoutException("Could not obtain a lock to connect. A previous attempt is likely stuck.");
 
             try
             {
-                while (apiState.Value == APIState.Online)
+                while (apiState.Value == APIState.RequiresSecondFactorAuth || apiState.Value == APIState.Online)
                 {
                     // ensure any previous connection was disposed.
                     // this will also create a new cancellation token source.
@@ -133,8 +143,15 @@ namespace osu.Game.Online
         /// </summary>
         private async Task handleErrorAndDelay(Exception exception, CancellationToken cancellationToken)
         {
-            Logger.Log($"{ClientName} connect attempt failed: {exception.Message}", LoggingTarget.Network);
-            await Task.Delay(5000, cancellationToken).ConfigureAwait(false);
+            // random stagger factor to avoid mass incidental synchronisation
+            // compare: https://github.com/peppy/osu-stable-reference/blob/013c3010a9d495e3471a9c59518de17006f9ad89/osu!/Online/BanchoClient.cs#L331
+            int thisDelay = (int)(retryDelay * RNG.NextDouble(0.75, 1.25));
+            // exponential backoff with upper limit
+            // compare: https://github.com/peppy/osu-stable-reference/blob/013c3010a9d495e3471a9c59518de17006f9ad89/osu!/Online/BanchoClient.cs#L539
+            retryDelay = Math.Min(120000, (int)(retryDelay * 1.5));
+
+            Logger.Log($"{ClientName} connect attempt failed: {exception.Message}. Next attempt in {thisDelay / 1000:N0} seconds.", LoggingTarget.Network);
+            await Task.Delay(thisDelay, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -158,6 +175,8 @@ namespace osu.Game.Online
             if (!hasBeenCancelled)
                 await Task.Run(connect, default).ConfigureAwait(false);
         }
+
+        protected Task Disconnect() => disconnect(true);
 
         private async Task disconnect(bool takeLock)
         {

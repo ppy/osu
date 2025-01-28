@@ -35,6 +35,7 @@ namespace osu.Game.Tests.Database
                         Logger.Log($"Running test using realm file {testStorage.GetFullPath(realm.Filename)}");
                         testAction(realm, testStorage);
 
+                        // ReSharper disable once DisposeOnUsingVariable
                         realm.Dispose();
 
                         Logger.Log($"Final database size: {getFileSize(testStorage, realm)}");
@@ -58,6 +59,7 @@ namespace osu.Game.Tests.Database
                         Logger.Log($"Running test using realm file {testStorage.GetFullPath(realm.Filename)}");
                         await testAction(realm, testStorage);
 
+                        // ReSharper disable once DisposeOnUsingVariable
                         realm.Dispose();
 
                         Logger.Log($"Final database size: {getFileSize(testStorage, realm)}");

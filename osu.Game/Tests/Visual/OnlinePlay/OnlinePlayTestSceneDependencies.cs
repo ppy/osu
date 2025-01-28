@@ -18,7 +18,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
     /// </summary>
     public class OnlinePlayTestSceneDependencies : IReadOnlyDependencyContainer, IOnlinePlayTestSceneDependencies
     {
-        public Bindable<Room> SelectedRoom { get; }
+        public Bindable<Room?> SelectedRoom { get; }
         public IRoomManager RoomManager { get; }
         public OngoingOperationTracker OngoingOperationTracker { get; }
         public OnlinePlayBeatmapAvailabilityTracker AvailabilityTracker { get; }
@@ -36,7 +36,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
 
         public OnlinePlayTestSceneDependencies()
         {
-            SelectedRoom = new Bindable<Room>();
+            SelectedRoom = new Bindable<Room?>();
             RequestsHandler = new TestRoomRequestsHandler();
             OngoingOperationTracker = new OngoingOperationTracker();
             AvailabilityTracker = new OnlinePlayBeatmapAvailabilityTracker();
@@ -44,7 +44,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
             UserLookupCache = new TestUserLookupCache();
             BeatmapLookupCache = new BeatmapLookupCache();
 
-            dependencies = new DependencyContainer(new CachedModelDependencyContainer<Room>(null) { Model = { BindTarget = SelectedRoom } });
+            dependencies = new DependencyContainer();
 
             CacheAs(RequestsHandler);
             CacheAs(SelectedRoom);
@@ -56,10 +56,10 @@ namespace osu.Game.Tests.Visual.OnlinePlay
             CacheAs(BeatmapLookupCache);
         }
 
-        public object Get(Type type)
+        public object? Get(Type type)
             => dependencies.Get(type);
 
-        public object Get(Type type, CacheInfo info)
+        public object? Get(Type type, CacheInfo info)
             => dependencies.Get(type, info);
 
         public void Inject<T>(T instance)

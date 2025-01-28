@@ -7,7 +7,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Utils;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Objects.Types;
@@ -16,7 +15,6 @@ using osu.Game.Rulesets.Osu.Skinning.Default;
 using osu.Game.Screens.Edit;
 using osu.Game.Skinning;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles.Components
 {
@@ -41,20 +39,13 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles.Components
         {
             Origin = Anchor.Centre;
 
-            Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
+            Size = OsuHitObject.OBJECT_DIMENSIONS;
 
             InternalChild = content = new Container
             {
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
-                    new Circle
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.White,
-                    },
                     ring = new RingPiece
                     {
                         BorderThickness = 4,
@@ -78,9 +69,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles.Components
 
             Scale = new Vector2(hitObject.Scale);
 
-            if (hitObject is IHasComboInformation combo)
-                ring.BorderColour = combo.GetComboColour(skin);
-
             double editorTime = editorClock.CurrentTime;
             double hitObjectTime = hitObject.StartTime;
             bool hasReachedObject = editorTime >= hitObjectTime;
@@ -92,6 +80,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles.Components
 
                 ring.Scale = new Vector2(1 + 0.1f * ringScale);
                 content.Alpha = 0.9f * (1 - alpha);
+
+                // TODO: should only update colour on skin/combo/object change.
+                if (hitObject is IHasComboInformation combo && content.Alpha > 0)
+                    ring.BorderColour = combo.GetComboColour(skin);
             }
             else
                 content.Alpha = 0;

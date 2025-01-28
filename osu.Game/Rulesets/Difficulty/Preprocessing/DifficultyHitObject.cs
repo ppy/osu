@@ -4,7 +4,6 @@
 #nullable disable
 
 using System.Collections.Generic;
-using System.Linq;
 using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Difficulty.Preprocessing
@@ -70,8 +69,16 @@ namespace osu.Game.Rulesets.Difficulty.Preprocessing
             EndTime = hitObject.GetEndTime() / clockRate;
         }
 
-        public DifficultyHitObject Previous(int backwardsIndex) => difficultyHitObjects.ElementAtOrDefault(Index - (backwardsIndex + 1));
+        public DifficultyHitObject Previous(int backwardsIndex)
+        {
+            int index = Index - (backwardsIndex + 1);
+            return index >= 0 && index < difficultyHitObjects.Count ? difficultyHitObjects[index] : default;
+        }
 
-        public DifficultyHitObject Next(int forwardsIndex) => difficultyHitObjects.ElementAtOrDefault(Index + (forwardsIndex + 1));
+        public DifficultyHitObject Next(int forwardsIndex)
+        {
+            int index = Index + (forwardsIndex + 1);
+            return index >= 0 && index < difficultyHitObjects.Count ? difficultyHitObjects[index] : default;
+        }
     }
 }

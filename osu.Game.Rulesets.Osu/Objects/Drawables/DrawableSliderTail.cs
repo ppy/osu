@@ -8,14 +8,16 @@ using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Utils;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Skinning;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
-    public partial class DrawableSliderTail : DrawableOsuHitObject, IRequireTracking
+    public partial class DrawableSliderTail : DrawableOsuHitObject
     {
         public new SliderTailCircle HitObject => (SliderTailCircle)base.HitObject;
 
@@ -25,17 +27,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         protected DrawableSlider DrawableSlider => (DrawableSlider)ParentHitObject;
 
         /// <summary>
-        /// The judgement text is provided by the <see cref="DrawableSlider"/>.
-        /// </summary>
-        public override bool DisplayResult => false;
-
-        /// <summary>
         /// Whether the hit samples only play on successful hits.
         /// If <c>false</c>, the hit samples will also play on misses.
         /// </summary>
         public bool SamplePlaysOnlyOnHit { get; set; } = true;
-
-        public bool Tracking { get; set; }
 
         public SkinnableDrawable CirclePiece { get; private set; }
 
@@ -55,7 +50,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private void load()
         {
             Origin = Anchor.Centre;
-            Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
+            Size = OsuHitObject.OBJECT_DIMENSIONS;
 
             AddRangeInternal(new Drawable[]
             {
@@ -123,11 +118,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             }
         }
 
-        protected override void CheckForResult(bool userTriggered, double timeOffset)
-        {
-            if (!userTriggered && timeOffset >= 0)
-                ApplyResult(r => r.Type = Tracking ? r.Judgement.MaxResult : r.Judgement.MinResult);
-        }
+        protected override void CheckForResult(bool userTriggered, double timeOffset) => DrawableSlider.SliderInputManager.TryJudgeNestedObject(this, timeOffset);
 
         protected override void OnApply()
         {
@@ -136,5 +127,32 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (Slider != null)
                 Position = Slider.CurvePositionAt(HitObject.RepeatIndex % 2 == 0 ? 1 : 0);
         }
+
+        #region FOR EDITOR USE ONLY, DO NOT USE FOR ANY OTHER PURPOSE
+
+        internal void SuppressHitAnimations()
+        {
+            UpdateState(ArmedState.Idle);
+            UpdateComboColour();
+
+            // This method is called every frame in editor contexts, thus the lack of need for transforms.
+
+            if (Time.Current >= HitStateUpdateTime)
+            {
+                // More or less matches stable (see https://github.com/peppy/osu-stable-reference/blob/bb57924c1552adbed11ee3d96cdcde47cf96f2b6/osu!/GameplayElements/HitObjects/Osu/HitCircleOsu.cs#L336-L338)
+                AccentColour.Value = Color4.White;
+                Alpha = Interpolation.ValueAt(Time.Current, 1f, 0f, HitStateUpdateTime, HitStateUpdateTime + 700);
+            }
+
+            LifetimeEnd = HitStateUpdateTime + 700;
+        }
+
+        internal void RestoreHitAnimations()
+        {
+            UpdateState(ArmedState.Hit);
+            UpdateComboColour();
+        }
+
+        #endregion
     }
 }

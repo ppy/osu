@@ -5,11 +5,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
+using osu.Game.Database;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays;
@@ -30,6 +32,8 @@ namespace osu.Game.Tests.Visual.UserInterface
         private SpriteText displayedCount = null!;
 
         public double TimeToCompleteProgress { get; set; } = 2000;
+
+        private readonly UserLookupCache userLookupCache = new TestUserLookupCache();
 
         [SetUp]
         public void SetUp() => Schedule(() =>
@@ -60,6 +64,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep(@"simple #2", sendAmazingNotification);
             AddStep(@"progress #1", sendUploadProgress);
             AddStep(@"progress #2", sendDownloadProgress);
+            AddStep(@"User notification", sendUserNotification);
 
             checkProgressingCount(2);
 
@@ -535,6 +540,16 @@ namespace osu.Game.Tests.Visual.UserInterface
             };
             notificationOverlay.Post(n);
             progressingNotifications.Add(n);
+        }
+
+        private void sendUserNotification()
+        {
+            var user = userLookupCache.GetUserAsync(0).GetResultSafely();
+            if (user == null) return;
+
+            var n = new UserAvatarNotification(user, $"{user.Username} invited you to a multiplayer match!");
+
+            notificationOverlay.Post(n);
         }
 
         private void sendUploadProgress()

@@ -65,11 +65,8 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
             if (tmp is IFramedAnimation tmpAnimation && tmpAnimation.FrameCount > 0)
                 frameLength = Math.Max(1000 / 60.0, 170.0 / tmpAnimation.FrameCount);
 
-            light = skin.GetAnimation(lightImage, true, true, frameLength: frameLength).With(d =>
+            light = skin.GetAnimation(lightImage, true, true, frameLength: frameLength)?.With(d =>
             {
-                if (d == null)
-                    return;
-
                 d.Origin = Anchor.Centre;
                 d.Blending = BlendingParameters.Additive;
                 d.Scale = new Vector2(lightScale);
@@ -91,11 +88,8 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
             direction.BindTo(scrollingInfo.Direction);
             isHitting.BindTo(holdNote.IsHitting);
 
-            bodySprite = skin.GetAnimation(imageName, wrapMode, wrapMode, true, true).With(d =>
+            bodySprite = skin.GetAnimation(imageName, wrapMode, wrapMode, true, true, frameLength: 30)?.With(d =>
             {
-                if (d == null)
-                    return;
-
                 if (d is TextureAnimation animation)
                     animation.IsPlaying = false;
 
@@ -123,18 +117,24 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 
         private void applyCustomUpdateState(DrawableHitObject hitObject, ArmedState state)
         {
-            // ensure that the hold note is also faded out when the head/tail/any tick is missed.
-            if (state == ArmedState.Miss)
-                missFadeTime.Value ??= hitObject.HitStateUpdateTime;
+            switch (hitObject)
+            {
+                // Ensure that the hold note is also faded out when the head/tail/body is missed.
+                // Importantly, we filter out unrelated objects like DrawableNotePerfectBonus.
+                case DrawableHoldNoteTail:
+                case DrawableHoldNoteHead:
+                case DrawableHoldNoteBody:
+                    if (state == ArmedState.Miss)
+                        missFadeTime.Value ??= hitObject.HitStateUpdateTime;
+
+                    break;
+            }
         }
 
         private void onIsHittingChanged(ValueChangedEvent<bool> isHitting)
         {
             if (bodySprite is TextureAnimation bodyAnimation)
-            {
-                bodyAnimation.GotoFrame(0);
                 bodyAnimation.IsPlaying = isHitting.NewValue;
-            }
 
             if (lightContainer == null)
                 return;
@@ -209,7 +209,12 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
         protected override void Update()
         {
             base.Update();
-            missFadeTime.Value ??= holdNote.HoldBrokenTime;
+
+            if (!isHitting.Value)
+                (bodySprite as TextureAnimation)?.GotoFrame(0);
+
+            if (holdNote.Body.HasHoldBreak)
+                missFadeTime.Value = holdNote.Body.Result.TimeAbsolute;
 
             int scaleDirection = (direction.Value == ScrollingDirection.Down ? 1 : -1);
 
@@ -223,7 +228,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                     break;
 
                 default:
-                    // this is where things get fucked up.
+                    // this is where things get a bit messed up.
                     // honestly there's three modes to handle here but they seem really pointless?
                     // let's wait to see if anyone actually uses them in skins.
                     if (bodySprite != null)
@@ -232,7 +237,9 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 
                         bodySprite.FillMode = FillMode.Stretch;
                         // i dunno this looks about right??
-                        bodySprite.Scale = new Vector2(1, scaleDirection * 32800 / sprite.DrawHeight);
+                        // the guard against zero draw height is intended for zero-length hold notes. yes, such cases have been spotted in the wild.
+                        if (sprite.DrawHeight > 0)
+                            bodySprite.Scale = new Vector2(1, scaleDirection * MathF.Max(1, 32800 / sprite.DrawHeight));
                     }
 
                     break;

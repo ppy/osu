@@ -68,7 +68,7 @@ namespace osu.Game.Screens.Play.HUD
 
             Spacing = new Vector2(0, -12 * iconScale);
 
-            foreach (Mod mod in current.Value)
+            foreach (Mod mod in current.Value.AsOrdered())
             {
                 Add(new ModIcon(mod)
                 {

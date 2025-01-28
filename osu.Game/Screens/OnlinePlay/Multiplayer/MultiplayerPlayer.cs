@@ -1,14 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Graphics.UserInterface;
@@ -26,23 +25,18 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
     {
         protected override bool PauseOnFocusLost => false;
 
-        // Disallow fails in multiplayer for now.
-        protected override bool CheckModsAllowFailure() => false;
-
         protected override UserActivity InitialActivity => new UserActivity.InMultiplayerGame(Beatmap.Value.BeatmapInfo, Ruleset.Value);
 
         [Resolved]
-        private MultiplayerClient client { get; set; }
+        private MultiplayerClient client { get; set; } = null!;
 
-        private IBindable<bool> isConnected;
+        private IBindable<bool> isConnected = null!;
 
         private readonly TaskCompletionSource<bool> resultsReady = new TaskCompletionSource<bool>();
-
         private readonly MultiplayerRoomUser[] users;
 
-        private LoadingLayer loadingDisplay;
-
-        private MultiplayerGameplayLeaderboard multiplayerLeaderboard;
+        private LoadingLayer loadingDisplay = null!;
+        private MultiplayerGameplayLeaderboard multiplayerLeaderboard = null!;
 
         /// <summary>
         /// Construct a multiplayer player.
@@ -55,8 +49,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             {
                 AllowPause = false,
                 AllowRestart = false,
-                AllowSkipping = room.AutoSkip.Value,
-                AutomaticallySkipIntro = room.AutoSkip.Value,
+                AllowFailAnimation = false,
+                AllowSkipping = room.AutoSkip,
+                AutomaticallySkipIntro = room.AutoSkip,
                 AlwaysShowLeaderboard = true,
             })
         {
@@ -68,6 +63,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         {
             if (!LoadedBeatmapSuccessfully)
                 return;
+
+            ScoreProcessor.ApplyNewJudgementsWhenFailed = true;
 
             LoadComponentAsync(new GameplayChatDisplay(Room)
             {
@@ -148,14 +145,17 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 loadingDisplay.Show();
                 client.ChangeState(MultiplayerUserState.ReadyForGameplay);
             }
+
+            // This will pause the clock, pending the gameplay started callback from the server.
+            GameplayClockContainer.Reset();
         }
 
-        private void failAndBail(string message = null)
+        private void failAndBail(string? message = null)
         {
             if (!string.IsNullOrEmpty(message))
                 Logger.Log(message, LoggingTarget.Runtime, LogLevel.Important);
 
-            Schedule(() => PerformExit(false));
+            Schedule(() => PerformExit());
         }
 
         private void onGameplayStarted() => Scheduler.Add(() =>
@@ -193,18 +193,24 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         protected override ResultsScreen CreateResults(ScoreInfo score)
         {
-            Debug.Assert(Room.RoomID.Value != null);
+            Debug.Assert(Room.RoomID != null);
 
             return multiplayerLeaderboard.TeamScores.Count == 2
-                ? new MultiplayerTeamResultsScreen(score, Room.RoomID.Value.Value, PlaylistItem, multiplayerLeaderboard.TeamScores)
-                : new MultiplayerResultsScreen(score, Room.RoomID.Value.Value, PlaylistItem);
+                ? new MultiplayerTeamResultsScreen(score, Room.RoomID.Value, PlaylistItem, multiplayerLeaderboard.TeamScores)
+                {
+                    ShowUserStatistics = true,
+                }
+                : new MultiplayerResultsScreen(score, Room.RoomID.Value, PlaylistItem)
+                {
+                    ShowUserStatistics = true
+                };
         }
 
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
 
-            if (client != null)
+            if (client.IsNotNull())
             {
                 client.GameplayStarted -= onGameplayStarted;
                 client.ResultsReady -= onResultsReady;

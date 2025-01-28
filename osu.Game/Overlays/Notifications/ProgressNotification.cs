@@ -54,7 +54,7 @@ namespace osu.Game.Overlays.Notifications
             set
             {
                 text = value;
-                Schedule(() => textDrawable.Text = text);
+                Scheduler.AddOnce(t => textDrawable.Text = t, text);
             }
         }
 

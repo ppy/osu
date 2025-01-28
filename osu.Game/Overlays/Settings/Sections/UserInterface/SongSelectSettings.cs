@@ -21,12 +21,6 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
             {
                 new SettingsCheckbox
                 {
-                    ClassicDefault = true,
-                    LabelText = UserInterfaceStrings.RightMouseScroll,
-                    Current = config.GetBindable<bool>(OsuSetting.SongSelectRightMouseScroll),
-                },
-                new SettingsCheckbox
-                {
                     LabelText = UserInterfaceStrings.ShowConvertedBeatmaps,
                     Current = config.GetBindable<bool>(OsuSetting.ShowConvertedBeatmaps),
                 },
@@ -40,6 +34,12 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
                     LabelText = UserInterfaceStrings.ModSelectHotkeyStyle,
                     Current = config.GetBindable<ModSelectHotkeyStyle>(OsuSetting.ModSelectHotkeyStyle),
                     ClassicDefault = ModSelectHotkeyStyle.Classic
+                },
+                new SettingsCheckbox
+                {
+                    LabelText = UserInterfaceStrings.ModSelectTextSearchStartsActive,
+                    Current = config.GetBindable<bool>(OsuSetting.ModSelectTextSearchStartsActive),
+                    ClassicDefault = false
                 },
                 new SettingsCheckbox
                 {

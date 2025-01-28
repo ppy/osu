@@ -18,6 +18,12 @@ namespace osu.Game.Beatmaps.Formats
     {
         public const int LATEST_VERSION = 14;
 
+        /// <summary>
+        /// The .osu format (beatmap) version.
+        ///
+        /// osu!stable's versions end at <see cref="LATEST_VERSION"/>.
+        /// osu!lazer's versions starts at <see cref="LegacyBeatmapEncoder.FIRST_LAZER_VERSION"/>.
+        /// </summary>
         protected readonly int FormatVersion;
 
         protected LegacyDecoder(int version)
@@ -93,14 +99,8 @@ namespace osu.Game.Beatmaps.Formats
             return line;
         }
 
-        protected void HandleColours<TModel>(TModel output, string line, bool allowAlpha)
+        private Color4 convertSettingStringToColor4(string[] split, bool allowAlpha, KeyValuePair<string, string> pair)
         {
-            var pair = SplitKeyVal(line);
-
-            bool isCombo = pair.Key.StartsWith(@"Combo", StringComparison.Ordinal);
-
-            string[] split = pair.Value.Split(',');
-
             if (split.Length != 3 && split.Length != 4)
                 throw new InvalidOperationException($@"Color specified in incorrect format (should be R,G,B or R,G,B,A): {pair.Value}");
 
@@ -115,6 +115,18 @@ namespace osu.Game.Beatmaps.Formats
             {
                 throw new InvalidOperationException(@"Color must be specified with 8-bit integer components");
             }
+
+            return colour;
+        }
+
+        protected void HandleColours<TModel>(TModel output, string line, bool allowAlpha)
+        {
+            var pair = SplitKeyVal(line);
+
+            string[] split = pair.Value.Split(',');
+            Color4 colour = convertSettingStringToColor4(split, allowAlpha, pair);
+
+            bool isCombo = pair.Key.StartsWith(@"Combo", StringComparison.Ordinal);
 
             if (isCombo)
             {
@@ -161,63 +173,6 @@ namespace osu.Game.Beatmaps.Formats
             Fonts,
             CatchTheBeat,
             Mania,
-        }
-
-        [Obsolete("Do not use unless you're a legacy ruleset and 100% sure.")]
-        public class LegacyDifficultyControlPoint : DifficultyControlPoint, IEquatable<LegacyDifficultyControlPoint>
-        {
-            /// <summary>
-            /// Legacy BPM multiplier that introduces floating-point errors for rulesets that depend on it.
-            /// DO NOT USE THIS UNLESS 100% SURE.
-            /// </summary>
-            public double BpmMultiplier { get; private set; }
-
-            /// <summary>
-            /// Whether or not slider ticks should be generated at this control point.
-            /// This exists for backwards compatibility with maps that abuse NaN slider velocity behavior on osu!stable (e.g. /b/2628991).
-            /// </summary>
-            public bool GenerateTicks { get; private set; } = true;
-
-            public LegacyDifficultyControlPoint(int rulesetId, double beatLength)
-                : this()
-            {
-                // Note: In stable, the division occurs on floats, but with compiler optimisations turned on actually seems to occur on doubles via some .NET black magic (possibly inlining?).
-                if (rulesetId == 1 || rulesetId == 3)
-                    BpmMultiplier = beatLength < 0 ? Math.Clamp((float)-beatLength, 10, 10000) / 100.0 : 1;
-                else
-                    BpmMultiplier = beatLength < 0 ? Math.Clamp((float)-beatLength, 10, 1000) / 100.0 : 1;
-
-                GenerateTicks = !double.IsNaN(beatLength);
-            }
-
-            public LegacyDifficultyControlPoint()
-            {
-                SliderVelocityBindable.Precision = double.Epsilon;
-            }
-
-            public override bool IsRedundant(ControlPoint? existing)
-                => base.IsRedundant(existing)
-                   && GenerateTicks == ((existing as LegacyDifficultyControlPoint)?.GenerateTicks ?? true);
-
-            public override void CopyFrom(ControlPoint other)
-            {
-                base.CopyFrom(other);
-
-                BpmMultiplier = ((LegacyDifficultyControlPoint)other).BpmMultiplier;
-                GenerateTicks = ((LegacyDifficultyControlPoint)other).GenerateTicks;
-            }
-
-            public override bool Equals(ControlPoint? other)
-                => other is LegacyDifficultyControlPoint otherLegacyDifficultyControlPoint
-                   && Equals(otherLegacyDifficultyControlPoint);
-
-            public bool Equals(LegacyDifficultyControlPoint? other)
-                => base.Equals(other)
-                   && BpmMultiplier == other.BpmMultiplier
-                   && GenerateTicks == other.GenerateTicks;
-
-            // ReSharper disable twice NonReadonlyMemberInGetHashCode
-            public override int GetHashCode() => HashCode.Combine(base.GetHashCode(), BpmMultiplier, GenerateTicks);
         }
 
         internal class LegacySampleControlPoint : SampleControlPoint, IEquatable<LegacySampleControlPoint>

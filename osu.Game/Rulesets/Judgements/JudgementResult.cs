@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Judgements
 
         /// <summary>
         /// The time at which this <see cref="JudgementResult"/> occurred.
-        /// Populated when this <see cref="JudgementResult"/> is applied via <see cref="DrawableHitObject.ApplyResult"/>.
+        /// Populated when this <see cref="JudgementResult"/> is applied via <see cref="DrawableHitObject.ApplyResult{T}"/>.
         /// </summary>
         /// <remarks>
         /// This is used instead of <see cref="TimeAbsolute"/> to check whether this <see cref="JudgementResult"/> should be reverted.
@@ -53,6 +53,11 @@ namespace osu.Game.Rulesets.Judgements
         /// The end time of <see cref="HitObject"/> is returned if this result is not populated yet.
         /// </remarks>
         public double TimeAbsolute => RawTime != null ? Math.Min(RawTime.Value, HitObject.GetEndTime() + HitObject.MaximumJudgementOffset) : HitObject.GetEndTime();
+
+        /// <summary>
+        /// The gameplay rate at the time this <see cref="JudgementResult"/> occurred.
+        /// </summary>
+        public double? GameplayRate { get; internal set; }
 
         /// <summary>
         /// The combo prior to this <see cref="JudgementResult"/> occurring.
@@ -90,6 +95,11 @@ namespace osu.Game.Rulesets.Judgements
         public bool IsHit => Type.IsHit();
 
         /// <summary>
+        /// The increase in health resulting from this judgement result.
+        /// </summary>
+        public double HealthIncrease => Judgement.HealthIncreaseFor(this);
+
+        /// <summary>
         /// Creates a new <see cref="JudgementResult"/>.
         /// </summary>
         /// <param name="hitObject">The <see cref="HitObject"/> which was judged.</param>
@@ -107,6 +117,6 @@ namespace osu.Game.Rulesets.Judgements
             RawTime = null;
         }
 
-        public override string ToString() => $"{Type} (Score:{Judgement.NumericResultFor(this)} HP:{Judgement.HealthIncreaseFor(this)} {Judgement})";
+        public override string ToString() => $"{Type} ({Judgement})";
     }
 }

@@ -1,10 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
-using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -13,6 +13,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
+using osu.Game.Utils;
 using osuTK;
 using osuTK.Graphics;
 
@@ -37,6 +38,8 @@ namespace osu.Game.Beatmaps.Drawables
         }
 
         private readonly Bindable<double> displayedStars = new BindableDouble();
+
+        private readonly Container textContainer;
 
         /// <summary>
         /// The currently displayed stars of this display wrapped in a bindable.
@@ -116,15 +119,19 @@ namespace osu.Game.Beatmaps.Drawables
                                     Size = new Vector2(8f),
                                 },
                                 Empty(),
-                                starsText = new OsuSpriteText
+                                textContainer = new Container
                                 {
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                    Margin = new MarginPadding { Bottom = 1.5f },
-                                    // todo: this should be size: 12f, but to match up with the design, it needs to be 14.4f
-                                    // see https://github.com/ppy/osu-framework/issues/3271.
-                                    Font = OsuFont.Torus.With(size: 14.4f, weight: FontWeight.Bold),
-                                    Shadow = false,
+                                    AutoSizeAxes = Axes.Y,
+                                    Child = starsText = new OsuSpriteText
+                                    {
+                                        Anchor = Anchor.Centre,
+                                        Origin = Anchor.Centre,
+                                        Margin = new MarginPadding { Bottom = 1.5f },
+                                        // todo: this should be size: 12f, but to match up with the design, it needs to be 14.4f
+                                        // see https://github.com/ppy/osu-framework/issues/3271.
+                                        Font = OsuFont.Torus.With(size: 14.4f, weight: FontWeight.Bold),
+                                        Shadow = false,
+                                    },
                                 },
                             }
                         }
@@ -149,12 +156,17 @@ namespace osu.Game.Beatmaps.Drawables
 
             displayedStars.BindValueChanged(s =>
             {
-                starsText.Text = s.NewValue < 0 ? "-" : s.NewValue.ToLocalisableString("0.00");
+                starsText.Text = s.NewValue < 0 ? "-" : s.NewValue.FormatStarRating();
 
                 background.Colour = colours.ForStarDifficulty(s.NewValue);
 
                 starIcon.Colour = s.NewValue >= 6.5 ? colours.Orange1 : colourProvider?.Background5 ?? Color4Extensions.FromHex("303d47");
                 starsText.Colour = s.NewValue >= 6.5 ? colours.Orange1 : colourProvider?.Background5 ?? Color4.Black.Opacity(0.75f);
+
+                // In order to avoid autosize throwing the width of these displays all over the place,
+                // let's lock in some sane defaults for the text width based on how many digits we're
+                // displaying.
+                textContainer.Width = 24 + Math.Max(starsText.Text.ToString().Length - 4, 0) * 6;
             }, true);
         }
     }

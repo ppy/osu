@@ -86,6 +86,42 @@ namespace osu.Game.Rulesets.Taiko.Tests.Judgements
         }
 
         [Test]
+        public void TestAlternatingIsRequired()
+        {
+            const double hit_time = 1000;
+
+            Swell swell = new Swell
+            {
+                StartTime = hit_time,
+                Duration = 1000,
+                RequiredHits = 10
+            };
+
+            List<ReplayFrame> frames = new List<ReplayFrame>
+            {
+                new TaikoReplayFrame(0),
+                new TaikoReplayFrame(2001),
+            };
+
+            for (int i = 0; i < swell.RequiredHits; i++)
+            {
+                double frameTime = 1000 + i * 50;
+                frames.Add(new TaikoReplayFrame(frameTime, TaikoAction.LeftCentre));
+                frames.Add(new TaikoReplayFrame(frameTime + 10));
+            }
+
+            PerformTest(frames, CreateBeatmap(swell));
+
+            AssertJudgementCount(11);
+
+            AssertResult<SwellTick>(0, HitResult.IgnoreHit);
+            for (int i = 1; i < swell.RequiredHits; i++)
+                AssertResult<SwellTick>(i, HitResult.IgnoreMiss);
+
+            AssertResult<Swell>(0, HitResult.IgnoreMiss);
+        }
+
+        [Test]
         public void TestHitNoneSwell()
         {
             const double hit_time = 1000;
@@ -113,6 +149,48 @@ namespace osu.Game.Rulesets.Taiko.Tests.Judgements
             AssertResult<Swell>(0, HitResult.IgnoreMiss);
 
             AddAssert("all tick offsets are 0", () => JudgementResults.Where(r => r.HitObject is SwellTick).All(r => r.TimeOffset == 0));
+        }
+
+        [Test]
+        public void TestAtMostOneSwellTickJudgedPerFrame()
+        {
+            const double swell_time = 1000;
+
+            Swell swell = new Swell
+            {
+                StartTime = swell_time,
+                Duration = 1000,
+                RequiredHits = 10
+            };
+
+            List<ReplayFrame> frames = new List<ReplayFrame>
+            {
+                new TaikoReplayFrame(1000),
+                new TaikoReplayFrame(1250, TaikoAction.LeftCentre, TaikoAction.LeftRim),
+                new TaikoReplayFrame(1251),
+                new TaikoReplayFrame(1500, TaikoAction.LeftCentre, TaikoAction.LeftRim, TaikoAction.RightCentre, TaikoAction.RightRim),
+                new TaikoReplayFrame(1501),
+                new TaikoReplayFrame(2000),
+            };
+
+            PerformTest(frames, CreateBeatmap(swell));
+
+            AssertJudgementCount(11);
+
+            // this is a charitable interpretation of the inputs.
+            //
+            // for the frame at time 1250, we only count either one of the input actions - simple.
+            //
+            // for the frame at time 1500, we give the user the benefit of the doubt,
+            // and we ignore actions that wouldn't otherwise cause a hit due to not alternating,
+            // but we still count one (just one) of the actions that _would_ normally cause a hit.
+            // this is done as a courtesy to avoid stuff like key chattering after press blocking legitimate inputs.
+            for (int i = 0; i < 2; i++)
+                AssertResult<SwellTick>(i, HitResult.IgnoreHit);
+            for (int i = 2; i < swell.RequiredHits; i++)
+                AssertResult<SwellTick>(i, HitResult.IgnoreMiss);
+
+            AssertResult<Swell>(0, HitResult.IgnoreMiss);
         }
 
         /// <summary>

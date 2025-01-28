@@ -4,8 +4,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Localisation;
@@ -28,16 +28,19 @@ using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Osu.Skinning.Argon;
+using osu.Game.Rulesets.Osu.Skinning.Default;
 using osu.Game.Rulesets.Osu.Skinning.Legacy;
 using osu.Game.Rulesets.Osu.Statistics;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Scoring.Legacy;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
 using osu.Game.Screens.Edit.Setup;
 using osu.Game.Screens.Ranking.Statistics;
 using osu.Game.Skinning;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu
 {
@@ -46,6 +49,8 @@ namespace osu.Game.Rulesets.Osu
         public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod>? mods = null) => new DrawableOsuRuleset(this, beatmap, mods);
 
         public override ScoreProcessor CreateScoreProcessor() => new OsuScoreProcessor();
+
+        public override HealthProcessor CreateHealthProcessor(double drainStartTime) => new OsuHealthProcessor(drainStartTime);
 
         public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new OsuBeatmapConverter(beatmap, this);
 
@@ -66,55 +71,55 @@ namespace osu.Game.Rulesets.Osu
 
         public override IEnumerable<Mod> ConvertFromLegacyMods(LegacyMods mods)
         {
-            if (mods.HasFlagFast(LegacyMods.Nightcore))
+            if (mods.HasFlag(LegacyMods.Nightcore))
                 yield return new OsuModNightcore();
-            else if (mods.HasFlagFast(LegacyMods.DoubleTime))
+            else if (mods.HasFlag(LegacyMods.DoubleTime))
                 yield return new OsuModDoubleTime();
 
-            if (mods.HasFlagFast(LegacyMods.Perfect))
+            if (mods.HasFlag(LegacyMods.Perfect))
                 yield return new OsuModPerfect();
-            else if (mods.HasFlagFast(LegacyMods.SuddenDeath))
+            else if (mods.HasFlag(LegacyMods.SuddenDeath))
                 yield return new OsuModSuddenDeath();
 
-            if (mods.HasFlagFast(LegacyMods.Autopilot))
+            if (mods.HasFlag(LegacyMods.Autopilot))
                 yield return new OsuModAutopilot();
 
-            if (mods.HasFlagFast(LegacyMods.Cinema))
+            if (mods.HasFlag(LegacyMods.Cinema))
                 yield return new OsuModCinema();
-            else if (mods.HasFlagFast(LegacyMods.Autoplay))
+            else if (mods.HasFlag(LegacyMods.Autoplay))
                 yield return new OsuModAutoplay();
 
-            if (mods.HasFlagFast(LegacyMods.Easy))
+            if (mods.HasFlag(LegacyMods.Easy))
                 yield return new OsuModEasy();
 
-            if (mods.HasFlagFast(LegacyMods.Flashlight))
+            if (mods.HasFlag(LegacyMods.Flashlight))
                 yield return new OsuModFlashlight();
 
-            if (mods.HasFlagFast(LegacyMods.HalfTime))
+            if (mods.HasFlag(LegacyMods.HalfTime))
                 yield return new OsuModHalfTime();
 
-            if (mods.HasFlagFast(LegacyMods.HardRock))
+            if (mods.HasFlag(LegacyMods.HardRock))
                 yield return new OsuModHardRock();
 
-            if (mods.HasFlagFast(LegacyMods.Hidden))
+            if (mods.HasFlag(LegacyMods.Hidden))
                 yield return new OsuModHidden();
 
-            if (mods.HasFlagFast(LegacyMods.NoFail))
+            if (mods.HasFlag(LegacyMods.NoFail))
                 yield return new OsuModNoFail();
 
-            if (mods.HasFlagFast(LegacyMods.Relax))
+            if (mods.HasFlag(LegacyMods.Relax))
                 yield return new OsuModRelax();
 
-            if (mods.HasFlagFast(LegacyMods.SpunOut))
+            if (mods.HasFlag(LegacyMods.SpunOut))
                 yield return new OsuModSpunOut();
 
-            if (mods.HasFlagFast(LegacyMods.Target))
+            if (mods.HasFlag(LegacyMods.Target))
                 yield return new OsuModTargetPractice();
 
-            if (mods.HasFlagFast(LegacyMods.TouchDevice))
+            if (mods.HasFlag(LegacyMods.TouchDevice))
                 yield return new OsuModTouchDevice();
 
-            if (mods.HasFlagFast(LegacyMods.ScoreV2))
+            if (mods.HasFlag(LegacyMods.ScoreV2))
                 yield return new ModScoreV2();
         }
 
@@ -208,7 +213,9 @@ namespace osu.Game.Rulesets.Osu
                         new ModAdaptiveSpeed(),
                         new OsuModFreezeFrame(),
                         new OsuModBubbles(),
-                        new OsuModSynesthesia()
+                        new OsuModSynesthesia(),
+                        new OsuModDepth(),
+                        new OsuModBloom()
                     };
 
                 case ModType.System:
@@ -250,6 +257,9 @@ namespace osu.Game.Rulesets.Osu
 
                 case ArgonSkin:
                     return new OsuArgonSkinTransformer(skin);
+
+                case TrianglesSkin:
+                    return new OsuTrianglesSkinTransformer(skin);
             }
 
             return null;
@@ -273,6 +283,7 @@ namespace osu.Game.Rulesets.Osu
 
                 HitResult.LargeTickHit,
                 HitResult.SmallTickHit,
+                HitResult.SliderTailHit,
                 HitResult.SmallBonus,
                 HitResult.LargeBonus,
             };
@@ -285,6 +296,7 @@ namespace osu.Game.Rulesets.Osu
                 case HitResult.LargeTickHit:
                     return "slider tick";
 
+                case HitResult.SliderTailHit:
                 case HitResult.SmallTickHit:
                     return "slider end";
 
@@ -327,6 +339,48 @@ namespace osu.Game.Rulesets.Osu
             };
         }
 
-        public override RulesetSetupSection CreateEditorSetupSection() => new OsuSetupSection();
+        public override IEnumerable<Drawable> CreateEditorSetupSections() =>
+        [
+            new MetadataSection(),
+            new OsuDifficultySection(),
+            new FillFlowContainer
+            {
+                AutoSizeAxes = Axes.Y,
+                Direction = FillDirection.Vertical,
+                Spacing = new Vector2(SetupScreen.SPACING),
+                Children = new Drawable[]
+                {
+                    new ResourcesSection
+                    {
+                        RelativeSizeAxes = Axes.X,
+                    },
+                    new ColoursSection
+                    {
+                        RelativeSizeAxes = Axes.X,
+                    }
+                }
+            },
+            new DesignSection(),
+        ];
+
+        /// <seealso cref="OsuHitObject.ApplyDefaultsToSelf"/>
+        /// <seealso cref="OsuHitWindows"/>
+        public override BeatmapDifficulty GetRateAdjustedDisplayDifficulty(IBeatmapDifficultyInfo difficulty, double rate)
+        {
+            BeatmapDifficulty adjustedDifficulty = new BeatmapDifficulty(difficulty);
+
+            double preempt = IBeatmapDifficultyInfo.DifficultyRange(adjustedDifficulty.ApproachRate, OsuHitObject.PREEMPT_MAX, OsuHitObject.PREEMPT_MID, OsuHitObject.PREEMPT_MIN);
+            preempt /= rate;
+            adjustedDifficulty.ApproachRate = (float)IBeatmapDifficultyInfo.InverseDifficultyRange(preempt, OsuHitObject.PREEMPT_MAX, OsuHitObject.PREEMPT_MID, OsuHitObject.PREEMPT_MIN);
+
+            var greatHitWindowRange = OsuHitWindows.OSU_RANGES.Single(range => range.Result == HitResult.Great);
+            double greatHitWindow = IBeatmapDifficultyInfo.DifficultyRange(adjustedDifficulty.OverallDifficulty, greatHitWindowRange.Min, greatHitWindowRange.Average, greatHitWindowRange.Max);
+            greatHitWindow /= rate;
+            adjustedDifficulty.OverallDifficulty = (float)IBeatmapDifficultyInfo.InverseDifficultyRange(greatHitWindow, greatHitWindowRange.Min, greatHitWindowRange.Average, greatHitWindowRange.Max);
+
+            return adjustedDifficulty;
+        }
+
+        public override bool EditorShowScrollSpeed => false;
     }
 }

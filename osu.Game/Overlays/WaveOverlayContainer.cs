@@ -18,7 +18,9 @@ namespace osu.Game.Overlays
 
         protected override bool StartHidden => true;
 
-        protected override string PopInSampleName => "UI/wave-pop-in";
+        // `WaveContainer` plays PopIn/PopOut samples, so we disable the overlay-level one as to not double-up sample playback.
+        protected override string PopInSampleName => string.Empty;
+        protected override string PopOutSampleName => string.Empty;
 
         public const float HORIZONTAL_PADDING = 50;
 
@@ -38,10 +40,12 @@ namespace osu.Game.Overlays
 
         protected override void PopOut()
         {
-            base.PopOut();
-
             Waves.Hide();
-            this.FadeOut(WaveContainer.DISAPPEAR_DURATION, Easing.InQuint);
+            this.FadeOut(WaveContainer.DISAPPEAR_DURATION, Easing.InQuint)
+                // base call is responsible for stopping preview tracks.
+                // delay it until the fade has concluded to ensure that nothing inside the overlay has triggered
+                // another preview track playback in the meantime, leaving an "orphaned" preview playing.
+                .OnComplete(_ => base.PopOut());
         }
     }
 }

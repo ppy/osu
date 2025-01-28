@@ -1,0 +1,54 @@
+{
+  "Mappings": [
+    {
+      "StartTime": 81593.0,
+      "Objects": [
+        {
+          "StartTime": 81593.0,
+          "Position": 384.0,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 81652.0,
+          "Position": 377.608948,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 81712.0,
+          "Position": 390.3638,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 81772.0,
+          "Position": 407.118683,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 81832.0,
+          "Position": 433.873535,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 81891.0,
+          "Position": 444.482483,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 81951.0,
+          "Position": 437.237366,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 82011.0,
+          "Position": 443.992218,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 82107.0,
+          "Position": 459.0,
+          "HyperDash": false
+        }
+      ]
+    }
+  ]
+}

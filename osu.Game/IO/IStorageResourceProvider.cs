@@ -41,6 +41,6 @@ namespace osu.Game.IO
         /// </summary>
         /// <param name="underlyingStore">The underlying provider of texture data (in arbitrary image formats).</param>
         /// <returns>A texture loader store.</returns>
-        IResourceStore<TextureUpload> CreateTextureLoaderStore(IResourceStore<byte[]> underlyingStore);
+        IResourceStore<TextureUpload>? CreateTextureLoaderStore(IResourceStore<byte[]> underlyingStore);
     }
 }

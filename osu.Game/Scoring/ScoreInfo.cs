@@ -47,6 +47,12 @@ namespace osu.Game.Scoring
         public BeatmapInfo? BeatmapInfo { get; set; }
 
         /// <summary>
+        /// The version of the client this score was set using.
+        /// Sourced from <see cref="OsuGameBase.Version"/> at the point of score submission.
+        /// </summary>
+        public string ClientVersion { get; set; } = string.Empty;
+
+        /// <summary>
         /// The <see cref="osu.Game.Beatmaps.BeatmapInfo.Hash"/> at the point in time when the score was set.
         /// </summary>
         public string BeatmapHash { get; set; } = string.Empty;
@@ -59,14 +65,25 @@ namespace osu.Game.Scoring
 
         public bool DeletePending { get; set; }
 
+        /// <summary>
+        /// The total number of points awarded for the score.
+        /// </summary>
         public long TotalScore { get; set; }
+
+        /// <summary>
+        /// The total number of points awarded for the score without including mod multipliers.
+        /// </summary>
+        /// <remarks>
+        /// The purpose of this property is to enable future lossless rebalances of mod multipliers.
+        /// </remarks>
+        public long TotalScoreWithoutMods { get; set; }
 
         /// <summary>
         /// The version of processing applied to calculate total score as stored in the database.
         /// If this does not match <see cref="LegacyScoreEncoder.LATEST_VERSION"/>,
         /// the total score has not yet been updated to reflect the current scoring values.
         ///
-        /// See <see cref="BackgroundBeatmapProcessor"/>'s conversion logic.
+        /// See <see cref="BackgroundDataStoreProcessor"/>'s conversion logic.
         /// </summary>
         /// <remarks>
         /// This may not match the version stored in the replay files.
@@ -81,18 +98,50 @@ namespace osu.Game.Scoring
         /// </remarks>
         public long? LegacyTotalScore { get; set; }
 
+        /// <summary>
+        /// If background processing of this beatmap failed in some way, this flag will become <c>true</c>.
+        /// Should be used to ensure we don't repeatedly attempt to reprocess the same scores each startup even though we already know they will fail.
+        /// </summary>
+        /// <remarks>
+        /// See https://github.com/ppy/osu/issues/24301 for one example of how this can occur (missing beatmap file on disk).
+        /// </remarks>
+        public bool BackgroundReprocessingFailed { get; set; }
+
         public int MaxCombo { get; set; }
 
         public double Accuracy { get; set; }
 
-        public bool HasReplay => !string.IsNullOrEmpty(Hash);
+        [Ignored]
+        public bool HasOnlineReplay { get; set; }
 
         public DateTimeOffset Date { get; set; }
 
         public double? PP { get; set; }
 
+        /// <summary>
+        /// Whether the performance points in this score is awarded to the player. This is used for online display purposes (see <see cref="SoloScoreInfo.Ranked"/>).
+        /// </summary>
+        [Ignored]
+        public bool Ranked { get; set; }
+
+        /// <summary>
+        /// The online ID of this score.
+        /// </summary>
+        /// <remarks>
+        /// In the osu-web database, this ID (if present) comes from the new <c>solo_scores</c> table.
+        /// </remarks>
         [Indexed]
         public long OnlineID { get; set; } = -1;
+
+        /// <summary>
+        /// The legacy online ID of this score.
+        /// </summary>
+        /// <remarks>
+        /// In the osu-web database, this ID (if present) comes from the legacy <c>osu_scores_*_high</c> tables.
+        /// This ID is also stored to replays set on osu!stable.
+        /// </remarks>
+        [Indexed]
+        public long LegacyOnlineID { get; set; } = -1;
 
         [MapTo("User")]
         public RealmUser RealmUser { get; set; } = null!;
@@ -116,7 +165,7 @@ namespace osu.Game.Scoring
         }
 
         [UsedImplicitly] // Realm
-        private ScoreInfo()
+        protected ScoreInfo()
         {
         }
 
@@ -159,7 +208,6 @@ namespace osu.Game.Scoring
         IRulesetInfo IScoreInfo.Ruleset => Ruleset;
         IBeatmapInfo? IScoreInfo.Beatmap => BeatmapInfo;
         IUser IScoreInfo.User => User;
-        IEnumerable<INamedFileUsage> IHasNamedFiles.Files => Files;
 
         #region Properties required to make things work with existing usages
 
@@ -176,6 +224,7 @@ namespace osu.Game.Scoring
 
             clone.Statistics = new Dictionary<HitResult, int>(clone.Statistics);
             clone.MaximumStatistics = new Dictionary<HitResult, int>(clone.MaximumStatistics);
+            clone.HitEvents = new List<HitEvent>(clone.HitEvents);
 
             // Ensure we have fresh mods to avoid any references (ie. after gameplay).
             clone.clearAllMods();
@@ -317,27 +366,12 @@ namespace osu.Game.Scoring
                 switch (r.result)
                 {
                     case HitResult.SmallTickHit:
-                    {
-                        int total = value + Statistics.GetValueOrDefault(HitResult.SmallTickMiss);
-                        if (total > 0)
-                            yield return new HitResultDisplayStatistic(r.result, value, total, r.displayName);
-
-                        break;
-                    }
-
                     case HitResult.LargeTickHit:
-                    {
-                        int total = value + Statistics.GetValueOrDefault(HitResult.LargeTickMiss);
-                        if (total > 0)
-                            yield return new HitResultDisplayStatistic(r.result, value, total, r.displayName);
-
-                        break;
-                    }
-
+                    case HitResult.SliderTailHit:
                     case HitResult.LargeBonus:
                     case HitResult.SmallBonus:
                         if (MaximumStatistics.TryGetValue(r.result, out int count) && count > 0)
-                            yield return new HitResultDisplayStatistic(r.result, value, null, r.displayName);
+                            yield return new HitResultDisplayStatistic(r.result, value, count, r.displayName);
 
                         break;
 

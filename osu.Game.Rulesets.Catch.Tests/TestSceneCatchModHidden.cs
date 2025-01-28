@@ -24,14 +24,14 @@ namespace osu.Game.Rulesets.Catch.Tests
         {
             CreateModTest(new ModTestData
             {
-                Beatmap = new Beatmap
+                CreateBeatmap = () => new Beatmap
                 {
                     HitObjects = new List<HitObject>
                     {
                         new JuiceStream
                         {
                             StartTime = 1000,
-                            Path = new SliderPath(PathType.Linear, new[] { Vector2.Zero, new Vector2(0, -192) }),
+                            Path = new SliderPath(PathType.LINEAR, new[] { Vector2.Zero, new Vector2(0, -192) }),
                             X = CatchPlayfield.WIDTH / 2
                         }
                     }
@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Catch.Tests
                 Mod = new CatchModHidden(),
                 PassCondition = () => Player.Results.Count > 0
                                       && Player.ChildrenOfType<DrawableJuiceStream>().Single().Alpha > 0
-                                      && Player.ChildrenOfType<DrawableFruit>().Last().Alpha > 0
+                                      && Player.ChildrenOfType<DrawableFruit>().First().Alpha > 0
             });
         }
 

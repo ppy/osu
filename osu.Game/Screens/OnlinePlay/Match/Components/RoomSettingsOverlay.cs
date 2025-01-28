@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -23,7 +21,7 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
         protected const float TRANSITION_DURATION = 350;
         protected const float FIELD_PADDING = 25;
 
-        protected OnlinePlayComposite Settings { get; set; }
+        protected Drawable Settings { get; set; } = null!;
 
         protected override bool BlockScrollInput => false;
 
@@ -50,7 +48,7 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
 
         protected abstract void SelectBeatmap();
 
-        protected abstract OnlinePlayComposite CreateSettings(Room room);
+        protected abstract Drawable CreateSettings(Room room);
 
         protected override void PopIn()
         {
@@ -113,7 +111,7 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
 
         protected partial class Section : Container
         {
-            private readonly Container content;
+            private readonly ReverseChildIDFillFlowContainer<Drawable> content;
 
             protected override Container<Drawable> Content => content;
 
@@ -135,10 +133,11 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
                             Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 12),
                             Text = title.ToUpperInvariant(),
                         },
-                        content = new Container
+                        content = new ReverseChildIDFillFlowContainer<Drawable>
                         {
                             AutoSizeAxes = Axes.Y,
                             RelativeSizeAxes = Axes.X,
+                            Direction = FillDirection.Vertical
                         },
                     },
                 };

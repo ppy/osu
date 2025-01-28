@@ -6,10 +6,13 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 using Newtonsoft.Json;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
@@ -18,11 +21,15 @@ using osu.Framework.Logging;
 using osu.Game.Audio;
 using osu.Game.Database;
 using osu.Game.IO;
+using osu.Game.Rulesets;
+using osu.Game.Screens.Play.HUD;
 
 namespace osu.Game.Skinning
 {
     public abstract class Skin : IDisposable, ISkin
     {
+        private readonly IStorageResourceProvider? resources;
+
         /// <summary>
         /// A texture store which can be used to perform user file lookups for this skin.
         /// </summary>
@@ -37,10 +44,10 @@ namespace osu.Game.Skinning
 
         public SkinConfiguration Configuration { get; set; }
 
-        public IDictionary<SkinComponentsContainerLookup.TargetArea, SkinLayoutInfo> LayoutInfos => layoutInfos;
+        public IDictionary<GlobalSkinnableContainers, SkinLayoutInfo> LayoutInfos => layoutInfos;
 
-        private readonly Dictionary<SkinComponentsContainerLookup.TargetArea, SkinLayoutInfo> layoutInfos =
-            new Dictionary<SkinComponentsContainerLookup.TargetArea, SkinLayoutInfo>();
+        private readonly Dictionary<GlobalSkinnableContainers, SkinLayoutInfo> layoutInfos =
+            new Dictionary<GlobalSkinnableContainers, SkinLayoutInfo>();
 
         public abstract ISample? GetSample(ISampleInfo sampleInfo);
 
@@ -52,24 +59,30 @@ namespace osu.Game.Skinning
             where TLookup : notnull
             where TValue : notnull;
 
-        private readonly RealmBackedResourceStore<SkinInfo>? realmBackedStorage;
+        private readonly ResourceStore<byte[]> store = new ResourceStore<byte[]>();
+
+        public string Name { get; }
 
         /// <summary>
         /// Construct a new skin.
         /// </summary>
         /// <param name="skin">The skin's metadata. Usually a live realm object.</param>
         /// <param name="resources">Access to game-wide resources.</param>
-        /// <param name="storage">An optional store which will *replace* all file lookups that are usually sourced from <paramref name="skin"/>.</param>
+        /// <param name="fallbackStore">An optional fallback store which will be used for file lookups that are not serviced by realm user storage.</param>
         /// <param name="configurationFilename">An optional filename to read the skin configuration from. If not provided, the configuration will be retrieved from the storage using "skin.ini".</param>
-        protected Skin(SkinInfo skin, IStorageResourceProvider? resources, IResourceStore<byte[]>? storage = null, string configurationFilename = @"skin.ini")
+        protected Skin(SkinInfo skin, IStorageResourceProvider? resources, IResourceStore<byte[]>? fallbackStore = null, string configurationFilename = @"skin.ini")
         {
+            this.resources = resources;
+
+            Name = skin.Name;
+
             if (resources != null)
             {
                 SkinInfo = skin.ToLive(resources.RealmAccess);
 
-                storage ??= realmBackedStorage = new RealmBackedResourceStore<SkinInfo>(SkinInfo, resources.Files, resources.RealmAccess);
+                store.AddStore(new RealmBackedResourceStore<SkinInfo>(SkinInfo, resources.Files, resources.RealmAccess));
 
-                var samples = resources.AudioManager?.GetSampleStore(storage);
+                var samples = resources.AudioManager?.GetSampleStore(store);
 
                 if (samples != null)
                 {
@@ -81,7 +94,7 @@ namespace osu.Game.Skinning
                 }
 
                 Samples = samples;
-                Textures = new TextureStore(resources.Renderer, new MaxDimensionLimitedTextureLoaderStore(resources.CreateTextureLoaderStore(storage)));
+                Textures = new TextureStore(resources.Renderer, CreateTextureLoaderStore(resources, store));
             }
             else
             {
@@ -89,7 +102,10 @@ namespace osu.Game.Skinning
                 SkinInfo = skin.ToLiveUnmanaged();
             }
 
-            var configurationStream = storage?.GetStream(configurationFilename);
+            if (fallbackStore != null)
+                store.AddStore(fallbackStore);
+
+            var configurationStream = store.GetStream(configurationFilename);
 
             if (configurationStream != null)
             {
@@ -98,14 +114,21 @@ namespace osu.Game.Skinning
                 Debug.Assert(Configuration != null);
             }
             else
-                Configuration = new SkinConfiguration();
+            {
+                Configuration = new SkinConfiguration
+                {
+                    // generally won't be hit as we always write a `skin.ini` on import, but best be safe than sorry.
+                    // see https://github.com/peppy/osu-stable-reference/blob/1531237b63392e82c003c712faa028406073aa8f/osu!/Graphics/Skinning/SkinManager.cs#L297-L298
+                    LegacyVersion = SkinConfiguration.LATEST_VERSION,
+                };
+            }
 
             // skininfo files may be null for default skin.
-            foreach (SkinComponentsContainerLookup.TargetArea skinnableTarget in Enum.GetValues<SkinComponentsContainerLookup.TargetArea>())
+            foreach (GlobalSkinnableContainers skinnableTarget in Enum.GetValues<GlobalSkinnableContainers>())
             {
                 string filename = $"{skinnableTarget}.json";
 
-                byte[]? bytes = storage?.Get(filename);
+                byte[]? bytes = store?.Get(filename);
 
                 if (bytes == null)
                     continue;
@@ -114,39 +137,9 @@ namespace osu.Game.Skinning
                 {
                     string jsonContent = Encoding.UTF8.GetString(bytes);
 
-                    SkinLayoutInfo? layoutInfo = null;
-
-                    try
-                    {
-                        // First attempt to deserialise using the new SkinLayoutInfo format
-                        layoutInfo = JsonConvert.DeserializeObject<SkinLayoutInfo>(jsonContent);
-                    }
-                    catch
-                    {
-                    }
-
-                    // Of note, the migration code below runs on read of skins, but there's nothing to
-                    // force a rewrite after migration. Let's not remove these migration rules until we
-                    // have something in place to ensure we don't end up breaking skins of users that haven't
-                    // manually saved their skin since a change was implemented.
-
-                    // If deserialisation using SkinLayoutInfo fails, attempt to deserialise using the old naked list.
+                    var layoutInfo = parseLayoutInfo(jsonContent, skinnableTarget);
                     if (layoutInfo == null)
-                    {
-                        // handle namespace changes...
-                        jsonContent = jsonContent.Replace(@"osu.Game.Screens.Play.SongProgress", @"osu.Game.Screens.Play.HUD.DefaultSongProgress");
-                        jsonContent = jsonContent.Replace(@"osu.Game.Screens.Play.HUD.LegacyComboCounter", @"osu.Game.Skinning.LegacyComboCounter");
-
-                        var deserializedContent = JsonConvert.DeserializeObject<IEnumerable<SerialisedDrawableInfo>>(jsonContent);
-
-                        if (deserializedContent == null)
-                            continue;
-
-                        layoutInfo = new SkinLayoutInfo();
-                        layoutInfo.Update(null, deserializedContent.ToArray());
-
-                        Logger.Log($"Ferrying {deserializedContent.Count()} components in {skinnableTarget} to global section of new {nameof(SkinLayoutInfo)} format");
-                    }
+                        continue;
 
                     LayoutInfos[skinnableTarget] = layoutInfo;
                 }
@@ -156,6 +149,9 @@ namespace osu.Game.Skinning
                 }
             }
         }
+
+        protected virtual IResourceStore<TextureUpload> CreateTextureLoaderStore(IStorageResourceProvider resources, IResourceStore<byte[]> storage)
+            => new MaxDimensionLimitedTextureLoaderStore(resources.CreateTextureLoaderStore(storage));
 
         protected virtual void ParseConfigurationStream(Stream stream)
         {
@@ -167,19 +163,19 @@ namespace osu.Game.Skinning
         /// Remove all stored customisations for the provided target.
         /// </summary>
         /// <param name="targetContainer">The target container to reset.</param>
-        public void ResetDrawableTarget(SkinComponentsContainer targetContainer)
+        public void ResetDrawableTarget(SkinnableContainer targetContainer)
         {
-            LayoutInfos.Remove(targetContainer.Lookup.Target);
+            LayoutInfos.Remove(targetContainer.Lookup.Lookup);
         }
 
         /// <summary>
         /// Update serialised information for the provided target.
         /// </summary>
         /// <param name="targetContainer">The target container to serialise to this skin.</param>
-        public void UpdateDrawableTarget(SkinComponentsContainer targetContainer)
+        public void UpdateDrawableTarget(SkinnableContainer targetContainer)
         {
-            if (!LayoutInfos.TryGetValue(targetContainer.Lookup.Target, out var layoutInfo))
-                layoutInfos[targetContainer.Lookup.Target] = layoutInfo = new SkinLayoutInfo();
+            if (!LayoutInfos.TryGetValue(targetContainer.Lookup.Lookup, out var layoutInfo))
+                layoutInfos[targetContainer.Lookup.Lookup] = layoutInfo = new SkinLayoutInfo();
 
             layoutInfo.Update(targetContainer.Lookup.Ruleset, ((ISerialisableDrawableContainer)targetContainer).CreateSerialisedInfo().ToArray());
         }
@@ -190,24 +186,131 @@ namespace osu.Game.Skinning
             {
                 // This fallback is important for user skins which use SkinnableSprites.
                 case SkinnableSprite.SpriteComponentLookup sprite:
-                    return this.GetAnimation(sprite.LookupName, false, false);
+                    return this.GetAnimation(sprite.LookupName, false, false, maxSize: sprite.MaxSize);
 
-                case SkinComponentsContainerLookup containerLookup:
-
-                    // It is important to return null if the user has not configured this yet.
-                    // This allows skin transformers the opportunity to provide default components.
-                    if (!LayoutInfos.TryGetValue(containerLookup.Target, out var layoutInfo)) return null;
-                    if (!layoutInfo.TryGetDrawableInfo(containerLookup.Ruleset, out var drawableInfos)) return null;
-
-                    return new Container
+                case UserSkinComponentLookup userLookup:
+                    switch (userLookup.Component)
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        ChildrenEnumerable = drawableInfos.Select(i => i.CreateInstance())
-                    };
+                        case GlobalSkinnableContainerLookup containerLookup:
+                            // It is important to return null if the user has not configured this yet.
+                            // This allows skin transformers the opportunity to provide default components.
+                            if (!LayoutInfos.TryGetValue(containerLookup.Lookup, out var layoutInfo)) return null;
+                            if (!layoutInfo.TryGetDrawableInfo(containerLookup.Ruleset, out var drawableInfos)) return null;
+
+                            return new Container
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                ChildrenEnumerable = drawableInfos.Select(i => i.CreateInstance())
+                            };
+                    }
+
+                    break;
             }
 
             return null;
         }
+
+        #region Deserialisation & Migration
+
+        private SkinLayoutInfo? parseLayoutInfo(string jsonContent, GlobalSkinnableContainers target)
+        {
+            SkinLayoutInfo? layout = null;
+
+            // handle namespace changes...
+            jsonContent = jsonContent.Replace(@"osu.Game.Screens.Play.SongProgress", @"osu.Game.Screens.Play.HUD.DefaultSongProgress");
+            jsonContent = jsonContent.Replace(@"osu.Game.Screens.Play.HUD.LegacyComboCounter", @"osu.Game.Skinning.LegacyComboCounter");
+            jsonContent = jsonContent.Replace(@"osu.Game.Skinning.LegacyComboCounter", @"osu.Game.Skinning.LegacyDefaultComboCounter");
+            jsonContent = jsonContent.Replace(@"osu.Game.Screens.Play.HUD.PerformancePointsCounter", @"osu.Game.Skinning.Triangles.TrianglesPerformancePointsCounter");
+
+            try
+            {
+                // First attempt to deserialise using the new SkinLayoutInfo format
+                layout = JsonConvert.DeserializeObject<SkinLayoutInfo>(jsonContent);
+            }
+            catch
+            {
+            }
+
+            // If deserialisation using SkinLayoutInfo fails, attempt to deserialise using the old naked list.
+            if (layout == null)
+            {
+                var deserializedContent = JsonConvert.DeserializeObject<IEnumerable<SerialisedDrawableInfo>>(jsonContent);
+                if (deserializedContent == null)
+                    return null;
+
+                layout = new SkinLayoutInfo { Version = 0 };
+                layout.Update(null, deserializedContent.ToArray());
+
+                Logger.Log($"Ferrying {deserializedContent.Count()} components in {target} to global section of new {nameof(SkinLayoutInfo)} format");
+            }
+
+            for (int i = layout.Version + 1; i <= SkinLayoutInfo.LATEST_VERSION; i++)
+                applyMigration(layout, target, i);
+
+            layout.Version = SkinLayoutInfo.LATEST_VERSION;
+
+            foreach (var kvp in layout.DrawableInfo.ToArray())
+            {
+                foreach (var di in kvp.Value)
+                {
+                    if (!isValidDrawable(di))
+                        layout.DrawableInfo[kvp.Key] = kvp.Value.Where(i => i.Type != di.Type).ToArray();
+                }
+            }
+
+            return layout;
+        }
+
+        private bool isValidDrawable(SerialisedDrawableInfo di)
+        {
+            if (!typeof(ISerialisableDrawable).IsAssignableFrom(di.Type))
+                return false;
+
+            foreach (var child in di.Children)
+            {
+                if (!isValidDrawable(child))
+                    return false;
+            }
+
+            return true;
+        }
+
+        private void applyMigration(SkinLayoutInfo layout, GlobalSkinnableContainers target, int version)
+        {
+            switch (version)
+            {
+                case 1:
+                {
+                    // Combo counters were moved out of the global HUD components into per-ruleset.
+                    // This is to allow some rulesets to customise further (ie. mania and catch moving the combo to within their play area).
+                    if (target != GlobalSkinnableContainers.MainHUDComponents ||
+                        !layout.TryGetDrawableInfo(null, out var globalHUDComponents) ||
+                        resources == null)
+                        break;
+
+                    var comboCounters = globalHUDComponents.Where(c =>
+                        c.Type.Name == nameof(LegacyDefaultComboCounter) ||
+                        c.Type.Name == nameof(DefaultComboCounter) ||
+                        c.Type.Name == nameof(ArgonComboCounter)).ToArray();
+
+                    layout.Update(null, globalHUDComponents.Except(comboCounters).ToArray());
+
+                    resources.RealmAccess.Run(r =>
+                    {
+                        foreach (var ruleset in r.All<RulesetInfo>())
+                        {
+                            layout.Update(ruleset, layout.TryGetDrawableInfo(ruleset, out var rulesetHUDComponents)
+                                ? rulesetHUDComponents.Concat(comboCounters).ToArray()
+                                : comboCounters);
+                        }
+                    });
+
+                    break;
+                }
+            }
+        }
+
+        #endregion
 
         #region Disposal
 
@@ -235,9 +338,54 @@ namespace osu.Game.Skinning
             Textures?.Dispose();
             Samples?.Dispose();
 
-            realmBackedStorage?.Dispose();
+            store.Dispose();
         }
 
         #endregion
+
+        public override string ToString() => $"{GetType().ReadableName()} {{ Name: {Name} }}";
+
+        private static readonly ThreadLocal<int> nested_level = new ThreadLocal<int>(() => 0);
+
+        [Conditional("SKIN_LOOKUP_DEBUG")]
+        internal static void LogLookupDebug(object callingClass, object lookup, LookupDebugType type, [CallerMemberName] string callerMethod = "")
+        {
+            string icon = string.Empty;
+            int level = nested_level.Value;
+
+            switch (type)
+            {
+                case LookupDebugType.Hit:
+                    icon = "🟢 hit";
+                    break;
+
+                case LookupDebugType.Miss:
+                    icon = "🔴 miss";
+                    break;
+
+                case LookupDebugType.Enter:
+                    nested_level.Value++;
+                    break;
+
+                case LookupDebugType.Exit:
+                    nested_level.Value--;
+                    if (nested_level.Value == 0)
+                        Logger.Log(string.Empty);
+                    return;
+            }
+
+            string lookupString = lookup.ToString() ?? string.Empty;
+            string callingClassString = callingClass.ToString() ?? string.Empty;
+
+            Logger.Log($"{string.Join(null, Enumerable.Repeat("|-", level))}{callingClassString}.{callerMethod}(lookup: {lookupString}) {icon}");
+        }
+
+        internal enum LookupDebugType
+        {
+            Hit,
+            Miss,
+            Enter,
+            Exit
+        }
     }
 }

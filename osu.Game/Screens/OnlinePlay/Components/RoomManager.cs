@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -19,17 +17,17 @@ namespace osu.Game.Screens.OnlinePlay.Components
 {
     public partial class RoomManager : Component, IRoomManager
     {
-        public event Action RoomsUpdated;
+        public event Action? RoomsUpdated;
 
         private readonly BindableList<Room> rooms = new BindableList<Room>();
 
         public IBindableList<Room> Rooms => rooms;
 
-        protected IBindable<Room> JoinedRoom => joinedRoom;
-        private readonly Bindable<Room> joinedRoom = new Bindable<Room>();
+        protected IBindable<Room?> JoinedRoom => joinedRoom;
+        private readonly Bindable<Room?> joinedRoom = new Bindable<Room?>();
 
         [Resolved]
-        private IAPIProvider api { get; set; }
+        private IAPIProvider api { get; set; } = null!;
 
         public RoomManager()
         {
@@ -42,9 +40,9 @@ namespace osu.Game.Screens.OnlinePlay.Components
             PartRoom();
         }
 
-        public virtual void CreateRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null)
+        public virtual void CreateRoom(Room room, Action<Room>? onSuccess = null, Action<string>? onError = null)
         {
-            room.Host.Value = api.LocalUser.Value;
+            room.Host = api.LocalUser.Value;
 
             var req = new CreateRoomRequest(room);
 
@@ -67,16 +65,20 @@ namespace osu.Game.Screens.OnlinePlay.Components
             api.Queue(req);
         }
 
-        private JoinRoomRequest currentJoinRoomRequest;
+        private JoinRoomRequest? currentJoinRoomRequest;
 
-        public virtual void JoinRoom(Room room, string password = null, Action<Room> onSuccess = null, Action<string> onError = null)
+        public virtual void JoinRoom(Room room, string? password = null, Action<Room>? onSuccess = null, Action<string>? onError = null)
         {
             currentJoinRoomRequest?.Cancel();
             currentJoinRoomRequest = new JoinRoomRequest(room, password);
 
-            currentJoinRoomRequest.Success += () =>
+            currentJoinRoomRequest.Success += result =>
             {
                 joinedRoom.Value = room;
+
+                AddOrUpdateRoom(result);
+                room.CopyFrom(result); // Also copy back to the source model, since this is likely to have been stored elsewhere.
+
                 onSuccess?.Invoke(room);
             };
 
@@ -95,10 +97,12 @@ namespace osu.Game.Screens.OnlinePlay.Components
         {
             currentJoinRoomRequest?.Cancel();
 
-            if (JoinedRoom.Value == null)
+            if (joinedRoom.Value == null)
                 return;
 
-            api.Queue(new PartRoomRequest(joinedRoom.Value));
+            if (api.State.Value == APIState.Online)
+                api.Queue(new PartRoomRequest(joinedRoom.Value));
+
             joinedRoom.Value = null;
         }
 
@@ -107,14 +111,14 @@ namespace osu.Game.Screens.OnlinePlay.Components
         public void AddOrUpdateRoom(Room room)
         {
             Debug.Assert(ThreadSafety.IsUpdateThread);
-            Debug.Assert(room.RoomID.Value != null);
+            Debug.Assert(room.RoomID != null);
 
-            if (ignoredRooms.Contains(room.RoomID.Value.Value))
+            if (ignoredRooms.Contains(room.RoomID.Value))
                 return;
 
             try
             {
-                var existing = rooms.FirstOrDefault(e => e.RoomID.Value == room.RoomID.Value);
+                var existing = rooms.FirstOrDefault(e => e.RoomID == room.RoomID);
                 if (existing == null)
                     rooms.Add(room);
                 else
@@ -122,9 +126,9 @@ namespace osu.Game.Screens.OnlinePlay.Components
             }
             catch (Exception ex)
             {
-                Logger.Error(ex, $"Failed to update room: {room.Name.Value}.");
+                Logger.Error(ex, $"Failed to update room: {room.Name}.");
 
-                ignoredRooms.Add(room.RoomID.Value.Value);
+                ignoredRooms.Add(room.RoomID.Value);
                 rooms.Remove(room);
             }
 

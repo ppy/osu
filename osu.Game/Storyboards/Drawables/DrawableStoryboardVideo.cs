@@ -1,13 +1,16 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.IO;
+using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.Video;
-using osu.Game.Beatmaps;
+using osu.Framework.Utils;
+using osuTK;
 
 namespace osu.Game.Storyboards.Drawables
 {
@@ -15,7 +18,7 @@ namespace osu.Game.Storyboards.Drawables
     {
         public readonly StoryboardVideo Video;
 
-        private Video? drawableVideo;
+        private DrawableVideo? drawableVideo;
 
         public override bool RemoveWhenNotAlive => false;
 
@@ -23,30 +26,37 @@ namespace osu.Game.Storyboards.Drawables
         {
             Video = video;
 
-            RelativeSizeAxes = Axes.Both;
+            // In osu-stable, a mapper can add a scale command for a storyboard video.
+            // This allows scaling based on the video's absolute size.
+            //
+            // If not specified we take up the full available space.
+            bool useRelative = !video.Commands.Scale.Any();
+
+            RelativeSizeAxes = useRelative ? Axes.Both : Axes.None;
+            AutoSizeAxes = useRelative ? Axes.None : Axes.Both;
+
+            Anchor = Anchor.Centre;
+            Origin = Anchor.Centre;
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(IBindable<WorkingBeatmap> beatmap, TextureStore textureStore)
+        private void load(TextureStore textureStore)
         {
-            string? path = beatmap.Value.BeatmapSetInfo?.GetPathForFile(Video.Path);
-
-            if (path == null)
-                return;
-
-            var stream = textureStore.GetStream(path);
+            var stream = textureStore.GetStream(Video.Path);
 
             if (stream == null)
                 return;
 
-            InternalChild = drawableVideo = new Video(stream, false)
+            InternalChild = drawableVideo = new DrawableVideo(stream, false)
             {
-                RelativeSizeAxes = Axes.Both,
+                RelativeSizeAxes = RelativeSizeAxes,
                 FillMode = FillMode.Fill,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Alpha = 0,
             };
+
+            Video.ApplyTransforms(drawableVideo);
         }
 
         protected override void LoadComplete()
@@ -63,6 +73,66 @@ namespace osu.Game.Storyboards.Drawables
 
                 using (drawableVideo.BeginDelayedSequence(drawableVideo.Duration - 500))
                     drawableVideo.FadeOut(500);
+            }
+        }
+
+        private partial class DrawableVideo : Video, IFlippable, IVectorScalable
+        {
+            private bool flipH;
+
+            public bool FlipH
+            {
+                get => flipH;
+                set
+                {
+                    if (flipH == value)
+                        return;
+
+                    flipH = value;
+                    Invalidate(Invalidation.MiscGeometry);
+                }
+            }
+
+            private bool flipV;
+
+            public bool FlipV
+            {
+                get => flipV;
+                set
+                {
+                    if (flipV == value)
+                        return;
+
+                    flipV = value;
+                    Invalidate(Invalidation.MiscGeometry);
+                }
+            }
+
+            private Vector2 vectorScale = Vector2.One;
+
+            public Vector2 VectorScale
+            {
+                get => vectorScale;
+                set
+                {
+                    if (vectorScale == value)
+                        return;
+
+                    if (!Validation.IsFinite(value)) throw new ArgumentException($@"{nameof(VectorScale)} must be finite, but is {value}.");
+
+                    vectorScale = value;
+                    Invalidate(Invalidation.MiscGeometry);
+                }
+            }
+
+            protected override Vector2 DrawScale
+                => new Vector2(FlipH ? -base.DrawScale.X : base.DrawScale.X, FlipV ? -base.DrawScale.Y : base.DrawScale.Y) * VectorScale;
+
+            public override Anchor Origin => StoryboardExtensions.AdjustOrigin(base.Origin, VectorScale, FlipH, FlipV);
+
+            public DrawableVideo(Stream stream, bool startAtCurrentTime = true)
+                : base(stream, startAtCurrentTime)
+            {
             }
         }
     }

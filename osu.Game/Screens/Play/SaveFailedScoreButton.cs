@@ -30,13 +30,13 @@ namespace osu.Game.Screens.Play
 
         private readonly Bindable<DownloadState> state = new Bindable<DownloadState>();
 
-        private readonly Func<Task<ScoreInfo>> importFailedScore;
+        private readonly Func<Task<ScoreInfo>>? importFailedScore;
 
-        private ScoreInfo? importedScore;
+        private Live<ScoreInfo>? importedScore;
 
         private DownloadButton button = null!;
 
-        public SaveFailedScoreButton(Func<Task<ScoreInfo>> importFailedScore)
+        public SaveFailedScoreButton(Func<Task<ScoreInfo>>? importFailedScore)
         {
             Size = new Vector2(50, 30);
 
@@ -55,16 +55,21 @@ namespace osu.Game.Screens.Play
                     switch (state.Value)
                     {
                         case DownloadState.LocallyAvailable:
-                            game?.PresentScore(importedScore, ScorePresentType.Gameplay);
+                            game?.PresentScore(importedScore?.Value, ScorePresentType.Gameplay);
                             break;
 
                         case DownloadState.NotDownloaded:
                             state.Value = DownloadState.Importing;
-                            Task.Run(importFailedScore).ContinueWith(t =>
+
+                            if (importFailedScore != null)
                             {
-                                importedScore = realm.Run(r => r.Find<ScoreInfo>(t.GetResultSafely().ID)?.Detach());
-                                Schedule(() => state.Value = importedScore != null ? DownloadState.LocallyAvailable : DownloadState.NotDownloaded);
-                            }).FireAndForget();
+                                Task.Run(importFailedScore).ContinueWith(t =>
+                                {
+                                    importedScore = realm.Run<Live<ScoreInfo>?>(r => r.Find<ScoreInfo>(t.GetResultSafely().ID)?.ToLive(realm));
+                                    Schedule(() => state.Value = importedScore != null ? DownloadState.LocallyAvailable : DownloadState.NotDownloaded);
+                                }).FireAndForget();
+                            }
+
                             break;
                     }
                 }
@@ -72,7 +77,7 @@ namespace osu.Game.Screens.Play
 
             if (player != null)
             {
-                importedScore = realm.Run(r => r.Find<ScoreInfo>(player.Score.ScoreInfo.ID)?.Detach());
+                importedScore = realm.Run(r => r.Find<ScoreInfo>(player.Score.ScoreInfo.ID)?.ToLive(realm));
                 state.Value = importedScore != null ? DownloadState.LocallyAvailable : DownloadState.NotDownloaded;
             }
 
@@ -102,6 +107,9 @@ namespace osu.Game.Screens.Play
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
+            if (e.Repeat)
+                return false;
+
             switch (e.Action)
             {
                 case GlobalAction.SaveReplay:
@@ -129,7 +137,7 @@ namespace osu.Game.Screens.Play
         {
             if (state.NewValue != DownloadState.LocallyAvailable) return;
 
-            scoreManager.Export(importedScore);
+            if (importedScore != null) scoreManager.Export(importedScore.Value);
 
             this.state.ValueChanged -= exportWhenReady;
         }

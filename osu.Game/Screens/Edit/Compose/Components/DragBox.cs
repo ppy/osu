@@ -4,6 +4,7 @@
 #nullable disable
 
 using System;
+using JetBrains.Annotations;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -69,6 +70,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         public override void Show() => State = Visibility.Visible;
 
+        [CanBeNull]
         public event Action<Visibility> StateChanged;
 
         public partial class BoxWithBorders : CompositeDrawable

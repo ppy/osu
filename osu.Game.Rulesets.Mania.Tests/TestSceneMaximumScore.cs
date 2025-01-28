@@ -54,7 +54,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             AddAssert("all objects perfectly judged",
                 () => judgementResults.Select(result => result.Type),
                 () => Is.EquivalentTo(judgementResults.Select(result => result.Judgement.MaxResult)));
-            AddAssert("score is 1 million", () => currentPlayer.ScoreProcessor.TotalScore.Value, () => Is.EqualTo(1_000_000));
+            AddAssert("score is correct", () => currentPlayer.ScoreProcessor.TotalScore.Value, () => Is.EqualTo(1_000_000));
         }
 
         [Test]
@@ -87,7 +87,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             AddAssert("all objects perfectly judged",
                 () => judgementResults.Select(result => result.Type),
                 () => Is.EquivalentTo(judgementResults.Select(result => result.Judgement.MaxResult)));
-            AddAssert("score is 1 million", () => currentPlayer.ScoreProcessor.TotalScore.Value, () => Is.EqualTo(1_000_000));
+            AddAssert("score is correct", () => currentPlayer.ScoreProcessor.TotalScore.Value, () => Is.EqualTo(1_000_000));
         }
 
         private void performTest(List<ManiaHitObject> hitObjects, List<ReplayFrame> frames)

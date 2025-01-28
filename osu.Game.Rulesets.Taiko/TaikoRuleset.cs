@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
@@ -34,7 +33,10 @@ using osu.Game.Screens.Ranking.Statistics;
 using osu.Game.Skinning;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Configuration;
+using osu.Game.Rulesets.Scoring.Legacy;
 using osu.Game.Rulesets.Taiko.Configuration;
+using osu.Game.Rulesets.Taiko.Edit.Setup;
+using osu.Game.Screens.Edit.Setup;
 
 namespace osu.Game.Rulesets.Taiko
 {
@@ -68,9 +70,9 @@ namespace osu.Game.Rulesets.Taiko
 
         public override IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0) => new[]
         {
-            new KeyBinding(InputKey.MouseLeft, TaikoAction.LeftCentre),
             new KeyBinding(InputKey.MouseRight, TaikoAction.LeftRim),
             new KeyBinding(InputKey.D, TaikoAction.LeftRim),
+            new KeyBinding(InputKey.MouseLeft, TaikoAction.LeftCentre),
             new KeyBinding(InputKey.F, TaikoAction.LeftCentre),
             new KeyBinding(InputKey.J, TaikoAction.RightCentre),
             new KeyBinding(InputKey.K, TaikoAction.RightRim),
@@ -78,57 +80,44 @@ namespace osu.Game.Rulesets.Taiko
 
         public override IEnumerable<Mod> ConvertFromLegacyMods(LegacyMods mods)
         {
-            if (mods.HasFlagFast(LegacyMods.Nightcore))
+            if (mods.HasFlag(LegacyMods.Nightcore))
                 yield return new TaikoModNightcore();
-            else if (mods.HasFlagFast(LegacyMods.DoubleTime))
+            else if (mods.HasFlag(LegacyMods.DoubleTime))
                 yield return new TaikoModDoubleTime();
 
-            if (mods.HasFlagFast(LegacyMods.Perfect))
+            if (mods.HasFlag(LegacyMods.Perfect))
                 yield return new TaikoModPerfect();
-            else if (mods.HasFlagFast(LegacyMods.SuddenDeath))
+            else if (mods.HasFlag(LegacyMods.SuddenDeath))
                 yield return new TaikoModSuddenDeath();
 
-            if (mods.HasFlagFast(LegacyMods.Cinema))
+            if (mods.HasFlag(LegacyMods.Cinema))
                 yield return new TaikoModCinema();
-            else if (mods.HasFlagFast(LegacyMods.Autoplay))
+            else if (mods.HasFlag(LegacyMods.Autoplay))
                 yield return new TaikoModAutoplay();
 
-            if (mods.HasFlagFast(LegacyMods.Easy))
+            if (mods.HasFlag(LegacyMods.Easy))
                 yield return new TaikoModEasy();
 
-            if (mods.HasFlagFast(LegacyMods.Flashlight))
+            if (mods.HasFlag(LegacyMods.Flashlight))
                 yield return new TaikoModFlashlight();
 
-            if (mods.HasFlagFast(LegacyMods.HalfTime))
+            if (mods.HasFlag(LegacyMods.HalfTime))
                 yield return new TaikoModHalfTime();
 
-            if (mods.HasFlagFast(LegacyMods.HardRock))
+            if (mods.HasFlag(LegacyMods.HardRock))
                 yield return new TaikoModHardRock();
 
-            if (mods.HasFlagFast(LegacyMods.Hidden))
+            if (mods.HasFlag(LegacyMods.Hidden))
                 yield return new TaikoModHidden();
 
-            if (mods.HasFlagFast(LegacyMods.NoFail))
+            if (mods.HasFlag(LegacyMods.NoFail))
                 yield return new TaikoModNoFail();
 
-            if (mods.HasFlagFast(LegacyMods.Relax))
+            if (mods.HasFlag(LegacyMods.Relax))
                 yield return new TaikoModRelax();
 
-            if (mods.HasFlagFast(LegacyMods.Random))
-                yield return new TaikoModRandom();
-
-            if (mods.HasFlagFast(LegacyMods.ScoreV2))
+            if (mods.HasFlag(LegacyMods.ScoreV2))
                 yield return new ModScoreV2();
-        }
-
-        public override LegacyMods ConvertToLegacyMods(Mod[] mods)
-        {
-            var value = base.ConvertToLegacyMods(mods);
-
-            if (mods.OfType<TaikoModRandom>().Any())
-                value |= LegacyMods.Random;
-
-            return value;
         }
 
         public override IEnumerable<Mod> GetModsFor(ModType type)
@@ -162,6 +151,7 @@ namespace osu.Game.Rulesets.Taiko
                         new TaikoModClassic(),
                         new TaikoModSwap(),
                         new TaikoModSingleTap(),
+                        new TaikoModConstantSpeed(),
                     };
 
                 case ModType.Automation:
@@ -199,6 +189,16 @@ namespace osu.Game.Rulesets.Taiko
         public override Drawable CreateIcon() => new SpriteIcon { Icon = OsuIcon.RulesetTaiko };
 
         public override HitObjectComposer CreateHitObjectComposer() => new TaikoHitObjectComposer(this);
+
+        public override IEnumerable<Drawable> CreateEditorSetupSections() =>
+        [
+            new MetadataSection(),
+            new TaikoDifficultySection(),
+            new ResourcesSection(),
+            new DesignSection(),
+        ];
+
+        public override IBeatmapVerifier CreateBeatmapVerifier() => new TaikoBeatmapVerifier();
 
         public override DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap) => new TaikoDifficultyCalculator(RulesetInfo, beatmap);
 
@@ -262,6 +262,19 @@ namespace osu.Game.Rulesets.Taiko
                     new UnstableRate(timedHitEvents)
                 }), true)
             };
+        }
+
+        /// <seealso cref="TaikoHitWindows"/>
+        public override BeatmapDifficulty GetRateAdjustedDisplayDifficulty(IBeatmapDifficultyInfo difficulty, double rate)
+        {
+            BeatmapDifficulty adjustedDifficulty = new BeatmapDifficulty(difficulty);
+
+            var greatHitWindowRange = TaikoHitWindows.TAIKO_RANGES.Single(range => range.Result == HitResult.Great);
+            double greatHitWindow = IBeatmapDifficultyInfo.DifficultyRange(adjustedDifficulty.OverallDifficulty, greatHitWindowRange.Min, greatHitWindowRange.Average, greatHitWindowRange.Max);
+            greatHitWindow /= rate;
+            adjustedDifficulty.OverallDifficulty = (float)IBeatmapDifficultyInfo.InverseDifficultyRange(greatHitWindow, greatHitWindowRange.Min, greatHitWindowRange.Average, greatHitWindowRange.Max);
+
+            return adjustedDifficulty;
         }
     }
 }

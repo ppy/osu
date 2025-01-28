@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Events;
 using osu.Game.Overlays;
 using osuTK;
 using osuTK.Graphics;
@@ -18,6 +19,8 @@ namespace osu.Game.Graphics.UserInterface
 {
     public partial class ShearedNub : Container, IHasCurrentValue<bool>, IHasAccentColour
     {
+        public Action? OnDoubleClicked { get; init; }
+
         protected const float BORDER_WIDTH = 3;
 
         public const int HEIGHT = 30;
@@ -178,6 +181,14 @@ namespace osu.Game.Graphics.UserInterface
                 main.ResizeWidthTo(0.75f, duration, Easing.OutQuint);
                 main.TransformTo(nameof(BorderThickness), BORDER_WIDTH, duration, Easing.OutQuint);
             }
+        }
+
+        protected override bool OnClick(ClickEvent e) => true;
+
+        protected override bool OnDoubleClick(DoubleClickEvent e)
+        {
+            OnDoubleClicked?.Invoke();
+            return true;
         }
     }
 }

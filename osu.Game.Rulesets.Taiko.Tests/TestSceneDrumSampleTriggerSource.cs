@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
         [SetUp]
         public void SetUp() => Schedule(() =>
         {
-            gameplayClock = new GameplayClockContainer(manualClock)
+            gameplayClock = new GameplayClockContainer(manualClock, false, false)
             {
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
@@ -315,10 +315,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
                 hitObjectContainer.Add(drawableSwell);
             });
 
-            // You might think that this should be a SwellTick since we're before the swell, but SwellTicks get no StartTime (ie. they are zero).
-            // This works fine in gameplay because they are judged whenever the user pressed, rather than being timed hits.
-            // But for sample playback purposes they can be ignored as noise.
-            AddAssert("most valid object is swell", () => triggerSource.GetMostValidObject(), Is.InstanceOf<Swell>);
+            AddAssert("most valid object is swell tick", () => triggerSource.GetMostValidObject(), Is.InstanceOf<SwellTick>);
             checkSamples(HitType.Centre, false, HitSampleInfo.HIT_NORMAL, SampleControlPoint.DEFAULT_BANK);
             checkSamples(HitType.Rim, false, HitSampleInfo.HIT_CLAP, SampleControlPoint.DEFAULT_BANK);
 
@@ -352,10 +349,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
                 hitObjectContainer.Add(drawableSwell);
             });
 
-            // You might think that this should be a SwellTick since we're before the swell, but SwellTicks get no StartTime (ie. they are zero).
-            // This works fine in gameplay because they are judged whenever the user pressed, rather than being timed hits.
-            // But for sample playback purposes they can be ignored as noise.
-            AddAssert("most valid object is swell", () => triggerSource.GetMostValidObject(), Is.InstanceOf<Swell>);
+            AddAssert("most valid object is swell tick", () => triggerSource.GetMostValidObject(), Is.InstanceOf<SwellTick>);
             checkSamples(HitType.Centre, false, HitSampleInfo.HIT_NORMAL, HitSampleInfo.BANK_DRUM);
             checkSamples(HitType.Rim, false, HitSampleInfo.HIT_CLAP, HitSampleInfo.BANK_DRUM);
 

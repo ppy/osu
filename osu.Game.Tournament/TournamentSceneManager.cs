@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -35,8 +33,8 @@ namespace osu.Game.Tournament
     [Cached]
     public partial class TournamentSceneManager : CompositeDrawable
     {
-        private Container screens;
-        private TourneyVideo video;
+        private Container screens = null!;
+        private TourneyVideo video = null!;
 
         public const int CONTROL_AREA_WIDTH = 200;
 
@@ -50,8 +48,8 @@ namespace osu.Game.Tournament
         [Cached]
         private TournamentMatchChatDisplay chat = new TournamentMatchChatDisplay();
 
-        private Container chatContainer;
-        private FillFlowContainer buttons;
+        private Container chatContainer = null!;
+        private FillFlowContainer buttons = null!;
 
         public TournamentSceneManager()
         {
@@ -166,10 +164,10 @@ namespace osu.Game.Tournament
 
         private float depth;
 
-        private Drawable currentScreen;
-        private ScheduledDelegate scheduledHide;
+        private Drawable? currentScreen;
+        private ScheduledDelegate? scheduledHide;
 
-        private Drawable temporaryScreen;
+        private Drawable? temporaryScreen;
 
         public void SetScreen(Drawable screen)
         {
@@ -284,7 +282,7 @@ namespace osu.Game.Tournament
                                 Y = -2,
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
-                                Text = shortcutKey.ToString(),
+                                Text = shortcutKey.Value.ToString(),
                             }
                         }
                     });
@@ -304,7 +302,7 @@ namespace osu.Game.Tournament
 
             private bool isSelected;
 
-            public Action<Type> RequestSelection;
+            public Action<Type>? RequestSelection;
 
             public bool IsSelected
             {

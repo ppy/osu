@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
             AddAssert("end time is correct", () => Precision.AlmostEquals(lastObject.EndTime, times[1]));
             AddAssert("start position is correct", () => Precision.AlmostEquals(lastObject.OriginalX, positions[0]));
             AddAssert("end position is correct", () => Precision.AlmostEquals(lastObject.EndX, positions[1]));
-            AddAssert("default slider velocity", () => lastObject.SliderVelocityBindable.IsDefault);
+            AddAssert("default slider velocity", () => lastObject.SliderVelocityMultiplierBindable.IsDefault);
         }
 
         [Test]
@@ -76,7 +76,7 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
             addPlacementSteps(times, positions);
             addPathCheckStep(times, positions);
 
-            AddAssert("slider velocity changed", () => !lastObject.SliderVelocityBindable.IsDefault);
+            AddAssert("slider velocity changed", () => !lastObject.SliderVelocityMultiplierBindable.IsDefault);
         }
 
         [Test]
@@ -114,7 +114,7 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
 
         protected override DrawableHitObject CreateHitObject(HitObject hitObject) => new DrawableJuiceStream((JuiceStream)hitObject);
 
-        protected override PlacementBlueprint CreateBlueprint() => new JuiceStreamPlacementBlueprint();
+        protected override HitObjectPlacementBlueprint CreateBlueprint() => new JuiceStreamPlacementBlueprint();
 
         private void addMoveAndClickSteps(double time, float position, bool end = false)
         {

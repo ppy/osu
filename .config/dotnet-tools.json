@@ -3,13 +3,13 @@
   "isRoot": true,
   "tools": {
     "jetbrains.resharper.globaltools": {
-      "version": "2022.2.3",
+      "version": "2023.3.3",
       "commands": [
         "jb"
       ]
     },
     "nvika": {
-      "version": "2.2.0",
+      "version": "4.0.0",
       "commands": [
         "nvika"
       ]
@@ -21,7 +21,7 @@
       ]
     },
     "ppy.localisationanalyser.tools": {
-      "version": "2023.712.0",
+      "version": "2024.802.0",
       "commands": [
         "localisation"
       ]

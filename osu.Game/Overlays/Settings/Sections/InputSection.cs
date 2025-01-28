@@ -7,6 +7,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Handlers;
 using osu.Framework.Localisation;
 using osu.Framework.Platform;
+using osu.Game.Graphics;
 using osu.Game.Localisation;
 using osu.Game.Overlays.Settings.Sections.Input;
 
@@ -20,7 +21,7 @@ namespace osu.Game.Overlays.Settings.Sections
 
         public override Drawable CreateIcon() => new SpriteIcon
         {
-            Icon = FontAwesome.Solid.Keyboard
+            Icon = OsuIcon.Input
         };
 
         public InputSection(KeyBindingPanel keyConfig)

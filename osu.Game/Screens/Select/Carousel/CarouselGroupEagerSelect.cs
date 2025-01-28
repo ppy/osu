@@ -10,9 +10,9 @@ namespace osu.Game.Screens.Select.Carousel
     /// <summary>
     /// A group which ensures at least one item is selected (if the group itself is selected).
     /// </summary>
-    public class CarouselGroupEagerSelect : CarouselGroup
+    public abstract class CarouselGroupEagerSelect : CarouselGroup
     {
-        public CarouselGroupEagerSelect()
+        protected CarouselGroupEagerSelect()
         {
             State.ValueChanged += state =>
             {
@@ -36,13 +36,13 @@ namespace osu.Game.Screens.Select.Carousel
         /// items have been filtered. This bool will be true during the base <see cref="Filter(FilterCriteria)"/>
         /// operation.
         /// </summary>
-        private bool filteringItems;
+        protected bool DisableSelection;
 
         public override void Filter(FilterCriteria criteria)
         {
-            filteringItems = true;
+            DisableSelection = true;
             base.Filter(criteria);
-            filteringItems = false;
+            DisableSelection = false;
 
             attemptSelection();
         }
@@ -95,7 +95,7 @@ namespace osu.Game.Screens.Select.Carousel
 
         private void attemptSelection()
         {
-            if (filteringItems) return;
+            if (DisableSelection) return;
 
             // we only perform eager selection if we are a currently selected group.
             if (State.Value != CarouselItemState.Selected) return;
@@ -110,7 +110,7 @@ namespace osu.Game.Screens.Select.Carousel
         /// Finds the item this group would select next if it attempted selection
         /// </summary>
         /// <returns>An unfiltered item nearest to the last selected one or null if all items are filtered</returns>
-        protected virtual CarouselItem? GetNextToSelect()
+        public virtual CarouselItem? GetNextToSelect()
         {
             if (Items.Count == 0)
                 return null;

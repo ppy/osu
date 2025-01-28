@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using JetBrains.Annotations;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -52,7 +50,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             name.BindValueChanged(_ => textName.Text = ((losers ? "Losers " : "") + round.Name).ToUpperInvariant(), true);
 
             description = round.Description.GetBoundCopy();
-            description.BindValueChanged(_ => textDescription.Text = round.Description.Value?.ToUpperInvariant(), true);
+            description.BindValueChanged(_ => textDescription.Text = round.Description.Value?.ToUpperInvariant() ?? string.Empty, true);
         }
     }
 }

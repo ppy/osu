@@ -11,7 +11,7 @@ using osu.Game.Overlays.Profile.Header.Components;
 
 namespace osu.Game.Overlays.Profile.Header
 {
-    public partial class BannerHeaderContainer : CompositeDrawable
+    public partial class BannerHeaderContainer : FillFlowContainer
     {
         public readonly Bindable<UserProfileData?> User = new Bindable<UserProfileData?>();
 
@@ -19,9 +19,9 @@ namespace osu.Game.Overlays.Profile.Header
         private void load()
         {
             Alpha = 0;
-            RelativeSizeAxes = Axes.Both;
-            FillMode = FillMode.Fit;
-            FillAspectRatio = 1000 / 60f;
+            RelativeSizeAxes = Axes.X;
+            AutoSizeAxes = Axes.Y;
+            Direction = FillDirection.Vertical;
         }
 
         protected override void LoadComplete()
@@ -40,13 +40,21 @@ namespace osu.Game.Overlays.Profile.Header
 
             ClearInternal();
 
-            var banner = user?.TournamentBanner;
+            var banners = user?.TournamentBanners;
 
-            if (banner != null)
+            if (banners?.Length > 0)
             {
                 Show();
 
-                LoadComponentAsync(new DrawableTournamentBanner(banner), AddInternal, cancellationTokenSource.Token);
+                for (int index = 0; index < banners.Length; index++)
+                {
+                    int displayIndex = index;
+                    LoadComponentAsync(new DrawableTournamentBanner(banners[index]), asyncBanner =>
+                    {
+                        // load in stable order regardless of async load order.
+                        Insert(displayIndex, asyncBanner);
+                    }, cancellationTokenSource.Token);
+                }
             }
             else
             {

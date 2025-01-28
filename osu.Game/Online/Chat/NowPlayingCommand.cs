@@ -7,8 +7,8 @@ using System.Text;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Online.API;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
@@ -33,10 +33,8 @@ namespace osu.Game.Online.Chat
         [Resolved]
         private IBindable<RulesetInfo> currentRuleset { get; set; } = null!;
 
-        [Resolved]
-        private LocalisationManager localisation { get; set; } = null!;
-
         private readonly Channel? target;
+        private IBindable<UserActivity?> userActivity = null!;
 
         /// <summary>
         /// Creates a new <see cref="NowPlayingCommand"/> to post the currently-playing beatmap to a parenting <see cref="IChannelPostTarget"/>.
@@ -47,28 +45,39 @@ namespace osu.Game.Online.Chat
             this.target = target;
         }
 
+        [BackgroundDependencyLoader]
+        private void load(SessionStatics session)
+        {
+            userActivity = session.GetBindable<UserActivity?>(Static.UserOnlineActivity);
+        }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
             string verb;
-            IBeatmapInfo beatmapInfo;
 
-            switch (api.Activity.Value)
+            int beatmapOnlineID;
+            string beatmapDisplayTitle;
+
+            switch (userActivity.Value)
             {
                 case UserActivity.InGame game:
                     verb = "playing";
-                    beatmapInfo = game.BeatmapInfo;
+                    beatmapOnlineID = game.BeatmapID;
+                    beatmapDisplayTitle = game.BeatmapDisplayTitle;
                     break;
 
                 case UserActivity.EditingBeatmap edit:
                     verb = "editing";
-                    beatmapInfo = edit.BeatmapInfo;
+                    beatmapOnlineID = edit.BeatmapID;
+                    beatmapDisplayTitle = edit.BeatmapDisplayTitle;
                     break;
 
                 default:
                     verb = "listening to";
-                    beatmapInfo = currentBeatmap.Value.BeatmapInfo;
+                    beatmapOnlineID = currentBeatmap.Value.BeatmapInfo.OnlineID;
+                    beatmapDisplayTitle = currentBeatmap.Value.BeatmapInfo.GetDisplayTitle();
                     break;
             }
 
@@ -86,21 +95,19 @@ namespace osu.Game.Online.Chat
 
             string getBeatmapPart()
             {
-                string beatmapInfoString = localisation.GetLocalisedBindableString(beatmapInfo.GetDisplayTitleRomanisable()).Value;
-
-                return beatmapInfo.OnlineID > 0 ? $"[{api.WebsiteRootUrl}/b/{beatmapInfo.OnlineID} {beatmapInfoString}]" : beatmapInfoString;
+                return beatmapOnlineID > 0 ? $"[{api.WebsiteRootUrl}/b/{beatmapOnlineID} {beatmapDisplayTitle}]" : beatmapDisplayTitle;
             }
 
             string getRulesetPart()
             {
-                if (api.Activity.Value is not UserActivity.InGame) return string.Empty;
+                if (userActivity.Value is not UserActivity.InGame) return string.Empty;
 
                 return $"<{currentRuleset.Value.Name}>";
             }
 
             string getModPart()
             {
-                if (api.Activity.Value is not UserActivity.InGame) return string.Empty;
+                if (userActivity.Value is not UserActivity.InGame) return string.Empty;
 
                 if (selectedMods.Value.Count == 0)
                 {

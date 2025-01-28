@@ -20,7 +20,7 @@ namespace osu.Game.Tournament.Components
 {
     public partial class TournamentBeatmapPanel : CompositeDrawable
     {
-        public readonly TournamentBeatmap? Beatmap;
+        public readonly IBeatmapInfo? Beatmap;
 
         private readonly string mod;
 
@@ -30,7 +30,7 @@ namespace osu.Game.Tournament.Components
 
         private Box flash = null!;
 
-        public TournamentBeatmapPanel(TournamentBeatmap? beatmap, string mod = "")
+        public TournamentBeatmapPanel(IBeatmapInfo? beatmap, string mod = "")
         {
             Beatmap = beatmap;
             this.mod = mod;
@@ -58,7 +58,7 @@ namespace osu.Game.Tournament.Components
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = OsuColour.Gray(0.5f),
-                    OnlineInfo = Beatmap,
+                    OnlineInfo = (Beatmap as IBeatmapSetOnlineInfo),
                 },
                 new FillFlowContainer
                 {
@@ -146,7 +146,12 @@ namespace osu.Game.Tournament.Components
 
         private void updateState()
         {
-            var newChoice = currentMatch.Value?.PicksBans.FirstOrDefault(p => p.BeatmapID == Beatmap?.OnlineID);
+            if (currentMatch.Value == null)
+            {
+                return;
+            }
+
+            var newChoice = currentMatch.Value.PicksBans.FirstOrDefault(p => p.BeatmapID == Beatmap?.OnlineID);
 
             bool shouldFlash = newChoice != choice;
 
@@ -189,7 +194,7 @@ namespace osu.Game.Tournament.Components
 
             // Use DelayedLoadWrapper to avoid content unloading when switching away to another screen.
             protected override DelayedLoadWrapper CreateDelayedLoadWrapper(Func<Drawable> createContentFunc, double timeBeforeLoad)
-                => new DelayedLoadWrapper(createContentFunc, timeBeforeLoad);
+                => new DelayedLoadWrapper(createContentFunc(), timeBeforeLoad);
         }
     }
 }

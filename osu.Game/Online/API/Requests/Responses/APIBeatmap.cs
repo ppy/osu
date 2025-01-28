@@ -41,6 +41,10 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"difficulty_rating")]
         public double StarRating { get; set; }
 
+        public int EndTimeObjectCount => SliderCount + SpinnerCount;
+
+        public int TotalObjectCount => CircleCount + SliderCount + SpinnerCount;
+
         [JsonProperty(@"drain")]
         public float DrainRate { get; set; }
 
@@ -108,7 +112,7 @@ namespace osu.Game.Online.API.Requests.Responses
             DrainRate = DrainRate,
             CircleSize = CircleSize,
             ApproachRate = ApproachRate,
-            OverallDifficulty = OverallDifficulty,
+            OverallDifficulty = OverallDifficulty
         };
 
         IBeatmapSetInfo? IBeatmapInfo.BeatmapSet => BeatmapSet;

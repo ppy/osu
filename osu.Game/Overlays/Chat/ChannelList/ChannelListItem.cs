@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -9,6 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -19,7 +21,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Chat.ChannelList
 {
-    public partial class ChannelListItem : OsuClickableContainer
+    public partial class ChannelListItem : OsuClickableContainer, IFilterable
     {
         public event Action<Channel>? OnRequestSelect;
         public event Action<Channel>? OnRequestLeave;
@@ -49,7 +51,7 @@ namespace osu.Game.Overlays.Chat.ChannelList
         [BackgroundDependencyLoader]
         private void load()
         {
-            Height = 30;
+            Height = 25;
             RelativeSizeAxes = Axes.X;
 
             Children = new Drawable[]
@@ -66,41 +68,37 @@ namespace osu.Game.Overlays.Chat.ChannelList
                     Colour = colourProvider.Background4,
                     Alpha = 0f,
                 },
-                new Container
+                new GridContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Padding = new MarginPadding { Left = 18, Right = 10 },
-                    Child = new GridContainer
+                    ColumnDimensions = new[]
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        ColumnDimensions = new[]
-                        {
-                            new Dimension(GridSizeMode.AutoSize),
-                            new Dimension(),
-                            new Dimension(GridSizeMode.AutoSize),
-                            new Dimension(GridSizeMode.AutoSize),
-                        },
-                        Content = new[]
-                        {
-                            new Drawable?[]
-                            {
-                                createIcon(),
-                                text = new TruncatingSpriteText
-                                {
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.CentreLeft,
-                                    Text = Channel.Name,
-                                    Font = OsuFont.Torus.With(size: 17, weight: FontWeight.SemiBold),
-                                    Colour = colourProvider.Light3,
-                                    Margin = new MarginPadding { Bottom = 2 },
-                                    RelativeSizeAxes = Axes.X,
-                                },
-                                createMentionPill(),
-                                close = createCloseButton(),
-                            }
-                        },
+                        new Dimension(GridSizeMode.AutoSize),
+                        new Dimension(),
+                        new Dimension(GridSizeMode.AutoSize),
+                        new Dimension(GridSizeMode.AutoSize),
                     },
-                },
+                    Content = new[]
+                    {
+                        new Drawable?[]
+                        {
+                            createIcon(),
+                            text = new TruncatingSpriteText
+                            {
+                                Anchor = Anchor.CentreLeft,
+                                Origin = Anchor.CentreLeft,
+                                Text = Channel.Name,
+                                Font = OsuFont.Torus.With(size: 14, weight: FontWeight.SemiBold),
+                                Colour = colourProvider.Light3,
+                                Margin = new MarginPadding { Bottom = 2 },
+                                RelativeSizeAxes = Axes.X,
+                            },
+                            createMentionPill(),
+                            close = createCloseButton(),
+                        }
+                    }
+                }
             };
 
             Action = () => OnRequestSelect?.Invoke(Channel);
@@ -190,5 +188,28 @@ namespace osu.Game.Overlays.Chat.ChannelList
         }
 
         private bool isSelector => Channel is ChannelListing.ChannelListingChannel;
+
+        #region Filtering support
+
+        public IEnumerable<LocalisableString> FilterTerms => isSelector ? Enumerable.Empty<LocalisableString>() : [Channel.Name];
+
+        private bool matchingFilter = true;
+
+        public bool MatchingFilter
+        {
+            get => matchingFilter;
+            set
+            {
+                if (matchingFilter == value)
+                    return;
+
+                matchingFilter = value;
+                Alpha = matchingFilter ? 1 : 0;
+            }
+        }
+
+        public bool FilteringActive { get; set; }
+
+        #endregion
     }
 }

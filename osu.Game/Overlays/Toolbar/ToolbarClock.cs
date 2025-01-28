@@ -44,38 +44,57 @@ namespace osu.Game.Overlays.Toolbar
 
             Children = new Drawable[]
             {
-                hoverBackground = new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = OsuColour.Gray(80).Opacity(180),
-                    Blending = BlendingParameters.Additive,
-                    Alpha = 0,
-                },
-                flashBackground = new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Alpha = 0,
-                    Colour = Color4.White.Opacity(100),
-                    Blending = BlendingParameters.Additive,
-                },
-                new FillFlowContainer
+                new Container
                 {
                     RelativeSizeAxes = Axes.Y,
                     AutoSizeAxes = Axes.X,
-                    Direction = FillDirection.Horizontal,
-                    Spacing = new Vector2(5),
-                    Padding = new MarginPadding(10),
+                    Padding = new MarginPadding(ToolbarButton.PADDING),
                     Children = new Drawable[]
                     {
-                        analog = new AnalogClockDisplay
+                        new Container
                         {
-                            Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreLeft,
+                            RelativeSizeAxes = Axes.Both,
+                            Masking = true,
+                            CornerRadius = 6,
+                            CornerExponent = 3f,
+                            Children = new Drawable[]
+                            {
+                                hoverBackground = new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Colour = OsuColour.Gray(80).Opacity(180),
+                                    Blending = BlendingParameters.Additive,
+                                    Alpha = 0,
+                                },
+                                flashBackground = new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Alpha = 0,
+                                    Colour = Color4.White.Opacity(100),
+                                    Blending = BlendingParameters.Additive,
+                                },
+                            }
                         },
-                        digital = new DigitalClockDisplay
+                        new FillFlowContainer
                         {
-                            Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreLeft,
+                            RelativeSizeAxes = Axes.Y,
+                            AutoSizeAxes = Axes.X,
+                            Direction = FillDirection.Horizontal,
+                            Spacing = new Vector2(5),
+                            Padding = new MarginPadding(10),
+                            Children = new Drawable[]
+                            {
+                                analog = new AnalogClockDisplay
+                                {
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
+                                },
+                                digital = new DigitalClockDisplay
+                                {
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
+                                }
+                            }
                         }
                     }
                 }

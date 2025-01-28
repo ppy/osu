@@ -188,7 +188,7 @@ namespace osu.Game.Tests.Visual.Online
                 AddUntilStep("placeholder shown", () =>
                 {
                     var notFoundDrawable = overlay.ChildrenOfType<BeatmapListingOverlay.NotFoundDrawable>().SingleOrDefault();
-                    return notFoundDrawable != null && notFoundDrawable.IsPresent && notFoundDrawable.Parent.DrawHeight > 0;
+                    return notFoundDrawable != null && notFoundDrawable.IsPresent && notFoundDrawable.Parent!.DrawHeight > 0;
                 });
         }
 
@@ -368,7 +368,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 var cardContainer = this.ChildrenOfType<ReverseChildIDFillFlowContainer<BeatmapCard>>().Single().Parent;
                 var expandedContent = this.ChildrenOfType<ExpandedContentScrollContainer>().Single();
-                return expandedContent.ScreenSpaceDrawQuad.GetVertices().ToArray().All(v => cardContainer.ScreenSpaceDrawQuad.Contains(v));
+                return expandedContent.ScreenSpaceDrawQuad.GetVertices().ToArray().All(v => cardContainer!.ScreenSpaceDrawQuad.Contains(v));
             });
         }
 

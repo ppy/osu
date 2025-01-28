@@ -17,7 +17,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Taiko.Skinning.Argon
 {
-    public partial class ArgonJudgementPiece : JudgementPiece, IAnimatableJudgement
+    public partial class ArgonJudgementPiece : TextJudgementPiece, IAnimatableJudgement
     {
         private RingExplosion? ringExplosion;
 

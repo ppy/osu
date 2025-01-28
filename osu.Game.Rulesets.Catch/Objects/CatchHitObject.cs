@@ -8,13 +8,14 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
 using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Objects
 {
-    public abstract class CatchHitObject : HitObject, IHasPosition, IHasComboInformation
+    public abstract class CatchHitObject : HitObject, IHasPosition, IHasComboInformation, IHasTimePreempt
     {
         public const float OBJECT_RADIUS = 64;
 
@@ -149,9 +150,35 @@ namespace osu.Game.Rulesets.Catch.Objects
         {
             base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
-            TimePreempt = (float)IBeatmapDifficultyInfo.DifficultyRange(difficulty.ApproachRate, 1800, 1200, 450);
+            TimePreempt = (float)IBeatmapDifficultyInfo.DifficultyRange(difficulty.ApproachRate, PREEMPT_MAX, PREEMPT_MID, PREEMPT_MIN);
 
-            Scale = (1.0f - 0.7f * (difficulty.CircleSize - 5) / 5) / 2;
+            Scale = LegacyRulesetExtensions.CalculateScaleFromCircleSize(difficulty.CircleSize);
+        }
+
+        public void UpdateComboInformation(IHasComboInformation? lastObj)
+        {
+            // Note that this implementation is shared with the osu! ruleset's implementation.
+            // If a change is made here, OsuHitObject.cs should also be updated.
+            int index = lastObj?.ComboIndex ?? 0;
+            int indexWithOffsets = lastObj?.ComboIndexWithOffsets ?? 0;
+            int inCurrentCombo = (lastObj?.IndexInCurrentCombo + 1) ?? 0;
+
+            // - For the purpose of combo colours, spinners never start a new combo even if they are flagged as doing so.
+            // - At decode time, the first hitobject in the beatmap and the first hitobject after a banana shower are both enforced to be a new combo,
+            //   but this isn't directly enforced by the editor so the extra checks against the last hitobject are duplicated here.
+            if (this is not BananaShower && (NewCombo || lastObj == null || lastObj is BananaShower))
+            {
+                inCurrentCombo = 0;
+                index++;
+                indexWithOffsets += ComboOffset + 1;
+
+                if (lastObj != null)
+                    lastObj.LastInCombo = true;
+            }
+
+            ComboIndex = index;
+            ComboIndexWithOffsets = indexWithOffsets;
+            IndexInCurrentCombo = inCurrentCombo;
         }
 
         protected override HitWindows CreateHitWindows() => HitWindows.Empty;
@@ -162,16 +189,47 @@ namespace osu.Game.Rulesets.Catch.Objects
         public const float DEFAULT_LEGACY_CONVERT_Y = 192;
 
         /// <summary>
+        /// Minimum preempt time at AR=10.
+        /// </summary>
+        public const double PREEMPT_MIN = 450;
+
+        /// <summary>
+        /// Median preempt time at AR=5.
+        /// </summary>
+        public const double PREEMPT_MID = 1200;
+
+        /// <summary>
+        /// Maximum preempt time at AR=0.
+        /// </summary>
+        public const double PREEMPT_MAX = 1800;
+
+        /// <summary>
         /// The Y position of the hit object is not used in the normal osu!catch gameplay.
         /// It is preserved to maximize the backward compatibility with the legacy editor, in which the mappers use the Y position to organize the patterns.
         /// </summary>
         public float LegacyConvertedY { get; set; } = DEFAULT_LEGACY_CONVERT_Y;
 
-        float IHasXPosition.X => OriginalX;
+        float IHasXPosition.X
+        {
+            get => OriginalX;
+            set => OriginalX = value;
+        }
 
-        float IHasYPosition.Y => LegacyConvertedY;
+        float IHasYPosition.Y
+        {
+            get => LegacyConvertedY;
+            set => LegacyConvertedY = value;
+        }
 
-        Vector2 IHasPosition.Position => new Vector2(OriginalX, LegacyConvertedY);
+        Vector2 IHasPosition.Position
+        {
+            get => new Vector2(OriginalX, LegacyConvertedY);
+            set
+            {
+                ((IHasXPosition)this).X = value.X;
+                ((IHasYPosition)this).Y = value.Y;
+            }
+        }
 
         #endregion
     }

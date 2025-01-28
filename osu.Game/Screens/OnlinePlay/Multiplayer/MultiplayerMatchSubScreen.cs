@@ -1,13 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
@@ -44,20 +43,18 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         public override string ShortTitle => "room";
 
-        protected override bool PlayExitSound => !exitConfirmed;
-
         [Resolved]
-        private MultiplayerClient client { get; set; }
+        private MultiplayerClient client { get; set; } = null!;
 
         [Resolved(canBeNull: true)]
-        private OsuGame game { get; set; }
+        private OsuGame? game { get; set; }
 
-        private AddItemButton addItemButton;
+        private AddItemButton addItemButton = null!;
 
         public MultiplayerMatchSubScreen(Room room)
             : base(room)
         {
-            Title = room.RoomID.Value == null ? "New room" : room.Name.Value;
+            Title = room.RoomID == null ? "New room" : room.Name;
             Activity.Value = new UserActivity.InLobby(room);
         }
 
@@ -97,7 +94,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                     },
                     Content = new[]
                     {
-                        new Drawable[]
+                        new Drawable?[]
                         {
                             // Participants column
                             new GridContainer
@@ -141,10 +138,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                     null,
                                     new Drawable[]
                                     {
-                                        new MultiplayerPlaylist
+                                        new MultiplayerPlaylist(Room)
                                         {
                                             RelativeSizeAxes = Axes.Both,
-                                            RequestEdit = OpenSongSelection
+                                            RequestEdit = OpenSongSelection,
+                                            SelectedItem = SelectedItem
                                         }
                                     },
                                     new[]
@@ -222,7 +220,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         /// Opens the song selection screen to add or edit an item.
         /// </summary>
         /// <param name="itemToEdit">An optional playlist item to edit. If null, a new item will be added instead.</param>
-        internal void OpenSongSelection(PlaylistItem itemToEdit = null)
+        internal void OpenSongSelection(PlaylistItem? itemToEdit = null)
         {
             if (!this.IsCurrentScreen())
                 return;
@@ -230,9 +228,15 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             this.Push(new MultiplayerMatchSongSelect(Room, itemToEdit));
         }
 
-        protected override Drawable CreateFooter() => new MultiplayerMatchFooter();
+        protected override Drawable CreateFooter() => new MultiplayerMatchFooter
+        {
+            SelectedItem = SelectedItem
+        };
 
-        protected override RoomSettingsOverlay CreateRoomSettingsOverlay(Room room) => new MultiplayerMatchSettingsOverlay(room);
+        protected override RoomSettingsOverlay CreateRoomSettingsOverlay(Room room) => new MultiplayerMatchSettingsOverlay(room)
+        {
+            SelectedItem = SelectedItem
+        };
 
         protected override void UpdateMods()
         {
@@ -241,12 +245,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             // update local mods based on room's reported status for the local user (omitting the base call implementation).
             // this makes the server authoritative, and avoids the local user potentially setting mods that the server is not aware of (ie. if the match was started during the selection being changed).
-            var ruleset = Ruleset.Value.CreateInstance();
-            Mods.Value = client.LocalUser.Mods.Select(m => m.ToMod(ruleset)).Concat(SelectedItem.Value.RequiredMods.Select(m => m.ToMod(ruleset))).ToList();
+            var rulesetInstance = Rulesets.GetRuleset(SelectedItem.Value.RulesetID)?.CreateInstance();
+            Debug.Assert(rulesetInstance != null);
+            Mods.Value = client.LocalUser.Mods.Select(m => m.ToMod(rulesetInstance)).Concat(SelectedItem.Value.RequiredMods.Select(m => m.ToMod(rulesetInstance))).ToList();
         }
 
         [Resolved(canBeNull: true)]
-        private IDialogOverlay dialogOverlay { get; set; }
+        private IDialogOverlay? dialogOverlay { get; set; }
 
         private bool exitConfirmed;
 
@@ -265,7 +270,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                     dialogOverlay.Push(new ConfirmDialog("Are you sure you want to leave this multiplayer match?", () =>
                     {
                         exitConfirmed = true;
-                        this.Exit();
+                        if (this.IsCurrentScreen())
+                            this.Exit();
                     }));
                 }
 
@@ -275,8 +281,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             return base.OnExiting(e);
         }
 
-        private ModSettingChangeTracker modSettingChangeTracker;
-        private ScheduledDelegate debouncedModSettingsUpdate;
+        private ModSettingChangeTracker? modSettingChangeTracker;
+        private ScheduledDelegate? debouncedModSettingsUpdate;
 
         private void onUserModsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)
         {
@@ -348,9 +354,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             addItemButton.Alpha = localUserCanAddItem ? 1 : 0;
 
             Scheduler.AddOnce(UpdateMods);
+
+            Activity.Value = new UserActivity.InLobby(Room);
         }
 
-        private bool localUserCanAddItem => client.IsHost || Room.QueueMode.Value != QueueMode.HostOnly;
+        private bool localUserCanAddItem => client.IsHost || Room.QueueMode != QueueMode.HostOnly;
 
         private void updateCurrentItem()
         {
@@ -370,9 +378,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         private void onLoadRequested()
         {
-            if (BeatmapAvailability.Value.State != DownloadState.LocallyAvailable)
-                return;
-
             // In the case of spectating, IMultiplayerClient.LoadRequested can be fired while the game is still spectating a previous session.
             // For now, we want to game to switch to the new game so need to request exiting from the play screen.
             if (!ParentScreen.IsCurrentScreen())
@@ -390,10 +395,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             if (client.LocalUser?.State == MultiplayerUserState.Spectating && (SelectedItem.Value == null || Beatmap.IsDefault))
                 return;
 
+            if (BeatmapAvailability.Value.State != DownloadState.LocallyAvailable)
+                return;
+
             StartPlay();
         }
 
-        protected override Screen CreateGameplayScreen()
+        protected override Screen CreateGameplayScreen(PlaylistItem selectedItem)
         {
             Debug.Assert(client.LocalUser != null);
             Debug.Assert(client.Room != null);
@@ -407,7 +415,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                     return new MultiSpectatorScreen(Room, users.Take(PlayerGrid.MAX_PLAYERS).ToArray());
 
                 default:
-                    return new MultiplayerPlayerLoader(() => new MultiplayerPlayer(Room, SelectedItem.Value, users));
+                    return new MultiplayerPlayerLoader(() => new MultiplayerPlayer(Room, selectedItem, users));
             }
         }
 
@@ -420,7 +428,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 return;
 
             // If there's only one playlist item and we are the host, assume we want to change it. Else add a new one.
-            PlaylistItem itemToEdit = client.IsHost && Room.Playlist.Count == 1 ? Room.Playlist.Single() : null;
+            PlaylistItem? itemToEdit = client.IsHost && Room.Playlist.Count == 1 ? Room.Playlist.Single() : null;
 
             OpenSongSelection(itemToEdit);
 
@@ -432,7 +440,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         {
             base.Dispose(isDisposing);
 
-            if (client != null)
+            if (client.IsNotNull())
             {
                 client.RoomUpdated -= onRoomUpdated;
                 client.LoadRequested -= onLoadRequested;

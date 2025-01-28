@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -8,7 +9,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Rulesets;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Screens.Play.HUD.JudgementCounter
@@ -18,16 +18,16 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
         public BindableBool ShowName = new BindableBool();
         public Bindable<FillDirection> Direction = new Bindable<FillDirection>();
 
-        public readonly JudgementCountController.JudgementCount Result;
+        public readonly JudgementCount Result;
 
-        public JudgementCounter(JudgementCountController.JudgementCount result) => Result = result;
+        public JudgementCounter(JudgementCount result) => Result = result;
 
         public OsuSpriteText ResultName = null!;
         private FillFlowContainer flowContainer = null!;
         private JudgementRollingCounter counter = null!;
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, IBindable<RulesetInfo> ruleset)
+        private void load(OsuColour colours)
         {
             AutoSizeAxes = Axes.Both;
 
@@ -44,14 +44,14 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
                     {
                         Alpha = 0,
                         Font = OsuFont.Numeric.With(size: 8),
-                        Text = ruleset.Value.CreateInstance().GetDisplayNameForHitResult(Result.Type)
+                        Text = Result.DisplayName,
                     }
                 }
             };
 
-            var result = Result.Type;
+            var result = Result.Types.First();
 
-            Colour = result.IsBasic() ? colours.ForHitResult(Result.Type) : !result.IsBonus() ? colours.PurpleLight : colours.PurpleLighter;
+            Colour = result.IsBasic() ? colours.ForHitResult(result) : !result.IsBonus() ? colours.PurpleLight : colours.PurpleLighter;
         }
 
         protected override void LoadComplete()

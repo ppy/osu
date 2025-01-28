@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.UserInterface;
@@ -13,12 +11,12 @@ namespace osu.Game.Tournament.Screens.Setup
 {
     internal partial class TournamentSwitcher : ActionableInfo
     {
-        private OsuDropdown<string> dropdown;
-        private OsuButton folderButton;
-        private OsuButton reloadTournamentsButton;
+        private OsuDropdown<string> dropdown = null!;
+        private OsuButton folderButton = null!;
+        private OsuButton reloadTournamentsButton = null!;
 
         [Resolved]
-        private TournamentGameBase game { get; set; }
+        private TournamentGameBase game { get; set; } = null!;
 
         [BackgroundDependencyLoader]
         private void load(TournamentStorage storage)

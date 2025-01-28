@@ -12,7 +12,7 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
 {
     public partial class GeneralSettings : SettingsSubsection
     {
-        protected override LocalisableString Header => GameplaySettingsStrings.GeneralHeader;
+        protected override LocalisableString Header => CommonStrings.General;
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
@@ -30,6 +30,11 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 {
                     LabelText = GraphicsSettingsStrings.HitLighting,
                     Current = config.GetBindable<bool>(OsuSetting.HitLighting)
+                },
+                new SettingsCheckbox
+                {
+                    LabelText = GameplaySettingsStrings.StarFountains,
+                    Current = config.GetBindable<bool>(OsuSetting.StarFountains)
                 },
             };
         }
