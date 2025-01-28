@@ -19,9 +19,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             for (int index = 0; index < osuBeatmap.HitObjects.Count; index++)
             {
-
-                if (index > 0 && !osuBeatmap.HitObjects[index].NewCombo)
-                { // Make sure objects are at the correct combo number in case previous sliders in the combo were converted
+                if (index > 0 && !osuBeatmap.HitObjects[index].NewCombo) // Make sure objects are at the correct combo number in case previous sliders in the combo were converted
+                {
                     osuBeatmap.HitObjects[index].IndexInCurrentCombo = osuBeatmap.HitObjects[index - 1].IndexInCurrentCombo + 1;
                 }
 
@@ -30,7 +29,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                     continue;
                 }
 
-                HitCircle newCircle = convertToCircle(slider.HeadCircle, osuBeatmap, slider.HeadCircle);
+                HitCircle newCircle = convertToCircle(slider.HeadCircle, osuBeatmap);
 
                 osuBeatmap.HitObjects[index] = newCircle;
 
@@ -38,6 +37,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                     continue;
 
                 int addedCircles = 0;
+
                 for (int k = 1; k < slider.NestedHitObjects.Count; k++) // We start at 1 to skip over the SliderHeadCircle
                 {
                     if (slider.NestedHitObjects.ElementAt(k) is not HitCircle circle)
@@ -51,6 +51,12 @@ namespace osu.Game.Rulesets.Osu.Mods
                 }
             }
         }
+
+        private HitCircle convertToCircle(HitCircle objectToConvert, OsuBeatmap osuBeatmap)
+        {
+            return convertToCircle(objectToConvert, osuBeatmap, objectToConvert);
+        }
+
         private HitCircle convertToCircle(HitCircle objectToConvert, OsuBeatmap osuBeatmap, HitCircle overrideCircle)
         {
             HitCircle newCircle = new HitCircle
@@ -64,8 +70,8 @@ namespace osu.Game.Rulesets.Osu.Mods
                 Scale = objectToConvert.Scale,
                 StackHeight = objectToConvert.StackHeight,
                 StartTime = objectToConvert.StartTime,
-                TimeFadeIn = overrideCircle != null ? overrideCircle.TimeFadeIn : objectToConvert.TimeFadeIn,
-                TimePreempt = overrideCircle != null ? overrideCircle.TimePreempt : objectToConvert.TimePreempt,
+                TimeFadeIn = overrideCircle.TimeFadeIn,
+                TimePreempt = overrideCircle.TimePreempt,
                 HitWindows = new OsuHitWindows()
             };
             newCircle.HitWindows.SetDifficulty(osuBeatmap.Difficulty.OverallDifficulty);
