@@ -93,10 +93,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                 }
             },
             Autoplay = true,
-            PassCondition = () =>
-            {
-                return Player.ScoreProcessor.Combo.Value == 9 && Player.ScoreProcessor.MaximumCombo == 9 && !this.ChildrenOfType<Slider>().Any() && checkObjectsScale(0.78f) && checkObjectsPreempt(1680);
-            }
+            PassCondition = () => Player.ScoreProcessor.Combo.Value == 9 && Player.ScoreProcessor.MaximumCombo == 9 && !this.ChildrenOfType<Slider>().Any() && checkObjectsScale(0.78f) && checkObjectsPreempt(1680)
         });
 
         [Test]
@@ -174,10 +171,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                 }
             },
             Autoplay = true,
-            PassCondition = () =>
-            {
-                return Player.ScoreProcessor.Combo.Value == 16 && Player.ScoreProcessor.MaximumCombo == 16 && !this.ChildrenOfType<Slider>().Any() && checkObjectsScale(0.15f) && checkObjectsPreempt(450);
-            }
+            PassCondition = () => Player.ScoreProcessor.Combo.Value == 16 && Player.ScoreProcessor.MaximumCombo == 16 && !this.ChildrenOfType<Slider>().Any() && checkObjectsScale(0.15f) && checkObjectsPreempt(450)
         });
 
         private bool checkObjectsPreempt(double target)
@@ -188,6 +182,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
 
             return objects.All(o => o.HitObject.TimePreempt == target);
         }
+
         private bool checkObjectsScale(float target)
         {
             var objects = Player.ChildrenOfType<DrawableHitCircle>();
