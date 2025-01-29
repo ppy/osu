@@ -12,7 +12,6 @@ using osu.Game.Graphics.Cursor;
 using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Rulesets;
 using osuTK;
 
 namespace osu.Game.Users.Drawables
