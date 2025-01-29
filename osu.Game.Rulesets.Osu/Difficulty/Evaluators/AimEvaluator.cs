@@ -143,20 +143,22 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     deltaVelocity *= DifficultyCalculationUtils.Smoothstep(osuNextObj.StrainTime, osuCurrObj.StrainTime * 1.75, osuCurrObj.StrainTime * 1.5); // Don't buff jump into slider
 
                     // Have a threshold so very small changes aren't buffed.
-                    deltaVelocity *= DifficultyCalculationUtils.Smoothstep(deltaVelocity, 0, radius / 2 / relevantStrainTime);
+                    deltaVelocity *= DifficultyCalculationUtils.Smoothstep(deltaVelocity, 0, (radius / 2.0) / relevantStrainTime);
 
-                    // Increase buff if velocity changed 2 times instead of 1.
+                    // Increase buff if velocity change is unconventioanl
                     double nextVelocity = (osuNextObj.LazyJumpDistance + osuCurrObj.TravelDistance) / osuNextObj.StrainTime;
-                    deltaVelocity *= 1 + 0.3 * Math.Min(prevVelocity, nextVelocity) / prevVelocity;
+                    deltaVelocity *= 1 + 0.5
+                        * DifficultyCalculationUtils.ReverseLerp(prevVelocity, 0, nextVelocity * 0.5)
+                        * DifficultyCalculationUtils.ReverseLerp(prevVelocity, nextVelocity, nextVelocity * 0.5);
 
-                    // Increase buff if it's difficult to doubletap.
-                    deltaVelocity *= 1 + 0.5 * DifficultyCalculationUtils.Smoothstep(osuCurrObj.LazyJumpDistance, radius * 0.5, diameter);
+                    // Increase buff if it's difficult/impossible to doubletap.
+                    deltaVelocity *= 1 + 0.5 * DifficultyCalculationUtils.Smoothstep(osuCurrObj.LazyJumpDistance, diameter * 0.75, diameter * 1.5);
 
                     // Nerf low OD as this type of pattern is much easier on low OD
-                    deltaVelocity *= 1 - DifficultyCalculationUtils.ReverseLerp(osuCurrObj.HitWindowGreat - 20, relevantStrainTime * 0.5, relevantStrainTime)
+                    deltaVelocity *= 1 - DifficultyCalculationUtils.ReverseLerp(osuCurrObj.HitWindowGreat - 20, relevantStrainTime * 0.5, relevantStrainTime * 0.8)
                         * DifficultyCalculationUtils.Smoothstep(osuCurrObj.LazyJumpDistance, diameter, radius * 0.5);
 
-                    velocityChangeBonus += 1.5 * deltaVelocity;
+                    velocityChangeBonus += 1.35 * deltaVelocity;
                 }
             }
 
