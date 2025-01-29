@@ -87,6 +87,9 @@ namespace osu.Game.Online.Leaderboards
         [Resolved]
         private ScoreManager scoreManager { get; set; } = null!;
 
+        [Resolved]
+        private OsuGame game { get; set; }
+
         public LeaderboardScore(ScoreInfo score, int? rank, bool isOnlineScope = true, bool highlightFriend = true)
         {
             Score = score;
@@ -145,7 +148,7 @@ namespace osu.Game.Online.Leaderboards
                             Children = new[]
                             {
                                 avatar = new DelayedLoadWrapper(
-                                    innerAvatar = new ClickableAvatar(user, false, ruleset)
+                                    innerAvatar = new ClickableAvatar(user)
                                     {
                                         RelativeSizeAxes = Axes.Both,
                                         CornerRadius = corner_radius,
@@ -265,6 +268,7 @@ namespace osu.Game.Online.Leaderboards
                 },
             };
 
+            innerAvatar.Action = () => game?.ShowUser(user, ruleset);
             innerAvatar.OnLoadComplete += d => d.FadeInFromZero(200);
         }
 

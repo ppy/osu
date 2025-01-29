@@ -552,7 +552,7 @@ namespace osu.Game
         /// Show a user's profile as an overlay.
         /// </summary>
         /// <param name="user">The user to display.</param>
-        /// /// <param name="ruleset">The user's ruleset to display on profile.</param>
+        /// <param name="ruleset">The user's ruleset to display on profile.</param>
         public void ShowUser(IUser user, IRulesetInfo ruleset = null) => waitForReady(() => userProfile, _ => userProfile.ShowUser(user, ruleset));
 
         /// <summary>

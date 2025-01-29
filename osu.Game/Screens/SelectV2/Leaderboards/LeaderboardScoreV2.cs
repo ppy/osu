@@ -90,6 +90,9 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
 
+        [Resolved]
+        private OsuGame? game { get; set; }
+
         private Container content = null!;
         private Box background = null!;
         private Box foreground = null!;
@@ -185,6 +188,7 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
                 }
             };
 
+            innerAvatar.Action = () => game?.ShowUser(user, score.Ruleset);
             innerAvatar.OnLoadComplete += d => d.FadeInFromZero(200);
         }
 
@@ -281,7 +285,7 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
                                 Children = new[]
                                 {
                                     avatar = new DelayedLoadWrapper(
-                                        innerAvatar = new ClickableAvatar(user, false, score.Ruleset)
+                                        innerAvatar = new ClickableAvatar(user)
                                         {
                                             Anchor = Anchor.Centre,
                                             Origin = Anchor.Centre,

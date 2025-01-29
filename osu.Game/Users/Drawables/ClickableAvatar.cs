@@ -25,8 +25,6 @@ namespace osu.Game.Users.Drawables
 
         private readonly APIUser? user;
 
-        private readonly IRulesetInfo? ruleset;
-
         private readonly bool showCardOnHover;
 
         [Resolved]
@@ -45,8 +43,6 @@ namespace osu.Game.Users.Drawables
 
             this.showCardOnHover = showCardOnHover;
 
-            this.ruleset = ruleset;
-
             TooltipContent = this.user = user ?? new GuestUser();
         }
 
@@ -59,7 +55,7 @@ namespace osu.Game.Users.Drawables
         private void openProfile()
         {
             if (user?.Id > 1 || !string.IsNullOrEmpty(user?.Username))
-                game?.ShowUser(user, ruleset);
+                game?.ShowUser(user);
         }
 
         protected override bool OnClick(ClickEvent e)
