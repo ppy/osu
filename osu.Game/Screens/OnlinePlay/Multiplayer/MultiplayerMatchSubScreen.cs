@@ -392,9 +392,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             addItemButton.Alpha = localUserCanAddItem ? 1 : 0;
 
-            // Forcefully update the selected item so that the user state is applied.
-            Scheduler.AddOnce(OnSelectedItemChanged);
-
             Activity.Value = new UserActivity.InLobby(Room);
         }
 

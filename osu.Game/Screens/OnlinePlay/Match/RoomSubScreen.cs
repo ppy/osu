@@ -259,8 +259,8 @@ namespace osu.Game.Screens.OnlinePlay.Match
         {
             base.LoadComplete();
 
-            SelectedItem.BindValueChanged(_ => Scheduler.AddOnce(OnSelectedItemChanged));
-            UserMods.BindValueChanged(_ => Scheduler.AddOnce(OnSelectedItemChanged));
+            SelectedItem.BindValueChanged(_ => updateSpecifics());
+            UserMods.BindValueChanged(_ => updateSpecifics());
 
             beatmapAvailabilityTracker.SelectedItem.BindTo(SelectedItem);
             beatmapAvailabilityTracker.Availability.BindValueChanged(_ => updateSpecifics());
@@ -426,35 +426,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
         /// <returns>The screen to enter.</returns>
         protected abstract Screen CreateGameplayScreen(PlaylistItem selectedItem);
 
-        protected void OnSelectedItemChanged()
-        {
-            if (!this.IsCurrentScreen() || SelectedItem.Value is not PlaylistItem item)
-                return;
-
-            updateSpecifics();
-
-            if (!item.AllowedMods.Any())
-            {
-                UserModsSection?.Hide();
-                UserModsSelectOverlay.Hide();
-                UserModsSelectOverlay.IsValidMod = _ => false;
-            }
-            else
-            {
-                UserModsSection?.Show();
-
-                var rulesetInstance = GetGameplayRuleset().CreateInstance();
-                var allowedMods = item.AllowedMods.Select(m => m.ToMod(rulesetInstance));
-                UserModsSelectOverlay.IsValidMod = m => allowedMods.Any(a => a.GetType() == m.GetType());
-            }
-
-            if (item.FreeStyle)
-                UserStyleSection?.Show();
-            else
-                UserStyleSection?.Hide();
-        }
-
-        private void updateSpecifics()
+        private void updateSpecifics() => Scheduler.AddOnce(() =>
         {
             if (!this.IsCurrentScreen() || SelectedItem.Value is not PlaylistItem item)
                 return;
@@ -476,22 +448,41 @@ namespace osu.Game.Screens.OnlinePlay.Match
             Mods.Value = GetGameplayMods().Select(m => m.ToMod(rulesetInstance)).ToArray();
             Ruleset.Value = GetGameplayRuleset();
 
-            if (UserStyleDisplayContainer != null)
+            if (!item.AllowedMods.Any())
             {
-                PlaylistItem gameplayItem = SelectedItem.Value.With(ruleset: GetGameplayRuleset().OnlineID, beatmap: new Optional<IBeatmapInfo>(GetGameplayBeatmap()));
-                PlaylistItem? currentItem = UserStyleDisplayContainer.SingleOrDefault()?.Item;
-
-                if (gameplayItem.Equals(currentItem))
-                    return;
-
-                UserStyleDisplayContainer.Child = new DrawableRoomPlaylistItem(gameplayItem, true)
-                {
-                    AllowReordering = false,
-                    AllowEditing = true,
-                    RequestEdit = _ => OpenStyleSelection()
-                };
+                UserModsSection?.Hide();
+                UserModsSelectOverlay.Hide();
+                UserModsSelectOverlay.IsValidMod = _ => false;
             }
-        }
+            else
+            {
+                UserModsSection?.Show();
+                UserModsSelectOverlay.IsValidMod = m => allowedMods.Any(a => a.GetType() == m.GetType());
+            }
+
+            if (item.FreeStyle)
+            {
+                UserStyleSection?.Show();
+
+                if (UserStyleDisplayContainer != null)
+                {
+                    PlaylistItem gameplayItem = SelectedItem.Value.With(ruleset: GetGameplayRuleset().OnlineID, beatmap: new Optional<IBeatmapInfo>(GetGameplayBeatmap()));
+                    PlaylistItem? currentItem = UserStyleDisplayContainer.SingleOrDefault()?.Item;
+
+                    if (gameplayItem.Equals(currentItem))
+                        return;
+
+                    UserStyleDisplayContainer.Child = new DrawableRoomPlaylistItem(gameplayItem, true)
+                    {
+                        AllowReordering = false,
+                        AllowEditing = item.FreeStyle,
+                        RequestEdit = _ => OpenStyleSelection()
+                    };
+                }
+            }
+            else
+                UserStyleSection?.Hide();
+        });
 
         protected virtual APIMod[] GetGameplayMods() => UserMods.Value.Select(m => new APIMod(m)).Concat(SelectedItem.Value!.RequiredMods).ToArray();
 
