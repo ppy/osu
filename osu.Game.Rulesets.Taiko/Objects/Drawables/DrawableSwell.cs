@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         /// <summary>
         /// Offset away from the start time of the swell at which the Fade-In effect starts.
         /// </summary>
-        private const double fade_in_offset = 1800;
+        private const double fade_in_offset = 1833;
         /// <summary>
         /// Duration of the Fade-In time of the swell.
         /// </summary>
