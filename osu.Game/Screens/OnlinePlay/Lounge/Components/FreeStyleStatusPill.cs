@@ -10,7 +10,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 {
-    public class FreeStyleStatusPill : OnlinePlayPill
+    public partial class FreeStyleStatusPill : OnlinePlayPill
     {
         private readonly Room room;
 
