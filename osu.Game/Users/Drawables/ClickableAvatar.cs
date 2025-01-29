@@ -34,9 +34,8 @@ namespace osu.Game.Users.Drawables
         /// A clickable avatar for the specified user, with UI sounds included.
         /// </summary>
         /// <param name="user">The user. A null value will get a placeholder avatar.</param>
-        /// <param name="ruleset">The ruleset. A null value will use the profile ruleset for when the profile is displayed.</param>
         /// <param name="showCardOnHover">If set to true, the <see cref="UserGridPanel"/> will be shown for the tooltip</param>
-        public ClickableAvatar(APIUser? user = null, bool showCardOnHover = false)
+        public ClickableAvatar(APIUser? user = null, bool showCardOnHover = false, IRulesetInfo? ruleset = null)
         {
             if (user?.Id != APIUser.SYSTEM_USER_ID)
                 Action = openProfile;
