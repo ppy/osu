@@ -58,8 +58,17 @@ namespace osu.Game.Users.Drawables
 
         private void openProfile()
         {
-            if (user?.Id > 1 || !string.IsNullOrEmpty(user?.Username))
-                game?.ShowUser(user, ruleset);
+            if (ruleset != null)
+            {
+                if (user?.Id > 1 || !string.IsNullOrEmpty(user?.Username))
+                {
+                    game?.ShowUser(user, ruleset);
+                }
+            }
+            else if (user?.Id > 1 || !string.IsNullOrEmpty(user?.Username))
+            {
+                game?.ShowUser(user);
+            }
         }
 
         protected override bool OnClick(ClickEvent e)
