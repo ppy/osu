@@ -9,7 +9,6 @@ using osu.Framework.Graphics;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
-using osu.Game.Resources.Localisation.Web;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Screens.OnlinePlay.Match.Components;
 using osuTK;
