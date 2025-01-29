@@ -31,6 +31,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                 HitCircle newCircle = convertToCircle(slider.HeadCircle, osuBeatmap);
 
+                newCircle.Samples = slider.NodeSamples.ElementAt(0);
+
                 osuBeatmap.HitObjects[index] = newCircle;
 
                 if (!ConvertEnds.Value)
@@ -45,6 +47,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                     HitCircle repeatCircle = convertToCircle(circle, osuBeatmap, newCircle);
                     addedCircles += 1;
+
+                    repeatCircle.Samples = slider.NodeSamples.ElementAt(addedCircles);
                     repeatCircle.IndexInCurrentCombo = osuBeatmap.HitObjects[index + addedCircles - 1].IndexInCurrentCombo + 1;
 
                     osuBeatmap.HitObjects.Insert(index + addedCircles, repeatCircle);
@@ -66,7 +70,6 @@ namespace osu.Game.Rulesets.Osu.Mods
                 LastInCombo = objectToConvert.LastInCombo,
                 NewCombo = objectToConvert.NewCombo,
                 Position = objectToConvert.Position,
-                Samples = objectToConvert.Samples,
                 Scale = objectToConvert.Scale,
                 StackHeight = objectToConvert.StackHeight,
                 StartTime = objectToConvert.StartTime,
