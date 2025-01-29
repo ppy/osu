@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -49,18 +50,18 @@ namespace osu.Game.Screens.OnlinePlay.Match
         /// A container that provides controls for selection of user mods.
         /// This will be shown/hidden automatically when applicable.
         /// </summary>
-        protected Drawable? UserModsSection;
+        protected Drawable UserModsSection = null!;
 
         /// <summary>
         /// A container that provides controls for selection of the user style.
         /// This will be shown/hidden automatically when applicable.
         /// </summary>
-        protected Drawable? UserStyleSection;
+        protected Drawable UserStyleSection = null!;
 
         /// <summary>
         /// A container that will display the user's style.
         /// </summary>
-        protected Container<DrawableRoomPlaylistItem>? UserStyleDisplayContainer;
+        protected Container<DrawableRoomPlaylistItem> UserStyleDisplayContainer = null!;
 
         private Sample? sampleStart;
 
@@ -448,40 +449,44 @@ namespace osu.Game.Screens.OnlinePlay.Match
             Mods.Value = GetGameplayMods().Select(m => m.ToMod(rulesetInstance)).ToArray();
             Ruleset.Value = GetGameplayRuleset();
 
-            if (!item.AllowedMods.Any())
+            bool freeMod = item.AllowedMods.Any();
+            bool freeStyle = item.FreeStyle;
+
+            // For now, the game can never be in a state where freemod and freestyle are on at the same time.
+            // This will change, but due to the current implementation if this was to occur drawables will overlap so let's assert.
+            Debug.Assert(!freeMod || !freeStyle);
+
+            if (freeMod)
             {
-                UserModsSection?.Hide();
+                UserModsSection.Show();
+                UserModsSelectOverlay.IsValidMod = m => allowedMods.Any(a => a.GetType() == m.GetType());
+            }
+            else
+            {
+                UserModsSection.Hide();
                 UserModsSelectOverlay.Hide();
                 UserModsSelectOverlay.IsValidMod = _ => false;
             }
-            else
-            {
-                UserModsSection?.Show();
-                UserModsSelectOverlay.IsValidMod = m => allowedMods.Any(a => a.GetType() == m.GetType());
-            }
 
-            if (item.FreeStyle)
+            if (freeStyle)
             {
-                UserStyleSection?.Show();
+                UserStyleSection.Show();
 
-                if (UserStyleDisplayContainer != null)
+                PlaylistItem gameplayItem = SelectedItem.Value.With(ruleset: GetGameplayRuleset().OnlineID, beatmap: new Optional<IBeatmapInfo>(GetGameplayBeatmap()));
+                PlaylistItem? currentItem = UserStyleDisplayContainer.SingleOrDefault()?.Item;
+
+                if (gameplayItem.Equals(currentItem))
+                    return;
+
+                UserStyleDisplayContainer.Child = new DrawableRoomPlaylistItem(gameplayItem, true)
                 {
-                    PlaylistItem gameplayItem = SelectedItem.Value.With(ruleset: GetGameplayRuleset().OnlineID, beatmap: new Optional<IBeatmapInfo>(GetGameplayBeatmap()));
-                    PlaylistItem? currentItem = UserStyleDisplayContainer.SingleOrDefault()?.Item;
-
-                    if (gameplayItem.Equals(currentItem))
-                        return;
-
-                    UserStyleDisplayContainer.Child = new DrawableRoomPlaylistItem(gameplayItem, true)
-                    {
-                        AllowReordering = false,
-                        AllowEditing = item.FreeStyle,
-                        RequestEdit = _ => OpenStyleSelection()
-                    };
-                }
+                    AllowReordering = false,
+                    AllowEditing = freeStyle,
+                    RequestEdit = _ => OpenStyleSelection()
+                };
             }
             else
-                UserStyleSection?.Hide();
+                UserStyleSection.Hide();
         });
 
         protected virtual APIMod[] GetGameplayMods() => UserMods.Value.Select(m => new APIMod(m)).Concat(SelectedItem.Value!.RequiredMods).ToArray();
