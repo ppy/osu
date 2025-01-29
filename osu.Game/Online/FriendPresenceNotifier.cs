@@ -171,9 +171,9 @@ namespace osu.Game.Online
             {
                 Transient = true,
                 IsImportant = false,
-                Icon = FontAwesome.Solid.UserPlus,
+                Icon = FontAwesome.Solid.User,
                 Text = $"Online: {string.Join(@", ", onlineAlertQueue.Select(u => u.Username))}",
-                IconColour = colours.Green,
+                IconColour = colours.GrayD,
                 Activated = () =>
                 {
                     if (singleUser != null)
@@ -208,9 +208,9 @@ namespace osu.Game.Online
             {
                 Transient = true,
                 IsImportant = false,
-                Icon = FontAwesome.Solid.UserMinus,
+                Icon = FontAwesome.Solid.UserSlash,
                 Text = $"Offline: {string.Join(@", ", offlineAlertQueue.Select(u => u.Username))}",
-                IconColour = colours.Red
+                IconColour = colours.Gray3
             });
 
             offlineAlertQueue.Clear();
