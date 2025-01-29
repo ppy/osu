@@ -111,25 +111,26 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
+            // Until the keys below are global actions, this will prevent conflicts with "seek between sample points"
+            // which has a default of ctrl+shift+arrows.
+            if (e.ShiftPressed)
+                return false;
+
             if (e.ControlPressed)
             {
                 switch (e.Key)
                 {
                     case Key.Left:
-                        nudgeSelection(new Vector2(-1, 0));
-                        return true;
+                        return nudgeSelection(new Vector2(-1, 0));
 
                     case Key.Right:
-                        nudgeSelection(new Vector2(1, 0));
-                        return true;
+                        return nudgeSelection(new Vector2(1, 0));
 
                     case Key.Up:
-                        nudgeSelection(new Vector2(0, -1));
-                        return true;
+                        return nudgeSelection(new Vector2(0, -1));
 
                     case Key.Down:
-                        nudgeSelection(new Vector2(0, 1));
-                        return true;
+                        return nudgeSelection(new Vector2(0, 1));
                 }
             }
 
@@ -151,7 +152,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// Move the current selection spatially by the specified delta, in gamefield coordinates (ie. the same coordinates as the blueprints).
         /// </summary>
         /// <param name="delta"></param>
-        private void nudgeSelection(Vector2 delta)
+        private bool nudgeSelection(Vector2 delta)
         {
             if (!nudgeMovementActive)
             {
@@ -162,12 +163,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
             var firstBlueprint = SelectionHandler.SelectedBlueprints.FirstOrDefault();
 
             if (firstBlueprint == null)
-                return;
+                return false;
 
             // convert to game space coordinates
             delta = firstBlueprint.ToScreenSpace(delta) - firstBlueprint.ToScreenSpace(Vector2.Zero);
 
             SelectionHandler.HandleMovement(new MoveSelectionEvent<HitObject>(firstBlueprint, delta));
+            return true;
         }
 
         private void updatePlacementNewCombo()
