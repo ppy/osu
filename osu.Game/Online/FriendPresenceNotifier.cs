@@ -156,7 +156,7 @@ namespace osu.Game.Online
                 return;
             }
 
-            notifications.Post(new FriendOnlineNotification(onlineAlertQueue));
+            notifications.Post(new FriendOnlineNotification(onlineAlertQueue.ToArray()));
 
             onlineAlertQueue.Clear();
             lastOnlineAlertTime = null;
@@ -176,7 +176,7 @@ namespace osu.Game.Online
                 return;
             }
 
-            notifications.Post(new FriendOfflineNotification(offlineAlertQueue));
+            notifications.Post(new FriendOfflineNotification(offlineAlertQueue.ToArray()));
 
             offlineAlertQueue.Clear();
             lastOfflineAlertTime = null;
