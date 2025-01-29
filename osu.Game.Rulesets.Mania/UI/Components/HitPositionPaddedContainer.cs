@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Mania.Skinning;
@@ -22,15 +23,12 @@ namespace osu.Game.Rulesets.Mania.UI.Components
         private void load(IScrollingInfo scrollingInfo)
         {
             Direction.BindTo(scrollingInfo.Direction);
-            Direction.BindValueChanged(onDirectionChanged);
+            Direction.BindValueChanged(_ => UpdateHitPosition(), true);
 
             skin.SourceChanged += onSkinChanged;
-
-            UpdateHitPosition();
         }
 
         private void onSkinChanged() => UpdateHitPosition();
-        private void onDirectionChanged(ValueChangedEvent<ScrollingDirection> direction) => UpdateHitPosition();
 
         protected virtual void UpdateHitPosition()
         {
@@ -41,6 +39,14 @@ namespace osu.Game.Rulesets.Mania.UI.Components
             Padding = Direction.Value == ScrollingDirection.Up
                 ? new MarginPadding { Top = hitPosition }
                 : new MarginPadding { Bottom = hitPosition };
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (skin.IsNotNull())
+                skin.SourceChanged -= onSkinChanged;
         }
     }
 }
