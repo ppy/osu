@@ -9,17 +9,17 @@ namespace osu.Game.Rulesets.Mods
 {
     public abstract class ModAllCircles : Mod
     {
-        public override string Name => "All Circles";
+        public override string Name => "Circles Only";
 
-        public override string Acronym => "CC";
+        public override string Acronym => "CO";
 
         public override ModType Type => ModType.Conversion;
 
-        public override LocalisableString Description => "Oops! All Circles! Sliders get changed into circles.";
+        public override LocalisableString Description => "Sliders? Never heard of them.";
 
         public override double ScoreMultiplier => ConvertEnds.Value ? 0.75 : 0.5;
 
-        [SettingSource("Convert Ends", "Should slider repeats/ends be converted")]
+        [SettingSource("Convert Ends", "Should slider repeats/ends become circles")]
         public virtual BindableBool ConvertEnds { get; } = new BindableBool();
     }
 }
