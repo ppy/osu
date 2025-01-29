@@ -69,18 +69,6 @@ namespace osu.Game.Screens.OnlinePlay.Match
         /// </summary>
         protected readonly Bindable<IReadOnlyList<Mod>> UserMods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
-        /// <summary>
-        /// When players are freely allowed to select their own gameplay style (selected item has a non-null beatmapset id),
-        /// a non-null value indicates a local beatmap selection from the same beatmapset as the selected item.
-        /// </summary>
-        public readonly Bindable<BeatmapInfo?> UserBeatmap = new Bindable<BeatmapInfo?>();
-
-        /// <summary>
-        /// When players are freely allowed to select their own gameplay style (selected item has a non-null beatmapset id),
-        /// a non-null value indicates a local ruleset selection.
-        /// </summary>
-        public readonly Bindable<RulesetInfo?> UserRuleset = new Bindable<RulesetInfo?>();
-
         [Resolved(CanBeNull = true)]
         private IOverlayManager? overlayManager { get; set; }
 
@@ -273,8 +261,6 @@ namespace osu.Game.Screens.OnlinePlay.Match
 
             SelectedItem.BindValueChanged(_ => Scheduler.AddOnce(OnSelectedItemChanged));
             UserMods.BindValueChanged(_ => Scheduler.AddOnce(OnSelectedItemChanged));
-            UserBeatmap.BindValueChanged(_ => Scheduler.AddOnce(OnSelectedItemChanged));
-            UserRuleset.BindValueChanged(_ => Scheduler.AddOnce(OnSelectedItemChanged));
 
             beatmapAvailabilityTracker.SelectedItem.BindTo(SelectedItem);
             beatmapAvailabilityTracker.Availability.BindValueChanged(_ => updateSpecifics());
@@ -507,14 +493,11 @@ namespace osu.Game.Screens.OnlinePlay.Match
             }
         }
 
-        protected virtual APIMod[] GetGameplayMods()
-            => UserMods.Value.Select(m => new APIMod(m)).Concat(SelectedItem.Value!.RequiredMods).ToArray();
+        protected virtual APIMod[] GetGameplayMods() => UserMods.Value.Select(m => new APIMod(m)).Concat(SelectedItem.Value!.RequiredMods).ToArray();
 
-        protected virtual RulesetInfo GetGameplayRuleset()
-            => Rulesets.GetRuleset(UserRuleset.Value?.OnlineID ?? SelectedItem.Value!.RulesetID)!;
+        protected virtual RulesetInfo GetGameplayRuleset() => Rulesets.GetRuleset(SelectedItem.Value!.RulesetID)!;
 
-        protected virtual IBeatmapInfo GetGameplayBeatmap()
-            => UserBeatmap.Value ?? SelectedItem.Value!.Beatmap;
+        protected virtual IBeatmapInfo GetGameplayBeatmap() => SelectedItem.Value!.Beatmap;
 
         protected abstract void OpenStyleSelection();
 

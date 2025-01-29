@@ -11,11 +11,13 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Input;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.Rooms;
+using osu.Game.Rulesets;
 using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Match;
 using osu.Game.Screens.OnlinePlay.Match.Components;
@@ -45,6 +47,9 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         private SelectionPollingComponent selectionPollingComponent = null!;
         private FillFlowContainer progressSection = null!;
         private DrawableRoomPlaylist drawablePlaylist = null!;
+
+        private readonly Bindable<BeatmapInfo?> userBeatmap = new Bindable<BeatmapInfo?>();
+        private readonly Bindable<RulesetInfo?> userRuleset = new Bindable<RulesetInfo?>();
 
         public PlaylistsRoomSubScreen(Room room)
             : base(room, false) // Editing is temporarily not allowed.
@@ -78,9 +83,12 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         private void onSelectedItemChanged(ValueChangedEvent<PlaylistItem?> item)
         {
             // Simplest for now.
-            UserBeatmap.Value = null;
-            UserRuleset.Value = null;
+            userBeatmap.Value = null;
+            userRuleset.Value = null;
         }
+
+        protected override IBeatmapInfo GetGameplayBeatmap() => userBeatmap.Value ?? base.GetGameplayBeatmap();
+        protected override RulesetInfo GetGameplayRuleset() => userRuleset.Value ?? base.GetGameplayRuleset();
 
         private void onRoomPropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
@@ -313,8 +321,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
             this.Push(new PlaylistsRoomStyleSelect(Room, item)
             {
-                Beatmap = { BindTarget = UserBeatmap },
-                Ruleset = { BindTarget = UserRuleset }
+                Beatmap = { BindTarget = userBeatmap },
+                Ruleset = { BindTarget = userRuleset }
             });
         }
 

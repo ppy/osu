@@ -388,7 +388,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 return;
             }
 
-            updateCurrentItem();
+            SelectedItem.Value = Room.Playlist.SingleOrDefault(i => i.ID == client.Room.Settings.PlaylistItemId);
 
             addItemButton.Alpha = localUserCanAddItem ? 1 : 0;
 
@@ -399,15 +399,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         }
 
         private bool localUserCanAddItem => client.IsHost || Room.QueueMode != QueueMode.HostOnly;
-
-        private void updateCurrentItem()
-        {
-            Debug.Assert(client.Room != null);
-
-            SelectedItem.Value = Room.Playlist.SingleOrDefault(i => i.ID == client.Room.Settings.PlaylistItemId);
-            UserBeatmap.Value = client.LocalUser?.BeatmapId == null ? null : UserBeatmap.Value;
-            UserRuleset.Value = client.LocalUser?.RulesetId == null ? null : UserRuleset.Value;
-        }
 
         private void handleRoomLost() => Schedule(() =>
         {
