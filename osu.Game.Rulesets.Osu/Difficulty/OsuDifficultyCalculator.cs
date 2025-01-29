@@ -54,7 +54,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double flashlightRating = flashlight == null ? 0.0 : Math.Sqrt(flashlight.DifficultyValue()) * difficulty_multiplier;
 
             var reading = skills.OfType<Reading>().SingleOrDefault();
-            double readingRating = Math.Sqrt(reading.DifficultyValue()) * difficulty_multiplier;
+            double readingRating = reading == null ? 0.0 : Math.Sqrt(reading.DifficultyValue()) * difficulty_multiplier;
 
             if (mods.Any(m => m is OsuModTouchDevice))
             {
