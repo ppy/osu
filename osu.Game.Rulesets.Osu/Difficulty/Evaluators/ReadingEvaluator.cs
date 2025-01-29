@@ -28,40 +28,41 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             // Maybe I should just pass in clockrate...
             double clockRateEstimate = current.BaseObject.StartTime / currObj.StartTime;
+            double currApproachRate = currObj.Preempt; // Approach rate in milliseconds
 
-            double pastObjectDifficultyInfluence = 1.0;
+            double noteDensityDifficulty = 1.0;
 
             foreach (var loopObj in retrievePastVisibleObjects(currObj))
             {
                 double loopDifficulty = currObj.OpacityAt(loopObj.BaseObject.StartTime, false);
 
                 // Small distances means objects may be cheesed, so it doesn't matter whether they are arranged confusingly.
-                loopDifficulty *= DifficultyCalculationUtils.Logistic(-(loopObj.MinimumJumpDistance - 70) / 10);
+                loopDifficulty *= DifficultyCalculationUtils.Logistic(-(loopObj.MinimumJumpDistance - 90) / 15);
 
                 double timeBetweenCurrAndLoopObj = (currObj.BaseObject.StartTime - loopObj.BaseObject.StartTime) / clockRateEstimate;
                 loopDifficulty *= getTimeNerfFactor(timeBetweenCurrAndLoopObj);
 
-                pastObjectDifficultyInfluence += loopDifficulty;
+                noteDensityDifficulty += loopDifficulty;
             }
 
-            double noteDensityDifficulty = Math.Pow(4 * Math.Log(Math.Max(1, pastObjectDifficultyInfluence - 3)), 2.3);
-
-            bool hidden = mods.OfType<OsuModHidden>().Any();
+            noteDensityDifficulty = Math.Max(0, noteDensityDifficulty - 2.5); // Density difficulty begins at over  notes on the screen
 
             double hiddenDifficulty = 0;
 
-            if (hidden)
+            if (mods.OfType<OsuModHidden>().Any())
             {
                 double timeSpentInvisible = getDurationSpentInvisible(currObj) / clockRateEstimate;
-                double timeDifficultyFactor = 1000 / pastObjectDifficultyInfluence;
+                double timeDifficultyFactor = 5000 / noteDensityDifficulty;
 
                 double visibleObjectFactor = Math.Clamp(retrieveCurrentVisibleObjects(currObj).Count - 2, 0, 15);
 
-                hiddenDifficulty += Math.Pow(visibleObjectFactor * timeSpentInvisible / timeDifficultyFactor, 1) +
-                                    (8 + visibleObjectFactor) * currVelocity;
+                hiddenDifficulty += (visibleObjectFactor * timeSpentInvisible / timeDifficultyFactor) +
+                                    (visibleObjectFactor) * currVelocity;
             }
 
+            hiddenDifficulty *= 0.5;
             double difficulty = hiddenDifficulty + noteDensityDifficulty;
+
             difficulty *= getConstantAngleNerfFactor(currObj);
 
             return difficulty;
@@ -84,6 +85,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             }
         }
 
+        // Returns a list of objects that are visible on screen at
+        // the point in time at which the current object needs is clicked.
         private static List<OsuDifficultyHitObject> retrieveCurrentVisibleObjects(OsuDifficultyHitObject current)
         {
             List<OsuDifficultyHitObject> objects = new List<OsuDifficultyHitObject>();
