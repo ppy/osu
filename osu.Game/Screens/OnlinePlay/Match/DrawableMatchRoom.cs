@@ -49,8 +49,10 @@ namespace osu.Game.Screens.OnlinePlay.Match
                 ButtonsContainer.Add(editButton = new PurpleRoundedButton
                 {
                     RelativeSizeAxes = Axes.Y,
-                    Size = new Vector2(100, 1),
-                    Text = CommonStrings.ButtonsEdit,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Size = new Vector2(120, 0.7f),
+                    Text = "Change settings",
                     Action = () => OnEdit?.Invoke()
                 });
             }
