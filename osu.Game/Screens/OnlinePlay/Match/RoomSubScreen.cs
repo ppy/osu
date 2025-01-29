@@ -277,7 +277,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
             UserRuleset.BindValueChanged(_ => Scheduler.AddOnce(OnSelectedItemChanged));
 
             beatmapAvailabilityTracker.SelectedItem.BindTo(SelectedItem);
-            beatmapAvailabilityTracker.Availability.BindValueChanged(_ => updateBeatmap());
+            beatmapAvailabilityTracker.Availability.BindValueChanged(_ => updateSpecifics());
 
             userModsSelectOverlayRegistration = overlayManager?.RegisterBlockingOverlay(UserModsSelectOverlay);
 
@@ -346,7 +346,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
         public override void OnSuspending(ScreenTransitionEvent e)
         {
             // Should be a noop in most cases, but let's ensure beyond doubt that the beatmap is in a correct state.
-            updateBeatmap();
+            updateSpecifics();
 
             onLeaving();
             base.OnSuspending(e);
@@ -356,7 +356,6 @@ namespace osu.Game.Screens.OnlinePlay.Match
         {
             base.OnResuming(e);
 
-            updateBeatmap();
             updateSpecifics();
 
             beginHandlingTrack();
@@ -446,8 +445,6 @@ namespace osu.Game.Screens.OnlinePlay.Match
             if (!this.IsCurrentScreen() || SelectedItem.Value is not PlaylistItem item)
                 return;
 
-            updateUserMods();
-            updateBeatmap();
             updateSpecifics();
 
             if (!item.AllowedMods.Any())
@@ -471,42 +468,26 @@ namespace osu.Game.Screens.OnlinePlay.Match
                 UserStyleSection?.Hide();
         }
 
-        private void updateUserMods()
+        private void updateSpecifics()
         {
             if (!this.IsCurrentScreen() || SelectedItem.Value is not PlaylistItem item)
                 return;
 
+            var rulesetInstance = GetGameplayRuleset().CreateInstance();
+
             // Remove any user mods that are no longer allowed.
-            Ruleset rulesetInstance = GetGameplayRuleset().CreateInstance();
             Mod[] allowedMods = item.AllowedMods.Select(m => m.ToMod(rulesetInstance)).ToArray();
             Mod[] newUserMods = UserMods.Value.Where(m => allowedMods.Any(a => m.GetType() == a.GetType())).ToArray();
-
-            if (newUserMods.SequenceEqual(UserMods.Value))
-                return;
-
-            UserMods.Value = UserMods.Value.Where(m => allowedMods.Any(a => m.GetType() == a.GetType())).ToList();
-        }
-
-        private void updateBeatmap()
-        {
-            if (!this.IsCurrentScreen() || SelectedItem.Value is not PlaylistItem)
-                return;
+            if (!newUserMods.SequenceEqual(UserMods.Value))
+                UserMods.Value = UserMods.Value.Where(m => allowedMods.Any(a => m.GetType() == a.GetType())).ToList();
 
             // Retrieve the corresponding local beatmap, since we can't directly use the playlist's beatmap info
             int beatmapId = GetGameplayBeatmap().OnlineID;
             var localBeatmap = beatmapManager.QueryBeatmap(b => b.OnlineID == beatmapId);
             Beatmap.Value = beatmapManager.GetWorkingBeatmap(localBeatmap);
             UserModsSelectOverlay.Beatmap.Value = Beatmap.Value;
-        }
 
-        private void updateSpecifics()
-        {
-            if (!this.IsCurrentScreen() || SelectedItem.Value is not PlaylistItem)
-                return;
-
-            var rulesetInstance = GetGameplayRuleset().CreateInstance();
             Mods.Value = GetGameplayMods().Select(m => m.ToMod(rulesetInstance)).ToArray();
-
             Ruleset.Value = GetGameplayRuleset();
 
             if (UserStyleDisplayContainer != null)
