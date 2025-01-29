@@ -36,7 +36,10 @@ namespace osu.Game.Rulesets.Osu.Mods
                 osuBeatmap.HitObjects[index] = newCircle;
 
                 if (!ConvertEnds.Value)
+                {
+                    newCircle.LastInCombo = slider.LastInCombo;
                     continue;
+                }
 
                 int addedCircles = 0;
 
@@ -53,6 +56,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                     osuBeatmap.HitObjects.Insert(index + addedCircles, repeatCircle);
                 }
+
+                osuBeatmap.HitObjects[index + addedCircles].LastInCombo = slider.LastInCombo;
             }
         }
 
@@ -67,7 +72,6 @@ namespace osu.Game.Rulesets.Osu.Mods
             {
                 ComboIndex = objectToConvert.ComboIndex,
                 IndexInCurrentCombo = objectToConvert.IndexInCurrentCombo,
-                LastInCombo = objectToConvert.LastInCombo,
                 NewCombo = objectToConvert.NewCombo,
                 Position = objectToConvert.Position,
                 Scale = objectToConvert.Scale,
