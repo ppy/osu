@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             var currObj = (OsuDifficultyHitObject)current;
             double currVelocity = currObj.LazyJumpDistance / currObj.StrainTime;
 
-            // Maybe I should just pass in clockrate...
+            // Apollo didn't pass in clockrate and I don't know how so we're stuck with this!!!
             double clockRateEstimate = current.BaseObject.StartTime / currObj.StartTime;
             double currApproachRate = currObj.Preempt; // Approach rate in milliseconds
 
@@ -45,19 +45,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 noteDensityDifficulty += loopDifficulty;
             }
 
-            noteDensityDifficulty = Math.Max(0, noteDensityDifficulty - 2.5); // Density difficulty begins at over  notes on the screen
+            noteDensityDifficulty = Math.Max(0, noteDensityDifficulty - 2.5); // Density difficulty begins at over 2.5 notes on the screen
 
             double hiddenDifficulty = 0;
 
             if (mods.OfType<OsuModHidden>().Any())
             {
                 double timeSpentInvisible = getDurationSpentInvisible(currObj) / clockRateEstimate;
-                double timeDifficultyFactor = 5000 / noteDensityDifficulty;
+                double timeDifficultyFactor = 300 / noteDensityDifficulty;
 
                 double visibleObjectFactor = Math.Clamp(retrieveCurrentVisibleObjects(currObj).Count - 2, 0, 15);
 
-                hiddenDifficulty += (visibleObjectFactor * timeSpentInvisible / timeDifficultyFactor) +
-                                    (visibleObjectFactor) * currVelocity;
+                hiddenDifficulty += (visibleObjectFactor + timeSpentInvisible * currVelocity) / timeDifficultyFactor;
             }
 
             hiddenDifficulty *= 0.5;
