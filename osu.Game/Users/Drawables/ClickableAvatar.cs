@@ -12,6 +12,7 @@ using osu.Game.Graphics.Cursor;
 using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Rulesets;
 using osuTK;
 
 namespace osu.Game.Users.Drawables
@@ -24,6 +25,8 @@ namespace osu.Game.Users.Drawables
 
         private readonly APIUser? user;
 
+        private readonly IRulesetInfo? ruleset;
+
         private readonly bool showCardOnHover;
 
         [Resolved]
@@ -33,13 +36,16 @@ namespace osu.Game.Users.Drawables
         /// A clickable avatar for the specified user, with UI sounds included.
         /// </summary>
         /// <param name="user">The user. A null value will get a placeholder avatar.</param>
+        /// <param name="ruleset">The ruleset. A null value will use the profile ruleset for when the profile is displayed.</param>
         /// <param name="showCardOnHover">If set to true, the <see cref="UserGridPanel"/> will be shown for the tooltip</param>
-        public ClickableAvatar(APIUser? user = null, bool showCardOnHover = false)
+        public ClickableAvatar(APIUser? user = null, bool showCardOnHover = false, IRulesetInfo? ruleset = null)
         {
             if (user?.Id != APIUser.SYSTEM_USER_ID)
                 Action = openProfile;
 
             this.showCardOnHover = showCardOnHover;
+
+            this.ruleset = ruleset;
 
             TooltipContent = this.user = user ?? new GuestUser();
         }
@@ -52,8 +58,14 @@ namespace osu.Game.Users.Drawables
 
         private void openProfile()
         {
-            if (user?.Id > 1 || !string.IsNullOrEmpty(user?.Username))
+            if (user?.Id > 1 || !string.IsNullOrEmpty(user?.Username) && ruleset != null)
+            {
+                game?.ShowUser(user, ruleset);
+            }
+            else if (user?.Id > 1 || !string.IsNullOrEmpty(user?.Username))
+            {
                 game?.ShowUser(user);
+            }
         }
 
         protected override bool OnClick(ClickEvent e)

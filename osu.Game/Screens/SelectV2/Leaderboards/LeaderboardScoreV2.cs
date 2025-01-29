@@ -281,7 +281,7 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
                                 Children = new[]
                                 {
                                     avatar = new DelayedLoadWrapper(
-                                        innerAvatar = new ClickableAvatar(user)
+                                        innerAvatar = new ClickableAvatar(user, false, score.Ruleset)
                                         {
                                             Anchor = Anchor.Centre,
                                             Origin = Anchor.Centre,

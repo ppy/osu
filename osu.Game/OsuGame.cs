@@ -56,6 +56,7 @@ using osu.Game.Overlays.Notifications;
 using osu.Game.Overlays.OSD;
 using osu.Game.Overlays.SkinEditor;
 using osu.Game.Overlays.Toolbar;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens;
@@ -547,7 +548,8 @@ namespace osu.Game
         /// Show a user's profile as an overlay.
         /// </summary>
         /// <param name="user">The user to display.</param>
-        public void ShowUser(IUser user) => waitForReady(() => userProfile, _ => userProfile.ShowUser(user));
+        /// /// <param name="ruleset">The user's ruleset to display on profile.</param>
+        public void ShowUser(IUser user, IRulesetInfo ruleset = null) => waitForReady(() => userProfile, _ => userProfile.ShowUser(user, ruleset));
 
         /// <summary>
         /// Show a beatmap's set as an overlay, displaying the given beatmap.

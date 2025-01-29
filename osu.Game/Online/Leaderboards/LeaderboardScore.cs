@@ -103,6 +103,7 @@ namespace osu.Game.Online.Leaderboards
         private void load(IAPIProvider api, OsuColour colour)
         {
             var user = Score.User;
+            var ruleset = Score.Ruleset;
             bool isUserFriend = api.Friends.Any(friend => friend.TargetID == user.OnlineID);
 
             statisticsLabels = GetStatistics(Score).Select(s => new ScoreComponentLabel(s)).ToList();
@@ -144,7 +145,7 @@ namespace osu.Game.Online.Leaderboards
                             Children = new[]
                             {
                                 avatar = new DelayedLoadWrapper(
-                                    innerAvatar = new ClickableAvatar(user)
+                                    innerAvatar = new ClickableAvatar(user, false, ruleset)
                                     {
                                         RelativeSizeAxes = Axes.Both,
                                         CornerRadius = corner_radius,
