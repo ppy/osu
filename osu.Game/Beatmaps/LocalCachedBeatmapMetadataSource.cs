@@ -113,6 +113,31 @@ namespace osu.Game.Beatmaps
                             return queryCacheVersion2(db, beatmapInfo, out onlineMetadata);
                     }
                 }
+
+                onlineMetadata = null;
+                return false;
+            }
+            catch (SqliteException sqliteException)
+            {
+                onlineMetadata = null;
+
+                // There have been cases where the user's local database is corrupt.
+                // Let's attempt to identify these cases and re-initialise the local cache.
+                switch (sqliteException.SqliteErrorCode)
+                {
+                    case 26: // SQLITE_NOTADB
+                    case 11: // SQLITE_CORRUPT
+                        // only attempt purge & re-download if there is no other refetch in progress
+                        if (cacheDownloadRequest != null)
+                            return false;
+
+                        tryPurgeCache();
+                        prepareLocalCache();
+                        return false;
+                }
+
+                logForModel(beatmapInfo.BeatmapSet, $@"Cached local retrieval for {beatmapInfo} failed with unhandled sqlite error {sqliteException}.");
+                return false;
             }
             catch (Exception ex)
             {
@@ -120,9 +145,22 @@ namespace osu.Game.Beatmaps
                 onlineMetadata = null;
                 return false;
             }
+        }
 
-            onlineMetadata = null;
-            return false;
+        private void tryPurgeCache()
+        {
+            log(@"Local metadata cache is corrupted; attempting purge.");
+
+            try
+            {
+                File.Delete(storage.GetFullPath(cache_database_name));
+            }
+            catch (Exception ex)
+            {
+                log($@"Failed to purge local metadata cache: {ex}");
+            }
+
+            log(@"Local metadata cache purged due to corruption.");
         }
 
         private SqliteConnection getConnection() =>

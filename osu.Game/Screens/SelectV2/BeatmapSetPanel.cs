@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -16,32 +17,38 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.SelectV2
 {
-    public partial class BeatmapCarouselPanel : PoolableDrawable, ICarouselPanel
+    public partial class BeatmapSetPanel : PoolableDrawable, ICarouselPanel
     {
+        public const float HEIGHT = CarouselItem.DEFAULT_HEIGHT * 2;
+
         [Resolved]
         private BeatmapCarousel carousel { get; set; } = null!;
 
-        public CarouselItem? Item
-        {
-            get => item;
-            set
-            {
-                item = value;
-
-                selected.UnbindBindings();
-
-                if (item != null)
-                    selected.BindTo(item.Selected);
-            }
-        }
-
-        private readonly BindableBool selected = new BindableBool();
-        private CarouselItem? item;
+        private OsuSpriteText text = null!;
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            selected.BindValueChanged(value =>
+            Size = new Vector2(500, HEIGHT);
+            Masking = true;
+
+            InternalChildren = new Drawable[]
+            {
+                new Box
+                {
+                    Colour = Color4.Yellow.Darken(5),
+                    Alpha = 0.8f,
+                    RelativeSizeAxes = Axes.Both,
+                },
+                text = new OsuSpriteText
+                {
+                    Padding = new MarginPadding(5),
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                }
+            };
+
+            KeyboardSelected.BindValueChanged(value =>
             {
                 if (value.NewValue)
                 {
@@ -55,38 +62,16 @@ namespace osu.Game.Screens.SelectV2
             });
         }
 
-        protected override void FreeAfterUse()
-        {
-            base.FreeAfterUse();
-            Item = null;
-        }
-
         protected override void PrepareForUse()
         {
             base.PrepareForUse();
 
             Debug.Assert(Item != null);
+            Debug.Assert(Item.IsGroupSelectionTarget);
 
-            DrawYPosition = Item.CarouselYPosition;
+            var beatmapSetInfo = (BeatmapSetInfo)Item.Model;
 
-            Size = new Vector2(500, Item.DrawHeight);
-            Masking = true;
-
-            InternalChildren = new Drawable[]
-            {
-                new Box
-                {
-                    Colour = (Item.Model is BeatmapInfo ? Color4.Aqua : Color4.Yellow).Darken(5),
-                    RelativeSizeAxes = Axes.Both,
-                },
-                new OsuSpriteText
-                {
-                    Text = Item.ToString() ?? string.Empty,
-                    Padding = new MarginPadding(5),
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreLeft,
-                }
-            };
+            text.Text = $"{beatmapSetInfo.Metadata}";
 
             this.FadeInFromZero(500, Easing.OutQuint);
         }
@@ -97,6 +82,20 @@ namespace osu.Game.Screens.SelectV2
             return true;
         }
 
+        #region ICarouselPanel
+
+        public CarouselItem? Item { get; set; }
+        public BindableBool Selected { get; } = new BindableBool();
+        public BindableBool KeyboardSelected { get; } = new BindableBool();
+
         public double DrawYPosition { get; set; }
+
+        public void Activated()
+        {
+            // sets should never be activated.
+            throw new InvalidOperationException();
+        }
+
+        #endregion
     }
 }

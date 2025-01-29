@@ -13,6 +13,13 @@ namespace osu.Game.Screens.SelectV2
 {
     public class BeatmapCarouselFilterGrouping : ICarouselFilter
     {
+        /// <summary>
+        /// Beatmap sets contain difficulties as related panels. This dictionary holds the relationships between set-difficulties to allow expanding them on selection.
+        /// </summary>
+        public IDictionary<BeatmapSetInfo, HashSet<CarouselItem>> SetItems => setItems;
+
+        private readonly Dictionary<BeatmapSetInfo, HashSet<CarouselItem>> setItems = new Dictionary<BeatmapSetInfo, HashSet<CarouselItem>>();
+
         private readonly Func<FilterCriteria> getCriteria;
 
         public BeatmapCarouselFilterGrouping(Func<FilterCriteria> getCriteria)
@@ -27,7 +34,10 @@ namespace osu.Game.Screens.SelectV2
             if (criteria.SplitOutDifficulties)
             {
                 foreach (var item in items)
-                    ((BeatmapCarouselItem)item).HasGroupHeader = false;
+                {
+                    item.IsVisible = true;
+                    item.IsGroupSelectionTarget = true;
+                }
 
                 return items;
             }
@@ -44,14 +54,25 @@ namespace osu.Game.Screens.SelectV2
                 {
                     // Add set header
                     if (lastItem == null || (lastItem.Model is BeatmapInfo b2 && b2.BeatmapSet!.OnlineID != b.BeatmapSet!.OnlineID))
-                        newItems.Add(new BeatmapCarouselItem(b.BeatmapSet!) { IsGroupHeader = true });
+                    {
+                        newItems.Add(new CarouselItem(b.BeatmapSet!)
+                        {
+                            DrawHeight = BeatmapSetPanel.HEIGHT,
+                            IsGroupSelectionTarget = true
+                        });
+                    }
+
+                    if (!setItems.TryGetValue(b.BeatmapSet!, out var related))
+                        setItems[b.BeatmapSet!] = related = new HashSet<CarouselItem>();
+
+                    related.Add(item);
                 }
 
                 newItems.Add(item);
                 lastItem = item;
 
-                var beatmapCarouselItem = (BeatmapCarouselItem)item;
-                beatmapCarouselItem.HasGroupHeader = true;
+                item.IsGroupSelectionTarget = false;
+                item.IsVisible = false;
             }
 
             return newItems;
