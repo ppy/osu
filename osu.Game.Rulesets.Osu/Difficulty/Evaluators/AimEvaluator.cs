@@ -31,6 +31,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             if (current.BaseObject is Spinner || current.Index <= 1 || current.Previous(0).BaseObject is Spinner)
                 return 0;
 
+            var osuNextObj = (OsuDifficultyHitObject)current.Next(0);
             var osuCurrObj = (OsuDifficultyHitObject)current;
             var osuLastObj = (OsuDifficultyHitObject)current.Previous(0);
             var osuLastLastObj = (OsuDifficultyHitObject)current.Previous(1);
@@ -112,16 +113,51 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 prevVelocity = (osuLastObj.LazyJumpDistance + osuLastLastObj.TravelDistance) / osuLastObj.StrainTime;
                 currVelocity = (osuCurrObj.LazyJumpDistance + osuLastObj.TravelDistance) / osuCurrObj.StrainTime;
 
-                // Scale with ratio of difference compared to 0.5 * max dist.
-                double distRatio = Math.Pow(Math.Sin(Math.PI / 2 * Math.Abs(prevVelocity - currVelocity) / Math.Max(prevVelocity, currVelocity)), 2);
+                double relevantStrainTime = Math.Min(osuCurrObj.StrainTime, osuLastObj.StrainTime);
 
-                // Reward for % distance up to 125 / strainTime for overlaps where velocity is still changing.
-                double overlapVelocityBuff = Math.Min(diameter * 1.25 / Math.Min(osuCurrObj.StrainTime, osuLastObj.StrainTime), Math.Abs(prevVelocity - currVelocity));
+                // Scale with ratio of difference from 0 on same velocities to 1 on close-to-zero velocity vs X velocity.
+                double differenceCoefficient = DifficultyCalculationUtils.Smoothstep(Math.Abs(prevVelocity - currVelocity), 0, Math.Max(prevVelocity, currVelocity));
 
-                velocityChangeBonus = overlapVelocityBuff * distRatio;
+                // Reward for delta distance up to 1.25 diameters.
+                double overlapVelocityBuff = Math.Min(diameter * 1.25 / relevantStrainTime, Math.Abs(prevVelocity - currVelocity));
+
+                velocityChangeBonus = overlapVelocityBuff * differenceCoefficient;
 
                 // Penalize for rhythm changes.
-                velocityChangeBonus *= Math.Pow(Math.Min(osuCurrObj.StrainTime, osuLastObj.StrainTime) / Math.Max(osuCurrObj.StrainTime, osuLastObj.StrainTime), 2);
+                double rhythmNerf = Math.Pow(Math.Min(osuCurrObj.StrainTime, osuLastObj.StrainTime) / Math.Max(osuCurrObj.StrainTime, osuLastObj.StrainTime), 2);
+
+                // Don't nerf small rhythm changes to avoid nerfing hard rhythms as much as possible
+                velocityChangeBonus *= double.Lerp(1, rhythmNerf, DifficultyCalculationUtils.Smoothstep(rhythmNerf, 0.5, 0.3));
+
+                // Apply additional buff for low-spaced doubles.
+                if (osuNextObj != null && prevVelocity > 0)
+                {
+                    double deltaVelocity = Math.Max(Math.Min(prevVelocity, diameter * 1.5 / relevantStrainTime) - currVelocity, 0);
+
+                    // Don't buff big spacing.
+                    deltaVelocity *= DifficultyCalculationUtils.ReverseLerp(prevVelocity, diameter * 3 / relevantStrainTime, diameter * 1.5 / relevantStrainTime);
+
+                    // Punish rhythm changes more harshly compared to previous bonus.
+                    deltaVelocity *= DifficultyCalculationUtils.Smoothstep(osuCurrObj.StrainTime, osuLastObj.StrainTime * 1.75, osuLastObj.StrainTime * 1.5); // Don't buff burst into jump
+                    deltaVelocity *= DifficultyCalculationUtils.Smoothstep(osuLastObj.StrainTime, osuCurrObj.StrainTime * 1.75, osuCurrObj.StrainTime * 1.5); // Don't buff jump to burst
+                    deltaVelocity *= DifficultyCalculationUtils.Smoothstep(osuNextObj.StrainTime, osuCurrObj.StrainTime * 1.75, osuCurrObj.StrainTime * 1.5); // Don't buff jump into slider
+
+                    // Have a threshold so very small changes aren't buffed.
+                    deltaVelocity *= DifficultyCalculationUtils.Smoothstep(deltaVelocity, 0, radius / 2 / relevantStrainTime);
+
+                    // Increase buff if velocity changed 2 times instead of 1.
+                    double nextVelocity = (osuNextObj.LazyJumpDistance + osuCurrObj.TravelDistance) / osuNextObj.StrainTime;
+                    deltaVelocity *= 1 + 0.3 * Math.Min(prevVelocity, nextVelocity) / prevVelocity;
+
+                    // Increase buff if it's difficult to doubletap.
+                    deltaVelocity *= 1 + 0.5 * DifficultyCalculationUtils.Smoothstep(osuCurrObj.LazyJumpDistance, radius * 0.5, diameter);
+
+                    // Nerf low OD as this type of pattern is much easier on low OD
+                    deltaVelocity *= 1 - DifficultyCalculationUtils.ReverseLerp(osuCurrObj.HitWindowGreat - 20, relevantStrainTime * 0.5, relevantStrainTime)
+                        * DifficultyCalculationUtils.Smoothstep(osuCurrObj.LazyJumpDistance, diameter, radius * 0.5);
+
+                    velocityChangeBonus += 1.5 * deltaVelocity;
+                }
             }
 
             if (osuLastObj.BaseObject is Slider)
