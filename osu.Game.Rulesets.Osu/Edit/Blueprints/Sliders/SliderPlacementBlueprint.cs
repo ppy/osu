@@ -25,6 +25,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
     {
         public new Slider HitObject => (Slider)base.HitObject;
 
+        [Resolved]
+        private OsuHitObjectComposer? composer { get; set; }
+
         private SliderBodyPiece bodyPiece = null!;
         private HitCirclePiece headCirclePiece = null!;
         private HitCirclePiece tailCirclePiece = null!;
@@ -39,9 +42,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         private int currentSegmentLength;
         private bool usingCustomSegmentType;
-
-        [Resolved]
-        private IPositionSnapProvider? positionSnapProvider { get; set; }
 
         [Resolved]
         private IDistanceSnapProvider? distanceSnapProvider { get; set; }
@@ -106,9 +106,15 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         [Resolved]
         private EditorBeatmap editorBeatmap { get; set; } = null!;
 
-        public override void UpdateTimeAndPosition(SnapResult result)
+        public override SnapResult UpdateTimeAndPosition(Vector2 screenSpacePosition, double fallbackTime)
         {
-            base.UpdateTimeAndPosition(result);
+            var result = composer?.TrySnapToNearbyObjects(screenSpacePosition, fallbackTime);
+            result ??= composer?.TrySnapToDistanceGrid(screenSpacePosition);
+            if (composer?.TrySnapToPositionGrid(result?.ScreenSpacePosition ?? screenSpacePosition, result?.Time ?? fallbackTime) is SnapResult gridSnapResult)
+                result = gridSnapResult;
+            result ??= new SnapResult(screenSpacePosition, fallbackTime);
+
+            base.UpdateTimeAndPosition(result.ScreenSpacePosition, result.Time ?? fallbackTime);
 
             switch (state)
             {
@@ -131,6 +137,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                     updateCursor();
                     break;
             }
+
+            return result;
         }
 
         protected override bool OnMouseDown(MouseDownEvent e)
@@ -375,7 +383,17 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         private Vector2 getCursorPosition()
         {
-            var result = positionSnapProvider?.FindSnappedPositionAndTime(inputManager.CurrentState.Mouse.Position, state == SliderPlacementState.ControlPoints ? SnapType.GlobalGrids : SnapType.All);
+            SnapResult? result = null;
+            var mousePosition = inputManager.CurrentState.Mouse.Position;
+
+            if (state != SliderPlacementState.ControlPoints)
+            {
+                result ??= composer?.TrySnapToNearbyObjects(mousePosition);
+                result ??= composer?.TrySnapToDistanceGrid(mousePosition);
+            }
+
+            result ??= composer?.TrySnapToPositionGrid(mousePosition);
+
             return ToLocalSpace(result?.ScreenSpacePosition ?? inputManager.CurrentState.Mouse.Position) - HitObject.Position;
         }
 

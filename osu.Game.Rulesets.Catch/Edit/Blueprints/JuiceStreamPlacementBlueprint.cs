@@ -83,8 +83,16 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
             return base.OnMouseDown(e);
         }
 
-        public override void UpdateTimeAndPosition(SnapResult result)
+        public override SnapResult UpdateTimeAndPosition(Vector2 screenSpacePosition, double fallbackTime)
         {
+            var gridSnapResult = Composer?.FindSnappedPositionAndTime(screenSpacePosition) ?? new SnapResult(screenSpacePosition, fallbackTime);
+            gridSnapResult.ScreenSpacePosition.X = screenSpacePosition.X;
+            var distanceSnapResult = Composer?.TryDistanceSnap(gridSnapResult.ScreenSpacePosition);
+
+            var result = distanceSnapResult != null && Vector2.Distance(gridSnapResult.ScreenSpacePosition, distanceSnapResult.ScreenSpacePosition) < CatchHitObjectComposer.DISTANCE_SNAP_RADIUS
+                ? distanceSnapResult
+                : gridSnapResult;
+
             switch (PlacementActive)
             {
                 case PlacementState.Waiting:
@@ -99,7 +107,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
                     break;
 
                 default:
-                    return;
+                    return result;
             }
 
             // Make sure the up-to-date position is used for outlines.
@@ -113,6 +121,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
             ApplyDefaultsToHitObject();
             scrollingPath.UpdatePathFrom(HitObjectContainer, HitObject);
             nestedOutlineContainer.UpdateNestedObjectsFrom(HitObjectContainer, HitObject);
+            return result;
         }
 
         private double positionToTime(float relativeYPosition)
