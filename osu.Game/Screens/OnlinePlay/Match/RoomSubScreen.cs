@@ -484,7 +484,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
                 if (gameplayItem.Equals(currentItem))
                     return;
 
-                UserStyleDisplayContainer.Child = new DrawableRoomPlaylistItem(gameplayItem)
+                UserStyleDisplayContainer.Child = new DrawableRoomPlaylistItem(gameplayItem, true)
                 {
                     AllowReordering = false,
                     AllowEditing = true,
