@@ -3,7 +3,6 @@
 
 #nullable disable
 
-using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
@@ -125,10 +124,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
             EditorClock?.SeekSmoothlyTo(ClickedBlueprint.Item.StartTime);
             return true;
         }
-
-        protected override IEnumerable<SelectionBlueprint<HitObject>> ApplySelectionOrder(IEnumerable<SelectionBlueprint<HitObject>> blueprints) =>
-            base.ApplySelectionOrder(blueprints)
-                .OrderBy(b => Math.Min(Math.Abs(EditorClock.CurrentTime - b.Item.GetEndTime()), Math.Abs(EditorClock.CurrentTime - b.Item.StartTime)));
 
         protected override SelectionBlueprintContainer CreateSelectionBlueprintContainer() => new HitObjectOrderedSelectionContainer { RelativeSizeAxes = Axes.Both };
 
