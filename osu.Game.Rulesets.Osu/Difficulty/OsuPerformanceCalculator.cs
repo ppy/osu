@@ -126,6 +126,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             score.Mods.OfType<IApplicableToTrack>().ForEach(m => m.ApplyToTrack(track));
             clockRate = track.Rate;
 
+            score.Mods.OfType<IApplicableToDifficulty>().ForEach(m => m.ApplyToDifficulty(score.BeatmapInfo!.Difficulty));
+
             HitWindows hitWindows = new OsuHitWindows();
             hitWindows.SetDifficulty(score.BeatmapInfo!.Difficulty.OverallDifficulty);
 
