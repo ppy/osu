@@ -52,14 +52,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             if (mods.OfType<OsuModHidden>().Any())
             {
                 double timeSpentInvisible = getDurationSpentInvisible(currObj) / clockRateEstimate;
-                double timeDifficultyFactor = noteDensityDifficulty < 0.1 ? 3000 : 300 / noteDensityDifficulty;
+                double timeDifficultyFactor = noteDensityDifficulty <= 1 ? 400 : 400 / noteDensityDifficulty;
 
                 double visibleObjectFactor = Math.Clamp(retrieveCurrentVisibleObjects(currObj).Count - 2, 0, 15);
 
                 hiddenDifficulty += (visibleObjectFactor + timeSpentInvisible * currVelocity) / timeDifficultyFactor;
             }
 
-            hiddenDifficulty *= 0.5; // placeholder mult variable wooooooo
+            hiddenDifficulty *= 0.6; // placeholder mult variable wooooooo
             double difficulty = hiddenDifficulty + noteDensityDifficulty;
 
             difficulty *= getConstantAngleNerfFactor(currObj);
