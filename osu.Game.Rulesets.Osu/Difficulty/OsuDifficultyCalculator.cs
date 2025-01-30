@@ -55,12 +55,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             var reading = skills.OfType<Reading>().SingleOrDefault();
             double readingRating = reading == null ? 0.0 : Math.Sqrt(reading.DifficultyValue()) * difficulty_multiplier;
-            double readingDifficultyStrainCount = reading.CountTopWeightedStrains();
+            double readingDifficultyStrainCount = reading?.CountTopWeightedStrains() ?? 0.0;
 
             if (mods.Any(m => m is OsuModTouchDevice))
             {
                 aimRating = Math.Pow(aimRating, 0.8);
                 flashlightRating = Math.Pow(flashlightRating, 0.8);
+                readingRating = Math.Pow(readingRating, 0.8);
             }
 
             if (mods.Any(h => h is OsuModRelax))
@@ -68,12 +69,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 aimRating *= 0.9;
                 speedRating = 0.0;
                 flashlightRating *= 0.7;
+                readingRating *= 0.7;
             }
             else if (mods.Any(h => h is OsuModAutopilot))
             {
                 speedRating *= 0.5;
                 aimRating = 0.0;
                 flashlightRating *= 0.4;
+                readingRating *= 0.7;
             }
 
             double baseAimPerformance = OsuStrainSkill.DifficultyToPerformance(aimRating);
