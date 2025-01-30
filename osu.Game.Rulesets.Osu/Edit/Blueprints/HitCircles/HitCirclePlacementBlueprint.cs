@@ -1,10 +1,12 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Allocation;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles.Components;
 using osu.Game.Rulesets.Osu.Objects;
+using osuTK;
 using osuTK.Input;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles
@@ -14,6 +16,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles
         public new HitCircle HitObject => (HitCircle)base.HitObject;
 
         private readonly HitCirclePiece circlePiece;
+
+        [Resolved]
+        private OsuHitObjectComposer? composer { get; set; }
 
         public HitCirclePlacementBlueprint()
             : base(new HitCircle())
@@ -45,10 +50,17 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles
             return base.OnMouseDown(e);
         }
 
-        public override void UpdateTimeAndPosition(SnapResult result)
+        public override SnapResult UpdateTimeAndPosition(Vector2 screenSpacePosition, double fallbackTime)
         {
-            base.UpdateTimeAndPosition(result);
+            var result = composer?.TrySnapToNearbyObjects(screenSpacePosition, fallbackTime);
+            result ??= composer?.TrySnapToDistanceGrid(screenSpacePosition);
+            if (composer?.TrySnapToPositionGrid(result?.ScreenSpacePosition ?? screenSpacePosition, result?.Time ?? fallbackTime) is SnapResult gridSnapResult)
+                result = gridSnapResult;
+            result ??= new SnapResult(screenSpacePosition, fallbackTime);
+
+            base.UpdateTimeAndPosition(result.ScreenSpacePosition, result.Time ?? fallbackTime);
             HitObject.Position = ToLocalSpace(result.ScreenSpacePosition);
+            return result;
         }
     }
 }
