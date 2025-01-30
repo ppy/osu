@@ -39,6 +39,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         [JsonProperty("speed_note_count")]
         public double SpeedNoteCount { get; set; }
 
+        [JsonProperty("stamina_difficulty")]
+        public double staminaRating { get; set; }
+
+        [JsonProperty("stamina_factor")]
+        public double StaminaFactor { get; set; }
+
         /// <summary>
         /// The difficulty corresponding to the flashlight skill.
         /// </summary>

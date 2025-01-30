@@ -45,10 +45,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double aimRatingNoSliders = Math.Sqrt(aimWithoutSliders.DifficultyValue()) * difficulty_multiplier;
             double sliderFactor = aimRating > 0 ? aimRatingNoSliders / aimRating : 1;
 
-            var speed = skills.OfType<Speed>().Single();
+            var speed = skills.OfType<Speed>().Single(s => !s.WithoutStamina);
             double speedRating = Math.Sqrt(speed.DifficultyValue()) * difficulty_multiplier;
             double speedNotes = speed.RelevantNoteCount();
             double speedDifficultyStrainCount = speed.CountTopWeightedStrains();
+
+            var speedWithoutStamina = skills.OfType<Speed>().Single(s => s.WithoutStamina);
+            double speedRatingNoStamina = Math.Sqrt(speedWithoutStamina.DifficultyValue()) * difficulty_multiplier;
+            double staminaFactor = speedRating > 0 ? speedRatingNoStamina / speedRating : 1;
+
+            var stamina = skills.OfType<Stamina>().Single();
+            double staminaRating = Math.Sqrt(stamina.DifficultyValue()) * difficulty_multiplier;
 
             var flashlight = skills.OfType<Flashlight>().SingleOrDefault();
             double flashlightRating = flashlight == null ? 0.0 : Math.Sqrt(flashlight.DifficultyValue()) * difficulty_multiplier;
@@ -112,6 +119,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 AimDifficultSliderCount = difficultSliders,
                 SpeedDifficulty = speedRating,
                 SpeedNoteCount = speedNotes,
+                staminaRating = staminaRating,
+                StaminaFactor = staminaFactor,
                 FlashlightDifficulty = flashlightRating,
                 SliderFactor = sliderFactor,
                 AimDifficultStrainCount = aimDifficultyStrainCount,
@@ -152,7 +161,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             {
                 new Aim(mods, true),
                 new Aim(mods, false),
-                new Speed(mods)
+                new Speed(mods, false),
+                new Speed(mods, true)
             };
 
             if (mods.Any(h => h is OsuModFlashlight))

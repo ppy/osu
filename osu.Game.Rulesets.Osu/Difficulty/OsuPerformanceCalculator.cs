@@ -208,7 +208,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (score.Mods.Any(h => h is OsuModRelax) || speedDeviation == null)
                 return 0.0;
 
-            double speedValue = OsuStrainSkill.DifficultyToPerformance(attributes.SpeedDifficulty);
+            double speedDifficulty = attributes.SpeedDifficulty;
+
+            speedDifficulty *= (1 - attributes.StaminaFactor) * DifficultyCalculationUtils.Erf(25.0 / (Math.Sqrt(2) * (double)speedDeviation)) + attributes.StaminaFactor;
+
+            double speedValue = OsuStrainSkill.DifficultyToPerformance(speedDifficulty);
 
             double lengthBonus = 0.95 + 0.4 * Math.Min(1.0, totalHits / 2000.0) +
                                  (totalHits > 2000 ? Math.Log10(totalHits / 2000.0) * 0.5 : 0.0);

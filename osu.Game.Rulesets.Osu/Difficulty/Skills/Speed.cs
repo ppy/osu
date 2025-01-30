@@ -17,15 +17,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     {
         private double totalMultiplier => 1.0;
         private double burstMultiplier => 1.925;
-        private double staminaMultiplier => 0.024;
+        private double staminaMultiplier => 0.025;
 
         private double currentBurstStrain;
         private double currentStaminaStrain;
         private double currentRhythm;
 
-        public Speed(Mod[] mods)
+        public readonly bool WithoutStamina;
+
+        public Speed(Mod[] mods, bool withoutStamina)
             : base(mods)
         {
+            WithoutStamina = withoutStamina;
         }
 
         private double strainDecayBurst(double ms) => Math.Pow(0.15, ms / 1000);
@@ -43,8 +46,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             currentRhythm = RhythmEvaluator.EvaluateDifficultyOf(current);
             currentBurstStrain += SpeedEvaluator.EvaluateDifficultyOf(current, Mods) * burstMultiplier;
 
-            currentStaminaStrain *= strainDecayStamina(((OsuDifficultyHitObject)current).StrainTime);
-            currentStaminaStrain += StaminaEvaluator.EvaluateDifficultyOf(current) * staminaMultiplier;
+            if (!WithoutStamina)
+            {
+                currentStaminaStrain *= strainDecayStamina(((OsuDifficultyHitObject)current).StrainTime);
+                currentStaminaStrain += StaminaEvaluator.EvaluateDifficultyOf(current) * staminaMultiplier;
+            }
 
             double combinedStrain = currentBurstStrain * currentRhythm + currentStaminaStrain;
 
