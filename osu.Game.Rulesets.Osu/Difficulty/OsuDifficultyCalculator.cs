@@ -55,6 +55,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             var reading = skills.OfType<Reading>().SingleOrDefault();
             double readingRating = reading == null ? 0.0 : Math.Sqrt(reading.DifficultyValue()) * difficulty_multiplier;
+            double readingDifficultyStrainCount = reading.CountTopWeightedStrains();
 
             if (mods.Any(m => m is OsuModTouchDevice))
             {
@@ -123,6 +124,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 SliderFactor = sliderFactor,
                 AimDifficultStrainCount = aimDifficultyStrainCount,
                 SpeedDifficultStrainCount = speedDifficultyStrainCount,
+                ReadingDifficultStrainCount = readingDifficultyStrainCount,
                 ApproachRate = preempt > 1200 ? (1800 - preempt) / 120 : (1200 - preempt) / 150 + 5,
                 OverallDifficulty = (80 - hitWindowGreat) / 6,
                 GreatHitWindow = hitWindowGreat,

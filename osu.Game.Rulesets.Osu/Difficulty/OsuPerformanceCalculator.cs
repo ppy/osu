@@ -316,9 +316,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
             if (effectiveMissCount > 0)
-                readingValue *= 0.97 * Math.Pow(1 - Math.Pow(effectiveMissCount / totalHits, 0.775), Math.Pow(effectiveMissCount, .875));
-
-            readingValue *= getComboScalingFactor(attributes);
+                readingValue *= calculateMissPenalty(effectiveMissCount, attributes.ReadingDifficultStrainCount);
 
             // Scale the reading value with accuracy _harshly_.
             readingValue *= accuracy * accuracy;
