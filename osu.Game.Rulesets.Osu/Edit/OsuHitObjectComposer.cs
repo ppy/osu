@@ -273,7 +273,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             pos = Vector2.Clamp(pos, Vector2.Zero, OsuPlayfield.BASE_SIZE);
 
             var playfield = PlayfieldAtScreenSpacePosition(screenSpacePosition);
-            return new SnapResult(positionSnapGrid.ToScreenSpace(pos), null, playfield);
+            return new SnapResult(positionSnapGrid.ToScreenSpace(pos), fallbackTime, playfield);
         }
 
         private bool snapToVisibleBlueprints(Vector2 screenSpacePosition, out SnapResult snapResult)
