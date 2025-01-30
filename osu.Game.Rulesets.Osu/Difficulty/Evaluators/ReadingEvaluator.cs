@@ -52,7 +52,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             if (mods.OfType<OsuModHidden>().Any())
             {
                 double timeSpentInvisible = getDurationSpentInvisible(currObj) / clockRateEstimate;
-                double timeDifficultyFactor = 300 / noteDensityDifficulty;
+                double timeDifficultyFactor = noteDensityDifficulty < 0.1 ? 3000 : 300 / noteDensityDifficulty;
 
                 double visibleObjectFactor = Math.Clamp(retrieveCurrentVisibleObjects(currObj).Count - 2, 0, 15);
 
