@@ -4,10 +4,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Audio.Track;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Difficulty.Utils;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Skills;
 using osu.Game.Rulesets.Osu.Mods;
+using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 
@@ -40,6 +44,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         /// Estimated total amount of combo breaks
         /// </summary>
         private double effectiveMissCount;
+
+        private double clockRate;
+        private double greatHitWindow;
+        private double okHitWindow;
+        private double mehHitWindow;
 
         private double? speedDeviation;
 
@@ -112,6 +121,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 // As we're adding Oks and Mehs to an approximated number of combo breaks the result can be higher than total hits in specific scenarios (which breaks some calculations) so we need to clamp it.
                 effectiveMissCount = Math.Min(effectiveMissCount + countOk * okMultiplier + countMeh * mehMultiplier, totalHits);
             }
+
+            var track = new TrackVirtual(10000);
+            score.Mods.OfType<IApplicableToTrack>().ForEach(m => m.ApplyToTrack(track));
+            clockRate = track.Rate;
+
+            HitWindows hitWindows = new OsuHitWindows();
+            hitWindows.SetDifficulty(score.BeatmapInfo!.Difficulty.OverallDifficulty);
+
+            greatHitWindow = hitWindows.WindowFor(HitResult.Great) / clockRate;
+            okHitWindow = hitWindows.WindowFor(HitResult.Ok) / clockRate;
+            mehHitWindow = hitWindows.WindowFor(HitResult.Meh) / clockRate;
 
             speedDeviation = calculateSpeedDeviation(osuAttributes);
 
@@ -352,10 +372,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double objectCount = relevantCountGreat + relevantCountOk + relevantCountMeh + relevantCountMiss;
 
-            double hitWindowGreat = attributes.GreatHitWindow;
-            double hitWindowOk = attributes.OkHitWindow;
-            double hitWindowMeh = attributes.MehHitWindow;
-
             // The probability that a player hits a circle is unknown, but we can estimate it to be
             // the number of greats on circles divided by the number of circles, and then add one
             // to the number of circles as a bias correction.
@@ -370,22 +386,22 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             // Compute the deviation assuming greats and oks are normally distributed, and mehs are uniformly distributed.
             // Begin with greats and oks first. Ignoring mehs, we can be 99% confident that the deviation is not higher than:
-            double deviation = hitWindowGreat / (Math.Sqrt(2) * DifficultyCalculationUtils.ErfInv(pLowerBound));
+            double deviation = greatHitWindow / (Math.Sqrt(2) * DifficultyCalculationUtils.ErfInv(pLowerBound));
 
-            double randomValue = Math.Sqrt(2 / Math.PI) * hitWindowOk * Math.Exp(-0.5 * Math.Pow(hitWindowOk / deviation, 2))
-                                 / (deviation * DifficultyCalculationUtils.Erf(hitWindowOk / (Math.Sqrt(2) * deviation)));
+            double randomValue = Math.Sqrt(2 / Math.PI) * okHitWindow * Math.Exp(-0.5 * Math.Pow(okHitWindow / deviation, 2))
+                                 / (deviation * DifficultyCalculationUtils.Erf(okHitWindow / (Math.Sqrt(2) * deviation)));
 
             deviation *= Math.Sqrt(1 - randomValue);
 
             // Value deviation approach as greatCount approaches 0
-            double limitValue = hitWindowOk / Math.Sqrt(3);
+            double limitValue = okHitWindow / Math.Sqrt(3);
 
             // If precision is not enough to compute true deviation - use limit value
             if (pLowerBound == 0 || randomValue >= 1 || deviation > limitValue)
                 deviation = limitValue;
 
             // Then compute the variance for mehs.
-            double mehVariance = (hitWindowMeh * hitWindowMeh + hitWindowOk * hitWindowMeh + hitWindowOk * hitWindowOk) / 3;
+            double mehVariance = (mehHitWindow * mehHitWindow + okHitWindow * mehHitWindow + okHitWindow * okHitWindow) / 3;
 
             // Find the total deviation.
             deviation = Math.Sqrt(((relevantCountGreat + relevantCountOk) * Math.Pow(deviation, 2) + relevantCountMeh * mehVariance) / (relevantCountGreat + relevantCountOk + relevantCountMeh));
