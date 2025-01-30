@@ -233,8 +233,6 @@ namespace osu.Game
 
             forwardGeneralLogsToNotifications();
             forwardTabletLogsToNotifications();
-
-            SentryLogger = new SentryLogger(this);
         }
 
         #region IOverlayManager
@@ -319,6 +317,12 @@ namespace osu.Game
 
         private readonly List<string> dragDropFiles = new List<string>();
         private ScheduledDelegate dragDropImportSchedule;
+
+        public override void SetupLogging(Storage gameStorage, Storage cacheStorage)
+        {
+            base.SetupLogging(gameStorage, cacheStorage);
+            SentryLogger = new SentryLogger(this, cacheStorage);
+        }
 
         public override void SetHost(GameHost host)
         {

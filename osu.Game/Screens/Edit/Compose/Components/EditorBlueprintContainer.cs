@@ -17,7 +17,7 @@ using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
-    public partial class EditorBlueprintContainer : BlueprintContainer<HitObject>
+    public abstract partial class EditorBlueprintContainer : BlueprintContainer<HitObject>
     {
         [Resolved]
         protected EditorClock EditorClock { get; private set; }
@@ -73,27 +73,22 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected override IEnumerable<SelectionBlueprint<HitObject>> SortForMovement(IReadOnlyList<SelectionBlueprint<HitObject>> blueprints)
             => blueprints.OrderBy(b => b.Item.StartTime);
 
-        protected override bool ApplySnapResult(SelectionBlueprint<HitObject>[] blueprints, SnapResult result)
+        protected void ApplySnapResultTime(SnapResult result, double referenceTime)
         {
-            if (!base.ApplySnapResult(blueprints, result))
-                return false;
+            if (!result.Time.HasValue)
+                return;
 
-            if (result.Time.HasValue)
+            // Apply the start time at the newly snapped-to position
+            double offset = result.Time.Value - referenceTime;
+
+            if (offset != 0)
             {
-                // Apply the start time at the newly snapped-to position
-                double offset = result.Time.Value - blueprints.First().Item.StartTime;
-
-                if (offset != 0)
+                Beatmap.PerformOnSelection(obj =>
                 {
-                    Beatmap.PerformOnSelection(obj =>
-                    {
-                        obj.StartTime += offset;
-                        Beatmap.Update(obj);
-                    });
-                }
+                    obj.StartTime += offset;
+                    Beatmap.Update(obj);
+                });
             }
-
-            return true;
         }
 
         protected override void AddBlueprintFor(HitObject item)

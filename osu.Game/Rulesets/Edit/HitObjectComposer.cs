@@ -376,7 +376,7 @@ namespace osu.Game.Rulesets.Edit
         /// <summary>
         /// Construct a relevant blueprint container. This will manage hitobject selection/placement input handling and display logic.
         /// </summary>
-        protected virtual ComposeBlueprintContainer CreateBlueprintContainer() => new ComposeBlueprintContainer(this);
+        protected abstract ComposeBlueprintContainer CreateBlueprintContainer();
 
         protected virtual Drawable CreateHitObjectInspector() => new HitObjectInspector();
 
@@ -566,28 +566,6 @@ namespace osu.Game.Rulesets.Edit
         /// <returns>The most relevant <see cref="Playfield"/>.</returns>
         protected virtual Playfield PlayfieldAtScreenSpacePosition(Vector2 screenSpacePosition) => drawableRulesetWrapper.Playfield;
 
-        public override SnapResult FindSnappedPositionAndTime(Vector2 screenSpacePosition, SnapType snapType = SnapType.All)
-        {
-            var playfield = PlayfieldAtScreenSpacePosition(screenSpacePosition);
-            double? targetTime = null;
-
-            if (snapType.HasFlag(SnapType.GlobalGrids))
-            {
-                if (playfield is ScrollingPlayfield scrollingPlayfield)
-                {
-                    targetTime = scrollingPlayfield.TimeAtScreenSpacePosition(screenSpacePosition);
-
-                    // apply beat snapping
-                    targetTime = BeatSnapProvider.SnapTime(targetTime.Value);
-
-                    // convert back to screen space
-                    screenSpacePosition = scrollingPlayfield.ScreenSpacePositionAtTime(targetTime.Value);
-                }
-            }
-
-            return new SnapResult(screenSpacePosition, targetTime, playfield);
-        }
-
         #endregion
     }
 
@@ -596,7 +574,7 @@ namespace osu.Game.Rulesets.Edit
     /// Generally used to access certain methods without requiring a generic type for <see cref="HitObjectComposer{T}" />.
     /// </summary>
     [Cached]
-    public abstract partial class HitObjectComposer : CompositeDrawable, IPositionSnapProvider
+    public abstract partial class HitObjectComposer : CompositeDrawable
     {
         public const float TOOLBOX_CONTRACTED_SIZE_LEFT = 60;
         public const float TOOLBOX_CONTRACTED_SIZE_RIGHT = 120;
@@ -639,11 +617,5 @@ namespace osu.Game.Rulesets.Edit
         /// <param name="timestamp">The time instant to seek to, in milliseconds.</param>
         /// <param name="objectDescription">The ruleset-specific description of objects to select at the given timestamp.</param>
         public virtual void SelectFromTimestamp(double timestamp, string objectDescription) { }
-
-        #region IPositionSnapProvider
-
-        public abstract SnapResult FindSnappedPositionAndTime(Vector2 screenSpacePosition, SnapType snapType = SnapType.All);
-
-        #endregion
     }
 }
