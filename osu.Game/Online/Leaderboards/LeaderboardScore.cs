@@ -89,7 +89,6 @@ namespace osu.Game.Online.Leaderboards
 
         // using nullable enable here because canBeNull is not respected for properties
         #nullable enable
-
         [Resolved]
         private OsuGame? game { get; set; }
 
