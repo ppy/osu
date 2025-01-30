@@ -28,7 +28,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             // Apollo didn't pass in clockrate and I don't know how so we're stuck with this!!!
             double clockRateEstimate = current.BaseObject.StartTime / currObj.StartTime;
-            double currApproachRate = currObj.Preempt; // Approach rate in milliseconds
 
             double noteDensityDifficulty = 1.0;
 
@@ -59,8 +58,30 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 hiddenDifficulty += (visibleObjectFactor + timeSpentInvisible * currVelocity) / timeDifficultyFactor;
             }
 
+            double preemptDifficulty = 0.0;
+
+            double currApproachRate = currObj.Preempt; // Approach rate in milliseconds
+
+            if (currApproachRate < 480)
+            {
+                preemptDifficulty += Math.Pow(480 - currApproachRate, 1.5) / 800;
+
+                var prevObj = (OsuDifficultyHitObject)currObj.Previous(0);
+
+                // // Buff spacing.
+                // preemptDifficulty *= Math.Max(1, 0.3 * currVelocity);
+
+                // Nerf repeated angles.
+                if (currObj.Index > 1)
+                {
+                    preemptDifficulty *= getConstantAngleNerfFactor(currObj);
+                    preemptDifficulty *= getConstantAngleNerfFactor(prevObj);
+                }
+            }
+
             hiddenDifficulty *= 0.6; // placeholder mult variable wooooooo
-            double difficulty = hiddenDifficulty + noteDensityDifficulty;
+            // preemptDifficulty *= 0.2;
+            double difficulty = preemptDifficulty + hiddenDifficulty + noteDensityDifficulty;
 
             difficulty *= getConstantAngleNerfFactor(currObj);
 
