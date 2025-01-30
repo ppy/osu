@@ -1,10 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Pooling;
@@ -45,11 +44,11 @@ namespace osu.Game.Rulesets.Mania.UI
 
         internal readonly Container TopLevelContainer = new Container { RelativeSizeAxes = Axes.Both };
 
-        private DrawablePool<PoolableHitExplosion> hitExplosionPool;
+        private DrawablePool<PoolableHitExplosion> hitExplosionPool = null!;
         private readonly OrderedHitPolicy hitPolicy;
         public Container UnderlayElements => HitObjectArea.UnderlayElements;
 
-        private GameplaySampleTriggerSource sampleTriggerSource;
+        private GameplaySampleTriggerSource sampleTriggerSource = null!;
 
         /// <summary>
         /// Whether this is a special (ie. scratch) column.
@@ -75,7 +74,7 @@ namespace osu.Game.Rulesets.Mania.UI
         }
 
         [Resolved]
-        private ISkinSource skin { get; set; }
+        private ISkinSource skin { get; set; } = null!;
 
         [BackgroundDependencyLoader]
         private void load(GameHost host)
@@ -136,7 +135,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
             base.Dispose(isDisposing);
 
-            if (skin != null)
+            if (skin.IsNotNull())
                 skin.SourceChanged -= onSourceChanged;
         }
 
@@ -187,14 +186,14 @@ namespace osu.Game.Rulesets.Mania.UI
 
         #region Touch Input
 
-        [Resolved(canBeNull: true)]
-        private ManiaInputManager maniaInputManager { get; set; }
+        [Resolved]
+        private ManiaInputManager? maniaInputManager { get; set; }
 
         private int touchActivationCount;
 
         protected override bool OnTouchDown(TouchDownEvent e)
         {
-            maniaInputManager.KeyBindingContainer.TriggerPressed(Action.Value);
+            maniaInputManager?.KeyBindingContainer.TriggerPressed(Action.Value);
             touchActivationCount++;
             return true;
         }
@@ -204,7 +203,7 @@ namespace osu.Game.Rulesets.Mania.UI
             touchActivationCount--;
 
             if (touchActivationCount == 0)
-                maniaInputManager.KeyBindingContainer.TriggerReleased(Action.Value);
+                maniaInputManager?.KeyBindingContainer.TriggerReleased(Action.Value);
         }
 
         #endregion
