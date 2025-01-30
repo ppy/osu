@@ -136,6 +136,7 @@ namespace osu.Game.Rulesets.Objects
                         {
                             for (int j = 0; j < segment.Length - 1; j++)
                             {
+                                if (result.Count > 0 && j == 0) result.Add(new PathControlPoint(segment[j]));
                                 result.Add(new PathControlPoint(segment[j], j == 0 ? PathType.BEZIER : null));
                             }
                         }
@@ -147,6 +148,7 @@ namespace osu.Game.Rulesets.Objects
                         {
                             for (int j = 0; j < segment.Length - 1; j++)
                             {
+                                if (result.Count > 0 && j == 0) result.Add(new PathControlPoint(segment[j]));
                                 result.Add(new PathControlPoint(segment[j], j == 0 ? PathType.BEZIER : null));
                             }
                         }
@@ -158,6 +160,7 @@ namespace osu.Game.Rulesets.Objects
 
                         for (int j = 0; j < circleResult.Length - 1; j++)
                         {
+                            if (result.Count > 0 && j == 0) result.Add(new PathControlPoint(circleResult[j]));
                             result.Add(new PathControlPoint(circleResult[j], j == 0 ? PathType.BEZIER : null));
                         }
 
@@ -170,6 +173,7 @@ namespace osu.Game.Rulesets.Objects
 
                         for (int j = 0; j < bSplineResult.Length - 1; j++)
                         {
+                            if (result.Count > 0 && j == 0) result.Add(new PathControlPoint(bSplineResult[j]));
                             result.Add(new PathControlPoint(bSplineResult[j], j == 0 ? PathType.BEZIER : null));
                         }
 
