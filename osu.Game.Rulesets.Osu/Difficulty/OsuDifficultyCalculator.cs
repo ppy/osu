@@ -81,12 +81,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double baseAimPerformance = OsuStrainSkill.DifficultyToPerformance(aimRating);
             double baseSpeedPerformance = OsuStrainSkill.DifficultyToPerformance(speedRating);
+            double baseReadingPerformance = OsuStrainSkill.DifficultyToPerformance(readingRating);
             double baseFlashlightPerformance = 0.0;
 
             if (mods.Any(h => h is OsuModFlashlight))
                 baseFlashlightPerformance = Flashlight.DifficultyToPerformance(flashlightRating);
-
-            double baseReadingPerformance = Math.Pow(5 * Math.Max(1, readingRating / 0.0675) - 4, 3) / 100000;
 
             double basePerformance =
                 Math.Pow(
