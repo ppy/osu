@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Humanizer;
@@ -51,6 +52,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// in order to handle composer blueprints which are partially offscreen.
         /// </remarks>
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => editorScreen?.MainContent.ReceivePositionalInputAt(screenSpacePos) ?? base.ReceivePositionalInputAt(screenSpacePos);
+
+        protected override IEnumerable<SelectionBlueprint<HitObject>> ApplySelectionOrder(IEnumerable<SelectionBlueprint<HitObject>> blueprints) =>
+            base.ApplySelectionOrder(blueprints)
+                .OrderBy(b => Math.Min(Math.Abs(EditorClock.CurrentTime - b.Item.GetEndTime()), Math.Abs(EditorClock.CurrentTime - b.Item.StartTime)));
 
         protected ComposeBlueprintContainer(HitObjectComposer composer)
             : base(composer)
