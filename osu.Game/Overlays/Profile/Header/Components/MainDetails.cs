@@ -27,6 +27,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
         private ProfileValueDisplay detailGlobalRank = null!;
         private ProfileValueDisplay detailCountryRank = null!;
         private RankGraph rankGraph = null!;
+        private TotalPlayTime timeInfo = null!;
 
         public readonly Bindable<UserProfileData?> User = new Bindable<UserProfileData?>();
 
@@ -117,10 +118,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                                     {
                                         Title = "pp",
                                     },
-                                    new TotalPlayTime
-                                    {
-                                        User = { BindTarget = User }
-                                    },
+                                    timeInfo = new TotalPlayTime()
                                 }
                             },
                             new FillFlowContainer
@@ -169,6 +167,8 @@ namespace osu.Game.Overlays.Profile.Header.Components
             detailCountryRank.ContentTooltipText = getCountryRankTooltipText(user);
 
             rankGraph.Statistics.Value = user?.Statistics;
+
+            timeInfo.UserStatistics.Value = user?.Statistics;
         }
 
         private static LocalisableString getGlobalRankTooltipText(APIUser? user)
