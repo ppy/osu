@@ -87,8 +87,9 @@ namespace osu.Game.Online.Leaderboards
         [Resolved]
         private ScoreManager scoreManager { get; set; } = null!;
 
-        // using nullable enable here because canBeNull is not respected for properties
-        #nullable enable
+        // using nullable enable here because canBeNull is not respected for OsuGame
+#nullable enable
+
         [Resolved]
         private OsuGame? game { get; set; }
 
