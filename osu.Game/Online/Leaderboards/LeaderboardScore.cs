@@ -88,7 +88,7 @@ namespace osu.Game.Online.Leaderboards
         private ScoreManager scoreManager { get; set; } = null!;
 
         [Resolved]
-        private OsuGame game { get; set; }
+        private OsuGame? game { get; set; }
 
         public LeaderboardScore(ScoreInfo score, int? rank, bool isOnlineScope = true, bool highlightFriend = true)
         {
