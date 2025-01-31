@@ -4,6 +4,7 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -15,12 +16,14 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Taiko.Skinning.Default
 {
-    public partial class DefaultSwell : Container, ISkinnableSwell
+    public partial class DefaultSwell : Container
     {
         private const float target_ring_thick_border = 1.4f;
         private const float target_ring_thin_border = 1f;
         private const float target_ring_scale = 5f;
         private const float inner_ring_alpha = 0.65f;
+
+        private DrawableSwell drawableSwell = null!;
 
         private readonly Container bodyContainer;
         private readonly CircularContainer targetRing;
@@ -102,6 +105,17 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
             });
         }
 
+        [BackgroundDependencyLoader]
+        private void load(DrawableHitObject hitObject, OsuColour colours)
+        {
+            drawableSwell = (DrawableSwell)hitObject;
+            drawableSwell.UpdateHitProgress += animateSwellProgress;
+            drawableSwell.ApplyCustomUpdateState += updateStateTransforms;
+
+            expandingRing.Colour = colours.YellowLight;
+            targetRing.BorderColour = colours.YellowDark.Opacity(0.25f);
+        }
+
         protected virtual Drawable CreateCentreCircle()
         {
             return new SwellCirclePiece()
@@ -111,18 +125,11 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
             };
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void animateSwellProgress(int numHits, int requiredHits)
         {
-            expandingRing.Colour = colours.YellowLight;
-            targetRing.BorderColour = colours.YellowDark.Opacity(0.25f);
-        }
+            float completion = (float)numHits / requiredHits;
 
-        public void AnimateSwellProgress(DrawableTaikoHitObject<Swell> swell, int numHits)
-        {
-            float completion = (float)numHits / swell.HitObject.RequiredHits;
-
-            centreCircle.RotateTo((float)(completion * swell.HitObject.Duration / 8), 4000, Easing.OutQuint);
+            centreCircle.RotateTo((float)(completion * drawableSwell.HitObject.Duration / 8), 4000, Easing.OutQuint);
 
             expandingRing.ScaleTo(1f + Math.Min(target_ring_scale - 1f, (target_ring_scale - 1f) * completion * 1.3f), 260, Easing.OutQuint);
 
@@ -132,23 +139,42 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
                 .FadeTo(completion / 8, 2000, Easing.OutQuint);
         }
 
-        public void AnimateSwellCompletion(ArmedState state)
+        private void updateStateTransforms(DrawableHitObject drawableHitObject, ArmedState state)
         {
-            const double transition_duration = 300;
+            if (!(drawableHitObject is DrawableSwell drawableSwell))
+                return;
 
-            bodyContainer.FadeOut(transition_duration, Easing.OutQuad);
-            bodyContainer.ScaleTo(1.4f, transition_duration);
-            centreCircle.FadeOut(transition_duration, Easing.OutQuad);
+            Swell swell = drawableSwell.HitObject;
+
+            using (BeginAbsoluteSequence(swell.StartTime))
+            {
+                if (state == ArmedState.Idle)
+                    expandingRing.FadeTo(0);
+
+                const double ring_appear_offset = 100;
+
+                targetRing.Delay(ring_appear_offset).ScaleTo(target_ring_scale, 400, Easing.OutQuint);
+            }
+
+            using (BeginAbsoluteSequence(drawableSwell.HitStateUpdateTime))
+            {
+                const double transition_duration = 300;
+
+                bodyContainer.FadeOut(transition_duration, Easing.OutQuad);
+                bodyContainer.ScaleTo(1.4f, transition_duration);
+                centreCircle.FadeOut(transition_duration, Easing.OutQuad);
+            }
         }
 
-        public void AnimateSwellStart(DrawableTaikoHitObject<Swell> swell)
+        protected override void Dispose(bool isDisposing)
         {
-            if (swell.IsHit == false)
-                expandingRing.FadeTo(0);
+            base.Dispose(isDisposing);
 
-            const double ring_appear_offset = 100;
-
-            targetRing.Delay(ring_appear_offset).ScaleTo(target_ring_scale, 400, Easing.OutQuint);
+            if (drawableSwell.IsNotNull())
+            {
+                drawableSwell.UpdateHitProgress -= animateSwellProgress;
+                drawableSwell.ApplyCustomUpdateState -= updateStateTransforms;
+            }
         }
     }
 }
