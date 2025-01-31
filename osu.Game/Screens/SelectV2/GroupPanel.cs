@@ -79,7 +79,6 @@ namespace osu.Game.Screens.SelectV2
             base.PrepareForUse();
 
             Debug.Assert(Item != null);
-            Debug.Assert(Item.IsGroupSelectionTarget);
 
             GroupDefinition group = (GroupDefinition)Item.Model;
 

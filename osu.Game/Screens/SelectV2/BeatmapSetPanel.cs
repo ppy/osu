@@ -67,7 +67,6 @@ namespace osu.Game.Screens.SelectV2
             base.PrepareForUse();
 
             Debug.Assert(Item != null);
-            Debug.Assert(Item.IsGroupSelectionTarget);
 
             var beatmapSetInfo = (BeatmapSetInfo)Item.Model;
 
