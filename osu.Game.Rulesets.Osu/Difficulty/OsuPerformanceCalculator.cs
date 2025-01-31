@@ -307,9 +307,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double computeReadingValue(ScoreInfo score, OsuDifficultyAttributes attributes)
         {
-            double rawReading = attributes.ReadingDifficulty;
-
-            double readingValue = Math.Pow(rawReading, 2.0) * 25.0;
+            double readingValue = Reading.DifficultyToPerformance(attributes.ReadingDifficulty);
 
             // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
             if (effectiveMissCount > 0)
