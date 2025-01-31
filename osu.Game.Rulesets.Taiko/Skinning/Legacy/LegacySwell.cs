@@ -18,6 +18,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
     public partial class LegacySwell : Container, ISkinnableSwell
     {
         private Container bodyContainer = null!;
+        private Sprite warning = null!;
         private Sprite spinnerCircle = null!;
         private Sprite shrinkingRing = null!;
         private Sprite clearAnimation = null!;
@@ -40,14 +41,21 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Position = new Vector2(200f, 100f),
 
                 Children = new Drawable[]
                 {
+                    warning = new Sprite
+                    {
+                        Texture = skin.GetTexture("spinner-warning") ?? skinManager.DefaultClassicSkin.GetTexture("spinner-circle"),
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Scale = skin.GetTexture("spinner-warning") != null ? Vector2.One : new Vector2(0.18f),
+                    },
                     bodyContainer = new Container
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
+                        Position = new Vector2(200f, 100f),
                         Alpha = 0,
 
                         Children = new Drawable[]
@@ -73,17 +81,17 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                                 Position = new Vector2(0f, 165f),
                                 Scale = Vector2.One,
                             },
+                            clearAnimation = new Sprite
+                            {
+                                // File extension is included here because of a GetTexture limitation, see #21543
+                                Texture = skin.GetTexture("spinner-osu.png"),
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Position = new Vector2(0f, -165f),
+                                Scale = new Vector2(0.3f),
+                                Alpha = 0,
+                            },
                         }
-                    },
-                    clearAnimation = new Sprite
-                    {
-                        // File extension is included here because of a GetTexture limitation, see #21543
-                        Texture = skin.GetTexture("spinner-osu.png"),
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Position = new Vector2(0f, -165f),
-                        Scale = new Vector2(0.3f),
-                        Alpha = 0,
                     },
                 }
             };
@@ -91,13 +99,13 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
             clearSample = skin.GetSample(new SampleInfo("spinner-osu"));
         }
 
-        public void AnimateSwellProgress(DrawableTaikoHitObject<Swell> swell, int numHits, SkinnableDrawable mainPiece)
+        public void AnimateSwellProgress(DrawableTaikoHitObject<Swell> swell, int numHits)
         {
             remainingHitsCountdown.Text = $"{swell.HitObject.RequiredHits - numHits}";
             spinnerCircle.RotateTo(180f * numHits, 1000, Easing.OutQuint);
         }
 
-        public void AnimateSwellCompletion(ArmedState state, SkinnableDrawable mainPiece)
+        public void AnimateSwellCompletion(ArmedState state)
         {
             const double clear_transition_duration = 300;
 
@@ -118,7 +126,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
             }
         }
 
-        public void AnimateSwellStart(DrawableTaikoHitObject<Swell> swell, SkinnableDrawable mainPiece)
+        public void AnimateSwellStart(DrawableTaikoHitObject<Swell> swell)
         {
             if (swell.IsHit == false)
             {
@@ -128,7 +136,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 
             const double body_transition_duration = 100;
 
-            mainPiece.FadeOut(body_transition_duration);
+            warning.FadeOut(body_transition_duration);
             bodyContainer.FadeIn(body_transition_duration);
             shrinkingRing.ResizeTo(0.1f, swell.HitObject.Duration);
         }

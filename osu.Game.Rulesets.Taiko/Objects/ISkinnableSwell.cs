@@ -3,16 +3,15 @@
 
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Objects.Drawables;
-using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Taiko.Objects
 {
     public interface ISkinnableSwell
     {
-        void AnimateSwellProgress(DrawableTaikoHitObject<Swell> swell, int numHits, SkinnableDrawable mainPiece);
+        void AnimateSwellProgress(DrawableTaikoHitObject<Swell> swell, int numHits);
 
-        void AnimateSwellCompletion(ArmedState state, SkinnableDrawable mainPiece);
+        void AnimateSwellCompletion(ArmedState state);
 
-        void AnimateSwellStart(DrawableTaikoHitObject<Swell> swell, SkinnableDrawable mainPiece);
+        void AnimateSwellStart(DrawableTaikoHitObject<Swell> swell);
     }
 }
