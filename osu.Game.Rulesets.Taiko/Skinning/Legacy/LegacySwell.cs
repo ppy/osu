@@ -86,8 +86,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                             },
                             clearAnimation = new Sprite
                             {
-                                // File extension is included here because of a GetTexture limitation, see #21543
-                                Texture = skin.GetTexture("spinner-osu.png"),
+                                Texture = skin.GetTexture("spinner-osu"),
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
                                 Position = new Vector2(0f, -165f),
