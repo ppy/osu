@@ -18,7 +18,6 @@ using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI;
-using osu.Game.Screens.Edit.Components.TernaryButtons;
 using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
 
@@ -70,7 +69,9 @@ namespace osu.Game.Rulesets.Catch.Edit
             }));
         }
 
-        protected override IEnumerable<TernaryButton> CreateTernaryButtons()
+        protected override Drawable CreateHitObjectInspector() => new CatchHitObjectInspector(DistanceSnapProvider);
+
+        protected override IEnumerable<Drawable> CreateTernaryButtons()
             => base.CreateTernaryButtons()
                    .Concat(DistanceSnapProvider.CreateTernaryButtons());
 

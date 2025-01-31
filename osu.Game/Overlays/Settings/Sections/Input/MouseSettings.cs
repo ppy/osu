@@ -57,10 +57,11 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                     LabelText = MouseSettingsStrings.HighPrecisionMouse,
                     TooltipText = MouseSettingsStrings.HighPrecisionMouseTooltip,
                     Current = relativeMode,
-                    Keywords = new[] { @"raw", @"input", @"relative", @"cursor" }
+                    Keywords = new[] { @"raw", @"input", @"relative", @"cursor", "sensitivity", "speed", "velocity" },
                 },
                 new SensitivitySetting
                 {
+                    Keywords = new[] { "speed", "velocity" },
                     LabelText = MouseSettingsStrings.CursorSensitivity,
                     Current = localSensitivity
                 },

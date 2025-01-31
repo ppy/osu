@@ -64,11 +64,11 @@ namespace osu.Game.Rulesets.Mania.Edit
                 return;
 
             List<ManiaHitObject> remainingHitObjects = EditorBeatmap.HitObjects.Cast<ManiaHitObject>().Where(h => h.StartTime >= timestamp).ToList();
-            string[] objectDescriptions = objectDescription.Split(',').ToArray();
+            string[] objectDescriptions = objectDescription.Split(',');
 
             for (int i = 0; i < objectDescriptions.Length; i++)
             {
-                string[] split = objectDescriptions[i].Split('|').ToArray();
+                string[] split = objectDescriptions[i].Split('|');
                 if (split.Length != 2)
                     continue;
 
@@ -92,7 +92,7 @@ namespace osu.Game.Rulesets.Mania.Edit
             base.Update();
 
             if (screenWithTimeline?.TimelineArea.Timeline != null)
-                drawableRuleset.TimelineTimeRange = EditorClock.TrackLength / screenWithTimeline.TimelineArea.Timeline.CurrentZoom / 2;
+                drawableRuleset.TimelineTimeRange = EditorClock.TrackLength / screenWithTimeline.TimelineArea.Timeline.CurrentZoom.Value / 2;
         }
     }
 }

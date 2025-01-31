@@ -5,11 +5,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Rulesets.Difficulty;
+using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Scoring;
-using osu.Game.Utils;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty
 {
@@ -42,18 +42,18 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             if (totalSuccessfulHits > 0)
                 effectiveMissCount = Math.Max(1.0, 1000.0 / totalSuccessfulHits) * countMiss;
 
-            // TODO: The detection of rulesets is temporary until the leftover old skills have been reworked.
+            // Converts are detected and omitted from mod-specific bonuses due to the scope of current difficulty calculation.
             bool isConvert = score.BeatmapInfo!.Ruleset.OnlineID != 1;
 
             double multiplier = 1.13;
 
-            if (score.Mods.Any(m => m is ModHidden))
+            if (score.Mods.Any(m => m is ModHidden) && !isConvert)
                 multiplier *= 1.075;
 
             if (score.Mods.Any(m => m is ModEasy))
-                multiplier *= 0.975;
+                multiplier *= 0.950;
 
-            double difficultyValue = computeDifficultyValue(score, taikoAttributes, isConvert);
+            double difficultyValue = computeDifficultyValue(score, taikoAttributes);
             double accuracyValue = computeAccuracyValue(score, taikoAttributes, isConvert);
             double totalValue =
                 Math.Pow(
@@ -71,9 +71,12 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             };
         }
 
-        private double computeDifficultyValue(ScoreInfo score, TaikoDifficultyAttributes attributes, bool isConvert)
+        private double computeDifficultyValue(ScoreInfo score, TaikoDifficultyAttributes attributes)
         {
-            double difficultyValue = Math.Pow(5 * Math.Max(1.0, attributes.StarRating / 0.115) - 4.0, 2.25) / 1150.0;
+            double baseDifficulty = 5 * Math.Max(1.0, attributes.StarRating / 0.110) - 4.0;
+            double difficultyValue = Math.Min(Math.Pow(baseDifficulty, 3) / 69052.51, Math.Pow(baseDifficulty, 2.25) / 1250.0);
+
+            difficultyValue *= 1 + 0.10 * Math.Max(0, attributes.StarRating - 10);
 
             double lengthBonus = 1 + 0.1 * Math.Min(1.0, totalHits / 1500.0);
             difficultyValue *= lengthBonus;
@@ -81,21 +84,22 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             difficultyValue *= Math.Pow(0.986, effectiveMissCount);
 
             if (score.Mods.Any(m => m is ModEasy))
-                difficultyValue *= 0.985;
+                difficultyValue *= 0.90;
 
-            if (score.Mods.Any(m => m is ModHidden) && !isConvert)
+            if (score.Mods.Any(m => m is ModHidden))
                 difficultyValue *= 1.025;
 
-            if (score.Mods.Any(m => m is ModHardRock))
-                difficultyValue *= 1.10;
-
             if (score.Mods.Any(m => m is ModFlashlight<TaikoHitObject>))
-                difficultyValue *= 1.050 * lengthBonus;
+                difficultyValue *= Math.Max(1, 1.050 - Math.Min(attributes.MonoStaminaFactor / 50, 1) * lengthBonus);
 
             if (estimatedUnstableRate == null)
                 return 0;
 
-            return difficultyValue * Math.Pow(SpecialFunctions.Erf(400 / (Math.Sqrt(2) * estimatedUnstableRate.Value)), 2.0);
+            // Scale accuracy more harshly on nearly-completely mono (single coloured) speed maps.
+            double accScalingExponent = 2 + attributes.MonoStaminaFactor;
+            double accScalingShift = 500 - 100 * (attributes.MonoStaminaFactor * 3);
+
+            return difficultyValue * Math.Pow(DifficultyCalculationUtils.Erf(accScalingShift / (Math.Sqrt(2) * estimatedUnstableRate.Value)), accScalingExponent);
         }
 
         private double computeAccuracyValue(ScoreInfo score, TaikoDifficultyAttributes attributes, bool isConvert)
@@ -121,56 +125,21 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         /// </summary>
         private double? computeDeviationUpperBound(TaikoDifficultyAttributes attributes)
         {
-            if (totalSuccessfulHits == 0 || attributes.GreatHitWindow <= 0)
+            if (countGreat == 0 || attributes.GreatHitWindow <= 0)
                 return null;
-
-            double h300 = attributes.GreatHitWindow;
-            double h100 = attributes.OkHitWindow;
 
             const double z = 2.32634787404; // 99% critical value for the normal distribution (one-tailed).
 
-            // The upper bound on deviation, calculated with the ratio of 300s to objects, and the great hit window.
-            double? calcDeviationGreatWindow()
-            {
-                if (countGreat == 0) return null;
+            double n = totalHits;
 
-                double n = totalHits;
+            // Proportion of greats hit.
+            double p = countGreat / n;
 
-                // Proportion of greats hit.
-                double p = countGreat / n;
+            // We can be 99% confident that p is at least this value.
+            double pLowerBound = (n * p + z * z / 2) / (n + z * z) - z / (n + z * z) * Math.Sqrt(n * p * (1 - p) + z * z / 4);
 
-                // We can be 99% confident that p is at least this value.
-                double pLowerBound = (n * p + z * z / 2) / (n + z * z) - z / (n + z * z) * Math.Sqrt(n * p * (1 - p) + z * z / 4);
-
-                // We can be 99% confident that the deviation is not higher than:
-                return h300 / (Math.Sqrt(2) * SpecialFunctions.ErfInv(pLowerBound));
-            }
-
-            // The upper bound on deviation, calculated with the ratio of 300s + 100s to objects, and the good hit window.
-            // This will return a lower value than the first method when the number of 100s is high, but the miss count is low.
-            double? calcDeviationGoodWindow()
-            {
-                if (totalSuccessfulHits == 0) return null;
-
-                double n = totalHits;
-
-                // Proportion of greats + goods hit.
-                double p = totalSuccessfulHits / n;
-
-                // We can be 99% confident that p is at least this value.
-                double pLowerBound = (n * p + z * z / 2) / (n + z * z) - z / (n + z * z) * Math.Sqrt(n * p * (1 - p) + z * z / 4);
-
-                // We can be 99% confident that the deviation is not higher than:
-                return h100 / (Math.Sqrt(2) * SpecialFunctions.ErfInv(pLowerBound));
-            }
-
-            double? deviationGreatWindow = calcDeviationGreatWindow();
-            double? deviationGoodWindow = calcDeviationGoodWindow();
-
-            if (deviationGreatWindow is null)
-                return deviationGoodWindow;
-
-            return Math.Min(deviationGreatWindow.Value, deviationGoodWindow!.Value);
+            // We can be 99% confident that the deviation is not higher than:
+            return attributes.GreatHitWindow / (Math.Sqrt(2) * DifficultyCalculationUtils.ErfInv(pLowerBound));
         }
 
         private int totalHits => countGreat + countOk + countMeh + countMiss;
