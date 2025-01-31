@@ -27,8 +27,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         private Vector2 baseSize;
 
-        private readonly SkinnableDrawable spinnerBody;
-
         private readonly Container<DrawableSwellTick> ticks;
 
         private double? lastPressHandleTime;
@@ -50,22 +48,15 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         {
             FillMode = FillMode.Fit;
 
-            Content.Add(spinnerBody = new SkinnableDrawable(new TaikoSkinComponentLookup(TaikoSkinComponents.SwellBody), _ => new DefaultSwell())
+            AddInternal(ticks = new Container<DrawableSwellTick> { RelativeSizeAxes = Axes.Both });
+        }
+
+        protected override SkinnableDrawable CreateMainPiece() => new SkinnableDrawable(new TaikoSkinComponentLookup(TaikoSkinComponents.SwellBody),
+            _ => new DefaultSwell
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 RelativeSizeAxes = Axes.Both,
-            });
-
-            AddInternal(ticks = new Container<DrawableSwellTick> { RelativeSizeAxes = Axes.Both });
-        }
-
-        protected override SkinnableDrawable CreateMainPiece() => new SkinnableDrawable(new TaikoSkinComponentLookup(TaikoSkinComponents.SwellCirclePiece),
-            _ => new SwellCirclePiece
-            {
-                // to allow for rotation transform
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
             });
 
         protected override void RecreatePieces()
@@ -132,7 +123,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
                 int numHits = ticks.Count(r => r.IsHit);
 
-                (spinnerBody.Drawable as ISkinnableSwell)?.AnimateSwellProgress(this, numHits, MainPiece);
+                (MainPiece.Drawable as ISkinnableSwell)?.AnimateSwellProgress(this, numHits);
 
                 if (numHits == HitObject.RequiredHits)
                     ApplyMaxResult();
@@ -167,7 +158,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         {
             base.UpdateStartTimeStateTransforms();
 
-            (spinnerBody.Drawable as ISkinnableSwell)?.AnimateSwellStart(this, MainPiece);
+            (MainPiece.Drawable as ISkinnableSwell)?.AnimateSwellStart(this);
         }
 
         protected override void UpdateHitStateTransforms(ArmedState state)
@@ -187,7 +178,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                     LifetimeEnd = Time.Current + clear_animation_duration;
                     HandleUserInput = false;
 
-                    (spinnerBody.Drawable as ISkinnableSwell)?.AnimateSwellCompletion(state, MainPiece);
+                    (MainPiece.Drawable as ISkinnableSwell)?.AnimateSwellCompletion(state);
                     break;
             }
         }

@@ -71,12 +71,6 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 
                         return null;
 
-                    case TaikoSkinComponents.SwellCirclePiece:
-                        if (GetTexture("spinner-circle") != null)
-                            return new LegacySwellCirclePiece();
-
-                        return null;
-
                     case TaikoSkinComponents.HitTarget:
                         if (GetTexture("taikobigcircle") != null)
                             return new TaikoLegacyHitTarget();
