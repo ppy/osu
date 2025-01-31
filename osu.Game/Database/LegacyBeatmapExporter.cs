@@ -141,7 +141,7 @@ namespace osu.Game.Database
                     // however, the Bézier path as output by the converter has multiple segments.
                     // `LegacyBeatmapEncoder` will attempt to encode this by emitting per-control-point curve type specs which don't do anything for stable.
                     // instead, stable expects control points that start a segment to be present in the path twice in succession.
-                    if (convertedPoint.Type == PathType.BEZIER)
+                    if (convertedPoint.Type == PathType.BEZIER && i > 0)
                         hasPath.Path.ControlPoints.Add(new PathControlPoint(position));
                 }
             }
