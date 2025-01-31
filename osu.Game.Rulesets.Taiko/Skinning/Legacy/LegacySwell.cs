@@ -12,11 +12,14 @@ using osu.Framework.Audio.Sample;
 using osu.Game.Audio;
 using osuTK;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Framework.Extensions.ObjectExtensions;
 
 namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 {
-    public partial class LegacySwell : Container, ISkinnableSwell
+    public partial class LegacySwell : Container
     {
+        private DrawableSwell drawableSwell = null!;
+
         private Container bodyContainer = null!;
         private Sprite warning = null!;
         private Sprite spinnerCircle = null!;
@@ -35,7 +38,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
         }
 
         [BackgroundDependencyLoader]
-        private void load(ISkinSource skin, SkinManager skinManager)
+        private void load(DrawableHitObject hitObject, ISkinSource skin, SkinManager skinManager)
         {
             Child = new Container
             {
@@ -96,49 +99,71 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                 }
             };
 
+            drawableSwell = (DrawableSwell)hitObject;
+            drawableSwell.UpdateHitProgress += animateSwellProgress;
+            drawableSwell.ApplyCustomUpdateState += updateStateTransforms;
             clearSample = skin.GetSample(new SampleInfo("spinner-osu"));
         }
 
-        public void AnimateSwellProgress(DrawableTaikoHitObject<Swell> swell, int numHits)
+        private void animateSwellProgress(int numHits, int requiredHits)
         {
-            remainingHitsCountdown.Text = $"{swell.HitObject.RequiredHits - numHits}";
+            remainingHitsCountdown.Text = $"{requiredHits - numHits}";
             spinnerCircle.RotateTo(180f * numHits, 1000, Easing.OutQuint);
         }
 
-        public void AnimateSwellCompletion(ArmedState state)
+        private void updateStateTransforms(DrawableHitObject drawableHitObject, ArmedState state)
         {
-            const double clear_transition_duration = 300;
+            if (!(drawableHitObject is DrawableSwell drawableSwell))
+                return;
 
-            bodyContainer.FadeOut(clear_transition_duration, Easing.OutQuad);
+            Swell swell = drawableSwell.HitObject;
 
-            if (state == ArmedState.Hit)
+            using (BeginAbsoluteSequence(swell.StartTime))
             {
-                if (!samplePlayed)
+                if (state == ArmedState.Idle)
                 {
-                    clearSample?.Play();
-                    samplePlayed = true;
+                    remainingHitsCountdown.Text = $"{swell.RequiredHits}";
+                    samplePlayed = false;
                 }
 
-                clearAnimation
-                    .FadeIn(clear_transition_duration, Easing.InQuad)
-                    .ScaleTo(0.8f, clear_transition_duration, Easing.InQuad)
-                    .Delay(700).FadeOut(200, Easing.OutQuad);
+                const double body_transition_duration = 100;
+
+                warning.FadeOut(body_transition_duration);
+                bodyContainer.FadeIn(body_transition_duration);
+                shrinkingRing.ResizeTo(0.1f, swell.Duration);
+            }
+
+            using (BeginAbsoluteSequence(drawableSwell.HitStateUpdateTime))
+            {
+                const double clear_transition_duration = 300;
+
+                bodyContainer.FadeOut(clear_transition_duration, Easing.OutQuad);
+
+                if (state == ArmedState.Hit)
+                {
+                    if (!samplePlayed)
+                    {
+                        clearSample?.Play();
+                        samplePlayed = true;
+                    }
+
+                    clearAnimation
+                        .FadeIn(clear_transition_duration, Easing.InQuad)
+                        .ScaleTo(0.8f, clear_transition_duration, Easing.InQuad)
+                        .Delay(700).FadeOut(200, Easing.OutQuad);
+                }
             }
         }
 
-        public void AnimateSwellStart(DrawableTaikoHitObject<Swell> swell)
+        protected override void Dispose(bool isDisposing)
         {
-            if (swell.IsHit == false)
+            base.Dispose(isDisposing);
+
+            if (drawableSwell.IsNotNull())
             {
-                remainingHitsCountdown.Text = $"{swell.HitObject.RequiredHits}";
-                samplePlayed = false;
+                drawableSwell.UpdateHitProgress -= animateSwellProgress;
+                drawableSwell.ApplyCustomUpdateState -= updateStateTransforms;
             }
-
-            const double body_transition_duration = 100;
-
-            warning.FadeOut(body_transition_duration);
-            bodyContainer.FadeIn(body_transition_duration);
-            shrinkingRing.ResizeTo(0.1f, swell.HitObject.Duration);
         }
     }
 }

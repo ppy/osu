@@ -38,6 +38,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         /// </summary>
         public bool MustAlternate { get; internal set; } = true;
 
+        public event Action<int, int> UpdateHitProgress;
+
         public DrawableSwell()
             : this(null)
         {
@@ -123,7 +125,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
                 int numHits = ticks.Count(r => r.IsHit);
 
-                (MainPiece.Drawable as ISkinnableSwell)?.AnimateSwellProgress(this, numHits);
+                UpdateHitProgress?.Invoke(numHits, HitObject.RequiredHits);
 
                 if (numHits == HitObject.RequiredHits)
                     ApplyMaxResult();
@@ -158,7 +160,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         {
             base.UpdateStartTimeStateTransforms();
 
-            (MainPiece.Drawable as ISkinnableSwell)?.AnimateSwellStart(this);
         }
 
         protected override void UpdateHitStateTransforms(ArmedState state)
@@ -178,7 +179,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                     LifetimeEnd = Time.Current + clear_animation_duration;
                     HandleUserInput = false;
 
-                    (MainPiece.Drawable as ISkinnableSwell)?.AnimateSwellCompletion(state);
                     break;
             }
         }
