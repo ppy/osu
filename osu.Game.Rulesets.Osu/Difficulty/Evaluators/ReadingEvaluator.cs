@@ -26,9 +26,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             var currObj = (OsuDifficultyHitObject)current;
 
-            // Apollo didn't pass in clockrate and I don't know how so we're stuck with this!!!
-            double clockRateEstimate = current.BaseObject.StartTime / currObj.StartTime;
-
             double noteDensityDifficulty = 1.0;
 
             foreach (var loopObj in retrievePastVisibleObjects(currObj))
@@ -38,7 +35,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 // Small distances means objects may be cheesed, so it doesn't matter whether they are arranged confusingly.
                 loopDifficulty *= DifficultyCalculationUtils.Logistic(-(loopObj.MinimumJumpDistance - 80) / 15);
 
-                double timeBetweenCurrAndLoopObj = (currObj.BaseObject.StartTime - loopObj.BaseObject.StartTime) / clockRateEstimate;
+                double timeBetweenCurrAndLoopObj = (currObj.BaseObject.StartTime - loopObj.BaseObject.StartTime) / current.ClockRate;
                 loopDifficulty *= getTimeNerfFactor(timeBetweenCurrAndLoopObj);
 
                 noteDensityDifficulty += loopDifficulty;
@@ -51,7 +48,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             if (mods.OfType<OsuModHidden>().Any())
             {
                 double currVelocity = currObj.LazyJumpDistance / currObj.StrainTime;
-                double timeSpentInvisible = getDurationSpentInvisible(currObj) / clockRateEstimate;
+                double timeSpentInvisible = getDurationSpentInvisible(currObj) / current.ClockRate;
                 // Nerf hidden difficulty less the more density difficulty you have
                 // We stop nerfing at density of 1 because there is a still an inherent hidden difficulty at low density
                 double timeDifficultyFactor = noteDensityDifficulty <= 1 ? 400 : 400 / noteDensityDifficulty;

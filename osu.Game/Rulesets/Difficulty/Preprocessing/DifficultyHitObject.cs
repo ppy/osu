@@ -21,6 +21,11 @@ namespace osu.Game.Rulesets.Difficulty.Preprocessing
         public int Count => difficultyHitObjects.Count;
 
         /// <summary>
+        /// >The rate at which the gameplay clock is run at.
+        /// </summary>
+        public readonly double ClockRate;
+
+        /// <summary>
         /// The index of this <see cref="DifficultyHitObject"/> in the list of all <see cref="DifficultyHitObject"/>s.
         /// </summary>
         public int Index;
@@ -64,6 +69,7 @@ namespace osu.Game.Rulesets.Difficulty.Preprocessing
             Index = index;
             BaseObject = hitObject;
             LastObject = lastObject;
+            ClockRate = clockRate;
             DeltaTime = (hitObject.StartTime - lastObject.StartTime) / clockRate;
             StartTime = hitObject.StartTime / clockRate;
             EndTime = hitObject.GetEndTime() / clockRate;
