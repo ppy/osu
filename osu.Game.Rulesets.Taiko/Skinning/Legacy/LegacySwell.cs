@@ -13,6 +13,7 @@ using osu.Game.Audio;
 using osuTK;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Framework.Extensions.ObjectExtensions;
+using System;
 
 namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 {
@@ -23,10 +24,10 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
         private Container bodyContainer = null!;
         private Sprite warning = null!;
         private Sprite spinnerCircle = null!;
-        private Sprite shrinkingRing = null!;
+        private Sprite approachCircle = null!;
         private Sprite clearAnimation = null!;
         private ISample? clearSample;
-        private LegacySpriteText remainingHitsCountdown = null!;
+        private LegacySpriteText remainingHitsText = null!;
 
         private bool samplePlayed;
 
@@ -40,6 +41,8 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
         [BackgroundDependencyLoader]
         private void load(DrawableHitObject hitObject, ISkinSource skin, SkinManager skinManager)
         {
+            var spinnerCircleProvider = skin.FindProvider(s => s.GetTexture("spinner-circle") != null);
+
             Child = new Container
             {
                 Anchor = Anchor.Centre,
@@ -49,7 +52,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                 {
                     warning = new Sprite
                     {
-                        Texture = skin.GetTexture("spinner-warning") ?? skinManager.DefaultClassicSkin.GetTexture("spinner-circle"),
+                        Texture = skin.GetTexture("spinner-warning"),
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Scale = skin.GetTexture("spinner-warning") != null ? Vector2.One : new Vector2(0.18f),
@@ -70,14 +73,14 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                                 Origin = Anchor.Centre,
                                 Scale = new Vector2(0.8f),
                             },
-                            shrinkingRing = new Sprite
+                            approachCircle = new Sprite
                             {
-                                Texture = skin.GetTexture("spinner-approachcircle") ?? skinManager.DefaultClassicSkin.GetTexture("spinner-approachcircle"),
+                                Texture = skin.GetTexture("spinner-approachcircle"),
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
-                                Scale = Vector2.One,
+                                Scale = new Vector2(1.86f * 0.8f),
                             },
-                            remainingHitsCountdown = new LegacySpriteText(LegacyFont.Combo)
+                            remainingHitsText = new LegacySpriteText(LegacyFont.Combo)
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
@@ -106,8 +109,14 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 
         private void animateSwellProgress(int numHits, int requiredHits)
         {
-            remainingHitsCountdown.Text = $"{requiredHits - numHits}";
-            spinnerCircle.RotateTo(180f * numHits, 1000, Easing.OutQuint);
+            remainingHitsText.Text = $"{requiredHits - numHits}";
+            remainingHitsText.ScaleTo(1.6f - 0.6f * ((float)numHits / requiredHits), 60, Easing.OutQuad);
+
+            spinnerCircle.ClearTransforms();
+            spinnerCircle
+                .RotateTo(180f * numHits, 1000, Easing.OutQuint)
+                .ScaleTo(Math.Min(0.94f, spinnerCircle.Scale.X + 0.02f))
+                .ScaleTo(0.8f, 400, Easing.OutQuad);
         }
 
         private void updateStateTransforms(DrawableHitObject drawableHitObject, ArmedState state)
@@ -121,7 +130,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
             {
                 if (state == ArmedState.Idle)
                 {
-                    remainingHitsCountdown.Text = $"{swell.RequiredHits}";
+                    remainingHitsText.Text = $"{swell.RequiredHits}";
                     samplePlayed = false;
                 }
 
@@ -129,14 +138,17 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 
                 warning.FadeOut(body_transition_duration);
                 bodyContainer.FadeIn(body_transition_duration);
-                shrinkingRing.ResizeTo(0.1f, swell.Duration);
+                approachCircle.ResizeTo(0.1f * 0.8f, swell.Duration);
             }
 
             using (BeginAbsoluteSequence(drawableSwell.HitStateUpdateTime))
             {
                 const double clear_transition_duration = 300;
+                const double clear_fade_in = 120;
 
-                bodyContainer.FadeOut(clear_transition_duration, Easing.OutQuad);
+                bodyContainer
+                    .FadeOut(clear_transition_duration, Easing.OutQuad)
+                    .ScaleTo(1.05f, clear_transition_duration, Easing.OutQuad);
 
                 if (state == ArmedState.Hit)
                 {
@@ -147,9 +159,13 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                     }
 
                     clearAnimation
-                        .FadeIn(clear_transition_duration, Easing.InQuad)
-                        .ScaleTo(0.8f, clear_transition_duration, Easing.InQuad)
-                        .Delay(700).FadeOut(200, Easing.OutQuad);
+                        .FadeIn(clear_fade_in)
+                        .MoveTo(new Vector2(320, 240))
+                        .ScaleTo(0.4f)
+                        .MoveTo(new Vector2(320, 150), clear_fade_in * 2, Easing.OutQuad)
+                        .ScaleTo(1f, clear_fade_in * 2, Easing.Out)
+                        .Delay(clear_fade_in * 3)
+                        .FadeOut(clear_fade_in * 2.5);
                 }
             }
         }
