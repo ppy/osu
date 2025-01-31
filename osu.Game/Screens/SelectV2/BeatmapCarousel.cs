@@ -102,23 +102,15 @@ namespace osu.Game.Screens.SelectV2
             switch (model)
             {
                 case GroupDefinition group:
-                    if (lastSelectedGroup != null)
-                        setVisibilityOfGroupItems(lastSelectedGroup, false);
-
-                    // Collapsing an open group.
+                    // Special case – collapsing an open group.
                     if (lastSelectedGroup == group)
                     {
+                        setVisibilityOfGroupItems(lastSelectedGroup, false);
                         lastSelectedGroup = null;
                         return false;
                     }
 
-                    lastSelectedGroup = group;
-
-                    setVisibilityOfGroupItems(group, true);
-
-                    // In stable, you can kinda select a group (expand without changing selection)
-                    // For simplicity, let's not do that for now and handle similar to a beatmap set header.
-                    CurrentSelection = grouping.GroupItems[group].First().Model;
+                    setVisibleGroup(group);
                     return false;
 
                 case BeatmapSetInfo setInfo:
@@ -127,26 +119,50 @@ namespace osu.Game.Screens.SelectV2
                     return false;
 
                 case BeatmapInfo beatmapInfo:
-                    if (lastSelectedBeatmap != null)
-                        setVisibilityOfSetItems(lastSelectedBeatmap.BeatmapSet!, false);
-                    lastSelectedBeatmap = beatmapInfo;
 
                     // If we have groups, we need to account for them.
-                    if (grouping.GroupItems.Count > 0)
+                    if (Criteria.SplitOutDifficulties)
                     {
                         // Find the containing group. There should never be too many groups so iterating is efficient enough.
-                        var group = grouping.GroupItems.Single(kvp => kvp.Value.Any(i => ReferenceEquals(i.Model, beatmapInfo))).Key;
-                        setVisibilityOfGroupItems(group, true);
+                        GroupDefinition group = grouping.GroupItems.Single(kvp => kvp.Value.Any(i => ReferenceEquals(i.Model, beatmapInfo))).Key;
+
+                        setVisibleGroup(group);
                     }
                     else
-                        setVisibilityOfSetItems(beatmapInfo.BeatmapSet!, true);
+                    {
+                        setVisibleSet(beatmapInfo);
+                    }
 
-                    // Ensure the group containing this beatmap is also visible.
-                    // TODO: need to update visibility of correct group?
                     return true;
             }
 
             return true;
+        }
+
+        protected override bool CheckValidForGroupSelection(CarouselItem item)
+        {
+            switch (item.Model)
+            {
+                case BeatmapSetInfo:
+                    return true;
+
+                case BeatmapInfo:
+                    return Criteria.SplitOutDifficulties;
+
+                case GroupDefinition:
+                    return false;
+
+                default:
+                    throw new ArgumentException($"Unsupported model type {item.Model}");
+            }
+        }
+
+        private void setVisibleGroup(GroupDefinition group)
+        {
+            if (lastSelectedGroup != null)
+                setVisibilityOfGroupItems(lastSelectedGroup, false);
+            lastSelectedGroup = group;
+            setVisibilityOfGroupItems(group, true);
         }
 
         private void setVisibilityOfGroupItems(GroupDefinition group, bool visible)
@@ -156,6 +172,14 @@ namespace osu.Game.Screens.SelectV2
                 foreach (var i in items)
                     i.IsVisible = visible;
             }
+        }
+
+        private void setVisibleSet(BeatmapInfo beatmapInfo)
+        {
+            if (lastSelectedBeatmap != null)
+                setVisibilityOfSetItems(lastSelectedBeatmap.BeatmapSet!, false);
+            lastSelectedBeatmap = beatmapInfo;
+            setVisibilityOfSetItems(beatmapInfo.BeatmapSet!, true);
         }
 
         private void setVisibilityOfSetItems(BeatmapSetInfo set, bool visible)

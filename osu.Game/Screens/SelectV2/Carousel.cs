@@ -169,6 +169,13 @@ namespace osu.Game.Screens.SelectV2
             scroll.Panels.SingleOrDefault(p => ((ICarouselPanel)p).Item == item);
 
         /// <summary>
+        /// When a user is traversing the carousel via group selection keys, assert whether the item provided is a valid target.
+        /// </summary>
+        /// <param name="item">The candidate item.</param>
+        /// <returns>Whether the provided item is a valid group target. If <c>false</c>, more panels will be checked in the user's requested direction until a valid target is found.</returns>
+        protected virtual bool CheckValidForGroupSelection(CarouselItem item) => true;
+
+        /// <summary>
         /// Called when an item is "selected".
         /// </summary>
         /// <returns>Whether the item should be selected.</returns>
@@ -373,7 +380,7 @@ namespace osu.Game.Screens.SelectV2
             // make sure to go back to the group header this item belongs to, so that the block below doesn't find it and stop too early.
             if (isGroupSelection && direction < 0)
             {
-                while (!carouselItems[selectionIndex].IsGroupSelectionTarget)
+                while (!CheckValidForGroupSelection(carouselItems[selectionIndex]))
                     selectionIndex--;
             }
 
@@ -394,7 +401,11 @@ namespace osu.Game.Screens.SelectV2
 
             bool attemptSelection(CarouselItem item)
             {
-                if (!item.IsVisible || (isGroupSelection && !item.IsGroupSelectionTarget))
+                // Keyboard (non-group) selection should only consider visible items.
+                if (!isGroupSelection && !item.IsVisible)
+                    return false;
+
+                if (isGroupSelection && !CheckValidForGroupSelection(item))
                     return false;
 
                 if (isGroupSelection)
@@ -427,8 +438,9 @@ namespace osu.Game.Screens.SelectV2
 
                 currentKeyboardSelection = new Selection(model);
                 currentSelection = currentKeyboardSelection;
-                selectionValid.Invalidate();
             }
+
+            selectionValid.Invalidate();
         }
 
         private void setKeyboardSelection(object? model)
