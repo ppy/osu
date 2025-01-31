@@ -230,6 +230,44 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddAssert("filter request not fired", () => !received);
         }
 
+        [Test]
+        public void TestDifficultySliderKeyHandling()
+        {
+            bool searchFocused = false;
+
+            AddStep("setup", () =>
+            {
+                searchFocused = false;
+                control.OnSearchTextBoxFocus = () => searchFocused = true;
+                control.Activate(); // Make search box active
+            });
+
+            AddStep("type abc", () =>
+            {
+                InputManager.Key(Key.A);
+                InputManager.Key(Key.B);
+                InputManager.Key(Key.C);
+            });
+            AddAssert("search focused", () => searchFocused);
+
+            AddStep("focus difficulty slider", () =>
+            {
+                var slider = control.ChildrenOfType<FilterControl.DifficultyRangeSlider>().Single();
+                var nub = slider.ChildrenOfType<Nub>().First();
+                InputManager.MoveMouseTo(nub);
+                InputManager.Click(MouseButton.Left);
+            });
+            AddStep("press left key", () => InputManager.Key(Key.Left));
+            AddStep("press right key", () => InputManager.Key(Key.Right));
+            AddStep("type def", () =>
+            {
+                InputManager.Key(Key.D);
+                InputManager.Key(Key.E);
+                InputManager.Key(Key.F);
+            });
+            AddUntilStep("search box returned focus", () => control.ChildrenOfType<SearchTextBox>().Single().HasFocus);
+        }
+
         private void writeAndRefresh(Action<Realm> action) => Realm.Write(r =>
         {
             action(r);

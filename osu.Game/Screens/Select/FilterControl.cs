@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 #nullable disable
@@ -178,7 +178,7 @@ namespace osu.Game.Screens.Select
                                 Height = 40,
                                 Children = new Drawable[]
                                 {
-                                    new RangeSlider
+                                    new DifficultyRangeSlider(this)
                                     {
                                         Anchor = Anchor.TopLeft,
                                         Origin = Anchor.TopLeft,
@@ -235,8 +235,6 @@ namespace osu.Game.Screens.Select
             sortMode.BindValueChanged(_ => updateCriteria());
 
             searchTextBox.Current.ValueChanged += _ => updateCriteria();
-
-            updateCriteria();
         }
 
         public void Deactivate()
@@ -263,7 +261,18 @@ namespace osu.Game.Screens.Select
         private readonly Bindable<double> minimumStars = new BindableDouble();
         private readonly Bindable<double> maximumStars = new BindableDouble();
 
+        public Action OnSearchTextBoxFocus { get; set; }
+
         private void updateCriteria() => FilterChanged?.Invoke(currentCriteria = CreateCriteria());
+
+        private void handleSliderInteraction()
+        {
+            Schedule(() =>
+            {
+                GetContainingFocusManager()?.ChangeFocus(searchTextBox);
+                OnSearchTextBoxFocus?.Invoke();
+            });
+        }
 
         protected override bool OnClick(ClickEvent e) => true;
 
@@ -303,6 +312,48 @@ namespace osu.Game.Screens.Select
                     return false;
 
                 return base.OnPressed(e);
+            }
+        }
+
+        public partial class DifficultyRangeSlider : RangeSlider
+        {
+            private readonly FilterControl parent;
+            private readonly BindableBool hasFocus = new BindableBool();
+
+            public DifficultyRangeSlider(FilterControl parent)
+            {
+                this.parent = parent;
+                hasFocus.BindValueChanged(e =>
+                {
+                    if (!e.NewValue) // When focus is lost
+                        parent.handleSliderInteraction();
+                }, true);
+            }
+
+            protected override void OnFocus(FocusEvent e)
+            {
+                base.OnFocus(e);
+                hasFocus.Value = true;
+            }
+
+            protected override void OnFocusLost(FocusLostEvent e)
+            {
+                base.OnFocusLost(e);
+                hasFocus.Value = false;
+            }
+
+            protected override bool OnKeyDown(KeyDownEvent e)
+            {
+                switch (e.Key)
+                {
+                    case Key.Left:
+                    case Key.Right:
+                        return base.OnKeyDown(e);
+
+                    default:
+                        parent.handleSliderInteraction();
+                        return false;
+                }
             }
         }
     }
