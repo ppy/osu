@@ -121,7 +121,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 
         private void updateStateTransforms(DrawableHitObject drawableHitObject, ArmedState state)
         {
-            if (!(drawableHitObject is DrawableSwell drawableSwell))
+            if (!(drawableHitObject is DrawableSwell))
                 return;
 
             Swell swell = drawableSwell.HitObject;

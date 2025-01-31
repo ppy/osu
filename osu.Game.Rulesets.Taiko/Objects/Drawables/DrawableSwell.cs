@@ -156,12 +156,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             }
         }
 
-        protected override void UpdateStartTimeStateTransforms()
-        {
-            base.UpdateStartTimeStateTransforms();
-
-        }
-
         protected override void UpdateHitStateTransforms(ArmedState state)
         {
             switch (state)

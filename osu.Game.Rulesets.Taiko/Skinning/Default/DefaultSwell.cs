@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
                 Origin = Anchor.Centre,
                 RelativeSizeAxes = Axes.Both,
                 Depth = 1,
-                Children = new Drawable[]
+                Children = new[]
                 {
                     expandingRing = new CircularContainer
                     {
@@ -118,7 +118,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
 
         protected virtual Drawable CreateCentreCircle()
         {
-            return new SwellCirclePiece()
+            return new SwellCirclePiece
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -141,7 +141,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
 
         private void updateStateTransforms(DrawableHitObject drawableHitObject, ArmedState state)
         {
-            if (!(drawableHitObject is DrawableSwell drawableSwell))
+            if (!(drawableHitObject is DrawableSwell))
                 return;
 
             Swell swell = drawableSwell.HitObject;
