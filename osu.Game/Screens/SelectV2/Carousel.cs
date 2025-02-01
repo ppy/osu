@@ -131,7 +131,7 @@ namespace osu.Game.Screens.SelectV2
         ///
         /// A filter may add, mutate or remove items.
         /// </remarks>
-        protected IEnumerable<ICarouselFilter> Filters { get; init; } = Enumerable.Empty<ICarouselFilter>();
+        public IEnumerable<ICarouselFilter> Filters { get; init; } = Enumerable.Empty<ICarouselFilter>();
 
         /// <summary>
         /// All items which are to be considered for display in this carousel.
