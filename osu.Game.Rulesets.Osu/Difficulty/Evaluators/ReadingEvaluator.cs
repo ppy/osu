@@ -55,7 +55,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                 // Nerf preempt difficulty with density, lower density means more difficulty
                 // This is on the basis that in a high density environment you can rely more on patterns and muscle memory
-                preemptDifficulty /= rawDensityDifficulty;
+                // A side effect of this is hidden makes objects appear earlier, reducing high ar difficulty
+                preemptDifficulty /= 1.5 * Math.Sqrt(rawDensityDifficulty);
             }
 
             double noteDensityDifficulty = Math.Max(0, rawDensityDifficulty - 2.5); // Density difficulty begins at over 2.5 units
