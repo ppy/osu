@@ -6,13 +6,18 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
 using JetBrains.Annotations;
+using Microsoft.Extensions.Logging;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
+using osu.Framework.Logging;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Skinning.Default;
+using osu.Game.Rulesets.Taiko.UI;
 using osu.Game.Skinning;
 using osuTK;
 
@@ -37,6 +42,21 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         private bool validActionPressed;
 
         private double? lastPressHandleTime;
+
+        /// <summary>
+        /// Duration of the Fade-In time of the hit.
+        /// </summary>
+        private const double fade_in_duration = 5000;
+
+        /// <summary>
+        /// Opacity difference of fade-in effect between scroll speeds.
+        /// </summary>
+        private const double fade_in_curve_factor = 200;
+
+        /// <summary>
+        /// Minimum time between HitObject.StartTime and LifetimeStart.
+        /// </summary>
+        private const double min_start_time_delta = 90;
 
         private readonly Bindable<HitType> type = new Bindable<HitType>();
 
@@ -140,6 +160,21 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             if (e.Action == HitAction)
                 HitAction = null;
             base.OnReleased(e);
+        }
+
+        protected override void UpdateInitialTransforms()
+        {
+            double start_time_delta = HitObject.StartTime - LifetimeStart;
+            // scale Alpha value to adjust to stable's fade-in object opacity when LifetimeStart begins, being the first accessible time point in which changing Alpha is possible
+            Alpha = (float)(1d - Math.Exp(-(start_time_delta - min_start_time_delta) / fade_in_curve_factor));
+
+            Logger.Log($"time delta: {HitObject.StartTime - LifetimeStart}, LifetimeStart alpha value: {Alpha}");
+
+            using (BeginAbsoluteSequence(LifetimeStart))
+            {
+                // makes the fade-in effect negligible on low enough scroll speeds
+                this.FadeIn(fade_in_duration * (1 - Alpha));
+            }
         }
 
         protected override void UpdateHitStateTransforms(ArmedState state)
