@@ -25,8 +25,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 return 0;
 
             var currObj = (OsuDifficultyHitObject)current;
+            double currVelocity = currObj.LazyJumpDistance / currObj.StrainTime;
 
-            double noteDensityDifficulty = 1.0;
+            double rawDensityDifficulty = 1.0;
 
             foreach (var loopObj in retrievePastVisibleObjects(currObj))
             {
@@ -38,16 +39,31 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double timeBetweenCurrAndLoopObj = (currObj.BaseObject.StartTime - loopObj.BaseObject.StartTime) / current.ClockRate;
                 loopDifficulty *= getTimeNerfFactor(timeBetweenCurrAndLoopObj);
 
-                noteDensityDifficulty += loopDifficulty;
+                rawDensityDifficulty += loopDifficulty;
             }
 
-            noteDensityDifficulty = Math.Max(0, noteDensityDifficulty - 2.5); // Density difficulty begins at over 2.5 units
+            double preemptDifficulty = 0.0;
+
+            double currApproachRate = currObj.Preempt; // Approach rate in milliseconds
+
+            if (currApproachRate < 450)
+            {
+                preemptDifficulty += Math.Pow(450 - currApproachRate, 2.3) / 27000;
+
+                // Buff spacing.
+                preemptDifficulty *= currVelocity;
+
+                // Nerf preempt difficulty with density, lower density means more difficulty
+                // This is on the basis that in a high density environment you can rely more on patterns and muscle memory
+                preemptDifficulty /= rawDensityDifficulty;
+            }
+
+            double noteDensityDifficulty = Math.Max(0, rawDensityDifficulty - 2.5); // Density difficulty begins at over 2.5 units
 
             double hiddenDifficulty = 0;
 
             if (mods.OfType<OsuModHidden>().Any())
             {
-                double currVelocity = currObj.LazyJumpDistance / currObj.StrainTime;
                 double timeSpentInvisible = getDurationSpentInvisible(currObj) / current.ClockRate;
                 // Nerf hidden difficulty less the more density difficulty you have
                 // We stop nerfing at density of 1 because there is a still an inherent hidden difficulty at low density
@@ -57,20 +73,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                 // The longer an object is hidden, the more velocity should matter
                 hiddenDifficulty += (visibleObjectFactor + timeSpentInvisible * currVelocity) / timeDifficultyFactor;
-            }
-
-            double preemptDifficulty = 0.0;
-
-            double currApproachRate = currObj.Preempt; // Approach rate in milliseconds
-
-            if (currApproachRate < 480)
-            {
-                preemptDifficulty += Math.Pow(480 - currApproachRate, 1.5) / 800;
-
-                var prevObj = (OsuDifficultyHitObject)currObj.Previous(0);
-
-                // // Buff spacing.
-                // preemptDifficulty *= Math.Max(1, 0.3 * currVelocity);
             }
 
             // preemptDifficulty *= 0.2;
