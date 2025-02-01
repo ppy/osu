@@ -41,64 +41,63 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
         [BackgroundDependencyLoader]
         private void load(DrawableHitObject hitObject, ISkinSource skin, SkinManager skinManager)
         {
-            var spinnerCircleProvider = skin.FindProvider(s => s.GetTexture("spinner-circle") != null);
-
-            Child = new Container
+            Children = new Drawable[]
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-
-                Children = new Drawable[]
+                warning = new Sprite
                 {
-                    warning = new Sprite
-                    {
-                        Texture = skin.GetTexture("spinner-warning"),
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Scale = skin.GetTexture("spinner-warning") != null ? Vector2.One : new Vector2(0.18f),
-                    },
-                    bodyContainer = new Container
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Position = new Vector2(200f, 100f),
-                        Alpha = 0,
+                    Texture = skin.GetTexture("spinner-warning"),
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Scale = skin.GetTexture("spinner-warning") != null ? Vector2.One : new Vector2(0.18f),
+                },
+                new Container
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Position = new Vector2(200f, 100f),
 
-                        Children = new Drawable[]
+                    Children = new Drawable[]
+                    {
+                        bodyContainer = new Container
                         {
-                            spinnerCircle = new Sprite
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Alpha = 0,
+
+                            Children = new Drawable[]
                             {
-                                Texture = skin.GetTexture("spinner-circle"),
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                Scale = new Vector2(0.8f),
-                            },
-                            approachCircle = new Sprite
-                            {
-                                Texture = skin.GetTexture("spinner-approachcircle"),
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                Scale = new Vector2(1.86f * 0.8f),
-                            },
-                            remainingHitsText = new LegacySpriteText(LegacyFont.Combo)
-                            {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                Position = new Vector2(0f, 165f),
-                                Scale = Vector2.One,
-                            },
-                            clearAnimation = new Sprite
-                            {
-                                Texture = skin.GetTexture("spinner-osu"),
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                Position = new Vector2(0f, -165f),
-                                Scale = new Vector2(0.3f),
-                                Alpha = 0,
-                            },
-                        }
+                                spinnerCircle = new Sprite
+                                {
+                                    Texture = skin.GetTexture("spinner-circle"),
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    Scale = new Vector2(0.8f),
+                                },
+                                approachCircle = new Sprite
+                                {
+                                    Texture = skin.GetTexture("spinner-approachcircle"),
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    Scale = new Vector2(1.86f * 0.8f),
+                                },
+                                remainingHitsText = new LegacySpriteText(LegacyFont.Combo)
+                                {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    Position = new Vector2(0f, 165f),
+                                    Scale = Vector2.One,
+                                },
+                            }
+                        },
+                        clearAnimation = new Sprite
+                        {
+                            Texture = skin.GetTexture("spinner-osu"),
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Alpha = 0,
+                        },
                     },
-                }
+                },
             };
 
             drawableSwell = (DrawableSwell)hitObject;
@@ -110,7 +109,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
         private void animateSwellProgress(int numHits, int requiredHits)
         {
             remainingHitsText.Text = $"{requiredHits - numHits}";
-            remainingHitsText.ScaleTo(1.6f - 0.6f * ((float)numHits / requiredHits), 60, Easing.OutQuad);
+            remainingHitsText.ScaleTo(1.6f - (0.6f * ((float)numHits / requiredHits)), 60, Easing.OutQuad);
 
             spinnerCircle.ClearTransforms();
             spinnerCircle
@@ -160,9 +159,9 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 
                     clearAnimation
                         .FadeIn(clear_fade_in)
-                        .MoveTo(new Vector2(320, 240))
+                        .MoveTo(new Vector2(0, 0))
                         .ScaleTo(0.4f)
-                        .MoveTo(new Vector2(320, 150), clear_fade_in * 2, Easing.OutQuad)
+                        .MoveTo(new Vector2(0, -90), clear_fade_in * 2, Easing.OutQuad)
                         .ScaleTo(1f, clear_fade_in * 2, Easing.Out)
                         .Delay(clear_fade_in * 3)
                         .FadeOut(clear_fade_in * 2.5);
