@@ -12,7 +12,6 @@ using Microsoft.Extensions.Logging;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
-using osu.Framework.Logging;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
@@ -167,8 +166,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             double start_time_delta = HitObject.StartTime - LifetimeStart;
             // scale Alpha value to adjust to stable's fade-in object opacity when LifetimeStart begins, being the first accessible time point in which changing Alpha is possible
             Alpha = (float)(1d - Math.Exp(-(start_time_delta - min_start_time_delta) / fade_in_curve_factor));
-
-            Logger.Log($"time delta: {HitObject.StartTime - LifetimeStart}, LifetimeStart alpha value: {Alpha}");
 
             using (BeginAbsoluteSequence(LifetimeStart))
             {
