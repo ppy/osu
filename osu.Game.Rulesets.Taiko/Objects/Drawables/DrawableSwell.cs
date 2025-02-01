@@ -158,21 +158,19 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         protected override void UpdateHitStateTransforms(ArmedState state)
         {
+            base.UpdateHitStateTransforms(state);
+
             switch (state)
             {
                 case ArmedState.Idle:
-                    // Only for rewind support. Reallows user inputs if swell is rewound from being hit/missed to being idle.
-                    HandleUserInput = true;
                     break;
 
                 case ArmedState.Miss:
+                    this.Delay(300).FadeOut();
+                    break;
+
                 case ArmedState.Hit:
-                    const int clear_animation_duration = 1200;
-
-                    // Postpone drawable hitobject expiration until it has animated/faded out. Inputs on the object are disallowed during this delay.
-                    LifetimeEnd = Time.Current + clear_animation_duration;
-                    HandleUserInput = false;
-
+                    this.Delay(660).FadeOut();
                     break;
             }
         }
