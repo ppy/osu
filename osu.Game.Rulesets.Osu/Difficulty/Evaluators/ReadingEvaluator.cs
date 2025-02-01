@@ -77,7 +77,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 hiddenDifficulty += (visibleObjectFactor + timeSpentInvisible * currVelocity) / timeDifficultyFactor;
             }
 
-            // preemptDifficulty *= 0.2;
             double difficulty = preemptDifficulty + hiddenDifficulty * hidden_multiplier + noteDensityDifficulty;
 
             difficulty *= getConstantAngleNerfFactor(currObj);
