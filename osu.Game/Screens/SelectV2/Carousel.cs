@@ -309,19 +309,19 @@ namespace osu.Game.Screens.SelectV2
                     return true;
 
                 case GlobalAction.SelectNext:
-                    selectNext(1, isGroupSelection: false);
-                    return true;
-
-                case GlobalAction.SelectNextGroup:
-                    selectNext(1, isGroupSelection: true);
+                    traverseKeyboardSelection(1);
                     return true;
 
                 case GlobalAction.SelectPrevious:
-                    selectNext(-1, isGroupSelection: false);
+                    traverseKeyboardSelection(-1);
+                    return true;
+
+                case GlobalAction.SelectNextGroup:
+                    traverseGroupSelection(1);
                     return true;
 
                 case GlobalAction.SelectPreviousGroup:
-                    selectNext(-1, isGroupSelection: true);
+                    traverseGroupSelection(-1);
                     return true;
             }
 
@@ -332,89 +332,86 @@ namespace osu.Game.Screens.SelectV2
         {
         }
 
-        /// <summary>
-        /// Select the next valid selection relative to a current selection.
-        /// This is generally for keyboard based traversal.
-        /// </summary>
-        /// <param name="direction">Positive for downwards, negative for upwards.</param>
-        /// <param name="isGroupSelection">Whether the selection should traverse groups. Group selection updates the actual selection immediately, while non-group selection will only prepare a future keyboard selection.</param>
-        /// <returns>Whether selection was possible.</returns>
-        private bool selectNext(int direction, bool isGroupSelection)
+        private void traverseKeyboardSelection(int direction)
         {
-            // Ensure sanity
-            Debug.Assert(direction != 0);
-            direction = direction > 0 ? 1 : -1;
+            if (carouselItems == null || carouselItems.Count == 0) return;
 
-            if (carouselItems == null || carouselItems.Count == 0)
-                return false;
+            int originalIndex;
 
-            // If the user has a different keyboard selection and requests
-            // group selection, first transfer the keyboard selection to actual selection.
-            if (isGroupSelection && currentSelection.CarouselItem != currentKeyboardSelection.CarouselItem)
-            {
-                TryActivateSelection();
-                return true;
-            }
+            if (currentKeyboardSelection.Index != null)
+                originalIndex = currentKeyboardSelection.Index.Value;
+            else if (direction > 0)
+                originalIndex = carouselItems.Count - 1;
+            else
+                originalIndex = 0;
 
-            CarouselItem? selectionItem = currentKeyboardSelection.CarouselItem;
-            int selectionIndex = currentKeyboardSelection.Index ?? -1;
-
-            // To keep things simple, let's first handle the cases where there's no selection yet.
-            if (selectionItem == null || selectionIndex < 0)
-            {
-                // Start by selecting the first item.
-                selectionItem = carouselItems.First();
-                selectionIndex = 0;
-
-                // In the forwards case, immediately attempt selection of this panel.
-                // If selection fails, continue with standard logic to find the next valid selection.
-                if (direction > 0 && attemptSelection(selectionItem))
-                    return true;
-
-                // In the backwards direction we can just allow the selection logic to go ahead and loop around to the last valid.
-            }
-
-            Debug.Assert(selectionItem != null);
-
-            // As a second special case, if we're group selecting backwards and the current selection isn't a group,
-            // make sure to go back to the group header this item belongs to, so that the block below doesn't find it and stop too early.
-            if (isGroupSelection && direction < 0)
-            {
-                while (!CheckValidForGroupSelection(carouselItems[selectionIndex]))
-                    selectionIndex--;
-            }
-
-            CarouselItem? newItem;
+            int newIndex = originalIndex;
 
             // Iterate over every item back to the current selection, finding the first valid item.
             // The fail condition is when we reach the selection after a cyclic loop over every item.
             do
             {
-                selectionIndex += direction;
-                newItem = carouselItems[(selectionIndex + carouselItems.Count) % carouselItems.Count];
+                newIndex = (newIndex + direction + carouselItems.Count) % carouselItems.Count;
+                var newItem = carouselItems[newIndex];
 
-                if (attemptSelection(newItem))
-                    return true;
-            } while (newItem != selectionItem);
+                if (newItem.IsVisible)
+                {
+                    setKeyboardSelection(newItem.Model);
+                    return;
+                }
+            } while (newIndex != originalIndex);
+        }
 
-            return false;
+        /// <summary>
+        /// Select the next valid selection relative to a current selection.
+        /// This is generally for keyboard based traversal.
+        /// </summary>
+        /// <param name="direction">Positive for downwards, negative for upwards.</param>
+        /// <returns>Whether selection was possible.</returns>
+        private void traverseGroupSelection(int direction)
+        {
+            if (carouselItems == null || carouselItems.Count == 0) return;
 
-            bool attemptSelection(CarouselItem item)
+            // If the user has a different keyboard selection and requests
+            // group selection, first transfer the keyboard selection to actual selection.
+            if (currentSelection.CarouselItem != currentKeyboardSelection.CarouselItem)
             {
-                // Keyboard (non-group) selection should only consider visible items.
-                if (!isGroupSelection && !item.IsVisible)
-                    return false;
-
-                if (isGroupSelection && !CheckValidForGroupSelection(item))
-                    return false;
-
-                if (isGroupSelection)
-                    setSelection(item.Model);
-                else
-                    setKeyboardSelection(item.Model);
-
-                return true;
+                TryActivateSelection();
+                return;
             }
+
+            int originalIndex;
+
+            if (currentKeyboardSelection.Index != null)
+                originalIndex = currentKeyboardSelection.Index.Value;
+            else if (direction > 0)
+                originalIndex = carouselItems.Count - 1;
+            else
+                originalIndex = 0;
+
+            int newIndex = originalIndex;
+
+            // As a second special case, if we're group selecting backwards and the current selection isn't a group,
+            // make sure to go back to the group header this item belongs to, so that the block below doesn't find it and stop too early.
+            if (direction < 0)
+            {
+                while (!CheckValidForGroupSelection(carouselItems[newIndex]))
+                    newIndex--;
+            }
+
+            // Iterate over every item back to the current selection, finding the first valid item.
+            // The fail condition is when we reach the selection after a cyclic loop over every item.
+            do
+            {
+                newIndex = (newIndex + direction + carouselItems.Count) % carouselItems.Count;
+                var newItem = carouselItems[newIndex];
+
+                if (CheckValidForGroupSelection(newItem))
+                {
+                    setSelection(newItem.Model);
+                    return;
+                }
+            } while (newIndex != originalIndex);
         }
 
         #endregion
