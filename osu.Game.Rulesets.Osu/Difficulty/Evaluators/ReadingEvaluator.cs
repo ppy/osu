@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             if (currApproachRate < 450)
             {
-                preemptDifficulty += Math.Pow(450 - currApproachRate, 2.5) / 60000;
+                preemptDifficulty += Math.Pow(450 - currApproachRate, 2.5) / 50000.0;
 
                 // Buff spacing.
                 preemptDifficulty *= currVelocity;
