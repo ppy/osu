@@ -124,9 +124,10 @@ namespace osu.Game.Screens.SelectV2
                     if (Criteria.SplitOutDifficulties)
                     {
                         // Find the containing group. There should never be too many groups so iterating is efficient enough.
-                        GroupDefinition group = grouping.GroupItems.Single(kvp => kvp.Value.Any(i => ReferenceEquals(i.Model, beatmapInfo))).Key;
+                        GroupDefinition? group = grouping.GroupItems.SingleOrDefault(kvp => kvp.Value.Any(i => ReferenceEquals(i.Model, beatmapInfo))).Key;
 
-                        setVisibleGroup(group);
+                        if (group != null)
+                            setVisibleGroup(group);
                     }
                     else
                     {
