@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
     public static class ReadingEvaluator
     {
         private const double reading_window_size = 3000;
-        private const double hidden_multiplier = 0.75;
+        private const double hidden_multiplier = 0.8;
 
         public static double EvaluateDifficultyOf(DifficultyHitObject current, IReadOnlyList<Mod> mods)
         {
@@ -46,9 +46,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             double currApproachRate = currObj.Preempt; // Approach rate in milliseconds
 
-            if (currApproachRate < 425)
+            if (currApproachRate < 450)
             {
-                preemptDifficulty += Math.Pow(425 - currApproachRate, 2.6) / 60000.0;
+                preemptDifficulty += Math.Pow(450 - currApproachRate, 2.1) / 14000.0;
 
                 // Buff spacing.
                 preemptDifficulty *= currVelocity;
@@ -69,7 +69,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double timeSpentInvisible = getDurationSpentInvisible(currObj) / current.ClockRate;
                 // Nerf hidden difficulty less the more density difficulty you have
                 // We stop nerfing at density of 1 because there is a still an inherent hidden difficulty at low density
-                double timeDifficultyFactor = noteDensityDifficulty <= 1 ? 400 : 400 / noteDensityDifficulty;
+                double timeDifficultyFactor = noteDensityDifficulty <= 1 ? 500 : 500 / noteDensityDifficulty;
 
                 double visibleObjectFactor = Math.Clamp(retrieveCurrentVisibleObjects(currObj).Count - 2, 0, 15);
 
