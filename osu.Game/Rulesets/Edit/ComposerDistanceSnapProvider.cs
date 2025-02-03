@@ -283,9 +283,6 @@ namespace osu.Game.Rulesets.Edit
             return distance / GetBeatSnapDistance(withVelocity) * beatLength;
         }
 
-        public virtual double FindSnappedDuration(float distance, double snapReferenceTime, IHasSliderVelocity? withVelocity = null)
-            => beatSnapProvider.SnapTime(snapReferenceTime + DistanceToDuration(distance, snapReferenceTime, withVelocity), snapReferenceTime) - snapReferenceTime;
-
         public virtual float FindSnappedDistance(float distance, double snapReferenceTime, IHasSliderVelocity? withVelocity = null)
         {
             double actualDuration = snapReferenceTime + DistanceToDuration(distance, snapReferenceTime, withVelocity);

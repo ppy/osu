@@ -67,19 +67,6 @@ namespace osu.Game.Rulesets.Edit
         double DistanceToDuration(float distance, double timingReference, IHasSliderVelocity? withVelocity = null);
 
         /// <summary>
-        /// Converts a spatial distance into a temporal duration and then snaps said duration to the beat, relative to <see cref="snapReferenceTime"/>.
-        /// Depends on:
-        /// <list type="bullet">
-        /// <item>the <paramref name="distance"/> provided,</item>
-        /// <item>a <paramref name="snapReferenceTime"/> used to retrieve the beat length of the beatmap at that time,</item>
-        /// <item>the slider velocity taken from <paramref name="withVelocity"/>,</item>
-        /// <item>the beatmap's <see cref="IBeatmapDifficultyInfo.SliderMultiplier"/>,</item>,
-        /// <item>the current beat divisor.</item>
-        /// </list>
-        /// </summary>
-        double FindSnappedDuration(float distance, double snapReferenceTime, IHasSliderVelocity? withVelocity = null);
-
-        /// <summary>
         /// Snaps a spatial distance to the beat, relative to <see cref="snapReferenceTime"/>.
         /// Depends on:
         /// <list type="bullet">
