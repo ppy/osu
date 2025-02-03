@@ -87,22 +87,19 @@ namespace osu.Game.Screens.SelectV2
 
                     if (item.Model is BeatmapInfo beatmap)
                     {
-                        if (groupSetsTogether)
+                        bool newBeatmapSet = lastItem == null || (lastItem.Model is BeatmapInfo lastBeatmap && lastBeatmap.BeatmapSet!.ID != beatmap.BeatmapSet!.ID);
+
+                        if (newBeatmapSet)
                         {
-                            bool newBeatmapSet = lastItem == null || (lastItem.Model is BeatmapInfo lastBeatmap && lastBeatmap.BeatmapSet!.ID != beatmap.BeatmapSet!.ID);
-
-                            if (newBeatmapSet)
-                            {
-                                newItems.Insert(i, new CarouselItem(beatmap.BeatmapSet!) { DrawHeight = BeatmapSetPanel.HEIGHT });
-                                i++;
-                            }
-
-                            if (!setItems.TryGetValue(beatmap.BeatmapSet!, out var related))
-                                setItems[beatmap.BeatmapSet!] = related = new HashSet<CarouselItem>();
-
-                            related.Add(item);
-                            item.IsVisible = false;
+                            newItems.Insert(i, new CarouselItem(beatmap.BeatmapSet!) { DrawHeight = BeatmapSetPanel.HEIGHT });
+                            i++;
                         }
+
+                        if (!setItems.TryGetValue(beatmap.BeatmapSet!, out var related))
+                            setItems[beatmap.BeatmapSet!] = related = new HashSet<CarouselItem>();
+
+                        related.Add(item);
+                        item.IsVisible = false;
                     }
 
                     lastItem = item;
