@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using osu.Game.Beatmaps;
 using osu.Game.Screens.Select;
+using osu.Game.Screens.Select.Filter;
 
 namespace osu.Game.Screens.SelectV2
 {
@@ -35,70 +36,100 @@ namespace osu.Game.Screens.SelectV2
 
         public async Task<IEnumerable<CarouselItem>> Run(IEnumerable<CarouselItem> items, CancellationToken cancellationToken) => await Task.Run(() =>
         {
+            bool groupSetsTogether;
+
             setItems.Clear();
             groupItems.Clear();
 
             var criteria = getCriteria();
-
-            int starGroup = int.MinValue;
-
-            if (criteria.SplitOutDifficulties)
-            {
-                var diffItems = new List<CarouselItem>(items.Count());
-
-                GroupDefinition? group = null;
-
-                foreach (var item in items)
-                {
-                    var b = (BeatmapInfo)item.Model;
-
-                    if (b.StarRating > starGroup)
-                    {
-                        starGroup = (int)Math.Floor(b.StarRating);
-                        group = new GroupDefinition($"{starGroup} - {++starGroup} *");
-                        diffItems.Add(new CarouselItem(group) { DrawHeight = GroupPanel.HEIGHT });
-                    }
-
-                    if (!groupItems.TryGetValue(group!, out var related))
-                        groupItems[group!] = related = new HashSet<CarouselItem>();
-                    related.Add(item);
-
-                    diffItems.Add(item);
-
-                    item.IsVisible = false;
-                }
-
-                return diffItems;
-            }
-
-            CarouselItem? lastItem = null;
-
             var newItems = new List<CarouselItem>(items.Count());
 
-            foreach (var item in items)
+            // Add criteria groups.
+            switch (criteria.Group)
+            {
+                default:
+                    groupSetsTogether = true;
+                    newItems.AddRange(items);
+                    break;
+
+                case GroupMode.Difficulty:
+                    groupSetsTogether = false;
+                    int starGroup = int.MinValue;
+
+                    foreach (var item in items)
+                    {
+                        cancellationToken.ThrowIfCancellationRequested();
+
+                        var b = (BeatmapInfo)item.Model;
+
+                        if (b.StarRating > starGroup)
+                        {
+                            starGroup = (int)Math.Floor(b.StarRating);
+                            newItems.Add(new CarouselItem(new GroupDefinition($"{starGroup} - {++starGroup} *")) { DrawHeight = GroupPanel.HEIGHT });
+                        }
+
+                        newItems.Add(item);
+                    }
+
+                    break;
+            }
+
+            // Add set headers wherever required.
+            CarouselItem? lastItem = null;
+
+            if (groupSetsTogether)
+            {
+                for (int i = 0; i < newItems.Count; i++)
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                    var item = newItems[i];
+
+                    if (item.Model is BeatmapInfo beatmap)
+                    {
+                        if (groupSetsTogether)
+                        {
+                            bool newBeatmapSet = lastItem == null || (lastItem.Model is BeatmapInfo lastBeatmap && lastBeatmap.BeatmapSet!.ID != beatmap.BeatmapSet!.ID);
+
+                            if (newBeatmapSet)
+                            {
+                                newItems.Insert(i, new CarouselItem(beatmap.BeatmapSet!) { DrawHeight = BeatmapSetPanel.HEIGHT });
+                                i++;
+                            }
+
+                            if (!setItems.TryGetValue(beatmap.BeatmapSet!, out var related))
+                                setItems[beatmap.BeatmapSet!] = related = new HashSet<CarouselItem>();
+
+                            related.Add(item);
+                            item.IsVisible = false;
+                        }
+                    }
+
+                    lastItem = item;
+                }
+            }
+
+            // Link group items to their headers.
+            GroupDefinition? lastGroup = null;
+
+            foreach (var item in newItems)
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                if (item.Model is BeatmapInfo b)
+                if (item.Model is GroupDefinition group)
                 {
-                    // Add set header
-                    if (lastItem == null || (lastItem.Model is BeatmapInfo b2 && b2.BeatmapSet!.OnlineID != b.BeatmapSet!.OnlineID))
-                    {
-                        newItems.Add(new CarouselItem(b.BeatmapSet!)
-                        {
-                            DrawHeight = BeatmapSetPanel.HEIGHT,
-                        });
-                    }
-
-                    if (!setItems.TryGetValue(b.BeatmapSet!, out var related))
-                        setItems[b.BeatmapSet!] = related = new HashSet<CarouselItem>();
-                    related.Add(item);
+                    lastGroup = group;
+                    continue;
                 }
 
-                newItems.Add(item);
-                lastItem = item;
+                if (lastGroup != null)
+                {
+                    if (!groupItems.TryGetValue(lastGroup, out var groupRelated))
+                        groupItems[lastGroup] = groupRelated = new HashSet<CarouselItem>();
+                    groupRelated.Add(item);
 
-                item.IsVisible = false;
+                    item.IsVisible = false;
+                }
             }
 
             return newItems;
