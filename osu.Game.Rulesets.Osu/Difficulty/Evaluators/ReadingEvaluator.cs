@@ -59,7 +59,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 preemptDifficulty /= 1.5 * Math.Sqrt(rawDensityDifficulty);
             }
 
-            // Only award notes over 2.7 difficulty so we only buff denser than average maps
+            // Award only denser than average maps
             double noteDensityDifficulty = Math.Max(0, rawDensityDifficulty - 3.5);
 
             double hiddenDifficulty = 0;
