@@ -50,7 +50,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         public void TestSorting()
         {
             AddBeatmaps(10);
-            SortBy(new FilterCriteria { Sort = SortMode.Difficulty });
+            SortBy(new FilterCriteria { Group = GroupMode.Difficulty, Sort = SortMode.Difficulty });
             SortBy(new FilterCriteria { Sort = SortMode.Artist });
         }
 

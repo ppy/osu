@@ -20,7 +20,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             CreateCarousel();
 
-            SortBy(new FilterCriteria { Sort = SortMode.Difficulty });
+            SortBy(new FilterCriteria { Group = GroupMode.Difficulty, Sort = SortMode.Difficulty });
         }
 
         [Test]

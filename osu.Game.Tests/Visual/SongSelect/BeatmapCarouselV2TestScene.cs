@@ -130,7 +130,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             });
         }
 
-        protected void SortBy(FilterCriteria criteria) => AddStep($"sort by {criteria.Sort}", () => Carousel.Filter(criteria));
+        protected void SortBy(FilterCriteria criteria) => AddStep($"sort {criteria.Sort} group {criteria.Group}", () => Carousel.Filter(criteria));
 
         protected void WaitForDrawablePanels() => AddUntilStep("drawable panels loaded", () => Carousel.ChildrenOfType<ICarouselPanel>().Count(), () => Is.GreaterThan(0));
         protected void WaitForSorting() => AddUntilStep("sorting finished", () => Carousel.IsFiltering, () => Is.False);
