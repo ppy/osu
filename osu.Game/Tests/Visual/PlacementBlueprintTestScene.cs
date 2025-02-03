@@ -28,7 +28,7 @@ namespace osu.Game.Tests.Visual
             base.Content.Add(HitObjectContainer = CreateHitObjectContainer().With(c => c.Clock = new FramedClock(new StopwatchClock())));
             base.Content.Add(new MouseMovementInterceptor
             {
-                MouseMoved = updatePlacementTimeAndPosition,
+                MouseMoved = UpdatePlacementTimeAndPosition,
             });
         }
 
@@ -93,13 +93,10 @@ namespace osu.Game.Tests.Visual
             if (CurrentBlueprint.PlacementActive == PlacementBlueprint.PlacementState.Finished)
                 ResetPlacement();
 
-            updatePlacementTimeAndPosition();
+            UpdatePlacementTimeAndPosition();
         }
 
-        private void updatePlacementTimeAndPosition() => CurrentBlueprint.UpdateTimeAndPosition(SnapForBlueprint(CurrentBlueprint));
-
-        protected virtual SnapResult SnapForBlueprint(HitObjectPlacementBlueprint blueprint) =>
-            new SnapResult(InputManager.CurrentState.Mouse.Position, null);
+        protected virtual void UpdatePlacementTimeAndPosition() => CurrentBlueprint.UpdateTimeAndPosition(InputManager.CurrentState.Mouse.Position, 0);
 
         public override void Add(Drawable drawable)
         {
@@ -108,7 +105,7 @@ namespace osu.Game.Tests.Visual
             if (drawable is HitObjectPlacementBlueprint blueprint)
             {
                 blueprint.Show();
-                blueprint.UpdateTimeAndPosition(SnapForBlueprint(blueprint));
+                UpdatePlacementTimeAndPosition();
             }
         }
 

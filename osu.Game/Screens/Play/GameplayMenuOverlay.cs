@@ -166,11 +166,6 @@ namespace osu.Game.Screens.Play
 
         protected override void PopOut() => this.FadeOut(TRANSITION_DURATION, Easing.In);
 
-        // Don't let mouse down events through the overlay or people can click circles while paused.
-        protected override bool OnMouseDown(MouseDownEvent e) => true;
-
-        protected override bool OnMouseMove(MouseMoveEvent e) => true;
-
         protected void AddButton(LocalisableString text, Color4 colour, Action? action)
         {
             var button = new Button

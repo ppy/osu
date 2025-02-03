@@ -53,7 +53,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                             Current = { Disabled = true },
                             TabbableContentContainer = this,
                         },
-                        new FormNumberBox
+                        new FormNumberBox(allowDecimals: true)
                         {
                             Caption = "Number",
                             HintText = "Insert your favourite number",
