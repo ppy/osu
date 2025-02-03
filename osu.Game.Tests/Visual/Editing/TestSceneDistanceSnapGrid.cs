@@ -197,7 +197,7 @@ namespace osu.Game.Tests.Visual.Editing
 
             public double DistanceToDuration(float distance, double timingReference, IHasSliderVelocity withVelocity = null) => distance;
 
-            public float FindSnappedDistance(float distance, double snapReferenceTime, IHasSliderVelocity? withVelocity = null) => 0;
+            public float FindSnappedDistance(float distance, double snapReferenceTime, IHasSliderVelocity withVelocity = null) => 0;
         }
     }
 }

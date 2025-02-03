@@ -67,7 +67,7 @@ namespace osu.Game.Rulesets.Edit
         double DistanceToDuration(float distance, double timingReference, IHasSliderVelocity? withVelocity = null);
 
         /// <summary>
-        /// Snaps a spatial distance to the beat, relative to <see cref="snapReferenceTime"/>.
+        /// Snaps a spatial distance to the beat, relative to <paramref name="snapReferenceTime"/>.
         /// Depends on:
         /// <list type="bullet">
         /// <item>the <paramref name="distance"/> provided,</item>

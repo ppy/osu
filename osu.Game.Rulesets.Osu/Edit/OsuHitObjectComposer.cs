@@ -408,7 +408,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(targetOffset);
 
             int positionSourceObjectIndex = -1;
-            IHasSliderVelocity? sliderVelocitySource = null;
+            IHasSliderVelocity sliderVelocitySource = null;
 
             for (int i = 0; i < EditorBeatmap.HitObjects.Count; i++)
             {
