@@ -82,6 +82,20 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
+        public void TestGroupSelectionOnHeader()
+        {
+            AddBeatmaps(10, 3);
+            WaitForDrawablePanels();
+
+            SelectNextGroup();
+            WaitForGroupSelection(0, 0);
+
+            SelectPrevPanel();
+            SelectPrevGroup();
+            WaitForGroupSelection(2, 9);
+        }
+
+        [Test]
         public void TestKeyboardSelection()
         {
             AddBeatmaps(10, 3);
