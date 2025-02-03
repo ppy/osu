@@ -42,7 +42,7 @@ namespace osu.Game.Screens.OnlinePlay
         protected override UserActivity InitialActivity => new UserActivity.InLobby(room);
 
         protected readonly Bindable<IReadOnlyList<Mod>> FreeMods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
-        protected readonly Bindable<bool> FreeStyle = new Bindable<bool>();
+        protected readonly Bindable<bool> Freestyle = new Bindable<bool>();
 
         private readonly Room room;
         private readonly PlaylistItem? initialItem;
@@ -112,17 +112,17 @@ namespace osu.Game.Screens.OnlinePlay
                     FreeMods.Value = initialItem.AllowedMods.Select(m => m.ToMod(rulesetInstance)).ToArray();
                 }
 
-                FreeStyle.Value = initialItem.FreeStyle;
+                Freestyle.Value = initialItem.Freestyle;
             }
 
             Mods.BindValueChanged(onModsChanged);
             Ruleset.BindValueChanged(onRulesetChanged);
-            FreeStyle.BindValueChanged(onFreeStyleChanged, true);
+            Freestyle.BindValueChanged(onFreestyleChanged, true);
 
             freeModSelectOverlayRegistration = OverlayManager?.RegisterBlockingOverlay(freeModSelect);
         }
 
-        private void onFreeStyleChanged(ValueChangedEvent<bool> enabled)
+        private void onFreestyleChanged(ValueChangedEvent<bool> enabled)
         {
             if (enabled.NewValue)
             {
@@ -162,7 +162,7 @@ namespace osu.Game.Screens.OnlinePlay
                 RulesetID = Ruleset.Value.OnlineID,
                 RequiredMods = Mods.Value.Select(m => new APIMod(m)).ToArray(),
                 AllowedMods = FreeMods.Value.Select(m => new APIMod(m)).ToArray(),
-                FreeStyle = FreeStyle.Value
+                Freestyle = Freestyle.Value
             };
 
             return SelectItem(item);
@@ -204,12 +204,12 @@ namespace osu.Game.Screens.OnlinePlay
             baseButtons.Single(i => i.button is FooterButtonMods).button.TooltipText = MultiplayerMatchStrings.RequiredModsButtonTooltip;
 
             freeModsFooterButton = new FooterButtonFreeMods(freeModSelect) { Current = FreeMods };
-            var freeStyleButton = new FooterButtonFreeStyle { Current = FreeStyle };
+            var freestyleButton = new FooterButtonFreestyle { Current = Freestyle };
 
             baseButtons.InsertRange(baseButtons.FindIndex(b => b.button is FooterButtonMods) + 1, new (FooterButton, OverlayContainer?)[]
             {
                 (freeModsFooterButton, null),
-                (freeStyleButton, null)
+                (freestyleButton, null)
             });
 
             return baseButtons;

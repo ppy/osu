@@ -10,7 +10,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 {
-    public partial class FreeStyleStatusPill : OnlinePlayPill
+    public partial class FreestyleStatusPill : OnlinePlayPill
     {
         private readonly Room room;
 
@@ -19,7 +19,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
         protected override FontUsage Font => base.Font.With(weight: FontWeight.SemiBold);
 
-        public FreeStyleStatusPill(Room room)
+        public FreestyleStatusPill(Room room)
         {
             this.room = room;
         }
@@ -35,7 +35,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             TextFlow.Colour = Color4.Black;
 
             room.PropertyChanged += onRoomPropertyChanged;
-            updateFreeStyleStatus();
+            updateFreestyleStatus();
         }
 
         private void onRoomPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -44,15 +44,15 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             {
                 case nameof(Room.CurrentPlaylistItem):
                 case nameof(Room.Playlist):
-                    updateFreeStyleStatus();
+                    updateFreestyleStatus();
                     break;
             }
         }
 
-        private void updateFreeStyleStatus()
+        private void updateFreestyleStatus()
         {
             PlaylistItem? currentItem = room.Playlist.GetCurrentItem() ?? room.CurrentPlaylistItem;
-            Alpha = currentItem?.FreeStyle == true ? 1 : 0;
+            Alpha = currentItem?.Freestyle == true ? 1 : 0;
         }
 
         protected override void Dispose(bool isDisposing)

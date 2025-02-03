@@ -450,11 +450,11 @@ namespace osu.Game.Screens.OnlinePlay.Match
             Ruleset.Value = GetGameplayRuleset();
 
             bool freeMod = item.AllowedMods.Any();
-            bool freeStyle = item.FreeStyle;
+            bool freestyle = item.Freestyle;
 
             // For now, the game can never be in a state where freemod and freestyle are on at the same time.
             // This will change, but due to the current implementation if this was to occur drawables will overlap so let's assert.
-            Debug.Assert(!freeMod || !freeStyle);
+            Debug.Assert(!freeMod || !freestyle);
 
             if (freeMod)
             {
@@ -468,7 +468,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
                 UserModsSelectOverlay.IsValidMod = _ => false;
             }
 
-            if (freeStyle)
+            if (freestyle)
             {
                 UserStyleSection.Show();
 
@@ -481,7 +481,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
                 UserStyleDisplayContainer.Child = new DrawableRoomPlaylistItem(gameplayItem, true)
                 {
                     AllowReordering = false,
-                    AllowEditing = freeStyle,
+                    AllowEditing = freestyle,
                     RequestEdit = _ => OpenStyleSelection()
                 };
             }

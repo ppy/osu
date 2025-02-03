@@ -71,7 +71,7 @@ namespace osu.Game.Online.Rooms
         /// Indicates whether participants in the room are able to pick their own choice of beatmap difficulty and ruleset.
         /// </summary>
         [JsonProperty("freestyle")]
-        public bool FreeStyle { get; set; }
+        public bool Freestyle { get; set; }
 
         /// <summary>
         /// A beatmap representing this playlist item.
@@ -107,7 +107,7 @@ namespace osu.Game.Online.Rooms
             PlayedAt = item.PlayedAt;
             RequiredMods = item.RequiredMods.ToArray();
             AllowedMods = item.AllowedMods.ToArray();
-            FreeStyle = item.FreeStyle;
+            Freestyle = item.Freestyle;
         }
 
         public void MarkInvalid() => valid.Value = false;
@@ -139,7 +139,7 @@ namespace osu.Game.Online.Rooms
                 PlayedAt = PlayedAt,
                 AllowedMods = AllowedMods,
                 RequiredMods = RequiredMods,
-                FreeStyle = FreeStyle,
+                Freestyle = Freestyle,
                 valid = { Value = Valid.Value },
             };
         }
@@ -152,6 +152,6 @@ namespace osu.Game.Online.Rooms
                && PlaylistOrder == other.PlaylistOrder
                && AllowedMods.SequenceEqual(other.AllowedMods)
                && RequiredMods.SequenceEqual(other.RequiredMods)
-               && FreeStyle == other.FreeStyle;
+               && Freestyle == other.Freestyle;
     }
 }
