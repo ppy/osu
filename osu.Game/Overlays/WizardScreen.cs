@@ -13,9 +13,9 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osuTK;
 
-namespace osu.Game.Overlays.FirstRunSetup
+namespace osu.Game.Overlays
 {
-    public abstract partial class FirstRunSetupScreen : Screen
+    public abstract partial class WizardScreen : Screen
     {
         private const float offset = 100;
 

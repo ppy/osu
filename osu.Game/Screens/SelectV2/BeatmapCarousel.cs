@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -14,7 +13,6 @@ using osu.Framework.Graphics.Pooling;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.Select;
 
 namespace osu.Game.Screens.SelectV2
@@ -24,9 +22,9 @@ namespace osu.Game.Screens.SelectV2
     {
         private IBindableList<BeatmapSetInfo> detachedBeatmaps = null!;
 
-        private readonly DrawablePool<BeatmapCarouselPanel> carouselPanelPool = new DrawablePool<BeatmapCarouselPanel>(100);
-
         private readonly LoadingLayer loading;
+
+        private readonly BeatmapCarouselFilterGrouping grouping;
 
         public BeatmapCarousel()
         {
@@ -36,10 +34,8 @@ namespace osu.Game.Screens.SelectV2
             Filters = new ICarouselFilter[]
             {
                 new BeatmapCarouselFilterSorting(() => Criteria),
-                new BeatmapCarouselFilterGrouping(() => Criteria),
+                grouping = new BeatmapCarouselFilterGrouping(() => Criteria),
             };
-
-            AddInternal(carouselPanelPool);
 
             AddInternal(loading = new LoadingLayer(dimBackground: true));
         }
@@ -47,13 +43,17 @@ namespace osu.Game.Screens.SelectV2
         [BackgroundDependencyLoader]
         private void load(BeatmapStore beatmapStore, CancellationToken? cancellationToken)
         {
+            setupPools();
+            setupBeatmaps(beatmapStore, cancellationToken);
+        }
+
+        #region Beatmap source hookup
+
+        private void setupBeatmaps(BeatmapStore beatmapStore, CancellationToken? cancellationToken)
+        {
             detachedBeatmaps = beatmapStore.GetBeatmapSets(cancellationToken);
             detachedBeatmaps.BindCollectionChanged(beatmapSetsChanged, true);
         }
-
-        protected override Drawable GetDrawableForDisplay(CarouselItem item) => carouselPanelPool.Get();
-
-        protected override CarouselItem CreateCarouselItemForModel(BeatmapInfo model) => new BeatmapCarouselItem(model);
 
         private void beatmapSetsChanged(object? beatmaps, NotifyCollectionChangedEventArgs changed)
         {
@@ -88,19 +88,82 @@ namespace osu.Game.Screens.SelectV2
             }
         }
 
+        #endregion
+
+        #region Selection handling
+
+        protected override void HandleItemSelected(object? model)
+        {
+            base.HandleItemSelected(model);
+
+            // Selecting a set isn't valid – let's re-select the first difficulty.
+            if (model is BeatmapSetInfo setInfo)
+            {
+                CurrentSelection = setInfo.Beatmaps.First();
+                return;
+            }
+
+            if (model is BeatmapInfo beatmapInfo)
+                setVisibilityOfSetItems(beatmapInfo.BeatmapSet!, true);
+        }
+
+        protected override void HandleItemDeselected(object? model)
+        {
+            base.HandleItemDeselected(model);
+
+            if (model is BeatmapInfo beatmapInfo)
+                setVisibilityOfSetItems(beatmapInfo.BeatmapSet!, false);
+        }
+
+        private void setVisibilityOfSetItems(BeatmapSetInfo set, bool visible)
+        {
+            if (grouping.SetItems.TryGetValue(set, out var group))
+            {
+                foreach (var i in group)
+                    i.IsVisible = visible;
+            }
+        }
+
+        #endregion
+
+        #region Filtering
+
         public FilterCriteria Criteria { get; private set; } = new FilterCriteria();
 
         public void Filter(FilterCriteria criteria)
         {
             Criteria = criteria;
-            FilterAsync().FireAndForget();
+            loading.Show();
+            FilterAsync().ContinueWith(_ => Schedule(() => loading.Hide()));
         }
 
-        protected override async Task FilterAsync()
+        #endregion
+
+        #region Drawable pooling
+
+        private readonly DrawablePool<BeatmapPanel> beatmapPanelPool = new DrawablePool<BeatmapPanel>(100);
+        private readonly DrawablePool<BeatmapSetPanel> setPanelPool = new DrawablePool<BeatmapSetPanel>(100);
+
+        private void setupPools()
         {
-            loading.Show();
-            await base.FilterAsync().ConfigureAwait(true);
-            loading.Hide();
+            AddInternal(beatmapPanelPool);
+            AddInternal(setPanelPool);
         }
+
+        protected override Drawable GetDrawableForDisplay(CarouselItem item)
+        {
+            switch (item.Model)
+            {
+                case BeatmapInfo:
+                    return beatmapPanelPool.Get();
+
+                case BeatmapSetInfo:
+                    return setPanelPool.Get();
+            }
+
+            throw new InvalidOperationException();
+        }
+
+        #endregion
     }
 }
