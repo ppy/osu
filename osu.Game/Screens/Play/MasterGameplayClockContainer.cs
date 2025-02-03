@@ -53,7 +53,7 @@ namespace osu.Game.Screens.Play
 
         private readonly Bindable<bool> playbackRateValid = new Bindable<bool>(true);
 
-        private readonly WorkingBeatmap beatmap;
+        private readonly IBeatmap beatmap;
 
         private Track track;
 
@@ -63,20 +63,19 @@ namespace osu.Game.Screens.Play
         /// <summary>
         /// Create a new master gameplay clock container.
         /// </summary>
-        /// <param name="beatmap">The beatmap to be used for time and metadata references.</param>
+        /// <param name="working">The beatmap to be used for time and metadata references.</param>
         /// <param name="gameplayStartTime">The latest time which should be used when introducing gameplay. Will be used when skipping forward.</param>
-        public MasterGameplayClockContainer(WorkingBeatmap beatmap, double gameplayStartTime)
-            : base(beatmap.Track, applyOffsets: true, requireDecoupling: true)
+        public MasterGameplayClockContainer(WorkingBeatmap working, double gameplayStartTime)
+            : base(working.Track, applyOffsets: true, requireDecoupling: true)
         {
-            this.beatmap = beatmap;
-
-            track = beatmap.Track;
+            beatmap = working.Beatmap;
+            track = working.Track;
 
             GameplayStartTime = gameplayStartTime;
-            StartTime = findEarliestStartTime(gameplayStartTime, beatmap);
+            StartTime = findEarliestStartTime(gameplayStartTime, working);
         }
 
-        private static double findEarliestStartTime(double gameplayStartTime, WorkingBeatmap beatmap)
+        private static double findEarliestStartTime(double gameplayStartTime, WorkingBeatmap working)
         {
             // here we are trying to find the time to start playback from the "zero" point.
             // generally this is either zero, or some point earlier than zero in the case of storyboards, lead-ins etc.
@@ -86,15 +85,15 @@ namespace osu.Game.Screens.Play
 
             // if a storyboard is present, it may dictate the appropriate start time by having events in negative time space.
             // this is commonly used to display an intro before the audio track start.
-            double? firstStoryboardEvent = beatmap.Storyboard.EarliestEventTime;
+            double? firstStoryboardEvent = working.Storyboard.EarliestEventTime;
             if (firstStoryboardEvent != null)
                 time = Math.Min(time, firstStoryboardEvent.Value);
 
             // some beatmaps specify a current lead-in time which should be used instead of the ruleset-provided value when available.
             // this is not available as an option in the live editor but can still be applied via .osu editing.
-            double firstHitObjectTime = beatmap.Beatmap.HitObjects.First().StartTime;
-            if (beatmap.Beatmap.AudioLeadIn > 0)
-                time = Math.Min(time, firstHitObjectTime - beatmap.Beatmap.AudioLeadIn);
+            double firstHitObjectTime = working.Beatmap.HitObjects.First().StartTime;
+            if (working.Beatmap.AudioLeadIn > 0)
+                time = Math.Min(time, firstHitObjectTime - working.Beatmap.AudioLeadIn);
 
             return time;
         }
@@ -136,7 +135,7 @@ namespace osu.Game.Screens.Play
         {
             removeAdjustmentsFromTrack();
 
-            track = new TrackVirtual(beatmap.Track.Length);
+            track = new TrackVirtual(track.Length);
             track.Seek(CurrentTime);
             if (IsRunning)
                 track.Start();
@@ -228,9 +227,8 @@ namespace osu.Game.Screens.Play
             removeAdjustmentsFromTrack();
         }
 
-        ControlPointInfo IBeatSyncProvider.ControlPoints => beatmap.Beatmap.ControlPointInfo;
+        ControlPointInfo IBeatSyncProvider.ControlPoints => beatmap.ControlPointInfo;
+        ChannelAmplitudes IHasAmplitudes.CurrentAmplitudes => track.CurrentAmplitudes;
         IClock IBeatSyncProvider.Clock => this;
-
-        ChannelAmplitudes IHasAmplitudes.CurrentAmplitudes => beatmap.TrackLoaded ? beatmap.Track.CurrentAmplitudes : ChannelAmplitudes.Empty;
     }
 }
