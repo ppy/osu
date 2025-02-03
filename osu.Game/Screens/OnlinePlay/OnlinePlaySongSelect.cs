@@ -203,13 +203,10 @@ namespace osu.Game.Screens.OnlinePlay
 
             baseButtons.Single(i => i.button is FooterButtonMods).button.TooltipText = MultiplayerMatchStrings.RequiredModsButtonTooltip;
 
-            freeModsFooterButton = new FooterButtonFreeMods(freeModSelect) { Current = FreeMods };
-            var freestyleButton = new FooterButtonFreestyle { Current = Freestyle };
-
             baseButtons.InsertRange(baseButtons.FindIndex(b => b.button is FooterButtonMods) + 1, new (FooterButton, OverlayContainer?)[]
             {
-                (freeModsFooterButton, null),
-                (freestyleButton, null)
+                (freeModsFooterButton = new FooterButtonFreeMods(freeModSelect) { Current = FreeMods }, null),
+                (new FooterButtonFreestyle { Current = Freestyle }, null)
             });
 
             return baseButtons;
