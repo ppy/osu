@@ -9,12 +9,12 @@ using osu.Game.Rulesets;
 
 namespace osu.Game.Screens.OnlinePlay.Playlists
 {
-    public partial class PlaylistsRoomStyleSelect : OnlinePlayStyleSelect
+    public partial class PlaylistsRoomFreestyleSelect : OnlinePlayFreestyleSelect
     {
         public new readonly Bindable<BeatmapInfo?> Beatmap = new Bindable<BeatmapInfo?>();
         public new readonly Bindable<RulesetInfo?> Ruleset = new Bindable<RulesetInfo?>();
 
-        public PlaylistsRoomStyleSelect(Room room, PlaylistItem item)
+        public PlaylistsRoomFreestyleSelect(Room room, PlaylistItem item)
             : base(room, item)
         {
         }

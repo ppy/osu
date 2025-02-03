@@ -16,7 +16,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Screens.OnlinePlay
 {
-    public abstract partial class OnlinePlayStyleSelect : SongSelect, IOnlinePlaySubScreen, IHandlePresentBeatmap
+    public abstract partial class OnlinePlayFreestyleSelect : SongSelect, IOnlinePlaySubScreen, IHandlePresentBeatmap
     {
         public string ShortTitle => "style selection";
 
@@ -29,7 +29,7 @@ namespace osu.Game.Screens.OnlinePlay
         private readonly Room room;
         private readonly PlaylistItem item;
 
-        protected OnlinePlayStyleSelect(Room room, PlaylistItem item)
+        protected OnlinePlayFreestyleSelect(Room room, PlaylistItem item)
         {
             this.room = room;
             this.item = item;
