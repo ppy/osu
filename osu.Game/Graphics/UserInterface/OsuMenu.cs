@@ -68,7 +68,9 @@ namespace osu.Game.Graphics.UserInterface
             if (!TopLevelMenu && wasOpened)
                 menuSamples?.PlayCloseSample();
 
-            this.FadeOut(300, Easing.OutQuint);
+            this.Delay(50)
+                .FadeOut(300, Easing.OutQuint);
+
             wasOpened = false;
         }
 
@@ -77,12 +79,21 @@ namespace osu.Game.Graphics.UserInterface
             if (Direction == Direction.Vertical)
             {
                 Width = newSize.X;
-                this.ResizeHeightTo(newSize.Y, 300, Easing.OutQuint);
+
+                if (newSize.Y > 0)
+                    this.ResizeHeightTo(newSize.Y, 300, Easing.OutQuint);
+                else
+                    // Delay until the fade out finishes from AnimateClose.
+                    this.Delay(350).ResizeHeightTo(0);
             }
             else
             {
                 Height = newSize.Y;
-                this.ResizeWidthTo(newSize.X, 300, Easing.OutQuint);
+                if (newSize.X > 0)
+                    this.ResizeWidthTo(newSize.X, 300, Easing.OutQuint);
+                else
+                    // Delay until the fade out finishes from AnimateClose.
+                    this.Delay(350).ResizeWidthTo(0);
             }
         }
 
