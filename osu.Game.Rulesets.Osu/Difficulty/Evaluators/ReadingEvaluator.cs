@@ -46,9 +46,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             double currApproachRate = currObj.Preempt; // Approach rate in milliseconds
 
-            if (currApproachRate < 450)
+            if (currApproachRate < 480)
             {
-                preemptDifficulty += Math.Pow(450 - currApproachRate, 2.5) / 50000.0;
+                preemptDifficulty += Math.Pow(480 - currApproachRate, 2.4) / 60000.0;
 
                 // Buff spacing.
                 preemptDifficulty *= currVelocity;
@@ -59,8 +59,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 preemptDifficulty /= 1.5 * Math.Sqrt(rawDensityDifficulty);
             }
 
-            // Only award notes over 2.5 difficulty so we only buff denser than average maps
-            double noteDensityDifficulty = Math.Max(0, rawDensityDifficulty - 2.5);
+            // Only award notes over 2.7 difficulty so we only buff denser than average maps
+            double noteDensityDifficulty = Math.Max(0, rawDensityDifficulty - 2.7);
 
             double hiddenDifficulty = 0;
 
