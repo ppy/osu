@@ -258,7 +258,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             if (!this.IsCurrentScreen() || SelectedItem.Value is not PlaylistItem item)
                 return;
 
-            this.Push(new MultiplayerMatchStyleSelect(Room, item));
+            this.Push(new MultiplayerMatchFreestyleSelect(Room, item));
         }
 
         protected override Drawable CreateFooter() => new MultiplayerMatchFooter

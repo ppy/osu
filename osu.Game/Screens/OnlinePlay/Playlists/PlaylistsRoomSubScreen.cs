@@ -319,7 +319,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             if (!this.IsCurrentScreen() || SelectedItem.Value is not PlaylistItem item)
                 return;
 
-            this.Push(new PlaylistsRoomStyleSelect(Room, item)
+            this.Push(new PlaylistsRoomFreestyleSelect(Room, item)
             {
                 Beatmap = { BindTarget = userBeatmap },
                 Ruleset = { BindTarget = userRuleset }
