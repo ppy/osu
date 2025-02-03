@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using DiffPlex.Model;
 using JetBrains.Annotations;
 using osu.Framework;
 using osu.Framework.Allocation;
@@ -450,7 +451,7 @@ namespace osu.Game.Screens.Edit
                                                     {
                                                         Hotkey = new Hotkey(GlobalAction.EditorSeekToNextBookmark)
                                                     },
-                                                    new EditorMenuItem(EditorStrings.ResetBookmarks, MenuItemType.Destructive, () => editorBeatmap.Bookmarks.Clear())
+                                                    new EditorMenuItem(EditorStrings.ResetBookmarks, MenuItemType.Destructive, () => dialogOverlay?.Push(new BookmarkResetDialog(editorBeatmap)))
                                                 }
                                             }
                                         }
