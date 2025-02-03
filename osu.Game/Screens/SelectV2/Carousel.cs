@@ -377,26 +377,31 @@ namespace osu.Game.Screens.SelectV2
             if (currentSelection.CarouselItem != currentKeyboardSelection.CarouselItem)
             {
                 TryActivateSelection();
-                return;
+
+                // There's a chance this couldn't resolve, at which point continue with standard traversal.
+                if (currentSelection.CarouselItem == currentKeyboardSelection.CarouselItem)
+                    return;
             }
 
             int originalIndex;
+            int newIndex;
 
-            if (currentKeyboardSelection.Index != null)
-                originalIndex = currentKeyboardSelection.Index.Value;
-            else if (direction > 0)
-                originalIndex = carouselItems.Count - 1;
-            else
-                originalIndex = 0;
-
-            int newIndex = originalIndex;
-
-            // As a second special case, if we're group selecting backwards and the current selection isn't a group,
-            // make sure to go back to the group header this item belongs to, so that the block below doesn't find it and stop too early.
-            if (direction < 0)
+            if (currentSelection.Index == null)
             {
-                while (!CheckValidForGroupSelection(carouselItems[newIndex]))
-                    newIndex--;
+                // If there's no current selection, start from either end of the full list.
+                newIndex = originalIndex = direction > 0 ? carouselItems.Count - 1 : 0;
+            }
+            else
+            {
+                newIndex = originalIndex = currentSelection.Index.Value;
+
+                // As a second special case, if we're group selecting backwards and the current selection isn't a group,
+                // make sure to go back to the group header this item belongs to, so that the block below doesn't find it and stop too early.
+                if (direction < 0)
+                {
+                    while (!CheckValidForGroupSelection(carouselItems[newIndex]))
+                        newIndex--;
+                }
             }
 
             // Iterate over every item back to the current selection, finding the first valid item.
