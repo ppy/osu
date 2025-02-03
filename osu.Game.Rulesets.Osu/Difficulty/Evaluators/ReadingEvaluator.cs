@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
     public static class ReadingEvaluator
     {
         private const double reading_window_size = 3000;
-        private const double hidden_multiplier = 0.6;
+        private const double hidden_multiplier = 0.75;
 
         public static double EvaluateDifficultyOf(DifficultyHitObject current, IReadOnlyList<Mod> mods)
         {
@@ -46,9 +46,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             double currApproachRate = currObj.Preempt; // Approach rate in milliseconds
 
-            if (currApproachRate < 480)
+            if (currApproachRate < 425)
             {
-                preemptDifficulty += Math.Pow(480 - currApproachRate, 2.4) / 60000.0;
+                preemptDifficulty += Math.Pow(425 - currApproachRate, 2.6) / 60000.0;
 
                 // Buff spacing.
                 preemptDifficulty *= currVelocity;
@@ -60,7 +60,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             }
 
             // Only award notes over 2.7 difficulty so we only buff denser than average maps
-            double noteDensityDifficulty = Math.Max(0, rawDensityDifficulty - 2.7);
+            double noteDensityDifficulty = Math.Max(0, rawDensityDifficulty - 3.5);
 
             double hiddenDifficulty = 0;
 
