@@ -107,7 +107,6 @@ namespace osu.Game.Tests.Editing
 
             assertSnapDistance(base_distance * slider_velocity, referenceObject);
             assertSnappedDistance(base_distance * slider_velocity + 10, base_distance * slider_velocity, referenceObject);
-            assertSnappedDuration(base_distance * slider_velocity + 10, 1000, referenceObject);
 
             assertDistanceToDuration(base_distance * slider_velocity, 1000, referenceObject);
             assertDurationToDistance(1000, base_distance * slider_velocity, referenceObject);
@@ -153,39 +152,6 @@ namespace osu.Game.Tests.Editing
 
             assertDistanceToDuration(200, 500);
             assertDistanceToDuration(400, 1000);
-        }
-
-        [Test]
-        public void TestGetSnappedDurationFromDistance()
-        {
-            assertSnappedDuration(0, 0);
-            assertSnappedDuration(50, 1000);
-            assertSnappedDuration(100, 1000);
-            assertSnappedDuration(150, 2000);
-            assertSnappedDuration(200, 2000);
-            assertSnappedDuration(250, 3000);
-
-            AddStep("set slider multiplier = 2", () => composer.EditorBeatmap.Difficulty.SliderMultiplier = 2);
-
-            assertSnappedDuration(0, 0);
-            assertSnappedDuration(50, 0);
-            assertSnappedDuration(100, 1000);
-            assertSnappedDuration(150, 1000);
-            assertSnappedDuration(200, 1000);
-            assertSnappedDuration(250, 1000);
-
-            AddStep("set beat length = 500", () =>
-            {
-                composer.EditorBeatmap.ControlPointInfo.Clear();
-                composer.EditorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = 500 });
-            });
-
-            assertSnappedDuration(50, 0);
-            assertSnappedDuration(100, 500);
-            assertSnappedDuration(150, 500);
-            assertSnappedDuration(200, 500);
-            assertSnappedDuration(250, 500);
-            assertSnappedDuration(400, 1000);
         }
 
         [Test]
@@ -288,9 +254,6 @@ namespace osu.Game.Tests.Editing
 
         private void assertDistanceToDuration(float distance, double expectedDuration, HitObject? referenceObject = null)
             => AddAssert($"distance = {distance} -> duration = {expectedDuration}", () => composer.DistanceSnapProvider.DistanceToDuration(distance, referenceObject?.StartTime ?? 0, referenceObject as IHasSliderVelocity), () => Is.EqualTo(expectedDuration).Within(Precision.FLOAT_EPSILON));
-
-        private void assertSnappedDuration(float distance, double expectedDuration, HitObject? referenceObject = null)
-            => AddAssert($"distance = {distance} -> duration = {expectedDuration} (snapped)", () => composer.DistanceSnapProvider.FindSnappedDuration(distance, referenceObject?.StartTime ?? 0, referenceObject as IHasSliderVelocity), () => Is.EqualTo(expectedDuration).Within(Precision.FLOAT_EPSILON));
 
         private void assertSnappedDistance(float distance, float expectedDistance, HitObject? referenceObject = null)
             => AddAssert($"distance = {distance} -> distance = {expectedDistance} (snapped)", () => composer.DistanceSnapProvider.FindSnappedDistance(distance, referenceObject?.GetEndTime() ?? 0, referenceObject as IHasSliderVelocity), () => Is.EqualTo(expectedDistance).Within(Precision.FLOAT_EPSILON));
