@@ -3,7 +3,10 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Input.Events;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles;
@@ -17,11 +20,19 @@ namespace osu.Game.Rulesets.Osu.Edit
 {
     public partial class OsuBlueprintContainer : ComposeBlueprintContainer
     {
+        private Bindable<bool> limitedDistanceSnap { get; set; } = null!;
+
         public new OsuHitObjectComposer Composer => (OsuHitObjectComposer)base.Composer;
 
         public OsuBlueprintContainer(OsuHitObjectComposer composer)
             : base(composer)
         {
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
+        {
+            limitedDistanceSnap = config.GetBindable<bool>(OsuSetting.EditorLimitedDistanceSnap);
         }
 
         protected override SelectionHandler<HitObject> CreateSelectionHandler() => new OsuSelectionHandler();
@@ -58,15 +69,15 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             // The final movement position, relative to movementBlueprintOriginalPosition.
             Vector2 movePosition = blueprints.First().originalSnapPositions.First() + distanceTravelled;
+            var referenceBlueprint = blueprints.First().blueprint;
 
             // Retrieve a snapped position.
             var result = Composer.TrySnapToNearbyObjects(movePosition);
-            result ??= Composer.TrySnapToDistanceGrid(movePosition);
+            result ??= Composer.TrySnapToDistanceGrid(movePosition, limitedDistanceSnap.Value ? referenceBlueprint.Item.StartTime : null);
             if (Composer.TrySnapToPositionGrid(result?.ScreenSpacePosition ?? movePosition, result?.Time) is SnapResult gridSnapResult)
                 result = gridSnapResult;
             result ??= new SnapResult(movePosition, null);
 
-            var referenceBlueprint = blueprints.First().blueprint;
             bool moved = SelectionHandler.HandleMovement(new MoveSelectionEvent<HitObject>(referenceBlueprint, result.ScreenSpacePosition - referenceBlueprint.ScreenSpaceSelectionPoint));
             if (moved)
                 ApplySnapResultTime(result, referenceBlueprint.Item.StartTime);
