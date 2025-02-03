@@ -12,6 +12,7 @@ using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Overlays;
+using osu.Game.Storyboards;
 
 namespace osu.Game.Screens.Play
 {
@@ -72,10 +73,10 @@ namespace osu.Game.Screens.Play
             track = working.Track;
 
             GameplayStartTime = gameplayStartTime;
-            StartTime = findEarliestStartTime(gameplayStartTime, working);
+            StartTime = findEarliestStartTime(gameplayStartTime, beatmap, working.Storyboard);
         }
 
-        private static double findEarliestStartTime(double gameplayStartTime, WorkingBeatmap working)
+        private static double findEarliestStartTime(double gameplayStartTime, IBeatmap beatmap, Storyboard storyboard)
         {
             // here we are trying to find the time to start playback from the "zero" point.
             // generally this is either zero, or some point earlier than zero in the case of storyboards, lead-ins etc.
@@ -85,15 +86,15 @@ namespace osu.Game.Screens.Play
 
             // if a storyboard is present, it may dictate the appropriate start time by having events in negative time space.
             // this is commonly used to display an intro before the audio track start.
-            double? firstStoryboardEvent = working.Storyboard.EarliestEventTime;
+            double? firstStoryboardEvent = storyboard.EarliestEventTime;
             if (firstStoryboardEvent != null)
                 time = Math.Min(time, firstStoryboardEvent.Value);
 
             // some beatmaps specify a current lead-in time which should be used instead of the ruleset-provided value when available.
             // this is not available as an option in the live editor but can still be applied via .osu editing.
-            double firstHitObjectTime = working.Beatmap.HitObjects.First().StartTime;
-            if (working.Beatmap.AudioLeadIn > 0)
-                time = Math.Min(time, firstHitObjectTime - working.Beatmap.AudioLeadIn);
+            double firstHitObjectTime = beatmap.HitObjects.First().StartTime;
+            if (beatmap.AudioLeadIn > 0)
+                time = Math.Min(time, firstHitObjectTime - beatmap.AudioLeadIn);
 
             return time;
         }
