@@ -10,7 +10,6 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Layout;
-using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
@@ -60,18 +59,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         [Resolved]
         private BindableBeatDivisor beatDivisor { get; set; }
-
-        /// <summary>
-        /// When enabled, distance snap should only snap to the current time (as per the editor clock).
-        /// This is to emulate stable behaviour.
-        /// </summary>
-        protected Bindable<bool> LimitedDistanceSnap { get; private set; }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
-        {
-            LimitedDistanceSnap = config.GetBindable<bool>(OsuSetting.EditorLimitedDistanceSnap);
-        }
 
         private readonly LayoutValue gridCache = new LayoutValue(Invalidation.RequiredParentSizeToFit);
 
@@ -143,8 +130,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// Snaps a position to this grid.
         /// </summary>
         /// <param name="position">The original position in coordinate space local to this <see cref="DistanceSnapGrid"/>.</param>
+        /// <param name="fixedTime">
+        /// Whether the snap operation should be temporally constrained to a particular time instant,
+        /// thus fixing the possible positions to a set distance from the <see cref="ReferenceObject"/>.
+        /// </param>
         /// <returns>A tuple containing the snapped position in coordinate space local to this <see cref="DistanceSnapGrid"/> and the respective time value.</returns>
-        public abstract (Vector2 position, double time) GetSnappedPosition(Vector2 position);
+        public abstract (Vector2 position, double time) GetSnappedPosition(Vector2 position, double? fixedTime = null);
 
         /// <summary>
         /// Retrieves the applicable colour for a beat index.
