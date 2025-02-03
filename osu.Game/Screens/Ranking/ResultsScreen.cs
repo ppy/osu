@@ -17,6 +17,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Screens;
+using osu.Game.Audio;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
@@ -29,10 +30,12 @@ using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking.Expanded.Accuracy;
 using osu.Game.Screens.Ranking.Statistics;
+using osu.Game.Skinning;
 using osuTK;
 
 namespace osu.Game.Screens.Ranking
 {
+    [Cached]
     public abstract partial class ResultsScreen : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>
     {
         protected const float BACKGROUND_BLUR = 20;
@@ -64,7 +67,6 @@ namespace osu.Game.Screens.Ranking
 
         private Drawable bottomPanel = null!;
         private Container<ScorePanel> detachedPanelContainer = null!;
-        private AudioContainer audioContainer = null!;
 
         private bool lastFetchCompleted;
 
@@ -101,80 +103,76 @@ namespace osu.Game.Screens.Ranking
 
             popInSample = audio.Samples.Get(@"UI/overlay-pop-in");
 
-            InternalChild = audioContainer = new AudioContainer
+            InternalChild = new PopoverContainer
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = new PopoverContainer
+                Child = new GridContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Child = new GridContainer
+                    Content = new[]
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        Content = new[]
+                        new Drawable[]
                         {
-                            new Drawable[]
+                            VerticalScrollContent = new VerticalScrollContainer
                             {
-                                VerticalScrollContent = new VerticalScrollContainer
+                                RelativeSizeAxes = Axes.Both,
+                                ScrollbarVisible = false,
+                                Child = new Container
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    ScrollbarVisible = false,
-                                    Child = new Container
-                                    {
-                                        RelativeSizeAxes = Axes.Both,
-                                        Children = new Drawable[]
-                                        {
-                                            StatisticsPanel = createStatisticsPanel().With(panel =>
-                                            {
-                                                panel.RelativeSizeAxes = Axes.Both;
-                                                panel.Score.BindTarget = SelectedScore;
-                                            }),
-                                            ScorePanelList = new ScorePanelList
-                                            {
-                                                RelativeSizeAxes = Axes.Both,
-                                                SelectedScore = { BindTarget = SelectedScore },
-                                                PostExpandAction = () => StatisticsPanel.ToggleVisibility()
-                                            },
-                                            detachedPanelContainer = new Container<ScorePanel>
-                                            {
-                                                RelativeSizeAxes = Axes.Both
-                                            },
-                                        }
-                                    }
-                                },
-                            },
-                            new[]
-                            {
-                                bottomPanel = new Container
-                                {
-                                    Anchor = Anchor.BottomLeft,
-                                    Origin = Anchor.BottomLeft,
-                                    RelativeSizeAxes = Axes.X,
-                                    Height = TwoLayerButton.SIZE_EXTENDED.Y,
-                                    Alpha = 0,
                                     Children = new Drawable[]
                                     {
-                                        new Box
+                                        StatisticsPanel = createStatisticsPanel().With(panel =>
+                                        {
+                                            panel.RelativeSizeAxes = Axes.Both;
+                                            panel.Score.BindTarget = SelectedScore;
+                                        }),
+                                        ScorePanelList = new ScorePanelList
                                         {
                                             RelativeSizeAxes = Axes.Both,
-                                            Colour = Color4Extensions.FromHex("#333")
+                                            SelectedScore = { BindTarget = SelectedScore },
+                                            PostExpandAction = () => StatisticsPanel.ToggleVisibility()
                                         },
-                                        buttons = new FillFlowContainer
+                                        detachedPanelContainer = new Container<ScorePanel>
                                         {
-                                            Anchor = Anchor.Centre,
-                                            Origin = Anchor.Centre,
-                                            AutoSizeAxes = Axes.Both,
-                                            Spacing = new Vector2(5),
-                                            Direction = FillDirection.Horizontal
+                                            RelativeSizeAxes = Axes.Both
                                         },
                                     }
                                 }
-                            }
+                            },
                         },
-                        RowDimensions = new[]
+                        new[]
                         {
-                            new Dimension(),
-                            new Dimension(GridSizeMode.AutoSize)
+                            bottomPanel = new Container
+                            {
+                                Anchor = Anchor.BottomLeft,
+                                Origin = Anchor.BottomLeft,
+                                RelativeSizeAxes = Axes.X,
+                                Height = TwoLayerButton.SIZE_EXTENDED.Y,
+                                Alpha = 0,
+                                Children = new Drawable[]
+                                {
+                                    new Box
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        Colour = Color4Extensions.FromHex("#333")
+                                    },
+                                    buttons = new FillFlowContainer
+                                    {
+                                        Anchor = Anchor.Centre,
+                                        Origin = Anchor.Centre,
+                                        AutoSizeAxes = Axes.Both,
+                                        Spacing = new Vector2(5),
+                                        Direction = FillDirection.Horizontal
+                                    },
+                                }
+                            }
                         }
+                    },
+                    RowDimensions = new[]
+                    {
+                        new Dimension(),
+                        new Dimension(GridSizeMode.AutoSize)
                     }
                 }
             };
@@ -268,6 +266,64 @@ namespace osu.Game.Screens.Ranking
             }
         }
 
+        #region Applause
+
+        private PoolableSkinnableSample? rankApplauseSound;
+
+        public void PlayApplause(ScoreRank rank)
+        {
+            const double applause_volume = 0.8f;
+
+            if (!this.IsCurrentScreen())
+                return;
+
+            rankApplauseSound?.Dispose();
+
+            var applauseSamples = new List<string>();
+
+            if (rank >= ScoreRank.B)
+                // when rank is B or higher, play legacy applause sample on legacy skins.
+                applauseSamples.Insert(0, @"applause");
+
+            switch (rank)
+            {
+                default:
+                case ScoreRank.D:
+                    applauseSamples.Add(@"Results/applause-d");
+                    break;
+
+                case ScoreRank.C:
+                    applauseSamples.Add(@"Results/applause-c");
+                    break;
+
+                case ScoreRank.B:
+                    applauseSamples.Add(@"Results/applause-b");
+                    break;
+
+                case ScoreRank.A:
+                    applauseSamples.Add(@"Results/applause-a");
+                    break;
+
+                case ScoreRank.S:
+                case ScoreRank.SH:
+                case ScoreRank.X:
+                case ScoreRank.XH:
+                    applauseSamples.Add(@"Results/applause-s");
+                    break;
+            }
+
+            LoadComponentAsync(rankApplauseSound = new PoolableSkinnableSample(new SampleInfo(applauseSamples.ToArray())), s =>
+            {
+                if (!this.IsCurrentScreen() || s != rankApplauseSound)
+                    return;
+
+                rankApplauseSound.VolumeTo(applause_volume);
+                rankApplauseSound.Play();
+            });
+        }
+
+        #endregion
+
         /// <summary>
         /// Performs a fetch/refresh of scores to be displayed.
         /// </summary>
@@ -336,7 +392,7 @@ namespace osu.Game.Screens.Ranking
             if (!skipExitTransition)
                 this.FadeOut(100);
 
-            audioContainer.Volume.Value = 0;
+            rankApplauseSound?.Stop();
             return false;
         }
 
