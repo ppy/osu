@@ -87,7 +87,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                     RulesetID = item.RulesetID,
                     RequiredMods = item.RequiredMods.ToArray(),
                     AllowedMods = item.AllowedMods.ToArray(),
-                    FreeStyle = item.FreeStyle
+                    Freestyle = item.Freestyle
                 };
 
                 Task task = itemToEdit != null ? client.EditPlaylistItem(multiplayerItem) : client.AddPlaylistItem(multiplayerItem);

@@ -16,7 +16,7 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Screens.OnlinePlay
 {
-    public partial class FooterButtonFreeStyle : FooterButton, IHasCurrentValue<bool>
+    public partial class FooterButtonFreestyle : FooterButton, IHasCurrentValue<bool>
     {
         private readonly BindableWithCurrent<bool> current = new BindableWithCurrent<bool>();
 
@@ -34,7 +34,7 @@ namespace osu.Game.Screens.OnlinePlay
         [Resolved]
         private OsuColour colours { get; set; } = null!;
 
-        public FooterButtonFreeStyle()
+        public FooterButtonFreestyle()
         {
             // Overwrite any external behaviour as we delegate the main toggle action to a sub-button.
             base.Action = () => current.Value = !current.Value;

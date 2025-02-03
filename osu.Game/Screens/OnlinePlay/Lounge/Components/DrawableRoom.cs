@@ -169,7 +169,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                                                         Anchor = Anchor.CentreLeft,
                                                                         Origin = Anchor.CentreLeft
                                                                     },
-                                                                    new FreeStyleStatusPill(Room)
+                                                                    new FreestyleStatusPill(Room)
                                                                     {
                                                                         Anchor = Anchor.CentreLeft,
                                                                         Origin = Anchor.CentreLeft

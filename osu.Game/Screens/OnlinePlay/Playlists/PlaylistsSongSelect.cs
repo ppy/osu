@@ -40,7 +40,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             RulesetID = Ruleset.Value.OnlineID,
             RequiredMods = Mods.Value.Select(m => new APIMod(m)).ToArray(),
             AllowedMods = FreeMods.Value.Select(m => new APIMod(m)).ToArray(),
-            FreeStyle = FreeStyle.Value
+            Freestyle = Freestyle.Value
         };
     }
 }

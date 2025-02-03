@@ -60,7 +60,7 @@ namespace osu.Game.Online.Rooms
         /// Indicates whether participants in the room are able to pick their own choice of beatmap difficulty and ruleset.
         /// </summary>
         [Key(11)]
-        public bool FreeStyle { get; set; }
+        public bool Freestyle { get; set; }
 
         [SerializationConstructor]
         public MultiplayerPlaylistItem()
