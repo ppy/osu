@@ -544,8 +544,8 @@ namespace osu.Game.Screens.SelectV2
                 if (c.Item == null)
                     continue;
 
-                if (panel.Depth != c.DrawYPosition)
-                    scroll.Panels.ChangeChildDepth(panel, (float)c.DrawYPosition);
+                double selectedYPos = currentSelection?.CarouselItem?.CarouselYPosition ?? 0;
+                scroll.Panels.ChangeChildDepth(panel, (float)Math.Abs(c.DrawYPosition - selectedYPos));
 
                 if (c.DrawYPosition != c.Item.CarouselYPosition)
                     c.DrawYPosition = Interpolation.DampContinuously(c.DrawYPosition, c.Item.CarouselYPosition, 50, Time.Elapsed);
