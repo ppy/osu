@@ -12,8 +12,6 @@ namespace osu.Game.Graphics.UserInterface
 {
     public partial class OsuContextMenu : OsuMenu
     {
-        private const int fade_duration = 250;
-
         [Resolved]
         private OsuMenuSamples menuSamples { get; set; } = null!;
 
@@ -48,7 +46,7 @@ namespace osu.Game.Graphics.UserInterface
         protected override void AnimateOpen()
         {
             wasOpened = true;
-            this.FadeIn(fade_duration, Easing.OutQuint);
+            this.FadeIn(FADE_DURATION, Easing.OutQuint);
 
             if (!playClickSample)
                 return;
@@ -59,7 +57,8 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override void AnimateClose()
         {
-            this.FadeOut(fade_duration, Easing.OutQuint);
+            this.Delay(DELAY_BEFORE_FADE_OUT)
+                .FadeOut(FADE_DURATION, Easing.OutQuint);
 
             if (wasOpened)
                 menuSamples.PlayCloseSample();
