@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Bindables;
+using osu.Framework.Caching;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -130,7 +131,7 @@ namespace osu.Game.Screens.SelectV2
         ///
         /// A filter may add, mutate or remove items.
         /// </remarks>
-        protected IEnumerable<ICarouselFilter> Filters { get; init; } = Enumerable.Empty<ICarouselFilter>();
+        public IEnumerable<ICarouselFilter> Filters { get; init; } = Enumerable.Empty<ICarouselFilter>();
 
         /// <summary>
         /// All items which are to be considered for display in this carousel.
@@ -168,11 +169,17 @@ namespace osu.Game.Screens.SelectV2
             scroll.Panels.SingleOrDefault(p => ((ICarouselPanel)p).Item == item);
 
         /// <summary>
+        /// When a user is traversing the carousel via group selection keys, assert whether the item provided is a valid target.
+        /// </summary>
+        /// <param name="item">The candidate item.</param>
+        /// <returns>Whether the provided item is a valid group target. If <c>false</c>, more panels will be checked in the user's requested direction until a valid target is found.</returns>
+        protected virtual bool CheckValidForGroupSelection(CarouselItem item) => true;
+
+        /// <summary>
         /// Called when an item is "selected".
         /// </summary>
-        protected virtual void HandleItemSelected(object? model)
-        {
-        }
+        /// <returns>Whether the item should be selected.</returns>
+        protected virtual bool HandleItemSelected(object? model) => true;
 
         /// <summary>
         /// Called when an item is "deselected".
@@ -205,7 +212,6 @@ namespace osu.Game.Screens.SelectV2
             InternalChild = scroll = new CarouselScrollContainer
             {
                 RelativeSizeAxes = Axes.Both,
-                Masking = false,
             };
 
             Items.BindCollectionChanged((_, _) => FilterAsync());
@@ -303,19 +309,19 @@ namespace osu.Game.Screens.SelectV2
                     return true;
 
                 case GlobalAction.SelectNext:
-                    selectNext(1, isGroupSelection: false);
-                    return true;
-
-                case GlobalAction.SelectNextGroup:
-                    selectNext(1, isGroupSelection: true);
+                    traverseKeyboardSelection(1);
                     return true;
 
                 case GlobalAction.SelectPrevious:
-                    selectNext(-1, isGroupSelection: false);
+                    traverseKeyboardSelection(-1);
+                    return true;
+
+                case GlobalAction.SelectNextGroup:
+                    traverseGroupSelection(1);
                     return true;
 
                 case GlobalAction.SelectPreviousGroup:
-                    selectNext(-1, isGroupSelection: true);
+                    traverseGroupSelection(-1);
                     return true;
             }
 
@@ -326,90 +332,98 @@ namespace osu.Game.Screens.SelectV2
         {
         }
 
-        /// <summary>
-        /// Select the next valid selection relative to a current selection.
-        /// This is generally for keyboard based traversal.
-        /// </summary>
-        /// <param name="direction">Positive for downwards, negative for upwards.</param>
-        /// <param name="isGroupSelection">Whether the selection should traverse groups. Group selection updates the actual selection immediately, while non-group selection will only prepare a future keyboard selection.</param>
-        /// <returns>Whether selection was possible.</returns>
-        private bool selectNext(int direction, bool isGroupSelection)
+        private void traverseKeyboardSelection(int direction)
         {
-            // Ensure sanity
-            Debug.Assert(direction != 0);
-            direction = direction > 0 ? 1 : -1;
+            if (carouselItems == null || carouselItems.Count == 0) return;
 
-            if (carouselItems == null || carouselItems.Count == 0)
-                return false;
+            int originalIndex;
 
-            // If the user has a different keyboard selection and requests
-            // group selection, first transfer the keyboard selection to actual selection.
-            if (isGroupSelection && currentSelection.CarouselItem != currentKeyboardSelection.CarouselItem)
-            {
-                TryActivateSelection();
-                return true;
-            }
+            if (currentKeyboardSelection.Index != null)
+                originalIndex = currentKeyboardSelection.Index.Value;
+            else if (direction > 0)
+                originalIndex = carouselItems.Count - 1;
+            else
+                originalIndex = 0;
 
-            CarouselItem? selectionItem = currentKeyboardSelection.CarouselItem;
-            int selectionIndex = currentKeyboardSelection.Index ?? -1;
-
-            // To keep things simple, let's first handle the cases where there's no selection yet.
-            if (selectionItem == null || selectionIndex < 0)
-            {
-                // Start by selecting the first item.
-                selectionItem = carouselItems.First();
-                selectionIndex = 0;
-
-                // In the forwards case, immediately attempt selection of this panel.
-                // If selection fails, continue with standard logic to find the next valid selection.
-                if (direction > 0 && attemptSelection(selectionItem))
-                    return true;
-
-                // In the backwards direction we can just allow the selection logic to go ahead and loop around to the last valid.
-            }
-
-            Debug.Assert(selectionItem != null);
-
-            // As a second special case, if we're group selecting backwards and the current selection isn't a group,
-            // make sure to go back to the group header this item belongs to, so that the block below doesn't find it and stop too early.
-            if (isGroupSelection && direction < 0)
-            {
-                while (!carouselItems[selectionIndex].IsGroupSelectionTarget)
-                    selectionIndex--;
-            }
-
-            CarouselItem? newItem;
+            int newIndex = originalIndex;
 
             // Iterate over every item back to the current selection, finding the first valid item.
             // The fail condition is when we reach the selection after a cyclic loop over every item.
             do
             {
-                selectionIndex += direction;
-                newItem = carouselItems[(selectionIndex + carouselItems.Count) % carouselItems.Count];
+                newIndex = (newIndex + direction + carouselItems.Count) % carouselItems.Count;
+                var newItem = carouselItems[newIndex];
 
-                if (attemptSelection(newItem))
-                    return true;
-            } while (newItem != selectionItem);
+                if (newItem.IsVisible)
+                {
+                    setKeyboardSelection(newItem.Model);
+                    return;
+                }
+            } while (newIndex != originalIndex);
+        }
 
-            return false;
+        /// <summary>
+        /// Select the next valid selection relative to a current selection.
+        /// This is generally for keyboard based traversal.
+        /// </summary>
+        /// <param name="direction">Positive for downwards, negative for upwards.</param>
+        /// <returns>Whether selection was possible.</returns>
+        private void traverseGroupSelection(int direction)
+        {
+            if (carouselItems == null || carouselItems.Count == 0) return;
 
-            bool attemptSelection(CarouselItem item)
+            // If the user has a different keyboard selection and requests
+            // group selection, first transfer the keyboard selection to actual selection.
+            if (currentSelection.CarouselItem != currentKeyboardSelection.CarouselItem)
             {
-                if (!item.IsVisible || (isGroupSelection && !item.IsGroupSelectionTarget))
-                    return false;
+                TryActivateSelection();
 
-                if (isGroupSelection)
-                    setSelection(item.Model);
-                else
-                    setKeyboardSelection(item.Model);
-
-                return true;
+                // There's a chance this couldn't resolve, at which point continue with standard traversal.
+                if (currentSelection.CarouselItem == currentKeyboardSelection.CarouselItem)
+                    return;
             }
+
+            int originalIndex;
+            int newIndex;
+
+            if (currentSelection.Index == null)
+            {
+                // If there's no current selection, start from either end of the full list.
+                newIndex = originalIndex = direction > 0 ? carouselItems.Count - 1 : 0;
+            }
+            else
+            {
+                newIndex = originalIndex = currentSelection.Index.Value;
+
+                // As a second special case, if we're group selecting backwards and the current selection isn't a group,
+                // make sure to go back to the group header this item belongs to, so that the block below doesn't find it and stop too early.
+                if (direction < 0)
+                {
+                    while (!CheckValidForGroupSelection(carouselItems[newIndex]))
+                        newIndex--;
+                }
+            }
+
+            // Iterate over every item back to the current selection, finding the first valid item.
+            // The fail condition is when we reach the selection after a cyclic loop over every item.
+            do
+            {
+                newIndex = (newIndex + direction + carouselItems.Count) % carouselItems.Count;
+                var newItem = carouselItems[newIndex];
+
+                if (CheckValidForGroupSelection(newItem))
+                {
+                    setSelection(newItem.Model);
+                    return;
+                }
+            } while (newIndex != originalIndex);
         }
 
         #endregion
 
         #region Selection handling
+
+        private readonly Cached selectionValid = new Cached();
 
         private Selection currentKeyboardSelection = new Selection();
         private Selection currentSelection = new Selection();
@@ -419,29 +433,22 @@ namespace osu.Game.Screens.SelectV2
             if (currentSelection.Model == model)
                 return;
 
-            var previousSelection = currentSelection;
+            if (HandleItemSelected(model))
+            {
+                if (currentSelection.Model != null)
+                    HandleItemDeselected(currentSelection.Model);
 
-            if (previousSelection.Model != null)
-                HandleItemDeselected(previousSelection.Model);
+                currentKeyboardSelection = new Selection(model);
+                currentSelection = currentKeyboardSelection;
+            }
 
-            currentSelection = currentKeyboardSelection = new Selection(model);
-            HandleItemSelected(currentSelection.Model);
-
-            // `HandleItemSelected` can alter `CurrentSelection`, which will recursively call `setSelection()` again.
-            // if that happens, the rest of this method should be a no-op.
-            if (currentSelection.Model != model)
-                return;
-
-            refreshAfterSelection();
-            scrollToSelection();
+            selectionValid.Invalidate();
         }
 
         private void setKeyboardSelection(object? model)
         {
             currentKeyboardSelection = new Selection(model);
-
-            refreshAfterSelection();
-            scrollToSelection();
+            selectionValid.Invalidate();
         }
 
         /// <summary>
@@ -526,6 +533,13 @@ namespace osu.Game.Screens.SelectV2
             if (carouselItems == null)
                 return;
 
+            if (!selectionValid.IsValid)
+            {
+                refreshAfterSelection();
+                scrollToSelection();
+                selectionValid.Validate();
+            }
+
             var range = getDisplayRange();
 
             if (range != displayedRange)
@@ -544,8 +558,8 @@ namespace osu.Game.Screens.SelectV2
                 if (c.Item == null)
                     continue;
 
-                if (panel.Depth != c.DrawYPosition)
-                    scroll.Panels.ChangeChildDepth(panel, (float)c.DrawYPosition);
+                double selectedYPos = currentSelection?.CarouselItem?.CarouselYPosition ?? 0;
+                scroll.Panels.ChangeChildDepth(panel, (float)Math.Abs(c.DrawYPosition - selectedYPos));
 
                 if (c.DrawYPosition != c.Item.CarouselYPosition)
                     c.DrawYPosition = Interpolation.DampContinuously(c.DrawYPosition, c.Item.CarouselYPosition, 50, Time.Elapsed);
@@ -557,6 +571,7 @@ namespace osu.Game.Screens.SelectV2
 
                 c.Selected.Value = c.Item == currentSelection?.CarouselItem;
                 c.KeyboardSelected.Value = c.Item == currentKeyboardSelection?.CarouselItem;
+                c.Expanded.Value = c.Item.IsExpanded;
             }
         }
 
@@ -660,6 +675,7 @@ namespace osu.Game.Screens.SelectV2
             carouselPanel.Item = null;
             carouselPanel.Selected.Value = false;
             carouselPanel.KeyboardSelected.Value = false;
+            carouselPanel.Expanded.Value = false;
         }
 
         #endregion
