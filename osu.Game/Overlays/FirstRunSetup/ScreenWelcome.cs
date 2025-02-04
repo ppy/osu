@@ -23,7 +23,7 @@ using osuTK;
 namespace osu.Game.Overlays.FirstRunSetup
 {
     [LocalisableDescription(typeof(FirstRunSetupOverlayStrings), nameof(FirstRunSetupOverlayStrings.WelcomeTitle))]
-    public partial class ScreenWelcome : FirstRunSetupScreen
+    public partial class ScreenWelcome : WizardScreen
     {
         [BackgroundDependencyLoader]
         private void load(FrameworkConfigManager frameworkConfig)
