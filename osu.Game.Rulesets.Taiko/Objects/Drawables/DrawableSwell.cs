@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             AddInternal(ticks = new Container<DrawableSwellTick> { RelativeSizeAxes = Axes.Both });
         }
 
-        protected override SkinnableDrawable CreateMainPiece() => new SkinnableDrawable(new TaikoSkinComponentLookup(TaikoSkinComponents.SwellBody),
+        protected override SkinnableDrawable CreateMainPiece() => new SkinnableDrawable(new TaikoSkinComponentLookup(TaikoSkinComponents.Swell),
             _ => new DefaultSwell
             {
                 Anchor = Anchor.Centre,
