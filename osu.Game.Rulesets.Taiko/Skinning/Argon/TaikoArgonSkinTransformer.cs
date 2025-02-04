@@ -68,7 +68,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
                         case TaikoSkinComponents.TaikoExplosionOk:
                             return new ArgonHitExplosion(taikoComponent.Component);
 
-                        case TaikoSkinComponents.SwellBody:
+                        case TaikoSkinComponents.Swell:
                             return new ArgonSwell();
                     }
 
