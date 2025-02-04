@@ -46,7 +46,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return difficulty;
         }
         public static double DifficultyToPerformance(double difficulty) => Math.Pow(5.0 * Math.Max(1.0, difficulty / 0.0675) - 4.0, 3.0) / 100000.0;
-        public static double CalculateLengthBonus(double totalHits, double consistencyFactor, double approachRateBonus) => computeBasicLengthBonus(totalHits, consistencyFactor) * (1.0 + approachRateBonus * computeBasicLengthBonus(totalHits, consistencyFactor));
-        private static double computeBasicLengthBonus(double totalHits, double consistencyFactor) => 0.95 + Math.Pow(totalHits / 2000, 1.38) * Math.Max(Math.Pow(consistencyFactor + 1.0, 1.1) - 1.1, 0.01);
+        //public static double CalculateLengthBonus(double totalHits, double consistencyFactor, double approachRateBonus) => computeBasicLengthBonus(totalHits, consistencyFactor) * (1.0 + approachRateBonus * computeBasicLengthBonus(totalHits, consistencyFactor));
+        public static double CalculateLengthBonus(double totalHits, double consistencyFactor, double approachRateBonus) => 1;
+        private static double computeBasicLengthBonus(double totalHits, double consistencyFactor) => 0.95 + 0.4 * Math.Min(1.0, totalHits * (0.7 + consistencyFactor / 2) / 2000.0) + (totalHits > 2000 ? Math.Log10(totalHits / 2000.0) * 0.5 : 0.0);
     }
 }
