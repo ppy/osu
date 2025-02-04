@@ -18,6 +18,9 @@ namespace osu.Game.Graphics.UserInterface
 {
     public partial class OsuMenu : Menu
     {
+        protected const double DELAY_BEFORE_FADE_OUT = 50;
+        protected const double FADE_DURATION = 280;
+
         // todo: this shouldn't be required after https://github.com/ppy/osu-framework/issues/4519 is fixed.
         private bool wasOpened;
 
@@ -68,8 +71,8 @@ namespace osu.Game.Graphics.UserInterface
             if (!TopLevelMenu && wasOpened)
                 menuSamples?.PlayCloseSample();
 
-            this.Delay(50)
-                .FadeOut(300, Easing.OutQuint);
+            this.Delay(DELAY_BEFORE_FADE_OUT)
+                .FadeOut(FADE_DURATION, Easing.OutQuint);
 
             wasOpened = false;
         }
