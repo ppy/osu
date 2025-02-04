@@ -79,8 +79,13 @@ namespace osu.Game.Screens.Edit.Timing
             var activeTimingPoint = EditorBeatmap.ControlPointInfo.TimingPointAt(accurateTime);
             var activeEffectPoint = EditorBeatmap.ControlPointInfo.EffectPointAt(accurateTime);
 
-            double latestActiveTime = Math.Max(activeTimingPoint.Time, activeEffectPoint.Time);
-            SelectedGroup.Value = EditorBeatmap.ControlPointInfo.GroupAt(latestActiveTime);
+            if (activeEffectPoint.Equals(EffectControlPoint.DEFAULT))
+                SelectedGroup.Value = EditorBeatmap.ControlPointInfo.GroupAt(activeTimingPoint.Time);
+            else
+            {
+                double latestActiveTime = Math.Max(activeTimingPoint.Time, activeEffectPoint.Time);
+                SelectedGroup.Value = EditorBeatmap.ControlPointInfo.GroupAt(latestActiveTime);
+            }
         }
 
         protected override void ConfigureTimeline(TimelineArea timelineArea)
