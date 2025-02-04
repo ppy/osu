@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -9,32 +10,35 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Pooling;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
 using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.SelectV2
 {
-    public partial class BeatmapPanel : PoolableDrawable, ICarouselPanel
+    public partial class GroupPanel : PoolableDrawable, ICarouselPanel
     {
+        public const float HEIGHT = CarouselItem.DEFAULT_HEIGHT * 2;
+
         [Resolved]
         private BeatmapCarousel carousel { get; set; } = null!;
 
         private Box activationFlash = null!;
         private OsuSpriteText text = null!;
 
+        private Box box = null!;
+
         [BackgroundDependencyLoader]
         private void load()
         {
-            Size = new Vector2(500, CarouselItem.DEFAULT_HEIGHT);
+            Size = new Vector2(500, HEIGHT);
             Masking = true;
 
             InternalChildren = new Drawable[]
             {
-                new Box
+                box = new Box
                 {
-                    Colour = Color4.Aqua.Darken(5),
+                    Colour = Color4.DarkBlue.Darken(5),
                     Alpha = 0.8f,
                     RelativeSizeAxes = Axes.Both,
                 },
@@ -58,6 +62,11 @@ namespace osu.Game.Screens.SelectV2
                 activationFlash.FadeTo(value.NewValue ? 0.2f : 0, 500, Easing.OutQuint);
             });
 
+            Expanded.BindValueChanged(value =>
+            {
+                box.FadeColour(value.NewValue ? Color4.SkyBlue : Color4.DarkBlue.Darken(5), 500, Easing.OutQuint);
+            });
+
             KeyboardSelected.BindValueChanged(value =>
             {
                 if (value.NewValue)
@@ -77,22 +86,17 @@ namespace osu.Game.Screens.SelectV2
             base.PrepareForUse();
 
             Debug.Assert(Item != null);
-            var beatmap = (BeatmapInfo)Item.Model;
 
-            text.Text = $"Difficulty: {beatmap.DifficultyName} ({beatmap.StarRating:N1}*)";
+            GroupDefinition group = (GroupDefinition)Item.Model;
+
+            text.Text = group.Title;
 
             this.FadeInFromZero(500, Easing.OutQuint);
         }
 
         protected override bool OnClick(ClickEvent e)
         {
-            if (carousel.CurrentSelection != Item!.Model)
-            {
-                carousel.CurrentSelection = Item!.Model;
-                return true;
-            }
-
-            carousel.TryActivateSelection();
+            carousel.CurrentSelection = Item!.Model;
             return true;
         }
 
@@ -105,7 +109,11 @@ namespace osu.Game.Screens.SelectV2
 
         public double DrawYPosition { get; set; }
 
-        public void Activated() => activationFlash.FadeOutFromOne(500, Easing.OutQuint);
+        public void Activated()
+        {
+            // sets should never be activated.
+            throw new InvalidOperationException();
+        }
 
         #endregion
     }

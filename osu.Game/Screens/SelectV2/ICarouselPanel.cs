@@ -14,9 +14,14 @@ namespace osu.Game.Screens.SelectV2
     public interface ICarouselPanel
     {
         /// <summary>
-        /// Whether this item has selection. Should be read from to update the visual state.
+        /// Whether this item has selection (see <see cref="Carousel{T}.CurrentSelection"/>). Should be read from to update the visual state.
         /// </summary>
         BindableBool Selected { get; }
+
+        /// <summary>
+        /// Whether this item is expanded (see <see cref="CarouselItem.IsExpanded"/>). Should be read from to update the visual state.
+        /// </summary>
+        BindableBool Expanded { get; }
 
         /// <summary>
         /// Whether this item has keyboard selection. Should be read from to update the visual state.

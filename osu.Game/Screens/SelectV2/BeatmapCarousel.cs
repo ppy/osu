@@ -92,35 +92,113 @@ namespace osu.Game.Screens.SelectV2
 
         #region Selection handling
 
-        protected override void HandleItemSelected(object? model)
+        private GroupDefinition? lastSelectedGroup;
+        private BeatmapInfo? lastSelectedBeatmap;
+
+        protected override bool HandleItemSelected(object? model)
         {
             base.HandleItemSelected(model);
 
-            // Selecting a set isn't valid – let's re-select the first difficulty.
-            if (model is BeatmapSetInfo setInfo)
+            switch (model)
             {
-                CurrentSelection = setInfo.Beatmaps.First();
-                return;
+                case GroupDefinition group:
+                    // Special case – collapsing an open group.
+                    if (lastSelectedGroup == group)
+                    {
+                        setExpansionStateOfGroup(lastSelectedGroup, false);
+                        lastSelectedGroup = null;
+                        return false;
+                    }
+
+                    setExpandedGroup(group);
+                    return false;
+
+                case BeatmapSetInfo setInfo:
+                    // Selecting a set isn't valid – let's re-select the first difficulty.
+                    CurrentSelection = setInfo.Beatmaps.First();
+                    return false;
+
+                case BeatmapInfo beatmapInfo:
+
+                    // If we have groups, we need to account for them.
+                    if (Criteria.SplitOutDifficulties)
+                    {
+                        // Find the containing group. There should never be too many groups so iterating is efficient enough.
+                        GroupDefinition? group = grouping.GroupItems.SingleOrDefault(kvp => kvp.Value.Any(i => ReferenceEquals(i.Model, beatmapInfo))).Key;
+
+                        if (group != null)
+                            setExpandedGroup(group);
+                    }
+                    else
+                    {
+                        setExpandedSet(beatmapInfo);
+                    }
+
+                    return true;
             }
 
-            if (model is BeatmapInfo beatmapInfo)
-                setVisibilityOfSetItems(beatmapInfo.BeatmapSet!, true);
+            return true;
         }
 
-        protected override void HandleItemDeselected(object? model)
+        protected override bool CheckValidForGroupSelection(CarouselItem item)
         {
-            base.HandleItemDeselected(model);
-
-            if (model is BeatmapInfo beatmapInfo)
-                setVisibilityOfSetItems(beatmapInfo.BeatmapSet!, false);
-        }
-
-        private void setVisibilityOfSetItems(BeatmapSetInfo set, bool visible)
-        {
-            if (grouping.SetItems.TryGetValue(set, out var group))
+            switch (item.Model)
             {
-                foreach (var i in group)
-                    i.IsVisible = visible;
+                case BeatmapSetInfo:
+                    return true;
+
+                case BeatmapInfo:
+                    return Criteria.SplitOutDifficulties;
+
+                case GroupDefinition:
+                    return false;
+
+                default:
+                    throw new ArgumentException($"Unsupported model type {item.Model}");
+            }
+        }
+
+        private void setExpandedGroup(GroupDefinition group)
+        {
+            if (lastSelectedGroup != null)
+                setExpansionStateOfGroup(lastSelectedGroup, false);
+            lastSelectedGroup = group;
+            setExpansionStateOfGroup(group, true);
+        }
+
+        private void setExpansionStateOfGroup(GroupDefinition group, bool expanded)
+        {
+            if (grouping.GroupItems.TryGetValue(group, out var items))
+            {
+                foreach (var i in items)
+                {
+                    if (i.Model is GroupDefinition)
+                        i.IsExpanded = expanded;
+                    else
+                        i.IsVisible = expanded;
+                }
+            }
+        }
+
+        private void setExpandedSet(BeatmapInfo beatmapInfo)
+        {
+            if (lastSelectedBeatmap != null)
+                setExpansionStateOfSetItems(lastSelectedBeatmap.BeatmapSet!, false);
+            lastSelectedBeatmap = beatmapInfo;
+            setExpansionStateOfSetItems(beatmapInfo.BeatmapSet!, true);
+        }
+
+        private void setExpansionStateOfSetItems(BeatmapSetInfo set, bool expanded)
+        {
+            if (grouping.SetItems.TryGetValue(set, out var items))
+            {
+                foreach (var i in items)
+                {
+                    if (i.Model is BeatmapSetInfo)
+                        i.IsExpanded = expanded;
+                    else
+                        i.IsVisible = expanded;
+                }
             }
         }
 
@@ -143,9 +221,11 @@ namespace osu.Game.Screens.SelectV2
 
         private readonly DrawablePool<BeatmapPanel> beatmapPanelPool = new DrawablePool<BeatmapPanel>(100);
         private readonly DrawablePool<BeatmapSetPanel> setPanelPool = new DrawablePool<BeatmapSetPanel>(100);
+        private readonly DrawablePool<GroupPanel> groupPanelPool = new DrawablePool<GroupPanel>(100);
 
         private void setupPools()
         {
+            AddInternal(groupPanelPool);
             AddInternal(beatmapPanelPool);
             AddInternal(setPanelPool);
         }
@@ -154,7 +234,12 @@ namespace osu.Game.Screens.SelectV2
         {
             switch (item.Model)
             {
+                case GroupDefinition:
+                    return groupPanelPool.Get();
+
                 case BeatmapInfo:
+                    // TODO: if beatmap is a group selection target, it needs to be a different drawable
+                    // with more information attached.
                     return beatmapPanelPool.Get();
 
                 case BeatmapSetInfo:
@@ -166,4 +251,6 @@ namespace osu.Game.Screens.SelectV2
 
         #endregion
     }
+
+    public record GroupDefinition(string Title);
 }
