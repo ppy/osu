@@ -228,8 +228,6 @@ namespace osu.Game.Screens.SelectV2
 
         private async Task performFilter()
         {
-            Debug.Assert(SynchronizationContext.Current != null);
-
             Stopwatch stopwatch = Stopwatch.StartNew();
             var cts = new CancellationTokenSource();
 
@@ -266,19 +264,22 @@ namespace osu.Game.Screens.SelectV2
                 {
                     log("Cancelled due to newer request arriving");
                 }
-            }, cts.Token).ConfigureAwait(true);
+            }, cts.Token).ConfigureAwait(false);
 
             if (cts.Token.IsCancellationRequested)
                 return;
 
-            log("Items ready for display");
-            carouselItems = items.ToList();
-            displayedRange = null;
+            Schedule(() =>
+            {
+                log("Items ready for display");
+                carouselItems = items.ToList();
+                displayedRange = null;
 
-            // Need to call this to ensure correct post-selection logic is handled on the new items list.
-            HandleItemSelected(currentSelection.Model);
+                // Need to call this to ensure correct post-selection logic is handled on the new items list.
+                HandleItemSelected(currentSelection.Model);
 
-            refreshAfterSelection();
+                refreshAfterSelection();
+            });
 
             void log(string text) => Logger.Log($"Carousel[op {cts.GetHashCode().ToString()}] {stopwatch.ElapsedMilliseconds} ms: {text}");
         }
