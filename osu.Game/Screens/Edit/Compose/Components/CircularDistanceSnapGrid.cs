@@ -56,7 +56,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             // Picture the scenario where the user has just placed an object on a 1/2 snap, then changes to
             // 1/3 snap and expects to be able to place the next object on a valid 1/3 snap, regardless of the
             // fact that the 1/2 snap reference object is not valid for 1/3 snapping.
-            float offset = SnapProvider.FindSnappedDistance(0, StartTime, SliderVelocitySource);
+            float offset = (float)(SnapProvider.FindSnappedDistance(0, StartTime, SliderVelocitySource) * DistanceSpacingMultiplier.Value);
 
             for (int i = 0; i < requiredCircles; i++)
             {

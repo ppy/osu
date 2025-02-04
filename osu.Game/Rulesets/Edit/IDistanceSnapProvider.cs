@@ -76,6 +76,8 @@ namespace osu.Game.Rulesets.Edit
         /// <item>the beatmap's <see cref="IBeatmapDifficultyInfo.SliderMultiplier"/>,</item>,
         /// <item>the current beat divisor.</item>
         /// </list>
+        /// Note that the returned value does <b>NOT</b> depend on <see cref="DistanceSpacingMultiplier"/>;
+        /// consumers are expected to include that multiplier as they see fit.
         /// </summary>
         float FindSnappedDistance(float distance, double snapReferenceTime, IHasSliderVelocity? withVelocity = null);
     }
