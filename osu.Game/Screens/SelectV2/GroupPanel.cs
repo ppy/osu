@@ -26,6 +26,8 @@ namespace osu.Game.Screens.SelectV2
         private Box activationFlash = null!;
         private OsuSpriteText text = null!;
 
+        private Box box = null!;
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -34,7 +36,7 @@ namespace osu.Game.Screens.SelectV2
 
             InternalChildren = new Drawable[]
             {
-                new Box
+                box = new Box
                 {
                     Colour = Color4.DarkBlue.Darken(5),
                     Alpha = 0.8f,
@@ -58,6 +60,11 @@ namespace osu.Game.Screens.SelectV2
             Selected.BindValueChanged(value =>
             {
                 activationFlash.FadeTo(value.NewValue ? 0.2f : 0, 500, Easing.OutQuint);
+            });
+
+            Expanded.BindValueChanged(value =>
+            {
+                box.FadeColour(value.NewValue ? Color4.SkyBlue : Color4.DarkBlue.Darken(5), 500, Easing.OutQuint);
             });
 
             KeyboardSelected.BindValueChanged(value =>
@@ -97,6 +104,7 @@ namespace osu.Game.Screens.SelectV2
 
         public CarouselItem? Item { get; set; }
         public BindableBool Selected { get; } = new BindableBool();
+        public BindableBool Expanded { get; } = new BindableBool();
         public BindableBool KeyboardSelected { get; } = new BindableBool();
 
         public double DrawYPosition { get; set; }

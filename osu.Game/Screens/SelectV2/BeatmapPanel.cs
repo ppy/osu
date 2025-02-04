@@ -100,6 +100,7 @@ namespace osu.Game.Screens.SelectV2
 
         public CarouselItem? Item { get; set; }
         public BindableBool Selected { get; } = new BindableBool();
+        public BindableBool Expanded { get; } = new BindableBool();
         public BindableBool KeyboardSelected { get; } = new BindableBool();
 
         public double DrawYPosition { get; set; }
