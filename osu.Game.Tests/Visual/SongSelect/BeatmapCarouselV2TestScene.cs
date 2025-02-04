@@ -153,7 +153,8 @@ namespace osu.Game.Tests.Visual.SongSelect
                 var groupingFilter = Carousel.Filters.OfType<BeatmapCarouselFilterGrouping>().Single();
 
                 GroupDefinition g = groupingFilter.GroupItems.Keys.ElementAt(group);
-                CarouselItem item = groupingFilter.GroupItems[g].ElementAt(panel);
+                // offset by one because the group itself is included in the items list.
+                CarouselItem item = groupingFilter.GroupItems[g].ElementAt(panel + 1);
 
                 return ReferenceEquals(Carousel.CurrentSelection, item.Model);
             });

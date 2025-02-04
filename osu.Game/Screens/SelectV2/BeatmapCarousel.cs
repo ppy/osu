@@ -105,12 +105,12 @@ namespace osu.Game.Screens.SelectV2
                     // Special case – collapsing an open group.
                     if (lastSelectedGroup == group)
                     {
-                        setVisibilityOfGroupItems(lastSelectedGroup, false);
+                        setExpansionStateOfGroup(lastSelectedGroup, false);
                         lastSelectedGroup = null;
                         return false;
                     }
 
-                    setVisibleGroup(group);
+                    setExpandedGroup(group);
                     return false;
 
                 case BeatmapSetInfo setInfo:
@@ -127,11 +127,11 @@ namespace osu.Game.Screens.SelectV2
                         GroupDefinition? group = grouping.GroupItems.SingleOrDefault(kvp => kvp.Value.Any(i => ReferenceEquals(i.Model, beatmapInfo))).Key;
 
                         if (group != null)
-                            setVisibleGroup(group);
+                            setExpandedGroup(group);
                     }
                     else
                     {
-                        setVisibleSet(beatmapInfo);
+                        setExpandedSet(beatmapInfo);
                     }
 
                     return true;
@@ -158,37 +158,47 @@ namespace osu.Game.Screens.SelectV2
             }
         }
 
-        private void setVisibleGroup(GroupDefinition group)
+        private void setExpandedGroup(GroupDefinition group)
         {
             if (lastSelectedGroup != null)
-                setVisibilityOfGroupItems(lastSelectedGroup, false);
+                setExpansionStateOfGroup(lastSelectedGroup, false);
             lastSelectedGroup = group;
-            setVisibilityOfGroupItems(group, true);
+            setExpansionStateOfGroup(group, true);
         }
 
-        private void setVisibilityOfGroupItems(GroupDefinition group, bool visible)
+        private void setExpansionStateOfGroup(GroupDefinition group, bool expanded)
         {
             if (grouping.GroupItems.TryGetValue(group, out var items))
             {
                 foreach (var i in items)
-                    i.IsVisible = visible;
+                {
+                    if (i.Model is GroupDefinition)
+                        i.IsExpanded = expanded;
+                    else
+                        i.IsVisible = expanded;
+                }
             }
         }
 
-        private void setVisibleSet(BeatmapInfo beatmapInfo)
+        private void setExpandedSet(BeatmapInfo beatmapInfo)
         {
             if (lastSelectedBeatmap != null)
-                setVisibilityOfSetItems(lastSelectedBeatmap.BeatmapSet!, false);
+                setExpansionStateOfSetItems(lastSelectedBeatmap.BeatmapSet!, false);
             lastSelectedBeatmap = beatmapInfo;
-            setVisibilityOfSetItems(beatmapInfo.BeatmapSet!, true);
+            setExpansionStateOfSetItems(beatmapInfo.BeatmapSet!, true);
         }
 
-        private void setVisibilityOfSetItems(BeatmapSetInfo set, bool visible)
+        private void setExpansionStateOfSetItems(BeatmapSetInfo set, bool expanded)
         {
             if (grouping.SetItems.TryGetValue(set, out var items))
             {
                 foreach (var i in items)
-                    i.IsVisible = visible;
+                {
+                    if (i.Model is BeatmapSetInfo)
+                        i.IsExpanded = expanded;
+                    else
+                        i.IsVisible = expanded;
+                }
             }
         }
 
