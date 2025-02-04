@@ -427,7 +427,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
         /// <returns>The screen to enter.</returns>
         protected abstract Screen CreateGameplayScreen(PlaylistItem selectedItem);
 
-        private void updateSpecifics() => Scheduler.AddOnce(() =>
+        private void updateSpecifics()
         {
             if (!this.IsCurrentScreen() || SelectedItem.Value is not PlaylistItem item)
                 return;
@@ -487,7 +487,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
             }
             else
                 UserStyleSection.Hide();
-        });
+        }
 
         protected virtual APIMod[] GetGameplayMods() => UserMods.Value.Select(m => new APIMod(m)).Concat(SelectedItem.Value!.RequiredMods).ToArray();
 
