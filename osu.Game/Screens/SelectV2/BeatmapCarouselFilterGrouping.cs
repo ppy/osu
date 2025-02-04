@@ -65,7 +65,11 @@ namespace osu.Game.Screens.SelectV2
                         if (b.StarRating > starGroup)
                         {
                             starGroup = (int)Math.Floor(b.StarRating);
-                            newItems.Add(new CarouselItem(new GroupDefinition($"{starGroup} - {++starGroup} *")) { DrawHeight = GroupPanel.HEIGHT });
+                            var groupDefinition = new GroupDefinition($"{starGroup} - {++starGroup} *");
+                            var groupItem = new CarouselItem(groupDefinition) { DrawHeight = GroupPanel.HEIGHT };
+
+                            newItems.Add(groupItem);
+                            groupItems[groupDefinition] = new HashSet<CarouselItem> { groupItem };
                         }
 
                         newItems.Add(item);
@@ -91,14 +95,13 @@ namespace osu.Game.Screens.SelectV2
 
                         if (newBeatmapSet)
                         {
-                            newItems.Insert(i, new CarouselItem(beatmap.BeatmapSet!) { DrawHeight = BeatmapSetPanel.HEIGHT });
+                            var setItem = new CarouselItem(beatmap.BeatmapSet!) { DrawHeight = BeatmapSetPanel.HEIGHT };
+                            setItems[beatmap.BeatmapSet!] = new HashSet<CarouselItem> { setItem };
+                            newItems.Insert(i, setItem);
                             i++;
                         }
 
-                        if (!setItems.TryGetValue(beatmap.BeatmapSet!, out var related))
-                            setItems[beatmap.BeatmapSet!] = related = new HashSet<CarouselItem>();
-
-                        related.Add(item);
+                        setItems[beatmap.BeatmapSet!].Add(item);
                         item.IsVisible = false;
                     }
 
@@ -121,10 +124,7 @@ namespace osu.Game.Screens.SelectV2
 
                 if (lastGroup != null)
                 {
-                    if (!groupItems.TryGetValue(lastGroup, out var groupRelated))
-                        groupItems[lastGroup] = groupRelated = new HashSet<CarouselItem>();
-                    groupRelated.Add(item);
-
+                    groupItems[lastGroup].Add(item);
                     item.IsVisible = false;
                 }
             }
