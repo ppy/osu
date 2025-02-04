@@ -24,7 +24,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
-        public void TestOpenCloseGroupWithNoSelection()
+        public void TestOpenCloseGroupWithNoSelectionMouse()
         {
             AddBeatmaps(10, 5);
             WaitForDrawablePanels();
@@ -39,6 +39,29 @@ namespace osu.Game.Tests.Visual.SongSelect
             ClickVisiblePanel<GroupPanel>(0);
             AddUntilStep("no beatmaps visible", () => Carousel.ChildrenOfType<BeatmapPanel>().Count(p => p.Alpha > 0), () => Is.Zero);
             CheckNoSelection();
+        }
+
+        [Test]
+        public void TestOpenCloseGroupWithNoSelectionKeyboard()
+        {
+            AddBeatmaps(10, 5);
+            WaitForDrawablePanels();
+
+            AddAssert("no beatmaps visible", () => Carousel.ChildrenOfType<BeatmapPanel>().Count(p => p.Alpha > 0), () => Is.Zero);
+            CheckNoSelection();
+
+            SelectNextPanel();
+            Select();
+            AddUntilStep("some beatmaps visible", () => Carousel.ChildrenOfType<BeatmapPanel>().Count(p => p.Alpha > 0), () => Is.GreaterThan(0));
+            AddAssert("keyboard selected is expanded", () => getKeyboardSelectedPanel()?.Expanded.Value, () => Is.True);
+            CheckNoSelection();
+
+            Select();
+            AddUntilStep("no beatmaps visible", () => Carousel.ChildrenOfType<BeatmapPanel>().Count(p => p.Alpha > 0), () => Is.Zero);
+            AddAssert("keyboard selected is collapsed", () => getKeyboardSelectedPanel()?.Expanded.Value, () => Is.False);
+            CheckNoSelection();
+
+            GroupPanel? getKeyboardSelectedPanel() => Carousel.ChildrenOfType<GroupPanel>().SingleOrDefault(p => p.KeyboardSelected.Value);
         }
 
         [Test]
