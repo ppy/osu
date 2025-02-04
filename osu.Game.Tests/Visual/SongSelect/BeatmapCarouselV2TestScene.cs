@@ -178,7 +178,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 Carousel.ChildrenOfType<UserTrackingScrollContainer>().Single()
                         .ChildrenOfType<T>()
                         .Where(p => ((ICarouselPanel)p).Item?.IsVisible == true)
-                        .Reverse()
+                        .OrderBy(p => p.Y)
                         .ElementAt(index)
                         .TriggerClick();
             });
