@@ -3,11 +3,13 @@
 
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Online.API;
+using osu.Game.Online.Multiplayer;
 using osu.Game.Users;
 
 namespace osu.Game.Online.Metadata
@@ -36,11 +38,6 @@ namespace osu.Game.Online.Metadata
         #endregion
 
         #region User presence updates
-
-        /// <summary>
-        /// Whether the client is currently receiving user presence updates from the server.
-        /// </summary>
-        public abstract IBindable<bool> IsWatchingUserPresence { get; }
 
         /// <summary>
         /// The <see cref="UserPresence"/> information about the current user.
@@ -82,17 +79,63 @@ namespace osu.Game.Online.Metadata
         /// <inheritdoc/>
         public abstract Task UpdateStatus(UserStatus? status);
 
-        /// <inheritdoc/>
-        public abstract Task BeginWatchingUserPresence();
+        private int userPresenceWatchCount;
+
+        protected bool IsWatchingUserPresence
+            => Interlocked.CompareExchange(ref userPresenceWatchCount, userPresenceWatchCount, userPresenceWatchCount) > 0;
+
+        /// <inheritdoc cref="IMetadataServer.BeginWatchingUserPresence" />
+        public IDisposable BeginWatchingUserPresence()
+            => new UserPresenceWatchToken(this);
 
         /// <inheritdoc/>
-        public abstract Task EndWatchingUserPresence();
+        Task IMetadataServer.BeginWatchingUserPresence()
+        {
+            if (Interlocked.Increment(ref userPresenceWatchCount) == 1)
+                return BeginWatchingUserPresenceInternal();
+
+            return Task.CompletedTask;
+        }
+
+        /// <inheritdoc/>
+        Task IMetadataServer.EndWatchingUserPresence()
+        {
+            if (Interlocked.Decrement(ref userPresenceWatchCount) == 0)
+                return EndWatchingUserPresenceInternal();
+
+            return Task.CompletedTask;
+        }
+
+        protected abstract Task BeginWatchingUserPresenceInternal();
+
+        protected abstract Task EndWatchingUserPresenceInternal();
 
         /// <inheritdoc/>
         public abstract Task UserPresenceUpdated(int userId, UserPresence? presence);
 
         /// <inheritdoc/>
         public abstract Task FriendPresenceUpdated(int userId, UserPresence? presence);
+
+        private class UserPresenceWatchToken : IDisposable
+        {
+            private readonly IMetadataServer server;
+            private bool isDisposed;
+
+            public UserPresenceWatchToken(IMetadataServer server)
+            {
+                this.server = server;
+                server.BeginWatchingUserPresence().FireAndForget();
+            }
+
+            public void Dispose()
+            {
+                if (isDisposed)
+                    return;
+
+                server.EndWatchingUserPresence().FireAndForget();
+                isDisposed = true;
+            }
+        }
 
         #endregion
 
