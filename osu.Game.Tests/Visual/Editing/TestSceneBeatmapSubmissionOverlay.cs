@@ -12,7 +12,6 @@ namespace osu.Game.Tests.Visual.Editing
     public partial class TestSceneBeatmapSubmissionOverlay : OsuTestScene
     {
         private ScreenFooter footer = null!;
-        private BeatmapSubmissionOverlay overlay = null!;
 
         [SetUpSteps]
         public void SetUpSteps()
@@ -29,7 +28,7 @@ namespace osu.Game.Tests.Visual.Editing
                     Children = new Drawable[]
                     {
                         receptor,
-                        overlay = new BeatmapSubmissionOverlay()
+                        new BeatmapSubmissionOverlay
                         {
                             State = { Value = Visibility.Visible, },
                         },
