@@ -10,20 +10,20 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Pooling;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
 using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.SelectV2
 {
-    public partial class BeatmapSetPanel : PoolableDrawable, ICarouselPanel
+    public partial class GroupPanel : PoolableDrawable, ICarouselPanel
     {
         public const float HEIGHT = CarouselItem.DEFAULT_HEIGHT * 2;
 
         [Resolved]
         private BeatmapCarousel carousel { get; set; } = null!;
 
+        private Box activationFlash = null!;
         private OsuSpriteText text = null!;
 
         [BackgroundDependencyLoader]
@@ -36,8 +36,15 @@ namespace osu.Game.Screens.SelectV2
             {
                 new Box
                 {
-                    Colour = Color4.Yellow.Darken(5),
+                    Colour = Color4.DarkBlue.Darken(5),
                     Alpha = 0.8f,
+                    RelativeSizeAxes = Axes.Both,
+                },
+                activationFlash = new Box
+                {
+                    Colour = Color4.White,
+                    Blending = BlendingParameters.Additive,
+                    Alpha = 0,
                     RelativeSizeAxes = Axes.Both,
                 },
                 text = new OsuSpriteText
@@ -47,6 +54,11 @@ namespace osu.Game.Screens.SelectV2
                     Origin = Anchor.CentreLeft,
                 }
             };
+
+            Selected.BindValueChanged(value =>
+            {
+                activationFlash.FadeTo(value.NewValue ? 0.2f : 0, 500, Easing.OutQuint);
+            });
 
             KeyboardSelected.BindValueChanged(value =>
             {
@@ -68,9 +80,9 @@ namespace osu.Game.Screens.SelectV2
 
             Debug.Assert(Item != null);
 
-            var beatmapSetInfo = (BeatmapSetInfo)Item.Model;
+            GroupDefinition group = (GroupDefinition)Item.Model;
 
-            text.Text = $"{beatmapSetInfo.Metadata}";
+            text.Text = group.Title;
 
             this.FadeInFromZero(500, Easing.OutQuint);
         }
