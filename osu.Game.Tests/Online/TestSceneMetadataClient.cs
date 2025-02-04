@@ -11,7 +11,7 @@ namespace osu.Game.Tests.Online
 {
     [TestFixture]
     [HeadlessTest]
-    public class TestSceneMetadataClient : OsuTestScene
+    public partial class TestSceneMetadataClient : OsuTestScene
     {
         private TestMetadataClient client = null!;
 
