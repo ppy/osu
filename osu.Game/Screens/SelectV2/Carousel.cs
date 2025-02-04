@@ -571,6 +571,7 @@ namespace osu.Game.Screens.SelectV2
 
                 c.Selected.Value = c.Item == currentSelection?.CarouselItem;
                 c.KeyboardSelected.Value = c.Item == currentKeyboardSelection?.CarouselItem;
+                c.Expanded.Value = c.Item.IsExpanded;
             }
         }
 
@@ -674,6 +675,7 @@ namespace osu.Game.Screens.SelectV2
             carouselPanel.Item = null;
             carouselPanel.Selected.Value = false;
             carouselPanel.KeyboardSelected.Value = false;
+            carouselPanel.Expanded.Value = false;
         }
 
         #endregion
