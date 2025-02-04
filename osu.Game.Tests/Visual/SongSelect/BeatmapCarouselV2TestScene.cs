@@ -175,7 +175,8 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             AddStep($"click panel at index {index}", () =>
             {
-                Carousel.ChildrenOfType<T>()
+                Carousel.ChildrenOfType<UserTrackingScrollContainer>().Single()
+                        .ChildrenOfType<T>()
                         .Where(p => ((ICarouselPanel)p).Item?.IsVisible == true)
                         .Reverse()
                         .ElementAt(index)
