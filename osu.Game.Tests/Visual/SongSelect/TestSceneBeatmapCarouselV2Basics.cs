@@ -51,6 +51,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             AddBeatmaps(10);
             SortBy(new FilterCriteria { Group = GroupMode.Difficulty, Sort = SortMode.Difficulty });
+            SortBy(new FilterCriteria { Group = GroupMode.Artist, Sort = SortMode.Artist });
             SortBy(new FilterCriteria { Sort = SortMode.Artist });
         }
 

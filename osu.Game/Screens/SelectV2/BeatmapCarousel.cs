@@ -119,20 +119,12 @@ namespace osu.Game.Screens.SelectV2
                     return false;
 
                 case BeatmapInfo beatmapInfo:
+                    // Find any containing group. There should never be too many groups so iterating is efficient enough.
+                    GroupDefinition? containingGroup = grouping.GroupItems.SingleOrDefault(kvp => kvp.Value.Any(i => ReferenceEquals(i.Model, beatmapInfo))).Key;
 
-                    // If we have groups, we need to account for them.
-                    if (Criteria.SplitOutDifficulties)
-                    {
-                        // Find the containing group. There should never be too many groups so iterating is efficient enough.
-                        GroupDefinition? group = grouping.GroupItems.SingleOrDefault(kvp => kvp.Value.Any(i => ReferenceEquals(i.Model, beatmapInfo))).Key;
-
-                        if (group != null)
-                            setExpandedGroup(group);
-                    }
-                    else
-                    {
-                        setExpandedSet(beatmapInfo);
-                    }
+                    if (containingGroup != null)
+                        setExpandedGroup(containingGroup);
+                    setExpandedSet(beatmapInfo);
 
                     return true;
             }
@@ -170,12 +162,23 @@ namespace osu.Game.Screens.SelectV2
         {
             if (grouping.GroupItems.TryGetValue(group, out var items))
             {
+                // First pass ignoring set groupings.
                 foreach (var i in items)
                 {
                     if (i.Model is GroupDefinition)
                         i.IsExpanded = expanded;
                     else
                         i.IsVisible = expanded;
+                }
+
+                // Second pass to hide set children when not meant to be displayed.
+                if (expanded)
+                {
+                    foreach (var i in items)
+                    {
+                        if (i.Model is BeatmapSetInfo set)
+                            setExpansionStateOfSetItems(set, i.IsExpanded);
+                    }
                 }
             }
         }
