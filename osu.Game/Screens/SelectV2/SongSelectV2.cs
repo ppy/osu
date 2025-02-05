@@ -39,6 +39,20 @@ namespace osu.Game.Screens.SelectV2
         {
             AddRangeInternal(new Drawable[]
             {
+                new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Padding = new MarginPadding { Bottom = ScreenFooter.HEIGHT },
+                    Child = new BeatmapCarousel
+                    {
+                        Anchor = Anchor.TopRight,
+                        Origin = Anchor.TopRight,
+                        RelativeSizeAxes = Axes.Both,
+                        Width = 0.5f,
+                        // Push the carousel slightly off the right edge of the screen for the ends of the panels to be cut off.
+                        X = 20f,
+                    },
+                },
                 modSelectOverlay,
             });
         }
