@@ -218,7 +218,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             if (result == -1) return 0;
 
-            return arr[result].Overlapness;
+            return arr[result].TotalOverlapness;
         }
     }
 }
