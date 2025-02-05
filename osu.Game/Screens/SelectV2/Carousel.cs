@@ -226,12 +226,14 @@ namespace osu.Game.Screens.SelectV2
         private Task filterTask = Task.CompletedTask;
         private CancellationTokenSource cancellationSource = new CancellationTokenSource();
 
+        private readonly object cancellationLock = new object();
+
         private async Task performFilter()
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
             var cts = new CancellationTokenSource();
 
-            lock (this)
+            lock (cancellationLock)
             {
                 cancellationSource.Cancel();
                 cancellationSource = cts;
