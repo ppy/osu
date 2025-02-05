@@ -16,10 +16,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Rhythm
             foreach (var rhythmGroup in rhythmGroups)
             {
                 foreach (var hitObject in rhythmGroup.HitObjects)
-                {
                     hitObject.RhythmData.SameRhythmGroupedHitObjects = rhythmGroup;
-                    hitObject.HitObjectInterval = rhythmGroup.HitObjectInterval;
-                }
             }
 
             var patternGroups = createSamePatternGroupedHitObjects(rhythmGroups);
@@ -27,9 +24,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Rhythm
             foreach (var patternGroup in patternGroups)
             {
                 foreach (var hitObject in patternGroup.AllHitObjects)
-                {
                     hitObject.RhythmData.SamePatternsGroupedHitObjects = patternGroup;
-                }
             }
         }
 
