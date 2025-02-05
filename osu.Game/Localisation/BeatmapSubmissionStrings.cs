@@ -90,9 +90,9 @@ namespace osu.Game.Localisation
         public static LocalisableString ModdingQueuesForumDescription => new TranslatableString(getKey(@"modding_queues_forum_description"), @"Having trouble getting feedback? Why not ask in a mod queue!");
 
         /// <summary>
-        /// "Where would you like to post your map?"
+        /// "Where would you like to post your beatmap?"
         /// </summary>
-        public static LocalisableString BeatmapSubmissionTargetCaption => new TranslatableString(getKey(@"beatmap_submission_target_caption"), @"Where would you like to post your map?");
+        public static LocalisableString BeatmapSubmissionTargetCaption => new TranslatableString(getKey(@"beatmap_submission_target_caption"), @"Where would you like to post your beatmap?");
 
         /// <summary>
         /// "Works in Progress / Help (incomplete, not ready for ranking)"
