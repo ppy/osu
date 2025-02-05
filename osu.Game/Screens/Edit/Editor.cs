@@ -330,6 +330,18 @@ namespace osu.Game.Screens.Edit
             editorTimelineShowTicks = config.GetBindable<bool>(OsuSetting.EditorTimelineShowTicks);
             editorContractSidebars = config.GetBindable<bool>(OsuSetting.EditorContractSidebars);
 
+            // These two settings don't work together. Make them mutually exclusive to let the user know.
+            editorAutoSeekOnPlacement.BindValueChanged(enabled =>
+            {
+                if (enabled.NewValue)
+                    editorLimitedDistanceSnap.Value = false;
+            });
+            editorLimitedDistanceSnap.BindValueChanged(enabled =>
+            {
+                if (enabled.NewValue)
+                    editorAutoSeekOnPlacement.Value = false;
+            });
+
             AddInternal(new OsuContextMenuContainer
             {
                 RelativeSizeAxes = Axes.Both,

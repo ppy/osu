@@ -16,9 +16,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
 {
     public abstract partial class CircularDistanceSnapGrid : DistanceSnapGrid
     {
-        [Resolved]
-        private EditorClock editorClock { get; set; } = null!;
-
         protected CircularDistanceSnapGrid(HitObject referenceObject, Vector2 startPosition, double startTime, double? endTime = null)
             : base(referenceObject, startPosition, startTime, endTime)
         {
@@ -76,7 +73,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             }
         }
 
-        public override (Vector2 position, double time) GetSnappedPosition(Vector2 position)
+        public override (Vector2 position, double time) GetSnappedPosition(Vector2 position, double? fixedTime = null)
         {
             if (MaxIntervals == 0)
                 return (StartPosition, StartTime);
@@ -100,8 +97,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (travelLength < DistanceBetweenTicks)
                 travelLength = DistanceBetweenTicks;
 
-            float snappedDistance = LimitedDistanceSnap.Value
-                ? SnapProvider.DurationToDistance(ReferenceObject, editorClock.CurrentTime - ReferenceObject.GetEndTime())
+            float snappedDistance = fixedTime != null
+                ? SnapProvider.DurationToDistance(ReferenceObject, fixedTime.Value - ReferenceObject.GetEndTime())
                 // When interacting with the resolved snap provider, the distance spacing multiplier should first be removed
                 // to allow for snapping at a non-multiplied ratio.
                 : SnapProvider.FindSnappedDistance(ReferenceObject, travelLength / distanceSpacingMultiplier, DistanceSnapTarget.End);
