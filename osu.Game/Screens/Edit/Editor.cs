@@ -462,7 +462,7 @@ namespace osu.Game.Screens.Edit
                                                     {
                                                         Hotkey = new Hotkey(GlobalAction.EditorSeekToNextBookmark)
                                                     },
-                                                    new EditorMenuItem(EditorStrings.ResetBookmarks, MenuItemType.Destructive, () => editorBeatmap.Bookmarks.Clear())
+                                                    new EditorMenuItem(EditorStrings.ResetBookmarks, MenuItemType.Destructive, () => dialogOverlay?.Push(new BookmarkResetDialog(editorBeatmap)))
                                                 }
                                             }
                                         }
