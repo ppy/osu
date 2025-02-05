@@ -11,6 +11,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Pooling;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -20,21 +22,30 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.SelectV2
 {
-    public partial class GroupPanel : PoolableDrawable, ICarouselPanel
+    public partial class StarsGroupPanel : PoolableDrawable, ICarouselPanel
     {
         public const float HEIGHT = CarouselItem.DEFAULT_HEIGHT;
 
         private const float glow_offset = 10f; // extra space for the edge effect to not be cutoff by the right edge of the carousel.
         private const float preselected_x_offset = 25f;
-        private const float selected_x_offset = 50f;
+        private const float expanded_x_offset = 50f;
 
         private const float duration = 500;
 
         [Resolved]
         private BeatmapCarousel? carousel { get; set; }
 
+        [Resolved]
+        private OsuColour colours { get; set; } = null!;
+
+        [Resolved]
+        private OverlayColourProvider colourProvider { get; set; } = null!;
+
         private Box activationFlash = null!;
-        private OsuSpriteText titleText = null!;
+        private Box outerLayer = null!;
+        private Box innerLayer = null!;
+        private StarRatingDisplay starRatingDisplay = null!;
+        private StarCounter starCounter = null!;
         private Box hoverLayer = null!;
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
@@ -48,7 +59,7 @@ namespace osu.Game.Screens.SelectV2
         }
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider, OsuColour colours)
+        private void load()
         {
             Anchor = Anchor.TopRight;
             Origin = Anchor.TopRight;
@@ -81,7 +92,7 @@ namespace osu.Game.Screens.SelectV2
                             }
                         }
                     },
-                    new Box
+                    outerLayer = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
                         Colour = colourProvider.Background3,
@@ -97,16 +108,32 @@ namespace osu.Game.Screens.SelectV2
                             Masking = true,
                             Children = new Drawable[]
                             {
-                                new Box
+                                innerLayer = new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Colour = colourProvider.Background5,
+                                    Colour = Color4.Black.Opacity(0.2f),
                                 },
-                                titleText = new OsuSpriteText
+                                new FillFlowContainer
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
-                                    X = 10f,
+                                    AutoSizeAxes = Axes.Both,
+                                    Spacing = new Vector2(10f, 0f),
+                                    Margin = new MarginPadding { Left = 10f },
+                                    Children = new Drawable[]
+                                    {
+                                        starRatingDisplay = new StarRatingDisplay(default, StarRatingDisplaySize.Small)
+                                        {
+                                            Anchor = Anchor.CentreLeft,
+                                            Origin = Anchor.CentreLeft,
+                                        },
+                                        starCounter = new StarCounter
+                                        {
+                                            Anchor = Anchor.CentreLeft,
+                                            Origin = Anchor.CentreLeft,
+                                            Scale = new Vector2(8f / 20f),
+                                        },
+                                    }
                                 },
                                 new CircularContainer
                                 {
@@ -178,9 +205,16 @@ namespace osu.Game.Screens.SelectV2
 
             Debug.Assert(Item != null);
 
-            GroupDefinition group = (GroupDefinition)Item.Model;
+            StarsGroupDefinition group = (StarsGroupDefinition)Item.Model;
 
-            titleText.Text = group.Title;
+            Color4 colour = group.StarNumber >= 9 ? OsuColour.Gray(0.2f) : colours.ForStarDifficulty(group.StarNumber);
+            Color4 contentColour = group.StarNumber >= 7 ? colours.Orange1 : colourProvider.Background5;
+
+            outerLayer.Colour = colour;
+            starCounter.Colour = contentColour;
+
+            starRatingDisplay.Current.Value = new StarDifficulty(group.StarNumber, 0);
+            starCounter.Current = group.StarNumber;
 
             this.FadeInFromZero(500, Easing.OutQuint);
         }
@@ -201,10 +235,10 @@ namespace osu.Game.Screens.SelectV2
 
         private void updatePanelPosition()
         {
-            float x = glow_offset + selected_x_offset + preselected_x_offset;
+            float x = glow_offset + expanded_x_offset + preselected_x_offset;
 
             if (Expanded.Value)
-                x -= selected_x_offset;
+                x -= expanded_x_offset;
 
             if (KeyboardSelected.Value)
                 x -= preselected_x_offset;
