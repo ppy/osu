@@ -60,18 +60,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         public double SpeedDifficultStrainCount { get; set; }
 
         /// <summary>
-        /// The perceived approach rate inclusive of rate-adjusting mods (DT/HT/etc).
-        /// </summary>
-        [JsonProperty("approach_rate")]
-        public double ApproachRate { get; set; }
-
-        /// <summary>
-        /// The perceived overall difficulty inclusive of rate-adjusting mods (DT/HT/etc).
-        /// </summary>
-        [JsonProperty("overall_difficulty")]
-        public double OverallDifficulty { get; set; }
-
-        /// <summary>
         /// The beatmap's drain rate. This doesn't scale with rate-adjusting mods.
         /// </summary>
         public double DrainRate { get; set; }
@@ -98,8 +86,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             yield return (ATTRIB_ID_AIM, AimDifficulty);
             yield return (ATTRIB_ID_SPEED, SpeedDifficulty);
-            yield return (ATTRIB_ID_OVERALL_DIFFICULTY, OverallDifficulty);
-            yield return (ATTRIB_ID_APPROACH_RATE, ApproachRate);
             yield return (ATTRIB_ID_DIFFICULTY, StarRating);
 
             if (ShouldSerializeFlashlightDifficulty())
@@ -119,8 +105,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             AimDifficulty = values[ATTRIB_ID_AIM];
             SpeedDifficulty = values[ATTRIB_ID_SPEED];
-            OverallDifficulty = values[ATTRIB_ID_OVERALL_DIFFICULTY];
-            ApproachRate = values[ATTRIB_ID_APPROACH_RATE];
             StarRating = values[ATTRIB_ID_DIFFICULTY];
             FlashlightDifficulty = values.GetValueOrDefault(ATTRIB_ID_FLASHLIGHT);
             SliderFactor = values[ATTRIB_ID_SLIDER_FACTOR];

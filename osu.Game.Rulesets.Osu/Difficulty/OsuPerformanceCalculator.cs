@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Audio.Track;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Mods;
@@ -49,6 +50,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private double greatHitWindow;
         private double okHitWindow;
         private double mehHitWindow;
+        private double overallDifficulty;
+        private double approachRate;
 
         private double? speedDeviation;
 
@@ -72,6 +75,26 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             countSliderEndsDropped = osuAttributes.SliderCount - score.Statistics.GetValueOrDefault(HitResult.SliderTailHit);
             countSliderTickMiss = score.Statistics.GetValueOrDefault(HitResult.LargeTickMiss);
             effectiveMissCount = countMiss;
+
+            var difficulty = score.BeatmapInfo!.Difficulty.Clone();
+
+            score.Mods.OfType<IApplicableToDifficulty>().ForEach(m => m.ApplyToDifficulty(difficulty));
+
+            var track = new TrackVirtual(10000);
+            score.Mods.OfType<IApplicableToTrack>().ForEach(m => m.ApplyToTrack(track));
+            clockRate = track.Rate;
+
+            HitWindows hitWindows = new OsuHitWindows();
+            hitWindows.SetDifficulty(difficulty.OverallDifficulty);
+
+            greatHitWindow = hitWindows.WindowFor(HitResult.Great) / clockRate;
+            okHitWindow = hitWindows.WindowFor(HitResult.Ok) / clockRate;
+            mehHitWindow = hitWindows.WindowFor(HitResult.Meh) / clockRate;
+
+            double preempt = IBeatmapDifficultyInfo.DifficultyRange(difficulty.ApproachRate, 1800, 1200, 450) / clockRate;
+
+            overallDifficulty = (80 - greatHitWindow) / 6;
+            approachRate = preempt > 1200 ? (1800 - preempt) / 120 : (1200 - preempt) / 150 + 5;
 
             if (osuAttributes.SliderCount > 0)
             {
@@ -115,25 +138,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 // https://www.desmos.com/calculator/bc9eybdthb
                 // we use OD13.3 as maximum since it's the value at which great hitwidow becomes 0
                 // this is well beyond currently maximum achievable OD which is 12.17 (DTx2 + DA with OD11)
-                double okMultiplier = Math.Max(0.0, osuAttributes.OverallDifficulty > 0.0 ? 1 - Math.Pow(osuAttributes.OverallDifficulty / 13.33, 1.8) : 1.0);
-                double mehMultiplier = Math.Max(0.0, osuAttributes.OverallDifficulty > 0.0 ? 1 - Math.Pow(osuAttributes.OverallDifficulty / 13.33, 5) : 1.0);
+                double okMultiplier = Math.Max(0.0, overallDifficulty > 0.0 ? 1 - Math.Pow(overallDifficulty / 13.33, 1.8) : 1.0);
+                double mehMultiplier = Math.Max(0.0, overallDifficulty > 0.0 ? 1 - Math.Pow(overallDifficulty / 13.33, 5) : 1.0);
 
                 // As we're adding Oks and Mehs to an approximated number of combo breaks the result can be higher than total hits in specific scenarios (which breaks some calculations) so we need to clamp it.
                 effectiveMissCount = Math.Min(effectiveMissCount + countOk * okMultiplier + countMeh * mehMultiplier, totalHits);
             }
-
-            var track = new TrackVirtual(10000);
-            score.Mods.OfType<IApplicableToTrack>().ForEach(m => m.ApplyToTrack(track));
-            clockRate = track.Rate;
-
-            score.Mods.OfType<IApplicableToDifficulty>().ForEach(m => m.ApplyToDifficulty(score.BeatmapInfo!.Difficulty));
-
-            HitWindows hitWindows = new OsuHitWindows();
-            hitWindows.SetDifficulty(score.BeatmapInfo!.Difficulty.OverallDifficulty);
-
-            greatHitWindow = hitWindows.WindowFor(HitResult.Great) / clockRate;
-            okHitWindow = hitWindows.WindowFor(HitResult.Ok) / clockRate;
-            mehHitWindow = hitWindows.WindowFor(HitResult.Meh) / clockRate;
 
             speedDeviation = calculateSpeedDeviation(osuAttributes);
 
@@ -200,10 +210,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 aimValue *= calculateMissPenalty(effectiveMissCount, attributes.AimDifficultStrainCount);
 
             double approachRateFactor = 0.0;
-            if (attributes.ApproachRate > 10.33)
-                approachRateFactor = 0.3 * (attributes.ApproachRate - 10.33);
-            else if (attributes.ApproachRate < 8.0)
-                approachRateFactor = 0.05 * (8.0 - attributes.ApproachRate);
+            if (approachRate > 10.33)
+                approachRateFactor = 0.3 * (approachRate - 10.33);
+            else if (approachRate < 8.0)
+                approachRateFactor = 0.05 * (8.0 - approachRate);
 
             if (score.Mods.Any(h => h is OsuModRelax))
                 approachRateFactor = 0.0;
@@ -215,12 +225,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             else if (score.Mods.Any(m => m is OsuModHidden || m is OsuModTraceable))
             {
                 // We want to give more reward for lower AR when it comes to aim and HD. This nerfs high AR and buffs lower AR.
-                aimValue *= 1.0 + 0.04 * (12.0 - attributes.ApproachRate);
+                aimValue *= 1.0 + 0.04 * (12.0 - approachRate);
             }
 
             aimValue *= accuracy;
             // It is important to consider accuracy difficulty when scaling with accuracy.
-            aimValue *= 0.98 + Math.Pow(Math.Max(0, attributes.OverallDifficulty), 2) / 2500;
+            aimValue *= 0.98 + Math.Pow(Math.Max(0, overallDifficulty), 2) / 2500;
 
             return aimValue;
         }
@@ -240,8 +250,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 speedValue *= calculateMissPenalty(effectiveMissCount, attributes.SpeedDifficultStrainCount);
 
             double approachRateFactor = 0.0;
-            if (attributes.ApproachRate > 10.33)
-                approachRateFactor = 0.3 * (attributes.ApproachRate - 10.33);
+            if (approachRate > 10.33)
+                approachRateFactor = 0.3 * (approachRate - 10.33);
 
             if (score.Mods.Any(h => h is OsuModAutopilot))
                 approachRateFactor = 0.0;
@@ -256,7 +266,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             else if (score.Mods.Any(m => m is OsuModHidden || m is OsuModTraceable))
             {
                 // We want to give more reward for lower AR when it comes to aim and HD. This nerfs high AR and buffs lower AR.
-                speedValue *= 1.0 + 0.04 * (12.0 - attributes.ApproachRate);
+                speedValue *= 1.0 + 0.04 * (12.0 - approachRate);
             }
 
             double speedHighDeviationMultiplier = calculateSpeedHighDeviationNerf(attributes);
@@ -270,7 +280,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double relevantAccuracy = attributes.SpeedNoteCount == 0 ? 0 : (relevantCountGreat * 6.0 + relevantCountOk * 2.0 + relevantCountMeh) / (attributes.SpeedNoteCount * 6.0);
 
             // Scale the speed value with accuracy and OD.
-            speedValue *= (0.95 + Math.Pow(Math.Max(0, attributes.OverallDifficulty), 2) / 750) * Math.Pow((accuracy + relevantAccuracy) / 2.0, (14.5 - attributes.OverallDifficulty) / 2);
+            speedValue *= (0.95 + Math.Pow(Math.Max(0, overallDifficulty), 2) / 750) * Math.Pow((accuracy + relevantAccuracy) / 2.0, (14.5 - overallDifficulty) / 2);
 
             return speedValue;
         }
@@ -297,7 +307,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             // Lots of arbitrary values from testing.
             // Considering to use derivation from perfect accuracy in a probabilistic manner - assume normal distribution.
-            double accuracyValue = Math.Pow(1.52163, attributes.OverallDifficulty) * Math.Pow(betterAccuracyPercentage, 24) * 2.83;
+            double accuracyValue = Math.Pow(1.52163, overallDifficulty) * Math.Pow(betterAccuracyPercentage, 24) * 2.83;
 
             // Bonus for many hitcircles - it's harder to keep good accuracy up for longer.
             accuracyValue *= Math.Min(1.15, Math.Pow(amountHitObjectsWithAccuracy / 1000.0, 0.3));
@@ -334,7 +344,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // Scale the flashlight value with accuracy _slightly_.
             flashlightValue *= 0.5 + accuracy / 2.0;
             // It is important to also consider accuracy difficulty when doing that.
-            flashlightValue *= 0.98 + Math.Pow(Math.Max(0, attributes.OverallDifficulty), 2) / 2500;
+            flashlightValue *= 0.98 + Math.Pow(Math.Max(0, overallDifficulty), 2) / 2500;
 
             return flashlightValue;
         }
