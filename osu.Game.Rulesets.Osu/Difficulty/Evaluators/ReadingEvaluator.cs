@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
     public static class ReadingEvaluator
     {
         private const double reading_window_size = 3000;
-        private const double hidden_multiplier = 0.8;
+        private const double hidden_multiplier = 0.25;
 
         public static double EvaluateDifficultyOf(DifficultyHitObject current, IReadOnlyList<Mod> mods)
         {
@@ -59,9 +59,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 preemptDifficulty /= 1.5 * Math.Sqrt(rawDensityDifficulty);
             }
 
-            // Award only denser than average maps
-            double noteDensityDifficulty = Math.Max(0, rawDensityDifficulty - 3.5);
-
             double hiddenDifficulty = 0;
 
             if (mods.OfType<OsuModHidden>().Any())
@@ -69,13 +66,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double timeSpentInvisible = getDurationSpentInvisible(currObj) / current.ClockRate;
                 // Nerf hidden difficulty less the more density difficulty you have
                 // We stop nerfing at density of 1 because there is a still an inherent hidden difficulty at low density
-                double timeDifficultyFactor = noteDensityDifficulty <= 1 ? 500 : 500 / noteDensityDifficulty;
+                double timeDifficultyFactor = 500 / rawDensityDifficulty;
 
                 double visibleObjectFactor = Math.Clamp(retrieveCurrentVisibleObjects(currObj).Count - 2, 0, 15);
 
                 // The longer an object is hidden, the more velocity should matter
                 hiddenDifficulty += (visibleObjectFactor + timeSpentInvisible * currVelocity) / timeDifficultyFactor;
             }
+
+            // Award only denser than average maps
+            double noteDensityDifficulty = Math.Max(0, rawDensityDifficulty - 3.5);
 
             double difficulty = preemptDifficulty + hiddenDifficulty * hidden_multiplier + noteDensityDifficulty;
 
