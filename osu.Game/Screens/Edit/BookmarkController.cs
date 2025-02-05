@@ -17,7 +17,7 @@ using osu.Game.Screens.Edit.Components.Menus;
 
 namespace osu.Game.Screens.Edit
 {
-    public class BookmarkController : Component, IKeyBindingHandler<GlobalAction>
+    public partial class BookmarkController : Component, IKeyBindingHandler<GlobalAction>
     {
         public EditorMenuItem Menu { get; private set; }
 
