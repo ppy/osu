@@ -28,16 +28,18 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         {
         }
 
+        [SetUp]
+        public void SetUp() => Schedule(() =>
+        {
+            beatmapSet = beatmaps.GetAllUsableBeatmapSets().FirstOrDefault(b => b.OnlineID == 241526)
+                         ?? beatmaps.GetAllUsableBeatmapSets().FirstOrDefault(b => !b.Protected)
+                         ?? TestResources.CreateTestBeatmapSetInfo();
+        });
+
         [Test]
         public void TestDisplay()
         {
-            AddStep("set beatmap", () =>
-            {
-                beatmapSet = beatmaps.GetAllUsableBeatmapSets().FirstOrDefault(b => b.OnlineID == 241526)
-                             ?? beatmaps.GetAllUsableBeatmapSets().FirstOrDefault(b => !b.Protected)
-                             ?? TestResources.CreateTestBeatmapSetInfo();
-                CreateThemedContent(OverlayColourScheme.Aquamarine);
-            });
+            AddStep("display", () => CreateThemedContent(OverlayColourScheme.Aquamarine));
         }
 
         [Test]
@@ -45,7 +47,10 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         {
             AddStep("random beatmap", () =>
             {
-                beatmapSet = beatmaps.GetAllUsableBeatmapSets().OrderBy(_ => RNG.Next()).First();
+                var randomSet = beatmaps.GetAllUsableBeatmapSets().OrderBy(_ => RNG.Next()).FirstOrDefault();
+                randomSet ??= TestResources.CreateTestBeatmapSetInfo();
+                beatmapSet = randomSet;
+
                 CreateThemedContent(OverlayColourScheme.Aquamarine);
             });
         }
