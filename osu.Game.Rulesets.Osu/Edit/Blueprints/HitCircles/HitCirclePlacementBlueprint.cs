@@ -2,10 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Input.Events;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles.Components;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Screens.Edit;
 using osuTK;
 using osuTK.Input;
 
@@ -20,10 +23,21 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles
         [Resolved]
         private OsuHitObjectComposer? composer { get; set; }
 
+        [Resolved]
+        private EditorClock? editorClock { get; set; }
+
+        private Bindable<bool> limitedDistanceSnap { get; set; } = null!;
+
         public HitCirclePlacementBlueprint()
             : base(new HitCircle())
         {
             InternalChild = circlePiece = new HitCirclePiece();
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
+        {
+            limitedDistanceSnap = config.GetBindable<bool>(OsuSetting.EditorLimitedDistanceSnap);
         }
 
         protected override void LoadComplete()
@@ -53,7 +67,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles
         public override SnapResult UpdateTimeAndPosition(Vector2 screenSpacePosition, double fallbackTime)
         {
             var result = composer?.TrySnapToNearbyObjects(screenSpacePosition, fallbackTime);
-            result ??= composer?.TrySnapToDistanceGrid(screenSpacePosition);
+            result ??= composer?.TrySnapToDistanceGrid(screenSpacePosition, limitedDistanceSnap.Value && editorClock != null ? editorClock.CurrentTime : null);
             if (composer?.TrySnapToPositionGrid(result?.ScreenSpacePosition ?? screenSpacePosition, result?.Time ?? fallbackTime) is SnapResult gridSnapResult)
                 result = gridSnapResult;
             result ??= new SnapResult(screenSpacePosition, fallbackTime);

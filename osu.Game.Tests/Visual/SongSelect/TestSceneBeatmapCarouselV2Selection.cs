@@ -22,10 +22,10 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             AddBeatmaps(10);
             WaitForDrawablePanels();
-            checkNoSelection();
+            CheckNoSelection();
 
-            select();
-            checkNoSelection();
+            Select();
+            CheckNoSelection();
 
             AddStep("press down arrow", () => InputManager.PressKey(Key.Down));
             checkSelectionIterating(false);
@@ -39,8 +39,8 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("release up arrow", () => InputManager.ReleaseKey(Key.Up));
             checkSelectionIterating(false);
 
-            select();
-            checkHasSelection();
+            Select();
+            CheckHasSelection();
         }
 
         /// <summary>
@@ -52,7 +52,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             AddBeatmaps(10);
             WaitForDrawablePanels();
-            checkNoSelection();
+            CheckNoSelection();
 
             AddStep("press right arrow", () => InputManager.PressKey(Key.Right));
             checkSelectionIterating(true);
@@ -73,13 +73,13 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddBeatmaps(10);
             WaitForDrawablePanels();
 
-            selectNextGroup();
+            SelectNextGroup();
 
             object? selection = null;
 
             AddStep("store drawable selection", () => selection = getSelectedPanel()?.Item?.Model);
 
-            checkHasSelection();
+            CheckHasSelection();
             AddAssert("drawable selection non-null", () => selection, () => Is.Not.Null);
             AddAssert("drawable selection matches carousel selection", () => selection, () => Is.EqualTo(Carousel.CurrentSelection));
 
@@ -89,13 +89,14 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddBeatmaps(10);
             WaitForDrawablePanels();
 
-            checkHasSelection();
+            CheckHasSelection();
             AddAssert("no drawable selection", getSelectedPanel, () => Is.Null);
 
             AddStep("add previous selection", () => BeatmapSets.Add(((BeatmapInfo)selection!).BeatmapSet!));
 
+            AddAssert("selection matches original carousel selection", () => selection, () => Is.EqualTo(Carousel.CurrentSelection));
             AddUntilStep("drawable selection restored", () => getSelectedPanel()?.Item?.Model, () => Is.EqualTo(selection));
-            AddAssert("drawable selection matches carousel selection", () => selection, () => Is.EqualTo(Carousel.CurrentSelection));
+            AddAssert("carousel item is visible", () => getSelectedPanel()?.Item?.IsVisible, () => Is.True);
 
             BeatmapPanel? getSelectedPanel() => Carousel.ChildrenOfType<BeatmapPanel>().SingleOrDefault(p => p.Selected.Value);
         }
@@ -108,10 +109,10 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddBeatmaps(total_set_count);
             WaitForDrawablePanels();
 
-            selectNextGroup();
-            waitForSelection(0, 0);
-            selectPrevGroup();
-            waitForSelection(total_set_count - 1, 0);
+            SelectNextGroup();
+            WaitForSelection(0, 0);
+            SelectPrevGroup();
+            WaitForSelection(total_set_count - 1, 0);
         }
 
         [Test]
@@ -122,10 +123,25 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddBeatmaps(total_set_count);
             WaitForDrawablePanels();
 
-            selectPrevGroup();
-            waitForSelection(total_set_count - 1, 0);
-            selectNextGroup();
-            waitForSelection(0, 0);
+            SelectPrevGroup();
+            WaitForSelection(total_set_count - 1, 0);
+            SelectNextGroup();
+            WaitForSelection(0, 0);
+        }
+
+        [Test]
+        public void TestGroupSelectionOnHeader()
+        {
+            AddBeatmaps(10, 3);
+            WaitForDrawablePanels();
+
+            SelectNextGroup();
+            SelectNextGroup();
+            WaitForSelection(1, 0);
+
+            SelectPrevPanel();
+            SelectPrevGroup();
+            WaitForSelection(0, 0);
         }
 
         [Test]
@@ -134,70 +150,49 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddBeatmaps(10, 3);
             WaitForDrawablePanels();
 
-            selectNextPanel();
-            selectNextPanel();
-            selectNextPanel();
-            selectNextPanel();
-            checkNoSelection();
+            SelectNextPanel();
+            SelectNextPanel();
+            SelectNextPanel();
+            SelectNextPanel();
+            CheckNoSelection();
 
-            select();
-            waitForSelection(3, 0);
+            Select();
+            WaitForSelection(3, 0);
 
-            selectNextPanel();
-            waitForSelection(3, 0);
+            SelectNextPanel();
+            WaitForSelection(3, 0);
 
-            select();
-            waitForSelection(3, 1);
+            Select();
+            WaitForSelection(3, 1);
 
-            selectNextPanel();
-            waitForSelection(3, 1);
+            SelectNextPanel();
+            WaitForSelection(3, 1);
 
-            select();
-            waitForSelection(3, 2);
+            Select();
+            WaitForSelection(3, 2);
 
-            selectNextPanel();
-            waitForSelection(3, 2);
+            SelectNextPanel();
+            WaitForSelection(3, 2);
 
-            select();
-            waitForSelection(4, 0);
+            Select();
+            WaitForSelection(4, 0);
         }
 
         [Test]
         public void TestEmptyTraversal()
         {
-            selectNextPanel();
-            checkNoSelection();
+            SelectNextPanel();
+            CheckNoSelection();
 
-            selectNextGroup();
-            checkNoSelection();
+            SelectNextGroup();
+            CheckNoSelection();
 
-            selectPrevPanel();
-            checkNoSelection();
+            SelectPrevPanel();
+            CheckNoSelection();
 
-            selectPrevGroup();
-            checkNoSelection();
+            SelectPrevGroup();
+            CheckNoSelection();
         }
-
-        private void waitForSelection(int set, int? diff = null)
-        {
-            AddUntilStep($"selected is set{set}{(diff.HasValue ? $" diff{diff.Value}" : "")}", () =>
-            {
-                if (diff != null)
-                    return ReferenceEquals(Carousel.CurrentSelection, BeatmapSets[set].Beatmaps[diff.Value]);
-
-                return BeatmapSets[set].Beatmaps.Contains(Carousel.CurrentSelection);
-            });
-        }
-
-        private void selectNextPanel() => AddStep("select next panel", () => InputManager.Key(Key.Down));
-        private void selectPrevPanel() => AddStep("select prev panel", () => InputManager.Key(Key.Up));
-        private void selectNextGroup() => AddStep("select next group", () => InputManager.Key(Key.Right));
-        private void selectPrevGroup() => AddStep("select prev group", () => InputManager.Key(Key.Left));
-
-        private void select() => AddStep("select", () => InputManager.Key(Key.Enter));
-
-        private void checkNoSelection() => AddAssert("has no selection", () => Carousel.CurrentSelection, () => Is.Null);
-        private void checkHasSelection() => AddAssert("has selection", () => Carousel.CurrentSelection, () => Is.Not.Null);
 
         private void checkSelectionIterating(bool isIterating)
         {
