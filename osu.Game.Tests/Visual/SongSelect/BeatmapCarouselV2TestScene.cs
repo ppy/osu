@@ -37,6 +37,9 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Cached(typeof(BeatmapStore))]
         private BeatmapStore store;
 
+        [Cached]
+        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
+
         private OsuTextFlowContainer stats = null!;
 
         private int beatmapCount;
