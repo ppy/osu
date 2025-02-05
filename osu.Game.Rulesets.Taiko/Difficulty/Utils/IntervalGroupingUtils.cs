@@ -8,56 +8,51 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Utils
 {
     public static class IntervalGroupingUtils
     {
-        public static List<List<T>> GroupByInterval<T>(IReadOnlyList<T> data, double marginOfError = 5) where T : IHasInterval
+        public static List<List<T>> GroupByInterval<T>(IReadOnlyList<T> objects) where T : IHasInterval
         {
             var groups = new List<List<T>>();
-            if (data.Count == 0)
-                return groups;
 
             int i = 0;
-
-            while (i < data.Count)
-            {
-                var group = createGroup(data, ref i, marginOfError);
-                groups.Add(group);
-            }
+            while (i < objects.Count)
+                groups.Add(createNextGroup(objects, ref i));
 
             return groups;
         }
 
-        private static List<T> createGroup<T>(IReadOnlyList<T> data, ref int i, double marginOfError) where T : IHasInterval
+        private static List<T> createNextGroup<T>(IReadOnlyList<T> objects, ref int i) where T : IHasInterval
         {
-            var children = new List<T> { data[i] };
+            const double margin_of_error = 5;
+
+            var groupedObjects = new List<T> { objects[i] };
             i++;
 
-            for (; i < data.Count - 1; i++)
+            for (; i < objects.Count - 1; i++)
             {
-                // An interval change occured, add the current data if the next interval is larger.
-                if (!Precision.AlmostEquals(data[i].Interval, data[i + 1].Interval, marginOfError))
+                // An interval change occured, add the current object if the next interval is larger.
+                if (!Precision.AlmostEquals(objects[i].Interval, objects[i + 1].Interval, margin_of_error))
                 {
-                    if (data[i + 1].Interval > data[i].Interval + marginOfError)
+                    if (objects[i + 1].Interval > objects[i].Interval + margin_of_error)
                     {
-                        children.Add(data[i]);
+                        groupedObjects.Add(objects[i]);
                         i++;
                     }
 
-                    return children;
+                    return groupedObjects;
                 }
 
                 // No interval change occurred
-                children.Add(data[i]);
+                groupedObjects.Add(objects[i]);
             }
 
-            // Check if the last two objects in the data form a "flat" rhythm pattern within the specified margin of error.
+            // Check if the last two objects in the object form a "flat" rhythm pattern within the specified margin of error.
             // If true, add the current object to the group and increment the index to process the next object.
-            if (data.Count > 2 && i < data.Count &&
-                Precision.AlmostEquals(data[^1].Interval, data[^2].Interval, marginOfError))
+            if (objects.Count > 2 && i < objects.Count && Precision.AlmostEquals(objects[^1].Interval, objects[^2].Interval, margin_of_error))
             {
-                children.Add(data[i]);
+                groupedObjects.Add(objects[i]);
                 i++;
             }
 
-            return children;
+            return groupedObjects;
         }
     }
 }
