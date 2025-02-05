@@ -10,7 +10,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Rhythm
     /// <summary>
     /// Stores rhythm data for a <see cref="TaikoDifficultyHitObject"/>.
     /// </summary>
-    public class TaikoDifficultyHitObjectRhythm
+    public class TaikoRhythmData
     {
         /// <summary>
         /// The group of hit objects with consistent rhythm that this object belongs to.
@@ -39,25 +39,25 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Rhythm
         /// <item>speeding up is <i>generally</i> harder than slowing down (with exceptions of rhythm changes requiring a hand switch).</item>
         /// </list>
         /// </remarks>
-        private static readonly TaikoDifficultyHitObjectRhythm[] common_rhythms =
+        private static readonly TaikoRhythmData[] common_rhythms =
         {
-            new TaikoDifficultyHitObjectRhythm(1, 1),
-            new TaikoDifficultyHitObjectRhythm(2, 1),
-            new TaikoDifficultyHitObjectRhythm(1, 2),
-            new TaikoDifficultyHitObjectRhythm(3, 1),
-            new TaikoDifficultyHitObjectRhythm(1, 3),
-            new TaikoDifficultyHitObjectRhythm(3, 2),
-            new TaikoDifficultyHitObjectRhythm(2, 3),
-            new TaikoDifficultyHitObjectRhythm(5, 4),
-            new TaikoDifficultyHitObjectRhythm(4, 5)
+            new TaikoRhythmData(1, 1),
+            new TaikoRhythmData(2, 1),
+            new TaikoRhythmData(1, 2),
+            new TaikoRhythmData(3, 1),
+            new TaikoRhythmData(1, 3),
+            new TaikoRhythmData(3, 2),
+            new TaikoRhythmData(2, 3),
+            new TaikoRhythmData(5, 4),
+            new TaikoRhythmData(4, 5)
         };
 
         /// <summary>
-        /// Initialises a new instance of <see cref="TaikoDifficultyHitObjectRhythm"/>s,
+        /// Initialises a new instance of <see cref="TaikoRhythmData"/>s,
         /// calculating the closest rhythm change and its associated difficulty for the current hit object.
         /// </summary>
         /// <param name="current">The current <see cref="TaikoDifficultyHitObject"/> being processed.</param>
-        public TaikoDifficultyHitObjectRhythm(TaikoDifficultyHitObject current)
+        public TaikoRhythmData(TaikoDifficultyHitObject current)
         {
             var previous = current.Previous(0);
 
@@ -67,8 +67,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Rhythm
                 return;
             }
 
-            TaikoDifficultyHitObjectRhythm closestRhythm = getClosestRhythm(current.DeltaTime, previous.DeltaTime);
-            Ratio = closestRhythm.Ratio;
+            TaikoRhythmData closestRhythmData = getClosestRhythm(current.DeltaTime, previous.DeltaTime);
+            Ratio = closestRhythmData.Ratio;
         }
 
         /// <summary>
@@ -76,7 +76,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Rhythm
         /// </summary>
         /// <param name="numerator">The numerator for <see cref="Ratio"/>.</param>
         /// <param name="denominator">The denominator for <see cref="Ratio"/></param>
-        private TaikoDifficultyHitObjectRhythm(int numerator, int denominator)
+        private TaikoRhythmData(int numerator, int denominator)
         {
             Ratio = numerator / (double)denominator;
         }
@@ -88,11 +88,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Rhythm
         /// <param name="currentDeltaTime">The time difference between the current hit object and the previous one.</param>
         /// <param name="previousDeltaTime">The time difference between the previous hit object and the one before it.</param>
         /// <returns>The closest matching rhythm from <see cref="common_rhythms"/>.</returns>
-        private TaikoDifficultyHitObjectRhythm getClosestRhythm(double currentDeltaTime, double previousDeltaTime)
+        private TaikoRhythmData getClosestRhythm(double currentDeltaTime, double previousDeltaTime)
         {
             double ratio = currentDeltaTime / previousDeltaTime;
             return common_rhythms.OrderBy(x => Math.Abs(x.Ratio - ratio)).First();
         }
     }
 }
-

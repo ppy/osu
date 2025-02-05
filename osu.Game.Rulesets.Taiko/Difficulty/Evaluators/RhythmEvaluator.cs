@@ -18,21 +18,21 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
         /// </summary>
         public static double EvaluateDifficultyOf(DifficultyHitObject hitObject, double hitWindow)
         {
-            TaikoDifficultyHitObjectRhythm rhythm = ((TaikoDifficultyHitObject)hitObject).Rhythm;
+            TaikoRhythmData rhythmData = ((TaikoDifficultyHitObject)hitObject).RhythmData;
             double difficulty = 0.0d;
 
             double sameRhythm = 0;
             double samePattern = 0;
             double intervalPenalty = 0;
 
-            if (rhythm.SameRhythmGroupedHitObjects?.FirstHitObject == hitObject) // Difficulty for SameRhythmGroupedHitObjects
+            if (rhythmData.SameRhythmGroupedHitObjects?.FirstHitObject == hitObject) // Difficulty for SameRhythmGroupedHitObjects
             {
-                sameRhythm += 10.0 * evaluateDifficultyOf(rhythm.SameRhythmGroupedHitObjects, hitWindow);
-                intervalPenalty = repeatedIntervalPenalty(rhythm.SameRhythmGroupedHitObjects, hitWindow);
+                sameRhythm += 10.0 * evaluateDifficultyOf(rhythmData.SameRhythmGroupedHitObjects, hitWindow);
+                intervalPenalty = repeatedIntervalPenalty(rhythmData.SameRhythmGroupedHitObjects, hitWindow);
             }
 
-            if (rhythm.SamePatternsGroupedHitObjects?.FirstHitObject == hitObject) // Difficulty for SamePatternsGroupedHitObjects
-                samePattern += 1.15 * ratioDifficulty(rhythm.SamePatternsGroupedHitObjects.IntervalRatio);
+            if (rhythmData.SamePatternsGroupedHitObjects?.FirstHitObject == hitObject) // Difficulty for SamePatternsGroupedHitObjects
+                samePattern += 1.15 * ratioDifficulty(rhythmData.SamePatternsGroupedHitObjects.IntervalRatio);
 
             difficulty += Math.Max(sameRhythm, samePattern) * intervalPenalty;
 

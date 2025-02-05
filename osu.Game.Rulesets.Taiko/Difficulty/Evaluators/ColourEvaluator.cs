@@ -34,8 +34,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
 
                 var previousHitObject = (TaikoDifficultyHitObject)current.Previous(1);
 
-                double currentRatio = current.Rhythm.Ratio;
-                double previousRatio = previousHitObject.Rhythm.Ratio;
+                double currentRatio = current.RhythmData.Ratio;
+                double previousRatio = previousHitObject.RhythmData.Ratio;
 
                 // A consistent interval is defined as the percentage difference between the two rhythmic ratios with the margin of error.
                 if (Math.Abs(1 - currentRatio / previousRatio) <= threshold)
@@ -61,17 +61,17 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
         public static double EvaluateDifficultyOf(DifficultyHitObject hitObject)
         {
             var taikoObject = (TaikoDifficultyHitObject)hitObject;
-            TaikoDifficultyHitObjectColour colour = taikoObject.Colour;
+            TaikoColourData colourData = taikoObject.ColourData;
             double difficulty = 0.0d;
 
-            if (colour.MonoStreak?.FirstHitObject == hitObject) // Difficulty for MonoStreak
-                difficulty += evaluateMonoStreakDifficulty(colour.MonoStreak);
+            if (colourData.MonoStreak?.FirstHitObject == hitObject) // Difficulty for MonoStreak
+                difficulty += evaluateMonoStreakDifficulty(colourData.MonoStreak);
 
-            if (colour.AlternatingMonoPattern?.FirstHitObject == hitObject) // Difficulty for AlternatingMonoPattern
-                difficulty += evaluateAlternatingMonoPatternDifficulty(colour.AlternatingMonoPattern);
+            if (colourData.AlternatingMonoPattern?.FirstHitObject == hitObject) // Difficulty for AlternatingMonoPattern
+                difficulty += evaluateAlternatingMonoPatternDifficulty(colourData.AlternatingMonoPattern);
 
-            if (colour.RepeatingHitPattern?.FirstHitObject == hitObject) // Difficulty for RepeatingHitPattern
-                difficulty += evaluateRepeatingHitPatternsDifficulty(colour.RepeatingHitPattern);
+            if (colourData.RepeatingHitPattern?.FirstHitObject == hitObject) // Difficulty for RepeatingHitPattern
+                difficulty += evaluateRepeatingHitPatternsDifficulty(colourData.RepeatingHitPattern);
 
             double consistencyPenalty = consistentRatioPenalty(taikoObject);
             difficulty *= consistencyPenalty;
