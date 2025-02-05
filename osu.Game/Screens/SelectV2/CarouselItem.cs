@@ -30,6 +30,12 @@ namespace osu.Game.Screens.SelectV2
         public float DrawHeight { get; set; } = DEFAULT_HEIGHT;
 
         /// <summary>
+        /// A number that defines the layer which this <see cref="CarouselItem"/> should be placed on depth-wise.
+        /// The higher the number, the farther the panel associated with this item is taken to the background.
+        /// </summary>
+        public int DepthLayer { get; set; } = 0;
+
+        /// <summary>
         /// Whether this item is visible or hidden.
         /// </summary>
         public bool IsVisible { get; set; } = true;
