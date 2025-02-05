@@ -95,6 +95,9 @@ namespace osu.Game.Configuration
         /// </summary>
         DailyChallengeIntroPlayed,
 
+        /// <summary>
+        /// The activity for the current user to broadcast to other players.
+        /// </summary>
         UserOnlineActivity,
     }
 }
