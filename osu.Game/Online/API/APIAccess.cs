@@ -40,9 +40,7 @@ namespace osu.Game.Online.API
 
         private readonly Queue<APIRequest> queue = new Queue<APIRequest>();
 
-        public string APIEndpointUrl { get; }
-
-        public string WebsiteRootUrl { get; }
+        public EndpointConfiguration EndpointConfiguration { get; }
 
         /// <summary>
         /// The API response version.
@@ -89,14 +87,13 @@ namespace osu.Game.Online.API
                 APIVersion = now.Year * 10000 + now.Month * 100 + now.Day;
             }
 
-            APIEndpointUrl = endpointConfiguration.APIEndpointUrl;
-            WebsiteRootUrl = endpointConfiguration.WebsiteRootUrl;
+            EndpointConfiguration = endpointConfiguration;
             NotificationsClient = setUpNotificationsClient();
 
-            authentication = new OAuth(endpointConfiguration.APIClientID, endpointConfiguration.APIClientSecret, APIEndpointUrl);
+            authentication = new OAuth(endpointConfiguration.APIClientID, endpointConfiguration.APIClientSecret, EndpointConfiguration.APIEndpointUrl);
 
             log = Logger.GetLogger(LoggingTarget.Network);
-            log.Add($@"API endpoint root: {APIEndpointUrl}");
+            log.Add($@"API endpoint root: {EndpointConfiguration.APIEndpointUrl}");
             log.Add($@"API request version: {APIVersion}");
 
             ProvidedUsername = config.Get<string>(OsuSetting.Username);
@@ -408,7 +405,7 @@ namespace osu.Game.Online.API
 
             var req = new RegistrationRequest
             {
-                Url = $@"{APIEndpointUrl}/users",
+                Url = $@"{EndpointConfiguration.APIEndpointUrl}/users",
                 Method = HttpMethod.Post,
                 Username = username,
                 Email = email,

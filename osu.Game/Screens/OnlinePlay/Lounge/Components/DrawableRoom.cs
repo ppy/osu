@@ -361,7 +361,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
                 return items.ToArray();
 
-                string formatRoomUrl(long id) => $@"{api.WebsiteRootUrl}/multiplayer/rooms/{id}";
+                string formatRoomUrl(long id) => $@"{api.EndpointConfiguration.WebsiteRootUrl}/multiplayer/rooms/{id}";
             }
         }
 

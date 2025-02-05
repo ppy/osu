@@ -33,7 +33,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 Texture = textures.Get(banner.Image),
             };
 
-            Action = () => game?.OpenUrlExternally($@"{api.WebsiteRootUrl}/community/tournaments/{banner.TournamentId}");
+            Action = () => game?.OpenUrlExternally($@"{api.EndpointConfiguration.WebsiteRootUrl}/community/tournaments/{banner.TournamentId}");
         }
 
         protected override void LoadComplete()
