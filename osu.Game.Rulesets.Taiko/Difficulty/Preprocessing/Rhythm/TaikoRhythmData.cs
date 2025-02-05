@@ -27,30 +27,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Rhythm
         /// to previous <see cref="Rulesets.Difficulty.Preprocessing.DifficultyHitObject.DeltaTime"/> for the rhythm change.
         /// A <see cref="Ratio"/> above 1 indicates a slow-down; a <see cref="Ratio"/> below 1 indicates a speed-up.
         /// </summary>
-        public readonly double Ratio;
-
-        /// <summary>
-        /// List of most common rhythm changes in taiko maps. Based on how each object's interval compares to the previous object.
-        /// </summary>
         /// <remarks>
-        /// The general guidelines for the values are:
-        /// <list type="bullet">
-        /// <item>rhythm changes with ratio closer to 1 (that are <i>not</i> 1) are harder to play,</item>
-        /// <item>speeding up is <i>generally</i> harder than slowing down (with exceptions of rhythm changes requiring a hand switch).</item>
-        /// </list>
+        /// This is snapped to the closest matching <see cref="common_ratios"/>.
         /// </remarks>
-        private static readonly TaikoRhythmData[] common_rhythms =
-        {
-            new TaikoRhythmData(1, 1),
-            new TaikoRhythmData(2, 1),
-            new TaikoRhythmData(1, 2),
-            new TaikoRhythmData(3, 1),
-            new TaikoRhythmData(1, 3),
-            new TaikoRhythmData(3, 2),
-            new TaikoRhythmData(2, 3),
-            new TaikoRhythmData(5, 4),
-            new TaikoRhythmData(4, 5)
-        };
+        public readonly double Ratio;
 
         /// <summary>
         /// Initialises a new instance of <see cref="TaikoRhythmData"/>s,
@@ -67,31 +47,33 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Rhythm
                 return;
             }
 
-            TaikoRhythmData closestRhythmData = getClosestRhythm(current.DeltaTime, previous.DeltaTime);
-            Ratio = closestRhythmData.Ratio;
+            double actualRatio = current.DeltaTime / previous.DeltaTime;
+            double closestRatio = common_ratios.OrderBy(r => Math.Abs(r - actualRatio)).First();
+
+            Ratio = closestRatio;
         }
 
         /// <summary>
-        /// Creates an object representing a rhythm change.
+        /// List of most common rhythm changes in taiko maps. Based on how each object's interval compares to the previous object.
         /// </summary>
-        /// <param name="numerator">The numerator for <see cref="Ratio"/>.</param>
-        /// <param name="denominator">The denominator for <see cref="Ratio"/></param>
-        private TaikoRhythmData(int numerator, int denominator)
+        /// <remarks>
+        /// The general guidelines for the values are:
+        /// <list type="bullet">
+        /// <item>rhythm changes with ratio closer to 1 (that are <i>not</i> 1) are harder to play,</item>
+        /// <item>speeding up is <i>generally</i> harder than slowing down (with exceptions of rhythm changes requiring a hand switch).</item>
+        /// </list>
+        /// </remarks>
+        private static readonly double[] common_ratios = new[]
         {
-            Ratio = numerator / (double)denominator;
-        }
-
-        /// <summary>
-        /// Determines the closest rhythm change from <see cref="common_rhythms"/> that matches the timing ratio
-        /// between the current and previous intervals.
-        /// </summary>
-        /// <param name="currentDeltaTime">The time difference between the current hit object and the previous one.</param>
-        /// <param name="previousDeltaTime">The time difference between the previous hit object and the one before it.</param>
-        /// <returns>The closest matching rhythm from <see cref="common_rhythms"/>.</returns>
-        private TaikoRhythmData getClosestRhythm(double currentDeltaTime, double previousDeltaTime)
-        {
-            double ratio = currentDeltaTime / previousDeltaTime;
-            return common_rhythms.OrderBy(x => Math.Abs(x.Ratio - ratio)).First();
-        }
+            1.0 / 1,
+            2.0 / 1,
+            1.0 / 2,
+            3.0 / 1,
+            1.0 / 3,
+            3.0 / 2,
+            2.0 / 3,
+            5.0 / 4,
+            4.0 / 5
+        };
     }
 }
