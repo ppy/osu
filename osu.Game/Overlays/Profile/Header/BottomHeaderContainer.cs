@@ -124,12 +124,12 @@ namespace osu.Game.Overlays.Profile.Header
             }
 
             topLinkContainer.AddText("Contributed ");
-            topLinkContainer.AddLink("forum post".ToQuantity(user.PostCount, "#,##0"), $"{api.WebsiteRootUrl}/users/{user.Id}/posts", creationParameters: embolden);
+            topLinkContainer.AddLink("forum post".ToQuantity(user.PostCount, "#,##0"), $"{api.EndpointConfiguration.WebsiteRootUrl}/users/{user.Id}/posts", creationParameters: embolden);
 
             addSpacer(topLinkContainer);
 
             topLinkContainer.AddText("Posted ");
-            topLinkContainer.AddLink("comment".ToQuantity(user.CommentsCount, "#,##0"), $"{api.WebsiteRootUrl}/comments?user_id={user.Id}", creationParameters: embolden);
+            topLinkContainer.AddLink("comment".ToQuantity(user.CommentsCount, "#,##0"), $"{api.EndpointConfiguration.WebsiteRootUrl}/comments?user_id={user.Id}", creationParameters: embolden);
 
             string websiteWithoutProtocol = user.Website;
 

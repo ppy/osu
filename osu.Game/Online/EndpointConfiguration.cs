@@ -9,12 +9,12 @@ namespace osu.Game.Online
     public class EndpointConfiguration
     {
         /// <summary>
-        /// The base URL for the website.
+        /// The base URL for the website. Does not include a trailing slash.
         /// </summary>
         public string WebsiteRootUrl { get; set; } = string.Empty;
 
         /// <summary>
-        /// The endpoint for the main (osu-web) API.
+        /// The endpoint for the main (osu-web) API. Does not include a trailing slash.
         /// </summary>
         public string APIEndpointUrl { get; set; } = string.Empty;
 

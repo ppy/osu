@@ -41,9 +41,9 @@ namespace osu.Game.Beatmaps
                 return null;
 
             if (ruleset != null)
-                return $@"{api.WebsiteRootUrl}/beatmapsets/{beatmapSetInfo.OnlineID}#{ruleset.ShortName}";
+                return $@"{api.EndpointConfiguration.WebsiteRootUrl}/beatmapsets/{beatmapSetInfo.OnlineID}#{ruleset.ShortName}";
 
-            return $@"{api.WebsiteRootUrl}/beatmapsets/{beatmapSetInfo.OnlineID}";
+            return $@"{api.EndpointConfiguration.WebsiteRootUrl}/beatmapsets/{beatmapSetInfo.OnlineID}";
         }
     }
 }

@@ -98,7 +98,7 @@ namespace osu.Game.Overlays.Login
             explainText.AddParagraph(UserVerificationStrings.BoxInfoCheckSpam);
             // We can't support localisable strings with nested links yet. Not sure if we even can (probably need to allow markdown link formatting or something).
             explainText.AddParagraph("If you can't access your email or have forgotten what you used, please follow the ");
-            explainText.AddLink(UserVerificationStrings.BoxInfoRecoverLink, $"{api.WebsiteRootUrl}/home/password-reset");
+            explainText.AddLink(UserVerificationStrings.BoxInfoRecoverLink, $"{api.EndpointConfiguration.WebsiteRootUrl}/home/password-reset");
             explainText.AddText(". You can also ");
             explainText.AddLink(UserVerificationStrings.BoxInfoReissueLink, () =>
             {
