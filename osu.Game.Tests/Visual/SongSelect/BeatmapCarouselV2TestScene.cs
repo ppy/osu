@@ -193,7 +193,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         protected void AddBeatmaps(int count, int? fixedDifficultiesPerSet = null) => AddStep($"add {count} beatmaps", () =>
         {
             for (int i = 0; i < count; i++)
-                BeatmapSets.Add(TestResources.CreateTestBeatmapSetInfo(fixedDifficultiesPerSet ?? RNG.Next(1, 4)));
+                BeatmapSets.Add(TestResources.CreateTestBeatmapSetInfo(fixedDifficultiesPerSet ?? RNG.Next(1, 4), randomiseMetadata: true));
         });
 
         protected void RemoveAllBeatmaps() => AddStep("clear all beatmaps", () => BeatmapSets.Clear());

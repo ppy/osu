@@ -85,7 +85,8 @@ namespace osu.Game.Tests.Resources
         /// </summary>
         /// <param name="difficultyCount">Number of difficulties. If null, a random number between 1 and 20 will be used.</param>
         /// <param name="rulesets">Rulesets to cycle through when creating difficulties. If <c>null</c>, osu! ruleset will be used.</param>
-        public static BeatmapSetInfo CreateTestBeatmapSetInfo(int? difficultyCount = null, RulesetInfo[] rulesets = null)
+        /// <param name="randomiseMetadata">Whether to randomise metadata to create a better distribution.</param>
+        public static BeatmapSetInfo CreateTestBeatmapSetInfo(int? difficultyCount = null, RulesetInfo[] rulesets = null, bool randomiseMetadata = false)
         {
             int j = 0;
 
@@ -95,13 +96,27 @@ namespace osu.Game.Tests.Resources
 
             int setId = GetNextTestID();
 
-            var metadata = new BeatmapMetadata
+            char getRandomCharacter()
             {
-                // Create random metadata, then we can check if sorting works based on these
-                Artist = "Some Artist " + RNG.Next(0, 9),
-                Title = $"Some Song (set id {setId:000}) {Guid.NewGuid()}",
-                Author = { Username = "Some Guy " + RNG.Next(0, 9) },
-            };
+                const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz*";
+                return chars[RNG.Next(chars.Length)];
+            }
+
+            var metadata = randomiseMetadata
+                ? new BeatmapMetadata
+                {
+                    // Create random metadata, then we can check if sorting works based on these
+                    Artist = $"{getRandomCharacter()}ome Artist " + RNG.Next(0, 9),
+                    Title = $"{getRandomCharacter()}ome Song (set id {setId:000}) {Guid.NewGuid()}",
+                    Author = { Username = $"{getRandomCharacter()}ome Guy " + RNG.Next(0, 9) },
+                }
+                : new BeatmapMetadata
+                {
+                    // Create random metadata, then we can check if sorting works based on these
+                    Artist = "Some Artist " + RNG.Next(0, 9),
+                    Title = $"Some Song (set id {setId:000}) {Guid.NewGuid()}",
+                    Author = { Username = "Some Guy " + RNG.Next(0, 9) },
+                };
 
             Logger.Log($"🛠️ Generating beatmap set \"{metadata}\" for test consumption.");
 
