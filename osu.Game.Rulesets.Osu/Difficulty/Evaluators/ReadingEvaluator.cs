@@ -65,7 +65,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             {
                 double timeSpentInvisible = getDurationSpentInvisible(currObj) / current.ClockRate;
                 // Nerf hidden difficulty less the more density difficulty you have
-                // We stop nerfing at density of 1 because there is a still an inherent hidden difficulty at low density
                 double timeDifficultyFactor = 500 / rawDensityDifficulty;
 
                 double visibleObjectFactor = Math.Clamp(retrieveCurrentVisibleObjects(currObj).Count - 2, 0, 15);
