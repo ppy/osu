@@ -65,6 +65,8 @@ namespace osu.Game.Overlays.FirstRunSetup
             };
         }
 
+        public override LocalisableString? NextStepText => FirstRunSetupOverlayStrings.GetStarted;
+
         private partial class LanguageSelectionFlow : FillFlowContainer
         {
             private Bindable<Language> language = null!;
