@@ -27,6 +27,16 @@ namespace osu.Game.Screens.SelectV2
         private OsuSpriteText text = null!;
         private Box box = null!;
 
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
+        {
+            var inputRectangle = DrawRectangle;
+
+            // Cover a gap introduced by the spacing between a BeatmapSetPanel and a BeatmapPanel either below/above it.
+            inputRectangle = inputRectangle.Inflate(new MarginPadding { Vertical = BeatmapCarousel.SPACING / 2f });
+
+            return inputRectangle.Contains(ToLocalSpace(screenSpacePos));
+        }
+
         [BackgroundDependencyLoader]
         private void load()
         {
