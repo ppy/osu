@@ -228,21 +228,16 @@ namespace osu.Game.Screens.SelectV2
 
         private async Task performFilter()
         {
-            Debug.Assert(SynchronizationContext.Current != null);
-
             Stopwatch stopwatch = Stopwatch.StartNew();
             var cts = new CancellationTokenSource();
 
-            lock (this)
-            {
-                cancellationSource.Cancel();
-                cancellationSource = cts;
-            }
+            var previousCancellationSource = Interlocked.Exchange(ref cancellationSource, cts);
+            await previousCancellationSource.CancelAsync().ConfigureAwait(false);
 
             if (DebounceDelay > 0)
             {
                 log($"Filter operation queued, waiting for {DebounceDelay} ms debounce");
-                await Task.Delay(DebounceDelay, cts.Token).ConfigureAwait(true);
+                await Task.Delay(DebounceDelay, cts.Token).ConfigureAwait(false);
             }
 
             // Copy must be performed on update thread for now (see ConfigureAwait above).
@@ -266,19 +261,22 @@ namespace osu.Game.Screens.SelectV2
                 {
                     log("Cancelled due to newer request arriving");
                 }
-            }, cts.Token).ConfigureAwait(true);
+            }, cts.Token).ConfigureAwait(false);
 
             if (cts.Token.IsCancellationRequested)
                 return;
 
-            log("Items ready for display");
-            carouselItems = items.ToList();
-            displayedRange = null;
+            Schedule(() =>
+            {
+                log("Items ready for display");
+                carouselItems = items.ToList();
+                displayedRange = null;
 
-            // Need to call this to ensure correct post-selection logic is handled on the new items list.
-            HandleItemSelected(currentSelection.Model);
+                // Need to call this to ensure correct post-selection logic is handled on the new items list.
+                HandleItemSelected(currentSelection.Model);
 
-            refreshAfterSelection();
+                refreshAfterSelection();
+            });
 
             void log(string text) => Logger.Log($"Carousel[op {cts.GetHashCode().ToString()}] {stopwatch.ElapsedMilliseconds} ms: {text}");
         }
