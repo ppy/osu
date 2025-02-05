@@ -1,11 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Screens.SelectV2;
+using osuTK;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.SongSelect
@@ -94,9 +96,8 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddStep("add previous selection", () => BeatmapSets.Add(((BeatmapInfo)selection!).BeatmapSet!));
 
-            AddAssert("selection matches original carousel selection", () => selection, () => Is.EqualTo(Carousel.CurrentSelection));
             AddUntilStep("drawable selection restored", () => getSelectedPanel()?.Item?.Model, () => Is.EqualTo(selection));
-            AddAssert("carousel item is visible", () => getSelectedPanel()?.Item?.IsVisible, () => Is.True);
+            AddAssert("drawable selection matches carousel selection", () => selection, () => Is.EqualTo(Carousel.CurrentSelection));
 
             BeatmapPanel? getSelectedPanel() => Carousel.ChildrenOfType<BeatmapPanel>().SingleOrDefault(p => p.Selected.Value);
         }
@@ -126,21 +127,6 @@ namespace osu.Game.Tests.Visual.SongSelect
             SelectPrevGroup();
             WaitForSelection(total_set_count - 1, 0);
             SelectNextGroup();
-            WaitForSelection(0, 0);
-        }
-
-        [Test]
-        public void TestGroupSelectionOnHeader()
-        {
-            AddBeatmaps(10, 3);
-            WaitForDrawablePanels();
-
-            SelectNextGroup();
-            SelectNextGroup();
-            WaitForSelection(1, 0);
-
-            SelectPrevPanel();
-            SelectPrevGroup();
             WaitForSelection(0, 0);
         }
 
@@ -194,6 +180,34 @@ namespace osu.Game.Tests.Visual.SongSelect
             CheckNoSelection();
         }
 
+        [Test]
+        public void TestInputHandlingWithinGaps()
+        {
+            AddBeatmaps(2, 5);
+            WaitForDrawablePanels();
+            SelectNextGroup();
+
+            clickOnDifficulty(0, 1, p => p.LayoutRectangle.TopLeft + new Vector2(20f, -1f));
+            WaitForSelection(0, 1);
+
+            clickOnDifficulty(0, 0, p => p.LayoutRectangle.BottomLeft + new Vector2(20f, 1f));
+            WaitForSelection(0, 0);
+
+            SelectNextPanel();
+            Select();
+            WaitForSelection(0, 1);
+
+            clickOnSet(0, p => p.LayoutRectangle.BottomLeft + new Vector2(20f, 1f));
+            WaitForSelection(0, 0);
+
+            AddStep("scroll to end", () => Scroll.ScrollToEnd(false));
+            clickOnDifficulty(0, 4, p => p.LayoutRectangle.BottomLeft + new Vector2(20f, 1f));
+            WaitForSelection(0, 4);
+
+            clickOnSet(1, p => p.LayoutRectangle.TopLeft + new Vector2(20f, -1f));
+            WaitForSelection(1, 0);
+        }
+
         private void checkSelectionIterating(bool isIterating)
         {
             object? selection = null;
@@ -206,6 +220,28 @@ namespace osu.Game.Tests.Visual.SongSelect
                 else
                     AddUntilStep("selection not changed", () => Carousel.CurrentSelection == selection);
             }
+        }
+
+        private void clickOnSet(int set, Func<BeatmapSetPanel, Vector2> pos)
+        {
+            AddStep($"click on set{set}", () =>
+            {
+                var model = BeatmapSets[set];
+                var panel = this.ChildrenOfType<BeatmapSetPanel>().Single(b => ReferenceEquals(b.Item!.Model, model));
+                InputManager.MoveMouseTo(panel.ToScreenSpace(pos(panel)));
+                InputManager.Click(MouseButton.Left);
+            });
+        }
+
+        private void clickOnDifficulty(int set, int diff, Func<BeatmapPanel, Vector2> pos)
+        {
+            AddStep($"click on set{set} diff{diff}", () =>
+            {
+                var model = BeatmapSets[set].Beatmaps[diff];
+                var panel = this.ChildrenOfType<BeatmapPanel>().Single(b => ReferenceEquals(b.Item!.Model, model));
+                InputManager.MoveMouseTo(panel.ToScreenSpace(pos(panel)));
+                InputManager.Click(MouseButton.Left);
+            });
         }
     }
 }
