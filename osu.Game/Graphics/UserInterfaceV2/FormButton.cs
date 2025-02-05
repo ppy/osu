@@ -148,7 +148,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             {
                 base.LoadComplete();
 
-                Content.CornerRadius = 2;
+                Content.CornerRadius = 4;
 
                 Add(triangles = new TrianglesV2
                 {
