@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using DiffPlex.Model;
 using JetBrains.Annotations;
 using osu.Framework;
 using osu.Framework.Allocation;
