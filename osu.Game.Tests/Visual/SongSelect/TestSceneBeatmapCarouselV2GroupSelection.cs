@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Testing;
@@ -8,6 +9,8 @@ using osu.Game.Beatmaps;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
 using osu.Game.Screens.SelectV2;
+using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.SongSelect
 {
@@ -153,6 +156,65 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             SelectPrevGroup();
             WaitForGroupSelection(2, 9);
+        }
+
+        [Test]
+        public void TestInputHandlingWithinGaps()
+        {
+            AddBeatmaps(5, 2);
+            WaitForDrawablePanels();
+            SelectNextGroup();
+
+            clickOnPanel(0, 1, p => p.LayoutRectangle.TopLeft + new Vector2(20f, -1f));
+            WaitForGroupSelection(0, 1);
+
+            clickOnPanel(0, 0, p => p.LayoutRectangle.BottomLeft + new Vector2(20f, 1f));
+            WaitForGroupSelection(0, 0);
+
+            SelectNextPanel();
+            Select();
+            WaitForGroupSelection(0, 1);
+
+            clickOnGroup(0, p => p.LayoutRectangle.BottomLeft + new Vector2(20f, 1f));
+            AddAssert("group 0 collapsed", () => this.ChildrenOfType<GroupPanel>().OrderBy(g => g.Y).ElementAt(0).Expanded.Value, () => Is.False);
+            clickOnGroup(0, p => p.LayoutRectangle.Centre);
+            AddAssert("group 0 expanded", () => this.ChildrenOfType<GroupPanel>().OrderBy(g => g.Y).ElementAt(0).Expanded.Value, () => Is.True);
+
+            AddStep("scroll to end", () => Scroll.ScrollToEnd(false));
+            clickOnPanel(0, 4, p => p.LayoutRectangle.BottomLeft + new Vector2(20f, 1f));
+            WaitForGroupSelection(0, 4);
+
+            clickOnGroup(1, p => p.LayoutRectangle.TopLeft + new Vector2(20f, -1f));
+            AddAssert("group 1 expanded", () => this.ChildrenOfType<GroupPanel>().OrderBy(g => g.Y).ElementAt(1).Expanded.Value, () => Is.True);
+        }
+
+        private void clickOnGroup(int group, Func<GroupPanel, Vector2> pos)
+        {
+            AddStep($"click on group{group}", () =>
+            {
+                var groupingFilter = Carousel.Filters.OfType<BeatmapCarouselFilterGrouping>().Single();
+                var model = groupingFilter.GroupItems.Keys.ElementAt(group);
+
+                var panel = this.ChildrenOfType<GroupPanel>().Single(b => ReferenceEquals(b.Item!.Model, model));
+                InputManager.MoveMouseTo(panel.ToScreenSpace(pos(panel)));
+                InputManager.Click(MouseButton.Left);
+            });
+        }
+
+        private void clickOnPanel(int group, int panel, Func<BeatmapPanel, Vector2> pos)
+        {
+            AddStep($"click on group{group} panel{panel}", () =>
+            {
+                var groupingFilter = Carousel.Filters.OfType<BeatmapCarouselFilterGrouping>().Single();
+
+                var g = groupingFilter.GroupItems.Keys.ElementAt(group);
+                // offset by one because the group itself is included in the items list.
+                object model = groupingFilter.GroupItems[g].ElementAt(panel + 1).Model;
+
+                var p = this.ChildrenOfType<BeatmapPanel>().Single(b => ReferenceEquals(b.Item!.Model, model));
+                InputManager.MoveMouseTo(p.ToScreenSpace(pos(p)));
+                InputManager.Click(MouseButton.Left);
+            });
         }
     }
 }
