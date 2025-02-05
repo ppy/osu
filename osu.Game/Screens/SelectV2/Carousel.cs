@@ -237,7 +237,7 @@ namespace osu.Game.Screens.SelectV2
             if (DebounceDelay > 0)
             {
                 log($"Filter operation queued, waiting for {DebounceDelay} ms debounce");
-                await Task.Delay(DebounceDelay, cts.Token).ConfigureAwait(true);
+                await Task.Delay(DebounceDelay, cts.Token).ConfigureAwait(false);
             }
 
             // Copy must be performed on update thread for now (see ConfigureAwait above).
