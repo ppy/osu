@@ -42,5 +42,10 @@ namespace osu.Game.Online
         /// The endpoint for the SignalR metadata server.
         /// </summary>
         public string MetadataEndpointUrl { get; set; } = string.Empty;
+
+        /// <summary>
+        /// The root URL for the service handling beatmap submission. Does not include a trailing slash.
+        /// </summary>
+        public string? BeatmapSubmissionServiceUrl { get; set; }
     }
 }
