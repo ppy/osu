@@ -28,9 +28,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Utils
 
             for (; i < objects.Count - 1; i++)
             {
-                // An interval change occured, add the current object if the next interval is larger.
                 if (!Precision.AlmostEquals(objects[i].Interval, objects[i + 1].Interval, margin_of_error))
                 {
+                    // When an interval change occurs, include the object with the differing interval in the case it increased
+                    // See https://github.com/ppy/osu/pull/31636#discussion_r1942368372 for rationale.
                     if (objects[i + 1].Interval > objects[i].Interval + margin_of_error)
                     {
                         groupedObjects.Add(objects[i]);
