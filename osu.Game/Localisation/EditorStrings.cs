@@ -70,6 +70,16 @@ namespace osu.Game.Localisation
         public static LocalisableString DeleteDifficulty => new TranslatableString(getKey(@"delete_difficulty"), @"Delete difficulty");
 
         /// <summary>
+        /// "Edit externally"
+        /// </summary>
+        public static LocalisableString EditExternally => new TranslatableString(getKey(@"edit_externally"), @"Edit externally");
+
+        /// <summary>
+        /// "Submit beatmap"
+        /// </summary>
+        public static LocalisableString SubmitBeatmap => new TranslatableString(getKey(@"submit_beatmap"), @"Submit beatmap");
+
+        /// <summary>
         /// "setup"
         /// </summary>
         public static LocalisableString SetupScreen => new TranslatableString(getKey(@"setup_screen"), @"setup");
