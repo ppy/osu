@@ -73,10 +73,8 @@ namespace osu.Game.Online.Metadata
             return null;
         }
 
-        /// <inheritdoc/>
         public abstract Task UpdateActivity(UserActivity? activity);
 
-        /// <inheritdoc/>
         public abstract Task UpdateStatus(UserStatus? status);
 
         private int userPresenceWatchCount;
@@ -84,11 +82,12 @@ namespace osu.Game.Online.Metadata
         protected bool IsWatchingUserPresence
             => Interlocked.CompareExchange(ref userPresenceWatchCount, userPresenceWatchCount, userPresenceWatchCount) > 0;
 
-        /// <inheritdoc cref="IMetadataServer.BeginWatchingUserPresence" />
-        public IDisposable BeginWatchingUserPresence()
-            => new UserPresenceWatchToken(this);
+        /// <summary>
+        /// Signals to the server that we want to begin receiving status updates for all users.
+        /// </summary>
+        /// <returns>An <see cref="IDisposable"/> which will end the session when disposed.</returns>
+        public IDisposable BeginWatchingUserPresence() => new UserPresenceWatchToken(this);
 
-        /// <inheritdoc/>
         Task IMetadataServer.BeginWatchingUserPresence()
         {
             if (Interlocked.Increment(ref userPresenceWatchCount) == 1)
@@ -97,7 +96,6 @@ namespace osu.Game.Online.Metadata
             return Task.CompletedTask;
         }
 
-        /// <inheritdoc/>
         Task IMetadataServer.EndWatchingUserPresence()
         {
             if (Interlocked.Decrement(ref userPresenceWatchCount) == 0)
@@ -110,10 +108,8 @@ namespace osu.Game.Online.Metadata
 
         protected abstract Task EndWatchingUserPresenceInternal();
 
-        /// <inheritdoc/>
         public abstract Task UserPresenceUpdated(int userId, UserPresence? presence);
 
-        /// <inheritdoc/>
         public abstract Task FriendPresenceUpdated(int userId, UserPresence? presence);
 
         private class UserPresenceWatchToken : IDisposable
@@ -143,7 +139,6 @@ namespace osu.Game.Online.Metadata
 
         public abstract IBindable<DailyChallengeInfo?> DailyChallengeInfo { get; }
 
-        /// <inheritdoc/>
         public abstract Task DailyChallengeUpdated(DailyChallengeInfo? info);
 
         #endregion
