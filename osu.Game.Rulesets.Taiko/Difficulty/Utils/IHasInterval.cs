@@ -9,7 +9,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Utils
     public interface IHasInterval
     {
         /// <summary>
-        /// The interval between 2 objects start times.
+        /// The interval – ie delta time – between this object and a known previous object.
         /// </summary>
         double Interval { get; }
     }

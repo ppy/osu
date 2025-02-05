@@ -78,7 +78,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 difficultyHitObjects.Add(new TaikoDifficultyHitObject(
                     beatmap.HitObjects[i],
                     beatmap.HitObjects[i - 1],
-                    beatmap.HitObjects[i - 2],
                     clockRate,
                     difficultyHitObjects,
                     centreObjects,
