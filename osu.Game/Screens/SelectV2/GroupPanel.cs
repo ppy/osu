@@ -24,7 +24,7 @@ namespace osu.Game.Screens.SelectV2
     {
         public const float HEIGHT = CarouselItem.DEFAULT_HEIGHT;
 
-        private const float glow_offset = 10f; // extra space for the edge effect to not be cutoff by the right edge of the carousel.
+        private const float glow_offset = 10f; // extra space for any edge effect to not be cutoff by the right edge of the carousel.
         private const float preselected_x_offset = 25f;
         private const float selected_x_offset = 50f;
 

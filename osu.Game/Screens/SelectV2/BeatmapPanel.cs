@@ -36,8 +36,10 @@ namespace osu.Game.Screens.SelectV2
         private const float colour_box_width = 30;
         private const float corner_radius = 10;
 
-        private const float glow_offset = 10f; // extra space for the edge effect to not be cutoff by the right edge of the carousel.
-        private const float difficulty_x_offset = 50f; // constant X offset for beatmap difficulty panels specifically.
+        // todo: this should be replaced with information from CarouselItem about how deep is BeatmapPanel in the carousel
+        // (i.e. whether it's under a beatmap set that's under a group, or just under a top-level beatmap set).
+        private const float difficulty_x_offset = 80f; // constant X offset for beatmap difficulty panels specifically.
+
         private const float preselected_x_offset = 25f;
         private const float selected_x_offset = 50f;
 
@@ -89,7 +91,7 @@ namespace osu.Game.Screens.SelectV2
             Origin = Anchor.TopRight;
 
             RelativeSizeAxes = Axes.X;
-            Width = 0.9f;
+            Width = 1f;
             Height = HEIGHT;
 
             InternalChild = panel = new Container
@@ -307,7 +309,7 @@ namespace osu.Game.Screens.SelectV2
 
         private void updatePanelPosition()
         {
-            float x = glow_offset + difficulty_x_offset + selected_x_offset + preselected_x_offset;
+            float x = difficulty_x_offset + selected_x_offset + preselected_x_offset;
 
             if (Selected.Value)
                 x -= selected_x_offset;
