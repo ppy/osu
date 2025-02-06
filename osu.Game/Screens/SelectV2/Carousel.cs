@@ -16,6 +16,7 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Pooling;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Layout;
 using osu.Framework.Logging;
 using osu.Framework.Utils;
 using osu.Game.Graphics.Containers;
@@ -676,6 +677,15 @@ namespace osu.Game.Screens.SelectV2
             carouselPanel.Selected.Value = false;
             carouselPanel.KeyboardSelected.Value = false;
             carouselPanel.Expanded.Value = false;
+        }
+
+        protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
+        {
+            // handles the vertical size of the carousel changing (ie. on window resize when aspect ratio has changed).
+            if (invalidation.HasFlag(Invalidation.DrawSize))
+                selectionValid.Invalidate();
+
+            return base.OnInvalidate(invalidation, source);
         }
 
         #endregion
