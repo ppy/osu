@@ -19,6 +19,9 @@ namespace osu.Game.Screens.Edit
 {
     public partial class BookmarkController : Component, IKeyBindingHandler<GlobalAction>
     {
+        /// <summary>
+        /// Bookmarks menu item (with submenu containing options). Should be added to the <see cref="Editor"/>'s global menu.
+        /// </summary>
         public EditorMenuItem Menu { get; private set; }
 
         [Resolved]
