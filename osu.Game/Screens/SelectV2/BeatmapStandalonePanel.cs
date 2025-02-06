@@ -105,6 +105,7 @@ namespace osu.Game.Screens.SelectV2
                 Masking = true,
                 CornerRadius = corner_radius,
                 RelativeSizeAxes = Axes.Both,
+                X = corner_radius,
                 EdgeEffect = new EdgeEffectParameters
                 {
                     Type = EdgeEffectType.Shadow,

@@ -38,7 +38,7 @@ namespace osu.Game.Screens.SelectV2
 
         // todo: this should be replaced with information from CarouselItem about how deep is BeatmapPanel in the carousel
         // (i.e. whether it's under a beatmap set that's under a group, or just under a top-level beatmap set).
-        private const float difficulty_x_offset = 80f; // constant X offset for beatmap difficulty panels specifically.
+        private const float difficulty_x_offset = 100f; // constant X offset for beatmap difficulty panels specifically.
 
         private const float preselected_x_offset = 25f;
         private const float selected_x_offset = 50f;
@@ -99,6 +99,7 @@ namespace osu.Game.Screens.SelectV2
                 Masking = true,
                 CornerRadius = corner_radius,
                 RelativeSizeAxes = Axes.Both,
+                X = corner_radius,
                 EdgeEffect = new EdgeEffectParameters
                 {
                     Type = EdgeEffectType.Shadow,

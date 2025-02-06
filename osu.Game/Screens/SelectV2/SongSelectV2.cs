@@ -48,9 +48,7 @@ namespace osu.Game.Screens.SelectV2
                         Anchor = Anchor.TopRight,
                         Origin = Anchor.TopRight,
                         RelativeSizeAxes = Axes.Both,
-                        Width = 0.5f,
-                        // Push the carousel slightly off the right edge of the screen for the ends of the panels to be cut off.
-                        X = 20f,
+                        Width = 0.6f,
                     },
                 },
                 modSelectOverlay,
