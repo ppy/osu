@@ -9,7 +9,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Pooling;
-using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
@@ -64,16 +63,6 @@ namespace osu.Game.Screens.SelectV2
         [Resolved]
         private IBindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
 
-        protected override bool ReceivePositionalInputAtSubTree(Vector2 screenSpacePos)
-        {
-            var inputRectangle = panel.TopLevelContent.DrawRectangle;
-
-            // Cover the gaps introduced by the spacing between BeatmapPanels.
-            inputRectangle = inputRectangle.Inflate(new MarginPadding { Vertical = BeatmapCarousel.SPACING / 2f });
-
-            return inputRectangle.Contains(panel.TopLevelContent.ToLocalSpace(screenSpacePos));
-        }
-
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
         {
@@ -86,6 +75,7 @@ namespace osu.Game.Screens.SelectV2
 
             InternalChild = panel = new CarouselPanelPiece(difficulty_x_offset)
             {
+                Action = onAction,
                 Icon = difficultyIcon = new ConstrainedIconContainer
                 {
                     Size = new Vector2(20),
@@ -261,19 +251,15 @@ namespace osu.Game.Screens.SelectV2
             panel.AccentColour = starRatingColour;
         }
 
-        protected override bool OnClick(ClickEvent e)
+        private void onAction()
         {
             if (carousel == null)
-                return true;
+                return;
 
             if (carousel.CurrentSelection != Item!.Model)
-            {
                 carousel.CurrentSelection = Item!.Model;
-                return true;
-            }
-
-            carousel.TryActivateSelection();
-            return true;
+            else
+                carousel.TryActivateSelection();
         }
 
         #region ICarouselPanel

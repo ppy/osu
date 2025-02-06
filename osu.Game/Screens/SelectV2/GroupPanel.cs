@@ -11,7 +11,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Pooling;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
@@ -33,16 +32,6 @@ namespace osu.Game.Screens.SelectV2
         private Drawable chevronIcon = null!;
         private OsuSpriteText titleText = null!;
 
-        protected override bool ReceivePositionalInputAtSubTree(Vector2 screenSpacePos)
-        {
-            var inputRectangle = panel.TopLevelContent.DrawRectangle;
-
-            // Cover a gap introduced by the spacing between a GroupPanel and other panel types either below/above it.
-            inputRectangle = inputRectangle.Inflate(new MarginPadding { Vertical = BeatmapCarousel.SPACING / 2f });
-
-            return inputRectangle.Contains(panel.TopLevelContent.ToLocalSpace(screenSpacePos));
-        }
-
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
         {
@@ -53,6 +42,7 @@ namespace osu.Game.Screens.SelectV2
 
             InternalChild = panel = new CarouselPanelPiece(0)
             {
+                Action = onAction,
                 Icon = chevronIcon = new SpriteIcon
                 {
                     AlwaysPresent = true,
@@ -136,12 +126,10 @@ namespace osu.Game.Screens.SelectV2
             this.FadeInFromZero(500, Easing.OutQuint);
         }
 
-        protected override bool OnClick(ClickEvent e)
+        private void onAction()
         {
             if (carousel != null)
                 carousel.CurrentSelection = Item!.Model;
-
-            return true;
         }
 
         #region ICarouselPanel

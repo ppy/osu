@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -68,6 +69,18 @@ namespace osu.Game.Screens.SelectV2
 
         public readonly BindableBool Active = new BindableBool();
         public readonly BindableBool KeyboardActive = new BindableBool();
+
+        public Action? Action;
+
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
+        {
+            var inputRectangle = TopLevelContent.DrawRectangle;
+
+            // Cover potential gaps introduced by the spacing between panels.
+            inputRectangle = inputRectangle.Inflate(new MarginPadding { Vertical = BeatmapCarousel.SPACING / 2f });
+
+            return inputRectangle.Contains(TopLevelContent.ToLocalSpace(screenSpacePos));
+        }
 
         public CarouselPanelPiece(float panelXOffset)
         {
@@ -221,13 +234,19 @@ namespace osu.Game.Screens.SelectV2
         protected override bool OnHover(HoverEvent e)
         {
             updateDisplay();
-            return base.OnHover(e);
+            return true;
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
             updateDisplay();
             base.OnHoverLost(e);
+        }
+
+        protected override bool OnClick(ClickEvent e)
+        {
+            Action?.Invoke();
+            return true;
         }
 
         protected override void Update()
