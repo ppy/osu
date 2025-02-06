@@ -185,6 +185,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                         .Where(p => ((ICarouselPanel)p).Item?.IsVisible == true)
                         .OrderBy(p => p.Y)
                         .ElementAt(index)
+                        .ChildrenOfType<CarouselPanelPiece>().Single()
                         .TriggerClick();
             });
         }
