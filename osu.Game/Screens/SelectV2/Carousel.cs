@@ -550,8 +550,7 @@ namespace osu.Game.Screens.SelectV2
                 updateDisplayedRange(range);
             }
 
-            double selectedYPos = currentSelection?.CarouselItem?.CarouselYPosition ?? 0;
-            double maximumDistanceFromSelection = scroll.Panels.Select(p => Math.Abs(((ICarouselPanel)p).DrawYPosition - selectedYPos)).DefaultIfEmpty().Max();
+            double selectedYPos = currentSelection.CarouselItem?.CarouselYPosition ?? 0;
 
             foreach (var panel in scroll.Panels)
             {
@@ -561,8 +560,8 @@ namespace osu.Game.Screens.SelectV2
                 if (c.Item == null)
                     continue;
 
-                float normalisedDepth = (float)(Math.Abs(selectedYPos - c.DrawYPosition) / maximumDistanceFromSelection);
-                scroll.Panels.ChangeChildDepth(panel, normalisedDepth + c.Item.DepthLayer);
+                float normalisedDepth = (float)(Math.Abs(selectedYPos - c.DrawYPosition) / DrawHeight);
+                scroll.Panels.ChangeChildDepth(panel, c.Item.DepthLayer + normalisedDepth);
 
                 if (c.DrawYPosition != c.Item.CarouselYPosition)
                     c.DrawYPosition = Interpolation.DampContinuously(c.DrawYPosition, c.Item.CarouselYPosition, 50, Time.Elapsed);
