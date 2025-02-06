@@ -161,11 +161,18 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                                     Origin = Anchor.CentreRight,
                                     AutoSizeAxes = Axes.Both,
                                     Margin = new MarginPadding { Right = 70 },
+                                    Spacing = new Vector2(2),
                                     Children = new Drawable[]
                                     {
-                                        userStyleDisplay = new StyleDisplayIcon(),
+                                        userStyleDisplay = new StyleDisplayIcon
+                                        {
+                                            Anchor = Anchor.CentreLeft,
+                                            Origin = Anchor.CentreLeft,
+                                        },
                                         userModsDisplay = new ModDisplay
                                         {
+                                            Anchor = Anchor.CentreLeft,
+                                            Origin = Anchor.CentreLeft,
                                             Scale = new Vector2(0.5f),
                                             ExpansionMode = ExpansionMode.AlwaysContracted,
                                         }
