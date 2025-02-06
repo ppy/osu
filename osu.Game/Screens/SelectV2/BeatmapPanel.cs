@@ -86,13 +86,7 @@ namespace osu.Game.Screens.SelectV2
 
         protected override bool OnClick(ClickEvent e)
         {
-            if (carousel.CurrentSelection != Item!.Model)
-            {
-                carousel.CurrentSelection = Item!.Model;
-                return true;
-            }
-
-            carousel.TryActivateSelection();
+            carousel.Activate(Item!);
             return true;
         }
 

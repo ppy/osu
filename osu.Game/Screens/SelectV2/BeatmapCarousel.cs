@@ -95,11 +95,9 @@ namespace osu.Game.Screens.SelectV2
         private GroupDefinition? lastSelectedGroup;
         private BeatmapInfo? lastSelectedBeatmap;
 
-        protected override bool HandleItemSelected(object? model)
+        protected override void HandleItemActivated(CarouselItem item)
         {
-            base.HandleItemSelected(model);
-
-            switch (model)
+            switch (item.Model)
             {
                 case GroupDefinition group:
                     // Special case – collapsing an open group.
@@ -107,16 +105,32 @@ namespace osu.Game.Screens.SelectV2
                     {
                         setExpansionStateOfGroup(lastSelectedGroup, false);
                         lastSelectedGroup = null;
-                        return false;
+                        return;
                     }
 
                     setExpandedGroup(group);
-                    return false;
+                    return;
 
                 case BeatmapSetInfo setInfo:
                     // Selecting a set isn't valid – let's re-select the first difficulty.
                     CurrentSelection = setInfo.Beatmaps.First();
-                    return false;
+                    return;
+
+                case BeatmapInfo beatmapInfo:
+                    CurrentSelection = beatmapInfo;
+                    return;
+            }
+        }
+
+        protected override void HandleItemSelected(object? model)
+        {
+            base.HandleItemSelected(model);
+
+            switch (model)
+            {
+                case BeatmapSetInfo:
+                case GroupDefinition:
+                    throw new InvalidOperationException("Groups should never become selected");
 
                 case BeatmapInfo beatmapInfo:
                     // Find any containing group. There should never be too many groups so iterating is efficient enough.
@@ -125,11 +139,8 @@ namespace osu.Game.Screens.SelectV2
                     if (containingGroup != null)
                         setExpandedGroup(containingGroup);
                     setExpandedSet(beatmapInfo);
-
-                    return true;
+                    break;
             }
-
-            return true;
         }
 
         protected override bool CheckValidForGroupSelection(CarouselItem item)
