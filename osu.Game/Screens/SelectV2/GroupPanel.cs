@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -96,7 +95,7 @@ namespace osu.Game.Screens.SelectV2
 
         protected override bool OnClick(ClickEvent e)
         {
-            carousel.CurrentSelection = Item!.Model;
+            carousel.Activate(Item!);
             return true;
         }
 
@@ -111,8 +110,6 @@ namespace osu.Game.Screens.SelectV2
 
         public void Activated()
         {
-            // sets should never be activated.
-            throw new InvalidOperationException();
         }
 
         #endregion

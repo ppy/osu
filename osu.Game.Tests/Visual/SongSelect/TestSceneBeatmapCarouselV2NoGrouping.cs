@@ -147,7 +147,11 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             SelectPrevPanel();
             SelectPrevGroup();
-            WaitForSelection(0, 0);
+            WaitForSelection(1, 0);
+
+            SelectPrevPanel();
+            SelectNextGroup();
+            WaitForSelection(1, 0);
         }
 
         [Test]

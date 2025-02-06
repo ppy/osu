@@ -29,7 +29,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             Quad positionBefore = default;
 
-            AddStep("select middle beatmap", () => Carousel.CurrentSelection = BeatmapSets.ElementAt(BeatmapSets.Count - 2));
+            AddStep("select middle beatmap", () => Carousel.CurrentSelection = BeatmapSets.ElementAt(BeatmapSets.Count - 2).Beatmaps.First());
             AddStep("scroll to selected item", () => Scroll.ScrollTo(Scroll.ChildrenOfType<BeatmapPanel>().Single(p => p.Selected.Value)));
 
             WaitForScrolling();
@@ -50,7 +50,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddStep("scroll to last item", () => Scroll.ScrollToEnd(false));
 
-            AddStep("select last beatmap", () => Carousel.CurrentSelection = BeatmapSets.Last());
+            AddStep("select last beatmap", () => Carousel.CurrentSelection = BeatmapSets.Last().Beatmaps.Last());
 
             WaitForScrolling();
 

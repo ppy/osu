@@ -100,8 +100,17 @@ namespace osu.Game.Tests.Visual.SongSelect
             WaitForGroupSelection(0, 0);
 
             SelectPrevPanel();
+            AddAssert("keyboard selected panel is expanded", () => GetKeyboardSelectedPanel()?.Expanded.Value, () => Is.True);
+
             SelectPrevGroup();
+
             WaitForGroupSelection(0, 0);
+            AddAssert("keyboard selected panel is contracted", () => GetKeyboardSelectedPanel()?.Expanded.Value, () => Is.False);
+
+            SelectPrevGroup();
+
+            WaitForGroupSelection(0, 0);
+            AddAssert("keyboard selected panel is expanded", () => GetKeyboardSelectedPanel()?.Expanded.Value, () => Is.True);
         }
 
         [Test]
