@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -441,7 +440,9 @@ namespace osu.Game.Screens.OnlinePlay.Match
             var rulesetInstance = GetGameplayRuleset().CreateInstance();
 
             // Remove any user mods that are no longer allowed.
-            Mod[] allowedMods = item.AllowedMods.Select(m => m.ToMod(rulesetInstance)).ToArray();
+            Mod[] allowedMods = item.Freestyle
+                ? rulesetInstance.CreateAllMods().Where(m => ModUtils.IsValidFreeModForMatchType(m, Room.Type)).ToArray()
+                : item.AllowedMods.Select(m => m.ToMod(rulesetInstance)).ToArray();
             Mod[] newUserMods = UserMods.Value.Where(m => allowedMods.Any(a => m.GetType() == a.GetType())).ToArray();
             if (!newUserMods.SequenceEqual(UserMods.Value))
                 UserMods.Value = UserMods.Value.Where(m => allowedMods.Any(a => m.GetType() == a.GetType())).ToList();
@@ -455,12 +456,8 @@ namespace osu.Game.Screens.OnlinePlay.Match
             Mods.Value = GetGameplayMods().Select(m => m.ToMod(rulesetInstance)).ToArray();
             Ruleset.Value = GetGameplayRuleset();
 
-            bool freeMod = item.AllowedMods.Any();
             bool freestyle = item.Freestyle;
-
-            // For now, the game can never be in a state where freemod and freestyle are on at the same time.
-            // This will change, but due to the current implementation if this was to occur drawables will overlap so let's assert.
-            Debug.Assert(!freeMod || !freestyle);
+            bool freeMod = freestyle || item.AllowedMods.Any();
 
             if (freeMod)
             {
