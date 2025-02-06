@@ -66,7 +66,12 @@ namespace osu.Game.Screens.SelectV2
                         {
                             starGroup = (int)Math.Floor(b.StarRating);
                             var groupDefinition = new GroupDefinition($"{starGroup} - {++starGroup} *");
-                            var groupItem = new CarouselItem(groupDefinition) { DrawHeight = GroupPanel.HEIGHT };
+
+                            var groupItem = new CarouselItem(groupDefinition)
+                            {
+                                DrawHeight = GroupPanel.HEIGHT,
+                                DepthLayer = -2
+                            };
 
                             newItems.Add(groupItem);
                             groupItems[groupDefinition] = new HashSet<CarouselItem> { groupItem };
@@ -95,7 +100,12 @@ namespace osu.Game.Screens.SelectV2
 
                         if (newBeatmapSet)
                         {
-                            var setItem = new CarouselItem(beatmap.BeatmapSet!) { DrawHeight = BeatmapSetPanel.HEIGHT };
+                            var setItem = new CarouselItem(beatmap.BeatmapSet!)
+                            {
+                                DrawHeight = BeatmapSetPanel.HEIGHT,
+                                DepthLayer = -1
+                            };
+
                             setItems[beatmap.BeatmapSet!] = new HashSet<CarouselItem> { setItem };
                             newItems.Insert(i, setItem);
                             i++;
