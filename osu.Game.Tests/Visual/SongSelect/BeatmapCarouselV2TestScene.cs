@@ -17,7 +17,6 @@ using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Screens.Select;
-using osu.Game.Screens.Select.Filter;
 using osu.Game.Screens.SelectV2;
 using osu.Game.Tests.Beatmaps;
 using osu.Game.Tests.Resources;
@@ -52,16 +51,6 @@ namespace osu.Game.Tests.Visual.SongSelect
             BeatmapSets.BindCollectionChanged((_, _) => beatmapCount = BeatmapSets.Sum(s => s.Beatmaps.Count));
 
             Scheduler.AddDelayed(updateStats, 100, true);
-        }
-
-        [SetUpSteps]
-        public virtual void SetUpSteps()
-        {
-            RemoveAllBeatmaps();
-
-            CreateCarousel();
-
-            SortBy(new FilterCriteria { Sort = SortMode.Title });
         }
 
         protected void CreateCarousel()
@@ -200,12 +189,14 @@ namespace osu.Game.Tests.Visual.SongSelect
 
                 if (randomMetadata)
                 {
+                    char randomCharacter = getRandomCharacter();
+
                     var metadata = new BeatmapMetadata
                     {
                         // Create random metadata, then we can check if sorting works based on these
-                        Artist = $"{getRandomCharacter()}ome Artist " + RNG.Next(0, 9),
-                        Title = $"{getRandomCharacter()}ome Song (set id {beatmapSetInfo.OnlineID:000}) {Guid.NewGuid()}",
-                        Author = { Username = $"{getRandomCharacter()}ome Guy " + RNG.Next(0, 9) },
+                        Artist = $"{randomCharacter}ome Artist " + RNG.Next(0, 9),
+                        Title = $"{randomCharacter}ome Song (set id {beatmapSetInfo.OnlineID:000}) {Guid.NewGuid()}",
+                        Author = { Username = $"{randomCharacter}ome Guy " + RNG.Next(0, 9) },
                     };
 
                     foreach (var beatmap in beatmapSetInfo.Beatmaps)
@@ -216,10 +207,12 @@ namespace osu.Game.Tests.Visual.SongSelect
             }
         });
 
+        private static long randomCharPointer;
+
         private static char getRandomCharacter()
         {
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz*";
-            return chars[RNG.Next(chars.Length)];
+            return chars[(int)((randomCharPointer++ / 2) % chars.Length)];
         }
 
         protected void RemoveAllBeatmaps() => AddStep("clear all beatmaps", () => BeatmapSets.Clear());
