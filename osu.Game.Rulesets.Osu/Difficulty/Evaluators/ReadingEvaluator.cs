@@ -74,7 +74,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             }
 
             // Award only denser than average maps
-            double noteDensityDifficulty = Math.Max(0, rawDensityDifficulty - 3.5);
+            double noteDensityDifficulty = Math.Max(0, rawDensityDifficulty - 3.2);
 
             double difficulty = preemptDifficulty + hiddenDifficulty * hidden_multiplier + noteDensityDifficulty;
 
