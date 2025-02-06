@@ -25,7 +25,11 @@ namespace osu.Game.Online.API.Requests
         protected override string Target => throw new NotSupportedException();
 
         public uint BeatmapSetID { get; }
+
+        // ReSharper disable once CollectionNeverUpdated.Global
         public Dictionary<string, byte[]> FilesChanged { get; } = new Dictionary<string, byte[]>();
+
+        // ReSharper disable once CollectionNeverUpdated.Global
         public HashSet<string> FilesDeleted { get; } = new HashSet<string>();
 
         public PatchBeatmapPackageRequest(uint beatmapSetId)
