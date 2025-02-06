@@ -26,8 +26,9 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestBasics()
         {
-            AddBeatmaps(1);
             AddBeatmaps(10);
+            AddBeatmaps(10, randomMetadata: true);
+            AddBeatmaps(1);
             RemoveFirstBeatmap();
             RemoveAllBeatmaps();
         }
