@@ -173,22 +173,45 @@ namespace osu.Game.Screens.SelectV2
         {
             if (grouping.GroupItems.TryGetValue(group, out var items))
             {
-                // First pass ignoring set groupings.
-                foreach (var i in items)
-                {
-                    if (i.Model is GroupDefinition)
-                        i.IsExpanded = expanded;
-                    else
-                        i.IsVisible = expanded;
-                }
-
-                // Second pass to hide set children when not meant to be displayed.
                 if (expanded)
                 {
                     foreach (var i in items)
                     {
-                        if (i.Model is BeatmapSetInfo set)
-                            setExpansionStateOfSetItems(set, i.IsExpanded);
+                        switch (i.Model)
+                        {
+                            case GroupDefinition:
+                                i.IsExpanded = true;
+                                break;
+
+                            case BeatmapSetInfo set:
+                                // Case where there are set headers, header should be visible
+                                // and items should use the set's expanded state.
+                                i.IsVisible = true;
+                                setExpansionStateOfSetItems(set, i.IsExpanded);
+                                break;
+
+                            default:
+                                // Case where there are no set headers, all items should be visible.
+                                if (!grouping.BeatmapSetsGroupedTogether)
+                                    i.IsVisible = true;
+                                break;
+                        }
+                    }
+                }
+                else
+                {
+                    foreach (var i in items)
+                    {
+                        switch (i.Model)
+                        {
+                            case GroupDefinition:
+                                i.IsExpanded = false;
+                                break;
+
+                            default:
+                                i.IsVisible = false;
+                                break;
+                        }
                     }
                 }
             }
