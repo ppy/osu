@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -190,11 +191,36 @@ namespace osu.Game.Tests.Visual.SongSelect
         /// </summary>
         /// <param name="count">The count of beatmap sets to add.</param>
         /// <param name="fixedDifficultiesPerSet">If not null, the number of difficulties per set. If null, randomised difficulty count will be used.</param>
-        protected void AddBeatmaps(int count, int? fixedDifficultiesPerSet = null) => AddStep($"add {count} beatmaps", () =>
+        /// <param name="randomMetadata">Whether to randomise the metadata to make groupings more uniform.</param>
+        protected void AddBeatmaps(int count, int? fixedDifficultiesPerSet = null, bool randomMetadata = false) => AddStep($"add {count} beatmaps{(randomMetadata ? " with random data" : "")}", () =>
         {
             for (int i = 0; i < count; i++)
-                BeatmapSets.Add(TestResources.CreateTestBeatmapSetInfo(fixedDifficultiesPerSet ?? RNG.Next(1, 4), randomiseMetadata: true));
+            {
+                var beatmapSetInfo = TestResources.CreateTestBeatmapSetInfo(fixedDifficultiesPerSet ?? RNG.Next(1, 4));
+
+                if (randomMetadata)
+                {
+                    var metadata = new BeatmapMetadata
+                    {
+                        // Create random metadata, then we can check if sorting works based on these
+                        Artist = $"{getRandomCharacter()}ome Artist " + RNG.Next(0, 9),
+                        Title = $"{getRandomCharacter()}ome Song (set id {beatmapSetInfo.OnlineID:000}) {Guid.NewGuid()}",
+                        Author = { Username = $"{getRandomCharacter()}ome Guy " + RNG.Next(0, 9) },
+                    };
+
+                    foreach (var beatmap in beatmapSetInfo.Beatmaps)
+                        beatmap.Metadata = metadata.DeepClone();
+                }
+
+                BeatmapSets.Add(beatmapSetInfo);
+            }
         });
+
+        private static char getRandomCharacter()
+        {
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz*";
+            return chars[RNG.Next(chars.Length)];
+        }
 
         protected void RemoveAllBeatmaps() => AddStep("clear all beatmaps", () => BeatmapSets.Clear());
 
