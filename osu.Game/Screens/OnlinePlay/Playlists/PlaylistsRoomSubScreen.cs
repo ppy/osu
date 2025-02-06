@@ -153,11 +153,21 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                             }
                                         }
                                     },
+                                    new Drawable[]
+                                    {
+                                        new AddPlaylistToCollectionButton(Room)
+                                        {
+                                            Margin = new MarginPadding { Top = 5 },
+                                            RelativeSizeAxes = Axes.X,
+                                            Size = new Vector2(1, 40)
+                                        }
+                                    }
                                 },
                                 RowDimensions = new[]
                                 {
                                     new Dimension(GridSizeMode.AutoSize),
                                     new Dimension(),
+                                    new Dimension(GridSizeMode.AutoSize),
                                 }
                             },
                             // Spacer
