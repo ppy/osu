@@ -38,7 +38,10 @@ namespace osu.Game.Screens.SelectV2
         private const float difficulty_icon_container_width = 30;
         private const float corner_radius = 10;
 
-        private const float glow_offset = 10f; // extra space for the edge effect to not be cutoff by the right edge of the carousel.
+        // todo: this should be replaced with information from CarouselItem about how deep is BeatmapPanel in the carousel
+        // (i.e. whether it's under a beatmap set that's under a group, or just under a top-level beatmap set).
+        private const float set_x_offset = 20f; // constant X offset for beatmap set/standalone panels specifically.
+
         private const float preselected_x_offset = 25f;
         private const float selected_x_offset = 50f;
 
@@ -348,7 +351,7 @@ namespace osu.Game.Screens.SelectV2
 
         private void updatePanelPosition()
         {
-            float x = glow_offset + selected_x_offset + preselected_x_offset;
+            float x = set_x_offset + selected_x_offset + preselected_x_offset;
 
             if (Selected.Value)
                 x -= selected_x_offset;
