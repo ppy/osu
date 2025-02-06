@@ -14,6 +14,8 @@ namespace osu.Game.Screens.SelectV2
 {
     public class BeatmapCarouselFilterGrouping : ICarouselFilter
     {
+        public bool BeatmapSetsGroupedTogether { get; private set; }
+
         /// <summary>
         /// Beatmap sets contain difficulties as related panels. This dictionary holds the relationships between set-difficulties to allow expanding them on selection.
         /// </summary>
@@ -36,8 +38,6 @@ namespace osu.Game.Screens.SelectV2
 
         public async Task<IEnumerable<CarouselItem>> Run(IEnumerable<CarouselItem> items, CancellationToken cancellationToken) => await Task.Run(() =>
         {
-            bool groupSetsTogether;
-
             setItems.Clear();
             groupItems.Clear();
 
@@ -48,12 +48,12 @@ namespace osu.Game.Screens.SelectV2
             switch (criteria.Group)
             {
                 default:
-                    groupSetsTogether = true;
+                    BeatmapSetsGroupedTogether = true;
                     newItems.AddRange(items);
                     break;
 
                 case GroupMode.Artist:
-                    groupSetsTogether = true;
+                    BeatmapSetsGroupedTogether = true;
                     char groupChar = (char)0;
 
                     foreach (var item in items)
@@ -80,7 +80,7 @@ namespace osu.Game.Screens.SelectV2
                     break;
 
                 case GroupMode.Difficulty:
-                    groupSetsTogether = false;
+                    BeatmapSetsGroupedTogether = false;
                     int starGroup = int.MinValue;
 
                     foreach (var item in items)
@@ -108,7 +108,7 @@ namespace osu.Game.Screens.SelectV2
             // Add set headers wherever required.
             CarouselItem? lastItem = null;
 
-            if (groupSetsTogether)
+            if (BeatmapSetsGroupedTogether)
             {
                 for (int i = 0; i < newItems.Count; i++)
                 {
