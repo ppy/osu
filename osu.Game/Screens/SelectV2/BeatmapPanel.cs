@@ -6,13 +6,9 @@ using System.Diagnostics;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Pooling;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
@@ -25,7 +21,6 @@ using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Screens.SelectV2
 {
@@ -33,36 +28,23 @@ namespace osu.Game.Screens.SelectV2
     {
         public const float HEIGHT = CarouselItem.DEFAULT_HEIGHT;
 
-        private const float colour_box_width = 30;
-        private const float corner_radius = 10;
-
         // todo: this should be replaced with information from CarouselItem about how deep is BeatmapPanel in the carousel
         // (i.e. whether it's under a beatmap set that's under a group, or just under a top-level beatmap set).
         private const float difficulty_x_offset = 100f; // constant X offset for beatmap difficulty panels specifically.
 
-        private const float preselected_x_offset = 25f;
-        private const float selected_x_offset = 50f;
-
         private const float duration = 500;
 
-        [Resolved]
-        private BeatmapCarousel? carousel { get; set; }
-
-        [Resolved]
-        private IBindable<RulesetInfo> ruleset { get; set; } = null!;
-
-        [Resolved]
-        private IBindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
-
-        private Container panel = null!;
+        private CarouselPanelPiece panel = null!;
         private StarCounter starCounter = null!;
-        private ConstrainedIconContainer iconContainer = null!;
-        private Box hoverLayer = null!;
-        private Box activationFlash = null!;
-
-        private Box backgroundBorder = null!;
-
+        private ConstrainedIconContainer difficultyIcon = null!;
+        private OsuSpriteText keyCountText = null!;
         private StarRatingDisplay starRatingDisplay = null!;
+        private TopLocalRankV2 difficultyRank = null!;
+        private OsuSpriteText difficultyText = null!;
+        private OsuSpriteText authorText = null!;
+
+        private IBindable<StarDifficulty?>? starDifficultyBindable;
+        private CancellationTokenSource? starDifficultyCancellationSource;
 
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
@@ -73,16 +55,24 @@ namespace osu.Game.Screens.SelectV2
         [Resolved]
         private BeatmapDifficultyCache difficultyCache { get; set; } = null!;
 
-        private OsuSpriteText keyCountText = null!;
+        [Resolved]
+        private BeatmapCarousel? carousel { get; set; }
 
-        private IBindable<StarDifficulty?>? starDifficultyBindable;
-        private CancellationTokenSource? starDifficultyCancellationSource;
+        [Resolved]
+        private IBindable<RulesetInfo> ruleset { get; set; } = null!;
 
-        private Container rightContainer = null!;
-        private Box starRatingGradient = null!;
-        private TopLocalRankV2 difficultyRank = null!;
-        private OsuSpriteText difficultyText = null!;
-        private OsuSpriteText authorText = null!;
+        [Resolved]
+        private IBindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
+
+        protected override bool ReceivePositionalInputAtSubTree(Vector2 screenSpacePos)
+        {
+            var inputRectangle = panel.TopLevelContent.DrawRectangle;
+
+            // Cover the gaps introduced by the spacing between BeatmapPanels.
+            inputRectangle = inputRectangle.Inflate(new MarginPadding { Vertical = BeatmapCarousel.SPACING / 2f });
+
+            return inputRectangle.Contains(panel.TopLevelContent.ToLocalSpace(screenSpacePos));
+        }
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
@@ -94,67 +84,21 @@ namespace osu.Game.Screens.SelectV2
             Width = 1f;
             Height = HEIGHT;
 
-            InternalChild = panel = new Container
+            InternalChild = panel = new CarouselPanelPiece(difficulty_x_offset)
             {
-                Masking = true,
-                CornerRadius = corner_radius,
-                RelativeSizeAxes = Axes.Both,
-                X = corner_radius,
-                EdgeEffect = new EdgeEffectParameters
+                Icon = difficultyIcon = new ConstrainedIconContainer
                 {
-                    Type = EdgeEffectType.Shadow,
-                    Offset = new Vector2(1f),
-                    Radius = 10,
+                    Size = new Vector2(20),
+                    Margin = new MarginPadding { Horizontal = 5f },
+                    Colour = colourProvider.Background5,
                 },
-                Children = new Drawable[]
+                Children = new[]
                 {
-                    new BufferedContainer
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Children = new Drawable[]
-                        {
-                            backgroundBorder = new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Colour = colours.ForStarDifficulty(0),
-                                EdgeSmoothness = new Vector2(2, 0),
-                            },
-                            rightContainer = new Container
-                            {
-                                Anchor = Anchor.CentreLeft,
-                                Origin = Anchor.CentreLeft,
-                                Masking = true,
-                                CornerRadius = corner_radius,
-                                RelativeSizeAxes = Axes.X,
-                                Height = HEIGHT,
-                                X = colour_box_width,
-                                Children = new Drawable[]
-                                {
-                                    new Box
-                                    {
-                                        RelativeSizeAxes = Axes.Both,
-                                        Colour = ColourInfo.GradientHorizontal(colourProvider.Background3, colourProvider.Background4),
-                                    },
-                                    starRatingGradient = new Box
-                                    {
-                                        RelativeSizeAxes = Axes.Both,
-                                        Alpha = 0,
-                                    },
-                                },
-                            },
-                        }
-                    },
-                    iconContainer = new ConstrainedIconContainer
-                    {
-                        X = colour_box_width / 2,
-                        Origin = Anchor.Centre,
-                        Anchor = Anchor.CentreLeft,
-                        Size = new Vector2(20),
-                        Colour = colourProvider.Background5,
-                    },
                     new FillFlowContainer
                     {
-                        Padding = new MarginPadding { Top = 8, Left = colour_box_width + corner_radius },
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreLeft,
+                        Padding = new MarginPadding { Left = 10f },
                         Direction = FillDirection.Vertical,
                         AutoSizeAxes = Axes.Both,
                         Children = new Drawable[]
@@ -216,32 +160,8 @@ namespace osu.Game.Screens.SelectV2
                             }
                         }
                     },
-                    hoverLayer = new Box
-                    {
-                        Colour = colours.Blue.Opacity(0.1f),
-                        Alpha = 0,
-                        Blending = BlendingParameters.Additive,
-                        RelativeSizeAxes = Axes.Both,
-                    },
-                    activationFlash = new Box
-                    {
-                        Blending = BlendingParameters.Additive,
-                        Alpha = 0f,
-                        RelativeSizeAxes = Axes.Both,
-                    },
-                    new HoverSounds(),
                 }
             };
-        }
-
-        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
-        {
-            var inputRectangle = panel.DrawRectangle;
-
-            // Cover the gaps introduced by the spacing between BeatmapPanels.
-            inputRectangle = inputRectangle.Inflate(new MarginPadding { Vertical = BeatmapCarousel.SPACING / 2f });
-
-            return inputRectangle.Contains(panel.ToLocalSpace(screenSpacePos));
         }
 
         protected override void LoadComplete()
@@ -260,8 +180,8 @@ namespace osu.Game.Screens.SelectV2
                 updateKeyCount();
             }, true);
 
-            Selected.BindValueChanged(_ => updateSelectionDisplay(), true);
-            KeyboardSelected.BindValueChanged(_ => updateKeyboardSelectedDisplay(), true);
+            Selected.BindValueChanged(s => panel.Active.Value = s.NewValue, true);
+            KeyboardSelected.BindValueChanged(k => panel.KeyboardActive.Value = k.NewValue, true);
         }
 
         protected override void PrepareForUse()
@@ -271,63 +191,25 @@ namespace osu.Game.Screens.SelectV2
             Debug.Assert(Item != null);
             var beatmap = (BeatmapInfo)Item.Model;
 
-            iconContainer.Icon = beatmap.Ruleset.CreateInstance().CreateIcon();
+            difficultyIcon.Icon = beatmap.Ruleset.CreateInstance().CreateIcon();
 
             difficultyRank.Beatmap = beatmap;
             difficultyText.Text = beatmap.DifficultyName;
             authorText.Text = BeatmapsetsStrings.ShowDetailsMappedBy(beatmap.Metadata.Author.Username);
 
-            starDifficultyBindable = null;
-
             computeStarRating();
             updateKeyCount();
 
-            updateSelectionDisplay();
             FinishTransforms(true);
-
             this.FadeInFromZero(duration, Easing.OutQuint);
-
-            // todo: only do this when visible.
-            // starCounter.ReplayAnimation();
         }
 
-        private void updateSelectionDisplay()
+        protected override void FreeAfterUse()
         {
-            bool selected = Selected.Value;
+            base.FreeAfterUse();
 
-            rightContainer.ResizeHeightTo(selected ? HEIGHT - 4 : HEIGHT, duration, Easing.OutQuint);
-
-            updatePanelPosition();
-            updateEdgeEffectColour();
-        }
-
-        private void updateKeyboardSelectedDisplay()
-        {
-            updatePanelPosition();
-            updateHover();
-        }
-
-        private void updatePanelPosition()
-        {
-            float x = difficulty_x_offset + selected_x_offset + preselected_x_offset;
-
-            if (Selected.Value)
-                x -= selected_x_offset;
-
-            if (KeyboardSelected.Value)
-                x -= preselected_x_offset;
-
-            this.TransformTo(nameof(Padding), new MarginPadding { Left = x }, duration, Easing.OutQuint);
-        }
-
-        private void updateHover()
-        {
-            bool hovered = IsHovered || KeyboardSelected.Value;
-
-            if (hovered)
-                hoverLayer.FadeIn(100, Easing.OutQuint);
-            else
-                hoverLayer.FadeOut(1000, Easing.OutQuint);
+            difficultyRank.Beatmap = null;
+            starDifficultyBindable = null;
         }
 
         private void computeStarRating()
@@ -341,34 +223,7 @@ namespace osu.Game.Screens.SelectV2
             var beatmap = (BeatmapInfo)Item.Model;
 
             starDifficultyBindable = difficultyCache.GetBindableDifficulty(beatmap, starDifficultyCancellationSource.Token);
-            starDifficultyBindable.BindValueChanged(d =>
-            {
-                var value = d.NewValue ?? default;
-
-                starRatingDisplay.Current.Value = value;
-                starCounter.Current = (float)value.Stars;
-
-                iconContainer.FadeColour(value.Stars > 6.5f ? colours.Orange1 : colourProvider.Background5, duration, Easing.OutQuint);
-
-                var starRatingColour = colours.ForStarDifficulty(value.Stars);
-
-                backgroundBorder.FadeColour(starRatingColour, duration, Easing.OutQuint);
-                starCounter.FadeColour(starRatingColour, duration, Easing.OutQuint);
-                starRatingGradient.FadeColour(ColourInfo.GradientHorizontal(starRatingColour.Opacity(0.25f), starRatingColour.Opacity(0)), duration, Easing.OutQuint);
-                starRatingGradient.FadeIn(duration, Easing.OutQuint);
-
-                // todo: this doesn't work for dark star rating colours, still not sure how to fix.
-                activationFlash.FadeColour(starRatingColour, duration, Easing.OutQuint);
-
-                updateEdgeEffectColour();
-            }, true);
-        }
-
-        private void updateEdgeEffectColour()
-        {
-            panel.FadeEdgeEffectTo(Selected.Value
-                ? colours.ForStarDifficulty(starDifficultyBindable?.Value?.Stars ?? 0f).Opacity(0.5f)
-                : Color4.Black.Opacity(0.4f), duration, Easing.OutQuint);
+            starDifficultyBindable.BindValueChanged(_ => updateDisplay(), true);
         }
 
         private void updateKeyCount()
@@ -392,16 +247,18 @@ namespace osu.Game.Screens.SelectV2
                 keyCountText.Alpha = 0;
         }
 
-        protected override bool OnHover(HoverEvent e)
+        private void updateDisplay()
         {
-            updateHover();
-            return true;
-        }
+            var starDifficulty = starDifficultyBindable?.Value ?? default;
 
-        protected override void OnHoverLost(HoverLostEvent e)
-        {
-            updateHover();
-            base.OnHoverLost(e);
+            starRatingDisplay.Current.Value = starDifficulty;
+            starCounter.Current = (float)starDifficulty.Stars;
+
+            difficultyIcon.FadeColour(starDifficulty.Stars > 6.5f ? colours.Orange1 : colourProvider.Background5, duration, Easing.OutQuint);
+
+            var starRatingColour = colours.ForStarDifficulty(starDifficulty.Stars);
+            starCounter.FadeColour(starRatingColour, duration, Easing.OutQuint);
+            panel.AccentColour = starRatingColour;
         }
 
         protected override bool OnClick(ClickEvent e)
@@ -430,7 +287,7 @@ namespace osu.Game.Screens.SelectV2
 
         public void Activated()
         {
-            activationFlash.FadeOutFromOne(500, Easing.OutQuint);
+            panel.Flash();
         }
 
         #endregion
