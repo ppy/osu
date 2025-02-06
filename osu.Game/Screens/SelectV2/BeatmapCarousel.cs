@@ -140,7 +140,7 @@ namespace osu.Game.Screens.SelectV2
                     return true;
 
                 case BeatmapInfo:
-                    return Criteria.SplitOutDifficulties;
+                    return !grouping.BeatmapSetsGroupedTogether;
 
                 case GroupDefinition:
                     return false;
