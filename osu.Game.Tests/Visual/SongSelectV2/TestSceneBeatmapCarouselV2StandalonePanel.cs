@@ -51,9 +51,9 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         {
             AddStep("random beatmap", () =>
             {
-                var randomSet = beatmaps.GetAllUsableBeatmapSets().OrderBy(_ => RNG.Next()).FirstOrDefault();
+                var randomSet = beatmaps.GetAllUsableBeatmapSets().MinBy(_ => RNG.Next());
                 randomSet ??= TestResources.CreateTestBeatmapSetInfo();
-                beatmap = randomSet.Beatmaps.OrderBy(_ => RNG.Next()).First();
+                beatmap = randomSet.Beatmaps.MinBy(_ => RNG.Next())!;
 
                 CreateThemedContent(OverlayColourScheme.Aquamarine);
             });
