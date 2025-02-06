@@ -1,13 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
-using osu.Game.Screens.SelectV2;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.SongSelect
@@ -87,28 +85,26 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             object? selection = null;
 
-            AddStep("store drawable selection", () => selection = getSelectedPanel()?.Item?.Model);
+            AddStep("store drawable selection", () => selection = GetSelectedPanel()?.Item?.Model);
 
             CheckHasSelection();
             AddAssert("drawable selection non-null", () => selection, () => Is.Not.Null);
             AddAssert("drawable selection matches carousel selection", () => selection, () => Is.EqualTo(Carousel.CurrentSelection));
 
             RemoveAllBeatmaps();
-            AddUntilStep("no drawable selection", getSelectedPanel, () => Is.Null);
+            AddUntilStep("no drawable selection", GetSelectedPanel, () => Is.Null);
 
             AddBeatmaps(10);
             WaitForDrawablePanels();
 
             CheckHasSelection();
-            AddAssert("no drawable selection", getSelectedPanel, () => Is.Null);
+            AddAssert("no drawable selection", GetSelectedPanel, () => Is.Null);
 
             AddStep("add previous selection", () => BeatmapSets.Add(((BeatmapInfo)selection!).BeatmapSet!));
 
             AddAssert("selection matches original carousel selection", () => selection, () => Is.EqualTo(Carousel.CurrentSelection));
-            AddUntilStep("drawable selection restored", () => getSelectedPanel()?.Item?.Model, () => Is.EqualTo(selection));
-            AddAssert("carousel item is visible", () => getSelectedPanel()?.Item?.IsVisible, () => Is.True);
-
-            BeatmapPanel? getSelectedPanel() => Carousel.ChildrenOfType<BeatmapPanel>().SingleOrDefault(p => p.Selected.Value);
+            AddUntilStep("drawable selection restored", () => GetSelectedPanel()?.Item?.Model, () => Is.EqualTo(selection));
+            AddAssert("carousel item is visible", () => GetSelectedPanel()?.Item?.IsVisible, () => Is.True);
         }
 
         [Test]
