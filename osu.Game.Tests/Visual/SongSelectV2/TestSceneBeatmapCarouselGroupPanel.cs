@@ -41,13 +41,13 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                     new GroupPanel
                     {
                         Item = new CarouselItem(new GroupDefinition("Group A")),
-                        Selected = { Value = true }
+                        Expanded = { Value = true }
                     },
                     new GroupPanel
                     {
                         Item = new CarouselItem(new GroupDefinition("Group A")),
                         KeyboardSelected = { Value = true },
-                        Selected = { Value = true }
+                        Expanded = { Value = true }
                     },
                     new StarsGroupPanel
                     {
@@ -56,6 +56,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                     new StarsGroupPanel
                     {
                         Item = new CarouselItem(new StarsGroupDefinition(3)),
+                        Expanded = { Value = true }
                     },
                     new StarsGroupPanel
                     {
@@ -64,6 +65,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                     new StarsGroupPanel
                     {
                         Item = new CarouselItem(new StarsGroupDefinition(7)),
+                        Expanded = { Value = true }
                     },
                     new StarsGroupPanel
                     {
@@ -72,6 +74,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                     new StarsGroupPanel
                     {
                         Item = new CarouselItem(new StarsGroupDefinition(9)),
+                        Expanded = { Value = true }
                     },
                 }
             };
