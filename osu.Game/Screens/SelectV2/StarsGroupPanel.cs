@@ -43,7 +43,6 @@ namespace osu.Game.Screens.SelectV2
 
         private Box activationFlash = null!;
         private Box outerLayer = null!;
-        private Box innerLayer = null!;
         private StarRatingDisplay starRatingDisplay = null!;
         private StarCounter starCounter = null!;
         private Box hoverLayer = null!;
@@ -108,7 +107,7 @@ namespace osu.Game.Screens.SelectV2
                             Masking = true,
                             Children = new Drawable[]
                             {
-                                innerLayer = new Box
+                                new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     Colour = Color4.Black.Opacity(0.2f),
