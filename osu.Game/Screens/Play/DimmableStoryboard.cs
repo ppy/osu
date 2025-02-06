@@ -8,7 +8,10 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Configuration;
+using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Storyboards;
@@ -19,7 +22,7 @@ namespace osu.Game.Screens.Play
     /// <summary>
     /// A container that handles <see cref="Storyboard"/> loading, as well as applies user-specified visual settings to it.
     /// </summary>
-    public partial class DimmableStoryboard : UserDimContainer
+    public partial class DimmableStoryboard : UserDimContainer, IColouredDimmable
     {
         public Container OverlayLayerContainer { get; private set; }
 
@@ -51,6 +54,8 @@ namespace osu.Game.Screens.Play
         /// </remarks>
         public IBindable<bool> HasStoryboardEnded = new BindableBool(true);
 
+        private Bindable<double> userDimColour { get; set; }
+
         public DimmableStoryboard(Storyboard storyboard, IReadOnlyList<Mod> mods)
         {
             this.storyboard = storyboard;
@@ -60,8 +65,10 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuConfigManager config)
         {
+            userDimColour = config.GetBindable<double>(OsuSetting.DimColour);
+
             Add(OverlayLayerContainer = new Container());
 
             initializeStoryboard(false);
@@ -69,6 +76,7 @@ namespace osu.Game.Screens.Play
 
         protected override void LoadComplete()
         {
+            userDimColour.ValueChanged += _ => UpdateVisuals();
             ShowStoryboard.BindValueChanged(_ => initializeStoryboard(true), true);
             base.LoadComplete();
         }
@@ -96,6 +104,42 @@ namespace osu.Game.Screens.Play
         {
             Add(storyboard);
             OverlayLayerContainer.Add(storyboard.OverlayLayer.CreateProxy());
+        }
+
+        protected virtual Colour4 DimColour
+        {
+            get
+            {
+                if (IgnoreUserSettings.Value)
+                    return Colour4.Black;
+
+                float grayscaleDimColour = (float)userDimColour.Value * DimLevel;
+                return new Colour4(grayscaleDimColour, grayscaleDimColour, grayscaleDimColour, 1.0f);
+            }
+        }
+
+        private Colour4 colourOffset;
+
+        protected Colour4 ColourOffset
+        {
+            get => colourOffset;
+            set
+            {
+                if (value.Equals(colourOffset))
+                    return;
+
+                colourOffset = value;
+                Invalidate(Invalidation.Colour);
+            }
+        }
+
+        public Colour4 DrawColourOffset => ColourOffset * DrawColourInfo.Colour;
+
+        protected override void UpdateVisuals()
+        {
+            base.UpdateVisuals();
+
+            this.TransformTo(nameof(ColourOffset), DimColour, BACKGROUND_FADE_DURATION, Easing.OutQuint);
         }
     }
 }

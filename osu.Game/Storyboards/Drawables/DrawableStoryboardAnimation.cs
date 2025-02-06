@@ -5,11 +5,16 @@
 
 using System;
 using System.IO;
+using System.Runtime.InteropServices;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
+using osu.Framework.Graphics.Rendering;
+using osu.Framework.Graphics.Shaders;
+using osu.Framework.Graphics.Shaders.Types;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Layout;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Backgrounds;
@@ -18,7 +23,7 @@ using osuTK;
 
 namespace osu.Game.Storyboards.Drawables
 {
-    public partial class DrawableStoryboardAnimation : TextureAnimation, IFlippable, IVectorScalable
+    public partial class DrawableStoryboardAnimation : TextureAnimation, IFlippable, IVectorScalable, IColouredDimmable
     {
         public StoryboardAnimation Animation { get; }
 
@@ -69,12 +74,11 @@ namespace osu.Game.Storyboards.Drawables
             }
         }
 
-        protected override Sprite CreateSprite() => new BeatmapBackground.DimmableSprite
+        protected override Sprite CreateSprite() => new DrawableStoryboardAnimationSprite
         {
             RelativeSizeAxes = Axes.Both,
             Anchor = Anchor.Centre,
             Origin = Anchor.Centre,
-            // DimColour = Colour4.Red,
         };
 
         public override bool RemoveWhenNotAlive => false;
@@ -87,6 +91,22 @@ namespace osu.Game.Storyboards.Drawables
         public override bool IsPresent
             => !float.IsNaN(DrawPosition.X) && !float.IsNaN(DrawPosition.Y) && base.IsPresent;
 
+        private LayoutValue<Colour4> drawColourOffsetBacking = new LayoutValue<Colour4>(Invalidation.DrawNode | Invalidation.Colour | Invalidation.DrawInfo | Invalidation.RequiredParentSizeToFit | Invalidation.Presence);
+
+        public Colour4 DrawColourOffset => drawColourOffsetBacking.IsValid ? drawColourOffsetBacking.Value : drawColourOffsetBacking.Value = computeDrawColourOffset();
+
+        private Colour4 computeDrawColourOffset()
+        {
+            // Additive blending doesn't require any offset, hopefully whatever is beneath it handles the offset.
+            if (DrawColourInfo.Blending == BlendingParameters.Additive)
+                return Colour4.Black;
+
+            if (Parent is IColouredDimmable colouredDimmableParent)
+                return colouredDimmableParent.DrawColourOffset;
+
+            return Colour4.Black;
+        }
+
         public DrawableStoryboardAnimation(StoryboardAnimation animation)
         {
             Animation = animation;
@@ -97,6 +117,8 @@ namespace osu.Game.Storyboards.Drawables
 
             LifetimeStart = animation.StartTime;
             LifetimeEnd = animation.EndTimeForDisplay;
+
+            AddLayout(drawColourOffsetBacking);
         }
 
         [Resolved]
@@ -169,6 +191,98 @@ namespace osu.Game.Storyboards.Drawables
 
             if (skin != null)
                 skin.SourceChanged -= skinSourceChanged;
+        }
+
+        public partial class DrawableStoryboardAnimationSprite : Sprite
+        {
+            private LayoutValue<Colour4> drawColourOffsetBacking = new LayoutValue<Colour4>(Invalidation.DrawNode | Invalidation.Colour | Invalidation.DrawInfo | Invalidation.RequiredParentSizeToFit | Invalidation.Presence);
+
+            public Colour4 DrawColourOffset => drawColourOffsetBacking.IsValid ? drawColourOffsetBacking.Value : drawColourOffsetBacking.Value = computeDrawColourOffset();
+
+            private Colour4 computeDrawColourOffset()
+            {
+                // Direct Parent is a Container, so we need to go up two levels to get the DrawableStoryboardAnimation.
+                if (Parent?.Parent is IColouredDimmable colouredDimmableParent)
+                    return colouredDimmableParent.DrawColourOffset;
+
+                return Colour4.Black;
+            }
+
+            protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
+            {
+                bool result = base.OnInvalidate(invalidation, source);
+
+                if ((invalidation & (Invalidation.Colour | Invalidation.DrawInfo | Invalidation.RequiredParentSizeToFit | Invalidation.Presence)) > 0)
+                {
+                    result |= Invalidate(Invalidation.DrawNode);
+                }
+
+                return result;
+            }
+
+            public DrawableStoryboardAnimationSprite()
+            {
+                AddLayout(drawColourOffsetBacking);
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(ShaderManager shaders)
+            {
+                TextureShader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, "ColouredDimmableTexture");
+            }
+
+            protected override DrawNode CreateDrawNode() => new BeatmapBackgroundSpriteDrawNode(this);
+
+            public class BeatmapBackgroundSpriteDrawNode : SpriteDrawNode
+            {
+                public new DrawableStoryboardAnimationSprite Source => (DrawableStoryboardAnimationSprite)base.Source;
+
+                public BeatmapBackgroundSpriteDrawNode(DrawableStoryboardAnimationSprite source)
+                    : base(source)
+                {
+                }
+
+                private Colour4 drawColourOffset;
+
+                public override void ApplyState()
+                {
+                    base.ApplyState();
+
+                    drawColourOffset = Source.DrawColourOffset;
+                }
+
+                private IUniformBuffer<DimParameters> dimParametersBuffer;
+
+                protected override void BindUniformResources(IShader shader, IRenderer renderer)
+                {
+                    dimParametersBuffer ??= renderer.CreateUniformBuffer<DimParameters>();
+
+                    dimParametersBuffer.Data = dimParametersBuffer.Data with
+                    {
+                        DimColour = new UniformVector4
+                        {
+                            X = drawColourOffset.R,
+                            Y = drawColourOffset.G,
+                            Z = drawColourOffset.B,
+                            W = drawColourOffset.A
+                        },
+                    };
+
+                    shader.BindUniformBlock("m_DimParameters", dimParametersBuffer);
+                }
+
+                protected override void Dispose(bool isDisposing)
+                {
+                    base.Dispose(isDisposing);
+                    dimParametersBuffer?.Dispose();
+                }
+
+                [StructLayout(LayoutKind.Sequential, Pack = 1)]
+                private record struct DimParameters
+                {
+                    public UniformVector4 DimColour;
+                }
+            }
         }
     }
 }

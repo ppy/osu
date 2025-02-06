@@ -11,7 +11,9 @@ using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Shaders.Types;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Layout;
 using osu.Framework.Utils;
+using osu.Game.Graphics.Backgrounds;
 using osu.Game.Skinning;
 using osuTK;
 
@@ -84,6 +86,30 @@ namespace osu.Game.Storyboards.Drawables
         [Resolved]
         private TextureStore textureStore { get; set; } = null!;
 
+        private LayoutValue<Colour4> drawColourOffsetBacking = new LayoutValue<Colour4>(Invalidation.DrawNode | Invalidation.Colour | Invalidation.DrawInfo | Invalidation.RequiredParentSizeToFit | Invalidation.Presence);
+
+        public Colour4 DrawColourOffset => drawColourOffsetBacking.IsValid ? drawColourOffsetBacking.Value : drawColourOffsetBacking.Value = computeDrawColourOffset();
+
+        private Colour4 computeDrawColourOffset()
+        {
+            if (Parent is IColouredDimmable colouredDimmableParent)
+                return colouredDimmableParent.DrawColourOffset;
+
+            return Colour4.Black;
+        }
+
+        protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
+        {
+            bool result = base.OnInvalidate(invalidation, source);
+
+            if ((invalidation & (Invalidation.Colour | Invalidation.DrawInfo | Invalidation.RequiredParentSizeToFit | Invalidation.Presence)) > 0)
+            {
+                result |= Invalidate(Invalidation.DrawNode);
+            }
+
+            return result;
+        }
+
         public DrawableStoryboardSprite(StoryboardSprite sprite)
         {
             Sprite = sprite;
@@ -93,6 +119,8 @@ namespace osu.Game.Storyboards.Drawables
 
             LifetimeStart = sprite.StartTime;
             LifetimeEnd = sprite.EndTimeForDisplay;
+
+            AddLayout(drawColourOffsetBacking);
         }
 
         [BackgroundDependencyLoader]
@@ -140,14 +168,13 @@ namespace osu.Game.Storyboards.Drawables
             {
             }
 
-            private Colour4 dimColour = Colour4.Red;
+            private Colour4 drawColourOffset;
 
             public override void ApplyState()
             {
                 base.ApplyState();
 
-                // dimColour = Source.DimColour;
-                // dimLevel = Source.DimLevel;
+                drawColourOffset = Source.DrawColourOffset;
             }
 
             private IUniformBuffer<DimParameters> dimParametersBuffer = null!;
@@ -160,10 +187,10 @@ namespace osu.Game.Storyboards.Drawables
                 {
                     DimColour = new UniformVector4
                     {
-                        X = dimColour.R,
-                        Y = dimColour.G,
-                        Z = dimColour.B,
-                        W = dimColour.A
+                        X = drawColourOffset.R,
+                        Y = drawColourOffset.G,
+                        Z = drawColourOffset.B,
+                        W = drawColourOffset.A
                     },
                 };
 

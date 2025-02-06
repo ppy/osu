@@ -15,18 +15,32 @@ using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Shaders.Types;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.Video;
+using osu.Framework.Layout;
 using osu.Framework.Utils;
+using osu.Game.Graphics.Backgrounds;
 using osuTK;
 
 namespace osu.Game.Storyboards.Drawables
 {
-    public partial class DrawableStoryboardVideo : CompositeDrawable
+    public partial class DrawableStoryboardVideo : CompositeDrawable, IColouredDimmable
     {
         public readonly StoryboardVideo Video;
 
         private DrawableVideo? drawableVideo;
 
         public override bool RemoveWhenNotAlive => false;
+
+        private LayoutValue<Colour4> drawColourOffsetBacking = new LayoutValue<Colour4>(Invalidation.DrawNode | Invalidation.Colour | Invalidation.DrawInfo | Invalidation.RequiredParentSizeToFit | Invalidation.Presence);
+
+        public Colour4 DrawColourOffset => drawColourOffsetBacking.IsValid ? drawColourOffsetBacking.Value : drawColourOffsetBacking.Value = computeDrawColourOffset();
+
+        private Colour4 computeDrawColourOffset()
+        {
+            if (Parent is IColouredDimmable colouredDimmableParent)
+                return colouredDimmableParent.DrawColourOffset;
+
+            return Colour4.Black;
+        }
 
         public DrawableStoryboardVideo(StoryboardVideo video)
         {
@@ -43,6 +57,8 @@ namespace osu.Game.Storyboards.Drawables
 
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
+
+            AddLayout(drawColourOffsetBacking);
         }
 
         [BackgroundDependencyLoader(true)]
@@ -82,7 +98,7 @@ namespace osu.Game.Storyboards.Drawables
             }
         }
 
-        private partial class DrawableVideo : Video, IFlippable, IVectorScalable
+        private partial class DrawableVideo : Video, IFlippable, IVectorScalable, IColouredDimmable
         {
             private bool flipH;
 
@@ -138,19 +154,59 @@ namespace osu.Game.Storyboards.Drawables
 
             protected override VideoSprite CreateSprite() => new DrawableVideoSprite(this);
 
+            private LayoutValue<Colour4> drawColourOffsetBacking = new LayoutValue<Colour4>(Invalidation.DrawNode | Invalidation.Colour | Invalidation.DrawInfo | Invalidation.RequiredParentSizeToFit | Invalidation.Presence);
+
+            public Colour4 DrawColourOffset => drawColourOffsetBacking.IsValid ? drawColourOffsetBacking.Value : drawColourOffsetBacking.Value = computeDrawColourOffset();
+
+            private Colour4 computeDrawColourOffset()
+            {
+                if (Parent is IColouredDimmable colouredDimmableParent)
+                    return colouredDimmableParent.DrawColourOffset;
+
+                return Colour4.Black;
+            }
+
             public DrawableVideo(Stream stream, bool startAtCurrentTime = true)
                 : base(stream, startAtCurrentTime)
             {
+                AddLayout(drawColourOffsetBacking);
             }
 
             private partial class DrawableVideoSprite : VideoSprite
             {
                 private readonly Video video;
 
+                private LayoutValue<Colour4> drawColourOffsetBacking = new LayoutValue<Colour4>(Invalidation.DrawNode | Invalidation.Colour | Invalidation.DrawInfo | Invalidation.RequiredParentSizeToFit | Invalidation.Presence);
+
+                public Colour4 DrawColourOffset => drawColourOffsetBacking.IsValid ? drawColourOffsetBacking.Value : drawColourOffsetBacking.Value = computeDrawColourOffset();
+
+                private Colour4 computeDrawColourOffset()
+                {
+                    // Direct Parent is a Container, so we need to go up two levels to get the DrawableVideo.
+                    if (Parent?.Parent is IColouredDimmable colouredDimmableParent)
+                        return colouredDimmableParent.DrawColourOffset;
+
+                    return Colour4.Black;
+                }
+
+                protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
+                {
+                    bool result = base.OnInvalidate(invalidation, source);
+
+                    if ((invalidation & (Invalidation.Colour | Invalidation.DrawInfo | Invalidation.RequiredParentSizeToFit | Invalidation.Presence)) > 0)
+                    {
+                        result |= Invalidate(Invalidation.DrawNode);
+                    }
+
+                    return result;
+                }
+
                 public DrawableVideoSprite(Video video)
                     : base(video)
                 {
                     this.video = video;
+
+                    AddLayout(drawColourOffsetBacking);
                 }
 
                 [BackgroundDependencyLoader]
@@ -159,16 +215,26 @@ namespace osu.Game.Storyboards.Drawables
                     TextureShader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, "ColouredDimmableVideo");
                 }
 
-                protected override DrawNode CreateDrawNode() => new DrawableVideoSpriteDrawNode(video);
+                protected override DrawNode CreateDrawNode() => new DrawableVideoSpriteDrawNode(this, video);
 
                 public class DrawableVideoSpriteDrawNode : VideoSpriteDrawNode
                 {
-                    public DrawableVideoSpriteDrawNode(Video source)
-                        : base(source)
+                    public new readonly DrawableVideoSprite Source;
+
+                    public DrawableVideoSpriteDrawNode(DrawableVideoSprite source, Video video)
+                        : base(video)
                     {
+                        Source = source;
                     }
 
-                    private Colour4 dimColour = Colour4.Red;
+                    private Colour4 drawColourOffset;
+
+                    public override void ApplyState()
+                    {
+                        base.ApplyState();
+
+                        drawColourOffset = Source.DrawColourOffset;
+                    }
 
                     private IUniformBuffer<DimParameters>? dimParametersBuffer;
 
@@ -182,10 +248,10 @@ namespace osu.Game.Storyboards.Drawables
                         {
                             DimColour = new UniformVector4
                             {
-                                X = dimColour.R,
-                                Y = dimColour.G,
-                                Z = dimColour.B,
-                                W = dimColour.A
+                                X = drawColourOffset.R,
+                                Y = drawColourOffset.G,
+                                Z = drawColourOffset.B,
+                                W = drawColourOffset.A
                             },
                         };
 
