@@ -165,26 +165,26 @@ namespace osu.Game.Tests.Visual.SongSelect
             WaitForDrawablePanels();
             SelectNextGroup();
 
-            clickOnPanel(0, 1, p => p.LayoutRectangle.TopLeft + new Vector2(20f, -1f));
+            clickOnPanel(0, 1, p => p.LayoutRectangle.TopLeft + new Vector2(p.LayoutRectangle.Centre.X, -1f));
             WaitForGroupSelection(0, 1);
 
-            clickOnPanel(0, 0, p => p.LayoutRectangle.BottomLeft + new Vector2(20f, 1f));
+            clickOnPanel(0, 0, p => p.LayoutRectangle.BottomLeft + new Vector2(p.LayoutRectangle.Centre.X, 1f));
             WaitForGroupSelection(0, 0);
 
             SelectNextPanel();
             Select();
             WaitForGroupSelection(0, 1);
 
-            clickOnGroup(0, p => p.LayoutRectangle.BottomLeft + new Vector2(20f, 1f));
+            clickOnGroup(0, p => p.LayoutRectangle.BottomLeft + new Vector2(p.LayoutRectangle.Centre.X, 1f));
             AddAssert("group 0 collapsed", () => this.ChildrenOfType<GroupPanel>().OrderBy(g => g.Y).ElementAt(0).Expanded.Value, () => Is.False);
             clickOnGroup(0, p => p.LayoutRectangle.Centre);
             AddAssert("group 0 expanded", () => this.ChildrenOfType<GroupPanel>().OrderBy(g => g.Y).ElementAt(0).Expanded.Value, () => Is.True);
 
             AddStep("scroll to end", () => Scroll.ScrollToEnd(false));
-            clickOnPanel(0, 4, p => p.LayoutRectangle.BottomLeft + new Vector2(20f, 1f));
+            clickOnPanel(0, 4, p => p.LayoutRectangle.BottomLeft + new Vector2(p.LayoutRectangle.Centre.X, 1f));
             WaitForGroupSelection(0, 4);
 
-            clickOnGroup(1, p => p.LayoutRectangle.TopLeft + new Vector2(20f, -1f));
+            clickOnGroup(1, p => p.LayoutRectangle.TopLeft + new Vector2(p.LayoutRectangle.Centre.X, -1f));
             AddAssert("group 1 expanded", () => this.ChildrenOfType<GroupPanel>().OrderBy(g => g.Y).ElementAt(1).Expanded.Value, () => Is.True);
         }
 

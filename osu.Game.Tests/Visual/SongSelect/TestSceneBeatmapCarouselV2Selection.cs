@@ -187,24 +187,23 @@ namespace osu.Game.Tests.Visual.SongSelect
             WaitForDrawablePanels();
             SelectNextGroup();
 
-            clickOnDifficulty(0, 1, p => p.LayoutRectangle.TopLeft + new Vector2(20f, -1f));
+            clickOnDifficulty(0, 1, p => new Vector2(p.LayoutRectangle.Centre.X, -1f));
             WaitForSelection(0, 1);
 
-            clickOnDifficulty(0, 0, p => p.LayoutRectangle.BottomLeft + new Vector2(20f, 1f));
+            clickOnDifficulty(0, 0, p => new Vector2(p.LayoutRectangle.Centre.X, BeatmapPanel.HEIGHT + 1f));
             WaitForSelection(0, 0);
 
-            SelectNextPanel();
-            Select();
+            clickOnDifficulty(0, 1, p => p.LayoutRectangle.Centre);
             WaitForSelection(0, 1);
 
-            clickOnSet(0, p => p.LayoutRectangle.BottomLeft + new Vector2(20f, 1f));
+            clickOnSet(0, p => new Vector2(p.LayoutRectangle.Centre.X, BeatmapSetPanel.HEIGHT + 1f));
             WaitForSelection(0, 0);
 
             AddStep("scroll to end", () => Scroll.ScrollToEnd(false));
-            clickOnDifficulty(0, 4, p => p.LayoutRectangle.BottomLeft + new Vector2(20f, 1f));
+            clickOnDifficulty(0, 4, p => new Vector2(p.LayoutRectangle.Centre.X, BeatmapPanel.HEIGHT + 1f));
             WaitForSelection(0, 4);
 
-            clickOnSet(1, p => p.LayoutRectangle.TopLeft + new Vector2(20f, -1f));
+            clickOnSet(1, p => new Vector2(p.LayoutRectangle.Centre.X, -1f));
             WaitForSelection(1, 0);
         }
 
