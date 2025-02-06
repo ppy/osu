@@ -548,6 +548,8 @@ namespace osu.Game.Screens.SelectV2
                 updateDisplayedRange(range);
             }
 
+            double selectedYPos = currentSelection.CarouselItem?.CarouselYPosition ?? 0;
+
             foreach (var panel in scroll.Panels)
             {
                 var c = (ICarouselPanel)panel;
@@ -556,8 +558,8 @@ namespace osu.Game.Screens.SelectV2
                 if (c.Item == null)
                     continue;
 
-                double selectedYPos = currentSelection?.CarouselItem?.CarouselYPosition ?? 0;
-                scroll.Panels.ChangeChildDepth(panel, (float)Math.Abs(c.DrawYPosition - selectedYPos));
+                float normalisedDepth = (float)(Math.Abs(selectedYPos - c.DrawYPosition) / DrawHeight);
+                scroll.Panels.ChangeChildDepth(panel, c.Item.DepthLayer + normalisedDepth);
 
                 if (c.DrawYPosition != c.Item.CarouselYPosition)
                     c.DrawYPosition = Interpolation.DampContinuously(c.DrawYPosition, c.Item.CarouselYPosition, 50, Time.Elapsed);
