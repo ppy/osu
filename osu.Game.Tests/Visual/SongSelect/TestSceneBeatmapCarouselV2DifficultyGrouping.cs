@@ -12,23 +12,22 @@ using osu.Game.Screens.SelectV2;
 namespace osu.Game.Tests.Visual.SongSelect
 {
     [TestFixture]
-    public partial class TestSceneBeatmapCarouselV2GroupSelection : BeatmapCarouselV2TestScene
+    public partial class TestSceneBeatmapCarouselV2DifficultyGrouping : BeatmapCarouselV2TestScene
     {
-        public override void SetUpSteps()
+        [SetUpSteps]
+        public void SetUpSteps()
         {
             RemoveAllBeatmaps();
-
             CreateCarousel();
-
             SortBy(new FilterCriteria { Group = GroupMode.Difficulty, Sort = SortMode.Difficulty });
+
+            AddBeatmaps(10, 3);
+            WaitForDrawablePanels();
         }
 
         [Test]
         public void TestOpenCloseGroupWithNoSelectionMouse()
         {
-            AddBeatmaps(10, 5);
-            WaitForDrawablePanels();
-
             AddAssert("no beatmaps visible", () => Carousel.ChildrenOfType<BeatmapPanel>().Count(p => p.Alpha > 0), () => Is.Zero);
             CheckNoSelection();
 
@@ -44,9 +43,6 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestOpenCloseGroupWithNoSelectionKeyboard()
         {
-            AddBeatmaps(10, 5);
-            WaitForDrawablePanels();
-
             AddAssert("no beatmaps visible", () => Carousel.ChildrenOfType<BeatmapPanel>().Count(p => p.Alpha > 0), () => Is.Zero);
             CheckNoSelection();
 
@@ -67,9 +63,6 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestCarouselRemembersSelection()
         {
-            AddBeatmaps(10);
-            WaitForDrawablePanels();
-
             SelectNextGroup();
 
             object? selection = null;
@@ -107,9 +100,6 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestGroupSelectionOnHeader()
         {
-            AddBeatmaps(10, 3);
-            WaitForDrawablePanels();
-
             SelectNextGroup();
             WaitForGroupSelection(0, 0);
 
@@ -121,9 +111,6 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestKeyboardSelection()
         {
-            AddBeatmaps(10, 3);
-            WaitForDrawablePanels();
-
             SelectNextPanel();
             SelectNextPanel();
             SelectNextPanel();

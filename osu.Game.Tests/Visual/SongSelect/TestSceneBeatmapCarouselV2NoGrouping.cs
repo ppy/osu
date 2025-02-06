@@ -5,14 +5,24 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Screens.Select;
+using osu.Game.Screens.Select.Filter;
 using osu.Game.Screens.SelectV2;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.SongSelect
 {
     [TestFixture]
-    public partial class TestSceneBeatmapCarouselV2Selection : BeatmapCarouselV2TestScene
+    public partial class TestSceneBeatmapCarouselV2NoGrouping : BeatmapCarouselV2TestScene
     {
+        [SetUpSteps]
+        public void SetUpSteps()
+        {
+            RemoveAllBeatmaps();
+            CreateCarousel();
+            SortBy(new FilterCriteria { Sort = SortMode.Title });
+        }
+
         /// <summary>
         /// Keyboard selection via up and down arrows doesn't actually change the selection until
         /// the select key is pressed.
