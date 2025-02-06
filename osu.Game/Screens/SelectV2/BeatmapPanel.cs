@@ -299,7 +299,6 @@ namespace osu.Game.Screens.SelectV2
 
             updatePanelPosition();
             updateEdgeEffectColour();
-            updateHover();
         }
 
         private void updateKeyboardSelectedDisplay()
@@ -323,7 +322,7 @@ namespace osu.Game.Screens.SelectV2
 
         private void updateHover()
         {
-            bool hovered = IsHovered || (KeyboardSelected.Value && !Selected.Value);
+            bool hovered = IsHovered || KeyboardSelected.Value;
 
             if (hovered)
                 hoverLayer.FadeIn(100, Easing.OutQuint);
