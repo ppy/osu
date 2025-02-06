@@ -264,5 +264,6 @@ namespace osu.Game.Screens.SelectV2
     }
 
     public record GroupDefinition(string Title);
+
     public record StarsGroupDefinition(int StarNumber);
 }
