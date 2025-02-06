@@ -11,7 +11,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Pooling;
-using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
@@ -76,16 +75,6 @@ namespace osu.Game.Screens.SelectV2
         private OsuSpriteText difficultyName = null!;
         private OsuSpriteText difficultyAuthor = null!;
 
-        protected override bool ReceivePositionalInputAtSubTree(Vector2 screenSpacePos)
-        {
-            var inputRectangle = panel.TopLevelContent.DrawRectangle;
-
-            // Cover a gap introduced by the spacing between a BeatmapSetPanel and a BeatmapPanel either above it or below it.
-            inputRectangle = inputRectangle.Inflate(new MarginPadding { Vertical = BeatmapCarousel.SPACING / 2f });
-
-            return inputRectangle.Contains(panel.TopLevelContent.ToLocalSpace(screenSpacePos));
-        }
-
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -97,6 +86,7 @@ namespace osu.Game.Screens.SelectV2
 
             InternalChild = panel = new CarouselPanelPiece(standalone_x_offset)
             {
+                Action = onAction,
                 Icon = difficultyIcon = new ConstrainedIconContainer
                 {
                     Size = new Vector2(20),
@@ -304,12 +294,15 @@ namespace osu.Game.Screens.SelectV2
             difficultyStarRating.Current.Value = starDifficulty;
         }
 
-        protected override bool OnClick(ClickEvent e)
+        private void onAction()
         {
-            if (carousel != null)
-                carousel.CurrentSelection = Item!.Model;
+            if (carousel == null)
+                return;
 
-            return true;
+            if (carousel.CurrentSelection != Item!.Model)
+                carousel.CurrentSelection = Item!.Model;
+            else
+                carousel.TryActivateSelection();
         }
 
         #region ICarouselPanel

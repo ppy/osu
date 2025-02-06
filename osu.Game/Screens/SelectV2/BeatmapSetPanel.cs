@@ -10,7 +10,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Pooling;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
@@ -50,16 +49,6 @@ namespace osu.Game.Screens.SelectV2
         [Resolved]
         private BeatmapManager beatmaps { get; set; } = null!;
 
-        protected override bool ReceivePositionalInputAtSubTree(Vector2 screenSpacePos)
-        {
-            var inputRectangle = panel.TopLevelContent.DrawRectangle;
-
-            // Cover a gap introduced by the spacing between a BeatmapSetPanel and a BeatmapPanel either above it or below it.
-            inputRectangle = inputRectangle.Inflate(new MarginPadding { Vertical = BeatmapCarousel.SPACING / 2f });
-
-            return inputRectangle.Contains(panel.TopLevelContent.ToLocalSpace(screenSpacePos));
-        }
-
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -70,6 +59,7 @@ namespace osu.Game.Screens.SelectV2
 
             InternalChild = panel = new CarouselPanelPiece(set_x_offset)
             {
+                Action = onAction,
                 Icon = chevronIcon = new Container
                 {
                     Size = new Vector2(22),
@@ -183,12 +173,10 @@ namespace osu.Game.Screens.SelectV2
             difficultiesDisplay.BeatmapSet = null;
         }
 
-        protected override bool OnClick(ClickEvent e)
+        private void onAction()
         {
             if (carousel != null)
                 carousel.CurrentSelection = Item!.Model;
-
-            return true;
         }
 
         #region ICarouselPanel
