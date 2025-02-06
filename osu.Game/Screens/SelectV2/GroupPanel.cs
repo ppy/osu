@@ -24,6 +24,8 @@ namespace osu.Game.Screens.SelectV2
     {
         public const float HEIGHT = CarouselItem.DEFAULT_HEIGHT;
 
+        private const float corner_radius = 10;
+
         private const float glow_offset = 10f; // extra space for any edge effect to not be cutoff by the right edge of the carousel.
         private const float preselected_x_offset = 25f;
         private const float selected_x_offset = 50f;
@@ -33,18 +35,19 @@ namespace osu.Game.Screens.SelectV2
         [Resolved]
         private BeatmapCarousel? carousel { get; set; }
 
+        private Container panel = null!;
         private Box activationFlash = null!;
         private OsuSpriteText titleText = null!;
         private Box hoverLayer = null!;
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
         {
-            var inputRectangle = DrawRectangle;
+            var inputRectangle = panel.DrawRectangle;
 
             // Cover a gap introduced by the spacing between a GroupPanel and a BeatmapPanel either below/above it.
             inputRectangle = inputRectangle.Inflate(new MarginPadding { Vertical = BeatmapCarousel.SPACING / 2f });
 
-            return inputRectangle.Contains(ToLocalSpace(screenSpacePos));
+            return inputRectangle.Contains(panel.ToLocalSpace(screenSpacePos));
         }
 
         [BackgroundDependencyLoader]
@@ -55,11 +58,12 @@ namespace osu.Game.Screens.SelectV2
             RelativeSizeAxes = Axes.X;
             Height = HEIGHT;
 
-            InternalChild = new Container
+            InternalChild = panel = new Container
             {
                 RelativeSizeAxes = Axes.Both,
-                CornerRadius = 10f,
+                CornerRadius = corner_radius,
                 Masking = true,
+                X = corner_radius,
                 Children = new Drawable[]
                 {
                     new Container
@@ -69,7 +73,7 @@ namespace osu.Game.Screens.SelectV2
                         Child = new Container
                         {
                             RelativeSizeAxes = Axes.Both,
-                            CornerRadius = 10f,
+                            CornerRadius = corner_radius,
                             Masking = true,
                             Children = new Drawable[]
                             {
@@ -93,7 +97,7 @@ namespace osu.Game.Screens.SelectV2
                         Child = new Container
                         {
                             RelativeSizeAxes = Axes.Both,
-                            CornerRadius = 10f,
+                            CornerRadius = corner_radius,
                             Masking = true,
                             Children = new Drawable[]
                             {
