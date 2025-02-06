@@ -16,14 +16,14 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.SongSelectV2
 {
-    public partial class TestSceneBeatmapCarouselSetPanel : ThemeComparisonTestScene
+    public partial class TestSceneBeatmapCarouselV2SetPanel : ThemeComparisonTestScene
     {
         [Resolved]
         private BeatmapManager beatmaps { get; set; } = null!;
 
         private BeatmapSetInfo beatmapSet = null!;
 
-        public TestSceneBeatmapCarouselSetPanel()
+        public TestSceneBeatmapCarouselV2SetPanel()
             : base(false)
         {
         }
