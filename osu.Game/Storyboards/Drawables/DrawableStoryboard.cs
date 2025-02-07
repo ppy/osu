@@ -13,7 +13,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
-using osu.Framework.Layout;
 using osu.Framework.Platform;
 using osu.Game.Database;
 using osu.Game.Graphics.Backgrounds;
