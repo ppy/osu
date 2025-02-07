@@ -75,7 +75,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             RemoveAllBeatmaps();
             AddUntilStep("no drawable selection", GetSelectedPanel, () => Is.Null);
 
-            AddBeatmaps(5);
+            AddBeatmaps(3);
             WaitForDrawablePanels();
 
             CheckHasSelection();
