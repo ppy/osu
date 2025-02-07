@@ -4,12 +4,14 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
+using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Graphics;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Collections;
 using osu.Game.Database;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
@@ -17,14 +19,17 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.OnlinePlay.Playlists;
 using osuTK;
+using osuTK.Input;
+using SharpCompress;
 
 namespace osu.Game.Tests.Visual.Playlists
 {
-    public partial class TestSceneAddPlaylistToCollectionButton : OsuTestScene
+    public partial class TestSceneAddPlaylistToCollectionButton : OsuManualInputManagerTestScene
     {
         private BeatmapManager manager = null!;
         private BeatmapSetInfo importedBeatmap = null!;
         private Room room = null!;
+        private AddPlaylistToCollectionButton button = null!;
 
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
@@ -32,6 +37,8 @@ namespace osu.Game.Tests.Visual.Playlists
             Dependencies.Cache(new RealmRulesetStore(Realm));
             Dependencies.Cache(manager = new BeatmapManager(LocalStorage, Realm, API, audio, Resources, host, Beatmap.Default));
             Dependencies.Cache(Realm);
+
+            Add(notificationOverlay);
         }
 
         [Cached(typeof(INotificationOverlay))]
@@ -44,23 +51,35 @@ namespace osu.Game.Tests.Visual.Playlists
         [SetUpSteps]
         public void SetUpSteps()
         {
+            AddStep("clear realm", () => Realm.Realm.Write(() => Realm.Realm.RemoveAll<BeatmapCollection>()));
+
+            AddStep("clear notifications", () => notificationOverlay.AllNotifications.Empty());
+
             importBeatmap();
 
             setupRoom();
 
             AddStep("create button", () =>
             {
-                AddRange(new Drawable[]
+                Add(button = new AddPlaylistToCollectionButton(room)
                 {
-                    notificationOverlay,
-                    new AddPlaylistToCollectionButton(room)
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Size = new Vector2(300, 40),
-                    }
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Size = new Vector2(300, 40),
                 });
             });
+        }
+
+        [Test]
+        public void TestButtonFlow()
+        {
+            AddStep("move mouse to button", () => InputManager.MoveMouseTo(button));
+
+            AddStep("click button", () => InputManager.Click(MouseButton.Left));
+
+            AddAssert("notification shown", () => notificationOverlay.AllNotifications.FirstOrDefault(n => n.Text.ToString().StartsWith("Created", StringComparison.Ordinal)) != null);
+
+            AddAssert("realm is updated", () => Realm.Realm.All<BeatmapCollection>().FirstOrDefault(c => c.Name == room.Name) != null);
         }
 
         private void importBeatmap() => AddStep("import beatmap", () =>

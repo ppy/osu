@@ -2,17 +2,15 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
-using System.Threading.Tasks;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions;
+using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Database;
-using osu.Game.Graphics;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
+using Realms;
 
 namespace osu.Game.Screens.OnlinePlay.Playlists
 {
@@ -20,13 +18,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
     {
         private readonly Room room;
 
-        private LoadingLayer loading = null!;
-
         [Resolved]
         private RealmAccess realmAccess { get; set; } = null!;
-
-        [Resolved]
-        private BeatmapLookupCache beatmapLookupCache { get; set; } = null!;
 
         [Resolved(canBeNull: true)]
         private INotificationOverlay? notifications { get; set; }
@@ -38,12 +31,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
-            BackgroundColour = colours.Gray5;
-
-            Add(loading = new LoadingLayer(true, false));
-
             Action = () =>
             {
                 int[] ids = room.Playlist.Select(item => item.Beatmap.OnlineID).Where(onlineId => onlineId > 0).ToArray();
@@ -54,34 +43,27 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                     return;
                 }
 
-                Enabled.Value = false;
-                loading.Show();
-                beatmapLookupCache.GetBeatmapsAsync(ids).ContinueWith(task => Schedule(() =>
+                string filter = string.Join(" OR ", ids.Select(id => $"(OnlineID == {id})"));
+                var beatmaps = realmAccess.Realm.All<BeatmapInfo>().Filter(filter).ToList();
+
+                var collection = realmAccess.Realm.All<BeatmapCollection>().FirstOrDefault(c => c.Name == room.Name);
+
+                if (collection == null)
                 {
-                    var beatmaps = task.GetResultSafely().Where(item => item?.BeatmapSet != null).ToList();
-
-                    var collection = realmAccess.Realm.All<BeatmapCollection>().FirstOrDefault(c => c.Name == room.Name);
-
-                    if (collection == null)
+                    collection = new BeatmapCollection(room.Name, beatmaps.Select(i => i.MD5Hash).Distinct().ToList());
+                    realmAccess.Realm.Write(() => realmAccess.Realm.Add(collection));
+                    notifications?.Post(new SimpleNotification { Text = $"Created new collection: {room.Name}" });
+                }
+                else
+                {
+                    collection.ToLive(realmAccess).PerformWrite(c =>
                     {
-                        collection = new BeatmapCollection(room.Name, beatmaps.Select(i => i!.MD5Hash).Distinct().ToList());
-                        realmAccess.Realm.Write(() => realmAccess.Realm.Add(collection));
-                        notifications?.Post(new SimpleNotification { Text = $"Created new collection: {room.Name}" });
-                    }
-                    else
-                    {
-                        collection.ToLive(realmAccess).PerformWrite(c =>
-                        {
-                            beatmaps = beatmaps.Where(i => !c.BeatmapMD5Hashes.Contains(i!.MD5Hash)).ToList();
-                            foreach (var item in beatmaps)
-                                c.BeatmapMD5Hashes.Add(item!.MD5Hash);
-                            notifications?.Post(new SimpleNotification { Text = $"Updated collection: {room.Name}" });
-                        });
-                    }
-
-                    loading.Hide();
-                    Enabled.Value = true;
-                }), TaskContinuationOptions.OnlyOnRanToCompletion);
+                        beatmaps = beatmaps.Where(i => !c.BeatmapMD5Hashes.Contains(i.MD5Hash)).ToList();
+                        foreach (var item in beatmaps)
+                            c.BeatmapMD5Hashes.Add(item.MD5Hash);
+                        notifications?.Post(new SimpleNotification { Text = $"Updated collection: {room.Name}" });
+                    });
+                }
             };
         }
     }
