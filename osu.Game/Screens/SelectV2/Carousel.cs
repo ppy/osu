@@ -52,11 +52,6 @@ namespace osu.Game.Screens.SelectV2
         public float DistanceOffscreenToPreload { get; set; }
 
         /// <summary>
-        /// Vertical space between panel layout. Negative value can be used to create an overlapping effect.
-        /// </summary>
-        protected float SpacingBetweenPanels { get; set; } = -5;
-
-        /// <summary>
         /// When a new request arrives to change filtering, the number of milliseconds to wait before performing the filter.
         /// Regardless of any external debouncing, this is a safety measure to avoid triggering too many threaded operations.
         /// </summary>
@@ -129,6 +124,11 @@ namespace osu.Game.Screens.SelectV2
 
             selectionValid.Invalidate();
         }
+
+        /// <summary>
+        /// Returns the vertical spacing between two given carousel items. Negative value can be used to create an overlapping effect.
+        /// </summary>
+        protected virtual float GetSpacingBetweenPanels(CarouselItem top, CarouselItem bottom) => 0f;
 
         #endregion
 
@@ -267,7 +267,7 @@ namespace osu.Game.Screens.SelectV2
                     }
 
                     log("Updating Y positions");
-                    updateYPositions(items, visibleHalfHeight, SpacingBetweenPanels);
+                    updateYPositions(items, visibleHalfHeight);
                 }
                 catch (OperationCanceledException)
                 {
@@ -293,17 +293,26 @@ namespace osu.Game.Screens.SelectV2
             void log(string text) => Logger.Log($"Carousel[op {cts.GetHashCode().ToString()}] {stopwatch.ElapsedMilliseconds} ms: {text}");
         }
 
-        private static void updateYPositions(IEnumerable<CarouselItem> carouselItems, float offset, float spacing)
+        private void updateYPositions(IEnumerable<CarouselItem> carouselItems, float offset)
         {
+            CarouselItem? previousVisible = null;
+
             foreach (var item in carouselItems)
-                updateItemYPosition(item, ref offset, spacing);
+                updateItemYPosition(item, ref previousVisible, ref offset);
         }
 
-        private static void updateItemYPosition(CarouselItem item, ref float offset, float spacing)
+        private void updateItemYPosition(CarouselItem item, ref CarouselItem? previousVisible, ref float offset)
         {
+            float spacing = previousVisible == null || !item.IsVisible ? 0 : GetSpacingBetweenPanels(previousVisible, item);
+
+            offset += spacing;
             item.CarouselYPosition = offset;
+
             if (item.IsVisible)
-                offset += item.DrawHeight + spacing;
+            {
+                offset += item.DrawHeight;
+                previousVisible = item;
+            }
         }
 
         #endregion
@@ -461,7 +470,7 @@ namespace osu.Game.Screens.SelectV2
                 return;
             }
 
-            float spacing = SpacingBetweenPanels;
+            CarouselItem? lastVisible = null;
             int count = carouselItems.Count;
 
             Selection prevKeyboard = currentKeyboardSelection;
@@ -473,7 +482,7 @@ namespace osu.Game.Screens.SelectV2
             {
                 var item = carouselItems[i];
 
-                updateItemYPosition(item, ref yPos, spacing);
+                updateItemYPosition(item, ref lastVisible, ref yPos);
 
                 if (ReferenceEquals(item.Model, currentKeyboardSelection.Model))
                     currentKeyboardSelection = new Selection(item.Model, item, item.CarouselYPosition, i);
