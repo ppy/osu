@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -59,7 +58,7 @@ namespace osu.Game.Screens.SelectV2
 
             InternalChild = panel = new CarouselPanelPiece(set_x_offset)
             {
-                Action = onAction,
+                Action = () => carousel?.Activate(Item!),
                 Icon = chevronIcon = new Container
                 {
                     Size = new Vector2(22),
@@ -173,12 +172,6 @@ namespace osu.Game.Screens.SelectV2
             difficultiesDisplay.BeatmapSet = null;
         }
 
-        private void onAction()
-        {
-            if (carousel != null)
-                carousel.CurrentSelection = Item!.Model;
-        }
-
         #region ICarouselPanel
 
         public CarouselItem? Item { get; set; }
@@ -190,8 +183,6 @@ namespace osu.Game.Screens.SelectV2
 
         public void Activated()
         {
-            // sets should never be activated.
-            throw new InvalidOperationException();
         }
 
         #endregion

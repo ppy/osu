@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Game.Beatmaps;
@@ -14,6 +13,8 @@ namespace osu.Game.Screens.SelectV2
 {
     public class BeatmapCarouselFilterGrouping : ICarouselFilter
     {
+        public bool BeatmapSetsGroupedTogether { get; private set; }
+
         /// <summary>
         /// Beatmap sets contain difficulties as related panels. This dictionary holds the relationships between set-difficulties to allow expanding them on selection.
         /// </summary>
@@ -34,102 +35,106 @@ namespace osu.Game.Screens.SelectV2
             this.getCriteria = getCriteria;
         }
 
-        public async Task<IEnumerable<CarouselItem>> Run(IEnumerable<CarouselItem> items, CancellationToken cancellationToken) => await Task.Run(() =>
+        public async Task<IEnumerable<CarouselItem>> Run(IEnumerable<CarouselItem> items, CancellationToken cancellationToken)
         {
-            bool groupSetsTogether;
-
-            setItems.Clear();
-            groupItems.Clear();
-
-            var criteria = getCriteria();
-            var newItems = new List<CarouselItem>(items.Count());
-
-            // Add criteria groups.
-            switch (criteria.Group)
+            return await Task.Run(() =>
             {
-                default:
-                    groupSetsTogether = true;
-                    newItems.AddRange(items);
-                    break;
+                setItems.Clear();
+                groupItems.Clear();
 
-                case GroupMode.Difficulty:
-                    groupSetsTogether = false;
-                    int starGroup = int.MinValue;
+                var criteria = getCriteria();
+                var newItems = new List<CarouselItem>();
 
-                    foreach (var item in items)
-                    {
-                        cancellationToken.ThrowIfCancellationRequested();
+                BeatmapInfo? lastBeatmap = null;
+                GroupDefinition? lastGroup = null;
 
-                        var b = (BeatmapInfo)item.Model;
+                HashSet<CarouselItem>? currentGroupItems = null;
+                HashSet<CarouselItem>? currentSetItems = null;
 
-                        if (b.StarRating > starGroup)
-                        {
-                            starGroup = (int)Math.Floor(b.StarRating);
-                            var groupDefinition = new GroupDefinition($"{starGroup} - {++starGroup} *");
-                            var groupItem = new CarouselItem(groupDefinition) { DrawHeight = GroupPanel.HEIGHT };
+                BeatmapSetsGroupedTogether = criteria.Group != GroupMode.Difficulty;
 
-                            newItems.Add(groupItem);
-                            groupItems[groupDefinition] = new HashSet<CarouselItem> { groupItem };
-                        }
-
-                        newItems.Add(item);
-                    }
-
-                    break;
-            }
-
-            // Add set headers wherever required.
-            CarouselItem? lastItem = null;
-
-            if (groupSetsTogether)
-            {
-                for (int i = 0; i < newItems.Count; i++)
+                foreach (var item in items)
                 {
                     cancellationToken.ThrowIfCancellationRequested();
 
-                    var item = newItems[i];
+                    var beatmap = (BeatmapInfo)item.Model;
 
-                    if (item.Model is BeatmapInfo beatmap)
+                    if (createGroupIfRequired(criteria, beatmap, lastGroup) is GroupDefinition newGroup)
                     {
-                        bool newBeatmapSet = lastItem == null || (lastItem.Model is BeatmapInfo lastBeatmap && lastBeatmap.BeatmapSet!.ID != beatmap.BeatmapSet!.ID);
+                        // When reaching a new group, ensure we reset any beatmap set tracking.
+                        currentSetItems = null;
+                        lastBeatmap = null;
+
+                        groupItems[newGroup] = currentGroupItems = new HashSet<CarouselItem>();
+                        lastGroup = newGroup;
+
+                        addItem(new CarouselItem(newGroup)
+                        {
+                            DrawHeight = GroupPanel.HEIGHT,
+                            DepthLayer = -2,
+                        });
+                    }
+
+                    if (BeatmapSetsGroupedTogether)
+                    {
+                        bool newBeatmapSet = lastBeatmap?.BeatmapSet!.ID != beatmap.BeatmapSet!.ID;
 
                         if (newBeatmapSet)
                         {
-                            var setItem = new CarouselItem(beatmap.BeatmapSet!) { DrawHeight = BeatmapSetPanel.HEIGHT };
-                            setItems[beatmap.BeatmapSet!] = new HashSet<CarouselItem> { setItem };
-                            newItems.Insert(i, setItem);
-                            i++;
-                        }
+                            setItems[beatmap.BeatmapSet!] = currentSetItems = new HashSet<CarouselItem>();
 
-                        setItems[beatmap.BeatmapSet!].Add(item);
-                        item.IsVisible = false;
+                            addItem(new CarouselItem(beatmap.BeatmapSet!)
+                            {
+                                DrawHeight = BeatmapSetPanel.HEIGHT,
+                                DepthLayer = -1
+                            });
+                        }
                     }
 
-                    lastItem = item;
+                    addItem(item);
+                    lastBeatmap = beatmap;
+
+                    void addItem(CarouselItem i)
+                    {
+                        newItems.Add(i);
+
+                        currentGroupItems?.Add(i);
+                        currentSetItems?.Add(i);
+
+                        i.IsVisible = i.Model is GroupDefinition || (lastGroup == null && (i.Model is BeatmapSetInfo || currentSetItems == null));
+                    }
                 }
-            }
 
-            // Link group items to their headers.
-            GroupDefinition? lastGroup = null;
+                return newItems;
+            }, cancellationToken).ConfigureAwait(false);
+        }
 
-            foreach (var item in newItems)
+        private GroupDefinition? createGroupIfRequired(FilterCriteria criteria, BeatmapInfo beatmap, GroupDefinition? lastGroup)
+        {
+            switch (criteria.Group)
             {
-                cancellationToken.ThrowIfCancellationRequested();
+                case GroupMode.Artist:
+                    char groupChar = lastGroup?.Data as char? ?? (char)0;
+                    char beatmapFirstChar = char.ToUpperInvariant(beatmap.Metadata.Artist[0]);
 
-                if (item.Model is GroupDefinition group)
-                {
-                    lastGroup = group;
-                    continue;
-                }
+                    if (beatmapFirstChar > groupChar)
+                        return new GroupDefinition(beatmapFirstChar, $"{beatmapFirstChar}");
 
-                if (lastGroup != null)
-                {
-                    groupItems[lastGroup].Add(item);
-                    item.IsVisible = false;
-                }
+                    break;
+
+                case GroupMode.Difficulty:
+                    int starGroup = lastGroup?.Data as int? ?? -1;
+
+                    if (beatmap.StarRating > starGroup)
+                    {
+                        starGroup = (int)Math.Floor(beatmap.StarRating);
+                        return new GroupDefinition(starGroup + 1, $"{starGroup} - {starGroup + 1} *");
+                    }
+
+                    break;
             }
 
-            return newItems;
-        }, cancellationToken).ConfigureAwait(false);
+            return null;
+        }
     }
 }

@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -42,7 +41,7 @@ namespace osu.Game.Screens.SelectV2
 
             InternalChild = panel = new CarouselPanelPiece(0)
             {
-                Action = onAction,
+                Action = () => carousel?.Activate(Item!),
                 Icon = chevronIcon = new SpriteIcon
                 {
                     AlwaysPresent = true,
@@ -126,12 +125,6 @@ namespace osu.Game.Screens.SelectV2
             this.FadeInFromZero(500, Easing.OutQuint);
         }
 
-        private void onAction()
-        {
-            if (carousel != null)
-                carousel.CurrentSelection = Item!.Model;
-        }
-
         #region ICarouselPanel
 
         public CarouselItem? Item { get; set; }
@@ -143,8 +136,6 @@ namespace osu.Game.Screens.SelectV2
 
         public void Activated()
         {
-            // groups should never be activated.
-            throw new InvalidOperationException();
         }
 
         #endregion

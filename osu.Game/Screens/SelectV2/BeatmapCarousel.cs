@@ -106,11 +106,9 @@ namespace osu.Game.Screens.SelectV2
         private GroupDefinition? lastSelectedGroup;
         private BeatmapInfo? lastSelectedBeatmap;
 
-        protected override bool HandleItemSelected(object? model)
+        protected override void HandleItemActivated(CarouselItem item)
         {
-            base.HandleItemSelected(model);
-
-            switch (model)
+            switch (item.Model)
             {
                 case GroupDefinition group:
                     // Special case – collapsing an open group.
@@ -118,37 +116,42 @@ namespace osu.Game.Screens.SelectV2
                     {
                         setExpansionStateOfGroup(lastSelectedGroup, false);
                         lastSelectedGroup = null;
-                        return false;
+                        return;
                     }
 
                     setExpandedGroup(group);
-                    return false;
+                    return;
 
                 case BeatmapSetInfo setInfo:
                     // Selecting a set isn't valid – let's re-select the first difficulty.
                     CurrentSelection = setInfo.Beatmaps.First();
-                    return false;
+                    return;
 
                 case BeatmapInfo beatmapInfo:
-
-                    // If we have groups, we need to account for them.
-                    if (Criteria.SplitOutDifficulties)
-                    {
-                        // Find the containing group. There should never be too many groups so iterating is efficient enough.
-                        GroupDefinition? group = grouping.GroupItems.SingleOrDefault(kvp => kvp.Value.Any(i => ReferenceEquals(i.Model, beatmapInfo))).Key;
-
-                        if (group != null)
-                            setExpandedGroup(group);
-                    }
-                    else
-                    {
-                        setExpandedSet(beatmapInfo);
-                    }
-
-                    return true;
+                    CurrentSelection = beatmapInfo;
+                    return;
             }
+        }
 
-            return true;
+        protected override void HandleItemSelected(object? model)
+        {
+            base.HandleItemSelected(model);
+
+            switch (model)
+            {
+                case BeatmapSetInfo:
+                case GroupDefinition:
+                    throw new InvalidOperationException("Groups should never become selected");
+
+                case BeatmapInfo beatmapInfo:
+                    // Find any containing group. There should never be too many groups so iterating is efficient enough.
+                    GroupDefinition? containingGroup = grouping.GroupItems.SingleOrDefault(kvp => kvp.Value.Any(i => ReferenceEquals(i.Model, beatmapInfo))).Key;
+
+                    if (containingGroup != null)
+                        setExpandedGroup(containingGroup);
+                    setExpandedSet(beatmapInfo);
+                    break;
+            }
         }
 
         protected override bool CheckValidForGroupSelection(CarouselItem item)
@@ -159,7 +162,7 @@ namespace osu.Game.Screens.SelectV2
                     return true;
 
                 case BeatmapInfo:
-                    return Criteria.SplitOutDifficulties;
+                    return !grouping.BeatmapSetsGroupedTogether;
 
                 case GroupDefinition:
                     return false;
@@ -181,12 +184,46 @@ namespace osu.Game.Screens.SelectV2
         {
             if (grouping.GroupItems.TryGetValue(group, out var items))
             {
-                foreach (var i in items)
+                if (expanded)
                 {
-                    if (i.Model is GroupDefinition)
-                        i.IsExpanded = expanded;
-                    else
-                        i.IsVisible = expanded;
+                    foreach (var i in items)
+                    {
+                        switch (i.Model)
+                        {
+                            case GroupDefinition:
+                                i.IsExpanded = true;
+                                break;
+
+                            case BeatmapSetInfo set:
+                                // Case where there are set headers, header should be visible
+                                // and items should use the set's expanded state.
+                                i.IsVisible = true;
+                                setExpansionStateOfSetItems(set, i.IsExpanded);
+                                break;
+
+                            default:
+                                // Case where there are no set headers, all items should be visible.
+                                if (!grouping.BeatmapSetsGroupedTogether)
+                                    i.IsVisible = true;
+                                break;
+                        }
+                    }
+                }
+                else
+                {
+                    foreach (var i in items)
+                    {
+                        switch (i.Model)
+                        {
+                            case GroupDefinition:
+                                i.IsExpanded = false;
+                                break;
+
+                            default:
+                                i.IsVisible = false;
+                                break;
+                        }
+                    }
                 }
             }
         }
@@ -263,7 +300,5 @@ namespace osu.Game.Screens.SelectV2
         #endregion
     }
 
-    public record GroupDefinition(string Title);
-
-    public record StarsGroupDefinition(int StarNumber);
+    public record GroupDefinition(object Data, string Title);
 }
