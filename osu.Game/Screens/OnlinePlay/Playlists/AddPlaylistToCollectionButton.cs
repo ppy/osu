@@ -66,7 +66,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                     {
                         collection = new BeatmapCollection(room.Name, beatmaps.Select(i => i!.MD5Hash).Distinct().ToList());
                         realmAccess.Realm.Write(() => realmAccess.Realm.Add(collection));
-                        notifications?.Post(new SimpleNotification { Text = $"Created new playlist: {room.Name}" });
+                        notifications?.Post(new SimpleNotification { Text = $"Created new collection: {room.Name}" });
                     }
                     else
                     {
@@ -75,7 +75,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                             beatmaps = beatmaps.Where(i => !c.BeatmapMD5Hashes.Contains(i!.MD5Hash)).ToList();
                             foreach (var item in beatmaps)
                                 c.BeatmapMD5Hashes.Add(item!.MD5Hash);
-                            notifications?.Post(new SimpleNotification { Text = $"Updated playlist: {room.Name}" });
+                            notifications?.Post(new SimpleNotification { Text = $"Updated collection: {room.Name}" });
                         });
                     }
 
