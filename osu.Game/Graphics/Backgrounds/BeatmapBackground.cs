@@ -111,6 +111,23 @@ namespace osu.Game.Graphics.Backgrounds
                 TextureShader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, "ColouredDimmableTexture");
             }
 
+            public Colour4 FrameBufferDrawColourOffset
+            {
+                get
+                {
+                    if (Parent is IColouredDimmable colouredDimmableParent)
+                        return colouredDimmableParent.DrawColourOffset;
+                    else if (Parent?.Parent is IColouredDimmable colouredDimmableGrandparent)
+                        // Needed to skip intermediate containers.
+                        return colouredDimmableGrandparent.DrawColourOffset;
+
+                    return Colour4.Black;
+                }
+            }
+
+            // Children should not receive the true colour to avoid colour doubling when the frame-buffers are rendered to the back-buffer.
+            public Colour4 DrawColourOffset => Colour4.Black;
+
             protected override DrawNode CreateDrawNode() => new DimmableBufferedContainerDrawNode(this, SharedData);
 
             protected class DimmableBufferedContainerDrawNode : BufferedContainerDrawNode
@@ -128,7 +145,7 @@ namespace osu.Game.Graphics.Backgrounds
                 {
                     base.ApplyState();
 
-                    drawColourOffset = (Source as IColouredDimmable).DrawColourOffset;
+                    drawColourOffset = Source.FrameBufferDrawColourOffset;
                 }
 
                 private IUniformBuffer<DimParameters> dimParametersBuffer;
