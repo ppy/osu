@@ -40,6 +40,8 @@ namespace osu.Game.Screens.Edit.Submission
 
         public override bool AllowUserExit => false;
 
+        public override bool DisallowExternalBeatmapRulesetChanges => true;
+
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
 
