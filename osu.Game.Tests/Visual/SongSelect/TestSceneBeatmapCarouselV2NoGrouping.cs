@@ -208,7 +208,6 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
-        [Solo]
         public void TestInputHandlingWithinGaps()
         {
             AddBeatmaps(2, 5);
