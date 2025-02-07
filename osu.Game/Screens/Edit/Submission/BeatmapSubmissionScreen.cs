@@ -21,7 +21,6 @@ using osu.Game.Beatmaps.Drawables.Cards;
 using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Extensions;
-using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.IO.Archives;
 using osu.Game.Localisation;
 using osu.Game.Online.API;
@@ -37,8 +36,6 @@ namespace osu.Game.Screens.Edit.Submission
     public partial class BeatmapSubmissionScreen : OsuScreen
     {
         private BeatmapSubmissionOverlay overlay = null!;
-
-        public override bool AllowUserExit => false;
 
         public override bool DisallowExternalBeatmapRulesetChanges => true;
 
@@ -73,7 +70,6 @@ namespace osu.Game.Screens.Edit.Submission
         private SubmissionStageProgress updateStep = null!;
         private Container successContainer = null!;
         private Container flashLayer = null!;
-        private RoundedButton backButton = null!;
 
         private uint? beatmapSetId;
         private MemoryStream? beatmapPackageStream;
@@ -81,6 +77,8 @@ namespace osu.Game.Screens.Edit.Submission
         private SubmissionBeatmapExporter legacyBeatmapExporter = null!;
         private ProgressNotification? exportProgressNotification;
         private ProgressNotification? updateProgressNotification;
+
+        private Live<BeatmapSetInfo>? importedSet;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -161,15 +159,6 @@ namespace osu.Game.Screens.Edit.Submission
                                         }
                                     }
                                 },
-                                backButton = new RoundedButton
-                                {
-                                    Text = CommonStrings.Back,
-                                    Width = 150,
-                                    Action = this.Exit,
-                                    Enabled = { Value = false },
-                                    Anchor = Anchor.TopCentre,
-                                    Origin = Anchor.TopCentre,
-                                }
                             }
                         }
                     }
@@ -181,7 +170,10 @@ namespace osu.Game.Screens.Edit.Submission
                 if (overlay.State.Value == Visibility.Hidden)
                 {
                     if (!overlay.Completed)
+                    {
+                        allowExit();
                         this.Exit();
+                    }
                     else
                     {
                         submissionProgress.FadeIn(200, Easing.OutQuint);
@@ -227,8 +219,8 @@ namespace osu.Game.Screens.Edit.Submission
             createRequest.Failure += ex =>
             {
                 createSetStep.SetFailed(ex.Message);
-                backButton.Enabled.Value = true;
                 Logger.Log($"Beatmap set submission failed on creation: {ex}");
+                allowExit();
             };
 
             createSetStep.SetInProgress();
@@ -250,9 +242,9 @@ namespace osu.Game.Screens.Edit.Submission
             catch (Exception ex)
             {
                 exportStep.SetFailed(ex.Message);
-                Logger.Log($"Beatmap set submission failed on export: {ex}");
-                backButton.Enabled.Value = true;
                 exportProgressNotification = null;
+                Logger.Log($"Beatmap set submission failed on export: {ex}");
+                allowExit();
             }
 
             exportStep.SetCompleted();
@@ -311,7 +303,7 @@ namespace osu.Game.Screens.Edit.Submission
             {
                 uploadStep.SetFailed(ex.Message);
                 Logger.Log($"Beatmap submission failed on upload: {ex}");
-                backButton.Enabled.Value = true;
+                allowExit();
             };
             patchRequest.Progressed += (current, total) => uploadStep.SetInProgress((float)current / total);
 
@@ -339,7 +331,7 @@ namespace osu.Game.Screens.Edit.Submission
             {
                 uploadStep.SetFailed(ex.Message);
                 Logger.Log($"Beatmap submission failed on upload: {ex}");
-                backButton.Enabled.Value = true;
+                allowExit();
             };
             uploadRequest.Progressed += (current, total) => uploadStep.SetInProgress((float)current / Math.Max(total, 1));
 
@@ -354,8 +346,6 @@ namespace osu.Game.Screens.Edit.Submission
 
             updateStep.SetInProgress();
 
-            Live<BeatmapSetInfo>? importedSet;
-
             try
             {
                 importedSet = await beatmaps.ImportAsUpdate(
@@ -367,28 +357,13 @@ namespace osu.Game.Screens.Edit.Submission
             {
                 updateStep.SetFailed(ex.Message);
                 Logger.Log($"Beatmap submission failed on local update: {ex}");
-                Schedule(() => backButton.Enabled.Value = true);
+                allowExit();
                 return;
             }
 
             updateStep.SetCompleted();
-            backButton.Enabled.Value = true;
-            backButton.Action = () =>
-            {
-                game?.PerformFromScreen(s =>
-                {
-                    if (s is OsuScreen osuScreen)
-                    {
-                        Debug.Assert(importedSet != null);
-                        var targetBeatmap = importedSet.Value.Beatmaps.FirstOrDefault(b => b.DifficultyName == Beatmap.Value.BeatmapInfo.DifficultyName)
-                                            ?? importedSet.Value.Beatmaps.First();
-                        osuScreen.Beatmap.Value = beatmaps.GetWorkingBeatmap(targetBeatmap);
-                    }
-
-                    s.Push(new EditorLoader());
-                }, [typeof(MainMenu)]);
-            };
             showBeatmapCard();
+            allowExit();
         }
 
         private void showBeatmapCard()
@@ -408,6 +383,11 @@ namespace osu.Game.Screens.Edit.Submission
             api.Queue(getBeatmapSetRequest);
         }
 
+        private void allowExit()
+        {
+            BackButtonVisibility.Value = true;
+        }
+
         protected override void Update()
         {
             base.Update();
@@ -417,6 +397,33 @@ namespace osu.Game.Screens.Edit.Submission
 
             if (updateProgressNotification != null && updateProgressNotification.Ongoing)
                 updateStep.SetInProgress(updateProgressNotification.Progress);
+        }
+
+        public override bool OnExiting(ScreenExitEvent e)
+        {
+            // We probably want a method of cancelling in the future…
+            if (!BackButtonVisibility.Value)
+                return true;
+
+            if (importedSet != null)
+            {
+                game?.PerformFromScreen(s =>
+                {
+                    if (s is OsuScreen osuScreen)
+                    {
+                        Debug.Assert(importedSet != null);
+                        var targetBeatmap = importedSet.Value.Beatmaps.FirstOrDefault(b => b.DifficultyName == Beatmap.Value.BeatmapInfo.DifficultyName)
+                                            ?? importedSet.Value.Beatmaps.First();
+                        osuScreen.Beatmap.Value = beatmaps.GetWorkingBeatmap(targetBeatmap);
+                    }
+
+                    s.Push(new EditorLoader());
+                }, [typeof(MainMenu)]);
+
+                return true;
+            }
+
+            return base.OnExiting(e);
         }
 
         public override void OnEntering(ScreenTransitionEvent e)
