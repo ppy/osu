@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Testing;
@@ -209,31 +208,34 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
+        [Solo]
         public void TestInputHandlingWithinGaps()
         {
             AddBeatmaps(2, 5);
             WaitForDrawablePanels();
-            SelectNextGroup();
 
-            clickOnDifficulty(0, 1, p => p.LayoutRectangle.TopLeft + new Vector2(20f, -1f));
-            WaitForSelection(0, 1);
+            AddAssert("no beatmaps visible", () => !GetVisiblePanels<BeatmapPanel>().Any());
 
-            clickOnDifficulty(0, 0, p => p.LayoutRectangle.BottomLeft + new Vector2(20f, 1f));
+            // Clicks just above the first group panel should not actuate any action.
+            ClickVisiblePanelWithOffset<BeatmapSetPanel>(0, new Vector2(0, -(BeatmapSetPanel.HEIGHT / 2 + 1)));
+
+            AddAssert("no beatmaps visible", () => !GetVisiblePanels<BeatmapPanel>().Any());
+
+            ClickVisiblePanelWithOffset<BeatmapSetPanel>(0, new Vector2(0, -(BeatmapSetPanel.HEIGHT / 2)));
+
+            AddUntilStep("wait for beatmaps visible", () => GetVisiblePanels<BeatmapPanel>().Any());
             WaitForSelection(0, 0);
 
-            SelectNextPanel();
-            Select();
-            WaitForSelection(0, 1);
-
-            clickOnSet(0, p => p.LayoutRectangle.BottomLeft + new Vector2(20f, 1f));
+            // Beatmap panels expand their selection area to cover holes from spacing.
+            ClickVisiblePanelWithOffset<BeatmapPanel>(1, new Vector2(0, -(CarouselItem.DEFAULT_HEIGHT / 2 + 1)));
             WaitForSelection(0, 0);
 
-            AddStep("scroll to end", () => Scroll.ScrollToEnd(false));
-            clickOnDifficulty(0, 4, p => p.LayoutRectangle.BottomLeft + new Vector2(20f, 1f));
-            WaitForSelection(0, 4);
+            // Panels with higher depth will handle clicks in the gutters for simplicity.
+            ClickVisiblePanelWithOffset<BeatmapPanel>(2, new Vector2(0, (CarouselItem.DEFAULT_HEIGHT / 2 + 1)));
+            WaitForSelection(0, 2);
 
-            clickOnSet(1, p => p.LayoutRectangle.TopLeft + new Vector2(20f, -1f));
-            WaitForSelection(1, 0);
+            ClickVisiblePanelWithOffset<BeatmapPanel>(3, new Vector2(0, (CarouselItem.DEFAULT_HEIGHT / 2 + 1)));
+            WaitForSelection(0, 3);
         }
 
         private void checkSelectionIterating(bool isIterating)
@@ -248,28 +250,6 @@ namespace osu.Game.Tests.Visual.SongSelect
                 else
                     AddUntilStep("selection not changed", () => Carousel.CurrentSelection == selection);
             }
-        }
-
-        private void clickOnSet(int set, Func<BeatmapSetPanel, Vector2> pos)
-        {
-            AddStep($"click on set{set}", () =>
-            {
-                var model = BeatmapSets[set];
-                var panel = this.ChildrenOfType<BeatmapSetPanel>().Single(b => ReferenceEquals(b.Item!.Model, model));
-                InputManager.MoveMouseTo(panel.ToScreenSpace(pos(panel)));
-                InputManager.Click(MouseButton.Left);
-            });
-        }
-
-        private void clickOnDifficulty(int set, int diff, Func<BeatmapPanel, Vector2> pos)
-        {
-            AddStep($"click on set{set} diff{diff}", () =>
-            {
-                var model = BeatmapSets[set].Beatmaps[diff];
-                var panel = this.ChildrenOfType<BeatmapPanel>().Single(b => ReferenceEquals(b.Item!.Model, model));
-                InputManager.MoveMouseTo(panel.ToScreenSpace(pos(panel)));
-                InputManager.Click(MouseButton.Left);
-            });
         }
     }
 }
