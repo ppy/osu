@@ -67,7 +67,7 @@ namespace osu.Game.Screens.Ranking.Contracted
                                 Colour = Color4.Black.Opacity(0.25f),
                                 Type = EdgeEffectType.Shadow,
                                 Radius = 1,
-                                Offset = new Vector2(0, 4)
+                                Offset = new Vector2(0, 2)
                             },
                             Children = new Drawable[]
                             {
@@ -100,10 +100,10 @@ namespace osu.Game.Screens.Ranking.Contracted
                                             CornerRadius = 20,
                                             EdgeEffect = new EdgeEffectParameters
                                             {
-                                                Colour = Color4.Black.Opacity(0.25f),
+                                                Colour = Color4.Black.Opacity(0.15f),
                                                 Type = EdgeEffectType.Shadow,
                                                 Radius = 8,
-                                                Offset = new Vector2(0, 4),
+                                                Offset = new Vector2(0, 1),
                                             }
                                         },
                                         new OsuSpriteText
