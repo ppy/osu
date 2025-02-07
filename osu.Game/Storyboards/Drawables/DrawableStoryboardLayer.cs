@@ -21,19 +21,6 @@ namespace osu.Game.Storyboards.Drawables
 
         protected LayerElementContainer ElementContainer { get; }
 
-        private LayoutValue<Colour4> drawColourOffsetBacking = new LayoutValue<Colour4>(Invalidation.DrawNode | Invalidation.Colour | Invalidation.DrawInfo | Invalidation.RequiredParentSizeToFit | Invalidation.Presence);
-
-        public Colour4 DrawColourOffset => drawColourOffsetBacking.IsValid ? drawColourOffsetBacking.Value : drawColourOffsetBacking.Value = computeDrawColourOffset();
-
-        private Colour4 computeDrawColourOffset()
-        {
-            // Direct Parent is a Container, so we need to go up two levels to get the DrawableStoryboard.
-            if (Parent?.Parent is IColouredDimmable colouredDimmableParent)
-                return colouredDimmableParent.DrawColourOffset;
-
-            return Colour4.Black;
-        }
-
         public DrawableStoryboardLayer(StoryboardLayer layer)
         {
             Layer = layer;
@@ -44,8 +31,6 @@ namespace osu.Game.Storyboards.Drawables
             Masking = layer.Masking;
 
             InternalChild = ElementContainer = new LayerElementContainer(layer);
-
-            AddLayout(drawColourOffsetBacking);
         }
 
         public partial class LayerElementContainer : LifetimeManagementContainer, IColouredDimmable
@@ -53,19 +38,6 @@ namespace osu.Game.Storyboards.Drawables
             private readonly StoryboardLayer storyboardLayer;
 
             public IEnumerable<Drawable> Elements => InternalChildren;
-
-            private LayoutValue<Colour4> drawColourOffsetBacking = new LayoutValue<Colour4>(Invalidation.DrawNode | Invalidation.Colour | Invalidation.DrawInfo | Invalidation.RequiredParentSizeToFit | Invalidation.Presence);
-
-            public Colour4 DrawColourOffset => drawColourOffsetBacking.IsValid ? drawColourOffsetBacking.Value : drawColourOffsetBacking.Value = computeDrawColourOffset();
-
-            private Colour4 computeDrawColourOffset()
-            {
-                // Double `Parent` because DrawableStoryboard is a child of a Container, which is a child of a DimmableStoryboard.
-                if (Parent is IColouredDimmable colouredDimmableParent)
-                    return colouredDimmableParent.DrawColourOffset;
-
-                return Colour4.Black;
-            }
 
             public LayerElementContainer(StoryboardLayer layer)
             {
@@ -75,8 +47,6 @@ namespace osu.Game.Storyboards.Drawables
 
                 Anchor = Anchor.Centre;
                 Origin = Anchor.Centre;
-
-                AddLayout(drawColourOffsetBacking);
             }
 
             [BackgroundDependencyLoader]

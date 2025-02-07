@@ -19,7 +19,7 @@ using osuTK;
 
 namespace osu.Game.Storyboards.Drawables
 {
-    public partial class DrawableStoryboardSprite : Sprite, IFlippable, IVectorScalable
+    public partial class DrawableStoryboardSprite : Sprite, IFlippable, IVectorScalable, IColouredDimmable
     {
         public StoryboardSprite Sprite { get; }
 
@@ -86,18 +86,6 @@ namespace osu.Game.Storyboards.Drawables
         [Resolved]
         private TextureStore textureStore { get; set; } = null!;
 
-        private LayoutValue<Colour4> drawColourOffsetBacking = new LayoutValue<Colour4>(Invalidation.DrawNode | Invalidation.Colour | Invalidation.DrawInfo | Invalidation.RequiredParentSizeToFit | Invalidation.Presence);
-
-        public Colour4 DrawColourOffset => drawColourOffsetBacking.IsValid ? drawColourOffsetBacking.Value : drawColourOffsetBacking.Value = computeDrawColourOffset();
-
-        private Colour4 computeDrawColourOffset()
-        {
-            if (Parent is IColouredDimmable colouredDimmableParent)
-                return colouredDimmableParent.DrawColourOffset;
-
-            return Colour4.Black;
-        }
-
         protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
         {
             bool result = base.OnInvalidate(invalidation, source);
@@ -119,8 +107,6 @@ namespace osu.Game.Storyboards.Drawables
 
             LifetimeStart = sprite.StartTime;
             LifetimeEnd = sprite.EndTimeForDisplay;
-
-            AddLayout(drawColourOffsetBacking);
         }
 
         [BackgroundDependencyLoader]
@@ -174,7 +160,7 @@ namespace osu.Game.Storyboards.Drawables
             {
                 base.ApplyState();
 
-                drawColourOffset = Source.DrawColourOffset;
+                drawColourOffset = (Source as IColouredDimmable).DrawColourOffset;
             }
 
             private IUniformBuffer<DimParameters> dimParametersBuffer = null!;

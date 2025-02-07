@@ -91,22 +91,6 @@ namespace osu.Game.Storyboards.Drawables
         public override bool IsPresent
             => !float.IsNaN(DrawPosition.X) && !float.IsNaN(DrawPosition.Y) && base.IsPresent;
 
-        private LayoutValue<Colour4> drawColourOffsetBacking = new LayoutValue<Colour4>(Invalidation.DrawNode | Invalidation.Colour | Invalidation.DrawInfo | Invalidation.RequiredParentSizeToFit | Invalidation.Presence);
-
-        public Colour4 DrawColourOffset => drawColourOffsetBacking.IsValid ? drawColourOffsetBacking.Value : drawColourOffsetBacking.Value = computeDrawColourOffset();
-
-        private Colour4 computeDrawColourOffset()
-        {
-            // Additive blending doesn't require any offset, hopefully whatever is beneath it handles the offset.
-            if (DrawColourInfo.Blending == BlendingParameters.Additive)
-                return Colour4.Black;
-
-            if (Parent is IColouredDimmable colouredDimmableParent)
-                return colouredDimmableParent.DrawColourOffset;
-
-            return Colour4.Black;
-        }
-
         public DrawableStoryboardAnimation(StoryboardAnimation animation)
         {
             Animation = animation;
@@ -117,8 +101,6 @@ namespace osu.Game.Storyboards.Drawables
 
             LifetimeStart = animation.StartTime;
             LifetimeEnd = animation.EndTimeForDisplay;
-
-            AddLayout(drawColourOffsetBacking);
         }
 
         [Resolved]
@@ -193,21 +175,8 @@ namespace osu.Game.Storyboards.Drawables
                 skin.SourceChanged -= skinSourceChanged;
         }
 
-        public partial class DrawableStoryboardAnimationSprite : Sprite
+        public partial class DrawableStoryboardAnimationSprite : Sprite, IColouredDimmable
         {
-            private LayoutValue<Colour4> drawColourOffsetBacking = new LayoutValue<Colour4>(Invalidation.DrawNode | Invalidation.Colour | Invalidation.DrawInfo | Invalidation.RequiredParentSizeToFit | Invalidation.Presence);
-
-            public Colour4 DrawColourOffset => drawColourOffsetBacking.IsValid ? drawColourOffsetBacking.Value : drawColourOffsetBacking.Value = computeDrawColourOffset();
-
-            private Colour4 computeDrawColourOffset()
-            {
-                // Direct Parent is a Container, so we need to go up two levels to get the DrawableStoryboardAnimation.
-                if (Parent?.Parent is IColouredDimmable colouredDimmableParent)
-                    return colouredDimmableParent.DrawColourOffset;
-
-                return Colour4.Black;
-            }
-
             protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
             {
                 bool result = base.OnInvalidate(invalidation, source);
@@ -222,7 +191,6 @@ namespace osu.Game.Storyboards.Drawables
 
             public DrawableStoryboardAnimationSprite()
             {
-                AddLayout(drawColourOffsetBacking);
             }
 
             [BackgroundDependencyLoader]
@@ -248,7 +216,7 @@ namespace osu.Game.Storyboards.Drawables
                 {
                     base.ApplyState();
 
-                    drawColourOffset = Source.DrawColourOffset;
+                    drawColourOffset = (Source as IColouredDimmable).DrawColourOffset;
                 }
 
                 private IUniformBuffer<DimParameters> dimParametersBuffer;

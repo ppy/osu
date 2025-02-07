@@ -19,7 +19,19 @@ namespace osu.Game.Graphics.Backgrounds
 {
     public interface IColouredDimmable : IDrawable
     {
-        Colour4 DrawColourOffset { get; }
+        Colour4 DrawColourOffset
+        {
+            get
+            {
+                if (Parent is IColouredDimmable colouredDimmableParent)
+                    return colouredDimmableParent.DrawColourOffset;
+                else if (Parent?.Parent is IColouredDimmable colouredDimmableGrandparent)
+                    // Needed to skip intermediate containers.
+                    return colouredDimmableGrandparent.DrawColourOffset;
+
+                return Colour4.Black;
+            }
+        }
     }
 
     /// <summary>
@@ -35,25 +47,10 @@ namespace osu.Game.Graphics.Backgrounds
 
         protected DimmableBufferedContainer ColouredDimmableBufferedContainer;
 
-        private LayoutValue<Colour4> drawColourOffsetBacking = new LayoutValue<Colour4>(Invalidation.DrawNode | Invalidation.Colour | Invalidation.DrawInfo | Invalidation.RequiredParentSizeToFit | Invalidation.Presence);
-
-        public Colour4 DrawColourOffset => drawColourOffsetBacking.IsValid ? drawColourOffsetBacking.Value : drawColourOffsetBacking.Value = computeDrawColourOffset();
-
-        private Colour4 computeDrawColourOffset()
-        {
-            // Double `Parent` because BeatmapBackground is a child of a Container, which is a child of a DimmableBackground.
-            if (Parent?.Parent is IColouredDimmable colouredDimmableParent)
-                return colouredDimmableParent.DrawColourOffset;
-
-            return Colour4.Black;
-        }
-
         public BeatmapBackground(WorkingBeatmap beatmap, string fallbackTextureName = @"Backgrounds/bg1")
         {
             Beatmap = beatmap;
             this.fallbackTextureName = fallbackTextureName;
-
-            AddLayout(drawColourOffsetBacking);
         }
 
         [BackgroundDependencyLoader]
@@ -89,20 +86,8 @@ namespace osu.Game.Graphics.Backgrounds
                    && ((BeatmapBackground)other).Beatmap == Beatmap;
         }
 
-        public partial class DimmableBufferedContainer : BufferedContainer
+        public partial class DimmableBufferedContainer : BufferedContainer, IColouredDimmable
         {
-            private LayoutValue<Colour4> drawColourOffsetBacking = new LayoutValue<Colour4>(Invalidation.DrawNode | Invalidation.Colour | Invalidation.DrawInfo | Invalidation.RequiredParentSizeToFit | Invalidation.Presence);
-
-            public Colour4 DrawColourOffset => drawColourOffsetBacking.IsValid ? drawColourOffsetBacking.Value : drawColourOffsetBacking.Value = computeDrawColourOffset();
-
-            private Colour4 computeDrawColourOffset()
-            {
-                if (Parent is IColouredDimmable colouredDimmableParent)
-                    return colouredDimmableParent.DrawColourOffset;
-
-                return Colour4.Black;
-            }
-
             protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
             {
                 bool result = base.OnInvalidate(invalidation, source);
@@ -118,7 +103,6 @@ namespace osu.Game.Graphics.Backgrounds
             public DimmableBufferedContainer(RenderBufferFormat[] formats = null, bool pixelSnapping = false, bool cachedFrameBuffer = false)
                 : base(formats, pixelSnapping, cachedFrameBuffer)
             {
-                AddLayout(drawColourOffsetBacking);
             }
 
             [BackgroundDependencyLoader]
@@ -144,7 +128,7 @@ namespace osu.Game.Graphics.Backgrounds
                 {
                     base.ApplyState();
 
-                    drawColourOffset = Source.DrawColourOffset;
+                    drawColourOffset = (Source as IColouredDimmable).DrawColourOffset;
                 }
 
                 private IUniformBuffer<DimParameters> dimParametersBuffer;
@@ -181,20 +165,8 @@ namespace osu.Game.Graphics.Backgrounds
             }
         }
 
-        public partial class DimmableSprite : Sprite
+        public partial class DimmableSprite : Sprite, IColouredDimmable
         {
-            private LayoutValue<Colour4> drawColourOffsetBacking = new LayoutValue<Colour4>(Invalidation.DrawNode | Invalidation.Colour | Invalidation.DrawInfo | Invalidation.RequiredParentSizeToFit | Invalidation.Presence);
-
-            public Colour4 DrawColourOffset => drawColourOffsetBacking.IsValid ? drawColourOffsetBacking.Value : drawColourOffsetBacking.Value = computeDrawColourOffset();
-
-            private Colour4 computeDrawColourOffset()
-            {
-                if (Parent is IColouredDimmable colouredDimmableParent)
-                    return colouredDimmableParent.DrawColourOffset;
-
-                return Colour4.Black;
-            }
-
             protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
             {
                 bool result = base.OnInvalidate(invalidation, source);
@@ -209,7 +181,6 @@ namespace osu.Game.Graphics.Backgrounds
 
             public DimmableSprite()
             {
-                AddLayout(drawColourOffsetBacking);
             }
 
             [BackgroundDependencyLoader]
@@ -235,7 +206,7 @@ namespace osu.Game.Graphics.Backgrounds
                 {
                     base.ApplyState();
 
-                    drawColourOffset = Source.DrawColourOffset;
+                    drawColourOffset = (Source as IColouredDimmable).DrawColourOffset;
                 }
 
                 private IUniformBuffer<DimParameters> dimParametersBuffer;

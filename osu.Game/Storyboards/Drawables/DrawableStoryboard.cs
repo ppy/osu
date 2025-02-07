@@ -60,19 +60,6 @@ namespace osu.Game.Storyboards.Drawables
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
             dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
-        private LayoutValue<Colour4> drawColourOffsetBacking = new LayoutValue<Colour4>(Invalidation.DrawNode | Invalidation.Colour | Invalidation.DrawInfo | Invalidation.RequiredParentSizeToFit | Invalidation.Presence);
-
-        public Colour4 DrawColourOffset => drawColourOffsetBacking.IsValid ? drawColourOffsetBacking.Value : drawColourOffsetBacking.Value = computeDrawColourOffset();
-
-        private Colour4 computeDrawColourOffset()
-        {
-            // Direct Parent is a Container, so we need to go up two levels to get the DimmableStoryboard.
-            if (Parent?.Parent is IColouredDimmable colouredDimmableParent)
-                return colouredDimmableParent.DrawColourOffset;
-
-            return Colour4.Black;
-        }
-
         public DrawableStoryboard(Storyboard storyboard, IReadOnlyList<Mod>? mods = null)
         {
             Storyboard = storyboard;
@@ -93,8 +80,6 @@ namespace osu.Game.Storyboards.Drawables
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
             });
-
-            AddLayout(drawColourOffsetBacking);
         }
 
         [BackgroundDependencyLoader]

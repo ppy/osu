@@ -30,18 +30,6 @@ namespace osu.Game.Storyboards.Drawables
 
         public override bool RemoveWhenNotAlive => false;
 
-        private LayoutValue<Colour4> drawColourOffsetBacking = new LayoutValue<Colour4>(Invalidation.DrawNode | Invalidation.Colour | Invalidation.DrawInfo | Invalidation.RequiredParentSizeToFit | Invalidation.Presence);
-
-        public Colour4 DrawColourOffset => drawColourOffsetBacking.IsValid ? drawColourOffsetBacking.Value : drawColourOffsetBacking.Value = computeDrawColourOffset();
-
-        private Colour4 computeDrawColourOffset()
-        {
-            if (Parent is IColouredDimmable colouredDimmableParent)
-                return colouredDimmableParent.DrawColourOffset;
-
-            return Colour4.Black;
-        }
-
         public DrawableStoryboardVideo(StoryboardVideo video)
         {
             Video = video;
@@ -57,8 +45,6 @@ namespace osu.Game.Storyboards.Drawables
 
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
-
-            AddLayout(drawColourOffsetBacking);
         }
 
         [BackgroundDependencyLoader(true)]
@@ -154,40 +140,14 @@ namespace osu.Game.Storyboards.Drawables
 
             protected override VideoSprite CreateSprite() => new DrawableVideoSprite(this);
 
-            private LayoutValue<Colour4> drawColourOffsetBacking = new LayoutValue<Colour4>(Invalidation.DrawNode | Invalidation.Colour | Invalidation.DrawInfo | Invalidation.RequiredParentSizeToFit | Invalidation.Presence);
-
-            public Colour4 DrawColourOffset => drawColourOffsetBacking.IsValid ? drawColourOffsetBacking.Value : drawColourOffsetBacking.Value = computeDrawColourOffset();
-
-            private Colour4 computeDrawColourOffset()
-            {
-                if (Parent is IColouredDimmable colouredDimmableParent)
-                    return colouredDimmableParent.DrawColourOffset;
-
-                return Colour4.Black;
-            }
-
             public DrawableVideo(Stream stream, bool startAtCurrentTime = true)
                 : base(stream, startAtCurrentTime)
             {
-                AddLayout(drawColourOffsetBacking);
             }
 
-            private partial class DrawableVideoSprite : VideoSprite
+            private partial class DrawableVideoSprite : VideoSprite, IColouredDimmable
             {
                 private readonly Video video;
-
-                private LayoutValue<Colour4> drawColourOffsetBacking = new LayoutValue<Colour4>(Invalidation.DrawNode | Invalidation.Colour | Invalidation.DrawInfo | Invalidation.RequiredParentSizeToFit | Invalidation.Presence);
-
-                public Colour4 DrawColourOffset => drawColourOffsetBacking.IsValid ? drawColourOffsetBacking.Value : drawColourOffsetBacking.Value = computeDrawColourOffset();
-
-                private Colour4 computeDrawColourOffset()
-                {
-                    // Direct Parent is a Container, so we need to go up two levels to get the DrawableVideo.
-                    if (Parent?.Parent is IColouredDimmable colouredDimmableParent)
-                        return colouredDimmableParent.DrawColourOffset;
-
-                    return Colour4.Black;
-                }
 
                 protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
                 {
@@ -205,8 +165,6 @@ namespace osu.Game.Storyboards.Drawables
                     : base(video)
                 {
                     this.video = video;
-
-                    AddLayout(drawColourOffsetBacking);
                 }
 
                 [BackgroundDependencyLoader]
@@ -233,7 +191,7 @@ namespace osu.Game.Storyboards.Drawables
                     {
                         base.ApplyState();
 
-                        drawColourOffset = Source.DrawColourOffset;
+                        drawColourOffset = (Source as IColouredDimmable).DrawColourOffset;
                     }
 
                     private IUniformBuffer<DimParameters>? dimParametersBuffer;
