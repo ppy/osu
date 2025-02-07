@@ -41,7 +41,7 @@ namespace osu.Game.Utils
         {
             this.game = game;
 
-            if (!game.IsDeployedBuild || !game.CreateEndpoints().WebsiteRootUrl.EndsWith(@".ppy.sh", StringComparison.Ordinal))
+            if (!game.IsDeployedBuild || !game.CreateEndpoints().WebsiteUrl.EndsWith(@".ppy.sh", StringComparison.Ordinal))
                 return;
 
             sentrySession = SentrySdk.Init(options =>
