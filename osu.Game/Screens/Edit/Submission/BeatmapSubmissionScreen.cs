@@ -76,10 +76,10 @@ namespace osu.Game.Screens.Edit.Submission
         private RoundedButton backButton = null!;
 
         private uint? beatmapSetId;
+        private MemoryStream? beatmapPackageStream;
 
         private SubmissionBeatmapExporter legacyBeatmapExporter = null!;
         private ProgressNotification? exportProgressNotification;
-        private MemoryStream beatmapPackageStream = null!;
         private ProgressNotification? updateProgressNotification;
 
         [BackgroundDependencyLoader]
@@ -189,7 +189,6 @@ namespace osu.Game.Screens.Edit.Submission
                     }
                 }
             });
-            beatmapPackageStream = new MemoryStream();
         }
 
         private void createBeatmapSet()
@@ -239,10 +238,12 @@ namespace osu.Game.Screens.Edit.Submission
         private async Task createBeatmapPackage(ICollection<BeatmapSetFile> onlineFiles)
         {
             Debug.Assert(ThreadSafety.IsUpdateThread);
+
             exportStep.SetInProgress();
 
             try
             {
+                beatmapPackageStream = new MemoryStream();
                 await legacyBeatmapExporter.ExportToStreamAsync(Beatmap.Value.BeatmapSetInfo.ToLive(realmAccess), beatmapPackageStream, exportProgressNotification = new ProgressNotification())
                                            .ConfigureAwait(true);
             }
@@ -266,6 +267,7 @@ namespace osu.Game.Screens.Edit.Submission
         private async Task patchBeatmapSet(ICollection<BeatmapSetFile> onlineFiles)
         {
             Debug.Assert(beatmapSetId != null);
+            Debug.Assert(beatmapPackageStream != null);
 
             var onlineFilesByFilename = onlineFiles.ToDictionary(f => f.Filename, f => f.SHA2Hash);
 
@@ -320,6 +322,7 @@ namespace osu.Game.Screens.Edit.Submission
         private void replaceBeatmapSet()
         {
             Debug.Assert(beatmapSetId != null);
+            Debug.Assert(beatmapPackageStream != null);
 
             var uploadRequest = new ReplaceBeatmapPackageRequest(beatmapSetId.Value, beatmapPackageStream.ToArray());
 
@@ -347,6 +350,8 @@ namespace osu.Game.Screens.Edit.Submission
         private async Task updateLocalBeatmap()
         {
             Debug.Assert(beatmapSetId != null);
+            Debug.Assert(beatmapPackageStream != null);
+
             updateStep.SetInProgress();
 
             Live<BeatmapSetInfo>? importedSet;
@@ -419,6 +424,13 @@ namespace osu.Game.Screens.Edit.Submission
             base.OnEntering(e);
 
             overlay.Show();
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            beatmapPackageStream?.Dispose();
         }
     }
 }
