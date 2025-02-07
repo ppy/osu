@@ -5,14 +5,25 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Screens.Select;
+using osu.Game.Screens.Select.Filter;
 using osu.Game.Screens.SelectV2;
+using osuTK;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.SongSelect
 {
     [TestFixture]
-    public partial class TestSceneBeatmapCarouselV2Selection : BeatmapCarouselV2TestScene
+    public partial class TestSceneBeatmapCarouselV2NoGrouping : BeatmapCarouselV2TestScene
     {
+        [SetUpSteps]
+        public void SetUpSteps()
+        {
+            RemoveAllBeatmaps();
+            CreateCarousel();
+            SortBy(new FilterCriteria { Sort = SortMode.Title });
+        }
+
         /// <summary>
         /// Keyboard selection via up and down arrows doesn't actually change the selection until
         /// the select key is pressed.
@@ -77,28 +88,26 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             object? selection = null;
 
-            AddStep("store drawable selection", () => selection = getSelectedPanel()?.Item?.Model);
+            AddStep("store drawable selection", () => selection = GetSelectedPanel()?.Item?.Model);
 
             CheckHasSelection();
             AddAssert("drawable selection non-null", () => selection, () => Is.Not.Null);
             AddAssert("drawable selection matches carousel selection", () => selection, () => Is.EqualTo(Carousel.CurrentSelection));
 
             RemoveAllBeatmaps();
-            AddUntilStep("no drawable selection", getSelectedPanel, () => Is.Null);
+            AddUntilStep("no drawable selection", GetSelectedPanel, () => Is.Null);
 
             AddBeatmaps(10);
             WaitForDrawablePanels();
 
             CheckHasSelection();
-            AddAssert("no drawable selection", getSelectedPanel, () => Is.Null);
+            AddAssert("no drawable selection", GetSelectedPanel, () => Is.Null);
 
             AddStep("add previous selection", () => BeatmapSets.Add(((BeatmapInfo)selection!).BeatmapSet!));
 
             AddAssert("selection matches original carousel selection", () => selection, () => Is.EqualTo(Carousel.CurrentSelection));
-            AddUntilStep("drawable selection restored", () => getSelectedPanel()?.Item?.Model, () => Is.EqualTo(selection));
-            AddAssert("carousel item is visible", () => getSelectedPanel()?.Item?.IsVisible, () => Is.True);
-
-            BeatmapPanel? getSelectedPanel() => Carousel.ChildrenOfType<BeatmapPanel>().SingleOrDefault(p => p.Selected.Value);
+            AddUntilStep("drawable selection restored", () => GetSelectedPanel()?.Item?.Model, () => Is.EqualTo(selection));
+            AddAssert("carousel item is visible", () => GetSelectedPanel()?.Item?.IsVisible, () => Is.True);
         }
 
         [Test]
@@ -141,7 +150,11 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             SelectPrevPanel();
             SelectPrevGroup();
-            WaitForSelection(0, 0);
+            WaitForSelection(1, 0);
+
+            SelectPrevPanel();
+            SelectNextGroup();
+            WaitForSelection(1, 0);
         }
 
         [Test]
@@ -192,6 +205,36 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             SelectPrevGroup();
             CheckNoSelection();
+        }
+
+        [Test]
+        public void TestInputHandlingWithinGaps()
+        {
+            AddBeatmaps(2, 5);
+            WaitForDrawablePanels();
+
+            AddAssert("no beatmaps visible", () => !GetVisiblePanels<BeatmapPanel>().Any());
+
+            // Clicks just above the first group panel should not actuate any action.
+            ClickVisiblePanelWithOffset<BeatmapSetPanel>(0, new Vector2(0, -(BeatmapSetPanel.HEIGHT / 2 + 1)));
+
+            AddAssert("no beatmaps visible", () => !GetVisiblePanels<BeatmapPanel>().Any());
+
+            ClickVisiblePanelWithOffset<BeatmapSetPanel>(0, new Vector2(0, -(BeatmapSetPanel.HEIGHT / 2)));
+
+            AddUntilStep("wait for beatmaps visible", () => GetVisiblePanels<BeatmapPanel>().Any());
+            WaitForSelection(0, 0);
+
+            // Beatmap panels expand their selection area to cover holes from spacing.
+            ClickVisiblePanelWithOffset<BeatmapPanel>(1, new Vector2(0, -(CarouselItem.DEFAULT_HEIGHT / 2 + 1)));
+            WaitForSelection(0, 0);
+
+            // Panels with higher depth will handle clicks in the gutters for simplicity.
+            ClickVisiblePanelWithOffset<BeatmapPanel>(2, new Vector2(0, (CarouselItem.DEFAULT_HEIGHT / 2 + 1)));
+            WaitForSelection(0, 2);
+
+            ClickVisiblePanelWithOffset<BeatmapPanel>(3, new Vector2(0, (CarouselItem.DEFAULT_HEIGHT / 2 + 1)));
+            WaitForSelection(0, 3);
         }
 
         private void checkSelectionIterating(bool isIterating)

@@ -24,7 +24,7 @@ namespace osu.Game.Online.Spectator
 
         public OnlineSpectatorClient(EndpointConfiguration endpoints)
         {
-            endpoint = endpoints.SpectatorEndpointUrl;
+            endpoint = endpoints.SpectatorUrl;
         }
 
         [BackgroundDependencyLoader]

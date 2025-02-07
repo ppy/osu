@@ -24,6 +24,19 @@ namespace osu.Game.Screens.SelectV2
         private Box activationFlash = null!;
         private OsuSpriteText text = null!;
 
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
+        {
+            var inputRectangle = DrawRectangle;
+
+            // Cover the gaps introduced by the spacing between BeatmapPanels so that clicks will not fall through the carousel.
+            //
+            // Caveat is that for simplicity, we are covering the full spacing, so panels with frontmost depth will have a slightly
+            // larger hit target.
+            inputRectangle = inputRectangle.Inflate(new MarginPadding { Vertical = BeatmapCarousel.SPACING });
+
+            return inputRectangle.Contains(ToLocalSpace(screenSpacePos));
+        }
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -86,13 +99,7 @@ namespace osu.Game.Screens.SelectV2
 
         protected override bool OnClick(ClickEvent e)
         {
-            if (carousel.CurrentSelection != Item!.Model)
-            {
-                carousel.CurrentSelection = Item!.Model;
-                return true;
-            }
-
-            carousel.TryActivateSelection();
+            carousel.Activate(Item!);
             return true;
         }
 

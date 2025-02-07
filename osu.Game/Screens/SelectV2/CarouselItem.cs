@@ -30,6 +30,11 @@ namespace osu.Game.Screens.SelectV2
         public float DrawHeight { get; set; } = DEFAULT_HEIGHT;
 
         /// <summary>
+        /// Defines the display depth relative to other <see cref="CarouselItem"/>s.
+        /// </summary>
+        public int DepthLayer { get; set; }
+
+        /// <summary>
         /// Whether this item is visible or hidden.
         /// </summary>
         public bool IsVisible { get; set; } = true;

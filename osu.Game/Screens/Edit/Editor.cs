@@ -1264,7 +1264,7 @@ namespace osu.Game.Screens.Edit
 
             bool isSetMadeOfLegacyRulesetBeatmaps = (isNewBeatmap && Ruleset.Value.IsLegacyRuleset())
                                                     || (!isNewBeatmap && Beatmap.Value.BeatmapSetInfo.Beatmaps.All(b => b.Ruleset.IsLegacyRuleset()));
-            bool submissionAvailable = api.EndpointConfiguration.BeatmapSubmissionServiceUrl != null;
+            bool submissionAvailable = api.Endpoints.BeatmapSubmissionServiceUrl != null;
 
             if (isSetMadeOfLegacyRulesetBeatmaps && submissionAvailable)
             {
