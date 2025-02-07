@@ -300,5 +300,5 @@ namespace osu.Game.Screens.SelectV2
         #endregion
     }
 
-    public record GroupDefinition(string Title);
+    public record GroupDefinition(object Data, string Title);
 }
