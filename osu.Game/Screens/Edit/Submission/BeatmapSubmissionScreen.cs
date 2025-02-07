@@ -420,7 +420,7 @@ namespace osu.Game.Screens.Edit.Submission
                     s.Push(new EditorLoader());
                 }, [typeof(MainMenu)]);
 
-                return true;
+                return false;
             }
 
             return base.OnExiting(e);
