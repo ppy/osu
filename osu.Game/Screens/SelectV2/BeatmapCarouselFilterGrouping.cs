@@ -48,8 +48,8 @@ namespace osu.Game.Screens.SelectV2
                 BeatmapInfo? lastBeatmap = null;
                 GroupDefinition? lastGroup = null;
 
-                HashSet<CarouselItem>? groupRefItems = null;
-                HashSet<CarouselItem>? setRefItems = null;
+                HashSet<CarouselItem>? currentGroupItems = null;
+                HashSet<CarouselItem>? currentSetItems = null;
 
                 BeatmapSetsGroupedTogether = criteria.Group != GroupMode.Difficulty;
 
@@ -62,10 +62,10 @@ namespace osu.Game.Screens.SelectV2
                     if (createGroupIfRequired(criteria, beatmap, lastGroup) is GroupDefinition newGroup)
                     {
                         // When reaching a new group, ensure we reset any beatmap set tracking.
-                        setRefItems = null;
+                        currentSetItems = null;
                         lastBeatmap = null;
 
-                        groupItems[newGroup] = groupRefItems = new HashSet<CarouselItem>();
+                        groupItems[newGroup] = currentGroupItems = new HashSet<CarouselItem>();
                         lastGroup = newGroup;
 
                         addItem(new CarouselItem(newGroup)
@@ -81,7 +81,7 @@ namespace osu.Game.Screens.SelectV2
 
                         if (newBeatmapSet)
                         {
-                            setItems[beatmap.BeatmapSet!] = setRefItems = new HashSet<CarouselItem>();
+                            setItems[beatmap.BeatmapSet!] = currentSetItems = new HashSet<CarouselItem>();
 
                             addItem(new CarouselItem(beatmap.BeatmapSet!)
                             {
@@ -98,10 +98,10 @@ namespace osu.Game.Screens.SelectV2
                     {
                         newItems.Add(i);
 
-                        groupRefItems?.Add(i);
-                        setRefItems?.Add(i);
+                        currentGroupItems?.Add(i);
+                        currentSetItems?.Add(i);
 
-                        i.IsVisible = i.Model is GroupDefinition || (lastGroup == null && (i.Model is BeatmapSetInfo || setRefItems == null));
+                        i.IsVisible = i.Model is GroupDefinition || (lastGroup == null && (i.Model is BeatmapSetInfo || currentSetItems == null));
                     }
                 }
 
