@@ -28,8 +28,11 @@ namespace osu.Game.Screens.SelectV2
         {
             var inputRectangle = DrawRectangle;
 
-            // Cover the gaps introduced by the spacing between BeatmapPanels.
-            inputRectangle = inputRectangle.Inflate(new MarginPadding { Vertical = BeatmapCarousel.SPACING / 2f });
+            // Cover the gaps introduced by the spacing between BeatmapPanels so that clicks will not fall through the carousel.
+            //
+            // Caveat is that for simplicity, we are covering the full spacing, so panels with frontmost depth will have a slightly
+            // larger hit target.
+            inputRectangle = inputRectangle.Inflate(new MarginPadding { Vertical = BeatmapCarousel.SPACING });
 
             return inputRectangle.Contains(ToLocalSpace(screenSpacePos));
         }
