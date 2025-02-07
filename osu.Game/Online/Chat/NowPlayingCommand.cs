@@ -95,7 +95,7 @@ namespace osu.Game.Online.Chat
 
             string getBeatmapPart()
             {
-                return beatmapOnlineID > 0 ? $"[{api.WebsiteRootUrl}/b/{beatmapOnlineID} {beatmapDisplayTitle}]" : beatmapDisplayTitle;
+                return beatmapOnlineID > 0 ? $"[{api.Endpoints.WebsiteUrl}/b/{beatmapOnlineID} {beatmapDisplayTitle}]" : beatmapDisplayTitle;
             }
 
             string getRulesetPart()

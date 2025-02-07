@@ -436,7 +436,7 @@ namespace osu.Game.Online.Leaderboards
                     items.Add(new OsuMenuItem("Use these mods", MenuItemType.Highlighted, () => songSelect.Mods.Value = Score.Mods));
 
                 if (Score.OnlineID > 0)
-                    items.Add(new OsuMenuItem(CommonStrings.CopyLink, MenuItemType.Standard, () => clipboard?.SetText($@"{api.WebsiteRootUrl}/scores/{Score.OnlineID}")));
+                    items.Add(new OsuMenuItem(CommonStrings.CopyLink, MenuItemType.Standard, () => clipboard?.SetText($@"{api.Endpoints.WebsiteUrl}/scores/{Score.OnlineID}")));
 
                 if (Score.Files.Count > 0)
                 {

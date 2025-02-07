@@ -47,7 +47,7 @@ namespace osu.Game.Online.Metadata
 
         public OnlineMetadataClient(EndpointConfiguration endpoints)
         {
-            endpoint = endpoints.MetadataEndpointUrl;
+            endpoint = endpoints.MetadataUrl;
         }
 
         [BackgroundDependencyLoader]
