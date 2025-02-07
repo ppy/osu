@@ -129,9 +129,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             double combinedRating = combinedDifficultyValue(rhythm, reading, colour, stamina, isRelax, isConvert);
             double starRating = rescale(combinedRating * 1.4);
 
-            HitWindows hitWindows = new TaikoHitWindows();
-            hitWindows.SetDifficulty(beatmap.Difficulty.OverallDifficulty);
-
             TaikoDifficultyAttributes attributes = new TaikoDifficultyAttributes
             {
                 StarRating = starRating,
@@ -144,8 +141,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 RhythmTopStrains = rhythmDifficultStrains,
                 ColourTopStrains = colourDifficultStrains,
                 StaminaTopStrains = staminaDifficultStrains,
-                GreatHitWindow = hitWindows.WindowFor(HitResult.Great) / clockRate,
-                OkHitWindow = hitWindows.WindowFor(HitResult.Ok) / clockRate,
                 MaxCombo = beatmap.GetMaxCombo(),
             };
 
