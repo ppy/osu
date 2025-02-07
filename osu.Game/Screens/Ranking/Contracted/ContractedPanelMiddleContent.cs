@@ -11,13 +11,15 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
+using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Resources.Localisation.Web;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
-using osu.Game.Screens.Play.HUD;
 using osu.Game.Users;
 using osu.Game.Users.Drawables;
 using osu.Game.Utils;
@@ -134,14 +136,33 @@ namespace osu.Game.Screens.Ranking.Contracted
                                                 createStatistic(BeatmapsetsStrings.ShowScoreboardHeadersAccuracy, $"{score.Accuracy.FormatAccuracy()}"),
                                             }
                                         },
-                                        new ModFlowDisplay
+                                        new FillFlowContainer
                                         {
                                             Anchor = Anchor.TopCentre,
                                             Origin = Anchor.TopCentre,
-                                            AutoSizeAxes = Axes.Y,
                                             RelativeSizeAxes = Axes.X,
-                                            Current = { Value = score.Mods },
-                                            IconScale = 0.5f,
+                                            AutoSizeAxes = Axes.Y,
+                                            Direction = FillDirection.Full,
+                                            Spacing = new Vector2(3),
+                                            ChildrenEnumerable =
+                                            [
+                                                new DifficultyIcon(score.BeatmapInfo!, score.Ruleset)
+                                                {
+                                                    Anchor = Anchor.TopCentre,
+                                                    Origin = Anchor.TopCentre,
+                                                    Size = new Vector2(20),
+                                                    TooltipType = DifficultyIconTooltipType.Extended,
+                                                    Margin = new MarginPadding { Right = 2 }
+                                                },
+                                                ..
+                                                score.Mods.AsOrdered().Select(m => new ModIcon(m)
+                                                {
+                                                    Anchor = Anchor.TopCentre,
+                                                    Origin = Anchor.TopCentre,
+                                                    Scale = new Vector2(0.3f),
+                                                    Margin = new MarginPadding { Top = -6 }
+                                                })
+                                            ]
                                         }
                                     }
                                 }
