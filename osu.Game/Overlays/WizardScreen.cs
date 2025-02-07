@@ -7,15 +7,16 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Localisation;
 using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osuTK;
 
-namespace osu.Game.Overlays.FirstRunSetup
+namespace osu.Game.Overlays
 {
-    public abstract partial class FirstRunSetupScreen : Screen
+    public abstract partial class WizardScreen : Screen
     {
         private const float offset = 100;
 
@@ -102,5 +103,7 @@ namespace osu.Game.Overlays.FirstRunSetup
 
             base.OnSuspending(e);
         }
+
+        public virtual LocalisableString? NextStepText => null;
     }
 }

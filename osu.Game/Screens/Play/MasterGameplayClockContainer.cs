@@ -12,6 +12,7 @@ using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Overlays;
+using osu.Game.Storyboards;
 
 namespace osu.Game.Screens.Play
 {
@@ -53,11 +54,9 @@ namespace osu.Game.Screens.Play
 
         private readonly Bindable<bool> playbackRateValid = new Bindable<bool>(true);
 
-        private readonly WorkingBeatmap beatmap;
+        private readonly IBeatmap beatmap;
 
         private Track track;
-
-        private readonly double skipTargetTime;
 
         [Resolved]
         private MusicController musicController { get; set; } = null!;
@@ -65,38 +64,37 @@ namespace osu.Game.Screens.Play
         /// <summary>
         /// Create a new master gameplay clock container.
         /// </summary>
-        /// <param name="beatmap">The beatmap to be used for time and metadata references.</param>
-        /// <param name="skipTargetTime">The latest time which should be used when introducing gameplay. Will be used when skipping forward.</param>
-        public MasterGameplayClockContainer(WorkingBeatmap beatmap, double skipTargetTime)
-            : base(beatmap.Track, applyOffsets: true, requireDecoupling: true)
+        /// <param name="working">The beatmap to be used for time and metadata references.</param>
+        /// <param name="gameplayStartTime">The latest time which should be used when introducing gameplay. Will be used when skipping forward.</param>
+        public MasterGameplayClockContainer(WorkingBeatmap working, double gameplayStartTime)
+            : base(working.Track, applyOffsets: true, requireDecoupling: true)
         {
-            this.beatmap = beatmap;
-            this.skipTargetTime = skipTargetTime;
+            beatmap = working.Beatmap;
+            track = working.Track;
 
-            track = beatmap.Track;
-
-            StartTime = findEarliestStartTime();
+            GameplayStartTime = gameplayStartTime;
+            StartTime = findEarliestStartTime(gameplayStartTime, beatmap, working.Storyboard);
         }
 
-        private double findEarliestStartTime()
+        private static double findEarliestStartTime(double gameplayStartTime, IBeatmap beatmap, Storyboard storyboard)
         {
             // here we are trying to find the time to start playback from the "zero" point.
             // generally this is either zero, or some point earlier than zero in the case of storyboards, lead-ins etc.
 
             // start with the originally provided latest time (if before zero).
-            double time = Math.Min(0, skipTargetTime);
+            double time = Math.Min(0, gameplayStartTime);
 
             // if a storyboard is present, it may dictate the appropriate start time by having events in negative time space.
             // this is commonly used to display an intro before the audio track start.
-            double? firstStoryboardEvent = beatmap.Storyboard.EarliestEventTime;
+            double? firstStoryboardEvent = storyboard.EarliestEventTime;
             if (firstStoryboardEvent != null)
                 time = Math.Min(time, firstStoryboardEvent.Value);
 
             // some beatmaps specify a current lead-in time which should be used instead of the ruleset-provided value when available.
             // this is not available as an option in the live editor but can still be applied via .osu editing.
-            double firstHitObjectTime = beatmap.Beatmap.HitObjects.First().StartTime;
-            if (beatmap.Beatmap.AudioLeadIn > 0)
-                time = Math.Min(time, firstHitObjectTime - beatmap.Beatmap.AudioLeadIn);
+            double firstHitObjectTime = beatmap.HitObjects.First().StartTime;
+            if (beatmap.AudioLeadIn > 0)
+                time = Math.Min(time, firstHitObjectTime - beatmap.AudioLeadIn);
 
             return time;
         }
@@ -119,10 +117,10 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public void Skip()
         {
-            if (GameplayClock.CurrentTime > skipTargetTime - MINIMUM_SKIP_TIME)
+            if (GameplayClock.CurrentTime > GameplayStartTime - MINIMUM_SKIP_TIME)
                 return;
 
-            double skipTarget = skipTargetTime - MINIMUM_SKIP_TIME;
+            double skipTarget = GameplayStartTime - MINIMUM_SKIP_TIME;
 
             if (StartTime < -10000 && GameplayClock.CurrentTime < 0 && skipTarget > 6000)
                 // double skip exception for storyboards with very long intros
@@ -138,7 +136,7 @@ namespace osu.Game.Screens.Play
         {
             removeAdjustmentsFromTrack();
 
-            track = new TrackVirtual(beatmap.Track.Length);
+            track = new TrackVirtual(track.Length);
             track.Seek(CurrentTime);
             if (IsRunning)
                 track.Start();
@@ -187,7 +185,8 @@ namespace osu.Game.Screens.Play
                     }
                     else
                     {
-                        Logger.Log($"Playback discrepancy detected ({playbackDiscrepancyCount} of allowed {allowed_playback_discrepancies}): {elapsedGameplayClockTime:N1} vs {elapsedValidationTime:N1}");
+                        Logger.Log(
+                            $"Playback discrepancy detected ({playbackDiscrepancyCount} of allowed {allowed_playback_discrepancies}): {elapsedGameplayClockTime:N1} vs {elapsedValidationTime:N1}");
                     }
 
                     elapsedValidationTime = null;
@@ -229,9 +228,8 @@ namespace osu.Game.Screens.Play
             removeAdjustmentsFromTrack();
         }
 
-        ControlPointInfo IBeatSyncProvider.ControlPoints => beatmap.Beatmap.ControlPointInfo;
+        ControlPointInfo IBeatSyncProvider.ControlPoints => beatmap.ControlPointInfo;
+        ChannelAmplitudes IHasAmplitudes.CurrentAmplitudes => track.CurrentAmplitudes;
         IClock IBeatSyncProvider.Clock => this;
-
-        ChannelAmplitudes IHasAmplitudes.CurrentAmplitudes => beatmap.TrackLoaded ? beatmap.Track.CurrentAmplitudes : ChannelAmplitudes.Empty;
     }
 }

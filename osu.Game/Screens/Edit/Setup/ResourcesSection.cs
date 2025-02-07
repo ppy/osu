@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays;
 using osu.Game.Localisation;
@@ -97,7 +98,17 @@ namespace osu.Game.Screens.Edit.Setup
             if (!source.Exists)
                 return false;
 
-            var tagSource = TagLib.File.Create(source.FullName);
+            TagLib.File? tagSource;
+
+            try
+            {
+                tagSource = TagLib.File.Create(source.FullName);
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, "The selected audio track appears to be corrupted. Please select another one.");
+                return false;
+            }
 
             changeResource(source, applyToAllDifficulties, @"audio",
                 metadata => metadata.AudioFile,
@@ -192,16 +203,40 @@ namespace osu.Game.Screens.Edit.Setup
             editor?.Save();
         }
 
+        // to avoid scaring users, both background & audio choosers use fake `FileInfo`s with user-friendly filenames
+        // when displaying an imported beatmap rather than the actual SHA-named file in storage.
+        // however, that means that when a background or audio file is chosen that is broken or doesn't exist on disk when switching away from the fake files,
+        // the rollback could enter an infinite loop, because the fake `FileInfo`s *also* don't exist on disk - at least not in the fake location they indicate.
+        // to circumvent this issue, just allow rollback to proceed always without actually running any of the change logic to ensure visual consistency.
+        // note that this means that `Change{BackgroundImage,AudioTrack}()` are required to not have made any modifications to the beatmap files
+        // (or at least cleaned them up properly themselves) if they return `false`.
+        private bool rollingBackBackgroundChange;
+        private bool rollingBackAudioChange;
+
         private void backgroundChanged(ValueChangedEvent<FileInfo?> file)
         {
+            if (rollingBackBackgroundChange)
+                return;
+
             if (file.NewValue == null || !ChangeBackgroundImage(file.NewValue, backgroundChooser.ApplyToAllDifficulties.Value))
+            {
+                rollingBackBackgroundChange = true;
                 backgroundChooser.Current.Value = file.OldValue;
+                rollingBackBackgroundChange = false;
+            }
         }
 
         private void audioTrackChanged(ValueChangedEvent<FileInfo?> file)
         {
+            if (rollingBackAudioChange)
+                return;
+
             if (file.NewValue == null || !ChangeAudioTrack(file.NewValue, audioTrackChooser.ApplyToAllDifficulties.Value))
+            {
+                rollingBackAudioChange = true;
                 audioTrackChooser.Current.Value = file.OldValue;
+                rollingBackAudioChange = false;
+            }
         }
     }
 }

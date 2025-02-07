@@ -8,7 +8,7 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Mania
 {
-    [Cached] // Used for touch input, see ColumnTouchInputArea.
+    [Cached] // Used for touch input, see Column.OnTouchDown/OnTouchUp.
     public partial class ManiaInputManager : RulesetInputManager<ManiaAction>
     {
         public ManiaInputManager(RulesetInfo ruleset, int variant)

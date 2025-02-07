@@ -317,6 +317,9 @@ namespace osu.Game.Screens.Edit
                 workingBeatmapUpdated = true;
             });
 
+            var bookmarkController = new BookmarkController();
+            AddInternal(bookmarkController);
+
             OsuMenuItem undoMenuItem;
             OsuMenuItem redoMenuItem;
 
@@ -329,6 +332,18 @@ namespace osu.Game.Screens.Edit
             editorTimelineShowBreaks = config.GetBindable<bool>(OsuSetting.EditorTimelineShowBreaks);
             editorTimelineShowTicks = config.GetBindable<bool>(OsuSetting.EditorTimelineShowTicks);
             editorContractSidebars = config.GetBindable<bool>(OsuSetting.EditorContractSidebars);
+
+            // These two settings don't work together. Make them mutually exclusive to let the user know.
+            editorAutoSeekOnPlacement.BindValueChanged(enabled =>
+            {
+                if (enabled.NewValue)
+                    editorLimitedDistanceSnap.Value = false;
+            });
+            editorLimitedDistanceSnap.BindValueChanged(enabled =>
+            {
+                if (enabled.NewValue)
+                    editorAutoSeekOnPlacement.Value = false;
+            });
 
             AddInternal(new OsuContextMenuContainer
             {
@@ -430,29 +445,7 @@ namespace osu.Game.Screens.Edit
                                         Items = new MenuItem[]
                                         {
                                             new EditorMenuItem(EditorStrings.SetPreviewPointToCurrent, MenuItemType.Standard, SetPreviewPointToCurrentTime),
-                                            new EditorMenuItem(EditorStrings.Bookmarks)
-                                            {
-                                                Items = new MenuItem[]
-                                                {
-                                                    new EditorMenuItem(EditorStrings.AddBookmark, MenuItemType.Standard, addBookmarkAtCurrentTime)
-                                                    {
-                                                        Hotkey = new Hotkey(GlobalAction.EditorAddBookmark),
-                                                    },
-                                                    new EditorMenuItem(EditorStrings.RemoveClosestBookmark, MenuItemType.Destructive, removeBookmarksInProximityToCurrentTime)
-                                                    {
-                                                        Hotkey = new Hotkey(GlobalAction.EditorRemoveClosestBookmark)
-                                                    },
-                                                    new EditorMenuItem(EditorStrings.SeekToPreviousBookmark, MenuItemType.Standard, () => seekBookmark(-1))
-                                                    {
-                                                        Hotkey = new Hotkey(GlobalAction.EditorSeekToPreviousBookmark)
-                                                    },
-                                                    new EditorMenuItem(EditorStrings.SeekToNextBookmark, MenuItemType.Standard, () => seekBookmark(1))
-                                                    {
-                                                        Hotkey = new Hotkey(GlobalAction.EditorSeekToNextBookmark)
-                                                    },
-                                                    new EditorMenuItem(EditorStrings.ResetBookmarks, MenuItemType.Destructive, () => editorBeatmap.Bookmarks.Clear())
-                                                }
-                                            }
+                                            bookmarkController.Menu,
                                         }
                                     }
                                 }
@@ -788,14 +781,6 @@ namespace osu.Game.Screens.Edit
                 case GlobalAction.EditorSeekToNextSamplePoint:
                     seekSamplePoint(1);
                     return true;
-
-                case GlobalAction.EditorSeekToPreviousBookmark:
-                    seekBookmark(-1);
-                    return true;
-
-                case GlobalAction.EditorSeekToNextBookmark:
-                    seekBookmark(1);
-                    return true;
             }
 
             if (e.Repeat)
@@ -803,14 +788,6 @@ namespace osu.Game.Screens.Edit
 
             switch (e.Action)
             {
-                case GlobalAction.EditorAddBookmark:
-                    addBookmarkAtCurrentTime();
-                    return true;
-
-                case GlobalAction.EditorRemoveClosestBookmark:
-                    removeBookmarksInProximityToCurrentTime();
-                    return true;
-
                 case GlobalAction.EditorCloneSelection:
                     Clone();
                     return true;
@@ -841,19 +818,6 @@ namespace osu.Game.Screens.Edit
             }
 
             return false;
-        }
-
-        private void addBookmarkAtCurrentTime()
-        {
-            int bookmark = (int)clock.CurrentTimeAccurate;
-            int idx = editorBeatmap.Bookmarks.BinarySearch(bookmark);
-            if (idx < 0)
-                editorBeatmap.Bookmarks.Insert(~idx, bookmark);
-        }
-
-        private void removeBookmarksInProximityToCurrentTime()
-        {
-            editorBeatmap.Bookmarks.RemoveAll(b => Math.Abs(b - clock.CurrentTimeAccurate) < 2000);
         }
 
         public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
@@ -1188,16 +1152,6 @@ namespace osu.Game.Screens.Edit
 
             if (found != null)
                 clock.SeekSmoothlyTo(found.StartTime);
-        }
-
-        private void seekBookmark(int direction)
-        {
-            int? targetBookmark = direction < 1
-                ? editorBeatmap.Bookmarks.Cast<int?>().LastOrDefault(b => b < clock.CurrentTimeAccurate)
-                : editorBeatmap.Bookmarks.Cast<int?>().FirstOrDefault(b => b > clock.CurrentTimeAccurate);
-
-            if (targetBookmark != null)
-                clock.SeekSmoothlyTo(targetBookmark.Value);
         }
 
         private void seekSamplePoint(int direction)
