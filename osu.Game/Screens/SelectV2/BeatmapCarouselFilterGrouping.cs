@@ -51,16 +51,7 @@ namespace osu.Game.Screens.SelectV2
                 HashSet<CarouselItem>? groupRefItems = null;
                 HashSet<CarouselItem>? setRefItems = null;
 
-                switch (criteria.Group)
-                {
-                    default:
-                        BeatmapSetsGroupedTogether = true;
-                        break;
-
-                    case GroupMode.Difficulty:
-                        BeatmapSetsGroupedTogether = false;
-                        break;
-                }
+                BeatmapSetsGroupedTogether = criteria.Group != GroupMode.Difficulty;
 
                 foreach (var item in items)
                 {
