@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Framework.Logging;
 using osu.Game.Graphics;
@@ -62,6 +63,7 @@ namespace osu.Game.Overlays.Login
                                 },
                                 codeTextBox = new OsuTextBox
                                 {
+                                    InputProperties = new TextInputProperties(TextInputType.Code),
                                     PlaceholderText = "Enter code",
                                     RelativeSizeAxes = Axes.X,
                                     TabbableContentContainer = this,
