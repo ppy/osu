@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Rhythm
             }
 
             double actualRatio = current.DeltaTime / previous.DeltaTime;
-            double closestRatio = common_ratios.OrderBy(r => Math.Abs(r - actualRatio)).First();
+            double closestRatio = common_ratios.MinBy(r => Math.Abs(r - actualRatio));
 
             Ratio = closestRatio;
         }
@@ -63,8 +63,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Rhythm
         /// <item>speeding up is <i>generally</i> harder than slowing down (with exceptions of rhythm changes requiring a hand switch).</item>
         /// </list>
         /// </remarks>
-        private static readonly double[] common_ratios = new[]
-        {
+        private static readonly double[] common_ratios =
+        [
             1.0 / 1,
             2.0 / 1,
             1.0 / 2,
@@ -74,6 +74,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Rhythm
             2.0 / 3,
             5.0 / 4,
             4.0 / 5
-        };
+        ];
     }
 }
