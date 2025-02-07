@@ -114,25 +114,25 @@ namespace osu.Game.Screens.Edit.Submission
                             {
                                 createSetStep = new SubmissionStageProgress
                                 {
-                                    StageDescription = BeatmapSubmissionStrings.PreparingBeatmapSet,
+                                    StageDescription = BeatmapSubmissionStrings.Preparing,
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
                                 },
                                 exportStep = new SubmissionStageProgress
                                 {
-                                    StageDescription = BeatmapSubmissionStrings.ExportingBeatmapSet,
+                                    StageDescription = BeatmapSubmissionStrings.Exporting,
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
                                 },
                                 uploadStep = new SubmissionStageProgress
                                 {
-                                    StageDescription = BeatmapSubmissionStrings.UploadingBeatmapSetContents,
+                                    StageDescription = BeatmapSubmissionStrings.Uploading,
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
                                 },
                                 updateStep = new SubmissionStageProgress
                                 {
-                                    StageDescription = BeatmapSubmissionStrings.UpdatingLocalBeatmap,
+                                    StageDescription = BeatmapSubmissionStrings.Finishing,
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
                                 },

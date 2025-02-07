@@ -45,24 +45,24 @@ namespace osu.Game.Localisation
         public static LocalisableString ConfirmSubmission => new TranslatableString(getKey(@"confirm_submission"), @"Submit beatmap!");
 
         /// <summary>
-        /// "Exporting beatmap set in compatibility mode..."
+        /// "Exporting beatmap for compatibility..."
         /// </summary>
-        public static LocalisableString ExportingBeatmapSet => new TranslatableString(getKey(@"exporting_beatmap_set"), @"Exporting beatmap set in compatibility mode...");
+        public static LocalisableString Exporting => new TranslatableString(getKey(@"exporting"), @"Exporting beatmap for compatibility...");
 
         /// <summary>
-        /// "Preparing beatmap set online..."
+        /// "Preparing for upload..."
         /// </summary>
-        public static LocalisableString PreparingBeatmapSet => new TranslatableString(getKey(@"preparing_beatmap_set"), @"Preparing beatmap set online...");
+        public static LocalisableString Preparing => new TranslatableString(getKey(@"preparing"), @"Preparing for upload...");
 
         /// <summary>
-        /// "Uploading beatmap set contents..."
+        /// "Uploading beatmap contents..."
         /// </summary>
-        public static LocalisableString UploadingBeatmapSetContents => new TranslatableString(getKey(@"uploading_beatmap_set_contents"), @"Uploading beatmap set contents...");
+        public static LocalisableString Uploading => new TranslatableString(getKey(@"uploading"), @"Uploading beatmap contents...");
 
         /// <summary>
-        /// "Updating local beatmap with relevant changes..."
+        /// "Finishing up..."
         /// </summary>
-        public static LocalisableString UpdatingLocalBeatmap => new TranslatableString(getKey(@"updating_local_beatmap"), @"Updating local beatmap with relevant changes...");
+        public static LocalisableString Finishing => new TranslatableString(getKey(@"finishing"), @"Finishing up...");
 
         /// <summary>
         /// "Before you continue, we ask you to check whether the content you are uploading has been cleared for upload. Please understand that you are responsible for the content you upload to the platform and if in doubt, should ask permission from the creators before uploading!"
@@ -140,9 +140,9 @@ namespace osu.Game.Localisation
         public static LocalisableString LoadInBrowserAfterSubmission => new TranslatableString(getKey(@"load_in_browser_after_submission"), @"Load in browser after submission");
 
         /// <summary>
-        /// "Note: In order to make it possible for users of all osu! versions to enjoy your beatmap, it will be exported in a backwards-compatible format. While we have made efforts to ensure that that process keeps the beatmap playable in its intended form, some data related to features that previous versions of osu! do not support may be lost."
+        /// "Note: In order to make it possible for users of all osu! versions to enjoy your beatmap, it will be exported in a backwards-compatible format. While we have made efforts to ensure that process keeps the beatmap playable in its intended form, some data related to features that previous versions of osu! do not support may be lost."
         /// </summary>
-        public static LocalisableString LegacyExportDisclaimer => new TranslatableString(getKey(@"legacy_export_disclaimer"), @"Note: In order to make it possible for users of all osu! versions to enjoy your beatmap, it will be exported in a backwards-compatible format. While we have made efforts to ensure that that process keeps the beatmap playable in its intended form, some data related to features that previous versions of osu! do not support may be lost.");
+        public static LocalisableString LegacyExportDisclaimer => new TranslatableString(getKey(@"legacy_export_disclaimer"), @"Note: In order to make it possible for users of all osu! versions to enjoy your beatmap, it will be exported in a backwards-compatible format. While we have made efforts to ensure that process keeps the beatmap playable in its intended form, some data related to features that previous versions of osu! do not support may be lost.");
 
         /// <summary>
         /// "Empty beatmaps cannot be submitted."
