@@ -35,15 +35,13 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         {
             Action = () =>
             {
-                int[] ids = room.Playlist.Select(item => item.Beatmap.OnlineID).Where(onlineId => onlineId > 0).ToArray();
-
-                if (ids.Length == 0)
+                if (room.Playlist.Count == 0)
                 {
                     notifications?.Post(new SimpleErrorNotification { Text = "Cannot add local beatmaps" });
                     return;
                 }
 
-                string filter = string.Join(" OR ", ids.Select(id => $"(OnlineID == {id})"));
+                string filter = string.Join(" OR ", room.Playlist.Select(item => $"(OnlineID == {item.Beatmap.OnlineID})").Distinct());
                 var beatmaps = realmAccess.Realm.All<BeatmapInfo>().Filter(filter).ToList();
 
                 var collection = realmAccess.Realm.All<BeatmapCollection>().FirstOrDefault(c => c.Name == room.Name);
