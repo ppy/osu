@@ -8,6 +8,7 @@ using osu.Framework.Extensions;
 using osu.Game.Collections;
 using osu.Game.Database;
 using osu.Game.Graphics;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
@@ -18,6 +19,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
     public partial class AddPlaylistToCollectionButton : RoundedButton
     {
         private readonly Room room;
+
+        private LoadingLayer loading = null!;
 
         [Resolved]
         private RealmAccess realmAccess { get; set; } = null!;
@@ -39,6 +42,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         {
             BackgroundColour = colours.Gray5;
 
+            Add(loading = new LoadingLayer(true, false));
+
             Action = () =>
             {
                 int[] ids = room.Playlist.Select(item => item.Beatmap.OnlineID).Where(onlineId => onlineId > 0).ToArray();
@@ -49,6 +54,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                     return;
                 }
 
+                Enabled.Value = false;
+                loading.Show();
                 beatmapLookupCache.GetBeatmapsAsync(ids).ContinueWith(task => Schedule(() =>
                 {
                     var beatmaps = task.GetResultSafely().Where(item => item?.BeatmapSet != null).ToList();
@@ -71,6 +78,9 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                             notifications?.Post(new SimpleNotification { Text = $"Updated playlist: {room.Name}" });
                         });
                     }
+
+                    loading.Hide();
+                    Enabled.Value = true;
                 }), TaskContinuationOptions.OnlyOnRanToCompletion);
             };
         }
