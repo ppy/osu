@@ -284,6 +284,13 @@ namespace osu.Game.Screens.Play
                 return Task.CompletedTask;
             }
 
+            // zero scores should also never be submitted.
+            if (score.ScoreInfo.TotalScore == 0)
+            {
+                Logger.Log("Zero score, skipping score submission");
+                return Task.CompletedTask;
+            }
+
             // mind the timing of this.
             // once `scoreSubmissionSource` is created, it is presumed that submission is taking place in the background,
             // so all exceptional circumstances that would disallow submission must be handled above.
