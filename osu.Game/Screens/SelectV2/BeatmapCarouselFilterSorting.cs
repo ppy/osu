@@ -36,7 +36,7 @@ namespace osu.Game.Screens.SelectV2
                 switch (criteria.Sort)
                 {
                     case SortMode.Artist:
-                        comparison = OrdinalSortByCaseStringComparer.DEFAULT.Compare(ab.BeatmapSet!.Metadata.Artist, bb.BeatmapSet!.Metadata.Artist);
+                        comparison = OrdinalSortByCaseStringComparer.DEFAULT.Compare(ab.Metadata.Artist, bb.Metadata.Artist);
                         if (comparison == 0)
                             goto case SortMode.Title;
                         break;
@@ -46,7 +46,7 @@ namespace osu.Game.Screens.SelectV2
                         break;
 
                     case SortMode.Title:
-                        comparison = OrdinalSortByCaseStringComparer.DEFAULT.Compare(ab.BeatmapSet!.Metadata.Title, bb.BeatmapSet!.Metadata.Title);
+                        comparison = OrdinalSortByCaseStringComparer.DEFAULT.Compare(ab.Metadata.Title, bb.Metadata.Title);
                         break;
 
                     default:

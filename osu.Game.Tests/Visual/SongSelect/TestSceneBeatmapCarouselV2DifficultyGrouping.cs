@@ -75,7 +75,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             RemoveAllBeatmaps();
             AddUntilStep("no drawable selection", GetSelectedPanel, () => Is.Null);
 
-            AddBeatmaps(10);
+            AddBeatmaps(3);
             WaitForDrawablePanels();
 
             CheckHasSelection();
@@ -95,7 +95,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
-        public void TestGroupSelectionOnHeader()
+        public void TestGroupSelectionOnHeaderKeyboard()
         {
             SelectNextGroup();
             WaitForGroupSelection(0, 0);
@@ -112,6 +112,26 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             WaitForGroupSelection(0, 0);
             AddAssert("keyboard selected panel is expanded", () => GetKeyboardSelectedPanel()?.Expanded.Value, () => Is.True);
+        }
+
+        [Test]
+        public void TestGroupSelectionOnHeaderMouse()
+        {
+            SelectNextGroup();
+            WaitForGroupSelection(0, 0);
+
+            AddAssert("keyboard selected panel is beatmap", GetKeyboardSelectedPanel, Is.TypeOf<BeatmapPanel>);
+            AddAssert("selected panel is beatmap", GetSelectedPanel, Is.TypeOf<BeatmapPanel>);
+
+            ClickVisiblePanel<GroupPanel>(0);
+            AddAssert("keyboard selected panel is group", GetKeyboardSelectedPanel, Is.TypeOf<GroupPanel>);
+            AddAssert("keyboard selected panel is contracted", () => GetKeyboardSelectedPanel()?.Expanded.Value, () => Is.False);
+
+            ClickVisiblePanel<GroupPanel>(0);
+            AddAssert("keyboard selected panel is group", GetKeyboardSelectedPanel, Is.TypeOf<GroupPanel>);
+            AddAssert("keyboard selected panel is expanded", () => GetKeyboardSelectedPanel()?.Expanded.Value, () => Is.True);
+
+            AddAssert("selected panel is still beatmap", GetSelectedPanel, Is.TypeOf<BeatmapPanel>);
         }
 
         [Test]
