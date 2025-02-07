@@ -8,6 +8,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
 using osu.Game.Screens.SelectV2;
+using osuTK;
 
 namespace osu.Game.Tests.Visual.SongSelect
 {
@@ -145,6 +146,29 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             SelectPrevGroup();
             WaitForGroupSelection(2, 9);
+        }
+
+        [Test]
+        public void TestInputHandlingWithinGaps()
+        {
+            AddAssert("no beatmaps visible", () => !GetVisiblePanels<BeatmapPanel>().Any());
+
+            // Clicks just above the first group panel should not actuate any action.
+            ClickVisiblePanelWithOffset<GroupPanel>(0, new Vector2(0, -(GroupPanel.HEIGHT / 2 + 1)));
+
+            AddAssert("no beatmaps visible", () => !GetVisiblePanels<BeatmapPanel>().Any());
+
+            ClickVisiblePanelWithOffset<GroupPanel>(0, new Vector2(0, -(GroupPanel.HEIGHT / 2)));
+
+            AddUntilStep("wait for beatmaps visible", () => GetVisiblePanels<BeatmapPanel>().Any());
+            CheckNoSelection();
+
+            // Beatmap panels expand their selection area to cover holes from spacing.
+            ClickVisiblePanelWithOffset<BeatmapPanel>(0, new Vector2(0, -(CarouselItem.DEFAULT_HEIGHT / 2 + 1)));
+            WaitForGroupSelection(0, 0);
+
+            ClickVisiblePanelWithOffset<BeatmapPanel>(1, new Vector2(0, (CarouselItem.DEFAULT_HEIGHT / 2 + 1)));
+            WaitForGroupSelection(0, 1);
         }
     }
 }
