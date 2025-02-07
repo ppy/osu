@@ -41,10 +41,10 @@ namespace osu.Game.Online.API
 
         public string ProvidedUsername => LocalUser.Value.Username;
 
-        public EndpointConfiguration EndpointConfiguration { get; } = new EndpointConfiguration
+        public EndpointConfiguration Endpoints { get; } = new EndpointConfiguration
         {
-            APIEndpointUrl = "http://localhost",
-            WebsiteRootUrl = "http://localhost",
+            APIUrl = "http://localhost",
+            WebsiteUrl = "http://localhost",
         };
 
         public int APIVersion => int.Parse(DateTime.Now.ToString("yyyyMMdd"));

@@ -15,10 +15,10 @@ namespace osu.Game.Online.API.Requests
             get
             {
                 // can be removed once the service has been successfully deployed to production
-                if (API!.EndpointConfiguration.BeatmapSubmissionServiceUrl == null)
+                if (API!.Endpoints.BeatmapSubmissionServiceUrl == null)
                     throw new NotSupportedException("Beatmap submission not supported in this configuration!");
 
-                return $@"{API!.EndpointConfiguration.BeatmapSubmissionServiceUrl!}/beatmapsets/{BeatmapSetID}";
+                return $@"{API!.Endpoints.BeatmapSubmissionServiceUrl!}/beatmapsets/{BeatmapSetID}";
             }
         }
 
