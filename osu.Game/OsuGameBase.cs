@@ -295,7 +295,7 @@ namespace osu.Game
 
             EndpointConfiguration endpoints = CreateEndpoints();
 
-            MessageFormatter.WebsiteRootUrl = endpoints.WebsiteRootUrl;
+            MessageFormatter.WebsiteRootUrl = endpoints.WebsiteUrl;
 
             frameworkLocale = frameworkConfig.GetBindable<string>(FrameworkSetting.Locale);
             frameworkLocale.BindValueChanged(_ => updateLanguage());

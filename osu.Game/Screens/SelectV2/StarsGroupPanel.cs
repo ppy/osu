@@ -144,16 +144,16 @@ namespace osu.Game.Screens.SelectV2
 
             Debug.Assert(Item != null);
 
-            StarsGroupDefinition group = (StarsGroupDefinition)Item.Model;
+            int starNumber = (int)((GroupDefinition)Item.Model).Data;
 
-            Color4 colour = group.StarNumber >= 9 ? OsuColour.Gray(0.2f) : colours.ForStarDifficulty(group.StarNumber);
-            Color4 contentColour = group.StarNumber >= 7 ? colours.Orange1 : colourProvider.Background5;
+            Color4 colour = starNumber >= 9 ? OsuColour.Gray(0.2f) : colours.ForStarDifficulty(starNumber);
+            Color4 contentColour = starNumber >= 7 ? colours.Orange1 : colourProvider.Background5;
 
             panel.AccentColour = colour;
             contentBackground.Colour = colour.Darken(0.3f);
 
-            starRatingDisplay.Current.Value = new StarDifficulty(group.StarNumber, 0);
-            starCounter.Current = group.StarNumber;
+            starRatingDisplay.Current.Value = new StarDifficulty(starNumber, 0);
+            starCounter.Current = starNumber;
 
             chevronIcon.Colour = contentColour;
             starCounter.Colour = contentColour;

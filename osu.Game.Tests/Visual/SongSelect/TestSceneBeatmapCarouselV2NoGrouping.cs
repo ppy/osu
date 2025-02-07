@@ -1,11 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Screens.Select;
+using osu.Game.Screens.Select.Filter;
 using osu.Game.Screens.SelectV2;
 using osuTK;
 using osuTK.Input;
@@ -13,8 +14,16 @@ using osuTK.Input;
 namespace osu.Game.Tests.Visual.SongSelect
 {
     [TestFixture]
-    public partial class TestSceneBeatmapCarouselV2Selection : BeatmapCarouselV2TestScene
+    public partial class TestSceneBeatmapCarouselV2NoGrouping : BeatmapCarouselV2TestScene
     {
+        [SetUpSteps]
+        public void SetUpSteps()
+        {
+            RemoveAllBeatmaps();
+            CreateCarousel();
+            SortBy(new FilterCriteria { Sort = SortMode.Title });
+        }
+
         /// <summary>
         /// Keyboard selection via up and down arrows doesn't actually change the selection until
         /// the select key is pressed.
@@ -79,27 +88,26 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             object? selection = null;
 
-            AddStep("store drawable selection", () => selection = getSelectedPanel()?.Item?.Model);
+            AddStep("store drawable selection", () => selection = GetSelectedPanel()?.Item?.Model);
 
             CheckHasSelection();
             AddAssert("drawable selection non-null", () => selection, () => Is.Not.Null);
             AddAssert("drawable selection matches carousel selection", () => selection, () => Is.EqualTo(Carousel.CurrentSelection));
 
             RemoveAllBeatmaps();
-            AddUntilStep("no drawable selection", getSelectedPanel, () => Is.Null);
+            AddUntilStep("no drawable selection", GetSelectedPanel, () => Is.Null);
 
             AddBeatmaps(10);
             WaitForDrawablePanels();
 
             CheckHasSelection();
-            AddAssert("no drawable selection", getSelectedPanel, () => Is.Null);
+            AddAssert("no drawable selection", GetSelectedPanel, () => Is.Null);
 
             AddStep("add previous selection", () => BeatmapSets.Add(((BeatmapInfo)selection!).BeatmapSet!));
 
-            AddUntilStep("drawable selection restored", () => getSelectedPanel()?.Item?.Model, () => Is.EqualTo(selection));
-            AddAssert("drawable selection matches carousel selection", () => selection, () => Is.EqualTo(Carousel.CurrentSelection));
-
-            BeatmapPanel? getSelectedPanel() => Carousel.ChildrenOfType<BeatmapPanel>().SingleOrDefault(p => p.Selected.Value);
+            AddAssert("selection matches original carousel selection", () => selection, () => Is.EqualTo(Carousel.CurrentSelection));
+            AddUntilStep("drawable selection restored", () => GetSelectedPanel()?.Item?.Model, () => Is.EqualTo(selection));
+            AddAssert("carousel item is visible", () => GetSelectedPanel()?.Item?.IsVisible, () => Is.True);
         }
 
         [Test]
@@ -128,6 +136,25 @@ namespace osu.Game.Tests.Visual.SongSelect
             WaitForSelection(total_set_count - 1, 0);
             SelectNextGroup();
             WaitForSelection(0, 0);
+        }
+
+        [Test]
+        public void TestGroupSelectionOnHeader()
+        {
+            AddBeatmaps(10, 3);
+            WaitForDrawablePanels();
+
+            SelectNextGroup();
+            SelectNextGroup();
+            WaitForSelection(1, 0);
+
+            SelectPrevPanel();
+            SelectPrevGroup();
+            WaitForSelection(1, 0);
+
+            SelectPrevPanel();
+            SelectNextGroup();
+            WaitForSelection(1, 0);
         }
 
         [Test]
@@ -185,26 +212,29 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             AddBeatmaps(2, 5);
             WaitForDrawablePanels();
-            SelectNextGroup();
 
-            clickOnDifficulty(0, 1, p => new Vector2(p.LayoutRectangle.Centre.X, -1f));
-            WaitForSelection(0, 1);
+            AddAssert("no beatmaps visible", () => !GetVisiblePanels<BeatmapPanel>().Any());
 
-            clickOnDifficulty(0, 0, p => new Vector2(p.LayoutRectangle.Centre.X, BeatmapPanel.HEIGHT + 1f));
+            // Clicks just above the first group panel should not actuate any action.
+            ClickVisiblePanelWithOffset<BeatmapSetPanel>(0, new Vector2(0, -(BeatmapSetPanel.HEIGHT / 2 + 1)));
+
+            AddAssert("no beatmaps visible", () => !GetVisiblePanels<BeatmapPanel>().Any());
+
+            ClickVisiblePanelWithOffset<BeatmapSetPanel>(0, new Vector2(0, -(BeatmapSetPanel.HEIGHT / 2)));
+
+            AddUntilStep("wait for beatmaps visible", () => GetVisiblePanels<BeatmapPanel>().Any());
             WaitForSelection(0, 0);
 
-            clickOnDifficulty(0, 1, p => p.LayoutRectangle.Centre);
-            WaitForSelection(0, 1);
-
-            clickOnSet(0, p => new Vector2(p.LayoutRectangle.Centre.X, BeatmapSetPanel.HEIGHT + 1f));
+            // Beatmap panels expand their selection area to cover holes from spacing.
+            ClickVisiblePanelWithOffset<BeatmapPanel>(1, new Vector2(0, -(CarouselItem.DEFAULT_HEIGHT / 2 + 1)));
             WaitForSelection(0, 0);
 
-            AddStep("scroll to end", () => Scroll.ScrollToEnd(false));
-            clickOnDifficulty(0, 4, p => new Vector2(p.LayoutRectangle.Centre.X, BeatmapPanel.HEIGHT + 1f));
-            WaitForSelection(0, 4);
+            // Panels with higher depth will handle clicks in the gutters for simplicity.
+            ClickVisiblePanelWithOffset<BeatmapPanel>(2, new Vector2(0, (CarouselItem.DEFAULT_HEIGHT / 2 + 1)));
+            WaitForSelection(0, 2);
 
-            clickOnSet(1, p => new Vector2(p.LayoutRectangle.Centre.X, -1f));
-            WaitForSelection(1, 0);
+            ClickVisiblePanelWithOffset<BeatmapPanel>(3, new Vector2(0, (CarouselItem.DEFAULT_HEIGHT / 2 + 1)));
+            WaitForSelection(0, 3);
         }
 
         private void checkSelectionIterating(bool isIterating)
@@ -219,28 +249,6 @@ namespace osu.Game.Tests.Visual.SongSelect
                 else
                     AddUntilStep("selection not changed", () => Carousel.CurrentSelection == selection);
             }
-        }
-
-        private void clickOnSet(int set, Func<BeatmapSetPanel, Vector2> pos)
-        {
-            AddStep($"click on set{set}", () =>
-            {
-                var model = BeatmapSets[set];
-                var panel = this.ChildrenOfType<BeatmapSetPanel>().Single(b => ReferenceEquals(b.Item!.Model, model));
-                InputManager.MoveMouseTo(panel.ToScreenSpace(pos(panel)));
-                InputManager.Click(MouseButton.Left);
-            });
-        }
-
-        private void clickOnDifficulty(int set, int diff, Func<BeatmapPanel, Vector2> pos)
-        {
-            AddStep($"click on set{set} diff{diff}", () =>
-            {
-                var model = BeatmapSets[set].Beatmaps[diff];
-                var panel = this.ChildrenOfType<BeatmapPanel>().Single(b => ReferenceEquals(b.Item!.Model, model));
-                InputManager.MoveMouseTo(panel.ToScreenSpace(pos(panel)));
-                InputManager.Click(MouseButton.Left);
-            });
         }
     }
 }

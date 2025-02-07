@@ -54,7 +54,7 @@ namespace osu.Game.Overlays.Wiki
                     Padding = new MarginPadding(padding),
                     Child = new WikiPanelMarkdownContainer(isFullWidth)
                     {
-                        CurrentPath = $@"{api.WebsiteRootUrl}/wiki/",
+                        CurrentPath = $@"{api.Endpoints.WebsiteUrl}/wiki/",
                         Text = text,
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y

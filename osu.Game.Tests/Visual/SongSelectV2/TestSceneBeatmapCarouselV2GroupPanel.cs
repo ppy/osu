@@ -31,49 +31,49 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 {
                     new GroupPanel
                     {
-                        Item = new CarouselItem(new GroupDefinition("Group A"))
+                        Item = new CarouselItem(new GroupDefinition('A', "Group A"))
                     },
                     new GroupPanel
                     {
-                        Item = new CarouselItem(new GroupDefinition("Group A")),
+                        Item = new CarouselItem(new GroupDefinition('A', "Group A")),
                         KeyboardSelected = { Value = true }
                     },
                     new GroupPanel
                     {
-                        Item = new CarouselItem(new GroupDefinition("Group A")),
+                        Item = new CarouselItem(new GroupDefinition('A', "Group A")),
                         Expanded = { Value = true }
                     },
                     new GroupPanel
                     {
-                        Item = new CarouselItem(new GroupDefinition("Group A")),
+                        Item = new CarouselItem(new GroupDefinition('A', "Group A")),
                         KeyboardSelected = { Value = true },
                         Expanded = { Value = true }
                     },
                     new StarsGroupPanel
                     {
-                        Item = new CarouselItem(new StarsGroupDefinition(1))
+                        Item = new CarouselItem(new GroupDefinition(1, "1"))
                     },
                     new StarsGroupPanel
                     {
-                        Item = new CarouselItem(new StarsGroupDefinition(3)),
+                        Item = new CarouselItem(new GroupDefinition(3, "3")),
                         Expanded = { Value = true }
                     },
                     new StarsGroupPanel
                     {
-                        Item = new CarouselItem(new StarsGroupDefinition(5)),
+                        Item = new CarouselItem(new GroupDefinition(5, "5")),
                     },
                     new StarsGroupPanel
                     {
-                        Item = new CarouselItem(new StarsGroupDefinition(7)),
+                        Item = new CarouselItem(new GroupDefinition(7, "7")),
                         Expanded = { Value = true }
                     },
                     new StarsGroupPanel
                     {
-                        Item = new CarouselItem(new StarsGroupDefinition(8)),
+                        Item = new CarouselItem(new GroupDefinition(8, "8")),
                     },
                     new StarsGroupPanel
                     {
-                        Item = new CarouselItem(new StarsGroupDefinition(9)),
+                        Item = new CarouselItem(new GroupDefinition(9, "9")),
                         Expanded = { Value = true }
                     },
                 }

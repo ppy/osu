@@ -86,7 +86,7 @@ namespace osu.Game.Screens.SelectV2
 
             InternalChild = panel = new CarouselPanelPiece(standalone_x_offset)
             {
-                Action = onAction,
+                Action = () => carousel?.Activate(Item!),
                 Icon = difficultyIcon = new ConstrainedIconContainer
                 {
                     Size = new Vector2(20),
@@ -292,17 +292,6 @@ namespace osu.Game.Screens.SelectV2
             panel.AccentColour = colours.ForStarDifficulty(starDifficulty.Stars);
             difficultyIcon.FadeColour(starDifficulty.Stars > 6.5f ? colours.Orange1 : colourProvider.Background5, duration, Easing.OutQuint);
             difficultyStarRating.Current.Value = starDifficulty;
-        }
-
-        private void onAction()
-        {
-            if (carousel == null)
-                return;
-
-            if (carousel.CurrentSelection != Item!.Model)
-                carousel.CurrentSelection = Item!.Model;
-            else
-                carousel.TryActivateSelection();
         }
 
         #region ICarouselPanel

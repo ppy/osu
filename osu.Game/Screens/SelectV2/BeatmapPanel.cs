@@ -57,6 +57,19 @@ namespace osu.Game.Screens.SelectV2
         [Resolved]
         private BeatmapCarousel? carousel { get; set; }
 
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
+        {
+            var inputRectangle = DrawRectangle;
+
+            // Cover the gaps introduced by the spacing between BeatmapPanels so that clicks will not fall through the carousel.
+            //
+            // Caveat is that for simplicity, we are covering the full spacing, so panels with frontmost depth will have a slightly
+            // larger hit target.
+            inputRectangle = inputRectangle.Inflate(new MarginPadding { Vertical = BeatmapCarousel.SPACING / 2f });
+
+            return inputRectangle.Contains(ToLocalSpace(screenSpacePos));
+        }
+
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; } = null!;
 
@@ -75,7 +88,7 @@ namespace osu.Game.Screens.SelectV2
 
             InternalChild = panel = new CarouselPanelPiece(difficulty_x_offset)
             {
-                Action = onAction,
+                Action = () => carousel?.Activate(Item!),
                 Icon = difficultyIcon = new ConstrainedIconContainer
                 {
                     Size = new Vector2(20),
@@ -249,17 +262,6 @@ namespace osu.Game.Screens.SelectV2
             var starRatingColour = colours.ForStarDifficulty(starDifficulty.Stars);
             starCounter.FadeColour(starRatingColour, duration, Easing.OutQuint);
             panel.AccentColour = starRatingColour;
-        }
-
-        private void onAction()
-        {
-            if (carousel == null)
-                return;
-
-            if (carousel.CurrentSelection != Item!.Model)
-                carousel.CurrentSelection = Item!.Model;
-            else
-                carousel.TryActivateSelection();
         }
 
         #region ICarouselPanel
