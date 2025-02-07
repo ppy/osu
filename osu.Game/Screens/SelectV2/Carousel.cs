@@ -124,6 +124,11 @@ namespace osu.Game.Screens.SelectV2
         /// <param name="item"></param>
         public void Activate(CarouselItem item)
         {
+            // Regardless of how the item handles activation, update keyboard selection to the activated panel.
+            // In other words, when a panel is clicked, keyboard selection should default to matching the clicked
+            // item.
+            setKeyboardSelection(item.Model);
+
             (GetMaterialisedDrawableForItem(item) as ICarouselPanel)?.Activated();
             HandleItemActivated(item);
 
