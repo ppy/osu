@@ -20,11 +20,22 @@ namespace osu.Game.Screens.SelectV2
     [Cached]
     public partial class BeatmapCarousel : Carousel<BeatmapInfo>
     {
+        public const float SPACING = 5f;
+
         private IBindableList<BeatmapSetInfo> detachedBeatmaps = null!;
 
         private readonly LoadingLayer loading;
 
         private readonly BeatmapCarouselFilterGrouping grouping;
+
+        protected override float GetSpacingBetweenPanels(CarouselItem top, CarouselItem bottom)
+        {
+            if (top.Model is BeatmapInfo || bottom.Model is BeatmapInfo)
+                // Beatmap difficulty panels do not overlap with themselves or any other panel.
+                return SPACING;
+
+            return -SPACING;
+        }
 
         public BeatmapCarousel()
         {
@@ -289,5 +300,5 @@ namespace osu.Game.Screens.SelectV2
         #endregion
     }
 
-    public record GroupDefinition(string Title);
+    public record GroupDefinition(object Data, string Title);
 }

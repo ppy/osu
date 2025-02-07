@@ -77,7 +77,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 Task.Run(() =>
                 {
                     for (int j = 0; j < count; j++)
-                        generated.Add(TestResources.CreateTestBeatmapSetInfo(RNG.Next(1, 4)));
+                        generated.Add(CreateTestBeatmapSetInfo(3, true));
                 }).ConfigureAwait(true);
             });
 

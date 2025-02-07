@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -20,6 +21,7 @@ using osu.Game.Screens.Select;
 using osu.Game.Screens.SelectV2;
 using osu.Game.Tests.Beatmaps;
 using osu.Game.Tests.Resources;
+using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
 using BeatmapCarousel = osu.Game.Screens.SelectV2.BeatmapCarousel;
@@ -136,8 +138,8 @@ namespace osu.Game.Tests.Visual.SongSelect
         protected void CheckNoSelection() => AddAssert("has no selection", () => Carousel.CurrentSelection, () => Is.Null);
         protected void CheckHasSelection() => AddAssert("has selection", () => Carousel.CurrentSelection, () => Is.Not.Null);
 
-        protected BeatmapPanel? GetSelectedPanel() => Carousel.ChildrenOfType<BeatmapPanel>().SingleOrDefault(p => p.Selected.Value);
-        protected GroupPanel? GetKeyboardSelectedPanel() => Carousel.ChildrenOfType<GroupPanel>().SingleOrDefault(p => p.KeyboardSelected.Value);
+        protected ICarouselPanel? GetSelectedPanel() => Carousel.ChildrenOfType<ICarouselPanel>().SingleOrDefault(p => p.Selected.Value);
+        protected ICarouselPanel? GetKeyboardSelectedPanel() => Carousel.ChildrenOfType<ICarouselPanel>().SingleOrDefault(p => p.KeyboardSelected.Value);
 
         protected void WaitForGroupSelection(int group, int panel)
         {
@@ -164,6 +166,15 @@ namespace osu.Game.Tests.Visual.SongSelect
             });
         }
 
+        protected IEnumerable<T> GetVisiblePanels<T>()
+            where T : Drawable
+        {
+            return Carousel.ChildrenOfType<UserTrackingScrollContainer>().Single()
+                           .ChildrenOfType<T>()
+                           .Where(p => ((ICarouselPanel)p).Item?.IsVisible == true)
+                           .OrderBy(p => p.Y);
+        }
+
         protected void ClickVisiblePanel<T>(int index)
             where T : Drawable
         {
@@ -178,6 +189,23 @@ namespace osu.Game.Tests.Visual.SongSelect
             });
         }
 
+        protected void ClickVisiblePanelWithOffset<T>(int index, Vector2 positionOffsetFromCentre)
+            where T : Drawable
+        {
+            AddStep($"move mouse to panel {index} with offset {positionOffsetFromCentre}", () =>
+            {
+                var panel = Carousel.ChildrenOfType<UserTrackingScrollContainer>().Single()
+                                    .ChildrenOfType<T>()
+                                    .Where(p => ((ICarouselPanel)p).Item?.IsVisible == true)
+                                    .OrderBy(p => p.Y)
+                                    .ElementAt(index);
+
+                InputManager.MoveMouseTo(panel.ScreenSpaceDrawQuad.Centre + panel.ToScreenSpace(positionOffsetFromCentre) - panel.ToScreenSpace(Vector2.Zero));
+            });
+
+            AddStep("click", () => InputManager.Click(MouseButton.Left));
+        }
+
         /// <summary>
         /// Add requested beatmap sets count to list.
         /// </summary>
@@ -187,28 +215,31 @@ namespace osu.Game.Tests.Visual.SongSelect
         protected void AddBeatmaps(int count, int? fixedDifficultiesPerSet = null, bool randomMetadata = false) => AddStep($"add {count} beatmaps{(randomMetadata ? " with random data" : "")}", () =>
         {
             for (int i = 0; i < count; i++)
-            {
-                var beatmapSetInfo = TestResources.CreateTestBeatmapSetInfo(fixedDifficultiesPerSet ?? RNG.Next(1, 4));
-
-                if (randomMetadata)
-                {
-                    char randomCharacter = getRandomCharacter();
-
-                    var metadata = new BeatmapMetadata
-                    {
-                        // Create random metadata, then we can check if sorting works based on these
-                        Artist = $"{randomCharacter}ome Artist " + RNG.Next(0, 9),
-                        Title = $"{randomCharacter}ome Song (set id {beatmapSetInfo.OnlineID:000}) {Guid.NewGuid()}",
-                        Author = { Username = $"{randomCharacter}ome Guy " + RNG.Next(0, 9) },
-                    };
-
-                    foreach (var beatmap in beatmapSetInfo.Beatmaps)
-                        beatmap.Metadata = metadata.DeepClone();
-                }
-
-                BeatmapSets.Add(beatmapSetInfo);
-            }
+                BeatmapSets.Add(CreateTestBeatmapSetInfo(fixedDifficultiesPerSet, randomMetadata));
         });
+
+        protected static BeatmapSetInfo CreateTestBeatmapSetInfo(int? fixedDifficultiesPerSet, bool randomMetadata)
+        {
+            var beatmapSetInfo = TestResources.CreateTestBeatmapSetInfo(fixedDifficultiesPerSet ?? RNG.Next(1, 4));
+
+            if (randomMetadata)
+            {
+                char randomCharacter = getRandomCharacter();
+
+                var metadata = new BeatmapMetadata
+                {
+                    // Create random metadata, then we can check if sorting works based on these
+                    Artist = $"{randomCharacter}ome Artist " + RNG.Next(0, 9),
+                    Title = $"{randomCharacter}ome Song (set id {beatmapSetInfo.OnlineID:000}) {Guid.NewGuid()}",
+                    Author = { Username = $"{randomCharacter}ome Guy " + RNG.Next(0, 9) },
+                };
+
+                foreach (var beatmap in beatmapSetInfo.Beatmaps)
+                    beatmap.Metadata = metadata.DeepClone();
+            }
+
+            return beatmapSetInfo;
+        }
 
         private static long randomCharPointer;
 

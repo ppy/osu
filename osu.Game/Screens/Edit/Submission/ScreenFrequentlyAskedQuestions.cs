@@ -46,14 +46,14 @@ namespace osu.Game.Screens.Edit.Submission
                         RelativeSizeAxes = Axes.X,
                         Caption = BeatmapSubmissionStrings.MappingHelpForumDescription,
                         ButtonText = BeatmapSubmissionStrings.MappingHelpForum,
-                        Action = () => game?.OpenUrlExternally($@"{api.WebsiteRootUrl}/community/forums/56"),
+                        Action = () => game?.OpenUrlExternally($@"{api.Endpoints.WebsiteUrl}/community/forums/56"),
                     },
                     new FormButton
                     {
                         RelativeSizeAxes = Axes.X,
                         Caption = BeatmapSubmissionStrings.ModdingQueuesForumDescription,
                         ButtonText = BeatmapSubmissionStrings.ModdingQueuesForum,
-                        Action = () => game?.OpenUrlExternally($@"{api.WebsiteRootUrl}/community/forums/60"),
+                        Action = () => game?.OpenUrlExternally($@"{api.Endpoints.WebsiteUrl}/community/forums/60"),
                     },
                 },
             });

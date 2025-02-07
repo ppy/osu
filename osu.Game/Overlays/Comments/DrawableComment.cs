@@ -419,7 +419,7 @@ namespace osu.Game.Overlays.Comments
 
         private void copyUrl()
         {
-            clipboard.SetText($@"{api.APIEndpointUrl}/comments/{Comment.Id}");
+            clipboard.SetText($@"{api.Endpoints.APIUrl}/comments/{Comment.Id}");
             onScreenDisplay?.Display(new CopyUrlToast());
         }
 
