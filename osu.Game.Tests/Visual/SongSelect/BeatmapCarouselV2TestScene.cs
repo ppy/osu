@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -20,6 +21,7 @@ using osu.Game.Screens.Select;
 using osu.Game.Screens.SelectV2;
 using osu.Game.Tests.Beatmaps;
 using osu.Game.Tests.Resources;
+using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
 using BeatmapCarousel = osu.Game.Screens.SelectV2.BeatmapCarousel;
@@ -164,6 +166,15 @@ namespace osu.Game.Tests.Visual.SongSelect
             });
         }
 
+        protected IEnumerable<T> GetVisiblePanels<T>()
+            where T : Drawable
+        {
+            return Carousel.ChildrenOfType<UserTrackingScrollContainer>().Single()
+                           .ChildrenOfType<T>()
+                           .Where(p => ((ICarouselPanel)p).Item?.IsVisible == true)
+                           .OrderBy(p => p.Y);
+        }
+
         protected void ClickVisiblePanel<T>(int index)
             where T : Drawable
         {
@@ -176,6 +187,23 @@ namespace osu.Game.Tests.Visual.SongSelect
                         .ElementAt(index)
                         .TriggerClick();
             });
+        }
+
+        protected void ClickVisiblePanelWithOffset<T>(int index, Vector2 positionOffsetFromCentre)
+            where T : Drawable
+        {
+            AddStep($"move mouse to panel {index} with offset {positionOffsetFromCentre}", () =>
+            {
+                var panel = Carousel.ChildrenOfType<UserTrackingScrollContainer>().Single()
+                                    .ChildrenOfType<T>()
+                                    .Where(p => ((ICarouselPanel)p).Item?.IsVisible == true)
+                                    .OrderBy(p => p.Y)
+                                    .ElementAt(index);
+
+                InputManager.MoveMouseTo(panel.ScreenSpaceDrawQuad.Centre + panel.ToScreenSpace(positionOffsetFromCentre) - panel.ToScreenSpace(Vector2.Zero));
+            });
+
+            AddStep("click", () => InputManager.Click(MouseButton.Left));
         }
 
         /// <summary>
