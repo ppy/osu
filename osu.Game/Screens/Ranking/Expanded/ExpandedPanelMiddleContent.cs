@@ -41,7 +41,6 @@ namespace osu.Game.Screens.Ranking.Expanded
 
         private readonly List<StatisticDisplay> statisticDisplays = new List<StatisticDisplay>();
 
-        private FillFlowContainer starAndModDisplay;
         private RollingCounter<long> scoreCounter;
 
         [Resolved]
@@ -139,12 +138,35 @@ namespace osu.Game.Screens.Ranking.Expanded
                                 Alpha = 0,
                                 AlwaysPresent = true
                             },
-                            starAndModDisplay = new FillFlowContainer
+                            new FillFlowContainer
                             {
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
                                 AutoSizeAxes = Axes.Both,
                                 Spacing = new Vector2(5, 0),
+                                Children = new Drawable[]
+                                {
+                                    new StarRatingDisplay(beatmapDifficultyCache.GetDifficultyAsync(beatmap, score.Ruleset, score.Mods).GetResultSafely() ?? default)
+                                    {
+                                        Anchor = Anchor.CentreLeft,
+                                        Origin = Anchor.CentreLeft
+                                    },
+                                    new DifficultyIcon(beatmap, score.Ruleset)
+                                    {
+                                        Anchor = Anchor.CentreLeft,
+                                        Origin = Anchor.CentreLeft,
+                                        Size = new Vector2(20),
+                                        TooltipType = DifficultyIconTooltipType.Extended,
+                                    },
+                                    new ModDisplay
+                                    {
+                                        Anchor = Anchor.CentreLeft,
+                                        Origin = Anchor.CentreLeft,
+                                        ExpansionMode = ExpansionMode.AlwaysExpanded,
+                                        Scale = new Vector2(0.5f),
+                                        Current = { Value = score.Mods }
+                                    }
+                                }
                             },
                             new FillFlowContainer
                             {
@@ -225,29 +247,6 @@ namespace osu.Game.Screens.Ranking.Expanded
 
             if (score.Date != default)
                 AddInternal(new PlayedOnText(score.Date));
-
-            var starDifficulty = beatmapDifficultyCache.GetDifficultyAsync(beatmap, score.Ruleset, score.Mods).GetResultSafely();
-
-            if (starDifficulty != null)
-            {
-                starAndModDisplay.Add(new StarRatingDisplay(starDifficulty.Value)
-                {
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreLeft
-                });
-            }
-
-            if (score.Mods.Any())
-            {
-                starAndModDisplay.Add(new ModDisplay
-                {
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreLeft,
-                    ExpansionMode = ExpansionMode.AlwaysExpanded,
-                    Scale = new Vector2(0.5f),
-                    Current = { Value = score.Mods }
-                });
-            }
         }
 
         protected override void LoadComplete()

@@ -40,7 +40,7 @@ namespace osu.Game.Online.API
 
         private readonly Queue<APIRequest> queue = new Queue<APIRequest>();
 
-        public EndpointConfiguration EndpointConfiguration { get; }
+        public EndpointConfiguration Endpoints { get; }
 
         /// <summary>
         /// The API response version.
@@ -73,7 +73,7 @@ namespace osu.Game.Online.API
         private readonly CancellationTokenSource cancellationToken = new CancellationTokenSource();
         private readonly Logger log;
 
-        public APIAccess(OsuGameBase game, OsuConfigManager config, EndpointConfiguration endpointConfiguration, string versionHash)
+        public APIAccess(OsuGameBase game, OsuConfigManager config, EndpointConfiguration endpoints, string versionHash)
         {
             this.game = game;
             this.config = config;
@@ -87,13 +87,13 @@ namespace osu.Game.Online.API
                 APIVersion = now.Year * 10000 + now.Month * 100 + now.Day;
             }
 
-            EndpointConfiguration = endpointConfiguration;
+            Endpoints = endpoints;
             NotificationsClient = setUpNotificationsClient();
 
-            authentication = new OAuth(endpointConfiguration.APIClientID, endpointConfiguration.APIClientSecret, EndpointConfiguration.APIEndpointUrl);
+            authentication = new OAuth(endpoints.APIClientID, endpoints.APIClientSecret, Endpoints.APIUrl);
 
             log = Logger.GetLogger(LoggingTarget.Network);
-            log.Add($@"API endpoint root: {EndpointConfiguration.APIEndpointUrl}");
+            log.Add($@"API endpoint root: {Endpoints.APIUrl}");
             log.Add($@"API request version: {APIVersion}");
 
             ProvidedUsername = config.Get<string>(OsuSetting.Username);
@@ -405,7 +405,7 @@ namespace osu.Game.Online.API
 
             var req = new RegistrationRequest
             {
-                Url = $@"{EndpointConfiguration.APIEndpointUrl}/users",
+                Url = $@"{Endpoints.APIUrl}/users",
                 Method = HttpMethod.Post,
                 Username = username,
                 Email = email,

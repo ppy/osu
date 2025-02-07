@@ -53,7 +53,7 @@ namespace osu.Game.Online.API
         /// <summary>
         /// Holds configuration for online endpoints.
         /// </summary>
-        EndpointConfiguration EndpointConfiguration { get; }
+        EndpointConfiguration Endpoints { get; }
 
         /// <summary>
         /// The version of the API.

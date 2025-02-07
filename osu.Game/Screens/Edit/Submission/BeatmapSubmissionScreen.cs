@@ -299,7 +299,7 @@ namespace osu.Game.Screens.Edit.Submission
                 uploadStep.SetCompleted();
 
                 if (configManager.Get<bool>(OsuSetting.EditorSubmissionLoadInBrowserAfterSubmission))
-                    game?.OpenUrlExternally($"{api.EndpointConfiguration.WebsiteRootUrl}/beatmapsets/{beatmapSetId}");
+                    game?.OpenUrlExternally($"{api.Endpoints.WebsiteUrl}/beatmapsets/{beatmapSetId}");
 
                 await updateLocalBeatmap().ConfigureAwait(true);
             };
@@ -326,7 +326,7 @@ namespace osu.Game.Screens.Edit.Submission
                 uploadStep.SetCompleted();
 
                 if (configManager.Get<bool>(OsuSetting.EditorSubmissionLoadInBrowserAfterSubmission))
-                    game?.OpenUrlExternally($"{api.EndpointConfiguration.WebsiteRootUrl}/beatmapsets/{beatmapSetId}");
+                    game?.OpenUrlExternally($"{api.Endpoints.WebsiteUrl}/beatmapsets/{beatmapSetId}");
 
                 await updateLocalBeatmap().ConfigureAwait(true);
             };
