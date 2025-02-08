@@ -77,11 +77,14 @@ namespace osu.Game.Online.Rooms
         [CanBeNull]
         public MultiplayerScoresAround ScoresAround { get; set; }
 
-        public ScoreInfo CreateScoreInfo(ScoreManager scoreManager, RulesetStore rulesets, PlaylistItem playlistItem, [NotNull] BeatmapInfo beatmap)
+        [JsonProperty("ruleset_id")]
+        public int RulesetId { get; set; }
+
+        public ScoreInfo CreateScoreInfo(ScoreManager scoreManager, RulesetStore rulesets, [NotNull] BeatmapInfo beatmap)
         {
-            var ruleset = rulesets.GetRuleset(playlistItem.RulesetID);
+            var ruleset = rulesets.GetRuleset(RulesetId);
             if (ruleset == null)
-                throw new InvalidOperationException($"Couldn't create score with unknown ruleset: {playlistItem.RulesetID}");
+                throw new InvalidOperationException($"Couldn't create score with unknown ruleset: {RulesetId}");
 
             var rulesetInstance = ruleset.CreateInstance();
 
@@ -91,7 +94,7 @@ namespace osu.Game.Online.Rooms
                 TotalScore = TotalScore,
                 MaxCombo = MaxCombo,
                 BeatmapInfo = beatmap,
-                Ruleset = rulesets.GetRuleset(playlistItem.RulesetID) ?? throw new InvalidOperationException($"Ruleset with ID of {playlistItem.RulesetID} not found locally"),
+                Ruleset = ruleset,
                 Passed = Passed,
                 Statistics = Statistics,
                 MaximumStatistics = MaximumStatistics,

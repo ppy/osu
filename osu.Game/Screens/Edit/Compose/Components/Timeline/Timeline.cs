@@ -3,9 +3,9 @@
 
 using System;
 using osu.Framework.Allocation;
-using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Containers;
@@ -22,7 +22,7 @@ using osuTK.Input;
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
     [Cached]
-    public partial class Timeline : ZoomableScrollContainer, IPositionSnapProvider
+    public partial class Timeline : ZoomableScrollContainer
     {
         private const float timeline_height = 80;
 
@@ -49,10 +49,13 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         [Resolved]
         private EditorBeatmap editorBeatmap { get; set; } = null!;
 
+        [Resolved]
+        private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
+
         /// <summary>
         /// The timeline's scroll position in the last frame.
         /// </summary>
-        private float lastScrollPosition;
+        private double lastScrollPosition;
 
         /// <summary>
         /// The track time in the last frame.
@@ -86,8 +89,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private double trackLengthForZoom;
 
-        private readonly IBindable<Track> track = new Bindable<Track>();
-
         public Timeline(Drawable userContent)
         {
             this.userContent = userContent;
@@ -101,7 +102,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         }
 
         [BackgroundDependencyLoader]
-        private void load(IBindable<WorkingBeatmap> beatmap, OsuColour colours, OverlayColourProvider colourProvider, OsuConfigManager config)
+        private void load(OsuColour colours, OverlayColourProvider colourProvider, OsuConfigManager config)
         {
             CentreMarker centreMarker;
 
@@ -150,14 +151,16 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             controlPointsVisible = config.GetBindable<bool>(OsuSetting.EditorTimelineShowTimingChanges);
             ticksVisible = config.GetBindable<bool>(OsuSetting.EditorTimelineShowTicks);
 
-            track.BindTo(editorClock.Track);
-            track.BindValueChanged(_ =>
-            {
-                waveform.Waveform = beatmap.Value.Waveform;
-                Scheduler.AddOnce(applyVisualOffset, beatmap);
-            }, true);
+            editorClock.TrackChanged += updateWaveform;
+            updateWaveform();
 
             Zoom = (float)(defaultTimelineZoom * editorBeatmap.TimelineZoom);
+        }
+
+        private void updateWaveform()
+        {
+            waveform.Waveform = beatmap.Value.Waveform;
+            Scheduler.AddOnce(applyVisualOffset, beatmap);
         }
 
         private void applyVisualOffset(IBindable<WorkingBeatmap> beatmap)
@@ -319,7 +322,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         /// </summary>
         public double VisibleRange => editorClock.TrackLength / Zoom;
 
-        public double TimeAtPosition(float x)
+        public double TimeAtPosition(double x)
         {
             return x / Content.DrawWidth * editorClock.TrackLength;
         }
@@ -329,10 +332,18 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             return (float)(time / editorClock.TrackLength * Content.DrawWidth);
         }
 
-        public SnapResult FindSnappedPositionAndTime(Vector2 screenSpacePosition, SnapType snapType = SnapType.All)
+        public SnapResult FindSnappedPositionAndTime(Vector2 screenSpacePosition)
         {
             double time = TimeAtPosition(Content.ToLocalSpace(screenSpacePosition).X);
             return new SnapResult(screenSpacePosition, beatSnapProvider.SnapTime(time));
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (editorClock.IsNotNull())
+                editorClock.TrackChanged -= updateWaveform;
         }
     }
 }

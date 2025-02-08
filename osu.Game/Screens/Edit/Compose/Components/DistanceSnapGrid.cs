@@ -4,16 +4,16 @@
 #nullable disable
 
 using System;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Layout;
-using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
-using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 using osuTK;
 using osuTK.Graphics;
 
@@ -49,6 +49,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected readonly double? LatestEndTime;
 
+        [CanBeNull]
+        protected readonly IHasSliderVelocity SliderVelocitySource;
+
         [Resolved]
         protected OsuColour Colours { get; private set; }
 
@@ -61,33 +64,19 @@ namespace osu.Game.Screens.Edit.Compose.Components
         [Resolved]
         private BindableBeatDivisor beatDivisor { get; set; }
 
-        /// <summary>
-        /// When enabled, distance snap should only snap to the current time (as per the editor clock).
-        /// This is to emulate stable behaviour.
-        /// </summary>
-        protected Bindable<bool> LimitedDistanceSnap { get; private set; }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
-        {
-            LimitedDistanceSnap = config.GetBindable<bool>(OsuSetting.EditorLimitedDistanceSnap);
-        }
-
         private readonly LayoutValue gridCache = new LayoutValue(Invalidation.RequiredParentSizeToFit);
-
-        protected readonly HitObject ReferenceObject;
 
         /// <summary>
         /// Creates a new <see cref="DistanceSnapGrid"/>.
         /// </summary>
-        /// <param name="referenceObject">A reference object to gather relevant difficulty values from.</param>
         /// <param name="startPosition">The position at which the grid should start. The first tick is located one distance spacing length away from this point.</param>
         /// <param name="startTime">The snapping time at <see cref="StartPosition"/>.</param>
         /// <param name="endTime">The time at which the snapping grid should end. If null, the grid will continue until the bounds of the screen are exceeded.</param>
-        protected DistanceSnapGrid(HitObject referenceObject, Vector2 startPosition, double startTime, double? endTime = null)
+        /// <param name="sliderVelocitySource">The reference object with slider velocity to include in the calculations for distance snapping.</param>
+        protected DistanceSnapGrid(Vector2 startPosition, double startTime, double? endTime = null, [CanBeNull] IHasSliderVelocity sliderVelocitySource = null)
         {
-            ReferenceObject = referenceObject;
             LatestEndTime = endTime;
+            SliderVelocitySource = sliderVelocitySource;
 
             StartPosition = startPosition;
             StartTime = startTime;
@@ -110,14 +99,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private void updateSpacing()
         {
             float distanceSpacingMultiplier = (float)DistanceSpacingMultiplier.Value;
-            float beatSnapDistance = SnapProvider.GetBeatSnapDistanceAt(ReferenceObject, false);
+            float beatSnapDistance = SnapProvider.GetBeatSnapDistance(SliderVelocitySource);
 
             DistanceBetweenTicks = beatSnapDistance * distanceSpacingMultiplier;
 
             if (LatestEndTime == null)
                 MaxIntervals = int.MaxValue;
             else
-                MaxIntervals = (int)((LatestEndTime.Value - StartTime) / SnapProvider.DistanceToDuration(ReferenceObject, beatSnapDistance));
+                MaxIntervals = (int)((LatestEndTime.Value - StartTime) / SnapProvider.DistanceToDuration(beatSnapDistance, StartTime, SliderVelocitySource));
 
             gridCache.Invalidate();
         }
@@ -143,8 +132,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// Snaps a position to this grid.
         /// </summary>
         /// <param name="position">The original position in coordinate space local to this <see cref="DistanceSnapGrid"/>.</param>
+        /// <param name="fixedTime">
+        /// Whether the snap operation should be temporally constrained to a particular time instant,
+        /// thus fixing the possible positions to a set distance relative from the <see cref="StartTime"/>.
+        /// </param>
         /// <returns>A tuple containing the snapped position in coordinate space local to this <see cref="DistanceSnapGrid"/> and the respective time value.</returns>
-        public abstract (Vector2 position, double time) GetSnappedPosition(Vector2 position);
+        public abstract (Vector2 position, double time) GetSnappedPosition(Vector2 position, double? fixedTime = null);
 
         /// <summary>
         /// Retrieves the applicable colour for a beat index.

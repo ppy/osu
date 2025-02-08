@@ -8,10 +8,12 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays;
 using osu.Game.Localisation;
 using osu.Game.Models;
+using osu.Game.Screens.Backgrounds;
 using osu.Game.Utils;
 
 namespace osu.Game.Screens.Edit.Setup
@@ -34,6 +36,9 @@ namespace osu.Game.Screens.Edit.Setup
 
         [Resolved]
         private Editor? editor { get; set; }
+
+        [Resolved]
+        private SetupScreen setupScreen { get; set; } = null!;
 
         private SetupScreenHeaderBackground headerBackground = null!;
 
@@ -84,7 +89,7 @@ namespace osu.Game.Screens.Edit.Setup
                 (metadata, name) => metadata.BackgroundFile = name);
 
             headerBackground.UpdateBackground();
-            editor?.ApplyToBackground(bg => bg.RefreshBackground());
+            editor?.ApplyToBackground(bg => ((EditorBackgroundScreen)bg).RefreshBackground());
             return true;
         }
 
@@ -93,15 +98,47 @@ namespace osu.Game.Screens.Edit.Setup
             if (!source.Exists)
                 return false;
 
+            TagLib.File? tagSource;
+
+            try
+            {
+                tagSource = TagLib.File.Create(source.FullName);
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, "The selected audio track appears to be corrupted. Please select another one.");
+                return false;
+            }
+
             changeResource(source, applyToAllDifficulties, @"audio",
                 metadata => metadata.AudioFile,
-                (metadata, name) => metadata.AudioFile = name);
+                (metadata, name) =>
+                {
+                    metadata.AudioFile = name;
+
+                    string artist = tagSource.Tag.JoinedAlbumArtists;
+
+                    if (!string.IsNullOrWhiteSpace(artist))
+                    {
+                        metadata.ArtistUnicode = artist;
+                        metadata.Artist = MetadataUtils.StripNonRomanisedCharacters(metadata.ArtistUnicode);
+                    }
+
+                    string title = tagSource.Tag.Title;
+
+                    if (!string.IsNullOrEmpty(title))
+                    {
+                        metadata.TitleUnicode = title;
+                        metadata.Title = MetadataUtils.StripNonRomanisedCharacters(metadata.TitleUnicode);
+                    }
+                });
 
             music.ReloadCurrentTrack();
+            setupScreen.MetadataChanged?.Invoke();
             return true;
         }
 
-        private void changeResource(FileInfo source, bool applyToAllDifficulties, string baseFilename, Func<BeatmapMetadata, string> readFilename, Action<BeatmapMetadata, string> writeFilename)
+        private void changeResource(FileInfo source, bool applyToAllDifficulties, string baseFilename, Func<BeatmapMetadata, string> readFilename, Action<BeatmapMetadata, string> writeMetadata)
         {
             var set = working.Value.BeatmapSetInfo;
             var beatmap = working.Value.BeatmapInfo;
@@ -148,10 +185,7 @@ namespace osu.Game.Screens.Edit.Setup
             {
                 foreach (var b in otherBeatmaps)
                 {
-                    // This operation is quite expensive, so only perform it if required.
-                    if (readFilename(b.Metadata) == newFilename) continue;
-
-                    writeFilename(b.Metadata, newFilename);
+                    writeMetadata(b.Metadata, newFilename);
 
                     // save the difficulty to re-encode the .osu file, updating any reference of the old filename.
                     //
@@ -162,23 +196,47 @@ namespace osu.Game.Screens.Edit.Setup
                 }
             }
 
-            writeFilename(beatmap.Metadata, newFilename);
+            writeMetadata(beatmap.Metadata, newFilename);
 
             // editor change handler cannot be aware of any file changes or other difficulties having their metadata modified.
             // for simplicity's sake, trigger a save when changing any resource to ensure the change is correctly saved.
             editor?.Save();
         }
 
+        // to avoid scaring users, both background & audio choosers use fake `FileInfo`s with user-friendly filenames
+        // when displaying an imported beatmap rather than the actual SHA-named file in storage.
+        // however, that means that when a background or audio file is chosen that is broken or doesn't exist on disk when switching away from the fake files,
+        // the rollback could enter an infinite loop, because the fake `FileInfo`s *also* don't exist on disk - at least not in the fake location they indicate.
+        // to circumvent this issue, just allow rollback to proceed always without actually running any of the change logic to ensure visual consistency.
+        // note that this means that `Change{BackgroundImage,AudioTrack}()` are required to not have made any modifications to the beatmap files
+        // (or at least cleaned them up properly themselves) if they return `false`.
+        private bool rollingBackBackgroundChange;
+        private bool rollingBackAudioChange;
+
         private void backgroundChanged(ValueChangedEvent<FileInfo?> file)
         {
+            if (rollingBackBackgroundChange)
+                return;
+
             if (file.NewValue == null || !ChangeBackgroundImage(file.NewValue, backgroundChooser.ApplyToAllDifficulties.Value))
+            {
+                rollingBackBackgroundChange = true;
                 backgroundChooser.Current.Value = file.OldValue;
+                rollingBackBackgroundChange = false;
+            }
         }
 
         private void audioTrackChanged(ValueChangedEvent<FileInfo?> file)
         {
+            if (rollingBackAudioChange)
+                return;
+
             if (file.NewValue == null || !ChangeAudioTrack(file.NewValue, audioTrackChooser.ApplyToAllDifficulties.Value))
+            {
+                rollingBackAudioChange = true;
                 audioTrackChooser.Current.Value = file.OldValue;
+                rollingBackAudioChange = false;
+            }
         }
     }
 }

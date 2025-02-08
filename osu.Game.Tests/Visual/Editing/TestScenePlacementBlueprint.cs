@@ -74,7 +74,6 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
-        [Solo]
         public void TestCommitPlacementViaRightClick()
         {
             Playfield playfield = null!;
