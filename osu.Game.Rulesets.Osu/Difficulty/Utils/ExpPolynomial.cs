@@ -22,8 +22,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Utils
         // The matrix that minimizes the square error at X values [0.0, 0.30, 0.60, 0.80, 0.90, 0.95, 1.0].
         private static readonly double[][] matrix =
         {
-            new[] { 0.0, 3.14395, 5.18439, 6.46975, 1.4638, -9.53526, 0.0 },
-            new[] { 0.0, -4.85829, -8.09612, -10.4498, -3.84479, 12.1626, 0.0 }
+            new[] { 0.0, -25.8899, -32.6909, -11.9147, 48.8588, -26.8943, 0.0 },
+            new[] { 0.0, 51.7787, 66.595, 28.8517, -90.3185, 40.9864, 0.0 },
+            new[] { 0.0, -31.5028, -41.7398, -22.7118, 46.438, -15.5156, 0.0 }
         };
 
         /// <summary>
@@ -38,9 +39,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Utils
 
             double[] penalties = { 1, 0.95, 0.9, 0.8, 0.6, 0.3, 0 };
 
-            coefficients = new double[3];
+            coefficients = new double[4];
 
-            coefficients[2] = endPoint;
+            coefficients[3] = endPoint;
 
             // Now we dot product the adjusted miss counts with the matrix.
             for (int row = 0; row < matrix.Length; row++)
@@ -50,8 +51,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Utils
                     coefficients[row] += matrix[row][column] * (logMissCounts[column] - endPoint * (1 - penalties[column]));
                 }
 
-                coefficients[2] -= coefficients[row];
+                coefficients[3] -= coefficients[row];
             }
+
+            coefficients = coefficients;
         }
 
         /// <summary>
