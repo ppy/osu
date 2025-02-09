@@ -10,7 +10,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Argon
@@ -66,7 +65,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
             if (Precision.AlmostEquals(0, Alpha))
                 this.ScaleTo(1);
 
-            this.ScaleTo(DrawableSliderBall.FOLLOW_AREA, duration, Easing.OutQuint)
+            this.ScaleTo(FollowAreaScale, duration, Easing.OutQuint)
                 .FadeIn(duration, Easing.OutQuint);
         }
 
@@ -74,7 +73,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
         {
             const float duration = 150;
 
-            this.ScaleTo(DrawableSliderBall.FOLLOW_AREA * 1.2f, duration, Easing.OutQuint)
+            this.ScaleTo(FollowAreaScale * 1.2f, duration, Easing.OutQuint)
                 .FadeTo(0, duration, Easing.OutQuint);
         }
 
@@ -88,11 +87,11 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
 
         protected override void OnSliderTick()
         {
-            if (Scale.X >= DrawableSliderBall.FOLLOW_AREA * 0.98f)
+            if (Scale.X >= FollowAreaScale * 0.98f)
             {
-                this.ScaleTo(DrawableSliderBall.FOLLOW_AREA * 1.08f, 40, Easing.OutQuint)
+                this.ScaleTo(FollowAreaScale * 1.08f, 40, Easing.OutQuint)
                     .Then()
-                    .ScaleTo(DrawableSliderBall.FOLLOW_AREA, 200f, Easing.OutQuint);
+                    .ScaleTo(FollowAreaScale, 200f, Easing.OutQuint);
             }
         }
 
