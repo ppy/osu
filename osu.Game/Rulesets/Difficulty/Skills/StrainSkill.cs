@@ -46,9 +46,11 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// </summary>
         public sealed override void Process(DifficultyHitObject current)
         {
-            // The first object doesn't generate a strain, so we begin with an incremented section end
+            // In order to ensure all sections begin correctly from the first note
+            // We ensure the first section ends exactly `SectionLength` after the first object
+            // This means any offset applied to the beatmap cannot affect difficulty outputs
             if (current.Index == 0)
-                currentSectionEnd = Math.Ceiling(current.StartTime / SectionLength) * SectionLength;
+                currentSectionEnd = current.StartTime + SectionLength;
 
             while (current.StartTime > currentSectionEnd)
             {
