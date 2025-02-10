@@ -29,6 +29,7 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Screens.Menu;
+using osu.Game.Screens.Select;
 using osuTK;
 
 namespace osu.Game.Screens.Edit.Submission
@@ -418,7 +419,7 @@ namespace osu.Game.Screens.Edit.Submission
                     }
 
                     s.Push(new EditorLoader());
-                }, [typeof(MainMenu)]);
+                }, [typeof(SongSelect)]);
 
                 return false;
             }
