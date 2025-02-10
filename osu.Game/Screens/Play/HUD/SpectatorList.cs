@@ -108,8 +108,10 @@ namespace osu.Game.Screens.Play.HUD
         {
             // the multiplayer gameplay leaderboard relies on calling `SpectatorClient.WatchUser()` to get updates on users' total scores.
             // this has an unfortunate side effect of other players showing up in `SpectatorClient.WatchingUsers`.
+            //
             // we do not generally wish to display other players in the room as spectators due to that implementation detail,
             // therefore this code is intended to filter out those players on the client side.
+            //
             // note that the way that this is done is rather specific to the multiplayer use case and therefore carries a lot of assumptions
             // (e.g. that the `MultiplayerRoomUser`s have the correct `State` at the point wherein they issue the `WatchUser()` calls).
             // the more proper way to do this (which is by subscribing to `WatchingUsers` and `RoomUpdated`, and doing a proper diff to a third list on any change of either)
