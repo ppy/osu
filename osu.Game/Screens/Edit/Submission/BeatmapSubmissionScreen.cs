@@ -92,6 +92,8 @@ namespace osu.Game.Screens.Edit.Submission
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
+                    AutoSizeDuration = 400,
+                    AutoSizeEasing = Easing.OutQuint,
                     Alpha = 0,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -144,9 +146,6 @@ namespace osu.Game.Screens.Edit.Submission
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
                                     AutoSizeAxes = Axes.Both,
-                                    AutoSizeDuration = 500,
-                                    AutoSizeEasing = Easing.OutQuint,
-                                    Masking = true,
                                     CornerRadius = BeatmapCard.CORNER_RADIUS,
                                     Child = flashLayer = new Container
                                     {
@@ -252,6 +251,8 @@ namespace osu.Game.Screens.Edit.Submission
             exportStep.SetCompleted();
             exportProgressNotification = null;
 
+            await Task.Delay(200).ConfigureAwait(true);
+
             if (onlineFiles.Count > 0)
                 await patchBeatmapSet(onlineFiles).ConfigureAwait(true);
             else
@@ -337,6 +338,7 @@ namespace osu.Game.Screens.Edit.Submission
             Debug.Assert(beatmapPackageStream != null);
 
             updateStep.SetInProgress();
+            await Task.Delay(200).ConfigureAwait(true);
 
             try
             {
