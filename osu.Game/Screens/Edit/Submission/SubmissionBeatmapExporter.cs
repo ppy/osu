@@ -14,43 +14,38 @@ namespace osu.Game.Screens.Edit.Submission
     public class SubmissionBeatmapExporter : LegacyBeatmapExporter
     {
         private readonly uint? beatmapSetId;
-        private readonly HashSet<int>? beatmapIds;
-
-        public SubmissionBeatmapExporter(Storage storage)
-            : base(storage)
-        {
-        }
+        private readonly HashSet<int>? allocatedBeatmapIds;
 
         public SubmissionBeatmapExporter(Storage storage, PutBeatmapSetResponse putBeatmapSetResponse)
             : base(storage)
         {
             beatmapSetId = putBeatmapSetResponse.BeatmapSetId;
-            beatmapIds = putBeatmapSetResponse.BeatmapIds.Select(id => (int)id).ToHashSet();
+            allocatedBeatmapIds = putBeatmapSetResponse.BeatmapIds.Select(id => (int)id).ToHashSet();
         }
 
         protected override void MutateBeatmap(BeatmapSetInfo beatmapSet, IBeatmap playableBeatmap)
         {
             base.MutateBeatmap(beatmapSet, playableBeatmap);
 
-            if (beatmapSetId != null && beatmapIds != null)
+            if (beatmapSetId != null && allocatedBeatmapIds != null)
             {
                 playableBeatmap.BeatmapInfo.BeatmapSet = beatmapSet;
                 playableBeatmap.BeatmapInfo.BeatmapSet!.OnlineID = (int)beatmapSetId;
 
-                if (beatmapIds.Contains(playableBeatmap.BeatmapInfo.OnlineID))
+                if (allocatedBeatmapIds.Contains(playableBeatmap.BeatmapInfo.OnlineID))
                 {
-                    beatmapIds.Remove(playableBeatmap.BeatmapInfo.OnlineID);
+                    allocatedBeatmapIds.Remove(playableBeatmap.BeatmapInfo.OnlineID);
                     return;
                 }
 
                 if (playableBeatmap.BeatmapInfo.OnlineID > 0)
                     throw new InvalidOperationException(@"Encountered beatmap with ID that has not been assigned to it by the server!");
 
-                if (beatmapIds.Count == 0)
+                if (allocatedBeatmapIds.Count == 0)
                     throw new InvalidOperationException(@"Ran out of new beatmap IDs to assign to unsubmitted beatmaps!");
 
-                int newId = beatmapIds.First();
-                beatmapIds.Remove(newId);
+                int newId = allocatedBeatmapIds.First();
+                allocatedBeatmapIds.Remove(newId);
                 playableBeatmap.BeatmapInfo.OnlineID = newId;
             }
         }
