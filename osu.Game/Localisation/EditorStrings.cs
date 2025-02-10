@@ -184,6 +184,16 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString ResetBookmarks => new TranslatableString(getKey(@"reset_bookmarks"), @"Reset bookmarks");
 
+        /// <summary>
+        /// "Open beatmap info page in browser"
+        /// </summary>
+        public static LocalisableString OpenInfoPageInBrowser => new TranslatableString(getKey(@"open_info_page_in_browser"), @"Open beatmap info page in browser");
+
+        /// <summary>
+        /// "Open beatmap discussion page in browser"
+        /// </summary>
+        public static LocalisableString OpenDiscussionPageInBrowser => new TranslatableString(getKey(@"open_discussion_page_in_browser"), @"Open beatmap discussion page in browser");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
