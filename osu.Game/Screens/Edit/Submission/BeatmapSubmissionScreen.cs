@@ -39,6 +39,8 @@ namespace osu.Game.Screens.Edit.Submission
 
         public override bool DisallowExternalBeatmapRulesetChanges => true;
 
+        protected override bool InitialBackButtonVisibility => false;
+
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
 
