@@ -1,8 +1,11 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Database;
@@ -17,6 +20,10 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
     public partial class AddPlaylistToCollectionButton : RoundedButton
     {
         private readonly Room room;
+        private readonly Bindable<int> downloadedBeatmapsCount = new Bindable<int>(0);
+        private readonly Bindable<bool> collectionExists = new Bindable<bool>(false);
+        private IDisposable? beatmapSubscription;
+        private IDisposable? collectionSubscription;
 
         [Resolved]
         private RealmAccess realmAccess { get; set; } = null!;
@@ -27,7 +34,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         public AddPlaylistToCollectionButton(Room room)
         {
             this.room = room;
-            Text = "Add Maps to Collection";
+            Text = formatButtonText(downloadedBeatmapsCount.Value, collectionExists.Value);
         }
 
         [BackgroundDependencyLoader]
@@ -41,8 +48,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                     return;
                 }
 
-                string filter = string.Join(" OR ", room.Playlist.Select(item => $"(OnlineID == {item.Beatmap.OnlineID})").Distinct());
-                var beatmaps = realmAccess.Realm.All<BeatmapInfo>().Filter(filter).ToList();
+                var beatmaps = realmAccess.Realm.All<BeatmapInfo>().Filter(formatFilterQuery(room.Playlist)).ToList();
 
                 var collection = realmAccess.Realm.All<BeatmapCollection>().FirstOrDefault(c => c.Name == room.Name);
 
@@ -64,5 +70,30 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                 }
             };
         }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            beatmapSubscription = realmAccess.RegisterForNotifications(r => r.All<BeatmapInfo>().Filter(formatFilterQuery(room.Playlist)), (sender, _) => downloadedBeatmapsCount.Value = sender.Count);
+
+            collectionSubscription = realmAccess.RegisterForNotifications(r => r.All<BeatmapCollection>().Where(c => c.Name == room.Name), (sender, _) => collectionExists.Value = sender.Count > 0);
+
+            downloadedBeatmapsCount.BindValueChanged(_ => Text = formatButtonText(downloadedBeatmapsCount.Value, collectionExists.Value));
+
+            collectionExists.BindValueChanged(_ => Text = formatButtonText(downloadedBeatmapsCount.Value, collectionExists.Value), true);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            beatmapSubscription?.Dispose();
+            collectionSubscription?.Dispose();
+        }
+
+        private string formatFilterQuery(IReadOnlyList<PlaylistItem> playlistItems) => string.Join(" OR ", playlistItems.Select(item => $"(OnlineID == {item.Beatmap.OnlineID})").Distinct());
+
+        private string formatButtonText(int count, bool collectionExists) => $"Add {count} {(count == 1 ? "beatmap" : "beatmaps")} to {(collectionExists ? "collection" : "new collection")}";
     }
 }
