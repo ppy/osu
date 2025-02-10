@@ -290,15 +290,7 @@ namespace osu.Game.Screens.Edit.Submission
             var patchRequest = new PatchBeatmapPackageRequest(beatmapSetId.Value);
             patchRequest.FilesChanged.AddRange(changedFiles);
             patchRequest.FilesDeleted.AddRange(onlineFilesByFilename.Keys);
-            patchRequest.Success += async () =>
-            {
-                uploadStep.SetCompleted();
-
-                if (configManager.Get<bool>(OsuSetting.EditorSubmissionLoadInBrowserAfterSubmission))
-                    game?.OpenUrlExternally($"{api.Endpoints.WebsiteUrl}/beatmapsets/{beatmapSetId}");
-
-                await updateLocalBeatmap().ConfigureAwait(true);
-            };
+            patchRequest.Success += uploadCompleted;
             patchRequest.Failure += ex =>
             {
                 uploadStep.SetFailed(ex.Message);
@@ -318,15 +310,7 @@ namespace osu.Game.Screens.Edit.Submission
 
             var uploadRequest = new ReplaceBeatmapPackageRequest(beatmapSetId.Value, beatmapPackageStream.ToArray());
 
-            uploadRequest.Success += async () =>
-            {
-                uploadStep.SetCompleted();
-
-                if (configManager.Get<bool>(OsuSetting.EditorSubmissionLoadInBrowserAfterSubmission))
-                    game?.OpenUrlExternally($"{api.Endpoints.WebsiteUrl}/beatmapsets/{beatmapSetId}");
-
-                await updateLocalBeatmap().ConfigureAwait(true);
-            };
+            uploadRequest.Success += uploadCompleted;
             uploadRequest.Failure += ex =>
             {
                 uploadStep.SetFailed(ex.Message);
@@ -337,6 +321,12 @@ namespace osu.Game.Screens.Edit.Submission
 
             api.Queue(uploadRequest);
             uploadStep.SetInProgress();
+        }
+
+        private void uploadCompleted()
+        {
+            uploadStep.SetCompleted();
+            updateLocalBeatmap().ConfigureAwait(true);
         }
 
         private async Task updateLocalBeatmap()
@@ -364,6 +354,12 @@ namespace osu.Game.Screens.Edit.Submission
             updateStep.SetCompleted();
             showBeatmapCard();
             allowExit();
+
+            if (configManager.Get<bool>(OsuSetting.EditorSubmissionLoadInBrowserAfterSubmission))
+            {
+                await Task.Delay(1000).ConfigureAwait(true);
+                game?.OpenUrlExternally($"{api.Endpoints.WebsiteUrl}/beatmapsets/{beatmapSetId}");
+            }
         }
 
         private void showBeatmapCard()
