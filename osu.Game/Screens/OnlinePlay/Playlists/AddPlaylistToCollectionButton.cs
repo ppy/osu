@@ -75,7 +75,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         {
             base.LoadComplete();
 
-            beatmapSubscription = realmAccess.RegisterForNotifications(r => r.All<BeatmapInfo>().Filter(formatFilterQuery(room.Playlist)), (sender, _) => downloadedBeatmapsCount.Value = sender.Count);
+            if (room.Playlist.Count > 0)
+                beatmapSubscription = realmAccess.RegisterForNotifications(r => r.All<BeatmapInfo>().Filter(formatFilterQuery(room.Playlist)), (sender, _) => downloadedBeatmapsCount.Value = sender.Count);
 
             collectionSubscription = realmAccess.RegisterForNotifications(r => r.All<BeatmapCollection>().Where(c => c.Name == room.Name), (sender, _) => collectionExists.Value = sender.Count > 0);
 
