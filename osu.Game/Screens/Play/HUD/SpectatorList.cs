@@ -28,17 +28,16 @@ namespace osu.Game.Screens.Play.HUD
     {
         private const int max_spectators_displayed = 10;
 
-        public BindableList<SpectatorUser> Spectators { get; } = new BindableList<SpectatorUser>();
-        public Bindable<LocalUserPlayingState> UserPlayingState { get; } = new Bindable<LocalUserPlayingState>();
-
         [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.Font), nameof(SkinnableComponentStrings.FontDescription))]
         public Bindable<Typeface> Font { get; } = new Bindable<Typeface>(Typeface.Torus);
 
         [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.TextColour), nameof(SkinnableComponentStrings.TextColourDescription))]
         public BindableColour4 HeaderColour { get; } = new BindableColour4(Colour4.White);
 
-        protected OsuSpriteText Header { get; private set; } = null!;
+        private BindableList<SpectatorUser> spectators { get; } = new BindableList<SpectatorUser>();
+        private Bindable<LocalUserPlayingState> userPlayingState { get; } = new Bindable<LocalUserPlayingState>();
 
+        private OsuSpriteText header = null!;
         private FillFlowContainer mainFlow = null!;
         private FillFlowContainer<SpectatorListEntry> spectatorsFlow = null!;
         private DrawablePool<SpectatorListEntry> pool = null!;
@@ -63,7 +62,7 @@ namespace osu.Game.Screens.Play.HUD
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
-                        Header = new OsuSpriteText
+                        header = new OsuSpriteText
                         {
                             Colour = colours.Blue0,
                             Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
@@ -78,18 +77,18 @@ namespace osu.Game.Screens.Play.HUD
                 pool = new DrawablePool<SpectatorListEntry>(max_spectators_displayed),
             };
 
-            HeaderColour.Value = Header.Colour;
+            HeaderColour.Value = header.Colour;
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            ((IBindableList<SpectatorUser>)Spectators).BindTo(client.WatchingUsers);
-            ((IBindable<LocalUserPlayingState>)UserPlayingState).BindTo(gameplayState.PlayingState);
+            ((IBindableList<SpectatorUser>)spectators).BindTo(client.WatchingUsers);
+            ((IBindable<LocalUserPlayingState>)userPlayingState).BindTo(gameplayState.PlayingState);
 
-            Spectators.BindCollectionChanged(onSpectatorsChanged, true);
-            UserPlayingState.BindValueChanged(_ => updateVisibility());
+            spectators.BindCollectionChanged(onSpectatorsChanged, true);
+            userPlayingState.BindValueChanged(_ => updateVisibility());
 
             Font.BindValueChanged(_ => updateAppearance());
             HeaderColour.BindValueChanged(_ => updateAppearance(), true);
@@ -125,10 +124,10 @@ namespace osu.Game.Screens.Play.HUD
                     for (int i = 0; i < spectatorsFlow.Count; i++)
                         spectatorsFlow.SetLayoutPosition(spectatorsFlow[i], i);
 
-                    if (Spectators.Count >= max_spectators_displayed && spectatorsFlow.Count < max_spectators_displayed)
+                    if (spectators.Count >= max_spectators_displayed && spectatorsFlow.Count < max_spectators_displayed)
                     {
                         for (int i = spectatorsFlow.Count; i < max_spectators_displayed; i++)
-                            addNewSpectatorToList(i, Spectators[i]);
+                            addNewSpectatorToList(i, spectators[i]);
                     }
 
                     break;
@@ -144,7 +143,7 @@ namespace osu.Game.Screens.Play.HUD
                     throw new NotSupportedException();
             }
 
-            Header.Text = SpectatorListStrings.SpectatorCount(Spectators.Count).ToUpper();
+            header.Text = SpectatorListStrings.SpectatorCount(spectators.Count).ToUpper();
             updateVisibility();
 
             for (int i = 0; i < spectatorsFlow.Count; i++)
@@ -160,7 +159,7 @@ namespace osu.Game.Screens.Play.HUD
             var entry = pool.Get(entry =>
             {
                 entry.Current.Value = spectator;
-                entry.UserPlayingState = UserPlayingState;
+                entry.UserPlayingState = userPlayingState;
             });
 
             spectatorsFlow.Insert(i, entry);
@@ -169,15 +168,15 @@ namespace osu.Game.Screens.Play.HUD
         private void updateVisibility()
         {
             // We don't want to show spectators when we are watching a replay.
-            mainFlow.FadeTo(Spectators.Count > 0 && UserPlayingState.Value != LocalUserPlayingState.NotPlaying ? 1 : 0, 250, Easing.OutQuint);
+            mainFlow.FadeTo(spectators.Count > 0 && userPlayingState.Value != LocalUserPlayingState.NotPlaying ? 1 : 0, 250, Easing.OutQuint);
         }
 
         private void updateAppearance()
         {
-            Header.Font = OsuFont.GetFont(Font.Value, 12, FontWeight.Bold);
-            Header.Colour = HeaderColour.Value;
+            header.Font = OsuFont.GetFont(Font.Value, 12, FontWeight.Bold);
+            header.Colour = HeaderColour.Value;
 
-            Width = Header.DrawWidth;
+            Width = header.DrawWidth;
         }
 
         private partial class SpectatorListEntry : PoolableDrawable
