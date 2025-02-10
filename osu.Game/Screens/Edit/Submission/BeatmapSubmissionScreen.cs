@@ -76,7 +76,6 @@ namespace osu.Game.Screens.Edit.Submission
         private uint? beatmapSetId;
         private MemoryStream? beatmapPackageStream;
 
-        private SubmissionBeatmapExporter legacyBeatmapExporter = null!;
         private ProgressNotification? exportProgressNotification;
         private ProgressNotification? updateProgressNotification;
 
@@ -214,8 +213,7 @@ namespace osu.Game.Screens.Edit.Submission
                     }).ConfigureAwait(true);
                 }
 
-                legacyBeatmapExporter = new SubmissionBeatmapExporter(storage, response);
-                await createBeatmapPackage(response.Files).ConfigureAwait(true);
+                await createBeatmapPackage(response).ConfigureAwait(true);
             };
             createRequest.Failure += ex =>
             {
@@ -228,7 +226,7 @@ namespace osu.Game.Screens.Edit.Submission
             api.Queue(createRequest);
         }
 
-        private async Task createBeatmapPackage(ICollection<BeatmapSetFile> onlineFiles)
+        private async Task createBeatmapPackage(PutBeatmapSetResponse response)
         {
             Debug.Assert(ThreadSafety.IsUpdateThread);
 
@@ -237,8 +235,13 @@ namespace osu.Game.Screens.Edit.Submission
             try
             {
                 beatmapPackageStream = new MemoryStream();
-                await legacyBeatmapExporter.ExportToStreamAsync(Beatmap.Value.BeatmapSetInfo.ToLive(realmAccess), beatmapPackageStream, exportProgressNotification = new ProgressNotification())
-                                           .ConfigureAwait(true);
+                exportProgressNotification = new ProgressNotification();
+
+                var legacyBeatmapExporter = new SubmissionBeatmapExporter(storage, response);
+
+                await legacyBeatmapExporter
+                      .ExportToStreamAsync(Beatmap.Value.BeatmapSetInfo.ToLive(realmAccess), beatmapPackageStream, exportProgressNotification)
+                      .ConfigureAwait(true);
             }
             catch (Exception ex)
             {
@@ -253,8 +256,8 @@ namespace osu.Game.Screens.Edit.Submission
 
             await Task.Delay(200).ConfigureAwait(true);
 
-            if (onlineFiles.Count > 0)
-                await patchBeatmapSet(onlineFiles).ConfigureAwait(true);
+            if (response.Files.Count > 0)
+                await patchBeatmapSet(response.Files).ConfigureAwait(true);
             else
                 replaceBeatmapSet();
         }
