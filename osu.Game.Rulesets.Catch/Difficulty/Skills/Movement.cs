@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
         private float lastDistanceMoved;
         private float lastExactDistanceMoved;
         private double lastStrainTime;
-        private bool isBuzzSliderTriggered;
+        private bool isInBuzzSection;
 
         /// <summary>
         /// The speed multiplier applied to the player's catcher.
@@ -107,14 +107,14 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
             // To achieve that, we need to store the exact distances (distance ignoring absolute_player_positioning_error and normalized_hitobject_radius)
             if (Math.Abs(exactDistanceMoved) <= HalfCatcherWidth * 2 && exactDistanceMoved == -lastExactDistanceMoved && catchCurrent.StrainTime == lastStrainTime)
             {
-                if (isBuzzSliderTriggered)
+                if (isInBuzzSection)
                     distanceAddition = 0;
                 else
-                    isBuzzSliderTriggered = true;
+                    isInBuzzSection = true;
             }
             else
             {
-                isBuzzSliderTriggered = false;
+                isInBuzzSection = false;
             }
 
             lastPlayerPosition = playerPosition;
