@@ -4,6 +4,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.ObjectExtensions;
@@ -14,6 +16,9 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Logging;
+using osu.Game.Beatmaps.Drawables;
+using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -47,6 +52,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
         private SpriteIcon crown = null!;
 
         private OsuSpriteText userRankText = null!;
+        private StyleDisplayIcon userStyleDisplay = null!;
         private ModDisplay userModsDisplay = null!;
         private StateDisplay userStateDisplay = null!;
 
@@ -149,16 +155,20 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                                         }
                                     }
                                 },
-                                new Container
+                                new FillFlowContainer
                                 {
                                     Anchor = Anchor.CentreRight,
                                     Origin = Anchor.CentreRight,
                                     AutoSizeAxes = Axes.Both,
                                     Margin = new MarginPadding { Right = 70 },
-                                    Child = userModsDisplay = new ModDisplay
+                                    Children = new Drawable[]
                                     {
-                                        Scale = new Vector2(0.5f),
-                                        ExpansionMode = ExpansionMode.AlwaysContracted,
+                                        userStyleDisplay = new StyleDisplayIcon(),
+                                        userModsDisplay = new ModDisplay
+                                        {
+                                            Scale = new Vector2(0.5f),
+                                            ExpansionMode = ExpansionMode.AlwaysContracted,
+                                        }
                                     }
                                 },
                                 userStateDisplay = new StateDisplay
@@ -208,9 +218,20 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
             userStateDisplay.UpdateStatus(User.State, User.BeatmapAvailability);
 
             if ((User.BeatmapAvailability.State == DownloadState.LocallyAvailable) && (User.State != MultiplayerUserState.Spectating))
+            {
                 userModsDisplay.FadeIn(fade_time);
+                userStyleDisplay.FadeIn(fade_time);
+            }
             else
+            {
                 userModsDisplay.FadeOut(fade_time);
+                userStyleDisplay.FadeOut(fade_time);
+            }
+
+            if ((User.BeatmapId == null && User.RulesetId == null) || (User.BeatmapId == currentItem?.BeatmapID && User.RulesetId == currentItem?.RulesetID))
+                userStyleDisplay.Style = null;
+            else
+                userStyleDisplay.Style = (User.BeatmapId ?? currentItem?.BeatmapID ?? 0, User.RulesetId ?? currentItem?.RulesetID ?? 0);
 
             kickButton.Alpha = client.IsHost && !User.Equals(client.LocalUser) ? 1 : 0;
             crown.Alpha = client.Room.Host?.Equals(User) == true ? 1 : 0;
@@ -282,6 +303,82 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
             private void load(OsuColour colours)
             {
                 IconHoverColour = colours.Red;
+            }
+        }
+
+        private partial class StyleDisplayIcon : CompositeComponent
+        {
+            [Resolved]
+            private BeatmapLookupCache beatmapLookupCache { get; set; } = null!;
+
+            [Resolved]
+            private RulesetStore rulesets { get; set; } = null!;
+
+            public StyleDisplayIcon()
+            {
+                AutoSizeAxes = Axes.Both;
+            }
+
+            private (int beatmap, int ruleset)? style;
+
+            public (int beatmap, int ruleset)? Style
+            {
+                get => style;
+                set
+                {
+                    if (style == value)
+                        return;
+
+                    style = value;
+                    Scheduler.Add(refresh);
+                }
+            }
+
+            private CancellationTokenSource? cancellationSource;
+
+            private void refresh()
+            {
+                cancellationSource?.Cancel();
+                cancellationSource?.Dispose();
+                cancellationSource = null;
+
+                if (Style == null)
+                {
+                    ClearInternal();
+                    return;
+                }
+
+                cancellationSource = new CancellationTokenSource();
+                CancellationToken token = cancellationSource.Token;
+
+                int localBeatmap = Style.Value.beatmap;
+                int localRuleset = Style.Value.ruleset;
+
+                Task.Run(async () =>
+                {
+                    try
+                    {
+                        var beatmap = await beatmapLookupCache.GetBeatmapAsync(localBeatmap, token).ConfigureAwait(false);
+                        if (beatmap == null)
+                            return;
+
+                        Schedule(() =>
+                        {
+                            if (token.IsCancellationRequested)
+                                return;
+
+                            InternalChild = new DifficultyIcon(beatmap, rulesets.GetRuleset(localRuleset))
+                            {
+                                Size = new Vector2(20),
+                                TooltipType = DifficultyIconTooltipType.Extended,
+                            };
+                        });
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Log($"Error while populating participant style icon {e}");
+                    }
+                }, token);
             }
         }
     }

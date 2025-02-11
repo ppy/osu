@@ -12,17 +12,11 @@ namespace osu.Game.Graphics.UserInterface
 {
     public partial class OsuContextMenu : OsuMenu
     {
-        private const int fade_duration = 250;
-
         [Resolved]
         private OsuMenuSamples menuSamples { get; set; } = null!;
 
-        // todo: this shouldn't be required after https://github.com/ppy/osu-framework/issues/4519 is fixed.
-        private bool wasOpened;
-        private readonly bool playClickSample;
-
-        public OsuContextMenu(bool playClickSample = false)
-            : base(Direction.Vertical)
+        public OsuContextMenu(bool playSamples)
+            : base(Direction.Vertical, topLevelMenu: false, playSamples)
         {
             MaskingContainer.CornerRadius = 5;
             MaskingContainer.EdgeEffect = new EdgeEffectParameters
@@ -35,8 +29,6 @@ namespace osu.Game.Graphics.UserInterface
             ItemsContainer.Padding = new MarginPadding { Vertical = DrawableOsuMenuItem.MARGIN_VERTICAL };
 
             MaxHeight = 250;
-
-            this.playClickSample = playClickSample;
         }
 
         [BackgroundDependencyLoader]
@@ -47,26 +39,12 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override void AnimateOpen()
         {
-            wasOpened = true;
-            this.FadeIn(fade_duration, Easing.OutQuint);
+            if (PlaySamples && !WasOpened)
+                menuSamples.PlayClickSample();
 
-            if (!playClickSample)
-                return;
-
-            menuSamples.PlayClickSample();
-            menuSamples.PlayOpenSample();
+            base.AnimateOpen();
         }
 
-        protected override void AnimateClose()
-        {
-            this.FadeOut(fade_duration, Easing.OutQuint);
-
-            if (wasOpened)
-                menuSamples.PlayCloseSample();
-
-            wasOpened = false;
-        }
-
-        protected override Menu CreateSubMenu() => new OsuContextMenu();
+        protected override Menu CreateSubMenu() => new OsuContextMenu(false); // sub menu samples are handled by OsuMenu.OnSubmenuOpen.
     }
 }

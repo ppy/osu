@@ -9,7 +9,9 @@ using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Screens.Play.HUD;
 using osu.Game.Skinning;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.Skinning.Argon
@@ -39,6 +41,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                             return new DefaultSkinComponentsContainer(container =>
                             {
                                 var combo = container.ChildrenOfType<ArgonManiaComboCounter>().FirstOrDefault();
+                                var spectatorList = container.OfType<SpectatorList>().FirstOrDefault();
 
                                 if (combo != null)
                                 {
@@ -47,9 +50,17 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                                     combo.Origin = Anchor.Centre;
                                     combo.Y = 200;
                                 }
+
+                                if (spectatorList != null)
+                                    spectatorList.Position = new Vector2(36, -66);
                             })
                             {
                                 new ArgonManiaComboCounter(),
+                                new SpectatorList
+                                {
+                                    Anchor = Anchor.BottomLeft,
+                                    Origin = Anchor.BottomLeft,
+                                }
                             };
                     }
 
