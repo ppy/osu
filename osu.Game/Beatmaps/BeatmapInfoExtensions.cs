@@ -59,7 +59,7 @@ namespace osu.Game.Beatmaps
             if (beatmapInfo.OnlineID <= 0 || beatmapInfo.BeatmapSet == null)
                 return null;
 
-            return $@"{api.WebsiteRootUrl}/beatmapsets/{beatmapInfo.BeatmapSet.OnlineID}#{ruleset?.ShortName ?? beatmapInfo.Ruleset.ShortName}/{beatmapInfo.OnlineID}";
+            return $@"{api.Endpoints.WebsiteUrl}/beatmapsets/{beatmapInfo.BeatmapSet.OnlineID}#{ruleset?.ShortName ?? beatmapInfo.Ruleset.ShortName}/{beatmapInfo.OnlineID}";
         }
     }
 }

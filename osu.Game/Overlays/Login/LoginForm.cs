@@ -129,7 +129,7 @@ namespace osu.Game.Overlays.Login
                 }
             };
 
-            forgottenPasswordLink.AddLink(LayoutStrings.PopupLoginLoginForgot, $"{api.WebsiteRootUrl}/home/password-reset");
+            forgottenPasswordLink.AddLink(LayoutStrings.PopupLoginLoginForgot, $"{api.Endpoints.WebsiteUrl}/home/password-reset");
 
             password.OnCommit += (_, _) => performLogin();
 

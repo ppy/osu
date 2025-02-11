@@ -8,7 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
-using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 using osuTK;
 using osuTK.Graphics;
 
@@ -16,11 +16,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
 {
     public abstract partial class CircularDistanceSnapGrid : DistanceSnapGrid
     {
-        [Resolved]
-        private EditorClock editorClock { get; set; } = null!;
-
-        protected CircularDistanceSnapGrid(HitObject referenceObject, Vector2 startPosition, double startTime, double? endTime = null)
-            : base(referenceObject, startPosition, startTime, endTime)
+        protected CircularDistanceSnapGrid(Vector2 startPosition, double startTime, double? endTime = null, IHasSliderVelocity? sliderVelocitySource = null)
+            : base(startPosition, startTime, endTime, sliderVelocitySource)
         {
         }
 
@@ -59,14 +56,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
             // Picture the scenario where the user has just placed an object on a 1/2 snap, then changes to
             // 1/3 snap and expects to be able to place the next object on a valid 1/3 snap, regardless of the
             // fact that the 1/2 snap reference object is not valid for 1/3 snapping.
-            float offset = SnapProvider.FindSnappedDistance(ReferenceObject, 0, DistanceSnapTarget.End);
+            float offset = (float)(SnapProvider.FindSnappedDistance(0, StartTime, SliderVelocitySource) * DistanceSpacingMultiplier.Value);
 
             for (int i = 0; i < requiredCircles; i++)
             {
                 const float thickness = 4;
                 float diameter = (offset + (i + 1) * DistanceBetweenTicks + thickness / 2) * 2;
 
-                AddInternal(new Ring(ReferenceObject, GetColourForIndexFromPlacement(i))
+                AddInternal(new Ring(StartTime, GetColourForIndexFromPlacement(i))
                 {
                     Position = StartPosition,
                     Origin = Anchor.Centre,
@@ -76,7 +73,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             }
         }
 
-        public override (Vector2 position, double time) GetSnappedPosition(Vector2 position)
+        public override (Vector2 position, double time) GetSnappedPosition(Vector2 position, double? fixedTime = null)
         {
             if (MaxIntervals == 0)
                 return (StartPosition, StartTime);
@@ -100,20 +97,20 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (travelLength < DistanceBetweenTicks)
                 travelLength = DistanceBetweenTicks;
 
-            float snappedDistance = LimitedDistanceSnap.Value
-                ? SnapProvider.DurationToDistance(ReferenceObject, editorClock.CurrentTime - ReferenceObject.GetEndTime())
+            float snappedDistance = fixedTime != null
+                ? SnapProvider.DurationToDistance(fixedTime.Value - StartTime, StartTime, SliderVelocitySource)
                 // When interacting with the resolved snap provider, the distance spacing multiplier should first be removed
                 // to allow for snapping at a non-multiplied ratio.
-                : SnapProvider.FindSnappedDistance(ReferenceObject, travelLength / distanceSpacingMultiplier, DistanceSnapTarget.End);
+                : SnapProvider.FindSnappedDistance(travelLength / distanceSpacingMultiplier, StartTime, SliderVelocitySource);
 
-            double snappedTime = StartTime + SnapProvider.DistanceToDuration(ReferenceObject, snappedDistance);
+            double snappedTime = StartTime + SnapProvider.DistanceToDuration(snappedDistance, StartTime, SliderVelocitySource);
 
             if (snappedTime > LatestEndTime)
             {
                 double tickLength = Beatmap.GetBeatLengthAtTime(StartTime);
 
-                snappedDistance = SnapProvider.DurationToDistance(ReferenceObject, MaxIntervals * tickLength);
-                snappedTime = StartTime + SnapProvider.DistanceToDuration(ReferenceObject, snappedDistance);
+                snappedDistance = SnapProvider.DurationToDistance(MaxIntervals * tickLength, StartTime, SliderVelocitySource);
+                snappedTime = StartTime + SnapProvider.DistanceToDuration(snappedDistance, StartTime, SliderVelocitySource);
             }
 
             // The multiplier can then be reapplied to the final position.
@@ -130,13 +127,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
             [Resolved]
             private EditorClock? editorClock { get; set; }
 
-            private readonly HitObject referenceObject;
+            private readonly double startTime;
 
             private readonly Color4 baseColour;
 
-            public Ring(HitObject referenceObject, Color4 baseColour)
+            public Ring(double startTime, Color4 baseColour)
             {
-                this.referenceObject = referenceObject;
+                this.startTime = startTime;
 
                 Colour = this.baseColour = baseColour;
 
@@ -151,9 +148,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     return;
 
                 float distanceSpacingMultiplier = (float)snapProvider.DistanceSpacingMultiplier.Value;
-                double timeFromReferencePoint = editorClock.CurrentTime - referenceObject.GetEndTime();
+                double timeFromReferencePoint = editorClock.CurrentTime - startTime;
 
-                float distanceForCurrentTime = snapProvider.DurationToDistance(referenceObject, timeFromReferencePoint)
+                float distanceForCurrentTime = snapProvider.DurationToDistance(timeFromReferencePoint, startTime)
                                                * distanceSpacingMultiplier;
 
                 float timeBasedAlpha = 1 - Math.Clamp(Math.Abs(distanceForCurrentTime - Size.X / 2) / 30, 0, 1);
