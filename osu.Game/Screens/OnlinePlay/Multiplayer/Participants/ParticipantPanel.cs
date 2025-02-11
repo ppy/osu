@@ -222,7 +222,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                 int userRulesetId = User.RulesetId ?? currentItem.RulesetID;
                 Ruleset? userRuleset = rulesets.GetRuleset(userRulesetId)?.CreateInstance();
 
-                int? currentModeRank = User.User?.RulesetsStatistics?.GetValueOrDefault(userRuleset?.ShortName)?.GlobalRank;
+                int? currentModeRank = userRuleset == null ? null : User.User?.RulesetsStatistics?.GetValueOrDefault(userRuleset.ShortName)?.GlobalRank;
                 userRankText.Text = currentModeRank != null ? $"#{currentModeRank.Value:N0}" : string.Empty;
 
                 if (userBeatmapId == currentItem.BeatmapID && userRulesetId == currentItem.RulesetID)
