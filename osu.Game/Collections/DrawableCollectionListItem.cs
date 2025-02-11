@@ -168,8 +168,8 @@ namespace osu.Game.Collections
                     countText.Text = count == 1
                         // Intentionally not localised until we have proper support for this (see https://github.com/ppy/osu-framework/pull/4918
                         // but also in this case we want support for formatting a number within a string).
-                        ? $"{count:#,0} beatmap"
-                        : $"{count:#,0} beatmaps";
+                        ? $"{count:#,0} item"
+                        : $"{count:#,0} items";
                 }
                 else
                 {
