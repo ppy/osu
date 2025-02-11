@@ -1,9 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.ComponentModel;
 using System.Threading;
-using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Leaderboards;
@@ -13,30 +12,44 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
 {
     public partial class MatchLeaderboard : Leaderboard<MatchLeaderboardScope, APIUserScoreAggregate>
     {
-        [Resolved(typeof(Room), nameof(Room.RoomID))]
-        private Bindable<long?> roomId { get; set; } = null!;
+        private readonly Room room;
 
-        [BackgroundDependencyLoader]
-        private void load()
+        public MatchLeaderboard(Room room)
         {
-            roomId.BindValueChanged(id =>
-            {
-                if (id.NewValue == null)
-                    return;
+            this.room = room;
+        }
 
-                SetScores(null);
-                RefetchScores();
-            }, true);
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            room.PropertyChanged += onRoomPropertyChanged;
+            fetchInitialScores();
+        }
+
+        private void onRoomPropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(Room.RoomID))
+                fetchInitialScores();
+        }
+
+        private void fetchInitialScores()
+        {
+            if (room.RoomID == null)
+                return;
+
+            SetScores(null);
+            RefetchScores();
         }
 
         protected override bool IsOnlineScope => true;
 
         protected override APIRequest? FetchScores(CancellationToken cancellationToken)
         {
-            if (roomId.Value == null)
+            if (room.RoomID == null)
                 return null;
 
-            var req = new GetRoomLeaderboardRequest(roomId.Value ?? 0);
+            var req = new GetRoomLeaderboardRequest(room.RoomID.Value);
 
             req.Success += r => Schedule(() =>
             {
@@ -52,6 +65,12 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
         protected override LeaderboardScore CreateDrawableScore(APIUserScoreAggregate model, int index) => new MatchLeaderboardScore(model, index);
 
         protected override LeaderboardScore CreateDrawableTopScore(APIUserScoreAggregate model) => new MatchLeaderboardScore(model, model.Position, false);
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            room.PropertyChanged -= onRoomPropertyChanged;
+        }
     }
 
     public enum MatchLeaderboardScope

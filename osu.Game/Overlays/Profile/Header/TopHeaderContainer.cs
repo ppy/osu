@@ -165,7 +165,6 @@ namespace osu.Game.Overlays.Profile.Header
                                                         userFlag = new UpdateableFlag
                                                         {
                                                             Size = new Vector2(28, 20),
-                                                            ShowPlaceholderOnUnknown = false,
                                                         },
                                                         userCountryContainer = new OsuHoverContainer
                                                         {
@@ -214,7 +213,7 @@ namespace osu.Game.Overlays.Profile.Header
             cover.User = user;
             avatar.User = user;
             usernameText.Text = user?.Username ?? string.Empty;
-            openUserExternally.Link = $@"{api.WebsiteRootUrl}/users/{user?.Id ?? 0}";
+            openUserExternally.Link = $@"{api.Endpoints.WebsiteUrl}/users/{user?.Id ?? 0}";
             userFlag.CountryCode = user?.CountryCode ?? default;
             userCountryText.Text = (user?.CountryCode ?? default).GetDescription();
             userCountryContainer.Action = () => rankingsOverlay?.ShowCountry(user?.CountryCode ?? default);

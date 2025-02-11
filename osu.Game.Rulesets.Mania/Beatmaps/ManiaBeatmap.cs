@@ -23,11 +23,6 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         public int TotalColumns => Stages.Sum(g => g.Columns);
 
         /// <summary>
-        /// The total number of columns that were present in this <see cref="ManiaBeatmap"/> before any user adjustments.
-        /// </summary>
-        public readonly int OriginalTotalColumns;
-
-        /// <summary>
         /// Creates a new <see cref="ManiaBeatmap"/>.
         /// </summary>
         /// <param name="defaultStage">The initial stages.</param>
@@ -35,7 +30,6 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         public ManiaBeatmap(StageDefinition defaultStage, int? originalTotalColumns = null)
         {
             Stages.Add(defaultStage);
-            OriginalTotalColumns = originalTotalColumns ?? defaultStage.Columns;
         }
 
         public override IEnumerable<BeatmapStatistic> GetStatistics()

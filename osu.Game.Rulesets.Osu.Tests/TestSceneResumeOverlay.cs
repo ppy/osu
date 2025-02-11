@@ -6,11 +6,11 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Cursor;
 using osu.Framework.Testing;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Osu.UI.Cursor;
+using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play;
 using osu.Game.Tests.Gameplay;
 using osu.Game.Tests.Visual;
@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Tests
     public partial class TestSceneResumeOverlay : OsuManualInputManagerTestScene
     {
         private ManualOsuInputManager osuInputManager = null!;
-        private CursorContainer cursor = null!;
+        private GameplayCursorContainer cursor = null!;
         private ResumeOverlay resume = null!;
 
         private bool resumeFired;
@@ -99,7 +99,17 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private void loadContent()
         {
-            Child = osuInputManager = new ManualOsuInputManager(new OsuRuleset().RulesetInfo) { Children = new Drawable[] { cursor = new CursorContainer(), resume = new OsuResumeOverlay { GameplayCursor = cursor }, } };
+            Child = osuInputManager = new ManualOsuInputManager(new OsuRuleset().RulesetInfo)
+            {
+                Children = new Drawable[]
+                {
+                    cursor = new GameplayCursorContainer(),
+                    resume = new OsuResumeOverlay
+                    {
+                        GameplayCursor = cursor
+                    },
+                }
+            };
 
             resumeFired = false;
             resume.ResumeAction = () => resumeFired = true;

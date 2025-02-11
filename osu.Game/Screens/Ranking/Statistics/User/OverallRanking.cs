@@ -6,7 +6,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Online.Solo;
+using osu.Game.Online;
 
 namespace osu.Game.Screens.Ranking.Statistics.User
 {
@@ -14,7 +14,7 @@ namespace osu.Game.Screens.Ranking.Statistics.User
     {
         private const float transition_duration = 300;
 
-        public Bindable<SoloStatisticsUpdate?> StatisticsUpdate { get; } = new Bindable<SoloStatisticsUpdate?>();
+        public Bindable<ScoreBasedUserStatisticsUpdate?> StatisticsUpdate { get; } = new Bindable<ScoreBasedUserStatisticsUpdate?>();
 
         private LoadingLayer loadingLayer = null!;
         private GridContainer content = null!;
@@ -59,14 +59,14 @@ namespace osu.Game.Screens.Ranking.Statistics.User
                             new SimpleStatisticTable.Spacer(),
                             new PerformancePointsChangeRow { StatisticsUpdate = { BindTarget = StatisticsUpdate } },
                         },
-                        new Drawable[] { },
+                        [],
                         new Drawable[]
                         {
                             new MaximumComboChangeRow { StatisticsUpdate = { BindTarget = StatisticsUpdate } },
                             new SimpleStatisticTable.Spacer(),
                             new AccuracyChangeRow { StatisticsUpdate = { BindTarget = StatisticsUpdate } },
                         },
-                        new Drawable[] { },
+                        [],
                         new Drawable[]
                         {
                             new RankedScoreChangeRow { StatisticsUpdate = { BindTarget = StatisticsUpdate } },
@@ -86,7 +86,7 @@ namespace osu.Game.Screens.Ranking.Statistics.User
             FinishTransforms(true);
         }
 
-        private void onUpdateReceived(ValueChangedEvent<SoloStatisticsUpdate?> update)
+        private void onUpdateReceived(ValueChangedEvent<ScoreBasedUserStatisticsUpdate?> update)
         {
             if (update.NewValue == null)
             {

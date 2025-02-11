@@ -57,6 +57,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
+                Mods = { BindTarget = SelectedMods },
             });
 
             AddStep("set beatmap", () =>

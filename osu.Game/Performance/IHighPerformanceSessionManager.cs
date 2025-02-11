@@ -15,6 +15,11 @@ namespace osu.Game.Performance
     public interface IHighPerformanceSessionManager
     {
         /// <summary>
+        /// Whether a high performance session is currently active.
+        /// </summary>
+        bool IsSessionActive { get; }
+
+        /// <summary>
         /// Start a new high performance session.
         /// </summary>
         /// <returns>An <see cref="IDisposable"/> which will end the session when disposed.</returns>

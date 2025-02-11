@@ -40,9 +40,11 @@ namespace osu.Game.Rulesets.Mods
 
         public override string SettingDescription => $"{SpinSpeed.Value:N2} rpm {Direction.Value.GetDescription().ToLowerInvariant()}";
 
-        public void Update(Playfield playfield)
+        private PlayfieldAdjustmentContainer playfieldAdjustmentContainer = null!;
+
+        public virtual void Update(Playfield playfield)
         {
-            playfield.Rotation = CurrentRotation = (Direction.Value == RotationDirection.Counterclockwise ? -1 : 1) * 360 * (float)(playfield.Time.Current / 60000 * SpinSpeed.Value);
+            playfieldAdjustmentContainer.Rotation = CurrentRotation = (Direction.Value == RotationDirection.Counterclockwise ? -1 : 1) * 360 * (float)(playfield.Time.Current / 60000 * SpinSpeed.Value);
         }
 
         public void ApplyToDrawableRuleset(DrawableRuleset<TObject> drawableRuleset)
@@ -52,7 +54,9 @@ namespace osu.Game.Rulesets.Mods
             var playfieldSize = drawableRuleset.Playfield.DrawSize;
             float minSide = MathF.Min(playfieldSize.X, playfieldSize.Y);
             float maxSide = MathF.Max(playfieldSize.X, playfieldSize.Y);
-            drawableRuleset.Playfield.Scale = new Vector2(minSide / maxSide);
+
+            playfieldAdjustmentContainer = drawableRuleset.PlayfieldAdjustmentContainer;
+            playfieldAdjustmentContainer.Scale = new Vector2(minSide / maxSide);
         }
     }
 }

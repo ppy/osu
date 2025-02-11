@@ -4,8 +4,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -13,6 +16,9 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Logging;
+using osu.Game.Beatmaps.Drawables;
+using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -30,7 +36,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
 {
-    public partial class ParticipantPanel : MultiplayerRoomComposite, IHasContextMenu
+    public partial class ParticipantPanel : CompositeDrawable, IHasContextMenu
     {
         public readonly MultiplayerRoomUser User;
 
@@ -40,9 +46,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
         [Resolved]
         private IRulesetStore rulesets { get; set; } = null!;
 
+        [Resolved]
+        private MultiplayerClient client { get; set; } = null!;
+
         private SpriteIcon crown = null!;
 
         private OsuSpriteText userRankText = null!;
+        private StyleDisplayIcon userStyleDisplay = null!;
         private ModDisplay userModsDisplay = null!;
         private StateDisplay userStateDisplay = null!;
 
@@ -145,16 +155,20 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                                         }
                                     }
                                 },
-                                new Container
+                                new FillFlowContainer
                                 {
                                     Anchor = Anchor.CentreRight,
                                     Origin = Anchor.CentreRight,
                                     AutoSizeAxes = Axes.Both,
                                     Margin = new MarginPadding { Right = 70 },
-                                    Child = userModsDisplay = new ModDisplay
+                                    Children = new Drawable[]
                                     {
-                                        Scale = new Vector2(0.5f),
-                                        ExpansionMode = ExpansionMode.AlwaysContracted,
+                                        userStyleDisplay = new StyleDisplayIcon(),
+                                        userModsDisplay = new ModDisplay
+                                        {
+                                            Scale = new Vector2(0.5f),
+                                            ExpansionMode = ExpansionMode.AlwaysContracted,
+                                        }
                                     }
                                 },
                                 userStateDisplay = new StateDisplay
@@ -171,23 +185,31 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                             Origin = Anchor.Centre,
                             Alpha = 0,
                             Margin = new MarginPadding(4),
-                            Action = () => Client.KickUser(User.UserID).FireAndForget(),
+                            Action = () => client.KickUser(User.UserID).FireAndForget(),
                         },
                     },
                 }
             };
         }
 
-        protected override void OnRoomUpdated()
+        protected override void LoadComplete()
         {
-            base.OnRoomUpdated();
+            base.LoadComplete();
 
-            if (Room == null || Client.LocalUser == null)
+            client.RoomUpdated += onRoomUpdated;
+            updateState();
+        }
+
+        private void onRoomUpdated() => Scheduler.AddOnce(updateState);
+
+        private void updateState()
+        {
+            if (client.Room == null || client.LocalUser == null)
                 return;
 
             const double fade_time = 50;
 
-            var currentItem = Playlist.GetCurrentItem();
+            MultiplayerPlaylistItem? currentItem = client.Room.GetCurrentItem();
             Ruleset? ruleset = currentItem != null ? rulesets.GetRuleset(currentItem.RulesetID)?.CreateInstance() : null;
 
             int? currentModeRank = ruleset != null ? User.User?.RulesetsStatistics?.GetValueOrDefault(ruleset.ShortName)?.GlobalRank : null;
@@ -196,12 +218,23 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
             userStateDisplay.UpdateStatus(User.State, User.BeatmapAvailability);
 
             if ((User.BeatmapAvailability.State == DownloadState.LocallyAvailable) && (User.State != MultiplayerUserState.Spectating))
+            {
                 userModsDisplay.FadeIn(fade_time);
+                userStyleDisplay.FadeIn(fade_time);
+            }
             else
+            {
                 userModsDisplay.FadeOut(fade_time);
+                userStyleDisplay.FadeOut(fade_time);
+            }
 
-            kickButton.Alpha = Client.IsHost && !User.Equals(Client.LocalUser) ? 1 : 0;
-            crown.Alpha = Room.Host?.Equals(User) == true ? 1 : 0;
+            if ((User.BeatmapId == null && User.RulesetId == null) || (User.BeatmapId == currentItem?.BeatmapID && User.RulesetId == currentItem?.RulesetID))
+                userStyleDisplay.Style = null;
+            else
+                userStyleDisplay.Style = (User.BeatmapId ?? currentItem?.BeatmapID ?? 0, User.RulesetId ?? currentItem?.RulesetID ?? 0);
+
+            kickButton.Alpha = client.IsHost && !User.Equals(client.LocalUser) ? 1 : 0;
+            crown.Alpha = client.Room.Host?.Equals(User) == true ? 1 : 0;
 
             // If the mods are updated at the end of the frame, the flow container will skip a reflow cycle: https://github.com/ppy/osu-framework/issues/4187
             // This looks particularly jarring here, so re-schedule the update to that start of our frame as a fix.
@@ -215,7 +248,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
         {
             get
             {
-                if (Room == null)
+                if (client.Room == null)
                     return null;
 
                 // If the local user is targetted.
@@ -223,7 +256,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                     return null;
 
                 // If the local user is not the host of the room.
-                if (Room.Host?.UserID != api.LocalUser.Value.Id)
+                if (client.Room.Host?.UserID != api.LocalUser.Value.Id)
                     return null;
 
                 int targetUser = User.UserID;
@@ -233,21 +266,29 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                     new OsuMenuItem("Give host", MenuItemType.Standard, () =>
                     {
                         // Ensure the local user is still host.
-                        if (!Client.IsHost)
+                        if (!client.IsHost)
                             return;
 
-                        Client.TransferHost(targetUser).FireAndForget();
+                        client.TransferHost(targetUser).FireAndForget();
                     }),
                     new OsuMenuItem("Kick", MenuItemType.Destructive, () =>
                     {
                         // Ensure the local user is still host.
-                        if (!Client.IsHost)
+                        if (!client.IsHost)
                             return;
 
-                        Client.KickUser(targetUser).FireAndForget();
+                        client.KickUser(targetUser).FireAndForget();
                     })
                 };
             }
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (client.IsNotNull())
+                client.RoomUpdated -= onRoomUpdated;
         }
 
         public partial class KickButton : IconButton
@@ -262,6 +303,82 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
             private void load(OsuColour colours)
             {
                 IconHoverColour = colours.Red;
+            }
+        }
+
+        private partial class StyleDisplayIcon : CompositeComponent
+        {
+            [Resolved]
+            private BeatmapLookupCache beatmapLookupCache { get; set; } = null!;
+
+            [Resolved]
+            private RulesetStore rulesets { get; set; } = null!;
+
+            public StyleDisplayIcon()
+            {
+                AutoSizeAxes = Axes.Both;
+            }
+
+            private (int beatmap, int ruleset)? style;
+
+            public (int beatmap, int ruleset)? Style
+            {
+                get => style;
+                set
+                {
+                    if (style == value)
+                        return;
+
+                    style = value;
+                    Scheduler.Add(refresh);
+                }
+            }
+
+            private CancellationTokenSource? cancellationSource;
+
+            private void refresh()
+            {
+                cancellationSource?.Cancel();
+                cancellationSource?.Dispose();
+                cancellationSource = null;
+
+                if (Style == null)
+                {
+                    ClearInternal();
+                    return;
+                }
+
+                cancellationSource = new CancellationTokenSource();
+                CancellationToken token = cancellationSource.Token;
+
+                int localBeatmap = Style.Value.beatmap;
+                int localRuleset = Style.Value.ruleset;
+
+                Task.Run(async () =>
+                {
+                    try
+                    {
+                        var beatmap = await beatmapLookupCache.GetBeatmapAsync(localBeatmap, token).ConfigureAwait(false);
+                        if (beatmap == null)
+                            return;
+
+                        Schedule(() =>
+                        {
+                            if (token.IsCancellationRequested)
+                                return;
+
+                            InternalChild = new DifficultyIcon(beatmap, rulesets.GetRuleset(localRuleset))
+                            {
+                                Size = new Vector2(20),
+                                TooltipType = DifficultyIconTooltipType.Extended,
+                            };
+                        });
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Log($"Error while populating participant style icon {e}");
+                    }
+                }, token);
             }
         }
     }

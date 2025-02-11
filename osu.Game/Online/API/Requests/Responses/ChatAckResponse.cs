@@ -1,7 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
+using System;
 using Newtonsoft.Json;
 
 namespace osu.Game.Online.API.Requests.Responses
@@ -10,6 +10,6 @@ namespace osu.Game.Online.API.Requests.Responses
     public class ChatAckResponse
     {
         [JsonProperty("silences")]
-        public List<ChatSilence> Silences { get; set; } = null!;
+        public ChatSilence[] Silences { get; set; } = Array.Empty<ChatSilence>();
     }
 }

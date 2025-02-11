@@ -198,10 +198,25 @@ namespace osu.Game.Scoring.Legacy
             }
         }
 
-        public static int? GetCountMiss(this ScoreInfo scoreInfo) =>
-            getCount(scoreInfo, HitResult.Miss);
+        public static int? GetCountMiss(this ScoreInfo scoreInfo)
+        {
+            switch (scoreInfo.Ruleset.OnlineID)
+            {
+                case 0:
+                case 1:
+                case 3:
+                    return getCount(scoreInfo, HitResult.Miss);
+
+                case 2:
+                    return (getCount(scoreInfo, HitResult.Miss) ?? 0) + (getCount(scoreInfo, HitResult.LargeTickMiss) ?? 0);
+            }
+
+            return null;
+        }
 
         public static void SetCountMiss(this ScoreInfo scoreInfo, int value) =>
+            // this does not match the implementation of `GetCountMiss()` for catch,
+            // but we physically cannot recover that data anymore at this point.
             scoreInfo.Statistics[HitResult.Miss] = value;
 
         private static int? getCount(ScoreInfo scoreInfo, HitResult result)

@@ -40,6 +40,11 @@ namespace osu.Game.Localisation
         public static LocalisableString SetPreviewPointToCurrent => new TranslatableString(getKey(@"set_preview_point_to_current"), @"Set preview point to current time");
 
         /// <summary>
+        /// "Move already placed objects when changing timing"
+        /// </summary>
+        public static LocalisableString AdjustExistingObjectsOnTimingChanges => new TranslatableString(getKey(@"adjust_existing_objects_on_timing_changes"), @"Move already placed objects when changing timing");
+
+        /// <summary>
         /// "For editing (.olz)"
         /// </summary>
         public static LocalisableString ExportForEditing => new TranslatableString(getKey(@"export_for_editing"), @"For editing (.olz)");
@@ -100,16 +105,6 @@ namespace osu.Game.Localisation
         public static LocalisableString TestBeatmap => new TranslatableString(getKey(@"test_beatmap"), @"Test!");
 
         /// <summary>
-        /// "Waveform"
-        /// </summary>
-        public static LocalisableString TimelineWaveform => new TranslatableString(getKey(@"timeline_waveform"), @"Waveform");
-
-        /// <summary>
-        /// "Ticks"
-        /// </summary>
-        public static LocalisableString TimelineTicks => new TranslatableString(getKey(@"timeline_ticks"), @"Ticks");
-
-        /// <summary>
         /// "{0:0}&#176;"
         /// </summary>
         public static LocalisableString RotationUnsnapped(float newRotation) => new TranslatableString(getKey(@"rotation_unsnapped"), @"{0:0}°", newRotation);
@@ -125,6 +120,11 @@ namespace osu.Game.Localisation
         public static LocalisableString LimitedDistanceSnap => new TranslatableString(getKey(@"limited_distance_snap_grid"), @"Limit distance snap placement to current time");
 
         /// <summary>
+        /// "Contract sidebars when not hovered"
+        /// </summary>
+        public static LocalisableString ContractSidebars => new TranslatableString(getKey(@"contract_sidebars"), @"Contract sidebars when not hovered");
+
+        /// <summary>
         /// "Must be in edit mode to handle editor links"
         /// </summary>
         public static LocalisableString MustBeInEditorToHandleLinks => new TranslatableString(getKey(@"must_be_in_editor_to_handle_links"), @"Must be in edit mode to handle editor links");
@@ -133,6 +133,56 @@ namespace osu.Game.Localisation
         /// "Failed to parse editor link"
         /// </summary>
         public static LocalisableString FailedToParseEditorLink => new TranslatableString(getKey(@"failed_to_parse_edtior_link"), @"Failed to parse editor link");
+
+        /// <summary>
+        /// "Timeline"
+        /// </summary>
+        public static LocalisableString Timeline => new TranslatableString(getKey(@"timeline"), @"Timeline");
+
+        /// <summary>
+        /// "Show timing changes"
+        /// </summary>
+        public static LocalisableString TimelineShowTimingChanges => new TranslatableString(getKey(@"timeline_show_timing_changes"), @"Show timing changes");
+
+        /// <summary>
+        /// "Show breaks"
+        /// </summary>
+        public static LocalisableString TimelineShowBreaks => new TranslatableString(getKey(@"timeline_show_breaks"), @"Show breaks");
+
+        /// <summary>
+        /// "Show ticks"
+        /// </summary>
+        public static LocalisableString TimelineShowTicks => new TranslatableString(getKey(@"timeline_show_ticks"), @"Show ticks");
+
+        /// <summary>
+        /// "Bookmarks"
+        /// </summary>
+        public static LocalisableString Bookmarks => new TranslatableString(getKey(@"bookmarks"), @"Bookmarks");
+
+        /// <summary>
+        /// "Add bookmark"
+        /// </summary>
+        public static LocalisableString AddBookmark => new TranslatableString(getKey(@"add_bookmark"), @"Add bookmark");
+
+        /// <summary>
+        /// "Remove closest bookmark"
+        /// </summary>
+        public static LocalisableString RemoveClosestBookmark => new TranslatableString(getKey(@"remove_closest_bookmark"), @"Remove closest bookmark");
+
+        /// <summary>
+        /// "Seek to previous bookmark"
+        /// </summary>
+        public static LocalisableString SeekToPreviousBookmark => new TranslatableString(getKey(@"seek_to_previous_bookmark"), @"Seek to previous bookmark");
+
+        /// <summary>
+        /// "Seek to next bookmark"
+        /// </summary>
+        public static LocalisableString SeekToNextBookmark => new TranslatableString(getKey(@"seek_to_next_bookmark"), @"Seek to next bookmark");
+
+        /// <summary>
+        /// "Reset bookmarks"
+        /// </summary>
+        public static LocalisableString ResetBookmarks => new TranslatableString(getKey(@"reset_bookmarks"), @"Reset bookmarks");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

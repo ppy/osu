@@ -19,6 +19,16 @@ namespace osu.Game.Rulesets.Scoring.Legacy
         public IRulesetInfo SourceRuleset { get; set; } = new RulesetInfo();
 
         /// <summary>
+        /// The beatmap drain rate.
+        /// </summary>
+        public float DrainRate { get; set; }
+
+        /// <summary>
+        /// The beatmap approach rate.
+        /// </summary>
+        public float ApproachRate { get; set; }
+
+        /// <summary>
         /// The beatmap circle size.
         /// </summary>
         public float CircleSize { get; set; }
@@ -41,8 +51,6 @@ namespace osu.Game.Rulesets.Scoring.Legacy
         /// </summary>
         public int TotalObjectCount { get; set; }
 
-        float IBeatmapDifficultyInfo.DrainRate => 0;
-        float IBeatmapDifficultyInfo.ApproachRate => 0;
         double IBeatmapDifficultyInfo.SliderMultiplier => 0;
         double IBeatmapDifficultyInfo.SliderTickRate => 0;
 
@@ -51,6 +59,8 @@ namespace osu.Game.Rulesets.Scoring.Legacy
         public static LegacyBeatmapConversionDifficultyInfo FromBeatmap(IBeatmap beatmap) => new LegacyBeatmapConversionDifficultyInfo
         {
             SourceRuleset = beatmap.BeatmapInfo.Ruleset,
+            DrainRate = beatmap.Difficulty.DrainRate,
+            ApproachRate = beatmap.Difficulty.ApproachRate,
             CircleSize = beatmap.Difficulty.CircleSize,
             OverallDifficulty = beatmap.Difficulty.OverallDifficulty,
             EndTimeObjectCount = beatmap.HitObjects.Count(h => h is IHasDuration),
@@ -60,6 +70,8 @@ namespace osu.Game.Rulesets.Scoring.Legacy
         public static LegacyBeatmapConversionDifficultyInfo FromBeatmapInfo(IBeatmapInfo beatmapInfo) => new LegacyBeatmapConversionDifficultyInfo
         {
             SourceRuleset = beatmapInfo.Ruleset,
+            DrainRate = beatmapInfo.Difficulty.DrainRate,
+            ApproachRate = beatmapInfo.Difficulty.ApproachRate,
             CircleSize = beatmapInfo.Difficulty.CircleSize,
             OverallDifficulty = beatmapInfo.Difficulty.OverallDifficulty,
             EndTimeObjectCount = beatmapInfo.EndTimeObjectCount,

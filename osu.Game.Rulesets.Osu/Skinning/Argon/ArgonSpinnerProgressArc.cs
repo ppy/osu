@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                     Origin = Anchor.Centre,
                     Colour = Color4.White.Opacity(0.25f),
                     RelativeSizeAxes = Axes.Both,
-                    Current = { Value = arc_fill },
+                    Progress = arc_fill,
                     Rotation = 90 - arc_fill * 180,
                     InnerRadius = arc_radius,
                     RoundedCaps = true,
@@ -71,9 +71,9 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
             background.Alpha = spinner.Progress >= 1 ? 0 : 1;
 
             fill.Alpha = (float)Interpolation.DampContinuously(fill.Alpha, spinner.Progress > 0 && spinner.Progress < 1 ? 1 : 0, 40f, (float)Math.Abs(Time.Elapsed));
-            fill.Current.Value = (float)Interpolation.DampContinuously(fill.Current.Value, spinner.Progress >= 1 ? 0 : arc_fill * spinner.Progress, 40f, (float)Math.Abs(Time.Elapsed));
+            fill.Progress = (float)Interpolation.DampContinuously(fill.Progress, spinner.Progress >= 1 ? 0 : arc_fill * spinner.Progress, 40f, (float)Math.Abs(Time.Elapsed));
 
-            fill.Rotation = (float)(90 - fill.Current.Value * 180);
+            fill.Rotation = (float)(90 - fill.Progress * 180);
         }
 
         private partial class ProgressFill : CircularProgress

@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
@@ -19,15 +18,15 @@ using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI;
-using osu.Game.Screens.Edit.Components.TernaryButtons;
 using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Edit
 {
+    [Cached]
     public partial class CatchHitObjectComposer : ScrollingHitObjectComposer<CatchHitObject>, IKeyBindingHandler<GlobalAction>
     {
-        private const float distance_snap_radius = 50;
+        public const float DISTANCE_SNAP_RADIUS = 50;
 
         private CatchDistanceSnapGrid distanceSnapGrid = null!;
 
@@ -71,7 +70,9 @@ namespace osu.Game.Rulesets.Catch.Edit
             }));
         }
 
-        protected override IEnumerable<TernaryButton> CreateTernaryButtons()
+        protected override Drawable CreateHitObjectInspector() => new CatchHitObjectInspector(DistanceSnapProvider);
+
+        protected override IEnumerable<Drawable> CreateTernaryButtons()
             => base.CreateTernaryButtons()
                    .Concat(DistanceSnapProvider.CreateTernaryButtons());
 
@@ -85,7 +86,7 @@ namespace osu.Game.Rulesets.Catch.Edit
 
         protected override BeatSnapGrid CreateBeatSnapGrid() => new CatchBeatSnapGrid();
 
-        protected override IReadOnlyList<HitObjectCompositionTool> CompositionTools => new HitObjectCompositionTool[]
+        protected override IReadOnlyList<CompositionTool> CompositionTools => new CompositionTool[]
         {
             new FruitCompositionTool(),
             new JuiceStreamCompositionTool(),
@@ -115,22 +116,32 @@ namespace osu.Game.Rulesets.Catch.Edit
         {
         }
 
-        public override SnapResult FindSnappedPositionAndTime(Vector2 screenSpacePosition, SnapType snapType = SnapType.All)
+        protected override bool OnKeyDown(KeyDownEvent e)
         {
-            var result = base.FindSnappedPositionAndTime(screenSpacePosition, snapType);
+            if (e.Repeat)
+                return false;
 
-            result.ScreenSpacePosition.X = screenSpacePosition.X;
+            handleToggleViaKey(e);
+            return base.OnKeyDown(e);
+        }
 
-            if (snapType.HasFlagFast(SnapType.RelativeGrids))
-            {
-                if (distanceSnapGrid.IsPresent && distanceSnapGrid.GetSnappedPosition(result.ScreenSpacePosition) is SnapResult snapResult &&
-                    Vector2.Distance(snapResult.ScreenSpacePosition, result.ScreenSpacePosition) < distance_snap_radius)
-                {
-                    result = snapResult;
-                }
-            }
+        protected override void OnKeyUp(KeyUpEvent e)
+        {
+            handleToggleViaKey(e);
+            base.OnKeyUp(e);
+        }
 
-            return result;
+        private void handleToggleViaKey(KeyboardEvent key)
+        {
+            DistanceSnapProvider.HandleToggleViaKey(key);
+        }
+
+        public SnapResult? TryDistanceSnap(Vector2 screenSpacePosition)
+        {
+            if (distanceSnapGrid.IsPresent && distanceSnapGrid.GetSnappedPosition(screenSpacePosition) is SnapResult snapResult)
+                return snapResult;
+
+            return null;
         }
 
         private PalpableCatchHitObject? getLastSnappableHitObject(double time)

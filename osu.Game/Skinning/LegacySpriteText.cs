@@ -96,7 +96,7 @@ namespace osu.Game.Skinning
                     if (maxSize != null)
                         texture = texture.WithMaximumSize(maxSize.Value);
 
-                    glyph = new TexturedCharacterGlyph(new CharacterGlyph(character, 0, 0, texture.Width, texture.Height, null), texture, 1f / texture.ScaleAdjust);
+                    glyph = new TexturedCharacterGlyph(new CharacterGlyph(character, 0, 0, texture.Width, 0, null), texture, 1f / texture.ScaleAdjust);
                 }
 
                 cache[character] = glyph;

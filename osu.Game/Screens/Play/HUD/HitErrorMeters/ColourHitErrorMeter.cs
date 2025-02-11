@@ -107,8 +107,6 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                 JudgementSpacing.BindValueChanged(_ => updateMetrics(), true);
             }
 
-            private readonly DrawablePool<HitErrorShape> judgementLinePool = new DrawablePool<HitErrorShape>(50);
-
             public void Push(HitErrorShape shape)
             {
                 Add(shape);

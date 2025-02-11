@@ -11,9 +11,11 @@ using osu.Framework.Graphics.Textures;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Extensions;
+using osu.Game.Graphics;
 using osu.Game.IO;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Play.HUD.HitErrorMeters;
+using osu.Game.Skinning.Triangles;
 using osuTK;
 using osuTK.Graphics;
 
@@ -63,19 +65,16 @@ namespace osu.Game.Skinning
             // Temporary until default skin has a valid hit lighting.
             if ((lookup as SkinnableSprite.SpriteComponentLookup)?.LookupName == @"lighting") return Drawable.Empty();
 
-            if (base.GetDrawableComponent(lookup) is Drawable c)
-                return c;
-
             switch (lookup)
             {
-                case SkinComponentsContainerLookup containerLookup:
+                case GlobalSkinnableContainerLookup containerLookup:
                     // Only handle global level defaults for now.
                     if (containerLookup.Ruleset != null)
                         return null;
 
-                    switch (containerLookup.Target)
+                    switch (containerLookup.Lookup)
                     {
-                        case SkinComponentsContainerLookup.TargetArea.SongSelect:
+                        case GlobalSkinnableContainers.SongSelect:
                             var songSelectComponents = new DefaultSkinComponentsContainer(_ =>
                             {
                                 // do stuff when we need to.
@@ -83,7 +82,7 @@ namespace osu.Game.Skinning
 
                             return songSelectComponents;
 
-                        case SkinComponentsContainerLookup.TargetArea.MainHUDComponents:
+                        case GlobalSkinnableContainers.MainHUDComponents:
                             var skinnableTargetWrapper = new DefaultSkinComponentsContainer(container =>
                             {
                                 var score = container.OfType<DefaultScoreCounter>().FirstOrDefault();
@@ -92,6 +91,7 @@ namespace osu.Game.Skinning
                                 var ppCounter = container.OfType<PerformancePointsCounter>().FirstOrDefault();
                                 var songProgress = container.OfType<DefaultSongProgress>().FirstOrDefault();
                                 var keyCounter = container.OfType<DefaultKeyCounterDisplay>().FirstOrDefault();
+                                var spectatorList = container.OfType<SpectatorList>().FirstOrDefault();
 
                                 if (score != null)
                                 {
@@ -144,16 +144,25 @@ namespace osu.Game.Skinning
                                     }
                                 }
 
+                                const float padding = 10;
+
+                                // Hard to find this at runtime, so taken from the most expanded state during replay.
+                                const float song_progress_offset_height = 73;
+
                                 if (songProgress != null && keyCounter != null)
                                 {
-                                    const float padding = 10;
-
-                                    // Hard to find this at runtime, so taken from the most expanded state during replay.
-                                    const float song_progress_offset_height = 73;
-
                                     keyCounter.Anchor = Anchor.BottomRight;
                                     keyCounter.Origin = Anchor.BottomRight;
                                     keyCounter.Position = new Vector2(-padding, -(song_progress_offset_height + padding));
+                                }
+
+                                if (spectatorList != null)
+                                {
+                                    spectatorList.Font.Value = Typeface.Venera;
+                                    spectatorList.HeaderColour.Value = new OsuColour().BlueLighter;
+                                    spectatorList.Anchor = Anchor.BottomLeft;
+                                    spectatorList.Origin = Anchor.BottomLeft;
+                                    spectatorList.Position = new Vector2(padding, -(song_progress_offset_height + padding));
                                 }
                             })
                             {
@@ -167,7 +176,8 @@ namespace osu.Game.Skinning
                                     new DefaultKeyCounterDisplay(),
                                     new BarHitErrorMeter(),
                                     new BarHitErrorMeter(),
-                                    new PerformancePointsCounter()
+                                    new TrianglesPerformancePointsCounter(),
+                                    new SpectatorList(),
                                 }
                             };
 
@@ -177,7 +187,7 @@ namespace osu.Game.Skinning
                     return null;
             }
 
-            return null;
+            return base.GetDrawableComponent(lookup);
         }
 
         public override IBindable<TValue>? GetConfig<TLookup, TValue>(TLookup lookup)

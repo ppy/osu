@@ -1,11 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using NUnit.Framework;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Osu.Objects;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Editing
@@ -135,9 +137,42 @@ namespace osu.Game.Tests.Visual.Editing
             pressAndCheckTime(Key.Up, 0);
         }
 
-        private void pressAndCheckTime(Key key, double expectedTime)
+        [Test]
+        public void TestSeekBetweenObjects()
         {
-            AddStep($"press {key}", () => InputManager.Key(key));
+            AddStep("add objects", () =>
+            {
+                EditorBeatmap.Clear();
+                EditorBeatmap.AddRange(new[]
+                {
+                    new HitCircle { StartTime = 1000, },
+                    new HitCircle { StartTime = 2250, },
+                    new HitCircle { StartTime = 3600, },
+                });
+            });
+            AddStep("seek to 0", () => EditorClock.Seek(0));
+
+            pressAndCheckTime(Key.Right, 1000, Key.ControlLeft);
+            pressAndCheckTime(Key.Right, 2250, Key.ControlLeft);
+            pressAndCheckTime(Key.Right, 3600, Key.ControlLeft);
+            pressAndCheckTime(Key.Right, 3600, Key.ControlLeft);
+            pressAndCheckTime(Key.Left, 2250, Key.ControlLeft);
+            pressAndCheckTime(Key.Left, 1000, Key.ControlLeft);
+            pressAndCheckTime(Key.Left, 1000, Key.ControlLeft);
+        }
+
+        private void pressAndCheckTime(Key key, double expectedTime, params Key[] modifiers)
+        {
+            AddStep($"press {key} with {(modifiers.Any() ? string.Join(',', modifiers) : "no modifiers")}", () =>
+            {
+                foreach (var modifier in modifiers)
+                    InputManager.PressKey(modifier);
+
+                InputManager.Key(key);
+
+                foreach (var modifier in modifiers)
+                    InputManager.ReleaseKey(modifier);
+            });
             AddUntilStep($"time is {expectedTime}", () => EditorClock.CurrentTime, () => Is.EqualTo(expectedTime).Within(1));
         }
     }
