@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -32,6 +33,17 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary
             Content.CornerRadius = 0;
 
             Text = EditorStrings.TestBeatmap;
+        }
+
+        protected override bool OnMouseDown(MouseDownEvent e)
+        {
+            // block scale animation
+            return false;
+        }
+
+        protected override void OnMouseUp(MouseUpEvent e)
+        {
+            // block scale animation
         }
     }
 }
