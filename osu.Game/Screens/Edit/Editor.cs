@@ -1259,9 +1259,9 @@ namespace osu.Game.Screens.Edit
             if (editorBeatmap.BeatmapInfo.OnlineID > 0)
             {
                 yield return new OsuMenuItemSpacer();
-                yield return new EditorMenuItem(EditorStrings.OpenInfoPageInBrowser, MenuItemType.Standard,
+                yield return new EditorMenuItem(EditorStrings.OpenInfoPage, MenuItemType.Standard,
                     () => (Game as OsuGame)?.OpenUrlExternally(editorBeatmap.BeatmapInfo.GetOnlineURL(api, editorBeatmap.BeatmapInfo.Ruleset)));
-                yield return new EditorMenuItem(EditorStrings.OpenDiscussionPageInBrowser, MenuItemType.Standard,
+                yield return new EditorMenuItem(EditorStrings.OpenDiscussionPage, MenuItemType.Standard,
                     () => (Game as OsuGame)?.OpenUrlExternally($@"{api.Endpoints.WebsiteUrl}/beatmapsets/{editorBeatmap.BeatmapInfo.BeatmapSet!.OnlineID}/discussion/{editorBeatmap.BeatmapInfo.OnlineID}"));
             }
 

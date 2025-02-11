@@ -187,12 +187,12 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Open beatmap info page in browser"
         /// </summary>
-        public static LocalisableString OpenInfoPageInBrowser => new TranslatableString(getKey(@"open_info_page_in_browser"), @"Open beatmap info page in browser");
+        public static LocalisableString OpenInfoPage => new TranslatableString(getKey(@"open_info_page"), @"Open beatmap info page");
 
         /// <summary>
         /// "Open beatmap discussion page in browser"
         /// </summary>
-        public static LocalisableString OpenDiscussionPageInBrowser => new TranslatableString(getKey(@"open_discussion_page_in_browser"), @"Open beatmap discussion page in browser");
+        public static LocalisableString OpenDiscussionPage => new TranslatableString(getKey(@"open_discussion_page"), @"Open beatmap discussion page");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
