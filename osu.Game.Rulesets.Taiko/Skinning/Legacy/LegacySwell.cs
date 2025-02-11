@@ -14,6 +14,7 @@ using osuTK;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Framework.Extensions.ObjectExtensions;
 using System;
+using System.Globalization;
 
 namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 {
@@ -39,7 +40,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
         }
 
         [BackgroundDependencyLoader]
-        private void load(DrawableHitObject hitObject, ISkinSource skin, SkinManager skinManager)
+        private void load(DrawableHitObject hitObject, ISkinSource skin)
         {
             Children = new Drawable[]
             {
@@ -54,7 +55,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Position = new Vector2(200f, 100f),
+                    Position = new Vector2(250f, 100f), // ballparked to be horizontally centred on 4:3 resolution
 
                     Children = new Drawable[]
                     {
@@ -109,14 +110,14 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
         private void animateSwellProgress(int numHits, int requiredHits)
         {
             int remainingHits = requiredHits - numHits;
-            remainingHitsText.Text = remainingHits.ToString();
-            remainingHitsText.ScaleTo(1.6f - (0.6f * ((float)remainingHits / requiredHits)), 60, Easing.OutQuad);
+            remainingHitsText.Text = remainingHits.ToString(CultureInfo.InvariantCulture);
+            remainingHitsText.ScaleTo(1.6f - (0.6f * ((float)remainingHits / requiredHits)), 60, Easing.Out);
 
             spinnerCircle.ClearTransforms();
             spinnerCircle
                 .RotateTo(180f * numHits, 1000, Easing.OutQuint)
                 .ScaleTo(Math.Min(0.94f, spinnerCircle.Scale.X + 0.02f))
-                .ScaleTo(0.8f, 400, Easing.OutQuad);
+                .ScaleTo(0.8f, 400, Easing.Out);
         }
 
         private void updateStateTransforms(DrawableHitObject drawableHitObject, ArmedState state)
@@ -134,7 +135,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                     samplePlayed = false;
                 }
 
-                const double body_transition_duration = 100;
+                const double body_transition_duration = 200;
 
                 warning.FadeOut(body_transition_duration);
                 bodyContainer.FadeIn(body_transition_duration);
@@ -146,9 +147,8 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                 const double clear_transition_duration = 300;
                 const double clear_fade_in = 120;
 
-                bodyContainer
-                    .FadeOut(clear_transition_duration, Easing.OutQuad)
-                    .ScaleTo(1.05f, clear_transition_duration, Easing.OutQuad);
+                bodyContainer.FadeOut(clear_transition_duration, Easing.OutQuad);
+                spinnerCircle.ScaleTo(spinnerCircle.Scale.X + 0.05f, clear_transition_duration, Easing.OutQuad);
 
                 if (state == ArmedState.Hit)
                 {
@@ -159,11 +159,11 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                     }
 
                     clearAnimation
-                        .FadeIn(clear_fade_in)
                         .MoveTo(new Vector2(0, 0))
+                        .MoveTo(new Vector2(0, -90), clear_fade_in * 2, Easing.Out)
                         .ScaleTo(0.4f)
-                        .MoveTo(new Vector2(0, -90), clear_fade_in * 2, Easing.OutQuad)
                         .ScaleTo(1f, clear_fade_in * 2, Easing.Out)
+                        .FadeIn(clear_fade_in)
                         .Delay(clear_fade_in * 3)
                         .FadeOut(clear_fade_in * 2.5);
                 }
