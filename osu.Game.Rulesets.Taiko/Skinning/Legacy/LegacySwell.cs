@@ -108,8 +108,9 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 
         private void animateSwellProgress(int numHits, int requiredHits)
         {
-            remainingHitsText.Text = $"{requiredHits - numHits}";
-            remainingHitsText.ScaleTo(1.6f - (0.6f * ((float)numHits / requiredHits)), 60, Easing.OutQuad);
+            int remainingHits = requiredHits - numHits;
+            remainingHitsText.Text = remainingHits.ToString();
+            remainingHitsText.ScaleTo(1.6f - (0.6f * ((float)remainingHits / requiredHits)), 60, Easing.OutQuad);
 
             spinnerCircle.ClearTransforms();
             spinnerCircle
