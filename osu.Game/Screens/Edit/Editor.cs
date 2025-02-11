@@ -1256,6 +1256,15 @@ namespace osu.Game.Screens.Edit
                 yield return externalEdit;
             }
 
+            if (editorBeatmap.BeatmapInfo.OnlineID > 0)
+            {
+                yield return new OsuMenuItemSpacer();
+                yield return new EditorMenuItem(EditorStrings.OpenInfoPage, MenuItemType.Standard,
+                    () => (Game as OsuGame)?.OpenUrlExternally(editorBeatmap.BeatmapInfo.GetOnlineURL(api, editorBeatmap.BeatmapInfo.Ruleset)));
+                yield return new EditorMenuItem(EditorStrings.OpenDiscussionPage, MenuItemType.Standard,
+                    () => (Game as OsuGame)?.OpenUrlExternally($@"{api.Endpoints.WebsiteUrl}/beatmapsets/{editorBeatmap.BeatmapInfo.BeatmapSet!.OnlineID}/discussion/{editorBeatmap.BeatmapInfo.OnlineID}"));
+            }
+
             yield return new OsuMenuItemSpacer();
             yield return new EditorMenuItem(CommonStrings.Exit, MenuItemType.Standard, this.Exit);
         }
