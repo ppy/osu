@@ -439,13 +439,14 @@ namespace osu.Game.Screens.OnlinePlay.Match
 
             var rulesetInstance = GetGameplayRuleset().CreateInstance();
 
-            // Remove any user mods that are no longer allowed.
             Mod[] allowedMods = item.Freestyle
-                ? rulesetInstance.CreateAllMods().Where(m => ModUtils.IsValidFreeModForMatchType(m, Room.Type)).ToArray()
+                ? rulesetInstance.AllMods.OfType<Mod>().Where(m => ModUtils.IsValidFreeModForMatchType(m, Room.Type)).ToArray()
                 : item.AllowedMods.Select(m => m.ToMod(rulesetInstance)).ToArray();
+
+            // Remove any user mods that are no longer allowed.
             Mod[] newUserMods = UserMods.Value.Where(m => allowedMods.Any(a => m.GetType() == a.GetType())).ToArray();
             if (!newUserMods.SequenceEqual(UserMods.Value))
-                UserMods.Value = UserMods.Value.Where(m => allowedMods.Any(a => m.GetType() == a.GetType())).ToList();
+                UserMods.Value = newUserMods;
 
             // Retrieve the corresponding local beatmap, since we can't directly use the playlist's beatmap info
             int beatmapId = GetGameplayBeatmap().OnlineID;
@@ -456,10 +457,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
             Mods.Value = GetGameplayMods().Select(m => m.ToMod(rulesetInstance)).ToArray();
             Ruleset.Value = GetGameplayRuleset();
 
-            bool freestyle = item.Freestyle;
-            bool freeMod = freestyle || item.AllowedMods.Any();
-
-            if (freeMod)
+            if (allowedMods.Length > 0)
             {
                 UserModsSection.Show();
                 UserModsSelectOverlay.IsValidMod = m => allowedMods.Any(a => a.GetType() == m.GetType());
@@ -471,7 +469,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
                 UserModsSelectOverlay.IsValidMod = _ => false;
             }
 
-            if (freestyle)
+            if (item.Freestyle)
             {
                 UserStyleSection.Show();
 
@@ -484,7 +482,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
                 UserStyleDisplayContainer.Child = new DrawableRoomPlaylistItem(gameplayItem, true)
                 {
                     AllowReordering = false,
-                    AllowEditing = freestyle,
+                    AllowEditing = true,
                     RequestEdit = _ => OpenStyleSelection()
                 };
             }
