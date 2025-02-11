@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -28,6 +27,7 @@ using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Users;
 using osu.Game.Users.Drawables;
@@ -216,20 +216,28 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
 
             const double fade_time = 50;
 
-            MultiplayerPlaylistItem? currentItem = client.Room.GetCurrentItem();
-            Debug.Assert(currentItem != null);
+            if (client.Room.GetCurrentItem() is MultiplayerPlaylistItem currentItem)
+            {
+                int userBeatmapId = User.BeatmapId ?? currentItem.BeatmapID;
+                int userRulesetId = User.RulesetId ?? currentItem.RulesetID;
+                Ruleset? userRuleset = rulesets.GetRuleset(userRulesetId)?.CreateInstance();
 
-            int userBeatmapId = User.BeatmapId ?? currentItem.BeatmapID;
-            int userRulesetId = User.RulesetId ?? currentItem.RulesetID;
-            Ruleset? userRuleset = rulesets.GetRuleset(userRulesetId)?.CreateInstance();
-            Debug.Assert(userRuleset != null);
+                int? currentModeRank = User.User?.RulesetsStatistics?.GetValueOrDefault(userRuleset?.ShortName)?.GlobalRank;
+                userRankText.Text = currentModeRank != null ? $"#{currentModeRank.Value:N0}" : string.Empty;
+
+                if (userBeatmapId == currentItem.BeatmapID && userRulesetId == currentItem.RulesetID)
+                    userStyleDisplay.Style = null;
+                else
+                    userStyleDisplay.Style = (userBeatmapId, userRulesetId);
+
+                // If the mods are updated at the end of the frame, the flow container will skip a reflow cycle: https://github.com/ppy/osu-framework/issues/4187
+                // This looks particularly jarring here, so re-schedule the update to that start of our frame as a fix.
+                Schedule(() => userModsDisplay.Current.Value = userRuleset == null ? Array.Empty<Mod>() : User.Mods.Select(m => m.ToMod(userRuleset)).ToList());
+            }
 
             userStateDisplay.UpdateStatus(User.State, User.BeatmapAvailability);
 
-            int? currentModeRank = User.User?.RulesetsStatistics?.GetValueOrDefault(userRuleset.ShortName)?.GlobalRank;
-            userRankText.Text = currentModeRank != null ? $"#{currentModeRank.Value:N0}" : string.Empty;
-
-            if ((User.BeatmapAvailability.State == DownloadState.LocallyAvailable) && (User.State != MultiplayerUserState.Spectating))
+            if (User.BeatmapAvailability.State == DownloadState.LocallyAvailable && User.State != MultiplayerUserState.Spectating)
             {
                 userModsDisplay.FadeIn(fade_time);
                 userStyleDisplay.FadeIn(fade_time);
@@ -240,17 +248,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                 userStyleDisplay.FadeOut(fade_time);
             }
 
-            if (userBeatmapId == currentItem.BeatmapID && userRulesetId == currentItem.RulesetID)
-                userStyleDisplay.Style = null;
-            else
-                userStyleDisplay.Style = (userBeatmapId, userRulesetId);
-
             kickButton.Alpha = client.IsHost && !User.Equals(client.LocalUser) ? 1 : 0;
             crown.Alpha = client.Room.Host?.Equals(User) == true ? 1 : 0;
-
-            // If the mods are updated at the end of the frame, the flow container will skip a reflow cycle: https://github.com/ppy/osu-framework/issues/4187
-            // This looks particularly jarring here, so re-schedule the update to that start of our frame as a fix.
-            Schedule(() => userModsDisplay.Current.Value = User.Mods.Select(m => m.ToMod(userRuleset)).ToList());
         }
 
         public MenuItem[]? ContextMenuItems
