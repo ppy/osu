@@ -255,7 +255,7 @@ namespace osu.Game.Collections
             private void deleteCollection() => collection.PerformWrite(c => c.Realm!.Remove(c));
         }
 
-        public IEnumerable<LocalisableString> FilterTerms => [(LocalisableString)Model.Value.Name];
+        public IEnumerable<LocalisableString> FilterTerms => Model.PerformRead(m => m.IsValid ? new[] { (LocalisableString)m.Name } : []);
 
         private bool matchingFilter = true;
 
