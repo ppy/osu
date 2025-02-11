@@ -31,7 +31,7 @@ namespace osu.Game.Overlays
         /// <summary>
         /// All notifications currently being displayed by the toast tray.
         /// </summary>
-        public IEnumerable<Notification> Notifications => toastFlow;
+        public IEnumerable<Notification> Notifications => toastFlow.Concat(InternalChildren.OfType<Notification>());
 
         public bool IsDisplayingToasts => toastFlow.Count > 0;
 
@@ -41,14 +41,9 @@ namespace osu.Game.Overlays
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
-        public Action<Notification>? ForwardNotificationToPermanentStore { get; set; }
+        public required Action<Notification> ForwardNotificationToPermanentStore { get; init; }
 
-        public int UnreadCount => allDisplayedNotifications.Count(n => !n.WasClosed && !n.Read);
-
-        /// <summary>
-        /// Notifications contained in the toast flow, or in a detached state while they animate during forwarding to the main overlay.
-        /// </summary>
-        private IEnumerable<Notification> allDisplayedNotifications => toastFlow.Concat(InternalChildren.OfType<Notification>());
+        public int UnreadCount => Notifications.Count(n => !n.WasClosed && !n.Read);
 
         private int runningDepth;
 
@@ -91,11 +86,7 @@ namespace osu.Game.Overlays
             };
         }
 
-        public void MarkAllRead()
-        {
-            toastFlow.Children.ForEach(n => n.Read = true);
-            InternalChildren.OfType<Notification>().ForEach(n => n.Read = true);
-        }
+        public void MarkAllRead() => Notifications.ForEach(n => n.Read = true);
 
         public void FlushAllToasts()
         {
@@ -151,8 +142,15 @@ namespace osu.Game.Overlays
             notification.MoveToOffset(new Vector2(400, 0), NotificationOverlay.TRANSITION_LENGTH, Easing.OutQuint);
             notification.FadeOut(NotificationOverlay.TRANSITION_LENGTH, Easing.OutQuint).OnComplete(_ =>
             {
+                if (notification.Transient)
+                {
+                    notification.IsInToastTray = false;
+                    notification.Close(false);
+                    return;
+                }
+
                 RemoveInternal(notification, false);
-                ForwardNotificationToPermanentStore?.Invoke(notification);
+                ForwardNotificationToPermanentStore(notification);
 
                 notification.FadeIn(300, Easing.OutQuint);
             });
@@ -162,8 +160,22 @@ namespace osu.Game.Overlays
         {
             base.Update();
 
-            float height = toastFlow.Count > 0 ? toastFlow.DrawHeight + 120 : 0;
-            float alpha = toastFlow.Count > 0 ? MathHelper.Clamp(toastFlow.DrawHeight / 41, 0, 1) * toastFlow.Children.Max(n => n.Alpha) : 0;
+            float height = 0;
+            float alpha = 0;
+
+            if (toastFlow.Count > 0)
+            {
+                float maxNotificationAlpha = 0;
+
+                foreach (var t in toastFlow)
+                {
+                    if (t.Alpha > maxNotificationAlpha)
+                        maxNotificationAlpha = t.Alpha;
+                }
+
+                height = toastFlow.DrawHeight + 120;
+                alpha = MathHelper.Clamp(toastFlow.DrawHeight / 41, 0, 1) * maxNotificationAlpha;
+            }
 
             toastContentBackground.Height = (float)Interpolation.DampContinuously(toastContentBackground.Height, height, 10, Clock.ElapsedFrameTime);
             toastContentBackground.Alpha = (float)Interpolation.DampContinuously(toastContentBackground.Alpha, alpha, 10, Clock.ElapsedFrameTime);

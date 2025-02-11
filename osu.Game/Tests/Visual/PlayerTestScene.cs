@@ -70,9 +70,19 @@ namespace osu.Game.Tests.Visual
 
             AddStep($"Load player for {CreatePlayerRuleset().Description}", LoadPlayer);
             AddUntilStep("player loaded", () => Player.IsLoaded && Player.Alpha == 1);
+
+            if (AllowBackwardsSeeks)
+            {
+                AddStep("allow backwards seeking", () =>
+                {
+                    Player.DrawableRuleset.AllowBackwardsSeeks = AllowBackwardsSeeks;
+                });
+            }
         }
 
         protected virtual bool AllowFail => false;
+
+        protected virtual bool AllowBackwardsSeeks => false;
 
         protected virtual bool Autoplay => false;
 
@@ -126,6 +136,6 @@ namespace osu.Game.Tests.Visual
 
         protected sealed override Ruleset CreateRuleset() => CreatePlayerRuleset();
 
-        protected virtual TestPlayer CreatePlayer(Ruleset ruleset) => new TestPlayer(false, false);
+        protected virtual TestPlayer CreatePlayer(Ruleset ruleset) => new TestPlayer(false, false, AllowBackwardsSeeks);
     }
 }

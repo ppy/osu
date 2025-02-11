@@ -64,7 +64,7 @@ namespace osu.Game.Beatmaps
             // The original texture upload will no longer be returned or used.
             textureUpload.Dispose();
 
-            Size size = image.Size();
+            Size size = image.Size;
 
             // Assume that panel backgrounds are always displayed using `FillMode.Fill`.
             // Also assume that all backgrounds are wider than they are tall, so the

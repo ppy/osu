@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Catch.Tests.Mods
                 },
                 Autoplay = true,
                 PassCondition = () => Player.ScoreProcessor.Combo.Value == 2,
-                Beatmap = new Beatmap
+                CreateBeatmap = () => new Beatmap
                 {
                     HitObjects = new List<HitObject>
                     {
@@ -59,7 +59,7 @@ namespace osu.Game.Rulesets.Catch.Tests.Mods
                 },
                 Autoplay = true,
                 PassCondition = () => true,
-                Beatmap = new Beatmap
+                CreateBeatmap = () => new Beatmap
                 {
                     HitObjects = new List<HitObject>
                     {
@@ -74,7 +74,7 @@ namespace osu.Game.Rulesets.Catch.Tests.Mods
                             StartTime = 5000,
                         }
                     },
-                    Breaks = new List<BreakPeriod>
+                    Breaks =
                     {
                         new BreakPeriod(2000, 4000),
                     }
@@ -99,7 +99,7 @@ namespace osu.Game.Rulesets.Catch.Tests.Mods
                 },
                 Autoplay = true,
                 PassCondition = () => true,
-                Beatmap = new Beatmap
+                CreateBeatmap = () => new Beatmap
                 {
                     HitObjects = new List<HitObject>
                     {

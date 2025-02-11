@@ -37,14 +37,8 @@ namespace osu.Game.Tests.Visual.SongSelect
         [SetUp]
         public void Setup() => Schedule(() => Child = advancedStats = new TestAdvancedStats
         {
-            Width = 500
+            Width = 500,
         });
-
-        [SetUpSteps]
-        public void SetUpSteps()
-        {
-            AddStep("reset game ruleset", () => Ruleset.Value = new OsuRuleset().RulesetInfo);
-        }
 
         private BeatmapInfo exampleBeatmapInfo => new BeatmapInfo
         {
@@ -74,45 +68,12 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
-        public void TestManiaFirstBarTextManiaBeatmap()
+        public void TestFirstBarText()
         {
-            AddStep("set game ruleset to mania", () => Ruleset.Value = new ManiaRuleset().RulesetInfo);
-
-            AddStep("set beatmap", () => advancedStats.BeatmapInfo = new BeatmapInfo
-            {
-                Ruleset = rulesets.GetRuleset(3) ?? throw new InvalidOperationException("osu!mania ruleset not found"),
-                Difficulty = new BeatmapDifficulty
-                {
-                    CircleSize = 5,
-                    DrainRate = 4.3f,
-                    OverallDifficulty = 4.5f,
-                    ApproachRate = 3.1f
-                },
-                StarRating = 8
-            });
-
+            AddStep("set ruleset to mania", () => advancedStats.Ruleset.Value = new ManiaRuleset().RulesetInfo);
             AddAssert("first bar text is correct", () => advancedStats.ChildrenOfType<SpriteText>().First().Text == BeatmapsetsStrings.ShowStatsCsMania);
-        }
-
-        [Test]
-        public void TestManiaFirstBarTextConvert()
-        {
-            AddStep("set game ruleset to mania", () => Ruleset.Value = new ManiaRuleset().RulesetInfo);
-
-            AddStep("set beatmap", () => advancedStats.BeatmapInfo = new BeatmapInfo
-            {
-                Ruleset = new OsuRuleset().RulesetInfo,
-                Difficulty = new BeatmapDifficulty
-                {
-                    CircleSize = 5,
-                    DrainRate = 4.3f,
-                    OverallDifficulty = 4.5f,
-                    ApproachRate = 3.1f
-                },
-                StarRating = 8
-            });
-
-            AddAssert("first bar text is correct", () => advancedStats.ChildrenOfType<SpriteText>().First().Text == BeatmapsetsStrings.ShowStatsCsMania);
+            AddStep("set ruleset to osu", () => advancedStats.Ruleset.Value = new OsuRuleset().RulesetInfo);
+            AddAssert("first bar text is correct", () => advancedStats.ChildrenOfType<SpriteText>().First().Text == BeatmapsetsStrings.ShowStatsCs);
         }
 
         [Test]
@@ -123,7 +84,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("select EZ mod", () =>
             {
                 var ruleset = advancedStats.BeatmapInfo.Ruleset.CreateInstance().AsNonNull();
-                SelectedMods.Value = new[] { ruleset.CreateMod<ModEasy>() };
+                advancedStats.Mods.Value = new[] { ruleset.CreateMod<ModEasy>() };
             });
 
             AddAssert("circle size bar is blue", () => barIsBlue(advancedStats.FirstValue));
@@ -140,7 +101,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("select HR mod", () =>
             {
                 var ruleset = advancedStats.BeatmapInfo.Ruleset.CreateInstance().AsNonNull();
-                SelectedMods.Value = new[] { ruleset.CreateMod<ModHardRock>() };
+                advancedStats.Mods.Value = new[] { ruleset.CreateMod<ModHardRock>() };
             });
 
             AddAssert("circle size bar is red", () => barIsRed(advancedStats.FirstValue));
@@ -159,7 +120,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 var ruleset = advancedStats.BeatmapInfo.Ruleset.CreateInstance().AsNonNull();
                 var difficultyAdjustMod = ruleset.CreateMod<ModDifficultyAdjust>().AsNonNull();
                 difficultyAdjustMod.ReadFromDifficulty(advancedStats.BeatmapInfo.Difficulty);
-                SelectedMods.Value = new[] { difficultyAdjustMod };
+                advancedStats.Mods.Value = new[] { difficultyAdjustMod };
             });
 
             AddAssert("circle size bar is white", () => barIsWhite(advancedStats.FirstValue));
@@ -182,7 +143,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 difficultyAdjustMod.ReadFromDifficulty(originalDifficulty);
                 difficultyAdjustMod.DrainRate.Value = originalDifficulty.DrainRate - 0.5f;
                 difficultyAdjustMod.ApproachRate.Value = originalDifficulty.ApproachRate + 2.2f;
-                SelectedMods.Value = new[] { difficultyAdjustMod };
+                advancedStats.Mods.Value = new[] { difficultyAdjustMod };
             });
 
             AddAssert("circle size bar is white", () => barIsWhite(advancedStats.FirstValue));

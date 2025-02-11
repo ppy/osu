@@ -32,7 +32,7 @@ namespace osu.Game.Online.Multiplayer
 
         public OnlineMultiplayerClient(EndpointConfiguration endpoints)
         {
-            endpoint = endpoints.MultiplayerEndpointUrl;
+            endpoint = endpoints.MultiplayerUrl;
         }
 
         [BackgroundDependencyLoader]
@@ -60,6 +60,7 @@ namespace osu.Game.Online.Multiplayer
                     connection.On(nameof(IMultiplayerClient.GameplayStarted), ((IMultiplayerClient)this).GameplayStarted);
                     connection.On<GameplayAbortReason>(nameof(IMultiplayerClient.GameplayAborted), ((IMultiplayerClient)this).GameplayAborted);
                     connection.On(nameof(IMultiplayerClient.ResultsReady), ((IMultiplayerClient)this).ResultsReady);
+                    connection.On<int, int?, int?>(nameof(IMultiplayerClient.UserStyleChanged), ((IMultiplayerClient)this).UserStyleChanged);
                     connection.On<int, IEnumerable<APIMod>>(nameof(IMultiplayerClient.UserModsChanged), ((IMultiplayerClient)this).UserModsChanged);
                     connection.On<int, BeatmapAvailability>(nameof(IMultiplayerClient.UserBeatmapAvailabilityChanged), ((IMultiplayerClient)this).UserBeatmapAvailabilityChanged);
                     connection.On<MatchRoomState>(nameof(IMultiplayerClient.MatchRoomStateChanged), ((IMultiplayerClient)this).MatchRoomStateChanged);
@@ -184,6 +185,16 @@ namespace osu.Game.Online.Multiplayer
             Debug.Assert(connection != null);
 
             return connection.InvokeAsync(nameof(IMultiplayerServer.ChangeBeatmapAvailability), newBeatmapAvailability);
+        }
+
+        public override Task ChangeUserStyle(int? beatmapId, int? rulesetId)
+        {
+            if (!IsConnected.Value)
+                return Task.CompletedTask;
+
+            Debug.Assert(connection != null);
+
+            return connection.InvokeAsync(nameof(IMultiplayerServer.ChangeUserStyle), beatmapId, rulesetId);
         }
 
         public override Task ChangeUserMods(IEnumerable<APIMod> newMods)

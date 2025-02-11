@@ -34,6 +34,7 @@ namespace osu.Game.Input.Bindings
         /// </remarks>
         public override IEnumerable<IKeyBinding> DefaultKeyBindings => globalKeyBindings
                                                                        .Concat(editorKeyBindings)
+                                                                       .Concat(editorTestPlayKeyBindings)
                                                                        .Concat(inGameKeyBindings)
                                                                        .Concat(replayKeyBindings)
                                                                        .Concat(songSelectKeyBindings)
@@ -68,6 +69,9 @@ namespace osu.Game.Input.Bindings
                 case GlobalActionCategory.Overlays:
                     return overlayKeyBindings;
 
+                case GlobalActionCategory.EditorTestPlay:
+                    return editorTestPlayKeyBindings;
+
                 default:
                     throw new ArgumentOutOfRangeException(nameof(category), category, $"Unexpected {nameof(GlobalActionCategory)}");
             }
@@ -97,10 +101,9 @@ namespace osu.Game.Input.Bindings
 
             new KeyBinding(new[] { InputKey.Alt, InputKey.Home }, GlobalAction.Home),
 
-            new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.F }, GlobalAction.ToggleFPSDisplay),
+            new KeyBinding(InputKey.None, GlobalAction.ToggleFPSDisplay),
             new KeyBinding(new[] { InputKey.Control, InputKey.T }, GlobalAction.ToggleToolbar),
             new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.S }, GlobalAction.ToggleSkinEditor),
-            new KeyBinding(new[] { InputKey.Control, InputKey.P }, GlobalAction.ToggleProfile),
 
             new KeyBinding(new[] { InputKey.Control, InputKey.Alt, InputKey.R }, GlobalAction.ResetInputSettings),
 
@@ -118,6 +121,7 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.Control, InputKey.B }, GlobalAction.ToggleBeatmapListing),
             new KeyBinding(new[] { InputKey.Control, InputKey.O }, GlobalAction.ToggleSettings),
             new KeyBinding(new[] { InputKey.Control, InputKey.N }, GlobalAction.ToggleNotifications),
+            new KeyBinding(new[] { InputKey.Control, InputKey.P }, GlobalAction.ToggleProfile),
         };
 
         private static IEnumerable<KeyBinding> editorKeyBindings => new[]
@@ -130,18 +134,35 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.Control, InputKey.D }, GlobalAction.EditorCloneSelection),
             new KeyBinding(new[] { InputKey.J }, GlobalAction.EditorNudgeLeft),
             new KeyBinding(new[] { InputKey.K }, GlobalAction.EditorNudgeRight),
-            new KeyBinding(new[] { InputKey.G }, GlobalAction.EditorCycleGridDisplayMode),
+            new KeyBinding(new[] { InputKey.G }, GlobalAction.EditorCycleGridSpacing),
+            new KeyBinding(new[] { InputKey.Shift, InputKey.G }, GlobalAction.EditorCycleGridType),
             new KeyBinding(new[] { InputKey.F5 }, GlobalAction.EditorTestGameplay),
             new KeyBinding(new[] { InputKey.T }, GlobalAction.EditorTapForBPM),
             new KeyBinding(new[] { InputKey.Control, InputKey.H }, GlobalAction.EditorFlipHorizontally),
             new KeyBinding(new[] { InputKey.Control, InputKey.J }, GlobalAction.EditorFlipVertically),
             new KeyBinding(new[] { InputKey.Control, InputKey.Alt, InputKey.MouseWheelDown }, GlobalAction.EditorDecreaseDistanceSpacing),
             new KeyBinding(new[] { InputKey.Control, InputKey.Alt, InputKey.MouseWheelUp }, GlobalAction.EditorIncreaseDistanceSpacing),
-            // Framework automatically converts wheel up/down to left/right when shift is held.
-            // See https://github.com/ppy/osu-framework/blob/master/osu.Framework/Input/StateChanges/MouseScrollRelativeInput.cs#L37-L38.
-            new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.MouseWheelRight }, GlobalAction.EditorCyclePreviousBeatSnapDivisor),
-            new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.MouseWheelLeft }, GlobalAction.EditorCycleNextBeatSnapDivisor),
+            new KeyBinding(new[] { InputKey.Control, InputKey.MouseWheelDown }, GlobalAction.EditorCyclePreviousBeatSnapDivisor),
+            new KeyBinding(new[] { InputKey.Control, InputKey.MouseWheelUp }, GlobalAction.EditorCycleNextBeatSnapDivisor),
+            new KeyBinding(InputKey.None, GlobalAction.EditorToggleMoveControl),
             new KeyBinding(new[] { InputKey.Control, InputKey.R }, GlobalAction.EditorToggleRotateControl),
+            new KeyBinding(new[] { InputKey.Control, InputKey.E }, GlobalAction.EditorToggleScaleControl),
+            new KeyBinding(new[] { InputKey.Control, InputKey.Left }, GlobalAction.EditorSeekToPreviousHitObject),
+            new KeyBinding(new[] { InputKey.Control, InputKey.Right }, GlobalAction.EditorSeekToNextHitObject),
+            new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.Left }, GlobalAction.EditorSeekToPreviousSamplePoint),
+            new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.Right }, GlobalAction.EditorSeekToNextSamplePoint),
+            new KeyBinding(new[] { InputKey.Control, InputKey.B }, GlobalAction.EditorAddBookmark),
+            new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.B }, GlobalAction.EditorRemoveClosestBookmark),
+            new KeyBinding(new[] { InputKey.Alt, InputKey.Left }, GlobalAction.EditorSeekToPreviousBookmark),
+            new KeyBinding(new[] { InputKey.Alt, InputKey.Right }, GlobalAction.EditorSeekToNextBookmark),
+        };
+
+        private static IEnumerable<KeyBinding> editorTestPlayKeyBindings => new[]
+        {
+            new KeyBinding(new[] { InputKey.Tab }, GlobalAction.EditorTestPlayToggleAutoplay),
+            new KeyBinding(new[] { InputKey.Control, InputKey.P }, GlobalAction.EditorTestPlayToggleQuickPause),
+            new KeyBinding(new[] { InputKey.F1 }, GlobalAction.EditorTestPlayQuickExitToInitialTime),
+            new KeyBinding(new[] { InputKey.F2 }, GlobalAction.EditorTestPlayQuickExitToCurrentTime),
         };
 
         private static IEnumerable<KeyBinding> inGameKeyBindings => new[]
@@ -182,6 +203,9 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.Shift, InputKey.F2 }, GlobalAction.SelectPreviousRandom),
             new KeyBinding(InputKey.F3, GlobalAction.ToggleBeatmapOptions),
             new KeyBinding(InputKey.BackSpace, GlobalAction.DeselectAllMods),
+            new KeyBinding(new[] { InputKey.Control, InputKey.Up }, GlobalAction.IncreaseModSpeed),
+            new KeyBinding(new[] { InputKey.Control, InputKey.Down }, GlobalAction.DecreaseModSpeed),
+            new KeyBinding(InputKey.None, GlobalAction.AbsoluteScrollSongList),
         };
 
         private static IEnumerable<KeyBinding> audioControlKeyBindings => new[]
@@ -349,8 +373,8 @@ namespace osu.Game.Input.Bindings
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleChatFocus))]
         ToggleChatFocus,
 
-        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorCycleGridDisplayMode))]
-        EditorCycleGridDisplayMode,
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorCycleGridSpacing))]
+        EditorCycleGridSpacing,
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorTestGameplay))]
         EditorTestGameplay,
@@ -420,6 +444,60 @@ namespace osu.Game.Input.Bindings
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.StepReplayBackward))]
         StepReplayBackward,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.IncreaseModSpeed))]
+        IncreaseModSpeed,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.DecreaseModSpeed))]
+        DecreaseModSpeed,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorToggleScaleControl))]
+        EditorToggleScaleControl,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorTestPlayToggleAutoplay))]
+        EditorTestPlayToggleAutoplay,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorTestPlayToggleQuickPause))]
+        EditorTestPlayToggleQuickPause,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorTestPlayQuickExitToInitialTime))]
+        EditorTestPlayQuickExitToInitialTime,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorTestPlayQuickExitToCurrentTime))]
+        EditorTestPlayQuickExitToCurrentTime,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorSeekToPreviousHitObject))]
+        EditorSeekToPreviousHitObject,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorSeekToNextHitObject))]
+        EditorSeekToNextHitObject,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorSeekToPreviousSamplePoint))]
+        EditorSeekToPreviousSamplePoint,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorSeekToNextSamplePoint))]
+        EditorSeekToNextSamplePoint,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorCycleGridType))]
+        EditorCycleGridType,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorAddBookmark))]
+        EditorAddBookmark,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorRemoveClosestBookmark))]
+        EditorRemoveClosestBookmark,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorSeekToPreviousBookmark))]
+        EditorSeekToPreviousBookmark,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorSeekToNextBookmark))]
+        EditorSeekToNextBookmark,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.AbsoluteScrollSongList))]
+        AbsoluteScrollSongList,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorToggleMoveControl))]
+        EditorToggleMoveControl,
     }
 
     public enum GlobalActionCategory
@@ -430,6 +508,7 @@ namespace osu.Game.Input.Bindings
         Replay,
         SongSelect,
         AudioControl,
-        Overlays
+        Overlays,
+        EditorTestPlay,
     }
 }

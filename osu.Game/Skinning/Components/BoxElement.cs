@@ -27,6 +27,9 @@ namespace osu.Game.Skinning.Components
             Precision = 0.01f
         };
 
+        [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.Colour), nameof(SkinnableComponentStrings.ColourDescription))]
+        public BindableColour4 AccentColour { get; } = new BindableColour4(Colour4.White);
+
         public BoxElement()
         {
             Size = new Vector2(400, 80);
@@ -41,6 +44,13 @@ namespace osu.Game.Skinning.Components
             };
 
             Masking = true;
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            AccentColour.BindValueChanged(_ => Colour = AccentColour.Value, true);
         }
 
         protected override void Update()

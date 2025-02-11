@@ -1,12 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
+using System.ComponentModel;
 using System.Linq;
-using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.UserInterfaceV2;
@@ -14,23 +11,22 @@ using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Playlists;
 using osu.Game.Screens.Select;
 using osuTK;
+using Container = osu.Framework.Graphics.Containers.Container;
 
 namespace osu.Game.Screens.OnlinePlay.Components
 {
     public partial class MatchBeatmapDetailArea : BeatmapDetailArea
     {
-        public Action CreateNewItem;
+        public Action? CreateNewItem;
 
-        public readonly Bindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();
-
-        [Resolved(typeof(Room))]
-        protected BindableList<PlaylistItem> Playlist { get; private set; }
-
+        private readonly Room room;
         private readonly GridContainer playlistArea;
         private readonly DrawableRoomPlaylist playlist;
 
-        public MatchBeatmapDetailArea()
+        public MatchBeatmapDetailArea(Room room)
         {
+            this.room = room;
+
             Add(playlistArea = new GridContainer
             {
                 RelativeSizeAxes = Axes.Both,
@@ -72,9 +68,20 @@ namespace osu.Game.Screens.OnlinePlay.Components
         {
             base.LoadComplete();
 
-            playlist.Items.BindTo(Playlist);
-            playlist.SelectedItem.BindTo(SelectedItem);
+            playlist.Items.BindCollectionChanged((_, __) => room.Playlist = playlist.Items.ToArray());
+
+            room.PropertyChanged += onRoomPropertyChanged;
+            updateRoomPlaylist();
         }
+
+        private void onRoomPropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(Room.Playlist))
+                updateRoomPlaylist();
+        }
+
+        private void updateRoomPlaylist()
+            => playlist.Items.ReplaceRange(0, playlist.Items.Count, room.Playlist);
 
         protected override void OnTabChanged(BeatmapDetailAreaTabItem tab, bool selectedMods)
         {
@@ -93,5 +100,11 @@ namespace osu.Game.Screens.OnlinePlay.Components
         }
 
         protected override BeatmapDetailAreaTabItem[] CreateTabItems() => base.CreateTabItems().Prepend(new BeatmapDetailAreaPlaylistTabItem()).ToArray();
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            room.PropertyChanged -= onRoomPropertyChanged;
+        }
     }
 }

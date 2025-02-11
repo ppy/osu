@@ -7,24 +7,46 @@ using System.Buffers;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using Microsoft.Toolkit.HighPerformance;
 using osu.Framework.Extensions;
 using osu.Framework.IO.Stores;
 using SharpCompress.Archives.Zip;
+using SharpCompress.Common;
+using SharpCompress.Readers;
 using SixLabors.ImageSharp.Memory;
 
 namespace osu.Game.IO.Archives
 {
     public sealed class ZipArchiveReader : ArchiveReader
     {
+        /// <summary>
+        /// Archives created by osu!stable still write out as Shift-JIS.
+        /// We want to force this fallback rather than leave it up to the library/system.
+        /// In the future we may want to change exports to set the zip UTF-8 flag and use that instead.
+        /// </summary>
+        public static readonly ArchiveEncoding DEFAULT_ENCODING;
+
         private readonly Stream archiveStream;
         private readonly ZipArchive archive;
+
+        static ZipArchiveReader()
+        {
+            // Required to support rare code pages.
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+
+            DEFAULT_ENCODING = new ArchiveEncoding(Encoding.GetEncoding(932), Encoding.GetEncoding(932));
+        }
 
         public ZipArchiveReader(Stream archiveStream, string name = null)
             : base(name)
         {
             this.archiveStream = archiveStream;
-            archive = ZipArchive.Open(archiveStream);
+
+            archive = ZipArchive.Open(archiveStream, new ReaderOptions
+            {
+                ArchiveEncoding = DEFAULT_ENCODING
+            });
         }
 
         public override Stream GetStream(string name)
@@ -33,12 +55,22 @@ namespace osu.Game.IO.Archives
             if (entry == null)
                 return null;
 
-            var owner = MemoryAllocator.Default.Allocate<byte>((int)entry.Size);
-
             using (Stream s = entry.OpenEntryStream())
-                s.ReadToFill(owner.Memory.Span);
+            {
+                if (entry.Size > 0)
+                {
+                    var owner = MemoryAllocator.Default.Allocate<byte>((int)entry.Size);
+                    s.ReadExactly(owner.Memory.Span);
+                    return new MemoryOwnerMemoryStream(owner);
+                }
 
-            return new MemoryOwnerMemoryStream(owner);
+                // due to a sharpcompress bug (https://github.com/adamhathcock/sharpcompress/issues/88),
+                // in rare instances the `ZipArchiveEntry` will not contain a correct `Size` but instead report 0.
+                // this would lead to the block above reading nothing, and the game basically seeing an archive full of empty files.
+                // since the bug is years old now, and this is a rather rare situation anyways (reported once in years),
+                // work around this locally by falling back to reading as many bytes as possible and using a standard non-pooled memory stream.
+                return new MemoryStream(s.ReadAllRemainingBytesToArray());
+            }
         }
 
         public override void Dispose()
@@ -47,7 +79,7 @@ namespace osu.Game.IO.Archives
             archiveStream.Dispose();
         }
 
-        public override IEnumerable<string> Filenames => archive.Entries.Select(e => e.Key).ExcludeSystemFileNames();
+        public override IEnumerable<string> Filenames => archive.Entries.Where(e => !e.IsDirectory).Select(e => e.Key).ExcludeSystemFileNames();
 
         private class MemoryOwnerMemoryStream : Stream
         {

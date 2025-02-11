@@ -8,11 +8,14 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -25,51 +28,86 @@ namespace osu.Game.Screens.Edit.Components
     public partial class PlaybackControl : BottomBarContainer
     {
         private IconButton playButton = null!;
+        private PlaybackSpeedControl playbackSpeedControl = null!;
 
         [Resolved]
         private EditorClock editorClock { get; set; } = null!;
 
-        private readonly BindableNumber<double> freqAdjust = new BindableDouble(1);
+        private readonly Bindable<EditorScreenMode> currentScreenMode = new Bindable<EditorScreenMode>();
+        private readonly BindableNumber<double> tempoAdjustment = new BindableDouble(1);
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OverlayColourProvider colourProvider, Editor? editor)
         {
+            Background.Colour = colourProvider.Background4;
+
             Children = new Drawable[]
             {
                 playButton = new IconButton
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
-                    Scale = new Vector2(1.4f),
-                    IconScale = new Vector2(1.4f),
+                    Scale = new Vector2(1.2f),
+                    IconScale = new Vector2(1.2f),
                     Icon = FontAwesome.Regular.PlayCircle,
                     Action = togglePause,
                 },
-                new OsuSpriteText
+                playbackSpeedControl = new PlaybackSpeedControl
                 {
-                    Origin = Anchor.BottomLeft,
-                    Text = EditorStrings.PlaybackSpeed,
-                    RelativePositionAxes = Axes.Y,
-                    Y = 0.5f,
-                    Padding = new MarginPadding { Left = 45 }
-                },
-                new Container
-                {
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
-                    RelativeSizeAxes = Axes.Both,
-                    Height = 0.5f,
-                    Padding = new MarginPadding { Left = 45 },
-                    Child = new PlaybackTabControl { Current = freqAdjust },
+                    AutoSizeAxes = Axes.Y,
+                    RelativeSizeAxes = Axes.X,
+                    Padding = new MarginPadding { Left = 45, },
+                    Anchor = Anchor.CentreRight,
+                    Origin = Anchor.CentreRight,
+                    Direction = FillDirection.Vertical,
+                    Children = new Drawable[]
+                    {
+                        new OsuSpriteText
+                        {
+                            Text = EditorStrings.PlaybackSpeed,
+                        },
+                        new PlaybackTabControl
+                        {
+                            Current = tempoAdjustment,
+                            RelativeSizeAxes = Axes.X,
+                            Height = 16,
+                        },
+                    }
                 }
             };
 
-            Track.BindValueChanged(tr => tr.NewValue?.AddAdjustment(AdjustableProperty.Frequency, freqAdjust), true);
+            editorClock.AudioAdjustments.AddAdjustment(AdjustableProperty.Tempo, tempoAdjustment);
+
+            if (editor != null)
+                currentScreenMode.BindTo(editor.Mode);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            currentScreenMode.BindValueChanged(_ =>
+            {
+                if (currentScreenMode.Value == EditorScreenMode.Timing)
+                {
+                    tempoAdjustment.Value = 1;
+                    tempoAdjustment.Disabled = true;
+                    playbackSpeedControl.FadeTo(0.5f, 400, Easing.OutQuint);
+                    playbackSpeedControl.TooltipText = "Speed adjustment is unavailable in timing mode. Timing at slower speeds is inaccurate due to resampling artifacts.";
+                }
+                else
+                {
+                    tempoAdjustment.Disabled = false;
+                    playbackSpeedControl.FadeTo(1, 400, Easing.OutQuint);
+                    playbackSpeedControl.TooltipText = default;
+                }
+            });
         }
 
         protected override void Dispose(bool isDisposing)
         {
-            Track.Value?.RemoveAdjustment(AdjustableProperty.Frequency, freqAdjust);
+            if (editorClock.IsNotNull())
+                editorClock.AudioAdjustments.RemoveAdjustment(AdjustableProperty.Tempo, tempoAdjustment);
 
             base.Dispose(isDisposing);
         }
@@ -107,7 +145,12 @@ namespace osu.Game.Screens.Edit.Components
             playButton.Icon = editorClock.IsRunning ? pause_icon : play_icon;
         }
 
-        private partial class PlaybackTabControl : OsuTabControl<double>
+        private partial class PlaybackSpeedControl : FillFlowContainer, IHasTooltip
+        {
+            public LocalisableString TooltipText { get; set; }
+        }
+
+        public partial class PlaybackTabControl : OsuTabControl<double>
         {
             private static readonly double[] tempo_values = { 0.25, 0.5, 0.75, 1 };
 
@@ -172,7 +215,7 @@ namespace osu.Game.Screens.Edit.Components
                 protected override bool OnHover(HoverEvent e)
                 {
                     updateState();
-                    return true;
+                    return false;
                 }
 
                 protected override void OnHoverLost(HoverLostEvent e) => updateState();

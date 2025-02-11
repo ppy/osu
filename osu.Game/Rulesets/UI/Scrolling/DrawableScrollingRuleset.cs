@@ -64,8 +64,6 @@ namespace osu.Game.Rulesets.UI.Scrolling
             MaxValue = time_span_max
         };
 
-        ScrollVisualisationMethod IDrawableScrollingRuleset.VisualisationMethod => VisualisationMethod;
-
         /// <summary>
         /// Whether the player can change <see cref="TimeRange"/>.
         /// </summary>

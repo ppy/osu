@@ -69,6 +69,8 @@ namespace osu.Game.Screens.Select.Carousel
                 default:
                 case SortMode.Artist:
                     comparison = OrdinalSortByCaseStringComparer.DEFAULT.Compare(BeatmapSet.Metadata.Artist, otherSet.BeatmapSet.Metadata.Artist);
+                    if (comparison == 0)
+                        goto case SortMode.Title;
                     break;
 
                 case SortMode.Title:

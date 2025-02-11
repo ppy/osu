@@ -54,7 +54,7 @@ namespace osu.Game.Screens.Select
         }
 
         protected void PresentScore(ScoreInfo score) =>
-            FinaliseSelection(score.BeatmapInfo, score.Ruleset, () => this.Push(new SoloResultsScreen(score, false)));
+            FinaliseSelection(score.BeatmapInfo, score.Ruleset, () => this.Push(new SoloResultsScreen(score)));
 
         protected override BeatmapDetailArea CreateBeatmapDetailArea()
         {
@@ -95,7 +95,7 @@ namespace osu.Game.Screens.Select
             modsAtGameplayStart = Mods.Value;
 
             // Ctrl+Enter should start map with autoplay enabled.
-            if (GetContainingInputManager().CurrentState?.Keyboard.ControlPressed == true)
+            if (GetContainingInputManager()?.CurrentState?.Keyboard.ControlPressed == true)
             {
                 var autoInstance = getAutoplayMod();
 

@@ -1,13 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
@@ -54,42 +51,43 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             AutoSizeAxes = Axes.Both
         };
 
-        protected ListingPollingComponent ListingPollingComponent { get; private set; }
+        protected ListingPollingComponent ListingPollingComponent { get; private set; } = null!;
 
-        protected readonly Bindable<Room> SelectedRoom = new Bindable<Room>();
+        protected readonly Bindable<Room?> SelectedRoom = new Bindable<Room?>();
 
         [Resolved]
-        private MusicController music { get; set; }
+        private MusicController music { get; set; } = null!;
 
         [Resolved(CanBeNull = true)]
-        private OngoingOperationTracker ongoingOperationTracker { get; set; }
+        private OngoingOperationTracker? ongoingOperationTracker { get; set; }
 
         [Resolved]
-        private IBindable<RulesetInfo> ruleset { get; set; }
+        private IBindable<RulesetInfo> ruleset { get; set; } = null!;
 
         [Resolved]
-        private IAPIProvider api { get; set; }
+        private IAPIProvider api { get; set; } = null!;
 
-        [CanBeNull]
-        private IDisposable joiningRoomOperation { get; set; }
-
-        [CanBeNull]
-        private LeasedBindable<Room> selectionLease;
+        [Resolved(CanBeNull = true)]
+        private IdleTracker? idleTracker { get; set; }
 
         [Resolved]
-        protected OsuConfigManager Config { get; private set; }
+        protected OsuConfigManager Config { get; private set; } = null!;
 
-        private readonly Bindable<FilterCriteria> filter = new Bindable<FilterCriteria>(new FilterCriteria());
+        private IDisposable? joiningRoomOperation { get; set; }
+        private LeasedBindable<Room?>? selectionLease;
+
+        private readonly Bindable<FilterCriteria?> filter = new Bindable<FilterCriteria?>();
         private readonly IBindable<bool> operationInProgress = new Bindable<bool>();
         private readonly IBindable<bool> isIdle = new BindableBool();
-        private PopoverContainer popoverContainer;
-        private LoadingLayer loadingLayer;
-        private RoomsContainer roomsContainer;
-        private SearchTextBox searchTextBox;
-        private Dropdown<RoomStatusFilter> statusDropdown;
+        private PopoverContainer popoverContainer = null!;
+        private LoadingLayer loadingLayer = null!;
+        private RoomsContainer roomsContainer = null!;
+        private SearchTextBox searchTextBox = null!;
+
+        protected Dropdown<RoomModeFilter> StatusDropdown { get; private set; } = null!;
 
         [BackgroundDependencyLoader(true)]
-        private void load([CanBeNull] IdleTracker idleTracker)
+        private void load()
         {
             const float controls_area_height = 25f;
 
@@ -208,7 +206,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
         public void UpdateFilter() => Scheduler.AddOnce(updateFilter);
 
-        private ScheduledDelegate scheduledFilterUpdate;
+        private ScheduledDelegate? scheduledFilterUpdate;
 
         private void updateFilterDebounced()
         {
@@ -226,20 +224,20 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         {
             SearchString = searchTextBox.Current.Value,
             Ruleset = ruleset.Value,
-            Status = statusDropdown.Current.Value
+            Mode = StatusDropdown.Current.Value
         };
 
         protected virtual IEnumerable<Drawable> CreateFilterControls()
         {
-            statusDropdown = new SlimEnumDropdown<RoomStatusFilter>
+            StatusDropdown = new SlimEnumDropdown<RoomModeFilter>
             {
                 RelativeSizeAxes = Axes.None,
                 Width = 160,
             };
 
-            statusDropdown.Current.BindValueChanged(_ => UpdateFilter());
+            StatusDropdown.Current.BindValueChanged(_ => UpdateFilter());
 
-            yield return statusDropdown;
+            yield return StatusDropdown;
         }
 
         #endregion
@@ -259,10 +257,10 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             selectionLease.Return();
             selectionLease = null;
 
-            if (SelectedRoom.Value?.RoomID.Value == null)
+            if (SelectedRoom.Value?.RoomID == null)
                 SelectedRoom.Value = new Room();
 
-            music?.EnsurePlayingSomething();
+            music.EnsurePlayingSomething();
 
             onReturning();
         }
@@ -299,7 +297,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             popoverContainer.HidePopover();
         }
 
-        public virtual void Join(Room room, string password, Action<Room> onSuccess = null, Action<string> onFailure = null) => Schedule(() =>
+        public virtual void Join(Room room, string? password, Action<Room>? onSuccess = null, Action<string>? onFailure = null) => Schedule(() =>
         {
             if (joiningRoomOperation != null)
                 return;
@@ -326,23 +324,23 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         /// <param name="room">The room to copy.</param>
         public void OpenCopy(Room room)
         {
-            Debug.Assert(room.RoomID.Value != null);
+            Debug.Assert(room.RoomID != null);
 
             if (joiningRoomOperation != null)
                 return;
 
             joiningRoomOperation = ongoingOperationTracker?.BeginOperation();
 
-            var req = new GetRoomRequest(room.RoomID.Value.Value);
+            var req = new GetRoomRequest(room.RoomID.Value);
 
             req.Success += r =>
             {
                 // ID must be unset as we use this as a marker for whether this is a client-side (not-yet-created) room or not.
-                r.RoomID.Value = null;
+                r.RoomID = null;
 
                 // Null out dates because end date is not supported client-side and the settings overlay will populate a duration.
-                r.EndDate.Value = null;
-                r.Duration.Value = null;
+                r.EndDate = null;
+                r.Duration = null;
 
                 Open(r);
 
@@ -364,7 +362,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         /// Push a room as a new subscreen.
         /// </summary>
         /// <param name="room">An optional template to use when creating the room.</param>
-        public void Open(Room room = null) => Schedule(() =>
+        public void Open(Room? room = null) => Schedule(() =>
         {
             // Handles the case where a room is clicked 3 times in quick succession
             if (!this.IsCurrentScreen())
@@ -381,6 +379,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
             this.Push(CreateRoomSubScreen(room));
         }
+
+        public void RefreshRooms() => ListingPollingComponent.PollImmediately();
 
         private void updateLoadingLayer()
         {

@@ -1,10 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Pooling;
@@ -45,11 +44,11 @@ namespace osu.Game.Rulesets.Mania.UI
 
         internal readonly Container TopLevelContainer = new Container { RelativeSizeAxes = Axes.Both };
 
-        private DrawablePool<PoolableHitExplosion> hitExplosionPool;
+        private DrawablePool<PoolableHitExplosion> hitExplosionPool = null!;
         private readonly OrderedHitPolicy hitPolicy;
         public Container UnderlayElements => HitObjectArea.UnderlayElements;
 
-        private GameplaySampleTriggerSource sampleTriggerSource;
+        private GameplaySampleTriggerSource sampleTriggerSource = null!;
 
         /// <summary>
         /// Whether this is a special (ie. scratch) column.
@@ -67,11 +66,15 @@ namespace osu.Game.Rulesets.Mania.UI
             Width = COLUMN_WIDTH;
 
             hitPolicy = new OrderedHitPolicy(HitObjectContainer);
-            HitObjectArea = new ColumnHitObjectArea(HitObjectContainer) { RelativeSizeAxes = Axes.Both };
+            HitObjectArea = new ColumnHitObjectArea
+            {
+                RelativeSizeAxes = Axes.Both,
+                Child = HitObjectContainer,
+            };
         }
 
         [Resolved]
-        private ISkinSource skin { get; set; }
+        private ISkinSource skin { get; set; } = null!;
 
         [BackgroundDependencyLoader]
         private void load(GameHost host)
@@ -93,8 +96,7 @@ namespace osu.Game.Rulesets.Mania.UI
                 // For input purposes, the background is added at the highest depth, but is then proxied back below all other elements externally
                 // (see `Stage.columnBackgrounds`).
                 BackgroundContainer,
-                TopLevelContainer,
-                new ColumnTouchInputArea(this)
+                TopLevelContainer
             };
 
             var background = new SkinnableDrawable(new ManiaSkinComponentLookup(ManiaSkinComponents.ColumnBackground), _ => new DefaultColumnBackground())
@@ -133,7 +135,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
             base.Dispose(isDisposing);
 
-            if (skin != null)
+            if (skin.IsNotNull())
                 skin.SourceChanged -= onSourceChanged;
         }
 
@@ -182,37 +184,28 @@ namespace osu.Game.Rulesets.Mania.UI
             // This probably shouldn't exist as is, but the columns in the stage are separated by a 1px border
             => DrawRectangle.Inflate(new Vector2(Stage.COLUMN_SPACING / 2, 0)).Contains(ToLocalSpace(screenSpacePos));
 
-        public partial class ColumnTouchInputArea : Drawable
+        #region Touch Input
+
+        [Resolved]
+        private ManiaInputManager? maniaInputManager { get; set; }
+
+        private int touchActivationCount;
+
+        protected override bool OnTouchDown(TouchDownEvent e)
         {
-            private readonly Column column;
-
-            [Resolved(canBeNull: true)]
-            private ManiaInputManager maniaInputManager { get; set; }
-
-            private KeyBindingContainer<ManiaAction> keyBindingContainer;
-
-            public ColumnTouchInputArea(Column column)
-            {
-                RelativeSizeAxes = Axes.Both;
-
-                this.column = column;
-            }
-
-            protected override void LoadComplete()
-            {
-                keyBindingContainer = maniaInputManager?.KeyBindingContainer;
-            }
-
-            protected override bool OnTouchDown(TouchDownEvent e)
-            {
-                keyBindingContainer?.TriggerPressed(column.Action.Value);
-                return true;
-            }
-
-            protected override void OnTouchUp(TouchUpEvent e)
-            {
-                keyBindingContainer?.TriggerReleased(column.Action.Value);
-            }
+            maniaInputManager?.KeyBindingContainer.TriggerPressed(Action.Value);
+            touchActivationCount++;
+            return true;
         }
+
+        protected override void OnTouchUp(TouchUpEvent e)
+        {
+            touchActivationCount--;
+
+            if (touchActivationCount == 0)
+                maniaInputManager?.KeyBindingContainer.TriggerReleased(Action.Value);
+        }
+
+        #endregion
     }
 }

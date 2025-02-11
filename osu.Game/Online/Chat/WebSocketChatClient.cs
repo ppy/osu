@@ -13,6 +13,8 @@ using osu.Framework.Logging;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.Notifications.WebSocket;
+using osu.Game.Online.Notifications.WebSocket.Events;
+using osu.Game.Online.Notifications.WebSocket.Requests;
 
 namespace osu.Game.Online.Chat
 {
@@ -78,7 +80,7 @@ namespace osu.Game.Online.Chat
 
             fetchReq.Success += updates =>
             {
-                if (updates?.Presence != null)
+                if (updates.Presence != null)
                 {
                     foreach (var channel in updates.Presence)
                         joinChannel(channel);

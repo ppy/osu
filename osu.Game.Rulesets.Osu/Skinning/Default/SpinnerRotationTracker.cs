@@ -66,7 +66,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
 
             if (mousePosition is Vector2 pos)
             {
-                float thisAngle = -MathUtils.RadiansToDegrees(MathF.Atan2(pos.X - DrawSize.X / 2, pos.Y - DrawSize.Y / 2));
+                float thisAngle = -float.RadiansToDegrees(MathF.Atan2(pos.X - DrawSize.X / 2, pos.Y - DrawSize.Y / 2));
                 float delta = lastAngle == null ? 0 : thisAngle - lastAngle.Value;
 
                 // Normalise the delta to -180 .. 180

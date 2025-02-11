@@ -342,7 +342,7 @@ namespace osu.Game.Rulesets.Osu.Replays
             // 0.05 rad/ms, or ~477 RPM, as per stable.
             // the redundant conversion from RPM to rad/ms is here for ease of testing custom SPM specs.
             const float spin_rpm = 0.05f / (2 * MathF.PI) * 60000;
-            float radsPerMillisecond = MathUtils.DegreesToRadians(spin_rpm * 360) / 60000;
+            float radsPerMillisecond = float.DegreesToRadians(spin_rpm * 360) / 60000;
 
             switch (h)
             {

@@ -8,6 +8,7 @@ using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Logging;
 using osu.Framework.Timing;
 using osu.Game.Input.Handlers;
 using osu.Game.Screens.Play;
@@ -24,6 +25,9 @@ namespace osu.Game.Rulesets.UI
     {
         public ReplayInputHandler? ReplayInputHandler { get; set; }
 
+        public bool AllowBackwardsSeeks { get; set; }
+        private double? lastBackwardsSeekLogTime;
+
         /// <summary>
         /// The number of CPU milliseconds to spend at most during seek catch-up.
         /// </summary>
@@ -38,7 +42,7 @@ namespace osu.Game.Rulesets.UI
 
         private readonly Bindable<bool> waitingOnFrames = new Bindable<bool>();
 
-        private readonly double gameplayStartTime;
+        public double GameplayStartTime { get; }
 
         private IGameplayClock? parentGameplayClock;
 
@@ -81,7 +85,7 @@ namespace osu.Game.Rulesets.UI
 
             framedClock = new FramedClock(manualClock = new ManualClock());
 
-            this.gameplayStartTime = gameplayStartTime;
+            GameplayStartTime = gameplayStartTime;
         }
 
         [BackgroundDependencyLoader(true)]
@@ -111,7 +115,7 @@ namespace osu.Game.Rulesets.UI
                     break;
 
                 base.UpdateSubTree();
-                UpdateSubTreeMasking(this, ScreenSpaceDrawQuad.AABBFloat);
+                UpdateSubTreeMasking();
             } while (state == PlaybackState.RequiresCatchUp && stopwatch.ElapsedMilliseconds < max_catchup_milliseconds);
 
             return true;
@@ -150,6 +154,23 @@ namespace osu.Game.Rulesets.UI
                     state = PlaybackState.NotValid;
             }
 
+            // This is a hotfix for https://github.com/ppy/osu/issues/26879 while we figure how the hell time is seeking
+            // backwards by 11,850 ms for some users during gameplay.
+            //
+            // It basically says that "while we're running in frame stable mode, and don't have a replay attached,
+            // time should never go backwards". If it does, we stop running gameplay until it returns to normal.
+            if (!hasReplayAttached && FrameStablePlayback && proposedTime > referenceClock.CurrentTime && !AllowBackwardsSeeks)
+            {
+                if (lastBackwardsSeekLogTime == null || Math.Abs(Clock.CurrentTime - lastBackwardsSeekLogTime.Value) > 1000)
+                {
+                    lastBackwardsSeekLogTime = Clock.CurrentTime;
+                    Logger.Log($"Denying backwards seek during gameplay (reference: {referenceClock.CurrentTime:N2} stable: {proposedTime:N2})");
+                }
+
+                state = PlaybackState.NotValid;
+                return;
+            }
+
             // if the proposed time is the same as the current time, assume that the clock will continue progressing in the same direction as previously.
             // this avoids spurious flips in direction from -1 to 1 during rewinds.
             if (state == PlaybackState.Valid && proposedTime != manualClock.CurrentTime)
@@ -158,7 +179,7 @@ namespace osu.Game.Rulesets.UI
             double timeBehind = Math.Abs(proposedTime - referenceClock.CurrentTime);
 
             isCatchingUp.Value = timeBehind > 200;
-            waitingOnFrames.Value = state == PlaybackState.NotValid;
+            waitingOnFrames.Value = hasReplayAttached && state == PlaybackState.NotValid;
 
             manualClock.CurrentTime = proposedTime;
             manualClock.Rate = Math.Abs(referenceClock.Rate) * direction;
@@ -236,8 +257,8 @@ namespace osu.Game.Rulesets.UI
                 return;
             }
 
-            if (manualClock.CurrentTime < gameplayStartTime)
-                manualClock.CurrentTime = proposedTime = Math.Min(gameplayStartTime, proposedTime);
+            if (manualClock.CurrentTime < GameplayStartTime)
+                manualClock.CurrentTime = proposedTime = Math.Min(GameplayStartTime, proposedTime);
             else if (Math.Abs(manualClock.CurrentTime - proposedTime) > sixty_frame_time * 1.2f)
             {
                 proposedTime = proposedTime > manualClock.CurrentTime

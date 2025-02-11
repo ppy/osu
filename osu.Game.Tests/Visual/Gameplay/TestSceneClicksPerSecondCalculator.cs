@@ -120,6 +120,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             public double FramesPerSecond => throw new NotImplementedException();
             public FrameTimeInfo TimeInfo => throw new NotImplementedException();
             public double StartTime => throw new NotImplementedException();
+            public double GameplayStartTime => throw new NotImplementedException();
 
             public IAdjustableAudioComponent AdjustmentsFromMods => adjustableAudioComponent;
 

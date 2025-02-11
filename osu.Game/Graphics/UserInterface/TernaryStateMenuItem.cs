@@ -5,6 +5,7 @@
 
 using System;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -20,7 +21,7 @@ namespace osu.Game.Graphics.UserInterface
         /// <param name="nextStateFunction">A function to inform what the next state should be when this item is clicked.</param>
         /// <param name="type">The type of action which this <see cref="TernaryStateMenuItem"/> performs.</param>
         /// <param name="action">A delegate to be invoked when this <see cref="TernaryStateMenuItem"/> is pressed.</param>
-        protected TernaryStateMenuItem(string text, Func<TernaryState, TernaryState> nextStateFunction, MenuItemType type = MenuItemType.Standard, Action<TernaryState> action = null)
+        protected TernaryStateMenuItem(LocalisableString text, Func<TernaryState, TernaryState> nextStateFunction, MenuItemType type = MenuItemType.Standard, Action<TernaryState> action = null)
             : base(text, nextStateFunction, type, action)
         {
         }

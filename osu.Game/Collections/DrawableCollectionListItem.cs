@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -10,6 +11,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -24,10 +26,14 @@ namespace osu.Game.Collections
     /// <summary>
     /// Visualises a <see cref="BeatmapCollection"/> inside a <see cref="DrawableCollectionList"/>.
     /// </summary>
-    public partial class DrawableCollectionListItem : OsuRearrangeableListItem<Live<BeatmapCollection>>
+    public partial class DrawableCollectionListItem : OsuRearrangeableListItem<Live<BeatmapCollection>>, IFilterable
     {
         private const float item_height = 45;
         private const float button_width = item_height * 0.75f;
+
+        protected TextBox TextBox => content.TextBox;
+
+        private ItemContent content = null!;
 
         /// <summary>
         /// Creates a new <see cref="DrawableCollectionListItem"/>.
@@ -44,21 +50,21 @@ namespace osu.Game.Collections
             //
             // if we want to support user sorting (but changes will need to be made to realm to persist).
             ShowDragHandle.Value = false;
+
+            Masking = true;
+            CornerRadius = item_height / 2;
         }
 
-        protected override Drawable CreateContent() => new ItemContent(Model);
+        protected override Drawable CreateContent() => content = new ItemContent(Model);
 
         /// <summary>
         /// The main content of the <see cref="DrawableCollectionListItem"/>.
         /// </summary>
-        private partial class ItemContent : CircularContainer
+        private partial class ItemContent : CompositeDrawable
         {
             private readonly Live<BeatmapCollection> collection;
 
-            private ItemTextBox textBox = null!;
-
-            [Resolved]
-            private RealmAccess realm { get; set; } = null!;
+            public ItemTextBox TextBox { get; private set; } = null!;
 
             public ItemContent(Live<BeatmapCollection> collection)
             {
@@ -66,20 +72,19 @@ namespace osu.Game.Collections
 
                 RelativeSizeAxes = Axes.X;
                 Height = item_height;
-                Masking = true;
             }
 
             [BackgroundDependencyLoader]
             private void load()
             {
-                Children = new[]
+                InternalChildren = new[]
                 {
                     collection.IsManaged
                         ? new DeleteButton(collection)
                         {
                             Anchor = Anchor.CentreRight,
                             Origin = Anchor.CentreRight,
-                            IsTextBoxHovered = v => textBox.ReceivePositionalInputAt(v)
+                            IsTextBoxHovered = v => TextBox.ReceivePositionalInputAt(v)
                         }
                         : Empty(),
                     new Container
@@ -88,7 +93,7 @@ namespace osu.Game.Collections
                         Padding = new MarginPadding { Right = collection.IsManaged ? button_width : 0 },
                         Children = new Drawable[]
                         {
-                            textBox = new ItemTextBox(collection)
+                            TextBox = new ItemTextBox(collection)
                             {
                                 RelativeSizeAxes = Axes.X,
                                 Height = item_height,
@@ -104,18 +109,14 @@ namespace osu.Game.Collections
                 base.LoadComplete();
 
                 // Bind late, as the collection name may change externally while still loading.
-                textBox.Current.Value = collection.PerformRead(c => c.IsValid ? c.Name : string.Empty);
-                textBox.OnCommit += onCommit;
+                TextBox.Current.Value = collection.PerformRead(c => c.IsValid ? c.Name : string.Empty);
+                TextBox.OnCommit += onCommit;
             }
 
             private void onCommit(TextBox sender, bool newText)
             {
-                if (collection.IsManaged)
-                    collection.PerformWrite(c => c.Name = textBox.Current.Value);
-                else if (!string.IsNullOrEmpty(textBox.Current.Value))
-                    realm.Write(r => r.Add(new BeatmapCollection(textBox.Current.Value)));
-
-                textBox.Text = string.Empty;
+                if (collection.IsManaged && collection.Value.Name != TextBox.Current.Value)
+                    collection.PerformWrite(c => c.Name = TextBox.Current.Value);
             }
         }
 
@@ -187,7 +188,7 @@ namespace osu.Game.Collections
             }
         }
 
-        public partial class DeleteButton : CompositeDrawable
+        public partial class DeleteButton : OsuClickableContainer
         {
             public Func<Vector2, bool> IsTextBoxHovered = null!;
 
@@ -210,7 +211,7 @@ namespace osu.Game.Collections
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
-                InternalChild = fadeContainer = new Container
+                Child = fadeContainer = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
                     Alpha = 0.1f,
@@ -231,6 +232,14 @@ namespace osu.Game.Collections
                         }
                     }
                 };
+
+                Action = () =>
+                {
+                    if (collection.PerformRead(c => c.BeatmapMD5Hashes.Count) == 0)
+                        deleteCollection();
+                    else
+                        dialogOverlay?.Push(new DeleteCollectionDialog(collection, deleteCollection));
+                };
             }
 
             public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => base.ReceivePositionalInputAt(screenSpacePos) && !IsTextBoxHovered(screenSpacePos);
@@ -250,15 +259,30 @@ namespace osu.Game.Collections
             {
                 background.FlashColour(Color4.White, 150);
 
-                if (collection.PerformRead(c => c.BeatmapMD5Hashes.Count) == 0)
-                    deleteCollection();
-                else
-                    dialogOverlay?.Push(new DeleteCollectionDialog(collection, deleteCollection));
-
-                return true;
+                return base.OnClick(e);
             }
 
             private void deleteCollection() => collection.PerformWrite(c => c.Realm!.Remove(c));
         }
+
+        public IEnumerable<LocalisableString> FilterTerms => [(LocalisableString)Model.Value.Name];
+
+        private bool matchingFilter = true;
+
+        public bool MatchingFilter
+        {
+            get => matchingFilter;
+            set
+            {
+                matchingFilter = value;
+
+                if (matchingFilter)
+                    this.FadeIn(200);
+                else
+                    Hide();
+            }
+        }
+
+        public bool FilteringActive { get; set; }
     }
 }

@@ -5,6 +5,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Input;
 using osu.Framework.Testing;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
@@ -42,7 +43,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             AddStep("set instantaneous to false", () => sliderWithTextBoxInput.Instantaneous = false);
 
-            AddStep("focus textbox", () => InputManager.ChangeFocus(textBox));
+            AddStep("focus textbox", () => ((IFocusManager)InputManager).ChangeFocus(textBox));
             AddStep("change text", () => textBox.Text = "3");
             AddAssert("slider not moved", () => slider.Current.Value, () => Is.Zero);
             AddAssert("current not changed", () => sliderWithTextBoxInput.Current.Value, () => Is.Zero);
@@ -61,7 +62,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("textbox changed", () => textBox.Current.Value, () => Is.EqualTo("-5"));
             AddAssert("current changed", () => sliderWithTextBoxInput.Current.Value, () => Is.EqualTo(-5));
 
-            AddStep("focus textbox", () => InputManager.ChangeFocus(textBox));
+            AddStep("focus textbox", () => ((IFocusManager)InputManager).ChangeFocus(textBox));
             AddStep("set text to invalid", () => textBox.Text = "garbage");
             AddAssert("slider not moved", () => slider.Current.Value, () => Is.EqualTo(-5));
             AddAssert("current not changed", () => sliderWithTextBoxInput.Current.Value, () => Is.EqualTo(-5));
@@ -71,12 +72,12 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("slider not moved", () => slider.Current.Value, () => Is.EqualTo(-5));
             AddAssert("current not changed", () => sliderWithTextBoxInput.Current.Value, () => Is.EqualTo(-5));
 
-            AddStep("focus textbox", () => InputManager.ChangeFocus(textBox));
+            AddStep("focus textbox", () => ((IFocusManager)InputManager).ChangeFocus(textBox));
             AddStep("set text to invalid", () => textBox.Text = "garbage");
             AddAssert("slider not moved", () => slider.Current.Value, () => Is.EqualTo(-5));
             AddAssert("current not changed", () => sliderWithTextBoxInput.Current.Value, () => Is.EqualTo(-5));
 
-            AddStep("lose focus", () => InputManager.ChangeFocus(null));
+            AddStep("lose focus", () => ((IFocusManager)InputManager).ChangeFocus(null));
             AddAssert("text restored", () => textBox.Text, () => Is.EqualTo("-5"));
             AddAssert("slider not moved", () => slider.Current.Value, () => Is.EqualTo(-5));
             AddAssert("current not changed", () => sliderWithTextBoxInput.Current.Value, () => Is.EqualTo(-5));
@@ -87,7 +88,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             AddStep("set instantaneous to true", () => sliderWithTextBoxInput.Instantaneous = true);
 
-            AddStep("focus textbox", () => InputManager.ChangeFocus(textBox));
+            AddStep("focus textbox", () => ((IFocusManager)InputManager).ChangeFocus(textBox));
             AddStep("change text", () => textBox.Text = "3");
             AddAssert("slider moved", () => slider.Current.Value, () => Is.EqualTo(3));
             AddAssert("current changed", () => sliderWithTextBoxInput.Current.Value, () => Is.EqualTo(3));
@@ -106,7 +107,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("textbox not changed", () => textBox.Current.Value, () => Is.EqualTo("-5"));
             AddAssert("current not changed", () => sliderWithTextBoxInput.Current.Value, () => Is.EqualTo(-5));
 
-            AddStep("focus textbox", () => InputManager.ChangeFocus(textBox));
+            AddStep("focus textbox", () => ((IFocusManager)InputManager).ChangeFocus(textBox));
             AddStep("set text to invalid", () => textBox.Text = "garbage");
             AddAssert("slider not moved", () => slider.Current.Value, () => Is.EqualTo(-5));
             AddAssert("current not changed", () => sliderWithTextBoxInput.Current.Value, () => Is.EqualTo(-5));
@@ -116,12 +117,12 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("slider not moved", () => slider.Current.Value, () => Is.EqualTo(-5));
             AddAssert("current not changed", () => sliderWithTextBoxInput.Current.Value, () => Is.EqualTo(-5));
 
-            AddStep("focus textbox", () => InputManager.ChangeFocus(textBox));
+            AddStep("focus textbox", () => ((IFocusManager)InputManager).ChangeFocus(textBox));
             AddStep("set text to invalid", () => textBox.Text = "garbage");
             AddAssert("slider not moved", () => slider.Current.Value, () => Is.EqualTo(-5));
             AddAssert("current not changed", () => sliderWithTextBoxInput.Current.Value, () => Is.EqualTo(-5));
 
-            AddStep("lose focus", () => InputManager.ChangeFocus(null));
+            AddStep("lose focus", () => ((IFocusManager)InputManager).ChangeFocus(null));
             AddAssert("text restored", () => textBox.Text, () => Is.EqualTo("-5"));
             AddAssert("slider not moved", () => slider.Current.Value, () => Is.EqualTo(-5));
             AddAssert("current not changed", () => sliderWithTextBoxInput.Current.Value, () => Is.EqualTo(-5));

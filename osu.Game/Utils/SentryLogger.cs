@@ -11,6 +11,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Configuration;
 using osu.Framework.Logging;
+using osu.Framework.Platform;
 using osu.Framework.Statistics;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
@@ -36,18 +37,20 @@ namespace osu.Game.Utils
 
         private readonly OsuGame game;
 
-        public SentryLogger(OsuGame game)
+        public SentryLogger(OsuGame game, Storage? storage = null)
         {
             this.game = game;
+
+            if (!game.IsDeployedBuild || !game.CreateEndpoints().WebsiteUrl.EndsWith(@".ppy.sh", StringComparison.Ordinal))
+                return;
+
             sentrySession = SentrySdk.Init(options =>
             {
-                // Not setting the dsn will completely disable sentry.
-                if (game.IsDeployedBuild && game.CreateEndpoints().WebsiteRootUrl.EndsWith(@".ppy.sh", StringComparison.Ordinal))
-                    options.Dsn = "https://ad9f78529cef40ac874afb95a9aca04e@sentry.ppy.sh/2";
-
+                options.Dsn = "https://ad9f78529cef40ac874afb95a9aca04e@sentry.ppy.sh/2";
                 options.AutoSessionTracking = true;
                 options.IsEnvironmentUser = false;
                 options.IsGlobalModeEnabled = true;
+                options.CacheDirectoryPath = storage?.GetFullPath(string.Empty);
                 // The reported release needs to match version as reported to Sentry in .github/workflows/sentry-release.yml
                 options.Release = $"osu@{game.Version.Replace($@"-{OsuGameBase.BUILD_SUFFIX}", string.Empty)}";
             });
@@ -59,12 +62,15 @@ namespace osu.Game.Utils
 
         public void AttachUser(IBindable<APIUser> user)
         {
+            if (sentrySession == null)
+                return;
+
             Debug.Assert(localUser == null);
 
             localUser = user.GetBoundCopy();
             localUser.BindValueChanged(u =>
             {
-                SentrySdk.ConfigureScope(scope => scope.User = new User
+                SentrySdk.ConfigureScope(scope => scope.User = new SentryUser
                 {
                     Username = u.NewValue.Username,
                     Id = u.NewValue.Id.ToString(),

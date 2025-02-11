@@ -104,7 +104,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                         Files = { new RealmNamedFileUsage(new RealmFile { Hash = $"{i}" }, string.Empty) }
                     };
 
-                    importedScores.Add(scoreManager.Import(score).Value);
+                    importedScores.Add(scoreManager.Import(score)!.Value);
                 }
             });
         });
@@ -151,7 +151,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("click delete option", () =>
             {
-                InputManager.MoveMouseTo(contextMenuContainer.ChildrenOfType<DrawableOsuMenuItem>().First(i => i.Item.Text.Value.ToString().ToLowerInvariant() == "delete"));
+                InputManager.MoveMouseTo(contextMenuContainer.ChildrenOfType<DrawableOsuMenuItem>().First(i => string.Equals(i.Item.Text.Value.ToString(), "delete", System.StringComparison.OrdinalIgnoreCase)));
                 InputManager.Click(MouseButton.Left);
             });
 

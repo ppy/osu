@@ -12,7 +12,6 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Online.Notifications.WebSocket;
 using osu.Game.Tests;
-using osu.Game.Users;
 
 namespace osu.Game.Online.API
 {
@@ -26,11 +25,7 @@ namespace osu.Game.Online.API
             Id = DUMMY_USER_ID,
         });
 
-        public BindableList<APIUser> Friends { get; } = new BindableList<APIUser>();
-
-        public Bindable<UserActivity> Activity { get; } = new Bindable<UserActivity>();
-
-        public Bindable<UserStatistics?> Statistics { get; } = new Bindable<UserStatistics?>();
+        public BindableList<APIRelation> Friends { get; } = new BindableList<APIRelation>();
 
         public DummyNotificationsClient NotificationsClient { get; } = new DummyNotificationsClient();
         INotificationsClient IAPIProvider.NotificationsClient => NotificationsClient;
@@ -39,14 +34,18 @@ namespace osu.Game.Online.API
 
         public string AccessToken => "token";
 
+        public Guid SessionIdentifier { get; } = Guid.NewGuid();
+
         /// <seealso cref="APIAccess.IsLoggedIn"/>
         public bool IsLoggedIn => State.Value > APIState.Offline;
 
         public string ProvidedUsername => LocalUser.Value.Username;
 
-        public string APIEndpointUrl => "http://localhost";
-
-        public string WebsiteRootUrl => "http://localhost";
+        public EndpointConfiguration Endpoints { get; } = new EndpointConfiguration
+        {
+            APIUrl = "http://localhost",
+            WebsiteUrl = "http://localhost",
+        };
 
         public int APIVersion => int.Parse(DateTime.Now.ToString("yyyyMMdd"));
 
@@ -69,30 +68,37 @@ namespace osu.Game.Online.API
         /// </summary>
         public IBindable<APIState> State => state;
 
-        public DummyAPIAccess()
-        {
-            LocalUser.BindValueChanged(u =>
-            {
-                u.OldValue?.Activity.UnbindFrom(Activity);
-                u.NewValue.Activity.BindTo(Activity);
-            }, true);
-        }
-
         public virtual void Queue(APIRequest request)
         {
+            request.AttachAPI(this);
+
             Schedule(() =>
             {
                 if (HandleRequest?.Invoke(request) != true)
                 {
+                    // Noisy so let's silently allow these to succeed.
+                    if (request is ChatAckRequest ack)
+                    {
+                        ack.TriggerSuccess(new ChatAckResponse());
+                        return;
+                    }
+
                     request.Fail(new InvalidOperationException($@"{nameof(DummyAPIAccess)} cannot process this request."));
                 }
             });
         }
 
-        public void Perform(APIRequest request) => HandleRequest?.Invoke(request);
+        void IAPIProvider.Schedule(Action action) => base.Schedule(action);
+
+        public void Perform(APIRequest request)
+        {
+            request.AttachAPI(this);
+            HandleRequest?.Invoke(request);
+        }
 
         public Task PerformAsync(APIRequest request)
         {
+            request.AttachAPI(this);
             HandleRequest?.Invoke(request);
             return Task.CompletedTask;
         }
@@ -146,6 +152,8 @@ namespace osu.Game.Online.API
             state.Value = APIState.Connecting;
             LastLoginError = null;
 
+            request.AttachAPI(this);
+
             // if no handler installed / handler can't handle verification, just assume that the server would verify for simplicity.
             if (HandleRequest?.Invoke(request) != true)
                 onSuccessfulLogin();
@@ -158,11 +166,6 @@ namespace osu.Game.Online.API
         private void onSuccessfulLogin()
         {
             state.Value = APIState.Online;
-            Statistics.Value = new UserStatistics
-            {
-                GlobalRank = 1,
-                CountryRank = 1
-            };
         }
 
         public void Logout()
@@ -173,12 +176,8 @@ namespace osu.Game.Online.API
             LocalUser.Value = new GuestUser();
         }
 
-        public void UpdateStatistics(UserStatistics newStatistics)
+        public void UpdateLocalFriends()
         {
-            Statistics.Value = newStatistics;
-
-            if (IsLoggedIn)
-                LocalUser.Value.Statistics = newStatistics;
         }
 
         public IHubClientConnector? GetHubConnector(string clientName, string endpoint, bool preferMessagePack) => null;
@@ -194,9 +193,7 @@ namespace osu.Game.Online.API
         public void SetState(APIState newState) => state.Value = newState;
 
         IBindable<APIUser> IAPIProvider.LocalUser => LocalUser;
-        IBindableList<APIUser> IAPIProvider.Friends => Friends;
-        IBindable<UserActivity> IAPIProvider.Activity => Activity;
-        IBindable<UserStatistics?> IAPIProvider.Statistics => Statistics;
+        IBindableList<APIRelation> IAPIProvider.Friends => Friends;
 
         /// <summary>
         /// Skip 2FA requirement for next login.

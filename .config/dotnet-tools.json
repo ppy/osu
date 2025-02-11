@@ -9,7 +9,7 @@
       ]
     },
     "nvika": {
-      "version": "3.0.0",
+      "version": "4.0.0",
       "commands": [
         "nvika"
       ]
@@ -21,7 +21,7 @@
       ]
     },
     "ppy.localisationanalyser.tools": {
-      "version": "2023.1117.0",
+      "version": "2024.802.0",
       "commands": [
         "localisation"
       ]

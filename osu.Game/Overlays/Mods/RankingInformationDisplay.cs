@@ -52,7 +52,7 @@ namespace osu.Game.Overlays.Mods
                 Anchor = Anchor.BottomRight,
                 Origin = Anchor.BottomRight,
                 RelativeSizeAxes = Axes.Both,
-                Shear = new Vector2(ShearedOverlayContainer.SHEAR, 0),
+                Shear = new Vector2(OsuGame.SHEAR, 0),
                 CornerRadius = ShearedButton.CORNER_RADIUS,
                 Masking = true,
                 Children = new Drawable[]
@@ -79,7 +79,7 @@ namespace osu.Game.Overlays.Mods
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0),
+                        Shear = new Vector2(-OsuGame.SHEAR, 0),
                         Font = OsuFont.Default.With(size: 17, weight: FontWeight.SemiBold)
                     }
                 }
@@ -94,7 +94,7 @@ namespace osu.Game.Overlays.Mods
                 Origin = Anchor.Centre,
                 Child = counter = new EffectCounter
                 {
-                    Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0),
+                    Shear = new Vector2(-OsuGame.SHEAR, 0),
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Current = { BindTarget = ModMultiplier }

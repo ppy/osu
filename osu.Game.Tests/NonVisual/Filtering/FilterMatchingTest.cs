@@ -1,10 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using NUnit.Framework;
+using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Filter;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Carousel;
 using osu.Game.Screens.Select.Filter;
@@ -145,6 +148,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
         [TestCase("tags too", false)]
         [TestCase("version", false)]
         [TestCase("an auteur", true)]
+        [TestCase("unit", false)]
         public void TestCriteriaMatchingTerms(string terms, bool filtered)
         {
             var exampleBeatmapInfo = getExampleBeatmap();
@@ -172,6 +176,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
         [TestCase("\"Artist\"!", true)]
         [TestCase("\"The Artist\"!", false)]
         [TestCase("\"the artist\"!", false)]
+        [TestCase("\"unit tests\"!", false)]
         [TestCase("\"\\\"", true)] // nasty case, covers properly escaping user input in underlying regex.
         public void TestCriteriaMatchingExactTerms(string terms, bool filtered)
         {
@@ -309,8 +314,10 @@ namespace osu.Game.Tests.NonVisual.Filtering
                 match = shouldMatch;
             }
 
-            public bool Matches(BeatmapInfo beatmapInfo) => match;
+            public bool Matches(BeatmapInfo beatmapInfo, FilterCriteria criteria) => match;
             public bool TryParseCustomKeywordCriteria(string key, Operator op, string value) => false;
+
+            public bool FilterMayChangeFromMods(ValueChangedEvent<IReadOnlyList<Mod>> mods) => false;
         }
     }
 }

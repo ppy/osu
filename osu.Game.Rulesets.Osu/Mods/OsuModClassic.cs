@@ -95,12 +95,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         /// </summary>
         private static void blockInputToObjectsUnderSliderHead(DrawableSliderHead slider)
         {
-            var oldHitAction = slider.HitArea.Hit;
-            slider.HitArea.Hit = () =>
-            {
-                oldHitAction?.Invoke();
-                return !slider.DrawableSlider.AllJudged;
-            };
+            slider.HitArea.CanBeHit = () => !slider.DrawableSlider.AllJudged;
         }
 
         private void applyEarlyFading(DrawableHitCircle circle)

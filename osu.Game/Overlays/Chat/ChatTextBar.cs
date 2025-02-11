@@ -19,6 +19,8 @@ namespace osu.Game.Overlays.Chat
 {
     public partial class ChatTextBar : Container
     {
+        public const float HEIGHT = 40;
+
         public readonly BindableBool ShowSearch = new BindableBool();
 
         public event Action<string>? OnChatMessageCommitted;
@@ -45,7 +47,7 @@ namespace osu.Game.Overlays.Chat
         private void load(OverlayColourProvider colourProvider)
         {
             RelativeSizeAxes = Axes.X;
-            Height = 60;
+            Height = HEIGHT;
 
             Children = new Drawable[]
             {
@@ -76,7 +78,7 @@ namespace osu.Game.Overlays.Chat
                                 Child = chattingText = new TruncatingSpriteText
                                 {
                                     MaxWidth = chatting_text_width - padding * 2,
-                                    Font = OsuFont.Torus.With(size: 20),
+                                    Font = OsuFont.Torus,
                                     Colour = colourProvider.Background1,
                                     Anchor = Anchor.CentreRight,
                                     Origin = Anchor.CentreRight,
@@ -91,7 +93,7 @@ namespace osu.Game.Overlays.Chat
                                     Icon = FontAwesome.Solid.Search,
                                     Origin = Anchor.CentreRight,
                                     Anchor = Anchor.CentreRight,
-                                    Size = new Vector2(20),
+                                    Size = new Vector2(OsuFont.DEFAULT_FONT_SIZE),
                                     Margin = new MarginPadding { Right = 2 },
                                 },
                             },
@@ -101,6 +103,7 @@ namespace osu.Game.Overlays.Chat
                                 Padding = new MarginPadding { Right = padding },
                                 Child = chatTextBox = new ChatTextBox
                                 {
+                                    FontSize = OsuFont.DEFAULT_FONT_SIZE,
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
                                     RelativeSizeAxes = Axes.X,

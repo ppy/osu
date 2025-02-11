@@ -14,8 +14,10 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Layout;
 using osu.Game.Audio;
 using osu.Game.Graphics.Containers;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Osu.Skinning.Default;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
@@ -26,6 +28,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
     public partial class DrawableSlider : DrawableOsuHitObject
     {
         public new Slider HitObject => (Slider)base.HitObject;
+
+        public new OsuSliderJudgementResult Result => (OsuSliderJudgementResult)base.Result;
 
         public DrawableSliderHead HeadCircle => headContainer.Child;
         public DrawableSliderTail TailCircle => tailContainer.Child;
@@ -133,6 +137,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     drawableHitObject.AccentColour.Value = colour.NewValue;
             }, true);
         }
+
+        protected override JudgementResult CreateResult(Judgement judgement) => new OsuSliderJudgementResult(HitObject, judgement);
 
         protected override void OnApply()
         {
@@ -364,5 +370,44 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private partial class DefaultSliderBody : PlaySliderBody
         {
         }
+
+        #region FOR EDITOR USE ONLY, DO NOT USE FOR ANY OTHER PURPOSE
+
+        internal void SuppressHitAnimations()
+        {
+            UpdateState(ArmedState.Idle);
+            HeadCircle.SuppressHitAnimations();
+
+            foreach (var repeat in repeatContainer)
+                repeat.SuppressHitAnimations();
+
+            TailCircle.SuppressHitAnimations();
+
+            // This method is called every frame in editor contexts, thus the lack of need for transforms.
+
+            if (Time.Current >= HitStateUpdateTime)
+            {
+                // Apply the slider's alpha to *only* the body.
+                // This allows start and – more importantly – end circles to fade slower than the overall slider.
+                if (Alpha < 1)
+                    Body.Alpha = Alpha;
+                Alpha = 1;
+            }
+
+            LifetimeEnd = HitStateUpdateTime + 700;
+        }
+
+        internal void RestoreHitAnimations()
+        {
+            UpdateState(ArmedState.Hit);
+            HeadCircle.RestoreHitAnimations();
+
+            foreach (var repeat in repeatContainer)
+                repeat.RestoreHitAnimations();
+
+            TailCircle.RestoreHitAnimations();
+        }
+
+        #endregion
     }
 }

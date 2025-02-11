@@ -19,6 +19,7 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Taiko.Skinning.Default;
 using osu.Game.Screens.Play;
 using osu.Game.Skinning;
+using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
@@ -34,6 +35,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         /// </summary>
         private const double ring_appear_offset = 100;
 
+        private Vector2 baseSize;
+
         private readonly Container<DrawableSwellTick> ticks;
         private readonly Container bodyContainer;
         private readonly CircularContainer targetRing;
@@ -42,6 +45,11 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         private double? lastPressHandleTime;
 
         public override bool DisplayResult => false;
+
+        /// <summary>
+        /// Whether the player must alternate centre and rim hits.
+        /// </summary>
+        public bool MustAlternate { get; internal set; } = true;
 
         public DrawableSwell()
             : this(null)
@@ -135,6 +143,12 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
             });
+
+        protected override void RecreatePieces()
+        {
+            base.RecreatePieces();
+            Size = baseSize = new Vector2(TaikoHitObject.DEFAULT_SIZE);
+        }
 
         protected override void OnFree()
         {
@@ -264,7 +278,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         {
             base.Update();
 
-            Size = BaseSize * Parent!.RelativeChildSize;
+            Size = baseSize * Parent!.RelativeChildSize;
 
             // Make the swell stop at the hit target
             X = Math.Max(0, X);
@@ -292,7 +306,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             bool isCentre = e.Action == TaikoAction.LeftCentre || e.Action == TaikoAction.RightCentre;
 
             // Ensure alternating centre and rim hits
-            if (lastWasCentre == isCentre)
+            if (lastWasCentre == isCentre && MustAlternate)
                 return false;
 
             // If we've already successfully judged a tick this frame, do not judge more.

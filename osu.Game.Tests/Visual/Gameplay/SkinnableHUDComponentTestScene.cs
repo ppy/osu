@@ -1,8 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using NUnit.Framework;
 using osu.Framework.Graphics;
+using osu.Framework.Testing;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Skinning;
@@ -13,8 +13,13 @@ namespace osu.Game.Tests.Visual.Gameplay
     {
         protected override Ruleset CreateRulesetForSkinProvider() => new OsuRuleset();
 
-        [SetUp]
-        public void SetUp() => Schedule(() =>
+        [SetUpSteps]
+        public virtual void SetUpSteps()
+        {
+            AddStep("setup components", SetUpComponents);
+        }
+
+        public void SetUpComponents()
         {
             SetContents(skin =>
             {
@@ -28,7 +33,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 implementation.Origin = Anchor.Centre;
                 return implementation;
             });
-        });
+        }
 
         protected abstract Drawable CreateDefaultImplementation();
         protected virtual Drawable CreateArgonImplementation() => CreateDefaultImplementation();

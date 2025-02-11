@@ -24,6 +24,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         [Resolved]
         private OngoingOperationTracker operationTracker { get; set; } = null!;
 
+        private readonly Room room;
         private readonly IBindable<bool> operationInProgress = new Bindable<bool>();
         private readonly PlaylistItem? itemToEdit;
 
@@ -38,6 +39,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         public MultiplayerMatchSongSelect(Room room, PlaylistItem? itemToEdit = null)
             : base(room, itemToEdit)
         {
+            this.room = room;
             this.itemToEdit = itemToEdit;
         }
 
@@ -84,7 +86,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                     BeatmapChecksum = item.Beatmap.MD5Hash,
                     RulesetID = item.RulesetID,
                     RequiredMods = item.RequiredMods.ToArray(),
-                    AllowedMods = item.AllowedMods.ToArray()
+                    AllowedMods = item.AllowedMods.ToArray(),
+                    Freestyle = item.Freestyle
                 };
 
                 Task task = itemToEdit != null ? client.EditPlaylistItem(multiplayerItem) : client.AddPlaylistItem(multiplayerItem);
@@ -111,8 +114,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             }
             else
             {
-                Playlist.Clear();
-                Playlist.Add(item);
+                room.Playlist = [item];
                 this.Exit();
             }
 

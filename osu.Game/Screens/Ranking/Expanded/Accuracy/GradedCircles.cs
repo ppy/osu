@@ -67,7 +67,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
         {
             public double RevealProgress
             {
-                set => Current.Value = Math.Clamp(value, startProgress, endProgress) - startProgress;
+                set => Progress = Math.Clamp(value, startProgress, endProgress) - startProgress;
             }
 
             private readonly double startProgress;

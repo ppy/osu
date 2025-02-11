@@ -34,8 +34,6 @@ namespace osu.Game.Rulesets.Mania
             LeftKeys = leftKeys,
             RightKeys = rightKeys,
             SpecialKey = InputKey.Space,
-            SpecialAction = ManiaAction.Special1,
-            NormalActionStart = ManiaAction.Key1,
-        }.GenerateKeyBindingsFor(variant, out _);
+        }.GenerateKeyBindingsFor(variant);
     }
 }

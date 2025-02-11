@@ -268,11 +268,14 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                     ApplyMaxResult();
                 else
                     MissForcefully();
-            }
 
-            // Make sure that the hold note is fully judged by giving the body a judgement.
-            if (Tail.AllJudged && !Body.AllJudged)
-                Body.TriggerResult(Tail.IsHit);
+                // Make sure that the hold note is fully judged by giving the body a judgement.
+                if (!Body.AllJudged)
+                    Body.TriggerResult(Tail.IsHit);
+
+                // Important that this is always called when a result is applied.
+                endHold();
+            }
         }
 
         public override void MissForcefully()

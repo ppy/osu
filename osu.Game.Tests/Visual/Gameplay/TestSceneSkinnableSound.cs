@@ -23,7 +23,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         private TestSkinSourceContainer skinSource = null!;
         private PausableSkinnableSound skinnableSound = null!;
 
-        private const string sample_lookup = "Gameplay/normal-sliderslide";
+        private const string sample_lookup = "Gameplay/Argon/normal-sliderslide";
 
         [SetUpSteps]
         public void SetUpSteps()

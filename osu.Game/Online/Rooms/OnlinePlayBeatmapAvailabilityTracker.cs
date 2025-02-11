@@ -29,7 +29,7 @@ namespace osu.Game.Online.Rooms
     /// </summary>
     public partial class OnlinePlayBeatmapAvailabilityTracker : CompositeComponent
     {
-        public readonly IBindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();
+        public readonly Bindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();
 
         [Resolved]
         private RealmAccess realm { get; set; } = null!;

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Game.Rulesets.Judgements;
+
 namespace osu.Game.Rulesets.Scoring
 {
     /// <summary>
@@ -9,7 +11,7 @@ namespace osu.Game.Rulesets.Scoring
     /// </summary>
     public partial class AccumulatingHealthProcessor : HealthProcessor
     {
-        protected override bool DefaultFailCondition => JudgedHits == MaxHits && Health.Value < requiredHealth;
+        protected override bool CheckDefaultFailCondition(JudgementResult _) => JudgedHits == MaxHits && Health.Value < requiredHealth;
 
         private readonly double requiredHealth;
 

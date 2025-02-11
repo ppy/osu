@@ -658,7 +658,6 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private partial class TestModSelectOverlay : UserModSelectOverlay
         {
-            protected override bool ShowModEffects => true;
             protected override bool ShowPresets => false;
 
             public TestModSelectOverlay()

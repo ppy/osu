@@ -63,8 +63,12 @@ namespace osu.Game.Graphics
                 case ScoreRank.C:
                     return Color4Extensions.FromHex(@"ff8e5d");
 
-                default:
+                case ScoreRank.D:
                     return Color4Extensions.FromHex(@"ff5a5a");
+
+                case ScoreRank.F:
+                default:
+                    return Color4Extensions.FromHex(@"3f3f3f");
             }
         }
 
@@ -188,6 +192,27 @@ namespace osu.Game.Graphics
 
                 default:
                     return null;
+            }
+        }
+
+        /// <summary>
+        /// Retrieves the accent colour representing a <see cref="Room"/>'s current status.
+        /// </summary>
+        public Color4 ForRoomStatus(Room room)
+        {
+            if (room.HasEnded)
+                return YellowDarker;
+
+            switch (room.Status)
+            {
+                case RoomStatus.Playing:
+                    return Purple;
+
+                default:
+                    if (room.HasPassword)
+                        return GreenDark;
+
+                    return GreenLight;
             }
         }
 

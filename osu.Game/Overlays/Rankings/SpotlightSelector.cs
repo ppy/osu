@@ -200,7 +200,7 @@ namespace osu.Game.Overlays.Rankings
                     Text.Font = OsuFont.GetFont(size: 15);
                     Text.Padding = new MarginPadding { Vertical = 1.5f }; // osu-web line-height difference compensation
                     Foreground.Padding = new MarginPadding { Horizontal = 10, Vertical = 15 };
-                    Margin = Icon.Margin = new MarginPadding(0);
+                    Margin = Chevron.Margin = new MarginPadding(0);
                 }
 
                 [BackgroundDependencyLoader]

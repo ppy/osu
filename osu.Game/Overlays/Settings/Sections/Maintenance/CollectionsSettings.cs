@@ -29,7 +29,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                 Text = MaintenanceSettingsStrings.DeleteAllCollections,
                 Action = () =>
                 {
-                    dialogOverlay?.Push(new MassDeleteConfirmationDialog(deleteAllCollections));
+                    dialogOverlay?.Push(new MassDeleteConfirmationDialog(deleteAllCollections, DeleteConfirmationContentStrings.Collections));
                 }
             });
         }

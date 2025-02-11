@@ -37,7 +37,7 @@ namespace osu.Game.Skinning
 
         protected override string[] HashableFileTypes => new[] { ".ini", ".json" };
 
-        protected override bool ShouldDeleteArchive(string path) => Path.GetExtension(path).ToLowerInvariant() == @".osk";
+        protected override bool ShouldDeleteArchive(string path) => string.Equals(Path.GetExtension(path), @".osk", StringComparison.OrdinalIgnoreCase);
 
         protected override SkinInfo CreateModel(ArchiveReader archive, ImportParameters parameters) => new SkinInfo { Name = archive.Name ?? @"No name" };
 
@@ -132,7 +132,7 @@ namespace osu.Game.Skinning
             {
                 // skins without a skin.ini are supposed to import using the "latest version" spec.
                 // see https://github.com/peppy/osu-stable-reference/blob/1531237b63392e82c003c712faa028406073aa8f/osu!/Graphics/Skinning/SkinManager.cs#L297-L298
-                newLines.Add($"Version: {SkinConfiguration.LATEST_VERSION}");
+                newLines.Add(FormattableString.Invariant($"Version: {SkinConfiguration.LATEST_VERSION}"));
 
                 // In the case a skin doesn't have a skin.ini yet, let's create one.
                 writeNewSkinIni();

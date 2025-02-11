@@ -6,7 +6,6 @@
 using System;
 using System.Diagnostics;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Rendering;
@@ -190,9 +189,9 @@ namespace osu.Game.Graphics
                 float width = Texture.DisplayWidth * scale;
                 float height = Texture.DisplayHeight * scale;
 
-                if (relativePositionAxes.HasFlagFast(Axes.X))
+                if (relativePositionAxes.HasFlag(Axes.X))
                     position.X *= sourceSize.X;
-                if (relativePositionAxes.HasFlagFast(Axes.Y))
+                if (relativePositionAxes.HasFlag(Axes.Y))
                     position.Y *= sourceSize.Y;
 
                 return new RectangleF(
