@@ -126,14 +126,9 @@ namespace osu.Game.Collections
 
             private const float count_text_size = 12;
 
-            [Resolved]
-            private RealmAccess realm { get; set; } = null!;
-
             private readonly Live<BeatmapCollection> collection;
 
             private OsuSpriteText countText = null!;
-
-            private IDisposable? itemCountSubscription;
 
             public ItemTextBox(Live<BeatmapCollection> collection)
             {
@@ -163,28 +158,23 @@ namespace osu.Game.Collections
                         Colour = colours.Yellow
                     });
 
-                    itemCountSubscription = realm.SubscribeToPropertyChanged(r => r.Find<BeatmapCollection>(collection.ID), c => c.BeatmapMD5Hashes, _ =>
-                        Scheduler.AddOnce(() =>
-                        {
-                            int count = collection.PerformRead(c => c.BeatmapMD5Hashes.Count);
+                    // interestingly, it is not required to subscribe to change notifications on this collection at all for this to work correctly.
+                    // the reasoning for this is that `DrawableCollectionList` already takes out a subscription on the set of all `BeatmapCollection`s -
+                    // but that subscription does not only cover *changes to the set of collections* (i.e. addition/removal/rearrangement of collections),
+                    // but also covers *changes to the properties of collections*, which `BeatmapMD5Hashes` is one.
+                    // when a collection item changes due to `BeatmapMD5Hashes` changing, the list item is deleted and re-inserted, thus guaranteeing this to work correctly.
+                    int count = collection.PerformRead(c => c.BeatmapMD5Hashes.Count);
 
-                            countText.Text = count == 1
-                                // Intentionally not localised until we have proper support for this (see https://github.com/ppy/osu-framework/pull/4918
-                                // but also in this case we want support for formatting a number within a string).
-                                ? $"{count:#,0} beatmap"
-                                : $"{count:#,0} beatmaps";
-                        }));
+                    countText.Text = count == 1
+                        // Intentionally not localised until we have proper support for this (see https://github.com/ppy/osu-framework/pull/4918
+                        // but also in this case we want support for formatting a number within a string).
+                        ? $"{count:#,0} beatmap"
+                        : $"{count:#,0} beatmaps";
                 }
                 else
                 {
                     PlaceholderText = "Create a new collection";
                 }
-            }
-
-            protected override void Dispose(bool isDisposing)
-            {
-                base.Dispose(isDisposing);
-                itemCountSubscription?.Dispose();
             }
         }
 
