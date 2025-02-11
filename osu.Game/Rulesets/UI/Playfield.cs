@@ -11,19 +11,19 @@ using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Pooling;
+using osu.Framework.Graphics.Primitives;
 using osu.Game.Audio;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Objects.Pooling;
 using osu.Game.Skinning;
 using osuTK;
-using osu.Game.Rulesets.Objects.Pooling;
-using osu.Framework.Extensions.ObjectExtensions;
-using osu.Framework.Graphics.Primitives;
 
 namespace osu.Game.Rulesets.UI
 {
@@ -428,14 +428,26 @@ namespace osu.Game.Rulesets.UI
             });
         }
 
+        /// <summary>
+        /// Returns a pool for given <see cref="HitObject"/> in case when it can not be determined only by <see cref="HitObject"/> type alone.<br/>
+        /// It only have sense if the same <see cref="HitObject"/> can have different <see cref="PoolableDrawable"/> for its representation.
+        /// </summary>
+        /// <param name="hitObject">The <see cref="HitObject"/> for which <see cref="IDrawablePool"/> will be returned.</param>
+        /// <returns>
+        /// * <c>null</c> if no property based pool is required for given <see cref="HitObject"/>;<br/>
+        /// * <see cref="IDrawablePool"/> if given <see cref="HitObject"/> requires property based pool.
+        /// </returns>
+        protected virtual IDrawablePool PropertyBasedDrawableHitObjectPool(HitObject hitObject) => null;
+
         private IDrawablePool prepareDrawableHitObjectPool(HitObject hitObject)
         {
+            var property_based_pool = PropertyBasedDrawableHitObjectPool(hitObject);
+            if (property_based_pool is not null) return property_based_pool;
+
             var lookupType = hitObject.GetType();
 
-            IDrawablePool pool;
-
             // Tests may add derived hitobject instances for which pools don't exist. Try to find any applicable pool and dynamically assign the type if the pool exists.
-            if (!pools.TryGetValue(lookupType, out pool))
+            if (!pools.TryGetValue(lookupType, out var pool))
             {
                 foreach (var (t, p) in pools)
                 {

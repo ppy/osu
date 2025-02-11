@@ -1,9 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Pooling;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.Skinning.Default;
@@ -12,37 +10,30 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
-    public partial class KiaiHitExplosion : Container
+    /// <summary>
+    /// An explosion from the hit target in Kiai mode to indicate a hitobject has been hit.
+    /// </summary>
+    internal partial class KiaiHitExplosion : HitExplosionBase
     {
-        public override bool RemoveWhenNotAlive => true;
-
-        [Cached(typeof(DrawableHitObject))]
-        public readonly DrawableHitObject JudgedObject;
-
         private readonly HitType hitType;
 
-        private SkinnableDrawable skinnable = null!;
+        /// <summary>
+        /// This constructor only exists to meet the <c>new()</c> type constraint of <see cref="DrawablePool{T}"/>.
+        /// </summary>
+        public KiaiHitExplosion() : this(HitType.Centre) { }
 
-        public override double LifetimeStart => skinnable.Drawable.LifetimeStart;
-
-        public override double LifetimeEnd => skinnable.Drawable.LifetimeEnd;
-
-        public KiaiHitExplosion(DrawableHitObject judgedObject, HitType hitType)
+        public KiaiHitExplosion(HitType hitType)
         {
-            JudgedObject = judgedObject;
             this.hitType = hitType;
-
-            Anchor = Anchor.Centre;
-            Origin = Anchor.Centre;
-
-            RelativeSizeAxes = Axes.Both;
             Size = new Vector2(TaikoHitObject.DEFAULT_SIZE, 1);
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
+        public KiaiHitExplosion(DrawableHitObject judgedObject, HitType hitType) : this(hitType)
         {
-            Child = skinnable = new SkinnableDrawable(new TaikoSkinComponentLookup(TaikoSkinComponents.TaikoExplosionKiai), _ => new DefaultKiaiHitExplosion(hitType));
+            Apply(judgedObject);
         }
+
+        protected override SkinnableDrawable OnLoadSkinnableCreate() =>
+            new SkinnableDrawable(new TaikoSkinComponentLookup(TaikoSkinComponents.TaikoExplosionKiai), _ => new DefaultKiaiHitExplosion(hitType));
     }
 }

@@ -42,6 +42,12 @@ namespace osu.Game.Rulesets.Taiko.Objects
             SamplesBindable.BindCollectionChanged((_, _) => updateTypeFromSamples());
         }
 
+        public Hit(HitType type, bool isStroing) : this()
+        {
+            IsStrong = isStroing;
+            Type = type;
+        }
+
         private void updateTypeFromSamples()
         {
             Type = getRimSamples().Any() ? HitType.Rim : HitType.Centre;

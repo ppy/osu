@@ -6,6 +6,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
@@ -71,7 +72,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         /// <summary>
         /// Moves <see cref="Content"/> to the normal hitobject layer.
-        /// Does nothing is content is not currently proxied.
+        /// Does nothing if content is not currently proxied.
         /// </summary>
         protected void UnproxyContent()
         {
@@ -141,22 +142,15 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             RelativeSizeAxes = Axes.Both;
         }
 
-        protected override void OnApply()
+        [BackgroundDependencyLoader]
+        private void load()
         {
-            base.OnApply();
-
-            // TODO: THIS CANNOT BE HERE, it makes pooling pointless (see https://github.com/ppy/osu/issues/21072).
-            RecreatePieces();
+            var drawable = OnLoadCreateMainPiece();
+            if (drawable is not null)
+                Content.Add(MainPiece = drawable);
         }
 
-        protected virtual void RecreatePieces()
-        {
-            if (MainPiece != null)
-                Content.Remove(MainPiece, true);
-
-            Content.Add(MainPiece = CreateMainPiece());
-        }
-
-        protected abstract SkinnableDrawable CreateMainPiece();
+        /// <summary>Creates <c>MainPiece</c>. Calls only on <c>load</c> or in EditorMode.</summary>
+        protected abstract SkinnableDrawable OnLoadCreateMainPiece();
     }
 }
