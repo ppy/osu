@@ -15,11 +15,14 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Framework.Extensions.ObjectExtensions;
 using System;
 using System.Globalization;
+using osu.Framework.Utils;
 
 namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 {
     public partial class LegacySwell : Container
     {
+        private const float scale_adjust = 768f / 480;
+
         private DrawableSwell drawableSwell = null!;
 
         private Container bodyContainer = null!;
@@ -80,12 +83,13 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
                                     Scale = new Vector2(1.86f * 0.8f),
+                                    Alpha = 0.8f,
                                 },
-                                remainingHitsText = new LegacySpriteText(LegacyFont.Combo)
+                                remainingHitsText = new LegacySpriteText(LegacyFont.Score)
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
-                                    Position = new Vector2(0f, 165f),
+                                    Position = new Vector2(0f, 130f),
                                     Scale = Vector2.One,
                                 },
                             }
@@ -96,6 +100,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Alpha = 0,
+                            Y = -40,
                         },
                     },
                 },
@@ -159,11 +164,10 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                     }
 
                     clearAnimation
-                        .MoveTo(new Vector2(0, 0))
-                        .MoveTo(new Vector2(0, -90), clear_fade_in * 2, Easing.Out)
+                        .MoveToOffset(new Vector2(0, -90 * scale_adjust), clear_fade_in * 2, Easing.Out)
                         .ScaleTo(0.4f)
                         .ScaleTo(1f, clear_fade_in * 2, Easing.Out)
-                        .FadeIn(clear_fade_in)
+                        .FadeIn()
                         .Delay(clear_fade_in * 3)
                         .FadeOut(clear_fade_in * 2.5);
                 }
