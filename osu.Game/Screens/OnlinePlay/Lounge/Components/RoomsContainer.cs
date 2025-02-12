@@ -7,10 +7,8 @@ using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
-using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
-using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
@@ -24,16 +22,13 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 {
     public partial class RoomsContainer : CompositeDrawable, IKeyBindingHandler<GlobalAction>
     {
+        public readonly BindableList<Room> Rooms = new BindableList<Room>();
         public readonly Bindable<Room?> SelectedRoom = new Bindable<Room?>();
         public readonly Bindable<FilterCriteria?> Filter = new Bindable<FilterCriteria?>();
 
-        public IReadOnlyList<DrawableRoom> Rooms => roomFlow.FlowingChildren.Cast<DrawableRoom>().ToArray();
+        public IReadOnlyList<DrawableRoom> DrawableRooms => roomFlow.FlowingChildren.Cast<DrawableRoom>().ToArray();
 
-        private readonly IBindableList<Room> rooms = new BindableList<Room>();
         private readonly FillFlowContainer<DrawableLoungeRoom> roomFlow;
-
-        [Resolved]
-        private IRoomManager roomManager { get; set; } = null!;
 
         // handle deselection
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
@@ -62,11 +57,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
         protected override void LoadComplete()
         {
-            rooms.CollectionChanged += roomsChanged;
-            roomManager.RoomsUpdated += updateSorting;
-
-            rooms.BindTo(roomManager.Rooms);
-
+            Rooms.BindCollectionChanged(roomsChanged, true);
             Filter.BindValueChanged(criteria => applyFilterCriteria(criteria.NewValue), true);
         }
 
@@ -155,7 +146,14 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         private void addRooms(IEnumerable<Room> rooms)
         {
             foreach (var room in rooms)
-                roomFlow.Add(new DrawableLoungeRoom(room) { SelectedRoom = SelectedRoom });
+            {
+                var drawableRoom = new DrawableLoungeRoom(room) { SelectedRoom = SelectedRoom };
+
+                roomFlow.Add(drawableRoom);
+
+                // Always show spotlight playlists at the top of the listing.
+                roomFlow.SetLayoutPosition(drawableRoom, room.Category > RoomCategory.Normal ? float.MinValue : -(room.RoomID ?? 0));
+            }
 
             applyFilterCriteria(Filter.Value);
         }
@@ -179,17 +177,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             // selection may have a lease due to being in a sub screen.
             if (!SelectedRoom.Disabled)
                 SelectedRoom.Value = null;
-        }
-
-        private void updateSorting()
-        {
-            foreach (var room in roomFlow)
-            {
-                roomFlow.SetLayoutPosition(room, room.Room.Category > RoomCategory.Normal
-                    // Always show spotlight playlists at the top of the listing.
-                    ? float.MinValue
-                    : -(room.Room.RoomID ?? 0));
-            }
         }
 
         protected override bool OnClick(ClickEvent e)
@@ -226,7 +213,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             if (SelectedRoom.Disabled)
                 return;
 
-            var visibleRooms = Rooms.AsEnumerable().Where(r => r.IsPresent);
+            var visibleRooms = DrawableRooms.AsEnumerable().Where(r => r.IsPresent);
 
             Room? room;
 
@@ -246,13 +233,5 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         }
 
         #endregion
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-
-            if (roomManager.IsNotNull())
-                roomManager.RoomsUpdated -= updateSorting;
-        }
     }
 }

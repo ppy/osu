@@ -36,7 +36,7 @@ namespace osu.Game.Tests.Visual.Playlists
         public void TestManyRooms()
         {
             AddStep("add rooms", () => RoomManager.AddRooms(500));
-            AddUntilStep("wait for rooms", () => roomsContainer.Rooms.Count == 500);
+            AddUntilStep("wait for rooms", () => roomsContainer.DrawableRooms.Count == 500);
         }
 
         [Test]
@@ -45,45 +45,45 @@ namespace osu.Game.Tests.Visual.Playlists
             AddStep("reset mouse", () => InputManager.ReleaseButton(MouseButton.Left));
 
             AddStep("add rooms", () => RoomManager.AddRooms(30));
-            AddUntilStep("wait for rooms", () => roomsContainer.Rooms.Count == 30);
+            AddUntilStep("wait for rooms", () => roomsContainer.DrawableRooms.Count == 30);
 
-            AddUntilStep("first room is not masked", () => checkRoomVisible(roomsContainer.Rooms[0]));
+            AddUntilStep("first room is not masked", () => checkRoomVisible(roomsContainer.DrawableRooms[0]));
 
-            AddStep("move mouse to third room", () => InputManager.MoveMouseTo(roomsContainer.Rooms[2]));
+            AddStep("move mouse to third room", () => InputManager.MoveMouseTo(roomsContainer.DrawableRooms[2]));
             AddStep("hold down", () => InputManager.PressButton(MouseButton.Left));
-            AddStep("drag to top", () => InputManager.MoveMouseTo(roomsContainer.Rooms[0]));
+            AddStep("drag to top", () => InputManager.MoveMouseTo(roomsContainer.DrawableRooms[0]));
 
             AddAssert("first and second room masked", ()
-                => !checkRoomVisible(roomsContainer.Rooms[0]) &&
-                   !checkRoomVisible(roomsContainer.Rooms[1]));
+                => !checkRoomVisible(roomsContainer.DrawableRooms[0]) &&
+                   !checkRoomVisible(roomsContainer.DrawableRooms[1]));
         }
 
         [Test]
         public void TestScrollSelectedIntoView()
         {
             AddStep("add rooms", () => RoomManager.AddRooms(30));
-            AddUntilStep("wait for rooms", () => roomsContainer.Rooms.Count == 30);
+            AddUntilStep("wait for rooms", () => roomsContainer.DrawableRooms.Count == 30);
 
-            AddUntilStep("first room is not masked", () => checkRoomVisible(roomsContainer.Rooms[0]));
+            AddUntilStep("first room is not masked", () => checkRoomVisible(roomsContainer.DrawableRooms[0]));
 
-            AddStep("select last room", () => roomsContainer.Rooms[^1].TriggerClick());
+            AddStep("select last room", () => roomsContainer.DrawableRooms[^1].TriggerClick());
 
-            AddUntilStep("first room is masked", () => !checkRoomVisible(roomsContainer.Rooms[0]));
-            AddUntilStep("last room is not masked", () => checkRoomVisible(roomsContainer.Rooms[^1]));
+            AddUntilStep("first room is masked", () => !checkRoomVisible(roomsContainer.DrawableRooms[0]));
+            AddUntilStep("last room is not masked", () => checkRoomVisible(roomsContainer.DrawableRooms[^1]));
         }
 
         [Test]
         public void TestEnteringRoomTakesLeaseOnSelection()
         {
             AddStep("add rooms", () => RoomManager.AddRooms(1));
-            AddUntilStep("wait for rooms", () => roomsContainer.Rooms.Count == 1);
+            AddUntilStep("wait for rooms", () => roomsContainer.DrawableRooms.Count == 1);
 
             AddAssert("selected room is not disabled", () => !loungeScreen.SelectedRoom.Disabled);
 
-            AddStep("select room", () => roomsContainer.Rooms[0].TriggerClick());
+            AddStep("select room", () => roomsContainer.DrawableRooms[0].TriggerClick());
             AddAssert("selected room is non-null", () => loungeScreen.SelectedRoom.Value != null);
 
-            AddStep("enter room", () => roomsContainer.Rooms[0].TriggerClick());
+            AddStep("enter room", () => roomsContainer.DrawableRooms[0].TriggerClick());
 
             AddUntilStep("wait for match load", () => Stack.CurrentScreen is PlaylistsRoomSubScreen);
 

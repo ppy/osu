@@ -28,15 +28,14 @@ namespace osu.Game.Screens.OnlinePlay.Components
             if (room.RoomID == null)
                 return base.Poll();
 
-            var tcs = new TaskCompletionSource<bool>();
-
             lastPollRequest?.Cancel();
 
+            var tcs = new TaskCompletionSource<bool>();
             var req = new GetRoomRequest(room.RoomID.Value);
 
             req.Success += result =>
             {
-                RoomManager.AddOrUpdateRoom(result);
+                room.CopyFrom(result);
                 tcs.SetResult(true);
             };
 
