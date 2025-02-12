@@ -23,11 +23,11 @@ using osuTK;
 
 namespace osu.Game.Screens.SelectV2
 {
-    public partial class BeatmapPanel : PoolableDrawable, ICarouselPanel
+    public partial class PanelBeatmap : PoolableDrawable, ICarouselPanel
     {
         public const float HEIGHT = CarouselItem.DEFAULT_HEIGHT;
 
-        // todo: this should be replaced with information from CarouselItem about how deep is BeatmapPanel in the carousel
+        // todo: this should be replaced with information from CarouselItem about how deep is PanelBeatmap in the carousel
         // (i.e. whether it's under a beatmap set that's under a group, or just under a top-level beatmap set).
         private const float difficulty_x_offset = 100f; // constant X offset for beatmap difficulty panels specifically.
 
