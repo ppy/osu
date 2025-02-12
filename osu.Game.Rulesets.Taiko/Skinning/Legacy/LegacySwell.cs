@@ -8,7 +8,6 @@ using osu.Game.Skinning;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Rulesets.Taiko.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Objects;
-using osu.Framework.Audio.Sample;
 using osu.Game.Audio;
 using osuTK;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -31,7 +30,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
         private Sprite spinnerCircle = null!;
         private Sprite approachCircle = null!;
         private Sprite clearAnimation = null!;
-        private ISample? clearSample;
+        private SkinnableSound clearSample = null!;
         private LegacySpriteText remainingHitsText = null!;
 
         private bool samplePlayed;
@@ -107,12 +106,12 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                         },
                     },
                 },
+                clearSample = new SkinnableSound(new SampleInfo("spinner-osu")),
             };
 
             drawableSwell = (DrawableSwell)hitObject;
             drawableSwell.UpdateHitProgress += animateSwellProgress;
             drawableSwell.ApplyCustomUpdateState += updateStateTransforms;
-            clearSample = skin.GetSample(new SampleInfo("spinner-osu"));
         }
 
         private void animateSwellProgress(int numHits)
@@ -173,7 +172,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                 {
                     if (!samplePlayed)
                     {
-                        clearSample?.Play();
+                        clearSample.Play();
                         samplePlayed = true;
                     }
 
