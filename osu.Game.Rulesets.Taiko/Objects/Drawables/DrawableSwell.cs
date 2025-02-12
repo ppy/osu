@@ -35,6 +35,15 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         /// </summary>
         private const double ring_appear_offset = 100;
 
+        /// <summary>
+        /// Offset away from the start time of the swell at which the Fade-In effect starts.
+        /// </summary>
+        private const double fade_in_offset = 1833;
+        /// <summary>
+        /// Duration of the Fade-In time of the swell.
+        /// </summary>
+        private const double fade_in_duration = 666;
+
         private Vector2 baseSize;
 
         private readonly Container<DrawableSwellTick> ticks;
@@ -248,9 +257,19 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             }
         }
 
+        protected override void UpdateInitialTransforms()
+        {
+            // allow for the fade-in effect
+            Alpha = 0;
+        }
+
         protected override void UpdateStartTimeStateTransforms()
         {
             base.UpdateStartTimeStateTransforms();
+
+            // swell fade-in effect from stable
+            using (BeginDelayedSequence(-fade_in_offset))
+                this.FadeIn(fade_in_duration, Easing.In);
 
             using (BeginDelayedSequence(-ring_appear_offset))
                 targetRing.ScaleTo(target_ring_scale, 400, Easing.OutQuint);
