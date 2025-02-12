@@ -13,6 +13,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Input.Bindings;
 using osu.Game.Online.Rooms;
@@ -28,6 +29,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
         public IReadOnlyList<DrawableRoom> DrawableRooms => roomFlow.FlowingChildren.Cast<DrawableRoom>().ToArray();
 
+        private readonly ScrollContainer<Drawable> scroll;
         private readonly FillFlowContainer<DrawableLoungeRoom> roomFlow;
 
         // handle deselection
@@ -35,28 +37,29 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
         public RoomsContainer()
         {
-            RelativeSizeAxes = Axes.X;
-            AutoSizeAxes = Axes.Y;
-
-            // account for the fact we are in a scroll container and want a bit of spacing from the scroll bar.
-            Padding = new MarginPadding { Right = 5 };
-
-            InternalChild = new OsuContextMenuContainer
+            InternalChild = scroll = new OsuScrollContainer
             {
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
-                Child = roomFlow = new FillFlowContainer<DrawableLoungeRoom>
+                RelativeSizeAxes = Axes.Both,
+                ScrollbarOverlapsContent = false,
+                Padding = new MarginPadding { Right = 5 },
+                Child = new OsuContextMenuContainer
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Direction = FillDirection.Vertical,
-                    Spacing = new Vector2(10),
+                    Child = roomFlow = new FillFlowContainer<DrawableLoungeRoom>
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Direction = FillDirection.Vertical,
+                        Spacing = new Vector2(10),
+                    }
                 }
             };
         }
 
         protected override void LoadComplete()
         {
+            SelectedRoom.BindValueChanged(onSelectedRoomChanged, true);
             Rooms.BindCollectionChanged(roomsChanged, true);
             Filter.BindValueChanged(criteria => applyFilterCriteria(criteria.NewValue), true);
         }
@@ -117,6 +120,14 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                         throw new ArgumentOutOfRangeException(nameof(accessType), accessType, $"Unsupported {nameof(RoomPermissionsFilter)} in filter");
                 }
             }
+        }
+
+        private void onSelectedRoomChanged(ValueChangedEvent<Room?> room)
+        {
+            // scroll selected room into view on selection.
+            var drawable = DrawableRooms.FirstOrDefault(r => r.Room == room.NewValue);
+            if (drawable != null)
+                scroll.ScrollIntoView(drawable);
         }
 
         private void roomsChanged(object? sender, NotifyCollectionChangedEventArgs args)
