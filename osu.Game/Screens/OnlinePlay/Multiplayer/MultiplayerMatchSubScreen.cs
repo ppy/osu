@@ -176,6 +176,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                                             Anchor = Anchor.CentreLeft,
                                                             Origin = Anchor.CentreLeft,
                                                             Width = 90,
+                                                            Height = 30,
                                                             Text = "Select",
                                                             Action = ShowUserModSelect,
                                                         },
