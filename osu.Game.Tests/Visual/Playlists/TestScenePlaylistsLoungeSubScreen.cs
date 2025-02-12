@@ -3,7 +3,6 @@
 
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Bindables;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Graphics.Containers;
@@ -17,13 +16,13 @@ namespace osu.Game.Tests.Visual.Playlists
 {
     public partial class TestScenePlaylistsLoungeSubScreen : OnlinePlayTestScene
     {
-        private TestLoungeSubScreen loungeScreen = null!;
+        private PlaylistsLoungeSubScreen loungeScreen = null!;
 
         public override void SetUpSteps()
         {
             base.SetUpSteps();
 
-            AddStep("push screen", () => LoadScreen(loungeScreen = new TestLoungeSubScreen()));
+            AddStep("push screen", () => LoadScreen(loungeScreen = new PlaylistsLoungeSubScreen()));
             AddUntilStep("wait for present", () => loungeScreen.IsCurrentScreen());
         }
 
@@ -62,24 +61,6 @@ namespace osu.Game.Tests.Visual.Playlists
             AddUntilStep("last room is not masked", () => checkRoomVisible(roomsContainer.DrawableRooms[^1]));
         }
 
-        [Test]
-        public void TestEnteringRoomTakesLeaseOnSelection()
-        {
-            createRooms(GenerateRooms(1));
-
-            AddAssert("selected room is not disabled", () => !loungeScreen.SelectedRoom.Disabled);
-
-            AddStep("select room", () => roomsContainer.DrawableRooms[0].TriggerClick());
-            AddAssert("selected room is non-null", () => loungeScreen.SelectedRoom.Value != null);
-
-            AddStep("enter room", () => roomsContainer.DrawableRooms[0].TriggerClick());
-
-            AddUntilStep("wait for match load", () => Stack.CurrentScreen is PlaylistsRoomSubScreen);
-
-            AddAssert("selected room is non-null", () => loungeScreen.SelectedRoom.Value != null);
-            AddAssert("selected room is disabled", () => loungeScreen.SelectedRoom.Disabled);
-        }
-
         private bool checkRoomVisible(DrawableRoom room) =>
             loungeScreen.ChildrenOfType<OsuScrollContainer>().First().ScreenSpaceDrawQuad
                         .Contains(room.ScreenSpaceDrawQuad.Centre);
@@ -93,11 +74,6 @@ namespace osu.Game.Tests.Visual.Playlists
             });
 
             AddStep("refresh lounge", () => loungeScreen.RefreshRooms());
-        }
-
-        private partial class TestLoungeSubScreen : PlaylistsLoungeSubScreen
-        {
-            public new Bindable<Room?> SelectedRoom => base.SelectedRoom;
         }
     }
 }

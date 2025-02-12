@@ -41,7 +41,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
         protected override BackgroundScreen CreateBackground() => new LoungeBackgroundScreen
         {
-            SelectedRoom = { BindTarget = SelectedRoom }
+            SelectedRoom = { BindTarget = selectedRoom }
         };
 
         protected override UserActivity InitialActivity => new UserActivity.SearchingForLobby();
@@ -52,9 +52,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             Origin = Anchor.BottomLeft,
             AutoSizeAxes = Axes.Both
         };
-
-        protected readonly Bindable<Room?> SelectedRoom = new Bindable<Room?>();
-        protected readonly BindableList<Room> Rooms = new BindableList<Room>();
 
         [Resolved]
         private MusicController music { get; set; } = null!;
@@ -75,8 +72,9 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         protected OsuConfigManager Config { get; private set; } = null!;
 
         private IDisposable? joiningRoomOperation;
-        private LeasedBindable<Room?>? selectionLease;
 
+        private readonly Bindable<Room?> selectedRoom = new Bindable<Room?>();
+        private readonly BindableList<Room> rooms = new BindableList<Room>();
         private readonly Bindable<FilterCriteria?> filter = new Bindable<FilterCriteria?>();
         private readonly Bindable<bool> hasListingResults = new Bindable<bool>();
         private readonly IBindable<bool> operationInProgress = new Bindable<bool>();
@@ -121,8 +119,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                         ScrollbarOverlapsContent = false,
                         Child = roomsContainer = new RoomsContainer
                         {
-                            Rooms = { BindTarget = Rooms },
-                            SelectedRoom = { BindTarget = SelectedRoom },
+                            Rooms = { BindTarget = rooms },
+                            SelectedRoom = { BindTarget = selectedRoom },
                             Filter = { BindTarget = filter },
                         }
                     },
@@ -182,7 +180,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             };
 
             // scroll selected room into view on selection.
-            SelectedRoom.BindValueChanged(val =>
+            selectedRoom.BindValueChanged(val =>
             {
                 var drawable = roomsContainer.DrawableRooms.FirstOrDefault(r => r.Room == val.NewValue);
                 if (drawable != null)
@@ -208,7 +206,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
             filter.BindValueChanged(_ =>
             {
-                Rooms.Clear();
+                rooms.Clear();
                 hasListingResults.Value = false;
                 listingPollingComponent.PollImmediately();
             });
@@ -218,11 +216,11 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
         private void onListingReceived(Room[] result)
         {
-            Dictionary<long, Room> localRoomsById = Rooms.ToDictionary(r => r.RoomID!.Value);
+            Dictionary<long, Room> localRoomsById = rooms.ToDictionary(r => r.RoomID!.Value);
             Dictionary<long, Room> resultRoomsById = result.ToDictionary(r => r.RoomID!.Value);
 
             // Remove all local rooms no longer in the result set.
-            Rooms.RemoveAll(r => !resultRoomsById.ContainsKey(r.RoomID!.Value));
+            rooms.RemoveAll(r => !resultRoomsById.ContainsKey(r.RoomID!.Value));
 
             // Add or update local rooms with the result set.
             foreach (var r in result)
@@ -230,7 +228,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                 if (localRoomsById.TryGetValue(r.RoomID!.Value, out Room? existingRoom))
                     existingRoom.CopyFrom(r);
                 else
-                    Rooms.Add(r);
+                    rooms.Add(r);
             }
 
             hasListingResults.Value = true;
@@ -285,14 +283,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         public override void OnResuming(ScreenTransitionEvent e)
         {
             base.OnResuming(e);
-
-            Debug.Assert(selectionLease != null);
-
-            selectionLease.Return();
-            selectionLease = null;
-
-            if (SelectedRoom.Value?.RoomID == null)
-                SelectedRoom.Value = new Room();
 
             music.EnsurePlayingSomething();
 
@@ -415,14 +405,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             OpenNewRoom(room ?? CreateNewRoom());
         });
 
-        protected virtual void OpenNewRoom(Room room)
-        {
-            selectionLease = SelectedRoom.BeginLease(false);
-            Debug.Assert(selectionLease != null);
-            selectionLease.Value = room;
-
-            this.Push(CreateRoomSubScreen(room));
-        }
+        protected virtual void OpenNewRoom(Room room) => this.Push(CreateRoomSubScreen(room));
 
         public void RefreshRooms() => listingPollingComponent.PollImmediately();
 
