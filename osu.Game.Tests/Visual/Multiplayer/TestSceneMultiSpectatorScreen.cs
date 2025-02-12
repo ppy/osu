@@ -17,6 +17,7 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.TeamVersus;
+using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Spectate;
@@ -42,6 +43,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private BeatmapManager beatmapManager { get; set; } = null!;
 
         private MultiSpectatorScreen spectatorScreen = null!;
+        private Room room = null!;
 
         private readonly List<MultiplayerRoomUser> playingUsers = new List<MultiplayerRoomUser>();
 
@@ -63,6 +65,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
             base.SetUpSteps();
 
             AddStep("clear playing users", () => playingUsers.Clear());
+
+            JoinDefaultRoom(r => room = r);
         }
 
         [TestCase(1)]
@@ -455,7 +459,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                 applyToBeatmap?.Invoke(Beatmap.Value);
 
-                LoadScreen(spectatorScreen = new MultiSpectatorScreen(SelectedRoom.Value!, playingUsers.ToArray()));
+                LoadScreen(spectatorScreen = new MultiSpectatorScreen(room, playingUsers.ToArray()));
             });
 
             AddUntilStep("wait for screen load", () => spectatorScreen.LoadState == LoadState.Loaded && (!waitForPlayerLoad || spectatorScreen.AllPlayersLoaded));

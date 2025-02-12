@@ -3,7 +3,6 @@
 
 using System;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
@@ -22,7 +21,6 @@ namespace osu.Game.Tests.Visual.OnlinePlay
     /// </summary>
     public abstract partial class OnlinePlayTestScene : ScreenTestScene, IOnlinePlayTestSceneDependencies
     {
-        public Bindable<Room?> SelectedRoom => OnlinePlayDependencies.SelectedRoom;
         public OngoingOperationTracker OngoingOperationTracker => OnlinePlayDependencies.OngoingOperationTracker;
         public OnlinePlayBeatmapAvailabilityTracker AvailabilityTracker => OnlinePlayDependencies.AvailabilityTracker;
         public TestUserLookupCache UserLookupCache => OnlinePlayDependencies.UserLookupCache;

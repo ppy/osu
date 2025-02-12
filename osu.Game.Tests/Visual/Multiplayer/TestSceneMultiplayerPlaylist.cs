@@ -32,6 +32,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private BeatmapManager beatmaps = null!;
         private BeatmapSetInfo importedSet = null!;
         private BeatmapInfo importedBeatmap = null!;
+        private Room room = null!;
 
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
@@ -46,9 +47,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             base.SetUpSteps();
 
+            JoinDefaultRoom(r => room = r);
+
             AddStep("create list", () =>
             {
-                Child = list = new MultiplayerPlaylist(SelectedRoom.Value!)
+                Child = list = new MultiplayerPlaylist(room)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
