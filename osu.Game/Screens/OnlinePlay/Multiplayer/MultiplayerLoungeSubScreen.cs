@@ -3,9 +3,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Extensions.ExceptionExtensions;
 using osu.Framework.Logging;
 using osu.Framework.Graphics;
@@ -15,7 +13,6 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
-using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Lounge;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Screens.OnlinePlay.Match;
