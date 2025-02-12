@@ -33,7 +33,6 @@ using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Taiko;
 using osu.Game.Scoring;
 using osu.Game.Screens.OnlinePlay;
-using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Lounge;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Screens.OnlinePlay.Match;
@@ -806,7 +805,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("wait for room", () => this.ChildrenOfType<DrawableRoom>().Any());
             AddStep("select room", () => InputManager.Key(Key.Down));
 
-            AddStep("disable polling", () => this.ChildrenOfType<ListingPollingComponent>().Single().TimeBetweenPolls.Value = 0);
+            AddStep("disable polling", () => this.ChildrenOfType<LoungePollingComponent>().Single().TimeBetweenPolls.Value = 0);
             AddStep("change server-side settings", () =>
             {
                 multiplayerClient.ServerSideRooms[0].Name = "New name";

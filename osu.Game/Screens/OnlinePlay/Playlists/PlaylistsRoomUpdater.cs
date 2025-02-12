@@ -7,19 +7,19 @@ using osu.Game.Online;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 
-namespace osu.Game.Screens.OnlinePlay.Components
+namespace osu.Game.Screens.OnlinePlay.Playlists
 {
     /// <summary>
     /// A <see cref="PollingComponent"/> that polls for and updates a room.
     /// </summary>
-    public partial class SelectionPollingComponent : PollingComponent
+    public partial class PlaylistsRoomUpdater : PollingComponent
     {
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
 
         private readonly Room room;
 
-        public SelectionPollingComponent(Room room)
+        public PlaylistsRoomUpdater(Room room)
         {
             this.room = room;
         }

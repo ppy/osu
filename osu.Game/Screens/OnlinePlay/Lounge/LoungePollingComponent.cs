@@ -11,12 +11,12 @@ using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
 
-namespace osu.Game.Screens.OnlinePlay.Components
+namespace osu.Game.Screens.OnlinePlay.Lounge
 {
     /// <summary>
     /// A <see cref="PollingComponent"/> that polls for the lounge listing.
     /// </summary>
-    public partial class ListingPollingComponent : PollingComponent
+    public partial class LoungePollingComponent : PollingComponent
     {
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
