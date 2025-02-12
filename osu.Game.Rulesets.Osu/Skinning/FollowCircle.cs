@@ -4,6 +4,7 @@
 using System;
 using System.Diagnostics;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -15,6 +16,8 @@ namespace osu.Game.Rulesets.Osu.Skinning
     {
         protected DrawableSlider? DrawableObject { get; private set; }
 
+        private readonly IBindable<bool> tracking = new Bindable<bool>();
+
         protected FollowCircle()
         {
             RelativeSizeAxes = Axes.Both;
@@ -25,21 +28,23 @@ namespace osu.Game.Rulesets.Osu.Skinning
         {
             DrawableObject = hitObject as DrawableSlider;
 
-            DrawableObject?.Tracking.BindValueChanged(tracking =>
+            if (DrawableObject != null)
             {
-                Debug.Assert(DrawableObject != null);
-
-                if (DrawableObject.Judged)
-                    return;
-
-                using (BeginAbsoluteSequence(Math.Max(Time.Current, DrawableObject.HitObject?.StartTime ?? 0)))
+                tracking.BindTo(DrawableObject.Tracking);
+                tracking.BindValueChanged(tracking =>
                 {
-                    if (tracking.NewValue)
-                        OnSliderPress();
-                    else
-                        OnSliderRelease();
-                }
-            }, true);
+                    if (DrawableObject.Judged)
+                        return;
+
+                    using (BeginAbsoluteSequence(Math.Max(Time.Current, DrawableObject.HitObject?.StartTime ?? 0)))
+                    {
+                        if (tracking.NewValue)
+                            OnSliderPress();
+                        else
+                            OnSliderRelease();
+                    }
+                }, true);
+            }
         }
 
         protected override void LoadComplete()
