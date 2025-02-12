@@ -63,8 +63,12 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
         private void onHitObjectApplied(DrawableHitObject drawableObject)
         {
+            // Sane defaults when a new hitobject is applied to the drawable slider.
             this.ScaleTo(1f)
                 .FadeOut();
+
+            // Immediately play out any pending transforms from press/release
+            FinishTransforms(true);
         }
 
         private void updateStateTransforms(DrawableHitObject d, ArmedState state)
