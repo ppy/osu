@@ -35,6 +35,8 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 
         private bool samplePlayed;
 
+        private int numHits;
+
         public LegacySwell()
         {
             Anchor = Anchor.Centre;
@@ -112,17 +114,25 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
             clearSample = skin.GetSample(new SampleInfo("spinner-osu"));
         }
 
-        private void animateSwellProgress(int numHits, int requiredHits)
+        private void animateSwellProgress(int numHits)
         {
-            int remainingHits = requiredHits - numHits;
-            remainingHitsText.Text = remainingHits.ToString(CultureInfo.InvariantCulture);
-            remainingHitsText.ScaleTo(1.6f - (0.6f * ((float)remainingHits / requiredHits)), 60, Easing.Out);
+            this.numHits = numHits;
+            remainingHitsText.Text = (drawableSwell.HitObject.RequiredHits - numHits).ToString(CultureInfo.InvariantCulture);
+            spinnerCircle.Scale = new Vector2(Math.Min(0.94f, spinnerCircle.Scale.X + 0.02f));
+        }
 
-            spinnerCircle.ClearTransforms();
-            spinnerCircle
-                .RotateTo(180f * numHits, 1000, Easing.OutQuint)
-                .ScaleTo(Math.Min(0.94f, spinnerCircle.Scale.X + 0.02f))
-                .ScaleTo(0.8f, 400, Easing.Out);
+        protected override void Update()
+        {
+            base.Update();
+
+            int requiredHits = drawableSwell.HitObject.RequiredHits;
+            int remainingHits = requiredHits - numHits;
+            remainingHitsText.Scale = new Vector2((float)Interpolation.DampContinuously(
+                remainingHitsText.Scale.X, 1.6f - (0.6f * ((float)remainingHits / requiredHits)), 17.5, Math.Abs(Time.Elapsed)));
+
+            spinnerCircle.Rotation = (float)Interpolation.DampContinuously(spinnerCircle.Rotation, 180f * numHits, 130, Math.Abs(Time.Elapsed));
+            spinnerCircle.Scale = new Vector2((float)Interpolation.DampContinuously(
+                spinnerCircle.Scale.X, 0.8f, 120, Math.Abs(Time.Elapsed)));
         }
 
         private void updateStateTransforms(DrawableHitObject drawableHitObject, ArmedState state)
