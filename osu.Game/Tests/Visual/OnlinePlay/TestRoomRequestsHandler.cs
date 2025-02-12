@@ -36,8 +36,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
         private int currentScoreId = 1;
 
         /// <summary>
-        /// Handles an API request, while also updating the local state to match
-        /// how the server would eventually respond and update an <see cref="RoomManager"/>.
+        /// Handles an API request, while also updating the local state to match how the server would eventually respond.
         /// </summary>
         /// <param name="request">The API request to handle.</param>
         /// <param name="localUser">The local user to store in responses where required.</param>

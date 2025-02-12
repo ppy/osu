@@ -11,7 +11,6 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Screens.Menu;
-using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Lounge;
 using osu.Game.Users;
 
@@ -39,9 +38,6 @@ namespace osu.Game.Screens.OnlinePlay
         [Cached]
         private readonly OngoingOperationTracker ongoingOperationTracker = new OngoingOperationTracker();
 
-        [Cached(Type = typeof(IRoomManager))]
-        private readonly RoomManager roomManager = new RoomManager();
-
         [Resolved]
         protected IAPIProvider API { get; private set; } = null!;
 
@@ -65,7 +61,6 @@ namespace osu.Game.Screens.OnlinePlay
                 {
                     screenStack,
                     new Header(ScreenTitle, screenStack),
-                    roomManager,
                     ongoingOperationTracker,
                 }
             };
