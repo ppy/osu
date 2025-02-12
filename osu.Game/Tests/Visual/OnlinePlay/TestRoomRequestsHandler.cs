@@ -15,7 +15,6 @@ using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
-using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Tests.Beatmaps;
 using osu.Game.Utils;
 
@@ -28,7 +27,6 @@ namespace osu.Game.Tests.Visual.OnlinePlay
     public class TestRoomRequestsHandler
     {
         public IReadOnlyList<Room> ServerSideRooms => serverSideRooms;
-
         private readonly List<Room> serverSideRooms = new List<Room>();
 
         private int currentRoomId = 1;
