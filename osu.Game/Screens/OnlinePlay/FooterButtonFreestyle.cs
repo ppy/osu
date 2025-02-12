@@ -16,15 +16,10 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Screens.OnlinePlay
 {
-    public partial class FooterButtonFreestyle : FooterButton, IHasCurrentValue<bool>
+    public partial class FooterButtonFreestyle : FooterButton
     {
-        private readonly BindableWithCurrent<bool> current = new BindableWithCurrent<bool>();
+        public readonly Bindable<bool> Freestyle = new Bindable<bool>();
 
-        public Bindable<bool> Current
-        {
-            get => current.Current;
-            set => current.Current = value;
-        }
 
         public new Action Action { set => throw new NotSupportedException("The click action is handled by the button itself."); }
 
@@ -37,7 +32,7 @@ namespace osu.Game.Screens.OnlinePlay
         public FooterButtonFreestyle()
         {
             // Overwrite any external behaviour as we delegate the main toggle action to a sub-button.
-            base.Action = () => current.Value = !current.Value;
+            base.Action = () => Freestyle.Value = !Freestyle.Value;
         }
 
         [BackgroundDependencyLoader]
@@ -81,12 +76,12 @@ namespace osu.Game.Screens.OnlinePlay
         {
             base.LoadComplete();
 
-            Current.BindValueChanged(_ => updateDisplay(), true);
+            Freestyle.BindValueChanged(_ => updateDisplay(), true);
         }
 
         private void updateDisplay()
         {
-            if (current.Value)
+            if (Freestyle.Value)
             {
                 text.Text = "on";
                 text.FadeColour(colours.Gray2, 200, Easing.OutQuint);

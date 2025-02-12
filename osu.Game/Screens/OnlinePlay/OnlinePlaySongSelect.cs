@@ -127,6 +127,7 @@ namespace osu.Game.Screens.OnlinePlay
             if (enabled.NewValue)
             {
                 freeModsFooterButton.Enabled.Value = false;
+                freeModsFooterButton.Enabled.Value = false;
                 ModsFooterButton.Enabled.Value = false;
 
                 ModSelect.Hide();
@@ -205,8 +206,15 @@ namespace osu.Game.Screens.OnlinePlay
 
             baseButtons.InsertRange(baseButtons.FindIndex(b => b.button is FooterButtonMods) + 1, new (FooterButton, OverlayContainer?)[]
             {
-                (freeModsFooterButton = new FooterButtonFreeMods(freeModSelect) { Current = FreeMods }, null),
-                (new FooterButtonFreestyle { Current = Freestyle }, null)
+                (freeModsFooterButton = new FooterButtonFreeMods(freeModSelect)
+                {
+                    FreeMods = { BindTarget = FreeMods },
+                    Freestyle = { BindTarget = Freestyle }
+                }, null),
+                (new FooterButtonFreestyle
+                {
+                    Freestyle = { BindTarget = Freestyle }
+                }, null)
             });
 
             return baseButtons;
@@ -225,10 +233,10 @@ namespace osu.Game.Screens.OnlinePlay
         /// <param name="mod">The <see cref="Mod"/> to check.</param>
         /// <returns>Whether <paramref name="mod"/> is a selectable free-mod.</returns>
         private bool isValidFreeMod(Mod mod) => ModUtils.IsValidFreeModForMatchType(mod, room.Type)
-                                                          // Mod must not be contained in the required mods.
-                                                          && Mods.Value.All(m => m.Acronym != mod.Acronym)
-                                                          // Mod must be compatible with all the required mods.
-                                                          && ModUtils.CheckCompatibleSet(Mods.Value.Append(mod).ToArray());
+                                                // Mod must not be contained in the required mods.
+                                                && Mods.Value.All(m => m.Acronym != mod.Acronym)
+                                                // Mod must be compatible with all the required mods.
+                                                && ModUtils.CheckCompatibleSet(Mods.Value.Append(mod).ToArray());
 
         protected override void Dispose(bool isDisposing)
         {
