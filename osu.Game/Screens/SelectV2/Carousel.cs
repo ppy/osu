@@ -16,6 +16,7 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Pooling;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Layout;
 using osu.Framework.Logging;
 using osu.Framework.Utils;
 using osu.Game.Graphics.Containers;
@@ -49,11 +50,6 @@ namespace osu.Game.Screens.SelectV2
         /// This allows preloading content before it scrolls into view.
         /// </summary>
         public float DistanceOffscreenToPreload { get; set; }
-
-        /// <summary>
-        /// Vertical space between panel layout. Negative value can be used to create an overlapping effect.
-        /// </summary>
-        protected float SpacingBetweenPanels { get; set; } = -5;
 
         /// <summary>
         /// When a new request arrives to change filtering, the number of milliseconds to wait before performing the filter.
@@ -94,27 +90,50 @@ namespace osu.Game.Screens.SelectV2
         public object? CurrentSelection
         {
             get => currentSelection.Model;
-            set => setSelection(value);
+            set
+            {
+                if (currentSelection.Model != value)
+                {
+                    HandleItemSelected(value);
+
+                    if (currentSelection.Model != null)
+                        HandleItemDeselected(currentSelection.Model);
+
+                    currentKeyboardSelection = new Selection(value);
+                    currentSelection = currentKeyboardSelection;
+                    selectionValid.Invalidate();
+                }
+                else if (currentKeyboardSelection.Model != value)
+                {
+                    // Even if the current selection matches, let's ensure the keyboard selection is reset
+                    // to the newly selected object. This matches user expectations (for now).
+                    currentKeyboardSelection = currentSelection;
+                    selectionValid.Invalidate();
+                }
+            }
         }
 
         /// <summary>
-        /// Activate the current selection, if a selection exists and matches keyboard selection.
-        /// If keyboard selection does not match selection, this will transfer the selection on first invocation.
+        /// Activate the specified item.
         /// </summary>
-        public void TryActivateSelection()
+        /// <param name="item"></param>
+        public void Activate(CarouselItem item)
         {
-            if (currentSelection.CarouselItem != currentKeyboardSelection.CarouselItem)
-            {
-                CurrentSelection = currentKeyboardSelection.Model;
-                return;
-            }
+            // Regardless of how the item handles activation, update keyboard selection to the activated panel.
+            // In other words, when a panel is clicked, keyboard selection should default to matching the clicked
+            // item.
+            setKeyboardSelection(item.Model);
 
-            if (currentSelection.CarouselItem != null)
-            {
-                (GetMaterialisedDrawableForItem(currentSelection.CarouselItem) as ICarouselPanel)?.Activated();
-                HandleItemActivated(currentSelection.CarouselItem);
-            }
+            (GetMaterialisedDrawableForItem(item) as ICarouselPanel)?.Activated();
+            HandleItemActivated(item);
+
+            selectionValid.Invalidate();
         }
+
+        /// <summary>
+        /// Returns the vertical spacing between two given carousel items. Negative value can be used to create an overlapping effect.
+        /// </summary>
+        protected virtual float GetSpacingBetweenPanels(CarouselItem top, CarouselItem bottom) => 0f;
 
         #endregion
 
@@ -176,30 +195,28 @@ namespace osu.Game.Screens.SelectV2
         protected virtual bool CheckValidForGroupSelection(CarouselItem item) => true;
 
         /// <summary>
-        /// Called when an item is "selected".
+        /// Called after an item becomes the <see cref="CurrentSelection"/>.
+        /// Should be used to handle any group expansion, item visibility changes, etc.
         /// </summary>
-        /// <returns>Whether the item should be selected.</returns>
-        protected virtual bool HandleItemSelected(object? model) => true;
+        protected virtual void HandleItemSelected(object? model) { }
 
         /// <summary>
-        /// Called when an item is "deselected".
+        /// Called when the <see cref="CurrentSelection"/> changes to a new selection.
+        /// Should be used to handle any group expansion, item visibility changes, etc.
         /// </summary>
-        protected virtual void HandleItemDeselected(object? model)
-        {
-        }
+        protected virtual void HandleItemDeselected(object? model) { }
 
         /// <summary>
-        /// Called when an item is "activated".
+        /// Called when an item is activated via user input (keyboard traversal or a mouse click).
         /// </summary>
         /// <remarks>
-        /// An activated item should for instance:
-        /// - Open or close a folder
-        /// - Start gameplay on a beatmap difficulty.
+        /// An activated item should decide to perform an action, such as:
+        /// - Change its expanded state (and show / hide children items).
+        /// - Set the item to the <see cref="CurrentSelection"/>.
+        /// - Start gameplay on a beatmap difficulty if already selected.
         /// </remarks>
         /// <param name="item">The carousel item which was activated.</param>
-        protected virtual void HandleItemActivated(CarouselItem item)
-        {
-        }
+        protected virtual void HandleItemActivated(CarouselItem item) { }
 
         #endregion
 
@@ -228,21 +245,16 @@ namespace osu.Game.Screens.SelectV2
 
         private async Task performFilter()
         {
-            Debug.Assert(SynchronizationContext.Current != null);
-
             Stopwatch stopwatch = Stopwatch.StartNew();
             var cts = new CancellationTokenSource();
 
-            lock (this)
-            {
-                cancellationSource.Cancel();
-                cancellationSource = cts;
-            }
+            var previousCancellationSource = Interlocked.Exchange(ref cancellationSource, cts);
+            await previousCancellationSource.CancelAsync().ConfigureAwait(false);
 
             if (DebounceDelay > 0)
             {
                 log($"Filter operation queued, waiting for {DebounceDelay} ms debounce");
-                await Task.Delay(DebounceDelay, cts.Token).ConfigureAwait(true);
+                await Task.Delay(DebounceDelay, cts.Token).ConfigureAwait(false);
             }
 
             // Copy must be performed on update thread for now (see ConfigureAwait above).
@@ -260,40 +272,52 @@ namespace osu.Game.Screens.SelectV2
                     }
 
                     log("Updating Y positions");
-                    updateYPositions(items, visibleHalfHeight, SpacingBetweenPanels);
+                    updateYPositions(items, visibleHalfHeight);
                 }
                 catch (OperationCanceledException)
                 {
                     log("Cancelled due to newer request arriving");
                 }
-            }, cts.Token).ConfigureAwait(true);
+            }, cts.Token).ConfigureAwait(false);
 
             if (cts.Token.IsCancellationRequested)
                 return;
 
-            log("Items ready for display");
-            carouselItems = items.ToList();
-            displayedRange = null;
+            Schedule(() =>
+            {
+                log("Items ready for display");
+                carouselItems = items.ToList();
+                displayedRange = null;
 
-            // Need to call this to ensure correct post-selection logic is handled on the new items list.
-            HandleItemSelected(currentSelection.Model);
+                // Need to call this to ensure correct post-selection logic is handled on the new items list.
+                HandleItemSelected(currentSelection.Model);
 
-            refreshAfterSelection();
+                refreshAfterSelection();
+            });
 
             void log(string text) => Logger.Log($"Carousel[op {cts.GetHashCode().ToString()}] {stopwatch.ElapsedMilliseconds} ms: {text}");
         }
 
-        private static void updateYPositions(IEnumerable<CarouselItem> carouselItems, float offset, float spacing)
+        private void updateYPositions(IEnumerable<CarouselItem> carouselItems, float offset)
         {
+            CarouselItem? previousVisible = null;
+
             foreach (var item in carouselItems)
-                updateItemYPosition(item, ref offset, spacing);
+                updateItemYPosition(item, ref previousVisible, ref offset);
         }
 
-        private static void updateItemYPosition(CarouselItem item, ref float offset, float spacing)
+        private void updateItemYPosition(CarouselItem item, ref CarouselItem? previousVisible, ref float offset)
         {
+            float spacing = previousVisible == null || !item.IsVisible ? 0 : GetSpacingBetweenPanels(previousVisible, item);
+
+            offset += spacing;
             item.CarouselYPosition = offset;
+
             if (item.IsVisible)
-                offset += item.DrawHeight + spacing;
+            {
+                offset += item.DrawHeight;
+                previousVisible = item;
+            }
         }
 
         #endregion
@@ -305,7 +329,8 @@ namespace osu.Game.Screens.SelectV2
             switch (e.Action)
             {
                 case GlobalAction.Select:
-                    TryActivateSelection();
+                    if (currentKeyboardSelection.CarouselItem != null)
+                        Activate(currentKeyboardSelection.CarouselItem);
                     return true;
 
                 case GlobalAction.SelectNext:
@@ -374,32 +399,29 @@ namespace osu.Game.Screens.SelectV2
 
             // If the user has a different keyboard selection and requests
             // group selection, first transfer the keyboard selection to actual selection.
-            if (currentSelection.CarouselItem != currentKeyboardSelection.CarouselItem)
+            if (currentKeyboardSelection.CarouselItem != null && currentSelection.CarouselItem != currentKeyboardSelection.CarouselItem)
             {
-                TryActivateSelection();
-
-                // There's a chance this couldn't resolve, at which point continue with standard traversal.
-                if (currentSelection.CarouselItem == currentKeyboardSelection.CarouselItem)
-                    return;
+                Activate(currentKeyboardSelection.CarouselItem);
+                return;
             }
 
             int originalIndex;
             int newIndex;
 
-            if (currentSelection.Index == null)
+            if (currentKeyboardSelection.Index == null)
             {
                 // If there's no current selection, start from either end of the full list.
                 newIndex = originalIndex = direction > 0 ? carouselItems.Count - 1 : 0;
             }
             else
             {
-                newIndex = originalIndex = currentSelection.Index.Value;
+                newIndex = originalIndex = currentKeyboardSelection.Index.Value;
 
                 // As a second special case, if we're group selecting backwards and the current selection isn't a group,
                 // make sure to go back to the group header this item belongs to, so that the block below doesn't find it and stop too early.
                 if (direction < 0)
                 {
-                    while (!CheckValidForGroupSelection(carouselItems[newIndex]))
+                    while (newIndex > 0 && !CheckValidForGroupSelection(carouselItems[newIndex]))
                         newIndex--;
                 }
             }
@@ -413,7 +435,7 @@ namespace osu.Game.Screens.SelectV2
 
                 if (CheckValidForGroupSelection(newItem))
                 {
-                    setSelection(newItem.Model);
+                    HandleItemActivated(newItem);
                     return;
                 }
             } while (newIndex != originalIndex);
@@ -427,23 +449,6 @@ namespace osu.Game.Screens.SelectV2
 
         private Selection currentKeyboardSelection = new Selection();
         private Selection currentSelection = new Selection();
-
-        private void setSelection(object? model)
-        {
-            if (currentSelection.Model == model)
-                return;
-
-            if (HandleItemSelected(model))
-            {
-                if (currentSelection.Model != null)
-                    HandleItemDeselected(currentSelection.Model);
-
-                currentKeyboardSelection = new Selection(model);
-                currentSelection = currentKeyboardSelection;
-            }
-
-            selectionValid.Invalidate();
-        }
 
         private void setKeyboardSelection(object? model)
         {
@@ -470,7 +475,7 @@ namespace osu.Game.Screens.SelectV2
                 return;
             }
 
-            float spacing = SpacingBetweenPanels;
+            CarouselItem? lastVisible = null;
             int count = carouselItems.Count;
 
             Selection prevKeyboard = currentKeyboardSelection;
@@ -482,7 +487,7 @@ namespace osu.Game.Screens.SelectV2
             {
                 var item = carouselItems[i];
 
-                updateItemYPosition(item, ref yPos, spacing);
+                updateItemYPosition(item, ref lastVisible, ref yPos);
 
                 if (ReferenceEquals(item.Model, currentKeyboardSelection.Model))
                     currentKeyboardSelection = new Selection(item.Model, item, item.CarouselYPosition, i);
@@ -550,6 +555,8 @@ namespace osu.Game.Screens.SelectV2
                 updateDisplayedRange(range);
             }
 
+            double selectedYPos = currentSelection.CarouselItem?.CarouselYPosition ?? 0;
+
             foreach (var panel in scroll.Panels)
             {
                 var c = (ICarouselPanel)panel;
@@ -558,8 +565,8 @@ namespace osu.Game.Screens.SelectV2
                 if (c.Item == null)
                     continue;
 
-                double selectedYPos = currentSelection?.CarouselItem?.CarouselYPosition ?? 0;
-                scroll.Panels.ChangeChildDepth(panel, (float)Math.Abs(c.DrawYPosition - selectedYPos));
+                float normalisedDepth = (float)(Math.Abs(selectedYPos - c.DrawYPosition) / DrawHeight);
+                scroll.Panels.ChangeChildDepth(panel, c.Item.DepthLayer + normalisedDepth);
 
                 if (c.DrawYPosition != c.Item.CarouselYPosition)
                     c.DrawYPosition = Interpolation.DampContinuously(c.DrawYPosition, c.Item.CarouselYPosition, 50, Time.Elapsed);
@@ -676,6 +683,15 @@ namespace osu.Game.Screens.SelectV2
             carouselPanel.Selected.Value = false;
             carouselPanel.KeyboardSelected.Value = false;
             carouselPanel.Expanded.Value = false;
+        }
+
+        protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
+        {
+            // handles the vertical size of the carousel changing (ie. on window resize when aspect ratio has changed).
+            if (invalidation.HasFlag(Invalidation.DrawSize))
+                selectionValid.Invalidate();
+
+            return base.OnInvalidate(invalidation, source);
         }
 
         #endregion

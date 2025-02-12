@@ -227,7 +227,7 @@ namespace osu.Game.Overlays
             updateButtons();
         }
 
-        private void updateButtons() => DisplayedFooterContent?.UpdateButtons(CurrentStepIndex, steps);
+        private void updateButtons() => DisplayedFooterContent?.UpdateButtons(CurrentStepIndex, CurrentScreen, steps);
 
         public partial class WizardFooterContent : VisibilityContainer
         {
@@ -248,24 +248,23 @@ namespace osu.Game.Overlays
                     RelativeSizeAxes = Axes.X,
                     Width = 1,
                     Text = FirstRunSetupOverlayStrings.GetStarted,
-                    DarkerColour = colourProvider.Colour2,
-                    LighterColour = colourProvider.Colour1,
+                    DarkerColour = colourProvider.Colour3,
+                    LighterColour = colourProvider.Colour2,
                     Action = () => ShowNextStep?.Invoke(),
                 };
             }
 
-            public void UpdateButtons(int? currentStep, IReadOnlyList<Type> steps)
+            public void UpdateButtons(int? currentStep, WizardScreen? currentScreen, IReadOnlyList<Type> steps)
             {
                 NextButton.Enabled.Value = currentStep != null;
 
                 if (currentStep == null)
                     return;
 
-                bool isFirstStep = currentStep == 0;
                 bool isLastStep = currentStep == steps.Count - 1;
 
-                if (isFirstStep)
-                    NextButton.Text = FirstRunSetupOverlayStrings.GetStarted;
+                if (currentScreen?.NextStepText != null)
+                    NextButton.Text = currentScreen.NextStepText.Value;
                 else
                 {
                     NextButton.Text = isLastStep
