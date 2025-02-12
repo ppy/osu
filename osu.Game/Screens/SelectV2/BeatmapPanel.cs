@@ -38,7 +38,7 @@ namespace osu.Game.Screens.SelectV2
         private ConstrainedIconContainer difficultyIcon = null!;
         private OsuSpriteText keyCountText = null!;
         private StarRatingDisplay starRatingDisplay = null!;
-        private TopLocalRankV2 difficultyRank = null!;
+        private TopLocalRank difficultyRank = null!;
         private OsuSpriteText difficultyText = null!;
         private OsuSpriteText authorText = null!;
 
@@ -118,7 +118,7 @@ namespace osu.Game.Screens.SelectV2
                                         Anchor = Anchor.CentreLeft,
                                         Origin = Anchor.CentreLeft,
                                     },
-                                    difficultyRank = new TopLocalRankV2
+                                    difficultyRank = new TopLocalRank
                                     {
                                         Anchor = Anchor.CentreLeft,
                                         Origin = Anchor.CentreLeft,

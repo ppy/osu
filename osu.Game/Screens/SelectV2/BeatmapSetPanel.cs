@@ -35,7 +35,7 @@ namespace osu.Game.Screens.SelectV2
         private OsuSpriteText titleText = null!;
         private OsuSpriteText artistText = null!;
         private Drawable chevronIcon = null!;
-        private UpdateBeatmapSetButtonV2 updateButton = null!;
+        private UpdateBeatmapSetButton updateButton = null!;
         private BeatmapSetOnlineStatusPill statusPill = null!;
         private DifficultySpectrumDisplay difficultiesDisplay = null!;
 
@@ -98,7 +98,7 @@ namespace osu.Game.Screens.SelectV2
                             Margin = new MarginPadding { Top = 5f },
                             Children = new Drawable[]
                             {
-                                updateButton = new UpdateBeatmapSetButtonV2
+                                updateButton = new UpdateBeatmapSetButton
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,

@@ -64,13 +64,13 @@ namespace osu.Game.Screens.SelectV2
 
         private OsuSpriteText titleText = null!;
         private OsuSpriteText artistText = null!;
-        private UpdateBeatmapSetButtonV2 updateButton = null!;
+        private UpdateBeatmapSetButton updateButton = null!;
         private BeatmapSetOnlineStatusPill statusPill = null!;
 
         private ConstrainedIconContainer difficultyIcon = null!;
         private FillFlowContainer difficultyLine = null!;
         private StarRatingDisplay difficultyStarRating = null!;
-        private TopLocalRankV2 difficultyRank = null!;
+        private TopLocalRank difficultyRank = null!;
         private OsuSpriteText difficultyKeyCountText = null!;
         private OsuSpriteText difficultyName = null!;
         private OsuSpriteText difficultyAuthor = null!;
@@ -121,7 +121,7 @@ namespace osu.Game.Screens.SelectV2
                             Margin = new MarginPadding { Top = 5f },
                             Children = new Drawable[]
                             {
-                                updateButton = new UpdateBeatmapSetButtonV2
+                                updateButton = new UpdateBeatmapSetButton
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
@@ -149,7 +149,7 @@ namespace osu.Game.Screens.SelectV2
                                             Scale = new Vector2(8f / 9f),
                                             Margin = new MarginPadding { Right = 5f },
                                         },
-                                        difficultyRank = new TopLocalRankV2
+                                        difficultyRank = new TopLocalRank
                                         {
                                             Scale = new Vector2(8f / 11),
                                             Origin = Anchor.CentreLeft,
