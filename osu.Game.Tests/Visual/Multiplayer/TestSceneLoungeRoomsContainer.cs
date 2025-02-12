@@ -32,13 +32,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 rooms = new BindableList<Room>();
                 Child = new PopoverContainer
                 {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
+                    RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Width = 0.5f,
                     Child = container = new RoomsContainer
                     {
+                        RelativeSizeAxes = Axes.Both,
                         Rooms = { BindTarget = rooms },
                         SelectedRoom = { BindTarget = SelectedRoom }
                     }

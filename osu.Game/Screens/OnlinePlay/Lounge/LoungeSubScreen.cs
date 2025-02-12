@@ -17,7 +17,6 @@ using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Game.Configuration;
-using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input;
 using osu.Game.Online.API;
@@ -82,7 +81,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         private ListingPollingComponent listingPollingComponent = null!;
         private PopoverContainer popoverContainer = null!;
         private LoadingLayer loadingLayer = null!;
-        private RoomsContainer roomsContainer = null!;
         private SearchTextBox searchTextBox = null!;
 
         protected Dropdown<RoomModeFilter> StatusDropdown { get; private set; } = null!;
@@ -94,8 +92,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
             if (idleTracker != null)
                 isIdle.BindTo(idleTracker.IsIdle);
-
-            OsuScrollContainer scrollContainer;
 
             InternalChildren = new Drawable[]
             {
@@ -113,17 +109,13 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                         Horizontal = WaveOverlayContainer.WIDTH_PADDING,
                         Top = Header.HEIGHT + controls_area_height + 20,
                     },
-                    Child = scrollContainer = new OsuScrollContainer
+                    Child = new RoomsContainer
                     {
                         RelativeSizeAxes = Axes.Both,
-                        ScrollbarOverlapsContent = false,
-                        Child = roomsContainer = new RoomsContainer
-                        {
-                            Rooms = { BindTarget = rooms },
-                            SelectedRoom = { BindTarget = selectedRoom },
-                            Filter = { BindTarget = filter },
-                        }
-                    },
+                        Rooms = { BindTarget = rooms },
+                        SelectedRoom = { BindTarget = selectedRoom },
+                        Filter = { BindTarget = filter },
+                    }
                 },
                 loadingLayer = new LoadingLayer(true),
                 new FillFlowContainer
@@ -178,14 +170,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                     },
                 },
             };
-
-            // scroll selected room into view on selection.
-            selectedRoom.BindValueChanged(val =>
-            {
-                var drawable = roomsContainer.DrawableRooms.FirstOrDefault(r => r.Room == val.NewValue);
-                if (drawable != null)
-                    scrollContainer.ScrollIntoView(drawable);
-            });
         }
 
         protected override void LoadComplete()
