@@ -8,11 +8,10 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Screens.Select;
 using osu.Game.Localisation;
+using osu.Game.Screens.Select;
 
 namespace osu.Game.Screens.OnlinePlay
 {
@@ -20,6 +19,7 @@ namespace osu.Game.Screens.OnlinePlay
     {
         public readonly Bindable<bool> Freestyle = new Bindable<bool>();
 
+        protected override bool IsActive => Freestyle.Value;
 
         public new Action Action { set => throw new NotSupportedException("The click action is handled by the button itself."); }
 
