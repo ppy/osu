@@ -70,7 +70,7 @@ namespace osu.Game.Screens.SelectV2
         public readonly BindableBool Active = new BindableBool();
         public readonly BindableBool KeyboardActive = new BindableBool();
 
-        public Action? Action;
+        public Action? Action { get; init; }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
         {
