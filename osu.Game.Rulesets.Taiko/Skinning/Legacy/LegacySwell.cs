@@ -22,6 +22,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
     public partial class LegacySwell : Container
     {
         private const float scale_adjust = 768f / 480;
+        private static readonly Vector2 swell_display_position = new Vector2(250f, 100f);
 
         private DrawableSwell drawableSwell = null!;
 
@@ -60,7 +61,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Position = new Vector2(250f, 100f), // ballparked to be horizontally centred on 4:3 resolution
+                    Position = swell_display_position, // ballparked to be horizontally centred on 4:3 resolution
 
                     Children = new Drawable[]
                     {
@@ -152,7 +153,10 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 
                 const double body_transition_duration = 200;
 
-                warning.FadeOut(body_transition_duration);
+                warning.MoveTo(swell_display_position, body_transition_duration)
+                       .ScaleTo(3, body_transition_duration, Easing.Out)
+                       .FadeOut(body_transition_duration);
+
                 bodyContainer.FadeIn(body_transition_duration);
                 approachCircle.ResizeTo(0.1f * 0.8f, swell.Duration);
             }
