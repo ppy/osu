@@ -26,6 +26,8 @@ namespace osu.Game.Screens.OnlinePlay
         public readonly Bindable<IReadOnlyList<Mod>> FreeMods = new Bindable<IReadOnlyList<Mod>>();
         public readonly IBindable<bool> Freestyle = new Bindable<bool>();
 
+        protected override bool IsActive => FreeMods.Value.Count > 0;
+
         public new Action Action { set => throw new NotSupportedException("The click action is handled by the button itself."); }
 
         private OsuSpriteText count = null!;

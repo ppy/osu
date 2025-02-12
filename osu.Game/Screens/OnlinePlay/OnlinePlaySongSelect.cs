@@ -42,7 +42,7 @@ namespace osu.Game.Screens.OnlinePlay
         protected override UserActivity InitialActivity => new UserActivity.InLobby(room);
 
         protected readonly Bindable<IReadOnlyList<Mod>> FreeMods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
-        protected readonly Bindable<bool> Freestyle = new Bindable<bool>();
+        protected readonly Bindable<bool> Freestyle = new Bindable<bool>(true);
 
         private readonly Room room;
         private readonly PlaylistItem? initialItem;
