@@ -53,16 +53,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("wait for room join", () => RoomJoined);
         }
 
-        /// <summary>
-        /// Creates and joins the given room.
-        /// </summary>
-        /// <param name="room">The room to create. If <c>null</c>, a default room will be created.</param>
-        protected void JoinRoom(Room room)
-        {
-            AddStep("join room", () => MultiplayerClient.CreateRoom(room).ConfigureAwait(false));
-            AddUntilStep("wait for room join", () => RoomJoined);
-        }
-
         protected override OnlinePlayTestSceneDependencies CreateOnlinePlayDependencies() => new MultiplayerTestSceneDependencies();
     }
 }
