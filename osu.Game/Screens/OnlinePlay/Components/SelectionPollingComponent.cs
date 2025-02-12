@@ -2,15 +2,21 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Threading.Tasks;
+using osu.Framework.Allocation;
+using osu.Game.Online;
+using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 
 namespace osu.Game.Screens.OnlinePlay.Components
 {
     /// <summary>
-    /// A <see cref="RoomPollingComponent"/> that polls for the currently-selected room.
+    /// A <see cref="PollingComponent"/> that polls for and updates a room.
     /// </summary>
-    public partial class SelectionPollingComponent : RoomPollingComponent
+    public partial class SelectionPollingComponent : PollingComponent
     {
+        [Resolved]
+        private IAPIProvider api { get; set; } = null!;
+
         private readonly Room room;
 
         public SelectionPollingComponent(Room room)
@@ -22,7 +28,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
 
         protected override Task Poll()
         {
-            if (!API.IsLoggedIn)
+            if (!api.IsLoggedIn)
                 return base.Poll();
 
             if (room.RoomID == null)
@@ -41,7 +47,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
 
             req.Failure += _ => tcs.SetResult(false);
 
-            API.Queue(req);
+            api.Queue(req);
 
             lastPollRequest = req;
 

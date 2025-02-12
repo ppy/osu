@@ -17,8 +17,6 @@ namespace osu.Game.Tests.Visual.Playlists
 {
     public partial class TestScenePlaylistsLoungeSubScreen : OnlinePlayTestScene
     {
-        protected new TestRoomManager RoomManager => (TestRoomManager)base.RoomManager;
-
         private TestLoungeSubScreen loungeScreen = null!;
 
         public override void SetUpSteps()
@@ -26,7 +24,6 @@ namespace osu.Game.Tests.Visual.Playlists
             base.SetUpSteps();
 
             AddStep("push screen", () => LoadScreen(loungeScreen = new TestLoungeSubScreen()));
-
             AddUntilStep("wait for present", () => loungeScreen.IsCurrentScreen());
         }
 
@@ -35,8 +32,7 @@ namespace osu.Game.Tests.Visual.Playlists
         [Test]
         public void TestManyRooms()
         {
-            AddStep("add rooms", () => RoomManager.AddRooms(500));
-            AddUntilStep("wait for rooms", () => roomsContainer.DrawableRooms.Count == 500);
+            createRooms(GenerateRooms(500));
         }
 
         [Test]
@@ -44,10 +40,7 @@ namespace osu.Game.Tests.Visual.Playlists
         {
             AddStep("reset mouse", () => InputManager.ReleaseButton(MouseButton.Left));
 
-            AddStep("add rooms", () => RoomManager.AddRooms(30));
-            AddUntilStep("wait for rooms", () => roomsContainer.DrawableRooms.Count == 30);
-
-            AddUntilStep("first room is not masked", () => checkRoomVisible(roomsContainer.DrawableRooms[0]));
+            createRooms(GenerateRooms(30));
 
             AddStep("move mouse to third room", () => InputManager.MoveMouseTo(roomsContainer.DrawableRooms[2]));
             AddStep("hold down", () => InputManager.PressButton(MouseButton.Left));
@@ -61,10 +54,7 @@ namespace osu.Game.Tests.Visual.Playlists
         [Test]
         public void TestScrollSelectedIntoView()
         {
-            AddStep("add rooms", () => RoomManager.AddRooms(30));
-            AddUntilStep("wait for rooms", () => roomsContainer.DrawableRooms.Count == 30);
-
-            AddUntilStep("first room is not masked", () => checkRoomVisible(roomsContainer.DrawableRooms[0]));
+            createRooms(GenerateRooms(30));
 
             AddStep("select last room", () => roomsContainer.DrawableRooms[^1].TriggerClick());
 
@@ -75,8 +65,7 @@ namespace osu.Game.Tests.Visual.Playlists
         [Test]
         public void TestEnteringRoomTakesLeaseOnSelection()
         {
-            AddStep("add rooms", () => RoomManager.AddRooms(1));
-            AddUntilStep("wait for rooms", () => roomsContainer.DrawableRooms.Count == 1);
+            createRooms(GenerateRooms(1));
 
             AddAssert("selected room is not disabled", () => !loungeScreen.SelectedRoom.Disabled);
 
@@ -94,6 +83,17 @@ namespace osu.Game.Tests.Visual.Playlists
         private bool checkRoomVisible(DrawableRoom room) =>
             loungeScreen.ChildrenOfType<OsuScrollContainer>().First().ScreenSpaceDrawQuad
                         .Contains(room.ScreenSpaceDrawQuad.Centre);
+
+        private void createRooms(params Room[] rooms)
+        {
+            AddStep("create rooms", () =>
+            {
+                foreach (var room in rooms)
+                    API.Queue(new CreateRoomRequest(room));
+            });
+
+            AddStep("refresh lounge", () => loungeScreen.RefreshRooms());
+        }
 
         private partial class TestLoungeSubScreen : PlaylistsLoungeSubScreen
         {

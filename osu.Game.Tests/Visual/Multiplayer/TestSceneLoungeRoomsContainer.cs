@@ -3,6 +3,7 @@
 
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
@@ -19,8 +20,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public partial class TestSceneLoungeRoomsContainer : OnlinePlayTestScene
     {
-        protected new TestRoomManager RoomManager => (TestRoomManager)base.RoomManager;
-
+        private BindableList<Room> rooms = null!;
         private RoomsContainer container = null!;
 
         public override void SetUpSteps()
@@ -29,6 +29,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("create container", () =>
             {
+                rooms = new BindableList<Room>();
                 Child = new PopoverContainer
                 {
                     RelativeSizeAxes = Axes.X,
@@ -36,9 +37,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Width = 0.5f,
-
                     Child = container = new RoomsContainer
                     {
+                        Rooms = { BindTarget = rooms },
                         SelectedRoom = { BindTarget = SelectedRoom }
                     }
                 };
@@ -48,7 +49,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestBasicListChanges()
         {
-            AddStep("add rooms", () => RoomManager.AddRooms(5, withSpotlightRooms: true));
+            AddStep("add rooms", () => rooms.AddRange(GenerateRooms(5, withSpotlightRooms: true)));
 
             AddAssert("has 5 rooms", () => container.DrawableRooms.Count == 5);
 
@@ -56,49 +57,50 @@ namespace osu.Game.Tests.Visual.Multiplayer
                                                               .SkipWhile(r => r.Room.Category == RoomCategory.Spotlight)
                                                               .All(r => r.Room.Category == RoomCategory.Normal));
 
-            AddStep("remove first room", () => RoomManager.RemoveRoom(RoomManager.Rooms.First(r => r.RoomID == 0)));
+            AddStep("remove first room", () => rooms.RemoveAt(0));
             AddAssert("has 4 rooms", () => container.DrawableRooms.Count == 4);
             AddAssert("first room removed", () => container.DrawableRooms.All(r => r.Room.RoomID != 0));
 
             AddStep("select first room", () => container.DrawableRooms.First().TriggerClick());
-            AddAssert("first spotlight selected", () => checkRoomSelected(RoomManager.Rooms.First(r => r.Category == RoomCategory.Spotlight)));
+            AddAssert("first spotlight selected", () => checkRoomSelected(rooms.First(r => r.Category == RoomCategory.Spotlight)));
 
-            AddStep("remove last room", () => RoomManager.RemoveRoom(RoomManager.Rooms.MinBy(r => r.RoomID)!));
-            AddAssert("first spotlight still selected", () => checkRoomSelected(RoomManager.Rooms.First(r => r.Category == RoomCategory.Spotlight)));
+            AddStep("remove last room", () => rooms.RemoveAt(rooms.Count - 1));
+            AddAssert("first spotlight still selected", () => checkRoomSelected(rooms.First(r => r.Category == RoomCategory.Spotlight)));
 
-            AddStep("remove spotlight room", () => RoomManager.RemoveRoom(RoomManager.Rooms.Single(r => r.Category == RoomCategory.Spotlight)));
+            AddStep("remove spotlight room", () => rooms.RemoveAll(r => r.Category == RoomCategory.Spotlight));
             AddAssert("selection vacated", () => checkRoomSelected(null));
         }
 
         [Test]
         public void TestKeyboardNavigation()
         {
-            AddStep("add rooms", () => RoomManager.AddRooms(3));
+            AddStep("add rooms", () => rooms.AddRange(GenerateRooms(3)));
 
             AddAssert("no selection", () => checkRoomSelected(null));
 
             press(Key.Down);
-            AddAssert("first room selected", () => checkRoomSelected(RoomManager.Rooms.First()));
+            AddAssert("first room selected", () => checkRoomSelected(container.DrawableRooms.First().Room));
 
             press(Key.Up);
-            AddAssert("first room selected", () => checkRoomSelected(RoomManager.Rooms.First()));
+            AddAssert("first room selected", () => checkRoomSelected(container.DrawableRooms.First().Room));
 
             press(Key.Down);
             press(Key.Down);
-            AddAssert("last room selected", () => checkRoomSelected(RoomManager.Rooms.Last()));
+            AddAssert("last room selected", () => checkRoomSelected(container.DrawableRooms.Last().Room));
         }
 
         [Test]
         public void TestKeyboardNavigationAfterOrderChange()
         {
-            AddStep("add rooms", () => RoomManager.AddRooms(3));
+            AddStep("add rooms", () => rooms.AddRange(GenerateRooms(3)));
 
             AddStep("reorder rooms", () =>
             {
-                var room = RoomManager.Rooms[1];
+                var room = rooms[1];
+                rooms.Remove(room);
 
-                RoomManager.RemoveRoom(room);
-                RoomManager.AddOrUpdateRoom(room);
+                room.RoomID += 3;
+                rooms.Add(room);
             });
 
             AddAssert("no selection", () => checkRoomSelected(null));
@@ -116,12 +118,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestClickDeselection()
         {
-            AddStep("add room", () => RoomManager.AddRooms(1));
+            AddStep("add room", () => rooms.AddRange(GenerateRooms(1)));
 
             AddAssert("no selection", () => checkRoomSelected(null));
 
             press(Key.Down);
-            AddAssert("first room selected", () => checkRoomSelected(RoomManager.Rooms.First()));
+            AddAssert("first room selected", () => checkRoomSelected(container.DrawableRooms.First().Room));
 
             AddStep("click away", () => InputManager.Click(MouseButton.Left));
             AddAssert("no selection", () => checkRoomSelected(null));
@@ -135,11 +137,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestStringFiltering()
         {
-            AddStep("add rooms", () => RoomManager.AddRooms(4));
+            AddStep("add rooms", () => rooms.AddRange(GenerateRooms(4)));
 
             AddUntilStep("4 rooms visible", () => container.DrawableRooms.Count(r => r.IsPresent) == 4);
 
-            AddStep("filter one room", () => container.Filter.Value = new FilterCriteria { SearchString = "1" });
+            AddStep("filter one room", () => container.Filter.Value = new FilterCriteria { SearchString = rooms.First().Name });
 
             AddUntilStep("1 rooms visible", () => container.DrawableRooms.Count(r => r.IsPresent) == 1);
 
@@ -151,8 +153,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestRulesetFiltering()
         {
-            AddStep("add rooms", () => RoomManager.AddRooms(2, new OsuRuleset().RulesetInfo));
-            AddStep("add rooms", () => RoomManager.AddRooms(3, new CatchRuleset().RulesetInfo));
+            AddStep("add rooms", () => rooms.AddRange(GenerateRooms(2, new OsuRuleset().RulesetInfo)));
+            AddStep("add rooms", () => rooms.AddRange(GenerateRooms(3, new CatchRuleset().RulesetInfo)));
 
             // Todo: What even is this case...?
             AddStep("set empty filter criteria", () => container.Filter.Value = new FilterCriteria());
@@ -170,8 +172,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("add rooms", () =>
             {
-                RoomManager.AddRooms(1, withPassword: true);
-                RoomManager.AddRooms(1, withPassword: false);
+                rooms.AddRange(GenerateRooms(1, withPassword: true));
+                rooms.AddRange(GenerateRooms(1, withPassword: false));
             });
 
             AddStep("apply default filter", () => container.Filter.SetDefault());
@@ -190,7 +192,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestPasswordProtectedRooms()
         {
-            AddStep("add rooms", () => RoomManager.AddRooms(3, withPassword: true));
+            AddStep("add rooms", () => rooms.AddRange(GenerateRooms(3, withPassword: true)));
         }
 
         private bool checkRoomSelected(Room? room) => SelectedRoom.Value == room;

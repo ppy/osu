@@ -4,17 +4,23 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Game.Online;
+using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
 
 namespace osu.Game.Screens.OnlinePlay.Components
 {
     /// <summary>
-    /// A <see cref="RoomPollingComponent"/> that polls for the lounge listing.
+    /// A <see cref="PollingComponent"/> that polls for the lounge listing.
     /// </summary>
-    public partial class ListingPollingComponent : RoomPollingComponent
+    public partial class ListingPollingComponent : PollingComponent
     {
+        [Resolved]
+        private IAPIProvider api { get; set; } = null!;
+
         public required Action<Room[]> RoomsReceived { get; init; }
         public readonly IBindable<FilterCriteria?> Filter = new Bindable<FilterCriteria?>();
 
@@ -22,7 +28,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
 
         protected override Task Poll()
         {
-            if (!API.IsLoggedIn)
+            if (!api.IsLoggedIn)
                 return base.Poll();
 
             if (Filter.Value == null)
@@ -41,7 +47,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
 
             req.Failure += _ => tcs.SetResult(false);
 
-            API.Queue(req);
+            api.Queue(req);
 
             lastPollRequest = req;
 
