@@ -8,10 +8,12 @@ using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.Objects.Drawables;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Taiko.Skinning.Default
@@ -29,6 +31,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
         private readonly CircularContainer targetRing;
         private readonly CircularContainer expandingRing;
         private readonly Drawable centreCircle;
+        private int numHits;
 
         public DefaultSwell()
         {
@@ -125,18 +128,25 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
             };
         }
 
-        private void animateSwellProgress(int numHits, int requiredHits)
+        private void animateSwellProgress(int numHits)
         {
-            float completion = (float)numHits / requiredHits;
+            this.numHits = numHits;
 
-            centreCircle.RotateTo((float)(completion * drawableSwell.HitObject.Duration / 8), 4000, Easing.OutQuint);
+            float completion = (float)numHits / drawableSwell.HitObject.RequiredHits;
+            expandingRing.Alpha += Math.Clamp(completion / 16, 0.1f, 0.6f);
+        }
 
-            expandingRing.ScaleTo(1f + Math.Min(target_ring_scale - 1f, (target_ring_scale - 1f) * completion * 1.3f), 260, Easing.OutQuint);
+        protected override void Update()
+        {
+            base.Update();
 
-            expandingRing
-                .FadeTo(expandingRing.Alpha + Math.Clamp(completion / 16, 0.1f, 0.6f), 50)
-                .Then()
-                .FadeTo(completion / 8, 2000, Easing.OutQuint);
+            float completion = (float)numHits / drawableSwell.HitObject.RequiredHits;
+
+            centreCircle.Rotation = (float)Interpolation.DampContinuously(centreCircle.Rotation,
+                (float)(completion * drawableSwell.HitObject.Duration / 8), 500, Math.Abs(Time.Elapsed));
+            expandingRing.Scale = new Vector2((float)Interpolation.DampContinuously(expandingRing.Scale.X,
+                1f + Math.Min(target_ring_scale - 1f, (target_ring_scale - 1f) * completion * 1.3f), 35, Math.Abs(Time.Elapsed)));
+            expandingRing.Alpha = (float)Interpolation.DampContinuously(expandingRing.Alpha, completion / 16, 250, Math.Abs(Time.Elapsed));
         }
 
         private void updateStateTransforms(DrawableHitObject drawableHitObject, ArmedState state)

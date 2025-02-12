@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         /// </summary>
         public bool MustAlternate { get; internal set; } = true;
 
-        public event Action<int, int> UpdateHitProgress;
+        public event Action<int> UpdateHitProgress;
 
         public DrawableSwell()
             : this(null)
@@ -125,7 +125,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
                 int numHits = ticks.Count(r => r.IsHit);
 
-                UpdateHitProgress?.Invoke(numHits, HitObject.RequiredHits);
+                UpdateHitProgress?.Invoke(numHits);
 
                 if (numHits == HitObject.RequiredHits)
                     ApplyMaxResult();
