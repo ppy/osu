@@ -29,49 +29,49 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 Spacing = new Vector2(0f, 5f),
                 Children = new Drawable[]
                 {
-                    new GroupPanel
+                    new PanelGroup
                     {
                         Item = new CarouselItem(new GroupDefinition('A', "Group A"))
                     },
-                    new GroupPanel
+                    new PanelGroup
                     {
                         Item = new CarouselItem(new GroupDefinition('A', "Group A")),
                         KeyboardSelected = { Value = true }
                     },
-                    new GroupPanel
+                    new PanelGroup
                     {
                         Item = new CarouselItem(new GroupDefinition('A', "Group A")),
                         Expanded = { Value = true }
                     },
-                    new GroupPanel
+                    new PanelGroup
                     {
                         Item = new CarouselItem(new GroupDefinition('A', "Group A")),
                         KeyboardSelected = { Value = true },
                         Expanded = { Value = true }
                     },
-                    new StarsGroupPanel
+                    new PanelGroupStarDificulty
                     {
                         Item = new CarouselItem(new GroupDefinition(1, "1"))
                     },
-                    new StarsGroupPanel
+                    new PanelGroupStarDificulty
                     {
                         Item = new CarouselItem(new GroupDefinition(3, "3")),
                         Expanded = { Value = true }
                     },
-                    new StarsGroupPanel
+                    new PanelGroupStarDificulty
                     {
                         Item = new CarouselItem(new GroupDefinition(5, "5")),
                     },
-                    new StarsGroupPanel
+                    new PanelGroupStarDificulty
                     {
                         Item = new CarouselItem(new GroupDefinition(7, "7")),
                         Expanded = { Value = true }
                     },
-                    new StarsGroupPanel
+                    new PanelGroupStarDificulty
                     {
                         Item = new CarouselItem(new GroupDefinition(8, "8")),
                     },
-                    new StarsGroupPanel
+                    new PanelGroupStarDificulty
                     {
                         Item = new CarouselItem(new GroupDefinition(9, "9")),
                         Expanded = { Value = true }

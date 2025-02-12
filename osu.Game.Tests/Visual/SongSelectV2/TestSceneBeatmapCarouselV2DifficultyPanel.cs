@@ -78,21 +78,21 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 Spacing = new Vector2(0f, 5f),
                 Children = new Drawable[]
                 {
-                    new BeatmapPanel
+                    new PanelBeatmap
                     {
                         Item = new CarouselItem(beatmap)
                     },
-                    new BeatmapPanel
+                    new PanelBeatmap
                     {
                         Item = new CarouselItem(beatmap),
                         KeyboardSelected = { Value = true }
                     },
-                    new BeatmapPanel
+                    new PanelBeatmap
                     {
                         Item = new CarouselItem(beatmap),
                         Selected = { Value = true }
                     },
-                    new BeatmapPanel
+                    new PanelBeatmap
                     {
                         Item = new CarouselItem(beatmap),
                         KeyboardSelected = { Value = true },
