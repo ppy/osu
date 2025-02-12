@@ -121,9 +121,18 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                             new GridContainer
                             {
                                 RelativeSizeAxes = Axes.Both,
+                                RowDimensions = new[]
+                                {
+                                    new Dimension(GridSizeMode.AutoSize),
+                                    new Dimension(GridSizeMode.AutoSize),
+                                    new Dimension(GridSizeMode.Absolute, 5),
+                                    new Dimension(),
+                                    new Dimension(GridSizeMode.AutoSize),
+                                    new Dimension(GridSizeMode.AutoSize),
+                                },
                                 Content = new[]
                                 {
-                                    new Drawable[] { new OverlinedHeader("Beatmap") },
+                                    new Drawable[] { new OverlinedHeader("Beatmap queue") },
                                     new Drawable[]
                                     {
                                         addItemButton = new AddItemButton
@@ -202,14 +211,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                         },
                                     },
                                 },
-                                RowDimensions = new[]
-                                {
-                                    new Dimension(GridSizeMode.AutoSize),
-                                    new Dimension(GridSizeMode.AutoSize),
-                                    new Dimension(GridSizeMode.Absolute, 5),
-                                    new Dimension(),
-                                    new Dimension(GridSizeMode.AutoSize),
-                                }
                             },
                             null,
                             new GridContainer
