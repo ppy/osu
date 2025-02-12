@@ -32,7 +32,7 @@ namespace osu.Game.Online.Multiplayer
 
         public OnlineMultiplayerClient(EndpointConfiguration endpoints)
         {
-            endpoint = endpoints.MultiplayerEndpointUrl;
+            endpoint = endpoints.MultiplayerUrl;
         }
 
         [BackgroundDependencyLoader]

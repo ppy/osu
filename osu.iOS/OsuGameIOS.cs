@@ -41,7 +41,7 @@ namespace osu.iOS
                 updateOrientation();
         }
 
-        private void updateOrientation()
+        private void updateOrientation() => UIApplication.SharedApplication.InvokeOnMainThread(() =>
         {
             bool iPad = UIDevice.CurrentDevice.UserInterfaceIdiom == UIUserInterfaceIdiom.Pad;
             var orientation = MobileUtils.GetOrientation(this, (IOsuScreen)ScreenStack.CurrentScreen, iPad);
@@ -60,7 +60,7 @@ namespace osu.iOS
                     appDelegate.Orientations = null;
                     break;
             }
-        }
+        });
 
         protected override UpdateManager CreateUpdateManager() => new MobileUpdateNotifier();
 
