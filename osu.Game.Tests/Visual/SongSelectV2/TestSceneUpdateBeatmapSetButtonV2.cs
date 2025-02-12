@@ -11,12 +11,12 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 {
     public partial class TestSceneUpdateBeatmapSetButtonV2 : OsuTestScene
     {
-        private UpdateBeatmapSetButtonV2 button = null!;
+        private UpdateBeatmapSetButton button = null!;
 
         [SetUp]
         public void SetUp() => Schedule(() =>
         {
-            Child = button = new UpdateBeatmapSetButtonV2
+            Child = button = new UpdateBeatmapSetButton
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
