@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Game.Online.Rooms;
 using osu.Game.Tests.Beatmaps;
 using osu.Game.Tests.Visual.OnlinePlay;
@@ -23,43 +24,43 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         public bool RoomJoined => MultiplayerClient.RoomJoined;
 
-        private readonly bool joinRoom;
-
-        protected MultiplayerTestScene(bool joinRoom = true)
+        /// <summary>
+        /// Creates and joins a basic multiplayer room.
+        /// </summary>
+        /// <param name="setupFunc">A callback that may be used to further set up the room.</param>
+        protected void JoinDefaultRoom(Action<Room>? setupFunc = null)
         {
-            this.joinRoom = joinRoom;
-        }
-
-        protected virtual Room CreateRoom()
-        {
-            return new Room
+            AddStep("join room", () =>
             {
-                Name = "test name",
-                Type = MatchType.HeadToHead,
-                Playlist =
-                [
-                    new PlaylistItem(new TestBeatmap(Ruleset.Value).BeatmapInfo)
-                    {
-                        RulesetID = Ruleset.Value.OnlineID
-                    }
-                ]
-            };
-        }
-
-        public override void SetUpSteps()
-        {
-            base.SetUpSteps();
-
-            if (joinRoom)
-            {
-                AddStep("join room", () =>
+                Room room = new Room
                 {
-                    SelectedRoom.Value = CreateRoom();
-                    MultiplayerClient.CreateRoom(SelectedRoom.Value).ConfigureAwait(false);
-                });
+                    Name = "test name",
+                    Type = MatchType.HeadToHead,
+                    Playlist =
+                    [
+                        new PlaylistItem(new TestBeatmap(Ruleset.Value).BeatmapInfo)
+                        {
+                            RulesetID = Ruleset.Value.OnlineID
+                        }
+                    ]
+                };
 
-                AddUntilStep("wait for room join", () => RoomJoined);
-            }
+                setupFunc?.Invoke(room);
+
+                MultiplayerClient.CreateRoom(room).ConfigureAwait(false);
+            });
+
+            AddUntilStep("wait for room join", () => RoomJoined);
+        }
+
+        /// <summary>
+        /// Creates and joins the given room.
+        /// </summary>
+        /// <param name="room">The room to create. If <c>null</c>, a default room will be created.</param>
+        protected void JoinRoom(Room room)
+        {
+            AddStep("join room", () => MultiplayerClient.CreateRoom(room).ConfigureAwait(false));
+            AddUntilStep("wait for room join", () => RoomJoined);
         }
 
         protected override OnlinePlayTestSceneDependencies CreateOnlinePlayDependencies() => new MultiplayerTestSceneDependencies();
