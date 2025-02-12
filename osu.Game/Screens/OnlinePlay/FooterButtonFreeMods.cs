@@ -11,31 +11,20 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Select;
 using osuTK;
-using osu.Game.Localisation;
 
 namespace osu.Game.Screens.OnlinePlay
 {
-    public partial class FooterButtonFreeMods : FooterButton, IHasCurrentValue<IReadOnlyList<Mod>>
+    public partial class FooterButtonFreeMods : FooterButton
     {
-        private readonly BindableWithCurrent<IReadOnlyList<Mod>> current = new BindableWithCurrent<IReadOnlyList<Mod>>(Array.Empty<Mod>());
-
-        public Bindable<IReadOnlyList<Mod>> Current
-        {
-            get => current.Current;
-            set
-            {
-                ArgumentNullException.ThrowIfNull(value);
-
-                current.Current = value;
-            }
-        }
+        public readonly Bindable<IReadOnlyList<Mod>> FreeMods = new Bindable<IReadOnlyList<Mod>>();
+        public readonly IBindable<bool> Freestyle = new Bindable<bool>();
 
         public new Action Action { set => throw new NotSupportedException("The click action is handled by the button itself."); }
 
@@ -104,7 +93,8 @@ namespace osu.Game.Screens.OnlinePlay
         {
             base.LoadComplete();
 
-            Current.BindValueChanged(_ => updateModDisplay(), true);
+            Freestyle.BindValueChanged(_ => updateModDisplay());
+            FreeMods.BindValueChanged(_ => updateModDisplay(), true);
         }
 
         /// <summary>
@@ -114,16 +104,16 @@ namespace osu.Game.Screens.OnlinePlay
         {
             var availableMods = allAvailableAndValidMods.ToArray();
 
-            Current.Value = Current.Value.Count == availableMods.Length
+            FreeMods.Value = FreeMods.Value.Count == availableMods.Length
                 ? Array.Empty<Mod>()
                 : availableMods;
         }
 
         private void updateModDisplay()
         {
-            int currentCount = Current.Value.Count;
+            int currentCount = FreeMods.Value.Count;
 
-            if (currentCount == allAvailableAndValidMods.Count())
+            if (currentCount == allAvailableAndValidMods.Count() || Freestyle.Value)
             {
                 count.Text = "all";
                 count.FadeColour(colours.Gray2, 200, Easing.OutQuint);
