@@ -146,7 +146,6 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                     {
                         new Drawable?[]
                         {
-                            // Playlist items column
                             new GridContainer
                             {
                                 RelativeSizeAxes = Axes.Both,
@@ -176,73 +175,67 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                     new Dimension(),
                                 }
                             },
-                            // Spacer
                             null,
-                            // Middle column (mods and leaderboard)
                             new GridContainer
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 Content = new[]
                                 {
-                                    new Drawable[]
+                                    new[]
                                     {
-                                        new Container
+                                        UserModsSection = new FillFlowContainer
                                         {
                                             RelativeSizeAxes = Axes.X,
                                             AutoSizeAxes = Axes.Y,
                                             Margin = new MarginPadding { Bottom = 10 },
-                                            Children = new[]
+                                            Alpha = 0,
+                                            Children = new Drawable[]
                                             {
-                                                UserModsSection = new FillFlowContainer
+                                                new OverlinedHeader("Extra mods"),
+                                                new FillFlowContainer
                                                 {
-                                                    RelativeSizeAxes = Axes.X,
-                                                    AutoSizeAxes = Axes.Y,
-                                                    Alpha = 0,
-                                                    Margin = new MarginPadding { Bottom = 10 },
+                                                    AutoSizeAxes = Axes.Both,
+                                                    Direction = FillDirection.Horizontal,
+                                                    Spacing = new Vector2(10, 0),
                                                     Children = new Drawable[]
                                                     {
-                                                        new OverlinedHeader("Extra mods"),
-                                                        new FillFlowContainer
+                                                        new UserModSelectButton
                                                         {
-                                                            AutoSizeAxes = Axes.Both,
-                                                            Direction = FillDirection.Horizontal,
-                                                            Spacing = new Vector2(10, 0),
-                                                            Children = new Drawable[]
-                                                            {
-                                                                new UserModSelectButton
-                                                                {
-                                                                    Anchor = Anchor.CentreLeft,
-                                                                    Origin = Anchor.CentreLeft,
-                                                                    Width = 90,
-                                                                    Text = "Select",
-                                                                    Action = ShowUserModSelect,
-                                                                },
-                                                                new ModDisplay
-                                                                {
-                                                                    Anchor = Anchor.CentreLeft,
-                                                                    Origin = Anchor.CentreLeft,
-                                                                    Current = UserMods,
-                                                                    Scale = new Vector2(0.8f),
-                                                                },
-                                                            }
-                                                        }
+                                                            Anchor = Anchor.CentreLeft,
+                                                            Origin = Anchor.CentreLeft,
+                                                            Width = 90,
+                                                            Height = 30,
+                                                            Text = "Select",
+                                                            Action = ShowUserModSelect,
+                                                        },
+                                                        new ModDisplay
+                                                        {
+                                                            Anchor = Anchor.CentreLeft,
+                                                            Origin = Anchor.CentreLeft,
+                                                            Current = UserMods,
+                                                            Scale = new Vector2(0.8f),
+                                                        },
                                                     }
-                                                },
-                                                UserStyleSection = new FillFlowContainer
+                                                }
+                                            }
+                                        },
+                                    },
+                                    new[]
+                                    {
+                                        UserStyleSection = new FillFlowContainer
+                                        {
+                                            RelativeSizeAxes = Axes.X,
+                                            AutoSizeAxes = Axes.Y,
+                                            Margin = new MarginPadding { Bottom = 10 },
+                                            Alpha = 0,
+                                            Children = new Drawable[]
+                                            {
+                                                new OverlinedHeader("Difficulty"),
+                                                UserStyleDisplayContainer = new Container<DrawableRoomPlaylistItem>
                                                 {
                                                     RelativeSizeAxes = Axes.X,
-                                                    AutoSizeAxes = Axes.Y,
-                                                    Alpha = 0,
-                                                    Children = new Drawable[]
-                                                    {
-                                                        new OverlinedHeader("Difficulty"),
-                                                        UserStyleDisplayContainer = new Container<DrawableRoomPlaylistItem>
-                                                        {
-                                                            RelativeSizeAxes = Axes.X,
-                                                            AutoSizeAxes = Axes.Y
-                                                        }
-                                                    }
-                                                },
+                                                    AutoSizeAxes = Axes.Y
+                                                }
                                             }
                                         },
                                     },
@@ -273,12 +266,11 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                     new Dimension(GridSizeMode.AutoSize),
                                     new Dimension(GridSizeMode.AutoSize),
                                     new Dimension(GridSizeMode.AutoSize),
+                                    new Dimension(GridSizeMode.AutoSize),
                                     new Dimension(),
                                 }
                             },
-                            // Spacer
                             null,
-                            // Main right column
                             new GridContainer
                             {
                                 RelativeSizeAxes = Axes.Both,
