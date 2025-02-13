@@ -2,60 +2,126 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Input;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.Rooms;
+using osu.Game.Overlays;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Screens.Menu;
 using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Match;
 using osu.Game.Screens.OnlinePlay.Match.Components;
+using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Users;
+using osu.Game.Utils;
 using osuTK;
 using Container = osu.Framework.Graphics.Containers.Container;
 
 namespace osu.Game.Screens.OnlinePlay.Playlists
 {
-    public partial class PlaylistsRoomSubScreen : RoomSubScreen
+    public partial class PlaylistsRoomSubScreen : OnlinePlaySubScreen, IPreviewTrackOwner
     {
         public override string Title { get; }
 
         public override string ShortTitle => "playlist";
 
-        private readonly IBindable<bool> isIdle = new BindableBool();
+        public override bool? ApplyModTrackAdjustments => true;
+
+        public override bool DisallowExternalBeatmapRulesetChanges => true;
+
+        /// <summary>
+        /// Whether the user has confirmed they want to exit this screen in the presence of unsaved changes.
+        /// </summary>
+        protected bool ExitConfirmed { get; private set; }
 
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
 
-        [Resolved(CanBeNull = true)]
+        [Resolved]
+        private AudioManager audio { get; set; } = null!;
+
+        [Resolved]
+        private BeatmapManager beatmapManager { get; set; } = null!;
+
+        [Resolved]
+        private RulesetStore rulesets { get; set; } = null!;
+
+        [Resolved]
+        private PreviewTrackManager previewTrackManager { get; set; } = null!;
+
+        [Resolved]
+        private MusicController music { get; set; } = null!;
+
+        [Resolved]
         private IdleTracker? idleTracker { get; set; }
 
-        private MatchLeaderboard leaderboard = null!;
+        [Resolved]
+        private OnlinePlayScreen? parentScreen { get; set; }
+
+        [Resolved]
+        private IOverlayManager? overlayManager { get; set; }
+
+        [Resolved]
+        private IDialogOverlay? dialogOverlay { get; set; }
+
+        [Cached]
+        private readonly OnlinePlayBeatmapAvailabilityTracker beatmapAvailabilityTracker = new OnlinePlayBeatmapAvailabilityTracker();
+
+        protected readonly Bindable<PlaylistItem?> SelectedItem = new Bindable<PlaylistItem?>();
+        private readonly Bindable<BeatmapInfo?> userBeatmap = new Bindable<BeatmapInfo?>();
+        private readonly Bindable<RulesetInfo?> userRuleset = new Bindable<RulesetInfo?>();
+        private readonly Bindable<IReadOnlyList<Mod>> userMods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
+
+        private readonly IBindable<bool> isIdle = new BindableBool();
+        private readonly Room room;
+
+        private Drawable roomContent = null!;
         private SelectionPollingComponent selectionPollingComponent = null!;
+        private PlaylistsRoomSettingsOverlay settingsOverlay = null!;
+
+        private MatchLeaderboard leaderboard = null!;
         private FillFlowContainer progressSection = null!;
         private DrawableRoomPlaylist drawablePlaylist = null!;
 
-        private readonly Bindable<BeatmapInfo?> userBeatmap = new Bindable<BeatmapInfo?>();
-        private readonly Bindable<RulesetInfo?> userRuleset = new Bindable<RulesetInfo?>();
+        private FillFlowContainer userModsSection = null!;
+        private RoomModSelectOverlay userModsSelectOverlay = null!;
+
+        private FillFlowContainer userStyleSection = null!;
+        private Container<DrawableRoomPlaylistItem> userStyleDisplayContainer = null!;
+
+        private Sample? sampleStart;
+        private IDisposable? userModsSelectOverlayRegistration;
 
         public PlaylistsRoomSubScreen(Room room)
-            : base(room, false) // Editing is temporarily not allowed.
         {
+            this.room = room;
+
             Title = room.RoomID == null ? "New playlist" : room.Name;
             Activity.Value = new UserActivity.InLobby(room);
+
+            Padding = new MarginPadding { Top = Header.HEIGHT };
         }
 
         [BackgroundDependencyLoader]
@@ -64,32 +130,350 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             if (idleTracker != null)
                 isIdle.BindTo(idleTracker.IsIdle);
 
-            AddInternal(selectionPollingComponent = new SelectionPollingComponent(Room));
+            sampleStart = audio.Samples.Get(@"SongSelect/confirm-selection");
+
+            InternalChild = new PopoverContainer
+            {
+                RelativeSizeAxes = Axes.Both,
+                Children = new Drawable[]
+                {
+                    selectionPollingComponent = new SelectionPollingComponent(room),
+                    beatmapAvailabilityTracker,
+                    new MultiplayerRoomSounds(),
+                    new GridContainer
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        RowDimensions = new[]
+                        {
+                            new Dimension(),
+                            new Dimension(GridSizeMode.Absolute, 50)
+                        },
+                        Content = new[]
+                        {
+                            // Padded main content (drawable room + main content)
+                            new Drawable[]
+                            {
+                                new Container
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Padding = new MarginPadding
+                                    {
+                                        Horizontal = WaveOverlayContainer.WIDTH_PADDING,
+                                        Bottom = 30
+                                    },
+                                    Children = new[]
+                                    {
+                                        roomContent = new GridContainer
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                            RowDimensions = new[]
+                                            {
+                                                new Dimension(GridSizeMode.AutoSize),
+                                                new Dimension(GridSizeMode.Absolute, 10)
+                                            },
+                                            Content = new[]
+                                            {
+                                                new Drawable[]
+                                                {
+                                                    new OsuContextMenuContainer
+                                                    {
+                                                        RelativeSizeAxes = Axes.X,
+                                                        AutoSizeAxes = Axes.Y,
+                                                        Child = new DrawableMatchRoom(room, false)
+                                                        {
+                                                            OnEdit = () => settingsOverlay.Show(),
+                                                            SelectedItem = SelectedItem
+                                                        }
+                                                    }
+                                                },
+                                                null,
+                                                new Drawable[]
+                                                {
+                                                    new Container
+                                                    {
+                                                        RelativeSizeAxes = Axes.Both,
+                                                        Children = new[]
+                                                        {
+                                                            new Container
+                                                            {
+                                                                RelativeSizeAxes = Axes.Both,
+                                                                Masking = true,
+                                                                CornerRadius = 10,
+                                                                Child = new Box
+                                                                {
+                                                                    RelativeSizeAxes = Axes.Both,
+                                                                    Colour = Color4Extensions.FromHex(@"3e3a44") // Temporary.
+                                                                },
+                                                            },
+                                                            new Container
+                                                            {
+                                                                RelativeSizeAxes = Axes.Both,
+                                                                Padding = new MarginPadding(20),
+                                                                Child = new Container
+                                                                {
+                                                                    RelativeSizeAxes = Axes.Both,
+                                                                    Padding = new MarginPadding { Horizontal = 5, Vertical = 10 },
+                                                                    Child = new OsuContextMenuContainer
+                                                                    {
+                                                                        RelativeSizeAxes = Axes.Both,
+                                                                        Child = new GridContainer
+                                                                        {
+                                                                            RelativeSizeAxes = Axes.Both,
+                                                                            ColumnDimensions = new[]
+                                                                            {
+                                                                                new Dimension(),
+                                                                                new Dimension(GridSizeMode.Absolute, 10),
+                                                                                new Dimension(),
+                                                                                new Dimension(GridSizeMode.Absolute, 10),
+                                                                                new Dimension(),
+                                                                            },
+                                                                            Content = new[]
+                                                                            {
+                                                                                new Drawable?[]
+                                                                                {
+                                                                                    new GridContainer
+                                                                                    {
+                                                                                        RelativeSizeAxes = Axes.Both,
+                                                                                        Padding = new MarginPadding { Right = 5 },
+                                                                                        Content = new[]
+                                                                                        {
+                                                                                            new Drawable[] { new OverlinedPlaylistHeader(room), },
+                                                                                            new Drawable[]
+                                                                                            {
+                                                                                                drawablePlaylist = new DrawableRoomPlaylist
+                                                                                                {
+                                                                                                    RelativeSizeAxes = Axes.Both,
+                                                                                                    SelectedItem = { BindTarget = SelectedItem },
+                                                                                                    AllowSelection = true,
+                                                                                                    AllowShowingResults = true,
+                                                                                                    RequestResults = item =>
+                                                                                                    {
+                                                                                                        Debug.Assert(room.RoomID != null);
+                                                                                                        parentScreen?.Push(new PlaylistItemUserBestResultsScreen(room.RoomID.Value, item,
+                                                                                                            api.LocalUser.Value.Id));
+                                                                                                    }
+                                                                                                }
+                                                                                            },
+                                                                                        },
+                                                                                        RowDimensions = new[]
+                                                                                        {
+                                                                                            new Dimension(GridSizeMode.AutoSize),
+                                                                                            new Dimension(),
+                                                                                        }
+                                                                                    },
+                                                                                    null,
+                                                                                    new GridContainer
+                                                                                    {
+                                                                                        RelativeSizeAxes = Axes.Both,
+                                                                                        Content = new[]
+                                                                                        {
+                                                                                            new Drawable[]
+                                                                                            {
+                                                                                                userModsSection = new FillFlowContainer
+                                                                                                {
+                                                                                                    RelativeSizeAxes = Axes.X,
+                                                                                                    AutoSizeAxes = Axes.Y,
+                                                                                                    Margin = new MarginPadding { Bottom = 10 },
+                                                                                                    Alpha = 0,
+                                                                                                    Children = new Drawable[]
+                                                                                                    {
+                                                                                                        new OverlinedHeader("Extra mods"),
+                                                                                                        new FillFlowContainer
+                                                                                                        {
+                                                                                                            AutoSizeAxes = Axes.Both,
+                                                                                                            Direction = FillDirection.Horizontal,
+                                                                                                            Spacing = new Vector2(10, 0),
+                                                                                                            Children = new Drawable[]
+                                                                                                            {
+                                                                                                                new UserModSelectButton
+                                                                                                                {
+                                                                                                                    Anchor = Anchor.CentreLeft,
+                                                                                                                    Origin = Anchor.CentreLeft,
+                                                                                                                    Width = 90,
+                                                                                                                    Height = 30,
+                                                                                                                    Text = "Select",
+                                                                                                                    Action = showUserModSelect,
+                                                                                                                },
+                                                                                                                new ModDisplay
+                                                                                                                {
+                                                                                                                    Anchor = Anchor.CentreLeft,
+                                                                                                                    Origin = Anchor.CentreLeft,
+                                                                                                                    Current = userMods,
+                                                                                                                    Scale = new Vector2(0.8f),
+                                                                                                                },
+                                                                                                            }
+                                                                                                        }
+                                                                                                    }
+                                                                                                },
+                                                                                            },
+                                                                                            new Drawable[]
+                                                                                            {
+                                                                                                userStyleSection = new FillFlowContainer
+                                                                                                {
+                                                                                                    RelativeSizeAxes = Axes.X,
+                                                                                                    AutoSizeAxes = Axes.Y,
+                                                                                                    Margin = new MarginPadding { Bottom = 10 },
+                                                                                                    Alpha = 0,
+                                                                                                    Children = new Drawable[]
+                                                                                                    {
+                                                                                                        new OverlinedHeader("Difficulty"),
+                                                                                                        userStyleDisplayContainer = new Container<DrawableRoomPlaylistItem>
+                                                                                                        {
+                                                                                                            RelativeSizeAxes = Axes.X,
+                                                                                                            AutoSizeAxes = Axes.Y
+                                                                                                        }
+                                                                                                    }
+                                                                                                },
+                                                                                            },
+                                                                                            new Drawable[]
+                                                                                            {
+                                                                                                progressSection = new FillFlowContainer
+                                                                                                {
+                                                                                                    RelativeSizeAxes = Axes.X,
+                                                                                                    AutoSizeAxes = Axes.Y,
+                                                                                                    Alpha = 0,
+                                                                                                    Margin = new MarginPadding { Bottom = 10 },
+                                                                                                    Direction = FillDirection.Vertical,
+                                                                                                    Children = new Drawable[]
+                                                                                                    {
+                                                                                                        new OverlinedHeader("Progress"),
+                                                                                                        new RoomLocalUserInfo(room),
+                                                                                                    }
+                                                                                                },
+                                                                                            },
+                                                                                            new Drawable[]
+                                                                                            {
+                                                                                                new OverlinedHeader("Leaderboard")
+                                                                                            },
+                                                                                            new Drawable[] { leaderboard = new MatchLeaderboard(room) { RelativeSizeAxes = Axes.Both }, },
+                                                                                        },
+                                                                                        RowDimensions = new[]
+                                                                                        {
+                                                                                            new Dimension(GridSizeMode.AutoSize),
+                                                                                            new Dimension(GridSizeMode.AutoSize),
+                                                                                            new Dimension(GridSizeMode.AutoSize),
+                                                                                            new Dimension(GridSizeMode.AutoSize),
+                                                                                            new Dimension(),
+                                                                                        }
+                                                                                    },
+                                                                                    null,
+                                                                                    new GridContainer
+                                                                                    {
+                                                                                        RelativeSizeAxes = Axes.Both,
+                                                                                        Content = new[]
+                                                                                        {
+                                                                                            new Drawable[] { new OverlinedHeader("Chat") },
+                                                                                            new Drawable[] { new MatchChatDisplay(room) { RelativeSizeAxes = Axes.Both } }
+                                                                                        },
+                                                                                        RowDimensions = new[]
+                                                                                        {
+                                                                                            new Dimension(GridSizeMode.AutoSize),
+                                                                                            new Dimension(),
+                                                                                        }
+                                                                                    },
+                                                                                },
+                                                                            },
+                                                                        }
+                                                                    }
+                                                                }
+                                                            },
+                                                            new Container
+                                                            {
+                                                                Anchor = Anchor.BottomLeft,
+                                                                Origin = Anchor.BottomLeft,
+                                                                RelativeSizeAxes = Axes.X,
+                                                                AutoSizeAxes = Axes.Y,
+                                                            },
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        new Container
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                            // Resolves 1px masking errors between the settings overlay and the room panel.
+                                            Padding = new MarginPadding(-1),
+                                            Child = settingsOverlay = new PlaylistsRoomSettingsOverlay(room)
+                                            {
+                                                EditPlaylist = () =>
+                                                {
+                                                    if (this.IsCurrentScreen())
+                                                        this.Push(new PlaylistsSongSelect(room));
+                                                },
+                                            }
+                                        }
+                                    },
+                                },
+                            },
+                            // Footer
+                            new Drawable[]
+                            {
+                                new Container
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Children = new Drawable[]
+                                    {
+                                        new Box
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                            Colour = Color4Extensions.FromHex(@"28242d") // Temporary.
+                                        },
+                                        new Container
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                            Padding = new MarginPadding(5),
+                                            Child = new PlaylistsRoomFooter(room)
+                                            {
+                                                OnStart = startPlay,
+                                                OnClose = closePlaylist,
+                                            }
+                                        },
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            LoadComponent(userModsSelectOverlay = new RoomModSelectOverlay
+            {
+                SelectedItem = { BindTarget = SelectedItem },
+                SelectedMods = { BindTarget = userMods },
+                IsValidMod = _ => false
+            });
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            SelectedItem.BindValueChanged(onSelectedItemChanged, true);
+            userModsSelectOverlayRegistration = overlayManager?.RegisterBlockingOverlay(userModsSelectOverlay);
+
+            room.PropertyChanged += onRoomPropertyChanged;
+
             isIdle.BindValueChanged(_ => updatePollingRate(), true);
+            SelectedItem.BindValueChanged(_ => onSelectedItemChanged());
 
-            Room.PropertyChanged += onRoomPropertyChanged;
+            beatmapAvailabilityTracker.SelectedItem.BindTo(SelectedItem);
+            beatmapAvailabilityTracker.Availability.BindValueChanged(_ => updateGameplayState());
+
+            userBeatmap.BindValueChanged(_ => updateGameplayState());
+            userRuleset.BindValueChanged(_ => updateGameplayState());
+            userMods.BindValueChanged(_ => updateGameplayState());
+
             updateSetupState();
-            updateRoomMaxAttempts();
-            updateRoomPlaylist();
+            updateGameplayState();
         }
 
-        private void onSelectedItemChanged(ValueChangedEvent<PlaylistItem?> item)
-        {
-            // Simplest for now.
-            userBeatmap.Value = null;
-            userRuleset.Value = null;
-        }
+        #region Room/property updates
 
-        protected override IBeatmapInfo GetGameplayBeatmap() => userBeatmap.Value ?? base.GetGameplayBeatmap();
-        protected override RulesetInfo GetGameplayRuleset() => userRuleset.Value ?? base.GetGameplayRuleset();
-
+        /// <summary>
+        /// Responds to changes of the <see cref="Room"/>'s properties.
+        /// </summary>
+        /// <param name="sender">The <see cref="Room"/> that changed.</param>
+        /// <param name="e">Describes the property that changed.</param>
         private void onRoomPropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             switch (e.PropertyName)
@@ -97,255 +481,342 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                 case nameof(Room.RoomID):
                     updateSetupState();
                     break;
-
-                case nameof(Room.MaxAttempts):
-                    updateRoomMaxAttempts();
-                    break;
-
-                case nameof(Room.Playlist):
-                    updateRoomPlaylist();
-                    break;
             }
         }
 
+        /// <summary>
+        /// Adjusts the visibility of the settings and main content when <see cref="Room.RoomID"/> changes.
+        /// Only the settings overlay is visible while the room isn't created, and only the main content is visible after creation.
+        /// </summary>
         private void updateSetupState()
         {
-            if (Room.RoomID != null)
+            if (room.RoomID == null)
             {
-                // Set the first playlist item.
-                // This is scheduled since updating the room and playlist may happen in an arbitrary order (via Room.CopyFrom()).
-                Schedule(() => SelectedItem.Value = Room.Playlist.FirstOrDefault());
+                // A new room is being created.
+                // The main content should be hidden until the settings overlay is hidden, signaling the room is ready to be displayed.
+                roomContent.Hide();
+                settingsOverlay.Show();
+            }
+            else
+            {
+                roomContent.Show();
+                settingsOverlay.Hide();
+
+                progressSection.Alpha = room.MaxAttempts != null ? 1 : 0;
+                drawablePlaylist.Items.ReplaceRange(0, drawablePlaylist.Items.Count, room.Playlist);
+                SelectedItem.Value = room.Playlist.FirstOrDefault();
             }
         }
 
-        private void updateRoomMaxAttempts()
-            => progressSection.Alpha = Room.MaxAttempts != null ? 1 : 0;
-
-        private void updateRoomPlaylist()
-            => drawablePlaylist.Items.ReplaceRange(0, drawablePlaylist.Items.Count, Room.Playlist);
-
-        protected override Drawable CreateMainContent() => new Container
-        {
-            RelativeSizeAxes = Axes.Both,
-            Padding = new MarginPadding { Horizontal = 5, Vertical = 10 },
-            Child = new OsuContextMenuContainer
-            {
-                RelativeSizeAxes = Axes.Both,
-                Child = new GridContainer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    ColumnDimensions = new[]
-                    {
-                        new Dimension(),
-                        new Dimension(GridSizeMode.Absolute, 10),
-                        new Dimension(),
-                        new Dimension(GridSizeMode.Absolute, 10),
-                        new Dimension(),
-                    },
-                    Content = new[]
-                    {
-                        new Drawable?[]
-                        {
-                            new GridContainer
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Padding = new MarginPadding { Right = 5 },
-                                Content = new[]
-                                {
-                                    new Drawable[] { new OverlinedPlaylistHeader(Room), },
-                                    new Drawable[]
-                                    {
-                                        drawablePlaylist = new DrawableRoomPlaylist
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-                                            SelectedItem = { BindTarget = SelectedItem },
-                                            AllowSelection = true,
-                                            AllowShowingResults = true,
-                                            RequestResults = item =>
-                                            {
-                                                Debug.Assert(Room.RoomID != null);
-                                                ParentScreen?.Push(new PlaylistItemUserBestResultsScreen(Room.RoomID.Value, item, api.LocalUser.Value.Id));
-                                            }
-                                        }
-                                    },
-                                },
-                                RowDimensions = new[]
-                                {
-                                    new Dimension(GridSizeMode.AutoSize),
-                                    new Dimension(),
-                                }
-                            },
-                            null,
-                            new GridContainer
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Content = new[]
-                                {
-                                    new[]
-                                    {
-                                        UserModsSection = new FillFlowContainer
-                                        {
-                                            RelativeSizeAxes = Axes.X,
-                                            AutoSizeAxes = Axes.Y,
-                                            Margin = new MarginPadding { Bottom = 10 },
-                                            Alpha = 0,
-                                            Children = new Drawable[]
-                                            {
-                                                new OverlinedHeader("Extra mods"),
-                                                new FillFlowContainer
-                                                {
-                                                    AutoSizeAxes = Axes.Both,
-                                                    Direction = FillDirection.Horizontal,
-                                                    Spacing = new Vector2(10, 0),
-                                                    Children = new Drawable[]
-                                                    {
-                                                        new UserModSelectButton
-                                                        {
-                                                            Anchor = Anchor.CentreLeft,
-                                                            Origin = Anchor.CentreLeft,
-                                                            Width = 90,
-                                                            Height = 30,
-                                                            Text = "Select",
-                                                            Action = ShowUserModSelect,
-                                                        },
-                                                        new ModDisplay
-                                                        {
-                                                            Anchor = Anchor.CentreLeft,
-                                                            Origin = Anchor.CentreLeft,
-                                                            Current = UserMods,
-                                                            Scale = new Vector2(0.8f),
-                                                        },
-                                                    }
-                                                }
-                                            }
-                                        },
-                                    },
-                                    new[]
-                                    {
-                                        UserStyleSection = new FillFlowContainer
-                                        {
-                                            RelativeSizeAxes = Axes.X,
-                                            AutoSizeAxes = Axes.Y,
-                                            Margin = new MarginPadding { Bottom = 10 },
-                                            Alpha = 0,
-                                            Children = new Drawable[]
-                                            {
-                                                new OverlinedHeader("Difficulty"),
-                                                UserStyleDisplayContainer = new Container<DrawableRoomPlaylistItem>
-                                                {
-                                                    RelativeSizeAxes = Axes.X,
-                                                    AutoSizeAxes = Axes.Y
-                                                }
-                                            }
-                                        },
-                                    },
-                                    new Drawable[]
-                                    {
-                                        progressSection = new FillFlowContainer
-                                        {
-                                            RelativeSizeAxes = Axes.X,
-                                            AutoSizeAxes = Axes.Y,
-                                            Alpha = 0,
-                                            Margin = new MarginPadding { Bottom = 10 },
-                                            Direction = FillDirection.Vertical,
-                                            Children = new Drawable[]
-                                            {
-                                                new OverlinedHeader("Progress"),
-                                                new RoomLocalUserInfo(Room),
-                                            }
-                                        },
-                                    },
-                                    new Drawable[]
-                                    {
-                                        new OverlinedHeader("Leaderboard")
-                                    },
-                                    new Drawable[] { leaderboard = new MatchLeaderboard(Room) { RelativeSizeAxes = Axes.Both }, },
-                                },
-                                RowDimensions = new[]
-                                {
-                                    new Dimension(GridSizeMode.AutoSize),
-                                    new Dimension(GridSizeMode.AutoSize),
-                                    new Dimension(GridSizeMode.AutoSize),
-                                    new Dimension(GridSizeMode.AutoSize),
-                                    new Dimension(),
-                                }
-                            },
-                            null,
-                            new GridContainer
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Content = new[]
-                                {
-                                    new Drawable[] { new OverlinedHeader("Chat") },
-                                    new Drawable[] { new MatchChatDisplay(Room) { RelativeSizeAxes = Axes.Both } }
-                                },
-                                RowDimensions = new[]
-                                {
-                                    new Dimension(GridSizeMode.AutoSize),
-                                    new Dimension(),
-                                }
-                            },
-                        },
-                    },
-                }
-            }
-        };
-
-        protected override Drawable CreateFooter() => new PlaylistsRoomFooter(Room)
-        {
-            OnStart = StartPlay,
-            OnClose = closePlaylist,
-        };
-
-        protected override RoomSettingsOverlay CreateRoomSettingsOverlay(Room room) => new PlaylistsRoomSettingsOverlay(room)
-        {
-            EditPlaylist = () =>
-            {
-                if (this.IsCurrentScreen())
-                    this.Push(new PlaylistsSongSelect(Room));
-            },
-        };
-
-        protected override void OpenStyleSelection()
-        {
-            if (!this.IsCurrentScreen() || SelectedItem.Value is not PlaylistItem item)
-                return;
-
-            this.Push(new PlaylistsRoomFreestyleSelect(Room, item)
-            {
-                Beatmap = { BindTarget = userBeatmap },
-                Ruleset = { BindTarget = userRuleset }
-            });
-        }
-
+        /// <summary>
+        /// Adjusts the rate at which the <see cref="Room"/> is updated.
+        /// </summary>
         private void updatePollingRate()
         {
             selectionPollingComponent.TimeBetweenPolls.Value = isIdle.Value ? 30000 : 5000;
             Logger.Log($"Polling adjusted (selection: {selectionPollingComponent.TimeBetweenPolls.Value})");
         }
 
-        private void closePlaylist()
+        /// <summary>
+        /// Responds to changes in the selected playlist item to validate the user's beatmap/ruleset/mod style and update UI components as necessary.
+        /// </summary>
+        private void onSelectedItemChanged()
         {
-            DialogOverlay?.Push(new ClosePlaylistDialog(Room, () =>
+            if (!this.IsCurrentScreen() || SelectedItem.Value is not PlaylistItem item)
+                return;
+
+            // Reset entire user style when disabled.
+            if (!item.Freestyle)
             {
-                var request = new ClosePlaylistRequest(Room.RoomID!.Value);
-                request.Success += () => Room.EndDate = DateTimeOffset.UtcNow;
-                API.Queue(request);
+                userBeatmap.Value = null;
+                userRuleset.Value = null;
+            }
+
+            // Reset beatmap style when no longer from the same beatmap set.
+            if (userBeatmap.Value != null && userBeatmap.Value.BeatmapSet!.OnlineID != item.Beatmap.BeatmapSet!.OnlineID)
+                userBeatmap.Value = null;
+
+            // Reset ruleset style when no longer valid for the beatmap.
+            if (userRuleset.Value != null)
+            {
+                IBeatmapInfo gameplayBeatmap = userBeatmap.Value ?? item.Beatmap;
+                int beatmapRuleset = gameplayBeatmap.Ruleset.OnlineID;
+
+                if (beatmapRuleset > 0 && userRuleset.Value.OnlineID != beatmapRuleset)
+                    userRuleset.Value = null;
+            }
+
+            RulesetInfo gameplayRuleset = userRuleset.Value ?? rulesets.GetRuleset(item.RulesetID)!;
+            Ruleset rulesetInstance = gameplayRuleset.CreateInstance();
+            Mod[] allowedMods = item.Freestyle
+                ? rulesetInstance.AllMods.OfType<Mod>().Where(m => ModUtils.IsValidFreeModForMatchType(m, room.Type)).ToArray()
+                : item.AllowedMods.Select(m => m.ToMod(rulesetInstance)).ToArray();
+
+            // Remove any user mods that are no longer allowed.
+            Mod[] newUserMods = userMods.Value.Where(m => allowedMods.Any(a => m.GetType() == a.GetType())).ToArray();
+            if (!newUserMods.SequenceEqual(userMods.Value))
+                userMods.Value = newUserMods;
+
+            if (allowedMods.Length > 0)
+            {
+                userModsSection.Show();
+                userModsSelectOverlay.IsValidMod = m => allowedMods.Any(a => a.GetType() == m.GetType());
+            }
+            else
+            {
+                userModsSection.Hide();
+                userModsSelectOverlay.Hide();
+                userModsSelectOverlay.IsValidMod = _ => false;
+            }
+
+            if (item.Freestyle)
+                userStyleSection.Show();
+            else
+                userStyleSection.Hide();
+
+            updateGameplayState();
+        }
+
+        /// <summary>
+        /// Adjusts the global beatmap/ruleset/mods values in preparation for a gameplay session.
+        /// </summary>
+        private void updateGameplayState()
+        {
+            if (!this.IsCurrentScreen() || SelectedItem.Value is not PlaylistItem item)
+                return;
+
+            IBeatmapInfo gameplayBeatmap = userBeatmap.Value ?? item.Beatmap;
+            RulesetInfo gameplayRuleset = userRuleset.Value ?? rulesets.GetRuleset(item.RulesetID)!;
+            Ruleset rulesetInstance = gameplayRuleset.CreateInstance();
+            Mod[] gameplayMods = userMods.Value.Concat(item.RequiredMods.Select(m => m.ToMod(rulesetInstance))).ToArray();
+
+            // Retrieve the corresponding local beatmap, since we can't directly use the playlist's beatmap info
+            int beatmapId = gameplayBeatmap.OnlineID;
+            var localBeatmap = beatmapManager.QueryBeatmap(b => b.OnlineID == beatmapId);
+
+            Beatmap.Value = beatmapManager.GetWorkingBeatmap(localBeatmap);
+            Ruleset.Value = gameplayRuleset;
+            Mods.Value = gameplayMods;
+
+            if (item.Freestyle)
+            {
+                PlaylistItem gameplayItem = item.With(ruleset: gameplayRuleset.OnlineID, beatmap: new Optional<IBeatmapInfo>(gameplayBeatmap));
+                PlaylistItem? currentItem = userStyleDisplayContainer.SingleOrDefault()?.Item;
+
+                if (!gameplayItem.Equals(currentItem))
+                {
+                    userStyleDisplayContainer.Child = new DrawableRoomPlaylistItem(gameplayItem, true)
+                    {
+                        AllowReordering = false,
+                        AllowEditing = true,
+                        RequestEdit = _ => showUserStyleSelect()
+                    };
+                }
+            }
+        }
+
+        #endregion
+
+        /// <summary>
+        /// Pushes a <see cref="Player"/> to start gameplay with the current selection.
+        /// </summary>
+        private void startPlay()
+        {
+            if (!this.IsCurrentScreen() || SelectedItem.Value is not PlaylistItem item)
+                return;
+
+            // Required for validation inside the player.
+            RulesetInfo gameplayRuleset = userRuleset.Value ?? rulesets.GetRuleset(item.RulesetID)!;
+            IBeatmapInfo gameplayBeatmap = userBeatmap.Value ?? item.Beatmap;
+            PlaylistItem gameplayItem = item.With(ruleset: gameplayRuleset.OnlineID, beatmap: new Optional<IBeatmapInfo>(gameplayBeatmap));
+
+            sampleStart?.Play();
+
+            // fallback is to allow this class to operate when there is no parent OnlineScreen (testing purposes).
+            var targetScreen = (Screen?)parentScreen ?? this;
+            targetScreen.Push(new PlayerLoader(() => new PlaylistsPlayer(room, gameplayItem)
+            {
+                Exited = () => leaderboard.RefetchScores()
             }));
         }
 
-        protected override Screen CreateGameplayScreen(PlaylistItem selectedItem)
+        /// <summary>
+        /// Shows the user mod selection.
+        /// </summary>
+        private void showUserModSelect()
         {
-            return new PlayerLoader(() => new PlaylistsPlayer(Room, selectedItem)
+            if (!this.IsCurrentScreen() || SelectedItem.Value is not PlaylistItem)
+                return;
+
+            userModsSelectOverlay.Show();
+        }
+
+        /// <summary>
+        /// Shows the user style selection.
+        /// </summary>
+        private void showUserStyleSelect()
+        {
+            if (!this.IsCurrentScreen() || SelectedItem.Value is not PlaylistItem item)
+                return;
+
+            this.Push(new PlaylistsRoomFreestyleSelect(room, item)
             {
-                Exited = () => leaderboard.RefetchScores()
+                Beatmap = { BindTarget = userBeatmap },
+                Ruleset = { BindTarget = userRuleset }
             });
         }
+
+        /// <summary>
+        /// May be invoked by the owner of the room to permanently close the room ahead of its intended end date.
+        /// </summary>
+        private void closePlaylist()
+        {
+            dialogOverlay?.Push(new ClosePlaylistDialog(room, () =>
+            {
+                var request = new ClosePlaylistRequest(room.RoomID!.Value);
+                request.Success += () => room.EndDate = DateTimeOffset.UtcNow;
+                api.Queue(request);
+            }));
+        }
+
+        #region Screen transition / track handling
+
+        public override void OnEntering(ScreenTransitionEvent e)
+        {
+            base.OnEntering(e);
+            updateGameplayState();
+            beginHandlingTrack();
+        }
+
+        public override void OnSuspending(ScreenTransitionEvent e)
+        {
+            endHandlingTrack();
+            base.OnSuspending(e);
+        }
+
+        public override void OnResuming(ScreenTransitionEvent e)
+        {
+            base.OnResuming(e);
+            updateGameplayState();
+            beginHandlingTrack();
+        }
+
+        public override bool OnExiting(ScreenExitEvent e)
+        {
+            if (!ensureExitConfirmed())
+                return true;
+
+            RoomManager?.PartRoom();
+
+            endHandlingTrack();
+            return base.OnExiting(e);
+        }
+
+        public override bool OnBackButton()
+        {
+            if (room.RoomID == null)
+            {
+                if (!ensureExitConfirmed())
+                    return true;
+
+                settingsOverlay.Hide();
+                return base.OnBackButton();
+            }
+
+            if (userModsSelectOverlay.State.Value == Visibility.Visible)
+            {
+                userModsSelectOverlay.Hide();
+                return true;
+            }
+
+            if (settingsOverlay.State.Value == Visibility.Visible)
+            {
+                settingsOverlay.Hide();
+                return true;
+            }
+
+            return base.OnBackButton();
+        }
+
+        /// <summary>
+        /// Handles changes in the track to keep it looping while active.
+        /// </summary>
+        private void beginHandlingTrack()
+        {
+            Beatmap.BindValueChanged(applyLoopingToTrack, true);
+        }
+
+        /// <summary>
+        /// Stops looping the current track and stops handling further changes to the track.
+        /// </summary>
+        private void endHandlingTrack()
+        {
+            Beatmap.ValueChanged -= applyLoopingToTrack;
+            Beatmap.Value.Track.Looping = false;
+
+            previewTrackManager.StopAnyPlaying(this);
+        }
+
+        /// <summary>
+        /// Invoked on changes to the beatmap to loop the track. See: <see cref="beginHandlingTrack"/>.
+        /// </summary>
+        /// <param name="beatmap">The beatmap change event.</param>
+        private void applyLoopingToTrack(ValueChangedEvent<WorkingBeatmap> beatmap)
+        {
+            if (!this.IsCurrentScreen())
+                return;
+
+            beatmap.NewValue.PrepareTrackForPreview(true);
+            music.EnsurePlayingSomething();
+        }
+
+        /// <summary>
+        /// Prompts the user to discard unsaved changes to the room before exiting.
+        /// </summary>
+        /// <returns><c>true</c> if the user has confirmed they want to exit.</returns>
+        private bool ensureExitConfirmed()
+        {
+            if (ExitConfirmed)
+                return true;
+
+            if (api.State.Value == APIState.Online)
+                return true;
+
+            bool hasUnsavedChanges = room.RoomID == null && room.Playlist.Count > 0;
+
+            if (dialogOverlay == null || !hasUnsavedChanges)
+                return true;
+
+            // if the dialog is already displayed, block exiting until the user explicitly makes a decision.
+            if (dialogOverlay.CurrentDialog is ConfirmDiscardChangesDialog discardChangesDialog)
+            {
+                discardChangesDialog.Flash();
+                return false;
+            }
+
+            dialogOverlay.Push(new ConfirmDiscardChangesDialog(() =>
+            {
+                ExitConfirmed = true;
+                settingsOverlay.Hide();
+                this.Exit();
+            }));
+
+            return false;
+        }
+
+        #endregion
+
+        protected override BackgroundScreen CreateBackground() => new RoomBackgroundScreen(room.Playlist.FirstOrDefault())
+        {
+            SelectedItem = { BindTarget = SelectedItem }
+        };
 
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            Room.PropertyChanged -= onRoomPropertyChanged;
+
+            userModsSelectOverlayRegistration?.Dispose();
+            room.PropertyChanged -= onRoomPropertyChanged;
         }
     }
 }
