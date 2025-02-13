@@ -26,7 +26,6 @@ using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
-using osu.Game.Screens.OnlinePlay.Match;
 using osu.Game.Users;
 using osuTK;
 
@@ -408,7 +407,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         /// <returns>The created <see cref="Room"/>.</returns>
         protected abstract Room CreateNewRoom();
 
-        protected abstract RoomSubScreen CreateRoomSubScreen(Room room);
+        protected abstract OnlinePlaySubScreen CreateRoomSubScreen(Room room);
 
         protected abstract ListingPollingComponent CreatePollingComponent();
     }
