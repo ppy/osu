@@ -199,6 +199,12 @@ namespace osu.Game.Online.Leaderboards
                                                             Origin = Anchor.CentreLeft,
                                                             Size = new Vector2(28, 20),
                                                         },
+                                                        new UpdateableTeamFlag(user.Team)
+                                                        {
+                                                            Anchor = Anchor.CentreLeft,
+                                                            Origin = Anchor.CentreLeft,
+                                                            Size = new Vector2(40, 20),
+                                                        },
                                                         new DateLabel(Score.Date)
                                                         {
                                                             Anchor = Anchor.CentreLeft,
