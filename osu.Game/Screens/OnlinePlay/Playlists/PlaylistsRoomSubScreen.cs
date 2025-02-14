@@ -272,11 +272,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                                 RowDimensions = new[]
                                                                 {
                                                                     new Dimension(GridSizeMode.AutoSize),
-                                                                    new Dimension(GridSizeMode.Absolute, row_padding),
                                                                     new Dimension(GridSizeMode.AutoSize),
-                                                                    new Dimension(GridSizeMode.Absolute, row_padding),
                                                                     new Dimension(GridSizeMode.AutoSize),
-                                                                    new Dimension(GridSizeMode.Absolute, row_padding),
                                                                     new Dimension(GridSizeMode.AutoSize),
                                                                 },
                                                                 Content = new[]
@@ -287,6 +284,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                                         {
                                                                             RelativeSizeAxes = Axes.X,
                                                                             AutoSizeAxes = Axes.Y,
+                                                                            Margin = new MarginPadding { Bottom = row_padding },
                                                                             Alpha = 0,
                                                                             Children = new Drawable[]
                                                                             {
@@ -319,13 +317,13 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                                             }
                                                                         }
                                                                     },
-                                                                    null,
                                                                     new Drawable[]
                                                                     {
                                                                         userStyleSection = new FillFlowContainer
                                                                         {
                                                                             RelativeSizeAxes = Axes.X,
                                                                             AutoSizeAxes = Axes.Y,
+                                                                            Margin = new MarginPadding { Bottom = row_padding },
                                                                             Alpha = 0,
                                                                             Children = new Drawable[]
                                                                             {
@@ -338,13 +336,13 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                                             }
                                                                         }
                                                                     },
-                                                                    null,
                                                                     new Drawable[]
                                                                     {
                                                                         progressSection = new FillFlowContainer
                                                                         {
                                                                             RelativeSizeAxes = Axes.X,
                                                                             AutoSizeAxes = Axes.Y,
+                                                                            Margin = new MarginPadding { Bottom = row_padding },
                                                                             Alpha = 0,
                                                                             Direction = FillDirection.Vertical,
                                                                             Children = new Drawable[]
@@ -354,7 +352,6 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                                             }
                                                                         }
                                                                     },
-                                                                    null,
                                                                     new Drawable[]
                                                                     {
                                                                         new OverlinedHeader("Leaderboard")
