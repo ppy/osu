@@ -21,7 +21,11 @@ namespace osu.Game.Users.Drawables
         public APITeam? Team
         {
             get => Model;
-            set => Model = value;
+            set
+            {
+                Model = value;
+                Invalidate(Invalidation.Presence);
+            }
         }
 
         protected override double LoadDelay => 200;
