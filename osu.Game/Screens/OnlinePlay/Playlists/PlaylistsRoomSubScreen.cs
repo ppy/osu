@@ -467,8 +467,6 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             updateGameplayState();
         }
 
-        #region Room/property updates
-
         /// <summary>
         /// Responds to changes of the <see cref="Room"/>'s properties.
         /// </summary>
@@ -485,7 +483,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         }
 
         /// <summary>
-        /// Adjusts the visibility of the settings and main content when <see cref="Room.RoomID"/> changes.
+        /// Responds to changes in <see cref="Room.RoomID"/> to adjust the visibility of the settings and main content.
         /// Only the settings overlay is visible while the room isn't created, and only the main content is visible after creation.
         /// </summary>
         private void updateSetupState()
@@ -502,9 +500,15 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                 roomContent.Show();
                 settingsOverlay.Hide();
 
-                progressSection.Alpha = room.MaxAttempts != null ? 1 : 0;
-                drawablePlaylist.Items.ReplaceRange(0, drawablePlaylist.Items.Count, room.Playlist);
-                SelectedItem.Value = room.Playlist.FirstOrDefault();
+                // Scheduled because room properties are updated in arbitrary order.
+                Schedule(() =>
+                {
+                    progressSection.Alpha = room.MaxAttempts != null ? 1 : 0;
+                    drawablePlaylist.Items.ReplaceRange(0, drawablePlaylist.Items.Count, room.Playlist);
+
+                    // Select an initial item for the user to help them get into a playable state quicker.
+                    SelectedItem.Value = room.Playlist.FirstOrDefault();
+                });
             }
         }
 
@@ -518,7 +522,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         }
 
         /// <summary>
-        /// Responds to changes in the selected playlist item to validate the user's beatmap/ruleset/mod style and update UI components as necessary.
+        /// Responds to changes in the selected playlist item to validate the user's style selection.
         /// </summary>
         private void onSelectedItemChanged()
         {
@@ -615,8 +619,6 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             }
         }
 
-        #endregion
-
         /// <summary>
         /// Pushes a <see cref="Player"/> to start gameplay with the current selection.
         /// </summary>
@@ -678,8 +680,6 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                 api.Queue(request);
             }));
         }
-
-        #region Screen transition / track handling
 
         public override void OnEntering(ScreenTransitionEvent e)
         {
@@ -803,8 +803,6 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
             return false;
         }
-
-        #endregion
 
         protected override BackgroundScreen CreateBackground() => new RoomBackgroundScreen(room.Playlist.FirstOrDefault())
         {
