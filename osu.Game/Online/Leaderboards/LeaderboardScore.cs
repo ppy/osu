@@ -189,7 +189,7 @@ namespace osu.Game.Online.Leaderboards
                                                     RelativeSizeAxes = Axes.Y,
                                                     Direction = FillDirection.Horizontal,
                                                     Spacing = new Vector2(5f, 0f),
-                                                    Width = 87f,
+                                                    Width = 114f,
                                                     Masking = true,
                                                     Children = new Drawable[]
                                                     {
@@ -212,15 +212,6 @@ namespace osu.Game.Online.Leaderboards
                                                         },
                                                     },
                                                 },
-                                                new FillFlowContainer
-                                                {
-                                                    Origin = Anchor.CentreLeft,
-                                                    Anchor = Anchor.CentreLeft,
-                                                    AutoSizeAxes = Axes.Both,
-                                                    Direction = FillDirection.Horizontal,
-                                                    Margin = new MarginPadding { Left = edge_margin },
-                                                    Children = statisticsLabels
-                                                },
                                             },
                                         },
                                     },
@@ -240,6 +231,7 @@ namespace osu.Game.Online.Leaderboards
                                             GlowColour = Color4Extensions.FromHex(@"83ccfa"),
                                             Current = scoreManager.GetBindableTotalScoreString(Score),
                                             Font = OsuFont.Numeric.With(size: 23),
+                                            Margin = new MarginPadding { Top = 1 },
                                         },
                                         RankContainer = new Container
                                         {
@@ -256,13 +248,32 @@ namespace osu.Game.Online.Leaderboards
                                         },
                                     },
                                 },
-                                modsContainer = new FillFlowContainer<ModIcon>
+                                new FillFlowContainer
                                 {
+                                    AutoSizeAxes = Axes.Both,
                                     Anchor = Anchor.BottomRight,
                                     Origin = Anchor.BottomRight,
-                                    AutoSizeAxes = Axes.Both,
                                     Direction = FillDirection.Horizontal,
-                                    ChildrenEnumerable = Score.Mods.AsOrdered().Select(mod => new ModIcon(mod) { Scale = new Vector2(0.375f) })
+                                    Children = new Drawable[]
+                                    {
+                                        new FillFlowContainer
+                                        {
+                                            Anchor = Anchor.CentreRight,
+                                            Origin = Anchor.CentreRight,
+                                            AutoSizeAxes = Axes.Both,
+                                            Direction = FillDirection.Horizontal,
+                                            Margin = new MarginPadding { Left = edge_margin },
+                                            Children = statisticsLabels
+                                        },
+                                        modsContainer = new FillFlowContainer<ModIcon>
+                                        {
+                                            Anchor = Anchor.CentreRight,
+                                            Origin = Anchor.CentreRight,
+                                            AutoSizeAxes = Axes.Both,
+                                            Direction = FillDirection.Horizontal,
+                                            ChildrenEnumerable = Score.Mods.AsOrdered().Select(mod => new ModIcon(mod) { Scale = new Vector2(0.34f) })
+                                        },
+                                    }
                                 },
                             },
                         },
@@ -330,7 +341,7 @@ namespace osu.Game.Online.Leaderboards
 
         private partial class ScoreComponentLabel : Container, IHasTooltip
         {
-            private const float icon_size = 20;
+            private const float icon_size = 16;
             private readonly FillFlowContainer content;
 
             public override bool Contains(Vector2 screenSpacePos) => content.Contains(screenSpacePos);
@@ -346,7 +357,7 @@ namespace osu.Game.Online.Leaderboards
                 {
                     AutoSizeAxes = Axes.Both,
                     Direction = FillDirection.Horizontal,
-                    Padding = new MarginPadding { Right = 10 },
+                    Padding = new MarginPadding { Right = 5 },
                     Children = new Drawable[]
                     {
                         new Container
@@ -381,7 +392,8 @@ namespace osu.Game.Online.Leaderboards
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                             Text = statistic.Value,
-                            Font = OsuFont.GetFont(size: 17, weight: FontWeight.Bold, fixedWidth: true)
+                            Spacing = new Vector2(-1, 0),
+                            Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold, fixedWidth: true)
                         },
                     },
                 };
@@ -412,7 +424,7 @@ namespace osu.Game.Online.Leaderboards
             public DateLabel(DateTimeOffset date)
                 : base(date)
             {
-                Font = OsuFont.GetFont(size: 17, weight: FontWeight.Bold, italics: true);
+                Font = OsuFont.GetFont(size: 13, weight: FontWeight.Bold, italics: true);
             }
 
             protected override string Format() => Date.ToShortRelativeTime(TimeSpan.FromSeconds(30));
