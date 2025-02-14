@@ -42,18 +42,7 @@ namespace osu.Game.Users.Drawables
             if (team == null)
                 return Empty();
 
-            return new Container
-            {
-                RelativeSizeAxes = Axes.Both,
-                Children = new Drawable[]
-                {
-                    new TeamFlag(team)
-                    {
-                        RelativeSizeAxes = Axes.Both
-                    },
-                    new HoverClickSounds()
-                }
-            };
+            return new TeamFlag(team) { RelativeSizeAxes = Axes.Both };
         }
 
         // Generally we just want team flags to disappear if the user doesn't have one.
@@ -67,7 +56,8 @@ namespace osu.Game.Users.Drawables
             CornerRadius = DrawHeight / 8;
         }
 
-        public partial class TeamFlag : Sprite, IHasTooltip
+        [LongRunningLoad]
+        public partial class TeamFlag : CompositeDrawable, IHasTooltip
         {
             private readonly APITeam team;
 
@@ -82,8 +72,15 @@ namespace osu.Game.Users.Drawables
             [BackgroundDependencyLoader]
             private void load(LargeTextureStore textures)
             {
-                if (!string.IsNullOrEmpty(team.Name))
-                    Texture = textures.Get(team.FlagUrl);
+                InternalChildren = new Drawable[]
+                {
+                    new HoverClickSounds(),
+                    new Sprite
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Texture = textures.Get(team.FlagUrl)
+                    }
+                };
             }
         }
     }
