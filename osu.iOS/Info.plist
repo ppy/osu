@@ -153,6 +153,8 @@
 			<string>Editor</string>
 		</dict>
 	</array>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.music-games</string>
 	<key>LSSupportsOpeningDocumentsInPlace</key>

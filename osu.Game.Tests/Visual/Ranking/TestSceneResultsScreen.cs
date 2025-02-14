@@ -62,12 +62,6 @@ namespace osu.Game.Tests.Visual.Ranking
                 if (beatmapInfo != null)
                     Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmapInfo);
             });
-
-            AddToggleStep("toggle legacy classic skin", v =>
-            {
-                if (skins != null)
-                    skins.CurrentSkinInfo.Value = v ? skins.DefaultClassicSkin.SkinInfo : skins.CurrentSkinInfo.Default;
-            });
         }
 
         [SetUp]
@@ -82,6 +76,16 @@ namespace osu.Game.Tests.Visual.Ranking
                 Content.Scale = new Vector2(v);
                 Content.Size = new Vector2(1f / v);
             }));
+        }
+
+        [Test]
+        public void TestLegacySkin()
+        {
+            AddToggleStep("toggle legacy classic skin", v =>
+            {
+                if (skins != null)
+                    skins.CurrentSkinInfo.Value = v ? skins.DefaultClassicSkin.SkinInfo : skins.CurrentSkinInfo.Default;
+            });
         }
 
         private int onlineScoreID = 1;

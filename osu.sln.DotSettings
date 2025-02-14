@@ -170,7 +170,7 @@
 	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=RedundantReadonlyModifier/@EntryIndexedValue">WARNING</s:String>
 	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=RedundantTypeDeclarationBody/@EntryIndexedValue">HINT</s:String>
 	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=RedundantTypeSpecificationInDefaultExpression/@EntryIndexedValue">WARNING</s:String>
-	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=RedundantLinebreak/@EntryIndexedValue">WARNING</s:String>
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=RedundantLinebreak/@EntryIndexedValue">HINT</s:String>
 	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=RedundantSpace/@EntryIndexedValue">WARNING</s:String>
 	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=RedundantUsingDirective/@EntryIndexedValue">ERROR</s:String>
 	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=RedundantStringInterpolation/@EntryIndexedValue">WARNING</s:String>
@@ -840,6 +840,7 @@ See the LICENCE file in the repository root for full licence text.&#xD;
 	<s:Boolean x:Key="/Default/Environment/AutoImport2/=CSHARP/BlackLists/=Microsoft_002EToolkit_002EHighPerformance_002EBox_002A/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/AutoImport2/=CSHARP/BlackLists/=OpenTabletDriver_002EPlugin_002EDependencyInjection_002E_002A/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/AutoImport2/=CSHARP/BlackLists/=Realms_002ELogging_002ELogger/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/Environment/AutoImport2/=CSHARP/BlackLists/=Realms_002EThreadSafe_002A/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/AutoImport2/=CSHARP/BlackLists/=System_002EComponentModel_002EComponent/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/AutoImport2/=CSHARP/BlackLists/=System_002EComponentModel_002EContainer/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/AutoImport2/=CSHARP/BlackLists/=System_002ENumerics_002E_002A/@EntryIndexedValue">True</s:Boolean>
