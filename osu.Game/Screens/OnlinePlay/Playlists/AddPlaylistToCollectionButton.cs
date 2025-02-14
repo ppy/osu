@@ -2,10 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics.Cursor;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Database;
@@ -17,7 +18,7 @@ using Realms;
 
 namespace osu.Game.Screens.OnlinePlay.Playlists
 {
-    public partial class AddPlaylistToCollectionButton : RoundedButton
+    public partial class AddPlaylistToCollectionButton : RoundedButton, IHasTooltip
     {
         private readonly Room room;
         private readonly Bindable<int> downloadedBeatmapsCount = new Bindable<int>(0);
@@ -34,7 +35,6 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         public AddPlaylistToCollectionButton(Room room)
         {
             this.room = room;
-            Text = formatButtonText(downloadedBeatmapsCount.Value, collectionExists.Value);
         }
 
         [BackgroundDependencyLoader]
@@ -43,31 +43,31 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             Action = () =>
             {
                 if (room.Playlist.Count == 0)
-                {
-                    notifications?.Post(new SimpleErrorNotification { Text = "Cannot add local beatmaps" });
                     return;
-                }
 
-                var beatmaps = realmAccess.Realm.All<BeatmapInfo>().Filter(formatFilterQuery(room.Playlist)).ToList();
+                var beatmaps = getBeatmapsForPlaylist(realmAccess.Realm).ToArray();
 
                 var collection = realmAccess.Realm.All<BeatmapCollection>().FirstOrDefault(c => c.Name == room.Name);
 
                 if (collection == null)
                 {
-                    collection = new BeatmapCollection(room.Name, beatmaps.Select(i => i.MD5Hash).Distinct().ToList());
+                    collection = new BeatmapCollection(room.Name);
                     realmAccess.Realm.Write(() => realmAccess.Realm.Add(collection));
                     notifications?.Post(new SimpleNotification { Text = $"Created new collection: {room.Name}" });
                 }
                 else
                 {
-                    collection.ToLive(realmAccess).PerformWrite(c =>
-                    {
-                        beatmaps = beatmaps.Where(i => !c.BeatmapMD5Hashes.Contains(i.MD5Hash)).ToList();
-                        foreach (var item in beatmaps)
-                            c.BeatmapMD5Hashes.Add(item.MD5Hash);
-                        notifications?.Post(new SimpleNotification { Text = $"Updated collection: {room.Name}" });
-                    });
+                    notifications?.Post(new SimpleNotification { Text = $"Updated collection: {room.Name}" });
                 }
+
+                collection.ToLive(realmAccess).PerformWrite(c =>
+                {
+                    foreach (var item in beatmaps)
+                    {
+                        if (!c.BeatmapMD5Hashes.Contains(item.MD5Hash))
+                            c.BeatmapMD5Hashes.Add(item.MD5Hash);
+                    }
+                });
             };
         }
 
@@ -76,13 +76,28 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             base.LoadComplete();
 
             if (room.Playlist.Count > 0)
-                beatmapSubscription = realmAccess.RegisterForNotifications(r => r.All<BeatmapInfo>().Filter(formatFilterQuery(room.Playlist)), (sender, _) => downloadedBeatmapsCount.Value = sender.Count);
+            {
+                beatmapSubscription =
+                    realmAccess.RegisterForNotifications(getBeatmapsForPlaylist, (sender, _) => downloadedBeatmapsCount.Value = sender.Count);
+            }
 
-            collectionSubscription = realmAccess.RegisterForNotifications(r => r.All<BeatmapCollection>().Where(c => c.Name == room.Name), (sender, _) => collectionExists.Value = sender.Count > 0);
+            collectionSubscription = realmAccess.RegisterForNotifications(r => r.All<BeatmapCollection>().Where(c => c.Name == room.Name), (sender, _) => collectionExists.Value = sender.Any());
 
-            downloadedBeatmapsCount.BindValueChanged(_ => Text = formatButtonText(downloadedBeatmapsCount.Value, collectionExists.Value));
+            downloadedBeatmapsCount.BindValueChanged(_ => updateButtonText());
+            collectionExists.BindValueChanged(_ => updateButtonText(), true);
+        }
 
-            collectionExists.BindValueChanged(_ => Text = formatButtonText(downloadedBeatmapsCount.Value, collectionExists.Value), true);
+        private IQueryable<BeatmapInfo> getBeatmapsForPlaylist(Realm r)
+        {
+            return r.All<BeatmapInfo>().Filter(string.Join(" OR ", room.Playlist.Select(item => $"(OnlineID == {item.Beatmap.OnlineID})").Distinct()));
+        }
+
+        private void updateButtonText()
+        {
+            if (!collectionExists.Value)
+                Text = $"Create new collection with {downloadedBeatmapsCount.Value} beatmaps";
+            else
+                Text = $"Update collection with {downloadedBeatmapsCount.Value} beatmaps";
         }
 
         protected override void Dispose(bool isDisposing)
@@ -93,8 +108,6 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             collectionSubscription?.Dispose();
         }
 
-        private string formatFilterQuery(IReadOnlyList<PlaylistItem> playlistItems) => string.Join(" OR ", playlistItems.Select(item => $"(OnlineID == {item.Beatmap.OnlineID})").Distinct());
-
-        private string formatButtonText(int count, bool collectionExists) => $"Add {count} {(count == 1 ? "beatmap" : "beatmaps")} to {(collectionExists ? "collection" : "new collection")}";
+        public LocalisableString TooltipText => "Only downloaded beatmaps will be added to the collection";
     }
 }
