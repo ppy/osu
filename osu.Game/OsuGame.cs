@@ -72,6 +72,7 @@ using osu.Game.Skinning;
 using osu.Game.Updater;
 using osu.Game.Users;
 using osu.Game.Utils;
+using osuTK;
 using osuTK.Graphics;
 using Sentry;
 
@@ -814,9 +815,10 @@ namespace osu.Game
         protected virtual UpdateManager CreateUpdateManager() => new UpdateManager();
 
         /// <summary>
-        /// The base aspect ratio to use in all <see cref="ScalingContainer"/>s.
+        /// Adjust the globally applied <see cref="DrawSizePreservingFillContainer.TargetDrawSize"/> in every <see cref="ScalingContainer"/>.
+        /// Useful for changing how the game handles different aspect ratios.
         /// </summary>
-        protected internal virtual float BaseAspectRatio => 4f / 3f;
+        protected internal virtual Vector2 ScalingContainerTargetDrawSize { get; } = new Vector2(1024, 768);
 
         protected override Container CreateScalingContainer() => new ScalingContainer(ScalingMode.Everything);
 
