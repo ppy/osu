@@ -230,6 +230,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                                 {
                                                                     new Dimension(GridSizeMode.AutoSize),
                                                                     new Dimension(),
+                                                                    new Dimension(GridSizeMode.AutoSize),
                                                                 },
                                                                 Content = new[]
                                                                 {
@@ -251,6 +252,15 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                                                 parentScreen?.Push(new PlaylistItemUserBestResultsScreen(room.RoomID.Value, item,
                                                                                     api.LocalUser.Value.Id));
                                                                             }
+                                                                        }
+                                                                    },
+                                                                    new Drawable[]
+                                                                    {
+                                                                        new AddPlaylistToCollectionButton(room)
+                                                                        {
+                                                                            Margin = new MarginPadding { Top = 5 },
+                                                                            RelativeSizeAxes = Axes.X,
+                                                                            Size = new Vector2(1, 40)
                                                                         }
                                                                     }
                                                                 }
