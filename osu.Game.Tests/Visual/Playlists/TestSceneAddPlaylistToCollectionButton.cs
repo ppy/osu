@@ -77,9 +77,9 @@ namespace osu.Game.Tests.Visual.Playlists
 
             AddStep("click button", () => InputManager.Click(MouseButton.Left));
 
-            AddAssert("notification shown", () => notificationOverlay.AllNotifications.FirstOrDefault(n => n.Text.ToString().StartsWith("Created", StringComparison.Ordinal)) != null);
+            AddUntilStep("notification shown", () => notificationOverlay.AllNotifications.Any(n => n.Text.ToString().StartsWith("Created new collection", StringComparison.Ordinal)));
 
-            AddAssert("realm is updated", () => Realm.Realm.All<BeatmapCollection>().FirstOrDefault(c => c.Name == room.Name) != null);
+            AddUntilStep("realm is updated", () => Realm.Realm.All<BeatmapCollection>().FirstOrDefault(c => c.Name == room.Name) != null);
         }
 
         private void importBeatmap() => AddStep("import beatmap", () =>
