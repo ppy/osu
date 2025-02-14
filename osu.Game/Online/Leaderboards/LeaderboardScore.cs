@@ -180,6 +180,7 @@ namespace osu.Game.Online.Leaderboards
                                             Height = 28,
                                             Direction = FillDirection.Horizontal,
                                             Spacing = new Vector2(10f, 0f),
+                                            Margin = new MarginPadding { Bottom = -2 },
                                             Children = new Drawable[]
                                             {
                                                 flagBadgeAndDateContainer = new FillFlowContainer
