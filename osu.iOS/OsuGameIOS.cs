@@ -11,6 +11,7 @@ using osu.Game;
 using osu.Game.Screens;
 using osu.Game.Updater;
 using osu.Game.Utils;
+using osuTK;
 using UIKit;
 
 namespace osu.iOS
@@ -21,6 +22,8 @@ namespace osu.iOS
         public override Version AssemblyVersion => new Version(NSBundle.MainBundle.InfoDictionary["CFBundleVersion"].ToString());
 
         public override bool HideUnlicensedContent => true;
+
+        protected override Vector2 ScalingContainerTargetDrawSize => new Vector2(1024, 1024 * DrawHeight / DrawWidth);
 
         public OsuGameIOS(AppDelegate appDelegate)
         {
