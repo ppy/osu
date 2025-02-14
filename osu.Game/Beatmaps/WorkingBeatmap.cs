@@ -203,6 +203,8 @@ namespace osu.Game.Beatmaps
             {
                 try
                 {
+                    // TODO: This is a touch expensive and can become an issue if being accessed every Update call.
+                    // Optimally we would not involve the async flow if things are already loaded.
                     return loadBeatmapAsync().GetResultSafely();
                 }
                 catch (AggregateException ae)

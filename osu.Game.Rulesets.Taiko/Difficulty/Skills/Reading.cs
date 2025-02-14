@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             }
 
             var taikoObject = (TaikoDifficultyHitObject)current;
-            int index = taikoObject.Colour.MonoStreak?.HitObjects.IndexOf(taikoObject) ?? 0;
+            int index = taikoObject.ColourData.MonoStreak?.HitObjects.IndexOf(taikoObject) ?? 0;
 
             currentStrain *= DifficultyCalculationUtils.Logistic(index, 4, -1 / 25.0, 0.5) + 0.5;
 
