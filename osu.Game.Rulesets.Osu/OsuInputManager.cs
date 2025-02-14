@@ -7,6 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Input.StateChanges;
 using osu.Framework.Lists;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
@@ -65,6 +66,15 @@ namespace osu.Game.Rulesets.Osu
             if ((e is MouseMoveEvent || e is TouchMoveEvent) && !AllowUserCursorMovement) return false;
 
             return base.Handle(e);
+        }
+
+        /// <summary>
+        /// Sets the cursor position from touch if it's allowed by the current state.
+        /// </summary>
+        /// <param name="position">The current position of a touch.</param>
+        internal void TrySetCursorPositionFromTouch(Vector2 position)
+        {
+            new MousePositionAbsoluteInput { Position = position }.Apply(CurrentState, this);
         }
 
         private partial class OsuKeyBindingContainer : RulesetKeyBindingContainer
