@@ -116,7 +116,8 @@ namespace osu.Game.Graphics.Containers
 
             protected override void Update()
             {
-                TargetDrawSize = new Vector2(1024, 1024 / (game?.BaseAspectRatio ?? 1f));
+                if (game != null)
+                    TargetDrawSize = game.ScalingContainerTargetDrawSize;
                 Scale = new Vector2(CurrentScale);
                 Size = new Vector2(1 / CurrentScale);
 

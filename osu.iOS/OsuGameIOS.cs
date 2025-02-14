@@ -11,6 +11,7 @@ using osu.Game;
 using osu.Game.Screens;
 using osu.Game.Updater;
 using osu.Game.Utils;
+using osuTK;
 using UIKit;
 
 namespace osu.iOS
@@ -22,7 +23,7 @@ namespace osu.iOS
 
         public override bool HideUnlicensedContent => true;
 
-        protected override float BaseAspectRatio => (float)(UIScreen.MainScreen.Bounds.Width / UIScreen.MainScreen.Bounds.Height);
+        protected override Vector2 ScalingContainerTargetDrawSize => new Vector2(1024, 1024 * DrawHeight / DrawWidth);
 
         public OsuGameIOS(AppDelegate appDelegate)
         {
