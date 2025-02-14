@@ -114,10 +114,7 @@ jobs:
           dotnet-version: "8.0.x"
 
       - name: Install .NET workloads
-        # since windows image 20241113.3.0, not specifying a version here
-        # installs the .NET 7 version of android workload for very unknown reasons.
-        # revisit once we upgrade to .NET 9, it's probably fixed there.
-        run: dotnet workload install android --version (dotnet --version)
+        run: dotnet workload install android
 
       - name: Compile
         run: dotnet build -c Debug osu.Android.slnf

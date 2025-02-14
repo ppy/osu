@@ -107,6 +107,23 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             return base.OnDragStart(e);
         }
 
+        protected override bool TryMoveBlueprints(DragEvent e, IList<(SelectionBlueprint<HitObject> blueprint, Vector2[] originalSnapPositions)> blueprints)
+        {
+            Vector2 distanceTravelled = e.ScreenSpaceMousePosition - e.ScreenSpaceMouseDownPosition;
+
+            // The final movement position, relative to movementBlueprintOriginalPosition.
+            Vector2 movePosition = blueprints.First().originalSnapPositions.First() + distanceTravelled;
+
+            // Retrieve a snapped position.
+            var result = timeline?.FindSnappedPositionAndTime(movePosition) ?? new SnapResult(movePosition, null);
+
+            var referenceBlueprint = blueprints.First().blueprint;
+            bool moved = SelectionHandler.HandleMovement(new MoveSelectionEvent<HitObject>(referenceBlueprint, result.ScreenSpacePosition - referenceBlueprint.ScreenSpaceSelectionPoint));
+            if (moved)
+                ApplySnapResultTime(result, referenceBlueprint.Item.StartTime);
+            return moved;
+        }
+
         private float dragTimeAccumulated;
 
         protected override void Update()
@@ -155,9 +172,11 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 if (hitObject.GetEndTime() < editorClock.CurrentTime - timeline.VisibleRange / 2)
                     break;
 
-                foreach (var sample in hitObject.Samples)
+                for (int i = 0; i < hitObject.Samples.Count; i++)
                 {
-                    if (!HitSampleInfo.AllBanks.Contains(sample.Bank))
+                    var sample = hitObject.Samples[i];
+
+                    if (!HitSampleInfo.ALL_BANKS.Contains(sample.Bank))
                         minimumGap = Math.Max(minimumGap, absolute_minimum_gap + sample.Bank.Length * 3);
                 }
 
@@ -165,10 +184,17 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 {
                     smallestTimeGap = Math.Min(smallestTimeGap, hasRepeats.Duration / hasRepeats.SpanCount() / 2);
 
-                    foreach (var sample in hasRepeats.NodeSamples.SelectMany(s => s))
+                    for (int i = 0; i < hasRepeats.NodeSamples.Count; i++)
                     {
-                        if (!HitSampleInfo.AllBanks.Contains(sample.Bank))
-                            minimumGap = Math.Max(minimumGap, absolute_minimum_gap + sample.Bank.Length * 3);
+                        var node = hasRepeats.NodeSamples[i];
+
+                        for (int j = 0; j < node.Count; j++)
+                        {
+                            var sample = node[j];
+
+                            if (!HitSampleInfo.ALL_BANKS.Contains(sample.Bank))
+                                minimumGap = Math.Max(minimumGap, absolute_minimum_gap + sample.Bank.Length * 3);
+                        }
                     }
                 }
 
