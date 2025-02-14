@@ -684,7 +684,6 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         public override void OnEntering(ScreenTransitionEvent e)
         {
             base.OnEntering(e);
-            updateGameplayState();
             beginHandlingTrack();
         }
 
@@ -697,8 +696,10 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         public override void OnResuming(ScreenTransitionEvent e)
         {
             base.OnResuming(e);
-            updateGameplayState();
             beginHandlingTrack();
+
+            // Required when resuming from style selection.
+            updateGameplayState();
         }
 
         public override bool OnExiting(ScreenExitEvent e)
