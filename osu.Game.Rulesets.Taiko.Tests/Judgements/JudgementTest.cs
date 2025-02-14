@@ -88,7 +88,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Judgements
             protected override bool PauseOnFocusLost => false;
 
             public ScoreAccessibleReplayPlayer(Score score)
-                : base(score, new PlayerConfiguration
+                : base(score, null, new PlayerConfiguration
                 {
                     AllowPause = false,
                     ShowResults = false,

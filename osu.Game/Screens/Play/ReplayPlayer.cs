@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Input.Bindings;
@@ -19,6 +20,7 @@ using osu.Game.Scoring;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Play.PlayerSettings;
 using osu.Game.Screens.Ranking;
+using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Users;
 
 namespace osu.Game.Screens.Play
@@ -38,6 +40,8 @@ namespace osu.Game.Screens.Play
 
         private bool isAutoplayPlayback => GameplayState.Mods.OfType<ModAutoplay>().Any();
 
+        private readonly BindableList<ScoreInfo> leaderboardScores = new BindableList<ScoreInfo>();
+
         // Disallow replays from failing. (see https://github.com/ppy/osu/issues/6108)
         protected override bool CheckModsAllowFailure()
         {
@@ -47,16 +51,17 @@ namespace osu.Game.Screens.Play
             return base.CheckModsAllowFailure();
         }
 
-        public ReplayPlayer(Score score, PlayerConfiguration configuration = null)
-            : this((_, _) => score, configuration)
+        public ReplayPlayer(Score score, StateTrackingLeaderboardProvider leaderboardScores = null, PlayerConfiguration configuration = null)
+            : this((_, _) => score, leaderboardScores, configuration)
         {
             replayIsFailedScore = score.ScoreInfo.Rank == ScoreRank.F;
         }
 
-        public ReplayPlayer(Func<IBeatmap, IReadOnlyList<Mod>, Score> createScore, PlayerConfiguration configuration = null)
+        public ReplayPlayer(Func<IBeatmap, IReadOnlyList<Mod>, Score> createScore, [CanBeNull] StateTrackingLeaderboardProvider leaderboardScores = null, PlayerConfiguration configuration = null)
             : base(configuration)
         {
             this.createScore = createScore;
+            this.leaderboardScores.AddRange(leaderboardScores?.Scores.Value?.best ?? []);
         }
 
         /// <summary>
@@ -97,13 +102,11 @@ namespace osu.Game.Screens.Play
         // Don't re-import replay scores as they're already present in the database.
         protected override Task ImportScore(Score score) => Task.CompletedTask;
 
-        public readonly BindableList<ScoreInfo> LeaderboardScores = new BindableList<ScoreInfo>();
-
         protected override GameplayLeaderboard CreateGameplayLeaderboard() =>
             new SoloGameplayLeaderboard(Score.ScoreInfo.User)
             {
                 AlwaysVisible = { Value = true },
-                Scores = { BindTarget = LeaderboardScores }
+                Scores = { BindTarget = leaderboardScores }
             };
 
         protected override ResultsScreen CreateResults(ScoreInfo score) => new SoloResultsScreen(score)

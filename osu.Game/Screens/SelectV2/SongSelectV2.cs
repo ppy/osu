@@ -114,7 +114,7 @@ namespace osu.Game.Screens.SelectV2
 
             logo.Action = () =>
             {
-                this.Push(new PlayerLoaderV2(() => new SoloPlayer()));
+                this.Push(new PlayerLoaderV2(() => new SoloPlayer(null)));
                 return false;
             };
         }
