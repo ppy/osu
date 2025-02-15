@@ -600,11 +600,12 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Test]
         public void TestMousePositionPriority()
         {
-            moveMouseTo(TouchSource.Touch1);
-            checkPosition(TouchSource.Touch1);
+            AddStep("move mouse and touch shortly after", () =>
+            {
+                InputManager.MoveMouseTo(getSanePositionForSource(TouchSource.Touch1));
+                InputManager.BeginTouch(new Touch(TouchSource.Touch2, getSanePositionForSource(TouchSource.Touch2)));
+            });
 
-            // touch at a different position
-            beginTouch(TouchSource.Touch2);
             endTouch(TouchSource.Touch2);
 
             checkPosition(TouchSource.Touch1);
