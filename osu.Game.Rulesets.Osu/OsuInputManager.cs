@@ -61,9 +61,21 @@ namespace osu.Game.Rulesets.Osu
             Add(new OsuTouchInputMapper(this) { RelativeSizeAxes = Axes.Both });
         }
 
+        // see https://github.com/ppy/osu-framework/blob/0ee307ed781391e26d90199c6be6ad8b15a4fd9c/osu.Framework/Input/InputManager.cs#L538-L543
+        private const double mouse_move_debounce_time = 50;
+
+        private double? lastMouseMove;
+
+        private bool isRealMouseMoveEvent(UIEvent e) => e is MouseMoveEvent mouseMove
+                                                        && mouseMove.CurrentState.Mouse.Position != CurrentState.Mouse.Position // filter out IRequireHighFrequencyMousePosition events
+                                                        && mouseMove.CurrentState.Mouse.LastSource is not ISourcedFromTouch;
+
         protected override bool Handle(UIEvent e)
         {
             if ((e is MouseMoveEvent || e is TouchMoveEvent) && !AllowUserCursorMovement) return false;
+
+            if (isRealMouseMoveEvent(e))
+                lastMouseMove = Clock.CurrentTime;
 
             return base.Handle(e);
         }
@@ -74,7 +86,8 @@ namespace osu.Game.Rulesets.Osu
         /// <param name="position">The current position of a touch.</param>
         internal void TrySetCursorPositionFromTouch(Vector2 position)
         {
-            new MousePositionAbsoluteInput { Position = position }.Apply(CurrentState, this);
+            if (lastMouseMove == null || Clock.CurrentTime - lastMouseMove.Value > mouse_move_debounce_time)
+                new MousePositionAbsoluteInput { Position = position }.Apply(CurrentState, this);
         }
 
         private partial class OsuKeyBindingContainer : RulesetKeyBindingContainer
