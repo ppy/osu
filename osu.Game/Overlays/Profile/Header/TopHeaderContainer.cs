@@ -156,10 +156,11 @@ namespace osu.Game.Overlays.Profile.Header
                                                 titleText = new OsuSpriteText
                                                 {
                                                     Font = OsuFont.GetFont(size: 16, weight: FontWeight.Regular),
-                                                    Margin = new MarginPadding { Bottom = 5 }
+                                                    Margin = new MarginPadding { Bottom = 3 },
                                                 },
                                                 new FillFlowContainer
                                                 {
+                                                    Margin = new MarginPadding { Top = 3 },
                                                     AutoSizeAxes = Axes.Both,
                                                     Direction = FillDirection.Horizontal,
                                                     Spacing = new Vector2(10, 0),
