@@ -39,7 +39,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
     /// <summary>
     /// A <see cref="DrawableRoom"/> with lounge-specific interactions such as selection and hover sounds.
     /// </summary>
-    public partial class DrawableLoungeRoom : DrawableRoom, IFilterable, IHasContextMenu, IHasPopover, IKeyBindingHandler<GlobalAction>
+    public partial class DrawableLoungeRoom : DrawableRoom, IFilterable, IHasPopover, IKeyBindingHandler<GlobalAction>
     {
         private const float transition_duration = 60;
         private const float selection_border_width = 4;
@@ -155,17 +155,16 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
         public Popover GetPopover() => new PasswordEntryPopover(Room);
 
-        public MenuItem[] ContextMenuItems
+        public override MenuItem[] ContextMenuItems
         {
             get
             {
-                var items = new List<MenuItem>
-                {
-                    new OsuMenuItem("Create copy", MenuItemType.Standard, () =>
-                    {
-                        lounge?.OpenCopy(Room);
-                    })
-                };
+                var items = new List<MenuItem>();
+
+                items.AddRange(base.ContextMenuItems);
+
+                items.Add(new OsuMenuItemSpacer());
+                items.Add(new OsuMenuItem("Create copy", MenuItemType.Standard, () => lounge?.OpenCopy(Room)));
 
                 if (Room.Type == MatchType.Playlists && Room.Host?.Id == api.LocalUser.Value.Id && Room.StartDate?.AddMinutes(5) >= DateTimeOffset.Now && !Room.HasEnded)
                 {

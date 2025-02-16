@@ -12,11 +12,14 @@ using osu.Framework.Utils;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online;
+using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
+using osu.Game.Rulesets.Catch.Mods;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
+using osu.Game.Rulesets.Taiko.Mods;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Participants;
 using osu.Game.Users;
 using osuTK;
@@ -309,6 +312,33 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        public void TestUserWithStyle()
+        {
+            AddStep("add users", () =>
+            {
+                MultiplayerClient.AddUser(new APIUser
+                {
+                    Id = 0,
+                    Username = "User 0",
+                    RulesetsStatistics = new Dictionary<string, UserStatistics>
+                    {
+                        {
+                            Ruleset.Value.ShortName,
+                            new UserStatistics { GlobalRank = RNG.Next(1, 100000), }
+                        }
+                    },
+                    CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
+                });
+
+                MultiplayerClient.ChangeUserStyle(0, 259, 2);
+            });
+
+            AddStep("set beatmap locally available", () => MultiplayerClient.ChangeUserBeatmapAvailability(0, BeatmapAvailability.LocallyAvailable()));
+            AddStep("change user style to beatmap: 258, ruleset: 1", () => MultiplayerClient.ChangeUserStyle(0, 258, 1));
+            AddStep("change user style to beatmap: null, ruleset: null", () => MultiplayerClient.ChangeUserStyle(0, null, null));
+        }
+
+        [Test]
         public void TestModOverlap()
         {
             AddStep("add dummy mods", () =>
@@ -363,6 +393,40 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 MultiplayerClient.ChangeBeatmapAvailability(BeatmapAvailability.LocallyAvailable());
                 MultiplayerClient.ChangeUserState(0, MultiplayerUserState.Idle);
                 MultiplayerClient.ChangeState(MultiplayerUserState.Idle);
+            });
+        }
+
+        [Test]
+        public void TestModsAndRuleset()
+        {
+            AddStep("add another user", () =>
+            {
+                MultiplayerClient.AddUser(new APIUser
+                {
+                    Id = 0,
+                    Username = "User 0",
+                    RulesetsStatistics = new Dictionary<string, UserStatistics>
+                    {
+                        {
+                            Ruleset.Value.ShortName,
+                            new UserStatistics { GlobalRank = RNG.Next(1, 100000), }
+                        }
+                    },
+                    CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
+                });
+
+                MultiplayerClient.ChangeUserBeatmapAvailability(0, BeatmapAvailability.LocallyAvailable());
+            });
+
+            AddStep("set user styles", () =>
+            {
+                MultiplayerClient.ChangeUserStyle(API.LocalUser.Value.OnlineID, 259, 1);
+                MultiplayerClient.ChangeUserMods(API.LocalUser.Value.OnlineID,
+                    [new APIMod(new TaikoModConstantSpeed()), new APIMod(new TaikoModHidden()), new APIMod(new TaikoModFlashlight()), new APIMod(new TaikoModHardRock())]);
+
+                MultiplayerClient.ChangeUserStyle(0, 259, 2);
+                MultiplayerClient.ChangeUserMods(0,
+                    [new APIMod(new CatchModFloatingFruits()), new APIMod(new CatchModHidden()), new APIMod(new CatchModMirror())]);
             });
         }
 

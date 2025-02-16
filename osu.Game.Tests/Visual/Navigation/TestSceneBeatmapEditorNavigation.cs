@@ -165,7 +165,6 @@ namespace osu.Game.Tests.Visual.Navigation
         }
 
         [Test]
-        [Solo]
         public void TestEditorGameplayTestAlwaysUsesOriginalRuleset()
         {
             prepareBeatmap();

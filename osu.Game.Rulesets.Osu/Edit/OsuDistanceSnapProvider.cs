@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Osu.Edit
     {
         public override double ReadCurrentDistanceSnap(HitObject before, HitObject after)
         {
-            float expectedDistance = DurationToDistance(before, after.StartTime - before.GetEndTime());
+            float expectedDistance = DurationToDistance(after.StartTime - before.GetEndTime(), before.StartTime);
             float actualDistance = Vector2.Distance(((OsuHitObject)before).EndPosition, ((OsuHitObject)after).Position);
 
             return actualDistance / expectedDistance;

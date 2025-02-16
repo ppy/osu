@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Humanizer;
@@ -33,7 +34,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
     /// <summary>
     /// A blueprint container generally displayed as an overlay to a ruleset's playfield.
     /// </summary>
-    public partial class ComposeBlueprintContainer : EditorBlueprintContainer
+    public abstract partial class ComposeBlueprintContainer : EditorBlueprintContainer
     {
         private readonly Container<PlacementBlueprint> placementBlueprintContainer;
 
@@ -52,7 +53,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// </remarks>
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => editorScreen?.MainContent.ReceivePositionalInputAt(screenSpacePos) ?? base.ReceivePositionalInputAt(screenSpacePos);
 
-        public ComposeBlueprintContainer(HitObjectComposer composer)
+        protected override IEnumerable<SelectionBlueprint<HitObject>> ApplySelectionOrder(IEnumerable<SelectionBlueprint<HitObject>> blueprints) =>
+            base.ApplySelectionOrder(blueprints)
+                .OrderBy(b => Math.Min(Math.Abs(EditorClock.CurrentTime - b.Item.GetEndTime()), Math.Abs(EditorClock.CurrentTime - b.Item.StartTime)));
+
+        protected ComposeBlueprintContainer(HitObjectComposer composer)
             : base(composer)
         {
             placementBlueprintContainer = new Container<PlacementBlueprint>
@@ -65,11 +70,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private void load()
         {
             MainTernaryStates = CreateTernaryButtons().ToArray();
-            SampleBankTernaryStates = createSampleBankTernaryButtons(SelectionHandler.SelectionBankStates).ToArray();
-            SampleAdditionBankTernaryStates = createSampleBankTernaryButtons(SelectionHandler.SelectionAdditionBankStates).ToArray();
-
-            SelectionHandler.AutoSelectionBankEnabled.BindValueChanged(_ => updateAutoBankTernaryButtonTooltip(), true);
-            SelectionHandler.SelectionAdditionBanksEnabled.BindValueChanged(_ => updateAdditionBankTernaryButtonTooltips(), true);
+            SampleBankTernaryStates = createSampleBankTernaryButtons().ToArray();
 
             AddInternal(new DrawableRulesetDependenciesProvidingContainer(Composer.Ruleset)
             {
@@ -98,6 +99,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             foreach (var kvp in SelectionHandler.SelectionAdditionBankStates)
                 kvp.Value.BindValueChanged(_ => updatePlacementSamples());
+
+            SelectionHandler.AutoSelectionBankEnabled.BindValueChanged(_ => updateAutoBankTernaryButtonTooltip(), true);
+            SelectionHandler.SelectionAdditionBanksEnabled.BindValueChanged(_ => updateAdditionBankTernaryButtonTooltips(), true);
         }
 
         protected override void TransferBlueprintFor(HitObject hitObject, DrawableHitObject drawableObject)
@@ -112,25 +116,26 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
+            // Until the keys below are global actions, this will prevent conflicts with "seek between sample points"
+            // which has a default of ctrl+shift+arrows.
+            if (e.ShiftPressed)
+                return false;
+
             if (e.ControlPressed)
             {
                 switch (e.Key)
                 {
                     case Key.Left:
-                        nudgeSelection(new Vector2(-1, 0));
-                        return true;
+                        return nudgeSelection(new Vector2(-1, 0));
 
                     case Key.Right:
-                        nudgeSelection(new Vector2(1, 0));
-                        return true;
+                        return nudgeSelection(new Vector2(1, 0));
 
                     case Key.Up:
-                        nudgeSelection(new Vector2(0, -1));
-                        return true;
+                        return nudgeSelection(new Vector2(0, -1));
 
                     case Key.Down:
-                        nudgeSelection(new Vector2(0, 1));
-                        return true;
+                        return nudgeSelection(new Vector2(0, 1));
                 }
             }
 
@@ -152,7 +157,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// Move the current selection spatially by the specified delta, in gamefield coordinates (ie. the same coordinates as the blueprints).
         /// </summary>
         /// <param name="delta"></param>
-        private void nudgeSelection(Vector2 delta)
+        private bool nudgeSelection(Vector2 delta)
         {
             if (!nudgeMovementActive)
             {
@@ -163,12 +168,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
             var firstBlueprint = SelectionHandler.SelectedBlueprints.FirstOrDefault();
 
             if (firstBlueprint == null)
-                return;
+                return false;
 
             // convert to game space coordinates
             delta = firstBlueprint.ToScreenSpace(delta) - firstBlueprint.ToScreenSpace(Vector2.Zero);
 
             SelectionHandler.HandleMovement(new MoveSelectionEvent<HitObject>(firstBlueprint, delta));
+            return true;
         }
 
         private void updatePlacementNewCombo()
@@ -238,28 +244,40 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <summary>
         /// A collection of states which will be displayed to the user in the toolbox.
         /// </summary>
-        public TernaryButton[] MainTernaryStates { get; private set; }
+        public Drawable[] MainTernaryStates { get; private set; }
 
-        public TernaryButton[] SampleBankTernaryStates { get; private set; }
-
-        public TernaryButton[] SampleAdditionBankTernaryStates { get; private set; }
+        public SampleBankTernaryButton[] SampleBankTernaryStates { get; private set; }
 
         /// <summary>
         /// Create all ternary states required to be displayed to the user.
         /// </summary>
-        protected virtual IEnumerable<TernaryButton> CreateTernaryButtons()
+        protected virtual IEnumerable<Drawable> CreateTernaryButtons()
         {
             //TODO: this should only be enabled (visible?) for rulesets that provide combo-supporting HitObjects.
-            yield return new TernaryButton(NewCombo, "New combo", () => new SpriteIcon { Icon = OsuIcon.EditorNewComboA });
+            yield return new NewComboTernaryButton { Current = NewCombo };
 
             foreach (var kvp in SelectionHandler.SelectionSampleStates)
-                yield return new TernaryButton(kvp.Value, kvp.Key.Replace("hit", string.Empty).Titleize(), () => GetIconForSample(kvp.Key));
+            {
+                yield return new DrawableTernaryButton
+                {
+                    Current = kvp.Value,
+                    Description = kvp.Key.Replace(@"hit", string.Empty).Titleize(),
+                    CreateIcon = () => GetIconForSample(kvp.Key),
+                };
+            }
         }
 
-        private IEnumerable<TernaryButton> createSampleBankTernaryButtons(Dictionary<string, Bindable<TernaryState>> sampleBankStates)
+        private IEnumerable<SampleBankTernaryButton> createSampleBankTernaryButtons()
         {
-            foreach (var kvp in sampleBankStates)
-                yield return new TernaryButton(kvp.Value, kvp.Key.Titleize(), () => getIconForBank(kvp.Key));
+            foreach (string bankName in HitSampleInfo.ALL_BANKS.Prepend(EditorSelectionHandler.HIT_BANK_AUTO))
+            {
+                yield return new SampleBankTernaryButton(bankName)
+                {
+                    NormalState = { Current = SelectionHandler.SelectionBankStates[bankName], },
+                    AdditionsState = { Current = SelectionHandler.SelectionAdditionBankStates[bankName], },
+                    CreateIcon = () => getIconForBank(bankName)
+                };
+            }
         }
 
         private Drawable getIconForBank(string sampleName)
@@ -295,19 +313,19 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             bool enabled = SelectionHandler.AutoSelectionBankEnabled.Value;
 
-            var autoBankButton = SampleBankTernaryStates.Single(t => t.Bindable == SelectionHandler.SelectionBankStates[EditorSelectionHandler.HIT_BANK_AUTO]);
-            autoBankButton.Enabled.Value = enabled;
-            autoBankButton.Tooltip = !enabled ? "Auto normal bank can only be used during hit object placement" : string.Empty;
+            var autoBankButton = SampleBankTernaryStates.Single(t => t.BankName == EditorSelectionHandler.HIT_BANK_AUTO);
+            autoBankButton.NormalButton.Enabled.Value = enabled;
+            autoBankButton.NormalButton.TooltipText = !enabled ? "Auto normal bank can only be used during hit object placement" : string.Empty;
         }
 
         private void updateAdditionBankTernaryButtonTooltips()
         {
             bool enabled = SelectionHandler.SelectionAdditionBanksEnabled.Value;
 
-            foreach (var ternaryButton in SampleAdditionBankTernaryStates)
+            foreach (var ternaryButton in SampleBankTernaryStates)
             {
-                ternaryButton.Enabled.Value = enabled;
-                ternaryButton.Tooltip = !enabled ? "Add an addition sample first to be able to set a bank" : string.Empty;
+                ternaryButton.AdditionsButton.Enabled.Value = enabled;
+                ternaryButton.AdditionsButton.TooltipText = !enabled ? "Add an addition sample first to be able to set a bank" : string.Empty;
             }
         }
 
@@ -327,12 +345,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void updatePlacementTimeAndPosition()
         {
-            var snapResult = Composer.FindSnappedPositionAndTime(InputManager.CurrentState.Mouse.Position, CurrentPlacement.SnapType);
-
-            // if no time was found from positional snapping, we should still quantize to the beat.
-            snapResult.Time ??= Beatmap.SnapTime(EditorClock.CurrentTime, null);
-
-            CurrentPlacement.UpdateTimeAndPosition(snapResult);
+            CurrentPlacement.UpdateTimeAndPosition(InputManager.CurrentState.Mouse.Position, Beatmap.SnapTime(EditorClock.CurrentTime, null));
         }
 
         #endregion

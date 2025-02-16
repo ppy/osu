@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints
     public partial class GridPlacementBlueprint : PlacementBlueprint
     {
         [Resolved]
-        private HitObjectComposer? hitObjectComposer { get; set; }
+        private OsuHitObjectComposer? hitObjectComposer { get; set; }
 
         private OsuGridToolboxGroup gridToolboxGroup = null!;
         private Vector2 originalOrigin;
@@ -95,12 +95,12 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints
             base.OnDragEnd(e);
         }
 
-        public override SnapType SnapType => ~SnapType.GlobalGrids;
-
-        public override void UpdateTimeAndPosition(SnapResult result)
+        public override SnapResult UpdateTimeAndPosition(Vector2 screenSpacePosition, double fallbackTime)
         {
             if (State.Value == Visibility.Hidden)
-                return;
+                return new SnapResult(screenSpacePosition, fallbackTime);
+
+            var result = hitObjectComposer?.TrySnapToNearbyObjects(screenSpacePosition) ?? new SnapResult(screenSpacePosition, fallbackTime);
 
             var pos = ToLocalSpace(result.ScreenSpacePosition);
 
@@ -120,6 +120,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints
                     gridToolboxGroup.SetGridFromPoints(gridToolboxGroup.StartPosition.Value, pos);
                 }
             }
+
+            return result;
         }
 
         protected override void PopOut()

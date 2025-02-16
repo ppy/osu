@@ -27,18 +27,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [SetUpSteps]
         public void SetUpSteps()
         {
-            AddStep("Create control", () =>
-            {
-                Child = new PlayerSettingsGroup("Some settings")
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Children = new Drawable[]
-                    {
-                        offsetControl = new BeatmapOffsetControl()
-                    }
-                };
-            });
+            recreateControl();
         }
 
         [Test]
@@ -123,13 +112,14 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestCalibrationFromZero()
         {
+            ScoreInfo referenceScore = null!;
             const double average_error = -4.5;
 
             AddAssert("Offset is neutral", () => offsetControl.Current.Value == 0);
             AddAssert("No calibration button", () => !offsetControl.ChildrenOfType<SettingsButton>().Any());
             AddStep("Set reference score", () =>
             {
-                offsetControl.ReferenceScore.Value = new ScoreInfo
+                offsetControl.ReferenceScore.Value = referenceScore = new ScoreInfo
                 {
                     HitEvents = TestSceneHitEventTimingDistributionGraph.CreateDistributedHitEvents(average_error),
                     BeatmapInfo = Beatmap.Value.BeatmapInfo,
@@ -142,6 +132,10 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddUntilStep("Button is disabled", () => !offsetControl.ChildrenOfType<SettingsButton>().Single().Enabled.Value);
             AddStep("Remove reference score", () => offsetControl.ReferenceScore.Value = null);
+            AddAssert("No calibration button", () => !offsetControl.ChildrenOfType<SettingsButton>().Any());
+
+            recreateControl();
+            AddStep("Set same reference score", () => offsetControl.ReferenceScore.Value = referenceScore);
             AddAssert("No calibration button", () => !offsetControl.ChildrenOfType<SettingsButton>().Any());
         }
 
@@ -250,6 +244,22 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("Button is disabled", () => !offsetControl.ChildrenOfType<SettingsButton>().Single().Enabled.Value);
             AddStep("Remove reference score", () => offsetControl.ReferenceScore.Value = null);
             AddAssert("No calibration button", () => !offsetControl.ChildrenOfType<SettingsButton>().Any());
+        }
+
+        private void recreateControl()
+        {
+            AddStep("Create control", () =>
+            {
+                Child = new PlayerSettingsGroup("Some settings")
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Children = new Drawable[]
+                    {
+                        offsetControl = new BeatmapOffsetControl()
+                    }
+                };
+            });
         }
     }
 }

@@ -96,6 +96,14 @@ namespace osu.Game.Online.Multiplayer
         Task UserBeatmapAvailabilityChanged(int userId, BeatmapAvailability beatmapAvailability);
 
         /// <summary>
+        /// Signals that a user in this room changed their style.
+        /// </summary>
+        /// <param name="userId">The ID of the user whose style changed.</param>
+        /// <param name="beatmapId">The user's beatmap.</param>
+        /// <param name="rulesetId">The user's ruleset.</param>
+        Task UserStyleChanged(int userId, int? beatmapId, int? rulesetId);
+
+        /// <summary>
         /// Signals that a user in this room changed their local mods.
         /// </summary>
         /// <param name="userId">The ID of the user whose mods have changed.</param>
