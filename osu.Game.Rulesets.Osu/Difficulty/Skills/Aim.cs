@@ -10,6 +10,7 @@ using osu.Game.Rulesets.Osu.Difficulty.Aggregation;
 using osu.Game.Rulesets.Osu.Difficulty.Evaluators;
 using osu.Game.Utils;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Difficulty.Utils;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
@@ -35,14 +36,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         {
             if (difficulty <= 0) return 1;
             if (skill <= 0) return 0;
-            
-            return SpecialFunctions.Erf(skill / (Math.Sqrt(2) * difficulty));
+            return DifficultyCalculationUtils.Erf(skill / (Math.Sqrt(2) * difficulty));
         }
 
         private readonly List<double> sliderStrains = new List<double>();
-
-        private double strainDecay(double ms) => Math.Pow(strainDecayBase, ms / 1000);
-
 
         private double strainDecay(double ms) => Math.Pow(strainDecayBase, ms / 1000);
 

@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Utils;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Utils
@@ -65,7 +66,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Utils
             List<double> listCoefficients = coefficients.ToList();
             listCoefficients.Add(-Math.Log(missCount + 1));
 
-            List<double?> xVals = SpecialFunctions.SolvePolynomialRoots(listCoefficients);
+            List<double?> xVals = DifficultyCalculationUtils.SolvePolynomialRoots(listCoefficients);
 
             const double max_error = 1e-7;
 
