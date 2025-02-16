@@ -42,9 +42,10 @@ namespace osu.Game.Overlays.Profile.Header
         private ExternalLinkButton openUserExternally = null!;
         private OsuSpriteText titleText = null!;
         private UpdateableFlag userFlag = null!;
-        private UpdateableTeamFlag teamFlag = null!;
         private OsuHoverContainer userCountryContainer = null!;
         private OsuSpriteText userCountryText = null!;
+        private UpdateableTeamFlag teamFlag = null!;
+        private OsuSpriteText teamText = null!;
         private GroupBadgeFlow groupBadgeFlow = null!;
         private ToggleCoverButton coverToggle = null!;
         private PreviousUsernamesDisplay previousUsernamesDisplay = null!;
@@ -161,27 +162,51 @@ namespace osu.Game.Overlays.Profile.Header
                                                 {
                                                     AutoSizeAxes = Axes.Both,
                                                     Direction = FillDirection.Horizontal,
+                                                    Spacing = new Vector2(10, 0),
                                                     Children = new Drawable[]
                                                     {
-                                                        userFlag = new UpdateableFlag
-                                                        {
-                                                            Size = new Vector2(28, 20),
-                                                        },
-                                                        teamFlag = new UpdateableTeamFlag
-                                                        {
-                                                            Size = new Vector2(40, 20),
-                                                        },
-                                                        userCountryContainer = new OsuHoverContainer
+                                                        new FillFlowContainer
                                                         {
                                                             AutoSizeAxes = Axes.Both,
-                                                            Anchor = Anchor.CentreLeft,
-                                                            Origin = Anchor.CentreLeft,
-                                                            Margin = new MarginPadding { Left = 5 },
-                                                            Child = userCountryText = new OsuSpriteText
+                                                            Direction = FillDirection.Horizontal,
+                                                            Spacing = new Vector2(4, 0),
+                                                            Children = new Drawable[]
                                                             {
-                                                                Font = OsuFont.GetFont(size: 14f, weight: FontWeight.Regular),
-                                                            },
+                                                                userFlag = new UpdateableFlag
+                                                                {
+                                                                    Size = new Vector2(28, 20),
+                                                                },
+                                                                userCountryContainer = new OsuHoverContainer
+                                                                {
+                                                                    AutoSizeAxes = Axes.Both,
+                                                                    Anchor = Anchor.CentreLeft,
+                                                                    Origin = Anchor.CentreLeft,
+                                                                    Child = userCountryText = new OsuSpriteText
+                                                                    {
+                                                                        Font = OsuFont.GetFont(size: 14f, weight: FontWeight.Regular),
+                                                                    },
+                                                                },
+                                                            }
                                                         },
+                                                        new FillFlowContainer
+                                                        {
+                                                            AutoSizeAxes = Axes.Both,
+                                                            Direction = FillDirection.Horizontal,
+                                                            Spacing = new Vector2(4, 0),
+                                                            Children = new Drawable[]
+                                                            {
+                                                                teamFlag = new UpdateableTeamFlag
+                                                                {
+                                                                    Size = new Vector2(40, 20),
+                                                                },
+                                                                teamText = new OsuSpriteText
+                                                                {
+                                                                    Anchor = Anchor.CentreLeft,
+                                                                    Origin = Anchor.CentreLeft,
+                                                                    Font = OsuFont.GetFont(size: 14f, weight: FontWeight.Regular),
+                                                                },
+                                                            }
+                                                        }
                                                     }
                                                 },
                                             }
@@ -220,9 +245,10 @@ namespace osu.Game.Overlays.Profile.Header
             usernameText.Text = user?.Username ?? string.Empty;
             openUserExternally.Link = $@"{api.Endpoints.WebsiteUrl}/users/{user?.Id ?? 0}";
             userFlag.CountryCode = user?.CountryCode ?? default;
-            teamFlag.Team = user?.Team;
             userCountryText.Text = (user?.CountryCode ?? default).GetDescription();
             userCountryContainer.Action = () => rankingsOverlay?.ShowCountry(user?.CountryCode ?? default);
+            teamFlag.Team = user?.Team;
+            teamText.Text = user?.Team?.Name ?? string.Empty;
             supporterTag.SupportLevel = user?.SupportLevel ?? 0;
             titleText.Text = user?.Title ?? string.Empty;
             titleText.Colour = Color4Extensions.FromHex(user?.Colour ?? "fff");
