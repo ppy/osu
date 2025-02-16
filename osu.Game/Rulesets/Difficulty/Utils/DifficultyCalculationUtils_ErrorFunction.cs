@@ -3,7 +3,6 @@
 
 // All code is referenced from the following:
 // https://github.com/mathnet/mathnet-numerics/blob/master/src/Numerics/SpecialFunctions/Erf.cs
-// https://github.com/mathnet/mathnet-numerics/blob/master/src/Numerics/Optimization/NelderMeadSimplex.cs
 
 /*
  Copyright (c) 2002-2022 Math.NET
@@ -17,9 +16,9 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Utils;
 
-namespace osu.Game.Utils
+namespace osu.Game.Rulesets.Difficulty.Utils
 {
-    public class SpecialFunctions
+    public partial class DifficultyCalculationUtils
     {
         private const double sqrt2 = 1.4142135623730950488016887242096980785696718753769d;
         private const double sqrt2_pi = 2.5066282746310005024157652848110452530069867406099d;
