@@ -7,7 +7,6 @@ using JetBrains.Annotations;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.Formats;
@@ -110,15 +109,37 @@ namespace osu.Game.Skinning
                         case GlobalSkinnableContainers.MainHUDComponents:
                             if (containerLookup.Ruleset != null)
                             {
-                                return new Container
+                                return new DefaultSkinComponentsContainer(container =>
+                                {
+                                    var comboCounter = container.OfType<ArgonComboCounter>().FirstOrDefault();
+                                    var spectatorList = container.OfType<SpectatorList>().FirstOrDefault();
+
+                                    Vector2 pos = new Vector2(36, -66);
+
+                                    if (comboCounter != null)
+                                    {
+                                        comboCounter.Position = pos;
+                                        pos -= new Vector2(0, comboCounter.DrawHeight * 1.4f + 20);
+                                    }
+
+                                    if (spectatorList != null)
+                                        spectatorList.Position = pos;
+                                })
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Child = new ArgonComboCounter
+                                    Children = new Drawable[]
                                     {
-                                        Anchor = Anchor.BottomLeft,
-                                        Origin = Anchor.BottomLeft,
-                                        Position = new Vector2(36, -66),
-                                        Scale = new Vector2(1.3f),
+                                        new ArgonComboCounter
+                                        {
+                                            Anchor = Anchor.BottomLeft,
+                                            Origin = Anchor.BottomLeft,
+                                            Scale = new Vector2(1.3f),
+                                        },
+                                        new SpectatorList
+                                        {
+                                            Anchor = Anchor.BottomLeft,
+                                            Origin = Anchor.BottomLeft,
+                                        }
                                     },
                                 };
                             }

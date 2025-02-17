@@ -358,6 +358,8 @@ namespace osu.Game.Online.Multiplayer
 
         public abstract Task DisconnectInternal();
 
+        public abstract Task ChangeUserStyle(int? beatmapId, int? rulesetId);
+
         /// <summary>
         /// Change the local user's mods in the currently joined room.
         /// </summary>
@@ -646,6 +648,25 @@ namespace osu.Game.Online.Multiplayer
                     return;
 
                 user.BeatmapAvailability = beatmapAvailability;
+
+                RoomUpdated?.Invoke();
+            }, false);
+
+            return Task.CompletedTask;
+        }
+
+        public Task UserStyleChanged(int userId, int? beatmapId, int? rulesetId)
+        {
+            Scheduler.Add(() =>
+            {
+                var user = Room?.Users.SingleOrDefault(u => u.UserID == userId);
+
+                // errors here are not critical - user style is mostly for display.
+                if (user == null)
+                    return;
+
+                user.BeatmapId = beatmapId;
+                user.RulesetId = rulesetId;
 
                 RoomUpdated?.Invoke();
             }, false);

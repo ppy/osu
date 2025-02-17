@@ -189,7 +189,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         /// <param name="pivot">An optional pivot around which the scores were retrieved.</param>
         protected virtual ScoreInfo[] PerformSuccessCallback(Action<IEnumerable<ScoreInfo>> callback, List<MultiplayerScore> scores, MultiplayerScores? pivot = null)
         {
-            var scoreInfos = scores.Select(s => s.CreateScoreInfo(ScoreManager, Rulesets, PlaylistItem, Beatmap.Value.BeatmapInfo)).OrderByTotalScore().ToArray();
+            var scoreInfos = scores.Select(s => s.CreateScoreInfo(ScoreManager, Rulesets, Beatmap.Value.BeatmapInfo)).OrderByTotalScore().ToArray();
 
             // Invoke callback to add the scores. Exclude the score provided to this screen since it's added already.
             callback.Invoke(scoreInfos.Where(s => s.OnlineID != Score?.OnlineID));

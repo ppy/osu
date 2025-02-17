@@ -16,6 +16,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
+using osu.Game.Audio;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
@@ -106,6 +107,23 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             return base.OnDragStart(e);
         }
 
+        protected override bool TryMoveBlueprints(DragEvent e, IList<(SelectionBlueprint<HitObject> blueprint, Vector2[] originalSnapPositions)> blueprints)
+        {
+            Vector2 distanceTravelled = e.ScreenSpaceMousePosition - e.ScreenSpaceMouseDownPosition;
+
+            // The final movement position, relative to movementBlueprintOriginalPosition.
+            Vector2 movePosition = blueprints.First().originalSnapPositions.First() + distanceTravelled;
+
+            // Retrieve a snapped position.
+            var result = timeline?.FindSnappedPositionAndTime(movePosition) ?? new SnapResult(movePosition, null);
+
+            var referenceBlueprint = blueprints.First().blueprint;
+            bool moved = SelectionHandler.HandleMovement(new MoveSelectionEvent<HitObject>(referenceBlueprint, result.ScreenSpacePosition - referenceBlueprint.ScreenSpaceSelectionPoint));
+            if (moved)
+                ApplySnapResultTime(result, referenceBlueprint.Item.StartTime);
+            return moved;
+        }
+
         private float dragTimeAccumulated;
 
         protected override void Update()
@@ -131,7 +149,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private void updateSamplePointContractedState()
         {
-            const double minimum_gap = 28;
+            const double absolute_minimum_gap = 31; // assumes single letter bank name for default banks
+            double minimumGap = absolute_minimum_gap;
 
             if (timeline == null || editorClock == null)
                 return;
@@ -153,8 +172,31 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 if (hitObject.GetEndTime() < editorClock.CurrentTime - timeline.VisibleRange / 2)
                     break;
 
+                for (int i = 0; i < hitObject.Samples.Count; i++)
+                {
+                    var sample = hitObject.Samples[i];
+
+                    if (!HitSampleInfo.ALL_BANKS.Contains(sample.Bank))
+                        minimumGap = Math.Max(minimumGap, absolute_minimum_gap + sample.Bank.Length * 3);
+                }
+
                 if (hitObject is IHasRepeats hasRepeats)
+                {
                     smallestTimeGap = Math.Min(smallestTimeGap, hasRepeats.Duration / hasRepeats.SpanCount() / 2);
+
+                    for (int i = 0; i < hasRepeats.NodeSamples.Count; i++)
+                    {
+                        var node = hasRepeats.NodeSamples[i];
+
+                        for (int j = 0; j < node.Count; j++)
+                        {
+                            var sample = node[j];
+
+                            if (!HitSampleInfo.ALL_BANKS.Contains(sample.Bank))
+                                minimumGap = Math.Max(minimumGap, absolute_minimum_gap + sample.Bank.Length * 3);
+                        }
+                    }
+                }
 
                 double gap = lastTime - hitObject.GetEndTime();
 
@@ -167,7 +209,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             }
 
             double smallestAbsoluteGap = ((TimelineSelectionBlueprintContainer)SelectionBlueprints).ContentRelativeToAbsoluteFactor.X * smallestTimeGap;
-            SamplePointContracted.Value = smallestAbsoluteGap < minimum_gap;
+            SamplePointContracted.Value = smallestAbsoluteGap < minimumGap;
         }
 
         private readonly Stack<HitObject> currentConcurrentObjects = new Stack<HitObject>();

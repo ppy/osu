@@ -84,6 +84,11 @@ namespace osu.Game.Screens.Select
         protected Container FooterPanels { get; private set; } = null!;
 
         /// <summary>
+        /// The <see cref="FooterButton"/> that opens the mod select dialog.
+        /// </summary>
+        protected FooterButton ModsFooterButton { get; private set; } = null!;
+
+        /// <summary>
         /// Whether entering editor mode should be allowed.
         /// </summary>
         public virtual bool AllowEditing => true;
@@ -214,11 +219,11 @@ namespace osu.Game.Screens.Select
                                 },
                             }
                         },
-                        FilterControl = new FilterControl
+                        FilterControl = CreateFilterControl().With(d =>
                         {
-                            RelativeSizeAxes = Axes.X,
-                            Height = FilterControl.HEIGHT,
-                        },
+                            d.RelativeSizeAxes = Axes.X;
+                            d.Height = FilterControl.HEIGHT;
+                        }),
                         new GridContainer // used for max width implementation
                         {
                             RelativeSizeAxes = Axes.Both,
@@ -378,7 +383,7 @@ namespace osu.Game.Screens.Select
 
                 BeatmapOptions.AddButton(@"Manage", @"collections", FontAwesome.Solid.Book, colours.Green, () => manageCollectionsDialog?.Show());
                 BeatmapOptions.AddButton(@"Delete", @"all difficulties", FontAwesome.Solid.Trash, colours.Pink, () => DeleteBeatmap(Beatmap.Value.BeatmapSetInfo));
-                BeatmapOptions.AddButton(@"Remove", @"from unplayed", FontAwesome.Regular.TimesCircle, colours.Purple, null);
+                BeatmapOptions.AddButton(@"Mark", @"as played", FontAwesome.Regular.TimesCircle, colours.Purple, () => beatmaps.MarkPlayed(Beatmap.Value.BeatmapInfo));
                 BeatmapOptions.AddButton(@"Clear", @"local scores", FontAwesome.Solid.Eraser, colours.Purple, () => ClearScores(Beatmap.Value.BeatmapInfo));
             }
 
@@ -386,6 +391,8 @@ namespace osu.Game.Screens.Select
             sampleChangeBeatmap = audio.Samples.Get(@"SongSelect/select-expand");
             SampleConfirm = audio.Samples.Get(@"SongSelect/confirm-selection");
         }
+
+        protected virtual FilterControl CreateFilterControl() => new FilterControl();
 
         protected override void LoadComplete()
         {
@@ -408,9 +415,9 @@ namespace osu.Game.Screens.Select
         /// Creates the buttons to be displayed in the footer.
         /// </summary>
         /// <returns>A set of <see cref="FooterButton"/> and an optional <see cref="OverlayContainer"/> which the button opens when pressed.</returns>
-        protected virtual IEnumerable<(FooterButton, OverlayContainer?)> CreateSongSelectFooterButtons() => new (FooterButton, OverlayContainer?)[]
+        protected virtual IEnumerable<(FooterButton button, OverlayContainer? overlay)> CreateSongSelectFooterButtons() => new (FooterButton, OverlayContainer?)[]
         {
-            (new FooterButtonMods { Current = Mods }, ModSelect),
+            (ModsFooterButton = new FooterButtonMods { Current = Mods }, ModSelect),
             (new FooterButtonRandom
             {
                 NextRandom = () => Carousel.SelectNextRandom(),
