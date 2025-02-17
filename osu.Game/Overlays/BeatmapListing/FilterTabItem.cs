@@ -57,7 +57,9 @@ namespace osu.Game.Overlays.BeatmapListing
         {
             base.LoadComplete();
 
+            Enabled.BindValueChanged(_ => UpdateState());
             UpdateState();
+
             FinishTransforms(true);
         }
 

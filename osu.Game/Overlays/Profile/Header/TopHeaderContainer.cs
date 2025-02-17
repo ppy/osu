@@ -42,6 +42,7 @@ namespace osu.Game.Overlays.Profile.Header
         private ExternalLinkButton openUserExternally = null!;
         private OsuSpriteText titleText = null!;
         private UpdateableFlag userFlag = null!;
+        private UpdateableTeamFlag teamFlag = null!;
         private OsuHoverContainer userCountryContainer = null!;
         private OsuSpriteText userCountryText = null!;
         private GroupBadgeFlow groupBadgeFlow = null!;
@@ -166,6 +167,10 @@ namespace osu.Game.Overlays.Profile.Header
                                                         {
                                                             Size = new Vector2(28, 20),
                                                         },
+                                                        teamFlag = new UpdateableTeamFlag
+                                                        {
+                                                            Size = new Vector2(40, 20),
+                                                        },
                                                         userCountryContainer = new OsuHoverContainer
                                                         {
                                                             AutoSizeAxes = Axes.Both,
@@ -213,8 +218,9 @@ namespace osu.Game.Overlays.Profile.Header
             cover.User = user;
             avatar.User = user;
             usernameText.Text = user?.Username ?? string.Empty;
-            openUserExternally.Link = $@"{api.WebsiteRootUrl}/users/{user?.Id ?? 0}";
+            openUserExternally.Link = $@"{api.Endpoints.WebsiteUrl}/users/{user?.Id ?? 0}";
             userFlag.CountryCode = user?.CountryCode ?? default;
+            teamFlag.Team = user?.Team;
             userCountryText.Text = (user?.CountryCode ?? default).GetDescription();
             userCountryContainer.Action = () => rankingsOverlay?.ShowCountry(user?.CountryCode ?? default);
             supporterTag.SupportLevel = user?.SupportLevel ?? 0;

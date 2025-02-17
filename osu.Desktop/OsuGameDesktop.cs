@@ -67,7 +67,12 @@ namespace osu.Desktop
             {
                 try
                 {
-                    stableInstallPath = getStableInstallPathFromRegistry();
+                    stableInstallPath = getStableInstallPathFromRegistry("osustable.File.osz");
+
+                    if (!string.IsNullOrEmpty(stableInstallPath) && checkExists(stableInstallPath))
+                        return stableInstallPath;
+
+                    stableInstallPath = getStableInstallPathFromRegistry("osu!");
 
                     if (!string.IsNullOrEmpty(stableInstallPath) && checkExists(stableInstallPath))
                         return stableInstallPath;
@@ -89,9 +94,9 @@ namespace osu.Desktop
         }
 
         [SupportedOSPlatform("windows")]
-        private string? getStableInstallPathFromRegistry()
+        private string? getStableInstallPathFromRegistry(string progId)
         {
-            using (RegistryKey? key = Registry.ClassesRoot.OpenSubKey("osu!"))
+            using (RegistryKey? key = Registry.ClassesRoot.OpenSubKey(progId))
                 return key?.OpenSubKey(WindowsAssociationManager.SHELL_OPEN_COMMAND)?.GetValue(string.Empty)?.ToString()?.Split('"')[1].Replace("osu!.exe", "");
         }
 
@@ -134,7 +139,6 @@ namespace osu.Desktop
             if (iconStream != null)
                 host.Window.SetIconFromStream(iconStream);
 
-            host.Window.CursorState |= CursorState.Hidden;
             host.Window.Title = Name;
         }
 

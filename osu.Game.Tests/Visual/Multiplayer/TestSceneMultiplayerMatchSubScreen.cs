@@ -30,6 +30,7 @@ using osu.Game.Screens.OnlinePlay;
 using osu.Game.Screens.OnlinePlay.Match;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Match;
+using osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Participants;
 using osu.Game.Tests.Beatmaps;
 using osu.Game.Tests.Resources;
@@ -271,7 +272,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddUntilStep("last playlist item selected", () =>
             {
-                var lastItem = this.ChildrenOfType<DrawableRoomPlaylistItem>().Single(p => p.Item.ID == MultiplayerClient.ServerAPIRoom?.Playlist.Last().ID);
+                var lastItem = this.ChildrenOfType<MultiplayerQueueList>()
+                                   .Single()
+                                   .ChildrenOfType<DrawableRoomPlaylistItem>()
+                                   .Single(p => p.Item.ID == MultiplayerClient.ServerAPIRoom?.Playlist.Last().ID);
                 return lastItem.IsSelectedItem;
             });
         }

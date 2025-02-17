@@ -80,7 +80,7 @@ namespace osu.Game.Overlays
 
         protected override CountryCode GetCountryCode(APIUser item) => item.CountryCode;
 
-        protected override Drawable CreateFlagContent(APIUser item)
+        protected override Drawable[] CreateFlagContent(APIUser item)
         {
             var username = new LinkFlowContainer(t => t.Font = OsuFont.GetFont(size: TEXT_SIZE, italics: true))
             {
@@ -89,7 +89,7 @@ namespace osu.Game.Overlays
                 TextAnchor = Anchor.CentreLeft
             };
             username.AddUserLink(item);
-            return username;
+            return [username];
         }
     }
 }

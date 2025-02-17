@@ -44,13 +44,13 @@ namespace osu.Game.Rulesets.Objects
                 PathProgress = 0,
             };
 
-            if (tickDistance != 0)
+            for (int span = 0; span < spanCount; span++)
             {
-                for (int span = 0; span < spanCount; span++)
-                {
-                    double spanStartTime = startTime + span * spanDuration;
-                    bool reversed = span % 2 == 1;
+                double spanStartTime = startTime + span * spanDuration;
+                bool reversed = span % 2 == 1;
 
+                if (tickDistance != 0)
+                {
                     var ticks = generateTicks(span, spanStartTime, spanDuration, reversed, length, tickDistance, minDistanceFromEnd, cancellationToken);
 
                     if (reversed)
@@ -61,18 +61,18 @@ namespace osu.Game.Rulesets.Objects
 
                     foreach (var e in ticks)
                         yield return e;
+                }
 
-                    if (span < spanCount - 1)
+                if (span < spanCount - 1)
+                {
+                    yield return new SliderEventDescriptor
                     {
-                        yield return new SliderEventDescriptor
-                        {
-                            Type = SliderEventType.Repeat,
-                            SpanIndex = span,
-                            SpanStartTime = startTime + span * spanDuration,
-                            Time = spanStartTime + spanDuration,
-                            PathProgress = (span + 1) % 2,
-                        };
-                    }
+                        Type = SliderEventType.Repeat,
+                        SpanIndex = span,
+                        SpanStartTime = startTime + span * spanDuration,
+                        Time = spanStartTime + spanDuration,
+                        PathProgress = (span + 1) % 2,
+                    };
                 }
             }
 

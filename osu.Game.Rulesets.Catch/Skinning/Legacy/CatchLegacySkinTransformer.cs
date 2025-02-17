@@ -4,6 +4,7 @@
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Game.Screens.Play.HUD;
 using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
@@ -47,6 +48,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
                             return new DefaultSkinComponentsContainer(container =>
                             {
                                 var keyCounter = container.OfType<LegacyKeyCounterDisplay>().FirstOrDefault();
+                                var spectatorList = container.OfType<SpectatorList>().FirstOrDefault();
 
                                 if (keyCounter != null)
                                 {
@@ -55,11 +57,19 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
                                     keyCounter.Origin = Anchor.TopRight;
                                     keyCounter.Position = new Vector2(0, -40) * 1.6f;
                                 }
+
+                                if (spectatorList != null)
+                                {
+                                    spectatorList.Anchor = Anchor.BottomLeft;
+                                    spectatorList.Origin = Anchor.BottomLeft;
+                                    spectatorList.Position = new Vector2(10, -10);
+                                }
                             })
                             {
                                 Children = new Drawable[]
                                 {
                                     new LegacyKeyCounterDisplay(),
+                                    new SpectatorList(),
                                 }
                             };
                     }

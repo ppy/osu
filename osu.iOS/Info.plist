@@ -153,9 +153,15 @@
 			<string>Editor</string>
 		</dict>
 	</array>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.music-games</string>
 	<key>LSSupportsOpeningDocumentsInPlace</key>
 	<false/>
+	<!-- Game mode is supposed to be automatically enabled by the app category specification above,
+	     but for some reason it needs to be explicitly enabled with this key. -->
+	<key>GCSupportsGameMode</key>
+	<true/>
 </dict>
 </plist>
