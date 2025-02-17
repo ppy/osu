@@ -764,7 +764,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             if (ExitConfirmed)
                 return true;
 
-            if (api.State.Value == APIState.Online)
+            if (api.State.Value != APIState.Online)
                 return true;
 
             bool hasUnsavedChanges = room.RoomID == null && room.Playlist.Count > 0;
