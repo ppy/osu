@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Newtonsoft.Json;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Online.API;
@@ -221,7 +222,15 @@ namespace osu.Game.Tests.Visual.OnlinePlay
                                                    : new APIUser
                                                    {
                                                        Id = id,
-                                                       Username = $"User {id}"
+                                                       Username = $"User {id}",
+                                                       Team = RNG.NextBool()
+                                                           ? new APITeam
+                                                           {
+                                                               Name = "Collective Wangs",
+                                                               ShortName = "WANG",
+                                                               FlagUrl = "https://assets.ppy.sh/teams/logo/1/wanglogo.jpg",
+                                                           }
+                                                           : null,
                                                    })
                                                .Where(u => u != null).ToList(),
                     });
