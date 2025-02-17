@@ -12,6 +12,7 @@ using osu.Game;
 using osu.Game.Screens;
 using osu.Game.Updater;
 using osu.Game.Utils;
+using osuTK;
 
 namespace osu.Android
 {
@@ -19,6 +20,8 @@ namespace osu.Android
     {
         [Cached]
         private readonly OsuGameActivity gameActivity;
+
+        protected override Vector2 ScalingContainerTargetDrawSize => new Vector2(1024, 1024 * DrawHeight / DrawWidth);
 
         public OsuGameAndroid(OsuGameActivity activity)
             : base(null)

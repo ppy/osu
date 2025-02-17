@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Framework.Layout;
 using osu.Game.Graphics;
@@ -53,6 +54,10 @@ namespace osu.Game.Overlays
         private Box background = null!;
 
         private IconButton expandButton = null!;
+
+        private InputManager inputManager = null!;
+
+        private Drawable? draggedChild;
 
         /// <summary>
         /// Create a new instance.
@@ -125,6 +130,8 @@ namespace osu.Game.Overlays
         {
             base.LoadComplete();
 
+            inputManager = GetContainingInputManager()!;
+
             Expanded.BindValueChanged(_ => updateExpandedState(true));
             updateExpandedState(false);
 
@@ -156,6 +163,13 @@ namespace osu.Game.Overlays
                 headerText.FadeTo(headerText.DrawWidth < DrawWidth ? 1 : 0, 150, Easing.OutQuint);
                 headerTextVisibilityCache.Validate();
             }
+
+            // Dragged child finished its drag operation.
+            if (draggedChild != null && inputManager.DraggedDrawable != draggedChild)
+            {
+                draggedChild = null;
+                updateExpandedState(true);
+            }
         }
 
         protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
@@ -168,11 +182,17 @@ namespace osu.Game.Overlays
 
         private void updateExpandedState(bool animate)
         {
+            // before we collapse down, let's double check the user is not dragging a UI control contained within us.
+            if (inputManager.DraggedDrawable.IsRootedAt(this))
+            {
+                draggedChild = inputManager.DraggedDrawable;
+            }
+
             // clearing transforms is necessary to avoid a previous height transform
             // potentially continuing to get processed while content has changed to autosize.
             content.ClearTransforms();
 
-            if (Expanded.Value || IsHovered)
+            if (Expanded.Value || IsHovered || draggedChild != null)
             {
                 content.AutoSizeAxes = Axes.Y;
                 content.AutoSizeDuration = animate ? transition_duration : 0;

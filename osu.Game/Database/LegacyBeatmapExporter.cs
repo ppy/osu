@@ -61,6 +61,20 @@ namespace osu.Game.Database
                 Configuration = new LegacySkinDecoder().Decode(skinStreamReader)
             };
 
+            MutateBeatmap(model, playableBeatmap);
+
+            // Encode to legacy format
+            var stream = new MemoryStream();
+            using (var sw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
+                new LegacyBeatmapEncoder(playableBeatmap, beatmapSkin).Encode(sw);
+
+            stream.Seek(0, SeekOrigin.Begin);
+
+            return stream;
+        }
+
+        protected virtual void MutateBeatmap(BeatmapSetInfo beatmapSet, IBeatmap playableBeatmap)
+        {
             // Convert beatmap elements to be compatible with legacy format
             // So we truncate time and position values to integers, and convert paths with multiple segments to Bézier curves
 
@@ -145,15 +159,6 @@ namespace osu.Game.Database
                         hasPath.Path.ControlPoints.Add(new PathControlPoint(position));
                 }
             }
-
-            // Encode to legacy format
-            var stream = new MemoryStream();
-            using (var sw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
-                new LegacyBeatmapEncoder(playableBeatmap, beatmapSkin).Encode(sw);
-
-            stream.Seek(0, SeekOrigin.Begin);
-
-            return stream;
         }
 
         protected override string FileExtension => @".osz";
