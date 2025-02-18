@@ -244,7 +244,7 @@ namespace osu.Game.Online.API
             // save the username at this point, if the user requested for it to be.
             config.SetValue(OsuSetting.Username, config.Get<bool>(OsuSetting.SaveUsername) ? ProvidedUsername : string.Empty);
 
-            if (!authentication.HasValidAccessToken)
+            if (!authentication.HasValidAccessToken && HasLogin)
             {
                 state.Value = APIState.Connecting;
                 LastLoginError = null;
