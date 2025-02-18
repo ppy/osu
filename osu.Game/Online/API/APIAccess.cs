@@ -253,6 +253,10 @@ namespace osu.Game.Online.API
                 {
                     authentication.AuthenticateWithLogin(ProvidedUsername, password);
                 }
+                catch (WebRequestFlushedException)
+                {
+                    return;
+                }
                 catch (Exception e)
                 {
                     //todo: this fails even on network-related issues. we should probably handle those differently.
@@ -313,7 +317,7 @@ namespace osu.Game.Online.API
                             log.Add(@"Login no longer valid");
                             Logout();
                         }
-                        else
+                        else if (ex is not WebRequestFlushedException)
                         {
                             state.Value = APIState.Failing;
                         }
@@ -494,6 +498,11 @@ namespace osu.Game.Online.API
                 handleWebException(we);
                 return false;
             }
+            catch (WebRequestFlushedException wrf)
+            {
+                log.Add(wrf.Message);
+                return false;
+            }
             catch (Exception ex)
             {
                 Logger.Error(ex, "Error occurred while handling an API request.");
@@ -575,7 +584,7 @@ namespace osu.Game.Online.API
                 if (failOldRequests)
                 {
                     foreach (var req in oldQueueRequests)
-                        req.Fail(new WebException($@"Request failed from flush operation (state {state.Value})"));
+                        req.Fail(new WebRequestFlushedException(state.Value));
                 }
             }
         }
@@ -606,7 +615,11 @@ namespace osu.Game.Online.API
                 return;
 
             var friendsReq = new GetFriendsRequest();
-            friendsReq.Failure += _ => state.Value = APIState.Failing;
+            friendsReq.Failure += ex =>
+            {
+                if (ex is not WebRequestFlushedException)
+                    state.Value = APIState.Failing;
+            };
             friendsReq.Success += res =>
             {
                 var existingFriends = friends.Select(f => f.TargetID).ToHashSet();
@@ -630,6 +643,14 @@ namespace osu.Game.Online.API
 
             flushQueue();
             cancellationToken.Cancel();
+        }
+
+        private class WebRequestFlushedException : Exception
+        {
+            public WebRequestFlushedException(APIState state)
+                : base($@"Request failed from flush operation (state {state})")
+            {
+            }
         }
     }
 
