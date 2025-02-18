@@ -26,12 +26,6 @@ namespace osu.Game.Screens.SelectV2
     {
         public const float HEIGHT = CarouselItem.DEFAULT_HEIGHT;
 
-        // todo: this should be replaced with information from CarouselItem about how deep is PanelBeatmap in the carousel
-        // (i.e. whether it's under a beatmap set that's under a group, or just under a top-level beatmap set).
-        private const float difficulty_x_offset = 100f; // constant X offset for beatmap difficulty panels specifically.
-
-        private const float duration = 500;
-
         private StarCounter starCounter = null!;
         private ConstrainedIconContainer difficultyIcon = null!;
         private OsuSpriteText keyCountText = null!;
@@ -74,11 +68,6 @@ namespace osu.Game.Screens.SelectV2
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
         {
-            Anchor = Anchor.TopRight;
-            Origin = Anchor.TopRight;
-
-            RelativeSizeAxes = Axes.X;
-            Width = 1f;
             Height = HEIGHT;
 
             Icon = difficultyIcon = new ConstrainedIconContainer
@@ -194,9 +183,6 @@ namespace osu.Game.Screens.SelectV2
 
             computeStarRating();
             updateKeyCount();
-
-            FinishTransforms(true);
-            this.FadeInFromZero(duration, Easing.OutQuint);
         }
 
         protected override void FreeAfterUse()
@@ -244,6 +230,8 @@ namespace osu.Game.Screens.SelectV2
 
         private void updateDisplay()
         {
+            const float duration = 500;
+
             var starDifficulty = starDifficultyBindable?.Value ?? default;
 
             starRatingDisplay.Current.Value = starDifficulty;

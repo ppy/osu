@@ -21,8 +21,6 @@ namespace osu.Game.Screens.SelectV2
     {
         public const float HEIGHT = CarouselItem.DEFAULT_HEIGHT * 1.6f;
 
-        private const float duration = 500;
-
         private BeatmapSetPanelBackground background = null!;
 
         private OsuSpriteText titleText = null!;
@@ -46,9 +44,6 @@ namespace osu.Game.Screens.SelectV2
         [BackgroundDependencyLoader]
         private void load()
         {
-            Anchor = Anchor.TopRight;
-            Origin = Anchor.TopRight;
-            RelativeSizeAxes = Axes.X;
             Height = HEIGHT;
 
             Icon = chevronIcon = new Container
@@ -133,6 +128,8 @@ namespace osu.Game.Screens.SelectV2
 
         private void onExpanded()
         {
+            const float duration = 500;
+
             chevronIcon.ResizeWidthTo(Expanded.Value ? 22 : 0f, duration, Easing.OutQuint);
             chevronIcon.FadeTo(Expanded.Value ? 1f : 0f, duration, Easing.OutQuint);
         }
@@ -153,9 +150,6 @@ namespace osu.Game.Screens.SelectV2
             updateButton.BeatmapSet = beatmapSet;
             statusPill.Status = beatmapSet.Status;
             difficultiesDisplay.BeatmapSet = beatmapSet;
-
-            FinishTransforms(true);
-            this.FadeInFromZero(duration, Easing.OutQuint);
         }
 
         protected override void FreeAfterUse()

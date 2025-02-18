@@ -20,17 +20,12 @@ namespace osu.Game.Screens.SelectV2
     {
         public const float HEIGHT = CarouselItem.DEFAULT_HEIGHT;
 
-        private const float duration = 500;
-
         private Drawable chevronIcon = null!;
         private OsuSpriteText titleText = null!;
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
         {
-            Anchor = Anchor.TopRight;
-            Origin = Anchor.TopRight;
-            RelativeSizeAxes = Axes.X;
             Height = HEIGHT;
 
             Icon = chevronIcon = new SpriteIcon
@@ -93,6 +88,8 @@ namespace osu.Game.Screens.SelectV2
 
         private void onExpanded()
         {
+            const float duration = 500;
+
             chevronIcon.ResizeWidthTo(Expanded.Value ? 12f : 0f, duration, Easing.OutQuint);
             chevronIcon.FadeTo(Expanded.Value ? 1f : 0f, duration, Easing.OutQuint);
         }
@@ -106,9 +103,6 @@ namespace osu.Game.Screens.SelectV2
             GroupDefinition group = (GroupDefinition)Item.Model;
 
             titleText.Text = group.Title;
-
-            FinishTransforms(true);
-            this.FadeInFromZero(500, Easing.OutQuint);
         }
     }
 }

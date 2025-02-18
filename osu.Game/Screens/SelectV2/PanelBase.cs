@@ -64,7 +64,11 @@ namespace osu.Game.Screens.SelectV2
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider, OsuColour colours)
         {
-            RelativeSizeAxes = Axes.Both;
+            Anchor = Anchor.TopRight;
+            Origin = Anchor.TopRight;
+
+            RelativeSizeAxes = Axes.X;
+            Height = CarouselItem.DEFAULT_HEIGHT;
 
             InternalChild = TopLevelContent = new Container
             {
@@ -159,6 +163,12 @@ namespace osu.Game.Screens.SelectV2
 
             Expanded.BindValueChanged(_ => updateDisplay());
             KeyboardSelected.BindValueChanged(_ => updateDisplay(), true);
+        }
+
+        protected override void PrepareForUse()
+        {
+            base.PrepareForUse();
+            this.FadeInFromZero(duration, Easing.OutQuint);
         }
 
         [Resolved]
