@@ -346,6 +346,13 @@ namespace osu.Game.Tests.Visual.Online
             Twitter = "test_user",
             Discord = "test_user",
             Website = "https://google.com",
+            Team = new APITeam
+            {
+                Id = 1,
+                Name = "Collective Wangs",
+                ShortName = "WANG",
+                FlagUrl = "https://assets.ppy.sh/teams/logo/1/wanglogo.jpg",
+            }
         };
     }
 }
