@@ -52,6 +52,12 @@ namespace osu.Game.Screens.SelectV2
         [Resolved]
         private BeatmapDifficultyCache difficultyCache { get; set; } = null!;
 
+        [Resolved]
+        private IBindable<RulesetInfo> ruleset { get; set; } = null!;
+
+        [Resolved]
+        private IBindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
+
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
         {
             var inputRectangle = DrawRectangle;
@@ -60,16 +66,10 @@ namespace osu.Game.Screens.SelectV2
             //
             // Caveat is that for simplicity, we are covering the full spacing, so panels with frontmost depth will have a slightly
             // larger hit target.
-            inputRectangle = inputRectangle.Inflate(new MarginPadding { Vertical = BeatmapCarousel.SPACING / 2f });
+            inputRectangle = inputRectangle.Inflate(new MarginPadding { Vertical = BeatmapCarousel.SPACING });
 
             return inputRectangle.Contains(ToLocalSpace(screenSpacePos));
         }
-
-        [Resolved]
-        private IBindable<RulesetInfo> ruleset { get; set; } = null!;
-
-        [Resolved]
-        private IBindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
