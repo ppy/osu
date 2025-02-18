@@ -7,8 +7,6 @@ using System.Linq;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Aggregation;
-using osu.Game.Rulesets.Osu.Difficulty.Evaluators;
-using osu.Game.Utils;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Difficulty.Utils;
 
@@ -17,7 +15,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     /// <summary>
     /// Represents the skill required to correctly aim at every object in the map with a uniform CircleSize and normalized distances.
     /// </summary>
-    public class Aim : OsuProbabilitySkill
+    public abstract class Aim : OsuProbabilitySkill
     {
         public readonly bool IncludeSliders;
 
@@ -29,14 +27,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double currentStrain;
         protected override double FcProbability => 0.0005;
-        private double skillMultiplier => 146;
         private double strainDecayBase => 0.15;
+
+        protected override double CalculateInitialStrain(double time, DifficultyHitObject current) => currentStrain * strainDecay(time - current.Previous(0).StartTime);
 
         protected override double HitProbability(double skill, double difficulty)
         {
             if (difficulty <= 0) return 1;
             if (skill <= 0) return 0;
-            return DifficultyCalculationUtils.Erf(skill / (Math.Sqrt(2) * difficulty));
+            return DifficultyCalculationUtils.Erf(skill / (Math.Sqrt(2) * difficulty * 6));
         }
 
         private readonly List<double> sliderStrains = new List<double>();
@@ -46,12 +45,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         protected override double StrainValueAt(DifficultyHitObject current)
         {
             currentStrain *= strainDecay(current.DeltaTime);
-            currentStrain += AimEvaluator.EvaluateDifficultyOf(current, IncludeSliders) * skillMultiplier;
 
             if (current.BaseObject is Slider)
             {
                 sliderStrains.Add(currentStrain);
             }
+
+            currentStrain += StrainValueOf(current) * SkillMultiplier;
+
+            if (double.IsNaN(currentStrain))
+                Console.WriteLine($"CLOWN: {current.BaseObject.StartTime}");
 
             return currentStrain;
         }
@@ -67,5 +70,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             return sliderStrains.Sum(strain => 1.0 / (1.0 + Math.Exp(-(strain / maxSliderStrain * 12.0 - 6.0))));
         }
+
+        protected virtual double SkillMultiplier => 25.83;
+        protected abstract double StrainValueOf(DifficultyHitObject current);
     }
 }

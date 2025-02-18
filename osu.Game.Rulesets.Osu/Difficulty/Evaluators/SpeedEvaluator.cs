@@ -18,7 +18,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         private const double single_spacing_threshold = OsuDifficultyHitObject.NORMALISED_DIAMETER * 1.25; // 1.25 circles distance between centers
         private const double min_speed_bonus = 200; // 200 BPM 1/4th
         private const double speed_balancing_factor = 40;
-        private const double distance_multiplier = 0.9;
 
         /// <summary>
         /// Evaluates the difficulty of tapping the current object, based on:
@@ -51,20 +50,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             if (DifficultyCalculationUtils.MillisecondsToBPM(strainTime) > min_speed_bonus)
                 speedBonus = 0.75 * Math.Pow((DifficultyCalculationUtils.BPMToMilliseconds(min_speed_bonus) - strainTime) / speed_balancing_factor, 2);
 
-            double travelDistance = osuPrevObj?.TravelDistance ?? 0;
-            double distance = travelDistance + osuCurrObj.MinimumJumpDistance;
-
-            // Cap distance at single_spacing_threshold
-            distance = Math.Min(distance, single_spacing_threshold);
-
-            // Max distance bonus is 1 * `distance_multiplier` at single_spacing_threshold
-            double distanceBonus = Math.Pow(distance / single_spacing_threshold, 3.95) * distance_multiplier;
-
-            if (mods.OfType<OsuModAutopilot>().Any())
-                distanceBonus = 0;
-
             // Base difficulty with all bonuses
-            double difficulty = (1 + speedBonus + distanceBonus) * 1000 / strainTime;
+            double difficulty = (1 + speedBonus) * 1000 / strainTime;
 
             // Apply penalty if there's doubletappable doubles
             return difficulty * doubletapness;

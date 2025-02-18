@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     /// </summary>
     public class Speed : OsuStrainSkill
     {
-        private double skillMultiplier => 1.46;
+        private double skillMultiplier => 1.45;
         private double strainDecayBase => 0.3;
 
         private double currentStrain;
@@ -47,14 +47,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         public double RelevantNoteCount()
         {
-            if (ObjectStrains.Count == 0)
+            if (Difficulties.Count == 0)
                 return 0;
 
-            double maxStrain = ObjectStrains.Max();
+            double maxStrain = Difficulties.Max();
             if (maxStrain == 0)
                 return 0;
 
-            return ObjectStrains.Sum(strain => 1.0 / (1.0 + Math.Exp(-(strain / maxStrain * 12.0 - 6.0))));
+            return Difficulties.Sum(strain => 1.0 / (1.0 + Math.Exp(-(strain / maxStrain * 12.0 - 6.0))));
         }
     }
 }

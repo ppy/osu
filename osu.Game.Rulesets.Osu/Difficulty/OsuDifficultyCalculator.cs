@@ -36,11 +36,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (beatmap.HitObjects.Count == 0)
                 return new OsuDifficultyAttributes { Mods = mods };
 
-            var aim = skills.OfType<Aim>().Single(a => a.IncludeSliders);
+            var aim = skills.OfType<TotalAim>().Single(a => a.IncludeSliders);
             double aimRating = Math.Sqrt(aim.DifficultyValue()) * difficulty_multiplier;
+            double aimRatingStrain = Math.Sqrt(aim.StrainDifficultyValue()) * difficulty_multiplier;
             double difficultSliders = aim.GetDifficultSliders();
 
-            var aimWithoutSliders = skills.OfType<Aim>().Single(a => !a.IncludeSliders);
+            double snapAimRating = Math.Sqrt(skills.OfType<SnapAim>().Single().DifficultyValue()) * difficulty_multiplier;
+            double flowAimRating = Math.Sqrt(skills.OfType<FlowAim>().Single().DifficultyValue()) * difficulty_multiplier;
+
+            var aimWithoutSliders = skills.OfType<TotalAim>().Single(a => !a.IncludeSliders);
             double aimRatingNoSliders = Math.Sqrt(aimWithoutSliders.DifficultyValue()) * difficulty_multiplier;
             double sliderFactor = aimRating > 0 ? aimRatingNoSliders / aimRating : 1;
 
@@ -57,12 +61,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (mods.Any(m => m is OsuModTouchDevice))
             {
                 aimRating = Math.Pow(aimRating, 0.8);
+                aimRatingStrain = Math.Pow(aimRating, 0.8);
                 flashlightRating = Math.Pow(flashlightRating, 0.8);
             }
 
             if (mods.Any(h => h is OsuModRelax))
             {
                 aimRating *= 0.9;
+                aimRatingStrain *= 0.9;
                 speedRating = 0.0;
                 flashlightRating *= 0.7;
             }
@@ -70,10 +76,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             {
                 speedRating *= 0.5;
                 aimRating = 0.0;
+                aimRatingStrain = 0.0;
                 flashlightRating *= 0.4;
             }
 
-            double baseAimPerformance = OsuStrainSkill.DifficultyToPerformance(aimRating);
+            double baseAimPerformance = OsuStrainSkill.DifficultyToPerformance(aimRatingStrain);
             double baseSpeedPerformance = OsuStrainSkill.DifficultyToPerformance(speedRating);
             double baseFlashlightPerformance = 0.0;
 
@@ -114,6 +121,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 HitCircleCount = hitCirclesCount,
                 SliderCount = sliderCount,
                 SpinnerCount = spinnerCount,
+                SnapAimDifficulty = snapAimRating,
+                FlowAimDifficulty = flowAimRating
             };
 
             return attributes;
@@ -138,9 +147,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
             var skills = new List<Skill>
             {
-                new Aim(mods, true),
-                new Aim(mods, false),
-                new Speed(mods)
+                new TotalAim(mods, true),
+                new TotalAim(mods, false),
+                new Speed(mods),
+                new SnapAim(mods),
+                new FlowAim(mods),
             };
 
             if (mods.Any(h => h is OsuModFlashlight))

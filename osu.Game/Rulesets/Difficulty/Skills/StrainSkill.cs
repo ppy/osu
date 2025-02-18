@@ -29,7 +29,6 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         private double currentSectionEnd;
 
         private readonly List<double> strainPeaks = new List<double>();
-        protected readonly List<double> ObjectStrains = new List<double>(); // Store individual strains
 
         protected StrainSkill(Mod[] mods)
             : base(mods)
@@ -61,7 +60,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             currentSectionPeak = Math.Max(strain, currentSectionPeak);
 
             // Store the strain value for the object
-            ObjectStrains.Add(strain);
+            Difficulties.Add(strain);
         }
 
         /// <summary>
@@ -70,16 +69,16 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// </summary>
         public virtual double CountTopWeightedStrains()
         {
-            if (ObjectStrains.Count == 0)
+            if (Difficulties.Count == 0)
                 return 0.0;
 
             double consistentTopStrain = DifficultyValue() / 10; // What would the top strain be if all strain values were identical
 
             if (consistentTopStrain == 0)
-                return ObjectStrains.Count;
+                return Difficulties.Count;
 
             // Use a weighted sum of all strains. Constants are arbitrary and give nice values
-            return ObjectStrains.Sum(s => 1.1 / (1 + Math.Exp(-10 * (s / consistentTopStrain - 0.88))));
+            return Difficulties.Sum(s => 1.1 / (1 + Math.Exp(-10 * (s / consistentTopStrain - 0.88))));
         }
 
         /// <summary>

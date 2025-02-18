@@ -65,6 +65,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         [JsonProperty("speed_difficult_strain_count")]
         public double SpeedDifficultStrainCount { get; set; }
 
+        [JsonProperty("snap_aim")]
+        public double SnapAimDifficulty { get; set; }
+
+        [JsonProperty("flow_aim")]
+        public double FlowAimDifficulty { get; set; }
+
         /// <summary>
         /// The beatmap's drain rate. This doesn't scale with rate-adjusting mods.
         /// </summary>
