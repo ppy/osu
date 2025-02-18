@@ -4,10 +4,8 @@
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Pooling;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
@@ -19,7 +17,7 @@ using osuTK;
 
 namespace osu.Game.Screens.SelectV2
 {
-    public partial class PanelBeatmapSet : PoolableDrawable, ICarouselPanel
+    public partial class PanelBeatmapSet : PanelBase
     {
         public const float HEIGHT = CarouselItem.DEFAULT_HEIGHT * 1.6f;
 
@@ -29,7 +27,6 @@ namespace osu.Game.Screens.SelectV2
 
         private const float duration = 500;
 
-        private CarouselPanelPiece panel = null!;
         private BeatmapSetPanelBackground background = null!;
 
         private OsuSpriteText titleText = null!;
@@ -40,13 +37,15 @@ namespace osu.Game.Screens.SelectV2
         private DifficultySpectrumDisplay difficultiesDisplay = null!;
 
         [Resolved]
-        private BeatmapCarousel? carousel { get; set; }
-
-        [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
         [Resolved]
         private BeatmapManager beatmaps { get; set; } = null!;
+
+        public PanelBeatmapSet()
+            : base(set_x_offset)
+        {
+        }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -56,27 +55,28 @@ namespace osu.Game.Screens.SelectV2
             RelativeSizeAxes = Axes.X;
             Height = HEIGHT;
 
-            InternalChild = panel = new CarouselPanelPiece(set_x_offset)
+            Icon = chevronIcon = new Container
             {
-                Action = () => carousel?.Activate(Item!),
-                Icon = chevronIcon = new Container
+                Size = new Vector2(22),
+                Child = new SpriteIcon
                 {
-                    Size = new Vector2(22),
-                    Child = new SpriteIcon
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Icon = FontAwesome.Solid.ChevronRight,
-                        Size = new Vector2(12),
-                        X = 1f,
-                        Colour = colourProvider.Background5,
-                    },
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Icon = FontAwesome.Solid.ChevronRight,
+                    Size = new Vector2(12),
+                    X = 1f,
+                    Colour = colourProvider.Background5,
                 },
-                Background = background = new BeatmapSetPanelBackground
-                {
-                    RelativeSizeAxes = Axes.Both,
-                },
-                Child = new FillFlowContainer
+            };
+
+            Background = background = new BeatmapSetPanelBackground
+            {
+                RelativeSizeAxes = Axes.Both,
+            };
+
+            Content.Children = new[]
+            {
+                new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Both,
                     Direction = FillDirection.Vertical,
@@ -132,12 +132,11 @@ namespace osu.Game.Screens.SelectV2
             base.LoadComplete();
 
             Expanded.BindValueChanged(_ => onExpanded(), true);
-            KeyboardSelected.BindValueChanged(k => panel.KeyboardActive.Value = k.NewValue, true);
+            KeyboardSelected.BindValueChanged(k => KeyboardSelected.Value = k.NewValue, true);
         }
 
         private void onExpanded()
         {
-            panel.Active.Value = Expanded.Value;
             chevronIcon.ResizeWidthTo(Expanded.Value ? 22 : 0f, duration, Easing.OutQuint);
             chevronIcon.FadeTo(Expanded.Value ? 1f : 0f, duration, Easing.OutQuint);
         }
@@ -171,20 +170,5 @@ namespace osu.Game.Screens.SelectV2
             updateButton.BeatmapSet = null;
             difficultiesDisplay.BeatmapSet = null;
         }
-
-        #region ICarouselPanel
-
-        public CarouselItem? Item { get; set; }
-        public BindableBool Selected { get; } = new BindableBool();
-        public BindableBool Expanded { get; } = new BindableBool();
-        public BindableBool KeyboardSelected { get; } = new BindableBool();
-
-        public double DrawYPosition { get; set; }
-
-        public void Activated()
-        {
-        }
-
-        #endregion
     }
 }

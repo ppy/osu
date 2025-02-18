@@ -49,29 +49,29 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                         KeyboardSelected = { Value = true },
                         Expanded = { Value = true }
                     },
-                    new PanelGroupStarDificulty
+                    new PanelGroupStarDifficulty
                     {
                         Item = new CarouselItem(new GroupDefinition(1, "1"))
                     },
-                    new PanelGroupStarDificulty
+                    new PanelGroupStarDifficulty
                     {
                         Item = new CarouselItem(new GroupDefinition(3, "3")),
                         Expanded = { Value = true }
                     },
-                    new PanelGroupStarDificulty
+                    new PanelGroupStarDifficulty
                     {
                         Item = new CarouselItem(new GroupDefinition(5, "5")),
                     },
-                    new PanelGroupStarDificulty
+                    new PanelGroupStarDifficulty
                     {
                         Item = new CarouselItem(new GroupDefinition(7, "7")),
                         Expanded = { Value = true }
                     },
-                    new PanelGroupStarDificulty
+                    new PanelGroupStarDifficulty
                     {
                         Item = new CarouselItem(new GroupDefinition(8, "8")),
                     },
-                    new PanelGroupStarDificulty
+                    new PanelGroupStarDifficulty
                     {
                         Item = new CarouselItem(new GroupDefinition(9, "9")),
                         Expanded = { Value = true }

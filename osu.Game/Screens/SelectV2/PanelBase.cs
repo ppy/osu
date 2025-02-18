@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -9,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
+using osu.Framework.Graphics.Pooling;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
@@ -19,7 +19,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.SelectV2
 {
-    public partial class CarouselPanelPiece : Container
+    public abstract partial class PanelBase : PoolableDrawable, ICarouselPanel
     {
         private const float corner_radius = 10;
 
@@ -43,7 +43,7 @@ namespace osu.Game.Screens.SelectV2
 
         public Container TopLevelContent { get; }
 
-        protected override Container Content { get; }
+        protected Container Content { get; }
 
         public Drawable Background
         {
@@ -67,11 +67,6 @@ namespace osu.Game.Screens.SelectV2
             }
         }
 
-        public readonly BindableBool Active = new BindableBool();
-        public readonly BindableBool KeyboardActive = new BindableBool();
-
-        public Action? Action { get; init; }
-
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
         {
             var inputRectangle = TopLevelContent.DrawRectangle;
@@ -82,7 +77,7 @@ namespace osu.Game.Screens.SelectV2
             return inputRectangle.Contains(TopLevelContent.ToLocalSpace(screenSpacePos));
         }
 
-        public CarouselPanelPiece(float panelXOffset)
+        protected PanelBase(float panelXOffset = 0)
         {
             this.panelXOffset = panelXOffset;
 
@@ -183,8 +178,17 @@ namespace osu.Game.Screens.SelectV2
         {
             base.LoadComplete();
 
-            Active.BindValueChanged(_ => updateDisplay());
-            KeyboardActive.BindValueChanged(_ => updateDisplay(), true);
+            Expanded.BindValueChanged(_ => updateDisplay());
+            KeyboardSelected.BindValueChanged(_ => updateDisplay(), true);
+        }
+
+        [Resolved]
+        private BeatmapCarousel? carousel { get; set; }
+
+        protected override bool OnClick(ClickEvent e)
+        {
+            carousel?.Activate(Item!);
+            return true;
         }
 
         public void Flash()
@@ -194,7 +198,7 @@ namespace osu.Game.Screens.SelectV2
 
         private void updateDisplay()
         {
-            backgroundLayer.TransformTo(nameof(Padding), backgroundLayer.Padding with { Vertical = Active.Value ? 2f : 0f }, duration, Easing.OutQuint);
+            backgroundLayer.TransformTo(nameof(Padding), backgroundLayer.Padding with { Vertical = Expanded.Value ? 2f : 0f }, duration, Easing.OutQuint);
 
             var backgroundColour = accentColour ?? Color4.White;
             var edgeEffectColour = accentColour ?? Color4Extensions.FromHex(@"4EBFFF");
@@ -202,7 +206,7 @@ namespace osu.Game.Screens.SelectV2
             backgroundAccentGradient.FadeColour(ColourInfo.GradientHorizontal(backgroundColour.Opacity(0.25f), backgroundColour.Opacity(0f)), duration, Easing.OutQuint);
             backgroundBorder.FadeColour(backgroundColour, duration, Easing.OutQuint);
 
-            TopLevelContent.FadeEdgeEffectTo(Active.Value ? edgeEffectColour.Opacity(0.5f) : Color4.Black.Opacity(0.4f), duration, Easing.OutQuint);
+            TopLevelContent.FadeEdgeEffectTo(Expanded.Value ? edgeEffectColour.Opacity(0.5f) : Color4.Black.Opacity(0.4f), duration, Easing.OutQuint);
 
             updateXOffset();
             updateHover();
@@ -212,10 +216,10 @@ namespace osu.Game.Screens.SelectV2
         {
             float x = panelXOffset + active_x_offset + keyboard_active_x_offset + left_edge_x_offset;
 
-            if (Active.Value)
+            if (Expanded.Value)
                 x -= active_x_offset;
 
-            if (KeyboardActive.Value)
+            if (KeyboardSelected.Value)
                 x -= keyboard_active_x_offset;
 
             this.TransformTo(nameof(Padding), new MarginPadding { Left = x }, duration, Easing.OutQuint);
@@ -223,7 +227,7 @@ namespace osu.Game.Screens.SelectV2
 
         private void updateHover()
         {
-            bool hovered = IsHovered || KeyboardActive.Value;
+            bool hovered = IsHovered || KeyboardSelected.Value;
 
             if (hovered)
                 hoverLayer.FadeIn(100, Easing.OutQuint);
@@ -243,17 +247,27 @@ namespace osu.Game.Screens.SelectV2
             base.OnHoverLost(e);
         }
 
-        protected override bool OnClick(ClickEvent e)
-        {
-            Action?.Invoke();
-            return true;
-        }
-
         protected override void Update()
         {
             base.Update();
             Content.Padding = Content.Padding with { Left = iconContainer.DrawWidth };
             backgroundLayerHorizontalPadding.Padding = new MarginPadding { Left = iconContainer.DrawWidth };
         }
+
+        #region ICarouselPanel
+
+        public CarouselItem? Item { get; set; }
+        public BindableBool Selected { get; } = new BindableBool();
+        public BindableBool Expanded { get; } = new BindableBool();
+        public BindableBool KeyboardSelected { get; } = new BindableBool();
+
+        public double DrawYPosition { get; set; }
+
+        public virtual void Activated()
+        {
+            activationFlash.FadeOutFromOne(500, Easing.OutQuint);
+        }
+
+        #endregion
     }
 }

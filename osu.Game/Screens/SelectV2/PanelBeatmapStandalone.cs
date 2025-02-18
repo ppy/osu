@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -10,7 +9,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Pooling;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
@@ -25,7 +23,7 @@ using osuTK;
 
 namespace osu.Game.Screens.SelectV2
 {
-    public partial class PanelBeatmapStandalone : PoolableDrawable, ICarouselPanel
+    public partial class PanelBeatmapStandalone : PanelBase
     {
         public const float HEIGHT = CarouselItem.DEFAULT_HEIGHT * 1.6f;
 
@@ -34,9 +32,6 @@ namespace osu.Game.Screens.SelectV2
         private const float standalone_x_offset = 20f; // constant X offset for beatmap set/standalone panels specifically.
 
         private const float duration = 500;
-
-        [Resolved]
-        private BeatmapCarousel? carousel { get; set; }
 
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; } = null!;
@@ -59,7 +54,6 @@ namespace osu.Game.Screens.SelectV2
         private IBindable<StarDifficulty?>? starDifficultyBindable;
         private CancellationTokenSource? starDifficultyCancellationSource;
 
-        private CarouselPanelPiece panel = null!;
         private BeatmapSetPanelBackground background = null!;
 
         private OsuSpriteText titleText = null!;
@@ -75,6 +69,11 @@ namespace osu.Game.Screens.SelectV2
         private OsuSpriteText difficultyName = null!;
         private OsuSpriteText difficultyAuthor = null!;
 
+        public PanelBeatmapStandalone()
+            : base(standalone_x_offset)
+        {
+        }
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -84,107 +83,105 @@ namespace osu.Game.Screens.SelectV2
             Width = 1f;
             Height = HEIGHT;
 
-            InternalChild = panel = new CarouselPanelPiece(standalone_x_offset)
+            Icon = difficultyIcon = new ConstrainedIconContainer
             {
-                Action = () => carousel?.Activate(Item!),
-                Icon = difficultyIcon = new ConstrainedIconContainer
+                Size = new Vector2(20),
+                Margin = new MarginPadding { Horizontal = 5f },
+                Colour = colourProvider.Background5,
+            };
+
+            Background = background = new BeatmapSetPanelBackground
+            {
+                RelativeSizeAxes = Axes.Both,
+            };
+
+            Content.Child = new FillFlowContainer
+            {
+                AutoSizeAxes = Axes.Both,
+                Direction = FillDirection.Vertical,
+                Padding = new MarginPadding { Top = 7.5f, Left = 15, Bottom = 5 },
+                Children = new Drawable[]
                 {
-                    Size = new Vector2(20),
-                    Margin = new MarginPadding { Horizontal = 5f },
-                    Colour = colourProvider.Background5,
-                },
-                Background = background = new BeatmapSetPanelBackground
-                {
-                    RelativeSizeAxes = Axes.Both,
-                },
-                Child = new FillFlowContainer
-                {
-                    AutoSizeAxes = Axes.Both,
-                    Direction = FillDirection.Vertical,
-                    Padding = new MarginPadding { Top = 7.5f, Left = 15, Bottom = 5 },
-                    Children = new Drawable[]
+                    titleText = new OsuSpriteText
                     {
-                        titleText = new OsuSpriteText
+                        Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 22, italics: true),
+                        Shadow = true,
+                    },
+                    artistText = new OsuSpriteText
+                    {
+                        Font = OsuFont.GetFont(weight: FontWeight.SemiBold, size: 17, italics: true),
+                        Shadow = true,
+                    },
+                    new FillFlowContainer
+                    {
+                        Direction = FillDirection.Horizontal,
+                        AutoSizeAxes = Axes.Both,
+                        Margin = new MarginPadding { Top = 5f },
+                        Children = new Drawable[]
                         {
-                            Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 22, italics: true),
-                            Shadow = true,
-                        },
-                        artistText = new OsuSpriteText
-                        {
-                            Font = OsuFont.GetFont(weight: FontWeight.SemiBold, size: 17, italics: true),
-                            Shadow = true,
-                        },
-                        new FillFlowContainer
-                        {
-                            Direction = FillDirection.Horizontal,
-                            AutoSizeAxes = Axes.Both,
-                            Margin = new MarginPadding { Top = 5f },
-                            Children = new Drawable[]
+                            updateButton = new UpdateBeatmapSetButton
                             {
-                                updateButton = new UpdateBeatmapSetButton
-                                {
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.CentreLeft,
-                                    Margin = new MarginPadding { Right = 5f, Top = -2f },
-                                },
-                                statusPill = new BeatmapSetOnlineStatusPill
-                                {
-                                    AutoSizeAxes = Axes.Both,
-                                    Origin = Anchor.CentreLeft,
-                                    Anchor = Anchor.CentreLeft,
-                                    TextSize = 11,
-                                    TextPadding = new MarginPadding { Horizontal = 8, Vertical = 2 },
-                                    Margin = new MarginPadding { Right = 5f },
-                                },
-                                difficultyLine = new FillFlowContainer
-                                {
-                                    Direction = FillDirection.Horizontal,
-                                    AutoSizeAxes = Axes.Both,
-                                    Children = new Drawable[]
-                                    {
-                                        difficultyStarRating = new StarRatingDisplay(default, StarRatingDisplaySize.Small)
-                                        {
-                                            Origin = Anchor.CentreLeft,
-                                            Anchor = Anchor.CentreLeft,
-                                            Scale = new Vector2(8f / 9f),
-                                            Margin = new MarginPadding { Right = 5f },
-                                        },
-                                        difficultyRank = new TopLocalRank
-                                        {
-                                            Scale = new Vector2(8f / 11),
-                                            Origin = Anchor.CentreLeft,
-                                            Anchor = Anchor.CentreLeft,
-                                            Margin = new MarginPadding { Right = 5f },
-                                        },
-                                        difficultyKeyCountText = new OsuSpriteText
-                                        {
-                                            Font = OsuFont.GetFont(size: 18, weight: FontWeight.SemiBold),
-                                            Anchor = Anchor.BottomLeft,
-                                            Origin = Anchor.BottomLeft,
-                                            Alpha = 0,
-                                            Margin = new MarginPadding { Bottom = 2f },
-                                        },
-                                        difficultyName = new OsuSpriteText
-                                        {
-                                            Font = OsuFont.GetFont(size: 18, weight: FontWeight.SemiBold),
-                                            Origin = Anchor.BottomLeft,
-                                            Anchor = Anchor.BottomLeft,
-                                            Margin = new MarginPadding { Right = 5f, Bottom = 2f },
-                                        },
-                                        difficultyAuthor = new OsuSpriteText
-                                        {
-                                            Colour = colourProvider.Content2,
-                                            Font = OsuFont.GetFont(weight: FontWeight.SemiBold),
-                                            Origin = Anchor.BottomLeft,
-                                            Anchor = Anchor.BottomLeft,
-                                            Margin = new MarginPadding { Right = 5f, Bottom = 2f },
-                                        }
-                                    }
-                                },
+                                Anchor = Anchor.CentreLeft,
+                                Origin = Anchor.CentreLeft,
+                                Margin = new MarginPadding { Right = 5f, Top = -2f },
                             },
-                        }
+                            statusPill = new BeatmapSetOnlineStatusPill
+                            {
+                                AutoSizeAxes = Axes.Both,
+                                Origin = Anchor.CentreLeft,
+                                Anchor = Anchor.CentreLeft,
+                                TextSize = 11,
+                                TextPadding = new MarginPadding { Horizontal = 8, Vertical = 2 },
+                                Margin = new MarginPadding { Right = 5f },
+                            },
+                            difficultyLine = new FillFlowContainer
+                            {
+                                Direction = FillDirection.Horizontal,
+                                AutoSizeAxes = Axes.Both,
+                                Children = new Drawable[]
+                                {
+                                    difficultyStarRating = new StarRatingDisplay(default, StarRatingDisplaySize.Small)
+                                    {
+                                        Origin = Anchor.CentreLeft,
+                                        Anchor = Anchor.CentreLeft,
+                                        Scale = new Vector2(8f / 9f),
+                                        Margin = new MarginPadding { Right = 5f },
+                                    },
+                                    difficultyRank = new TopLocalRank
+                                    {
+                                        Scale = new Vector2(8f / 11),
+                                        Origin = Anchor.CentreLeft,
+                                        Anchor = Anchor.CentreLeft,
+                                        Margin = new MarginPadding { Right = 5f },
+                                    },
+                                    difficultyKeyCountText = new OsuSpriteText
+                                    {
+                                        Font = OsuFont.GetFont(size: 18, weight: FontWeight.SemiBold),
+                                        Anchor = Anchor.BottomLeft,
+                                        Origin = Anchor.BottomLeft,
+                                        Alpha = 0,
+                                        Margin = new MarginPadding { Bottom = 2f },
+                                    },
+                                    difficultyName = new OsuSpriteText
+                                    {
+                                        Font = OsuFont.GetFont(size: 18, weight: FontWeight.SemiBold),
+                                        Origin = Anchor.BottomLeft,
+                                        Anchor = Anchor.BottomLeft,
+                                        Margin = new MarginPadding { Right = 5f, Bottom = 2f },
+                                    },
+                                    difficultyAuthor = new OsuSpriteText
+                                    {
+                                        Colour = colourProvider.Content2,
+                                        Font = OsuFont.GetFont(weight: FontWeight.SemiBold),
+                                        Origin = Anchor.BottomLeft,
+                                        Anchor = Anchor.BottomLeft,
+                                        Margin = new MarginPadding { Right = 5f, Bottom = 2f },
+                                    }
+                                }
+                            },
+                        },
                     }
-                },
+                }
             };
         }
 
@@ -203,9 +200,6 @@ namespace osu.Game.Screens.SelectV2
                 computeStarRating();
                 updateKeyCount();
             }, true);
-
-            Selected.BindValueChanged(s => panel.Active.Value = s.NewValue, true);
-            KeyboardSelected.BindValueChanged(k => panel.KeyboardActive.Value = k.NewValue, true);
         }
 
         protected override void PrepareForUse()
@@ -289,26 +283,9 @@ namespace osu.Game.Screens.SelectV2
         {
             var starDifficulty = starDifficultyBindable?.Value ?? default;
 
-            panel.AccentColour = colours.ForStarDifficulty(starDifficulty.Stars);
+            AccentColour = colours.ForStarDifficulty(starDifficulty.Stars);
             difficultyIcon.FadeColour(starDifficulty.Stars > 6.5f ? colours.Orange1 : colourProvider.Background5, duration, Easing.OutQuint);
             difficultyStarRating.Current.Value = starDifficulty;
         }
-
-        #region ICarouselPanel
-
-        public CarouselItem? Item { get; set; }
-        public BindableBool Selected { get; } = new BindableBool();
-        public BindableBool Expanded { get; } = new BindableBool();
-        public BindableBool KeyboardSelected { get; } = new BindableBool();
-
-        public double DrawYPosition { get; set; }
-
-        public void Activated()
-        {
-            // sets should never be activated.
-            throw new InvalidOperationException();
-        }
-
-        #endregion
     }
 }
