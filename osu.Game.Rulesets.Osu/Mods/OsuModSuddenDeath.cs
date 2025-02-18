@@ -19,15 +19,18 @@ namespace osu.Game.Rulesets.Osu.Mods
             typeof(OsuModTargetPractice),
         }).ToArray();
 
-        [SettingSource("Fail when missing on a slider tail")]
-        public BindableBool SliderTailMiss { get; } = new BindableBool();
+        [SettingSource("Also fail when missing a slider tail")]
+        public BindableBool FailOnSliderTail { get; } = new BindableBool();
 
         protected override bool FailCondition(HealthProcessor healthProcessor, JudgementResult result)
         {
-            if (SliderTailMiss.Value && result.HitObject is SliderTailCircle && result.Type == HitResult.IgnoreMiss)
+            if (base.FailCondition(healthProcessor, result))
                 return true;
 
-            return base.FailCondition(healthProcessor, result);
+            if (FailOnSliderTail.Value && result.HitObject is SliderTailCircle && !result.IsHit)
+                return true;
+
+            return false;
         }
     }
 }
