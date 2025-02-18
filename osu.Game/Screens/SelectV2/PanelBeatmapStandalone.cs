@@ -27,10 +27,6 @@ namespace osu.Game.Screens.SelectV2
     {
         public const float HEIGHT = CarouselItem.DEFAULT_HEIGHT * 1.6f;
 
-        // todo: this should be replaced with information from CarouselItem about how deep is PanelBeatmap in the carousel
-        // (i.e. whether it's under a beatmap set that's under a group, or just under a top-level beatmap set).
-        private const float standalone_x_offset = 20f; // constant X offset for beatmap set/standalone panels specifically.
-
         private const float duration = 500;
 
         [Resolved]
@@ -70,8 +66,8 @@ namespace osu.Game.Screens.SelectV2
         private OsuSpriteText difficultyAuthor = null!;
 
         public PanelBeatmapStandalone()
-            : base(standalone_x_offset)
         {
+            PanelXOffset = 20;
         }
 
         [BackgroundDependencyLoader]

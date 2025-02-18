@@ -29,31 +29,25 @@ namespace osu.Game.Screens.SelectV2
 
         private const float duration = 500;
 
-        private readonly float panelXOffset;
+        protected float PanelXOffset { get; init; }
 
-        private readonly Box backgroundBorder;
-        private readonly Box backgroundGradient;
-        private readonly Box backgroundAccentGradient;
-        private readonly Container backgroundLayer;
-        private readonly Container backgroundLayerHorizontalPadding;
-        private readonly Container backgroundContainer;
-        private readonly Container iconContainer;
-        private readonly Box activationFlash;
-        private readonly Box hoverLayer;
+        private Box backgroundBorder = null!;
+        private Box backgroundGradient = null!;
+        private Box backgroundAccentGradient = null!;
+        private Container backgroundLayer = null!;
+        private Container backgroundLayerHorizontalPadding = null!;
+        private Container backgroundContainer = null!;
+        private Container iconContainer = null!;
+        private Box activationFlash = null!;
+        private Box hoverLayer = null!;
 
-        public Container TopLevelContent { get; }
+        public Container TopLevelContent { get; private set; } = null!;
 
-        protected Container Content { get; }
+        protected Container Content { get; private set; } = null!;
 
-        public Drawable Background
-        {
-            set => backgroundContainer.Child = value;
-        }
+        public Drawable Background { set => backgroundContainer.Child = value; }
 
-        public Drawable Icon
-        {
-            set => iconContainer.Child = value;
-        }
+        public Drawable Icon { set => iconContainer.Child = value; }
 
         private Color4? accentColour;
 
@@ -77,10 +71,9 @@ namespace osu.Game.Screens.SelectV2
             return inputRectangle.Contains(TopLevelContent.ToLocalSpace(screenSpacePos));
         }
 
-        protected PanelBase(float panelXOffset = 0)
+        [BackgroundDependencyLoader]
+        private void load(OverlayColourProvider colourProvider, OsuColour colours)
         {
-            this.panelXOffset = panelXOffset;
-
             RelativeSizeAxes = Axes.Both;
 
             InternalChild = TopLevelContent = new Container
@@ -147,7 +140,7 @@ namespace osu.Game.Screens.SelectV2
                     Content = new Container
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Padding = new MarginPadding { Right = panelXOffset + corner_radius },
+                        Padding = new MarginPadding { Right = PanelXOffset + corner_radius },
                     },
                     hoverLayer = new Box
                     {
@@ -165,11 +158,7 @@ namespace osu.Game.Screens.SelectV2
                     new HoverSounds(),
                 }
             };
-        }
 
-        [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider, OsuColour colours)
-        {
             hoverLayer.Colour = colours.Blue.Opacity(0.1f);
             backgroundGradient.Colour = ColourInfo.GradientHorizontal(colourProvider.Background3, colourProvider.Background4);
         }
@@ -187,13 +176,9 @@ namespace osu.Game.Screens.SelectV2
 
         protected override bool OnClick(ClickEvent e)
         {
+            activationFlash.FadeOutFromOne(500, Easing.OutQuint);
             carousel?.Activate(Item!);
             return true;
-        }
-
-        public void Flash()
-        {
-            activationFlash.FadeOutFromOne(500, Easing.OutQuint);
         }
 
         private void updateDisplay()
@@ -214,7 +199,7 @@ namespace osu.Game.Screens.SelectV2
 
         private void updateXOffset()
         {
-            float x = panelXOffset + active_x_offset + keyboard_active_x_offset + left_edge_x_offset;
+            float x = PanelXOffset + active_x_offset + keyboard_active_x_offset + left_edge_x_offset;
 
             if (Expanded.Value)
                 x -= active_x_offset;
