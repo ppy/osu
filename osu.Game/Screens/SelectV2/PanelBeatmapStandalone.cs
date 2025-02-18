@@ -27,8 +27,6 @@ namespace osu.Game.Screens.SelectV2
     {
         public const float HEIGHT = CarouselItem.DEFAULT_HEIGHT * 1.6f;
 
-        private const float duration = 500;
-
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; } = null!;
 
@@ -73,10 +71,6 @@ namespace osu.Game.Screens.SelectV2
         [BackgroundDependencyLoader]
         private void load()
         {
-            Anchor = Anchor.TopRight;
-            Origin = Anchor.TopRight;
-            RelativeSizeAxes = Axes.X;
-            Width = 1f;
             Height = HEIGHT;
 
             Icon = difficultyIcon = new ConstrainedIconContainer
@@ -224,10 +218,6 @@ namespace osu.Game.Screens.SelectV2
             difficultyLine.Show();
 
             computeStarRating();
-
-            FinishTransforms(true);
-
-            this.FadeInFromZero(duration, Easing.OutQuint);
         }
 
         protected override void FreeAfterUse()
@@ -277,6 +267,8 @@ namespace osu.Game.Screens.SelectV2
 
         private void updateDisplay()
         {
+            const float duration = 500;
+
             var starDifficulty = starDifficultyBindable?.Value ?? default;
 
             AccentColour = colours.ForStarDifficulty(starDifficulty.Stars);

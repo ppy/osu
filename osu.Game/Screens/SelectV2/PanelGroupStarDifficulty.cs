@@ -21,10 +21,6 @@ namespace osu.Game.Screens.SelectV2
 {
     public partial class PanelGroupStarDifficulty : PanelBase
     {
-        public const float HEIGHT = CarouselItem.DEFAULT_HEIGHT;
-
-        private const float duration = 500;
-
         [Resolved]
         private OsuColour colours { get; set; } = null!;
 
@@ -39,10 +35,7 @@ namespace osu.Game.Screens.SelectV2
         [BackgroundDependencyLoader]
         private void load()
         {
-            Anchor = Anchor.TopRight;
-            Origin = Anchor.TopRight;
-            RelativeSizeAxes = Axes.X;
-            Height = HEIGHT;
+            Height = PanelGroup.HEIGHT;
 
             Icon = chevronIcon = new SpriteIcon
             {
@@ -117,12 +110,6 @@ namespace osu.Game.Screens.SelectV2
             Expanded.BindValueChanged(_ => onExpanded(), true);
         }
 
-        private void onExpanded()
-        {
-            chevronIcon.ResizeWidthTo(Expanded.Value ? 12f : 0f, duration, Easing.OutQuint);
-            chevronIcon.FadeTo(Expanded.Value ? 1f : 0f, duration, Easing.OutQuint);
-        }
-
         protected override void PrepareForUse()
         {
             base.PrepareForUse();
@@ -142,8 +129,14 @@ namespace osu.Game.Screens.SelectV2
 
             chevronIcon.Colour = contentColour;
             starCounter.Colour = contentColour;
+        }
 
-            this.FadeInFromZero(500, Easing.OutQuint);
+        private void onExpanded()
+        {
+            const float duration = 500;
+
+            chevronIcon.ResizeWidthTo(Expanded.Value ? 12f : 0f, duration, Easing.OutQuint);
+            chevronIcon.FadeTo(Expanded.Value ? 1f : 0f, duration, Easing.OutQuint);
         }
     }
 }
