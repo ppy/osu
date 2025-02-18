@@ -38,8 +38,8 @@ using ParticipantsList = osu.Game.Screens.OnlinePlay.Multiplayer.Participants.Pa
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
-    [Cached]
-    public partial class MultiplayerMatchSubScreen : RoomSubScreen, IHandlePresentBeatmap
+    [Cached(typeof(IMultiplayerMatchScreen))]
+    public partial class MultiplayerMatchSubScreen : RoomSubScreen, IHandlePresentBeatmap, IMultiplayerMatchScreen
     {
         public override string Title { get; }
 
@@ -476,5 +476,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         public partial class AddItemButton : PurpleRoundedButton
         {
         }
+
+        Room IMultiplayerMatchScreen.Room => Room;
+
+        bool IMultiplayerMatchScreen.IsCurrentScreen() => this.IsCurrentScreen();
+
+        void IMultiplayerMatchScreen.Push(IScreen screen) => this.Push(screen);
     }
 }

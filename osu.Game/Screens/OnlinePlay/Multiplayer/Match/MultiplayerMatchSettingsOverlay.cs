@@ -12,7 +12,6 @@ using osu.Framework.Extensions.ExceptionExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -84,7 +83,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             public void SelectBeatmap() => selectBeatmapButton.TriggerClick();
 
             [Resolved]
-            private MultiplayerMatchSubScreen matchSubScreen { get; set; } = null!;
+            private IMultiplayerMatchScreen matchSubScreen { get; set; } = null!;
 
             [Resolved]
             private IRoomManager manager { get; set; } = null!;

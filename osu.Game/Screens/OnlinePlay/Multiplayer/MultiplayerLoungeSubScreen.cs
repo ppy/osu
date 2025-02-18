@@ -37,7 +37,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             // Upon having left a room, we don't know whether we were the only participant, and whether the room is now closed as a result of leaving it.
             // To work around this, temporarily remove the room and trigger an immediate listing poll.
-            if (e.Last is MultiplayerMatchSubScreen match)
+            if (e.Last is IMultiplayerMatchScreen match)
             {
                 RoomManager?.RemoveRoom(match.Room);
                 ListingPollingComponent.PollImmediately();
@@ -88,7 +88,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             Type = MatchType.HeadToHead,
         };
 
-        protected override OnlinePlaySubScreen CreateRoomSubScreen(Room room) => new MultiplayerMatchSubScreen(room);
+        protected override OnlinePlaySubScreen CreateRoomSubScreen(Room room) => new MultiplayerMatchSubScreen2(room);
 
         protected override ListingPollingComponent CreatePollingComponent() => new MultiplayerListingPollingComponent();
 
