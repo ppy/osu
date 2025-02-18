@@ -249,6 +249,7 @@ namespace osu.Game.Screens.Edit.Submission
                 exportProgressNotification = null;
                 Logger.Log($"Beatmap set submission failed on export: {ex}");
                 allowExit();
+                return;
             }
 
             exportStep.SetCompleted();
