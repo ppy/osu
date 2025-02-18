@@ -61,16 +61,6 @@ namespace osu.Game.Screens.SelectV2
             }
         }
 
-        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
-        {
-            var inputRectangle = TopLevelContent.DrawRectangle;
-
-            // Cover potential gaps introduced by the spacing between panels.
-            inputRectangle = inputRectangle.Inflate(new MarginPadding { Vertical = BeatmapCarousel.SPACING / 2f });
-
-            return inputRectangle.Contains(TopLevelContent.ToLocalSpace(screenSpacePos));
-        }
-
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider, OsuColour colours)
         {
