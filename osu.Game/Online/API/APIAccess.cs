@@ -190,7 +190,10 @@ namespace osu.Game.Online.API
                     attemptConnect();
 
                     if (state.Value != APIState.Online)
+                    {
+                        Thread.Sleep(50);
                         continue;
+                    }
                 }
 
                 // hard bail if we can't get a valid access token.
