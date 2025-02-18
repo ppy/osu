@@ -238,7 +238,8 @@ namespace osu.Game.Online.API
         /// <returns>Whether the connection attempt was successful.</returns>
         private void attemptConnect()
         {
-            Scheduler.Add(setPlaceholderLocalUser, false);
+            if (localUser.IsDefault)
+                Scheduler.Add(setPlaceholderLocalUser, false);
 
             // save the username at this point, if the user requested for it to be.
             config.SetValue(OsuSetting.Username, config.Get<bool>(OsuSetting.SaveUsername) ? ProvidedUsername : string.Empty);
