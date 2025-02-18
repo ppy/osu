@@ -8,7 +8,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Pooling;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
@@ -23,7 +22,7 @@ using osuTK;
 
 namespace osu.Game.Screens.SelectV2
 {
-    public partial class PanelBeatmap : PoolableDrawable, ICarouselPanel
+    public partial class PanelBeatmap : PanelBase
     {
         public const float HEIGHT = CarouselItem.DEFAULT_HEIGHT;
 
@@ -33,7 +32,6 @@ namespace osu.Game.Screens.SelectV2
 
         private const float duration = 500;
 
-        private CarouselPanelPiece panel = null!;
         private StarCounter starCounter = null!;
         private ConstrainedIconContainer difficultyIcon = null!;
         private OsuSpriteText keyCountText = null!;
@@ -53,9 +51,6 @@ namespace osu.Game.Screens.SelectV2
 
         [Resolved]
         private BeatmapDifficultyCache difficultyCache { get; set; } = null!;
-
-        [Resolved]
-        private BeatmapCarousel? carousel { get; set; }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
         {
@@ -86,84 +81,81 @@ namespace osu.Game.Screens.SelectV2
             Width = 1f;
             Height = HEIGHT;
 
-            InternalChild = panel = new CarouselPanelPiece(difficulty_x_offset)
+            Icon = difficultyIcon = new ConstrainedIconContainer
             {
-                Action = () => carousel?.Activate(Item!),
-                Icon = difficultyIcon = new ConstrainedIconContainer
+                Size = new Vector2(20),
+                Margin = new MarginPadding { Horizontal = 5f },
+                Colour = colourProvider.Background5,
+            };
+
+            Content.Children = new[]
+            {
+                new FillFlowContainer
                 {
-                    Size = new Vector2(20),
-                    Margin = new MarginPadding { Horizontal = 5f },
-                    Colour = colourProvider.Background5,
-                },
-                Children = new[]
-                {
-                    new FillFlowContainer
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                    Padding = new MarginPadding { Left = 10f },
+                    Direction = FillDirection.Vertical,
+                    AutoSizeAxes = Axes.Both,
+                    Children = new Drawable[]
                     {
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
-                        Padding = new MarginPadding { Left = 10f },
-                        Direction = FillDirection.Vertical,
-                        AutoSizeAxes = Axes.Both,
-                        Children = new Drawable[]
+                        new FillFlowContainer
                         {
-                            new FillFlowContainer
+                            Direction = FillDirection.Horizontal,
+                            Spacing = new Vector2(3, 0),
+                            AutoSizeAxes = Axes.Both,
+                            Children = new Drawable[]
                             {
-                                Direction = FillDirection.Horizontal,
-                                Spacing = new Vector2(3, 0),
-                                AutoSizeAxes = Axes.Both,
-                                Children = new Drawable[]
+                                starRatingDisplay = new StarRatingDisplay(default, StarRatingDisplaySize.Small)
                                 {
-                                    starRatingDisplay = new StarRatingDisplay(default, StarRatingDisplaySize.Small)
-                                    {
-                                        Anchor = Anchor.CentreLeft,
-                                        Origin = Anchor.CentreLeft,
-                                    },
-                                    difficultyRank = new TopLocalRank
-                                    {
-                                        Anchor = Anchor.CentreLeft,
-                                        Origin = Anchor.CentreLeft,
-                                        Scale = new Vector2(0.75f)
-                                    },
-                                    starCounter = new StarCounter
-                                    {
-                                        Anchor = Anchor.CentreLeft,
-                                        Origin = Anchor.CentreLeft,
-                                        Scale = new Vector2(0.4f)
-                                    }
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
+                                },
+                                difficultyRank = new TopLocalRank
+                                {
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
+                                    Scale = new Vector2(0.75f)
+                                },
+                                starCounter = new StarCounter
+                                {
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
+                                    Scale = new Vector2(0.4f)
                                 }
-                            },
-                            new FillFlowContainer
+                            }
+                        },
+                        new FillFlowContainer
+                        {
+                            Direction = FillDirection.Horizontal,
+                            AutoSizeAxes = Axes.Both,
+                            Children = new[]
                             {
-                                Direction = FillDirection.Horizontal,
-                                AutoSizeAxes = Axes.Both,
-                                Children = new[]
+                                keyCountText = new OsuSpriteText
                                 {
-                                    keyCountText = new OsuSpriteText
-                                    {
-                                        Font = OsuFont.GetFont(size: 18, weight: FontWeight.SemiBold),
-                                        Anchor = Anchor.BottomLeft,
-                                        Origin = Anchor.BottomLeft,
-                                        Alpha = 0,
-                                    },
-                                    difficultyText = new OsuSpriteText
-                                    {
-                                        Font = OsuFont.GetFont(size: 18, weight: FontWeight.SemiBold),
-                                        Anchor = Anchor.BottomLeft,
-                                        Origin = Anchor.BottomLeft,
-                                        Margin = new MarginPadding { Right = 8f },
-                                    },
-                                    authorText = new OsuSpriteText
-                                    {
-                                        Colour = colourProvider.Content2,
-                                        Font = OsuFont.GetFont(weight: FontWeight.SemiBold),
-                                        Anchor = Anchor.BottomLeft,
-                                        Origin = Anchor.BottomLeft
-                                    }
+                                    Font = OsuFont.GetFont(size: 18, weight: FontWeight.SemiBold),
+                                    Anchor = Anchor.BottomLeft,
+                                    Origin = Anchor.BottomLeft,
+                                    Alpha = 0,
+                                },
+                                difficultyText = new OsuSpriteText
+                                {
+                                    Font = OsuFont.GetFont(size: 18, weight: FontWeight.SemiBold),
+                                    Anchor = Anchor.BottomLeft,
+                                    Origin = Anchor.BottomLeft,
+                                    Margin = new MarginPadding { Right = 8f },
+                                },
+                                authorText = new OsuSpriteText
+                                {
+                                    Colour = colourProvider.Content2,
+                                    Font = OsuFont.GetFont(weight: FontWeight.SemiBold),
+                                    Anchor = Anchor.BottomLeft,
+                                    Origin = Anchor.BottomLeft
                                 }
                             }
                         }
-                    },
-                }
+                    }
+                },
             };
         }
 
@@ -183,8 +175,8 @@ namespace osu.Game.Screens.SelectV2
                 updateKeyCount();
             }, true);
 
-            Selected.BindValueChanged(s => panel.Active.Value = s.NewValue, true);
-            KeyboardSelected.BindValueChanged(k => panel.KeyboardActive.Value = k.NewValue, true);
+            Selected.BindValueChanged(s => Expanded.Value = s.NewValue, true);
+            KeyboardSelected.BindValueChanged(k => KeyboardSelected.Value = k.NewValue, true);
         }
 
         protected override void PrepareForUse()
@@ -261,23 +253,7 @@ namespace osu.Game.Screens.SelectV2
 
             var starRatingColour = colours.ForStarDifficulty(starDifficulty.Stars);
             starCounter.FadeColour(starRatingColour, duration, Easing.OutQuint);
-            panel.AccentColour = starRatingColour;
+            AccentColour = starRatingColour;
         }
-
-        #region ICarouselPanel
-
-        public CarouselItem? Item { get; set; }
-        public BindableBool Selected { get; } = new BindableBool();
-        public BindableBool Expanded { get; } = new BindableBool();
-        public BindableBool KeyboardSelected { get; } = new BindableBool();
-
-        public double DrawYPosition { get; set; }
-
-        public void Activated()
-        {
-            panel.Flash();
-        }
-
-        #endregion
     }
 }

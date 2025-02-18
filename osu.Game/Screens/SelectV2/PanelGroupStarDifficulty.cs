@@ -8,25 +8,36 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.SelectV2
 {
-    public partial class PanelGroup : PanelBase
+    public partial class PanelGroupStarDifficulty : PanelBase
     {
         public const float HEIGHT = CarouselItem.DEFAULT_HEIGHT;
 
         private const float duration = 500;
 
+        [Resolved]
+        private OsuColour colours { get; set; } = null!;
+
+        [Resolved]
+        private OverlayColourProvider colourProvider { get; set; } = null!;
+
         private Drawable chevronIcon = null!;
-        private OsuSpriteText titleText = null!;
+        private Box contentBackground = null!;
+        private StarRatingDisplay starRatingDisplay = null!;
+        private StarCounter starCounter = null!;
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
+        private void load()
         {
             Anchor = Anchor.TopRight;
             Origin = Anchor.TopRight;
@@ -40,9 +51,8 @@ namespace osu.Game.Screens.SelectV2
                 Size = new Vector2(12),
                 Margin = new MarginPadding { Horizontal = 5f },
                 X = 2f,
-                Colour = colourProvider.Background3,
             };
-            Background = new Box
+            Background = contentBackground = new Box
             {
                 RelativeSizeAxes = Axes.Both,
                 Colour = colourProvider.Dark1,
@@ -50,11 +60,27 @@ namespace osu.Game.Screens.SelectV2
             AccentColour = colourProvider.Highlight1;
             Content.Children = new Drawable[]
             {
-                titleText = new OsuSpriteText
+                new FillFlowContainer
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
-                    X = 10f,
+                    AutoSizeAxes = Axes.Both,
+                    Spacing = new Vector2(10f, 0f),
+                    Margin = new MarginPadding { Left = 10f },
+                    Children = new Drawable[]
+                    {
+                        starRatingDisplay = new StarRatingDisplay(default, StarRatingDisplaySize.Small)
+                        {
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                        },
+                        starCounter = new StarCounter
+                        {
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            Scale = new Vector2(8f / 20f),
+                        },
+                    }
                 },
                 new CircularContainer
                 {
@@ -103,11 +129,20 @@ namespace osu.Game.Screens.SelectV2
 
             Debug.Assert(Item != null);
 
-            GroupDefinition group = (GroupDefinition)Item.Model;
+            int starNumber = (int)((GroupDefinition)Item.Model).Data;
 
-            titleText.Text = group.Title;
+            Color4 colour = starNumber >= 9 ? OsuColour.Gray(0.2f) : colours.ForStarDifficulty(starNumber);
+            Color4 contentColour = starNumber >= 7 ? colours.Orange1 : colourProvider.Background5;
 
-            FinishTransforms(true);
+            AccentColour = colour;
+            contentBackground.Colour = colour.Darken(0.3f);
+
+            starRatingDisplay.Current.Value = new StarDifficulty(starNumber, 0);
+            starCounter.Current = starNumber;
+
+            chevronIcon.Colour = contentColour;
+            starCounter.Colour = contentColour;
+
             this.FadeInFromZero(500, Easing.OutQuint);
         }
     }
