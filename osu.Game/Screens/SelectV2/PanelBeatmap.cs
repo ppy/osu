@@ -165,7 +165,6 @@ namespace osu.Game.Screens.SelectV2
             }, true);
 
             Selected.BindValueChanged(s => Expanded.Value = s.NewValue, true);
-            KeyboardSelected.BindValueChanged(k => KeyboardSelected.Value = k.NewValue, true);
         }
 
         protected override void PrepareForUse()
