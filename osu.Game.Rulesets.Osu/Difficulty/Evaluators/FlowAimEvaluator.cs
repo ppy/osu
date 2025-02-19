@@ -6,6 +6,7 @@ using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 {
@@ -20,17 +21,23 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             var osuCurrObj = (OsuDifficultyHitObject)current;
             var osuLastObj = (OsuDifficultyHitObject)current.Previous(0);
+            var osuLastLastObj = (OsuDifficultyHitObject)current.Previous(1);
 
             const int diameter = OsuDifficultyHitObject.NORMALISED_DIAMETER;
-
-            double currVelocity = osuCurrObj.LazyJumpDistance / osuCurrObj.StrainTime;
-            double prevVelocity = osuLastObj.LazyJumpDistance / osuLastObj.StrainTime;
 
             // Start with velocity
             double flowDifficulty = osuCurrObj.LazyJumpDistance / osuCurrObj.StrainTime;
 
             // Square the distance to turn into d/t
-            flowDifficulty *= osuCurrObj.LazyJumpDistance / diameter;
+            if (osuCurrObj.LazyJumpDistance > diameter)
+            {
+                flowDifficulty *= 1 + 0.65 * (osuCurrObj.LazyJumpDistance - diameter) / diameter;
+            }
+            else
+            {
+                flowDifficulty *= osuCurrObj.LazyJumpDistance / diameter;
+            }
+
 
             double angleBonus = 0;
 
@@ -40,41 +47,53 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double angleChangeBonus = CalculateFlowAngleChangeBonus(current);
                 double acuteAngleBonus = CalculateFlowAcuteAngleBonus(current);
 
-                double streamNerf = 1.0;
-
-                if (osuCurrObj.Index >= 4)
-                {
-                    for (int i = 0; i < 3; i++)
-                    {
-                        osuLastObj = (OsuDifficultyHitObject)current.Previous(i);
-
-                        // Angle is constant
-                        double angle = osuLastObj.Angle ?? 0;
-                        double reverseAngleBonus = 1 - AimEvaluator.CalcAcuteAngleBonus(angle);
-
-                        // Or there was no stream before
-                        double timeDifferenceFactor = DifficultyCalculationUtils.Smoothstep(osuCurrObj.StrainTime, osuLastObj.StrainTime * 0.75, osuLastObj.StrainTime * 0.55);
-
-                        streamNerf *= Math.Max(reverseAngleBonus, timeDifferenceFactor);
-                    }
-                }
-
                 double overlappedNotesWeight = 1;
 
                 if (current.Index > 2)
                 {
-                    var osuLastLastObj = (OsuDifficultyHitObject)current.Previous(1);
+                    double o1 = getOverlapness(osuCurrObj, osuLastObj);
+                    double o2 = getOverlapness(osuCurrObj, osuLastLastObj);
+                    double o3 = getOverlapness(osuLastObj, osuLastLastObj);
 
-                    double currOverlapness = getOverlapness((OsuHitObject)osuCurrObj.BaseObject, (OsuHitObject)osuLastObj.BaseObject);
-                    double prevOverlapness = getOverlapness((OsuHitObject)osuCurrObj.BaseObject, (OsuHitObject)osuLastLastObj.BaseObject);
-
-                    overlappedNotesWeight = Math.Max(currOverlapness, prevOverlapness);
+                    overlappedNotesWeight = 1 - o1 * o2 * o3;
                 }
 
-                angleBonus = Math.Max(angleChangeBonus, acuteAngleBonus) * (1 - streamNerf) * overlappedNotesWeight;
+
+                if (osuCurrObj.Index >= 4)
+                {
+                    var osuLast2Obj = (OsuDifficultyHitObject)current.Previous(2);
+                    var osuLast3Obj = (OsuDifficultyHitObject)current.Previous(3);
+
+                    // Angle is constant
+                    double angleCurr = osuCurrObj.Angle ?? 0;
+                    double angleLast = osuLast2Obj.Angle ?? 0;
+                    double angleLastLast = osuLast3Obj.Angle ?? 0;
+
+                    double deltaAngle = Math.Abs(angleLast - angleLastLast);
+                    double isSameAngle = DifficultyCalculationUtils.Smoothstep(deltaAngle, 0.25, 0.15);
+
+                    double currAngleBonus = AimEvaluator.CalcAcuteAngleBonus(angleCurr);
+                    double prevAngleBonus = AimEvaluator.CalcAcuteAngleBonus(angleLastLast);
+
+                    double angleBonusDifference = currAngleBonus > 0 ? Math.Clamp(prevAngleBonus / currAngleBonus, 0, 1) : 1;
+
+                    // Or there was no stream before
+                    double timeDifferenceFactor = DifficultyCalculationUtils.Smoothstep(osuCurrObj.StrainTime, osuLastLastObj.StrainTime * 0.75, osuLastLastObj.StrainTime * 0.55);
+
+                    double beforeNerf = Math.Max(angleChangeBonus, acuteAngleBonus);
+
+                    acuteAngleBonus *= 1 - isSameAngle * (1 - angleBonusDifference);
+                    angleChangeBonus *= 1 - Math.Max(isSameAngle * (1 - prevAngleBonus), timeDifferenceFactor);
+
+                    double nerf = beforeNerf - Math.Max(angleChangeBonus, acuteAngleBonus);
+
+                    if (osuCurrObj.StrainTime < 88 && osuLastObj.StrainTime < 88 && nerf > 0.5) Console.WriteLine($"{T(osuCurrObj.BaseObject.StartTime)}: {nerf}");
+                }
+
+                angleBonus = Math.Max(angleChangeBonus, acuteAngleBonus) * overlappedNotesWeight;
             }
 
-            double velocityChangeBonus = Math.Abs(prevVelocity - currVelocity);
+            double velocityChangeBonus = CalculateFlowVelocityChangeBonus(current);
 
             flowDifficulty += angleBonus + velocityChangeBonus;
             flowDifficulty *= flowMultiplier;
@@ -88,12 +107,25 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             return flowDifficulty;
         }
 
-        private static double getOverlapness(OsuHitObject a, OsuHitObject b)
+        public static string T(double t)
         {
-            var vector = a.StackedPosition - b.StackedPosition;
-            double diameterSqr = 16 * a.Radius * a.Radius;
-            double distanceSqr = vector.LengthSquared;
-            return Math.Clamp((distanceSqr / diameterSqr - 0.5) * 2, 0, 1);
+            int seconds = (int)(t / 1000);
+            int minutes = seconds / 60;
+            return $"{minutes}m {seconds - minutes * 60}s {t % 1000}ms";
+        }
+
+        private static double getOverlapness(OsuDifficultyHitObject odho1, OsuDifficultyHitObject odho2)
+        {
+            OsuHitObject o1 = (OsuHitObject)odho1.BaseObject, o2 = (OsuHitObject)odho2.BaseObject;
+
+            double distance = Vector2.Distance(o1.StackedPosition, o2.StackedPosition);
+            double radius = o1.Radius * 0.85; // We want to decrease radius because you can't cheese with very small space
+
+            if (distance >= radius * 2)
+                return 0;
+            if (distance <= radius)
+                return 1;
+            return 1 - Math.Pow((distance - radius) / radius, 2);
         }
 
         public static double CalculateFlowAcuteAngleBonus(DifficultyHitObject current)
@@ -145,11 +177,28 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             var osuCurrObj = (OsuDifficultyHitObject)current;
             var osuLastObj = (OsuDifficultyHitObject)current.Previous(0);
+            var osuLastLastObj = (OsuDifficultyHitObject)current.Previous(1);
 
             double currVelocity = osuCurrObj.LazyJumpDistance / osuCurrObj.StrainTime;
             double prevVelocity = osuLastObj.LazyJumpDistance / osuLastObj.StrainTime;
+            double prevPrevVelocity = osuLastLastObj.LazyJumpDistance / osuLastLastObj.StrainTime;
 
-            return Math.Abs(prevVelocity - currVelocity);
+            double minVelocity = Math.Min(currVelocity, prevVelocity);
+            double maxVelocity = Math.Max(currVelocity, prevVelocity);
+
+            double deltaVelocity = maxVelocity - minVelocity;
+            double deltaPrevVelocity = Math.Abs(prevVelocity - prevPrevVelocity);
+
+            // Don't buff slight consistent changes
+            if (minVelocity > 0) deltaVelocity -= Math.Min(deltaVelocity, deltaPrevVelocity) * DifficultyCalculationUtils.ReverseLerp(Math.Max(deltaVelocity, deltaPrevVelocity), minVelocity * 0.3, minVelocity * 0.2);
+
+            if (deltaVelocity > minVelocity * 2)
+            {
+                double rescaledBonus = deltaVelocity - minVelocity * 2;
+                return minVelocity * 2 + Math.Sqrt(2 * rescaledBonus + 1) - 1;
+            }
+
+            return deltaVelocity;
         }
     }
 }

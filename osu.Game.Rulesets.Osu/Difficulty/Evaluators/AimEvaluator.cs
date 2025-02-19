@@ -45,8 +45,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             if (osuCurrObj.StrainTime < 165)
             {
                 double bpmFactor = Math.Pow((165 - osuCurrObj.StrainTime) * 0.015, 2.5);
+
                 hardSnapBonus = OsuDifficultyHitObject.NORMALISED_DIAMETER * bpmFactor;
-                hardSnapBonus *= DifficultyCalculationUtils.Smoothstep(osuCurrObj.Angle ?? 0, Math.PI / 3, Math.PI / 2);
+
+                // Shift starting point from square to wide-angle patterns if spacing is too big
+                double highSpacingAdjust = Math.PI / 6;
+                highSpacingAdjust *= DifficultyCalculationUtils.ReverseLerp(osuCurrObj.LazyJumpDistance, diameter * 2, diameter * 4);
+
+                hardSnapBonus *= DifficultyCalculationUtils.Smoothstep(osuCurrObj.Angle ?? 0, Math.PI / 3 + highSpacingAdjust, Math.PI / 2 + highSpacingAdjust);
+
             }
 
             double getSnapDistance(double currDistance, double prevDistance, double snapBonus)
@@ -114,7 +121,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     acuteAngleBonus = CalcAcuteAngleBonus(currAngle);
 
                     // Penalize angle repetition.
-                    //wideAngleBonus *= 1 - Math.Min(wideAngleBonus, Math.Pow(calcWideAngleBonus(lastAngle), 3));
+                    wideAngleBonus *= 1 - Math.Min(wideAngleBonus, Math.Pow(CalcWideAngleBonus(lastAngle), 3))
+                        * DifficultyCalculationUtils.Smoothstep(Math.Max(currAngle, lastAngle), 2 * Math.PI / 3, Math.PI / 2);
                     acuteAngleBonus *= 0.08 + 0.3 * (1 - Math.Min(acuteAngleBonus, Math.Pow(CalcAcuteAngleBonus(lastAngle), 3)));
 
                     // Apply full wide angle bonus for distance more than one diameter

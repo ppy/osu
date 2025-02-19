@@ -54,7 +54,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             currentStrain += StrainValueOf(current) * SkillMultiplier;
 
             if (double.IsNaN(currentStrain))
+            {
                 Console.WriteLine($"CLOWN: {current.BaseObject.StartTime}");
+                double clown = StrainValueOf(current);
+            }
 
             return currentStrain;
         }

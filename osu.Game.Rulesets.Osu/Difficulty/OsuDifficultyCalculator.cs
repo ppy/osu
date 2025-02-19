@@ -41,8 +41,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double aimRatingStrain = Math.Sqrt(aim.StrainDifficultyValue()) * difficulty_multiplier;
             double difficultSliders = aim.GetDifficultSliders();
 
-            double snapAimRating = Math.Sqrt(skills.OfType<SnapAim>().Single().DifficultyValue()) * difficulty_multiplier;
-            double flowAimRating = Math.Sqrt(skills.OfType<FlowAim>().Single().DifficultyValue()) * difficulty_multiplier;
+            //double snapAimRating = Math.Sqrt(skills.OfType<SnapAim>().Single().DifficultyValue()) * difficulty_multiplier;
+            //double flowAimRating = Math.Sqrt(skills.OfType<FlowAim>().Single().DifficultyValue()) * difficulty_multiplier;
 
             var aimWithoutSliders = skills.OfType<TotalAim>().Single(a => !a.IncludeSliders);
             double aimRatingNoSliders = Math.Sqrt(aimWithoutSliders.DifficultyValue()) * difficulty_multiplier;
@@ -121,8 +121,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 HitCircleCount = hitCirclesCount,
                 SliderCount = sliderCount,
                 SpinnerCount = spinnerCount,
-                SnapAimDifficulty = snapAimRating,
-                FlowAimDifficulty = flowAimRating
+                //SnapAimDifficulty = snapAimRating,
+                //FlowAimDifficulty = flowAimRating
             };
 
             return attributes;
@@ -150,8 +150,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 new TotalAim(mods, true),
                 new TotalAim(mods, false),
                 new Speed(mods),
-                new SnapAim(mods),
-                new FlowAim(mods),
+                //new SnapAim(mods),
+                //new FlowAim(mods),
             };
 
             if (mods.Any(h => h is OsuModFlashlight))
