@@ -53,7 +53,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         public Score? Score { get; private set; }
 
         [Resolved]
-        private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
+        private BeatmapManager beatmapManager { get; set; } = null!;
 
         private readonly AudioAdjustments clockAdjustmentsFromMods = new AudioAdjustments();
         private readonly BindableDouble volumeAdjustment = new BindableDouble();
@@ -89,7 +89,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
             Score = score;
 
-            gameplayContent.Child = new PlayerIsolationContainer(beatmap.Value, Score.ScoreInfo.Ruleset, Score.ScoreInfo.Mods)
+            var workingBeatmap = beatmapManager.GetWorkingBeatmap(Score.ScoreInfo.BeatmapInfo);
+            workingBeatmap.LoadTrack();
+            gameplayContent.Child = new PlayerIsolationContainer(workingBeatmap, Score.ScoreInfo.Ruleset, Score.ScoreInfo.Mods)
             {
                 RelativeSizeAxes = Axes.Both,
                 Child = stack = new OsuScreenStack
