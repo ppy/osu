@@ -4,8 +4,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
+using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Utils;
 
@@ -40,6 +42,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Aggregation
 
         protected abstract double HitProbability(double skill, double difficulty);
 
+
+        private const double lowSkillThreshold = 1000;
+        private const double midSkillThreshold = 2500;
+
+        // Reward consistency much more on low skill level
+        private double probabilityAdjust(double skill) => Math.Pow(0.1, DifficultyCalculationUtils.ReverseLerp(skill, midSkillThreshold, lowSkillThreshold) * 4);
+        private double skillAdjust(double skill) => skill * (1 + 0.25 * DifficultyCalculationUtils.ReverseLerp(skill, midSkillThreshold, lowSkillThreshold));
+
         private double difficultyValueExact()
         {
             double maxDiff = Difficulties.Max();
@@ -49,10 +59,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Aggregation
             double upperBoundEstimate = 3.0 * maxDiff;
 
             double skill = RootFinding.FindRootExpand(
-                skill => fcProbability(skill) - FcProbability,
+                skill => fcProbability(skill) - FcProbability * probabilityAdjust(skill),
                 lower_bound,
                 upperBoundEstimate,
                 accuracy: 1e-4);
+
+            skill = skillAdjust(skill);
 
             return skill;
 
@@ -75,10 +87,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Aggregation
             double upperBoundEstimate = 3.0 * maxDiff;
 
             double skill = RootFinding.FindRootExpand(
-                skill => fcProbability(skill) - FcProbability,
+                skill => fcProbability(skill) - FcProbability * probabilityAdjust(skill),
                 lower_bound,
                 upperBoundEstimate,
                 accuracy: 1e-4);
+
+            skill = skillAdjust(skill);
 
             return skill;
 
