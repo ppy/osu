@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
@@ -28,7 +27,6 @@ using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Dialog;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Match;
@@ -124,18 +122,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         /// </summary>
         private readonly Bindable<PlaylistItem?> currentItem = new Bindable<PlaylistItem?>();
 
-        /// <summary>
-        /// Todo: TEMPORARY. READ-ONLY.
-        /// </summary>
-        private readonly Bindable<IReadOnlyList<Mod>> userMods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
-
         private readonly Room room;
 
         private Drawable roomContent = null!;
         private MultiplayerMatchSettingsOverlay settingsOverlay = null!;
 
         private FillFlowContainer userModsSection = null!;
-        private RoomModSelectOverlay userModsSelectOverlay = null!;
+        private MultiplayerUserModSelectOverlay userModsSelectOverlay = null!;
 
         private FillFlowContainer userStyleSection = null!;
         private Container<DrawableRoomPlaylistItem> userStyleDisplayContainer = null!;
@@ -408,12 +401,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 }
             };
 
-            LoadComponent(userModsSelectOverlay = new RoomModSelectOverlay
-            {
-                SelectedItem = { BindTarget = currentItem },
-                SelectedMods = { BindTarget = userMods },
-                IsValidMod = _ => false
-            });
+            LoadComponent(userModsSelectOverlay = new MultiplayerUserModSelectOverlay());
         }
 
         protected override void LoadComplete()
@@ -520,24 +508,15 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             updateGameplayState();
 
-            Ruleset rulesetInstance = rulesets.GetRuleset(item.RulesetID)!.CreateInstance();
-            Mod[] allowedMods = item.Freestyle
-                ? rulesetInstance.AllMods.OfType<Mod>().Where(m => ModUtils.IsValidFreeModForMatchType(m, room.Type)).ToArray()
-                : item.AllowedMods.Select(m => m.ToMod(rulesetInstance)).ToArray();
-
-            bool freemods = allowedMods.Length > 0;
+            bool freemods = item.Freestyle || item.AllowedMods.Length > 0;
             bool freestyle = item.Freestyle;
 
             if (freemods)
-            {
                 userModsSection.Show();
-                userModsSelectOverlay.IsValidMod = m => allowedMods.Any(a => a.GetType() == m.GetType());
-            }
             else
             {
                 userModsSection.Hide();
                 userModsSelectOverlay.Hide();
-                userModsSelectOverlay.IsValidMod = _ => false;
             }
 
             if (freestyle)

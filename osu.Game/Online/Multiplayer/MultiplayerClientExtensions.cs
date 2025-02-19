@@ -11,7 +11,7 @@ namespace osu.Game.Online.Multiplayer
 {
     public static class MultiplayerClientExtensions
     {
-        public static void FireAndForget(this Task task, Action? onSuccess = null, Action<Exception>? onError = null) =>
+        public static Task FireAndForget(this Task task, Action? onSuccess = null, Action<Exception>? onError = null) =>
             task.ContinueWith(t =>
             {
                 if (t.IsFaulted)
