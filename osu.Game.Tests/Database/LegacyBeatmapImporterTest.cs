@@ -89,7 +89,7 @@ namespace osu.Game.Tests.Database
 
                     File.SetLastWriteTimeUtc(beatmaps[beatmaps.Length / 2], new DateTime(2000, 1, 1, 12, 0, 0));
 
-                    await new LegacyBeatmapImporter(new BeatmapImporter(storage, realm)).ImportFromStableAsync(stableStorage);
+                    await new LegacyBeatmapImporter(new BeatmapImporter(storage, realm)).ImportFromStableAsync(stableStorage, false, false);
 
                     var importedSet = realm.Realm.All<BeatmapSetInfo>().Single();
 
