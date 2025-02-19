@@ -192,8 +192,8 @@ namespace osu.Game.Screens.Edit.Submission
                     (uint)Beatmap.Value.BeatmapSetInfo.OnlineID,
                     Beatmap.Value.BeatmapSetInfo.Beatmaps.Where(b => b.OnlineID > 0).Select(b => (uint)b.OnlineID).ToArray(),
                     (uint)Beatmap.Value.BeatmapSetInfo.Beatmaps.Count(b => b.OnlineID <= 0),
-                    settings.Target.Value)
-                : PutBeatmapSetRequest.CreateNew((uint)Beatmap.Value.BeatmapSetInfo.Beatmaps.Count, settings.Target.Value);
+                    settings)
+                : PutBeatmapSetRequest.CreateNew((uint)Beatmap.Value.BeatmapSetInfo.Beatmaps.Count, settings);
 
             createRequest.Success += async response =>
             {
