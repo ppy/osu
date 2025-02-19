@@ -37,7 +37,6 @@ using osu.Game.Screens.OnlinePlay.Multiplayer.Match;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Participants;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Spectate;
-using osu.Game.Screens.Play.HUD;
 using osu.Game.Users;
 using osu.Game.Utils;
 using osuTK;
@@ -313,11 +312,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                                                                             Text = "Select",
                                                                                             Action = showUserModSelect,
                                                                                         },
-                                                                                        new ModDisplay
+                                                                                        new MultiplayerUserModDisplay
                                                                                         {
                                                                                             Anchor = Anchor.CentreLeft,
                                                                                             Origin = Anchor.CentreLeft,
-                                                                                            Current = userMods,
                                                                                             Scale = new Vector2(0.8f),
                                                                                         },
                                                                                     }
