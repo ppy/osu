@@ -55,7 +55,6 @@ namespace osu.Game.Screens.Play
 
             if (EffectPoint.KiaiMode && !isTriggered)
             {
-                Logger.Log("shooting");
                 bool isNearEffectPoint = Math.Abs(BeatSyncSource.Clock.CurrentTime - EffectPoint.Time) < 500;
                 if (isNearEffectPoint)
                     Shoot();
