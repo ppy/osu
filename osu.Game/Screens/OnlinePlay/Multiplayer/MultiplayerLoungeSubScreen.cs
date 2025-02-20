@@ -88,7 +88,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             Type = MatchType.HeadToHead,
         };
 
-        protected override OnlinePlaySubScreen CreateRoomSubScreen(Room room) => new MultiplayerMatchSubScreen2(room);
+        protected override OnlinePlaySubScreen CreateRoomSubScreen(Room room) => new MultiplayerMatchSubScreen(room);
 
         protected override ListingPollingComponent CreatePollingComponent() => new MultiplayerListingPollingComponent();
 
