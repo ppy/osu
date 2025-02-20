@@ -211,19 +211,59 @@ namespace osu.Game.Overlays.BeatmapSet
         private void showBeatmap(APIBeatmap? beatmapInfo)
         {
             guestMapperContainer.Clear();
+            var beatmapOwners = beatmapInfo?.BeatmapOwners;
 
-            if (beatmapInfo?.AuthorID != BeatmapSet?.AuthorID)
+            if (beatmapOwners != null && (beatmapOwners.Length != 1 || beatmapOwners.First().Id != beatmapSet?.AuthorID))
             {
-                APIUser? user = BeatmapSet?.RelatedUsers?.SingleOrDefault(u => u.OnlineID == beatmapInfo?.AuthorID);
+                APIUser[]? users = BeatmapSet?.RelatedUsers?.Where(u => beatmapOwners.Any(o => o.Id == u.OnlineID)).ToArray();
 
-                if (user != null)
+                if (users != null)
                 {
-                    guestMapperContainer.AddText("mapped by ");
-                    guestMapperContainer.AddUserLink(user);
+                    formatGuestUser(users);
                 }
             }
 
             version.Text = beatmapInfo?.DifficultyName ?? string.Empty;
+            return;
+
+            void formatGuestUser(APIUser[] users)
+            {
+                int count = users.Length;
+
+                guestMapperContainer.AddText(BeatmapsetsStrings.ShowDetailsMappedBy(string.Empty)); // set string.Empty here because we need link.
+
+                switch (count)
+                {
+                    case 1:
+                        guestMapperContainer.AddUserLink(users[0]);
+                        break;
+
+                    case 2:
+                        guestMapperContainer.AddUserLink(users[0]);
+                        guestMapperContainer.AddText(CommonStrings.ArrayAndTwoWordsConnector);
+                        guestMapperContainer.AddUserLink(users[1]);
+                        break;
+
+                    default:
+                    {
+                        for (int i = 0; i < count; i++)
+                        {
+                            guestMapperContainer.AddUserLink(users[i]);
+
+                            if (i < count - 2)
+                            {
+                                guestMapperContainer.AddText(CommonStrings.ArrayAndWordsConnector);
+                            }
+                            else if (i == count - 2)
+                            {
+                                guestMapperContainer.AddText(CommonStrings.ArrayAndLastWordConnector);
+                            }
+                        }
+
+                        break;
+                    }
+                }
+            }
         }
 
         private void updateDifficultyButtons()
