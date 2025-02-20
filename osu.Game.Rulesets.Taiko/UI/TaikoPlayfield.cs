@@ -120,6 +120,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                         new Container
                         {
                             Name = "Bar line content",
+                            Masking = true,
                             RelativeSizeAxes = Axes.Both,
                             Padding = new MarginPadding { Left = hit_target_width / 2 + hit_target_offset },
                             Children = new Drawable[]
