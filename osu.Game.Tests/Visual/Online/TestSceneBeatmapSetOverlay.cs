@@ -297,6 +297,31 @@ namespace osu.Game.Tests.Visual.Online
             AddAssert("guest mapper information shown", () => overlay.ChildrenOfType<BeatmapPicker>().Single().ChildrenOfType<OsuSpriteText>().Any(s => s.Text == "BanchoBot"));
         }
 
+        [Test]
+        public void TestBeatmapsetWithALotGuestOwner()
+        {
+            AddStep("show map with 2 mapper", () => overlay.ShowBeatmapSet(createBeatmapSetWithGuestDifficulty(2)));
+            AddStep("move mouse to guest difficulty", () =>
+            {
+                InputManager.MoveMouseTo(overlay.ChildrenOfType<DifficultyIcon>().ElementAt(1));
+            });
+            AddStep("show map with 3 mapper", () => overlay.ShowBeatmapSet(createBeatmapSetWithGuestDifficulty(3)));
+            AddStep("move mouse to guest difficulty", () =>
+            {
+                InputManager.MoveMouseTo(overlay.ChildrenOfType<DifficultyIcon>().ElementAt(1));
+            });
+            AddStep("show map with 10 mapper", () => overlay.ShowBeatmapSet(createBeatmapSetWithGuestDifficulty(20)));
+            AddStep("move mouse to guest difficulty", () =>
+            {
+                InputManager.MoveMouseTo(overlay.ChildrenOfType<DifficultyIcon>().ElementAt(1));
+            });
+            AddStep("show map with 20 mapper", () => overlay.ShowBeatmapSet(createBeatmapSetWithGuestDifficulty(20)));
+            AddStep("move mouse to guest difficulty", () =>
+            {
+                InputManager.MoveMouseTo(overlay.ChildrenOfType<DifficultyIcon>().ElementAt(1));
+            });
+        }
+
         private APIBeatmapSet createManyDifficultiesBeatmapSet()
         {
             var set = getBeatmapSet();
@@ -336,22 +361,31 @@ namespace osu.Game.Tests.Visual.Online
             return beatmapSet;
         }
 
-        private APIBeatmapSet createBeatmapSetWithGuestDifficulty()
+        private APIBeatmapSet createBeatmapSetWithGuestDifficulty(int guestCount = 1)
         {
             var set = getBeatmapSet();
 
             var beatmaps = new List<APIBeatmap>();
+            var beatmapOwners = new List<APIBeatmap.BeatmapOwner>();
+            var ownersAPIUser = new List<APIUser>();
 
-            var guestUser = new APIUser
+            for (int i = 0; i < guestCount; i++)
             {
-                Username = @"BanchoBot",
-                Id = 3,
-            };
+                var guestUser = new APIUser
+                {
+                    Username = @$"BanchoBot{i}",
+                    Id = i + 3,
+                };
 
-            set.RelatedUsers = new[]
-            {
-                set.Author, guestUser
-            };
+                beatmapOwners.Add(new APIBeatmap.BeatmapOwner
+                {
+                    Username = @$"BanchoBot{i}",
+                    Id = i + 3,
+                });
+                ownersAPIUser.Add(guestUser);
+            }
+
+            set.RelatedUsers = new[] { set.Author }.Concat(ownersAPIUser).ToArray();
 
             beatmaps.Add(new APIBeatmap
             {
@@ -366,7 +400,7 @@ namespace osu.Game.Tests.Visual.Online
                     Fails = Enumerable.Range(1, 100).Select(j => j % 12 - 6).ToArray(),
                     Retries = Enumerable.Range(-2, 100).Select(j => j % 12 - 6).ToArray(),
                 },
-                Status = BeatmapOnlineStatus.Graveyard
+                Status = BeatmapOnlineStatus.Graveyard,
             });
 
             beatmaps.Add(new APIBeatmap
@@ -382,7 +416,8 @@ namespace osu.Game.Tests.Visual.Online
                     Fails = Enumerable.Range(1, 100).Select(j => j % 12 - 6).ToArray(),
                     Retries = Enumerable.Range(-2, 100).Select(j => j % 12 - 6).ToArray(),
                 },
-                Status = BeatmapOnlineStatus.Graveyard
+                Status = BeatmapOnlineStatus.Graveyard,
+                BeatmapOwners = beatmapOwners.ToArray(),
             });
 
             set.Beatmaps = beatmaps.ToArray();
