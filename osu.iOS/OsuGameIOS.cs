@@ -23,7 +23,7 @@ namespace osu.iOS
 
         public override bool HideUnlicensedContent => true;
 
-        protected override Vector2 ScalingContainerTargetDrawSize => new Vector2(1024, 1024 * DrawHeight / DrawWidth);
+        public override Vector2 ScalingContainerTargetDrawSize => new Vector2(1024, 1024 * DrawHeight / DrawWidth);
 
         public OsuGameIOS(AppDelegate appDelegate)
         {
