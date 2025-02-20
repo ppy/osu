@@ -56,9 +56,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             }
 
-            double getSnapDistance(double currDistance, double prevDistance, double snapBonus)
+            double getSnapDistance(double currDistance)
             {
-                const double snapThreshold = diameter * 3;
+                double bpm = DifficultyCalculationUtils.BPMToMilliseconds(osuCurrObj.StrainTime, 2);
+                double snapThreshold = diameter * (2 + DifficultyCalculationUtils.ReverseLerp(bpm, 200, 250));
 
                 // Jumps need to have some spacing to be snapped
                 double result = currDistance < snapThreshold ? snapThreshold / 2 + currDistance / 2 : currDistance;
@@ -67,23 +68,23 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double doublesNerf = DifficultyCalculationUtils.ReverseLerp(currDistance, radius * 2, radius);
 
                 // Don't accidentally nerf streams here
-                doublesNerf *= DifficultyCalculationUtils.ReverseLerp(prevDistance, diameter, diameter * 2);
+                doublesNerf *= DifficultyCalculationUtils.ReverseLerp(osuLastObj.LazyJumpDistance, diameter, diameter * 2);
 
                 // And don't nerf spaced bursts
                 //doublesNerf *= DifficultyCalculationUtils.ReverseLerp(osuCurrObj.StrainTime, osuLastObj.StrainTime * 1.5, osuLastObj.StrainTime * 1.95);
                 //doublesNerf *= DifficultyCalculationUtils.ReverseLerp(osuLastObj.StrainTime, osuCurrObj.StrainTime * 1.5, osuCurrObj.StrainTime * 1.95);
 
-                return (result + snapBonus) * (1 - doublesNerf);
+                return (result + hardSnapBonus) * (1 - doublesNerf);
             }
 
             // Calculate the velocity to the current hitobject, which starts with a base distance / time assuming the last object is a hitcircle.
-            double currVelocity = getSnapDistance(osuCurrObj.LazyJumpDistance, osuLastObj.LazyJumpDistance, hardSnapBonus) / osuCurrObj.StrainTime;
+            double currVelocity = getSnapDistance(osuCurrObj.LazyJumpDistance) / osuCurrObj.StrainTime;
 
             // But if the last object is a slider, then we extend the travel velocity through the slider into the current object.
             if (osuLastObj.BaseObject is Slider && withSliderTravelDistance)
             {
                 double travelVelocity = osuLastObj.TravelDistance / osuLastObj.TravelTime; // calculate the slider velocity from slider head to slider end.
-                double movementVelocity = getSnapDistance(osuCurrObj.MinimumJumpDistance, osuLastObj.LazyJumpDistance, hardSnapBonus) / osuCurrObj.MinimumJumpTime; // calculate the movement velocity from slider end to current object
+                double movementVelocity = getSnapDistance(osuCurrObj.MinimumJumpDistance) / osuCurrObj.MinimumJumpTime; // calculate the movement velocity from slider end to current object
 
                 currVelocity = Math.Max(currVelocity, movementVelocity + travelVelocity); // take the larger total combined velocity.
             }

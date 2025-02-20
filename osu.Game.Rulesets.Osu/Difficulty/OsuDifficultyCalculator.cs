@@ -53,6 +53,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double speedNotes = speed.RelevantNoteCount();
             double speedDifficultyStrainCount = speed.CountTopWeightedStrains();
 
+            const double addition_portion = 0.35;
+
+            if (aimRating > speedRating)
+                speedRating += (aimRating - speedRating) * addition_portion;
+            else
+                aimRating += (speedRating - aimRating) * addition_portion;
+
+            if (speedRating > aimRatingStrain)
+                aimRatingStrain += (speedRating - aimRatingStrain) * addition_portion;
+
             ExpPolynomial aimMissPenaltyCurve = aim.GetMissPenaltyCurve();
 
             var flashlight = skills.OfType<Flashlight>().SingleOrDefault();

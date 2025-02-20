@@ -42,13 +42,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Aggregation
 
         protected abstract double HitProbability(double skill, double difficulty);
 
+        public bool UseProbabilityAdjust => true;
+        public bool UseDefaultMissProb => false;
+        public bool UseDifficultyPower => false;
 
-        private const double lowSkillThreshold = 1000;
-        private const double midSkillThreshold = 2500;
+        public const double LOW_SKILL_THRESHOLD = 1000;
+        public const double MID_SKILL_THRESHOLD = 2500;
 
         // Reward consistency much more on low skill level
-        private double probabilityAdjust(double skill) => Math.Pow(0.1, DifficultyCalculationUtils.ReverseLerp(skill, midSkillThreshold, lowSkillThreshold) * 4);
-        private double skillAdjust(double skill) => skill * (1 + 0.25 * DifficultyCalculationUtils.ReverseLerp(skill, midSkillThreshold, lowSkillThreshold));
+        private double probabilityAdjust(double skill) => UseProbabilityAdjust ? Math.Pow(0.1, DifficultyCalculationUtils.ReverseLerp(skill, MID_SKILL_THRESHOLD, LOW_SKILL_THRESHOLD) * 4) : 1.0;
+        private double skillAdjust1(double skill) => skill * (1 + 0.25 * DifficultyCalculationUtils.ReverseLerp(skill, MID_SKILL_THRESHOLD, LOW_SKILL_THRESHOLD));
+        private double skillAdjust2(double skill) => skill * (1 - 0.155 * DifficultyCalculationUtils.ReverseLerp(skill, MID_SKILL_THRESHOLD, LOW_SKILL_THRESHOLD));
+        private double skillAdjust3(double skill) => skill * (1 + 0.185 * DifficultyCalculationUtils.ReverseLerp(skill, MID_SKILL_THRESHOLD, LOW_SKILL_THRESHOLD));
 
         private double difficultyValueExact()
         {
@@ -63,8 +68,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Aggregation
                 lower_bound,
                 upperBoundEstimate,
                 accuracy: 1e-4);
-
-            skill = skillAdjust(skill);
 
             return skill;
 
@@ -92,8 +95,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Aggregation
                 upperBoundEstimate,
                 accuracy: 1e-4);
 
-            skill = skillAdjust(skill);
-
             return skill;
 
             double fcProbability(double s)
@@ -104,11 +105,29 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Aggregation
             }
         }
 
-        public override double DifficultyValue()
+        private double difficultyValue()
         {
             if (Difficulties.Count == 0) return 0;
 
-            return Difficulties.Count > binThreshold ? difficultyValueBinned() : difficultyValueExact();
+            double skill = Difficulties.Count > binThreshold ? difficultyValueBinned() : difficultyValueExact();
+
+            // Use adjusts BEFORE miss penalty calc to make miss penalty harsher for easy and long maps (even tho it would not be mathematically correct)
+            if (UseProbabilityAdjust) skill = skillAdjust1(skill);
+            if (UseDefaultMissProb) skill = skillAdjust2(skill);
+            if (UseDifficultyPower) skill = skillAdjust3(skill);
+
+            return skill;
+        }
+
+        public override double DifficultyValue()
+        {
+            double skill = difficultyValue();
+
+            // This adjust is just global balancing to reduce nerf on lower end
+            // Apply AFTER miss penalty to not mess things up
+            skill *= 1 + 0.12 * DifficultyCalculationUtils.ReverseLerp(skill, 4000, 2000);
+
+            return skill;
         }
 
         public double StrainDifficultyValue() => base.DifficultyValue();
@@ -127,7 +146,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Aggregation
             if (Difficulties.Count == 0 || Difficulties.Max() == 0)
                 return missPenaltyCurve;
 
-            double fcSkill = DifficultyValue();
+            double fcSkill = difficultyValue();
 
             var bins = Bin.CreateBins(Difficulties, bin_count);
 

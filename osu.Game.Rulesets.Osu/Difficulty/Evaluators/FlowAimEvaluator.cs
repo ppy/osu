@@ -28,6 +28,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             // Start with velocity
             double flowDifficulty = osuCurrObj.LazyJumpDistance / osuCurrObj.StrainTime;
 
+            if (osuLastObj.BaseObject is Slider && withSliderTravelDistance)
+            {
+                double travelVelocity = osuLastObj.TravelDistance / osuLastObj.TravelTime; // calculate the slider velocity from slider head to slider end.
+                double movementVelocity = osuCurrObj.MinimumJumpDistance / osuCurrObj.MinimumJumpTime; // calculate the movement velocity from slider end to current object
+
+                flowDifficulty = Math.Max(flowDifficulty, movementVelocity + travelVelocity); // take the larger total combined velocity.
+            }
+
             // Square the distance to turn into d/t
             if (osuCurrObj.LazyJumpDistance > diameter)
             {
@@ -38,6 +46,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 flowDifficulty *= osuCurrObj.LazyJumpDistance / diameter;
             }
 
+            // Flow aim is harder on High BPM
+            double effectiveStrainTime = Math.Min(osuCurrObj.StrainTime, DifficultyCalculationUtils.BPMToMilliseconds(175, 4)); // Don't nerf BPM below 175 to avoid nerfing alt maps
+            flowDifficulty *= (60.0 / 75.0) * (effectiveStrainTime / (effectiveStrainTime - 15));
 
             double angleBonus = 0;
 
@@ -61,8 +72,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                 if (osuCurrObj.Index >= 4)
                 {
-                    var osuLast2Obj = (OsuDifficultyHitObject)current.Previous(2);
-                    var osuLast3Obj = (OsuDifficultyHitObject)current.Previous(3);
+                    var osuLast2Obj = (OsuDifficultyHitObject)current.Previous(1);
+                    var osuLast3Obj = (OsuDifficultyHitObject)current.Previous(2);
 
                     // Angle is constant
                     double angleCurr = osuCurrObj.Angle ?? 0;
@@ -189,7 +200,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double deltaPrevVelocity = Math.Abs(prevVelocity - prevPrevVelocity);
 
             // Don't buff slight consistent changes
-            if (minVelocity > 0) deltaVelocity -= Math.Min(deltaVelocity, deltaPrevVelocity) * DifficultyCalculationUtils.ReverseLerp(Math.Max(deltaVelocity, deltaPrevVelocity), minVelocity * 0.3, minVelocity * 0.2);
+            if (minVelocity > 0)
+                deltaVelocity -= Math.Min(deltaVelocity, deltaPrevVelocity) * DifficultyCalculationUtils.ReverseLerp(Math.Max(deltaVelocity, deltaPrevVelocity), minVelocity * 0.3, minVelocity * 0.2);
+
+            // Don't buff velocity increase if previous note was slower
+            if (currVelocity > prevVelocity)
+                deltaVelocity *= DifficultyCalculationUtils.Smoothstep(osuCurrObj.StrainTime, osuLastObj.StrainTime * 0.55, osuLastObj.StrainTime * 0.75);
 
             if (deltaVelocity > minVelocity * 2)
             {

@@ -19,6 +19,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     {
         public readonly bool IncludeSliders;
 
+        protected virtual double SkillMultiplier => 25.83 * 0.92;
+
         public Aim(Mod[] mods, bool includeSliders)
             : base(mods)
         {
@@ -35,7 +37,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         {
             if (difficulty <= 0) return 1;
             if (skill <= 0) return 0;
-            return DifficultyCalculationUtils.Erf(skill / (Math.Sqrt(2) * difficulty * 6));
+            double result = DifficultyCalculationUtils.Erf(skill / (Math.Sqrt(2) * difficulty * 6));
+
+            if (UseDifficultyPower) result = Math.Pow(result, 1 - 0.5 * DifficultyCalculationUtils.ReverseLerp(skill, 2500, 1000));
+
+            return result * (UseDefaultMissProb ? (1 - 0.008 * DifficultyCalculationUtils.ReverseLerp(skill, 2500, 1000)) : 1.0);
         }
 
         private readonly List<double> sliderStrains = new List<double>();
@@ -73,8 +79,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             return sliderStrains.Sum(strain => 1.0 / (1.0 + Math.Exp(-(strain / maxSliderStrain * 12.0 - 6.0))));
         }
-
-        protected virtual double SkillMultiplier => 25.83;
         protected abstract double StrainValueOf(DifficultyHitObject current);
     }
 }
