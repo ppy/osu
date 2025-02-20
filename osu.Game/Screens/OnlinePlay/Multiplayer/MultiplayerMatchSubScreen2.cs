@@ -44,7 +44,7 @@ using ParticipantsList = osu.Game.Screens.OnlinePlay.Multiplayer.Participants.Pa
 namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
     [Cached(typeof(IMultiplayerMatchScreen))]
-    public class MultiplayerMatchSubScreen2 : OnlinePlaySubScreen, IPreviewTrackOwner, IMultiplayerMatchScreen
+    public class MultiplayerMatchSubScreen2 : OnlinePlaySubScreen, IPreviewTrackOwner, IMultiplayerMatchScreen, IHandlePresentBeatmap
     {
         /// <summary>
         /// Footer height.
@@ -113,6 +113,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         [Resolved]
         private MultiplayerClient client { get; set; } = null!;
+
+        [Resolved]
+        private OsuGame? game { get; set; }
 
         [Cached]
         private readonly OnlinePlayBeatmapAvailabilityTracker beatmapAvailabilityTracker = new OnlinePlayBeatmapAvailabilityTracker();
@@ -813,6 +816,26 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             }
 
             return false;
+        }
+
+        public void PresentBeatmap(WorkingBeatmap beatmap, RulesetInfo ruleset)
+        {
+            if (!this.IsCurrentScreen())
+                return;
+
+            if (client.Room == null || client.LocalUser == null)
+                return;
+
+            if (client.LocalUser.CanAddPlaylistItems(client.Room) != true)
+                return;
+
+            // If there's only one playlist item and we are the host, assume we want to change it. Else add a new one.
+            PlaylistItem? itemToEdit = client.IsHost && room.Playlist.Count == 1 ? room.Playlist.Single() : null;
+
+            showSongSelect(itemToEdit);
+
+            // Re-run PresentBeatmap now that we've pushed a song select that can handle it.
+            game?.PresentBeatmap(beatmap.BeatmapSetInfo, b => b.ID == beatmap.BeatmapInfo.ID);
         }
 
         protected override BackgroundScreen CreateBackground() => new RoomBackgroundScreen(room.Playlist.FirstOrDefault())
