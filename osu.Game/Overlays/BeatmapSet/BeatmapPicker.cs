@@ -219,51 +219,45 @@ namespace osu.Game.Overlays.BeatmapSet
 
                 if (users != null)
                 {
-                    formatGuestUser(users);
+                    int count = users.Length;
+
+                    guestMapperContainer.AddText(BeatmapsetsStrings.ShowDetailsMappedBy(string.Empty)); // set string.Empty here because we need user link.
+
+                    switch (count)
+                    {
+                        case 1:
+                            guestMapperContainer.AddUserLink(users[0]);
+                            break;
+
+                        case 2:
+                            guestMapperContainer.AddUserLink(users[0]);
+                            guestMapperContainer.AddText(CommonStrings.ArrayAndTwoWordsConnector);
+                            guestMapperContainer.AddUserLink(users[1]);
+                            break;
+
+                        default:
+                        {
+                            for (int i = 0; i < count; i++)
+                            {
+                                guestMapperContainer.AddUserLink(users[i]);
+
+                                if (i < count - 2)
+                                {
+                                    guestMapperContainer.AddText(CommonStrings.ArrayAndWordsConnector);
+                                }
+                                else if (i == count - 2)
+                                {
+                                    guestMapperContainer.AddText(CommonStrings.ArrayAndLastWordConnector);
+                                }
+                            }
+
+                            break;
+                        }
+                    }
                 }
             }
 
             version.Text = beatmapInfo?.DifficultyName ?? string.Empty;
-            return;
-
-            void formatGuestUser(APIUser[] users)
-            {
-                int count = users.Length;
-
-                guestMapperContainer.AddText(BeatmapsetsStrings.ShowDetailsMappedBy(string.Empty)); // set string.Empty here because we need link.
-
-                switch (count)
-                {
-                    case 1:
-                        guestMapperContainer.AddUserLink(users[0]);
-                        break;
-
-                    case 2:
-                        guestMapperContainer.AddUserLink(users[0]);
-                        guestMapperContainer.AddText(CommonStrings.ArrayAndTwoWordsConnector);
-                        guestMapperContainer.AddUserLink(users[1]);
-                        break;
-
-                    default:
-                    {
-                        for (int i = 0; i < count; i++)
-                        {
-                            guestMapperContainer.AddUserLink(users[i]);
-
-                            if (i < count - 2)
-                            {
-                                guestMapperContainer.AddText(CommonStrings.ArrayAndWordsConnector);
-                            }
-                            else if (i == count - 2)
-                            {
-                                guestMapperContainer.AddText(CommonStrings.ArrayAndLastWordConnector);
-                            }
-                        }
-
-                        break;
-                    }
-                }
-            }
         }
 
         private void updateDifficultyButtons()
