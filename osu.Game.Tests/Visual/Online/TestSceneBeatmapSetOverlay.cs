@@ -289,12 +289,12 @@ namespace osu.Game.Tests.Visual.Online
             {
                 InputManager.MoveMouseTo(overlay.ChildrenOfType<DifficultyIcon>().ElementAt(0));
             });
-            AddAssert("guest mapper information not shown", () => overlay.ChildrenOfType<BeatmapPicker>().Single().ChildrenOfType<OsuSpriteText>().All(s => s.Text != "BanchoBot"));
+            AddAssert("guest mapper information not shown", () => overlay.ChildrenOfType<BeatmapPicker>().Single().ChildrenOfType<OsuSpriteText>().All(s => s.Text != "BanchoBot0"));
             AddStep("move mouse to guest difficulty", () =>
             {
                 InputManager.MoveMouseTo(overlay.ChildrenOfType<DifficultyIcon>().ElementAt(1));
             });
-            AddAssert("guest mapper information shown", () => overlay.ChildrenOfType<BeatmapPicker>().Single().ChildrenOfType<OsuSpriteText>().Any(s => s.Text == "BanchoBot"));
+            AddAssert("guest mapper information shown", () => overlay.ChildrenOfType<BeatmapPicker>().Single().ChildrenOfType<OsuSpriteText>().Any(s => s.Text == "BanchoBot0"));
         }
 
         [Test]
@@ -310,7 +310,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 InputManager.MoveMouseTo(overlay.ChildrenOfType<DifficultyIcon>().ElementAt(1));
             });
-            AddStep("show map with 10 mapper", () => overlay.ShowBeatmapSet(createBeatmapSetWithGuestDifficulty(20)));
+            AddStep("show map with 10 mapper", () => overlay.ShowBeatmapSet(createBeatmapSetWithGuestDifficulty(10)));
             AddStep("move mouse to guest difficulty", () =>
             {
                 InputManager.MoveMouseTo(overlay.ChildrenOfType<DifficultyIcon>().ElementAt(1));
