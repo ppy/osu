@@ -9,6 +9,7 @@ using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets;
@@ -128,8 +129,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             get => mute;
             set
             {
+                if (mute == value)
+                    return;
+
                 mute = value;
                 volumeAdjustment.Value = value ? 0 : 1;
+                Logger.Log($"{(mute ? "muting" : "unmuting")} player {UserId}");
             }
         }
 
