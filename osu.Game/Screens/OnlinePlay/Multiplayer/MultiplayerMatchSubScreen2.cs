@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -124,6 +123,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         /// Describes the current playlist item to be used for the next gameplay session.
         /// </summary>
         private readonly Bindable<PlaylistItem?> currentItem = new Bindable<PlaylistItem?>();
+
+        /// <summary>
+        /// Whether the multiplayer room has been joined.
+        /// </summary>
+        private readonly Bindable<bool> hasJoinedRoom = new Bindable<bool>();
 
         private readonly Room room;
 
@@ -413,58 +417,33 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             userModsSelectOverlayRegistration = overlayManager?.RegisterBlockingOverlay(userModsSelectOverlay);
 
-            room.PropertyChanged += onRoomPropertyChanged;
             client.RoomUpdated += onRoomUpdated;
             client.LoadRequested += onLoadRequested;
 
+            hasJoinedRoom.BindValueChanged(onHasJoinedRoomChanged, true);
+            currentItem.BindValueChanged(onCurrentItemChanged, true);
+
             beatmapAvailabilityTracker.SelectedItem.BindTo(currentItem);
-            beatmapAvailabilityTracker.Availability.BindValueChanged(onBeatmapAvailabilityChanged);
+            beatmapAvailabilityTracker.Availability.BindValueChanged(onBeatmapAvailabilityChanged, true);
 
-            currentItem.BindValueChanged(onCurrentItemChanged);
-
-            updateSetupState();
             onRoomUpdated();
         }
 
         /// <summary>
-        /// Responds to changes of the <see cref="Room"/>'s properties.
-        /// </summary>
-        /// <param name="sender">The <see cref="Room"/> that changed.</param>
-        /// <param name="e">Describes the property that changed.</param>
-        private void onRoomPropertyChanged(object? sender, PropertyChangedEventArgs e)
-        {
-            switch (e.PropertyName)
-            {
-                case nameof(Room.RoomID):
-                    updateSetupState();
-                    break;
-            }
-        }
-
-        /// <summary>
-        /// Responds to changes of the <see cref="MultiplayerRoom"/>'s properties.
+        /// Updates the current playlist item and local user's activity to reflect the room's current state.
         /// </summary>
         private void onRoomUpdated()
         {
+            hasJoinedRoom.Value = client.Room != null;
+
             if (client.Room == null || client.LocalUser == null)
-            {
-                if (room.RoomID != null)
-                {
-                    Logger.Log($"{this} exiting due to loss of room or connection");
-
-                    if (this.IsCurrentScreen())
-                        this.Exit();
-                    else
-                        ValidForResume = false;
-                }
-
                 return;
-            }
 
-            Activity.Value = new UserActivity.InLobby(room);
+            if (Activity.Value is not UserActivity.InLobby existing || existing.RoomName != client.Room.Settings.Name)
+                Activity.Value = new UserActivity.InLobby(client.Room);
 
-            PlaylistItem? roomItem = room.Playlist.SingleOrDefault(i => i.ID == client.Room.Settings.PlaylistItemId);
-            currentItem.Value = roomItem?.With(
+            PlaylistItem roomItem = room.Playlist.Single(i => i.ID == client.Room.Settings.PlaylistItemId);
+            currentItem.Value = roomItem.With(
                 beatmap: new Optional<IBeatmapInfo>(new APIBeatmap { OnlineID = client.LocalUser.BeatmapId ?? roomItem.Beatmap.OnlineID }),
                 ruleset: client.LocalUser.RulesetId ?? roomItem.RulesetID);
         }
@@ -496,6 +475,35 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 return;
 
             startPlay();
+        }
+
+        /// <summary>
+        /// Adjusts visibility of UI controls while the room is being created and updates the user's activity on any relevant changes.
+        /// Only the settings overlay is visible while the room isn't created, and only the main content is visible after creation.
+        /// </summary>
+        private void onHasJoinedRoomChanged(ValueChangedEvent<bool> joined)
+        {
+            if (joined.NewValue)
+            {
+                roomContent.Show();
+                settingsOverlay.Hide();
+            }
+            else if (joined.OldValue)
+            {
+                Logger.Log($"{this} exiting due to loss of room or connection");
+
+                if (this.IsCurrentScreen())
+                    this.Exit();
+                else
+                    ValidForResume = false;
+            }
+            else
+            {
+                // A new room is being created.
+                // The main content should be hidden until the settings overlay is hidden, signaling the room is ready to be displayed.
+                roomContent.Hide();
+                settingsOverlay.Show();
+            }
         }
 
         /// <summary>
@@ -566,26 +574,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                     if (client.LocalUser.State == MultiplayerUserState.Ready)
                         client.ChangeState(MultiplayerUserState.Idle);
                     break;
-            }
-        }
-
-        /// <summary>
-        /// Invoked on changes to <see cref="Room.RoomID"/> to adjust the visibility of the settings and main content.
-        /// Only the settings overlay is visible while the room isn't created, and only the main content is visible after creation.
-        /// </summary>
-        private void updateSetupState()
-        {
-            if (room.RoomID == null)
-            {
-                // A new room is being created.
-                // The main content should be hidden until the settings overlay is hidden, signaling the room is ready to be displayed.
-                roomContent.Hide();
-                settingsOverlay.Show();
-            }
-            else
-            {
-                roomContent.Show();
-                settingsOverlay.Hide();
             }
         }
 
@@ -854,8 +842,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             base.Dispose(isDisposing);
 
             userModsSelectOverlayRegistration?.Dispose();
-
-            room.PropertyChanged -= onRoomPropertyChanged;
 
             if (client.IsNotNull())
             {
