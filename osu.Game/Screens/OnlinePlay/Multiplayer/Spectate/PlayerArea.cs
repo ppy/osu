@@ -91,9 +91,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
             Score = score;
 
+            // Required for freestyle, where each player may be playing a different beatmap.
             var workingBeatmap = beatmapManager.GetWorkingBeatmap(Score.ScoreInfo.BeatmapInfo);
+
+            // Required to avoid crashes, but we really don't want to be doing this if we can avoid it.
+            // If we get to fixing this, we will want to investigate every access to `Track` in gameplay.
             if (!workingBeatmap.TrackLoaded)
                 loadedTrack = workingBeatmap.LoadTrack();
+
             gameplayContent.Child = new PlayerIsolationContainer(workingBeatmap, Score.ScoreInfo.Ruleset, Score.ScoreInfo.Mods)
             {
                 RelativeSizeAxes = Axes.Both,
