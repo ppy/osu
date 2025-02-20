@@ -810,8 +810,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                         this.Exit();
                     }));
                 }
-
-                return true;
             }
 
             return false;
