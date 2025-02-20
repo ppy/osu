@@ -147,7 +147,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         {
             this.room = room;
 
-            Title = room.RoomID == null ? "New playlist" : room.Name;
+            Title = room.RoomID == null ? "New room" : room.Name;
             Activity.Value = new UserActivity.InLobby(room);
 
             Padding = new MarginPadding { Top = Header.HEIGHT };
