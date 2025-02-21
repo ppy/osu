@@ -91,13 +91,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     // Or there was no stream before
                     double timeDifferenceFactor = DifficultyCalculationUtils.Smoothstep(osuCurrObj.StrainTime, osuLastLastObj.StrainTime * 0.75, osuLastLastObj.StrainTime * 0.55);
 
+                    double beforeNerf = angleChangeBonus + acuteAngleBonus;
 
                     acuteAngleBonus *= 1 - isSameAngle * (1 - angleBonusDifference);
                     angleChangeBonus *= 1 - Math.Max(isSameAngle * (1 - prevAngleBonus), timeDifferenceFactor);
 
-                    // double nerf = beforeNerf - Math.Max(angleChangeBonus, acuteAngleBonus);
+                    double nerf = beforeNerf - angleChangeBonus + acuteAngleBonus;
 
-                    // if (osuCurrObj.StrainTime < 88 && osuLastObj.StrainTime < 88 && nerf > 0.5) Console.WriteLine($"{T(osuCurrObj.BaseObject.StartTime)}: {nerf}");
+                    if (osuCurrObj.StrainTime < 100 && osuLastObj.StrainTime < 100 && nerf > 0.5) Console.WriteLine($"{T(osuCurrObj.BaseObject.StartTime)}: {nerf}");
                 }
 
                 angleBonus = Math.Max(angleChangeBonus, acuteAngleBonus) * overlappedNotesWeight;

@@ -17,6 +17,7 @@ using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
+using osu.Game.Rulesets.Difficulty.Skills;
 
 namespace osu.Game.Rulesets.Osu.Difficulty
 {
@@ -232,6 +233,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             aimValue *= accuracy;
             // It is important to consider accuracy difficulty when scaling with accuracy.
             aimValue *= 0.98 + Math.Pow(Math.Max(0, overallDifficulty), 2) / 2500;
+
+            aimValue *= 1 + 0.15 * DifficultyCalculationUtils.ReverseLerp(aimValue, 400, 200);
 
             return aimValue;
         }

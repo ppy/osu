@@ -125,7 +125,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Aggregation
 
             // This adjust is just global balancing to reduce nerf on lower end
             // Apply AFTER miss penalty to not mess things up
-            skill *= 1 + 0.12 * DifficultyCalculationUtils.ReverseLerp(skill, 4000, 2000);
+            //skill *= 1 + 0.16 * DifficultyCalculationUtils.ReverseLerp(skill, 5000, 2000);
 
             return skill;
         }
