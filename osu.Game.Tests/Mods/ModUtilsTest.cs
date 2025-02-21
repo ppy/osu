@@ -6,6 +6,7 @@ using System.Linq;
 using Moq;
 using NUnit.Framework;
 using osu.Framework.Localisation;
+using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
@@ -340,6 +341,40 @@ namespace osu.Game.Tests.Mods
             Assert.AreEqual(ModUtils.FormatScoreMultiplier(1.045).ToString(), "1.05x");
             Assert.AreEqual(ModUtils.FormatScoreMultiplier(1.05).ToString(), "1.05x");
             Assert.AreEqual(ModUtils.FormatScoreMultiplier(1.055).ToString(), "1.06x");
+        }
+
+        [Test]
+        public void TestRoomModValidity()
+        {
+            Assert.IsTrue(ModUtils.IsValidModForMatchType(new OsuModHardRock(), MatchType.Playlists));
+            Assert.IsTrue(ModUtils.IsValidModForMatchType(new OsuModDoubleTime(), MatchType.Playlists));
+            Assert.IsTrue(ModUtils.IsValidModForMatchType(new ModAdaptiveSpeed(), MatchType.Playlists));
+            Assert.IsFalse(ModUtils.IsValidModForMatchType(new OsuModAutoplay(), MatchType.Playlists));
+            Assert.IsFalse(ModUtils.IsValidModForMatchType(new OsuModTouchDevice(), MatchType.Playlists));
+
+            Assert.IsTrue(ModUtils.IsValidModForMatchType(new OsuModHardRock(), MatchType.HeadToHead));
+            Assert.IsTrue(ModUtils.IsValidModForMatchType(new OsuModDoubleTime(), MatchType.HeadToHead));
+            // For now, adaptive speed isn't allowed in multiplayer because it's a per-user rate adjustment.
+            Assert.IsFalse(ModUtils.IsValidModForMatchType(new ModAdaptiveSpeed(), MatchType.HeadToHead));
+            Assert.IsFalse(ModUtils.IsValidModForMatchType(new OsuModAutoplay(), MatchType.HeadToHead));
+            Assert.IsFalse(ModUtils.IsValidModForMatchType(new OsuModTouchDevice(), MatchType.HeadToHead));
+        }
+
+        [Test]
+        public void TestRoomFreeModValidity()
+        {
+            Assert.IsTrue(ModUtils.IsValidFreeModForMatchType(new OsuModHardRock(), MatchType.Playlists));
+            Assert.IsTrue(ModUtils.IsValidFreeModForMatchType(new OsuModDoubleTime(), MatchType.Playlists));
+            Assert.IsTrue(ModUtils.IsValidFreeModForMatchType(new ModAdaptiveSpeed(), MatchType.Playlists));
+            Assert.IsFalse(ModUtils.IsValidFreeModForMatchType(new OsuModAutoplay(), MatchType.Playlists));
+            Assert.IsFalse(ModUtils.IsValidFreeModForMatchType(new OsuModTouchDevice(), MatchType.Playlists));
+
+            Assert.IsTrue(ModUtils.IsValidFreeModForMatchType(new OsuModHardRock(), MatchType.HeadToHead));
+            // For now, all rate adjustment mods aren't allowed as free mods in multiplayer.
+            Assert.IsFalse(ModUtils.IsValidFreeModForMatchType(new OsuModDoubleTime(), MatchType.HeadToHead));
+            Assert.IsFalse(ModUtils.IsValidFreeModForMatchType(new ModAdaptiveSpeed(), MatchType.HeadToHead));
+            Assert.IsFalse(ModUtils.IsValidFreeModForMatchType(new OsuModAutoplay(), MatchType.HeadToHead));
+            Assert.IsFalse(ModUtils.IsValidFreeModForMatchType(new OsuModTouchDevice(), MatchType.HeadToHead));
         }
 
         public abstract class CustomMod1 : Mod, IModCompatibilitySpecification
