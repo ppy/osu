@@ -155,6 +155,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double accuracyValue = computeAccuracyValue(score, osuAttributes);
             double flashlightValue = computeFlashlightValue(score, osuAttributes);
 
+            if (aimValue > speedValue)
+                speedValue += (aimValue - speedValue) * OsuDifficultyCalculator.ADDITION_PORTION;
+            else
+                aimValue += (speedValue - aimValue) * OsuDifficultyCalculator.ADDITION_PORTION;
+
             double totalValue =
                 Math.Pow(
                     Math.Pow(aimValue, 1.1) +

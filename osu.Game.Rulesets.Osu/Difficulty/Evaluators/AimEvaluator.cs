@@ -62,7 +62,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double snapThreshold = diameter * (1 + DifficultyCalculationUtils.ReverseLerp(bpm, 200, 250));
 
                 // Jumps need to have some spacing to be snapped
-                double result = currDistance < snapThreshold ? snapThreshold / 2 + currDistance / 2 : currDistance;
+                double result = currDistance < snapThreshold ? snapThreshold * 0.75 + currDistance * 0.25 : currDistance;
 
                 // Don't buff double jumps as you don't snap in this case
                 double doublesNerf = DifficultyCalculationUtils.ReverseLerp(currDistance, radius * 2, radius);
@@ -78,7 +78,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             }
 
             // Calculate the velocity to the current hitobject, which starts with a base distance / time assuming the last object is a hitcircle.
-            double currVelocity = getSnapDistance(osuCurrObj.LazyJumpDistance) / osuCurrObj.StrainTime;
+            double currDistance = getSnapDistance(osuCurrObj.LazyJumpDistance);
+            double currVelocity = currDistance / osuCurrObj.StrainTime;
 
             // But if the last object is a slider, then we extend the travel velocity through the slider into the current object.
             if (osuLastObj.BaseObject is Slider && withSliderTravelDistance)
@@ -131,17 +132,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                     // Apply acute angle bonus for BPM above 300 1/2 and distance more than one diameter
                     acuteAngleBonus *= angleBonus *
-                                       DifficultyCalculationUtils.Smootherstep(DifficultyCalculationUtils.MillisecondsToBPM(osuCurrObj.StrainTime, 2), 300, 400) *
-                                       DifficultyCalculationUtils.Smootherstep(osuCurrObj.LazyJumpDistance, diameter, diameter * 2);
+                                       DifficultyCalculationUtils.Smootherstep(DifficultyCalculationUtils.MillisecondsToBPM(osuCurrObj.StrainTime, 2), 300, 400);
 
                     // Apply wiggle bonus for jumps that are [radius, 3*diameter] in distance, with < 110 angle
                     // https://www.desmos.com/calculator/dp0v0nvowc
                     wiggleBonus = angleBonus
-                                  * DifficultyCalculationUtils.Smootherstep(osuCurrObj.LazyJumpDistance, radius, diameter)
-                                  * Math.Pow(DifficultyCalculationUtils.ReverseLerp(osuCurrObj.LazyJumpDistance, diameter * 3, diameter), 1.8)
+                                  * DifficultyCalculationUtils.Smootherstep(currDistance, radius, diameter)
+                                  * Math.Pow(DifficultyCalculationUtils.ReverseLerp(currDistance, diameter * 3, diameter), 1.8)
                                   * DifficultyCalculationUtils.Smootherstep(currAngle, double.DegreesToRadians(110), double.DegreesToRadians(60))
-                                  * DifficultyCalculationUtils.Smootherstep(osuLastObj.LazyJumpDistance, radius, diameter)
-                                  * Math.Pow(DifficultyCalculationUtils.ReverseLerp(osuLastObj.LazyJumpDistance, diameter * 3, diameter), 1.8)
+                                  * DifficultyCalculationUtils.Smootherstep(currDistance, radius, diameter)
+                                  * Math.Pow(DifficultyCalculationUtils.ReverseLerp(currDistance, diameter * 3, diameter), 1.8)
                                   * DifficultyCalculationUtils.Smootherstep(Math.Min(lastAngle, lastLastAngle), double.DegreesToRadians(110), double.DegreesToRadians(60));
                 }
             }

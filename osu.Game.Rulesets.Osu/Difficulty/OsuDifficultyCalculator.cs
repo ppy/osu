@@ -31,6 +31,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
         }
 
+        public const double ADDITION_PORTION = 0.0;
+
         protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
         {
             if (beatmap.HitObjects.Count == 0)
@@ -52,16 +54,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double speedRating = Math.Sqrt(speed.DifficultyValue()) * difficulty_multiplier;
             double speedNotes = speed.RelevantNoteCount();
             double speedDifficultyStrainCount = speed.CountTopWeightedStrains();
-
-            const double addition_portion = 0.35;
-
-            if (aimRating > speedRating)
-                speedRating += (aimRating - speedRating) * addition_portion;
-            else
-                aimRating += (speedRating - aimRating) * addition_portion;
-
-            if (speedRating > aimRatingStrain)
-                aimRatingStrain += (speedRating - aimRatingStrain) * addition_portion;
 
             ExpPolynomial aimMissPenaltyCurve = aim.GetMissPenaltyCurve();
 
@@ -96,6 +88,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             if (mods.Any(h => h is OsuModFlashlight))
                 baseFlashlightPerformance = Flashlight.DifficultyToPerformance(flashlightRating);
+
+            if (baseAimPerformance > baseSpeedPerformance)
+                baseSpeedPerformance += (baseAimPerformance - baseSpeedPerformance) * ADDITION_PORTION;
+            else
+                baseAimPerformance += (baseSpeedPerformance - baseAimPerformance) * ADDITION_PORTION;
 
             double basePerformance =
                 Math.Pow(

@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 {
     public static class FlowAimEvaluator
     {
-        private static double flowMultiplier => 1.25;
+        private static double flowMultiplier => 1.09;
 
         public static double EvaluateDifficultyOf(DifficultyHitObject current, bool withSliderTravelDistance)
         {
@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             // Flow aim is harder on High BPM
             double effectiveStrainTime = Math.Min(osuCurrObj.StrainTime, DifficultyCalculationUtils.BPMToMilliseconds(175, 4)); // Don't nerf BPM below 175 to avoid nerfing alt maps
-            flowDifficulty *= (60.0 / 75.0) * (effectiveStrainTime / (effectiveStrainTime - 15));
+            flowDifficulty *= (effectiveStrainTime / (effectiveStrainTime - 10));
 
             double angleBonus = 0;
 
