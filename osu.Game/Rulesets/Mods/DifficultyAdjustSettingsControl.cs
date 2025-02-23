@@ -90,6 +90,7 @@ namespace osu.Game.Rulesets.Mods
             if (difficultyBindable.ReadCurrentFromDifficulty == null)
                 return;
 
+            difficultyBindable.UpdateDefaultFromDifficulty(difficulty);
             isInternalChange = true;
             sliderDisplayCurrent.Value = difficultyBindable.ReadCurrentFromDifficulty(difficulty);
             isInternalChange = false;

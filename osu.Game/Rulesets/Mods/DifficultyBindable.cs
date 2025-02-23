@@ -18,11 +18,19 @@ namespace osu.Game.Rulesets.Mods
         /// An internal numeric bindable to hold and propagate min/max/precision.
         /// The value of this bindable should not be set.
         /// </summary>
-        internal readonly BindableFloat CurrentNumber = new BindableFloat
+        internal readonly BindableFloat CurrentNumber = new BindableFloat()
         {
             MinValue = 0,
             MaxValue = 10,
         };
+
+        public void UpdateDefaultFromDifficulty(IBeatmapDifficultyInfo difficulty)
+        {
+            if (ReadCurrentFromDifficulty == null)
+                return;
+
+            CurrentNumber.Default = ReadCurrentFromDifficulty(difficulty);
+        }
 
         /// <summary>
         /// A function that can extract the current value of this setting from a beatmap difficulty for display purposes.
