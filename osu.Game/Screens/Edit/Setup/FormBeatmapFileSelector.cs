@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.IO;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
@@ -32,9 +33,9 @@ namespace osu.Game.Screens.Edit.Setup
 
         public readonly Bindable<bool> ApplyToAllDifficulties = new Bindable<bool>(true);
 
-        private SelectionScopePopoverTarget selectionScopeTarget = null!;
+        private SelectionScopePopoverProvider scopePopoverProvider = null!;
 
-        protected override bool IsPopoverVisible => base.IsPopoverVisible || selectionScopeTarget.PopoverState.Value == Visibility.Visible;
+        protected override bool IsPopoverVisible => base.IsPopoverVisible || scopePopoverProvider.PopoverState.Value == Visibility.Visible;
 
         public FormBeatmapFileSelector(bool beatmapHasMultipleDifficulties, params string[] handledExtensions)
             : base(handledExtensions)
@@ -45,7 +46,7 @@ namespace osu.Game.Screens.Edit.Setup
         [BackgroundDependencyLoader]
         private void load()
         {
-            AddInternal(selectionScopeTarget = new SelectionScopePopoverTarget
+            AddInternal(scopePopoverProvider = new SelectionScopePopoverProvider
             {
                 RelativeSizeAxes = Axes.Both,
             });
@@ -54,7 +55,7 @@ namespace osu.Game.Screens.Edit.Setup
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            selectionScopeTarget.PopoverState.BindValueChanged(_ => UpdateState(), true);
+            scopePopoverProvider.PopoverState.BindValueChanged(_ => UpdateState(), true);
         }
 
         protected override void OnFileSelected(FileInfo file)
@@ -65,8 +66,8 @@ namespace osu.Game.Screens.Edit.Setup
                 return;
             }
 
-            selectionScopeTarget.ShowPopover();
-            selectionScopeTarget.OnSelected = v =>
+            scopePopoverProvider.ShowPopover();
+            scopePopoverProvider.OnSelected = v =>
             {
                 this.HidePopover();
                 ApplyToAllDifficulties.Value = v;
@@ -75,7 +76,7 @@ namespace osu.Game.Screens.Edit.Setup
             };
         }
 
-        public partial class SelectionScopePopoverTarget : Drawable, IHasPopover
+        public partial class SelectionScopePopoverProvider : Drawable, IHasPopover
         {
             public Action<bool>? OnSelected;
 
