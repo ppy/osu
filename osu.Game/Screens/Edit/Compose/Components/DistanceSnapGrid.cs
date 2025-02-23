@@ -159,7 +159,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             // in case 2, we want *flooring* to occur, to prevent a possible off-by-one
             // because of the rounding snapping forward by a chunk of time significantly too high to be considered a rounding error.
             // the tolerance margin chosen here is arbitrary and can be adjusted if more cases of this are found.
-            if (Precision.DefinitelyBigger(beatIndex, fractionalBeatIndex, 0.005))
+            if (Precision.DefinitelyBigger(beatIndex, fractionalBeatIndex, 0.01))
                 beatIndex = (int)Math.Floor(fractionalBeatIndex);
 
             var colour = BindableBeatDivisor.GetColourFor(BindableBeatDivisor.GetDivisorForBeatIndex(beatIndex + placementIndex + 1, beatDivisor.Value), Colours);
