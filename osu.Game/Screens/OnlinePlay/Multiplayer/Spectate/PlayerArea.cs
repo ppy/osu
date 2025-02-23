@@ -154,12 +154,15 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         private partial class PlayerIsolationContainer : Container
         {
             [Cached]
+            [Cached(typeof(IBindable<RulesetInfo>))]
             private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
 
             [Cached]
+            [Cached(typeof(IBindable<WorkingBeatmap>))]
             private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
 
             [Cached]
+            [Cached(typeof(IBindable<IReadOnlyList<Mod>>))]
             private readonly Bindable<IReadOnlyList<Mod>> mods = new Bindable<IReadOnlyList<Mod>>();
 
             public PlayerIsolationContainer(WorkingBeatmap beatmap, RulesetInfo ruleset, IReadOnlyList<Mod> mods)
