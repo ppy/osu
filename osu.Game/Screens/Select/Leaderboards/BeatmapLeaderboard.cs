@@ -17,6 +17,7 @@ using osu.Game.Online.Leaderboards;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
+using osu.Game.Screens.Select.Filter;
 using Realms;
 
 namespace osu.Game.Screens.Select.Leaderboards
@@ -62,6 +63,22 @@ namespace osu.Game.Screens.Select.Leaderboards
                     return;
 
                 filterMods = value;
+
+                RefetchScores();
+            }
+        }
+
+        private ScoreSortMode scoresScoreSortMode;
+
+        public ScoreSortMode ScoresScoreSortMode
+        {
+            get => scoresScoreSortMode;
+            set
+            {
+                if (value == scoresScoreSortMode)
+                    return;
+
+                scoresScoreSortMode = value;
 
                 RefetchScores();
             }
@@ -219,7 +236,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                     scores = scores.Where(s => selectedMods.SetEquals(s.Mods.Select(m => m.Acronym)));
                 }
 
-                scores = scores.Detach().OrderByTotalScore();
+                scores = scores.Detach().OrderByCriteria(scoresScoreSortMode);
 
                 SetScores(scores);
             }

@@ -5,15 +5,13 @@
 
 using System;
 using System.Collections.Generic;
-using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
-using osu.Framework.Graphics.Shapes;
+using osu.Game.Screens.Select.Filter;
 
 namespace osu.Game.Screens.Select
 {
@@ -33,7 +31,13 @@ namespace osu.Game.Screens.Select
             set => modsCheckbox.Current = value;
         }
 
-        public Action<BeatmapDetailAreaTabItem, bool> OnFilter; // passed the selected tab and if mods is checked
+        public Bindable<ScoreSortMode> CurrentScoreSortMode
+        {
+            get => sortModeDropdown.Current;
+            set => sortModeDropdown.Current = value;
+        }
+
+        public Action<BeatmapDetailAreaTabItem, bool, ScoreSortMode> OnFilter; // passed the selected tab and if mods is checked
 
         public IReadOnlyList<BeatmapDetailAreaTabItem> TabItems
         {
@@ -43,6 +47,7 @@ namespace osu.Game.Screens.Select
 
         private readonly OsuTabControlCheckbox modsCheckbox;
         private readonly OsuTabControl<BeatmapDetailAreaTabItem> tabs;
+        private readonly SlimEnumDropdown<ScoreSortMode> sortModeDropdown;
         private readonly Container tabsContainer;
 
         public BeatmapDetailAreaTabControl()
@@ -51,36 +56,63 @@ namespace osu.Game.Screens.Select
 
             Children = new Drawable[]
             {
-                new Box
+                new GridContainer
                 {
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
+                    Height = HEIGHT,
                     RelativeSizeAxes = Axes.X,
-                    Height = 1,
-                    Colour = Color4.White.Opacity(0.2f),
-                },
-                tabsContainer = new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Child = tabs = new OsuTabControl<BeatmapDetailAreaTabItem>
+                    ColumnDimensions = new[]
                     {
-                        Anchor = Anchor.BottomLeft,
-                        Origin = Anchor.BottomLeft,
-                        RelativeSizeAxes = Axes.Both,
-                        IsSwitchable = true,
+                        new Dimension(),
+                        new Dimension(GridSizeMode.AutoSize),
+                        new Dimension(GridSizeMode.Relative, 0.2f)
                     },
-                },
-                modsCheckbox = new OsuTabControlCheckbox
-                {
-                    Anchor = Anchor.BottomRight,
-                    Origin = Anchor.BottomRight,
-                    Text = @"Selected Mods",
-                    Alpha = 0,
-                },
+                    RowDimensions = new[]
+                    {
+                        new Dimension(),
+                    },
+                    Content = new[]
+                    {
+                        new Drawable[]
+                        {
+                            tabsContainer = new Container
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Child = tabs = new OsuTabControl<BeatmapDetailAreaTabItem>
+                                {
+                                    Anchor = Anchor.BottomLeft,
+                                    Origin = Anchor.BottomLeft,
+                                    RelativeSizeAxes = Axes.Both,
+                                    IsSwitchable = true,
+                                },
+                            },
+                            modsCheckbox = new OsuTabControlCheckbox
+                            {
+                                Padding = new MarginPadding { Right = 10 },
+                                Anchor = Anchor.BottomRight,
+                                Origin = Anchor.BottomRight,
+                                Text = @"Selected Mods",
+                                Alpha = 0,
+                            },
+                            new Container
+                            {
+                                Anchor = Anchor.CentreLeft,
+                                Origin = Anchor.CentreLeft,
+                                Height = HEIGHT,
+                                RelativeSizeAxes = Axes.X,
+                                Child = sortModeDropdown = new SlimEnumDropdown<ScoreSortMode>
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    BypassAutoSizeAxes = Axes.Y,
+                                }
+                            }
+                        }
+                    }
+                }
             };
 
             tabs.Current.ValueChanged += _ => invokeOnFilter();
             modsCheckbox.Current.ValueChanged += _ => invokeOnFilter();
+            sortModeDropdown.Current.ValueChanged += _ => invokeOnFilter();
         }
 
         [BackgroundDependencyLoader]
@@ -91,16 +123,18 @@ namespace osu.Game.Screens.Select
 
         private void invokeOnFilter()
         {
-            OnFilter?.Invoke(tabs.Current.Value, modsCheckbox.Current.Value);
+            OnFilter?.Invoke(tabs.Current.Value, modsCheckbox.Current.Value, sortModeDropdown.Current.Value);
 
             if (tabs.Current.Value.FilterableByMods)
             {
                 modsCheckbox.FadeTo(1, 200, Easing.OutQuint);
-                tabsContainer.Padding = new MarginPadding { Right = 100 };
+                sortModeDropdown.FadeTo(1, 200, Easing.OutQuint);
+                tabsContainer.Padding = new MarginPadding { Right = 20 };
             }
             else
             {
                 modsCheckbox.FadeTo(0, 200, Easing.OutQuint);
+                sortModeDropdown.FadeTo(0, 200, Easing.OutQuint);
                 tabsContainer.Padding = new MarginPadding();
             }
         }
