@@ -21,9 +21,9 @@ namespace osu.Game.Graphics.UserInterface
         /// <summary>
         /// The colour that should be flashed when the <see cref="OsuAnimatedButton"/> is clicked.
         /// </summary>
-        protected Color4 FlashColour = Color4.White.Opacity(0.3f);
+        protected Color4 FlashColour = Color4.White.Opacity(0.4f);
 
-        private Color4 hoverColour = Color4.White.Opacity(0.1f);
+        private Color4 hoverColour = Color4.White.Opacity(0.2f);
 
         /// <summary>
         /// The background colour of the <see cref="OsuAnimatedButton"/> while it is hovered.
