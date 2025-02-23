@@ -57,22 +57,21 @@ namespace osu.Game.Screens.Edit.Setup
             selectionScopeTarget.PopoverState.BindValueChanged(_ => UpdateState(), true);
         }
 
-        protected override void OnFileSelected()
+        protected override void OnFileSelected(FileInfo file)
         {
-            if (InternalSelection.Value == null)
-                return;
-
             if (!beatmapHasMultipleDifficulties)
             {
-                base.OnFileSelected();
+                base.OnFileSelected(file);
                 return;
             }
 
             selectionScopeTarget.ShowPopover();
             selectionScopeTarget.OnSelected = v =>
             {
+                this.HidePopover();
                 ApplyToAllDifficulties.Value = v;
-                base.OnFileSelected();
+
+                base.OnFileSelected(file);
             };
         }
 

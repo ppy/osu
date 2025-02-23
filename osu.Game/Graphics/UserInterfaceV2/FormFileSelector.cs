@@ -37,11 +37,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         private readonly BindableWithCurrent<FileInfo?> current = new BindableWithCurrent<FileInfo?>();
 
-        /// <summary>
-        /// Directly contains the file selected from the popover.
-        /// This is propagated to <see cref="Current"/> through <see cref="OnFileSelected"/>.
-        /// </summary>
-        protected Bindable<FileInfo?> InternalSelection { get; } = new Bindable<FileInfo?>();
+        private readonly Bindable<FileInfo?> popoverSelection = new Bindable<FileInfo?>();
 
         public IEnumerable<string> HandledExtensions => handledExtensions;
 
@@ -182,10 +178,14 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 onCurrentChanged();
             }, true);
 
-            InternalSelection.BindValueChanged(_ => OnFileSelected());
+            popoverSelection.BindValueChanged(f =>
+            {
+                this.HidePopover();
+                OnFileSelected(f.NewValue!);
+            });
 
             if (systemFileSelector != null)
-                systemFileSelector.Selected += f => Schedule(() => InternalSelection.Value = f);
+                systemFileSelector.Selected += f => Schedule(OnFileSelected, f);
 
             FinishTransforms(true);
             game.RegisterImportHandler(this);
@@ -200,17 +200,11 @@ namespace osu.Game.Graphics.UserInterfaceV2
         }
 
         /// <summary>
-        /// Triggered when a file is selected from the popover. This propagates selection specified in <see cref="InternalSelection"/> to <see cref="Current"/>.
-        /// This can be overriden to include extra dialogs before setting <see cref="Current"/>.
+        /// Triggered when a file is selected from a file selector. By default, this directly propagates the selection to <see cref="Current"/>,
+        /// but extra dialogs can be included before propagating selection to <see cref="Current"/> by overriding this method.
         /// </summary>
-        protected virtual void OnFileSelected()
-        {
-            if (InternalSelection.Value == null)
-                return;
-
-            Current.Value = InternalSelection.Value;
-            this.HidePopover();
-        }
+        /// <param name="file">The file selected by the file selector.</param>
+        protected virtual void OnFileSelected(FileInfo file) => Current.Value = file;
 
         protected override bool OnClick(ClickEvent e)
         {
@@ -273,18 +267,15 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         Task ICanAcceptFiles.Import(ImportTask[] tasks, ImportParameters parameters) => throw new NotImplementedException();
 
-        protected virtual FileChooserPopover CreatePopover(string[] handledExtensions, Bindable<FileInfo?> current, string? chooserPath) =>
-            new FileChooserPopover(handledExtensions, current, chooserPath);
-
         public Popover GetPopover()
         {
-            var popover = CreatePopover(handledExtensions, InternalSelection, initialChooserPath);
+            var popover = new FileChooserPopover(handledExtensions, popoverSelection, initialChooserPath);
             popoverState.UnbindBindings();
             popoverState.BindTo(popover.State);
             return popover;
         }
 
-        protected partial class FileChooserPopover : OsuPopover
+        private partial class FileChooserPopover : OsuPopover
         {
             protected override string PopInSampleName => "UI/overlay-big-pop-in";
             protected override string PopOutSampleName => "UI/overlay-big-pop-out";
