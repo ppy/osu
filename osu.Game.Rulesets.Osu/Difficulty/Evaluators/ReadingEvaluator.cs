@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             var currObj = (OsuDifficultyHitObject)current;
             double currVelocity = currObj.LazyJumpDistance / currObj.StrainTime;
 
-            double rawDensityDifficulty = 1.0;
+            double pastObjectDifficultyInfluence = 1.0;
 
             foreach (var loopObj in retrievePastVisibleObjects(currObj))
             {
@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double timeBetweenCurrAndLoopObj = (currObj.BaseObject.StartTime - loopObj.BaseObject.StartTime) / current.ClockRate;
                 loopDifficulty *= getTimeNerfFactor(timeBetweenCurrAndLoopObj);
 
-                rawDensityDifficulty += loopDifficulty;
+                pastObjectDifficultyInfluence += loopDifficulty;
             }
 
             double preemptDifficulty = 0.0;
@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             if (currApproachRate < 450)
             {
-                preemptDifficulty += Math.Pow(450 - currApproachRate, 2.1) / 14000.0;
+                preemptDifficulty += Math.Pow(450 - currApproachRate, 2.2) / 18000.0;
 
                 // Buff spacing.
                 preemptDifficulty *= currVelocity;
@@ -56,7 +56,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 // Nerf preempt difficulty with density, lower density means more difficulty
                 // This is on the basis that in a high density environment you can rely more on patterns and muscle memory
                 // A side effect of this is since hidden makes objects appear earlier it increases density, reducing high ar difficulty
-                preemptDifficulty /= 1.5 * Math.Sqrt(rawDensityDifficulty);
+                preemptDifficulty /= 1 + Math.Sqrt(retrieveCurrentVisibleObjects(currObj).Count);
             }
 
             double hiddenDifficulty = 0;
@@ -65,7 +65,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             {
                 double timeSpentInvisible = getDurationSpentInvisible(currObj) / current.ClockRate;
                 // Nerf hidden difficulty less the more density difficulty you have
-                double timeDifficultyFactor = 500 / rawDensityDifficulty;
+                double timeDifficultyFactor = 500 / pastObjectDifficultyInfluence;
 
                 double visibleObjectFactor = Math.Clamp(retrieveCurrentVisibleObjects(currObj).Count - 2, 0, 15);
 
@@ -74,7 +74,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             }
 
             // Award only denser than average maps
-            double noteDensityDifficulty = Math.Max(0, rawDensityDifficulty - 3.2);
+            double noteDensityDifficulty = Math.Max(0, pastObjectDifficultyInfluence - 3.2);
 
             double difficulty = preemptDifficulty + hiddenDifficulty * hidden_multiplier + noteDensityDifficulty;
 
