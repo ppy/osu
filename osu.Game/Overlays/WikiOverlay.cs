@@ -7,6 +7,7 @@ using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Game.Extensions;
 using osu.Game.Localisation;
 using osu.Game.Online.API;
@@ -38,7 +39,7 @@ namespace osu.Game.Overlays
 
         private bool displayUpdateRequired = true;
 
-        private string lastValidPath = INDEX_PATH;
+        private string lastPath = INDEX_PATH;
 
         public WikiOverlay()
             : base(OverlayColourScheme.Orange, false)
@@ -111,6 +112,12 @@ namespace osu.Game.Overlays
             cancellationToken?.Cancel();
             request?.Cancel();
 
+            if (path == "error")
+            {
+                onFail(lastPath);
+                return;
+            }
+
             // Language code + path, or just path1 + path2 in case
             string[] values = path.Split('/', 2);
 
@@ -119,13 +126,15 @@ namespace osu.Game.Overlays
             else
                 request = new GetWikiRequest(path, lang);
 
+            lastPath = request.Path;
             Loading.Show();
 
             request.Success += response => Schedule(() => onSuccess(response));
             request.Failure += ex =>
             {
                 if (ex is not OperationCanceledException)
-                    Schedule(onFail, request.Path);
+                    // To ensure the path shown on error page is always the last requested path.
+                    Schedule(onFail, request.Path == "error" ? lastPath : request.Path);
             };
 
             api.PerformAsync(request);
@@ -147,13 +156,12 @@ namespace osu.Game.Overlays
         private void onLangChanged(ValueChangedEvent<Language> e)
         {
             // Path unmodified, just reload the page with new language value.
-            loadPage(path.Value == "error" ? lastValidPath : path.Value, e.NewValue);
+            loadPage(path.Value, e.NewValue);
         }
 
         private void onSuccess(APIWikiPage response)
         {
             wikiData.Value = response;
-            lastValidPath = response.Path;
             path.Value = response.Path;
 
             if (response.Layout.Equals(INDEX_PATH, StringComparison.OrdinalIgnoreCase))
@@ -179,9 +187,10 @@ namespace osu.Game.Overlays
             wikiData.Value = null;
             path.Value = "error";
 
+            // TODO: Further changes for localisation are needed.
             LoadDisplay(articlePage = new WikiArticlePage($@"{api.WebsiteRootUrl}/wiki/",
-                $"{WikiOverlayStrings.PageErrorDescription(originalPath)}\n\n"
-                + $"{WikiOverlayStrings.ReloadPageLink(originalPath)}\n{WikiOverlayStrings.ReturnToMainPageLink(INDEX_PATH)}"));
+                LocalisableString.Format("{0}\n\n{1}\n{2}", WikiOverlayStrings.PageErrorDescription(originalPath),
+                    WikiOverlayStrings.ReloadPageLink(originalPath), WikiOverlayStrings.ReturnToMainPageLink(INDEX_PATH)).ToString()));
         }
 
         private void showParentPage()
