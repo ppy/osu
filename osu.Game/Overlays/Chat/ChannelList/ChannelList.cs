@@ -106,6 +106,7 @@ namespace osu.Game.Overlays.Chat.ChannelList
             };
 
             selector.OnRequestSelect += chan => OnRequestSelect?.Invoke(chan);
+            updateVisibility();
         }
 
         public void AddChannel(Channel channel)
@@ -170,10 +171,8 @@ namespace osu.Game.Overlays.Chat.ChannelList
 
         private void updateVisibility()
         {
-            if (AnnounceChannelGroup.ItemFlow.Children.Count == 0)
-                AnnounceChannelGroup.Hide();
-            else
-                AnnounceChannelGroup.Show();
+            AnnounceChannelGroup.Alpha = AnnounceChannelGroup.ItemFlow.Any() ? 1 : 0;
+            TeamChannelGroup.Alpha = TeamChannelGroup.ItemFlow.Any() ? 1 : 0;
         }
 
         public partial class ChannelGroup : FillFlowContainer
