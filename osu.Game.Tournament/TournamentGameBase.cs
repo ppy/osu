@@ -20,6 +20,7 @@ using osu.Game.Online;
 using osu.Game.Online.API.Requests;
 using osu.Game.Tournament.IO;
 using osu.Game.Tournament.IPC;
+using osu.Game.Tournament.Localisation;
 using osu.Game.Tournament.Models;
 using osu.Game.Users;
 using osuTK.Input;
@@ -229,7 +230,7 @@ namespace osu.Game.Tournament
             {
                 var p = playersRequiringPopulation[i];
                 PopulatePlayer(p, immediate: true);
-                updateLoadProgressMessage($"Populating user stats ({i} / {playersRequiringPopulation.Count})");
+                updateLoadProgressMessage(BaseStrings.PopulatingUserStats(i, playersRequiringPopulation.Count));
             }
 
             return true;
@@ -255,7 +256,7 @@ namespace osu.Game.Tournament
                 if (populated != null)
                     b.Beatmap = new TournamentBeatmap(populated);
 
-                updateLoadProgressMessage($"Populating round beatmaps ({i} / {beatmapsRequiringPopulation.Count})");
+                updateLoadProgressMessage(BaseStrings.PopulatingRoundBeatmaps(i, beatmapsRequiringPopulation.Count));
             }
 
             return true;
@@ -282,13 +283,13 @@ namespace osu.Game.Tournament
                 if (populated != null)
                     b.Beatmap = new TournamentBeatmap(populated);
 
-                updateLoadProgressMessage($"Populating seeding beatmaps ({i} / {beatmapsRequiringPopulation.Count})");
+                updateLoadProgressMessage(BaseStrings.PopulatingSeedingBeatmaps(i, beatmapsRequiringPopulation.Count));
             }
 
             return true;
         }
 
-        private void updateLoadProgressMessage(string s) => Schedule(() => initialisationText.Text = s);
+        private void updateLoadProgressMessage(LocalisableString s) => Schedule(() => initialisationText.Text = s);
 
         public void PopulatePlayer(TournamentUser user, Action? success = null, Action? failure = null, bool immediate = false)
         {

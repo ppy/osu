@@ -16,6 +16,7 @@ using osu.Framework.Platform;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Tournament.Components;
+using osu.Game.Tournament.Localisation;
 using osu.Game.Tournament.Models;
 using osu.Game.Tournament.Screens.Drawings.Components;
 using osuTK;
@@ -65,7 +66,7 @@ namespace osu.Game.Tournament.Screens.Drawings
                         Origin = Anchor.Centre,
                         Height = 0.3f,
                     },
-                    new WarningBox("No drawings.txt file found. Please create one and restart the client."),
+                    new WarningBox(DrawingsStrings.NoDrawingDataWarning),
                     links = new LinkFlowContainer
                     {
                         Anchor = Anchor.Centre,
@@ -75,7 +76,7 @@ namespace osu.Game.Tournament.Screens.Drawings
                     }
                 };
 
-                links.AddLink("Click for details on the file format", "https://osu.ppy.sh/wiki/en/Tournament_Drawings", t => t.Colour = Color4.White);
+                links.AddLink(DrawingsStrings.FileFormatLinkText, "https://osu.ppy.sh/wiki/en/Tournament_Drawings", t => t.Colour = Color4.White);
                 return;
             }
 
@@ -153,21 +154,21 @@ namespace osu.Game.Tournament.Screens.Drawings
                     {
                         RelativeSizeAxes = Axes.X,
 
-                        Text = "Begin random",
+                        Text = DrawingsStrings.BeginRandom,
                         Action = teamsContainer.StartScrolling,
                     },
                     new TourneyButton
                     {
                         RelativeSizeAxes = Axes.X,
 
-                        Text = "Stop random",
+                        Text = DrawingsStrings.StopRandom,
                         Action = teamsContainer.StopScrolling,
                     },
                     new TourneyButton
                     {
                         RelativeSizeAxes = Axes.X,
 
-                        Text = "Reload",
+                        Text = BaseStrings.Refresh,
                         Action = reloadTeams
                     },
                     new ControlPanel.Spacer(),
@@ -175,7 +176,7 @@ namespace osu.Game.Tournament.Screens.Drawings
                     {
                         RelativeSizeAxes = Axes.X,
 
-                        Text = "Reset",
+                        Text = BaseStrings.Reset,
                         Action = () => reset()
                     }
                 }
