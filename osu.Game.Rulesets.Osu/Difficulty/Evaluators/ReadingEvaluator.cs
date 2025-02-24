@@ -46,17 +46,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             double currApproachRate = currObj.Preempt; // Approach rate in milliseconds
 
-            if (currApproachRate < 450)
+            if (currApproachRate < 500)
             {
-                preemptDifficulty += Math.Pow(450 - currApproachRate, 2.2) / 18000.0;
+                preemptDifficulty += Math.Pow(500 - currApproachRate, 4.15) / (2 * Math.Pow(10, 9));
 
                 // Buff spacing.
-                preemptDifficulty *= currVelocity;
+                preemptDifficulty *= Math.Sqrt(currVelocity);
 
                 // Nerf preempt difficulty with density, lower density means more difficulty
                 // This is on the basis that in a high density environment you can rely more on patterns and muscle memory
                 // A side effect of this is since hidden makes objects appear earlier it increases density, reducing high ar difficulty
-                preemptDifficulty /= 1 + Math.Sqrt(retrieveCurrentVisibleObjects(currObj).Count);
+                preemptDifficulty /= Math.Max(1, retrieveCurrentVisibleObjects(currObj).Count);
             }
 
             double hiddenDifficulty = 0;
@@ -65,7 +65,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             {
                 double timeSpentInvisible = getDurationSpentInvisible(currObj) / current.ClockRate;
                 // Nerf hidden difficulty less the more density difficulty you have
-                double timeDifficultyFactor = 500 / pastObjectDifficultyInfluence;
+                double timeDifficultyFactor = 4000 / pastObjectDifficultyInfluence;
 
                 double visibleObjectFactor = Math.Clamp(retrieveCurrentVisibleObjects(currObj).Count - 2, 0, 15);
 
@@ -76,7 +76,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             // Award only denser than average maps
             double noteDensityDifficulty = Math.Max(0, pastObjectDifficultyInfluence - 3.2);
 
-            double difficulty = preemptDifficulty + hiddenDifficulty * hidden_multiplier + noteDensityDifficulty;
+            double difficulty = preemptDifficulty + hiddenDifficulty + noteDensityDifficulty;
 
             difficulty *= getConstantAngleNerfFactor(currObj);
 
