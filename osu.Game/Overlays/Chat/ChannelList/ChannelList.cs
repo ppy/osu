@@ -39,6 +39,7 @@ namespace osu.Game.Overlays.Chat.ChannelList
 
         public ChannelGroup AnnounceChannelGroup { get; private set; } = null!;
         public ChannelGroup PublicChannelGroup { get; private set; } = null!;
+        public ChannelGroup TeamChannelGroup { get; private set; } = null!;
         public ChannelGroup PrivateChannelGroup { get; private set; } = null!;
 
         private OsuScrollContainer scroll = null!;
@@ -82,6 +83,7 @@ namespace osu.Game.Overlays.Chat.ChannelList
                             AnnounceChannelGroup = new ChannelGroup(ChatStrings.ChannelsListTitleANNOUNCE.ToUpper(), false),
                             PublicChannelGroup = new ChannelGroup(ChatStrings.ChannelsListTitlePUBLIC.ToUpper(), false),
                             selector = new ChannelListItem(ChannelListingChannel),
+                            TeamChannelGroup = new ChannelGroup("TEAM", false), // TODO: replace with osu-web localisable string once available
                             PrivateChannelGroup = new ChannelGroup(ChatStrings.ChannelsListTitlePM.ToUpper(), true),
                         },
                     },
@@ -155,6 +157,9 @@ namespace osu.Game.Overlays.Chat.ChannelList
 
                 case ChannelType.Announce:
                     return AnnounceChannelGroup;
+
+                case ChannelType.Team:
+                    return TeamChannelGroup;
 
                 default:
                     return PublicChannelGroup;
