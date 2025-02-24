@@ -114,9 +114,13 @@ namespace osu.Game.Overlays.Chat.ChannelList
             if (channelMap.ContainsKey(channel))
                 return;
 
-            ChannelListItem item = new ChannelListItem(channel);
+            ChannelListItem item = new ChannelListItem(channel)
+            {
+                CanLeave = channel.Type != ChannelType.Team
+            };
             item.OnRequestSelect += chan => OnRequestSelect?.Invoke(chan);
-            item.OnRequestLeave += chan => OnRequestLeave?.Invoke(chan);
+            if (item.CanLeave)
+                item.OnRequestLeave += chan => OnRequestLeave?.Invoke(chan);
 
             ChannelGroup group = getGroupFromChannel(channel);
             channelMap.Add(channel, item);
