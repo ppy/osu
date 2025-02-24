@@ -115,11 +115,7 @@ namespace osu.Game.Tests.Visual.Online
                     channelList.AddChannel(createRandomPrivateChannel());
             });
 
-            AddStep("Add Team Channels", () =>
-            {
-                for (int i = 0; i < 10; i++)
-                    channelList.AddChannel(createRandomTeamChannel());
-            });
+            AddStep("Add Team Channel", () => channelList.AddChannel(createRandomTeamChannel()));
 
             AddStep("Add Announce Channels", () =>
             {
