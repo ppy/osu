@@ -9,6 +9,7 @@ using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
 using osu.Framework.Testing;
@@ -80,11 +81,12 @@ namespace osu.Game.Overlays.Chat.ChannelList
                                     RelativeSizeAxes = Axes.X,
                                 }
                             },
-                            AnnounceChannelGroup = new ChannelGroup(ChatStrings.ChannelsListTitleANNOUNCE.ToUpper(), false),
-                            PublicChannelGroup = new ChannelGroup(ChatStrings.ChannelsListTitlePUBLIC.ToUpper(), false),
+                            // cross-reference for icons: https://github.com/ppy/osu-web/blob/3c9e99eaf4bd9e73d2712f60d67f5bc95f9dfe2b/resources/js/chat/conversation-list.tsx#L13-L19
+                            AnnounceChannelGroup = new ChannelGroup(ChatStrings.ChannelsListTitleANNOUNCE.ToUpper(), FontAwesome.Solid.Bullhorn, false),
+                            PublicChannelGroup = new ChannelGroup(ChatStrings.ChannelsListTitlePUBLIC.ToUpper(), FontAwesome.Solid.Comments, false),
                             selector = new ChannelListItem(ChannelListingChannel),
-                            TeamChannelGroup = new ChannelGroup("TEAM", false), // TODO: replace with osu-web localisable string once available
-                            PrivateChannelGroup = new ChannelGroup(ChatStrings.ChannelsListTitlePM.ToUpper(), true),
+                            TeamChannelGroup = new ChannelGroup("TEAM", FontAwesome.Solid.Users, false), // TODO: replace with osu-web localisable string once available
+                            PrivateChannelGroup = new ChannelGroup(ChatStrings.ChannelsListTitlePM.ToUpper(), FontAwesome.Solid.Envelope, true),
                         },
                     },
                 },
@@ -179,7 +181,7 @@ namespace osu.Game.Overlays.Chat.ChannelList
             private readonly bool sortByRecent;
             public readonly ChannelListItemFlow ItemFlow;
 
-            public ChannelGroup(LocalisableString label, bool sortByRecent)
+            public ChannelGroup(LocalisableString label, IconUsage icon, bool sortByRecent)
             {
                 this.sortByRecent = sortByRecent;
                 Direction = FillDirection.Vertical;
@@ -189,11 +191,26 @@ namespace osu.Game.Overlays.Chat.ChannelList
 
                 Children = new Drawable[]
                 {
-                    new OsuSpriteText
+                    new FillFlowContainer
                     {
-                        Text = label,
-                        Margin = new MarginPadding { Left = 18, Bottom = 5 },
-                        Font = OsuFont.Torus.With(size: 12, weight: FontWeight.SemiBold),
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Direction = FillDirection.Horizontal,
+                        Spacing = new Vector2(5),
+                        Children = new Drawable[]
+                        {
+                            new OsuSpriteText
+                            {
+                                Text = label,
+                                Margin = new MarginPadding { Left = 18, Bottom = 5 },
+                                Font = OsuFont.Torus.With(size: 12, weight: FontWeight.SemiBold),
+                            },
+                            new SpriteIcon
+                            {
+                                Icon = icon,
+                                Size = new Vector2(12),
+                            },
+                        }
                     },
                     ItemFlow = new ChannelListItemFlow(sortByRecent)
                     {
