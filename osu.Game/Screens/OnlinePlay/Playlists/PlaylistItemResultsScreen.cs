@@ -97,7 +97,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
             try
             {
-                var userScore = await requestTaskSource.Task;
+                var userScore = await requestTaskSource.Task.ConfigureAwait(false);
                 var allScores = new List<MultiplayerScore> { userScore };
 
                 // Other scores could have arrived between score submission and entering the results screen. Ensure the local player score position is up to date.
@@ -125,7 +125,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                     setPositions(lowerScores, userScore.Position.Value, 1);
                 }
 
-                return await transformScores(allScores);
+                return await transformScores(allScores).ConfigureAwait(false);
             }
             catch (OperationCanceledException)
             {
@@ -133,7 +133,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             }
             catch
             {
-                return await fetchScoresAround();
+                return await fetchScoresAround().ConfigureAwait(false);
             }
             finally
             {
@@ -157,7 +157,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                     RightSpinner.Show();
             });
 
-            return await fetchScoresAround(pivot);
+            return await fetchScoresAround(pivot).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -177,7 +177,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
             try
             {
-                var index = await requestTaskSource.Task;
+                var index = await requestTaskSource.Task.ConfigureAwait(false);
 
                 if (pivot == lowerScores)
                 {
@@ -190,7 +190,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                     setPositions(index, pivot, -1);
                 }
 
-                return await transformScores(index.Scores);
+                return await transformScores(index.Scores).ConfigureAwait(false);
             }
             catch (OperationCanceledException)
             {
@@ -208,7 +208,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         /// <param name="scores">The <see cref="MultiplayerScore"/>s that were retrieved from <see cref="APIRequest"/>s.</param>
         private async Task<ScoreInfo[]> transformScores(List<MultiplayerScore> scores)
         {
-            APIBeatmap?[] beatmaps = await beatmapLookupCache.GetBeatmapsAsync(scores.Select(s => s.BeatmapId).Distinct().ToArray());
+            APIBeatmap?[] beatmaps = await beatmapLookupCache.GetBeatmapsAsync(scores.Select(s => s.BeatmapId).Distinct().ToArray()).ConfigureAwait(false);
 
             // Minimal data required to get various components in this screen to display correctly.
             Dictionary<int, BeatmapInfo> beatmapsById = beatmaps.Where(b => b != null).ToDictionary(b => b!.OnlineID, b => new BeatmapInfo

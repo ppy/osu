@@ -47,7 +47,7 @@ namespace osu.Game.Screens.Ranking
 
             try
             {
-                var scores = await requestTaskSource.Task;
+                var scores = await requestTaskSource.Task.ConfigureAwait(false);
                 var toDisplay = new List<ScoreInfo>();
 
                 for (int i = 0; i < scores.Scores.Count; ++i)
