@@ -125,7 +125,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                     setPositions(lowerScores, userScore.Position.Value, 1);
                 }
 
-                return await TransformScores(allScores);
+                return await transformScores(allScores);
             }
             catch (OperationCanceledException)
             {
@@ -190,7 +190,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                     setPositions(index, pivot, -1);
                 }
 
-                return await TransformScores(index.Scores, index);
+                return await transformScores(index.Scores);
             }
             catch (OperationCanceledException)
             {
@@ -203,11 +203,10 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         }
 
         /// <summary>
-        /// Transforms returned <see cref="MultiplayerScores"/> into <see cref="ScoreInfo"/>s, ensure the <see cref="ScorePanelList"/> is put into a sane state, and invokes a given success callback.
+        /// Transforms returned <see cref="MultiplayerScores"/> into <see cref="ScoreInfo"/>s.
         /// </summary>
         /// <param name="scores">The <see cref="MultiplayerScore"/>s that were retrieved from <see cref="APIRequest"/>s.</param>
-        /// <param name="pivot">An optional pivot around which the scores were retrieved.</param>
-        protected virtual async Task<ScoreInfo[]> TransformScores(List<MultiplayerScore> scores, MultiplayerScores? pivot = null)
+        private async Task<ScoreInfo[]> transformScores(List<MultiplayerScore> scores)
         {
             APIBeatmap?[] beatmaps = await beatmapLookupCache.GetBeatmapsAsync(scores.Select(s => s.BeatmapId).Distinct().ToArray());
 

@@ -357,7 +357,17 @@ namespace osu.Game.Screens.Ranking
                 // This can happen if for example a beatmap that is part of a playlist hasn't been played yet.
                 VerticalScrollContent.Add(new MessagePlaceholder(LeaderboardStrings.NoRecordsYet));
             }
+
+            OnScoresAdded(scores);
         });
+
+        /// <summary>
+        /// Invoked after online scores are fetched and added to the list.
+        /// </summary>
+        /// <param name="scores">The scores that were added.</param>
+        protected virtual void OnScoresAdded(IEnumerable<ScoreInfo> scores)
+        {
+        }
 
         public override void OnEntering(ScreenTransitionEvent e)
         {
