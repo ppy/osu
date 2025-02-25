@@ -24,7 +24,6 @@ namespace osu.Game.Tournament.Screens.Setup
                 Text = "1080",
                 Width = 100,
                 CommitOnFocusLost = false,
-                ReleaseFocusOnCommit = false,
             });
 
             numberBox.OnCommit += (_, _) => checkAndApply();
