@@ -31,7 +31,7 @@ namespace osu.Game.Screens.Ranking
         {
         }
 
-        protected override async Task<IEnumerable<ScoreInfo>> FetchScores()
+        protected override async Task<ScoreInfo[]> FetchScores()
         {
             Debug.Assert(Score != null);
 
@@ -70,7 +70,7 @@ namespace osu.Game.Screens.Ranking
                     }
                 }
 
-                return toDisplay;
+                return toDisplay.ToArray();
             }
             catch (OperationCanceledException)
             {

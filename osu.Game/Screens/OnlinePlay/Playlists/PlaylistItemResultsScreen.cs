@@ -83,7 +83,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
         protected abstract APIRequest<MultiplayerScore> CreateScoreRequest();
 
-        protected override async Task<IEnumerable<ScoreInfo>> FetchScores()
+        protected override async Task<ScoreInfo[]> FetchScores()
         {
             // This performs two requests:
             // 1. A request to show the relevant score (and scores around).
@@ -141,7 +141,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             }
         }
 
-        protected override async Task<IEnumerable<ScoreInfo>> FetchNextPage(int direction)
+        protected override async Task<ScoreInfo[]> FetchNextPage(int direction)
         {
             Debug.Assert(direction == 1 || direction == -1);
 
@@ -165,7 +165,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         /// </summary>
         /// <remarks>Does not queue the request.</remarks>
         /// <param name="pivot">An optional score pivot to retrieve scores around. Can be null to retrieve scores from the highest score.</param>
-        private async Task<IEnumerable<ScoreInfo>> fetchScoresAround(MultiplayerScores? pivot = null)
+        private async Task<ScoreInfo[]> fetchScoresAround(MultiplayerScores? pivot = null)
         {
             var requestTaskSource = new TaskCompletionSource<IndexedMultiplayerScores>();
             var indexReq = pivot != null
