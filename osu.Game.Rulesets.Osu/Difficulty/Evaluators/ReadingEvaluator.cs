@@ -17,9 +17,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
     public static class ReadingEvaluator
     {
         private const double reading_window_size = 3000;
-        private const double hidden_multiplier = 0.25;
 
-        public static double EvaluateDifficultyOf(DifficultyHitObject current, IReadOnlyList<Mod> mods)
+        public static double EvaluateDifficultyOf(DifficultyHitObject current, IReadOnlyList<Mod> mods, double rhythm)
         {
             if (current.BaseObject is Spinner || current.Index == 0)
                 return 0;
@@ -48,7 +47,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             if (currApproachRate < 500)
             {
-                preemptDifficulty += Math.Pow(500 - currApproachRate, 4.15) / (2 * Math.Pow(10, 9));
+                preemptDifficulty += Math.Pow(500 - currApproachRate, 4.15) / Math.Pow(10, 9);
 
                 // Buff spacing.
                 preemptDifficulty *= Math.Sqrt(currVelocity);
@@ -57,6 +56,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 // This is on the basis that in a high density environment you can rely more on patterns and muscle memory
                 // A side effect of this is since hidden makes objects appear earlier it increases density, reducing high ar difficulty
                 preemptDifficulty /= Math.Max(1, retrieveCurrentVisibleObjects(currObj).Count);
+
+                // Nerf reading difficulty less the more rhythmically straining a note is
+                preemptDifficulty /= 1 + 2 * DifficultyCalculationUtils.Logistic(15 * rhythm - 17);
             }
 
             double hiddenDifficulty = 0;
@@ -65,12 +67,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             {
                 double timeSpentInvisible = getDurationSpentInvisible(currObj) / current.ClockRate;
                 // Nerf hidden difficulty less the more density difficulty you have
-                double timeDifficultyFactor = 4000 / pastObjectDifficultyInfluence;
+                double timeDifficultyFactor = 4500 / pastObjectDifficultyInfluence;
 
-                double visibleObjectFactor = Math.Clamp(retrieveCurrentVisibleObjects(currObj).Count - 2, 0, 15);
+                double visibleObjectFactor = retrieveCurrentVisibleObjects(currObj).Count;
 
                 // The longer an object is hidden, the more velocity should matter
-                hiddenDifficulty += (visibleObjectFactor + timeSpentInvisible * currVelocity) / timeDifficultyFactor;
+                hiddenDifficulty += (visibleObjectFactor + timeSpentInvisible) * currVelocity / timeDifficultyFactor;
+
+                // Buff rhythm
+                hiddenDifficulty *= rhythm;
             }
 
             // Award only denser than average maps

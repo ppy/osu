@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         protected override double StrainValueAt(DifficultyHitObject current)
         {
             currentStrain *= strainDecay(current.DeltaTime);
-            currentStrain += ReadingEvaluator.EvaluateDifficultyOf(current, Mods) * skillMultiplier;
+            currentStrain += ReadingEvaluator.EvaluateDifficultyOf(current, Mods, RhythmEvaluator.EvaluateDifficultyOf(current)) * skillMultiplier;
 
             return currentStrain;
         }
