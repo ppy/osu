@@ -45,7 +45,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         private readonly BindableNumber<float> rotation = new BindableNumber<float> { MinValue = 0, MaxValue = 360 };
 
-        private readonly BindableNumber<float> pressureThreshold = new BindableNumber<float> { MinValue = 0, MaxValue = 100 };
+        private readonly BindableNumber<float> pressureThreshold = new BindableNumber<float> { MinValue = 0.0f, MaxValue = 1.0f, Precision = 0.005f };
 
         [Resolved]
         private GameHost host { get; set; }
