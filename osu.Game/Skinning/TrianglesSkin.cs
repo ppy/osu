@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Textures;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Extensions;
+using osu.Game.Graphics;
 using osu.Game.IO;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Play.HUD.HitErrorMeters;
@@ -90,6 +91,7 @@ namespace osu.Game.Skinning
                                 var ppCounter = container.OfType<PerformancePointsCounter>().FirstOrDefault();
                                 var songProgress = container.OfType<DefaultSongProgress>().FirstOrDefault();
                                 var keyCounter = container.OfType<DefaultKeyCounterDisplay>().FirstOrDefault();
+                                var spectatorList = container.OfType<SpectatorList>().FirstOrDefault();
 
                                 if (score != null)
                                 {
@@ -142,16 +144,25 @@ namespace osu.Game.Skinning
                                     }
                                 }
 
+                                const float padding = 10;
+
+                                // Hard to find this at runtime, so taken from the most expanded state during replay.
+                                const float song_progress_offset_height = 73;
+
                                 if (songProgress != null && keyCounter != null)
                                 {
-                                    const float padding = 10;
-
-                                    // Hard to find this at runtime, so taken from the most expanded state during replay.
-                                    const float song_progress_offset_height = 73;
-
                                     keyCounter.Anchor = Anchor.BottomRight;
                                     keyCounter.Origin = Anchor.BottomRight;
                                     keyCounter.Position = new Vector2(-padding, -(song_progress_offset_height + padding));
+                                }
+
+                                if (spectatorList != null)
+                                {
+                                    spectatorList.Font.Value = Typeface.Venera;
+                                    spectatorList.HeaderColour.Value = new OsuColour().BlueLighter;
+                                    spectatorList.Anchor = Anchor.BottomLeft;
+                                    spectatorList.Origin = Anchor.BottomLeft;
+                                    spectatorList.Position = new Vector2(padding, -(song_progress_offset_height + padding));
                                 }
                             })
                             {
@@ -165,7 +176,8 @@ namespace osu.Game.Skinning
                                     new DefaultKeyCounterDisplay(),
                                     new BarHitErrorMeter(),
                                     new BarHitErrorMeter(),
-                                    new TrianglesPerformancePointsCounter()
+                                    new TrianglesPerformancePointsCounter(),
+                                    new SpectatorList(),
                                 }
                             };
 

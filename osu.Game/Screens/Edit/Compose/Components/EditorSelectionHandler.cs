@@ -79,7 +79,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// </summary>
         private void createStateBindables()
         {
-            foreach (string bankName in HitSampleInfo.AllBanks.Prepend(HIT_BANK_AUTO))
+            foreach (string bankName in HitSampleInfo.ALL_BANKS.Prepend(HIT_BANK_AUTO))
             {
                 var bindable = new Bindable<TernaryState>
                 {
@@ -143,7 +143,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 SelectionBankStates[bankName] = bindable;
             }
 
-            foreach (string bankName in HitSampleInfo.AllBanks.Prepend(HIT_BANK_AUTO))
+            foreach (string bankName in HitSampleInfo.ALL_BANKS.Prepend(HIT_BANK_AUTO))
             {
                 var bindable = new Bindable<TernaryState>
                 {
@@ -216,7 +216,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             resetTernaryStates();
 
-            foreach (string sampleName in HitSampleInfo.AllAdditions)
+            foreach (string sampleName in HitSampleInfo.ALL_ADDITIONS)
             {
                 var bindable = new Bindable<TernaryState>
                 {
@@ -355,8 +355,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     for (int i = 0; i < hasRepeats.NodeSamples.Count; ++i)
                         hasRepeats.NodeSamples[i] = hasRepeats.NodeSamples[i].Select(s => s.Name == HitSampleInfo.HIT_NORMAL ? s.With(newBank: bankName) : s).ToList();
                 }
-
-                EditorBeatmap.Update(h);
             });
         }
 
@@ -390,8 +388,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
                         hasRepeats.NodeSamples[i] = hasRepeats.NodeSamples[i].Select(s => s.Name != HitSampleInfo.HIT_NORMAL ? bankName == HIT_BANK_AUTO ? s.With(newBank: normalBank, newEditorAutoBank: true) : s.With(newBank: bankName, newEditorAutoBank: false) : s).ToList();
                     }
                 }
-
-                EditorBeatmap.Update(h);
             });
         }
 
@@ -439,8 +435,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
                         node.Add(hitSample);
                     }
                 }
-
-                EditorBeatmap.Update(h);
             });
         }
 
@@ -462,8 +456,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     for (int i = 0; i < hasRepeats.NodeSamples.Count; ++i)
                         hasRepeats.NodeSamples[i] = hasRepeats.NodeSamples[i].Where(s => s.Name != sampleName).ToList();
                 }
-
-                EditorBeatmap.Update(h);
             });
         }
 
@@ -484,7 +476,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 if (comboInfo == null || comboInfo.NewCombo == state) return;
 
                 comboInfo.NewCombo = state;
-                EditorBeatmap.Update(h);
             });
         }
 

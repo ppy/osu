@@ -103,7 +103,7 @@ namespace osu.Game.Overlays
             if (articlePage != null)
             {
                 articlePage.SidebarContainer.Height = DrawHeight;
-                articlePage.SidebarContainer.Y = Math.Clamp(ScrollFlow.Current - Header.DrawHeight, 0, Math.Max(ScrollFlow.ScrollContent.DrawHeight - DrawHeight - Header.DrawHeight, 0));
+                articlePage.SidebarContainer.Y = (float)Math.Clamp(ScrollFlow.Current - Header.DrawHeight, 0, Math.Max(ScrollFlow.ScrollContent.DrawHeight - DrawHeight - Header.DrawHeight, 0));
             }
         }
 
@@ -178,7 +178,7 @@ namespace osu.Game.Overlays
             }
             else
             {
-                LoadDisplay(articlePage = new WikiArticlePage($@"{api.WebsiteRootUrl}/wiki/{path.Value}/", response.Markdown));
+                LoadDisplay(articlePage = new WikiArticlePage($@"{api.Endpoints.WebsiteUrl}/wiki/{path.Value}/", response.Markdown));
             }
         }
 
@@ -186,6 +186,7 @@ namespace osu.Game.Overlays
         {
             wikiData.Value = null;
             path.Value = "error";
+
 
             // TODO: Further changes for localisation are needed.
             LoadDisplay(articlePage = new WikiArticlePage($@"{api.WebsiteRootUrl}/wiki/",

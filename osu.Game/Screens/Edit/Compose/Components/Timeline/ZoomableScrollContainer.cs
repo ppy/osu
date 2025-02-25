@@ -182,7 +182,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         }
 
         private void transformZoomTo(float newZoom, float focusPoint, double duration = 0, Easing easing = Easing.None)
-            => this.TransformTo(this.PopulateTransform(new TransformZoom(focusPoint, zoomedContent.DrawWidth, Current), newZoom, duration, easing));
+            => this.TransformTo(this.PopulateTransform(new TransformZoom(focusPoint, zoomedContent.DrawWidth, (float)Current), newZoom, duration, easing));
 
         /// <summary>
         /// Invoked when <see cref="Zoom"/> has changed.
