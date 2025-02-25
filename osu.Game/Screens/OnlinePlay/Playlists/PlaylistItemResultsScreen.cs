@@ -135,10 +135,6 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             {
                 return await fetchScoresAround().ConfigureAwait(false);
             }
-            finally
-            {
-                Schedule(() => hideLoadingSpinners());
-            }
         }
 
         protected override async Task<ScoreInfo[]> FetchNextPage(int direction)
@@ -196,10 +192,6 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             {
                 return [];
             }
-            finally
-            {
-                Schedule(() => hideLoadingSpinners(pivot));
-            }
         }
 
         /// <summary>
@@ -228,14 +220,13 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                    .ToArray();
         }
 
-        private void hideLoadingSpinners(MultiplayerScores? pivot = null)
+        protected override void OnScoresAdded(ScoreInfo[] scores)
         {
-            CentreSpinner.Hide();
+            base.OnScoresAdded(scores);
 
-            if (pivot == lowerScores)
-                RightSpinner.Hide();
-            else if (pivot == higherScores)
-                LeftSpinner.Hide();
+            CentreSpinner.Hide();
+            RightSpinner.Hide();
+            LeftSpinner.Hide();
         }
 
         /// <summary>
