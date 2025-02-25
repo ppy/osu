@@ -70,7 +70,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             {
                 double timeSpentInvisible = getDurationSpentInvisible(currObj) / current.ClockRate;
                 // Nerf hidden difficulty less the more density difficulty you have
-                double timeDifficultyFactor = 4500 / pastObjectDifficultyInfluence;
+                double timeDifficultyFactor = 5000 / pastObjectDifficultyInfluence;
 
                 double visibleObjectFactor = retrieveCurrentVisibleObjects(currObj).Count;
 
