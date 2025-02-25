@@ -3,7 +3,6 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Scoring;
@@ -25,17 +24,12 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
         protected override APIRequest<MultiplayerScore> CreateScoreRequest() => new ShowPlaylistUserScoreRequest(RoomId, PlaylistItem.ID, userId);
 
-        protected override async Task<ScoreInfo[]> TransformScores(List<MultiplayerScore> scores, MultiplayerScores? pivot = null)
+        protected override void OnScoresAdded(IEnumerable<ScoreInfo> scores)
         {
-            var scoreInfos = await base.TransformScores(scores, pivot);
+            base.OnScoresAdded(scores);
 
-            Schedule(() =>
-            {
-                // Prefer selecting the local user's score, or otherwise default to the first visible score.
-                SelectedScore.Value ??= scoreInfos.FirstOrDefault(s => s.UserID == userId) ?? scoreInfos.FirstOrDefault();
-            });
-
-            return scoreInfos;
+            // Prefer selecting the local user's score, or otherwise default to the first visible score.
+            SelectedScore.Value ??= scores.FirstOrDefault(s => s.UserID == userId) ?? scores.FirstOrDefault();
         }
     }
 }
