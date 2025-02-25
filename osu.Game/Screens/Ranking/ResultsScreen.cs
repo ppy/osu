@@ -10,7 +10,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -66,7 +65,7 @@ namespace osu.Game.Screens.Ranking
         private Drawable bottomPanel = null!;
         private Container<ScorePanel> detachedPanelContainer = null!;
 
-        private bool lastFetchCompleted;
+        private Task lastFetchTask = Task.CompletedTask;
 
         /// <summary>
         /// Whether the user can retry the beatmap from the results screen.
@@ -235,7 +234,7 @@ namespace osu.Game.Screens.Ranking
         {
             base.LoadComplete();
 
-            FetchScores().ContinueWith(t => addScores(t.GetResultSafely()));
+            lastFetchTask = Task.Run(async () => await addScores(await FetchScores().ConfigureAwait(false)).ConfigureAwait(false));
 
             StatisticsPanel.State.BindValueChanged(onStatisticsStateChanged, true);
         }
@@ -244,18 +243,17 @@ namespace osu.Game.Screens.Ranking
         {
             base.Update();
 
-            if (lastFetchCompleted)
+            if (lastFetchTask.IsCompleted)
             {
-                Task<ScoreInfo[]> nextPageTask = Task.FromResult<ScoreInfo[]>([]);
+                Task<ScoreInfo[]>? nextPageTask = null;
 
                 if (ScorePanelList.IsScrolledToStart)
                     nextPageTask = FetchNextPage(-1);
                 else if (ScorePanelList.IsScrolledToEnd)
                     nextPageTask = FetchNextPage(1);
 
-                nextPageTask.ContinueWith(t => addScores(t.GetResultSafely()), TaskContinuationOptions.OnlyOnRanToCompletion);
-
-                lastFetchCompleted = nextPageTask.IsCompletedSuccessfully;
+                if (nextPageTask != null)
+                    lastFetchTask = Task.Run(async () => await addScores(await nextPageTask).ConfigureAwait(false));
             }
         }
 
@@ -340,26 +338,33 @@ namespace osu.Game.Screens.Ranking
                 : new StatisticsPanel();
         }
 
-        private void addScores(ScoreInfo[] scores) => Schedule(() =>
+        private Task addScores(ScoreInfo[] scores)
         {
-            foreach (var s in scores)
+            var tcs = new TaskCompletionSource();
+
+            Schedule(() =>
             {
-                var panel = ScorePanelList.AddScore(s);
-                if (detachedPanel != null)
-                    panel.Alpha = 0;
-            }
+                foreach (var s in scores)
+                {
+                    var panel = ScorePanelList.AddScore(s);
+                    if (detachedPanel != null)
+                        panel.Alpha = 0;
+                }
 
-            // allow a frame for scroll container to adjust its dimensions with the added scores before fetching again.
-            Schedule(() => lastFetchCompleted = true);
+                // allow a frame for scroll container to adjust its dimensions with the added scores before fetching again.
+                Schedule(() => tcs.SetResult());
 
-            if (ScorePanelList.IsEmpty)
-            {
-                // This can happen if for example a beatmap that is part of a playlist hasn't been played yet.
-                VerticalScrollContent.Add(new MessagePlaceholder(LeaderboardStrings.NoRecordsYet));
-            }
+                if (ScorePanelList.IsEmpty)
+                {
+                    // This can happen if for example a beatmap that is part of a playlist hasn't been played yet.
+                    VerticalScrollContent.Add(new MessagePlaceholder(LeaderboardStrings.NoRecordsYet));
+                }
 
-            OnScoresAdded(scores);
-        });
+                OnScoresAdded(scores);
+            });
+
+            return tcs.Task;
+        }
 
         /// <summary>
         /// Invoked after online scores are fetched and added to the list.
