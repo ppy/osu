@@ -246,7 +246,7 @@ namespace osu.Game.Screens.Ranking
 
             if (lastFetchCompleted)
             {
-                Task<IEnumerable<ScoreInfo>> nextPageTask = Task.FromResult<IEnumerable<ScoreInfo>>([]);
+                Task<ScoreInfo[]> nextPageTask = Task.FromResult<ScoreInfo[]>([]);
 
                 if (ScorePanelList.IsScrolledToStart)
                     nextPageTask = FetchNextPage(-1);
@@ -322,13 +322,13 @@ namespace osu.Game.Screens.Ranking
         /// <summary>
         /// Performs a fetch/refresh of scores to be displayed.
         /// </summary>
-        protected virtual Task<IEnumerable<ScoreInfo>> FetchScores() => Task.FromResult<IEnumerable<ScoreInfo>>([]);
+        protected virtual Task<ScoreInfo[]> FetchScores() => Task.FromResult<ScoreInfo[]>([]);
 
         /// <summary>
         /// Performs a fetch of the next page of scores. This is invoked every frame.
         /// </summary>
         /// <param name="direction">The fetch direction. -1 to fetch scores greater than the current start of the list, and 1 to fetch scores lower than the current end of the list.</param>
-        protected virtual Task<IEnumerable<ScoreInfo>> FetchNextPage(int direction) => Task.FromResult<IEnumerable<ScoreInfo>>([]);
+        protected virtual Task<ScoreInfo[]> FetchNextPage(int direction) => Task.FromResult<ScoreInfo[]>([]);
 
         /// <summary>
         /// Creates the <see cref="Statistics.StatisticsPanel"/> to be used to display extended information about scores.
@@ -340,7 +340,7 @@ namespace osu.Game.Screens.Ranking
                 : new StatisticsPanel();
         }
 
-        private void addScores(IEnumerable<ScoreInfo> scores) => Schedule(() =>
+        private void addScores(ScoreInfo[] scores) => Schedule(() =>
         {
             foreach (var s in scores)
             {
@@ -365,7 +365,7 @@ namespace osu.Game.Screens.Ranking
         /// Invoked after online scores are fetched and added to the list.
         /// </summary>
         /// <param name="scores">The scores that were added.</param>
-        protected virtual void OnScoresAdded(IEnumerable<ScoreInfo> scores)
+        protected virtual void OnScoresAdded(ScoreInfo[] scores)
         {
         }
 

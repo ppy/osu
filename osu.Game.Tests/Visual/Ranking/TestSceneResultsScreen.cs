@@ -4,7 +4,6 @@
 #nullable disable
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using NUnit.Framework;
@@ -415,19 +414,19 @@ namespace osu.Game.Tests.Visual.Ranking
                 RetryOverlay = InternalChildren.OfType<HotkeyRetryOverlay>().SingleOrDefault();
             }
 
-            protected override Task<IEnumerable<ScoreInfo>> FetchScores()
+            protected override Task<ScoreInfo[]> FetchScores()
             {
-                var scores = new List<ScoreInfo>();
+                var scores = new ScoreInfo[20];
 
-                for (int i = 0; i < 20; i++)
+                for (int i = 0; i < scores.Length; i++)
                 {
                     var score = TestResources.CreateTestScoreInfo();
                     score.TotalScore += 10 - i;
                     score.HasOnlineReplay = true;
-                    scores.Add(score);
+                    scores[i] = score;
                 }
 
-                return Task.FromResult<IEnumerable<ScoreInfo>>(scores);
+                return Task.FromResult(scores);
             }
         }
 
@@ -443,19 +442,19 @@ namespace osu.Game.Tests.Visual.Ranking
                 this.fetchWaitTask = fetchWaitTask ?? Task.CompletedTask;
             }
 
-            protected override Task<IEnumerable<ScoreInfo>> FetchScores()
+            protected override Task<ScoreInfo[]> FetchScores()
             {
-                return Task.Run<IEnumerable<ScoreInfo>>(async () =>
+                return Task.Run(async () =>
                 {
                     await fetchWaitTask;
 
-                    var scores = new List<ScoreInfo>();
+                    var scores = new ScoreInfo[20];
 
-                    for (int i = 0; i < 20; i++)
+                    for (int i = 0; i < scores.Length; i++)
                     {
                         var score = TestResources.CreateTestScoreInfo();
                         score.TotalScore += 10 - i;
-                        scores.Add(score);
+                        scores[i] = score;
                     }
 
                     Schedule(() => FetchCompleted = true);
