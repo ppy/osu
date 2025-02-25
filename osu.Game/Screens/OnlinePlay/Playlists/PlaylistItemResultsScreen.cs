@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -76,16 +77,21 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
         protected abstract APIRequest<MultiplayerScore> CreateScoreRequest();
 
-        protected sealed override APIRequest FetchScores(Action<IEnumerable<ScoreInfo>> scoresCallback)
+        protected override async Task<IEnumerable<ScoreInfo>> FetchScores()
         {
             // This performs two requests:
             // 1. A request to show the relevant score (and scores around).
             // 2. If that fails, a request to index the room starting from the highest score.
 
+            var requestTaskSource = new TaskCompletionSource<MultiplayerScore>();
             var userScoreReq = CreateScoreRequest();
+            userScoreReq.Success += requestTaskSource.SetResult;
+            userScoreReq.Failure += requestTaskSource.SetException;
+            API.Queue(userScoreReq);
 
-            userScoreReq.Success += userScore =>
+            try
             {
+                var userScore = await requestTaskSource.Task;
                 var allScores = new List<MultiplayerScore> { userScore };
 
                 // Other scores could have arrived between score submission and entering the results screen. Ensure the local player score position is up to date.
@@ -113,88 +119,96 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                     setPositions(lowerScores, userScore.Position.Value, 1);
                 }
 
-                Schedule(() =>
-                {
-                    PerformSuccessCallback(scoresCallback, allScores);
-                    hideLoadingSpinners();
-                });
-            };
-
-            // On failure, fallback to a normal index.
-            userScoreReq.Failure += _ => API.Queue(createIndexRequest(scoresCallback));
-
-            return userScoreReq;
+                return TransformScores(allScores);
+            }
+            catch (OperationCanceledException)
+            {
+                return [];
+            }
+            catch
+            {
+                return await fetchScoresAround();
+            }
+            finally
+            {
+                Schedule(() => hideLoadingSpinners());
+            }
         }
 
-        protected override APIRequest? FetchNextPage(int direction, Action<IEnumerable<ScoreInfo>> scoresCallback)
+        protected override async Task<IEnumerable<ScoreInfo>> FetchNextPage(int direction)
         {
             Debug.Assert(direction == 1 || direction == -1);
 
             MultiplayerScores? pivot = direction == -1 ? higherScores : lowerScores;
-
             if (pivot?.Cursor == null)
-                return null;
+                return [];
 
-            if (pivot == higherScores)
-                LeftSpinner.Show();
-            else
-                RightSpinner.Show();
+            Schedule(() =>
+            {
+                if (pivot == higherScores)
+                    LeftSpinner.Show();
+                else
+                    RightSpinner.Show();
+            });
 
-            return createIndexRequest(scoresCallback, pivot);
+            return await fetchScoresAround(pivot);
         }
 
         /// <summary>
         /// Creates a <see cref="IndexPlaylistScoresRequest"/> with an optional score pivot.
         /// </summary>
         /// <remarks>Does not queue the request.</remarks>
-        /// <param name="scoresCallback">The callback to perform with the resulting scores.</param>
         /// <param name="pivot">An optional score pivot to retrieve scores around. Can be null to retrieve scores from the highest score.</param>
-        /// <returns>The indexing <see cref="APIRequest"/>.</returns>
-        private APIRequest createIndexRequest(Action<IEnumerable<ScoreInfo>> scoresCallback, MultiplayerScores? pivot = null)
+        private async Task<IEnumerable<ScoreInfo>> fetchScoresAround(MultiplayerScores? pivot = null)
         {
+            var requestTaskSource = new TaskCompletionSource<IndexedMultiplayerScores>();
             var indexReq = pivot != null
                 ? new IndexPlaylistScoresRequest(RoomId, PlaylistItem.ID, pivot.Cursor, pivot.Params)
                 : new IndexPlaylistScoresRequest(RoomId, PlaylistItem.ID);
+            indexReq.Success += requestTaskSource.SetResult;
+            indexReq.Failure += requestTaskSource.SetException;
+            API.Queue(indexReq);
 
-            indexReq.Success += r =>
+            try
             {
+                var index = await requestTaskSource.Task;
+
                 if (pivot == lowerScores)
                 {
-                    lowerScores = r;
-                    setPositions(r, pivot, 1);
+                    lowerScores = index;
+                    setPositions(index, pivot, 1);
                 }
                 else
                 {
-                    higherScores = r;
-                    setPositions(r, pivot, -1);
+                    higherScores = index;
+                    setPositions(index, pivot, -1);
                 }
 
-                Schedule(() =>
-                {
-                    PerformSuccessCallback(scoresCallback, r.Scores, r);
-                    hideLoadingSpinners(r);
-                });
-            };
-
-            indexReq.Failure += _ => hideLoadingSpinners(pivot);
-
-            return indexReq;
+                return TransformScores(index.Scores, index);
+            }
+            catch (OperationCanceledException)
+            {
+                return [];
+            }
+            finally
+            {
+                Schedule(() => hideLoadingSpinners(pivot));
+            }
         }
 
         /// <summary>
         /// Transforms returned <see cref="MultiplayerScores"/> into <see cref="ScoreInfo"/>s, ensure the <see cref="ScorePanelList"/> is put into a sane state, and invokes a given success callback.
         /// </summary>
-        /// <param name="callback">The callback to invoke with the final <see cref="ScoreInfo"/>s.</param>
         /// <param name="scores">The <see cref="MultiplayerScore"/>s that were retrieved from <see cref="APIRequest"/>s.</param>
         /// <param name="pivot">An optional pivot around which the scores were retrieved.</param>
-        protected virtual ScoreInfo[] PerformSuccessCallback(Action<IEnumerable<ScoreInfo>> callback, List<MultiplayerScore> scores, MultiplayerScores? pivot = null)
+        protected virtual ScoreInfo[] TransformScores(List<MultiplayerScore> scores, MultiplayerScores? pivot = null)
         {
-            var scoreInfos = scores.Select(s => s.CreateScoreInfo(ScoreManager, Rulesets, Beatmap.Value.BeatmapInfo)).OrderByTotalScore().ToArray();
-
-            // Invoke callback to add the scores. Exclude the score provided to this screen since it's added already.
-            callback.Invoke(scoreInfos.Where(s => s.OnlineID != Score?.OnlineID));
-
-            return scoreInfos;
+            // Exclude the score provided to this screen since it's added already.
+            return scores
+                   .Where(s => s.ID != Score?.OnlineID)
+                   .Select(s => s.CreateScoreInfo(ScoreManager, Rulesets, Beatmap.Value.BeatmapInfo))
+                   .OrderByTotalScore()
+                   .ToArray();
         }
 
         private void hideLoadingSpinners(MultiplayerScores? pivot = null)
@@ -213,7 +227,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         /// <param name="scores">The <see cref="MultiplayerScores"/> to set positions on.</param>
         /// <param name="pivot">The pivot.</param>
         /// <param name="increment">The amount to increment the pivot position by for each <see cref="MultiplayerScore"/> in <paramref name="scores"/>.</param>
-        private void setPositions(MultiplayerScores scores, MultiplayerScores? pivot, int increment)
+        private static void setPositions(MultiplayerScores scores, MultiplayerScores? pivot, int increment)
             => setPositions(scores, pivot?.Scores[^1].Position ?? 0, increment);
 
         /// <summary>
@@ -222,7 +236,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         /// <param name="scores">The <see cref="MultiplayerScores"/> to set positions on.</param>
         /// <param name="pivotPosition">The pivot position.</param>
         /// <param name="increment">The amount to increment the pivot position by for each <see cref="MultiplayerScore"/> in <paramref name="scores"/>.</param>
-        private void setPositions(MultiplayerScores scores, int pivotPosition, int increment)
+        private static void setPositions(MultiplayerScores scores, int pivotPosition, int increment)
         {
             foreach (var s in scores.Scores)
             {
