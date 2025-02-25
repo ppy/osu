@@ -17,7 +17,6 @@ using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Online.API;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Osu;
@@ -416,7 +415,7 @@ namespace osu.Game.Tests.Visual.Ranking
                 RetryOverlay = InternalChildren.OfType<HotkeyRetryOverlay>().SingleOrDefault();
             }
 
-            protected override APIRequest FetchScores(Action<IEnumerable<ScoreInfo>> scoresCallback)
+            protected override Task<IEnumerable<ScoreInfo>> FetchScores()
             {
                 var scores = new List<ScoreInfo>();
 
@@ -428,9 +427,7 @@ namespace osu.Game.Tests.Visual.Ranking
                     scores.Add(score);
                 }
 
-                scoresCallback.Invoke(scores);
-
-                return null;
+                return Task.FromResult<IEnumerable<ScoreInfo>>(scores);
             }
         }
 
@@ -446,9 +443,9 @@ namespace osu.Game.Tests.Visual.Ranking
                 this.fetchWaitTask = fetchWaitTask ?? Task.CompletedTask;
             }
 
-            protected override APIRequest FetchScores(Action<IEnumerable<ScoreInfo>> scoresCallback)
+            protected override Task<IEnumerable<ScoreInfo>> FetchScores()
             {
-                Task.Run(async () =>
+                return Task.Run<IEnumerable<ScoreInfo>>(async () =>
                 {
                     await fetchWaitTask;
 
@@ -461,12 +458,10 @@ namespace osu.Game.Tests.Visual.Ranking
                         scores.Add(score);
                     }
 
-                    scoresCallback?.Invoke(scores);
-
                     Schedule(() => FetchCompleted = true);
-                });
 
-                return null;
+                    return scores;
+                });
             }
         }
 

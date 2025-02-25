@@ -5,10 +5,12 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -23,7 +25,6 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
-using osu.Game.Online.API;
 using osu.Game.Online.Placeholders;
 using osu.Game.Overlays;
 using osu.Game.Scoring;
@@ -59,9 +60,6 @@ namespace osu.Game.Screens.Ranking
         private Player? player { get; set; }
 
         private bool skipExitTransition;
-
-        [Resolved]
-        private IAPIProvider api { get; set; } = null!;
 
         protected StatisticsPanel StatisticsPanel { get; private set; } = null!;
 
@@ -237,10 +235,7 @@ namespace osu.Game.Screens.Ranking
         {
             base.LoadComplete();
 
-            var req = FetchScores(fetchScoresCallback);
-
-            if (req != null)
-                api.Queue(req);
+            FetchScores().ContinueWith(t => addScores(t.GetResultSafely()));
 
             StatisticsPanel.State.BindValueChanged(onStatisticsStateChanged, true);
         }
@@ -251,18 +246,16 @@ namespace osu.Game.Screens.Ranking
 
             if (lastFetchCompleted)
             {
-                APIRequest? nextPageRequest = null;
+                Task<IEnumerable<ScoreInfo>> nextPageTask = Task.FromResult<IEnumerable<ScoreInfo>>([]);
 
                 if (ScorePanelList.IsScrolledToStart)
-                    nextPageRequest = FetchNextPage(-1, fetchScoresCallback);
+                    nextPageTask = FetchNextPage(-1);
                 else if (ScorePanelList.IsScrolledToEnd)
-                    nextPageRequest = FetchNextPage(1, fetchScoresCallback);
+                    nextPageTask = FetchNextPage(1);
 
-                if (nextPageRequest != null)
-                {
-                    lastFetchCompleted = false;
-                    api.Queue(nextPageRequest);
-                }
+                nextPageTask.ContinueWith(t => addScores(t.GetResultSafely()), TaskContinuationOptions.OnlyOnRanToCompletion);
+
+                lastFetchCompleted = nextPageTask.IsCompletedSuccessfully;
             }
         }
 
@@ -329,17 +322,13 @@ namespace osu.Game.Screens.Ranking
         /// <summary>
         /// Performs a fetch/refresh of scores to be displayed.
         /// </summary>
-        /// <param name="scoresCallback">A callback which should be called when fetching is completed. Scheduling is not required.</param>
-        /// <returns>An <see cref="APIRequest"/> responsible for the fetch operation. This will be queued and performed automatically.</returns>
-        protected virtual APIRequest? FetchScores(Action<IEnumerable<ScoreInfo>> scoresCallback) => null;
+        protected virtual Task<IEnumerable<ScoreInfo>> FetchScores() => Task.FromResult<IEnumerable<ScoreInfo>>([]);
 
         /// <summary>
-        /// Performs a fetch of the next page of scores. This is invoked every frame until a non-null <see cref="APIRequest"/> is returned.
+        /// Performs a fetch of the next page of scores. This is invoked every frame.
         /// </summary>
         /// <param name="direction">The fetch direction. -1 to fetch scores greater than the current start of the list, and 1 to fetch scores lower than the current end of the list.</param>
-        /// <param name="scoresCallback">A callback which should be called when fetching is completed. Scheduling is not required.</param>
-        /// <returns>An <see cref="APIRequest"/> responsible for the fetch operation. This will be queued and performed automatically.</returns>
-        protected virtual APIRequest? FetchNextPage(int direction, Action<IEnumerable<ScoreInfo>> scoresCallback) => null;
+        protected virtual Task<IEnumerable<ScoreInfo>> FetchNextPage(int direction) => Task.FromResult<IEnumerable<ScoreInfo>>([]);
 
         /// <summary>
         /// Creates the <see cref="Statistics.StatisticsPanel"/> to be used to display extended information about scores.
@@ -351,10 +340,14 @@ namespace osu.Game.Screens.Ranking
                 : new StatisticsPanel();
         }
 
-        private void fetchScoresCallback(IEnumerable<ScoreInfo> scores) => Schedule(() =>
+        private void addScores(IEnumerable<ScoreInfo> scores) => Schedule(() =>
         {
             foreach (var s in scores)
-                addScore(s);
+            {
+                var panel = ScorePanelList.AddScore(s);
+                if (detachedPanel != null)
+                    panel.Alpha = 0;
+            }
 
             // allow a frame for scroll container to adjust its dimensions with the added scores before fetching again.
             Schedule(() => lastFetchCompleted = true);
@@ -407,14 +400,6 @@ namespace osu.Game.Screens.Ranking
             }
 
             return false;
-        }
-
-        private void addScore(ScoreInfo score)
-        {
-            var panel = ScorePanelList.AddScore(score);
-
-            if (detachedPanel != null)
-                panel.Alpha = 0;
         }
 
         private ScorePanel? detachedPanel;
