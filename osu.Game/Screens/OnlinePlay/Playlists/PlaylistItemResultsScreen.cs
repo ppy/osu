@@ -9,8 +9,11 @@ using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
@@ -38,6 +41,9 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
         [Resolved]
         protected RulesetStore Rulesets { get; private set; } = null!;
+
+        [Resolved]
+        private BeatmapLookupCache beatmapLookupCache { get; set; } = null!;
 
         protected PlaylistItemResultsScreen(ScoreInfo? score, long roomId, PlaylistItem playlistItem)
             : base(score)
@@ -119,7 +125,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                     setPositions(lowerScores, userScore.Position.Value, 1);
                 }
 
-                return TransformScores(allScores);
+                return await TransformScores(allScores);
             }
             catch (OperationCanceledException)
             {
@@ -184,7 +190,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                     setPositions(index, pivot, -1);
                 }
 
-                return TransformScores(index.Scores, index);
+                return await TransformScores(index.Scores, index);
             }
             catch (OperationCanceledException)
             {
@@ -201,12 +207,24 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         /// </summary>
         /// <param name="scores">The <see cref="MultiplayerScore"/>s that were retrieved from <see cref="APIRequest"/>s.</param>
         /// <param name="pivot">An optional pivot around which the scores were retrieved.</param>
-        protected virtual ScoreInfo[] TransformScores(List<MultiplayerScore> scores, MultiplayerScores? pivot = null)
+        protected virtual async Task<ScoreInfo[]> TransformScores(List<MultiplayerScore> scores, MultiplayerScores? pivot = null)
         {
+            APIBeatmap?[] beatmaps = await beatmapLookupCache.GetBeatmapsAsync(scores.Select(s => s.BeatmapId).Distinct().ToArray());
+
+            // Minimal data required to get various components in this screen to display correctly.
+            Dictionary<int, BeatmapInfo> beatmapsById = beatmaps.Where(b => b != null).ToDictionary(b => b!.OnlineID, b => new BeatmapInfo
+            {
+                Difficulty = new BeatmapDifficulty(b!.Difficulty),
+                DifficultyName = b.DifficultyName,
+                StarRating = b.StarRating,
+                Length = b.Length,
+                BPM = b.BPM
+            });
+
             // Exclude the score provided to this screen since it's added already.
             return scores
                    .Where(s => s.ID != Score?.OnlineID)
-                   .Select(s => s.CreateScoreInfo(ScoreManager, Rulesets, Beatmap.Value.BeatmapInfo))
+                   .Select(s => s.CreateScoreInfo(ScoreManager, Rulesets, beatmapsById.GetValueOrDefault(s.BeatmapId) ?? Beatmap.Value.BeatmapInfo))
                    .OrderByTotalScore()
                    .ToArray();
         }

@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Scoring;
@@ -24,9 +25,9 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
         protected override APIRequest<MultiplayerScore> CreateScoreRequest() => new ShowPlaylistUserScoreRequest(RoomId, PlaylistItem.ID, userId);
 
-        protected override ScoreInfo[] TransformScores(List<MultiplayerScore> scores, MultiplayerScores? pivot = null)
+        protected override async Task<ScoreInfo[]> TransformScores(List<MultiplayerScore> scores, MultiplayerScores? pivot = null)
         {
-            var scoreInfos = base.TransformScores(scores, pivot);
+            var scoreInfos = await base.TransformScores(scores, pivot);
 
             Schedule(() =>
             {
