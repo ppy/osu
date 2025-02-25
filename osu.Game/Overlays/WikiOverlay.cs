@@ -187,7 +187,6 @@ namespace osu.Game.Overlays
             wikiData.Value = null;
             path.Value = "error";
 
-
             // TODO: Further changes for localisation are needed.
             LoadDisplay(articlePage = new WikiArticlePage($@"{api.WebsiteRootUrl}/wiki/",
                 LocalisableString.Format("{0}\n\n{1}\n{2}", WikiOverlayStrings.PageErrorDescription(originalPath),
