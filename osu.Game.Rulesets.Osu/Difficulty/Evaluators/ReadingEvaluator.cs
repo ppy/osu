@@ -59,7 +59,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                 // Nerf preempt difficulty with density, lower density means more difficulty
                 // This is on the basis that in a high density environment you can rely more on patterns and muscle memory
-                // A side effect of this is since hidden makes objects appear earlier it increases density, reducing high ar difficulty
                 preemptDifficulty /= Math.Max(1, retrieveCurrentVisibleObjects(currObj).Count);
 
                 // Nerf reading difficulty less the more rhythmically straining a note is
