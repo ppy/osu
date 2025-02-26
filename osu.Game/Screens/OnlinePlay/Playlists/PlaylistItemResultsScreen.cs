@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Models;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
@@ -222,6 +223,14 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                 beatmapsById[beatmap.OnlineID] = new BeatmapInfo
                 {
                     Difficulty = new BeatmapDifficulty(beatmap.Difficulty),
+                    Metadata =
+                    {
+                        Author = new RealmUser
+                        {
+                            Username = beatmap.Metadata.Author.Username,
+                            OnlineID = beatmap.Metadata.Author.OnlineID,
+                        }
+                    },
                     DifficultyName = beatmap.DifficultyName,
                     StarRating = beatmap.StarRating,
                     Length = beatmap.Length,
