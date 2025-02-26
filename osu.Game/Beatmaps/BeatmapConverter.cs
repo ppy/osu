@@ -14,10 +14,6 @@ using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Beatmaps
 {
-    /// <summary>
-    /// Converts a Beatmap for another mode.
-    /// </summary>
-    /// <typeparam name="T">The type of HitObject stored in the Beatmap.</typeparam>
     public abstract class BeatmapConverter<T> : IBeatmapConverter
         where T : HitObject
     {
@@ -36,34 +32,21 @@ namespace osu.Game.Beatmaps
             Beatmap = beatmap;
         }
 
-        /// <summary>
-        /// Whether <see cref="Beatmap"/> can be converted by this <see cref="BeatmapConverter{T}"/>.
-        /// </summary>
         public abstract bool CanConvert();
 
         public IBeatmap Convert(CancellationToken cancellationToken = default)
         {
-            // We always operate on a clone of the original beatmap, to not modify it game-wide
             var original = Beatmap.Clone();
 
-            // Shallow clone isn't enough to ensure we don't mutate beatmap info unexpectedly.
-            // Can potentially be removed after `Beatmap.Difficulty` doesn't save back to `Beatmap.BeatmapInfo`.
             original.BeatmapInfo = original.BeatmapInfo.Clone();
             original.ControlPointInfo = original.ControlPointInfo.DeepClone();
 
-            // Used in osu!mania conversion.
             original.Breaks = new SortedList<BreakPeriod>(Comparer<BreakPeriod>.Default);
             original.Breaks.AddRange(Beatmap.Breaks);
 
             return ConvertBeatmap(original, cancellationToken);
         }
 
-        /// <summary>
-        /// Performs the conversion of a Beatmap using this Beatmap Converter.
-        /// </summary>
-        /// <param name="original">The un-converted Beatmap.</param>
-        /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>The converted Beatmap.</returns>
         protected virtual Beatmap<T> ConvertBeatmap(IBeatmap original, CancellationToken cancellationToken)
         {
             var beatmap = CreateBeatmap();
@@ -72,7 +55,9 @@ namespace osu.Game.Beatmaps
             beatmap.ControlPointInfo = original.ControlPointInfo;
             beatmap.HitObjects = convertHitObjects(original.HitObjects, original, cancellationToken).OrderBy(s => s.StartTime).ToList();
             beatmap.Breaks = original.Breaks;
-            beatmap.UnhandledEventLines = original.UnhandledEventLines;
+
+            beatmap.UnhandledEventLines = new List<string>(original.UnhandledEventLines);
+
             beatmap.AudioLeadIn = original.AudioLeadIn;
             beatmap.StackLeniency = original.StackLeniency;
             beatmap.SpecialStyle = original.SpecialStyle;
@@ -119,20 +104,12 @@ namespace osu.Game.Beatmaps
 
             return result;
         }
+        
+        protected virtual IEnumerable<T> ConvertHitObject(HitObject original, IBeatmap beatmap, CancellationToken cancellationToken)
+        {
+            return Enumerable.Empty<T>();
+        }
 
-        /// <summary>
-        /// Creates the <see cref="Beatmap{T}"/> that will be returned by this <see cref="BeatmapProcessor"/>.
-        /// </summary>
         protected virtual Beatmap<T> CreateBeatmap() => new Beatmap<T>();
-
-        /// <summary>
-        /// Performs the conversion of a hit object.
-        /// This method is generally executed sequentially for all objects in a beatmap.
-        /// </summary>
-        /// <param name="original">The hit object to convert.</param>
-        /// <param name="beatmap">The un-converted Beatmap.</param>
-        /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>The converted hit object.</returns>
-        protected virtual IEnumerable<T> ConvertHitObject(HitObject original, IBeatmap beatmap, CancellationToken cancellationToken) => Enumerable.Empty<T>();
     }
 }
