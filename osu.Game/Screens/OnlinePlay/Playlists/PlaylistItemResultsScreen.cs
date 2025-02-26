@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Graphics.UserInterface;
@@ -131,10 +132,6 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
                 return await transformScores(allScores).ConfigureAwait(false);
             }
-            catch (OperationCanceledException)
-            {
-                return [];
-            }
             catch
             {
                 return await fetchScoresAround().ConfigureAwait(false);
@@ -192,8 +189,9 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
                 return await transformScores(index.Scores).ConfigureAwait(false);
             }
-            catch (OperationCanceledException)
+            catch (Exception ex)
             {
+                Logger.Log($"Failed to fetch scores (room: {RoomId}, item: {PlaylistItem.ID}): {ex}");
                 return [];
             }
         }
@@ -242,7 +240,10 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             foreach (int id in allBeatmapIds)
             {
                 if (!beatmapsById.ContainsKey(id))
-                    throw new MissingBeatmapException(PlaylistItem, id);
+                {
+                    Logger.Log($"Failed to fetch beatmap {id} to display scores for playlist item {PlaylistItem.ID}");
+                    beatmapsById[id] = Beatmap.Value.BeatmapInfo;
+                }
             }
 
             // Exclude the score provided to this screen since it's added already.
@@ -311,14 +312,6 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                     X = (float)(panelOffset - list.Current);
                 else if ((Anchor & Anchor.x2) > 0)
                     X = (float)(list.ScrollableExtent - list.Current - panelOffset);
-            }
-        }
-
-        private class MissingBeatmapException : Exception
-        {
-            public MissingBeatmapException(PlaylistItem item, int beatmapId)
-                : base($"Missing beatmap {beatmapId} for playlist item {item.ID}")
-            {
             }
         }
     }
