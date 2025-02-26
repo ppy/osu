@@ -349,7 +349,7 @@ namespace osu.Game.Beatmaps.Formats
 
             writer.WriteLine("[Colours]");
 
-            for (int i = 0; i < colours.Count; i++)
+            for (int i = 0; i < Math.Min(colours.Count, LegacyBeatmapDecoder.MAX_COMBO_COLOUR_COUNT); i++)
             {
                 var comboColour = colours[i];
 
