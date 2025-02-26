@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         {
         }
 
-        protected override PerformanceAttributes CreatePerformanceAttributes(ScoreInfo score, DifficultyAttributes attributes)
+        protected override IPerformanceAttributes CreatePerformanceAttributes(ScoreInfo score, IDifficultyAttributes attributes)
         {
             var catchAttributes = (CatchDifficultyAttributes)attributes;
 

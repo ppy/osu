@@ -7,8 +7,14 @@ using osu.Game.Rulesets.Difficulty;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty
 {
-    public class TaikoPerformanceAttributes : PerformanceAttributes
+    public struct TaikoPerformanceAttributes : IPerformanceAttributes
     {
+        /// <summary>
+        /// Calculated score performance points.
+        /// </summary>
+        [JsonProperty("pp")]
+        public double Total { get; set; }
+
         [JsonProperty("difficulty")]
         public double Difficulty { get; set; }
 
@@ -21,11 +27,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         [JsonProperty("estimated_unstable_rate")]
         public double? EstimatedUnstableRate { get; set; }
 
-        public override IEnumerable<PerformanceDisplayAttribute> GetAttributesForDisplay()
+        public IEnumerable<PerformanceDisplayAttribute> GetAttributesForDisplay()
         {
-            foreach (var attribute in base.GetAttributesForDisplay())
-                yield return attribute;
-
+            yield return new PerformanceDisplayAttribute(nameof(Total), "Achieved PP", Total);
             yield return new PerformanceDisplayAttribute(nameof(Difficulty), "Difficulty", Difficulty);
             yield return new PerformanceDisplayAttribute(nameof(Accuracy), "Accuracy", Accuracy);
         }

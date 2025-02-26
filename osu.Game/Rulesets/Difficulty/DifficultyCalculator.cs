@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Difficulty
         /// </summary>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>A structure describing the difficulty of the beatmap.</returns>
-        public DifficultyAttributes Calculate(CancellationToken cancellationToken = default)
+        public IDifficultyAttributes Calculate(CancellationToken cancellationToken = default)
             => Calculate(Array.Empty<Mod>(), cancellationToken);
 
         /// <summary>
@@ -60,7 +60,7 @@ namespace osu.Game.Rulesets.Difficulty
         /// <param name="mods">The mods that should be applied to the beatmap.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>A structure describing the difficulty of the beatmap.</returns>
-        public DifficultyAttributes Calculate([NotNull] IEnumerable<Mod> mods, CancellationToken cancellationToken = default)
+        public IDifficultyAttributes Calculate([NotNull] IEnumerable<Mod> mods, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             preProcess(mods, cancellationToken);
@@ -140,7 +140,7 @@ namespace osu.Game.Rulesets.Difficulty
         /// This can only be used to compute difficulties for legacy mod combinations.
         /// </remarks>
         /// <returns>A collection of structures describing the difficulty of the beatmap for each mod combination.</returns>
-        public IEnumerable<DifficultyAttributes> CalculateAllLegacyCombinations(CancellationToken cancellationToken = default)
+        public IEnumerable<(Mod[] Mods, IDifficultyAttributes Attributes)> CalculateAllLegacyCombinations(CancellationToken cancellationToken = default)
         {
             var rulesetInstance = ruleset.CreateInstance();
 
@@ -148,11 +148,13 @@ namespace osu.Game.Rulesets.Difficulty
             {
                 Mod classicMod = rulesetInstance.CreateMod<ModClassic>();
 
-                var finalCombination = ModUtils.FlattenMod(combination);
+                IEnumerable<Mod> finalCombination = ModUtils.FlattenMod(combination);
                 if (classicMod != null)
                     finalCombination = finalCombination.Append(classicMod);
 
-                yield return Calculate(finalCombination.ToArray(), cancellationToken);
+                Mod[] finalMods = finalCombination.ToArray();
+
+                yield return (finalMods, Calculate(finalMods, cancellationToken));
             }
         }
 
@@ -263,14 +265,14 @@ namespace osu.Game.Rulesets.Difficulty
         protected virtual Mod[] DifficultyAdjustmentMods => Array.Empty<Mod>();
 
         /// <summary>
-        /// Creates <see cref="DifficultyAttributes"/> to describe beatmap's calculated difficulty.
+        /// Creates <see cref="IDifficultyAttributes"/> to describe beatmap's calculated difficulty.
         /// </summary>
         /// <param name="beatmap">The <see cref="IBeatmap"/> whose difficulty was calculated.
         /// This may differ from <see cref="Beatmap"/> in the case of timed calculation.</param>
         /// <param name="mods">The <see cref="Mod"/>s that difficulty was calculated with.</param>
         /// <param name="skills">The skills which processed the beatmap.</param>
         /// <param name="clockRate">The rate at which the gameplay clock is run at.</param>
-        protected abstract DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate);
+        protected abstract IDifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate);
 
         /// <summary>
         /// Enumerates <see cref="DifficultyHitObject"/>s to be processed from <see cref="HitObject"/>s in the <see cref="IBeatmap"/>.

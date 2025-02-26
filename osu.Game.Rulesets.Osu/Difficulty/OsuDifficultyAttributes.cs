@@ -2,17 +2,22 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using System.Linq;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
-using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Osu.Difficulty
 {
-    public class OsuDifficultyAttributes : DifficultyAttributes
+    [JsonObject(MemberSerialization.OptIn)]
+    public struct OsuDifficultyAttributes : IDifficultyAttributes
     {
+        /// <inheritdoc/>
+        public double StarRating { get; set; }
+
+        /// <inheritdoc/>
+        public int MaxCombo { get; set; }
+
         /// <summary>
         /// The difficulty corresponding to the aim skill.
         /// </summary>
@@ -33,10 +38,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         public double SpeedNoteCount { get; set; }
 
         /// <summary>
-        /// The difficulty corresponding to the flashlight skill.
+        /// The difficulty corresponding to the flashlight skill. A null value indicates the non-existence of <see cref="Mods.OsuModFlashlight"/>.
         /// </summary>
         [JsonProperty("flashlight_difficulty")]
-        public double FlashlightDifficulty { get; set; }
+        public double? FlashlightDifficulty { get; set; }
 
         /// <summary>
         /// Describes how much of <see cref="AimDifficulty"/> is contributed to by hitcircles or sliders.
@@ -90,41 +95,38 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         /// </summary>
         public int SpinnerCount { get; set; }
 
-        public override IEnumerable<(int attributeId, object value)> ToDatabaseAttributes()
+        public IEnumerable<(int attributeId, object value)> ToDatabaseAttributes()
         {
-            foreach (var v in base.ToDatabaseAttributes())
-                yield return v;
-
-            yield return (ATTRIB_ID_AIM, AimDifficulty);
-            yield return (ATTRIB_ID_SPEED, SpeedDifficulty);
-            yield return (ATTRIB_ID_OVERALL_DIFFICULTY, OverallDifficulty);
-            yield return (ATTRIB_ID_APPROACH_RATE, ApproachRate);
-            yield return (ATTRIB_ID_DIFFICULTY, StarRating);
+            yield return (IDifficultyAttributes.ATTRIB_ID_MAX_COMBO, MaxCombo);
+            yield return (IDifficultyAttributes.ATTRIB_ID_AIM, AimDifficulty);
+            yield return (IDifficultyAttributes.ATTRIB_ID_SPEED, SpeedDifficulty);
+            yield return (IDifficultyAttributes.ATTRIB_ID_OVERALL_DIFFICULTY, OverallDifficulty);
+            yield return (IDifficultyAttributes.ATTRIB_ID_APPROACH_RATE, ApproachRate);
+            yield return (IDifficultyAttributes.ATTRIB_ID_DIFFICULTY, StarRating);
 
             if (ShouldSerializeFlashlightDifficulty())
-                yield return (ATTRIB_ID_FLASHLIGHT, FlashlightDifficulty);
+                yield return (IDifficultyAttributes.ATTRIB_ID_FLASHLIGHT, FlashlightDifficulty!);
 
-            yield return (ATTRIB_ID_SLIDER_FACTOR, SliderFactor);
+            yield return (IDifficultyAttributes.ATTRIB_ID_SLIDER_FACTOR, SliderFactor);
 
-            yield return (ATTRIB_ID_AIM_DIFFICULT_STRAIN_COUNT, AimDifficultStrainCount);
-            yield return (ATTRIB_ID_SPEED_DIFFICULT_STRAIN_COUNT, SpeedDifficultStrainCount);
-            yield return (ATTRIB_ID_SPEED_NOTE_COUNT, SpeedNoteCount);
+            yield return (IDifficultyAttributes.ATTRIB_ID_AIM_DIFFICULT_STRAIN_COUNT, AimDifficultStrainCount);
+            yield return (IDifficultyAttributes.ATTRIB_ID_SPEED_DIFFICULT_STRAIN_COUNT, SpeedDifficultStrainCount);
+            yield return (IDifficultyAttributes.ATTRIB_ID_SPEED_NOTE_COUNT, SpeedNoteCount);
         }
 
-        public override void FromDatabaseAttributes(IReadOnlyDictionary<int, double> values, IBeatmapOnlineInfo onlineInfo)
+        public void FromDatabaseAttributes(IReadOnlyDictionary<int, double> values, IBeatmapOnlineInfo onlineInfo)
         {
-            base.FromDatabaseAttributes(values, onlineInfo);
-
-            AimDifficulty = values[ATTRIB_ID_AIM];
-            SpeedDifficulty = values[ATTRIB_ID_SPEED];
-            OverallDifficulty = values[ATTRIB_ID_OVERALL_DIFFICULTY];
-            ApproachRate = values[ATTRIB_ID_APPROACH_RATE];
-            StarRating = values[ATTRIB_ID_DIFFICULTY];
-            FlashlightDifficulty = values.GetValueOrDefault(ATTRIB_ID_FLASHLIGHT);
-            SliderFactor = values[ATTRIB_ID_SLIDER_FACTOR];
-            AimDifficultStrainCount = values[ATTRIB_ID_AIM_DIFFICULT_STRAIN_COUNT];
-            SpeedDifficultStrainCount = values[ATTRIB_ID_SPEED_DIFFICULT_STRAIN_COUNT];
-            SpeedNoteCount = values[ATTRIB_ID_SPEED_NOTE_COUNT];
+            MaxCombo = (int)values[IDifficultyAttributes.ATTRIB_ID_MAX_COMBO];
+            AimDifficulty = values[IDifficultyAttributes.ATTRIB_ID_AIM];
+            SpeedDifficulty = values[IDifficultyAttributes.ATTRIB_ID_SPEED];
+            OverallDifficulty = values[IDifficultyAttributes.ATTRIB_ID_OVERALL_DIFFICULTY];
+            ApproachRate = values[IDifficultyAttributes.ATTRIB_ID_APPROACH_RATE];
+            StarRating = values[IDifficultyAttributes.ATTRIB_ID_DIFFICULTY];
+            FlashlightDifficulty = values.GetValueOrDefault(IDifficultyAttributes.ATTRIB_ID_FLASHLIGHT);
+            SliderFactor = values[IDifficultyAttributes.ATTRIB_ID_SLIDER_FACTOR];
+            AimDifficultStrainCount = values[IDifficultyAttributes.ATTRIB_ID_AIM_DIFFICULT_STRAIN_COUNT];
+            SpeedDifficultStrainCount = values[IDifficultyAttributes.ATTRIB_ID_SPEED_DIFFICULT_STRAIN_COUNT];
+            SpeedNoteCount = values[IDifficultyAttributes.ATTRIB_ID_SPEED_NOTE_COUNT];
             DrainRate = onlineInfo.DrainRate;
             HitCircleCount = onlineInfo.CircleCount;
             SliderCount = onlineInfo.SliderCount;
@@ -138,7 +140,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         // unless the fields are also renamed.
 
         [UsedImplicitly]
-        public bool ShouldSerializeFlashlightDifficulty() => Mods.Any(m => m is ModFlashlight);
+        public bool ShouldSerializeFlashlightDifficulty() => FlashlightDifficulty is not null;
 
         #endregion
     }

@@ -7,16 +7,20 @@ using osu.Game.Rulesets.Difficulty;
 
 namespace osu.Game.Rulesets.Mania.Difficulty
 {
-    public class ManiaPerformanceAttributes : PerformanceAttributes
+    public struct ManiaPerformanceAttributes : IPerformanceAttributes
     {
+        /// <summary>
+        /// Calculated score performance points.
+        /// </summary>
+        [JsonProperty("pp")]
+        public double Total { get; set; }
+
         [JsonProperty("difficulty")]
         public double Difficulty { get; set; }
 
-        public override IEnumerable<PerformanceDisplayAttribute> GetAttributesForDisplay()
+        public IEnumerable<PerformanceDisplayAttribute> GetAttributesForDisplay()
         {
-            foreach (var attribute in base.GetAttributesForDisplay())
-                yield return attribute;
-
+            yield return new PerformanceDisplayAttribute(nameof(Total), "Achieved PP", Total);
             yield return new PerformanceDisplayAttribute(nameof(Difficulty), "Difficulty", Difficulty);
         }
     }
