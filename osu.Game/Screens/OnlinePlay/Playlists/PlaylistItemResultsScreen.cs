@@ -45,6 +45,9 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         [Resolved]
         private BeatmapLookupCache beatmapLookupCache { get; set; } = null!;
 
+        [Resolved]
+        private BeatmapManager beatmapManager { get; set; } = null!;
+
         protected PlaylistItemResultsScreen(ScoreInfo? score, long roomId, PlaylistItem playlistItem)
             : base(score)
         {
@@ -200,22 +203,43 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         /// <param name="scores">The <see cref="MultiplayerScore"/>s that were retrieved from <see cref="APIRequest"/>s.</param>
         private async Task<ScoreInfo[]> transformScores(List<MultiplayerScore> scores)
         {
-            APIBeatmap?[] beatmaps = await beatmapLookupCache.GetBeatmapsAsync(scores.Select(s => s.BeatmapId).Distinct().ToArray()).ConfigureAwait(false);
+            int[] allBeatmapIds = scores.Select(s => s.BeatmapId).Distinct().ToArray();
+            BeatmapInfo[] localBeatmaps = allBeatmapIds.Select(id => beatmapManager.QueryBeatmap(b => b.OnlineID == id))
+                                                       .Where(b => b != null)
+                                                       .ToArray()!;
 
-            // Minimal data required to get various components in this screen to display correctly.
-            Dictionary<int, BeatmapInfo> beatmapsById = beatmaps.Where(b => b != null).ToDictionary(b => b!.OnlineID, b => new BeatmapInfo
+            int[] missingBeatmapIds = allBeatmapIds.Except(localBeatmaps.Select(b => b.OnlineID)).ToArray();
+            APIBeatmap[] onlineBeatmaps = (await beatmapLookupCache.GetBeatmapsAsync(missingBeatmapIds).ConfigureAwait(false)).Where(b => b != null).ToArray()!;
+
+            Dictionary<int, BeatmapInfo> beatmapsById = new Dictionary<int, BeatmapInfo>();
+
+            foreach (var beatmap in localBeatmaps)
+                beatmapsById[beatmap.OnlineID] = beatmap;
+
+            foreach (var beatmap in onlineBeatmaps)
             {
-                Difficulty = new BeatmapDifficulty(b!.Difficulty),
-                DifficultyName = b.DifficultyName,
-                StarRating = b.StarRating,
-                Length = b.Length,
-                BPM = b.BPM
-            });
+                // Minimal data required to get various components in this screen to display correctly.
+                beatmapsById[beatmap.OnlineID] = new BeatmapInfo
+                {
+                    Difficulty = new BeatmapDifficulty(beatmap.Difficulty),
+                    DifficultyName = beatmap.DifficultyName,
+                    StarRating = beatmap.StarRating,
+                    Length = beatmap.Length,
+                    BPM = beatmap.BPM
+                };
+            }
+
+            // Validate that we have all beatmaps we need.
+            foreach (int id in allBeatmapIds)
+            {
+                if (!beatmapsById.ContainsKey(id))
+                    throw new MissingBeatmapException(PlaylistItem, id);
+            }
 
             // Exclude the score provided to this screen since it's added already.
             return scores
                    .Where(s => s.ID != Score?.OnlineID)
-                   .Select(s => s.CreateScoreInfo(ScoreManager, Rulesets, beatmapsById.GetValueOrDefault(s.BeatmapId) ?? Beatmap.Value.BeatmapInfo))
+                   .Select(s => s.CreateScoreInfo(ScoreManager, Rulesets, beatmapsById[s.BeatmapId]))
                    .OrderByTotalScore()
                    .ToArray();
         }
@@ -278,6 +302,14 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                     X = (float)(panelOffset - list.Current);
                 else if ((Anchor & Anchor.x2) > 0)
                     X = (float)(list.ScrollableExtent - list.Current - panelOffset);
+            }
+        }
+
+        private class MissingBeatmapException : Exception
+        {
+            public MissingBeatmapException(PlaylistItem item, int beatmapId)
+                : base($"Missing beatmap {beatmapId} for playlist item {item.ID}")
+            {
             }
         }
     }
