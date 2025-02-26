@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Extensions;
 using osu.Game.Online.API;
@@ -72,8 +73,9 @@ namespace osu.Game.Screens.Ranking
 
                 return toDisplay.ToArray();
             }
-            catch (OperationCanceledException)
+            catch (Exception ex)
             {
+                Logger.Log($"Failed to fetch scores (beatmap: {Score.BeatmapInfo}, ruleset: {Score.Ruleset}): {ex}");
                 return [];
             }
         }
