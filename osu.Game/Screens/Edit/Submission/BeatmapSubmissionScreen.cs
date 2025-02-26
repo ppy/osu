@@ -285,7 +285,7 @@ namespace osu.Game.Screens.Edit.Submission
                     continue;
                 }
 
-                if (localHash != onlineHash)
+                if (!localHash.Equals(onlineHash, StringComparison.OrdinalIgnoreCase))
                     filesToUpdate.Add(filename);
             }
 
