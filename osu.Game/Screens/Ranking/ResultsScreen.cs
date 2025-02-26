@@ -253,7 +253,7 @@ namespace osu.Game.Screens.Ranking
                     nextPageTask = FetchNextPage(1);
 
                 if (nextPageTask != null)
-                    lastFetchTask = Task.Run(async () => await addScores(await nextPageTask).ConfigureAwait(false));
+                    lastFetchTask = Task.Run(async () => await addScores(await nextPageTask.ConfigureAwait(false)).ConfigureAwait(false));
             }
         }
 
