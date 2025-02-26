@@ -375,8 +375,8 @@ namespace osu.Game.Online.Leaderboards
         {
             base.UpdateAfterChildren();
 
-            float fadeBottom = scrollContainer.Current + scrollContainer.DrawHeight;
-            float fadeTop = scrollContainer.Current + LeaderboardScore.HEIGHT;
+            float fadeBottom = (float)(scrollContainer.Current + scrollContainer.DrawHeight);
+            float fadeTop = (float)(scrollContainer.Current + LeaderboardScore.HEIGHT);
 
             if (!scrollContainer.IsScrolledToEnd())
                 fadeBottom -= LeaderboardScore.HEIGHT;

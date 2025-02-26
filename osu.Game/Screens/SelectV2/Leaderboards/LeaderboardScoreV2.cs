@@ -339,6 +339,12 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
                                                 Origin = Anchor.CentreLeft,
                                                 Size = new Vector2(24, 16),
                                             },
+                                            new UpdateableTeamFlag(user.Team)
+                                            {
+                                                Anchor = Anchor.CentreLeft,
+                                                Origin = Anchor.CentreLeft,
+                                                Size = new Vector2(40, 20),
+                                            },
                                             new DateLabel(score.Date)
                                             {
                                                 Anchor = Anchor.CentreLeft,
@@ -778,7 +784,7 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
                     items.Add(new OsuMenuItem("Use these mods", MenuItemType.Highlighted, () => SelectedMods.Value = score.Mods.Where(m => IsValidMod.Invoke(m)).ToArray()));
 
                 if (score.OnlineID > 0)
-                    items.Add(new OsuMenuItem(CommonStrings.CopyLink, MenuItemType.Standard, () => clipboard?.SetText($@"{api.WebsiteRootUrl}/scores/{score.OnlineID}")));
+                    items.Add(new OsuMenuItem(CommonStrings.CopyLink, MenuItemType.Standard, () => clipboard?.SetText($@"{api.Endpoints.WebsiteUrl}/scores/{score.OnlineID}")));
 
                 if (score.Files.Count <= 0) return items.ToArray();
 

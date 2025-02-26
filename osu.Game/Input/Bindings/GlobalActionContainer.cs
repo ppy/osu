@@ -146,10 +146,9 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.Control, InputKey.J }, GlobalAction.EditorFlipVertically),
             new KeyBinding(new[] { InputKey.Control, InputKey.Alt, InputKey.MouseWheelDown }, GlobalAction.EditorDecreaseDistanceSpacing),
             new KeyBinding(new[] { InputKey.Control, InputKey.Alt, InputKey.MouseWheelUp }, GlobalAction.EditorIncreaseDistanceSpacing),
-            // Framework automatically converts wheel up/down to left/right when shift is held.
-            // See https://github.com/ppy/osu-framework/blob/master/osu.Framework/Input/StateChanges/MouseScrollRelativeInput.cs#L37-L38.
-            new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.MouseWheelRight }, GlobalAction.EditorCyclePreviousBeatSnapDivisor),
-            new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.MouseWheelLeft }, GlobalAction.EditorCycleNextBeatSnapDivisor),
+            new KeyBinding(new[] { InputKey.Control, InputKey.MouseWheelDown }, GlobalAction.EditorCyclePreviousBeatSnapDivisor),
+            new KeyBinding(new[] { InputKey.Control, InputKey.MouseWheelUp }, GlobalAction.EditorCycleNextBeatSnapDivisor),
+            new KeyBinding(InputKey.None, GlobalAction.EditorToggleMoveControl),
             new KeyBinding(new[] { InputKey.Control, InputKey.R }, GlobalAction.EditorToggleRotateControl),
             new KeyBinding(new[] { InputKey.Control, InputKey.E }, GlobalAction.EditorToggleScaleControl),
             new KeyBinding(new[] { InputKey.Control, InputKey.Left }, GlobalAction.EditorSeekToPreviousHitObject),
@@ -216,6 +215,7 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(InputKey.BackSpace, GlobalAction.DeselectAllMods),
             new KeyBinding(new[] { InputKey.Control, InputKey.Up }, GlobalAction.IncreaseModSpeed),
             new KeyBinding(new[] { InputKey.Control, InputKey.Down }, GlobalAction.DecreaseModSpeed),
+            new KeyBinding(InputKey.None, GlobalAction.AbsoluteScrollSongList),
         };
 
         private static IEnumerable<KeyBinding> audioControlKeyBindings => new[]
@@ -237,6 +237,10 @@ namespace osu.Game.Input.Bindings
         };
     }
 
+    /// <remarks>
+    /// IMPORTANT: New entries should always be added at the end of the enum, as key bindings are stored using the enum's numeric value and
+    /// changes in order would cause key bindings to get associated with the wrong action.
+    /// </remarks>
     public enum GlobalAction
     {
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleChat))]
@@ -502,6 +506,12 @@ namespace osu.Game.Input.Bindings
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorSeekToNextBookmark))]
         EditorSeekToNextBookmark,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.AbsoluteScrollSongList))]
+        AbsoluteScrollSongList,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorToggleMoveControl))]
+        EditorToggleMoveControl,
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.MultiplayerReady))]
         MultiplayerReady,
