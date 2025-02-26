@@ -153,7 +153,7 @@ namespace osu.Game.Beatmaps
 
             foreach (var hitObject in HitObjects)
             {
-                if (hitObject is osu.Game.Beatmaps.Sliderf slider)
+                if (hitObject is Sliderf slider)
                 {
                     if (slider.RepeatCount > 5)
                     {
