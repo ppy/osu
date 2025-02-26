@@ -234,27 +234,19 @@ namespace osu.Game.Screens.Ranking
         {
             base.LoadComplete();
 
-            lastFetchTask = Task.Run(async () => await addScores(await FetchScores().ConfigureAwait(false)).ConfigureAwait(false));
-
             StatisticsPanel.State.BindValueChanged(onStatisticsStateChanged, true);
+
+            fetchScores(null);
         }
 
         protected override void Update()
         {
             base.Update();
 
-            if (lastFetchTask.IsCompleted)
-            {
-                Task<ScoreInfo[]>? nextPageTask = null;
-
-                if (ScorePanelList.IsScrolledToStart)
-                    nextPageTask = FetchNextPage(-1);
-                else if (ScorePanelList.IsScrolledToEnd)
-                    nextPageTask = FetchNextPage(1);
-
-                if (nextPageTask != null)
-                    lastFetchTask = Task.Run(async () => await addScores(await nextPageTask.ConfigureAwait(false)).ConfigureAwait(false));
-            }
+            if (ScorePanelList.IsScrolledToStart)
+                fetchScores(-1);
+            else if (ScorePanelList.IsScrolledToEnd)
+                fetchScores(1);
         }
 
         #region Applause
@@ -316,6 +308,37 @@ namespace osu.Game.Screens.Ranking
         }
 
         #endregion
+
+        /// <summary>
+        /// Fetches the next page of scores in the given direction.
+        /// </summary>
+        /// <param name="direction">The direction, or <c>null</c> to fetch any scores.</param>
+        private void fetchScores(int? direction)
+        {
+            Debug.Assert(direction == null || direction == -1 || direction == 1);
+
+            if (!lastFetchTask.IsCompleted)
+                return;
+
+            lastFetchTask = Task.Run(async () =>
+            {
+                ScoreInfo[] scores;
+
+                switch (direction)
+                {
+                    default:
+                        scores = await FetchScores().ConfigureAwait(false);
+                        break;
+
+                    case -1:
+                    case 1:
+                        scores = await FetchNextPage(direction.Value).ConfigureAwait(false);
+                        break;
+                }
+
+                await addScores(scores).ConfigureAwait(false);
+            });
+        }
 
         /// <summary>
         /// Performs a fetch/refresh of scores to be displayed.
