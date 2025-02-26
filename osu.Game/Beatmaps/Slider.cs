@@ -5,7 +5,7 @@ using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Beatmaps
 {
-    internal class Slider : HitObject
+    internal class Sliderf : HitObject
     {
         public int RepeatCount { get; set; }
 
@@ -13,7 +13,7 @@ namespace osu.Game.Beatmaps
 
         public string Path { get; set; }
 
-        public Slider(int repeatCount, double duration, string path)
+        public Sliderf(int repeatCount, double duration, string path)
         {
             RepeatCount = repeatCount;
             Duration = duration;
