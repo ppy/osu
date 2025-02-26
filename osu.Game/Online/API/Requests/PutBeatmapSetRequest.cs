@@ -11,6 +11,7 @@ using osu.Framework.IO.Network;
 using osu.Framework.Localisation;
 using osu.Game.Localisation;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Screens.Edit.Submission;
 
 namespace osu.Game.Online.API.Requests
 {
@@ -42,22 +43,27 @@ namespace osu.Game.Online.API.Requests
         [JsonProperty("target")]
         public BeatmapSubmissionTarget SubmissionTarget { get; init; }
 
+        [JsonProperty("notify_on_discussion_replies")]
+        public bool NotifyOnDiscussionReplies { get; init; }
+
         private PutBeatmapSetRequest()
         {
         }
 
-        public static PutBeatmapSetRequest CreateNew(uint beatmapCount, BeatmapSubmissionTarget target) => new PutBeatmapSetRequest
+        public static PutBeatmapSetRequest CreateNew(uint beatmapCount, BeatmapSubmissionSettings settings) => new PutBeatmapSetRequest
         {
             BeatmapsToCreate = beatmapCount,
-            SubmissionTarget = target,
+            SubmissionTarget = settings.Target.Value,
+            NotifyOnDiscussionReplies = settings.NotifyOnDiscussionReplies.Value,
         };
 
-        public static PutBeatmapSetRequest UpdateExisting(uint beatmapSetId, IEnumerable<uint> beatmapsToKeep, uint beatmapsToCreate, BeatmapSubmissionTarget target) => new PutBeatmapSetRequest
+        public static PutBeatmapSetRequest UpdateExisting(uint beatmapSetId, IEnumerable<uint> beatmapsToKeep, uint beatmapsToCreate, BeatmapSubmissionSettings settings) => new PutBeatmapSetRequest
         {
             BeatmapSetID = beatmapSetId,
             BeatmapsToKeep = beatmapsToKeep.ToArray(),
             BeatmapsToCreate = beatmapsToCreate,
-            SubmissionTarget = target,
+            SubmissionTarget = settings.Target.Value,
+            NotifyOnDiscussionReplies = settings.NotifyOnDiscussionReplies.Value,
         };
 
         protected override WebRequest CreateWebRequest()

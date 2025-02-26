@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Edit.Submission
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager configManager, OsuColour colours, BeatmapSubmissionSettings settings)
         {
-            configManager.BindWith(OsuSetting.EditorSubmissionNotifyOnDiscussionReplies, notifyOnDiscussionReplies);
+            configManager.BindWith(OsuSetting.EditorSubmissionNotifyOnDiscussionReplies, settings.NotifyOnDiscussionReplies);
             configManager.BindWith(OsuSetting.EditorSubmissionLoadInBrowserAfterSubmission, loadInBrowserAfterSubmission);
 
             Content.Add(new FillFlowContainer
@@ -47,7 +47,7 @@ namespace osu.Game.Screens.Edit.Submission
                     new FormCheckBox
                     {
                         Caption = BeatmapSubmissionStrings.NotifyOnDiscussionReplies,
-                        Current = notifyOnDiscussionReplies,
+                        Current = settings.NotifyOnDiscussionReplies,
                     },
                     new FormCheckBox
                     {

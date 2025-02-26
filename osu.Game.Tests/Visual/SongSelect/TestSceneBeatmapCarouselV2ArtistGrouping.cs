@@ -28,42 +28,42 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestOpenCloseGroupWithNoSelectionMouse()
         {
-            AddAssert("no beatmaps visible", () => Carousel.ChildrenOfType<BeatmapPanel>().Count(p => p.Alpha > 0), () => Is.Zero);
-            AddUntilStep("no sets visible", () => Carousel.ChildrenOfType<BeatmapSetPanel>().Count(p => p.Alpha > 0), () => Is.Zero);
+            AddAssert("no beatmaps visible", () => Carousel.ChildrenOfType<PanelBeatmap>().Count(p => p.Alpha > 0), () => Is.Zero);
+            AddUntilStep("no sets visible", () => Carousel.ChildrenOfType<PanelBeatmapSet>().Count(p => p.Alpha > 0), () => Is.Zero);
             CheckNoSelection();
 
-            ClickVisiblePanel<GroupPanel>(0);
+            ClickVisiblePanel<PanelGroup>(0);
 
-            AddUntilStep("some sets visible", () => Carousel.ChildrenOfType<BeatmapSetPanel>().Count(p => p.Alpha > 0), () => Is.GreaterThan(0));
-            AddUntilStep("no beatmaps visible", () => Carousel.ChildrenOfType<BeatmapPanel>().Count(p => p.Alpha > 0), () => Is.Zero);
+            AddUntilStep("some sets visible", () => Carousel.ChildrenOfType<PanelBeatmapSet>().Count(p => p.Alpha > 0), () => Is.GreaterThan(0));
+            AddUntilStep("no beatmaps visible", () => Carousel.ChildrenOfType<PanelBeatmap>().Count(p => p.Alpha > 0), () => Is.Zero);
             CheckNoSelection();
 
-            ClickVisiblePanel<GroupPanel>(0);
+            ClickVisiblePanel<PanelGroup>(0);
 
-            AddUntilStep("no sets visible", () => Carousel.ChildrenOfType<BeatmapSetPanel>().Count(p => p.Alpha > 0), () => Is.Zero);
-            AddUntilStep("no beatmaps visible", () => Carousel.ChildrenOfType<BeatmapPanel>().Count(p => p.Alpha > 0), () => Is.Zero);
+            AddUntilStep("no sets visible", () => Carousel.ChildrenOfType<PanelBeatmapSet>().Count(p => p.Alpha > 0), () => Is.Zero);
+            AddUntilStep("no beatmaps visible", () => Carousel.ChildrenOfType<PanelBeatmap>().Count(p => p.Alpha > 0), () => Is.Zero);
             CheckNoSelection();
         }
 
         [Test]
         public void TestOpenCloseGroupWithNoSelectionKeyboard()
         {
-            AddAssert("no beatmaps visible", () => Carousel.ChildrenOfType<BeatmapPanel>().Count(p => p.Alpha > 0), () => Is.Zero);
-            AddUntilStep("no sets visible", () => Carousel.ChildrenOfType<BeatmapSetPanel>().Count(p => p.Alpha > 0), () => Is.Zero);
+            AddAssert("no beatmaps visible", () => Carousel.ChildrenOfType<PanelBeatmap>().Count(p => p.Alpha > 0), () => Is.Zero);
+            AddUntilStep("no sets visible", () => Carousel.ChildrenOfType<PanelBeatmapSet>().Count(p => p.Alpha > 0), () => Is.Zero);
             CheckNoSelection();
 
             SelectNextPanel();
             Select();
 
-            AddUntilStep("some sets visible", () => Carousel.ChildrenOfType<BeatmapSetPanel>().Count(p => p.Alpha > 0), () => Is.GreaterThan(0));
-            AddUntilStep("no beatmaps visible", () => Carousel.ChildrenOfType<BeatmapPanel>().Count(p => p.Alpha > 0), () => Is.Zero);
+            AddUntilStep("some sets visible", () => Carousel.ChildrenOfType<PanelBeatmapSet>().Count(p => p.Alpha > 0), () => Is.GreaterThan(0));
+            AddUntilStep("no beatmaps visible", () => Carousel.ChildrenOfType<PanelBeatmap>().Count(p => p.Alpha > 0), () => Is.Zero);
             AddAssert("keyboard selected is expanded", () => GetKeyboardSelectedPanel()?.Expanded.Value, () => Is.True);
             CheckNoSelection();
 
             Select();
 
-            AddUntilStep("no sets visible", () => Carousel.ChildrenOfType<BeatmapSetPanel>().Count(p => p.Alpha > 0), () => Is.Zero);
-            AddUntilStep("no beatmaps visible", () => Carousel.ChildrenOfType<BeatmapPanel>().Count(p => p.Alpha > 0), () => Is.Zero);
+            AddUntilStep("no sets visible", () => Carousel.ChildrenOfType<PanelBeatmapSet>().Count(p => p.Alpha > 0), () => Is.Zero);
+            AddUntilStep("no beatmaps visible", () => Carousel.ChildrenOfType<PanelBeatmap>().Count(p => p.Alpha > 0), () => Is.Zero);
             AddAssert("keyboard selected is collapsed", () => GetKeyboardSelectedPanel()?.Expanded.Value, () => Is.False);
             CheckNoSelection();
         }
@@ -96,10 +96,10 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddUntilStep("drawable selection restored", () => GetSelectedPanel()?.Item?.Model, () => Is.EqualTo(selection));
             AddAssert("carousel item is visible", () => GetSelectedPanel()?.Item?.IsVisible, () => Is.True);
 
-            ClickVisiblePanel<GroupPanel>(0);
+            ClickVisiblePanel<PanelGroup>(0);
             AddUntilStep("carousel item not visible", GetSelectedPanel, () => Is.Null);
 
-            ClickVisiblePanel<GroupPanel>(0);
+            ClickVisiblePanel<PanelGroup>(0);
             AddUntilStep("carousel item is visible", () => GetSelectedPanel()?.Item?.IsVisible, () => Is.True);
         }
 
@@ -137,7 +137,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             // open first group
             Select();
             CheckNoSelection();
-            AddUntilStep("some beatmaps visible", () => Carousel.ChildrenOfType<BeatmapSetPanel>().Count(p => p.Alpha > 0), () => Is.GreaterThan(0));
+            AddUntilStep("some beatmaps visible", () => Carousel.ChildrenOfType<PanelBeatmapSet>().Count(p => p.Alpha > 0), () => Is.GreaterThan(0));
 
             SelectNextPanel();
             Select();

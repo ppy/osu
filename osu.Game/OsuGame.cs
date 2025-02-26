@@ -818,7 +818,7 @@ namespace osu.Game
         /// Adjust the globally applied <see cref="DrawSizePreservingFillContainer.TargetDrawSize"/> in every <see cref="ScalingContainer"/>.
         /// Useful for changing how the game handles different aspect ratios.
         /// </summary>
-        protected internal virtual Vector2 ScalingContainerTargetDrawSize { get; } = new Vector2(1024, 768);
+        public virtual Vector2 ScalingContainerTargetDrawSize { get; } = new Vector2(1024, 768);
 
         protected override Container CreateScalingContainer() => new ScalingContainer(ScalingMode.Everything);
 

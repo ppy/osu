@@ -228,7 +228,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
                                                            {
                                                                Name = "Collective Wangs",
                                                                ShortName = "WANG",
-                                                               FlagUrl = "https://assets.ppy.sh/teams/logo/1/wanglogo.jpg",
+                                                               FlagUrl = "https://assets.ppy.sh/teams/flag/1/wanglogo.jpg",
                                                            }
                                                            : null,
                                                    })
