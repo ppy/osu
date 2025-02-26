@@ -191,8 +191,10 @@ namespace osu.Game.Input.Bindings
 
         private static IEnumerable<KeyBinding> multiplayerKeyBindings => new[]
         {
-            new KeyBinding(new[] { InputKey.Control, InputKey.R }, GlobalAction.MultiplayerReady),
-            new KeyBinding(new[] { InputKey.Control, InputKey.S }, GlobalAction.MultiplayerSpectate),
+            new KeyBinding(new[] { InputKey.Control, InputKey.Enter }, GlobalAction.MultiplayerReady),
+            new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.Enter }, GlobalAction.MultiplayerSpectate),
+            new KeyBinding(new[] { InputKey.Control, InputKey.Q }, GlobalAction.MultiplayerQueueMap),
+            new KeyBinding(new[] { InputKey.Control, InputKey.D }, GlobalAction.MultiplayerSetFreestyleDifficulty),
         };
 
         private static IEnumerable<KeyBinding> replayKeyBindings => new[]
@@ -518,6 +520,12 @@ namespace osu.Game.Input.Bindings
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.MultiplayerSpectate))]
         MultiplayerSpectate,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.MultiplayerQueueMap))]
+        MultiplayerQueueMap,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.MultiplayerSetFreestyleDifficulty))]
+        MultiplayerSetFreestyleDifficulty,
     }
 
     public enum GlobalActionCategory

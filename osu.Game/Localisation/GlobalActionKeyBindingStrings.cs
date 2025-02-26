@@ -469,6 +469,16 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString MultiplayerSpectate => new TranslatableString(getKey(@"multiplayer_spectate"), @"Spectate");
 
+        /// <summary>
+        /// "Queue map"
+        /// </summary>
+        public static LocalisableString MultiplayerQueueMap => new TranslatableString(getKey(@"multiplayer_queue_map"), @"Queue map");
+
+        /// <summary>
+        /// "Set freestyle difficulty"
+        /// </summary>
+        public static LocalisableString MultiplayerSetFreestyleDifficulty => new TranslatableString(getKey(@"multiplayer_set_freestyle_difficulty"), @"Set freestyle difficulty");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

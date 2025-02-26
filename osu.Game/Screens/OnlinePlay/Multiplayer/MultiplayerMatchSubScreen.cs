@@ -9,12 +9,15 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Cursor;
+using osu.Game.Input.Bindings;
 using osu.Game.Online;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
@@ -39,7 +42,7 @@ using ParticipantsList = osu.Game.Screens.OnlinePlay.Multiplayer.Participants.Pa
 namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
     [Cached]
-    public partial class MultiplayerMatchSubScreen : RoomSubScreen, IHandlePresentBeatmap
+    public partial class MultiplayerMatchSubScreen : RoomSubScreen, IHandlePresentBeatmap, IKeyBindingHandler<GlobalAction>
     {
         public override string Title { get; }
 
@@ -248,7 +251,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         protected override void OpenStyleSelection()
         {
-            if (!this.IsCurrentScreen() || SelectedItem.Value is not PlaylistItem item)
+            if (!this.IsCurrentScreen() || SelectedItem.Value is not PlaylistItem item || !item.Freestyle)
                 return;
 
             this.Push(new MultiplayerMatchFreestyleSelect(Room, item));
@@ -460,6 +463,28 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             game?.PresentBeatmap(beatmap.BeatmapSetInfo, b => b.ID == beatmap.BeatmapInfo.ID);
         }
 
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+        {
+            if (e.Repeat)
+            {
+                return false;
+            }
+
+            switch (e.Action)
+            {
+                case GlobalAction.MultiplayerSetFreestyleDifficulty:
+                    OpenStyleSelection();
+                    return true;
+
+                default:
+                    return false;
+            }
+        }
+
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
+        {
+        }
+
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
@@ -473,8 +498,29 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             modSettingChangeTracker?.Dispose();
         }
 
-        public partial class AddItemButton : PurpleRoundedButton
+        public partial class AddItemButton : PurpleRoundedButton, IKeyBindingHandler<GlobalAction>
         {
+            public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+            {
+                if (e.Repeat)
+                {
+                    return false;
+                }
+
+                switch (e.Action)
+                {
+                    case GlobalAction.MultiplayerQueueMap:
+                        TriggerClick();
+                        return true;
+
+                    default:
+                        return false;
+                }
+            }
+
+            public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
+            {
+            }
         }
     }
 }
