@@ -271,6 +271,7 @@ namespace osu.Game.Online.Leaderboards
                                             Anchor = Anchor.CentreRight,
                                             Origin = Anchor.CentreRight,
                                             AutoSizeAxes = Axes.Both,
+                                            Spacing = new Vector2(-10, 0),
                                             Direction = FillDirection.Horizontal,
                                             ChildrenEnumerable = Score.Mods.AsOrdered().Select(mod => new ModIcon(mod) { Scale = new Vector2(0.34f) })
                                         },
@@ -394,7 +395,7 @@ namespace osu.Game.Online.Leaderboards
                             Origin = Anchor.CentreLeft,
                             Text = statistic.Value,
                             Spacing = new Vector2(-1, 0),
-                            Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold, fixedWidth: true)
+                            Font = OsuFont.GetFont(size: 16, weight: FontWeight.Bold, fixedWidth: true)
                         },
                     },
                 };
@@ -425,7 +426,7 @@ namespace osu.Game.Online.Leaderboards
             public DateLabel(DateTimeOffset date)
                 : base(date)
             {
-                Font = OsuFont.GetFont(size: 13, weight: FontWeight.Bold, italics: true);
+                Font = OsuFont.GetFont(size: 16, weight: FontWeight.Bold);
             }
 
             protected override string Format() => Date.ToShortRelativeTime(TimeSpan.FromSeconds(30));
