@@ -50,10 +50,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             if (currApproachRate < 500)
             {
-                preemptDifficulty += Math.Pow(500 - currApproachRate, 4.15) / Math.Pow(10, 9);
+                preemptDifficulty += Math.Pow(500 - currApproachRate, 2.1) / 23000;
 
                 // Buff spacing.
-                preemptDifficulty *= Math.Sqrt(currVelocity);
+                preemptDifficulty *= currVelocity;
 
                 // Nerf preempt difficulty with density, lower density means more difficulty
                 // This is on the basis that in a high density environment you can rely more on patterns and muscle memory
@@ -70,7 +70,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             {
                 double timeSpentInvisible = getDurationSpentInvisible(currObj) / current.ClockRate;
                 // Nerf hidden difficulty less the more density difficulty you have
-                double timeDifficultyFactor = 5000 / pastObjectDifficultyInfluence;
+                double timeDifficultyFactor = 6000 / pastObjectDifficultyInfluence;
 
                 double visibleObjectFactor = retrieveCurrentVisibleObjects(currObj).Count;
 
@@ -82,7 +82,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             }
 
             // Award only denser than average maps
-            double noteDensityDifficulty = Math.Max(0, pastObjectDifficultyInfluence - 3.2);
+            double noteDensityDifficulty = Math.Max(0, pastObjectDifficultyInfluence - 2.8);
 
             double difficulty = preemptDifficulty + hiddenDifficulty + noteDensityDifficulty;
 
