@@ -10,6 +10,7 @@ using osu.Game.Beatmaps.ControlPoints;
 using Newtonsoft.Json;
 using osu.Framework.Lists;
 using osu.Game.IO.Serialization.Converters;
+using osu.Game.Overlays.Profile;
 
 namespace osu.Game.Beatmaps
 {
@@ -153,7 +154,7 @@ namespace osu.Game.Beatmaps
 
             foreach (var hitObject in HitObjects)
             {
-                if (hitObject is slider slider)
+                if (hitObject is osu.Game.Beatmaps.Slider slider)
                 {
                     if (slider.RepeatCount > 5)
                     {
