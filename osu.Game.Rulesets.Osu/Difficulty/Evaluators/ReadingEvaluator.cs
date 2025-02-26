@@ -36,7 +36,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 loopDifficulty *= DifficultyCalculationUtils.Logistic(-(loopObj.MinimumJumpDistance - 80) / 15);
 
                 if (loopObj.BaseObject is Slider)
-                    loopDifficulty += Math.Sqrt(loopObj.TravelDistance / OsuDifficultyHitObject.NORMALISED_DIAMETER);
+                    // Sliders have a small inherent difficulty regardless of size
+                    // This is temporary until proper overlap check is implemented
+                    loopDifficulty += 0.3 + Math.Sqrt(loopObj.TravelDistance / OsuDifficultyHitObject.NORMALISED_DIAMETER);
 
                 double timeBetweenCurrAndLoopObj = (currObj.BaseObject.StartTime - loopObj.BaseObject.StartTime) / current.ClockRate;
                 loopDifficulty *= getTimeNerfFactor(timeBetweenCurrAndLoopObj);
@@ -50,7 +52,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             if (currApproachRate < 500)
             {
-                preemptDifficulty += Math.Pow(500 - currApproachRate, 2.1) / 23000;
+                preemptDifficulty += Math.Pow(500 - currApproachRate, 2.1) / 25000;
 
                 // Buff spacing.
                 preemptDifficulty *= currVelocity;
