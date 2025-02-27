@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Objects
             double length = Math.Min(max_length, totalDistance);
             tickDistance = Math.Clamp(tickDistance, 0, length);
 
-            double minDistanceFromEnd = velocity * 10;
+            double minDistanceFromEnd = (tickDistance / velocity) > 10 ? velocity * 10 : velocity;
 
             yield return new SliderEventDescriptor
             {
