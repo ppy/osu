@@ -157,7 +157,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             ratingMultiplier *= 1.0 + approachRateFactor * lengthBonus; // Buff for longer maps with high AR.
 
-            if (mods.Any(m => m is OsuModHidden || m is OsuModTraceable))
+            if (mods.Any(m => m is OsuModHidden))
             {
                 // We want to give more reward for lower AR when it comes to aim and HD. This nerfs high AR and buffs lower AR.
                 ratingMultiplier *= 1.0 + 0.04 * (12.0 - approachRate);
@@ -195,12 +195,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             ratingMultiplier *= 1.0 + approachRateFactor * lengthBonus; // Buff for longer maps with high AR.
 
-            if (mods.Any(m => m is OsuModBlinds))
-            {
-                // Increasing the speed value by object count for Blinds isn't ideal, so the minimum buff is given.
-                ratingMultiplier *= 1.12;
-            }
-            else if (mods.Any(m => m is OsuModHidden || m is OsuModTraceable))
+            if (mods.Any(m => m is OsuModHidden))
             {
                 // We want to give more reward for lower AR when it comes to aim and HD. This nerfs high AR and buffs lower AR.
                 ratingMultiplier *= 1.0 + 0.04 * (12.0 - approachRate);

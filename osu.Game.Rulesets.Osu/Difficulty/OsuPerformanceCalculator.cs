@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Audio.Track;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Mods;
@@ -48,6 +49,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private double okHitWindow;
         private double mehHitWindow;
         private double overallDifficulty;
+        private double approachRate;
 
         private double? speedDeviation;
 
@@ -86,6 +88,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             greatHitWindow = hitWindows.WindowFor(HitResult.Great) / clockRate;
             okHitWindow = hitWindows.WindowFor(HitResult.Ok) / clockRate;
             mehHitWindow = hitWindows.WindowFor(HitResult.Meh) / clockRate;
+
+            double preempt = IBeatmapDifficultyInfo.DifficultyRange(difficulty.ApproachRate, 1800, 1200, 450) / clockRate;
+            approachRate = preempt > 1200 ? (1800 - preempt) / 120 : (1200 - preempt) / 150 + 5;
 
             overallDifficulty = (80 - greatHitWindow) / 6;
 
@@ -197,6 +202,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             if (score.Mods.Any(m => m is OsuModBlinds))
                 aimValue *= 1.3 + (totalHits * (0.0016 / (1 + 2 * effectiveMissCount)) * Math.Pow(accuracy, 16)) * (1 - 0.003 * attributes.DrainRate * attributes.DrainRate);
+            else if (score.Mods.Any(m => m is OsuModTraceable))
+            {
+                // We want to give more reward for lower AR when it comes to aim and HD. This nerfs high AR and buffs lower AR.
+                aimValue *= 1.0 + 0.04 * (12.0 - approachRate);
+            }
 
             aimValue *= accuracy;
 
@@ -212,6 +222,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             if (effectiveMissCount > 0)
                 speedValue *= calculateMissPenalty(effectiveMissCount, attributes.SpeedDifficultStrainCount);
+
+            if (score.Mods.Any(m => m is OsuModBlinds))
+            {
+                // Increasing the speed value by object count for Blinds isn't ideal, so the minimum buff is given.
+                speedValue *= 1.12;
+            }
+            else if (score.Mods.Any(m => m is OsuModTraceable))
+            {
+                // We want to give more reward for lower AR when it comes to aim and HD. This nerfs high AR and buffs lower AR.
+                speedValue *= 1.0 + 0.04 * (12.0 - approachRate);
+            }
 
             double speedHighDeviationMultiplier = calculateSpeedHighDeviationNerf(attributes);
             speedValue *= speedHighDeviationMultiplier;
