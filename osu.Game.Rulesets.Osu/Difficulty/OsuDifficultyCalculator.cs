@@ -31,7 +31,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
         }
 
-        public const double ADDITION_PORTION = 0.0;
+        public static double AdditionPortion => 0.1;
+        public static double MechanicsMultiplier => 0.95;
 
         protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
         {
@@ -39,15 +40,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 return new OsuDifficultyAttributes { Mods = mods };
 
             var aim = skills.OfType<TotalAim>().Single(a => a.IncludeSliders);
-            double aimRating = Math.Sqrt(aim.DifficultyValue()) * difficulty_multiplier;
-            double aimRatingStrain = Math.Sqrt(aim.StrainDifficultyValue()) * difficulty_multiplier;
+            double aimRating = Math.Sqrt(aim.StrainDifficultyValue()) * difficulty_multiplier;
+            double aimRatingStrain = aimRating; // Math.Sqrt(aim.StrainDifficultyValue()) * difficulty_multiplier;
+            double aimDifficultyStrainCount = aim.CountTopWeightedStrains();
             double difficultSliders = aim.GetDifficultSliders();
 
             //double snapAimRating = Math.Sqrt(skills.OfType<SnapAim>().Single().DifficultyValue()) * difficulty_multiplier;
             //double flowAimRating = Math.Sqrt(skills.OfType<FlowAim>().Single().DifficultyValue()) * difficulty_multiplier;
 
             var aimWithoutSliders = skills.OfType<TotalAim>().Single(a => !a.IncludeSliders);
-            double aimRatingNoSliders = Math.Sqrt(aimWithoutSliders.DifficultyValue()) * difficulty_multiplier;
+            double aimRatingNoSliders = Math.Sqrt(aimWithoutSliders.StrainDifficultyValue()) * difficulty_multiplier;
             double sliderFactor = aimRating > 0 ? aimRatingNoSliders / aimRating : 1;
 
             var speed = skills.OfType<Speed>().Single();
@@ -55,7 +57,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double speedNotes = speed.RelevantNoteCount();
             double speedDifficultyStrainCount = speed.CountTopWeightedStrains();
 
-            ExpPolynomial aimMissPenaltyCurve = aim.GetMissPenaltyCurve();
+            //ExpPolynomial aimMissPenaltyCurve = aim.GetMissPenaltyCurve();
 
             var flashlight = skills.OfType<Flashlight>().SingleOrDefault();
             double flashlightRating = flashlight == null ? 0.0 : Math.Sqrt(flashlight.DifficultyValue()) * difficulty_multiplier;
@@ -90,9 +92,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 baseFlashlightPerformance = Flashlight.DifficultyToPerformance(flashlightRating);
 
             if (baseAimPerformance > baseSpeedPerformance)
-                baseSpeedPerformance += (baseAimPerformance - baseSpeedPerformance) * ADDITION_PORTION;
+                baseSpeedPerformance += (baseAimPerformance - baseSpeedPerformance) * AdditionPortion;
             else
-                baseAimPerformance += (baseSpeedPerformance - baseAimPerformance) * ADDITION_PORTION;
+                baseAimPerformance += (baseSpeedPerformance - baseAimPerformance) * AdditionPortion;
 
             double basePerformance =
                 Math.Pow(
@@ -121,7 +123,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 SpeedNoteCount = speedNotes,
                 FlashlightDifficulty = flashlightRating,
                 SliderFactor = sliderFactor,
-                AimMissPenaltyCurve = aimMissPenaltyCurve,
+                //AimMissPenaltyCurve = aimMissPenaltyCurve,
+                AimDifficultStrainCount = aimDifficultyStrainCount,
                 SpeedDifficultStrainCount = speedDifficultyStrainCount,
                 DrainRate = drainRate,
                 MaxCombo = beatmap.GetMaxCombo(),

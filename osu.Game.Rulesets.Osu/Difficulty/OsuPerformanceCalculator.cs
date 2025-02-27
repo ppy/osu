@@ -156,9 +156,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double flashlightValue = computeFlashlightValue(score, osuAttributes);
 
             if (aimValue > speedValue)
-                speedValue += (aimValue - speedValue) * OsuDifficultyCalculator.ADDITION_PORTION;
+                speedValue += (aimValue - speedValue) * OsuDifficultyCalculator.AdditionPortion;
             else
-                aimValue += (speedValue - aimValue) * OsuDifficultyCalculator.ADDITION_PORTION;
+                aimValue += (speedValue - aimValue) * OsuDifficultyCalculator.AdditionPortion;
 
             double totalValue =
                 Math.Pow(
@@ -212,9 +212,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double lengthBonus = 0.95 + 0.4 * Math.Min(1.0, totalHits / 2000.0) +
                                  (totalHits > 2000 ? Math.Log10(totalHits / 2000.0) * 0.5 : 0.0);
+            aimValue *= lengthBonus;
 
             if (effectiveMissCount > 0)
-                aimValue *= calculateCurveFittedMissPenalty(effectiveMissCount, attributes.AimMissPenaltyCurve);
+                //aimValue *= calculateCurveFittedMissPenalty(effectiveMissCount, attributes.AimMissPenaltyCurve);
+                aimValue *= calculateStrainCountMissPenalty(effectiveMissCount, attributes.AimDifficultStrainCount);
 
             double approachRateFactor = 0.0;
             if (approachRate > 10.33)
@@ -239,7 +241,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // It is important to consider accuracy difficulty when scaling with accuracy.
             aimValue *= 0.98 + Math.Pow(Math.Max(0, overallDifficulty), 2) / 2500;
 
-            aimValue *= 1 + 0.15 * DifficultyCalculationUtils.ReverseLerp(aimValue, 400, 200);
+            //aimValue *= 1 + 0.15 * DifficultyCalculationUtils.ReverseLerp(aimValue, 400, 200);
 
             return aimValue;
         }
