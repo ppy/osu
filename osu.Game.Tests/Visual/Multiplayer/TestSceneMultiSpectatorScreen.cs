@@ -372,7 +372,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             sendFrames(getPlayerIds(4), 300);
 
-            AddUntilStep("wait for correct track speed", () => Beatmap.Value.Track.Rate, () => Is.EqualTo(1.5));
+            AddUntilStep("wait for correct track speed",
+                () => this.ChildrenOfType<MultiSpectatorPlayer>().All(player => player.ClockAdjustmentsFromMods.AggregateTempo.Value == 1.5));
         }
 
         [Test]

@@ -17,6 +17,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Overlays;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.SelectV2;
 using osu.Game.Tests.Beatmaps;
@@ -38,6 +39,9 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         [Cached(typeof(BeatmapStore))]
         private BeatmapStore store;
+
+        [Cached]
+        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
 
         private OsuTextFlowContainer stats = null!;
 
@@ -94,7 +98,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
-                                    Width = 500,
+                                    Width = 800,
                                     RelativeSizeAxes = Axes.Y,
                                 },
                             },
@@ -185,6 +189,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                         .Where(p => ((ICarouselPanel)p).Item?.IsVisible == true)
                         .OrderBy(p => p.Y)
                         .ElementAt(index)
+                        .ChildrenOfType<PanelBase>().Single()
                         .TriggerClick();
             });
         }
