@@ -21,7 +21,6 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input;
 using osu.Game.Online.API;
-using osu.Game.Online.API.Requests;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
@@ -361,14 +360,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             api.Queue(req);
         }
 
-        public void Close(Room room)
-        {
-            Debug.Assert(room.RoomID != null);
-
-            var request = new ClosePlaylistRequest(room.RoomID.Value);
-            request.Success += RefreshRooms;
-            api.Queue(request);
-        }
+        public abstract void Close(Room room);
 
         /// <summary>
         /// Push a room as a new subscreen.
