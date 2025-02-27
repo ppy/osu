@@ -46,6 +46,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (beatmap.HitObjects.Count == 0)
                 return new OsuDifficultyAttributes { Mods = mods };
 
+            var aim = skills.OfType<Aim>().Single(a => a.IncludeSliders);
+            var aimWithoutSliders = skills.OfType<Aim>().Single(a => !a.IncludeSliders);
+            var speed = skills.OfType<Speed>().Single();
+            var flashlight = skills.OfType<Flashlight>().SingleOrDefault();
+
+            double speedNotes = speed.RelevantNoteCount();
+
+            double aimDifficultStrainCount = aim.CountTopWeightedStrains();
+            double speedDifficultStrainCount = speed.CountTopWeightedStrains();
+
+            double difficultSliders = aim.GetDifficultSliders();
+
             double preempt = IBeatmapDifficultyInfo.DifficultyRange(beatmap.Difficulty.ApproachRate, 1800, 1200, 450) / clockRate;
             double approachRate = preempt > 1200 ? (1800 - preempt) / 120 : (1200 - preempt) / 150 + 5;
 
@@ -63,18 +75,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             int totalHits = beatmap.HitObjects.Count;
 
             double drainRate = beatmap.Difficulty.DrainRate;
-
-            var aim = skills.OfType<Aim>().Single(a => a.IncludeSliders);
-            var aimWithoutSliders = skills.OfType<Aim>().Single(a => !a.IncludeSliders);
-            var speed = skills.OfType<Speed>().Single();
-            var flashlight = skills.OfType<Flashlight>().SingleOrDefault();
-
-            double speedNotes = speed.RelevantNoteCount();
-
-            double aimDifficultyStrainCount = aim.CountTopWeightedStrains();
-            double speedDifficultyStrainCount = speed.CountTopWeightedStrains();
-
-            double difficultSliders = aim.GetDifficultSliders();
 
             double aimRating = computeAimRating(aim.DifficultyValue(), mods, totalHits, approachRate, overallDifficulty);
             double aimRatingNoSliders = computeAimRating(aimWithoutSliders.DifficultyValue(), mods, totalHits, approachRate, overallDifficulty);
@@ -114,8 +114,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 SpeedNoteCount = speedNotes,
                 FlashlightDifficulty = flashlightRating,
                 SliderFactor = sliderFactor,
-                AimDifficultStrainCount = aimDifficultyStrainCount,
-                SpeedDifficultStrainCount = speedDifficultyStrainCount,
+                AimDifficultStrainCount = aimDifficultStrainCount,
+                SpeedDifficultStrainCount = speedDifficultStrainCount,
                 DrainRate = drainRate,
                 MaxCombo = beatmap.GetMaxCombo(),
                 HitCircleCount = hitCircleCount,
