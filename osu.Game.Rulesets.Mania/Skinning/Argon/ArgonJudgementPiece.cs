@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -12,6 +13,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.UI.Scrolling;
 using osuTK;
 using osuTK.Graphics;
 
@@ -19,12 +21,14 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
 {
     public partial class ArgonJudgementPiece : TextJudgementPiece, IAnimatableJudgement
     {
-        private const float judgement_y_position = 160;
+        private const float judgement_y_position = -180f;
 
         private RingExplosion? ringExplosion;
 
         [Resolved]
         private OsuColour colours { get; set; } = null!;
+
+        private IBindable<ScrollingDirection> direction = null!;
 
         public ArgonJudgementPiece(HitResult result)
             : base(result)
@@ -32,12 +36,14 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
             AutoSizeAxes = Axes.Both;
 
             Origin = Anchor.Centre;
-            Y = judgement_y_position;
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(IScrollingInfo scrollingInfo)
         {
+            direction = scrollingInfo.Direction.GetBoundCopy();
+            direction.BindValueChanged(_ => onDirectionChanged(), true);
+
             if (Result.IsHit())
             {
                 AddInternal(ringExplosion = new RingExplosion(Result)
@@ -46,6 +52,8 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                 });
             }
         }
+
+        private void onDirectionChanged() => Y = direction.Value == ScrollingDirection.Up ? -judgement_y_position : judgement_y_position;
 
         protected override SpriteText CreateJudgementText() =>
             new OsuSpriteText
@@ -78,7 +86,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                     this.ScaleTo(1.6f);
                     this.ScaleTo(1, 100, Easing.In);
 
-                    this.MoveToY(judgement_y_position);
+                    this.MoveToY(direction.Value == ScrollingDirection.Up ? -judgement_y_position : judgement_y_position);
                     this.MoveToOffset(new Vector2(0, 100), 800, Easing.InQuint);
 
                     this.RotateTo(0);

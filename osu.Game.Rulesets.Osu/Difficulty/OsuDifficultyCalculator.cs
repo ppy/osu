@@ -64,10 +64,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double drainRate = beatmap.Difficulty.DrainRate;
 
-            var aim = (Aim)skills.Single(s => s is Aim aimSkill && aimSkill.WithSliders);
-            var aimNoSliders = (Aim)skills.Single(s => s is Aim aimSkill && !aimSkill.WithSliders);
-            var speed = (Speed)skills.Single(s => s is Speed);
-            var flashlight = (Flashlight?)skills.SingleOrDefault(s => s is Flashlight);
+            var aim = skills.OfType<Aim>().Single(a => a.IncludeSliders);
+            var aimWithoutSliders = skills.OfType<Aim>().Single(a => !a.IncludeSliders);
+            var speed = skills.OfType<Speed>().Single();
+            var flashlight = skills.OfType<Flashlight>().SingleOrDefault();
 
             double speedNotes = speed.RelevantNoteCount();
 
@@ -77,7 +77,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double difficultSliders = aim.GetDifficultSliders();
 
             double aimRating = computeAimRating(aim.DifficultyValue(), mods, totalHits, approachRate, overallDifficulty);
-            double aimRatingNoSliders = computeAimRating(aimNoSliders.DifficultyValue(), mods, totalHits, approachRate, overallDifficulty);
+            double aimRatingNoSliders = computeAimRating(aimWithoutSliders.DifficultyValue(), mods, totalHits, approachRate, overallDifficulty);
             double speedRating = computeSpeedRating(speed.DifficultyValue(), mods, totalHits, approachRate);
 
             double flashlightRating = 0.0;
@@ -116,8 +116,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 SliderFactor = sliderFactor,
                 AimDifficultStrainCount = aimDifficultyStrainCount,
                 SpeedDifficultStrainCount = speedDifficultyStrainCount,
-                ApproachRate = approachRate,
-                OverallDifficulty = overallDifficulty,
                 DrainRate = drainRate,
                 MaxCombo = beatmap.GetMaxCombo(),
                 HitCircleCount = hitCircleCount,
@@ -166,7 +164,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             }
 
             // It is important to consider accuracy difficulty when scaling with accuracy.
-            ratingMultiplier *= 0.98 + Math.Pow(overallDifficulty, 2) / 2500;
+            ratingMultiplier *= 0.98 + Math.Pow(Math.Max(0, overallDifficulty), 2) / 2500;
 
             return aimRating * Math.Cbrt(ratingMultiplier);
         }
@@ -233,7 +231,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                                 (totalHits > 200 ? 0.2 * Math.Min(1.0, (totalHits - 200) / 200.0) : 0.0);
 
             // It is important to consider accuracy difficulty when scaling with accuracy.
-            ratingMultiplier *= 0.98 + Math.Pow(overallDifficulty, 2) / 2500;
+            ratingMultiplier *= 0.98 + Math.Pow(Math.Max(0, overallDifficulty), 2) / 2500;
 
             return flashlightRating * Math.Cbrt(ratingMultiplier);
         }

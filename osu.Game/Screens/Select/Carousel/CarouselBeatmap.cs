@@ -90,6 +90,12 @@ namespace osu.Game.Screens.Select.Carousel
             if (match && criteria.RulesetCriteria != null)
                 match &= criteria.RulesetCriteria.Matches(BeatmapInfo, criteria);
 
+            if (match && criteria.HasOnlineID == true)
+                match &= BeatmapInfo.OnlineID >= 0;
+
+            if (match && criteria.BeatmapSetId != null)
+                match &= criteria.BeatmapSetId == BeatmapInfo.BeatmapSet?.OnlineID;
+
             return match;
         }
 

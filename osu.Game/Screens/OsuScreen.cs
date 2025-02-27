@@ -47,6 +47,8 @@ namespace osu.Game.Screens
 
         public virtual bool HideMenuCursorOnNonMouseInput => false;
 
+        public virtual bool RequiresPortraitOrientation => false;
+
         /// <summary>
         /// The initial overlay activation mode to use when this screen is entered for the first time.
         /// </summary>
@@ -81,7 +83,7 @@ namespace osu.Game.Screens
         /// </summary>
         protected readonly Bindable<UserActivity> Activity = new Bindable<UserActivity>();
 
-        IBindable<UserActivity> IOsuScreen.Activity => Activity;
+        Bindable<UserActivity> IOsuScreen.Activity => Activity;
 
         /// <summary>
         /// Whether to disallow changes to game-wise Beatmap/Ruleset bindables for this screen (and all children).

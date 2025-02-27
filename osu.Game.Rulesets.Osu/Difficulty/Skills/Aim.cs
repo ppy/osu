@@ -16,15 +16,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     /// </summary>
     public class Aim : OsuStrainSkill
     {
-        public Aim(Mod[] mods, bool withSliders)
+        public readonly bool IncludeSliders;
+
+        public Aim(Mod[] mods, bool includeSliders)
             : base(mods)
         {
-            WithSliders = withSliders;
+            IncludeSliders = includeSliders;
         }
 
         private double currentStrain;
 
-        private double skillMultiplier => 25.18;
+        private double skillMultiplier => 25.6;
         private double strainDecayBase => 0.15;
 
         private readonly List<double> sliderStrains = new List<double>();
@@ -38,7 +40,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         protected override double StrainValueAt(DifficultyHitObject current)
         {
             currentStrain *= strainDecay(current.DeltaTime);
-            currentStrain += AimEvaluator.EvaluateDifficultyOf(current, WithSliders) * skillMultiplier;
+            currentStrain += AimEvaluator.EvaluateDifficultyOf(current, IncludeSliders) * skillMultiplier;
 
             if (current.BaseObject is Slider)
             {
@@ -53,13 +55,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             if (sliderStrains.Count == 0)
                 return 0;
 
-            double[] sortedStrains = sliderStrains.OrderDescending().ToArray();
-
-            double maxSliderStrain = sortedStrains.Max();
+            double maxSliderStrain = sliderStrains.Max();
             if (maxSliderStrain == 0)
                 return 0;
 
-            return sortedStrains.Sum(strain => 1.0 / (1.0 + Math.Exp(-(strain / maxSliderStrain * 12.0 - 6.0))));
+            return sliderStrains.Sum(strain => 1.0 / (1.0 + Math.Exp(-(strain / maxSliderStrain * 12.0 - 6.0))));
         }
     }
 }
