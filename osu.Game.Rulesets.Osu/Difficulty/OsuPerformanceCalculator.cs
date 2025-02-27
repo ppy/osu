@@ -90,9 +90,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             mehHitWindow = hitWindows.WindowFor(HitResult.Meh) / clockRate;
 
             double preempt = IBeatmapDifficultyInfo.DifficultyRange(difficulty.ApproachRate, 1800, 1200, 450) / clockRate;
-            approachRate = preempt > 1200 ? (1800 - preempt) / 120 : (1200 - preempt) / 150 + 5;
 
             overallDifficulty = (80 - greatHitWindow) / 6;
+            approachRate = preempt > 1200 ? (1800 - preempt) / 120 : (1200 - preempt) / 150 + 5;
 
             if (osuAttributes.SliderCount > 0)
             {
