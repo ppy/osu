@@ -170,13 +170,23 @@ namespace osu.Game.Online.Multiplayer
         private readonly TaskChain joinOrLeaveTaskChain = new TaskChain();
         private CancellationTokenSource? joinCancellationSource;
 
+        /// <summary>
+        /// Creates and joins a <see cref="MultiplayerRoom"/> described by an API <see cref="Room"/>.
+        /// </summary>
+        /// <param name="room">The API <see cref="Room"/> describing the room to create.</param>
+        /// <exception cref="InvalidOperationException">If the current user is already in another room.</exception>
         public async Task CreateRoom(Room room)
         {
             if (Room != null)
                 throw new InvalidOperationException("Cannot create a multiplayer room while already in one.");
 
             var cancellationSource = joinCancellationSource = new CancellationTokenSource();
-            await initRoom(room, r => CreateRoomInternal(new MultiplayerRoom(room)), cancellationSource.Token).ConfigureAwait(false);
+
+            await joinOrLeaveTaskChain.Add(async () =>
+            {
+                var multiplayerRoom = await CreateRoomInternal(new MultiplayerRoom(room)).ConfigureAwait(false);
+                await setupJoinedRoom(room, multiplayerRoom, cancellationSource.Token).ConfigureAwait(false);
+            }, cancellationSource.Token).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -184,54 +194,61 @@ namespace osu.Game.Online.Multiplayer
         /// </summary>
         /// <param name="room">The API <see cref="Room"/>.</param>
         /// <param name="password">An optional password to use for the join operation.</param>
+        /// <exception cref="InvalidOperationException">If the current user is already in another room, or <paramref name="room"/> does not represent an active room.</exception>
         public async Task JoinRoom(Room room, string? password = null)
         {
             if (Room != null)
                 throw new InvalidOperationException("Cannot join a multiplayer room while already in one.");
 
-            Debug.Assert(room.RoomID != null);
+            if (room.RoomID == null)
+                throw new InvalidOperationException("Cannot join an inactive room.");
 
             var cancellationSource = joinCancellationSource = new CancellationTokenSource();
-            await initRoom(room, r => JoinRoomInternal(room.RoomID.Value, password ?? room.Password), cancellationSource.Token).ConfigureAwait(false);
-        }
 
-        private async Task initRoom(Room room, Func<Room, Task<MultiplayerRoom>> initFunc, CancellationToken cancellationToken)
-        {
             await joinOrLeaveTaskChain.Add(async () =>
             {
-                // Initialise the server-side room.
-                MultiplayerRoom joinedRoom = await initFunc(room).ConfigureAwait(false);
+                var multiplayerRoom = await JoinRoomInternal(room.RoomID.Value, password ?? room.Password).ConfigureAwait(false);
+                await setupJoinedRoom(room, multiplayerRoom, cancellationSource.Token).ConfigureAwait(false);
+            }, cancellationSource.Token).ConfigureAwait(false);
+        }
 
-                // Populate users.
-                await PopulateUsers(joinedRoom.Users).ConfigureAwait(false);
+        /// <summary>
+        /// Performs post-join setup of a <see cref="MultiplayerRoom"/>.
+        /// </summary>
+        /// <param name="apiRoom">The incoming API <see cref="Room"/> that was requested to be joined.</param>
+        /// <param name="joinedRoom">The resuling <see cref="MultiplayerRoom"/> that was joined.</param>
+        /// <param name="cancellationToken">A token to cancel the process.</param>
+        private async Task setupJoinedRoom(Room apiRoom, MultiplayerRoom joinedRoom, CancellationToken cancellationToken)
+        {
+            // Populate users.
+            await PopulateUsers(joinedRoom.Users).ConfigureAwait(false);
 
-                // Update the stored room (must be done on update thread for thread-safety).
-                await runOnUpdateThreadAsync(() =>
-                {
-                    Debug.Assert(Room == null);
-                    Debug.Assert(APIRoom == null);
+            // Update the stored room (must be done on update thread for thread-safety).
+            await runOnUpdateThreadAsync(() =>
+            {
+                Debug.Assert(Room == null);
+                Debug.Assert(APIRoom == null);
 
-                    Room = joinedRoom;
-                    APIRoom = room;
+                Room = joinedRoom;
+                APIRoom = apiRoom;
 
-                    APIRoom.RoomID = joinedRoom.RoomID;
-                    APIRoom.Playlist = joinedRoom.Playlist.Select(item => new PlaylistItem(item)).ToArray();
-                    APIRoom.CurrentPlaylistItem = APIRoom.Playlist.Single(item => item.ID == joinedRoom.Settings.PlaylistItemId);
-                    // The server will null out the end date upon the host joining the room, but the null value is never communicated to the client.
-                    APIRoom.EndDate = null;
+                APIRoom.RoomID = joinedRoom.RoomID;
+                APIRoom.Playlist = joinedRoom.Playlist.Select(item => new PlaylistItem(item)).ToArray();
+                APIRoom.CurrentPlaylistItem = APIRoom.Playlist.Single(item => item.ID == joinedRoom.Settings.PlaylistItemId);
+                // The server will null out the end date upon the host joining the room, but the null value is never communicated to the client.
+                APIRoom.EndDate = null;
 
-                    Debug.Assert(LocalUser != null);
-                    addUserToAPIRoom(LocalUser);
+                Debug.Assert(LocalUser != null);
+                addUserToAPIRoom(LocalUser);
 
-                    foreach (var user in joinedRoom.Users)
-                        updateUserPlayingState(user.UserID, user.State);
+                foreach (var user in joinedRoom.Users)
+                    updateUserPlayingState(user.UserID, user.State);
 
-                    updateLocalRoomSettings(joinedRoom.Settings);
+                updateLocalRoomSettings(joinedRoom.Settings);
 
-                    postServerShuttingDownNotification();
+                postServerShuttingDownNotification();
 
-                    OnRoomJoined();
-                }, cancellationToken).ConfigureAwait(false);
+                OnRoomJoined();
             }, cancellationToken).ConfigureAwait(false);
         }
 
