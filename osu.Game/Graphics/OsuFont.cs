@@ -87,6 +87,10 @@ namespace osu.Game.Graphics
                 // torus doesn't have a medium; fallback to regular.
                 weight = FontWeight.Regular;
 
+            // venera only has bold; switch to bold if it isn't
+            if (family == GetFamilyString(Typeface.Venera) && weight != FontWeight.Bold)
+                weight = FontWeight.Bold;
+
             return weight.ToString();
         }
     }
