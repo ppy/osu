@@ -100,7 +100,19 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 if (args.Action != NotifyCollectionChangedAction.Replace)
                     updateColours();
             }, true);
-            CanAdd.BindValueChanged(_ => addButton.Alpha = CanAdd.Value ? 1 : 0, true);
+            CanAdd.BindValueChanged(canAdd =>
+            {
+                if (canAdd.NewValue)
+                {
+                    addButton.Enabled.Value = true;
+                    addButton.TooltipText = string.Empty;
+                }
+                else
+                {
+                    addButton.Enabled.Value = false;
+                    addButton.TooltipText = "Maximum combo colours reached";
+                }
+            }, true);
             updateState();
         }
 
