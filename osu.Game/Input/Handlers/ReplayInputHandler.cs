@@ -60,8 +60,16 @@ namespace osu.Game.Input.Handlers
                 }
                 else if (!lastPressed.SequenceEqual(PressedActions))
                 {
-                    released = lastPressed.Except(PressedActions).ToArray();
-                    pressed = PressedActions.Except(lastPressed).ToArray();
+                    var releasedList = lastPressed.ToList();
+                    foreach (var action in PressedActions)
+                        releasedList.Remove(action);
+
+                    var pressedList = PressedActions.ToList();
+                    foreach (var action in lastPressed)
+                        pressedList.Remove(action);
+
+                    released = releasedList.ToArray();
+                    pressed = pressedList.ToArray();
                 }
 
                 inputState.LastReplayState = this;
