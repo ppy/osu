@@ -267,9 +267,9 @@ namespace osu.Game.Screens.SelectV2
 
         #region Drawable pooling
 
-        private readonly DrawablePool<BeatmapPanel> beatmapPanelPool = new DrawablePool<BeatmapPanel>(100);
-        private readonly DrawablePool<BeatmapSetPanel> setPanelPool = new DrawablePool<BeatmapSetPanel>(100);
-        private readonly DrawablePool<GroupPanel> groupPanelPool = new DrawablePool<GroupPanel>(100);
+        private readonly DrawablePool<PanelBeatmap> beatmapPanelPool = new DrawablePool<PanelBeatmap>(100);
+        private readonly DrawablePool<PanelBeatmapSet> setPanelPool = new DrawablePool<PanelBeatmapSet>(100);
+        private readonly DrawablePool<PanelGroup> groupPanelPool = new DrawablePool<PanelGroup>(100);
 
         private void setupPools()
         {

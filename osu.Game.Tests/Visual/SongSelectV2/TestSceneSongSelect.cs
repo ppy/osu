@@ -9,15 +9,27 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
+using osu.Game.Beatmaps;
+using osu.Game.Configuration;
+using osu.Game.Database;
+using osu.Game.Online.API;
+using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
+using osu.Game.Rulesets;
+using osu.Game.Rulesets.Catch;
+using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
+using osu.Game.Rulesets.Taiko;
 using osu.Game.Screens;
 using osu.Game.Screens.Footer;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.SelectV2.Footer;
+using osu.Game.Tests.Resources;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.SongSelectV2
@@ -29,6 +41,10 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
         [Cached]
         private readonly OsuLogo logo;
+
+        private BeatmapManager beatmapManager = null!;
+
+        protected override bool UseOnlineAPI => true;
 
         public TestSceneSongSelect()
         {
@@ -49,6 +65,35 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             };
         }
 
+        [BackgroundDependencyLoader]
+        private void load(GameHost host, IAPIProvider onlineAPI)
+        {
+            BeatmapStore beatmapStore;
+            BeatmapUpdater beatmapUpdater;
+            BeatmapDifficultyCache difficultyCache;
+
+            // These DI caches are required to ensure for interactive runs this test scene doesn't nuke all user beatmaps in the local install.
+            // At a point we have isolated interactive test runs enough, this can likely be removed.
+            Dependencies.Cache(new RealmRulesetStore(Realm));
+            Dependencies.Cache(Realm);
+            Dependencies.Cache(difficultyCache = new BeatmapDifficultyCache());
+            Dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, Realm, onlineAPI, Audio, Resources, host, Beatmap.Default, difficultyCache));
+            Dependencies.CacheAs(beatmapUpdater = new BeatmapUpdater(beatmapManager, difficultyCache, onlineAPI, LocalStorage));
+            Dependencies.CacheAs(beatmapStore = new RealmDetachedBeatmapStore());
+
+            beatmapManager.ProcessBeatmap = (set, scope) => beatmapUpdater.Process(set, scope);
+
+            MusicController music;
+            Dependencies.Cache(music = new MusicController());
+
+            // required to get bindables attached
+            Add(difficultyCache);
+            Add(music);
+            Add(beatmapStore);
+
+            Dependencies.Cache(new OsuConfigManager(LocalStorage));
+        }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -64,6 +109,16 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             AddStep("load screen", () => Stack.Push(new Screens.SelectV2.SongSelectV2()));
             AddUntilStep("wait for load", () => Stack.CurrentScreen is Screens.SelectV2.SongSelectV2 songSelect && songSelect.IsLoaded);
+            AddStep("import test beatmap", () => beatmapManager.Import(TestResources.GetTestBeatmapForImport()));
+        }
+
+        [Test]
+        public void TestRulesets()
+        {
+            AddStep("set osu ruleset", () => Ruleset.Value = new OsuRuleset().RulesetInfo);
+            AddStep("set taiko ruleset", () => Ruleset.Value = new TaikoRuleset().RulesetInfo);
+            AddStep("set catch ruleset", () => Ruleset.Value = new CatchRuleset().RulesetInfo);
+            AddStep("set mania ruleset", () => Ruleset.Value = new ManiaRuleset().RulesetInfo);
         }
 
         #region Footer
@@ -80,8 +135,11 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddStep("modified", () => SelectedMods.Value = new List<Mod> { new OsuModDoubleTime { SpeedChange = { Value = 1.2 } } });
             AddStep("modified + one", () => SelectedMods.Value = new List<Mod> { new OsuModHidden(), new OsuModDoubleTime { SpeedChange = { Value = 1.2 } } });
             AddStep("modified + two", () => SelectedMods.Value = new List<Mod> { new OsuModHidden(), new OsuModHardRock(), new OsuModDoubleTime { SpeedChange = { Value = 1.2 } } });
-            AddStep("modified + three", () => SelectedMods.Value = new List<Mod> { new OsuModHidden(), new OsuModHardRock(), new OsuModClassic(), new OsuModDoubleTime { SpeedChange = { Value = 1.2 } } });
-            AddStep("modified + four", () => SelectedMods.Value = new List<Mod> { new OsuModHidden(), new OsuModHardRock(), new OsuModClassic(), new OsuModDifficultyAdjust(), new OsuModDoubleTime { SpeedChange = { Value = 1.2 } } });
+            AddStep("modified + three",
+                () => SelectedMods.Value = new List<Mod> { new OsuModHidden(), new OsuModHardRock(), new OsuModClassic(), new OsuModDoubleTime { SpeedChange = { Value = 1.2 } } });
+            AddStep("modified + four",
+                () => SelectedMods.Value = new List<Mod>
+                    { new OsuModHidden(), new OsuModHardRock(), new OsuModClassic(), new OsuModDifficultyAdjust(), new OsuModDoubleTime { SpeedChange = { Value = 1.2 } } });
 
             AddStep("clear mods", () => SelectedMods.Value = Array.Empty<Mod>());
             AddWaitStep("wait", 3);

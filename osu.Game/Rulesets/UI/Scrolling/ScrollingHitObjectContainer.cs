@@ -247,7 +247,12 @@ namespace osu.Game.Rulesets.UI.Scrolling
             // It is required that we set a lifetime end here to ensure that in scenarios like loading a Player instance to a seeked
             // location in a beatmap doesn't churn every hit object into a DrawableHitObject. Even in a pooled scenario, the overhead
             // of this can be quite crippling.
-            entry.LifetimeEnd = entry.HitObject.GetEndTime() + timeRange.Value;
+            //
+            // However, additionally do not attempt to alter lifetime of judged entries.
+            // This is to prevent freak accidents like objects suddenly becoming alive because of this estimate assigning a later lifetime
+            // than the object itself decided it should have when it underwent judgement.
+            if (!entry.Judged)
+                entry.LifetimeEnd = entry.HitObject.GetEndTime() + timeRange.Value;
         }
 
         private void updateLayoutRecursive(DrawableHitObject hitObject, double? parentHitObjectStartTime = null)

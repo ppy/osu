@@ -162,6 +162,8 @@ namespace osu.Game.Graphics.UserInterface
 
         protected partial class BoundSlider : RoundedSliderBar<double>
         {
+            public override bool AcceptsFocus => false;
+
             public new Nub Nub => base.Nub;
 
             public string? DefaultString;

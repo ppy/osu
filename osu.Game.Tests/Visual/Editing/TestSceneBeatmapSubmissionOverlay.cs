@@ -24,7 +24,11 @@ namespace osu.Game.Tests.Visual.Editing
                 Child = new DependencyProvidingContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    CachedDependencies = new[] { (typeof(ScreenFooter), (object)footer) },
+                    CachedDependencies = new[]
+                    {
+                        (typeof(ScreenFooter), (object)footer),
+                        (typeof(BeatmapSubmissionSettings), new BeatmapSubmissionSettings()),
+                    },
                     Children = new Drawable[]
                     {
                         receptor,

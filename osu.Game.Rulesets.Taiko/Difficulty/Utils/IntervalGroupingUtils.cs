@@ -23,6 +23,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Utils
         {
             const double margin_of_error = 5;
 
+            // This never compares the first two elements in the group.
+            // This sounds wrong but is apparently "as intended" (https://github.com/ppy/osu/pull/31636#discussion_r1942673329)
             var groupedObjects = new List<T> { objects[i] };
             i++;
 

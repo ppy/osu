@@ -52,6 +52,11 @@ namespace osu.Game.Online.Multiplayer
         public event Action<MultiplayerRoomUser>? UserKicked;
 
         /// <summary>
+        /// Invoked when the room's host is changed.
+        /// </summary>
+        public event Action<MultiplayerRoomUser?>? HostChanged;
+
+        /// <summary>
         /// Invoked when a new item is added to the playlist.
         /// </summary>
         public event Action<MultiplayerPlaylistItem>? ItemAdded;
@@ -531,6 +536,7 @@ namespace osu.Game.Online.Multiplayer
                 Room.Host = user;
                 APIRoom.Host = user?.User;
 
+                HostChanged?.Invoke(user);
                 RoomUpdated?.Invoke();
             }, false);
 

@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.UI;
@@ -15,6 +16,8 @@ namespace osu.Game.Rulesets.Catch.UI
         protected override Container<Drawable> Content => content;
         private readonly Container content;
 
+        private readonly Container scaleContainer;
+
         public CatchPlayfieldAdjustmentContainer()
         {
             const float base_game_width = 1024f;
@@ -26,28 +29,47 @@ namespace osu.Game.Rulesets.Catch.UI
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
-            InternalChild = new Container
+            InternalChild = scaleContainer = new Container
             {
-                // This container limits vertical visibility of the playfield to ensure fairness between wide and tall resolutions (i.e. tall resolutions should not see more fruits).
-                // Note that the container still extends across the screen horizontally, so that hit explosions at the sides of the playfield do not get cut off.
-                Name = "Visible area",
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                RelativeSizeAxes = Axes.X,
-                Height = base_game_height + extra_bottom_space,
-                Y = extra_bottom_space / 2,
-                Masking = true,
+                RelativeSizeAxes = Axes.Both,
                 Child = new Container
                 {
-                    Name = "Playable area",
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
-                    // playfields in stable are positioned vertically at three fourths the difference between the playfield height and the window height in stable.
-                    Y = base_game_height * ((1 - playfield_size_adjust) / 4 * 3),
-                    Size = new Vector2(base_game_width, base_game_height) * playfield_size_adjust,
-                    Child = content = new ScalingContainer { RelativeSizeAxes = Axes.Both }
-                },
+                    // This container limits vertical visibility of the playfield to ensure fairness between wide and tall resolutions (i.e. tall resolutions should not see more fruits).
+                    // Note that the container still extends across the screen horizontally, so that hit explosions at the sides of the playfield do not get cut off.
+                    Name = "Visible area",
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.X,
+                    Height = base_game_height + extra_bottom_space,
+                    Y = extra_bottom_space / 2,
+                    Masking = true,
+                    Child = new Container
+                    {
+                        Name = "Playable area",
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopCentre,
+                        // playfields in stable are positioned vertically at three fourths the difference between the playfield height and the window height in stable.
+                        Y = base_game_height * ((1 - playfield_size_adjust) / 4 * 3),
+                        Size = new Vector2(base_game_width, base_game_height) * playfield_size_adjust,
+                        Child = content = new ScalingContainer { RelativeSizeAxes = Axes.Both }
+                    },
+                }
             };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuGame? osuGame)
+        {
+            if (osuGame != null)
+            {
+                // on mobile platforms where the base aspect ratio is wider, the catch playfield
+                // needs to be scaled down to remain playable.
+                const float base_aspect_ratio = 1024f / 768f;
+                float aspectRatio = osuGame.ScalingContainerTargetDrawSize.X / osuGame.ScalingContainerTargetDrawSize.Y;
+                scaleContainer.Scale = new Vector2(base_aspect_ratio / aspectRatio);
+            }
         }
 
         /// <summary>

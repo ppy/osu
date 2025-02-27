@@ -10,6 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Game.Overlays;
 using Vector2 = osuTK.Vector2;
@@ -52,10 +53,21 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
+        /// <summary>
+        /// The action to use to reset the value of <see cref="SliderBar{T}.Current"/> to the default.
+        /// Triggered on double click.
+        /// </summary>
+        public Action ResetToDefault { get; internal set; }
+
         public RoundedSliderBar()
         {
             Height = Nub.HEIGHT;
             RangePadding = Nub.DEFAULT_EXPANDED_SIZE / 2;
+            ResetToDefault = () =>
+            {
+                if (!Current.Disabled)
+                    Current.SetDefault();
+            };
             Children = new Drawable[]
             {
                 new Container
@@ -102,11 +114,7 @@ namespace osu.Game.Graphics.UserInterface
                         Origin = Anchor.TopCentre,
                         RelativePositionAxes = Axes.X,
                         Current = { Value = true },
-                        OnDoubleClicked = () =>
-                        {
-                            if (!Current.Disabled)
-                                Current.SetDefault();
-                        },
+                        OnDoubleClicked = () => ResetToDefault.Invoke(),
                     },
                 },
                 hoverClickSounds = new HoverClickSounds()

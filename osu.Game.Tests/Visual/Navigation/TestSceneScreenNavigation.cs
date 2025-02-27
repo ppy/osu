@@ -11,6 +11,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Extensions;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
@@ -52,7 +53,6 @@ using osu.Game.Tests.Resources;
 using osu.Game.Utils;
 using osuTK;
 using osuTK.Input;
-using SharpCompress;
 
 namespace osu.Game.Tests.Visual.Navigation
 {

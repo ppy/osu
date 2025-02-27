@@ -227,6 +227,10 @@ namespace osu.Game.Input.Bindings
         };
     }
 
+    /// <remarks>
+    /// IMPORTANT: New entries should always be added at the end of the enum, as key bindings are stored using the enum's numeric value and
+    /// changes in order would cause key bindings to get associated with the wrong action.
+    /// </remarks>
     public enum GlobalAction
     {
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleChat))]

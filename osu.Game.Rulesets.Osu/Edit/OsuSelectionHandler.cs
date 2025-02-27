@@ -40,6 +40,8 @@ namespace osu.Game.Rulesets.Osu.Edit
             SelectionBox.CanReverse = EditorBeatmap.SelectedHitObjects.Count > 1 || EditorBeatmap.SelectedHitObjects.Any(s => s is Slider);
         }
 
+        private bool nudgeMovementActive;
+
         protected override bool OnKeyDown(KeyDownEvent e)
         {
             if (e.Key == Key.M && e.ControlPressed && e.ShiftPressed)
@@ -48,7 +50,41 @@ namespace osu.Game.Rulesets.Osu.Edit
                 return true;
             }
 
+            // Until the keys below are global actions, this will prevent conflicts with "seek between sample points"
+            // which has a default of ctrl+shift+arrows.
+            if (e.ShiftPressed)
+                return false;
+
+            if (e.ControlPressed)
+            {
+                switch (e.Key)
+                {
+                    case Key.Left:
+                        return nudgeSelection(new Vector2(-1, 0));
+
+                    case Key.Right:
+                        return nudgeSelection(new Vector2(1, 0));
+
+                    case Key.Up:
+                        return nudgeSelection(new Vector2(0, -1));
+
+                    case Key.Down:
+                        return nudgeSelection(new Vector2(0, 1));
+                }
+            }
+
             return false;
+        }
+
+        protected override void OnKeyUp(KeyUpEvent e)
+        {
+            base.OnKeyUp(e);
+
+            if (nudgeMovementActive && !e.ControlPressed)
+            {
+                EditorBeatmap.EndChange();
+                nudgeMovementActive = false;
+            }
         }
 
         public override bool HandleMovement(MoveSelectionEvent<HitObject> moveEvent)
@@ -70,6 +106,13 @@ namespace osu.Game.Rulesets.Osu.Edit
             if (hitObjects.Any(h => Precision.AlmostEquals(localDelta, -h.StackOffset)))
                 return true;
 
+            moveObjects(hitObjects, localDelta);
+
+            return true;
+        }
+
+        private void moveObjects(OsuHitObject[] hitObjects, Vector2 localDelta)
+        {
             // this will potentially move the selection out of bounds...
             foreach (var h in hitObjects)
                 h.Position += localDelta;
@@ -81,7 +124,26 @@ namespace osu.Game.Rulesets.Osu.Edit
             // this intentionally bypasses the editor `UpdateState()` / beatmap processor flow for performance reasons,
             // as the entire flow is too expensive to run on every movement.
             Scheduler.AddOnce(OsuBeatmapProcessor.ApplyStacking, EditorBeatmap);
+        }
 
+        /// <summary>
+        /// Move the current selection spatially by the specified delta, in gamefield coordinates (ie. the same coordinates as the blueprints).
+        /// </summary>
+        /// <param name="delta"></param>
+        private bool nudgeSelection(Vector2 delta)
+        {
+            if (!nudgeMovementActive)
+            {
+                nudgeMovementActive = true;
+                EditorBeatmap.BeginChange();
+            }
+
+            var firstBlueprint = SelectedBlueprints.FirstOrDefault();
+
+            if (firstBlueprint == null)
+                return false;
+
+            moveObjects(selectedMovableObjects, delta);
             return true;
         }
 

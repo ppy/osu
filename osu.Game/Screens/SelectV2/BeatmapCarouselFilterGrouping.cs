@@ -70,7 +70,7 @@ namespace osu.Game.Screens.SelectV2
 
                         addItem(new CarouselItem(newGroup)
                         {
-                            DrawHeight = GroupPanel.HEIGHT,
+                            DrawHeight = PanelGroup.HEIGHT,
                             DepthLayer = -2,
                         });
                     }
@@ -85,7 +85,7 @@ namespace osu.Game.Screens.SelectV2
 
                             addItem(new CarouselItem(beatmap.BeatmapSet!)
                             {
-                                DrawHeight = BeatmapSetPanel.HEIGHT,
+                                DrawHeight = PanelBeatmapSet.HEIGHT,
                                 DepthLayer = -1
                             });
                         }

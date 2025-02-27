@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -440,11 +439,14 @@ namespace osu.Game.Screens.OnlinePlay.Match
 
             var rulesetInstance = GetGameplayRuleset().CreateInstance();
 
+            Mod[] allowedMods = item.Freestyle
+                ? rulesetInstance.AllMods.OfType<Mod>().Where(m => ModUtils.IsValidFreeModForMatchType(m, Room.Type)).ToArray()
+                : item.AllowedMods.Select(m => m.ToMod(rulesetInstance)).ToArray();
+
             // Remove any user mods that are no longer allowed.
-            Mod[] allowedMods = item.AllowedMods.Select(m => m.ToMod(rulesetInstance)).ToArray();
             Mod[] newUserMods = UserMods.Value.Where(m => allowedMods.Any(a => m.GetType() == a.GetType())).ToArray();
             if (!newUserMods.SequenceEqual(UserMods.Value))
-                UserMods.Value = UserMods.Value.Where(m => allowedMods.Any(a => m.GetType() == a.GetType())).ToList();
+                UserMods.Value = newUserMods;
 
             // Retrieve the corresponding local beatmap, since we can't directly use the playlist's beatmap info
             int beatmapId = GetGameplayBeatmap().OnlineID;
@@ -455,14 +457,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
             Mods.Value = GetGameplayMods().Select(m => m.ToMod(rulesetInstance)).ToArray();
             Ruleset.Value = GetGameplayRuleset();
 
-            bool freeMod = item.AllowedMods.Any();
-            bool freestyle = item.Freestyle;
-
-            // For now, the game can never be in a state where freemod and freestyle are on at the same time.
-            // This will change, but due to the current implementation if this was to occur drawables will overlap so let's assert.
-            Debug.Assert(!freeMod || !freestyle);
-
-            if (freeMod)
+            if (allowedMods.Length > 0)
             {
                 UserModsSection.Show();
                 UserModsSelectOverlay.IsValidMod = m => allowedMods.Any(a => a.GetType() == m.GetType());
@@ -474,7 +469,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
                 UserModsSelectOverlay.IsValidMod = _ => false;
             }
 
-            if (freestyle)
+            if (item.Freestyle)
             {
                 UserStyleSection.Show();
 
@@ -487,7 +482,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
                 UserStyleDisplayContainer.Child = new DrawableRoomPlaylistItem(gameplayItem, true)
                 {
                     AllowReordering = false,
-                    AllowEditing = freestyle,
+                    AllowEditing = true,
                     RequestEdit = _ => OpenStyleSelection()
                 };
             }

@@ -140,6 +140,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                                             Size = new Vector2(28, 20),
                                             CountryCode = user?.CountryCode ?? default
                                         },
+                                        new UpdateableTeamFlag(user?.Team)
+                                        {
+                                            Anchor = Anchor.CentreLeft,
+                                            Origin = Anchor.CentreLeft,
+                                            Size = new Vector2(40, 20),
+                                        },
                                         new OsuSpriteText
                                         {
                                             Anchor = Anchor.CentreLeft,
@@ -161,11 +167,18 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                                     Origin = Anchor.CentreRight,
                                     AutoSizeAxes = Axes.Both,
                                     Margin = new MarginPadding { Right = 70 },
+                                    Spacing = new Vector2(2),
                                     Children = new Drawable[]
                                     {
-                                        userStyleDisplay = new StyleDisplayIcon(),
+                                        userStyleDisplay = new StyleDisplayIcon
+                                        {
+                                            Anchor = Anchor.CentreLeft,
+                                            Origin = Anchor.CentreLeft,
+                                        },
                                         userModsDisplay = new ModDisplay
                                         {
+                                            Anchor = Anchor.CentreLeft,
+                                            Origin = Anchor.CentreLeft,
                                             Scale = new Vector2(0.5f),
                                             ExpansionMode = ExpansionMode.AlwaysContracted,
                                         }
@@ -209,15 +222,28 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
 
             const double fade_time = 50;
 
-            MultiplayerPlaylistItem? currentItem = client.Room.GetCurrentItem();
-            Ruleset? ruleset = currentItem != null ? rulesets.GetRuleset(currentItem.RulesetID)?.CreateInstance() : null;
+            if (client.Room.GetCurrentItem() is MultiplayerPlaylistItem currentItem)
+            {
+                int userBeatmapId = User.BeatmapId ?? currentItem.BeatmapID;
+                int userRulesetId = User.RulesetId ?? currentItem.RulesetID;
+                Ruleset? userRuleset = rulesets.GetRuleset(userRulesetId)?.CreateInstance();
 
-            int? currentModeRank = ruleset != null ? User.User?.RulesetsStatistics?.GetValueOrDefault(ruleset.ShortName)?.GlobalRank : null;
-            userRankText.Text = currentModeRank != null ? $"#{currentModeRank.Value:N0}" : string.Empty;
+                int? currentModeRank = userRuleset == null ? null : User.User?.RulesetsStatistics?.GetValueOrDefault(userRuleset.ShortName)?.GlobalRank;
+                userRankText.Text = currentModeRank != null ? $"#{currentModeRank.Value:N0}" : string.Empty;
+
+                if (userBeatmapId == currentItem.BeatmapID && userRulesetId == currentItem.RulesetID)
+                    userStyleDisplay.Style = null;
+                else
+                    userStyleDisplay.Style = (userBeatmapId, userRulesetId);
+
+                // If the mods are updated at the end of the frame, the flow container will skip a reflow cycle: https://github.com/ppy/osu-framework/issues/4187
+                // This looks particularly jarring here, so re-schedule the update to that start of our frame as a fix.
+                Schedule(() => userModsDisplay.Current.Value = userRuleset == null ? Array.Empty<Mod>() : User.Mods.Select(m => m.ToMod(userRuleset)).ToList());
+            }
 
             userStateDisplay.UpdateStatus(User.State, User.BeatmapAvailability);
 
-            if ((User.BeatmapAvailability.State == DownloadState.LocallyAvailable) && (User.State != MultiplayerUserState.Spectating))
+            if (User.BeatmapAvailability.State == DownloadState.LocallyAvailable && User.State != MultiplayerUserState.Spectating)
             {
                 userModsDisplay.FadeIn(fade_time);
                 userStyleDisplay.FadeIn(fade_time);
@@ -228,20 +254,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                 userStyleDisplay.FadeOut(fade_time);
             }
 
-            if ((User.BeatmapId == null && User.RulesetId == null) || (User.BeatmapId == currentItem?.BeatmapID && User.RulesetId == currentItem?.RulesetID))
-                userStyleDisplay.Style = null;
-            else
-                userStyleDisplay.Style = (User.BeatmapId ?? currentItem?.BeatmapID ?? 0, User.RulesetId ?? currentItem?.RulesetID ?? 0);
-
             kickButton.Alpha = client.IsHost && !User.Equals(client.LocalUser) ? 1 : 0;
             crown.Alpha = client.Room.Host?.Equals(User) == true ? 1 : 0;
-
-            // If the mods are updated at the end of the frame, the flow container will skip a reflow cycle: https://github.com/ppy/osu-framework/issues/4187
-            // This looks particularly jarring here, so re-schedule the update to that start of our frame as a fix.
-            Schedule(() =>
-            {
-                userModsDisplay.Current.Value = ruleset != null ? User.Mods.Select(m => m.ToMod(ruleset)).ToList() : Array.Empty<Mod>();
-            });
         }
 
         public MenuItem[]? ContextMenuItems

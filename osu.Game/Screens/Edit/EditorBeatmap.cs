@@ -312,8 +312,13 @@ namespace osu.Game.Screens.Edit
                 return;
 
             BeginChange();
+
             foreach (var h in SelectedHitObjects)
+            {
                 action(h);
+                Update(h);
+            }
+
             EndChange();
         }
 

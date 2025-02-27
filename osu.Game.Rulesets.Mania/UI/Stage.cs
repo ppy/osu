@@ -216,13 +216,7 @@ namespace osu.Game.Rulesets.Mania.UI
                 return;
 
             judgements.Clear(false);
-            judgements.Add(judgementPooler.Get(result.Type, j =>
-            {
-                j.Apply(result, judgedObject);
-
-                j.Anchor = Anchor.BottomCentre;
-                j.Origin = Anchor.Centre;
-            })!);
+            judgements.Add(judgementPooler.Get(result.Type, j => j.Apply(result, judgedObject))!);
         }
 
         protected override void Update()

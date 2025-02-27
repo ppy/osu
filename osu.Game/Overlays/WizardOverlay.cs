@@ -45,6 +45,8 @@ namespace osu.Game.Overlays
         private LoadingSpinner loading = null!;
         private ScheduledDelegate? loadingShowDelegate;
 
+        public bool Completed { get; private set; }
+
         protected WizardOverlay(OverlayColourScheme scheme)
             : base(scheme)
         {
@@ -221,6 +223,7 @@ namespace osu.Game.Overlays
             else
             {
                 CurrentStepIndex = null;
+                Completed = true;
                 Hide();
             }
 

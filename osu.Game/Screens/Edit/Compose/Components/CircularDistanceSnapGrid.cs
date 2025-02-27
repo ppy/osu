@@ -63,7 +63,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 const float thickness = 4;
                 float diameter = (offset + (i + 1) * DistanceBetweenTicks + thickness / 2) * 2;
 
-                AddInternal(new Ring(StartTime, GetColourForIndexFromPlacement(i))
+                AddInternal(new Ring(StartTime, GetColourForIndexFromPlacement(i), SliderVelocitySource)
                 {
                     Position = StartPosition,
                     Origin = Anchor.Centre,
@@ -128,12 +128,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
             private EditorClock? editorClock { get; set; }
 
             private readonly double startTime;
+            private readonly IHasSliderVelocity? sliderVelocitySource;
 
             private readonly Color4 baseColour;
 
-            public Ring(double startTime, Color4 baseColour)
+            public Ring(double startTime, Color4 baseColour, IHasSliderVelocity? sliderVelocitySource)
             {
                 this.startTime = startTime;
+                this.sliderVelocitySource = sliderVelocitySource;
 
                 Colour = this.baseColour = baseColour;
 
@@ -150,7 +152,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 float distanceSpacingMultiplier = (float)snapProvider.DistanceSpacingMultiplier.Value;
                 double timeFromReferencePoint = editorClock.CurrentTime - startTime;
 
-                float distanceForCurrentTime = snapProvider.DurationToDistance(timeFromReferencePoint, startTime)
+                float distanceForCurrentTime = snapProvider.DurationToDistance(timeFromReferencePoint, startTime, sliderVelocitySource)
                                                * distanceSpacingMultiplier;
 
                 float timeBasedAlpha = 1 - Math.Clamp(Math.Abs(distanceForCurrentTime - Size.X / 2) / 30, 0, 1);

@@ -2,6 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Taiko.Beatmaps;
@@ -18,6 +20,9 @@ namespace osu.Game.Rulesets.Taiko.UI
         private const float stable_gamefield_height = 480f;
 
         public readonly IBindable<bool> LockPlayfieldAspectRange = new BindableBool(true);
+
+        [Resolved]
+        private OsuGame? osuGame { get; set; }
 
         public TaikoPlayfieldAdjustmentContainer()
         {
@@ -56,6 +61,18 @@ namespace osu.Game.Rulesets.Taiko.UI
             relativeHeight = Math.Min(relativeHeight, 1f / 3f);
 
             Scale = new Vector2(Math.Max((Parent!.ChildSize.Y / 768f) * (relativeHeight / base_relative_height), 1f));
+
+            // on mobile platforms where the base aspect ratio is wider, the taiko playfield
+            // needs to be scaled down to remain playable.
+            if (RuntimeInfo.IsMobile && osuGame != null)
+            {
+                const float base_aspect_ratio = 1024f / 768f;
+                float gameAspectRatio = osuGame.ScalingContainerTargetDrawSize.X / osuGame.ScalingContainerTargetDrawSize.Y;
+                // this magic scale is unexplainable, but required so the playfield doesn't become too zoomed out as the aspect ratio increases.
+                const float magic_scale = 1.25f;
+                Scale *= magic_scale * new Vector2(base_aspect_ratio / gameAspectRatio);
+            }
+
             Width = 1 / Scale.X;
         }
 

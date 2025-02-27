@@ -11,6 +11,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Layout;
+using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects.Types;
@@ -148,7 +149,18 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             var timingPoint = Beatmap.ControlPointInfo.TimingPointAt(StartTime);
             double beatLength = timingPoint.BeatLength / beatDivisor.Value;
-            int beatIndex = (int)Math.Floor((StartTime - timingPoint.Time) / beatLength);
+            double fractionalBeatIndex = (StartTime - timingPoint.Time) / beatLength;
+            int beatIndex = (int)Math.Round(fractionalBeatIndex);
+            // `fractionalBeatIndex` could differ from `beatIndex` for two reasons:
+            // - rounding errors (which can be exacerbated by timing point start times being truncated by/for stable),
+            // - `StartTime` is not snapped to the beat.
+            // in case 1, we want rounding to occur to prevent an off-by-one,
+            // as `StartTime` *is* quantised to the beat. but it just doesn't look like it because floats do float things.
+            // in case 2, we want *flooring* to occur, to prevent a possible off-by-one
+            // because of the rounding snapping forward by a chunk of time significantly too high to be considered a rounding error.
+            // the tolerance margin chosen here is arbitrary and can be adjusted if more cases of this are found.
+            if (Precision.DefinitelyBigger(beatIndex, fractionalBeatIndex, 0.01))
+                beatIndex = (int)Math.Floor(fractionalBeatIndex);
 
             var colour = BindableBeatDivisor.GetColourFor(BindableBeatDivisor.GetDivisorForBeatIndex(beatIndex + placementIndex + 1, beatDivisor.Value), Colours);
 

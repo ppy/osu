@@ -317,6 +317,8 @@ namespace osu.Game.Screens.Ranking
                 if (!this.IsCurrentScreen() || s != rankApplauseSound)
                     return;
 
+                AddInternal(rankApplauseSound);
+
                 rankApplauseSound.VolumeTo(applause_volume);
                 rankApplauseSound.Play();
             });

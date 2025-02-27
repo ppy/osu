@@ -28,7 +28,7 @@ namespace osu.Game.Beatmaps.Drawables
                 dotSize = value;
 
                 if (IsLoaded)
-                    updateDotDimensions();
+                    updateDisplay();
             }
         }
 
@@ -42,13 +42,27 @@ namespace osu.Game.Beatmaps.Drawables
                 dotSpacing = value;
 
                 if (IsLoaded)
-                    updateDotDimensions();
+                    updateDisplay();
+            }
+        }
+
+        private IBeatmapSetInfo? beatmapSet;
+
+        public IBeatmapSetInfo? BeatmapSet
+        {
+            get => beatmapSet;
+            set
+            {
+                beatmapSet = value;
+
+                if (IsLoaded)
+                    updateDisplay();
             }
         }
 
         private readonly FillFlowContainer<RulesetDifficultyGroup> flow;
 
-        public DifficultySpectrumDisplay(IBeatmapSetInfo beatmapSet)
+        public DifficultySpectrumDisplay(IBeatmapSetInfo? beatmapSet = null)
         {
             AutoSizeAxes = Axes.Both;
 
@@ -59,25 +73,31 @@ namespace osu.Game.Beatmaps.Drawables
                 Direction = FillDirection.Horizontal,
             };
 
-            // matching web: https://github.com/ppy/osu-web/blob/d06d8c5e735eb1f48799b1654b528e9a7afb0a35/resources/assets/lib/beatmapset-panel.tsx#L127
-            bool collapsed = beatmapSet.Beatmaps.Count() > 12;
-
-            foreach (var rulesetGrouping in beatmapSet.Beatmaps.GroupBy(beatmap => beatmap.Ruleset).OrderBy(group => group.Key))
-                flow.Add(new RulesetDifficultyGroup(rulesetGrouping.Key.OnlineID, rulesetGrouping, collapsed));
+            BeatmapSet = beatmapSet;
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            updateDotDimensions();
+            updateDisplay();
         }
 
-        private void updateDotDimensions()
+        private void updateDisplay()
         {
-            foreach (var group in flow)
+            flow.Clear();
+
+            if (beatmapSet == null)
+                return;
+
+            // matching web: https://github.com/ppy/osu-web/blob/d06d8c5e735eb1f48799b1654b528e9a7afb0a35/resources/assets/lib/beatmapset-panel.tsx#L127
+            bool collapsed = beatmapSet.Beatmaps.Count() > 12;
+
+            foreach (var rulesetGrouping in beatmapSet.Beatmaps.GroupBy(beatmap => beatmap.Ruleset).OrderBy(group => group.Key))
             {
-                group.DotSize = DotSize;
-                group.DotSpacing = DotSpacing;
+                flow.Add(new RulesetDifficultyGroup(rulesetGrouping.Key.OnlineID, rulesetGrouping, collapsed, dotSize)
+                {
+                    Spacing = new Vector2(DotSpacing, 0f),
+                });
             }
         }
 
@@ -86,26 +106,14 @@ namespace osu.Game.Beatmaps.Drawables
             private readonly int rulesetId;
             private readonly IEnumerable<IBeatmapInfo> beatmapInfos;
             private readonly bool collapsed;
+            private readonly Vector2 dotSize;
 
-            public RulesetDifficultyGroup(int rulesetId, IEnumerable<IBeatmapInfo> beatmapInfos, bool collapsed)
+            public RulesetDifficultyGroup(int rulesetId, IEnumerable<IBeatmapInfo> beatmapInfos, bool collapsed, Vector2 dotSize)
             {
                 this.rulesetId = rulesetId;
                 this.beatmapInfos = beatmapInfos;
                 this.collapsed = collapsed;
-            }
-
-            public Vector2 DotSize
-            {
-                set
-                {
-                    foreach (var dot in Children.OfType<DifficultyDot>())
-                        dot.Size = value;
-                }
-            }
-
-            public float DotSpacing
-            {
-                set => Spacing = new Vector2(value, 0);
+                this.dotSize = dotSize;
             }
 
             [BackgroundDependencyLoader]
@@ -125,7 +133,7 @@ namespace osu.Game.Beatmaps.Drawables
                 if (!collapsed)
                 {
                     foreach (var beatmapInfo in beatmapInfos.OrderBy(bi => bi.StarRating))
-                        Add(new DifficultyDot(beatmapInfo.StarRating));
+                        Add(new DifficultyDot(beatmapInfo.StarRating, dotSize));
                 }
                 else
                 {
@@ -145,9 +153,10 @@ namespace osu.Game.Beatmaps.Drawables
         {
             private readonly double starDifficulty;
 
-            public DifficultyDot(double starDifficulty)
+            public DifficultyDot(double starDifficulty, Vector2 dotSize)
             {
                 this.starDifficulty = starDifficulty;
+                Size = dotSize;
             }
 
             [BackgroundDependencyLoader]
