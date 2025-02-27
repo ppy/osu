@@ -31,8 +31,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
         }
 
-        public static double AdditionPortion => 0.1;
-        public static double MechanicsMultiplier => 0.95;
+        public static double AdditionPortion => 0.07;
+        public static double MechanicsMultiplier => 0.96;
 
         protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
         {
