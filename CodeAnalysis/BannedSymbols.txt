@@ -18,3 +18,6 @@ M:Humanizer.InflectorExtensions.Pascalize(System.String);Humanizer's .Pascalize(
 M:Humanizer.InflectorExtensions.Camelize(System.String);Humanizer's .Camelize() extension method changes behaviour depending on CultureInfo.CurrentCulture. Use StringDehumanizeExtensions.ToCamelCase() instead.
 M:Humanizer.InflectorExtensions.Underscore(System.String);Humanizer's .Underscore() extension method changes behaviour depending on CultureInfo.CurrentCulture. Use StringDehumanizeExtensions.ToSnakeCase() instead.
 M:Humanizer.InflectorExtensions.Kebaberize(System.String);Humanizer's .Kebaberize() extension method changes behaviour depending on CultureInfo.CurrentCulture. Use StringDehumanizeExtensions.ToKebabCase() instead.
+M:osuTK.MathHelper.Clamp(System.Int32,System.Int32,System.Int32)~System.Int32;Use Math.Clamp() instead.
+M:osuTK.MathHelper.Clamp(System.Single,System.Single,System.Single)~System.Single;This osuTK helper has unsafe semantics when one of the bounds provided is NaN. Use Math.Clamp() instead.
+M:osuTK.MathHelper.Clamp(System.Double,System.Double,System.Double)~System.Double;This osuTK helper has unsafe semantics when one of the bounds provided is NaN. Use Math.Clamp() instead.
