@@ -4,7 +4,6 @@
 #nullable disable
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using NUnit.Framework;
@@ -17,7 +16,6 @@ using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Online.API;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Osu;
@@ -416,21 +414,19 @@ namespace osu.Game.Tests.Visual.Ranking
                 RetryOverlay = InternalChildren.OfType<HotkeyRetryOverlay>().SingleOrDefault();
             }
 
-            protected override APIRequest FetchScores(Action<IEnumerable<ScoreInfo>> scoresCallback)
+            protected override Task<ScoreInfo[]> FetchScores()
             {
-                var scores = new List<ScoreInfo>();
+                var scores = new ScoreInfo[20];
 
-                for (int i = 0; i < 20; i++)
+                for (int i = 0; i < scores.Length; i++)
                 {
                     var score = TestResources.CreateTestScoreInfo();
                     score.TotalScore += 10 - i;
                     score.HasOnlineReplay = true;
-                    scores.Add(score);
+                    scores[i] = score;
                 }
 
-                scoresCallback.Invoke(scores);
-
-                return null;
+                return Task.FromResult(scores);
             }
         }
 
@@ -446,27 +442,25 @@ namespace osu.Game.Tests.Visual.Ranking
                 this.fetchWaitTask = fetchWaitTask ?? Task.CompletedTask;
             }
 
-            protected override APIRequest FetchScores(Action<IEnumerable<ScoreInfo>> scoresCallback)
+            protected override Task<ScoreInfo[]> FetchScores()
             {
-                Task.Run(async () =>
+                return Task.Run(async () =>
                 {
                     await fetchWaitTask;
 
-                    var scores = new List<ScoreInfo>();
+                    var scores = new ScoreInfo[20];
 
-                    for (int i = 0; i < 20; i++)
+                    for (int i = 0; i < scores.Length; i++)
                     {
                         var score = TestResources.CreateTestScoreInfo();
                         score.TotalScore += 10 - i;
-                        scores.Add(score);
+                        scores[i] = score;
                     }
 
-                    scoresCallback?.Invoke(scores);
-
                     Schedule(() => FetchCompleted = true);
-                });
 
-                return null;
+                    return scores;
+                });
             }
         }
 
