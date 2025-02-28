@@ -223,6 +223,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                     Difficulty = new BeatmapDifficulty(beatmap.Difficulty),
                     Metadata =
                     {
+                        Artist = beatmap.Metadata.Artist,
+                        Title = beatmap.Metadata.Title,
                         Author = new RealmUser
                         {
                             Username = beatmap.Metadata.Author.Username,
