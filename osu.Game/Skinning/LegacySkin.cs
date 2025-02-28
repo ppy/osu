@@ -198,8 +198,14 @@ namespace osu.Game.Skinning
                 case LegacyManiaSkinConfigurationLookups.ComboBreakColour:
                     return SkinUtils.As<TValue>(getCustomColour(existing, "ColourBreak"));
 
+                case LegacyManiaSkinConfigurationLookups.BarLineColour:
+                    return SkinUtils.As<TValue>(getCustomColour(existing, "ColourBarline"));
+
                 case LegacyManiaSkinConfigurationLookups.MinimumColumnWidth:
                     return SkinUtils.As<TValue>(new Bindable<float>(existing.MinimumColumnWidth));
+
+                case LegacyManiaSkinConfigurationLookups.BarLineHeight:
+                    return SkinUtils.As<TValue>(new Bindable<float>(existing.BarLineHeight));
 
                 case LegacyManiaSkinConfigurationLookups.NoteBodyStyle:
 
