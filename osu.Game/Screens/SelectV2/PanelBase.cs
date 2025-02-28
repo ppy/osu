@@ -61,6 +61,11 @@ namespace osu.Game.Screens.SelectV2
             }
         }
 
+        // content is offset by PanelXOffset, make sure we only handle input at the actual visible
+        // offset region.
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
+            TopLevelContent.ReceivePositionalInputAt(screenSpacePos);
+
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider, OsuColour colours)
         {
@@ -219,8 +224,6 @@ namespace osu.Game.Screens.SelectV2
 
         private void updateDisplay()
         {
-            backgroundLayer.TransformTo(nameof(Padding), backgroundLayer.Padding with { Vertical = Expanded.Value ? 2f : 0f }, duration, Easing.OutQuint);
-
             var backgroundColour = accentColour ?? Color4.White;
             var edgeEffectColour = accentColour ?? Color4Extensions.FromHex(@"4EBFFF");
 
@@ -235,7 +238,7 @@ namespace osu.Game.Screens.SelectV2
 
         private void updateXOffset()
         {
-            float x = PanelXOffset;
+            float x = PanelXOffset + corner_radius;
 
             if (!Expanded.Value && !Selected.Value)
                 x += active_x_offset;
@@ -243,7 +246,7 @@ namespace osu.Game.Screens.SelectV2
             if (!KeyboardSelected.Value)
                 x += active_x_offset * 0.5f;
 
-            this.TransformTo(nameof(Padding), new MarginPadding { Left = x }, duration, Easing.OutQuint);
+            TopLevelContent.MoveToX(x, duration, Easing.OutQuint);
         }
 
         private void updateHover()
