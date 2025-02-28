@@ -54,7 +54,7 @@ namespace osu.Game.Overlays
 
         public SettingsSectionsContainer SectionsContainer { get; private set; }
 
-        protected SeekLimitedSearchTextBox SearchTextBox;
+        protected SeekLimitedSearchTextBox SearchTextBox { get; private set; }
 
         protected override string PopInSampleName => "UI/settings-pop-in";
         protected override double PopInOutSampleBalance => -OsuGameBase.SFX_STEREO_STRENGTH;
