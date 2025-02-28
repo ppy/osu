@@ -62,7 +62,7 @@ namespace osu.Game.Screens.Select
         {
             base.OnTabChanged(tab, selectedMods);
 
-            Leaderboard.FilterMods = selectedMods;
+            Leaderboard.FilterMods.Value = selectedMods;
 
             switch (tab)
             {
