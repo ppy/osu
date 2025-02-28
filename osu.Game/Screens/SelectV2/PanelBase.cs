@@ -32,7 +32,6 @@ namespace osu.Game.Screens.SelectV2
         private Box backgroundBorder = null!;
         private Box backgroundGradient = null!;
         private Box backgroundAccentGradient = null!;
-        private Container backgroundLayer = null!;
         private Container backgroundLayerHorizontalPadding = null!;
         private Container backgroundContainer = null!;
         private Container iconContainer = null!;
@@ -65,6 +64,9 @@ namespace osu.Game.Screens.SelectV2
         // offset region.
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
             TopLevelContent.ReceivePositionalInputAt(screenSpacePos);
+
+        [Resolved]
+        private BeatmapCarousel? carousel { get; set; }
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider, OsuColour colours)
@@ -102,30 +104,26 @@ namespace osu.Game.Screens.SelectV2
                             backgroundLayerHorizontalPadding = new Container
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Child = backgroundLayer = new Container
+                                Child = new Container
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Child = new Container
+                                    Masking = true,
+                                    CornerRadius = corner_radius,
+                                    Children = new Drawable[]
                                     {
-                                        Masking = true,
-                                        CornerRadius = corner_radius,
-                                        RelativeSizeAxes = Axes.Both,
-                                        Children = new Drawable[]
+                                        backgroundGradient = new Box
                                         {
-                                            backgroundGradient = new Box
-                                            {
-                                                RelativeSizeAxes = Axes.Both,
-                                            },
-                                            backgroundAccentGradient = new Box
-                                            {
-                                                RelativeSizeAxes = Axes.Both,
-                                            },
-                                            backgroundContainer = new Container
-                                            {
-                                                RelativeSizeAxes = Axes.Both,
-                                            },
-                                        }
-                                    },
+                                            RelativeSizeAxes = Axes.Both,
+                                        },
+                                        backgroundAccentGradient = new Box
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                        },
+                                        backgroundContainer = new Container
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                        },
+                                    }
                                 },
                             }
                         },
@@ -211,9 +209,6 @@ namespace osu.Game.Screens.SelectV2
             base.PrepareForUse();
             this.FadeInFromZero(duration, Easing.OutQuint);
         }
-
-        [Resolved]
-        private BeatmapCarousel? carousel { get; set; }
 
         protected override bool OnClick(ClickEvent e)
         {
