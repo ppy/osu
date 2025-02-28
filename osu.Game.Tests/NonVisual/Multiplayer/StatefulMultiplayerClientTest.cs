@@ -8,7 +8,6 @@ using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Testing;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
-using osu.Game.Online.Rooms;
 using osu.Game.Tests.Visual.Multiplayer;
 
 namespace osu.Game.Tests.NonVisual.Multiplayer
@@ -16,6 +15,12 @@ namespace osu.Game.Tests.NonVisual.Multiplayer
     [HeadlessTest]
     public partial class StatefulMultiplayerClientTest : MultiplayerTestScene
     {
+        public override void SetUpSteps()
+        {
+            base.SetUpSteps();
+            JoinDefaultRoom();
+        }
+
         [Test]
         public void TestUserAddedOnJoin()
         {
@@ -72,10 +77,6 @@ namespace osu.Game.Tests.NonVisual.Multiplayer
 
             AddStep("create room initially in gameplay", () =>
             {
-                var newRoom = new Room();
-                newRoom.CopyFrom(SelectedRoom.Value!);
-
-                newRoom.RoomID = null;
                 MultiplayerClient.RoomSetupAction = room =>
                 {
                     room.State = MultiplayerRoomState.Playing;
@@ -86,7 +87,7 @@ namespace osu.Game.Tests.NonVisual.Multiplayer
                     });
                 };
 
-                RoomManager.CreateRoom(newRoom);
+                MultiplayerClient.JoinRoom(MultiplayerClient.ServerSideRooms.Single()).ConfigureAwait(false);
             });
 
             AddUntilStep("wait for room join", () => RoomJoined);

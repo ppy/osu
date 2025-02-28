@@ -28,9 +28,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public partial class TestSceneMultiplayerParticipantsList : MultiplayerTestScene
     {
-        [SetUpSteps]
-        public void SetupSteps()
+        public override void SetUpSteps()
         {
+            base.SetUpSteps();
+
+            JoinDefaultRoom();
             createNewParticipantsList();
         }
 

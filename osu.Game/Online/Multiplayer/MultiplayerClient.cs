@@ -170,6 +170,15 @@ namespace osu.Game.Online.Multiplayer
         private readonly TaskChain joinOrLeaveTaskChain = new TaskChain();
         private CancellationTokenSource? joinCancellationSource;
 
+        public async Task CreateRoom(Room room)
+        {
+            if (Room != null)
+                throw new InvalidOperationException("Cannot create a multiplayer room while already in one.");
+
+            var cancellationSource = joinCancellationSource = new CancellationTokenSource();
+            await initRoom(room, r => CreateRoomInternal(new MultiplayerRoom(room)), cancellationSource.Token).ConfigureAwait(false);
+        }
+
         /// <summary>
         /// Joins the <see cref="MultiplayerRoom"/> for a given API <see cref="Room"/>.
         /// </summary>
@@ -180,33 +189,34 @@ namespace osu.Game.Online.Multiplayer
             if (Room != null)
                 throw new InvalidOperationException("Cannot join a multiplayer room while already in one.");
 
-            var cancellationSource = joinCancellationSource = new CancellationTokenSource();
+            Debug.Assert(room.RoomID != null);
 
+            var cancellationSource = joinCancellationSource = new CancellationTokenSource();
+            await initRoom(room, r => JoinRoomInternal(room.RoomID.Value, password ?? room.Password), cancellationSource.Token).ConfigureAwait(false);
+        }
+
+        private async Task initRoom(Room room, Func<Room, Task<MultiplayerRoom>> initFunc, CancellationToken cancellationToken)
+        {
             await joinOrLeaveTaskChain.Add(async () =>
             {
-                Debug.Assert(room.RoomID != null);
-
-                // Join the server-side room.
-                var joinedRoom = await JoinRoom(room.RoomID.Value, password ?? room.Password).ConfigureAwait(false);
-                Debug.Assert(joinedRoom != null);
+                // Initialise the server-side room.
+                MultiplayerRoom joinedRoom = await initFunc(room).ConfigureAwait(false);
 
                 // Populate users.
-                Debug.Assert(joinedRoom.Users != null);
                 await PopulateUsers(joinedRoom.Users).ConfigureAwait(false);
 
                 // Update the stored room (must be done on update thread for thread-safety).
                 await runOnUpdateThreadAsync(() =>
                 {
                     Debug.Assert(Room == null);
+                    Debug.Assert(APIRoom == null);
 
                     Room = joinedRoom;
                     APIRoom = room;
 
-                    Debug.Assert(joinedRoom.Playlist.Count > 0);
-
+                    APIRoom.RoomID = joinedRoom.RoomID;
                     APIRoom.Playlist = joinedRoom.Playlist.Select(item => new PlaylistItem(item)).ToArray();
                     APIRoom.CurrentPlaylistItem = APIRoom.Playlist.Single(item => item.ID == joinedRoom.Settings.PlaylistItemId);
-
                     // The server will null out the end date upon the host joining the room, but the null value is never communicated to the client.
                     APIRoom.EndDate = null;
 
@@ -221,8 +231,8 @@ namespace osu.Game.Online.Multiplayer
                     postServerShuttingDownNotification();
 
                     OnRoomJoined();
-                }, cancellationSource.Token).ConfigureAwait(false);
-            }, cancellationSource.Token).ConfigureAwait(false);
+                }, cancellationToken).ConfigureAwait(false);
+            }, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -232,16 +242,11 @@ namespace osu.Game.Online.Multiplayer
         {
         }
 
-        /// <summary>
-        /// Joins the <see cref="MultiplayerRoom"/> with a given ID.
-        /// </summary>
-        /// <param name="roomId">The room ID.</param>
-        /// <param name="password">An optional password to use when joining the room.</param>
-        /// <returns>The joined <see cref="MultiplayerRoom"/>.</returns>
-        protected abstract Task<MultiplayerRoom> JoinRoom(long roomId, string? password = null);
-
         public Task LeaveRoom()
         {
+            if (Room == null)
+                return Task.CompletedTask;
+
             // The join may have not completed yet, so certain tasks that either update the room or reference the room should be cancelled.
             // This includes the setting of Room itself along with the initial update of the room settings on join.
             joinCancellationSource?.Cancel();
@@ -265,6 +270,24 @@ namespace osu.Game.Online.Multiplayer
             });
         }
 
+        /// <summary>
+        /// Creates the <see cref="MultiplayerRoom"/> with the given settings.
+        /// </summary>
+        /// <param name="room">The room.</param>
+        /// <returns>The joined <see cref="MultiplayerRoom"/></returns>
+        protected abstract Task<MultiplayerRoom> CreateRoomInternal(MultiplayerRoom room);
+
+        /// <summary>
+        /// Joins the <see cref="MultiplayerRoom"/> with a given ID.
+        /// </summary>
+        /// <param name="roomId">The room ID.</param>
+        /// <param name="password">An optional password to use when joining the room.</param>
+        /// <returns>The joined <see cref="MultiplayerRoom"/>.</returns>
+        protected abstract Task<MultiplayerRoom> JoinRoomInternal(long roomId, string? password = null);
+
+        /// <summary>
+        /// Leaves the currently-joined <see cref="MultiplayerRoom"/>.
+        /// </summary>
         protected abstract Task LeaveRoomInternal();
 
         public abstract Task InvitePlayer(int userId);

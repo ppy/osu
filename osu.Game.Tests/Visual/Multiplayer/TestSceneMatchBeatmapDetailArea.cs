@@ -16,15 +16,15 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public partial class TestSceneMatchBeatmapDetailArea : OnlinePlayTestScene
     {
+        private Room room = null!;
+
         public override void SetUpSteps()
         {
             base.SetUpSteps();
 
             AddStep("create area", () =>
             {
-                SelectedRoom.Value = new Room();
-
-                Child = new MatchBeatmapDetailArea(SelectedRoom.Value)
+                Child = new MatchBeatmapDetailArea(room = new Room())
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -36,9 +36,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private void createNewItem()
         {
-            SelectedRoom.Value!.Playlist = SelectedRoom.Value.Playlist.Append(new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo)
+            room.Playlist = room.Playlist.Append(new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo)
             {
-                ID = SelectedRoom.Value.Playlist.Count,
+                ID = room.Playlist.Count,
                 RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
                 RequiredMods = new[]
                 {

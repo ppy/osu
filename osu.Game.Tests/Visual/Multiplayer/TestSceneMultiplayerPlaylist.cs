@@ -32,6 +32,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private BeatmapManager beatmaps = null!;
         private BeatmapSetInfo importedSet = null!;
         private BeatmapInfo importedBeatmap = null!;
+        private Room room = null!;
 
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
@@ -46,9 +47,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             base.SetUpSteps();
 
+            JoinDefaultRoom(r => room = r);
+
             AddStep("create list", () =>
             {
-                Child = list = new MultiplayerPlaylist(SelectedRoom.Value!)
+                Child = list = new MultiplayerPlaylist(room)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -127,7 +130,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             addItemStep();
             AddStep("finish current item", () => MultiplayerClient.FinishCurrentItem().WaitSafely());
 
-            AddStep("leave room", () => RoomManager.PartRoom());
+            AddStep("leave room", () => MultiplayerClient.LeaveRoom());
             AddUntilStep("wait for room part", () => !RoomJoined);
 
             AddUntilStep("item 0 not in lists", () => !inHistoryList(0) && !inQueueList(0));
@@ -148,7 +151,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("finish current item", () => MultiplayerClient.FinishCurrentItem().WaitSafely());
             assertQueueTabCount(2);
 
-            AddStep("leave room", () => RoomManager.PartRoom());
+            AddStep("leave room", () => MultiplayerClient.LeaveRoom());
             AddUntilStep("wait for room part", () => !RoomJoined);
             assertQueueTabCount(0);
         }
@@ -157,12 +160,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestJoinRoomWithMixedItemsAddedInCorrectLists()
         {
-            AddStep("leave room", () => RoomManager.PartRoom());
+            AddStep("leave room", () => MultiplayerClient.LeaveRoom());
             AddUntilStep("wait for room part", () => !RoomJoined);
 
             AddStep("join room with items", () =>
             {
-                RoomManager.CreateRoom(new Room
+                API.Queue(new CreateRoomRequest(new Room
                 {
                     Name = "test name",
                     Playlist =
@@ -177,7 +180,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                             Expired = true
                         }
                     ]
-                });
+                }));
             });
 
             AddUntilStep("wait for room join", () => RoomJoined);
