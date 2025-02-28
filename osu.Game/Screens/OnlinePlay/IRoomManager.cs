@@ -38,27 +38,5 @@ namespace osu.Game.Screens.OnlinePlay
         /// Removes all <see cref="Room"/>s from this <see cref="IRoomManager"/>.
         /// </summary>
         void ClearRooms();
-
-        /// <summary>
-        /// Creates a new <see cref="Room"/>.
-        /// </summary>
-        /// <param name="room">The <see cref="Room"/> to create.</param>
-        /// <param name="onSuccess">An action to be invoked if the creation succeeds.</param>
-        /// <param name="onError">An action to be invoked if an error occurred.</param>
-        void CreateRoom(Room room, Action<Room>? onSuccess = null, Action<string>? onError = null);
-
-        /// <summary>
-        /// Joins a <see cref="Room"/>.
-        /// </summary>
-        /// <param name="room">The <see cref="Room"/> to join. <see cref="Room.RoomID"/> must be populated.</param>
-        /// <param name="password">An optional password to use for the join operation.</param>
-        /// <param name="onSuccess"></param>
-        /// <param name="onError"></param>
-        void JoinRoom(Room room, string? password = null, Action<Room>? onSuccess = null, Action<string>? onError = null);
-
-        /// <summary>
-        /// Parts the currently-joined <see cref="Room"/>.
-        /// </summary>
-        void PartRoom();
     }
 }

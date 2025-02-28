@@ -17,7 +17,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public const int PLAYER_2_ID = 56;
 
         public TestMultiplayerClient MultiplayerClient => OnlinePlayDependencies.MultiplayerClient;
-        public new TestMultiplayerRoomManager RoomManager => OnlinePlayDependencies.RoomManager;
         public TestSpectatorClient SpectatorClient => OnlinePlayDependencies.SpectatorClient;
 
         protected new MultiplayerTestSceneDependencies OnlinePlayDependencies => (MultiplayerTestSceneDependencies)base.OnlinePlayDependencies;
@@ -56,7 +55,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 AddStep("join room", () =>
                 {
                     SelectedRoom.Value = CreateRoom();
-                    RoomManager.CreateRoom(SelectedRoom.Value);
+                    MultiplayerClient.CreateRoom(SelectedRoom.Value).ConfigureAwait(false);
                 });
 
                 AddUntilStep("wait for room join", () => RoomJoined);

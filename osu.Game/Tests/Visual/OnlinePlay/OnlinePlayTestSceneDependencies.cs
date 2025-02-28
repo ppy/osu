@@ -40,7 +40,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
             RequestsHandler = new TestRoomRequestsHandler();
             OngoingOperationTracker = new OngoingOperationTracker();
             AvailabilityTracker = new OnlinePlayBeatmapAvailabilityTracker();
-            RoomManager = CreateRoomManager();
+            RoomManager = new TestRoomManager();
             UserLookupCache = new TestUserLookupCache();
             BeatmapLookupCache = new BeatmapLookupCache();
 
@@ -80,7 +80,5 @@ namespace osu.Game.Tests.Visual.OnlinePlay
             if (instance is Drawable drawable)
                 drawableComponents.Add(drawable);
         }
-
-        protected virtual IRoomManager CreateRoomManager() => new TestRoomManager();
     }
 }

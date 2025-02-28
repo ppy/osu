@@ -34,7 +34,6 @@ using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.DailyChallenge.Events;
 using osu.Game.Screens.OnlinePlay.Match;
 using osu.Game.Screens.OnlinePlay.Match.Components;
@@ -70,9 +69,6 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Plum);
-
-        [Cached(Type = typeof(IRoomManager))]
-        private RoomManager roomManager { get; set; }
 
         [Cached]
         private readonly OnlinePlayBeatmapAvailabilityTracker beatmapAvailabilityTracker = new OnlinePlayBeatmapAvailabilityTracker();
@@ -115,7 +111,6 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
         {
             this.room = room;
             playlistItem = room.Playlist.Single();
-            roomManager = new RoomManager();
             Padding = new MarginPadding { Horizontal = -HORIZONTAL_OVERFLOW_PADDING };
         }
 
@@ -131,7 +126,6 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
-                    roomManager,
                     beatmapAvailabilityTracker,
                     new ScreenStack(new RoomBackgroundScreen(playlistItem))
                     {
@@ -426,7 +420,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             base.OnEntering(e);
 
             waves.Show();
-            roomManager.JoinRoom(room);
+            API.Queue(new JoinRoomRequest(room, null));
             startLoopingTrack(this, musicController);
 
             metadataClient.BeginWatchingMultiplayerRoom(room.RoomID!.Value).ContinueWith(t =>
@@ -480,7 +474,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             previewTrackManager.StopAnyPlaying(this);
             this.Delay(WaveContainer.DISAPPEAR_DURATION).FadeOut();
 
-            roomManager.PartRoom();
+            API.Queue(new PartRoomRequest(room));
             metadataClient.EndWatchingMultiplayerRoom(room.RoomID!.Value).FireAndForget();
 
             return base.OnExiting(e);

@@ -360,13 +360,20 @@ namespace osu.Game.Screens.OnlinePlay.Match
             if (!ensureExitConfirmed())
                 return true;
 
-            RoomManager?.PartRoom();
+            if (Room.RoomID != null)
+                PartRoom();
+
             Mods.Value = Array.Empty<Mod>();
 
             onLeaving();
 
             return base.OnExiting(e);
         }
+
+        /// <summary>
+        /// Parts from the current room.
+        /// </summary>
+        protected abstract void PartRoom();
 
         private bool ensureExitConfirmed()
         {

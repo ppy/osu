@@ -36,6 +36,7 @@ namespace osu.Game.Tests.Visual.Playlists
         public void TestManyRooms()
         {
             AddStep("add rooms", () => RoomManager.AddRooms(500));
+            AddUntilStep("wait for rooms", () => roomsContainer.Rooms.Count == 500);
         }
 
         [Test]
@@ -75,6 +76,7 @@ namespace osu.Game.Tests.Visual.Playlists
         public void TestEnteringRoomTakesLeaseOnSelection()
         {
             AddStep("add rooms", () => RoomManager.AddRooms(1));
+            AddUntilStep("wait for rooms", () => roomsContainer.Rooms.Count == 1);
 
             AddAssert("selected room is not disabled", () => !loungeScreen.SelectedRoom.Disabled);
 
