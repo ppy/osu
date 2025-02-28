@@ -36,6 +36,7 @@ namespace osu.Game.Input.Bindings
                                                                        .Concat(editorKeyBindings)
                                                                        .Concat(editorTestPlayKeyBindings)
                                                                        .Concat(inGameKeyBindings)
+                                                                       .Concat(multiplayerKeyBindings)
                                                                        .Concat(replayKeyBindings)
                                                                        .Concat(songSelectKeyBindings)
                                                                        .Concat(audioControlKeyBindings)
@@ -56,6 +57,9 @@ namespace osu.Game.Input.Bindings
 
                 case GlobalActionCategory.InGame:
                     return inGameKeyBindings;
+
+                case GlobalActionCategory.Multiplayer:
+                    return multiplayerKeyBindings;
 
                 case GlobalActionCategory.Replay:
                     return replayKeyBindings;
@@ -183,6 +187,14 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(InputKey.F2, GlobalAction.ExportReplay),
             new KeyBinding(InputKey.Plus, GlobalAction.IncreaseOffset),
             new KeyBinding(InputKey.Minus, GlobalAction.DecreaseOffset),
+        };
+
+        private static IEnumerable<KeyBinding> multiplayerKeyBindings => new[]
+        {
+            new KeyBinding(new[] { InputKey.Control, InputKey.Enter }, GlobalAction.MultiplayerReady),
+            new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.Enter }, GlobalAction.MultiplayerSpectate),
+            new KeyBinding(new[] { InputKey.Control, InputKey.Q }, GlobalAction.MultiplayerQueueMap),
+            new KeyBinding(new[] { InputKey.Control, InputKey.D }, GlobalAction.MultiplayerSetFreestyleDifficulty),
         };
 
         private static IEnumerable<KeyBinding> replayKeyBindings => new[]
@@ -502,6 +514,18 @@ namespace osu.Game.Input.Bindings
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorToggleMoveControl))]
         EditorToggleMoveControl,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.MultiplayerReady))]
+        MultiplayerReady,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.MultiplayerSpectate))]
+        MultiplayerSpectate,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.MultiplayerQueueMap))]
+        MultiplayerQueueMap,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.MultiplayerSetFreestyleDifficulty))]
+        MultiplayerSetFreestyleDifficulty,
     }
 
     public enum GlobalActionCategory
@@ -509,6 +533,7 @@ namespace osu.Game.Input.Bindings
         General,
         Editor,
         InGame,
+        Multiplayer,
         Replay,
         SongSelect,
         AudioControl,
