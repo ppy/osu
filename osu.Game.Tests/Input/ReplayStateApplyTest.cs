@@ -9,7 +9,6 @@ using osu.Framework.Configuration.Tracking;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
-using osu.Framework.Input.StateChanges.Events;
 using osu.Framework.IO.Stores;
 using osu.Framework.Lists;
 using osu.Framework.Testing;
@@ -27,18 +26,29 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Tests.Input
 {
     [HeadlessTest]
-    public partial class ReplayInputHandlerTest : OsuTestScene
+    public partial class ReplayStateApplyTest : OsuTestScene
     {
         // There are commented out assertions that will always fail as Replay inputs don't go through the typical input flow
         // Related framework issue: https://github.com/ppy/osu-framework/issues/6037
+
+        private readonly TestRulesetInputManager rulesetInputManagerNone  = new TestRulesetInputManager(SimultaneousBindingMode.None);
+        private readonly TestRulesetInputManager rulesetInputManagerUnique  = new TestRulesetInputManager(SimultaneousBindingMode.Unique);
+        private readonly TestRulesetInputManager rulesetInputManagerAll = new TestRulesetInputManager(SimultaneousBindingMode.All);
+
+        public ReplayStateApplyTest()
+        {
+            AddRange(new Drawable[]
+            {
+                rulesetInputManagerNone,
+                rulesetInputManagerUnique,
+                rulesetInputManagerAll
+            });
+        }
+
         [Test]
         public void TestNoSimultaneousBindings()
         {
-            Clear();
-
-            TestRulesetInputManager rulesetInputManager = new TestRulesetInputManager(SimultaneousBindingMode.None);
-            Add(rulesetInputManager);
-            RulesetInputManagerInputState<TestAction> state = new RulesetInputManagerInputState<TestAction>(rulesetInputManager.CurrentState);
+            TestRulesetInputManager rulesetInputManager = rulesetInputManagerNone;
 
             List<TestAction> actions = new List<TestAction>();
 
@@ -62,7 +72,7 @@ namespace osu.Game.Tests.Input
             AddAssert("1 Press event for TestKey1", () => rulesetInputManager.PressEventsSinceLastObservation(TestAction.TestKey1) == 1);
             AddStep("Add TestKey2", () => actions.Add(TestAction.TestKey2));
             AddStep("Apply actions", applyActions);
-            AddAssert("TestKey1 is not pressed anymore", () => rulesetInputManager.PressedActions.Count(k => k == TestAction.TestKey1) == 0);
+            AddAssert("TestKey1 is not pressed anymore", () => rulesetInputManager.PressedActions.All(k => k != TestAction.TestKey1));
             AddAssert("TestKey2 is pressed once", () => rulesetInputManager.PressedActions.Count(k => k == TestAction.TestKey2) == 1);
             AddAssert("1 Press event for TestKey2", () => rulesetInputManager.PressEventsSinceLastObservation(TestAction.TestKey2) == 1);
 
@@ -71,8 +81,8 @@ namespace osu.Game.Tests.Input
 
             AddStep("Remove TestKey2", () => actions.Remove(TestAction.TestKey2));
             AddStep("Apply actions", applyActions);
-            AddAssert("TestKey2 is not pressed anymore", () => rulesetInputManager.PressedActions.Count(k => k == TestAction.TestKey2) == 0);
-            AddAssert("TestKey1 is still not pressed anymore", () => rulesetInputManager.PressedActions.Count(k => k == TestAction.TestKey1) == 0);
+            AddAssert("TestKey2 is not pressed anymore", () => rulesetInputManager.PressedActions.All(k => k != TestAction.TestKey2));
+            AddAssert("TestKey1 is still not pressed anymore", () => rulesetInputManager.PressedActions.All(k => k != TestAction.TestKey1));
             AddAssert("1 Release event for TestKey2", () => rulesetInputManager.ReleaseEventsSinceLastObservation(TestAction.TestKey2) == 1);
             AddStep("Reset actions", resetActions);
 
@@ -92,7 +102,7 @@ namespace osu.Game.Tests.Input
             AddStep("Remove TestKey1", () => actions.Remove(TestAction.TestKey1));
             AddStep("Apply actions", applyActions);
 
-            AddAssert("TestKey1 is not pressed anymore", () => rulesetInputManager.PressedActions.Count(k => k == TestAction.TestKey1) == 0);
+            AddAssert("TestKey1 is not pressed anymore", () => rulesetInputManager.PressedActions.All(k => k != TestAction.TestKey1));
             AddAssert("1 Release event for TestKey1", () => rulesetInputManager.ReleaseEventsSinceLastObservation(TestAction.TestKey1) == 1);
 
             AddStep("Remove TestKey1 again", () => actions.Remove(TestAction.TestKey1));
@@ -107,7 +117,7 @@ namespace osu.Game.Tests.Input
             void applyActions() => new ReplayInputHandler.ReplayState<TestAction>()
             {
                 PressedActions = actions.ToList(),
-            }.Apply(state, rulesetInputManager);
+            }.Apply(rulesetInputManager.CurrentState, rulesetInputManager);
 
             void resetActions()
             {
@@ -119,10 +129,7 @@ namespace osu.Game.Tests.Input
         [Test]
         public void TestUniqueSimultaneousBindings()
         {
-            Clear();
-            TestRulesetInputManager rulesetInputManager = new TestRulesetInputManager(SimultaneousBindingMode.Unique);
-            Add(rulesetInputManager);
-
+            TestRulesetInputManager rulesetInputManager =  rulesetInputManagerUnique;
             List<TestAction> actions = new List<TestAction>();
 
             AddAssert("No actions are pressed.", () => rulesetInputManager.PressedActions.Count == 0);
@@ -184,7 +191,7 @@ namespace osu.Game.Tests.Input
             AddStep("Remove TestKey1 again", () => actions.Remove(TestAction.TestKey1));
             AddStep("Apply actions", applyActions);
 
-            AddAssert("TestKey1 is not pressed anymore", () => rulesetInputManager.PressedActions.Count(k => k == TestAction.TestKey1) == 0);
+            AddAssert("TestKey1 is not pressed anymore", () => rulesetInputManager.PressedActions.All(k => k != TestAction.TestKey1));
             AddAssert("1 Release event for TestKey1", () => rulesetInputManager.ReleaseEventsSinceLastObservation(TestAction.TestKey1) == 1);
 
             return;
@@ -204,10 +211,7 @@ namespace osu.Game.Tests.Input
         [Test]
         public void TestAllSimultaneousBindings()
         {
-            Clear();
-            TestRulesetInputManager rulesetInputManager = new TestRulesetInputManager(SimultaneousBindingMode.All);
-            Add(rulesetInputManager);
-
+            TestRulesetInputManager rulesetInputManager = rulesetInputManagerAll;
             List<TestAction> actions = new List<TestAction>();
 
             AddAssert("No actions are pressed.", () => rulesetInputManager.PressedActions.Count == 0);
@@ -263,7 +267,7 @@ namespace osu.Game.Tests.Input
             AddStep("Apply actions", applyActions);
             AddAssert("1 Release event for TestKey1", () => rulesetInputManager.ReleaseEventsSinceLastObservation(TestAction.TestKey1) == 1);
             AddAssert("0 Press event for TestKey1", () => rulesetInputManager.PressEventsSinceLastObservation(TestAction.TestKey1) == 0);
-            AddAssert("TestKey1 is not pressed", () => rulesetInputManager.PressedActions.Count(k => k == TestAction.TestKey1) == 0);
+            AddAssert("TestKey1 is not pressed", () => rulesetInputManager.PressedActions.All(k => k != TestAction.TestKey1));
 
             return;
 
