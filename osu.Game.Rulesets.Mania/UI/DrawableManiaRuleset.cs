@@ -32,7 +32,6 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
-    [Cached]
     public partial class DrawableManiaRuleset : DrawableScrollingRuleset<ManiaHitObject>
     {
         /// <summary>
@@ -51,12 +50,14 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public IEnumerable<BarLine> BarLines;
 
+        public override bool RequiresPortraitOrientation => Beatmap.Stages.Count == 1;
+
         protected override bool RelativeScaleBeatLengths => true;
 
         protected new ManiaRulesetConfigManager Config => (ManiaRulesetConfigManager)base.Config;
 
         private readonly Bindable<ManiaScrollingDirection> configDirection = new Bindable<ManiaScrollingDirection>();
-        private readonly BindableInt configScrollSpeed = new BindableInt();
+        private readonly BindableDouble configScrollSpeed = new BindableDouble();
 
         private double currentTimeRange;
         protected double TargetTimeRange;
@@ -110,8 +111,6 @@ namespace osu.Game.Rulesets.Mania.UI
             configScrollSpeed.BindValueChanged(speed => TargetTimeRange = ComputeScrollTime(speed.NewValue));
 
             TimeRange.Value = TargetTimeRange = currentTimeRange = ComputeScrollTime(configScrollSpeed.Value);
-
-            KeyBindingInputManager.Add(new ManiaTouchInputArea());
         }
 
         protected override void AdjustScrollSpeed(int amount) => configScrollSpeed.Value += amount;
@@ -160,9 +159,9 @@ namespace osu.Game.Rulesets.Mania.UI
         /// </summary>
         /// <param name="scrollSpeed">The scroll speed.</param>
         /// <returns>The scroll time.</returns>
-        public static double ComputeScrollTime(int scrollSpeed) => MAX_TIME_RANGE / scrollSpeed;
+        public static double ComputeScrollTime(double scrollSpeed) => MAX_TIME_RANGE / scrollSpeed;
 
-        public override PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new ManiaPlayfieldAdjustmentContainer();
+        public override PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new ManiaPlayfieldAdjustmentContainer(this);
 
         protected override Playfield CreatePlayfield() => new ManiaPlayfield(Beatmap.Stages);
 

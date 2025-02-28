@@ -28,7 +28,7 @@ namespace osu.Game.Tests.Visual
             base.Content.Add(HitObjectContainer = CreateHitObjectContainer().With(c => c.Clock = new FramedClock(new StopwatchClock())));
             base.Content.Add(new MouseMovementInterceptor
             {
-                MouseMoved = updatePlacementTimeAndPosition,
+                MouseMoved = UpdatePlacementTimeAndPosition,
             });
         }
 
@@ -59,20 +59,20 @@ namespace osu.Game.Tests.Visual
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
             ResetPlacement();
         }
 
-        public void BeginPlacement(HitObject hitObject)
+        public void ShowPlacement(HitObject hitObject)
         {
         }
 
-        public void EndPlacement(HitObject hitObject, bool commit)
+        public void HidePlacement()
         {
-            if (commit)
-                AddHitObject(CreateHitObject(hitObject));
+        }
 
-            ResetPlacement();
+        public void CommitPlacement(HitObject hitObject)
+        {
+            AddHitObject(CreateHitObject(hitObject));
         }
 
         protected void ResetPlacement()
@@ -89,13 +89,14 @@ namespace osu.Game.Tests.Visual
         protected override void Update()
         {
             base.Update();
-            updatePlacementTimeAndPosition();
+
+            if (CurrentBlueprint.PlacementActive == PlacementBlueprint.PlacementState.Finished)
+                ResetPlacement();
+
+            UpdatePlacementTimeAndPosition();
         }
 
-        private void updatePlacementTimeAndPosition() => CurrentBlueprint.UpdateTimeAndPosition(SnapForBlueprint(CurrentBlueprint));
-
-        protected virtual SnapResult SnapForBlueprint(HitObjectPlacementBlueprint blueprint) =>
-            new SnapResult(InputManager.CurrentState.Mouse.Position, null);
+        protected virtual void UpdatePlacementTimeAndPosition() => CurrentBlueprint.UpdateTimeAndPosition(InputManager.CurrentState.Mouse.Position, 0);
 
         public override void Add(Drawable drawable)
         {
@@ -104,7 +105,7 @@ namespace osu.Game.Tests.Visual
             if (drawable is HitObjectPlacementBlueprint blueprint)
             {
                 blueprint.Show();
-                blueprint.UpdateTimeAndPosition(SnapForBlueprint(blueprint));
+                UpdatePlacementTimeAndPosition();
             }
         }
 

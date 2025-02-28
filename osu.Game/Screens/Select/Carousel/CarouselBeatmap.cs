@@ -81,6 +81,7 @@ namespace osu.Game.Screens.Select.Carousel
             match &= !criteria.Title.HasFilter || criteria.Title.Matches(BeatmapInfo.Metadata.Title) ||
                      criteria.Title.Matches(BeatmapInfo.Metadata.TitleUnicode);
             match &= !criteria.DifficultyName.HasFilter || criteria.DifficultyName.Matches(BeatmapInfo.DifficultyName);
+            match &= !criteria.Source.HasFilter || criteria.Source.Matches(BeatmapInfo.Metadata.Source);
             match &= !criteria.UserStarDifficulty.HasFilter || criteria.UserStarDifficulty.IsInRange(BeatmapInfo.StarRating);
 
             if (!match) return false;
@@ -88,6 +89,12 @@ namespace osu.Game.Screens.Select.Carousel
             match &= criteria.CollectionBeatmapMD5Hashes?.Contains(BeatmapInfo.MD5Hash) ?? true;
             if (match && criteria.RulesetCriteria != null)
                 match &= criteria.RulesetCriteria.Matches(BeatmapInfo, criteria);
+
+            if (match && criteria.HasOnlineID == true)
+                match &= BeatmapInfo.OnlineID >= 0;
+
+            if (match && criteria.BeatmapSetId != null)
+                match &= criteria.BeatmapSetId == BeatmapInfo.BeatmapSet?.OnlineID;
 
             return match;
         }

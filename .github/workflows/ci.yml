@@ -114,7 +114,7 @@ jobs:
           dotnet-version: "8.0.x"
 
       - name: Install .NET workloads
-        run: dotnet workload install maui-android
+        run: dotnet workload install android
 
       - name: Compile
         run: dotnet build -c Debug osu.Android.slnf

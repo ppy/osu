@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -17,22 +18,24 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Screens;
+using osu.Game.Audio;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
-using osu.Game.Online.API;
 using osu.Game.Online.Placeholders;
 using osu.Game.Overlays;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking.Expanded.Accuracy;
 using osu.Game.Screens.Ranking.Statistics;
+using osu.Game.Skinning;
 using osuTK;
 
 namespace osu.Game.Screens.Ranking
 {
+    [Cached]
     public abstract partial class ResultsScreen : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>
     {
         protected const float BACKGROUND_BLUR = 20;
@@ -55,15 +58,14 @@ namespace osu.Game.Screens.Ranking
         [Resolved]
         private Player? player { get; set; }
 
-        [Resolved]
-        private IAPIProvider api { get; set; } = null!;
+        private bool skipExitTransition;
 
         protected StatisticsPanel StatisticsPanel { get; private set; } = null!;
 
         private Drawable bottomPanel = null!;
         private Container<ScorePanel> detachedPanelContainer = null!;
 
-        private bool lastFetchCompleted;
+        private Task lastFetchTask = Task.CompletedTask;
 
         /// <summary>
         /// Whether the user can retry the beatmap from the results screen.
@@ -184,6 +186,8 @@ namespace osu.Game.Screens.Ranking
                 Scheduler.AddDelayed(() => OverlayActivationMode.Value = OverlayActivation.All, shouldFlair ? AccuracyCircle.TOTAL_DURATION + 1000 : 0);
             }
 
+            bool allowHotkeyRetry = false;
+
             if (AllowWatchingReplay)
             {
                 buttons.Add(new ReplayDownloadButton(SelectedScore.Value)
@@ -191,18 +195,29 @@ namespace osu.Game.Screens.Ranking
                     Score = { BindTarget = SelectedScore },
                     Width = 300
                 });
+
+                // for simplicity, only allow this when coming from a replay player where we know the replay is ready to be played.
+                //
+                // if we show it in all cases, consider the case where a user comes from song select and potentially has to download
+                // the replay before it can be played back. it wouldn't flow well with the quick retry in such a case.
+                allowHotkeyRetry = player is ReplayPlayer;
             }
 
             if (player != null && AllowRetry)
             {
                 buttons.Add(new RetryButton { Width = 300 });
+                allowHotkeyRetry = true;
+            }
 
+            if (allowHotkeyRetry)
+            {
                 AddInternal(new HotkeyRetryOverlay
                 {
                     Action = () =>
                     {
                         if (!this.IsCurrentScreen()) return;
 
+                        skipExitTransition = true;
                         player?.Restart(true);
                     },
                 });
@@ -219,49 +234,122 @@ namespace osu.Game.Screens.Ranking
         {
             base.LoadComplete();
 
-            var req = FetchScores(fetchScoresCallback);
-
-            if (req != null)
-                api.Queue(req);
-
             StatisticsPanel.State.BindValueChanged(onStatisticsStateChanged, true);
+
+            fetchScores(null);
         }
 
         protected override void Update()
         {
             base.Update();
 
-            if (lastFetchCompleted)
+            if (ScorePanelList.IsScrolledToStart)
+                fetchScores(-1);
+            else if (ScorePanelList.IsScrolledToEnd)
+                fetchScores(1);
+        }
+
+        #region Applause
+
+        private PoolableSkinnableSample? rankApplauseSound;
+
+        public void PlayApplause(ScoreRank rank)
+        {
+            const double applause_volume = 0.8f;
+
+            if (!this.IsCurrentScreen())
+                return;
+
+            rankApplauseSound?.Dispose();
+
+            var applauseSamples = new List<string>();
+
+            if (rank >= ScoreRank.B)
+                // when rank is B or higher, play legacy applause sample on legacy skins.
+                applauseSamples.Insert(0, @"applause");
+
+            switch (rank)
             {
-                APIRequest? nextPageRequest = null;
+                default:
+                case ScoreRank.D:
+                    applauseSamples.Add(@"Results/applause-d");
+                    break;
 
-                if (ScorePanelList.IsScrolledToStart)
-                    nextPageRequest = FetchNextPage(-1, fetchScoresCallback);
-                else if (ScorePanelList.IsScrolledToEnd)
-                    nextPageRequest = FetchNextPage(1, fetchScoresCallback);
+                case ScoreRank.C:
+                    applauseSamples.Add(@"Results/applause-c");
+                    break;
 
-                if (nextPageRequest != null)
-                {
-                    lastFetchCompleted = false;
-                    api.Queue(nextPageRequest);
-                }
+                case ScoreRank.B:
+                    applauseSamples.Add(@"Results/applause-b");
+                    break;
+
+                case ScoreRank.A:
+                    applauseSamples.Add(@"Results/applause-a");
+                    break;
+
+                case ScoreRank.S:
+                case ScoreRank.SH:
+                case ScoreRank.X:
+                case ScoreRank.XH:
+                    applauseSamples.Add(@"Results/applause-s");
+                    break;
             }
+
+            LoadComponentAsync(rankApplauseSound = new PoolableSkinnableSample(new SampleInfo(applauseSamples.ToArray())), s =>
+            {
+                if (!this.IsCurrentScreen() || s != rankApplauseSound)
+                    return;
+
+                AddInternal(rankApplauseSound);
+
+                rankApplauseSound.VolumeTo(applause_volume);
+                rankApplauseSound.Play();
+            });
+        }
+
+        #endregion
+
+        /// <summary>
+        /// Fetches the next page of scores in the given direction.
+        /// </summary>
+        /// <param name="direction">The direction, or <c>null</c> to fetch any scores.</param>
+        private void fetchScores(int? direction)
+        {
+            Debug.Assert(direction == null || direction == -1 || direction == 1);
+
+            if (!lastFetchTask.IsCompleted)
+                return;
+
+            lastFetchTask = Task.Run(async () =>
+            {
+                ScoreInfo[] scores;
+
+                switch (direction)
+                {
+                    default:
+                        scores = await FetchScores().ConfigureAwait(false);
+                        break;
+
+                    case -1:
+                    case 1:
+                        scores = await FetchNextPage(direction.Value).ConfigureAwait(false);
+                        break;
+                }
+
+                await addScores(scores).ConfigureAwait(false);
+            });
         }
 
         /// <summary>
         /// Performs a fetch/refresh of scores to be displayed.
         /// </summary>
-        /// <param name="scoresCallback">A callback which should be called when fetching is completed. Scheduling is not required.</param>
-        /// <returns>An <see cref="APIRequest"/> responsible for the fetch operation. This will be queued and performed automatically.</returns>
-        protected virtual APIRequest? FetchScores(Action<IEnumerable<ScoreInfo>> scoresCallback) => null;
+        protected virtual Task<ScoreInfo[]> FetchScores() => Task.FromResult<ScoreInfo[]>([]);
 
         /// <summary>
-        /// Performs a fetch of the next page of scores. This is invoked every frame until a non-null <see cref="APIRequest"/> is returned.
+        /// Performs a fetch of the next page of scores. This is invoked every frame.
         /// </summary>
         /// <param name="direction">The fetch direction. -1 to fetch scores greater than the current start of the list, and 1 to fetch scores lower than the current end of the list.</param>
-        /// <param name="scoresCallback">A callback which should be called when fetching is completed. Scheduling is not required.</param>
-        /// <returns>An <see cref="APIRequest"/> responsible for the fetch operation. This will be queued and performed automatically.</returns>
-        protected virtual APIRequest? FetchNextPage(int direction, Action<IEnumerable<ScoreInfo>> scoresCallback) => null;
+        protected virtual Task<ScoreInfo[]> FetchNextPage(int direction) => Task.FromResult<ScoreInfo[]>([]);
 
         /// <summary>
         /// Creates the <see cref="Statistics.StatisticsPanel"/> to be used to display extended information about scores.
@@ -273,20 +361,41 @@ namespace osu.Game.Screens.Ranking
                 : new StatisticsPanel();
         }
 
-        private void fetchScoresCallback(IEnumerable<ScoreInfo> scores) => Schedule(() =>
+        private Task addScores(ScoreInfo[] scores)
         {
-            foreach (var s in scores)
-                addScore(s);
+            var tcs = new TaskCompletionSource();
 
-            // allow a frame for scroll container to adjust its dimensions with the added scores before fetching again.
-            Schedule(() => lastFetchCompleted = true);
-
-            if (ScorePanelList.IsEmpty)
+            Schedule(() =>
             {
-                // This can happen if for example a beatmap that is part of a playlist hasn't been played yet.
-                VerticalScrollContent.Add(new MessagePlaceholder(LeaderboardStrings.NoRecordsYet));
-            }
-        });
+                foreach (var s in scores)
+                {
+                    var panel = ScorePanelList.AddScore(s);
+                    if (detachedPanel != null)
+                        panel.Alpha = 0;
+                }
+
+                // allow a frame for scroll container to adjust its dimensions with the added scores before fetching again.
+                Schedule(() => tcs.SetResult());
+
+                if (ScorePanelList.IsEmpty)
+                {
+                    // This can happen if for example a beatmap that is part of a playlist hasn't been played yet.
+                    VerticalScrollContent.Add(new MessagePlaceholder(LeaderboardStrings.NoRecordsYet));
+                }
+
+                OnScoresAdded(scores);
+            });
+
+            return tcs.Task;
+        }
+
+        /// <summary>
+        /// Invoked after online scores are fetched and added to the list.
+        /// </summary>
+        /// <param name="scores">The scores that were added.</param>
+        protected virtual void OnScoresAdded(ScoreInfo[] scores)
+        {
+        }
 
         public override void OnEntering(ScreenTransitionEvent e)
         {
@@ -313,7 +422,10 @@ namespace osu.Game.Screens.Ranking
             // HitObject references from HitEvent.
             Score?.HitEvents.Clear();
 
-            this.FadeOut(100);
+            if (!skipExitTransition)
+                this.FadeOut(100);
+
+            rankApplauseSound?.Stop();
             return false;
         }
 
@@ -326,14 +438,6 @@ namespace osu.Game.Screens.Ranking
             }
 
             return false;
-        }
-
-        private void addScore(ScoreInfo score)
-        {
-            var panel = ScorePanelList.AddScore(score);
-
-            if (detachedPanel != null)
-                panel.Alpha = 0;
         }
 
         private ScorePanel? detachedPanel;

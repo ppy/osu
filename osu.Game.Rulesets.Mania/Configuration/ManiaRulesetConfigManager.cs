@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Mania.Configuration
         {
             base.InitialiseDefaults();
 
-            SetDefault(ManiaRulesetSetting.ScrollSpeed, 8, 1, 40);
+            SetDefault(ManiaRulesetSetting.ScrollSpeed, 8.0, 1.0, 40.0, 0.1);
             SetDefault(ManiaRulesetSetting.ScrollDirection, ManiaScrollingDirection.Down);
             SetDefault(ManiaRulesetSetting.TimingBasedNoteColouring, false);
 
@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Mania.Configuration
 
             if (Get<double?>(ManiaRulesetSetting.ScrollTime) is double scrollTime)
             {
-                SetValue(ManiaRulesetSetting.ScrollSpeed, (int)Math.Round(DrawableManiaRuleset.MAX_TIME_RANGE / scrollTime));
+                SetValue(ManiaRulesetSetting.ScrollSpeed, Math.Round(DrawableManiaRuleset.MAX_TIME_RANGE / scrollTime));
                 SetValue<double?>(ManiaRulesetSetting.ScrollTime, null);
             }
 #pragma warning restore CS0618
@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Mania.Configuration
 
         public override TrackedSettings CreateTrackedSettings() => new TrackedSettings
         {
-            new TrackedSetting<int>(ManiaRulesetSetting.ScrollSpeed,
+            new TrackedSetting<double>(ManiaRulesetSetting.ScrollSpeed,
                 speed => new SettingDescription(
                     rawValue: speed,
                     name: RulesetSettingsStrings.ScrollSpeed,

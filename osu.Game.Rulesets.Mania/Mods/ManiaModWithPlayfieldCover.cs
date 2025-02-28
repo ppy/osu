@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Mania.Mods
 
             foreach (Column column in maniaPlayfield.Stages.SelectMany(stage => stage.Columns))
             {
-                HitObjectContainer hoc = column.HitObjectArea.HitObjectContainer;
+                HitObjectContainer hoc = column.HitObjectContainer;
                 Container hocParent = (Container)hoc.Parent!;
 
                 hocParent.Remove(hoc, false);

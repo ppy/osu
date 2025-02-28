@@ -85,9 +85,9 @@ namespace osu.Game.Screens.Play
         private readonly BindableBool replayLoaded = new BindableBool();
 
         private static bool hasShownNotificationOnce;
-
         private readonly FillFlowContainer bottomRightElements;
-        private readonly FillFlowContainer topRightElements;
+
+        internal readonly FillFlowContainer TopRightElements;
 
         internal readonly IBindable<bool> IsPlaying = new Bindable<bool>();
 
@@ -115,6 +115,8 @@ namespace osu.Game.Screens.Play
 
         public HUDOverlay([CanBeNull] DrawableRuleset drawableRuleset, IReadOnlyList<Mod> mods, bool alwaysShowLeaderboard = true)
         {
+            Container rightSettings;
+
             this.drawableRuleset = drawableRuleset;
             this.mods = mods;
 
@@ -134,7 +136,7 @@ namespace osu.Game.Screens.Play
                 PlayfieldSkinLayer = drawableRuleset != null
                     ? new SkinnableContainer(new GlobalSkinnableContainerLookup(GlobalSkinnableContainers.Playfield, drawableRuleset.Ruleset.RulesetInfo)) { AlwaysPresent = true, }
                     : Empty(),
-                topRightElements = new FillFlowContainer
+                TopRightElements = new FillFlowContainer
                 {
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
@@ -146,7 +148,6 @@ namespace osu.Game.Screens.Play
                     Children = new Drawable[]
                     {
                         ModDisplay = CreateModsContainer(),
-                        PlayerSettingsOverlay = CreatePlayerSettingsOverlay(),
                     }
                 },
                 bottomRightElements = new FillFlowContainer
@@ -164,6 +165,14 @@ namespace osu.Game.Screens.Play
                         HoldToQuit = CreateHoldForMenuButton(),
                     }
                 },
+                rightSettings = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Children = new Drawable[]
+                    {
+                        PlayerSettingsOverlay = new PlayerSettingsOverlay(),
+                    }
+                },
                 LeaderboardFlow = new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Both,
@@ -173,7 +182,7 @@ namespace osu.Game.Screens.Play
                 },
             };
 
-            hideTargets = new List<Drawable> { mainComponents, topRightElements };
+            hideTargets = new List<Drawable> { mainComponents, TopRightElements, rightSettings };
 
             if (rulesetComponents != null)
                 hideTargets.Add(rulesetComponents);
@@ -228,7 +237,7 @@ namespace osu.Game.Screens.Play
             {
                 if (e.NewValue)
                 {
-                    ModDisplay.FadeIn(200);
+                    ModDisplay.FadeIn(1000, FADE_EASING);
                     InputCountController.Margin = new MarginPadding(10) { Bottom = 30 };
                 }
                 else
@@ -239,6 +248,9 @@ namespace osu.Game.Screens.Play
 
                 updateVisibility();
             }, true);
+
+            ModDisplay.ExpansionMode = ExpansionMode.AlwaysExpanded;
+            Scheduler.AddDelayed(() => ModDisplay.ExpansionMode = ExpansionMode.ExpandOnHover, 1200);
         }
 
         protected override void Update()
@@ -266,9 +278,9 @@ namespace osu.Game.Screens.Play
                 processDrawables(rulesetComponents);
 
             if (lowestTopScreenSpaceRight.HasValue)
-                topRightElements.Y = MathHelper.Clamp(ToLocalSpace(new Vector2(0, lowestTopScreenSpaceRight.Value)).Y, 0, DrawHeight - topRightElements.DrawHeight);
+                TopRightElements.Y = MathHelper.Clamp(ToLocalSpace(new Vector2(0, lowestTopScreenSpaceRight.Value)).Y, 0, DrawHeight - TopRightElements.DrawHeight);
             else
-                topRightElements.Y = 0;
+                TopRightElements.Y = 0;
 
             if (lowestTopScreenSpaceLeft.HasValue)
                 LeaderboardFlow.Y = MathHelper.Clamp(ToLocalSpace(new Vector2(0, lowestTopScreenSpaceLeft.Value)).Y, 0, DrawHeight - LeaderboardFlow.DrawHeight);
@@ -389,8 +401,6 @@ namespace osu.Game.Screens.Play
             Origin = Anchor.TopRight,
         };
 
-        protected PlayerSettingsOverlay CreatePlayerSettingsOverlay() => new PlayerSettingsOverlay();
-
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
             if (e.Repeat)
@@ -404,7 +414,7 @@ namespace osu.Game.Screens.Play
 
                 case GlobalAction.HoldForHUD:
                     holdingForHUD.Value = true;
-                    return true;
+                    return false;
 
                 case GlobalAction.ToggleInGameInterface:
                     switch (configVisibilityMode.Value)
