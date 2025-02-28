@@ -163,8 +163,6 @@ namespace osu.Game.Screens.SelectV2
                 computeStarRating();
                 updateKeyCount();
             }, true);
-
-            Selected.BindValueChanged(s => Expanded.Value = s.NewValue, true);
         }
 
         protected override void PrepareForUse()

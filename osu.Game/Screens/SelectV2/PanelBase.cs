@@ -23,8 +23,6 @@ namespace osu.Game.Screens.SelectV2
     {
         private const float corner_radius = 10;
 
-        private const float left_edge_x_offset = 20f;
-        private const float keyboard_active_x_offset = 25f;
         private const float active_x_offset = 50f;
 
         private const float duration = 500;
@@ -162,6 +160,7 @@ namespace osu.Game.Screens.SelectV2
             base.LoadComplete();
 
             Expanded.BindValueChanged(_ => updateDisplay());
+            Selected.BindValueChanged(_ => updateDisplay());
             KeyboardSelected.BindValueChanged(_ => updateDisplay(), true);
         }
 
@@ -199,13 +198,13 @@ namespace osu.Game.Screens.SelectV2
 
         private void updateXOffset()
         {
-            float x = PanelXOffset + active_x_offset + keyboard_active_x_offset + left_edge_x_offset;
+            float x = PanelXOffset;
 
-            if (Expanded.Value)
-                x -= active_x_offset;
+            if (!Expanded.Value && !Selected.Value)
+                x += active_x_offset;
 
-            if (KeyboardSelected.Value)
-                x -= keyboard_active_x_offset;
+            if (!KeyboardSelected.Value)
+                x += active_x_offset * 0.5f;
 
             this.TransformTo(nameof(Padding), new MarginPadding { Left = x }, duration, Easing.OutQuint);
         }
