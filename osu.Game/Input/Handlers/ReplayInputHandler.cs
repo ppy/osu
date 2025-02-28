@@ -60,6 +60,10 @@ namespace osu.Game.Input.Handlers
                 }
                 else if (!lastPressed.SequenceEqual(PressedActions))
                 {
+                    // `SimultaneousBindingMode.All` allows the same action to be pressed multiple times, before an equal number of releases.
+                    // We not only want to consider the existance of an action, but the number of occurances too when determining which actions has been pressed/released since the last replay state.
+                    // For this reason, the `.Except()` set operation is not appropriate as that only considers existence.
+
                     var releasedList = lastPressed.ToList();
                     foreach (var action in PressedActions)
                         releasedList.Remove(action);

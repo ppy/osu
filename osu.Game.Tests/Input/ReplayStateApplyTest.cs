@@ -31,8 +31,8 @@ namespace osu.Game.Tests.Input
         // There are commented out assertions that will always fail as Replay inputs don't go through the typical input flow
         // Related framework issue: https://github.com/ppy/osu-framework/issues/6037
 
-        private readonly TestRulesetInputManager rulesetInputManagerNone  = new TestRulesetInputManager(SimultaneousBindingMode.None);
-        private readonly TestRulesetInputManager rulesetInputManagerUnique  = new TestRulesetInputManager(SimultaneousBindingMode.Unique);
+        private readonly TestRulesetInputManager rulesetInputManagerNone = new TestRulesetInputManager(SimultaneousBindingMode.None);
+        private readonly TestRulesetInputManager rulesetInputManagerUnique = new TestRulesetInputManager(SimultaneousBindingMode.Unique);
         private readonly TestRulesetInputManager rulesetInputManagerAll = new TestRulesetInputManager(SimultaneousBindingMode.All);
 
         public ReplayStateApplyTest()
@@ -129,7 +129,7 @@ namespace osu.Game.Tests.Input
         [Test]
         public void TestUniqueSimultaneousBindings()
         {
-            TestRulesetInputManager rulesetInputManager =  rulesetInputManagerUnique;
+            TestRulesetInputManager rulesetInputManager = rulesetInputManagerUnique;
             List<TestAction> actions = new List<TestAction>();
 
             AddAssert("No actions are pressed.", () => rulesetInputManager.PressedActions.Count == 0);
