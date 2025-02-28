@@ -26,10 +26,10 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             : base(barLine)
         {
             RelativeSizeAxes = Axes.X;
-            AutoSizeAxes = Axes.Y;
+            Height = 1;
         }
 
-        [BackgroundDependencyLoader]
+        [BackgroundDependencyLoader(true)]
         private void load()
         {
             AddInternal(new SkinnableDrawable(new ManiaSkinComponentLookup(ManiaSkinComponents.BarLine), _ => new DefaultBarLine())

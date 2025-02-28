@@ -5,17 +5,22 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Skinning;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 {
     public partial class LegacyBarLine : CompositeDrawable
     {
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(ISkinSource skin)
         {
+            float skinHeight = skin.GetManiaSkinConfig<float>(LegacyManiaSkinConfigurationLookups.BarLineHeight)?.Value ?? 1;
+
             RelativeSizeAxes = Axes.X;
-            Height = 1.2f;
+            Height = 1.2f * skinHeight;
+            Colour = skin.GetManiaSkinConfig<Color4>(LegacyManiaSkinConfigurationLookups.BarLineColour)?.Value ?? Color4.White;
 
             // Avoid flickering due to no anti-aliasing of boxes by default.
             var edgeSmoothness = new Vector2(0.3f);
