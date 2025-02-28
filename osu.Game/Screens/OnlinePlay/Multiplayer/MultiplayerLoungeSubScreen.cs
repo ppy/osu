@@ -17,7 +17,6 @@ using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Lounge;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
-using osu.Game.Screens.OnlinePlay.Match;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
@@ -89,7 +88,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             Type = MatchType.HeadToHead,
         };
 
-        protected override RoomSubScreen CreateRoomSubScreen(Room room) => new MultiplayerMatchSubScreen(room);
+        protected override OnlinePlaySubScreen CreateRoomSubScreen(Room room) => new MultiplayerMatchSubScreen(room);
 
         protected override ListingPollingComponent CreatePollingComponent() => new MultiplayerListingPollingComponent();
 
