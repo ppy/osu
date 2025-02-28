@@ -222,6 +222,8 @@ namespace osu.Game.Online.Multiplayer
         {
             // Populate users.
             await PopulateUsers(joinedRoom.Users).ConfigureAwait(false);
+            if (joinedRoom.Host != null)
+                await PopulateUsers([joinedRoom.Host]).ConfigureAwait(false);
 
             // Update the stored room (must be done on update thread for thread-safety).
             await runOnUpdateThreadAsync(() =>
@@ -233,6 +235,7 @@ namespace osu.Game.Online.Multiplayer
                 APIRoom = apiRoom;
 
                 APIRoom.RoomID = joinedRoom.RoomID;
+                APIRoom.Host = joinedRoom.Host?.User;
                 APIRoom.Playlist = joinedRoom.Playlist.Select(item => new PlaylistItem(item)).ToArray();
                 APIRoom.CurrentPlaylistItem = APIRoom.Playlist.Single(item => item.ID == joinedRoom.Settings.PlaylistItemId);
                 // The server will null out the end date upon the host joining the room, but the null value is never communicated to the client.
