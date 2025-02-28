@@ -69,7 +69,7 @@ namespace osu.Game.Overlays
             where T : Drawable
         {
             // if search isn't cleared then the target control won't be visible if it doesn't match the query
-            SearchTextBox.Current.Value = "";
+            SearchTextBox.Current.SetDefault();
 
             Show();
 
