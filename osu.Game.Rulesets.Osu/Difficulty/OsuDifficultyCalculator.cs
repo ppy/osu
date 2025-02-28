@@ -228,7 +228,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // It is important to consider accuracy difficulty when scaling with accuracy.
             ratingMultiplier *= 0.98 + Math.Pow(Math.Max(0, overallDifficulty), 2) / 2500;
 
-            return flashlightRating * Math.Cbrt(ratingMultiplier);
+            return flashlightRating * Math.Sqrt(ratingMultiplier);
         }
 
         protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
