@@ -38,6 +38,8 @@ namespace osu.Game.Screens.SelectV2
         private Container iconContainer = null!;
         private Box activationFlash = null!;
         private Box hoverLayer = null!;
+        private Box keyboardSelectionLayer = null!;
+        private Box selectionLayer = null!;
 
         public Container TopLevelContent { get; private set; } = null!;
 
@@ -137,6 +139,24 @@ namespace osu.Game.Screens.SelectV2
                     hoverLayer = new Box
                     {
                         Alpha = 0,
+                        Colour = colours.Blue.Opacity(0.1f),
+                        Blending = BlendingParameters.Additive,
+                        RelativeSizeAxes = Axes.Both,
+                    },
+                    selectionLayer = new Box
+                    {
+                        Alpha = 0,
+                        Colour = ColourInfo.GradientHorizontal(colours.Yellow.Opacity(0), colours.Yellow.Opacity(0.5f)),
+                        Blending = BlendingParameters.Additive,
+                        RelativeSizeAxes = Axes.Both,
+                        Width = 0.7f,
+                        Anchor = Anchor.TopRight,
+                        Origin = Anchor.TopRight,
+                    },
+                    keyboardSelectionLayer = new Box
+                    {
+                        Alpha = 0,
+                        Colour = colours.Yellow.Opacity(0.1f),
                         Blending = BlendingParameters.Additive,
                         RelativeSizeAxes = Axes.Both,
                     },
@@ -151,7 +171,6 @@ namespace osu.Game.Screens.SelectV2
                 }
             };
 
-            hoverLayer.Colour = colours.Blue.Opacity(0.1f);
             backgroundGradient.Colour = ColourInfo.GradientHorizontal(colourProvider.Background3, colourProvider.Background4);
         }
 
@@ -159,9 +178,27 @@ namespace osu.Game.Screens.SelectV2
         {
             base.LoadComplete();
 
-            Expanded.BindValueChanged(_ => updateDisplay());
-            Selected.BindValueChanged(_ => updateDisplay());
-            KeyboardSelected.BindValueChanged(_ => updateDisplay(), true);
+            Expanded.BindValueChanged(_ => updateDisplay(), true);
+
+            Selected.BindValueChanged(selected =>
+            {
+                if (selected.NewValue)
+                    selectionLayer.FadeIn(100, Easing.OutQuint);
+                else
+                    selectionLayer.FadeOut(200, Easing.OutQuint);
+
+                updateXOffset();
+            }, true);
+
+            KeyboardSelected.BindValueChanged(selected =>
+            {
+                if (selected.NewValue)
+                    keyboardSelectionLayer.FadeIn(100, Easing.OutQuint);
+                else
+                    keyboardSelectionLayer.FadeOut(1000, Easing.OutQuint);
+
+                updateXOffset();
+            }, true);
         }
 
         protected override void PrepareForUse()
@@ -211,9 +248,7 @@ namespace osu.Game.Screens.SelectV2
 
         private void updateHover()
         {
-            bool hovered = IsHovered || KeyboardSelected.Value;
-
-            if (hovered)
+            if (IsHovered)
                 hoverLayer.FadeIn(100, Easing.OutQuint);
             else
                 hoverLayer.FadeOut(1000, Easing.OutQuint);
@@ -221,13 +256,13 @@ namespace osu.Game.Screens.SelectV2
 
         protected override bool OnHover(HoverEvent e)
         {
-            updateDisplay();
+            updateHover();
             return true;
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            updateDisplay();
+            updateHover();
             base.OnHoverLost(e);
         }
 
