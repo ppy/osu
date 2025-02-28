@@ -3,6 +3,8 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Utils;
 using osu.Game.Graphics.Containers;
@@ -14,8 +16,11 @@ namespace osu.Game.Screens.Menu
         private StarFountain leftFountain = null!;
         private StarFountain rightFountain = null!;
 
+        private Sample? sample;
+        private SampleChannel? sampleChannel;
+
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(AudioManager audio)
         {
             RelativeSizeAxes = Axes.Both;
 
@@ -34,6 +39,8 @@ namespace osu.Game.Screens.Menu
                     X = -250,
                 },
             };
+
+            sample = audio.Samples.Get(@"Gameplay/fountain-shoot");
         }
 
         private bool isTriggered;
@@ -73,6 +80,11 @@ namespace osu.Game.Screens.Menu
                     rightFountain.Shoot(1);
                     break;
             }
+
+            // Track sample channel to avoid overlapping playback
+            sampleChannel?.Stop();
+            sampleChannel = sample?.GetChannel();
+            sampleChannel?.Play();
         }
     }
 }
