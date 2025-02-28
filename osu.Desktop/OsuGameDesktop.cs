@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Microsoft.Win32;
 using osu.Desktop.Performance;
 using osu.Desktop.Security;
+using osu.Desktop.Platform;
 using osu.Framework.Platform;
 using osu.Game;
 using osu.Desktop.Updater;
@@ -126,6 +127,8 @@ namespace osu.Desktop
                 LoadComponentAsync(new GameplayWinKeyBlocker(), Add);
 
             LoadComponentAsync(new ElevatedPrivilegesChecker(), Add);
+
+            LoadComponentAsync(new BossKeyManager(), Add);
 
             osuSchemeLinkIPCChannel = new OsuSchemeLinkIPCChannel(Host, this);
             archiveImportIPCChannel = new ArchiveImportIPCChannel(Host, this);
