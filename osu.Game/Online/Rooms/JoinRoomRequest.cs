@@ -16,6 +16,9 @@ namespace osu.Game.Online.Rooms
         {
             Room = room;
             Password = password;
+
+            // Also copy back to the source model, since it is likely to have been stored elsewhere.
+            Success += r => Room.CopyFrom(r);
         }
 
         protected override WebRequest CreateWebRequest()

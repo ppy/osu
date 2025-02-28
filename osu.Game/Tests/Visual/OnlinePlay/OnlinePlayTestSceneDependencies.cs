@@ -19,7 +19,6 @@ namespace osu.Game.Tests.Visual.OnlinePlay
     public class OnlinePlayTestSceneDependencies : IReadOnlyDependencyContainer, IOnlinePlayTestSceneDependencies
     {
         public Bindable<Room?> SelectedRoom { get; }
-        public IRoomManager RoomManager { get; }
         public OngoingOperationTracker OngoingOperationTracker { get; }
         public OnlinePlayBeatmapAvailabilityTracker AvailabilityTracker { get; }
         public TestRoomRequestsHandler RequestsHandler { get; }
@@ -40,7 +39,6 @@ namespace osu.Game.Tests.Visual.OnlinePlay
             RequestsHandler = new TestRoomRequestsHandler();
             OngoingOperationTracker = new OngoingOperationTracker();
             AvailabilityTracker = new OnlinePlayBeatmapAvailabilityTracker();
-            RoomManager = CreateRoomManager();
             UserLookupCache = new TestUserLookupCache();
             BeatmapLookupCache = new BeatmapLookupCache();
 
@@ -48,7 +46,6 @@ namespace osu.Game.Tests.Visual.OnlinePlay
 
             CacheAs(RequestsHandler);
             CacheAs(SelectedRoom);
-            CacheAs(RoomManager);
             CacheAs(OngoingOperationTracker);
             CacheAs(AvailabilityTracker);
             CacheAs(new OverlayColourProvider(OverlayColourScheme.Plum));
@@ -80,7 +77,5 @@ namespace osu.Game.Tests.Visual.OnlinePlay
             if (instance is Drawable drawable)
                 drawableComponents.Add(drawable);
         }
-
-        protected virtual IRoomManager CreateRoomManager() => new TestRoomManager();
     }
 }

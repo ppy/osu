@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -10,7 +11,6 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
-using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Lounge;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Screens.OnlinePlay.Match;
@@ -59,6 +59,20 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             return criteria;
         }
 
+        protected override void JoinInternal(Room room, string? password, Action<Room> onSuccess, Action<string> onFailure)
+        {
+            var joinRoomRequest = new JoinRoomRequest(room, password);
+
+            joinRoomRequest.Success += r => onSuccess(r);
+            joinRoomRequest.Failure += exception =>
+            {
+                if (exception is not OperationCanceledException)
+                    onFailure(exception.Message);
+            };
+
+            api.Queue(joinRoomRequest);
+        }
+
         protected override OsuButton CreateNewRoomButton() => new CreatePlaylistsRoomButton();
 
         protected override Room CreateNewRoom()
@@ -71,8 +85,6 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         }
 
         protected override RoomSubScreen CreateRoomSubScreen(Room room) => new PlaylistsRoomSubScreen(room);
-
-        protected override ListingPollingComponent CreatePollingComponent() => new ListingPollingComponent();
 
         private enum PlaylistsCategory
         {
