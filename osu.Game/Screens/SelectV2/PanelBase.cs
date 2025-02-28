@@ -25,7 +25,7 @@ namespace osu.Game.Screens.SelectV2
 
         private const float active_x_offset = 50f;
 
-        private const float duration = 500;
+        private const float duration = 400;
 
         protected float PanelXOffset { get; init; }
 
