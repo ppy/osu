@@ -26,6 +26,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             : base(barLine)
         {
             RelativeSizeAxes = Axes.X;
+            AutoSizeAxes = Axes.Y;
         }
 
         [BackgroundDependencyLoader]
@@ -36,8 +37,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
             });
-
-            Major.BindValueChanged(major => Height = major.NewValue ? 1.7f : 1.2f, true);
         }
 
         protected override void OnApply()
