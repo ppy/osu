@@ -54,7 +54,7 @@ namespace osu.Game.Screens.SelectV2
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
         {
-            var inputRectangle = DrawRectangle;
+            var inputRectangle = TopLevelContent.DrawRectangle;
 
             // Cover the gaps introduced by the spacing between BeatmapPanels so that clicks will not fall through the carousel.
             //
@@ -62,7 +62,7 @@ namespace osu.Game.Screens.SelectV2
             // larger hit target.
             inputRectangle = inputRectangle.Inflate(new MarginPadding { Vertical = BeatmapCarousel.SPACING });
 
-            return inputRectangle.Contains(ToLocalSpace(screenSpacePos));
+            return inputRectangle.Contains(TopLevelContent.ToLocalSpace(screenSpacePos));
         }
 
         [BackgroundDependencyLoader]
@@ -163,8 +163,6 @@ namespace osu.Game.Screens.SelectV2
                 computeStarRating();
                 updateKeyCount();
             }, true);
-
-            Selected.BindValueChanged(s => Expanded.Value = s.NewValue, true);
         }
 
         protected override void PrepareForUse()

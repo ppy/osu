@@ -48,7 +48,7 @@ namespace osu.Game.Screens.SelectV2
 
             Icon = chevronIcon = new Container
             {
-                Size = new Vector2(22),
+                Size = new Vector2(0, 22),
                 Child = new SpriteIcon
                 {
                     Anchor = Anchor.Centre,
@@ -128,10 +128,16 @@ namespace osu.Game.Screens.SelectV2
 
         private void onExpanded()
         {
-            const float duration = 500;
-
-            chevronIcon.ResizeWidthTo(Expanded.Value ? 22 : 0f, duration, Easing.OutQuint);
-            chevronIcon.FadeTo(Expanded.Value ? 1f : 0f, duration, Easing.OutQuint);
+            if (Expanded.Value)
+            {
+                chevronIcon.ResizeWidthTo(18, 600, Easing.OutElasticQuarter);
+                chevronIcon.FadeTo(1f, DURATION, Easing.OutQuint);
+            }
+            else
+            {
+                chevronIcon.ResizeWidthTo(0f, DURATION, Easing.OutQuint);
+                chevronIcon.FadeTo(0f, DURATION, Easing.OutQuint);
+            }
         }
 
         protected override void PrepareForUse()
