@@ -25,7 +25,7 @@ namespace osu.Game.Screens.SelectV2
 
         private const float active_x_offset = 50f;
 
-        private const float duration = 400;
+        protected const float DURATION = 400;
 
         protected float PanelXOffset { get; init; }
 
@@ -207,7 +207,7 @@ namespace osu.Game.Screens.SelectV2
         protected override void PrepareForUse()
         {
             base.PrepareForUse();
-            this.FadeInFromZero(duration, Easing.OutQuint);
+            this.FadeInFromZero(DURATION, Easing.OutQuint);
         }
 
         protected override bool OnClick(ClickEvent e)
@@ -221,10 +221,10 @@ namespace osu.Game.Screens.SelectV2
             var backgroundColour = accentColour ?? Color4.White;
             var edgeEffectColour = accentColour ?? Color4Extensions.FromHex(@"4EBFFF");
 
-            backgroundAccentGradient.FadeColour(ColourInfo.GradientHorizontal(backgroundColour.Opacity(0.25f), backgroundColour.Opacity(0f)), duration, Easing.OutQuint);
-            backgroundBorder.FadeColour(backgroundColour, duration, Easing.OutQuint);
+            backgroundAccentGradient.FadeColour(ColourInfo.GradientHorizontal(backgroundColour.Opacity(0.25f), backgroundColour.Opacity(0f)), DURATION, Easing.OutQuint);
+            backgroundBorder.FadeColour(backgroundColour, DURATION, Easing.OutQuint);
 
-            TopLevelContent.FadeEdgeEffectTo(Expanded.Value ? edgeEffectColour.Opacity(0.5f) : Color4.Black.Opacity(0.4f), duration, Easing.OutQuint);
+            TopLevelContent.FadeEdgeEffectTo(Expanded.Value ? edgeEffectColour.Opacity(0.5f) : Color4.Black.Opacity(0.4f), DURATION, Easing.OutQuint);
 
             updateXOffset();
             updateHover();
@@ -240,7 +240,7 @@ namespace osu.Game.Screens.SelectV2
             if (!KeyboardSelected.Value)
                 x += active_x_offset * 0.5f;
 
-            TopLevelContent.MoveToX(x, duration, Easing.OutQuint);
+            TopLevelContent.MoveToX(x, DURATION, Easing.OutQuint);
         }
 
         private void updateHover()
