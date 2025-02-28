@@ -217,7 +217,6 @@ namespace osu.Game.Screens.SelectV2
 
         protected override bool OnClick(ClickEvent e)
         {
-            activationFlash.FadeOutFromOne(500, Easing.OutQuint);
             carousel?.Activate(Item!);
             return true;
         }
@@ -287,7 +286,7 @@ namespace osu.Game.Screens.SelectV2
 
         public virtual void Activated()
         {
-            activationFlash.FadeOutFromOne(500, Easing.OutQuint);
+            activationFlash.FadeOutFromOne(1000, Easing.OutQuint);
         }
 
         #endregion
