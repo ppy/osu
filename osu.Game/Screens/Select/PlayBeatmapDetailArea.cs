@@ -10,6 +10,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Screens.Select.Filter;
 using osu.Game.Screens.Select.Leaderboards;
 
 namespace osu.Game.Screens.Select
@@ -33,6 +34,8 @@ namespace osu.Game.Screens.Select
 
         private Bindable<bool> selectedModsFilter;
 
+        private Bindable<ScoreSortMode> selectedScoresSortMode;
+
         public PlayBeatmapDetailArea()
         {
             Add(Leaderboard = new BeatmapLeaderboard { RelativeSizeAxes = Axes.Both });
@@ -43,12 +46,16 @@ namespace osu.Game.Screens.Select
         {
             selectedTab = config.GetBindable<TabType>(OsuSetting.BeatmapDetailTab);
             selectedModsFilter = config.GetBindable<bool>(OsuSetting.BeatmapDetailModsFilter);
+            selectedScoresSortMode = config.GetBindable<ScoreSortMode>(OsuSetting.BeatmapDetailScoresSortMode);
 
             selectedTab.BindValueChanged(tab => CurrentTab.Value = getTabItemFromTabType(tab.NewValue), true);
             CurrentTab.BindValueChanged(tab => selectedTab.Value = getTabTypeFromTabItem(tab.NewValue));
 
             selectedModsFilter.BindValueChanged(checkbox => CurrentModsFilter.Value = checkbox.NewValue, true);
             CurrentModsFilter.BindValueChanged(checkbox => selectedModsFilter.Value = checkbox.NewValue);
+
+            selectedScoresSortMode.BindValueChanged(filter => CurrentScoresSortMode.Value = filter.NewValue, true);
+            CurrentScoresSortMode.BindValueChanged(filter => selectedScoresSortMode.Value = filter.NewValue);
         }
 
         public override void Refresh()
@@ -58,11 +65,12 @@ namespace osu.Game.Screens.Select
             Leaderboard.RefetchScores();
         }
 
-        protected override void OnTabChanged(BeatmapDetailAreaTabItem tab, bool selectedMods)
+        protected override void OnTabChanged(BeatmapDetailAreaTabItem tab, bool selectedMods, ScoreSortMode sortMode)
         {
-            base.OnTabChanged(tab, selectedMods);
+            base.OnTabChanged(tab, selectedMods, sortMode);
 
             Leaderboard.FilterMods = selectedMods;
+            Leaderboard.ScoresScoreSortMode = sortMode;
 
             switch (tab)
             {

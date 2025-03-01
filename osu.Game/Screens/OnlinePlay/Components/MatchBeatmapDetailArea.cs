@@ -10,6 +10,7 @@ using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Playlists;
 using osu.Game.Screens.Select;
+using osu.Game.Screens.Select.Filter;
 using osuTK;
 using Container = osu.Framework.Graphics.Containers.Container;
 
@@ -83,9 +84,9 @@ namespace osu.Game.Screens.OnlinePlay.Components
         private void updateRoomPlaylist()
             => playlist.Items.ReplaceRange(0, playlist.Items.Count, room.Playlist);
 
-        protected override void OnTabChanged(BeatmapDetailAreaTabItem tab, bool selectedMods)
+        protected override void OnTabChanged(BeatmapDetailAreaTabItem tab, bool selectedMods, ScoreSortMode sortMode)
         {
-            base.OnTabChanged(tab, selectedMods);
+            base.OnTabChanged(tab, selectedMods, sortMode);
 
             switch (tab)
             {
