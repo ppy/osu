@@ -56,8 +56,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             var reading = skills.OfType<Reading>().SingleOrDefault();
             double readingRating = reading == null ? 0.0 : Math.Sqrt(reading.DifficultyValue()) * difficulty_multiplier;
             double readingDifficultyStrainCount = reading?.CountTopWeightedStrains() ?? 0.0;
-            double readingLengthBonus = 1 + readingDifficultyStrainCount / 450.0;
-            readingRating *= Math.Cbrt(readingLengthBonus);
+            double readingLengthBonus = 1 + readingDifficultyStrainCount / 700.0;
+            readingRating *= Math.Sqrt(readingLengthBonus);
 
             if (mods.Any(m => m is OsuModTouchDevice))
             {
