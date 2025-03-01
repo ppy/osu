@@ -151,7 +151,7 @@ namespace osu.Game.Screens.Select
             if (tabs.Current.Value.FilterableByMods)
             {
                 modsCheckbox.FadeTo(1, 200, Easing.OutQuint);
-                tabsContainer.Padding = new MarginPadding { Right = 110 };
+                tabsContainer.Padding = new MarginPadding { Right = 215 };
             }
             else
             {
