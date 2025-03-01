@@ -30,9 +30,9 @@ namespace osu.Game.Localisation
         public static LocalisableString Mappools => new TranslatableString(getKey(@"mappools"), @"mappools");
 
         /// <summary>
-        /// "bracket"
+        /// "results"
         /// </summary>
-        public static LocalisableString Bracket => new TranslatableString(getKey(@"bracket"), @"bracket");
+        public static LocalisableString Results => new TranslatableString(getKey(@"results"), @"results");
 
         /// <summary>
         /// "schedule"
@@ -40,9 +40,9 @@ namespace osu.Game.Localisation
         public static LocalisableString Schedule => new TranslatableString(getKey(@"schedule"), @"schedule");
 
         /// <summary>
-        /// "dangerous"
+        /// "settings"
         /// </summary>
-        public static LocalisableString Dangerous => new TranslatableString(getKey(@"dangerous"), @"dangerous");
+        public static LocalisableString Settings => new TranslatableString(getKey(@"settings"), @"settings");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
