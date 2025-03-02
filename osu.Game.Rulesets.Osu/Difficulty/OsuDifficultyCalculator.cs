@@ -78,7 +78,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double aimRating = computeAimRating(aim.DifficultyValue(), mods, totalHits, approachRate, overallDifficulty);
             double aimRatingNoSliders = computeAimRating(aimWithoutSliders.DifficultyValue(), mods, totalHits, approachRate, overallDifficulty);
-            double speedRating = computeSpeedRating(speed.DifficultyValue(), mods, totalHits, approachRate);
+            double speedRating = computeSpeedRating(speed.DifficultyValue(), mods, totalHits, approachRate, overallDifficulty);
 
             double flashlightRating = 0.0;
 
@@ -170,7 +170,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return aimRating * Math.Cbrt(ratingMultiplier);
         }
 
-        private double computeSpeedRating(double speedDifficultyValue, Mod[] mods, int totalHits, double approachRate)
+        private double computeSpeedRating(double speedDifficultyValue, Mod[] mods, int totalHits, double approachRate, double overallDifficulty)
         {
             if (mods.Any(m => m is OsuModRelax))
                 return 0;
@@ -202,6 +202,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 // We want to give more reward for lower AR when it comes to aim and HD. This nerfs high AR and buffs lower AR.
                 ratingMultiplier *= 1.0 + 0.04 * (12.0 - approachRate);
             }
+
+            ratingMultiplier *= 0.95 + Math.Pow(Math.Max(0, overallDifficulty), 2) / 750;
 
             return speedRating * Math.Cbrt(ratingMultiplier);
         }
