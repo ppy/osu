@@ -149,7 +149,8 @@ namespace osu.Game.Overlays
             AddInternal(Sidebar = new SettingsSidebar(showBackButton)
             {
                 BackButtonAction = Hide,
-                Width = sidebar_width
+                Width = sidebar_width,
+                Expanded = { Value = showBackButton }
             });
 
             CreateSections()?.ForEach(AddSection);

@@ -22,7 +22,7 @@ namespace osu.Game.Overlays.Settings
 
         public Action? BackButtonAction;
 
-        protected override bool ExpandOnHover => false;
+        protected override bool ExpandOnHover => true;
 
         private readonly bool showBackButton;
 
@@ -30,7 +30,7 @@ namespace osu.Game.Overlays.Settings
             : base(CONTRACTED_WIDTH, EXPANDED_WIDTH)
         {
             this.showBackButton = showBackButton;
-            Expanded.Value = true;
+            Expanded.Value = false;
         }
 
         [BackgroundDependencyLoader]
