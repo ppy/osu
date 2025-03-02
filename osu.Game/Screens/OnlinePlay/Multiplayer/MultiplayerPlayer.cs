@@ -30,6 +30,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         [Resolved]
         private MultiplayerClient client { get; set; } = null!;
 
+        [Resolved]
+        private OsuGame? game { get; set; }
+
         private IBindable<bool> isConnected = null!;
 
         private readonly TaskCompletionSource<bool> resultsReady = new TaskCompletionSource<bool>();
@@ -142,6 +145,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             if (client.LocalUser?.State == MultiplayerUserState.Loaded)
             {
+                game?.Window?.Flash();
                 loadingDisplay.Show();
                 client.ChangeState(MultiplayerUserState.ReadyForGameplay);
             }
