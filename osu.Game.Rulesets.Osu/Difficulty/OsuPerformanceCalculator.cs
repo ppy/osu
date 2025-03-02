@@ -200,6 +200,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (effectiveMissCount > 0)
                 aimValue *= calculateMissPenalty(effectiveMissCount, attributes.AimDifficultStrainCount);
 
+            // TC bonuses are excluded when blinds is present as the increased visual difficulty is unimportant when notes cannot be seen.
             if (score.Mods.Any(m => m is OsuModBlinds))
                 aimValue *= 1.3 + (totalHits * (0.0016 / (1 + 2 * effectiveMissCount)) * Math.Pow(accuracy, 16)) * (1 - 0.003 * attributes.DrainRate * attributes.DrainRate);
             else if (score.Mods.Any(m => m is OsuModTraceable))
@@ -223,6 +224,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (effectiveMissCount > 0)
                 speedValue *= calculateMissPenalty(effectiveMissCount, attributes.SpeedDifficultStrainCount);
 
+            // TC bonuses are excluded when blinds is present as the increased visual difficulty is unimportant when notes cannot be seen.
             if (score.Mods.Any(m => m is OsuModBlinds))
             {
                 // Increasing the speed value by object count for Blinds isn't ideal, so the minimum buff is given.

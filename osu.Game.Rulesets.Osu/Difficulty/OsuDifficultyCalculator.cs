@@ -157,7 +157,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             ratingMultiplier *= 1.0 + approachRateFactor * lengthBonus; // Buff for longer maps with high AR.
 
-            if (mods.Any(m => m is OsuModHidden))
+            // HD bonuses are excluded when blinds is present as the increased visual difficulty is unimportant when notes cannot be seen.
+            if (mods.Any(m => m is OsuModHidden) && !mods.Any(m => m is OsuModBlinds))
             {
                 // We want to give more reward for lower AR when it comes to aim and HD. This nerfs high AR and buffs lower AR.
                 ratingMultiplier *= 1.0 + 0.04 * (12.0 - approachRate);
@@ -195,7 +196,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             ratingMultiplier *= 1.0 + approachRateFactor * lengthBonus; // Buff for longer maps with high AR.
 
-            if (mods.Any(m => m is OsuModHidden))
+            // HD bonuses are excluded when blinds is present as the increased visual difficulty is unimportant when notes cannot be seen.
+            if (mods.Any(m => m is OsuModHidden) && !mods.Any(m => m is OsuModBlinds))
             {
                 // We want to give more reward for lower AR when it comes to aim and HD. This nerfs high AR and buffs lower AR.
                 ratingMultiplier *= 1.0 + 0.04 * (12.0 - approachRate);
