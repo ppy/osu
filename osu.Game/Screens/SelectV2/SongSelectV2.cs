@@ -39,17 +39,32 @@ namespace osu.Game.Screens.SelectV2
         {
             AddRangeInternal(new Drawable[]
             {
-                new Container
+                new GridContainer // used for max width implementation
                 {
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight,
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Bottom = ScreenFooter.HEIGHT },
-                    Child = new BeatmapCarousel
+                    ColumnDimensions = new[]
                     {
-                        Anchor = Anchor.TopRight,
-                        Origin = Anchor.TopRight,
-                        RelativeSizeAxes = Axes.Both,
-                        Width = 0.6f,
+                        new Dimension(),
+                        new Dimension(GridSizeMode.Relative, 0.5f, maxSize: 750),
                     },
+                    Content = new[]
+                    {
+                        new[]
+                        {
+                            Empty(),
+                            new Container
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Padding = new MarginPadding { Bottom = ScreenFooter.HEIGHT },
+                                Child = new BeatmapCarousel
+                                {
+                                    RelativeSizeAxes = Axes.Both
+                                },
+                            },
+                        }
+                    }
                 },
                 modSelectOverlay,
             });
