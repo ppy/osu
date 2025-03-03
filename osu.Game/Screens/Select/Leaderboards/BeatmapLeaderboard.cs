@@ -68,17 +68,17 @@ namespace osu.Game.Screens.Select.Leaderboards
             }
         }
 
-        private ScoreSortMode scoresScoreSortMode;
+        private ScoreSortMode scoreSortMode;
 
-        public ScoreSortMode ScoresScoreSortMode
+        public ScoreSortMode ScoreSortMode
         {
-            get => scoresScoreSortMode;
+            get => scoreSortMode;
             set
             {
-                if (value == scoresScoreSortMode)
+                if (value == scoreSortMode)
                     return;
 
-                scoresScoreSortMode = value;
+                scoreSortMode = value;
 
                 RefetchScores();
             }
@@ -236,7 +236,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                     scores = scores.Where(s => selectedMods.SetEquals(s.Mods.Select(m => m.Acronym)));
                 }
 
-                scores = scores.Detach().OrderByCriteria(scoresScoreSortMode);
+                scores = scores.Detach().OrderByCriteria(scoreSortMode);
 
                 SetScores(scores);
             }

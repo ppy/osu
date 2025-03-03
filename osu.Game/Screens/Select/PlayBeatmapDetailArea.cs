@@ -70,7 +70,7 @@ namespace osu.Game.Screens.Select
             base.OnTabChanged(tab, selectedMods, sortMode);
 
             Leaderboard.FilterMods = selectedMods;
-            Leaderboard.ScoresScoreSortMode = sortMode;
+            Leaderboard.ScoreSortMode = sortMode;
 
             switch (tab)
             {
