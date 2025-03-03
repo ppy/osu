@@ -161,7 +161,7 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Find the total milliseconds between the first and last hittable objects, excluding any break time.
         /// </summary>
-        public static double CalculateDrainLength(this IBeatmap beatmap) => CalculatePlayableLength(beatmap.HitObjects) - beatmap.TotalBreakTime;
+        public static double CalculateDrainLength(this IBeatmap beatmap) => Math.Max(CalculatePlayableLength(beatmap.HitObjects) - beatmap.TotalBreakTime, 0);
 
         /// <summary>
         /// Find the timestamps in milliseconds of the start and end of the playable region.
