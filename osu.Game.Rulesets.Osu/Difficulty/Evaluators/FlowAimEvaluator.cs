@@ -20,17 +20,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 return 0;
 
             var osuCurrObj = (OsuDifficultyHitObject)current;
-            var osuLastObj = (OsuDifficultyHitObject)current.Previous(0);
-            var osuLastLastObj = (OsuDifficultyHitObject)current.Previous(1);
+            var osuLast0Obj = (OsuDifficultyHitObject)current.Previous(0);
+            var osuLast1Obj = (OsuDifficultyHitObject)current.Previous(1);
 
             const int diameter = OsuDifficultyHitObject.NORMALISED_DIAMETER;
 
             // Start with velocity
             double flowDifficulty = osuCurrObj.LazyJumpDistance / osuCurrObj.StrainTime;
 
-            if (osuLastObj.BaseObject is Slider && withSliderTravelDistance)
+            if (osuLast0Obj.BaseObject is Slider && withSliderTravelDistance)
             {
-                double travelVelocity = osuLastObj.TravelDistance / osuLastObj.TravelTime; // calculate the slider velocity from slider head to slider end.
+                double travelVelocity = osuLast0Obj.TravelDistance / osuLast0Obj.TravelTime; // calculate the slider velocity from slider head to slider end.
                 double movementVelocity = osuCurrObj.MinimumJumpDistance / osuCurrObj.MinimumJumpTime; // calculate the movement velocity from slider end to current object
 
                 flowDifficulty = Math.Max(flowDifficulty, movementVelocity + travelVelocity); // take the larger total combined velocity.
@@ -39,7 +39,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             // Square the distance to turn into d/t
             if (osuCurrObj.LazyJumpDistance > diameter)
             {
-                flowDifficulty *= 1 + 0.65 * (osuCurrObj.LazyJumpDistance - diameter) / diameter;
+                double comfyness = IdentifyComfyCircluarFlow(current);
+                flowDifficulty *= Math.Pow(osuCurrObj.LazyJumpDistance / diameter, 1 - comfyness);
             }
             else
             {
@@ -52,7 +53,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             double angleBonus = 0;
 
-            if (osuCurrObj.AngleSigned != null && osuLastObj.AngleSigned != null)
+            if (osuCurrObj.AngleSigned != null && osuLast0Obj.AngleSigned != null && osuLast1Obj.AngleSigned != null)
             {
 
                 double angleChangeBonus = CalculateFlowAngleChangeBonus(current);
@@ -62,9 +63,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                 if (current.Index > 2)
                 {
-                    double o1 = getOverlapness(osuCurrObj, osuLastObj);
-                    double o2 = getOverlapness(osuCurrObj, osuLastLastObj);
-                    double o3 = getOverlapness(osuLastObj, osuLastLastObj);
+                    double o1 = getOverlapness(osuCurrObj, osuLast0Obj);
+                    double o2 = getOverlapness(osuCurrObj, osuLast1Obj);
+                    double o3 = getOverlapness(osuLast0Obj, osuLast1Obj);
 
                     overlappedNotesWeight = 1 - o1 * o2 * o3;
                 }
@@ -72,13 +73,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                 if (osuCurrObj.Index >= 4)
                 {
-                    var osuLast2Obj = (OsuDifficultyHitObject)current.Previous(1);
-                    var osuLast3Obj = (OsuDifficultyHitObject)current.Previous(2);
+                    var osuLast2Obj = (OsuDifficultyHitObject)current.Previous(2);
 
                     // Angle is constant
                     double angleCurr = osuCurrObj.Angle ?? 0;
-                    double angleLast = osuLast2Obj.Angle ?? 0;
-                    double angleLastLast = osuLast3Obj.Angle ?? 0;
+                    double angleLast = osuLast1Obj.Angle ?? 0;
+                    double angleLastLast = osuLast2Obj.Angle ?? 0;
 
                     double deltaAngle = Math.Abs(angleLast - angleLastLast);
                     double isSameAngle = DifficultyCalculationUtils.Smoothstep(deltaAngle, 0.25, 0.15);
@@ -89,7 +89,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     double angleBonusDifference = currAngleBonus > 0 ? Math.Clamp(prevAngleBonus / currAngleBonus, 0, 1) : 1;
 
                     // Or there was no stream before
-                    double timeDifferenceFactor = DifficultyCalculationUtils.Smoothstep(osuCurrObj.StrainTime, osuLastLastObj.StrainTime * 0.75, osuLastLastObj.StrainTime * 0.55);
+                    double timeDifferenceFactor = DifficultyCalculationUtils.Smoothstep(osuCurrObj.StrainTime, osuLast1Obj.StrainTime * 0.75, osuLast1Obj.StrainTime * 0.55);
 
                     //double beforeNerf = angleChangeBonus + acuteAngleBonus;
 
@@ -101,7 +101,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     //if (osuCurrObj.StrainTime < 100 && osuLastObj.StrainTime < 100 && nerf > 0.5) Console.WriteLine($"{T(osuCurrObj.BaseObject.StartTime)}: {nerf}");
                 }
 
-                angleBonus = Math.Max(angleChangeBonus, acuteAngleBonus) * overlappedNotesWeight;
+                // Don't apply both angle change and acute angle bonus at the same time if change is consistent
+                double angleChangeCurrent = Math.Abs((double)(osuCurrObj.AngleSigned - osuLast0Obj.AngleSigned));
+                double angleChangePrevious = Math.Abs((double)(osuLast0Obj.AngleSigned - osuLast1Obj.AngleSigned));
+                double angleChangeBonusDifference = Math.Abs(angleChangePrevious - angleChangeCurrent);
+                double angleChangeConsistency = DifficultyCalculationUtils.Smoothstep(angleChangeBonusDifference, 0.2, 0.1);
+
+                double largerBonus = Math.Max(angleChangeBonus, acuteAngleBonus);
+                double summedBonus = angleChangeBonus + acuteAngleBonus;
+
+                angleBonus = double.Lerp(summedBonus, largerBonus, angleChangeConsistency) * overlappedNotesWeight;
             }
 
             double velocityChangeBonus = CalculateFlowVelocityChangeBonus(current);
@@ -109,9 +118,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             flowDifficulty += angleBonus + velocityChangeBonus;
             flowDifficulty *= flowMultiplier;
 
-            if (osuLastObj.BaseObject is Slider && withSliderTravelDistance)
+            if (osuLast0Obj.BaseObject is Slider && withSliderTravelDistance)
             {
-                double sliderBonus = osuLastObj.TravelDistance / osuLastObj.TravelTime;
+                double sliderBonus = osuLast0Obj.TravelDistance / osuLast0Obj.TravelTime;
                 flowDifficulty += sliderBonus * AimEvaluator.SLIDER_MULTIPLIER;
             }
 
@@ -215,6 +224,47 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             }
 
             return deltaVelocity;
+        }
+
+        public static double IdentifyComfyCircluarFlow(DifficultyHitObject current)
+        {
+            if (current.BaseObject is Spinner || current.Index <= 4 || current.Previous(0).BaseObject is Spinner)
+                return 0;
+
+            double totalComfyness = 1.0;
+
+            OsuDifficultyHitObject osuCurrObj = (OsuDifficultyHitObject)current;
+
+            double prevAngle = osuCurrObj.AngleSigned ?? 0;
+            double prevVelocity = osuCurrObj.LazyJumpDistance / osuCurrObj.StrainTime;
+            double prevVelocityChange = double.NaN;
+
+            for (int i = 0; i < 3; i++)
+            {
+                var relevantObj = (OsuDifficultyHitObject)current.Previous(i);
+
+                double currAngle = relevantObj.AngleSigned ?? 0;
+                double currAngleChange = Math.Abs(currAngle - prevAngle);
+
+                double currVelocity = relevantObj.LazyJumpDistance / relevantObj.StrainTime;
+                double currVelocityChange = currVelocity / prevVelocity;
+                double normalizedVelocityChange = currVelocityChange >= 1 ? currVelocityChange : 1.0 / currVelocityChange;
+                double accelerationChange = Math.Abs(currVelocityChange - prevVelocityChange);
+
+                double angleFactor = DifficultyCalculationUtils.Smoothstep(Math.Abs(currAngle), Math.PI * 0.55, Math.PI * 0.75);
+                double angleChangeFactor = DifficultyCalculationUtils.Smoothstep(currAngleChange, 0.45, 0.3);
+                double velocityChangeFactor = double.IsNaN(normalizedVelocityChange) ? 1.0 : DifficultyCalculationUtils.Smoothstep(normalizedVelocityChange, 1.4, 1.25);
+                double accelerationChangeFactor = double.IsNaN(accelerationChange) ? 1.0 : DifficultyCalculationUtils.Smoothstep(accelerationChange, 0.3, 0.2);
+
+                double instantComfyness = angleFactor * angleChangeFactor * velocityChangeFactor * accelerationChangeFactor;
+                totalComfyness *= instantComfyness;
+
+                prevVelocity = currVelocity;
+                prevVelocityChange = currVelocityChange;
+                prevAngle = currAngle;
+            }
+
+            return totalComfyness;
         }
     }
 }
