@@ -114,6 +114,8 @@ namespace osu.Game.Rulesets.Objects
             {
                 foreach (HitObject hitObject in nestedHitObjects)
                 {
+                    cancellationToken.ThrowIfCancellationRequested();
+
                     if (hitObject is IHasComboInformation n)
                     {
                         n.ComboIndexBindable.BindTo(hasCombo.ComboIndexBindable);
