@@ -165,7 +165,7 @@ namespace osu.Game.Screens.Utility
                 {
                     double preempt = (float)IBeatmapDifficultyInfo.DifficultyRange(SampleApproachRate.Value, 1800, 1200, 450);
 
-                    Alpha = (float)MathHelper.Clamp((Clock.CurrentTime - HitTime + 600) / 400, 0, 1);
+                    Alpha = (float)Math.Clamp((Clock.CurrentTime - HitTime + 600) / 400, 0, 1);
                     Y = judgement_position - (float)((HitTime - Clock.CurrentTime) / preempt);
 
                     if (Clock.CurrentTime > HitTime + duration)
