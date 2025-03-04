@@ -253,14 +253,10 @@ namespace osu.Game.Skinning
                 yield return CurrentSkin.Value;
 
                 // Skin manager provides default fallbacks.
-                // This handles cases where a user skin doesn't have the required resources for complete display of
-                // certain elements.
-
-                if (CurrentSkin.Value is LegacySkin && CurrentSkin.Value != DefaultClassicSkin)
-                    yield return DefaultClassicSkin;
-
-                if (CurrentSkin.Value != trianglesSkin)
-                    yield return trianglesSkin;
+                // This handles cases where a user skin doesn't have the required resources for complete display of certain elements, ie. textures.
+                if (CurrentSkin.Value != DefaultClassicSkin) yield return DefaultClassicSkin;
+                if (CurrentSkin.Value != argonSkin) yield return argonSkin;
+                if (CurrentSkin.Value != trianglesSkin) yield return trianglesSkin;
             }
         }
 
