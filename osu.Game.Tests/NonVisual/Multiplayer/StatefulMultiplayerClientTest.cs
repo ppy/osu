@@ -97,16 +97,12 @@ namespace osu.Game.Tests.NonVisual.Multiplayer
 
             AddStep("create room with many users", () =>
             {
-                var newRoom = new Room();
-                newRoom.CopyFrom(SelectedRoom.Value!);
-
-                newRoom.RoomID = null;
                 MultiplayerClient.RoomSetupAction = room =>
                 {
                     room.Users.AddRange(Enumerable.Range(PLAYER_1_ID, 100).Select(id => new MultiplayerRoomUser(id)));
                 };
 
-                RoomManager.CreateRoom(newRoom);
+                MultiplayerClient.JoinRoom(MultiplayerClient.ServerSideRooms.Single()).ConfigureAwait(false);
             });
 
             AddUntilStep("wait for room join", () => RoomJoined);
