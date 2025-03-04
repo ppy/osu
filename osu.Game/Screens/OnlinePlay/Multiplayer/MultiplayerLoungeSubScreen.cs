@@ -1,12 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ExceptionExtensions;
 using osu.Framework.Logging;
-using osu.Framework.Screens;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Configuration;
@@ -31,19 +32,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         private Dropdown<RoomPermissionsFilter> roomAccessTypeDropdown = null!;
         private OsuCheckbox showInProgress = null!;
-
-        public override void OnResuming(ScreenTransitionEvent e)
-        {
-            base.OnResuming(e);
-
-            // Upon having left a room, we don't know whether we were the only participant, and whether the room is now closed as a result of leaving it.
-            // To work around this, temporarily remove the room and trigger an immediate listing poll.
-            if (e.Last is MultiplayerMatchSubScreen match)
-            {
-                RoomManager?.RemoveRoom(match.Room);
-                ListingPollingComponent.PollImmediately();
-            }
-        }
 
         protected override IEnumerable<Drawable> CreateFilterControls()
         {
@@ -92,6 +80,27 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         protected override RoomSubScreen CreateRoomSubScreen(Room room) => new MultiplayerMatchSubScreen(room);
 
         protected override ListingPollingComponent CreatePollingComponent() => new MultiplayerListingPollingComponent();
+
+        protected override void JoinInternal(Room room, string? password, Action<Room> onSuccess, Action<string> onFailure)
+        {
+            client.JoinRoom(room, password).ContinueWith(result =>
+            {
+                if (result.IsCompletedSuccessfully)
+                    onSuccess(room);
+                else
+                {
+                    const string message = "Failed to join multiplayer room.";
+
+                    if (result.Exception != null)
+                        Logger.Error(result.Exception, message);
+
+                    onFailure.Invoke(result.Exception?.AsSingular().Message ?? message);
+                }
+            });
+        }
+
+        public override void Close(Room room)
+            => throw new NotSupportedException("Cannot close multiplayer rooms.");
 
         protected override void OpenNewRoom(Room room)
         {
