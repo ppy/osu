@@ -2,7 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -20,6 +22,9 @@ namespace osu.Game.Overlays.Music
         public readonly Bindable<Live<BeatmapSetInfo>> SelectedSet = new Bindable<Live<BeatmapSetInfo>>();
 
         private FilterCriteria currentCriteria = new FilterCriteria();
+
+        [Resolved]
+        private MusicController musicController { get; set; } = null!;
 
         public new MarginPadding Padding
         {
@@ -46,9 +51,21 @@ namespace osu.Game.Overlays.Music
 
             items.SearchTerm = criteria.SearchText;
             currentCriteria = criteria;
+
+            if (currentCriteria == criteria)
+                updateMusicControllerPlaylist();
+
+            items.FilterCompleted += updateMusicControllerPlaylist;
+
+            void updateMusicControllerPlaylist() => Scheduler.AddOnce(() =>
+            {
+                musicController.Playlist.RemoveAll(x => !x.Value.Protected);
+                musicController.Playlist.AddRange(AllVisibleSets);
+            });
         }
 
         public Live<BeatmapSetInfo>? FirstVisibleSet => Items.FirstOrDefault(i => ((PlaylistItem)ItemMap[i]).MatchingFilter);
+        public IEnumerable<Live<BeatmapSetInfo>> AllVisibleSets => Items.Where(i => ((PlaylistItem)ItemMap[i]).MatchingFilter);
 
         protected override OsuRearrangeableListItem<Live<BeatmapSetInfo>> CreateOsuDrawable(Live<BeatmapSetInfo> item) =>
             new PlaylistItem(item)
