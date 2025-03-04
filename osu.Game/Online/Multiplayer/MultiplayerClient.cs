@@ -815,19 +815,22 @@ namespace osu.Game.Online.Multiplayer
         /// <param name="multiplayerUsers">The <see cref="MultiplayerRoomUser"/>s to populate.</param>
         protected async Task PopulateUsers(IEnumerable<MultiplayerRoomUser> multiplayerUsers)
         {
-            var request = new GetUsersRequest(multiplayerUsers.Select(u => u.UserID).Distinct().ToArray());
-
-            await API.PerformAsync(request).ConfigureAwait(false);
-
-            if (request.Response == null)
-                return;
-
-            Dictionary<int, APIUser> users = request.Response.Users.ToDictionary(user => user.Id);
-
-            foreach (var multiplayerUser in multiplayerUsers)
+            foreach (int[] userChunk in multiplayerUsers.Select(u => u.UserID).Distinct().Chunk(GetUsersRequest.MAX_IDS_PER_REQUEST))
             {
-                if (users.TryGetValue(multiplayerUser.UserID, out var user))
-                    multiplayerUser.User = user;
+                var request = new GetUsersRequest(userChunk);
+
+                await API.PerformAsync(request).ConfigureAwait(false);
+
+                if (request.Response == null)
+                    return;
+
+                Dictionary<int, APIUser> users = request.Response.Users.ToDictionary(user => user.Id);
+
+                foreach (var multiplayerUser in multiplayerUsers)
+                {
+                    if (users.TryGetValue(multiplayerUser.UserID, out var user))
+                        multiplayerUser.User = user;
+                }
             }
         }
 
