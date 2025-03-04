@@ -275,14 +275,11 @@ namespace osu.Game.Screens.SelectV2
             base.Update();
 
             selectionFocusOffset = (float)Interpolation.DampContinuously(selectionFocusOffset, VisuallyFocusSelected ? 300 : 0, 100, Time.Elapsed);
+        }
 
-            foreach (var panel in Scroll.Panels)
-            {
-                var c = (ICarouselPanel)panel;
-
-                if (!c.Selected.Value)
-                    panel.X += selectionFocusOffset;
-            }
+        protected override float GetPanelXOffset(Drawable panel)
+        {
+            return base.GetPanelXOffset(panel) + (((ICarouselPanel)panel).Selected.Value ? 0 : selectionFocusOffset);
         }
 
         #endregion
