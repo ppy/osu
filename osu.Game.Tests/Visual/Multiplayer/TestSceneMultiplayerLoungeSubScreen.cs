@@ -20,11 +20,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
     {
         private MultiplayerLoungeSubScreen loungeScreen = null!;
 
-        public TestSceneMultiplayerLoungeSubScreen()
-            : base(false)
-        {
-        }
-
         public override void SetUpSteps()
         {
             base.SetUpSteps();
