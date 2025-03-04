@@ -269,7 +269,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private void assertQueueTabCount(int count)
         {
-            string queueTabText = count > 0 ? $"Queue ({count})" : "Queue";
+            string queueTabText = count > 0 ? $"Up next ({count})" : "Up next";
             AddUntilStep($"Queue tab shows \"{queueTabText}\"", () =>
             {
                 return this.ChildrenOfType<OsuTabControl<MultiplayerPlaylistDisplayMode>.OsuTabItem>()

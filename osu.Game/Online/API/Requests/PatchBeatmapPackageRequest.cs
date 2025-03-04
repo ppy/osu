@@ -26,10 +26,8 @@ namespace osu.Game.Online.API.Requests
 
         public uint BeatmapSetID { get; }
 
-        // ReSharper disable once CollectionNeverUpdated.Global
         public Dictionary<string, byte[]> FilesChanged { get; } = new Dictionary<string, byte[]>();
 
-        // ReSharper disable once CollectionNeverUpdated.Global
         public HashSet<string> FilesDeleted { get; } = new HashSet<string>();
 
         public PatchBeatmapPackageRequest(uint beatmapSetId)
@@ -48,7 +46,7 @@ namespace osu.Game.Online.API.Requests
             foreach (string filename in FilesDeleted)
                 request.AddParameter(@"filesDeleted", filename, RequestParameterType.Form);
 
-            request.Timeout = 60_000;
+            request.Timeout = 600_000;
             return request;
         }
     }

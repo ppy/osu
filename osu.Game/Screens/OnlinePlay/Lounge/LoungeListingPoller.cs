@@ -14,9 +14,9 @@ using osu.Game.Screens.OnlinePlay.Lounge.Components;
 namespace osu.Game.Screens.OnlinePlay.Lounge
 {
     /// <summary>
-    /// A <see cref="PollingComponent"/> that polls for the lounge listing.
+    /// Polls for rooms for the main lounge listing.
     /// </summary>
-    public partial class LoungePollingComponent : PollingComponent
+    public partial class LoungeListingPoller : PollingComponent
     {
         [Resolved]
         private IAPIProvider api { get; set; } = null!;

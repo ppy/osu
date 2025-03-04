@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
@@ -31,11 +29,10 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
         protected override APIRequest<MultiplayerScore> CreateScoreRequest() => new ShowPlaylistScoreRequest(RoomId, PlaylistItem.ID, scoreId);
 
-        protected override ScoreInfo[] PerformSuccessCallback(Action<IEnumerable<ScoreInfo>> callback, List<MultiplayerScore> scores, MultiplayerScores? pivot = null)
+        protected override void OnScoresAdded(ScoreInfo[] scores)
         {
-            var scoreInfos = base.PerformSuccessCallback(callback, scores, pivot);
-            Schedule(() => SelectedScore.Value ??= scoreInfos.SingleOrDefault(s => s.OnlineID == scoreId));
-            return scoreInfos;
+            base.OnScoresAdded(scores);
+            SelectedScore.Value ??= scores.SingleOrDefault(s => s.OnlineID == scoreId);
         }
     }
 }

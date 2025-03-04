@@ -94,6 +94,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             });
         }
 
+        public override void Close(Room room)
+            => throw new NotSupportedException("Cannot close multiplayer rooms.");
+
         protected override void OpenNewRoom(Room room)
         {
             if (!client.IsConnected.Value)
