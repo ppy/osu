@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -11,7 +10,7 @@ using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
 using osu.Game.Screens.Footer;
 using osu.Game.Screens.Menu;
-using osu.Game.Screens.Play;
+using osu.Game.Screens.Select;
 using osu.Game.Screens.SelectV2.Footer;
 
 namespace osu.Game.Screens.SelectV2
@@ -20,7 +19,7 @@ namespace osu.Game.Screens.SelectV2
     /// This screen is intended to house all components introduced in the new song select design to add transitions and examine the overall look.
     /// This will be gradually built upon and ultimately replace <see cref="Select.SongSelect"/> once everything is in place.
     /// </summary>
-    public partial class SongSelectV2 : OsuScreen
+    public abstract partial class SongSelect : OsuScreen
     {
         private const float logo_scale = 0.4f;
 
@@ -28,6 +27,8 @@ namespace osu.Game.Screens.SelectV2
 
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
+
+        private BeatmapCarousel carousel = null!;
 
         public override bool ShowFooter => true;
 
@@ -58,8 +59,9 @@ namespace osu.Game.Screens.SelectV2
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 Padding = new MarginPadding { Bottom = ScreenFooter.HEIGHT },
-                                Child = new BeatmapCarousel
+                                Child = carousel = new BeatmapCarousel
                                 {
+                                    RequestPresentBeatmap = _ => OnStart(),
                                     RelativeSizeAxes = Axes.Both
                                 },
                             },
@@ -141,10 +143,16 @@ namespace osu.Game.Screens.SelectV2
 
             logo.Action = () =>
             {
-                this.Push(new PlayerLoaderV2(() => new SoloPlayer()));
+                OnStart();
                 return false;
             };
         }
+
+        /// <summary>
+        /// Called when a selection is made.
+        /// </summary>
+        /// <returns>If a resultant action occurred that takes the user away from SongSelect.</returns>
+        protected abstract bool OnStart();
 
         protected override void LogoSuspending(OsuLogo logo)
         {
@@ -160,19 +168,22 @@ namespace osu.Game.Screens.SelectV2
             logo.FadeOut(120, Easing.Out);
         }
 
+        /// <summary>
+        /// Set the query to the search text box.
+        /// </summary>
+        /// <param name="query">The string to search.</param>
+        public void Search(string query)
+        {
+            carousel.Filter(new FilterCriteria
+            {
+                // TODO: this should only set the text of the current criteria, not use a completely new criteria.
+                SearchText = query,
+            });
+        }
+
         private partial class SoloModSelectOverlay : UserModSelectOverlay
         {
             protected override bool ShowPresets => true;
-        }
-
-        private partial class PlayerLoaderV2 : PlayerLoader
-        {
-            public override bool ShowFooter => true;
-
-            public PlayerLoaderV2(Func<Player> createPlayer)
-                : base(createPlayer)
-            {
-            }
         }
     }
 }
