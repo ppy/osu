@@ -23,7 +23,10 @@ namespace osu.Game.Screens.SelectV2
     {
         private const float logo_scale = 0.4f;
 
-        private readonly ModSelectOverlay modSelectOverlay = new SoloModSelectOverlay();
+        private readonly ModSelectOverlay modSelectOverlay = new ModSelectOverlay
+        {
+            ShowPresets = true,
+        };
 
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
@@ -185,11 +188,6 @@ namespace osu.Game.Screens.SelectV2
                 // TODO: this should only set the text of the current criteria, not use a completely new criteria.
                 SearchText = query,
             });
-        }
-
-        private partial class SoloModSelectOverlay : UserModSelectOverlay
-        {
-            protected override bool ShowPresets => true;
         }
     }
 }
