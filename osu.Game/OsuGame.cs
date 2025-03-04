@@ -829,6 +829,9 @@ namespace osu.Game
             beatmap.OldValue?.CancelAsyncLoad();
             beatmap.NewValue?.BeginAsyncLoad();
 
+            if (Host.Window == null)
+                return;
+
             // prevent weird window title saying please load a beatmap
             string newTitle = Name;
             if (beatmap.NewValue != null && beatmap.NewValue is not DummyWorkingBeatmap)
