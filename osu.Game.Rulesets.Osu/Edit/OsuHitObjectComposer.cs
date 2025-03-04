@@ -30,6 +30,7 @@ using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Edit.Components.TernaryButtons;
 using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Rulesets.Osu.Edit
 {
@@ -349,6 +350,19 @@ namespace osu.Game.Rulesets.Osu.Edit
                 distanceSnapGridContainer.Add(distanceSnapGrid);
                 distanceSnapGridCache.Validate();
             }
+        }
+
+        protected override bool OnMouseDown(MouseDownEvent e)
+        {
+            if (e.Button == MouseButton.Right)
+            {
+                var osuSelectionHandler = (OsuSelectionHandler)BlueprintContainer.SelectionHandler;
+
+                osuSelectionHandler.SelectionNewComboState.Value =
+                    osuSelectionHandler.SelectionNewComboState.Value == TernaryState.False ? TernaryState.True : TernaryState.False;
+            }
+
+            return base.OnMouseDown(e);
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)
