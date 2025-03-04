@@ -117,27 +117,37 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     double lastLastAngle = osuLastLastObj.Angle ?? Math.PI;
 
                     // Rewarding angles, take the smaller velocity as base.
-                    double minVelocity = Math.Min(currVelocity, prevVelocity);
-                    double minVelocityCircle = Math.Min(currDistance / osuCurrObj.StrainTime, prevVelocity); // Don't reward wide angle bonus to sliders
+                    double acuteVelocityBase = Math.Min(currVelocity, prevVelocity);
+                    double wideVelocityBase = Math.Min(currDistance / osuCurrObj.StrainTime, prevVelocity); // Don't reward wide angle bonus to sliders
+
+                    double velocityThreshold = diameter * 3 / osuCurrObj.StrainTime;
+                    if (wideVelocityBase > velocityThreshold) // Nerf high spaced squares to compensate buff on lower spaced squares
+                    {
+                        wideVelocityBase = velocityThreshold + 0.6 * (wideVelocityBase - velocityThreshold);
+                    }
 
                     wideAngleBonus = CalcWideAngleBonus(currAngle);
                     acuteAngleBonus = CalcAcuteAngleBonus(currAngle);
 
                     // Penalize angle repetition.
-                    wideAngleBonus *= 1 - Math.Min(wideAngleBonus, Math.Pow(CalcWideAngleBonus(lastAngle), 3))
-                        * DifficultyCalculationUtils.Smoothstep(Math.Max(currAngle, lastAngle), 2 * Math.PI / 3, Math.PI / 2);
-                    acuteAngleBonus *= 0.08 + 0.7 * (1 - Math.Min(acuteAngleBonus, Math.Pow(CalcAcuteAngleBonus(lastAngle), 3)));
+                    double wideAngleRepetitionNerf = Math.Min(wideAngleBonus, Math.Pow(CalcWideAngleBonus(lastAngle), 3));
+                    wideAngleRepetitionNerf *= DifficultyCalculationUtils.Smoothstep(Math.Max(currAngle, Math.Min(lastAngle, lastLastAngle)), 2 * Math.PI / 3, Math.PI / 2);
+                    wideAngleBonus *= 1 - wideAngleRepetitionNerf;
+
+                    double acuteAngleRepetitionNerf = Math.Pow(CalcAcuteAngleBonus(lastAngle), 3);
+                    // Need to somehow nerf anoneanone here
+                    acuteAngleBonus *= 0.08 + 0.7 * (1 - Math.Min(acuteAngleBonus, acuteAngleRepetitionNerf));
 
                     // Apply full wide angle bonus for distance more than one diameter
-                    wideAngleBonus *= minVelocityCircle * DifficultyCalculationUtils.Smootherstep(osuCurrObj.LazyJumpDistance, 0, diameter);
+                    wideAngleBonus *= wideVelocityBase * DifficultyCalculationUtils.Smootherstep(osuCurrObj.LazyJumpDistance, 0, diameter);
 
                     // Apply acute angle bonus for BPM above 300 1/2 and distance more than one diameter
-                    acuteAngleBonus *= minVelocity *
+                    acuteAngleBonus *= acuteVelocityBase *
                                        DifficultyCalculationUtils.Smootherstep(DifficultyCalculationUtils.MillisecondsToBPM(osuCurrObj.StrainTime, 2), 300, 400);
 
                     // Apply wiggle bonus for jumps that are [radius, 3*diameter] in distance, with < 110 angle
                     // https://www.desmos.com/calculator/dp0v0nvowc
-                    wiggleBonus = minVelocity
+                    wiggleBonus = acuteVelocityBase
                                   * DifficultyCalculationUtils.Smootherstep(currDistance, radius, diameter)
                                   * Math.Pow(DifficultyCalculationUtils.ReverseLerp(currDistance, diameter * 3, diameter), 1.8)
                                   * DifficultyCalculationUtils.Smootherstep(currAngle, double.DegreesToRadians(110), double.DegreesToRadians(60))
