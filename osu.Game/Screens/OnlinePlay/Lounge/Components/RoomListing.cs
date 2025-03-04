@@ -45,14 +45,20 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         private readonly ScrollContainer<Drawable> scroll;
         private readonly FillFlowContainer<DrawableLoungeRoom> roomFlow;
 
+        private const float display_scale = 0.8f;
+
         // handle deselection
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
         public RoomListing()
         {
-            InternalChild = scroll = new OsuScrollContainer
+            InternalChild = scroll = new Scroll
             {
+                Masking = false,
                 RelativeSizeAxes = Axes.Both,
+                Anchor = Anchor.TopCentre,
+                Origin = Anchor.TopCentre,
+                Width = display_scale,
                 ScrollbarOverlapsContent = false,
                 Padding = new MarginPadding { Right = 5 },
                 Child = new OsuContextMenuContainer
@@ -64,10 +70,16 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
                         Direction = FillDirection.Vertical,
-                        Spacing = new Vector2(10),
+                        Spacing = new Vector2(5),
+                        Margin = new MarginPadding { Vertical = 10 },
                     }
                 }
             };
+        }
+
+        private partial class Scroll : OsuScrollContainer
+        {
+            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
         }
 
         protected override void LoadComplete()
@@ -171,7 +183,14 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         {
             foreach (var room in rooms)
             {
-                var drawableRoom = new DrawableLoungeRoom(room) { SelectedRoom = selectedRoom };
+                var drawableRoom = new DrawableLoungeRoom(room)
+                {
+                    SelectedRoom = selectedRoom,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Scale = new Vector2(display_scale),
+                    Width = 1 / display_scale,
+                };
 
                 roomFlow.Add(drawableRoom);
 
