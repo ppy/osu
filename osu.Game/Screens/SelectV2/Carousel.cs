@@ -571,15 +571,20 @@ namespace osu.Game.Screens.SelectV2
                 if (c.DrawYPosition != c.Item.CarouselYPosition)
                     c.DrawYPosition = Interpolation.DampContinuously(c.DrawYPosition, c.Item.CarouselYPosition, 50, Time.Elapsed);
 
-                Vector2 posInScroll = Scroll.ToLocalSpace(panel.ScreenSpaceDrawQuad.Centre);
-                float dist = Math.Abs(1f - posInScroll.Y / visibleHalfHeight);
-
-                panel.X = offsetX(dist, visibleHalfHeight);
+                panel.X = GetPanelXOffset(panel);
 
                 c.Selected.Value = c.Item == currentSelection?.CarouselItem;
                 c.KeyboardSelected.Value = c.Item == currentKeyboardSelection?.CarouselItem;
                 c.Expanded.Value = c.Item.IsExpanded;
             }
+        }
+
+        protected virtual float GetPanelXOffset(Drawable panel)
+        {
+            Vector2 posInScroll = Scroll.ToLocalSpace(panel.ScreenSpaceDrawQuad.Centre);
+            float dist = Math.Abs(1f - posInScroll.Y / visibleHalfHeight);
+
+            return offsetX(dist, visibleHalfHeight);
         }
 
         /// <summary>
