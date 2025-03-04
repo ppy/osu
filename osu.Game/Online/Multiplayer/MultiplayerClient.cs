@@ -486,18 +486,44 @@ namespace osu.Game.Online.Multiplayer
             }, false);
         }
 
-        Task IMultiplayerClient.UserLeft(MultiplayerRoomUser user) =>
-            handleUserLeft(user, UserLeft);
+        Task IMultiplayerClient.UserLeft(MultiplayerRoomUser user)
+        {
+            Scheduler.Add(() => handleUserLeft(user, UserLeft), false);
+            return Task.CompletedTask;
+        }
 
         Task IMultiplayerClient.UserKicked(MultiplayerRoomUser user)
         {
-            if (LocalUser == null)
-                return Task.CompletedTask;
+            Scheduler.Add(() =>
+            {
+                if (LocalUser == null)
+                    return;
 
-            if (user.Equals(LocalUser))
-                LeaveRoom();
+                if (user.Equals(LocalUser))
+                    LeaveRoom();
 
-            return handleUserLeft(user, UserKicked);
+                handleUserLeft(user, UserKicked);
+            }, false);
+
+            return Task.CompletedTask;
+        }
+
+        private void handleUserLeft(MultiplayerRoomUser user, Action<MultiplayerRoomUser>? callback)
+        {
+            Debug.Assert(ThreadSafety.IsUpdateThread);
+
+            if (Room == null)
+                return;
+
+            Room.Users.Remove(user);
+            PlayingUserIds.Remove(user.UserID);
+
+            Debug.Assert(APIRoom != null);
+            APIRoom.RecentParticipants = APIRoom.RecentParticipants.Where(u => u.Id != user.UserID).ToArray();
+            APIRoom.ParticipantCount--;
+
+            callback?.Invoke(user);
+            RoomUpdated?.Invoke();
         }
 
         async Task IMultiplayerClient.Invited(int invitedBy, long roomID, string password)
@@ -542,27 +568,6 @@ namespace osu.Game.Online.Multiplayer
                 Username = "[Unresolved]"
             }).ToArray();
             APIRoom.ParticipantCount++;
-        }
-
-        private Task handleUserLeft(MultiplayerRoomUser user, Action<MultiplayerRoomUser>? callback)
-        {
-            Scheduler.Add(() =>
-            {
-                if (Room == null)
-                    return;
-
-                Room.Users.Remove(user);
-                PlayingUserIds.Remove(user.UserID);
-
-                Debug.Assert(APIRoom != null);
-                APIRoom.RecentParticipants = APIRoom.RecentParticipants.Where(u => u.Id != user.UserID).ToArray();
-                APIRoom.ParticipantCount--;
-
-                callback?.Invoke(user);
-                RoomUpdated?.Invoke();
-            }, false);
-
-            return Task.CompletedTask;
         }
 
         Task IMultiplayerClient.HostChanged(int userId)

@@ -28,10 +28,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         private void onRoomUpdated()
         {
-            if (client.Room == null)
+            if (client.Room == null || client.LocalUser == null)
                 return;
-
-            Debug.Assert(client.LocalUser != null);
 
             // If the user exits gameplay before score submission completes, we'll transition to idle when results has been prepared.
             if (client.LocalUser.State == MultiplayerUserState.Results && this.IsCurrentScreen())
@@ -62,10 +60,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         {
             base.OnResuming(e);
 
-            if (client.Room == null)
+            if (client.Room == null || client.LocalUser == null)
                 return;
-
-            Debug.Assert(client.LocalUser != null);
 
             if (!(e.Last is MultiplayerPlayerLoader playerLoader))
                 return;
