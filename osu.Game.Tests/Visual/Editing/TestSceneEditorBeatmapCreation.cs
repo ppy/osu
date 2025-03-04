@@ -533,8 +533,6 @@ namespace osu.Game.Tests.Visual.Editing
 
             ensureEditorLoaded();
 
-            ensureEditorLoaded();
-
             AddStep("set difficulty name", () => EditorBeatmap.BeatmapInfo.DifficultyName = duplicate_difficulty_name);
             AddStep("try to save beatmap", () => Editor.Save());
             AddAssert("beatmap set not corrupted", () =>
