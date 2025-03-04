@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             if (osuCurrObj.LazyJumpDistance > diameter)
             {
                 double comfyness = IdentifyComfyCircluarFlow(current);
-                flowDifficulty *= Math.Pow(osuCurrObj.LazyJumpDistance / diameter, 1 - 0.7 * comfyness);
+                flowDifficulty *= Math.Pow(osuCurrObj.LazyJumpDistance / diameter, 1 - 0.5 * comfyness);
             }
             else
             {
@@ -241,24 +241,41 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double prevVelocityChange = double.NaN;
 
             // It's allowed to get two angle change without triggering comfyness penalty
-            double allowedAngleChange = 1.0;
+
+            // First one is normal direction change
+            double angleLeniency = 1.0;
+
+            // Second one is the S type of movement where clockwise is changing to counterclockwise
+            double angleChangeLeniency = 1.0;
 
             for (int i = 0; i < 3; i++)
             {
                 var relevantObj = (OsuDifficultyHitObject)current.Previous(i);
 
                 double currAngle = relevantObj.AngleSigned ?? 0;
+
+                if (angleLeniency > 0)
+                {
+                    double currAngleAbs = Math.Abs(currAngle);
+                    double prevAngleAbs = Math.Abs(prevAngle);
+
+                    double potentialLeniency = Math.Max(currAngleAbs, prevAngleAbs) - currAngleAbs;
+
+                    double usedLeniency = Math.Min(angleLeniency * Math.PI, potentialLeniency);
+                    currAngle = (currAngleAbs + usedLeniency) * Math.Sign(currAngle);
+                    angleLeniency -= Math.Min(usedLeniency, 1);
+                }
+
                 double currAngleChange = Math.Abs(currAngle - prevAngle);
                 double relevantAngleChange = currAngleChange;
 
-                if (allowedAngleChange > 0)
+                if (angleChangeLeniency > 0)
                 {
                     double potentialLeniency = currAngleChange - Math.Min(currAngleChange, prevAngleChange);
-                    potentialLeniency = Math.Min(potentialLeniency, 1);
 
-                    double usedLeniency = Math.Min(allowedAngleChange, potentialLeniency);
+                    double usedLeniency = Math.Min(angleChangeLeniency * Math.PI, potentialLeniency);
                     relevantAngleChange = Math.Min(relevantAngleChange, 1) * (1 - usedLeniency);
-                    allowedAngleChange -= usedLeniency;
+                    angleChangeLeniency -= Math.Min(usedLeniency, 1);
                 }
 
                 double currVelocity = relevantObj.LazyJumpDistance / relevantObj.StrainTime;
