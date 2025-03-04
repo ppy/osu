@@ -242,7 +242,7 @@ namespace osu.Game.Online.Rooms
         public int ChannelId
         {
             get => channelId;
-            private set => SetField(ref channelId, value);
+            set => SetField(ref channelId, value);
         }
 
         /// <summary>

@@ -59,6 +59,12 @@ namespace osu.Game.Online.Multiplayer
         [Key(7)]
         public IList<MultiplayerCountdown> ActiveCountdowns { get; set; } = new List<MultiplayerCountdown>();
 
+        /// <summary>
+        /// The ID of the chat channel for the room.
+        /// </summary>
+        [Key(8)]
+        public int ChannelID { get; set; }
+
         [JsonConstructor]
         [SerializationConstructor]
         public MultiplayerRoom(long roomId)
@@ -69,6 +75,7 @@ namespace osu.Game.Online.Multiplayer
         public MultiplayerRoom(Room room)
         {
             RoomID = room.RoomID ?? 0;
+            ChannelID = room.ChannelId;
             Settings = new MultiplayerRoomSettings(room);
             Host = room.Host != null ? new MultiplayerRoomUser(room.Host.OnlineID) : null;
             Playlist = room.Playlist.Select(p => new MultiplayerPlaylistItem(p)).ToArray();

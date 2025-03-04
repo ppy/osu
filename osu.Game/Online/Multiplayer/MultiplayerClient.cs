@@ -235,6 +235,7 @@ namespace osu.Game.Online.Multiplayer
                 APIRoom = apiRoom;
 
                 APIRoom.RoomID = joinedRoom.RoomID;
+                APIRoom.ChannelId = joinedRoom.ChannelID;
                 APIRoom.Host = joinedRoom.Host?.User;
                 APIRoom.Playlist = joinedRoom.Playlist.Select(item => new PlaylistItem(item)).ToArray();
                 APIRoom.CurrentPlaylistItem = APIRoom.Playlist.Single(item => item.ID == joinedRoom.Settings.PlaylistItemId);
