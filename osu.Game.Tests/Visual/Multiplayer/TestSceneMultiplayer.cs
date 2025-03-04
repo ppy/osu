@@ -805,7 +805,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("wait for room", () => this.ChildrenOfType<DrawableRoom>().Any());
             AddStep("select room", () => InputManager.Key(Key.Down));
 
-            AddStep("disable polling", () => this.ChildrenOfType<LoungePollingComponent>().Single().TimeBetweenPolls.Value = 0);
+            AddStep("disable polling", () => this.ChildrenOfType<LoungeListingPoller>().Single().TimeBetweenPolls.Value = 0);
             AddStep("change server-side settings", () =>
             {
                 multiplayerClient.ServerSideRooms[0].Name = "New name";
