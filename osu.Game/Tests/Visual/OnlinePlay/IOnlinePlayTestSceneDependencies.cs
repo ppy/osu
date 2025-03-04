@@ -19,11 +19,6 @@ namespace osu.Game.Tests.Visual.OnlinePlay
         Bindable<Room?> SelectedRoom { get; }
 
         /// <summary>
-        /// The cached <see cref="IRoomManager"/>
-        /// </summary>
-        IRoomManager RoomManager { get; }
-
-        /// <summary>
         /// The cached <see cref="OngoingOperationTracker"/>.
         /// </summary>
         OngoingOperationTracker OngoingOperationTracker { get; }

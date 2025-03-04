@@ -13,7 +13,6 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.Rooms;
-using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Lounge;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Screens.OnlinePlay.Match;
@@ -97,8 +96,6 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         }
 
         protected override RoomSubScreen CreateRoomSubScreen(Room room) => new PlaylistsRoomSubScreen(room);
-
-        protected override ListingPollingComponent CreatePollingComponent() => new ListingPollingComponent();
 
         private enum PlaylistsCategory
         {
