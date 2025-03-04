@@ -25,7 +25,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public override void SetUpSteps()
         {
             base.SetUpSteps();
-            JoinDefaultRoom();
+            AddStep("join room", () => JoinRoom(CreateDefaultRoom()));
+            WaitForJoined();
         }
 
         [Test]

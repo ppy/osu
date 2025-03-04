@@ -1,7 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
+using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Tests.Beatmaps;
 using osu.Game.Tests.Visual.OnlinePlay;
@@ -24,34 +24,28 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         public bool RoomJoined => MultiplayerClient.RoomJoined;
 
+        protected Room CreateDefaultRoom()
+        {
+            return new Room
+            {
+                Name = "test name",
+                Type = MatchType.HeadToHead,
+                Playlist =
+                [
+                    new PlaylistItem(new TestBeatmap(Ruleset.Value).BeatmapInfo)
+                    {
+                        RulesetID = Ruleset.Value.OnlineID
+                    }
+                ]
+            };
+        }
+
         /// <summary>
         /// Creates and joins a basic multiplayer room.
         /// </summary>
-        /// <param name="setupFunc">A callback that may be used to further set up the room.</param>
-        protected void JoinDefaultRoom(Action<Room>? setupFunc = null)
-        {
-            AddStep("join room", () =>
-            {
-                Room room = new Room
-                {
-                    Name = "test name",
-                    Type = MatchType.HeadToHead,
-                    Playlist =
-                    [
-                        new PlaylistItem(new TestBeatmap(Ruleset.Value).BeatmapInfo)
-                        {
-                            RulesetID = Ruleset.Value.OnlineID
-                        }
-                    ]
-                };
+        protected void JoinRoom(Room room) => MultiplayerClient.CreateRoom(room).FireAndForget();
 
-                setupFunc?.Invoke(room);
-
-                MultiplayerClient.CreateRoom(room).ConfigureAwait(false);
-            });
-
-            AddUntilStep("wait for room join", () => RoomJoined);
-        }
+        protected void WaitForJoined() => AddUntilStep("wait for room join", () => RoomJoined);
 
         protected override OnlinePlayTestSceneDependencies CreateOnlinePlayDependencies() => new MultiplayerTestSceneDependencies();
     }

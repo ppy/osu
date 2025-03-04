@@ -32,7 +32,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             base.SetUpSteps();
 
-            JoinDefaultRoom();
+            AddStep("join room", () => JoinRoom(CreateDefaultRoom()));
+            WaitForJoined();
             createNewParticipantsList();
         }
 
