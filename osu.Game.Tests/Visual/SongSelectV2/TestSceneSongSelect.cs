@@ -78,8 +78,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         {
             base.SetUpSteps();
 
-            AddStep("load screen", () => Stack.Push(new Screens.SelectV2.SongSelectV2()));
-            AddUntilStep("wait for load", () => Stack.CurrentScreen is Screens.SelectV2.SongSelectV2 songSelect && songSelect.IsLoaded);
+            AddStep("load screen", () => Stack.Push(new Screens.SelectV2.SoloSongSelect()));
+            AddUntilStep("wait for load", () => Stack.CurrentScreen is Screens.SelectV2.SongSelect songSelect && songSelect.IsLoaded);
         }
 
         [Test]

@@ -10,6 +10,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Pooling;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Graphics.UserInterface;
@@ -20,6 +21,8 @@ namespace osu.Game.Screens.SelectV2
     [Cached]
     public partial class BeatmapCarousel : Carousel<BeatmapInfo>
     {
+        public Action<BeatmapInfo>? RequestPresentBeatmap { private get; init; }
+
         public const float SPACING = 5f;
 
         private IBindableList<BeatmapSetInfo> detachedBeatmaps = null!;
@@ -128,6 +131,12 @@ namespace osu.Game.Screens.SelectV2
                     return;
 
                 case BeatmapInfo beatmapInfo:
+                    if (ReferenceEquals(CurrentSelection, beatmapInfo))
+                    {
+                        RequestPresentBeatmap?.Invoke(beatmapInfo);
+                        return;
+                    }
+
                     CurrentSelection = beatmapInfo;
                     return;
             }
@@ -248,6 +257,29 @@ namespace osu.Game.Screens.SelectV2
                         i.IsVisible = expanded;
                 }
             }
+        }
+
+        #endregion
+
+        #region Animation
+
+        /// <summary>
+        /// Moves non-selected beatmaps to the right, hiding off-screen.
+        /// </summary>
+        public bool VisuallyFocusSelected { get; set; }
+
+        private float selectionFocusOffset;
+
+        protected override void Update()
+        {
+            base.Update();
+
+            selectionFocusOffset = (float)Interpolation.DampContinuously(selectionFocusOffset, VisuallyFocusSelected ? 300 : 0, 100, Time.Elapsed);
+        }
+
+        protected override float GetPanelXOffset(Drawable panel)
+        {
+            return base.GetPanelXOffset(panel) + (((ICarouselPanel)panel).Selected.Value ? 0 : selectionFocusOffset);
         }
 
         #endregion

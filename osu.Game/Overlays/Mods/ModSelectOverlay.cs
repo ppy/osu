@@ -35,7 +35,7 @@ using osuTK.Input;
 
 namespace osu.Game.Overlays.Mods
 {
-    public abstract partial class ModSelectOverlay : ShearedOverlayContainer, ISamplePlaybackDisabler, IKeyBindingHandler<PlatformAction>
+    public partial class ModSelectOverlay : ShearedOverlayContainer, ISamplePlaybackDisabler, IKeyBindingHandler<PlatformAction>
     {
         public const int BUTTON_WIDTH = 200;
 
@@ -96,7 +96,7 @@ namespace osu.Game.Overlays.Mods
         /// <summary>
         /// Whether the column with available mod presets should be shown.
         /// </summary>
-        protected virtual bool ShowPresets => false;
+        public bool ShowPresets { get; init; }
 
         protected virtual ModColumn CreateModColumn(ModType modType) => new ModColumn(modType, false);
 
@@ -125,7 +125,7 @@ namespace osu.Game.Overlays.Mods
         [Resolved]
         private ScreenFooter? footer { get; set; }
 
-        protected ModSelectOverlay(OverlayColourScheme colourScheme = OverlayColourScheme.Green)
+        public ModSelectOverlay(OverlayColourScheme colourScheme = OverlayColourScheme.Green)
             : base(colourScheme)
         {
         }
