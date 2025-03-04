@@ -38,7 +38,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
         protected override BackgroundScreen CreateBackground() => new LoungeBackgroundScreen
         {
-            SelectedRoom = { BindTarget = roomsContainer.SelectedRoom }
+            SelectedRoom = { BindTarget = roomListing.SelectedRoom }
         };
 
         protected override UserActivity InitialActivity => new UserActivity.SearchingForLobby();
@@ -74,7 +74,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         private readonly Bindable<bool> hasListingResults = new Bindable<bool>();
         private readonly IBindable<bool> operationInProgress = new Bindable<bool>();
         private readonly IBindable<bool> isIdle = new BindableBool();
-        private RoomsContainer roomsContainer = null!;
+        private RoomListing roomListing = null!;
         private LoungeListingPoller listingPoller = null!;
         private PopoverContainer popoverContainer = null!;
         private LoadingLayer loadingLayer = null!;
@@ -106,7 +106,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                         Horizontal = WaveOverlayContainer.WIDTH_PADDING,
                         Top = Header.HEIGHT + controls_area_height + 20,
                     },
-                    Child = roomsContainer = new RoomsContainer
+                    Child = roomListing = new RoomListing
                     {
                         RelativeSizeAxes = Axes.Both,
                         Filter = { BindTarget = filter },
@@ -185,7 +185,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
             filter.BindValueChanged(_ =>
             {
-                roomsContainer.Rooms.Clear();
+                roomListing.Rooms.Clear();
                 hasListingResults.Value = false;
                 listingPoller.PollImmediately();
             });
@@ -195,11 +195,11 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
         private void onListingReceived(Room[] result)
         {
-            Dictionary<long, Room> localRoomsById = roomsContainer.Rooms.ToDictionary(r => r.RoomID!.Value);
+            Dictionary<long, Room> localRoomsById = roomListing.Rooms.ToDictionary(r => r.RoomID!.Value);
             Dictionary<long, Room> resultRoomsById = result.ToDictionary(r => r.RoomID!.Value);
 
             // Remove all local rooms no longer in the result set.
-            roomsContainer.Rooms.RemoveAll(r => !resultRoomsById.ContainsKey(r.RoomID!.Value));
+            roomListing.Rooms.RemoveAll(r => !resultRoomsById.ContainsKey(r.RoomID!.Value));
 
             // Add or update local rooms with the result set.
             foreach (var r in result)
@@ -207,7 +207,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                 if (localRoomsById.TryGetValue(r.RoomID!.Value, out Room? existingRoom))
                     existingRoom.CopyFrom(r);
                 else
-                    roomsContainer.Rooms.Add(r);
+                    roomListing.Rooms.Add(r);
             }
 
             hasListingResults.Value = true;

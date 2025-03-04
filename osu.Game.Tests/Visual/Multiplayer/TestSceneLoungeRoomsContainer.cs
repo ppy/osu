@@ -21,7 +21,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
     public partial class TestSceneLoungeRoomsContainer : OnlinePlayTestScene
     {
         private BindableList<Room> rooms = null!;
-        private RoomsContainer container = null!;
+        private RoomListing container = null!;
 
         public override void SetUpSteps()
         {
@@ -36,7 +36,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Width = 0.5f,
-                    Child = container = new RoomsContainer
+                    Child = container = new RoomListing
                     {
                         RelativeSizeAxes = Axes.Both,
                         Rooms = { BindTarget = rooms },

@@ -21,11 +21,24 @@ using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 {
-    public partial class RoomsContainer : CompositeDrawable, IKeyBindingHandler<GlobalAction>
+    public partial class RoomListing : CompositeDrawable, IKeyBindingHandler<GlobalAction>
     {
+        /// <summary>
+        /// Rooms which should be displayed. Should be managed externally.
+        /// </summary>
         public readonly BindableList<Room> Rooms = new BindableList<Room>();
-        public readonly Bindable<Room?> SelectedRoom = new Bindable<Room?>();
+
+        /// <summary>
+        /// The current filter criteria. Should be managed externally.
+        /// </summary>
         public readonly Bindable<FilterCriteria?> Filter = new Bindable<FilterCriteria?>();
+
+        /// <summary>
+        /// The currently user-selected room.
+        /// </summary>
+        public IBindable<Room?> SelectedRoom => selectedRoom;
+
+        private readonly Bindable<Room?> selectedRoom = new Bindable<Room?>();
 
         public IReadOnlyList<DrawableRoom> DrawableRooms => roomFlow.FlowingChildren.Cast<DrawableRoom>().ToArray();
 
@@ -35,7 +48,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         // handle deselection
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
-        public RoomsContainer()
+        public RoomListing()
         {
             InternalChild = scroll = new OsuScrollContainer
             {
@@ -158,7 +171,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         {
             foreach (var room in rooms)
             {
-                var drawableRoom = new DrawableLoungeRoom(room) { SelectedRoom = SelectedRoom };
+                var drawableRoom = new DrawableLoungeRoom(room) { SelectedRoom = selectedRoom };
 
                 roomFlow.Add(drawableRoom);
 
@@ -177,7 +190,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
                 // selection may have a lease due to being in a sub screen.
                 if (SelectedRoom.Value == r && !SelectedRoom.Disabled)
-                    SelectedRoom.Value = null;
+                    selectedRoom.Value = null;
             }
         }
 
@@ -187,13 +200,13 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
             // selection may have a lease due to being in a sub screen.
             if (!SelectedRoom.Disabled)
-                SelectedRoom.Value = null;
+                selectedRoom.Value = null;
         }
 
         protected override bool OnClick(ClickEvent e)
         {
             if (!SelectedRoom.Disabled)
-                SelectedRoom.Value = null;
+                selectedRoom.Value = null;
             return base.OnClick(e);
         }
 
@@ -240,7 +253,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
             // we already have a valid selection only change selection if we still have a room to switch to.
             if (room != null)
-                SelectedRoom.Value = room;
+                selectedRoom.Value = room;
         }
 
         #endregion
