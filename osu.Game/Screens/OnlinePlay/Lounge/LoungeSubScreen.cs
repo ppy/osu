@@ -8,9 +8,12 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Logging;
@@ -27,6 +30,7 @@ using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Screens.OnlinePlay.Match;
 using osu.Game.Users;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Lounge
 {
@@ -85,10 +89,14 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         [BackgroundDependencyLoader(true)]
         private void load()
         {
+            Masking = true;
+
             const float controls_area_height = 25f;
 
             if (idleTracker != null)
                 isIdle.BindTo(idleTracker.IsIdle);
+
+            Color4 bg = Color4Extensions.FromHex("#070405");
 
             InternalChildren = new Drawable[]
             {
@@ -113,56 +121,80 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                     }
                 },
                 loadingLayer = new LoadingLayer(true),
-                new FillFlowContainer
+                new Container
                 {
-                    Name = @"Header area flow",
+                    Name = "Header area",
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Padding = new MarginPadding { Horizontal = WaveOverlayContainer.WIDTH_PADDING },
-                    Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
-                        new Container
+                        new Box
                         {
-                            RelativeSizeAxes = Axes.X,
-                            Height = Header.HEIGHT,
-                            Child = searchTextBox = new BasicSearchTextBox
-                            {
-                                Anchor = Anchor.CentreRight,
-                                Origin = Anchor.CentreRight,
-                                RelativeSizeAxes = Axes.X,
-                                Width = 0.6f,
-                            },
+                            Colour = ColourInfo.GradientVertical(bg, bg.Opacity(0.75f)),
+                            RelativeSizeAxes = Axes.Both,
+                            Height = 0.8f,
                         },
-                        new Container
+                        new Box
                         {
+                            Colour = ColourInfo.GradientVertical(bg.Opacity(0.75f), bg.Opacity(0)),
+                            RelativeSizeAxes = Axes.Both,
+                            RelativePositionAxes = Axes.Both,
+                            Y = 0.8f,
+                            // Intentionally taller than the header for a more gradual fade
+                            Height = 0.5f,
+                        },
+                        new FillFlowContainer
+                        {
+                            Name = @"Header area flow",
                             RelativeSizeAxes = Axes.X,
-                            Height = controls_area_height,
+                            AutoSizeAxes = Axes.Y,
+                            Padding = new MarginPadding { Horizontal = WaveOverlayContainer.WIDTH_PADDING },
+                            Direction = FillDirection.Vertical,
                             Children = new Drawable[]
                             {
-                                Buttons.WithChild(CreateNewRoomButton().With(d =>
+                                new Container
                                 {
-                                    d.Anchor = Anchor.BottomLeft;
-                                    d.Origin = Anchor.BottomLeft;
-                                    d.Size = new Vector2(150, 37.5f);
-                                    d.Action = () => Open();
-                                })),
-                                new FillFlowContainer
-                                {
-                                    Anchor = Anchor.TopRight,
-                                    Origin = Anchor.TopRight,
-                                    AutoSizeAxes = Axes.Both,
-                                    Direction = FillDirection.Horizontal,
-                                    Spacing = new Vector2(10),
-                                    ChildrenEnumerable = CreateFilterControls().Select(f => f.With(d =>
+                                    RelativeSizeAxes = Axes.X,
+                                    Height = Header.HEIGHT,
+                                    Child = searchTextBox = new BasicSearchTextBox
                                     {
-                                        d.Anchor = Anchor.TopRight;
-                                        d.Origin = Anchor.TopRight;
-                                    }))
+                                        Anchor = Anchor.CentreRight,
+                                        Origin = Anchor.CentreRight,
+                                        RelativeSizeAxes = Axes.X,
+                                        Width = 0.6f,
+                                    },
+                                },
+                                new Container
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    Height = controls_area_height,
+                                    Children = new Drawable[]
+                                    {
+                                        Buttons.WithChild(CreateNewRoomButton().With(d =>
+                                        {
+                                            d.Anchor = Anchor.BottomLeft;
+                                            d.Origin = Anchor.BottomLeft;
+                                            d.Size = new Vector2(150, 37.5f);
+                                            d.Action = () => Open();
+                                        })),
+                                        new FillFlowContainer
+                                        {
+                                            Anchor = Anchor.TopRight,
+                                            Origin = Anchor.TopRight,
+                                            AutoSizeAxes = Axes.Both,
+                                            Direction = FillDirection.Horizontal,
+                                            Spacing = new Vector2(10),
+                                            ChildrenEnumerable = CreateFilterControls().Select(f => f.With(d =>
+                                            {
+                                                d.Anchor = Anchor.TopRight;
+                                                d.Origin = Anchor.TopRight;
+                                            }))
+                                        }
+                                    }
                                 }
-                            }
-                        }
-                    },
+                            },
+                        },
+                    }
                 },
             };
         }
