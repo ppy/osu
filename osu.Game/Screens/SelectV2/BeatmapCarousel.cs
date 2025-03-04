@@ -20,6 +20,8 @@ namespace osu.Game.Screens.SelectV2
     [Cached]
     public partial class BeatmapCarousel : Carousel<BeatmapInfo>
     {
+        public Action<BeatmapInfo>? RequestPresentBeatmap { private get; init; }
+
         public const float SPACING = 5f;
 
         private IBindableList<BeatmapSetInfo> detachedBeatmaps = null!;
@@ -128,6 +130,12 @@ namespace osu.Game.Screens.SelectV2
                     return;
 
                 case BeatmapInfo beatmapInfo:
+                    if (ReferenceEquals(CurrentSelection, beatmapInfo))
+                    {
+                        RequestPresentBeatmap?.Invoke(beatmapInfo);
+                        return;
+                    }
+
                     CurrentSelection = beatmapInfo;
                     return;
             }
