@@ -18,6 +18,7 @@ namespace osu.Game.Tests.Visual.Playlists
     public partial class TestScenePlaylistsMatchSettingsOverlay : OnlinePlayTestScene
     {
         private TestRoomSettings settings = null!;
+        private Room room = null!;
         private Func<Room, string?>? handleRequest;
 
         public override void SetUpSteps()
@@ -47,9 +48,7 @@ namespace osu.Game.Tests.Visual.Playlists
 
             AddStep("create overlay", () =>
             {
-                SelectedRoom.Value = new Room();
-
-                Child = settings = new TestRoomSettings(SelectedRoom.Value!)
+                Child = settings = new TestRoomSettings(room = new Room())
                 {
                     RelativeSizeAxes = Axes.Both,
                     State = { Value = Visibility.Visible }
@@ -62,19 +61,19 @@ namespace osu.Game.Tests.Visual.Playlists
         {
             AddStep("clear name and beatmap", () =>
             {
-                SelectedRoom.Value!.Name = "";
-                SelectedRoom.Value!.Playlist = [];
+                room.Name = "";
+                room.Playlist = [];
             });
 
             AddAssert("button disabled", () => !settings.ApplyButton.Enabled.Value);
 
-            AddStep("set name", () => SelectedRoom.Value!.Name = "Room name");
+            AddStep("set name", () => room.Name = "Room name");
             AddAssert("button disabled", () => !settings.ApplyButton.Enabled.Value);
 
-            AddStep("set beatmap", () => SelectedRoom.Value!.Playlist = [new PlaylistItem(CreateBeatmap(Ruleset.Value).BeatmapInfo)]);
+            AddStep("set beatmap", () => room.Playlist = [new PlaylistItem(CreateBeatmap(Ruleset.Value).BeatmapInfo)]);
             AddAssert("button enabled", () => settings.ApplyButton.Enabled.Value);
 
-            AddStep("clear name", () => SelectedRoom.Value!.Name = "");
+            AddStep("clear name", () => room.Name = "");
             AddAssert("button disabled", () => !settings.ApplyButton.Enabled.Value);
         }
 
@@ -90,7 +89,7 @@ namespace osu.Game.Tests.Visual.Playlists
             {
                 settings.NameField.Current.Value = expected_name;
                 settings.DurationField.Current.Value = expectedDuration;
-                SelectedRoom.Value!.Playlist = [new PlaylistItem(CreateBeatmap(Ruleset.Value).BeatmapInfo)];
+                room.Playlist = [new PlaylistItem(CreateBeatmap(Ruleset.Value).BeatmapInfo)];
 
                 handleRequest = r =>
                 {
@@ -115,8 +114,8 @@ namespace osu.Game.Tests.Visual.Playlists
             {
                 var beatmap = CreateBeatmap(Ruleset.Value).BeatmapInfo;
 
-                SelectedRoom.Value!.Name = "Test Room";
-                SelectedRoom.Value!.Playlist = [new PlaylistItem(beatmap)];
+                room.Name = "Test Room";
+                room.Playlist = [new PlaylistItem(beatmap)];
 
                 errorMessage = $"{not_found_prefix} {beatmap.OnlineID}";
 
@@ -124,13 +123,13 @@ namespace osu.Game.Tests.Visual.Playlists
             });
 
             AddAssert("error not displayed", () => !settings.ErrorText.IsPresent);
-            AddAssert("playlist item valid", () => SelectedRoom.Value!.Playlist[0].Valid.Value);
+            AddAssert("playlist item valid", () => room.Playlist[0].Valid.Value);
 
             AddStep("create room", () => settings.ApplyButton.Action.Invoke());
 
             AddAssert("error displayed", () => settings.ErrorText.IsPresent);
             AddAssert("error has custom text", () => settings.ErrorText.Text != errorMessage);
-            AddAssert("playlist item marked invalid", () => !SelectedRoom.Value!.Playlist[0].Valid.Value);
+            AddAssert("playlist item marked invalid", () => !room.Playlist[0].Valid.Value);
         }
 
         [Test]
@@ -142,8 +141,8 @@ namespace osu.Game.Tests.Visual.Playlists
 
             AddStep("setup", () =>
             {
-                SelectedRoom.Value!.Name = "Test Room";
-                SelectedRoom.Value!.Playlist = [new PlaylistItem(CreateBeatmap(Ruleset.Value).BeatmapInfo)];
+                room.Name = "Test Room";
+                room.Playlist = [new PlaylistItem(CreateBeatmap(Ruleset.Value).BeatmapInfo)];
 
                 handleRequest = _ => failText;
             });

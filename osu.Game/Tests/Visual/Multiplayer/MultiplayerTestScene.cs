@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Tests.Beatmaps;
 using osu.Game.Tests.Visual.OnlinePlay;
@@ -23,14 +24,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         public bool RoomJoined => MultiplayerClient.RoomJoined;
 
-        private readonly bool joinRoom;
-
-        protected MultiplayerTestScene(bool joinRoom = true)
-        {
-            this.joinRoom = joinRoom;
-        }
-
-        protected virtual Room CreateRoom()
+        protected Room CreateDefaultRoom()
         {
             return new Room
             {
@@ -46,21 +40,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
             };
         }
 
-        public override void SetUpSteps()
-        {
-            base.SetUpSteps();
+        /// <summary>
+        /// Creates and joins a basic multiplayer room.
+        /// </summary>
+        protected void JoinRoom(Room room) => MultiplayerClient.CreateRoom(room).FireAndForget();
 
-            if (joinRoom)
-            {
-                AddStep("join room", () =>
-                {
-                    SelectedRoom.Value = CreateRoom();
-                    MultiplayerClient.CreateRoom(SelectedRoom.Value).ConfigureAwait(false);
-                });
-
-                AddUntilStep("wait for room join", () => RoomJoined);
-            }
-        }
+        protected void WaitForJoined() => AddUntilStep("wait for room join", () => RoomJoined);
 
         protected override OnlinePlayTestSceneDependencies CreateOnlinePlayDependencies() => new MultiplayerTestSceneDependencies();
     }
