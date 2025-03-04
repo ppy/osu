@@ -6,6 +6,7 @@ using Humanizer;
 using NUnit.Framework;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Testing;
+using osu.Game.Extensions;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
@@ -91,6 +92,29 @@ namespace osu.Game.Tests.NonVisual.Multiplayer
 
             AddUntilStep("wait for room join", () => RoomJoined);
             checkPlayingUserCount(1);
+        }
+
+        [Test]
+        public void TestJoinRoomWithManyUsers()
+        {
+            AddStep("leave room", () => MultiplayerClient.LeaveRoom());
+            AddUntilStep("wait for room part", () => !RoomJoined);
+
+            AddStep("create room with many users", () =>
+            {
+                var newRoom = new Room();
+                newRoom.CopyFrom(SelectedRoom.Value!);
+
+                newRoom.RoomID = null;
+                MultiplayerClient.RoomSetupAction = room =>
+                {
+                    room.Users.AddRange(Enumerable.Range(PLAYER_1_ID, 100).Select(id => new MultiplayerRoomUser(id)));
+                };
+
+                RoomManager.CreateRoom(newRoom);
+            });
+
+            AddUntilStep("wait for room join", () => RoomJoined);
         }
 
         private void checkPlayingUserCount(int expectedCount)
