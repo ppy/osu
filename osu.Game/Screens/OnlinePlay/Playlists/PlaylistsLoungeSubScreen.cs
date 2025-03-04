@@ -4,12 +4,14 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Lounge;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
@@ -71,6 +73,15 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             };
 
             api.Queue(joinRoomRequest);
+        }
+
+        public override void Close(Room room)
+        {
+            Debug.Assert(room.RoomID != null);
+
+            var request = new ClosePlaylistRequest(room.RoomID.Value);
+            request.Success += RefreshRooms;
+            api.Queue(request);
         }
 
         protected override OsuButton CreateNewRoomButton() => new CreatePlaylistsRoomButton();

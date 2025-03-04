@@ -414,7 +414,7 @@ namespace osu.Game.Screens.Play
 
                 case GlobalAction.HoldForHUD:
                     holdingForHUD.Value = true;
-                    return true;
+                    return false;
 
                 case GlobalAction.ToggleInGameInterface:
                     switch (configVisibilityMode.Value)

@@ -444,7 +444,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 if (!ApplyButton.Enabled.Value)
                     return;
 
-                hideError();
+                ErrorText.FadeOut(50);
 
                 Debug.Assert(applyingSettingsOperation == null);
                 applyingSettingsOperation = ongoingOperationTracker.BeginOperation();
@@ -479,8 +479,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                     }));
                 }
             }
-
-            private void hideError() => ErrorText.FadeOut(50);
 
             private void onSuccess() => Schedule(() =>
             {

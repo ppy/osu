@@ -160,7 +160,20 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 {
                     Size = new Vector2(19, 14),
                 },
-                username,
+                new FillFlowContainer
+                {
+                    AutoSizeAxes = Axes.Both,
+                    Direction = FillDirection.Horizontal,
+                    Spacing = new Vector2(4),
+                    Children = new Drawable[]
+                    {
+                        new UpdateableTeamFlag(score.User.Team)
+                        {
+                            Size = new Vector2(28, 14),
+                        },
+                        username,
+                    }
+                },
 #pragma warning disable 618
                 new StatisticText(score.MaxCombo, score.BeatmapInfo!.MaxCombo, @"0\x"),
 #pragma warning restore 618
