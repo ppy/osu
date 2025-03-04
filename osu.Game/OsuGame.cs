@@ -828,6 +828,16 @@ namespace osu.Game
         {
             beatmap.OldValue?.CancelAsyncLoad();
             beatmap.NewValue?.BeginAsyncLoad();
+
+            if (Host.Window == null)
+                return;
+
+            // prevent weird window title saying please load a beatmap
+            string newTitle = Name;
+            if (beatmap.NewValue != null && beatmap.NewValue is not DummyWorkingBeatmap)
+                newTitle = $"{Name} - {beatmap.NewValue.BeatmapInfo.GetDisplayTitleRomanisable(true, false)}";
+
+            Host.InputThread.Scheduler.AddOnce(s => Host.Window.Title = s, newTitle);
         }
 
         private void modsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)
