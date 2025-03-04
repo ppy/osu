@@ -8,18 +8,21 @@ using osu.Framework.Extensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Input.Bindings;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 {
-    public partial class MultiplayerSpectateButton : CompositeDrawable
+    public partial class MultiplayerSpectateButton : CompositeDrawable, IKeyBindingHandler<GlobalAction>
     {
         public required Bindable<PlaylistItem?> SelectedItem
         {
@@ -102,6 +105,28 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                    && !operationInProgress.Value;
 
             Scheduler.AddOnce(checkForAutomaticDownload);
+        }
+
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+        {
+            if (e.Repeat)
+            {
+                return false;
+            }
+
+            switch (e.Action)
+            {
+                case GlobalAction.MultiplayerSpectate:
+                    button.TriggerClick();
+                    return true;
+
+                default:
+                    return false;
+            }
+        }
+
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
+        {
         }
 
         #region Automatic download handling
