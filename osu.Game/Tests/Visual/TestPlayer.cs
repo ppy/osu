@@ -52,7 +52,7 @@ namespace osu.Game.Tests.Visual
         private SpectatorClient spectatorClient { get; set; }
 
         public TestPlayer(bool allowPause = true, bool showResults = true, bool pauseOnFocusLost = false)
-            : base(new PlayerConfiguration
+            : base(null, new PlayerConfiguration
             {
                 AllowPause = allowPause,
                 ShowResults = showResults

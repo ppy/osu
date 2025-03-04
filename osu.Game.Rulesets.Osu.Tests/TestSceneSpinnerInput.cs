@@ -338,7 +338,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             protected override bool PauseOnFocusLost => false;
 
             public ScoreAccessibleReplayPlayer(Score score)
-                : base(score, new PlayerConfiguration
+                : base(score, null, new PlayerConfiguration
                 {
                     AllowPause = false,
                     ShowResults = false,

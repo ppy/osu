@@ -199,7 +199,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
             protected override bool PauseOnFocusLost => false;
 
             public ScoreAccessibleSoloPlayer()
-                : base(new PlayerConfiguration
+                : base(null, new PlayerConfiguration
                 {
                     AllowPause = false,
                     ShowResults = false,
