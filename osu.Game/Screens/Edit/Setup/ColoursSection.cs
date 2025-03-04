@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
+using osu.Game.Beatmaps.Formats;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
 using osu.Game.Skinning;
@@ -54,6 +55,8 @@ namespace osu.Game.Screens.Edit.Setup
                     Beatmap.BeatmapSkin.ComboColours.Clear();
                     Beatmap.BeatmapSkin.ComboColours.AddRange(comboColours.Colours);
 
+                    updateAddButtonVisibility();
+
                     syncingColours = false;
                 }
             });
@@ -68,8 +71,14 @@ namespace osu.Game.Screens.Edit.Setup
                 comboColours.Colours.Clear();
                 comboColours.Colours.AddRange(Beatmap.BeatmapSkin?.ComboColours);
 
+                updateAddButtonVisibility();
+
                 syncingColours = false;
             });
+
+            updateAddButtonVisibility();
+
+            void updateAddButtonVisibility() => comboColours.CanAdd.Value = comboColours.Colours.Count < LegacyBeatmapDecoder.MAX_COMBO_COLOUR_COUNT;
         }
     }
 }

@@ -20,7 +20,6 @@ using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input;
 using osu.Game.Online.API;
-using osu.Game.Online.API.Requests;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
@@ -39,7 +38,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
         protected override BackgroundScreen CreateBackground() => new LoungeBackgroundScreen
         {
-            SelectedRoom = { BindTarget = roomsContainer.SelectedRoom }
+            SelectedRoom = { BindTarget = roomListing.SelectedRoom }
         };
 
         protected override UserActivity InitialActivity => new UserActivity.SearchingForLobby();
@@ -75,8 +74,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         private readonly Bindable<bool> hasListingResults = new Bindable<bool>();
         private readonly IBindable<bool> operationInProgress = new Bindable<bool>();
         private readonly IBindable<bool> isIdle = new BindableBool();
-        private RoomsContainer roomsContainer = null!;
-        private LoungePollingComponent pollingComponent = null!;
+        private RoomListing roomListing = null!;
+        private LoungeListingPoller listingPoller = null!;
         private PopoverContainer popoverContainer = null!;
         private LoadingLayer loadingLayer = null!;
         private SearchTextBox searchTextBox = null!;
@@ -93,7 +92,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
             InternalChildren = new Drawable[]
             {
-                pollingComponent = new LoungePollingComponent
+                listingPoller = new LoungeListingPoller
                 {
                     RoomsReceived = onListingReceived,
                     Filter = { BindTarget = filter }
@@ -107,7 +106,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                         Horizontal = WaveOverlayContainer.WIDTH_PADDING,
                         Top = Header.HEIGHT + controls_area_height + 20,
                     },
-                    Child = roomsContainer = new RoomsContainer
+                    Child = roomListing = new RoomListing
                     {
                         RelativeSizeAxes = Axes.Both,
                         Filter = { BindTarget = filter },
@@ -186,9 +185,9 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
             filter.BindValueChanged(_ =>
             {
-                roomsContainer.Rooms.Clear();
+                roomListing.Rooms.Clear();
                 hasListingResults.Value = false;
-                pollingComponent.PollImmediately();
+                listingPoller.PollImmediately();
             });
 
             updateFilter();
@@ -196,11 +195,11 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
         private void onListingReceived(Room[] result)
         {
-            Dictionary<long, Room> localRoomsById = roomsContainer.Rooms.ToDictionary(r => r.RoomID!.Value);
+            Dictionary<long, Room> localRoomsById = roomListing.Rooms.ToDictionary(r => r.RoomID!.Value);
             Dictionary<long, Room> resultRoomsById = result.ToDictionary(r => r.RoomID!.Value);
 
             // Remove all local rooms no longer in the result set.
-            roomsContainer.Rooms.RemoveAll(r => !resultRoomsById.ContainsKey(r.RoomID!.Value));
+            roomListing.Rooms.RemoveAll(r => !resultRoomsById.ContainsKey(r.RoomID!.Value));
 
             // Add or update local rooms with the result set.
             foreach (var r in result)
@@ -208,7 +207,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                 if (localRoomsById.TryGetValue(r.RoomID!.Value, out Room? existingRoom))
                     existingRoom.CopyFrom(r);
                 else
-                    roomsContainer.Rooms.Add(r);
+                    roomListing.Rooms.Add(r);
             }
 
             hasListingResults.Value = true;
@@ -269,7 +268,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             onReturning();
 
             // Poll for any newly-created rooms (including potentially the user's own).
-            pollingComponent.PollImmediately();
+            listingPoller.PollImmediately();
         }
 
         public override bool OnExiting(ScreenExitEvent e)
@@ -363,14 +362,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             api.Queue(req);
         }
 
-        public void Close(Room room)
-        {
-            Debug.Assert(room.RoomID != null);
-
-            var request = new ClosePlaylistRequest(room.RoomID.Value);
-            request.Success += RefreshRooms;
-            api.Queue(request);
-        }
+        public abstract void Close(Room room);
 
         /// <summary>
         /// Push a room as a new subscreen.
@@ -387,7 +379,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
         protected virtual void OpenNewRoom(Room room) => this.Push(CreateRoomSubScreen(room));
 
-        public void RefreshRooms() => pollingComponent.PollImmediately();
+        public void RefreshRooms() => listingPoller.PollImmediately();
 
         private void updateLoadingLayer()
         {
@@ -400,11 +392,11 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         private void updatePollingRate(bool isCurrentScreen)
         {
             if (!isCurrentScreen)
-                pollingComponent.TimeBetweenPolls.Value = 0;
+                listingPoller.TimeBetweenPolls.Value = 0;
             else
-                pollingComponent.TimeBetweenPolls.Value = isIdle.Value ? 120000 : 15000;
+                listingPoller.TimeBetweenPolls.Value = isIdle.Value ? 120000 : 15000;
 
-            Logger.Log($"Polling adjusted (listing: {pollingComponent.TimeBetweenPolls.Value})");
+            Logger.Log($"Polling adjusted (listing: {listingPoller.TimeBetweenPolls.Value})");
         }
 
         protected abstract OsuButton CreateNewRoomButton();

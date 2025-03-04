@@ -26,7 +26,7 @@ namespace osu.Game.Tests.Visual.Playlists
             AddUntilStep("wait for present", () => loungeScreen.IsCurrentScreen());
         }
 
-        private RoomsContainer roomsContainer => loungeScreen.ChildrenOfType<RoomsContainer>().First();
+        private RoomListing roomListing => loungeScreen.ChildrenOfType<RoomListing>().First();
 
         [Test]
         public void TestManyRooms()
@@ -41,13 +41,13 @@ namespace osu.Game.Tests.Visual.Playlists
 
             createRooms(GenerateRooms(30));
 
-            AddStep("move mouse to third room", () => InputManager.MoveMouseTo(roomsContainer.DrawableRooms[2]));
+            AddStep("move mouse to third room", () => InputManager.MoveMouseTo(roomListing.DrawableRooms[2]));
             AddStep("hold down", () => InputManager.PressButton(MouseButton.Left));
-            AddStep("drag to top", () => InputManager.MoveMouseTo(roomsContainer.DrawableRooms[0]));
+            AddStep("drag to top", () => InputManager.MoveMouseTo(roomListing.DrawableRooms[0]));
 
             AddAssert("first and second room masked", ()
-                => !checkRoomVisible(roomsContainer.DrawableRooms[0]) &&
-                   !checkRoomVisible(roomsContainer.DrawableRooms[1]));
+                => !checkRoomVisible(roomListing.DrawableRooms[0]) &&
+                   !checkRoomVisible(roomListing.DrawableRooms[1]));
         }
 
         [Test]
@@ -55,10 +55,10 @@ namespace osu.Game.Tests.Visual.Playlists
         {
             createRooms(GenerateRooms(30));
 
-            AddStep("select last room", () => roomsContainer.DrawableRooms[^1].TriggerClick());
+            AddStep("select last room", () => roomListing.DrawableRooms[^1].TriggerClick());
 
-            AddUntilStep("first room is masked", () => !checkRoomVisible(roomsContainer.DrawableRooms[0]));
-            AddUntilStep("last room is not masked", () => checkRoomVisible(roomsContainer.DrawableRooms[^1]));
+            AddUntilStep("first room is masked", () => !checkRoomVisible(roomListing.DrawableRooms[0]));
+            AddUntilStep("last room is not masked", () => checkRoomVisible(roomListing.DrawableRooms[^1]));
         }
 
         private bool checkRoomVisible(DrawableRoom room) =>

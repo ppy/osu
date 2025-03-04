@@ -313,6 +313,29 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddAssert("score multiplier = 1.20", () => this.ChildrenOfType<RankingInformationDisplay>().Single().ModMultiplier.Value, () => Is.EqualTo(1.2).Within(0.01));
         }
 
+        [Test]
+        public void TestChangeSettingsButtonVisibleForHost()
+        {
+            AddStep("add playlist item", () =>
+            {
+                SelectedRoom.Value!.Playlist =
+                [
+                    new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo)
+                    {
+                        RulesetID = new OsuRuleset().RulesetInfo.OnlineID
+                    }
+                ];
+            });
+            ClickButtonWhenEnabled<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>();
+
+            AddUntilStep("wait for join", () => RoomJoined);
+
+            AddUntilStep("button visible", () => this.ChildrenOfType<DrawableMatchRoom>().Single().ChangeSettingsButton?.Alpha, () => Is.GreaterThan(0));
+            AddStep("join other user", void () => MultiplayerClient.AddUser(new APIUser { Id = PLAYER_1_ID }));
+            AddStep("make other user host", () => MultiplayerClient.TransferHost(PLAYER_1_ID));
+            AddAssert("button hidden", () => this.ChildrenOfType<DrawableMatchRoom>().Single().ChangeSettingsButton?.Alpha, () => Is.EqualTo(0));
+        }
+
         private partial class TestMultiplayerMatchSubScreen : MultiplayerMatchSubScreen
         {
             [Resolved(canBeNull: true)]
