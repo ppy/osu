@@ -33,7 +33,8 @@ using osuTK;
 namespace osu.Game.Screens.OnlinePlay.Lounge
 {
     [Cached]
-    public abstract partial class LoungeSubScreen : OnlinePlaySubScreen
+    [Cached(typeof(IOnlinePlayLounge))]
+    public abstract partial class LoungeSubScreen : OnlinePlaySubScreen, IOnlinePlayLounge
     {
         public override string Title => "Lounge";
 
@@ -263,6 +264,9 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             music.EnsurePlayingSomething();
 
             onReturning();
+
+            // Poll for any newly-created rooms (including potentially the user's own).
+            ListingPollingComponent.PollImmediately();
         }
 
         public override bool OnExiting(ScreenExitEvent e)
@@ -297,14 +301,14 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             popoverContainer.HidePopover();
         }
 
-        public virtual void Join(Room room, string? password, Action<Room>? onSuccess = null, Action<string>? onFailure = null) => Schedule(() =>
+        public void Join(Room room, string? password, Action<Room>? onSuccess = null, Action<string>? onFailure = null) => Schedule(() =>
         {
             if (joiningRoomOperation != null)
                 return;
 
             joiningRoomOperation = ongoingOperationTracker?.BeginOperation();
 
-            RoomManager?.JoinRoom(room, password, _ =>
+            JoinInternal(room, password, r =>
             {
                 Open(room);
                 joiningRoomOperation?.Dispose();
@@ -318,10 +322,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             });
         });
 
-        /// <summary>
-        /// Copies a room and opens it as a fresh (not-yet-created) one.
-        /// </summary>
-        /// <param name="room">The room to copy.</param>
+        protected abstract void JoinInternal(Room room, string? password, Action<Room> onSuccess, Action<string> onFailure);
+
         public void OpenCopy(Room room)
         {
             Debug.Assert(room.RoomID != null);
@@ -357,6 +359,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
             api.Queue(req);
         }
+
+        public abstract void Close(Room room);
 
         /// <summary>
         /// Push a room as a new subscreen.
