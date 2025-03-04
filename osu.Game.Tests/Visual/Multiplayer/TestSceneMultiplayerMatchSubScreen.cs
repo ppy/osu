@@ -318,7 +318,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("add playlist item", () =>
             {
-                SelectedRoom.Value!.Playlist =
+                room.Playlist =
                 [
                     new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo)
                     {
