@@ -10,6 +10,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Pooling;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Graphics.UserInterface;
@@ -255,6 +256,32 @@ namespace osu.Game.Screens.SelectV2
                     else
                         i.IsVisible = expanded;
                 }
+            }
+        }
+
+        #endregion
+
+        #region Animation
+
+        /// <summary>
+        /// Moves non-selected beatmaps to the right, hiding off-screen.
+        /// </summary>
+        public bool VisuallyFocusSelected { get; set; }
+
+        private float selectionFocusOffset;
+
+        protected override void Update()
+        {
+            base.Update();
+
+            selectionFocusOffset = (float)Interpolation.DampContinuously(selectionFocusOffset, VisuallyFocusSelected ? 300 : 0, 100, Time.Elapsed);
+
+            foreach (var panel in Scroll.Panels)
+            {
+                var c = (ICarouselPanel)panel;
+
+                if (!c.Selected.Value)
+                    panel.X += selectionFocusOffset;
             }
         }
 

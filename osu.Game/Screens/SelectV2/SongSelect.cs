@@ -99,9 +99,13 @@ namespace osu.Game.Screens.SelectV2
             base.OnEntering(e);
         }
 
+        private const double fade_duration = 300;
+
         public override void OnResuming(ScreenTransitionEvent e)
         {
-            this.FadeIn();
+            this.FadeIn(fade_duration, Easing.OutQuint);
+
+            carousel.VisuallyFocusSelected = false;
 
             // required due to https://github.com/ppy/osu-framework/issues/3218
             modSelectOverlay.SelectedMods.Disabled = false;
@@ -112,16 +116,18 @@ namespace osu.Game.Screens.SelectV2
 
         public override void OnSuspending(ScreenTransitionEvent e)
         {
-            this.Delay(400).FadeOut();
+            this.Delay(100).FadeOut(fade_duration, Easing.OutQuint);
 
             modSelectOverlay.SelectedMods.UnbindFrom(Mods);
+
+            carousel.VisuallyFocusSelected = true;
 
             base.OnSuspending(e);
         }
 
         public override bool OnExiting(ScreenExitEvent e)
         {
-            this.Delay(400).FadeOut();
+            this.FadeOut(fade_duration, Easing.OutQuint);
             return base.OnExiting(e);
         }
 
