@@ -204,7 +204,7 @@ namespace osu.Game.Screens.OnlinePlay
                 ScrollContainer.ScrollIntoView(drawableItem);
         }
 
-        #region Key selection logic (shared with BeatmapCarousel and RoomsContainer)
+        #region Key selection logic (shared with BeatmapCarousel and RoomListing)
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {

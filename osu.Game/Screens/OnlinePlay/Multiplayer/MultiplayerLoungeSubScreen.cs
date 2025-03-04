@@ -3,9 +3,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Extensions.ExceptionExtensions;
 using osu.Framework.Logging;
 using osu.Framework.Graphics;
@@ -15,7 +13,6 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
-using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Lounge;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Screens.OnlinePlay.Match;
@@ -79,8 +76,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         protected override RoomSubScreen CreateRoomSubScreen(Room room) => new MultiplayerMatchSubScreen(room);
 
-        protected override ListingPollingComponent CreatePollingComponent() => new MultiplayerListingPollingComponent();
-
         protected override void JoinInternal(Room room, string? password, Action<Room> onSuccess, Action<string> onFailure)
         {
             client.JoinRoom(room, password).ContinueWith(result =>
@@ -111,38 +106,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             }
 
             base.OpenNewRoom(room);
-        }
-
-        private partial class MultiplayerListingPollingComponent : ListingPollingComponent
-        {
-            [Resolved]
-            private MultiplayerClient client { get; set; } = null!;
-
-            private readonly IBindable<bool> isConnected = new Bindable<bool>();
-
-            [BackgroundDependencyLoader]
-            private void load()
-            {
-                isConnected.BindTo(client.IsConnected);
-                isConnected.BindValueChanged(_ => Scheduler.AddOnce(poll), true);
-            }
-
-            private void poll()
-            {
-                if (isConnected.Value && IsLoaded)
-                    PollImmediately();
-            }
-
-            protected override Task Poll()
-            {
-                if (!isConnected.Value)
-                    return Task.CompletedTask;
-
-                if (client.Room != null)
-                    return Task.CompletedTask;
-
-                return base.Poll();
-            }
         }
     }
 }

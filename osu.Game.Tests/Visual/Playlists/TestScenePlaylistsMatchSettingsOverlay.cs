@@ -17,8 +17,6 @@ namespace osu.Game.Tests.Visual.Playlists
 {
     public partial class TestScenePlaylistsMatchSettingsOverlay : OnlinePlayTestScene
     {
-        protected new TestRoomManager RoomManager => (TestRoomManager)base.RoomManager;
-
         private TestRoomSettings settings = null!;
         private Func<Room, string?>? handleRequest;
 
