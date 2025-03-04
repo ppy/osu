@@ -437,7 +437,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                 if (!ApplyButton.Enabled.Value)
                     return;
 
-                hideError();
+                ErrorText.FadeOut(50);
 
                 room.Name = NameField.Text;
                 room.Availability = AvailabilityPicker.Current.Value;
@@ -448,14 +448,10 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                 loadingLayer.Show();
 
                 var req = new CreateRoomRequest(room);
-                req.Success += onSuccess;
+                req.Success += _ => loadingLayer.Hide();
                 req.Failure += e => onError(req.Response?.Error ?? e.Message);
                 api.Queue(req);
             }
-
-            private void hideError() => ErrorText.FadeOut(50);
-
-            private void onSuccess(Room room) => loadingLayer.Hide();
 
             private void onError(string text)
             {

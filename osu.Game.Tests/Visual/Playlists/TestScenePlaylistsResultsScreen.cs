@@ -7,9 +7,12 @@ using System.Linq;
 using System.Net;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
+using osu.Framework.Utils;
+using osu.Game.Database;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
@@ -32,6 +35,9 @@ namespace osu.Game.Tests.Visual.Playlists
         private const int scores_per_result = 10;
         private const int real_user_position = 200;
 
+        [Cached]
+        private readonly BeatmapLookupCache beatmapLookupCache = new BeatmapLookupCache();
+
         private ResultsScreen resultsScreen = null!;
 
         private int lowestScoreId; // Score ID of the lowest score in the list.
@@ -40,6 +46,11 @@ namespace osu.Game.Tests.Visual.Playlists
         private bool requestComplete;
         private int totalCount;
         private ScoreInfo userScore = null!;
+
+        public TestScenePlaylistsResultsScreen()
+        {
+            Add(beatmapLookupCache);
+        }
 
         [SetUpSteps]
         public override void SetUpSteps()
@@ -279,6 +290,25 @@ namespace osu.Game.Tests.Visual.Playlists
                 case IndexPlaylistScoresRequest:
                     break;
 
+                case GetBeatmapsRequest getBeatmaps:
+                    getBeatmaps.TriggerSuccess(new GetBeatmapsResponse
+                    {
+                        Beatmaps = getBeatmaps.BeatmapIds.Select(id => new APIBeatmap
+                        {
+                            OnlineID = id,
+                            StarRating = id,
+                            DifficultyName = $"Beatmap {id}",
+                            BeatmapSet = new APIBeatmapSet
+                            {
+                                Title = $"Title {id}",
+                                Artist = $"Artist {id}",
+                                AuthorString = $"Author {id}"
+                            }
+                        }).ToList()
+                    });
+
+                    return true;
+
                 default:
                     return false;
             }
@@ -346,6 +376,7 @@ namespace osu.Game.Tests.Visual.Playlists
                 Position = real_user_position,
                 MaxCombo = userScore.MaxCombo,
                 User = userScore.User,
+                BeatmapId = RNG.Next(0, 7),
                 ScoresAround = new MultiplayerScoresAround
                 {
                     Higher = new MultiplayerScores(),
@@ -364,6 +395,7 @@ namespace osu.Game.Tests.Visual.Playlists
                     Passed = true,
                     Rank = userScore.Rank,
                     MaxCombo = userScore.MaxCombo,
+                    BeatmapId = RNG.Next(0, 7),
                     User = new APIUser
                     {
                         Id = 2 + i,
@@ -379,6 +411,7 @@ namespace osu.Game.Tests.Visual.Playlists
                     Passed = true,
                     Rank = userScore.Rank,
                     MaxCombo = userScore.MaxCombo,
+                    BeatmapId = RNG.Next(0, 7),
                     User = new APIUser
                     {
                         Id = 2 + i,
@@ -396,7 +429,7 @@ namespace osu.Game.Tests.Visual.Playlists
             return multiplayerUserScore;
         }
 
-        private IndexedMultiplayerScores createIndexResponse(IndexPlaylistScoresRequest req, bool noScores = false)
+        private IndexedMultiplayerScores createIndexResponse(IndexPlaylistScoresRequest req, bool noScores)
         {
             var result = new IndexedMultiplayerScores();
 
@@ -413,6 +446,7 @@ namespace osu.Game.Tests.Visual.Playlists
                     Passed = true,
                     Rank = ScoreRank.X,
                     MaxCombo = 1000,
+                    BeatmapId = RNG.Next(0, 7),
                     User = new APIUser
                     {
                         Id = 2 + i,
