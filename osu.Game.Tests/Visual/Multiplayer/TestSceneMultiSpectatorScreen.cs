@@ -66,7 +66,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("clear playing users", () => playingUsers.Clear());
 
-            JoinDefaultRoom(r => room = r);
+            AddStep("create room", () => room = CreateDefaultRoom());
+            AddStep("join room", () => JoinRoom(room));
+            WaitForJoined();
         }
 
         [TestCase(1)]

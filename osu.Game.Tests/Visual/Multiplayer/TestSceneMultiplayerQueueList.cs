@@ -43,7 +43,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             base.SetUpSteps();
 
-            JoinDefaultRoom(r => room = r);
+            AddStep("create room", () => room = CreateDefaultRoom());
+            AddStep("join room", () => JoinRoom(room));
+            WaitForJoined();
 
             AddStep("create playlist", () =>
             {
