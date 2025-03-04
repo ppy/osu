@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             if (osuCurrObj.LazyJumpDistance > diameter)
             {
                 double comfyness = IdentifyComfyCircluarFlow(current);
-                flowDifficulty *= Math.Pow(osuCurrObj.LazyJumpDistance / diameter, 1 - comfyness);
+                flowDifficulty *= Math.Pow(osuCurrObj.LazyJumpDistance / diameter, 1 - 0.7 * comfyness);
             }
             else
             {
@@ -236,8 +236,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             OsuDifficultyHitObject osuCurrObj = (OsuDifficultyHitObject)current;
 
             double prevAngle = osuCurrObj.AngleSigned ?? 0;
+            double prevAngleChange = 0;
             double prevVelocity = osuCurrObj.LazyJumpDistance / osuCurrObj.StrainTime;
             double prevVelocityChange = double.NaN;
+
+            // It's allowed to get two angle change without triggering comfyness penalty
+            double allowedAngleChange = 1.0;
 
             for (int i = 0; i < 3; i++)
             {
@@ -245,6 +249,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                 double currAngle = relevantObj.AngleSigned ?? 0;
                 double currAngleChange = Math.Abs(currAngle - prevAngle);
+                double relevantAngleChange = currAngleChange;
+
+                if (allowedAngleChange > 0)
+                {
+                    double potentialLeniency = currAngleChange - Math.Min(currAngleChange, prevAngleChange);
+                    potentialLeniency = Math.Min(potentialLeniency, 1);
+
+                    double usedLeniency = Math.Min(allowedAngleChange, potentialLeniency);
+                    relevantAngleChange = Math.Min(relevantAngleChange, 1) * (1 - usedLeniency);
+                    allowedAngleChange -= usedLeniency;
+                }
 
                 double currVelocity = relevantObj.LazyJumpDistance / relevantObj.StrainTime;
                 double currVelocityChange = currVelocity / prevVelocity;
@@ -252,7 +267,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double accelerationChange = Math.Abs(currVelocityChange - prevVelocityChange);
 
                 double angleFactor = DifficultyCalculationUtils.Smoothstep(Math.Abs(currAngle), Math.PI * 0.55, Math.PI * 0.75);
-                double angleChangeFactor = DifficultyCalculationUtils.Smoothstep(currAngleChange, 0.45, 0.3);
+                double angleChangeFactor = DifficultyCalculationUtils.Smoothstep(relevantAngleChange, 0.45, 0.3);
                 double velocityChangeFactor = double.IsNaN(normalizedVelocityChange) ? 1.0 : DifficultyCalculationUtils.Smoothstep(normalizedVelocityChange, 1.4, 1.25);
                 double accelerationChangeFactor = double.IsNaN(accelerationChange) ? 1.0 : DifficultyCalculationUtils.Smoothstep(accelerationChange, 0.3, 0.2);
 
@@ -262,6 +277,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 prevVelocity = currVelocity;
                 prevVelocityChange = currVelocityChange;
                 prevAngle = currAngle;
+                prevAngleChange = currAngleChange;
             }
 
             return totalComfyness;
