@@ -8,14 +8,17 @@ using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Screens.OnlinePlay.Tournaments.Tabs
 {
-    public partial class TournamentsTabBase : CompositeDrawable
+    public abstract partial class TournamentsTabBase : CompositeDrawable
     {
         [Resolved]
         protected TournamentInfo TournamentInfo { get; private set; } = null!;
 
+        public abstract TournamentsTabs TabType { get; }
+
         protected TournamentsTabBase()
         {
             RelativeSizeAxes = Axes.Both;
+            Alpha = 0.0f;
         }
     }
 }

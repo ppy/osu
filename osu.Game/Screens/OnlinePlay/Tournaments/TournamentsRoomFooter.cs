@@ -4,36 +4,24 @@
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Logging;
-using osu.Game.Screens.OnlinePlay.Tournaments.Components;
+using osu.Game.Graphics;
+using osu.Game.Screens.Select;
 using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Tournaments
 {
-    public partial class TournamentsRoomFooter : CompositeDrawable
+    public partial class TournamentsRoomFooter : Container
     {
-        public TournamentsRoomSubScreen TournamentScreen;
-
-        [Resolved]
-        private TournamentInfo tournamentInfo { get; set; } = null!;
-
-        private TournamentsRoomFooterButton[] tabButtons = [];
-
-        public TournamentsRoomFooter(TournamentsRoomSubScreen subScreen)
-        {
-            TournamentScreen = subScreen;
-        }
-
         [BackgroundDependencyLoader]
         private void load()
         {
-            tournamentInfo.UpdateTabVisibility = updateTabVisibility;
-
             RelativeSizeAxes = Axes.Both;
 
-            InternalChild = new FillFlowContainer
+            Child = new FillFlowContainer
             {
                 AutoSizeAxes = Axes.X,
                 RelativeSizeAxes = Axes.Y,
@@ -41,57 +29,97 @@ namespace osu.Game.Screens.OnlinePlay.Tournaments
                 Origin = Anchor.BottomLeft,
                 Direction = FillDirection.Horizontal,
                 Position = new Vector2(170, 0),
-                Spacing = new Vector2(8),
-                Children = tabButtons = createFooterButtons()
+                Children = createFooterButtons()
             };
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            // For some reason after hiding disabled footer buttons, they still show on screen.
-            // Tried turning all footer buttons' AlwaysPresent to false.
-            // I am literally stuck with this, cannot make it work.
-            foreach (TournamentsRoomFooterButton tabButton in tabButtons)
-            {
-                if (!tournamentInfo.GetTabVisibility(tabButton.TabType))
-                    tabButton.Hide();
-                Logger.Log("Visibility - " + tabButton.TabType + ", " + tabButton.Alpha + ", " +
-                tournamentInfo.GetTabVisibility(tabButton.TabType).ToString());
-            }
         }
 
         private TournamentsRoomFooterButton createFooterButton(TournamentsTabs tab)
         {
             return new TournamentsRoomFooterButton
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
                 TabType = tab,
-                Action = () => TournamentScreen.ChangeTab(tab),
-                TabText = TournamentsRoomSubScreen.GetTournamentsTabsName(tab),
-                // Alpha = TournamentScreen.TournamentInfo.GetTabVisibility(tab) ? 1.0f : 0.0f, // Want this to hide tab on creation if not visible
+                Text = TournamentsRoomSubScreen.GetTournamentsTabsName(tab),
             };
         }
 
         private TournamentsRoomFooterButton[] createFooterButtons()
         {
-            return [..
+            return (
                 from TournamentsTabs tab in Enum.GetValues(typeof(TournamentsTabs))
-                select createFooterButton(tab)];
+                select createFooterButton(tab)
+                ).ToArray();
+        }
+    }
+
+    public partial class TournamentsRoomFooterButton : FooterButton
+    {
+        /// <summary>
+        /// The <see cref="TournamentsTabs"/> type this button will display when pressed.
+        /// </summary>
+        public TournamentsTabs TabType;
+
+        /// <summary>
+        /// The currentTabType that is opened. Dictated by TournamentInfo.
+        /// </summary>
+        private Bindable<TournamentsTabs> currentTabType = new();
+
+        private bool isVisible = true;
+        public bool IsVisible
+        {
+            get => isVisible;
+            set
+            {
+                // For some reason using normal Alpha doesnt hide the button on load
+                if (value != IsVisible)
+                    Content.Alpha = value ? 1.0f : 0.0f;
+                isVisible = value;
+            }
         }
 
-        private void updateTabVisibility(TournamentsTabs tab, bool is_visible)
+        /// <summary>
+        /// True if this button is normally hidden, but needs showing.
+        /// </summary>
+        public bool IsForced;
+
+        private bool isCurrent;
+        public bool IsCurrent
         {
-            Logger.Log("Updated Visibility - " + tab + ", " + is_visible.ToString());
-            foreach (TournamentsRoomFooterButton child in tabButtons)
+            get => isCurrent;
+            set
             {
-                if (child.TabType == tab)
-                {
-                    if (is_visible) child.Show(); else child.Hide();
-                }
+                if (value != isCurrent)
+                    DeselectedColour = value ? CurrentColour : BaseColour;
+                isCurrent = value;
             }
+        }
+
+        public Colour4 CurrentColour;
+        public Colour4 BaseColour;
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours, TournamentInfo tournamentInfo)
+        {
+            Anchor = Anchor.CentreLeft;
+            Origin = Anchor.CentreLeft;
+            // todo : Not perfectly happy with the colours, but they are fine for now.
+            SelectedColour = colours.BlueLighter;
+            CurrentColour = colours.BlueLight;
+            BaseColour = colours.Pink1.Opacity(0.8f);
+            DeselectedColour = BaseColour;
+
+            // Setting Enabled is to trigger updateDisplay in FooterButton
+            // This was done to avoid the possibility of tabButton not reverting color after currentTabType changed.
+            currentTabType.BindTo(tournamentInfo.CurrentTabType);
+            currentTabType.BindValueChanged((e) =>
+            {
+                IsCurrent = e.NewValue == TabType;
+                Enabled.Value = !Enabled.Value;
+                Enabled.Value = !Enabled.Value;
+            }, true);
+
+            tournamentInfo.UpdateTabVisibility += (tab, b) => IsVisible = tab == TabType && b != IsVisible ? b : IsVisible;
+            IsVisible = tournamentInfo.GetTabVisibility(TabType);
+            Action = () => currentTabType.Value = TabType;
         }
     }
 }

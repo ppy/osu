@@ -22,6 +22,8 @@ using osu.Game.Graphics.Cursor;
 using osu.Game.Online.API.Requests;
 using System;
 using osu.Game.Screens.OnlinePlay.Tournaments.Models;
+using osu.Game.Screens.OnlinePlay.Tournaments.Tabs.Players;
+using osu.Framework.Bindables;
 
 namespace osu.Game.Screens.OnlinePlay.Tournaments
 {
@@ -42,27 +44,22 @@ namespace osu.Game.Screens.OnlinePlay.Tournaments
         [Cached]
         private TournamentInfo tournamentInfo { get; set; } = new();
 
+        private readonly Bindable<TournamentsTabs> currentTabType = new();
+        private TournamentsTabBase? currentTab;
+
         public override string ShortTitle => "Name of Tornament. Testing long names.";
 
         public TournamentsRoomSubScreen(Room room, bool allowEdit = true) : base(room, allowEdit)
         {
         }
 
-        public Container MainContent = null!;
-        public Drawable? InfoTab;
-        public Drawable? PlayersTab;
-        public Drawable? QualifiersTab;
-        public Drawable? MappoolsTab;
-        public Drawable ResultsTab = null!;
-        public Drawable? ScheduleTab;
-        public Drawable? SettingsTab;
-        public Drawable? CurrentTab;
-
-        // todo : Selected tab will have different color.
-        public TournamentsTabs CurrentTabType = TournamentsTabs.Info;
+        public Container<TournamentsTabBase> MainContent = null!;
 
         protected override void LoadComplete()
         {
+            currentTabType.BindTo(tournamentInfo.CurrentTabType);
+            currentTabType.BindValueChanged((tab) => ChangeTab(tab.NewValue), true);
+
             foreach (var team in tournamentInfo.Teams)
             {
                 foreach (var player in team.Players)
@@ -72,27 +69,26 @@ namespace osu.Game.Screens.OnlinePlay.Tournaments
             }
         }
 
-        protected override Drawable CreateFooter() => new TournamentsRoomFooter(this);
+        protected override Drawable CreateFooter() => new TournamentsRoomFooter();
 
         protected override Drawable CreateMainContent()
         {
-            MainContent = new OsuContextMenuContainer
+            return new OsuContextMenuContainer
             {
                 RelativeSizeAxes = Axes.Both,
                 Origin = Anchor.Centre,
                 Anchor = Anchor.Centre,
-                Children = new Drawable[]
+                Child = MainContent = new()
                 {
-
-                    ResultsTab = new TournamentsResultsTab()
+                    RelativeSizeAxes = Axes.Both,
+                    Origin = Anchor.Centre,
+                    Anchor = Anchor.Centre,
+                    Children = [
+                        new TournamentsPlayersTab(),
+                        new TournamentsResultsTab()
+                    ]
                 }
             };
-            foreach (var tab in MainContent)
-            {
-                if (tab is TournamentsTabBase) tab.Hide();
-            }
-
-            return MainContent;
         }
 
         protected override RoomSettingsOverlay CreateRoomSettingsOverlay(Room room)
@@ -115,40 +111,16 @@ namespace osu.Game.Screens.OnlinePlay.Tournaments
         public void ChangeTab(TournamentsTabs tab)
         {
             Logger.Log($@"Pressed {tab} Button!");
-            if (tab == CurrentTabType)
+            if (tab == currentTab?.TabType)
                 return;
 
-            CurrentTab?.Hide();
-            switch (tab)
-            {
-                case TournamentsTabs.Info:
-                    break;
+            currentTab?.Hide();
+            foreach (TournamentsTabBase tabScreen in MainContent)
+                if (tabScreen.TabType == tab)
+                    currentTab = tabScreen;
 
-                case TournamentsTabs.Players:
-                    break;
-
-                case TournamentsTabs.Qualifiers:
-                    break;
-
-                case TournamentsTabs.Mappools:
-                    break;
-
-                case TournamentsTabs.Results:
-                    ResultsTab.Show();
-                    CurrentTab = ResultsTab;
-                    break;
-
-                case TournamentsTabs.Schedule:
-                    break;
-
-                case TournamentsTabs.Settings:
-                    break;
-
-                default:
-                    break;
-            }
-
-            CurrentTabType = tab;
+            currentTab?.Show();
+            currentTabType.Value = tab;
         }
 
         public static LocalisableString GetTournamentsTabsName(TournamentsTabs tab)

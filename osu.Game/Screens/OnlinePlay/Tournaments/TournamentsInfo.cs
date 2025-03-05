@@ -25,7 +25,20 @@ namespace osu.Game.Screens.OnlinePlay.Tournaments
         public int TournamentID;
         public string TournamentName { get; set; } = string.Empty;
 
-        public Action<TournamentsTabs, bool>? UpdateTabVisibility;
+        [JsonIgnore]
+        public readonly Bindable<TournamentsTabs> CurrentTabType = new(TournamentsTabs.Info);
+
+        [JsonIgnore]
+        public Action<TournamentsTabs, bool> UpdateTabVisibility = (tabs, b) => { };
+
+        /// <summary>
+        /// Defines which tabs are visible for all users.
+        /// </summary>
+        [JsonIgnore]
+        private uint tabsVisibility = 0u;
+
+        [JsonIgnore]
+        public readonly BindableBool IsEditing = new BindableBool(false);
 
         /// <summary>
         /// The largest number of players allowed in a team
@@ -47,12 +60,6 @@ namespace osu.Game.Screens.OnlinePlay.Tournaments
         {
             MinValue = 1
         };
-
-        [JsonIgnore]
-        private uint tabsVisibility = 0u;
-
-        [JsonIgnore]
-        public BindableBool IsEditing = new BindableBool(false);
 
         // TAKEN FROM LadderInfo.cs
 
@@ -115,12 +122,12 @@ namespace osu.Game.Screens.OnlinePlay.Tournaments
             tabsVisibility = visibility ? tabsVisibility | (1u << (int)tab) : tabsVisibility & ~(1u << (int)tab);
             Logger.Log("Visibility after " + tabsVisibility.ToString());
             // Only updates when visiiblity updates, might be redundant
-            if (visibilityChanged) UpdateTabVisibility?.Invoke(tab, visibility);
+            if (visibilityChanged) UpdateTabVisibility.Invoke(tab, visibility);
         }
 
         private void testTournament1()
         {
-            tabsVisibility = 17u;
+            tabsVisibility = 19u;
             IsEditing.Value = true;
 
             List<TournamentUser> players = [];
