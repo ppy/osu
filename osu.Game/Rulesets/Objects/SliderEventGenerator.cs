@@ -46,6 +46,8 @@ namespace osu.Game.Rulesets.Objects
 
             for (int span = 0; span < spanCount; span++)
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
                 double spanStartTime = startTime + span * spanDuration;
                 bool reversed = span % 2 == 1;
 

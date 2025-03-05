@@ -122,7 +122,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         private readonly Room room;
 
         private Drawable roomContent = null!;
-        private SelectionPollingComponent selectionPollingComponent = null!;
+        private PlaylistsRoomUpdater roomUpdater = null!;
         private PlaylistsRoomSettingsOverlay settingsOverlay = null!;
 
         private MatchLeaderboard leaderboard = null!;
@@ -161,7 +161,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
-                    selectionPollingComponent = new SelectionPollingComponent(room),
+                    roomUpdater = new PlaylistsRoomUpdater(room),
                     beatmapAvailabilityTracker,
                     new MultiplayerRoomSounds(),
                     new Container
@@ -514,8 +514,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         /// </summary>
         private void updatePollingRate()
         {
-            selectionPollingComponent.TimeBetweenPolls.Value = isIdle.Value ? 30000 : 5000;
-            Logger.Log($"Polling adjusted (selection: {selectionPollingComponent.TimeBetweenPolls.Value})");
+            roomUpdater.TimeBetweenPolls.Value = isIdle.Value ? 30000 : 5000;
+            Logger.Log($"Polling adjusted (selection: {roomUpdater.TimeBetweenPolls.Value})");
         }
 
         /// <summary>
@@ -691,7 +691,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             if (!ensureExitConfirmed())
                 return true;
 
-            RoomManager?.PartRoom();
+            if (room.RoomID != null)
+                api.Queue(new PartRoomRequest(room));
 
             endHandlingTrack();
             return base.OnExiting(e);

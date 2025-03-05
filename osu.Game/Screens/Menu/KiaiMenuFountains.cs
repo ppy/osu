@@ -3,10 +3,10 @@
 
 using System;
 using osu.Framework.Allocation;
-using osu.Framework.Audio.Track;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Utils;
-using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Screens.Menu
@@ -16,8 +16,11 @@ namespace osu.Game.Screens.Menu
         private StarFountain leftFountain = null!;
         private StarFountain rightFountain = null!;
 
+        private Sample? sample;
+        private SampleChannel? sampleChannel;
+
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(AudioManager audio)
         {
             RelativeSizeAxes = Axes.Both;
 
@@ -36,31 +39,28 @@ namespace osu.Game.Screens.Menu
                     X = -250,
                 },
             };
+
+            sample = audio.Samples.Get(@"Gameplay/fountain-shoot");
         }
 
         private bool isTriggered;
 
-        private double? lastTrigger;
-
-        protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
+        protected override void Update()
         {
-            base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
+            base.Update();
 
-            if (effectPoint.KiaiMode && !isTriggered)
+            if (EffectPoint.KiaiMode && !isTriggered)
             {
-                bool isNearEffectPoint = Math.Abs(BeatSyncSource.Clock.CurrentTime - effectPoint.Time) < 500;
+                bool isNearEffectPoint = Math.Abs(BeatSyncSource.Clock.CurrentTime - EffectPoint.Time) < 500;
                 if (isNearEffectPoint)
                     Shoot();
             }
 
-            isTriggered = effectPoint.KiaiMode;
+            isTriggered = EffectPoint.KiaiMode;
         }
 
         public void Shoot()
         {
-            if (lastTrigger != null && Clock.CurrentTime - lastTrigger < 500)
-                return;
-
             int direction = RNG.Next(-1, 2);
 
             switch (direction)
@@ -81,7 +81,10 @@ namespace osu.Game.Screens.Menu
                     break;
             }
 
-            lastTrigger = Clock.CurrentTime;
+            // Track sample channel to avoid overlapping playback
+            sampleChannel?.Stop();
+            sampleChannel = sample?.GetChannel();
+            sampleChannel?.Play();
         }
     }
 }

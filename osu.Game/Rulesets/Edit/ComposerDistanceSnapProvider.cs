@@ -52,7 +52,7 @@ namespace osu.Game.Rulesets.Edit
         private EditorClock editorClock { get; set; } = null!;
 
         [Resolved]
-        private EditorBeatmap editorBeatmap { get; set; } = null!;
+        protected EditorBeatmap EditorBeatmap { get; private set; } = null!;
 
         [Resolved]
         private IBeatSnapProvider beatSnapProvider { get; set; } = null!;
@@ -100,7 +100,7 @@ namespace osu.Game.Rulesets.Edit
                 }
             });
 
-            DistanceSpacingMultiplier.Value = editorBeatmap.DistanceSpacing;
+            DistanceSpacingMultiplier.Value = EditorBeatmap.DistanceSpacing;
             DistanceSpacingMultiplier.BindValueChanged(multiplier =>
             {
                 distanceSpacingSlider.ContractedLabelText = $"D. S. ({multiplier.NewValue:0.##x})";
@@ -109,7 +109,7 @@ namespace osu.Game.Rulesets.Edit
                 if (multiplier.NewValue != multiplier.OldValue)
                     onScreenDisplay?.Display(new DistanceSpacingToast(multiplier.NewValue.ToLocalisableString(@"0.##x"), multiplier));
 
-                editorBeatmap.DistanceSpacing = multiplier.NewValue;
+                EditorBeatmap.DistanceSpacing = multiplier.NewValue;
             }, true);
 
             DistanceSpacingMultiplier.BindDisabledChanged(disabled => distanceSpacingSlider.Alpha = disabled ? 0 : 1, true);
@@ -267,7 +267,7 @@ namespace osu.Game.Rulesets.Edit
 
         public virtual float GetBeatSnapDistance(IHasSliderVelocity? withVelocity = null)
         {
-            return (float)(100 * (withVelocity?.SliderVelocityMultiplier ?? 1) * editorBeatmap.Difficulty.SliderMultiplier * 1
+            return (float)(100 * (withVelocity?.SliderVelocityMultiplier ?? 1) * EditorBeatmap.Difficulty.SliderMultiplier * 1
                            / beatSnapProvider.BeatDivisor);
         }
 

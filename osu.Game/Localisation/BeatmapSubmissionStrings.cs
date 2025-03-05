@@ -140,9 +140,9 @@ namespace osu.Game.Localisation
         public static LocalisableString LoadInBrowserAfterSubmission => new TranslatableString(getKey(@"load_in_browser_after_submission"), @"Load in browser after submission");
 
         /// <summary>
-        /// "Note: In order to make it possible for users of all osu! versions to enjoy your beatmap, it will be exported in a backwards-compatible format. While we have made efforts to ensure that process keeps the beatmap playable in its intended form, some data related to features that previous versions of osu! do not support may be lost."
+        /// "Note: In order to make it possible for users of all osu! versions to enjoy your beatmap, it will be exported in a backwards-compatible format. While we have made efforts to ensure that this process keeps the beatmap playable in its intended form, some data related to features that previous versions of osu! do not support may be lost."
         /// </summary>
-        public static LocalisableString LegacyExportDisclaimer => new TranslatableString(getKey(@"legacy_export_disclaimer"), @"Note: In order to make it possible for users of all osu! versions to enjoy your beatmap, it will be exported in a backwards-compatible format. While we have made efforts to ensure that process keeps the beatmap playable in its intended form, some data related to features that previous versions of osu! do not support may be lost.");
+        public static LocalisableString LegacyExportDisclaimer => new TranslatableString(getKey(@"legacy_export_disclaimer"), @"Note: In order to make it possible for users of all osu! versions to enjoy your beatmap, it will be exported in a backwards-compatible format. While we have made efforts to ensure that this process keeps the beatmap playable in its intended form, some data related to features that previous versions of osu! do not support may be lost.");
 
         /// <summary>
         /// "Empty beatmaps cannot be submitted."
