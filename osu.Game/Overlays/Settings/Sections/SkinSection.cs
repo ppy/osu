@@ -27,6 +27,7 @@ using osu.Game.Screens.Select;
 using osu.Game.Skinning;
 using osuTK;
 using Realms;
+using WebCommonStrings = osu.Game.Resources.Localisation.Web.CommonStrings;
 
 namespace osu.Game.Overlays.Settings.Sections
 {
@@ -231,7 +232,7 @@ namespace osu.Game.Overlays.Settings.Sections
             [BackgroundDependencyLoader]
             private void load()
             {
-                Text = CommonStrings.Delete;
+                Text = WebCommonStrings.ButtonsDelete;
                 Action = delete;
             }
 
