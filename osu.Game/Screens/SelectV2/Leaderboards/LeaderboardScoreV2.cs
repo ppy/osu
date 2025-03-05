@@ -780,8 +780,11 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
             {
                 List<MenuItem> items = new List<MenuItem>();
 
-                if (score.Mods.Length > 0)
-                    items.Add(new OsuMenuItem("Use these mods", MenuItemType.Highlighted, () => SelectedMods.Value = score.Mods.Where(m => IsValidMod.Invoke(m)).ToArray()));
+                // system mods should never be copied across regardless of anything.
+                var copyableMods = score.Mods.Where(m => IsValidMod.Invoke(m) && m.Type != ModType.System).ToArray();
+
+                if (copyableMods.Length > 0)
+                    items.Add(new OsuMenuItem("Use these mods", MenuItemType.Highlighted, () => SelectedMods.Value = copyableMods));
 
                 if (score.OnlineID > 0)
                     items.Add(new OsuMenuItem(CommonStrings.CopyLink, MenuItemType.Standard, () => clipboard?.SetText($@"{api.Endpoints.WebsiteUrl}/scores/{score.OnlineID}")));
