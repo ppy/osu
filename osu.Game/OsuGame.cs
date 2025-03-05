@@ -833,7 +833,7 @@ namespace osu.Game
                 return;
 
             string newTitle = Name;
-            if (beatmap.NewValue != null && beatmap.NewValue is not DummyWorkingBeatmap)
+            if (beatmap.NewValue?.BeatmapSetInfo?.Protected == false && beatmap.NewValue is not DummyWorkingBeatmap)
                 newTitle = $"{Name} - {beatmap.NewValue.BeatmapInfo.GetDisplayTitleRomanisable(true, false)}";
 
             Host.Window.Title = newTitle;
