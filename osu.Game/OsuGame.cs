@@ -832,7 +832,6 @@ namespace osu.Game
             if (Host.Window == null)
                 return;
 
-            // prevent weird window title saying please load a beatmap
             string newTitle = Name;
             if (beatmap.NewValue != null && beatmap.NewValue is not DummyWorkingBeatmap)
                 newTitle = $"{Name} - {beatmap.NewValue.BeatmapInfo.GetDisplayTitleRomanisable(true, false)}";
