@@ -222,6 +222,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     CountryCode = CountryCode.ES,
                 }
             }));
+            AddUntilStep("wait for scores", () => this.ChildrenOfType<LeaderboardScore>().Count(), () => Is.GreaterThan(0));
             AddStep("right click panel", () =>
             {
                 InputManager.MoveMouseTo(this.ChildrenOfType<LeaderboardScore>().Single());
