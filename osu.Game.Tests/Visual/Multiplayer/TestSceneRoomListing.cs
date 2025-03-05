@@ -18,7 +18,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public partial class TestSceneLoungeRoomsContainer : OnlinePlayTestScene
+    public partial class TestSceneRoomListing : OnlinePlayTestScene
     {
         private BindableList<Room> rooms = null!;
         private IBindable<Room?> selectedRoom = null!;
