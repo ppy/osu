@@ -9,6 +9,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
+using osu.Game.Screens.OnlinePlay.Tournaments.Tabs;
 using osu.Game.Screens.Select;
 using osuTK;
 
@@ -117,8 +118,8 @@ namespace osu.Game.Screens.OnlinePlay.Tournaments
                 Enabled.Value = !Enabled.Value;
             }, true);
 
-            tournamentInfo.UpdateTabVisibility += (tab, b) => IsVisible = tab == TabType && b != IsVisible ? b : IsVisible;
-            IsVisible = tournamentInfo.GetTabVisibility(TabType);
+            tournamentInfo.VisibleTabs.BindValueChanged((tab) => IsVisible = tab.NewValue.HasFlag(TabType.AsFlag()));
+            IsVisible = tournamentInfo.VisibleTabs.Value.HasFlag(TabType.AsFlag());
             Action = () => currentTabType.Value = TabType;
         }
     }

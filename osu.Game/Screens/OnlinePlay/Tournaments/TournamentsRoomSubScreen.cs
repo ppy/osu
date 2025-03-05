@@ -14,6 +14,9 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Framework.Allocation;
 using osu.Game.Screens.OnlinePlay.Tournaments.Tabs;
+using osu.Game.Screens.OnlinePlay.Tournaments.Tabs.Info;
+using osu.Game.Screens.OnlinePlay.Tournaments.Tabs.Settings;
+using osu.Game.Screens.OnlinePlay.Tournaments.Tabs.Schedule;
 using osu.Game.Screens.OnlinePlay.Tournaments.Tabs.Results;
 using osu.Framework.Graphics.Colour;
 using osuTK.Graphics;
@@ -43,9 +46,10 @@ namespace osu.Game.Screens.OnlinePlay.Tournaments
 
         [Cached]
         private TournamentInfo tournamentInfo { get; set; } = new();
+        public TournamentInfo TournamentInfo { get => tournamentInfo; set => tournamentInfo = value; }
 
         private readonly Bindable<TournamentsTab> currentTabType = new();
-        private TournamentsTabBase? currentTab;
+        private TournamentsBaseTab? currentTab;
 
         public override string ShortTitle => "Name of Tornament. Testing long names.";
 
@@ -53,7 +57,7 @@ namespace osu.Game.Screens.OnlinePlay.Tournaments
         {
         }
 
-        public Container<TournamentsTabBase> MainContent = null!;
+        public Container<TournamentsBaseTab> MainContent = null!;
 
         protected override void LoadComplete()
         {
@@ -84,8 +88,11 @@ namespace osu.Game.Screens.OnlinePlay.Tournaments
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
                     Children = [
+                        new TournamentsInfoTab(),
                         new TournamentsPlayersTab(),
-                        new TournamentsResultsTab()
+                        new TournamentsResultsTab(),
+                        new TournamentsScheduleTab(),
+                        new TournamentsSettingsTab(),
                     ]
                 }
             };
@@ -115,7 +122,7 @@ namespace osu.Game.Screens.OnlinePlay.Tournaments
                 return;
 
             currentTab?.Hide();
-            foreach (TournamentsTabBase tabScreen in MainContent)
+            foreach (TournamentsBaseTab tabScreen in MainContent)
                 if (tabScreen.TabType == tab)
                     currentTab = tabScreen;
 
@@ -192,17 +199,5 @@ namespace osu.Game.Screens.OnlinePlay.Tournaments
                 success?.Invoke();
             }
         }
-    }
-
-    // todo : don't know where to put these, they can just stay here for now.
-    public enum TournamentsTab
-    {
-        Info,
-        Players,
-        Qualifiers,
-        Mappools,
-        Results,
-        Schedule,
-        Settings,
     }
 }

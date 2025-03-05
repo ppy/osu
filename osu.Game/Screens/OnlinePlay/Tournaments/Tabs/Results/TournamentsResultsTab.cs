@@ -9,7 +9,7 @@ using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Screens.OnlinePlay.Tournaments.Tabs.Results
 {
-    public partial class TournamentsResultsTab : TournamentsTabBase
+    public partial class TournamentsResultsTab : TournamentsBaseTab
     {
         public override TournamentsTab TabType => TournamentsTab.Results;
 

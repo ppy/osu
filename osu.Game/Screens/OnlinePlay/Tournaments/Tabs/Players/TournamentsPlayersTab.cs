@@ -9,7 +9,7 @@ using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Screens.OnlinePlay.Tournaments.Tabs.Players
 {
-    public partial class TournamentsPlayersTab : TournamentsTabBase
+    public partial class TournamentsPlayersTab : TournamentsBaseTab
     {
         public override TournamentsTab TabType => TournamentsTab.Players;
 

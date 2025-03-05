@@ -5,37 +5,26 @@
 // Instanced on joining a TournamentLounge
 
 using System;
-using System.Linq;
+using System.Diagnostics;
 using System.Collections.Generic;
-using osu.Framework.Logging;
 using osu.Framework.Bindables;
 using System.Text.Json.Serialization;
 using osu.Game.Rulesets;
 using osu.Game.Screens.OnlinePlay.Tournaments.Models;
-using System.Drawing;
+using osu.Game.Screens.OnlinePlay.Tournaments.Tabs;
 
 namespace osu.Game.Screens.OnlinePlay.Tournaments
 {
     [Serializable]
     public class TournamentInfo
     {
-        // todo : all mentions of this should be removed in final product
-        public const bool IS_TESTING = true;
-
         public int TournamentID;
         public string TournamentName { get; set; } = string.Empty;
 
         [JsonIgnore]
         public readonly Bindable<TournamentsTab> CurrentTabType = new(TournamentsTab.Info);
 
-        [JsonIgnore]
-        public Action<TournamentsTab, bool> UpdateTabVisibility = (tabs, b) => { };
-
-        /// <summary>
-        /// Defines which tabs are visible for all users.
-        /// </summary>
-        [JsonIgnore]
-        private uint tabsVisibility = 0u;
+        public readonly Bindable<TournamentsTabs> VisibleTabs = new(TournamentsTabs.None);
 
         [JsonIgnore]
         public readonly BindableBool IsEditing = new BindableBool(false);
@@ -97,62 +86,31 @@ namespace osu.Game.Screens.OnlinePlay.Tournaments
 
         public TournamentInfo()
         {
-            if (IS_TESTING)
-                testTournament1();
+            VisibleTabs.BindValueChanged((tab) =>
+            {
+                // Don't know if hiding all tabs should be allowed. Just assert for now.
+                Debug.Assert(VisibleTabs.Value != TournamentsTabs.None);
+                Debug.Assert((uint)VisibleTabs.Value <= (uint)TournamentsTabs.All);
+
+                // If the current tab was hidden.
+                if ((~tab.NewValue & tab.OldValue).HasFlag(CurrentTabType.Value.AsFlag()))
+                {
+                    // If current tab was hidden, select its right tab as current if able, otherwise select its left.
+                    uint rights = (uint)VisibleTabs.Value & ~((uint)CurrentTabType.Value - 1);
+                    uint right = rights & (~rights + 1);
+                    CurrentTabType.Value = right != 0 ? (TournamentsTab)right : VisibleTabs.Value.GetLast();
+                }
+            });
         }
 
-        public bool GetTabVisibility(TournamentsTab tab)
-        {
-            return ((tabsVisibility & (1u << (int)tab)) >> (int)tab) == 1;
-        }
-
-        public IEnumerable<TournamentsTab> GetTabsVisibility()
-        {
-            return
-                from TournamentsTab tab in Enum.GetValues(typeof(TournamentsTab))
-                where GetTabVisibility(tab)
-                select tab;
-        }
-
-        // Sets the visibility of the local clients footer tabs
+        /// <summary>
+        /// Sets the visibility of the local client's footer tabs
+        /// </summary>
+        /// <param name="tab"></param>
+        /// <param name="visibility"></param>
         public void SetTabVisibility(TournamentsTab tab, bool visibility)
         {
-            bool visibilityChanged = visibility != GetTabVisibility(tab);
-            Logger.Log("Visibility before " + tabsVisibility.ToString());
-            tabsVisibility = visibility ? tabsVisibility | (1u << (int)tab) : tabsVisibility & ~(1u << (int)tab);
-            Logger.Log("Visibility after " + tabsVisibility.ToString());
-            // Only updates when visiiblity updates, might be redundant
-            if (visibilityChanged) UpdateTabVisibility.Invoke(tab, visibility);
-        }
-
-        private void testTournament1()
-        {
-            tabsVisibility = 19u;
-            IsEditing.Value = true;
-
-            List<TournamentUser> players = [];
-            foreach (int id in Enumerable.Range(1, 8))
-            {
-                players.Add(new TournamentUser() { OnlineID = id });
-                // PopulatePlayer(players.Last(), success: () => Console.WriteLine("Successfully populated player."), immediate: true);
-            }
-
-            foreach (int i in Enumerable.Range(0, 4))
-            {
-                Teams.Add(new TournamentTeam(players.GetRange(i, 2))
-                {
-                    FullName = { Value = "Team" + i.ToString() },
-                    FlagName = { Value = "NO" },
-                    Acronym = { Value = "T" + i.ToString() },
-                    ID = i,
-                });
-            }
-
-            foreach (int i in Enumerable.Range(0, 3))
-            {
-                Matches.Add(new TournamentMatch([Teams[i], Teams[i + 1]]));
-                Matches.Last().Position.Value = new Point(i * 240, 0);
-            }
+            VisibleTabs.Value = visibility ? VisibleTabs.Value | tab.AsFlag() : VisibleTabs.Value & ~tab.AsFlag();
         }
     }
 }
