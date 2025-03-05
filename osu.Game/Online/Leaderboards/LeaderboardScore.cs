@@ -453,7 +453,10 @@ namespace osu.Game.Online.Leaderboards
                 List<MenuItem> items = new List<MenuItem>();
 
                 if (Score.Mods.Length > 0 && songSelect != null)
-                    items.Add(new OsuMenuItem("Use these mods", MenuItemType.Highlighted, () => songSelect.Mods.Value = Score.Mods));
+                {
+                    // system mods should never be copied across regardless of anything.
+                    items.Add(new OsuMenuItem("Use these mods", MenuItemType.Highlighted, () => songSelect.Mods.Value = Score.Mods.Where(m => m.Type != ModType.System).ToArray()));
+                }
 
                 if (Score.OnlineID > 0)
                     items.Add(new OsuMenuItem(CommonStrings.CopyLink, MenuItemType.Standard, () => clipboard?.SetText($@"{api.Endpoints.WebsiteUrl}/scores/{Score.OnlineID}")));
