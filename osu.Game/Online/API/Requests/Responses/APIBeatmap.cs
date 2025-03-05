@@ -98,7 +98,7 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"top_tag_ids")]
         public APIBeatmapTag[]? TopTags { get; set; }
 
-        [JsonProperty(@"own_tag_ids")]
+        [JsonProperty(@"current_user_tag_ids")]
         public long[]? OwnTagIds { get; set; }
 
         [JsonProperty(@"max_combo")]
