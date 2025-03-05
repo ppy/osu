@@ -164,6 +164,7 @@ namespace osu.Game.Screens.Edit
         private bool switchingDifficulty;
 
         private string lastSavedHash;
+        private EditorMenuItem discardChangesMenuItem;
 
         private ScreenContainer screenContainer;
 
@@ -391,6 +392,10 @@ namespace osu.Game.Screens.Edit
                                         {
                                             undoMenuItem = new EditorMenuItem(CommonStrings.Undo, MenuItemType.Standard, Undo) { Hotkey = new Hotkey(PlatformAction.Undo) },
                                             redoMenuItem = new EditorMenuItem(CommonStrings.Redo, MenuItemType.Standard, Redo) { Hotkey = new Hotkey(PlatformAction.Redo) },
+                                            discardChangesMenuItem = new EditorMenuItem("Discard unsaved changes", MenuItemType.Destructive, DiscardUnsavedChanges)
+                                            {
+                                                Hotkey = new Hotkey(GlobalAction.EditorDiscardUnsavedChanges)
+                                            },
                                             new OsuMenuItemSpacer(),
                                             cutMenuItem = new EditorMenuItem(CommonStrings.Cut, MenuItemType.Standard, Cut) { Hotkey = new Hotkey(PlatformAction.Cut) },
                                             copyMenuItem = new EditorMenuItem(CommonStrings.Copy, MenuItemType.Standard, Copy) { Hotkey = new Hotkey(PlatformAction.Copy) },
@@ -607,6 +612,8 @@ namespace osu.Game.Screens.Edit
         {
             base.Update();
             clock.ProcessFrame();
+
+            discardChangesMenuItem.Action.Disabled = !HasUnsavedChanges;
         }
 
         public bool OnPressed(KeyBindingPressEvent<PlatformAction> e)
@@ -821,6 +828,10 @@ namespace osu.Game.Screens.Edit
                 case GlobalAction.EditorTestGameplay:
                     bottomBar.TestGameplayButton.TriggerClick();
                     return true;
+
+                case GlobalAction.EditorDiscardUnsavedChanges:
+                    DiscardUnsavedChanges();
+                    return true;
             }
 
             return false;
@@ -1007,6 +1018,20 @@ namespace osu.Game.Screens.Edit
         protected void Undo() => changeHandler?.RestoreState(-1);
 
         protected void Redo() => changeHandler?.RestoreState(1);
+
+        protected void DiscardUnsavedChanges()
+        {
+            if (!HasUnsavedChanges)
+                return;
+
+            // we're not doing this via `changeHandler` because `changeHandler` has limited number of undo actions
+            // and therefore there's no guarantee that it even *has* the beatmap's last saved state in its history still.
+            dialogOverlay.Push(new DiscardUnsavedChangesDialog(() =>
+            {
+                updateLastSavedHash(); // without this a second dialog will show (the standard "save unsaved changes" one that shows on exit).
+                SwitchToDifficulty(editorBeatmap.BeatmapInfo);
+            }));
+        }
 
         protected void SetPreviewPointToCurrentTime()
         {
@@ -1510,11 +1535,11 @@ namespace osu.Game.Screens.Edit
             loader?.CancelPendingDifficultySwitch();
         }
 
-        public Task<bool> Reload()
+        public Task<bool> SaveAndReload()
         {
             var tcs = new TaskCompletionSource<bool>();
 
-            dialogOverlay.Push(new ReloadEditorDialog(
+            dialogOverlay.Push(new SaveAndReloadEditorDialog(
                 reload: () =>
                 {
                     bool reloadedSuccessfully = attemptMutationOperation(() =>

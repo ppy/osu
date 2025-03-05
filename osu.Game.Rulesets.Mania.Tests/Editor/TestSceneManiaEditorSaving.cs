@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
             {
                 keyCount.Current.Value = 8;
             });
-            AddUntilStep("dialog visible", () => Game.ChildrenOfType<IDialogOverlay>().SingleOrDefault()?.CurrentDialog, Is.InstanceOf<ReloadEditorDialog>);
+            AddUntilStep("dialog visible", () => Game.ChildrenOfType<IDialogOverlay>().SingleOrDefault()?.CurrentDialog, Is.InstanceOf<SaveAndReloadEditorDialog>);
             AddStep("refuse", () => InputManager.Key(Key.Number2));
             AddAssert("key count is 5", () => keyCount.Current.Value, () => Is.EqualTo(5));
 
@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
             {
                 keyCount.Current.Value = 8;
             });
-            AddUntilStep("dialog visible", () => Game.ChildrenOfType<IDialogOverlay>().Single().CurrentDialog, Is.InstanceOf<ReloadEditorDialog>);
+            AddUntilStep("dialog visible", () => Game.ChildrenOfType<IDialogOverlay>().Single().CurrentDialog, Is.InstanceOf<SaveAndReloadEditorDialog>);
             AddStep("acquiesce", () => InputManager.Key(Key.Number1));
             AddUntilStep("beatmap became 8K", () => Game.Beatmap.Value.BeatmapInfo.Difficulty.CircleSize, () => Is.EqualTo(8));
         }
