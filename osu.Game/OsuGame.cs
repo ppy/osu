@@ -421,6 +421,7 @@ namespace osu.Game
 
             SelectedMods.BindValueChanged(modsChanged);
             Beatmap.BindValueChanged(beatmapChanged, true);
+            configUserActivity.BindValueChanged(userActivityChanged);
 
             applySafeAreaConsiderations = LocalConfig.GetBindable<bool>(OsuSetting.SafeAreaConsiderations);
             applySafeAreaConsiderations.BindValueChanged(apply => SafeAreaContainer.SafeAreaOverrideEdges = apply.NewValue ? SafeAreaOverrideEdges : Edges.All, true);
@@ -828,13 +829,41 @@ namespace osu.Game
         {
             beatmap.OldValue?.CancelAsyncLoad();
             beatmap.NewValue?.BeginAsyncLoad();
+            updateWindowTitle();
+        }
 
+        private void userActivityChanged(ValueChangedEvent<UserActivity> userActivity)
+        {
+            updateWindowTitle();
+        }
+
+        private void updateWindowTitle()
+        {
             if (Host.Window == null)
                 return;
 
+            if (Beatmap.Value?.BeatmapSetInfo?.Protected != false || Beatmap.Value is DummyWorkingBeatmap)
+            {
+                Host.Window.Title = Name;
+                return;
+            }
+
             string newTitle = Name;
-            if (beatmap.NewValue?.BeatmapSetInfo?.Protected == false && beatmap.NewValue is not DummyWorkingBeatmap)
-                newTitle = $"{Name} - {beatmap.NewValue.BeatmapInfo.GetDisplayTitleRomanisable(true, false)}";
+
+            switch (configUserActivity.Value)
+            {
+                case UserActivity.InGame:
+                case UserActivity.TestingBeatmap:
+                case UserActivity.WatchingReplay:
+                    newTitle = $"{Name} - {Beatmap.Value.BeatmapInfo.GetDisplayTitleRomanisable(true, false)}";
+                    break;
+
+                case UserActivity.EditingBeatmap:
+                    if (Beatmap.Value.BeatmapInfo.Path != null)
+                        newTitle = $"{Name} - {Beatmap.Value.BeatmapInfo.Path}";
+
+                    break;
+            }
 
             Host.Window.Title = newTitle;
         }
