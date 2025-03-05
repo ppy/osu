@@ -84,6 +84,8 @@ namespace osu.Game.Input.Bindings
 
         public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e) => handler?.OnReleased(e);
 
+
+
         private static IEnumerable<KeyBinding> globalKeyBindings => new[]
         {
             new KeyBinding(InputKey.Up, GlobalAction.SelectPrevious),
@@ -111,6 +113,7 @@ namespace osu.Game.Input.Bindings
 
             new KeyBinding(InputKey.F10, GlobalAction.ToggleGameplayMouseButtons),
             new KeyBinding(InputKey.F12, GlobalAction.TakeScreenshot),
+            new KeyBinding(InputKey.Insert, GlobalAction.BossKey),
         };
 
         private static IEnumerable<KeyBinding> overlayKeyBindings => new[]
@@ -502,6 +505,9 @@ namespace osu.Game.Input.Bindings
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorToggleMoveControl))]
         EditorToggleMoveControl,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.BossKey))]
+        BossKey,
     }
 
     public enum GlobalActionCategory
