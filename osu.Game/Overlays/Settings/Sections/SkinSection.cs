@@ -165,7 +165,7 @@ namespace osu.Game.Overlays.Settings.Sections
             [BackgroundDependencyLoader]
             private void load()
             {
-                Text = "Rename";
+                Text = CommonStrings.Rename;
                 Action = this.ShowPopover;
             }
 
@@ -193,7 +193,7 @@ namespace osu.Game.Overlays.Settings.Sections
             [BackgroundDependencyLoader]
             private void load()
             {
-                Text = "Export";
+                Text = CommonStrings.Export;
                 Action = export;
             }
 
@@ -231,7 +231,7 @@ namespace osu.Game.Overlays.Settings.Sections
             [BackgroundDependencyLoader]
             private void load()
             {
-                Text = "Delete";
+                Text = CommonStrings.Delete;
                 Action = delete;
             }
 
