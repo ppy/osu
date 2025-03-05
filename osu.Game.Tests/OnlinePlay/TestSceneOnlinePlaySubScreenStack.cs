@@ -15,7 +15,7 @@ using osu.Game.Tests.Visual.OnlinePlay;
 namespace osu.Game.Tests.OnlinePlay
 {
     [HeadlessTest]
-    public class TestSceneOnlinePlaySubScreenStack : OnlinePlayTestScene
+    public partial class TestSceneOnlinePlaySubScreenStack : OnlinePlayTestScene
     {
         private ScreenStack stack = null!;
 
@@ -56,7 +56,7 @@ namespace osu.Game.Tests.OnlinePlay
             AddAssert("mods reset", () => SelectedMods.Value.Count, () => Is.Zero);
         }
 
-        private class ScreenWithExternalBindableDisablement : OsuScreen
+        private partial class ScreenWithExternalBindableDisablement : OsuScreen
         {
             public override bool DisallowExternalBeatmapRulesetChanges { get; }
 
@@ -66,7 +66,7 @@ namespace osu.Game.Tests.OnlinePlay
             }
         }
 
-        private class ScreenWithMod : OsuScreen
+        private partial class ScreenWithMod : OsuScreen
         {
             private readonly Mod mod;
 
