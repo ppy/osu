@@ -13,7 +13,7 @@ namespace osu.Game.Screens.OnlinePlay.Tournaments.Tabs
         [Resolved]
         protected TournamentInfo TournamentInfo { get; private set; } = null!;
 
-        public abstract TournamentsTabs TabType { get; }
+        public abstract TournamentsTab TabType { get; }
 
         protected TournamentsTabBase()
         {

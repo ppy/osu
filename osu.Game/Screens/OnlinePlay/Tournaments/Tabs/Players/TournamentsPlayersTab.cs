@@ -11,7 +11,7 @@ namespace osu.Game.Screens.OnlinePlay.Tournaments.Tabs.Players
 {
     public partial class TournamentsPlayersTab : TournamentsTabBase
     {
-        public override TournamentsTabs TabType => TournamentsTabs.Players;
+        public override TournamentsTab TabType => TournamentsTab.Players;
 
         [BackgroundDependencyLoader]
         private void load()

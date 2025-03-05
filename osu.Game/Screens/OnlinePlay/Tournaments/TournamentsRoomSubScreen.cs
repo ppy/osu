@@ -44,7 +44,7 @@ namespace osu.Game.Screens.OnlinePlay.Tournaments
         [Cached]
         private TournamentInfo tournamentInfo { get; set; } = new();
 
-        private readonly Bindable<TournamentsTabs> currentTabType = new();
+        private readonly Bindable<TournamentsTab> currentTabType = new();
         private TournamentsTabBase? currentTab;
 
         public override string ShortTitle => "Name of Tornament. Testing long names.";
@@ -108,7 +108,7 @@ namespace osu.Game.Screens.OnlinePlay.Tournaments
             return new Screen();
         }
 
-        public void ChangeTab(TournamentsTabs tab)
+        public void ChangeTab(TournamentsTab tab)
         {
             Logger.Log($@"Pressed {tab} Button!");
             if (tab == currentTab?.TabType)
@@ -123,29 +123,29 @@ namespace osu.Game.Screens.OnlinePlay.Tournaments
             currentTabType.Value = tab;
         }
 
-        public static LocalisableString GetTournamentsTabsName(TournamentsTabs tab)
+        public static LocalisableString GetTournamentsTabsName(TournamentsTab tab)
         {
             switch (tab)
             {
-                case TournamentsTabs.Info:
+                case TournamentsTab.Info:
                     return TournamentsTabsString.Info;
 
-                case TournamentsTabs.Players:
+                case TournamentsTab.Players:
                     return TournamentsTabsString.Players;
 
-                case TournamentsTabs.Qualifiers:
+                case TournamentsTab.Qualifiers:
                     return TournamentsTabsString.Qualifiers;
 
-                case TournamentsTabs.Mappools:
+                case TournamentsTab.Mappools:
                     return TournamentsTabsString.Mappools;
 
-                case TournamentsTabs.Results:
+                case TournamentsTab.Results:
                     return TournamentsTabsString.Results;
 
-                case TournamentsTabs.Schedule:
+                case TournamentsTab.Schedule:
                     return TournamentsTabsString.Schedule;
 
-                case TournamentsTabs.Settings:
+                case TournamentsTab.Settings:
                     return TournamentsTabsString.Settings;
 
                 default:
@@ -194,7 +194,8 @@ namespace osu.Game.Screens.OnlinePlay.Tournaments
         }
     }
 
-    public enum TournamentsTabs
+    // todo : don't know where to put these, they can just stay here for now.
+    public enum TournamentsTab
     {
         Info,
         Players,

@@ -26,10 +26,10 @@ namespace osu.Game.Screens.OnlinePlay.Tournaments
         public string TournamentName { get; set; } = string.Empty;
 
         [JsonIgnore]
-        public readonly Bindable<TournamentsTabs> CurrentTabType = new(TournamentsTabs.Info);
+        public readonly Bindable<TournamentsTab> CurrentTabType = new(TournamentsTab.Info);
 
         [JsonIgnore]
-        public Action<TournamentsTabs, bool> UpdateTabVisibility = (tabs, b) => { };
+        public Action<TournamentsTab, bool> UpdateTabVisibility = (tabs, b) => { };
 
         /// <summary>
         /// Defines which tabs are visible for all users.
@@ -101,21 +101,21 @@ namespace osu.Game.Screens.OnlinePlay.Tournaments
                 testTournament1();
         }
 
-        public bool GetTabVisibility(TournamentsTabs tab)
+        public bool GetTabVisibility(TournamentsTab tab)
         {
             return ((tabsVisibility & (1u << (int)tab)) >> (int)tab) == 1;
         }
 
-        public IEnumerable<TournamentsTabs> GetTabsVisibility()
+        public IEnumerable<TournamentsTab> GetTabsVisibility()
         {
             return
-                from TournamentsTabs tab in Enum.GetValues(typeof(TournamentsTabs))
+                from TournamentsTab tab in Enum.GetValues(typeof(TournamentsTab))
                 where GetTabVisibility(tab)
                 select tab;
         }
 
         // Sets the visibility of the local clients footer tabs
-        public void SetTabVisibility(TournamentsTabs tab, bool visibility)
+        public void SetTabVisibility(TournamentsTab tab, bool visibility)
         {
             bool visibilityChanged = visibility != GetTabVisibility(tab);
             Logger.Log("Visibility before " + tabsVisibility.ToString());

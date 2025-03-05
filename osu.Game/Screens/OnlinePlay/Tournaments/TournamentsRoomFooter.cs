@@ -33,7 +33,7 @@ namespace osu.Game.Screens.OnlinePlay.Tournaments
             };
         }
 
-        private TournamentsRoomFooterButton createFooterButton(TournamentsTabs tab)
+        private TournamentsRoomFooterButton createFooterButton(TournamentsTab tab)
         {
             return new TournamentsRoomFooterButton
             {
@@ -45,7 +45,7 @@ namespace osu.Game.Screens.OnlinePlay.Tournaments
         private TournamentsRoomFooterButton[] createFooterButtons()
         {
             return (
-                from TournamentsTabs tab in Enum.GetValues(typeof(TournamentsTabs))
+                from TournamentsTab tab in Enum.GetValues(typeof(TournamentsTab))
                 select createFooterButton(tab)
                 ).ToArray();
         }
@@ -54,14 +54,14 @@ namespace osu.Game.Screens.OnlinePlay.Tournaments
     public partial class TournamentsRoomFooterButton : FooterButton
     {
         /// <summary>
-        /// The <see cref="TournamentsTabs"/> type this button will display when pressed.
+        /// The <see cref="TournamentsTab"/> type this button will display when pressed.
         /// </summary>
-        public TournamentsTabs TabType;
+        public TournamentsTab TabType;
 
         /// <summary>
         /// The currentTabType that is opened. Dictated by TournamentInfo.
         /// </summary>
-        private Bindable<TournamentsTabs> currentTabType = new();
+        private Bindable<TournamentsTab> currentTabType = new();
 
         private bool isVisible = true;
         public bool IsVisible
