@@ -50,11 +50,6 @@ namespace osu.Game.Localisation
         public static LocalisableString Export => new TranslatableString(getKey(@"export"), @"Export");
 
         /// <summary>
-        /// "Delete"
-        /// </summary>
-        public static LocalisableString Delete => new TranslatableString(getKey(@"delete"), @"Delete");
-
-        /// <summary>
         /// "Width"
         /// </summary>
         public static LocalisableString Width => new TranslatableString(getKey(@"width"), @"Width");
