@@ -20,7 +20,6 @@ using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.OnlinePlay.Playlists;
 using osuTK;
 using osuTK.Input;
-using SharpCompress;
 
 namespace osu.Game.Tests.Visual.Playlists
 {
@@ -53,7 +52,11 @@ namespace osu.Game.Tests.Visual.Playlists
         {
             AddStep("clear realm", () => Realm.Realm.Write(() => Realm.Realm.RemoveAll<BeatmapCollection>()));
 
-            AddStep("clear notifications", () => notificationOverlay.AllNotifications.Empty());
+            AddStep("clear notifications", () =>
+            {
+                foreach (var notification in notificationOverlay.AllNotifications)
+                    notification.Close(runFlingAnimation: false);
+            });
 
             importBeatmap();
 

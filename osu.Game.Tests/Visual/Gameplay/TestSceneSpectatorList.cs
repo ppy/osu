@@ -32,7 +32,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             Bindable<LocalUserPlayingState> playingState = new Bindable<LocalUserPlayingState>();
             GameplayState gameplayState = new GameplayState(new Beatmap(), new OsuRuleset(), healthProcessor: new OsuHealthProcessor(0), localUserPlayingState: playingState);
             TestSpectatorClient spectatorClient = new TestSpectatorClient();
-            TestMultiplayerClient multiplayerClient = new TestMultiplayerClient(new TestMultiplayerRoomManager(new TestRoomRequestsHandler()));
+            TestMultiplayerClient multiplayerClient = new TestMultiplayerClient(new TestRoomRequestsHandler());
 
             AddStep("create spectator list", () =>
             {
