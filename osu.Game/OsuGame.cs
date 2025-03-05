@@ -837,7 +837,7 @@ namespace osu.Game
             if (beatmap.NewValue != null && beatmap.NewValue is not DummyWorkingBeatmap)
                 newTitle = $"{Name} - {beatmap.NewValue.BeatmapInfo.GetDisplayTitleRomanisable(true, false)}";
 
-            Host.InputThread.Scheduler.AddOnce(s => Host.Window.Title = s, newTitle);
+            Host.Window.Title = newTitle;
         }
 
         private void modsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)
