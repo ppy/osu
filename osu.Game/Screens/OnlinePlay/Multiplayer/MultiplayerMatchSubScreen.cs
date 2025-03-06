@@ -679,7 +679,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         public override void OnSuspending(ScreenTransitionEvent e)
         {
-            endHandlingTrack();
+            onLeaving();
             base.OnSuspending(e);
         }
 
@@ -699,7 +699,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             client.LeaveRoom().FireAndForget();
 
-            endHandlingTrack();
+            onLeaving();
             return base.OnExiting(e);
         }
 
@@ -727,6 +727,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             }
 
             return base.OnBackButton();
+        }
+
+        private void onLeaving()
+        {
+            // Must hide this overlay because it is added to a global container.
+            userModsSelectOverlay.Hide();
+
+            endHandlingTrack();
         }
 
         /// <summary>
