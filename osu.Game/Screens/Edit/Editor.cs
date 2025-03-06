@@ -392,7 +392,7 @@ namespace osu.Game.Screens.Edit
                                         {
                                             undoMenuItem = new EditorMenuItem(CommonStrings.Undo, MenuItemType.Standard, Undo) { Hotkey = new Hotkey(PlatformAction.Undo) },
                                             redoMenuItem = new EditorMenuItem(CommonStrings.Redo, MenuItemType.Standard, Redo) { Hotkey = new Hotkey(PlatformAction.Redo) },
-                                            discardChangesMenuItem = new EditorMenuItem("Discard unsaved changes", MenuItemType.Destructive, DiscardUnsavedChanges)
+                                            discardChangesMenuItem = new EditorMenuItem(GlobalActionKeyBindingStrings.EditorDiscardUnsavedChanges, MenuItemType.Destructive, DiscardUnsavedChanges)
                                             {
                                                 Hotkey = new Hotkey(GlobalAction.EditorDiscardUnsavedChanges)
                                             },
