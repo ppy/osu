@@ -421,7 +421,7 @@ namespace osu.Game
 
             SelectedMods.BindValueChanged(modsChanged);
             Beatmap.BindValueChanged(beatmapChanged, true);
-            configUserActivity.BindValueChanged(userActivityChanged);
+            configUserActivity.BindValueChanged(_ => updateWindowTitle());
 
             applySafeAreaConsiderations = LocalConfig.GetBindable<bool>(OsuSetting.SafeAreaConsiderations);
             applySafeAreaConsiderations.BindValueChanged(apply => SafeAreaContainer.SafeAreaOverrideEdges = apply.NewValue ? SafeAreaOverrideEdges : Edges.All, true);
@@ -832,26 +832,19 @@ namespace osu.Game
             updateWindowTitle();
         }
 
-        private void userActivityChanged(ValueChangedEvent<UserActivity> userActivity)
-        {
-            updateWindowTitle();
-        }
-
         private void updateWindowTitle()
         {
             if (Host.Window == null)
                 return;
 
-            if (Beatmap.Value?.BeatmapSetInfo?.Protected != false || Beatmap.Value is DummyWorkingBeatmap)
-            {
-                Host.Window.Title = Name;
-                return;
-            }
-
-            string newTitle = Name;
+            string newTitle;
 
             switch (configUserActivity.Value)
             {
+                default:
+                    newTitle = Name;
+                    break;
+
                 case UserActivity.InGame:
                 case UserActivity.TestingBeatmap:
                 case UserActivity.WatchingReplay:
@@ -859,13 +852,12 @@ namespace osu.Game
                     break;
 
                 case UserActivity.EditingBeatmap:
-                    if (Beatmap.Value.BeatmapInfo.Path != null)
-                        newTitle = $"{Name} - {Beatmap.Value.BeatmapInfo.Path}";
-
+                    newTitle = $"{Name} - {Beatmap.Value.BeatmapInfo.Path ?? "new beatmap"}";
                     break;
             }
 
-            Host.Window.Title = newTitle;
+            if (newTitle != Host.Window.Title)
+                Host.Window.Title = newTitle;
         }
 
         private void modsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)
