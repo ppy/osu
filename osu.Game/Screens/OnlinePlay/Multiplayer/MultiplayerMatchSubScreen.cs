@@ -836,6 +836,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             game?.PresentBeatmap(beatmap.BeatmapSetInfo, b => b.ID == beatmap.BeatmapInfo.ID);
         }
 
+        // Block all input to this screen during gameplay/etc when the parent screen is no longer current.
+        // Normally this would be handled by ScreenStack, but we are in a child ScreenStack.
+        public override bool PropagatePositionalInputSubTree => base.PropagatePositionalInputSubTree && (parentScreen?.IsCurrentScreen() ?? this.IsCurrentScreen());
+
+        // Block all input to this screen during gameplay/etc when the parent screen is no longer current.
+        // Normally this would be handled by ScreenStack, but we are in a child ScreenStack.
+        public override bool PropagateNonPositionalInputSubTree => base.PropagateNonPositionalInputSubTree && (parentScreen?.IsCurrentScreen() ?? this.IsCurrentScreen());
+
         protected override BackgroundScreen CreateBackground() => new RoomBackgroundScreen(room.Playlist.FirstOrDefault())
         {
             SelectedItem = { BindTarget = currentItem }
