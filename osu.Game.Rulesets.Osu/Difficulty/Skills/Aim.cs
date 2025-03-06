@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     {
         public readonly bool IncludeSliders;
 
-        protected virtual double SkillMultiplier => 27.73 * OsuDifficultyCalculator.MechanicsMultiplier * 0.94;
+        protected virtual double SkillMultiplier => 27.73 * OsuDifficultyCalculator.MechanicsMultiplier * 0.955;
 
         public Aim(Mod[] mods, bool includeSliders)
             : base(mods)
