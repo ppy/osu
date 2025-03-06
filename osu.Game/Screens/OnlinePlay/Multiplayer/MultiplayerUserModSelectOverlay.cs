@@ -196,6 +196,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 SelectedMods.Value = userMods;
                 SelectedMods.ValueChanged += onSelectedModsChanged;
             }
+
+            ActiveMods.Value = ComputeActiveMods();
         }
 
         protected override IReadOnlyList<Mod> ComputeActiveMods()
