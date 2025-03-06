@@ -463,6 +463,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 return;
             }
 
+            if (!this.IsCurrentScreen())
+            {
+                this.MakeCurrent();
+                Schedule(onLoadRequested);
+                return;
+            }
+
             // The beatmap is queried asynchronously when the selected item changes.
             // This is an issue with MultiSpectatorScreen which is effectively in an always "ready" state and receives LoadRequested() callbacks
             // even when it is not truly ready (i.e. the beatmap hasn't been selected by the client yet). For the time being, a simple fix to this is to ignore the callback.
@@ -786,6 +793,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                     settingsOverlay.Hide();
                     this.Exit();
                 }));
+
+                return false;
             }
 
             if (client.Room != null)
@@ -800,9 +809,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                         this.Exit();
                     }));
                 }
+
+                return false;
             }
 
-            return false;
+            return true;
         }
 
         public void PresentBeatmap(WorkingBeatmap beatmap, RulesetInfo ruleset)
