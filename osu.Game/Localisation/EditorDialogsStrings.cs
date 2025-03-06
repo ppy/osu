@@ -54,6 +54,11 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString EditorReloadDialogHeader => new TranslatableString(getKey(@"editor_reload_dialog_header"), @"The editor must be reloaded to apply this change. The beatmap will be saved.");
 
+        /// <summary>
+        /// "Discard all unsaved changes? This cannot be undone."
+        /// </summary>
+        public static LocalisableString DiscardUnsavedChangesDialogHeader => new TranslatableString(getKey(@"discard_unsaved_changes_dialog_header"), @"Discard all unsaved changes? This cannot be undone.");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
