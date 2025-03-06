@@ -140,6 +140,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                                             Size = new Vector2(28, 20),
                                             CountryCode = user?.CountryCode ?? default
                                         },
+                                        new UpdateableTeamFlag(user?.Team)
+                                        {
+                                            Anchor = Anchor.CentreLeft,
+                                            Origin = Anchor.CentreLeft,
+                                            Size = new Vector2(40, 20),
+                                        },
                                         new OsuSpriteText
                                         {
                                             Anchor = Anchor.CentreLeft,

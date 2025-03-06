@@ -43,11 +43,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private MultiplayerMatchSubScreen screen = null!;
         private BeatmapManager beatmaps = null!;
         private BeatmapSetInfo importedSet = null!;
-
-        public TestSceneMultiplayerMatchSubScreen()
-            : base(false)
-        {
-        }
+        private Room room = null!;
 
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
@@ -66,8 +62,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("load match", () =>
             {
-                SelectedRoom.Value = new Room { Name = "Test Room" };
-                LoadScreen(screen = new TestMultiplayerMatchSubScreen(SelectedRoom.Value!));
+                room = new Room { Name = "Test Room" };
+                LoadScreen(screen = new TestMultiplayerMatchSubScreen(room));
             });
 
             AddUntilStep("wait for load", () => screen.IsCurrentScreen());
@@ -78,7 +74,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("add playlist item", () =>
             {
-                SelectedRoom.Value!.Playlist =
+                room.Playlist =
                 [
                     new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo)
                     {
@@ -97,7 +93,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("add playlist item", () =>
             {
-                SelectedRoom.Value!.Playlist =
+                room.Playlist =
                 [
                     new PlaylistItem(new TestBeatmap(new TaikoRuleset().RulesetInfo).BeatmapInfo)
                     {
@@ -122,7 +118,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("set playlist", () =>
             {
-                SelectedRoom.Value!.Playlist =
+                room.Playlist =
                 [
                     new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo)
                     {
@@ -139,7 +135,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("set playlist", () =>
             {
-                SelectedRoom.Value!.Playlist =
+                room.Playlist =
                 [
                     new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First()).BeatmapInfo)
                     {
@@ -170,7 +166,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("add playlist item with allowed mod", () =>
             {
-                SelectedRoom.Value!.Playlist =
+                room.Playlist =
                 [
                     new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo)
                     {
@@ -189,7 +185,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("mod select contents loaded",
                 () => this.ChildrenOfType<ModColumn>().Any() && this.ChildrenOfType<ModColumn>().All(col => col.IsLoaded && col.ItemsLoaded));
             AddUntilStep("mod select contains only double time mod",
-                () => this.ChildrenOfType<RoomSubScreen>().Single().UserModsSelectOverlay
+                () => this.ChildrenOfType<MultiplayerUserModSelectOverlay>().Single()
                           .ChildrenOfType<ModPanel>()
                           .SingleOrDefault(panel => panel.Visible)?.Mod is OsuModDoubleTime);
         }
@@ -199,7 +195,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("add playlist item with allowed mod", () =>
             {
-                SelectedRoom.Value!.Playlist =
+                room.Playlist =
                 [
                     new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo)
                     {
@@ -215,7 +211,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("press toggle mod select key", () => InputManager.Key(Key.F1));
 
-            AddUntilStep("mod select shown", () => this.ChildrenOfType<RoomSubScreen>().Single().UserModsSelectOverlay.State.Value == Visibility.Visible);
+            AddUntilStep("mod select shown", () => this.ChildrenOfType<MultiplayerUserModSelectOverlay>().Single().State.Value == Visibility.Visible);
         }
 
         [Test]
@@ -223,7 +219,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("add playlist item with no allowed mods", () =>
             {
-                SelectedRoom.Value!.Playlist =
+                room.Playlist =
                 [
                     new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo)
                     {
@@ -238,7 +234,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("press toggle mod select key", () => InputManager.Key(Key.F1));
 
             AddWaitStep("wait some", 3);
-            AddAssert("mod select not shown", () => this.ChildrenOfType<RoomSubScreen>().Single().UserModsSelectOverlay.State.Value == Visibility.Hidden);
+            AddAssert("mod select not shown", () => this.ChildrenOfType<MultiplayerUserModSelectOverlay>().Single().State.Value == Visibility.Hidden);
         }
 
         [Test]
@@ -246,7 +242,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("add two playlist items", () =>
             {
-                SelectedRoom.Value!.Playlist =
+                room.Playlist =
                 [
                     new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First()).BeatmapInfo)
                     {
@@ -285,7 +281,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("add playlist item", () =>
             {
-                SelectedRoom.Value!.Playlist =
+                room.Playlist =
                 [
                     new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo)
                     {
@@ -315,6 +311,29 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("change flashlight setting", () => ((OsuModFlashlight)screen.ChildrenOfType<MultiplayerUserModSelectOverlay>().Single().SelectedMods.Value.Single()).FollowDelay.Value = 1200);
             AddAssert("score multiplier = 1.20", () => this.ChildrenOfType<RankingInformationDisplay>().Single().ModMultiplier.Value, () => Is.EqualTo(1.2).Within(0.01));
+        }
+
+        [Test]
+        public void TestChangeSettingsButtonVisibleForHost()
+        {
+            AddStep("add playlist item", () =>
+            {
+                room.Playlist =
+                [
+                    new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo)
+                    {
+                        RulesetID = new OsuRuleset().RulesetInfo.OnlineID
+                    }
+                ];
+            });
+            ClickButtonWhenEnabled<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>();
+
+            AddUntilStep("wait for join", () => RoomJoined);
+
+            AddUntilStep("button visible", () => this.ChildrenOfType<DrawableMatchRoom>().Single().ChangeSettingsButton?.Alpha, () => Is.GreaterThan(0));
+            AddStep("join other user", void () => MultiplayerClient.AddUser(new APIUser { Id = PLAYER_1_ID }));
+            AddStep("make other user host", () => MultiplayerClient.TransferHost(PLAYER_1_ID));
+            AddAssert("button hidden", () => this.ChildrenOfType<DrawableMatchRoom>().Single().ChangeSettingsButton?.Alpha, () => Is.EqualTo(0));
         }
 
         private partial class TestMultiplayerMatchSubScreen : MultiplayerMatchSubScreen

@@ -11,7 +11,7 @@ namespace osu.Game.Screens.SelectV2
     /// </summary>
     public sealed class CarouselItem : IComparable<CarouselItem>
     {
-        public const float DEFAULT_HEIGHT = 40;
+        public const float DEFAULT_HEIGHT = 50;
 
         /// <summary>
         /// The model this item is representing.

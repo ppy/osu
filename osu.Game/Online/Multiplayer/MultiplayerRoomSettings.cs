@@ -35,6 +35,20 @@ namespace osu.Game.Online.Multiplayer
         [IgnoreMember]
         public bool AutoStartEnabled => AutoStartDuration != TimeSpan.Zero;
 
+        public MultiplayerRoomSettings()
+        {
+        }
+
+        public MultiplayerRoomSettings(Room room)
+        {
+            Name = room.Name;
+            Password = room.Password ?? string.Empty;
+            MatchType = room.Type;
+            QueueMode = room.QueueMode;
+            AutoStartDuration = room.AutoStartDuration;
+            AutoSkip = room.AutoSkip;
+        }
+
         public bool Equals(MultiplayerRoomSettings? other)
         {
             if (ReferenceEquals(this, other)) return true;

@@ -213,27 +213,27 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddBeatmaps(2, 5);
             WaitForDrawablePanels();
 
-            AddAssert("no beatmaps visible", () => !GetVisiblePanels<BeatmapPanel>().Any());
+            AddAssert("no beatmaps visible", () => !GetVisiblePanels<PanelBeatmap>().Any());
 
             // Clicks just above the first group panel should not actuate any action.
-            ClickVisiblePanelWithOffset<BeatmapSetPanel>(0, new Vector2(0, -(BeatmapSetPanel.HEIGHT / 2 + 1)));
+            ClickVisiblePanelWithOffset<PanelBeatmapSet>(0, new Vector2(0, -(PanelBeatmapSet.HEIGHT / 2 + 1)));
 
-            AddAssert("no beatmaps visible", () => !GetVisiblePanels<BeatmapPanel>().Any());
+            AddAssert("no beatmaps visible", () => !GetVisiblePanels<PanelBeatmap>().Any());
 
-            ClickVisiblePanelWithOffset<BeatmapSetPanel>(0, new Vector2(0, -(BeatmapSetPanel.HEIGHT / 2)));
+            ClickVisiblePanelWithOffset<PanelBeatmapSet>(0, new Vector2(0, -(PanelBeatmapSet.HEIGHT / 2)));
 
-            AddUntilStep("wait for beatmaps visible", () => GetVisiblePanels<BeatmapPanel>().Any());
+            AddUntilStep("wait for beatmaps visible", () => GetVisiblePanels<PanelBeatmap>().Any());
             WaitForSelection(0, 0);
 
             // Beatmap panels expand their selection area to cover holes from spacing.
-            ClickVisiblePanelWithOffset<BeatmapPanel>(1, new Vector2(0, -(CarouselItem.DEFAULT_HEIGHT / 2 + 1)));
+            ClickVisiblePanelWithOffset<PanelBeatmap>(1, new Vector2(0, -(CarouselItem.DEFAULT_HEIGHT / 2 + 1)));
             WaitForSelection(0, 0);
 
             // Panels with higher depth will handle clicks in the gutters for simplicity.
-            ClickVisiblePanelWithOffset<BeatmapPanel>(2, new Vector2(0, (CarouselItem.DEFAULT_HEIGHT / 2 + 1)));
+            ClickVisiblePanelWithOffset<PanelBeatmap>(2, new Vector2(0, (CarouselItem.DEFAULT_HEIGHT / 2 + 1)));
             WaitForSelection(0, 2);
 
-            ClickVisiblePanelWithOffset<BeatmapPanel>(3, new Vector2(0, (CarouselItem.DEFAULT_HEIGHT / 2 + 1)));
+            ClickVisiblePanelWithOffset<PanelBeatmap>(3, new Vector2(0, (CarouselItem.DEFAULT_HEIGHT / 2 + 1)));
             WaitForSelection(0, 3);
         }
 

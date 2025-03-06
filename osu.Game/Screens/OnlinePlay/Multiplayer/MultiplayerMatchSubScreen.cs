@@ -377,9 +377,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                 }
                             },
                             settingsOverlay = new MultiplayerMatchSettingsOverlay(room)
-                            {
-                                SelectedItem = currentItem
-                            }
                         }
                     },
                     new Container
@@ -693,7 +690,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             if (!ensureExitConfirmed())
                 return true;
 
-            RoomManager?.PartRoom();
+            client.LeaveRoom().FireAndForget();
 
             endHandlingTrack();
             return base.OnExiting(e);

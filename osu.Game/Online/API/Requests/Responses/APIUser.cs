@@ -55,6 +55,10 @@ namespace osu.Game.Online.API.Requests.Responses
             set => countryCodeString = value.ToString();
         }
 
+        [JsonProperty(@"team")]
+        [CanBeNull]
+        public APITeam Team { get; set; }
+
         [JsonProperty(@"profile_colour")]
         public string Colour;
 
