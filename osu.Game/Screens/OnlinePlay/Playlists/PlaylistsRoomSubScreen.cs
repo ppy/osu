@@ -452,16 +452,21 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
             isIdle.BindValueChanged(_ => updatePollingRate(), true);
 
-            beatmapAvailabilityTracker.SelectedItem.BindTo(SelectedItem);
-            beatmapAvailabilityTracker.Availability.BindValueChanged(_ => updateSelectionState());
+            SelectedItem.BindValueChanged(onSelectedItemChanged);
 
-            SelectedItem.BindValueChanged(_ => updateSelectionState());
-            userBeatmap.BindValueChanged(_ => updateSelectionState());
-            userRuleset.BindValueChanged(_ => updateSelectionState());
-            userMods.BindValueChanged(_ => updateSelectionState());
+            beatmapAvailabilityTracker.SelectedItem.BindTo(SelectedItem);
+            beatmapAvailabilityTracker.Availability.BindValueChanged(_ => updateGameplayState());
+
+            userBeatmap.BindValueChanged(_ => updateGameplayState());
+            userRuleset.BindValueChanged(_ =>
+            {
+                validateUserMods();
+                updateGameplayState();
+            });
+            userMods.BindValueChanged(_ => updateGameplayState());
 
             updateSetupState();
-            updateSelectionState();
+            updateGameplayState();
         }
 
         /// <summary>
@@ -519,44 +524,67 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         }
 
         /// <summary>
-        /// Responds to changes in the selected playlist item or user style (beatmap/ruleset/mods) to validate and update global states in preparation for a gameplay session.
+        /// Responds to changes in <see cref="SelectedItem"/> to validate the user style and update the global gameplay state.
         /// </summary>
-        private void updateSelectionState()
+        private void onSelectedItemChanged(ValueChangedEvent<PlaylistItem?> e)
         {
-            if (!this.IsCurrentScreen() || SelectedItem.Value is not PlaylistItem item)
+            if (e.NewValue is not PlaylistItem item)
                 return;
 
-            // Reset entire user style when disabled.
-            if (!item.Freestyle)
+            // Always resetting the user beatmap style when a new item is selected is most intuitive.
+            userBeatmap.Value = null;
+
+            if (item.Freestyle)
             {
-                userBeatmap.Value = null;
-                userRuleset.Value = null;
-            }
-
-            // Reset beatmap style when no longer from the same beatmap set.
-            if (userBeatmap.Value != null && userBeatmap.Value.BeatmapSet!.OnlineID != item.Beatmap.BeatmapSet!.OnlineID)
-                userBeatmap.Value = null;
-
-            IBeatmapInfo gameplayBeatmap = userBeatmap.Value ?? item.Beatmap;
-
-            // Reset ruleset style when no longer valid for the beatmap.
-            if (userRuleset.Value != null)
-            {
-                int beatmapRuleset = gameplayBeatmap.Ruleset.OnlineID;
-                if (beatmapRuleset > 0 && userRuleset.Value.OnlineID != beatmapRuleset)
+                // If freestyle is active, attempt to preserve the user ruleset style but only if the online item is from the osu! ruleset
+                // (i.e. the beatmap is generally always convertible to the current ruleset, excluding custom rulesets).
+                if (item.RulesetID > 0)
                     userRuleset.Value = null;
             }
+
+            validateUserMods();
+
+            updateGameplayState();
+        }
+
+        /// <summary>
+        /// Lists the <see cref="Mod"/>s that are valid to be selected for the user mod style.
+        /// </summary>
+        private Mod[] listAllowedMods()
+        {
+            if (SelectedItem.Value is not PlaylistItem item)
+                return [];
 
             RulesetInfo gameplayRuleset = userRuleset.Value ?? rulesets.GetRuleset(item.RulesetID)!;
             Ruleset rulesetInstance = gameplayRuleset.CreateInstance();
 
-            // Remove any user mods that are no longer allowed.
-            Mod[] allowedMods = item.Freestyle
-                ? rulesetInstance.AllMods.OfType<Mod>().Where(m => ModUtils.IsValidFreeModForMatchType(m, room.Type)).ToArray()
-                : item.AllowedMods.Select(m => m.ToMod(rulesetInstance)).ToArray();
-            Mod[] newUserMods = userMods.Value.Where(m => allowedMods.Any(a => m.GetType() == a.GetType())).ToArray();
-            if (!newUserMods.SequenceEqual(userMods.Value))
-                userMods.Value = newUserMods;
+            if (item.Freestyle)
+                return rulesetInstance.AllMods.OfType<Mod>().Where(m => ModUtils.IsValidFreeModForMatchType(m, room.Type)).ToArray();
+
+            return item.AllowedMods.Select(m => m.ToMod(rulesetInstance)).ToArray();
+        }
+
+        /// <summary>
+        /// Validates the user mod style against the selected item and ruleset style.
+        /// </summary>
+        private void validateUserMods()
+        {
+            Mod[] allowedMods = listAllowedMods();
+            userMods.Value = userMods.Value.Where(m => allowedMods.Any(a => m.GetType() == a.GetType())).ToArray();
+        }
+
+        /// <summary>
+        /// Updates the global states in preparation for a new gameplay session.
+        /// </summary>
+        private void updateGameplayState()
+        {
+            if (!this.IsCurrentScreen() || SelectedItem.Value is not PlaylistItem item)
+                return;
+
+            IBeatmapInfo gameplayBeatmap = userBeatmap.Value ?? item.Beatmap;
+            RulesetInfo gameplayRuleset = userRuleset.Value ?? rulesets.GetRuleset(item.RulesetID)!;
+            Ruleset rulesetInstance = gameplayRuleset.CreateInstance();
+            Mod[] allowedMods = listAllowedMods();
 
             // Update global gameplay state to correspond to the new selection.
             // Retrieve the corresponding local beatmap, since we can't directly use the playlist's beatmap info
@@ -683,7 +711,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             beginHandlingTrack();
 
             // Required to update beatmap/ruleset when resuming from style selection.
-            updateSelectionState();
+            updateGameplayState();
         }
 
         public override bool OnExiting(ScreenExitEvent e)
