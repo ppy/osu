@@ -26,6 +26,7 @@ using osu.Game.Resources.Localisation.Web;
 using osuTK;
 using osuTK.Graphics;
 using ChatStrings = osu.Game.Localisation.ChatStrings;
+using WebUsersStrings = osu.Game.Resources.Localisation.Web.UsersStrings;
 
 namespace osu.Game.Overlays.Chat
 {
@@ -178,7 +179,7 @@ namespace osu.Game.Overlays.Chat
                 }
 
                 if (!user.Equals(api.LocalUser.Value))
-                    items.Add(new OsuMenuItem("Report", MenuItemType.Destructive, ReportRequested));
+                    items.Add(new OsuMenuItem(WebUsersStrings.ReportButtonText, MenuItemType.Destructive, ReportRequested));
 
                 return items.ToArray();
             }
