@@ -19,7 +19,7 @@ using osu.Game.Utils;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
-    public class MultiplayerUserModSelectOverlay : UserModSelectOverlay
+    public partial class MultiplayerUserModSelectOverlay : UserModSelectOverlay
     {
         private const double update_debounce_time = 500;
 
