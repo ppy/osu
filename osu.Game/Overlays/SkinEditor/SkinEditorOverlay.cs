@@ -343,7 +343,7 @@ namespace osu.Game.Overlays.SkinEditor
             public override bool? AllowGlobalTrackControl => false;
 
             public EndlessPlayer(Func<IBeatmap, IReadOnlyList<Mod>, Score> createScore)
-                : base(createScore, new PlayerConfiguration
+                : base(createScore, null, new PlayerConfiguration
                 {
                     ShowResults = false,
                     AutomaticallySkipIntro = true,
