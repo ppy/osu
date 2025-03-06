@@ -107,6 +107,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                               * DifficultyCalculationUtils.Smootherstep(osuLastObj.LazyJumpDistance, radius, diameter)
                               * Math.Pow(DifficultyCalculationUtils.ReverseLerp(osuLastObj.LazyJumpDistance, diameter * 3, diameter), 1.8)
                               * DifficultyCalculationUtils.Smootherstep(lastAngle, double.DegreesToRadians(110), double.DegreesToRadians(60));
+
+                // If we're coming from a slider we can't reliably guarantee that player travelled from the end position of a slider
+                // That makes angle potentially look harder than it was to play since players will always try to take the easiest route possible
+                // Therefore we nerf the angle bonus
+                if (osuLastObj.BaseObject is Slider)
+                {
+                    wideAngleBonus = Math.Log(1 + wideAngleBonus);
+                    wiggleBonus = Math.Log(1 + wiggleBonus);
+                }
             }
 
             if (Math.Max(prevVelocity, currVelocity) != 0)
