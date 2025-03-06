@@ -156,13 +156,13 @@ namespace osu.Game.Tests.Visual.Playlists
                 AddStep("get panel count", () => beforePanelCount = this.ChildrenOfType<ScorePanel>().Count());
                 AddStep("scroll to right", () => resultsScreen.ChildrenOfType<ScorePanelList>().Single().ChildrenOfType<OsuScrollContainer>().Single().ScrollToEnd(false));
 
-                AddAssert("right loading spinner shown", () =>
+                AddUntilStep("right loading spinner shown", () =>
                     resultsScreen.ChildrenOfType<LoadingSpinner>().Single(l => l.Anchor == Anchor.CentreRight).State.Value == Visibility.Visible);
 
                 waitForDisplay();
 
                 AddAssert($"count increased by {scores_per_result}", () => this.ChildrenOfType<ScorePanel>().Count() == beforePanelCount + scores_per_result);
-                AddAssert("right loading spinner hidden", () =>
+                AddUntilStep("right loading spinner hidden", () =>
                     resultsScreen.ChildrenOfType<LoadingSpinner>().Single(l => l.Anchor == Anchor.CentreRight).State.Value == Visibility.Hidden);
             }
         }
@@ -180,26 +180,26 @@ namespace osu.Game.Tests.Visual.Playlists
             AddStep("get panel count", () => beforePanelCount = this.ChildrenOfType<ScorePanel>().Count());
             AddStep("scroll to right", () => resultsScreen.ChildrenOfType<ScorePanelList>().Single().ChildrenOfType<OsuScrollContainer>().Single().ScrollToEnd(false));
 
-            AddAssert("right loading spinner shown", () =>
+            AddUntilStep("right loading spinner shown", () =>
                 resultsScreen.ChildrenOfType<LoadingSpinner>().Single(l => l.Anchor == Anchor.CentreRight).State.Value == Visibility.Visible);
 
             waitForDisplay();
 
             AddAssert($"count increased by {scores_per_result}", () => this.ChildrenOfType<ScorePanel>().Count() == beforePanelCount + scores_per_result);
-            AddAssert("right loading spinner hidden", () =>
+            AddUntilStep("right loading spinner hidden", () =>
                 resultsScreen.ChildrenOfType<LoadingSpinner>().Single(l => l.Anchor == Anchor.CentreRight).State.Value == Visibility.Hidden);
 
             AddStep("get panel count", () => beforePanelCount = this.ChildrenOfType<ScorePanel>().Count());
             AddStep("bind delayed handler with no scores", () => bindHandler(delayed: true, noScores: true));
             AddStep("scroll to right", () => resultsScreen.ChildrenOfType<ScorePanelList>().Single().ChildrenOfType<OsuScrollContainer>().Single().ScrollToEnd(false));
 
-            AddAssert("right loading spinner shown", () =>
+            AddUntilStep("right loading spinner shown", () =>
                 resultsScreen.ChildrenOfType<LoadingSpinner>().Single(l => l.Anchor == Anchor.CentreRight).State.Value == Visibility.Visible);
 
             waitForDisplay();
 
             AddAssert("count not increased", () => this.ChildrenOfType<ScorePanel>().Count() == beforePanelCount);
-            AddAssert("right loading spinner hidden", () =>
+            AddUntilStep("right loading spinner hidden", () =>
                 resultsScreen.ChildrenOfType<LoadingSpinner>().Single(l => l.Anchor == Anchor.CentreRight).State.Value == Visibility.Hidden);
 
             AddAssert("no placeholders shown", () => this.ChildrenOfType<MessagePlaceholder>().Count(), () => Is.Zero);
@@ -222,13 +222,13 @@ namespace osu.Game.Tests.Visual.Playlists
                 AddStep("get panel count", () => beforePanelCount = this.ChildrenOfType<ScorePanel>().Count());
                 AddStep("scroll to left", () => resultsScreen.ChildrenOfType<ScorePanelList>().Single().ChildrenOfType<OsuScrollContainer>().Single().ScrollToStart(false));
 
-                AddAssert("left loading spinner shown", () =>
+                AddUntilStep("left loading spinner shown", () =>
                     resultsScreen.ChildrenOfType<LoadingSpinner>().Single(l => l.Anchor == Anchor.CentreLeft).State.Value == Visibility.Visible);
 
                 waitForDisplay();
 
                 AddAssert($"count increased by {scores_per_result}", () => this.ChildrenOfType<ScorePanel>().Count() == beforePanelCount + scores_per_result);
-                AddAssert("left loading spinner hidden", () =>
+                AddUntilStep("left loading spinner hidden", () =>
                     resultsScreen.ChildrenOfType<LoadingSpinner>().Single(l => l.Anchor == Anchor.CentreLeft).State.Value == Visibility.Hidden);
             }
         }
@@ -242,7 +242,7 @@ namespace osu.Game.Tests.Visual.Playlists
             AddStep("bind user score info handler", () => bindHandler(noScores: true));
             createUserBestResults();
             AddAssert("no scores visible", () => !resultsScreen.ChildrenOfType<ScorePanelList>().Single().GetScorePanels().Any());
-            AddAssert("placeholder shown", () => this.ChildrenOfType<MessagePlaceholder>().Count(), () => Is.EqualTo(1));
+            AddUntilStep("placeholder shown", () => this.ChildrenOfType<MessagePlaceholder>().Count(), () => Is.EqualTo(1));
         }
 
         [Test]
@@ -261,12 +261,12 @@ namespace osu.Game.Tests.Visual.Playlists
                 AddStep("simulate user falling down ranking", () => userScore.Position += 2);
                 AddStep("scroll to left", () => resultsScreen.ChildrenOfType<ScorePanelList>().Single().ChildrenOfType<OsuScrollContainer>().Single().ScrollToStart(false));
 
-                AddAssert("left loading spinner shown", () =>
+                AddUntilStep("left loading spinner shown", () =>
                     resultsScreen.ChildrenOfType<LoadingSpinner>().Single(l => l.Anchor == Anchor.CentreLeft).State.Value == Visibility.Visible);
 
                 waitForDisplay();
 
-                AddAssert("left loading spinner hidden", () =>
+                AddUntilStep("left loading spinner hidden", () =>
                     resultsScreen.ChildrenOfType<LoadingSpinner>().Single(l => l.Anchor == Anchor.CentreLeft).State.Value == Visibility.Hidden);
             }
 
