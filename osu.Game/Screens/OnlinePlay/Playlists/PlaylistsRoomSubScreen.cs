@@ -701,7 +701,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
         public override void OnSuspending(ScreenTransitionEvent e)
         {
-            endHandlingTrack();
+            onLeaving();
             base.OnSuspending(e);
         }
 
@@ -722,7 +722,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             if (room.RoomID != null)
                 api.Queue(new PartRoomRequest(room));
 
-            endHandlingTrack();
+            onLeaving();
             return base.OnExiting(e);
         }
 
@@ -750,6 +750,14 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             }
 
             return base.OnBackButton();
+        }
+
+        private void onLeaving()
+        {
+            // Must hide this overlay because it is added to a global container.
+            userModsSelectOverlay.Hide();
+
+            endHandlingTrack();
         }
 
         /// <summary>
