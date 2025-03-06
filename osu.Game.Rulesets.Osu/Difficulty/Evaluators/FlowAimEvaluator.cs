@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 {
     public static class FlowAimEvaluator
     {
-        private static double flowMultiplier => 1.01;
+        private static double flowMultiplier => 1.15;
 
         public static double EvaluateDifficultyOf(DifficultyHitObject current, bool withSliderTravelDistance)
         {
@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             if (osuCurrObj.LazyJumpDistance > diameter)
             {
                 double comfyness = IdentifyComfyCircluarFlow(current);
-                flowDifficulty *= Math.Pow(osuCurrObj.LazyJumpDistance / diameter, 1 - 0.5 * comfyness);
+                flowDifficulty *= Math.Pow(osuCurrObj.LazyJumpDistance / diameter, 0.65 - 0.5 * comfyness);
             }
             else
             {
@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             // Flow aim is harder on High BPM
             double effectiveStrainTime = Math.Min(osuCurrObj.StrainTime, DifficultyCalculationUtils.BPMToMilliseconds(175, 4)); // Don't nerf BPM below 175 to avoid nerfing alt maps
-            flowDifficulty *= (effectiveStrainTime / (effectiveStrainTime - 15));
+            flowDifficulty *= (effectiveStrainTime / (effectiveStrainTime - 7));
 
             double angleBonus = 0;
 

@@ -156,9 +156,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double flashlightValue = computeFlashlightValue(score, osuAttributes);
 
             if (aimValue > speedValue)
-                speedValue += (aimValue - speedValue) * OsuDifficultyCalculator.AdditionPortion;
+                speedValue += (aimValue - speedValue) * OsuDifficultyCalculator.MechanicsAdditionPortion;
             else
-                aimValue += (speedValue - aimValue) * OsuDifficultyCalculator.AdditionPortion;
+                aimValue += (speedValue - aimValue) * OsuDifficultyCalculator.MechanicsAdditionPortion;
 
             double totalValue =
                 Math.Pow(
