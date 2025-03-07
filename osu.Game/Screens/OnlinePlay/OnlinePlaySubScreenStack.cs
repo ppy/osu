@@ -2,13 +2,44 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Screens;
+using osu.Game.Beatmaps;
+using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.OnlinePlay.Lounge;
 
 namespace osu.Game.Screens.OnlinePlay
 {
     public partial class OnlinePlaySubScreenStack : OsuScreenStack
     {
+        private OsuScreenDependencies dependencies = null!;
+
+        // Note - these are required to be unbound on disposal.
+        private Bindable<WorkingBeatmap> beatmap = null!;
+        private Bindable<RulesetInfo> ruleset = null!;
+        private Bindable<IReadOnlyList<Mod>> mods = null!;
+
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
+        {
+            // Bindables are leased by the OnlinePlayScreen, but pulled locally in order ot not rely on screen load timings.
+            // They will all be initially enabled while there is no screen in this stack.
+            dependencies = new OsuScreenDependencies(true, parent)
+            {
+                Beatmap = { Disabled = false },
+                Ruleset = { Disabled = false },
+                Mods = { Disabled = false }
+            };
+
+            beatmap = dependencies.Beatmap;
+            ruleset = dependencies.Ruleset;
+            mods = dependencies.Mods;
+
+            return dependencies;
+        }
+
         protected override void ScreenChanged(IScreen prev, IScreen? next)
         {
             base.ScreenChanged(prev, next);
@@ -27,9 +58,9 @@ namespace osu.Game.Screens.OnlinePlay
             // This is a two-part process...
 
             // First, emulate the behaviour of DisallowExternalBeatmapRulesetChanges to disable toolbar buttons.
-            osuNext.Beatmap.Disabled = osuNext.DisallowExternalBeatmapRulesetChanges;
-            osuNext.Ruleset.Disabled = osuNext.DisallowExternalBeatmapRulesetChanges;
-            osuNext.Mods.Disabled = osuNext.DisallowExternalBeatmapRulesetChanges;
+            beatmap.Disabled = osuNext.DisallowExternalBeatmapRulesetChanges;
+            ruleset.Disabled = osuNext.DisallowExternalBeatmapRulesetChanges;
+            mods.Disabled = osuNext.DisallowExternalBeatmapRulesetChanges;
 
             // Second, when an OsuScreen is exited with DisallowExternalBeatmapRulesetChanges=true, leased bindables
             // are normally returned which reverts the mod and ruleset bindables to their original states.
@@ -37,7 +68,7 @@ namespace osu.Game.Screens.OnlinePlay
             // The exact behaiour of the revert is awkward to emulate, but we particularly care about resetting mods
             // when returning to the lounge so that they don't stick around if the user then goes to create a new room.
             if (next is LoungeSubScreen)
-                osuNext.Mods.Value = [];
+                mods.Value = [];
         }
     }
 }
