@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 {
     public static class FlowAimEvaluator
     {
-        private static double flowMultiplier => 1.18;
+        private static double flowMultiplier => 1.13;
 
         public static double EvaluateDifficultyOf(DifficultyHitObject current, bool withSliderTravelDistance)
         {
@@ -26,15 +26,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             const int diameter = OsuDifficultyHitObject.NORMALISED_DIAMETER;
 
             // Start with velocity
-            double flowDifficulty = osuCurrObj.LazyJumpDistance / osuCurrObj.StrainTime;
+            double velocity = osuCurrObj.LazyJumpDistance / osuCurrObj.StrainTime;
 
             if (osuLast0Obj.BaseObject is Slider && withSliderTravelDistance)
             {
                 double travelVelocity = osuLast0Obj.TravelDistance / osuLast0Obj.TravelTime; // calculate the slider velocity from slider head to slider end.
                 double movementVelocity = osuCurrObj.MinimumJumpDistance / osuCurrObj.MinimumJumpTime; // calculate the movement velocity from slider end to current object
 
-                flowDifficulty = Math.Max(flowDifficulty, movementVelocity + travelVelocity); // take the larger total combined velocity.
+                velocity = Math.Max(velocity, movementVelocity + travelVelocity); // take the larger total combined velocity.
             }
+
+            double flowDifficulty = velocity;
 
             // Square the distance to turn into d/t
             if (osuCurrObj.LazyJumpDistance > diameter)
@@ -44,12 +46,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             }
             else
             {
-               flowDifficulty *= Math.Pow(osuCurrObj.LazyJumpDistance / diameter, 1);
+               flowDifficulty *= Math.Pow(osuCurrObj.LazyJumpDistance / diameter, 0.8);
             }
 
             // Flow aim is harder on High BPM
             double effectiveStrainTime = Math.Min(osuCurrObj.StrainTime, DifficultyCalculationUtils.BPMToMilliseconds(175, 4)); // Don't nerf BPM below 175 to avoid nerfing alt maps
-            flowDifficulty *= (effectiveStrainTime / (effectiveStrainTime - 7));
+            flowDifficulty += velocity * (effectiveStrainTime / (effectiveStrainTime - 8) - 1);
 
             double angleBonus = 0;
 
@@ -91,14 +93,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     // Or there was no stream before
                     double timeDifferenceFactor = DifficultyCalculationUtils.Smoothstep(osuCurrObj.StrainTime, osuLast1Obj.StrainTime * 0.75, osuLast1Obj.StrainTime * 0.55);
 
-                    //double beforeNerf = angleChangeBonus + acuteAngleBonus;
-
-                    acuteAngleBonus *= 1 - isSameAngle * (1 - angleBonusDifference);
-                    angleChangeBonus *= 1 - Math.Max(isSameAngle * (1 - prevAngleBonus), timeDifferenceFactor);
-
-                    //double nerf = beforeNerf - angleChangeBonus + acuteAngleBonus;
-
-                    //if (osuCurrObj.StrainTime < 100 && osuLastObj.StrainTime < 100 && nerf > 0.5) Console.WriteLine($"{T(osuCurrObj.BaseObject.StartTime)}: {nerf}");
+                    acuteAngleBonus *= 1 - 0.5 * isSameAngle * (1 - angleBonusDifference);
+                    angleChangeBonus *= 1 - 0.5 * Math.Max(isSameAngle * (1 - prevAngleBonus), timeDifferenceFactor);
                 }
 
                 // Don't apply both angle change and acute angle bonus at the same time if change is consistent
