@@ -5,6 +5,7 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
+using osu.Framework.Platform;
 using osu.Framework.Utils;
 using osu.Game.Audio;
 using osu.Game.Graphics.Containers;
@@ -16,6 +17,9 @@ namespace osu.Game.Screens.Menu
     {
         private StarFountain leftFountain = null!;
         private StarFountain rightFountain = null!;
+
+        [Resolved]
+        private GameHost host { get; set; } = null!;
 
         [Resolved]
         private ISkinSource skin { get; set; } = null!;
@@ -84,6 +88,9 @@ namespace osu.Game.Screens.Menu
                     rightFountain.Shoot(1);
                     break;
             }
+
+            // Don't play SFX when game is in background
+            if (!host.IsActive.Value) return;
 
             // Track sample channel to avoid overlapping playback
             sampleChannel?.Stop();
