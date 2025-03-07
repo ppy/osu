@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             }
             else
             {
-                flowDifficulty *= osuCurrObj.LazyJumpDistance / diameter;
+               flowDifficulty *= Math.Pow(osuCurrObj.LazyJumpDistance / diameter, 1);
             }
 
             // Flow aim is harder on High BPM
@@ -199,7 +199,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             var osuLast0Obj = (OsuDifficultyHitObject)current.Previous(0);
             var osuLast1Obj = (OsuDifficultyHitObject)current.Previous(1);
             var osuLast2Obj = (OsuDifficultyHitObject)current.Previous(2);
+            var osuLast3Obj = (OsuDifficultyHitObject)current.Previous(3);
 
+            const int radius = OsuDifficultyHitObject.NORMALISED_RADIUS;
             const int diameter = OsuDifficultyHitObject.NORMALISED_DIAMETER;
 
             double currVelocity = osuCurrObj.LazyJumpDistance / osuCurrObj.StrainTime;
@@ -220,19 +222,47 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             if (currVelocity > prevVelocity)
                 deltaVelocity *= DifficultyCalculationUtils.Smoothstep(osuCurrObj.StrainTime, osuLast0Obj.StrainTime * 0.55, osuLast0Obj.StrainTime * 0.75);
 
-            // Decrease buff on cutstreams
+            double currDistance = Math.Max(osuCurrObj.LazyJumpDistance, 0.01);
+            double prevDistance = Math.Max(osuLast0Obj.LazyJumpDistance, 0.01);
             double prev1Distance = Math.Max(osuLast1Obj.LazyJumpDistance, 0.01);
             double prev2Distance = Math.Max(osuLast2Obj?.LazyJumpDistance ?? prev1Distance, 0.01);
 
-            double velocitySimilarityFactor = DifficultyCalculationUtils.Smoothstep(prev1Distance, prev2Distance * 0.8, prev2Distance * 0.95)
-                * DifficultyCalculationUtils.Smoothstep(prev2Distance, prev1Distance * 0.8, prev1Distance * 0.95);
+            // Decrease buff on cutstreams
+            double distanceSimilarityFactor = DifficultyCalculationUtils.ReverseLerpTwoDirectional(prev1Distance, prev2Distance, 0.8, 0.95);
 
-            double angleFactor = DifficultyCalculationUtils.Smoothstep(osuLast1Obj.Angle ?? 0, Math.PI * 0.55, Math.PI * 0.75)
-                * DifficultyCalculationUtils.Smoothstep(osuLast2Obj?.Angle ?? 0, Math.PI * 0.55, Math.PI * 0.75);
+            // Don't sure if it's needed
+            //double angleFactor = DifficultyCalculationUtils.Smoothstep(osuLast1Obj.Angle ?? 0, Math.PI * 0.55, Math.PI * 0.75)
+            //    * DifficultyCalculationUtils.Smoothstep(osuLast2Obj?.Angle ?? 0, Math.PI * 0.55, Math.PI * 0.75);
 
             double distanceFactor = 0.5 + 0.5 * DifficultyCalculationUtils.ReverseLerp(Math.Max(prev1Distance, prev2Distance), diameter * 1.5, diameter * 0.75);
 
-            deltaVelocity *= 1 - 0.5 * velocitySimilarityFactor * angleFactor * distanceFactor;
+            deltaVelocity *= 1 - 0.5 * distanceSimilarityFactor * distanceFactor;
+
+            // Decrease buff on doubles that go back and forth
+            // Add radius to account for distance potenitally being very small
+            double distanceSimilarity1 = DifficultyCalculationUtils.ReverseLerpTwoDirectional(currDistance + radius, prev1Distance + radius, 0.7, 0.9);
+            double distanceSimilarity2 = DifficultyCalculationUtils.ReverseLerpTwoDirectional(prevDistance + radius, prev2Distance + radius, 0.7, 0.9);
+
+            // Check the direction of doubles
+            double directionFactor = 1.0;
+            if (osuLast3Obj != null)
+            {
+                Vector2 p1 = ((OsuHitObject)osuCurrObj.BaseObject).StackedPosition;
+                Vector2 p2 = ((OsuHitObject)osuLast1Obj.BaseObject).StackedPosition;
+                Vector2 p3 = ((OsuHitObject)osuLast3Obj.BaseObject).StackedPosition;
+
+                Vector2 v1 = p3 - p2;
+                Vector2 v2 = p1 - p2;
+
+                float dot = Vector2.Dot(v1, v2);
+                float det = v1.X * v2.Y - v1.Y * v2.X;
+
+                double angle = Math.Abs(Math.Atan2(det, dot));
+
+                directionFactor = DifficultyCalculationUtils.ReverseLerp(angle, 3 * Math.PI / 2, Math.PI / 2);
+            }
+
+            deltaVelocity *= 1 - distanceSimilarity1 * distanceSimilarity2 * directionFactor;
 
             if (deltaVelocity > minVelocity * 2)
             {

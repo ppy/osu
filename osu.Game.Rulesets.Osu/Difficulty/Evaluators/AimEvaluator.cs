@@ -64,17 +64,24 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 // Jumps need to have some spacing to be snapped
                 double result = currDistance < snapThreshold ? snapThreshold * 0.75 + currDistance * 0.25 : currDistance;
 
-                // Don't buff double jumps as you don't snap in this case
-                double doublesNerf = DifficultyCalculationUtils.ReverseLerp(currDistance, radius * 2, radius);
+                // Don't buff doubles jumps as you don't snap in this case
+                double doublesFactor = DifficultyCalculationUtils.ReverseLerp(currDistance, radius * 2, radius);
 
-                // Don't accidentally nerf streams here
-                doublesNerf *= DifficultyCalculationUtils.ReverseLerp(osuLastObj.LazyJumpDistance, diameter, diameter * 2);
+                double timeFactor = DifficultyCalculationUtils.ReverseLerpTwoDirectional(osuCurrObj.StrainTime, osuLastObj.StrainTime, 0.75, 0.95);
+
+                // Make nerf much smaller if it's not doubles and time is different
+                double doublesAdjust = diameter * 2 * (1 - doublesFactor) * (2 - timeFactor);
+
+                // Don't buff Zan'ei and Walk This Way with this
+                double bigDistanceDifferenceFactor = 1 - DifficultyCalculationUtils.ReverseLerp(osuLastObj.LazyJumpDistance, doublesAdjust + diameter, doublesAdjust + diameter * 2);
+
+                double totalBonus = result + hardSnapBonus - currDistance;
 
                 // And don't nerf spaced bursts
                 //doublesNerf *= DifficultyCalculationUtils.ReverseLerp(osuCurrObj.StrainTime, osuLastObj.StrainTime * 1.5, osuLastObj.StrainTime * 1.95);
                 //doublesNerf *= DifficultyCalculationUtils.ReverseLerp(osuLastObj.StrainTime, osuCurrObj.StrainTime * 1.5, osuCurrObj.StrainTime * 1.95);
 
-                return (result + hardSnapBonus) * (1 - doublesNerf);
+                return currDistance + totalBonus * bigDistanceDifferenceFactor;
             }
 
             // Calculate the velocity to the current hitobject, which starts with a base distance / time assuming the last object is a hitcircle.
@@ -185,6 +192,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double angleFactor = DifficultyCalculationUtils.Smoothstep(Math.Max(osuLastLastObj?.Angle ?? 0, osuLast2Obj?.Angle ?? 0), Math.PI * 0.55, Math.PI * 0.75);
 
                 velocityChangeBonus *= 1 - velocitySimilarityFactor * angleFactor;
+
+                // Decrease buff on very spaced doubles
+                velocityChangeBonus *= 1 - 0.8 * DifficultyCalculationUtils.ReverseLerp(osuCurrObj.LazyJumpDistance, diameter * 3, diameter * 4) * DifficultyCalculationUtils.ReverseLerp(osuLastObj.LazyJumpDistance, diameter * 1.6, radius);
             }
 
             if (osuLastObj.BaseObject is Slider)
