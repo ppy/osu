@@ -27,6 +27,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         [JsonProperty("speed_deviation")]
         public double? SpeedDeviation { get; set; }
 
+        [JsonProperty("snap_aim")]
+        public double SnapAim { get; set; }
+
+        [JsonProperty("flow_aim")]
+        public double FlowAim { get; set; }
+
         public override IEnumerable<PerformanceDisplayAttribute> GetAttributesForDisplay()
         {
             foreach (var attribute in base.GetAttributesForDisplay())

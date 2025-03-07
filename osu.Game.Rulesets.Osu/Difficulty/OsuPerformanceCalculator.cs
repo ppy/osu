@@ -160,6 +160,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             else
                 aimValue += (speedValue - aimValue) * OsuDifficultyCalculator.MechanicsAdditionPortion;
 
+            // Debug stuff to see snap and flow pp
+            double aimScale = aimValue / OsuStrainSkill.DifficultyToPerformance(osuAttributes.AimDifficulty);
+
             double totalValue =
                 Math.Pow(
                     Math.Pow(aimValue, 1.1) +
@@ -176,6 +179,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 Flashlight = flashlightValue,
                 EffectiveMissCount = effectiveMissCount,
                 SpeedDeviation = speedDeviation,
+                SnapAim = OsuStrainSkill.DifficultyToPerformance(osuAttributes.SnapAimDifficulty) * aimScale,
+                FlowAim = OsuStrainSkill.DifficultyToPerformance(osuAttributes.FlowAimDifficulty) * aimScale,
                 Total = totalValue
             };
         }
