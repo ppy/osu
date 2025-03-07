@@ -120,10 +120,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     double acuteVelocityBase = Math.Min(currVelocity, prevVelocity);
                     double wideVelocityBase = Math.Min(currDistance / osuCurrObj.StrainTime, prevVelocity); // Don't reward wide angle bonus to sliders
 
-                    double velocityThreshold = diameter * 3 / osuCurrObj.StrainTime;
+                    double velocityThreshold = diameter * 2.5 / osuCurrObj.StrainTime;
                     if (wideVelocityBase > velocityThreshold) // Nerf high spaced squares to compensate buff on lower spaced squares
                     {
-                        wideVelocityBase = velocityThreshold + 0.6 * (wideVelocityBase - velocityThreshold);
+                        wideVelocityBase = velocityThreshold + 0.4 * (wideVelocityBase - velocityThreshold);
                     }
 
                     wideAngleBonus = CalcWideAngleBonus(currAngle);
@@ -135,8 +135,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     wideAngleBonus *= 1 - wideAngleRepetitionNerf;
 
                     double acuteAngleRepetitionNerf = Math.Pow(CalcAcuteAngleBonus(lastAngle), 3);
-                    // Need to somehow nerf anoneanone here
-                    acuteAngleBonus *= 0.08 + 0.5 * (1 - Math.Min(acuteAngleBonus, acuteAngleRepetitionNerf));
+                    acuteAngleBonus *= 0.08 + 0.5 * (1 - Math.Min(acuteAngleBonus, acuteAngleRepetitionNerf)); // Need to somehow nerf anoneanone here
 
                     // Apply full wide angle bonus for distance more than one diameter
                     wideAngleBonus *= wideVelocityBase * DifficultyCalculationUtils.Smootherstep(osuCurrObj.LazyJumpDistance, 0, diameter);
