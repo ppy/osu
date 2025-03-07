@@ -150,8 +150,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                                   * DifficultyCalculationUtils.Smootherstep(currDistance, radius, diameter)
                                   * Math.Pow(DifficultyCalculationUtils.ReverseLerp(currDistance, diameter * 3, diameter), 1.8)
                                   * DifficultyCalculationUtils.Smootherstep(currAngle, double.DegreesToRadians(110), double.DegreesToRadians(60))
-                                  * DifficultyCalculationUtils.Smootherstep(currDistance, radius, diameter)
-                                  * Math.Pow(DifficultyCalculationUtils.ReverseLerp(currDistance, diameter * 3, diameter), 1.8)
+                                  * DifficultyCalculationUtils.Smootherstep(osuLastObj.LazyJumpDistance, radius, diameter)
+                                  * Math.Pow(DifficultyCalculationUtils.ReverseLerp(osuLastObj.LazyJumpDistance, diameter * 3, diameter), 1.8)
                                   * DifficultyCalculationUtils.Smootherstep(Math.Min(lastAngle, lastLastAngle), double.DegreesToRadians(110), double.DegreesToRadians(60));
                 }
             }
