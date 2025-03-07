@@ -181,6 +181,11 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             AddStep(@"Set scope", () => leaderboard.Scope = BeatmapLeaderboardScope.Global);
             AddStep(@"New Scores", () => leaderboard.SetScores(generateSampleScores(new BeatmapInfo())));
+            AddStep(@"New Scores with teams", () => leaderboard.SetScores(generateSampleScores(new BeatmapInfo()).Select(s =>
+            {
+                s.User.Team = new APITeam();
+                return s;
+            })));
         }
 
         [Test]
@@ -473,7 +478,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Accuracy = 0.5140,
                     MaxCombo = 244,
                     TotalScore = 1707827,
-                    Date = DateTime.Now.AddMonths(-3),
+                    Date = DateTime.Now.AddMonths(-10),
                     Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
                     BeatmapInfo = beatmapInfo,
                     BeatmapHash = beatmapInfo.Hash,
