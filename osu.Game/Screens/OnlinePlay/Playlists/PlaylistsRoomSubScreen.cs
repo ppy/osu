@@ -541,6 +541,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                 if (item.RulesetID > 0)
                     UserRuleset.Value = null;
             }
+            else
+                UserRuleset.Value = null;
 
             validateUserMods();
 
