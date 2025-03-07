@@ -173,6 +173,19 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                 // Penalize for rhythm changes.
                 velocityChangeBonus *= Math.Pow(Math.Min(osuCurrObj.StrainTime, osuLastObj.StrainTime) / Math.Max(osuCurrObj.StrainTime, osuLastObj.StrainTime), 2);
+
+                var osuLast2Obj = (OsuDifficultyHitObject)current.Previous(2);
+
+                // Decrease buff on cutstreams
+                double prev1Distance = Math.Max(osuLastLastObj.LazyJumpDistance, 0.01);
+                double prev2Distance = Math.Max(osuLast2Obj?.LazyJumpDistance ?? prev1Distance, 0.01);
+
+                double velocitySimilarityFactor = DifficultyCalculationUtils.Smoothstep(prev1Distance, prev2Distance * 0.8, prev2Distance * 0.95)
+                    * DifficultyCalculationUtils.Smoothstep(prev2Distance, prev1Distance * 0.8, prev1Distance * 0.95);
+
+                double angleFactor = DifficultyCalculationUtils.Smoothstep(Math.Max(osuLastLastObj?.Angle ?? 0, osuLast2Obj?.Angle ?? 0), Math.PI * 0.55, Math.PI * 0.75);
+
+                velocityChangeBonus *= 1 - velocitySimilarityFactor * angleFactor;
             }
 
             if (osuLastObj.BaseObject is Slider)

@@ -192,22 +192,25 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
         public static double CalculateFlowVelocityChangeBonus(DifficultyHitObject current)
         {
-            if (current.BaseObject is Spinner || current.Index <= 1 || current.Previous(0).BaseObject is Spinner)
+            if (current.BaseObject is Spinner || current.Index <= 2 || current.Previous(0).BaseObject is Spinner)
                 return 0;
 
             var osuCurrObj = (OsuDifficultyHitObject)current;
-            var osuLastObj = (OsuDifficultyHitObject)current.Previous(0);
-            var osuLastLastObj = (OsuDifficultyHitObject)current.Previous(1);
+            var osuLast0Obj = (OsuDifficultyHitObject)current.Previous(0);
+            var osuLast1Obj = (OsuDifficultyHitObject)current.Previous(1);
+            var osuLast2Obj = (OsuDifficultyHitObject)current.Previous(2);
+
+            const int diameter = OsuDifficultyHitObject.NORMALISED_DIAMETER;
 
             double currVelocity = osuCurrObj.LazyJumpDistance / osuCurrObj.StrainTime;
-            double prevVelocity = osuLastObj.LazyJumpDistance / osuLastObj.StrainTime;
-            double prevPrevVelocity = osuLastLastObj.LazyJumpDistance / osuLastLastObj.StrainTime;
+            double prevVelocity = osuLast0Obj.LazyJumpDistance / osuLast0Obj.StrainTime;
+            double prev1Velocity = osuLast1Obj.LazyJumpDistance / osuLast1Obj.StrainTime;
 
             double minVelocity = Math.Min(currVelocity, prevVelocity);
             double maxVelocity = Math.Max(currVelocity, prevVelocity);
 
             double deltaVelocity = maxVelocity - minVelocity;
-            double deltaPrevVelocity = Math.Abs(prevVelocity - prevPrevVelocity);
+            double deltaPrevVelocity = Math.Abs(prevVelocity - prev1Velocity);
 
             // Don't buff slight consistent changes
             if (minVelocity > 0)
@@ -215,7 +218,21 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             // Don't buff velocity increase if previous note was slower
             if (currVelocity > prevVelocity)
-                deltaVelocity *= DifficultyCalculationUtils.Smoothstep(osuCurrObj.StrainTime, osuLastObj.StrainTime * 0.55, osuLastObj.StrainTime * 0.75);
+                deltaVelocity *= DifficultyCalculationUtils.Smoothstep(osuCurrObj.StrainTime, osuLast0Obj.StrainTime * 0.55, osuLast0Obj.StrainTime * 0.75);
+
+            // Decrease buff on cutstreams
+            double prev1Distance = Math.Max(osuLast1Obj.LazyJumpDistance, 0.01);
+            double prev2Distance = Math.Max(osuLast2Obj?.LazyJumpDistance ?? prev1Distance, 0.01);
+
+            double velocitySimilarityFactor = DifficultyCalculationUtils.Smoothstep(prev1Distance, prev2Distance * 0.8, prev2Distance * 0.95)
+                * DifficultyCalculationUtils.Smoothstep(prev2Distance, prev1Distance * 0.8, prev1Distance * 0.95);
+
+            double angleFactor = DifficultyCalculationUtils.Smoothstep(osuLast1Obj.Angle ?? 0, Math.PI * 0.55, Math.PI * 0.75)
+                * DifficultyCalculationUtils.Smoothstep(osuLast2Obj?.Angle ?? 0, Math.PI * 0.55, Math.PI * 0.75);
+
+            double distanceFactor = 0.5 + 0.5 * DifficultyCalculationUtils.ReverseLerp(Math.Max(prev1Distance, prev2Distance), diameter * 1.5, diameter * 0.75);
+
+            deltaVelocity *= 1 - 0.5 * velocitySimilarityFactor * angleFactor * distanceFactor;
 
             if (deltaVelocity > minVelocity * 2)
             {
@@ -224,6 +241,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             }
 
             return deltaVelocity;
+        }
+
+        public static double IdentifyCutStream(DifficultyHitObject current)
+        {
+            return 0;
         }
 
         public static double IdentifyComfyCircluarFlow(DifficultyHitObject current)
