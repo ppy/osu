@@ -3,11 +3,12 @@
 
 using System;
 using osu.Framework.Allocation;
-using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Utils;
+using osu.Game.Audio;
 using osu.Game.Graphics.Containers;
+using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Menu
 {
@@ -16,11 +17,14 @@ namespace osu.Game.Screens.Menu
         private StarFountain leftFountain = null!;
         private StarFountain rightFountain = null!;
 
-        private Sample? sample;
+        [Resolved]
+        private ISkinSource skin { get; set; } = null!;
+
+        private ISample? sample;
         private SampleChannel? sampleChannel;
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
+        private void load()
         {
             RelativeSizeAxes = Axes.Both;
 
@@ -40,7 +44,7 @@ namespace osu.Game.Screens.Menu
                 },
             };
 
-            sample = audio.Samples.Get(@"Gameplay/fountain-shoot");
+            sample = skin.GetSample(new SampleInfo(@"Gameplay/fountain-shoot"));
         }
 
         private bool isTriggered;
