@@ -17,6 +17,7 @@ using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Catch;
@@ -511,6 +512,63 @@ namespace osu.Game.Tests.Visual.Playlists
             AddUntilStep("user ruleset selected", () => Ruleset.Value.Equals(new TaikoRuleset().RulesetInfo));
             AddUntilStep("user mods reset", () => !screen.UserMods.Value.Any());
             AddUntilStep("mods reset", () => !SelectedMods.Value.Any());
+        }
+
+        /// <summary>
+        /// Tests that the beatmap and ruleset style are reset when the selected item is changed to one without freestyle,
+        /// and that the mod selection is re-validated against the item's allowed mods.
+        /// </summary>
+        [Test]
+        public void TestUserStyle_Reset_OnFreestyleDisabled()
+        {
+            Room room = null!;
+
+            AddStep("add room", () =>
+            {
+                room = new Room
+                {
+                    RoomID = 1,
+                    Playlist =
+                    [
+                        new PlaylistItem(importedSet.Beatmaps[0])
+                        {
+                            RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
+                            Freestyle = true
+                        },
+                        new PlaylistItem(importedSet.Beatmaps[0])
+                        {
+                            RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
+                            AllowedMods = [new APIMod(new OsuModDoubleTime())]
+                        },
+                    ]
+                };
+
+                API.Perform(new CreateRoomRequest(room));
+            });
+
+            TestPlaylistsRoomSubScreen screen = null!;
+            AddStep("load screen", () => LoadScreen(new TestPlaylistsScreen(screen = new TestPlaylistsRoomSubScreen(room))));
+            AddUntilStep("wait for load", () => screen.IsLoaded);
+
+            // Set beatmap + ruleset, reset by selecting second playlist item
+            AddStep("set user beatmap/ruleset style", () =>
+            {
+                screen.UserBeatmap.Value = importedSet.Beatmaps[1];
+                screen.UserRuleset.Value = new TaikoRuleset().RulesetInfo;
+            });
+            AddUntilStep("beatmap/ruleset set", () => Beatmap.Value.BeatmapInfo.Equals(importedSet.Beatmaps[1]) && Ruleset.Value.Equals(new TaikoRuleset().RulesetInfo));
+            AddStep("select second playlist item", () => screen.SelectedItem.Value = room.Playlist[1]);
+            AddUntilStep("user style reset", () => screen.UserBeatmap.Value == null && screen.UserRuleset.Value == null);
+            AddUntilStep("beatmap/ruleset set", () => Beatmap.Value.BeatmapInfo.Equals(importedSet.Beatmaps[0]) && Ruleset.Value.Equals(new OsuRuleset().RulesetInfo));
+
+            AddStep("select first playlist item", () => screen.SelectedItem.Value = room.Playlist[0]);
+
+            // Set mods (DT+HR), validate by selecting second playlist item where only DT is allowed.
+            AddStep("set user mods style", () => screen.UserMods.Value = [new OsuModDoubleTime(), new OsuModHardRock()]);
+            AddUntilStep("mods set", () => SelectedMods.Value.OfType<OsuModDoubleTime>().Any() && SelectedMods.Value.OfType<OsuModHardRock>().Any());
+            AddStep("select second playlist item", () => screen.SelectedItem.Value = room.Playlist[1]);
+            AddUntilStep("user mods validated", () => screen.UserMods.Value.Count == 1 && screen.UserMods.Value.OfType<OsuModDoubleTime>().Any());
+            AddUntilStep("mods set", () => SelectedMods.Value.Count == 1 && SelectedMods.Value.OfType<OsuModDoubleTime>().Any());
         }
 
         private partial class TestPlaylistsScreen : OsuScreen
