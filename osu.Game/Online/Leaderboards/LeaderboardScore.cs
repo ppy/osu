@@ -190,7 +190,7 @@ namespace osu.Game.Online.Leaderboards
                                                     RelativeSizeAxes = Axes.Y,
                                                     Direction = FillDirection.Horizontal,
                                                     Spacing = new Vector2(5f, 0f),
-                                                    Width = 114f,
+                                                    Width = 130f,
                                                     Masking = true,
                                                     Children = new Drawable[]
                                                     {
