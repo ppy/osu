@@ -464,13 +464,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double calculateEstimatedSliderbreaks(double topWeightedSliderFactor, OsuDifficultyAttributes attributes)
         {
+            // If we're not using classic slider accuracy then we already have an accurate number of sliderbreaks.
+            // If we did not get any Oks, further breaks are not possible.
             if (!usingClassicSliderAccuracy || countOk == 0)
                 return 0;
 
             double missedComboPercent = 1.0 - (double)scoreMaxCombo / attributes.MaxCombo;
             double estimatedSliderbreaks = Math.Min(countOk, effectiveMissCount * topWeightedSliderFactor);
-            // scores with more oks are more likely to have sliderbreaks
+
+            // Scores with more oks are more likely to have sliderbreaks
             double okAdjustment = ((countOk - estimatedSliderbreaks) + 0.5) / countOk;
+
             return estimatedSliderbreaks * okAdjustment * DifficultyCalculationUtils.Logistic(missedComboPercent, 0.33, 15);
         }
 
