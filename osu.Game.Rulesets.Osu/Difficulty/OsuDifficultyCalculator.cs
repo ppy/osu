@@ -50,13 +50,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             var flashlight = skills.OfType<Flashlight>().SingleOrDefault();
             double flashlightRating = flashlight == null ? 0.0 : Math.Sqrt(flashlight.DifficultyValue()) * difficulty_multiplier;
-            
-            double aimDifficultyStrainCount = aim.CountTopWeightedStrains();
-            double speedDifficultyStrainCount = speed.CountTopWeightedStrains();
 
             double aimNoSlidersTopWeightedSliderCount = aimWithoutSliders.CountTopWeightedSliders();
             double aimNoSlidersDifficultyStrainCount = aimWithoutSliders.CountTopWeightedStrains();
+
             double aimTopWeightedSliderFactor = aimNoSlidersTopWeightedSliderCount / (aimNoSlidersDifficultyStrainCount - aimNoSlidersTopWeightedSliderCount);
+
             double speedTopWeightedSliderCount = speed.CountTopWeightedSliders();
             double speedTopWeightedSliderFactor = speedTopWeightedSliderCount / (speedDifficultyStrainCount - speedTopWeightedSliderCount);
 

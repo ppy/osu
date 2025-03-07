@@ -54,12 +54,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private double approachRate;
 
         /// <summary>
-        /// estimated number of sliderbreaks from aim difficulty
+        /// The estimated number of sliderbreaks from aim difficulty.
         /// </summary>
         private double estimatedAimSliderbreaks;
 
         /// <summary>
-        /// estimated number of sliderbreaks from speed difficulty
+        /// The estimated number of sliderbreaks from speed difficulty.
         /// </summary>
         private double estimatedSpeedSliderbreaks;
 
@@ -134,6 +134,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             effectiveMissCount = Math.Max(countMiss, effectiveMissCount);
             effectiveMissCount = Math.Min(totalHits, effectiveMissCount);
+
             estimatedAimSliderbreaks = calculateEstimatedSliderbreaks(osuAttributes.AimTopWeightedSliderFactor, osuAttributes);
             estimatedSpeedSliderbreaks = calculateEstimatedSliderbreaks(osuAttributes.SpeedTopWeightedSliderFactor, osuAttributes);
 
@@ -221,9 +222,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             aimValue *= lengthBonus;
 
             if (effectiveMissCount > 0)
-            {
                 aimValue *= calculateMissPenalty(effectiveMissCount + estimatedAimSliderbreaks, attributes.AimDifficultStrainCount);
-            }
 
             double approachRateFactor = 0.0;
             if (approachRate > 10.33)
@@ -263,9 +262,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             speedValue *= lengthBonus;
 
             if (effectiveMissCount > 0)
-            {
                 speedValue *= calculateMissPenalty(effectiveMissCount + estimatedSpeedSliderbreaks, attributes.SpeedDifficultStrainCount);
-            }
 
             double approachRateFactor = 0.0;
             if (approachRate > 10.33)
