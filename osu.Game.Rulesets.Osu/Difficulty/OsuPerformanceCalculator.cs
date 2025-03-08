@@ -190,7 +190,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (score.Mods.Any(h => h is OsuModAutopilot))
                 return 0.0;
 
-            double aimDifficulty = attributes.AimDifficulty;
+            double flowAimHighDeviationMultiplier = calculateFlowAimHighDeviationNerf(attributes);
+            double aimDifficulty = double.Lerp(attributes.SnapAimDifficulty, attributes.AimDifficulty, flowAimHighDeviationMultiplier);
 
             if (attributes.SliderCount > 0 && attributes.AimDifficultSliderCount > 0)
             {
@@ -472,6 +473,35 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             adjustedSpeedValue = double.Lerp(adjustedSpeedValue, speedValue, lerp);
 
             return adjustedSpeedValue / speedValue;
+        }
+
+        private double calculateFlowAimHighDeviationNerf(OsuDifficultyAttributes attributes)
+        {
+            if (speedDeviation == null)
+                return 0;
+
+            double speedValue = OsuStrainSkill.DifficultyToPerformance(attributes.SpeedDifficulty);
+            double flowAimValue = OsuStrainSkill.DifficultyToPerformance(attributes.FlowAimDifficulty);
+
+            double speedFlowValue = Math.Pow(Math.Pow(speedValue, 1.1) + Math.Pow(flowAimValue, 1.1), 1 / 1.1);
+
+            // Decides a point where the PP value achieved compared to the speed deviation is assumed to be tapped improperly. Any PP above this point is considered "excess" speed difficulty.
+            // This is used to cause PP above the cutoff to scale logarithmically towards the original speed value thus nerfing the value.
+            double excessSpeedFlowDifficultyCutoff = 1.5 * (100 + 220 * Math.Pow(22 / speedDeviation.Value, 6.5));
+
+            if (speedFlowValue <= excessSpeedFlowDifficultyCutoff)
+                return 1.0;
+
+            const double scale = 50;
+            double adjustedSpeedFlowValue = scale * (Math.Log((speedFlowValue - excessSpeedFlowDifficultyCutoff) / scale + 1) + excessSpeedFlowDifficultyCutoff / scale);
+
+            // 220 UR and less are considered tapped correctly to ensure that normal scores will be punished as little as possible
+            double lerp = 1 - DifficultyCalculationUtils.ReverseLerp(speedDeviation.Value, 22.0, 27.0);
+            adjustedSpeedFlowValue = double.Lerp(adjustedSpeedFlowValue, speedFlowValue, lerp);
+
+            double adjustedFlowValue = flowAimValue * (adjustedSpeedFlowValue / speedFlowValue);
+
+            return adjustedFlowValue / flowAimValue;
         }
 
         // Miss penalty assumes that a player will miss on the hardest parts of a map,
