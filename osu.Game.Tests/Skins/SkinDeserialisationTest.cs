@@ -75,6 +75,8 @@ namespace osu.Game.Tests.Skins
             "Archives/modified-argon-20250116.osk",
             // Covers player team flag
             "Archives/modified-argon-20250214.osk",
+            // Covers argon judgement counter
+            "Archives/modified-argon-20250308.osk",
         };
 
         /// <summary>

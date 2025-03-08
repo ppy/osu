@@ -16,7 +16,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Skinning.Components
 {
-    public sealed partial class ArgonJudgmentCounter : VisibilityContainer
+    public sealed partial class ArgonJudgementCounter : VisibilityContainer
     {
         public ArgonCounterTextComponent TextComponent;
         private OsuColour colours = null!;
@@ -24,7 +24,7 @@ namespace osu.Game.Skinning.Components
         public BindableInt DisplayedValue = new BindableInt();
         public string JudgementName;
 
-        public ArgonJudgmentCounter(JudgementCount judgementCounter)
+        public ArgonJudgementCounter(JudgementCount judgementCounter)
         {
             JudgementCounter = judgementCounter;
             JudgementName = judgementCounter.DisplayName.ToUpper().ToString();

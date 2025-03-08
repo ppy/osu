@@ -91,7 +91,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddRepeatStep("Add judgement", () => applyOneJudgement(HitResult.LargeTickHit), 2);
             AddAssert("Check value added whilst hidden", () => hiddenCount() == 2);
-            AddStep("Show all judgements", () => counterDisplay.Mode.Value = ArgonJudgmentCounterDisplay.DisplayMode.All);
+            AddStep("Show all judgements", () => counterDisplay.Mode.Value = ArgonJudgementCounterDisplay.DisplayMode.All);
         }
 
         [Test]
@@ -123,7 +123,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("Hide max judgement", () => counterDisplay.ShowMaxJudgement.Value = false);
             AddWaitStep("wait some", 2);
-            AddAssert("Check max hidden", () => counterDisplay.CounterFlow.ChildrenOfType<ArgonJudgmentCounter>().First().Alpha == 0);
+            AddAssert("Check max hidden", () => counterDisplay.CounterFlow.ChildrenOfType<ArgonJudgementCounter>().First().Alpha == 0);
             AddStep("Show max judgement", () => counterDisplay.ShowMaxJudgement.Value = true);
         }
 
@@ -134,7 +134,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 ShowMaxJudgement = { Value = false }
             });
-            AddAssert("Check max hidden", () => counterDisplay.CounterFlow.ChildrenOfType<ArgonJudgmentCounter>().First().Alpha == 0);
+            AddAssert("Check max hidden", () => counterDisplay.CounterFlow.ChildrenOfType<ArgonJudgementCounter>().First().Alpha == 0);
         }
 
         [Test]
@@ -143,19 +143,19 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("create counter", () => Child = counterDisplay = new TestArgonJudgementCounterDisplay());
 
             AddStep("Set max judgement to hide itself", () => counterDisplay.ShowMaxJudgement.Value = false);
-            AddStep("Show all judgements", () => counterDisplay.Mode.Value = ArgonJudgmentCounterDisplay.DisplayMode.All);
+            AddStep("Show all judgements", () => counterDisplay.Mode.Value = ArgonJudgementCounterDisplay.DisplayMode.All);
             AddWaitStep("wait some", 2);
-            AddAssert("Assert max judgement hidden", () => counterDisplay.CounterFlow.ChildrenOfType<ArgonJudgmentCounter>().First().Alpha == 0);
+            AddAssert("Assert max judgement hidden", () => counterDisplay.CounterFlow.ChildrenOfType<ArgonJudgementCounter>().First().Alpha == 0);
         }
 
         [Test]
         public void TestNoDuplicates()
         {
             AddStep("create counter", () => Child = counterDisplay = new TestArgonJudgementCounterDisplay());
-            AddStep("Show all judgements", () => counterDisplay.Mode.Value = ArgonJudgmentCounterDisplay.DisplayMode.All);
+            AddStep("Show all judgements", () => counterDisplay.Mode.Value = ArgonJudgementCounterDisplay.DisplayMode.All);
             AddAssert("Check no duplicates",
-                () => counterDisplay.CounterFlow.ChildrenOfType<ArgonJudgmentCounter>().Count(),
-                () => Is.EqualTo(counterDisplay.CounterFlow.ChildrenOfType<ArgonJudgmentCounter>().Select(c => c.JudgementName).Distinct().Count()));
+                () => counterDisplay.CounterFlow.ChildrenOfType<ArgonJudgementCounter>().Count(),
+                () => Is.EqualTo(counterDisplay.CounterFlow.ChildrenOfType<ArgonJudgementCounter>().Select(c => c.JudgementName).Distinct().Count()));
         }
 
         [Test]
@@ -163,13 +163,13 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddStep("create counter", () => Child = counterDisplay = new TestArgonJudgementCounterDisplay());
 
-            AddStep("Show basic judgements", () => counterDisplay.Mode.Value = ArgonJudgmentCounterDisplay.DisplayMode.Simple);
+            AddStep("Show basic judgements", () => counterDisplay.Mode.Value = ArgonJudgementCounterDisplay.DisplayMode.Simple);
             AddWaitStep("wait some", 2);
-            AddAssert("Check only basic", () => counterDisplay.CounterFlow.ChildrenOfType<ArgonJudgmentCounter>().Last().Alpha == 0);
-            AddStep("Show normal judgements", () => counterDisplay.Mode.Value = ArgonJudgmentCounterDisplay.DisplayMode.Normal);
-            AddStep("Show all judgements", () => counterDisplay.Mode.Value = ArgonJudgmentCounterDisplay.DisplayMode.All);
+            AddAssert("Check only basic", () => counterDisplay.CounterFlow.ChildrenOfType<ArgonJudgementCounter>().Last().Alpha == 0);
+            AddStep("Show normal judgements", () => counterDisplay.Mode.Value = ArgonJudgementCounterDisplay.DisplayMode.Normal);
+            AddStep("Show all judgements", () => counterDisplay.Mode.Value = ArgonJudgementCounterDisplay.DisplayMode.All);
             AddWaitStep("wait some", 2);
-            AddAssert("Check all visible", () => counterDisplay.CounterFlow.ChildrenOfType<ArgonJudgmentCounter>().Last().Alpha == 1);
+            AddAssert("Check all visible", () => counterDisplay.CounterFlow.ChildrenOfType<ArgonJudgementCounter>().Last().Alpha == 1);
         }
 
         private int hiddenCount()
@@ -178,9 +178,9 @@ namespace osu.Game.Tests.Visual.Gameplay
             return num.JudgementCounter.ResultCount.Value;
         }
 
-        private partial class TestArgonJudgementCounterDisplay : ArgonJudgmentCounterDisplay
+        private partial class TestArgonJudgementCounterDisplay : ArgonJudgementCounterDisplay
         {
-            public new FillFlowContainer<ArgonJudgmentCounter> CounterFlow => base.CounterFlow;
+            public new FillFlowContainer<ArgonJudgementCounter> CounterFlow => base.CounterFlow;
 
             public TestArgonJudgementCounterDisplay()
             {
