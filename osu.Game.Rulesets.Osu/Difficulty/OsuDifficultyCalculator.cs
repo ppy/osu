@@ -46,8 +46,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double aimDifficultyStrainCount = aim.CountTopWeightedStrains();
             double difficultSliders = aim.GetDifficultSliders();
 
-            double snapAimRating = Math.Sqrt(skills.OfType<SnapAim>().Single().DifficultyValue()) * difficulty_multiplier;
-            double flowAimRating = Math.Sqrt(skills.OfType<FlowAim>().Single().DifficultyValue()) * difficulty_multiplier;
+            double snapAimRating = Math.Sqrt(skills.OfType<SnapAim>().Single().StrainDifficultyValue()) * difficulty_multiplier;
+            double flowAimRating = Math.Sqrt(skills.OfType<FlowAim>().Single().StrainDifficultyValue()) * difficulty_multiplier;
 
             var aimWithoutSliders = skills.OfType<TotalAim>().Single(a => !a.IncludeSliders);
             double aimRatingNoSliders = Math.Sqrt(aimWithoutSliders.StrainDifficultyValue()) * difficulty_multiplier;
