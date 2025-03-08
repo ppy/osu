@@ -134,7 +134,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Setup
 
             updatingKeyCount = true;
 
-            editor.Reload().ContinueWith(t =>
+            editor.SaveAndReload().ContinueWith(t =>
             {
                 if (!t.GetResultSafely())
                 {

@@ -185,6 +185,24 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                 {
                     higherScores = index;
                     setPositions(index, pivot, -1);
+
+                    // when paginating the results, it's possible for the user's score to naturally fall down the rankings.
+                    // unmitigated, this can cause scores at the very top of the rankings to have zero or negative positions
+                    // because the positions are counted backwards from the user's score, which has increased in this case during pagination.
+                    // if this happens, just give the top score the first position.
+                    // note that this isn't 100% correct, but it *is* however the most reliable way to mask the problem.
+                    int smallestPosition = index.Scores.Min(s => s.Position ?? 1);
+
+                    if (smallestPosition < 1)
+                    {
+                        int offset = 1 - smallestPosition;
+
+                        foreach (var scorePanel in ScorePanelList.GetScorePanels())
+                            scorePanel.ScorePosition.Value += offset;
+
+                        foreach (var score in index.Scores)
+                            score.Position += offset;
+                    }
                 }
 
                 return await transformScores(index.Scores).ConfigureAwait(false);

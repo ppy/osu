@@ -421,6 +421,7 @@ namespace osu.Game
 
             SelectedMods.BindValueChanged(modsChanged);
             Beatmap.BindValueChanged(beatmapChanged, true);
+            configUserActivity.BindValueChanged(_ => updateWindowTitle());
 
             applySafeAreaConsiderations = LocalConfig.GetBindable<bool>(OsuSetting.SafeAreaConsiderations);
             applySafeAreaConsiderations.BindValueChanged(apply => SafeAreaContainer.SafeAreaOverrideEdges = apply.NewValue ? SafeAreaOverrideEdges : Edges.All, true);
@@ -828,6 +829,35 @@ namespace osu.Game
         {
             beatmap.OldValue?.CancelAsyncLoad();
             beatmap.NewValue?.BeginAsyncLoad();
+            updateWindowTitle();
+        }
+
+        private void updateWindowTitle()
+        {
+            if (Host.Window == null)
+                return;
+
+            string newTitle;
+
+            switch (configUserActivity.Value)
+            {
+                default:
+                    newTitle = Name;
+                    break;
+
+                case UserActivity.InGame:
+                case UserActivity.TestingBeatmap:
+                case UserActivity.WatchingReplay:
+                    newTitle = $"{Name} - {Beatmap.Value.BeatmapInfo.GetDisplayTitleRomanisable(true, false)}";
+                    break;
+
+                case UserActivity.EditingBeatmap:
+                    newTitle = $"{Name} - {Beatmap.Value.BeatmapInfo.Path ?? "new beatmap"}";
+                    break;
+            }
+
+            if (newTitle != Host.Window.Title)
+                Host.Window.Title = newTitle;
         }
 
         private void modsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)
