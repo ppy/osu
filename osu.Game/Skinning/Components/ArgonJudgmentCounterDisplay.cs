@@ -45,13 +45,13 @@ namespace osu.Game.Skinning.Components
         [SettingSource(typeof(JudgementCounterDisplayStrings), nameof(JudgementCounterDisplayStrings.FlowDirection))]
         public Bindable<Direction> FlowDirection { get; } = new Bindable<Direction>();
 
-        private FillFlowContainer<ArgonJudgmentCounter> counterFlow = null!;
+        protected FillFlowContainer<ArgonJudgmentCounter> CounterFlow = null!;
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
             AutoSizeAxes = Axes.Both;
-            InternalChild = counterFlow = new FillFlowContainer<ArgonJudgmentCounter>
+            InternalChild = CounterFlow = new FillFlowContainer<ArgonJudgmentCounter>
             {
                 Direction = getFillDirection(FlowDirection.Value),
                 Spacing = new Vector2(16),
@@ -64,7 +64,7 @@ namespace osu.Game.Skinning.Components
                 counterComponent.TextComponent.WireframeOpacity.BindTo(WireframeOpacity);
                 counterComponent.TextComponent.ShowLabel.BindTo(ShowLabel);
                 counterComponent.DisplayedValue.BindTo(counter.ResultCount);
-                counterFlow.Add(counterComponent);
+                CounterFlow.Add(counterComponent);
             }
         }
 
@@ -73,14 +73,14 @@ namespace osu.Game.Skinning.Components
             base.LoadComplete();
             Mode.BindValueChanged(_ => updateVisibility(), true);
             ShowMaxJudgement.BindValueChanged(_ => updateVisibility(), true);
-            FlowDirection.BindValueChanged(d => counterFlow.Direction = getFillDirection(d.NewValue));
+            FlowDirection.BindValueChanged(d => CounterFlow.Direction = getFillDirection(d.NewValue));
         }
 
         private void updateVisibility()
         {
-            for (int i = 0; i < counterFlow.Children.Count; i++)
+            for (int i = 0; i < CounterFlow.Children.Count; i++)
             {
-                ArgonJudgmentCounter counter = counterFlow.Children[i];
+                ArgonJudgmentCounter counter = CounterFlow.Children[i];
 
                 if (shouldBeVisible(i, counter))
                     counter.Show();
