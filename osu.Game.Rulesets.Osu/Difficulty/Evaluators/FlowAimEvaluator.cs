@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 {
     public static class FlowAimEvaluator
     {
-        private static double flowMultiplier => 1.13;
+        private static double flowMultiplier => 1.18;
 
         public static double EvaluateDifficultyOf(DifficultyHitObject current, bool withSliderTravelDistance)
         {
@@ -46,11 +46,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             }
             else
             {
-               flowDifficulty *= Math.Pow(osuCurrObj.LazyJumpDistance / diameter, 0.8);
+               flowDifficulty *= Math.Pow(osuCurrObj.LazyJumpDistance / diameter, 0.7);
             }
 
             // Flow aim is harder on High BPM
-            flowDifficulty += velocity * (osuCurrObj.StrainTime / (osuCurrObj.StrainTime - 8) - 1);
+            flowDifficulty += (Math.Pow(osuCurrObj.LazyJumpDistance, 0.9) / osuCurrObj.StrainTime) * (osuCurrObj.StrainTime / (osuCurrObj.StrainTime - 9) - 1);
 
             double angleBonus = 0;
 
