@@ -16,6 +16,13 @@ namespace osu.Game.Tests.NonVisual.Multiplayer
     [HeadlessTest]
     public partial class StatefulMultiplayerClientTest : MultiplayerTestScene
     {
+        public override void SetUpSteps()
+        {
+            base.SetUpSteps();
+            AddStep("join room", () => JoinRoom(CreateDefaultRoom()));
+            WaitForJoined();
+        }
+
         [Test]
         public void TestUserAddedOnJoin()
         {

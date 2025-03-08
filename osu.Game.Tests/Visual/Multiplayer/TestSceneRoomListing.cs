@@ -18,9 +18,10 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public partial class TestSceneLoungeRoomsContainer : OnlinePlayTestScene
+    public partial class TestSceneRoomListing : OnlinePlayTestScene
     {
         private BindableList<Room> rooms = null!;
+        private IBindable<Room?> selectedRoom = null!;
         private RoomListing container = null!;
 
         public override void SetUpSteps()
@@ -30,6 +31,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("create container", () =>
             {
                 rooms = new BindableList<Room>();
+                selectedRoom = new Bindable<Room?>();
+
                 Child = new PopoverContainer
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -40,7 +43,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     {
                         RelativeSizeAxes = Axes.Both,
                         Rooms = { BindTarget = rooms },
-                        SelectedRoom = { BindTarget = SelectedRoom }
+                        SelectedRoom = { BindTarget = selectedRoom }
                     }
                 };
             });
@@ -195,7 +198,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("add rooms", () => rooms.AddRange(GenerateRooms(3, withPassword: true)));
         }
 
-        private bool checkRoomSelected(Room? room) => SelectedRoom.Value == room;
+        private bool checkRoomSelected(Room? room) => selectedRoom.Value == room;
 
         private Room? getRoomInFlow(int index) =>
             (container.ChildrenOfType<FillFlowContainer<DrawableLoungeRoom>>().First().FlowingChildren.ElementAt(index) as DrawableRoom)?.Room;

@@ -80,6 +80,7 @@ namespace osu.Game.Online.Rooms
             PlaylistOrder = item.PlaylistOrder ?? 0;
             PlayedAt = item.PlayedAt;
             StarRating = item.Beatmap.StarRating;
+            Freestyle = item.Freestyle;
         }
     }
 }
