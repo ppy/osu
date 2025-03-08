@@ -4,7 +4,7 @@
 using System.Net.Http;
 using osu.Framework.IO.Network;
 
-namespace osu.Game.Online.API.Requests.Responses
+namespace osu.Game.Online.API.Requests
 {
     public class RemoveBeatmapTagRequest : APIRequest
     {
