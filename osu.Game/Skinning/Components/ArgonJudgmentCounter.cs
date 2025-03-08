@@ -16,16 +16,18 @@ using osuTK.Graphics;
 
 namespace osu.Game.Skinning.Components
 {
-    public sealed class ArgonJudgmentCounter : VisibilityContainer
+    public sealed partial class ArgonJudgmentCounter : VisibilityContainer
     {
         public ArgonCounterTextComponent TextComponent;
         private OsuColour colours = null!;
         public readonly JudgementCount JudgementCounter;
         public BindableInt DisplayedValue = new BindableInt();
+        public string JudgementName = null!;
 
         public ArgonJudgmentCounter(JudgementCount judgementCounter)
         {
-            this.JudgementCounter = judgementCounter;
+            JudgementCounter = judgementCounter;
+            JudgementName = judgementCounter.DisplayName.ToString().ToUpper();
 
             AutoSizeAxes = Axes.Both;
             AddInternal(TextComponent = new ArgonCounterTextComponent(Anchor.TopRight, judgementCounter.DisplayName.ToUpper()));
