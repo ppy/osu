@@ -27,7 +27,7 @@ namespace osu.Game.Skinning.Components
         public ArgonJudgmentCounter(JudgementCount judgementCounter)
         {
             JudgementCounter = judgementCounter;
-            JudgementName = judgementCounter.DisplayName.ToString().ToUpper();
+            JudgementName = judgementCounter.DisplayName.ToUpper().ToString();
 
             AutoSizeAxes = Axes.Both;
             AddInternal(TextComponent = new ArgonCounterTextComponent(Anchor.TopRight, judgementCounter.DisplayName.ToUpper()));
