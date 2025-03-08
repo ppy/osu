@@ -50,7 +50,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             var aimWithoutSliders = skills.OfType<TotalAim>().Single(a => !a.IncludeSliders);
             double aimRatingNoSliders = Math.Sqrt(aimWithoutSliders.StrainDifficultyValue()) * difficulty_multiplier;
-            double sliderFactor = aimRating > 0 ? aimRatingNoSliders / aimRating : 1;
 
             var speed = skills.OfType<Speed>().Single();
             double speedRating = Math.Sqrt(speed.DifficultyValue()) * difficulty_multiplier;
@@ -63,9 +62,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double flashlightRating = flashlight == null ? 0.0 : Math.Sqrt(flashlight.DifficultyValue()) * difficulty_multiplier;
 
             // Adjust aim to reward more versatile maps
-            double totalAim = aimRating;
             aimRating = aimRating * (1 - AimVersatilityAdditionPortion) + (snapAimRating + flowAimRating) * AimVersatilityAdditionPortion;
-
+            aimRatingNoSliders = aimRatingNoSliders * (1 - AimVersatilityAdditionPortion) + (snapAimRating + flowAimRating) * AimVersatilityAdditionPortion;
+            double sliderFactor = aimRating > 0 ? aimRatingNoSliders / aimRating : 1;
 
             if (mods.Any(m => m is OsuModTouchDevice))
             {
