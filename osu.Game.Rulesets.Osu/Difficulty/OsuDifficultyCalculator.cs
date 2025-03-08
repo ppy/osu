@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
         }
 
-        public static double AimVersatilityAdditionPortion = 0.1;
+        public static double AimVersatilityAdditionPortion = 0.08;
         public static double MechanicsAdditionPortion => 0.13;
         public static double MechanicsMultiplier => 0.935;
 
