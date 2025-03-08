@@ -50,8 +50,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             }
 
             // Flow aim is harder on High BPM
-            double effectiveStrainTime = Math.Min(osuCurrObj.StrainTime, DifficultyCalculationUtils.BPMToMilliseconds(175, 4)); // Don't nerf BPM below 175 to avoid nerfing alt maps
-            flowDifficulty += velocity * (effectiveStrainTime / (effectiveStrainTime - 8) - 1);
+            flowDifficulty += velocity * (osuCurrObj.StrainTime / (osuCurrObj.StrainTime - 8) - 1);
 
             double angleBonus = 0;
 
@@ -90,19 +89,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 // Or there was no stream before
                 double timeDifferenceFactor = DifficultyCalculationUtils.Smoothstep(osuCurrObj.StrainTime, osuLast1Obj.StrainTime * 0.75, osuLast1Obj.StrainTime * 0.55);
 
+                // Decrease buffs from angle bonuses if it's not repeating too often
                 acuteAngleBonus *= 1 - 0.5 * isSameAngle * (1 - angleBonusDifference);
                 angleChangeBonus *= 1 - 0.5 * Math.Max(isSameAngle * (1 - prevAngleBonus), timeDifferenceFactor);
 
-                // Don't apply both angle change and acute angle bonus at the same time if change is consistent
-                double angleChangeCurrent = Math.Abs((double)(osuCurrObj.AngleSigned - osuLast0Obj.AngleSigned));
-                double angleChangePrevious = Math.Abs((double)(osuLast0Obj.AngleSigned - osuLast1Obj.AngleSigned));
-                double angleChangeBonusDifference = Math.Abs(angleChangePrevious - angleChangeCurrent);
-                double angleChangeConsistency = DifficultyCalculationUtils.Smoothstep(angleChangeBonusDifference, 0.2, 0.1);
-
-                double largerBonus = Math.Max(angleChangeBonus, acuteAngleBonus);
-                double summedBonus = angleChangeBonus + acuteAngleBonus;
-
-                angleBonus = double.Lerp(summedBonus, largerBonus, angleChangeConsistency) * overlappedNotesWeight;
+                angleBonus = Math.Max(angleChangeBonus, acuteAngleBonus) * overlappedNotesWeight;
             }
 
             double velocityChangeBonus = CalculateFlowVelocityChangeBonus(current);
@@ -152,6 +143,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double acuteAngleBonus = AimEvaluator.CalcAcuteAngleBonus(currAngle);
             acuteAngleBonus *= Math.Min(osuCurrObj.LazyJumpDistance, osuLastObj.LazyJumpDistance) / Math.Max(osuCurrObj.StrainTime, osuLastObj.StrainTime);
 
+            // Nerf acute angle if previous notes were slower
+            acuteAngleBonus *= DifficultyCalculationUtils.ReverseLerp(osuCurrObj.StrainTime, osuLastObj.StrainTime * 0.55, osuLastObj.StrainTime * 0.75);
+
             return acuteAngleBonus;
         }
 
@@ -162,6 +156,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             var osuCurrObj = (OsuDifficultyHitObject)current;
             var osuLastObj = (OsuDifficultyHitObject)current.Previous(0);
+            var osuLastLastObj = (OsuDifficultyHitObject)current.Previous(1);
 
             if (osuCurrObj.AngleSigned == null || osuLastObj.AngleSigned == null)
                 return 0;
@@ -174,6 +169,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             double minVelocity = Math.Min(currVelocity, prevVelocity);
             double angleChangeBonus = Math.Pow(Math.Sin((currAngle - lastAngle) / 2), 2) * minVelocity;
+
+            // Nerf angle change if previous notes were slower
+            angleChangeBonus *= DifficultyCalculationUtils.ReverseLerp(osuCurrObj.StrainTime, osuLastObj.StrainTime * 0.55, osuLastObj.StrainTime * 0.75);
+            angleChangeBonus *= DifficultyCalculationUtils.ReverseLerp(osuCurrObj.StrainTime, osuLastLastObj.StrainTime * 0.55, osuLastLastObj.StrainTime * 0.75);
 
             return angleChangeBonus;
         }
