@@ -22,7 +22,7 @@ namespace osu.Game.Skinning.Components
         private OsuColour colours = null!;
         public readonly JudgementCount JudgementCounter;
         public BindableInt DisplayedValue = new BindableInt();
-        public string JudgementName = null!;
+        public string JudgementName;
 
         public ArgonJudgmentCounter(JudgementCount judgementCounter)
         {
