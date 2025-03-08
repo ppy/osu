@@ -20,7 +20,7 @@ using osuTK;
 namespace osu.Game.Skinning.Components
 {
     [UsedImplicitly]
-    public partial class ArgonJudgmentCounterDisplay : CompositeDrawable, ISerialisableDrawable
+    public partial class ArgonJudgementCounterDisplay : CompositeDrawable, ISerialisableDrawable
     {
         [Resolved]
         private JudgementCountController judgementCountController { get; set; } = null!;
@@ -45,13 +45,13 @@ namespace osu.Game.Skinning.Components
         [SettingSource(typeof(JudgementCounterDisplayStrings), nameof(JudgementCounterDisplayStrings.FlowDirection))]
         public Bindable<Direction> FlowDirection { get; } = new Bindable<Direction>();
 
-        protected FillFlowContainer<ArgonJudgmentCounter> CounterFlow = null!;
+        protected FillFlowContainer<ArgonJudgementCounter> CounterFlow = null!;
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
             AutoSizeAxes = Axes.Both;
-            InternalChild = CounterFlow = new FillFlowContainer<ArgonJudgmentCounter>
+            InternalChild = CounterFlow = new FillFlowContainer<ArgonJudgementCounter>
             {
                 Direction = getFillDirection(FlowDirection.Value),
                 Spacing = new Vector2(16),
@@ -60,7 +60,7 @@ namespace osu.Game.Skinning.Components
 
             foreach (var counter in judgementCountController.Counters)
             {
-                ArgonJudgmentCounter counterComponent = new ArgonJudgmentCounter(counter);
+                ArgonJudgementCounter counterComponent = new ArgonJudgementCounter(counter);
                 counterComponent.TextComponent.WireframeOpacity.BindTo(WireframeOpacity);
                 counterComponent.TextComponent.ShowLabel.BindTo(ShowLabel);
                 counterComponent.DisplayedValue.BindTo(counter.ResultCount);
@@ -80,7 +80,7 @@ namespace osu.Game.Skinning.Components
         {
             for (int i = 0; i < CounterFlow.Children.Count; i++)
             {
-                ArgonJudgmentCounter counter = CounterFlow.Children[i];
+                ArgonJudgementCounter counter = CounterFlow.Children[i];
 
                 if (shouldBeVisible(i, counter))
                     counter.Show();
@@ -89,7 +89,7 @@ namespace osu.Game.Skinning.Components
             }
         }
 
-        private bool shouldBeVisible(int index, ArgonJudgmentCounter counter)
+        private bool shouldBeVisible(int index, ArgonJudgementCounter counter)
         {
             if (index == 0 && !ShowMaxJudgement.Value)
                 return false;
