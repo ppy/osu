@@ -3,14 +3,14 @@
 
 using System;
 using osu.Framework.Allocation;
-using osu.Framework.Audio;
-using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Utils;
+using osu.Game.Audio;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osu.Game.Screens.Menu;
+using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Play
 {
@@ -21,17 +21,16 @@ namespace osu.Game.Screens.Play
 
         private Bindable<bool> kiaiStarFountains = null!;
 
-        private Sample? sample;
-        private SampleChannel? sampleChannel;
+        private SkinnableSound? sample;
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config, AudioManager audio)
+        private void load(OsuConfigManager config)
         {
             kiaiStarFountains = config.GetBindable<bool>(OsuSetting.StarFountains);
 
             RelativeSizeAxes = Axes.Both;
 
-            Children = new[]
+            Children = new Drawable[]
             {
                 leftFountain = new GameplayStarFountain
                 {
@@ -45,9 +44,8 @@ namespace osu.Game.Screens.Play
                     Origin = Anchor.BottomRight,
                     X = -75,
                 },
+                sample = new SkinnableSound(new SampleInfo("Gameplay/fountain-shoot"))
             };
-
-            sample = audio.Samples.Get(@"Gameplay/fountain-shoot");
         }
 
         private bool isTriggered;
@@ -74,10 +72,7 @@ namespace osu.Game.Screens.Play
             leftFountain.Shoot(1);
             rightFountain.Shoot(-1);
 
-            // Track sample channel to avoid overlapping playback
-            sampleChannel?.Stop();
-            sampleChannel = sample?.GetChannel();
-            sampleChannel?.Play();
+            sample?.Play();
         }
 
         public partial class GameplayStarFountain : StarFountain
