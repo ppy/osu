@@ -41,7 +41,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             var aim = skills.OfType<TotalAim>().Single(a => a.IncludeSliders);
             double aimRating = Math.Sqrt(aim.StrainDifficultyValue()) * difficulty_multiplier;
-             // Math.Sqrt(aim.StrainDifficultyValue()) * difficulty_multiplier;
             double aimDifficultyStrainCount = aim.CountTopWeightedStrains();
             double difficultSliders = aim.GetDifficultSliders();
 

@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 {
     public static class FlowAimEvaluator
     {
-        private static double flowMultiplier => 1.196;
+        private static double flowMultiplier => 1.12;
 
         public static double EvaluateDifficultyOf(DifficultyHitObject current, bool withSliderTravelDistance)
         {
@@ -41,16 +41,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             // Square the distance to turn into d/t
             if (osuCurrObj.LazyJumpDistance > diameter)
             {
-                double comfyness = IdentifyComfyCircluarFlow(current);
-                flowDifficulty *= Math.Pow(osuCurrObj.LazyJumpDistance / diameter, 0.65 - 0.5 * comfyness);
+                // Decrease spacing if patterns are comfy
+                double comfyness = IdentifyComfyFlow(current);
+                flowDifficulty *= Math.Pow(osuCurrObj.LazyJumpDistance / diameter, 0.65 - 0.45 * comfyness);
             }
             else
             {
-               flowDifficulty *= Math.Pow(osuCurrObj.LazyJumpDistance / diameter, 0.7);
+                flowDifficulty *= Math.Pow(osuCurrObj.LazyJumpDistance / diameter, 0.8);
             }
 
             // Flow aim is harder on High BPM
-            flowDifficulty += (Math.Pow(osuCurrObj.LazyJumpDistance, 0.9) / osuCurrObj.StrainTime) * (osuCurrObj.StrainTime / (osuCurrObj.StrainTime - 9) - 1);
+            flowDifficulty += 2.2 * (Math.Pow(osuCurrObj.LazyJumpDistance, 0.7) / osuCurrObj.StrainTime) * (osuCurrObj.StrainTime / (osuCurrObj.StrainTime - 13) - 1);
 
             double angleBonus = 0;
 
@@ -71,27 +72,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     overlappedNotesWeight = 1 - o1 * o2 * o3;
                 }
 
-                var osuLast2Obj = (OsuDifficultyHitObject)current.Previous(2);
+                //// Don't apply both angle change and acute angle bonus at the same time if change is consistent
+                //double angleChangeCurrent = Math.Abs((double)(osuCurrObj.AngleSigned - osuLast0Obj.AngleSigned));
+                //double angleChangePrevious = Math.Abs((double)(osuLast0Obj.AngleSigned - osuLast1Obj.AngleSigned));
+                //double angleChangeBonusDifference = Math.Abs(angleChangePrevious - angleChangeCurrent);
+                //double angleChangeConsistency = DifficultyCalculationUtils.Smoothstep(angleChangeBonusDifference, 0.2, 0.1);
 
-                // Angle is constant
-                double angleCurr = osuCurrObj.Angle ?? 0;
-                double angleLast = osuLast1Obj.Angle ?? 0;
-                double angleLastLast = osuLast2Obj.Angle ?? 0;
+                //double largerBonus = Math.Max(angleChangeBonus, acuteAngleBonus);
+                //double summedBonus = angleChangeBonus + acuteAngleBonus;
 
-                double deltaAngle = Math.Abs(angleLast - angleLastLast);
-                double isSameAngle = DifficultyCalculationUtils.Smoothstep(deltaAngle, 0.25, 0.15);
-
-                double currAngleBonus = AimEvaluator.CalcAcuteAngleBonus(angleCurr);
-                double prevAngleBonus = AimEvaluator.CalcAcuteAngleBonus(angleLastLast);
-
-                double angleBonusDifference = currAngleBonus > 0 ? Math.Clamp(prevAngleBonus / currAngleBonus, 0, 1) : 1;
-
-                // Or there was no stream before
-                double timeDifferenceFactor = DifficultyCalculationUtils.Smoothstep(osuCurrObj.StrainTime, osuLast1Obj.StrainTime * 0.75, osuLast1Obj.StrainTime * 0.55);
-
-                // Decrease buffs from angle bonuses if it's not repeating too often
-                acuteAngleBonus *= 1 - 0.5 * isSameAngle * (1 - angleBonusDifference);
-                angleChangeBonus *= 1 - 0.5 * Math.Max(isSameAngle * (1 - prevAngleBonus), timeDifferenceFactor);
+                //angleBonus = double.Lerp(summedBonus, largerBonus, angleChangeConsistency) * overlappedNotesWeight;
 
                 angleBonus = Math.Max(angleChangeBonus, acuteAngleBonus) * overlappedNotesWeight;
             }
@@ -134,19 +124,35 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             var osuCurrObj = (OsuDifficultyHitObject)current;
             var osuLastObj = (OsuDifficultyHitObject)current.Previous(0);
+            var osuLast1Obj = (OsuDifficultyHitObject)current.Previous(1);
+            var osuLast2Obj = (OsuDifficultyHitObject)current.Previous(2);
 
             if (osuCurrObj.Angle == null)
                 return 0;
 
-            double currAngle = osuCurrObj.Angle.Value;
+            double currAngle = osuCurrObj.Angle ?? 0;
+            double last1Angle = osuLast1Obj.Angle ?? 0;
+            double last2Angle = osuLast2Obj.Angle ?? 0;
 
-            double acuteAngleBonus = AimEvaluator.CalcAcuteAngleBonus(currAngle);
-            acuteAngleBonus *= Math.Min(osuCurrObj.LazyJumpDistance, osuLastObj.LazyJumpDistance) / Math.Max(osuCurrObj.StrainTime, osuLastObj.StrainTime);
+            double currAngleBonus = AimEvaluator.CalcAcuteAngleBonus(currAngle);
+            double prevAngleBonus = AimEvaluator.CalcAcuteAngleBonus(last2Angle);
+
+            double result = currAngleBonus;
+
+            result *= Math.Min(osuCurrObj.LazyJumpDistance, osuLastObj.LazyJumpDistance) / Math.Max(osuCurrObj.StrainTime, osuLastObj.StrainTime);
 
             // Nerf acute angle if previous notes were slower
-            acuteAngleBonus *= DifficultyCalculationUtils.ReverseLerp(osuCurrObj.StrainTime, osuLastObj.StrainTime * 0.55, osuLastObj.StrainTime * 0.75);
+            result *= DifficultyCalculationUtils.ReverseLerp(osuCurrObj.StrainTime, osuLastObj.StrainTime * 0.55, osuLastObj.StrainTime * 0.75);
 
-            return acuteAngleBonus;
+            // Decrease angle change buff if angle changes are slower than 1 in 4 notes
+            double deltaAngle = Math.Abs(last1Angle - last2Angle);
+            double isSameAngle = DifficultyCalculationUtils.Smoothstep(deltaAngle, 0.25, 0.15); // =1 if there's no angle change
+
+            double angleBonusDifference = currAngleBonus > 0 ? Math.Clamp(prevAngleBonus / currAngleBonus, 0, 1) : 1;
+
+            result *= 1 - 0.5 * isSameAngle * (1 - angleBonusDifference);
+
+            return result;
         }
 
         public static double CalculateFlowAngleChangeBonus(DifficultyHitObject current)
@@ -156,7 +162,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             var osuCurrObj = (OsuDifficultyHitObject)current;
             var osuLastObj = (OsuDifficultyHitObject)current.Previous(0);
-            var osuLastLastObj = (OsuDifficultyHitObject)current.Previous(1);
+            var osuLast1Obj = (OsuDifficultyHitObject)current.Previous(1);
+            var osuLast2Obj = (OsuDifficultyHitObject)current.Previous(2);
 
             if (osuCurrObj.AngleSigned == null || osuLastObj.AngleSigned == null)
                 return 0;
@@ -172,7 +179,19 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             // Nerf angle change if previous notes were slower
             angleChangeBonus *= DifficultyCalculationUtils.ReverseLerp(osuCurrObj.StrainTime, osuLastObj.StrainTime * 0.55, osuLastObj.StrainTime * 0.75);
-            angleChangeBonus *= DifficultyCalculationUtils.ReverseLerp(osuCurrObj.StrainTime, osuLastLastObj.StrainTime * 0.55, osuLastLastObj.StrainTime * 0.75);
+            angleChangeBonus *= DifficultyCalculationUtils.ReverseLerp(osuCurrObj.StrainTime, osuLast1Obj.StrainTime * 0.55, osuLast1Obj.StrainTime * 0.75);
+
+            double last1Angle = osuLast1Obj.Angle ?? 0;
+            double last2Angle = osuLast2Obj.Angle ?? 0;
+
+            double deltaAngle = Math.Abs(last1Angle - last2Angle);
+            double isSameAngle = DifficultyCalculationUtils.Smoothstep(deltaAngle, 0.25, 0.15); // =1 if there's no angle change
+
+            double prevAngleBonus = AimEvaluator.CalcAcuteAngleBonus(last2Angle);
+
+            // Decrease buffs from angle bonuses if it's not repeating too often
+            // Multiply nerf by difference in bonus to not nerf repeating high angle bonuses
+            angleChangeBonus *= 1 - 0.5 * isSameAngle * (1 - prevAngleBonus);
 
             return angleChangeBonus;
         }
@@ -214,18 +233,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double prev1Distance = Math.Max(osuLast1Obj.LazyJumpDistance, 0.01);
             double prev2Distance = Math.Max(osuLast2Obj?.LazyJumpDistance ?? prev1Distance, 0.01);
 
-            // Decrease buff on cutstreams
+            // Decrease buff if distance is small and angle is not changing previously, as it's easier to follow angle change in this way
             double distanceSimilarityFactor = DifficultyCalculationUtils.ReverseLerpTwoDirectional(prev1Distance, prev2Distance, 0.8, 0.95);
-
-            // Don't sure if it's needed
-            //double angleFactor = DifficultyCalculationUtils.Smoothstep(osuLast1Obj.Angle ?? 0, Math.PI * 0.55, Math.PI * 0.75)
-            //    * DifficultyCalculationUtils.Smoothstep(osuLast2Obj?.Angle ?? 0, Math.PI * 0.55, Math.PI * 0.75);
-
             double distanceFactor = 0.5 + 0.5 * DifficultyCalculationUtils.ReverseLerp(Math.Max(prev1Distance, prev2Distance), diameter * 1.5, diameter * 0.75);
-
             deltaVelocity *= 1 - 0.5 * distanceSimilarityFactor * distanceFactor;
 
-            // Decrease buff on doubles that go back and forth
+            // Decrease buff on doubles that go back and forth, because in this case angle change bonuses account for all added difficulty
             // Add radius to account for distance potenitally being very small
             double distanceSimilarity1 = DifficultyCalculationUtils.ReverseLerpTwoDirectional(currDistance + radius, prev1Distance + radius, 0.7, 0.9);
             double distanceSimilarity2 = DifficultyCalculationUtils.ReverseLerpTwoDirectional(prevDistance + radius, prev2Distance + radius, 0.7, 0.9);
@@ -251,6 +264,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             deltaVelocity *= 1 - distanceSimilarity1 * distanceSimilarity2 * directionFactor;
 
+            // Don't reward very big differences too much
             if (deltaVelocity > minVelocity * 2)
             {
                 double rescaledBonus = deltaVelocity - minVelocity * 2;
@@ -260,12 +274,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             return deltaVelocity;
         }
 
-        public static double IdentifyCutStream(DifficultyHitObject current)
-        {
-            return 0;
-        }
-
-        public static double IdentifyComfyCircluarFlow(DifficultyHitObject current)
+        public static double IdentifyComfyFlow(DifficultyHitObject current)
         {
             if (current.BaseObject is Spinner || current.Index <= 4 || current.Previous(0).BaseObject is Spinner)
                 return 0;
