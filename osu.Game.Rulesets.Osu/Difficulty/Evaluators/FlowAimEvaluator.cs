@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double comfyness = IdentifyComfyFlow(current);
 
                 // Change those 2 power coeficients to control amount of buff high spaced flow aim has for comfy/uncomfy patterns
-                flowDifficulty *= Math.Pow(osuCurrObj.LazyJumpDistance / diameter, 0.65 - 0.45 * comfyness);
+                flowDifficulty *= Math.Pow(osuCurrObj.LazyJumpDistance / diameter, 0.85 - 0.6 * comfyness);
             }
             else
             {
@@ -132,9 +132,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             if (osuCurrObj.Angle == null)
                 return 0;
 
-            double currAngle = osuCurrObj.Angle ?? 0;
+            double currAngle = (double)osuCurrObj.Angle;
             double last1Angle = osuLast1Obj.Angle ?? 0;
-            double last2Angle = osuLast2Obj.Angle ?? 0;
+            double last2Angle = osuLast2Obj?.Angle ?? 0;
 
             double currAngleBonus = AimEvaluator.CalcAcuteAngleBonus(currAngle);
             double prevAngleBonus = AimEvaluator.CalcAcuteAngleBonus(last2Angle);
@@ -188,7 +188,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             angleChangeBonus *= DifficultyCalculationUtils.ReverseLerp(osuCurrObj.StrainTime, osuLast1Obj.StrainTime * 0.55, osuLast1Obj.StrainTime * 0.75);
 
             double last1Angle = osuLast1Obj.Angle ?? 0;
-            double last2Angle = osuLast2Obj.Angle ?? 0;
+            double last2Angle = osuLast2Obj?.Angle ?? 0;
 
             double deltaAngle = Math.Abs(last1Angle - last2Angle);
             double isSameAngle = DifficultyCalculationUtils.Smoothstep(deltaAngle, 0.25, 0.15); // =1 if there's no angle change
@@ -283,17 +283,31 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
         public static double IdentifyComfyFlow(DifficultyHitObject current)
         {
-            if (current.BaseObject is Spinner || current.Index <= 4 || current.Previous(0).BaseObject is Spinner)
+            if (current.BaseObject is Spinner || current.Index <= 3 || current.Previous(0).BaseObject is Spinner)
                 return 0;
+
+            // Check starts from this note before current and ends with current notes
+            // Previous 3 notes before are still checked for some adjustments but not relevenat to main check
+            const int starting_index = 4;
 
             double totalComfyness = 1.0;
 
-            OsuDifficultyHitObject osuCurrObj = (OsuDifficultyHitObject)current;
+            OsuDifficultyHitObject osuLast1Obj = (OsuDifficultyHitObject)current.Previous(starting_index - 1);
+            OsuDifficultyHitObject osuLast2Obj = (OsuDifficultyHitObject)current.Previous(starting_index);
+            OsuDifficultyHitObject osuLast3Obj = (OsuDifficultyHitObject)current.Previous(starting_index + 1);
+            OsuDifficultyHitObject osuLast4Obj = (OsuDifficultyHitObject)current.Previous(starting_index + 2);
 
-            double prevAngle = osuCurrObj.AngleSigned ?? 0;
+            double prevAngle = osuLast1Obj.AngleSigned ?? 0;
             double prevAngleChange = 0;
-            double prevVelocity = osuCurrObj.LazyJumpDistance / osuCurrObj.StrainTime;
-            double prevVelocityChange = double.NaN;
+
+            double prev3Velocity = osuLast4Obj != null ? osuLast4Obj.LazyJumpDistance / osuLast4Obj.StrainTime : double.NaN;
+            double prev2Velocity = osuLast3Obj != null ? osuLast3Obj.LazyJumpDistance / osuLast3Obj.StrainTime : double.NaN;
+            double prev1Velocity = osuLast2Obj != null ? osuLast2Obj.LazyJumpDistance / osuLast2Obj.StrainTime : double.NaN;
+            double prevVelocity = osuLast1Obj != null ? osuLast1Obj.LazyJumpDistance / osuLast1Obj.StrainTime : double.NaN;
+
+            double prevVelocityChange = prevVelocity / prev1Velocity;
+            double prev1VelocityChange = prev1Velocity / prev2Velocity;
+            double prev2VelocityChange = prev2Velocity / prev3Velocity;
 
             // It's allowed to get two angle change without triggering comfyness penalty
 
@@ -303,7 +317,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             // Second one is the S type of movement where clockwise is changing to counterclockwise
             double angleChangeLeniency = 1.0;
 
-            for (int i = 0; i < 3; i++)
+            for (int i = starting_index - 2; i >= -1; i--)
             {
                 var relevantObj = (OsuDifficultyHitObject)current.Previous(i);
 
@@ -321,38 +335,48 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     angleLeniency -= Math.Min(usedLeniency, 1);
                 }
 
-                double currAngleChange = Math.Abs(currAngle - prevAngle);
+                double currAngleChange = Math.Pow(Math.Sin((currAngle - prevAngle) / 2), 2);
                 double relevantAngleChange = currAngleChange;
 
                 if (angleChangeLeniency > 0)
                 {
                     double potentialLeniency = currAngleChange - Math.Min(currAngleChange, prevAngleChange);
 
-                    double usedLeniency = Math.Min(angleChangeLeniency * Math.PI, potentialLeniency);
-                    relevantAngleChange = Math.Min(relevantAngleChange, 1) * (1 - usedLeniency);
-                    angleChangeLeniency -= Math.Min(usedLeniency, 1);
+                    double usedLeniency = Math.Min(angleChangeLeniency, potentialLeniency);
+                    relevantAngleChange = relevantAngleChange * (1 - usedLeniency);
+                    angleChangeLeniency -= usedLeniency;
                 }
 
                 double currVelocity = relevantObj.LazyJumpDistance / relevantObj.StrainTime;
                 double currVelocityChange = currVelocity / prevVelocity;
-                double normalizedVelocityChange = currVelocityChange >= 1 ? currVelocityChange : 1.0 / currVelocityChange;
+                double normalizedVelocityChange = normalizeVelocityChange(currVelocityChange);
                 double accelerationChange = Math.Abs(currVelocityChange - prevVelocityChange);
 
                 double angleFactor = DifficultyCalculationUtils.Smoothstep(Math.Abs(currAngle), Math.PI * 0.55, Math.PI * 0.75);
-                double angleChangeFactor = DifficultyCalculationUtils.Smoothstep(relevantAngleChange, 0.45, 0.3);
-                double velocityChangeFactor = double.IsNaN(normalizedVelocityChange) ? 1.0 : DifficultyCalculationUtils.Smoothstep(normalizedVelocityChange, 1.4, 1.25);
-                double accelerationChangeFactor = double.IsNaN(accelerationChange) ? 1.0 : DifficultyCalculationUtils.Smoothstep(accelerationChange, 0.3, 0.2);
+                double angleChangeFactor = DifficultyCalculationUtils.Smoothstep(relevantAngleChange, 0.3, 0.2);
+
+                // Adjust coefs for velocity change factors if velocity wasn't changing before
+                // It's using very old velocity change stats because accelaration change is using 3 objects beforehand, so to check previos state it need at least objects 4th and 5th
+                double normalVelocityChangeAdjust = 0.15 * DifficultyCalculationUtils.Smoothstep(normalizeVelocityChange(prev1VelocityChange) * normalizeVelocityChange(prev2VelocityChange), 1.2, 1.05);
+
+                double velocityChangeFactor = DifficultyCalculationUtils.Smoothstep(normalizedVelocityChange, 1.25 + normalVelocityChangeAdjust, 1.1 + normalVelocityChangeAdjust);
+                double accelerationChangeFactor = double.IsNaN(accelerationChange) ? 1.0 : DifficultyCalculationUtils.Smoothstep(accelerationChange, 0.25 + normalVelocityChangeAdjust, 0.15 + normalVelocityChangeAdjust);
 
                 double instantComfyness = angleFactor * angleChangeFactor * velocityChangeFactor * accelerationChangeFactor;
                 totalComfyness *= instantComfyness;
 
                 prevVelocity = currVelocity;
+
+                prev1VelocityChange = prevVelocityChange;
                 prevVelocityChange = currVelocityChange;
+
                 prevAngle = currAngle;
                 prevAngleChange = currAngleChange;
             }
 
             return totalComfyness;
         }
+
+        private static double normalizeVelocityChange(double velocityChange) => double.IsNaN(velocityChange) ? 1.0 :  velocityChange >= 1 ? velocityChange : 1.0 / velocityChange;
     }
 }

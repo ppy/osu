@@ -62,6 +62,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             var flashlight = skills.OfType<Flashlight>().SingleOrDefault();
             double flashlightRating = flashlight == null ? 0.0 : Math.Sqrt(flashlight.DifficultyValue()) * difficulty_multiplier;
 
+            // Warning - this is very debatable but I think it's reasonable to assume that if map has 10 star flowaim difficulty - player who plays it must have at least 6 star snapaim skill
+            snapAimRating = Math.Max(snapAimRating, flowAimRating * 0.6);
+
             // Adjust aim to reward more versatile maps
             aimRating = aimRating * (1 - AimVersatilityBonus) + (snapAimRating + flowAimRating) * AimVersatilityBonus;
             aimRatingNoSliders = aimRatingNoSliders * (1 - AimVersatilityBonus) + (snapAimRating + flowAimRating) * AimVersatilityBonus;
