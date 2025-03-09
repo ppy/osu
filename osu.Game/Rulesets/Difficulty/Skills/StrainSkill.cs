@@ -60,7 +60,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             currentSectionPeak = Math.Max(strain, currentSectionPeak);
 
             // Store the strain value for the object
-            Difficulties.Add(strain);
+            ObjectStrains.Add(strain);
         }
 
         /// <summary>
@@ -69,16 +69,16 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// </summary>
         public virtual double CountTopWeightedStrains()
         {
-            if (Difficulties.Count == 0)
+            if (ObjectStrains.Count == 0)
                 return 0.0;
 
             double consistentTopStrain = DifficultyValue() / 10; // What would the top strain be if all strain values were identical
 
             if (consistentTopStrain == 0)
-                return Difficulties.Count;
+                return ObjectStrains.Count;
 
             // Use a weighted sum of all strains. Constants are arbitrary and give nice values
-            return Difficulties.Sum(s => 1.1 / (1 + Math.Exp(-10 * (s / consistentTopStrain - 0.88))));
+            return ObjectStrains.Sum(s => 1.1 / (1 + Math.Exp(-10 * (s / consistentTopStrain - 0.88))));
         }
 
         /// <summary>

@@ -11,7 +11,6 @@ using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Osu.Difficulty.Aggregation;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Difficulty.Skills;
 using osu.Game.Rulesets.Osu.Mods;
@@ -40,22 +39,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 return new OsuDifficultyAttributes { Mods = mods };
 
             var aim = skills.OfType<TotalAim>().Single(a => a.IncludeSliders);
-            double aimRating = Math.Sqrt(aim.StrainDifficultyValue()) * difficulty_multiplier;
+            double aimRating = Math.Sqrt(aim.DifficultyValue()) * difficulty_multiplier;
             double aimDifficultyStrainCount = aim.CountTopWeightedStrains();
             double difficultSliders = aim.GetDifficultSliders();
 
-            double snapAimRating = Math.Sqrt(skills.OfType<SnapAim>().Single().StrainDifficultyValue()) * difficulty_multiplier;
-            double flowAimRating = Math.Sqrt(skills.OfType<FlowAim>().Single().StrainDifficultyValue()) * difficulty_multiplier;
+            double snapAimRating = Math.Sqrt(skills.OfType<SnapAim>().Single().DifficultyValue()) * difficulty_multiplier;
+            double flowAimRating = Math.Sqrt(skills.OfType<FlowAim>().Single().DifficultyValue()) * difficulty_multiplier;
 
             var aimWithoutSliders = skills.OfType<TotalAim>().Single(a => !a.IncludeSliders);
-            double aimRatingNoSliders = Math.Sqrt(aimWithoutSliders.StrainDifficultyValue()) * difficulty_multiplier;
+            double aimRatingNoSliders = Math.Sqrt(aimWithoutSliders.DifficultyValue()) * difficulty_multiplier;
 
             var speed = skills.OfType<Speed>().Single();
             double speedRating = Math.Sqrt(speed.DifficultyValue()) * difficulty_multiplier;
             double speedNotes = speed.RelevantNoteCount();
             double speedDifficultyStrainCount = speed.CountTopWeightedStrains();
-
-            //ExpPolynomial aimMissPenaltyCurve = aim.GetMissPenaltyCurve();
 
             var flashlight = skills.OfType<Flashlight>().SingleOrDefault();
             double flashlightRating = flashlight == null ? 0.0 : Math.Sqrt(flashlight.DifficultyValue()) * difficulty_multiplier;
@@ -84,9 +81,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 flashlightRating *= 0.4;
             }
 
-            double aimRatingStrain = aimRating;
-
-            double baseAimPerformance = OsuStrainSkill.DifficultyToPerformance(aimRatingStrain);
+            double baseAimPerformance = OsuStrainSkill.DifficultyToPerformance(aimRating);
             double baseSpeedPerformance = OsuStrainSkill.DifficultyToPerformance(speedRating);
             double baseFlashlightPerformance = 0.0;
 
@@ -125,7 +120,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 SpeedNoteCount = speedNotes,
                 FlashlightDifficulty = flashlightRating,
                 SliderFactor = sliderFactor,
-                //AimMissPenaltyCurve = aimMissPenaltyCurve,
                 AimDifficultStrainCount = aimDifficultyStrainCount,
                 SpeedDifficultStrainCount = speedDifficultyStrainCount,
                 DrainRate = drainRate,

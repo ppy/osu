@@ -6,16 +6,14 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Osu.Difficulty.Aggregation;
 using osu.Game.Rulesets.Osu.Objects;
-using osu.Game.Rulesets.Difficulty.Utils;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
     /// <summary>
     /// Represents the skill required to correctly aim at every object in the map with a uniform CircleSize and normalized distances.
     /// </summary>
-    public abstract class Aim : OsuProbabilitySkill
+    public abstract class Aim : OsuStrainSkill
     {
         public readonly bool IncludeSliders;
 
@@ -28,21 +26,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         }
 
         private double currentStrain;
-        protected override double FcProbability => 0.0005;
         private double strainDecayBase => 0.15;
 
         protected override double CalculateInitialStrain(double time, DifficultyHitObject current) => currentStrain * strainDecay(time - current.Previous(0).StartTime);
-
-        protected override double HitProbability(double skill, double difficulty)
-        {
-            if (difficulty <= 0) return 1;
-            if (skill <= 0) return 0;
-            double result = DifficultyCalculationUtils.Erf(skill / (Math.Sqrt(2) * difficulty * 5.59));
-
-            if (UseDifficultyPower) result = Math.Pow(result, 1 - 0.5 * DifficultyCalculationUtils.ReverseLerp(skill, 2500, 1000));
-
-            return result * (UseDefaultMissProb ? (1 - 0.008 * DifficultyCalculationUtils.ReverseLerp(skill, 2500, 1000)) : 1.0);
-        }
 
         private readonly List<double> sliderStrains = new List<double>();
 

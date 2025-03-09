@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
 
         private readonly Mod[] mods;
 
-        public readonly List<double> Difficulties = new List<double>();
+        public readonly List<double> ObjectStrains = new List<double>();
 
         protected Skill(Mod[] mods)
         {
