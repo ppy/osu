@@ -109,13 +109,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             return flowDifficulty;
         }
 
-        public static string T(double t)
-        {
-            int seconds = (int)(t / 1000);
-            int minutes = seconds / 60;
-            return $"{minutes}m {seconds - minutes * 60}s {t % 1000}ms";
-        }
-
         private static double getOverlapness(OsuDifficultyHitObject odho1, OsuDifficultyHitObject odho2)
         {
             OsuHitObject o1 = (OsuHitObject)odho1.BaseObject, o2 = (OsuHitObject)odho2.BaseObject;
@@ -241,13 +234,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             if (currVelocity > prevVelocity)
                 deltaVelocity *= DifficultyCalculationUtils.Smoothstep(osuCurrObj.StrainTime, osuLast0Obj.StrainTime * 0.55, osuLast0Obj.StrainTime * 0.75);
 
-            double currDistance = Math.Max(osuCurrObj.LazyJumpDistance, 0.01);
-            double prevDistance = Math.Max(osuLast0Obj.LazyJumpDistance, 0.01);
-            double prev1Distance = Math.Max(osuLast1Obj.LazyJumpDistance, 0.01);
-            double prev2Distance = Math.Max(osuLast2Obj?.LazyJumpDistance ?? prev1Distance, 0.01);
+            double currDistance = osuCurrObj.LazyJumpDistance;
+            double prevDistance = osuLast0Obj.LazyJumpDistance;
+            double prev1Distance = osuLast1Obj.LazyJumpDistance;
+            double prev2Distance = osuLast2Obj?.LazyJumpDistance ?? 0;
 
             // Decrease buff if distance is small and angle is not changing previously, as it's easier to follow angle change in this way
-            double distanceSimilarityFactor = DifficultyCalculationUtils.ReverseLerpTwoDirectional(prev1Distance, prev2Distance, 0.8, 0.95);
+            // Add radius to account for distance potenitally being very small
+            double distanceSimilarityFactor = DifficultyCalculationUtils.ReverseLerpTwoDirectional(prev1Distance + radius, prev2Distance + radius, 0.8, 0.95);
             double distanceFactor = 0.5 + 0.5 * DifficultyCalculationUtils.ReverseLerp(Math.Max(prev1Distance, prev2Distance), diameter * 1.5, diameter * 0.75);
             deltaVelocity *= 1 - 0.5 * distanceSimilarityFactor * distanceFactor;
 

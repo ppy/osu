@@ -17,8 +17,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     {
         public readonly bool IncludeSliders;
 
-        protected virtual double SkillMultiplier => 26.57 * OsuDifficultyCalculator.MechanicsMultiplier;
-
         public Aim(Mod[] mods, bool includeSliders)
             : base(mods)
         {
@@ -26,29 +24,26 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         }
 
         private double currentStrain;
-        private double strainDecayBase => 0.15;
 
-        protected override double CalculateInitialStrain(double time, DifficultyHitObject current) => currentStrain * strainDecay(time - current.Previous(0).StartTime);
+        private double skillMultiplier => 26.57 * OsuDifficultyCalculator.MechanicsMultiplier;
+        private double strainDecayBase => 0.15;
 
         private readonly List<double> sliderStrains = new List<double>();
 
         private double strainDecay(double ms) => Math.Pow(strainDecayBase, ms / 1000);
+        protected override double CalculateInitialStrain(double time, DifficultyHitObject current) => currentStrain * strainDecay(time - current.Previous(0).StartTime);
+
+        protected abstract double StrainValueOf(DifficultyHitObject current);
 
         protected override double StrainValueAt(DifficultyHitObject current)
         {
             currentStrain *= strainDecay(current.DeltaTime);
 
+            currentStrain += StrainValueOf(current) * skillMultiplier;
+
             if (current.BaseObject is Slider)
             {
                 sliderStrains.Add(currentStrain);
-            }
-
-            currentStrain += StrainValueOf(current) * SkillMultiplier;
-
-            if (double.IsNaN(currentStrain))
-            {
-                Console.WriteLine($"CLOWN: {current.BaseObject.StartTime}");
-                double clown = StrainValueOf(current);
             }
 
             return currentStrain;
@@ -65,6 +60,5 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             return sliderStrains.Sum(strain => 1.0 / (1.0 + Math.Exp(-(strain / maxSliderStrain * 12.0 - 6.0))));
         }
-        protected abstract double StrainValueOf(DifficultyHitObject current);
     }
 }

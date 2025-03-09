@@ -19,6 +19,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         [JsonProperty("aim_difficulty")]
         public double AimDifficulty { get; set; }
 
+        /// <summary>
         /// The number of <see cref="Slider"/>s weighted by difficulty.
         /// </summary>
         [JsonProperty("aim_difficult_slider_count")]
