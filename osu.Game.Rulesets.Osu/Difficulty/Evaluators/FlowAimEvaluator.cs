@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
     public static class FlowAimEvaluator
     {
         // The reason why this exist in evaluator instead of FlowAim skill - it's because it's very important to keep flowaim in the same scaling as snapaim on evaluator level
-        private static double flowMultiplier => 1.13;
+        private static double flowMultiplier => 1.147;
 
         public static double EvaluateDifficultyOf(DifficultyHitObject current, bool withSliderTravelDistance)
         {
@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double comfyness = IdentifyComfyFlow(current);
 
                 // Change those 2 power coeficients to control amount of buff high spaced flow aim has for comfy/uncomfy patterns
-                flowDifficulty *= Math.Pow(osuCurrObj.LazyJumpDistance / diameter, 0.85 - 0.6 * comfyness);
+                flowDifficulty *= Math.Pow(osuCurrObj.LazyJumpDistance / diameter, 0.75 - 0.55 * comfyness);
             }
             else
             {
@@ -58,7 +58,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             // Increase multiplier in the beginning to buff all the scaling
             // Increase power to increase buff for spaced speedflow
             // Increase number in the divisor to make steeper scaling with bpm
-            flowDifficulty += 2.2 * (Math.Pow(osuCurrObj.LazyJumpDistance, 0.7) / osuCurrObj.StrainTime) * (osuCurrObj.StrainTime / (osuCurrObj.StrainTime - 13) - 1);
+            flowDifficulty += 2.2 * (Math.Pow(osuCurrObj.LazyJumpDistance, 0.7) / osuCurrObj.StrainTime) * (osuCurrObj.StrainTime / (osuCurrObj.StrainTime - 12) - 1);
 
             double angleBonus = 0;
 
