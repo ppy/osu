@@ -60,7 +60,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double getSnapDistance(double currDistance)
             {
                 double bpm = DifficultyCalculationUtils.BPMToMilliseconds(osuCurrObj.StrainTime, 2);
-                double snapThreshold = diameter * (1 + 1.5 * DifficultyCalculationUtils.ReverseLerp(bpm, 200, 250));
+                double snapThreshold = diameter * (1 + 1.3 * DifficultyCalculationUtils.ReverseLerp(bpm, 200, 250));
 
                 // Jumps need to have some spacing to be snapped
                 double result = currDistance < snapThreshold ? snapThreshold * 0.65 + currDistance * 0.35 : currDistance;
