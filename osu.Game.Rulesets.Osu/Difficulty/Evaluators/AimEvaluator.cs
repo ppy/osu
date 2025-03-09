@@ -147,7 +147,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     wideAngleBonus *= 1 - wideAngleRepetitionNerf;
 
                     double acuteAngleRepetitionNerf = Math.Pow(CalcAcuteAngleBonus(lastAngle), 3);
-                    acuteAngleBonus *= 0.08 + 0.65 * (1 - Math.Min(acuteAngleBonus, acuteAngleRepetitionNerf)); // Need to somehow nerf anoneanone here
+                    acuteAngleBonus *= 0.08 + 0.7 * (1 - Math.Min(acuteAngleBonus, acuteAngleRepetitionNerf)); // Need to somehow nerf anoneanone here
 
                     // Apply full wide angle bonus for distance more than one diameter
                     wideAngleBonus *= wideVelocityBase * DifficultyCalculationUtils.Smootherstep(osuCurrObj.LazyJumpDistance, 0, diameter);
@@ -199,7 +199,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 velocityChangeBonus *= 1 - velocitySimilarityFactor * angleFactor;
 
                 // Decrease buff large jumps leading into very small jumps to compensate the fact that smaller jumps are buffed by minimal jump distance
-                velocityChangeBonus *= 1 - 0.8 * DifficultyCalculationUtils.ReverseLerp(osuCurrObj.LazyJumpDistance, diameter * 3, diameter * 4) * DifficultyCalculationUtils.ReverseLerp(osuLastObj.LazyJumpDistance, diameter * 1.6, radius);
+                double doublesNerf = DifficultyCalculationUtils.ReverseLerp(osuCurrObj.LazyJumpDistance, diameter, diameter * 3) * DifficultyCalculationUtils.ReverseLerp(osuLastObj.LazyJumpDistance, diameter, radius);
+                double cheesableJumpsNerf = DifficultyCalculationUtils.ReverseLerp(osuCurrObj.LazyJumpDistance, diameter * 2, diameter * 4) * DifficultyCalculationUtils.ReverseLerp(osuLastObj.LazyJumpDistance, diameter * 1.5, diameter);
+                velocityChangeBonus *= 1 - 0.8 * Math.Max(doublesNerf, cheesableJumpsNerf);
             }
 
             if (osuLastObj.BaseObject is Slider)
