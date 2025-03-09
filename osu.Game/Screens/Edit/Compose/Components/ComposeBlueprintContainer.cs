@@ -387,6 +387,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
                 currentTool = value;
 
+                SelectionHandler.RightClickAlwaysQuickDeletes = currentTool is not SelectTool;
+
                 // As per stable editor, when changing tools, we should forcefully commit any pending placement.
                 CommitIfPlacementActive();
             }
