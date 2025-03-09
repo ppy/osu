@@ -89,6 +89,26 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString TouchControlScheme => new TranslatableString(getKey(@"touch_control_scheme"), @"Touch control scheme");
 
+        /// <summary>
+        /// "Circles fly off after successful hit"
+        /// </summary>
+        public static LocalisableString FlyingHitEnable => new TranslatableString(getKey(@"hit_flying_enable"), @"Circles fly off after successful hit");
+
+        /// <summary>
+        /// "Never"
+        /// </summary>
+        public static LocalisableString FlyingHitEnableNever => new TranslatableString(getKey(@"hit_flying_enable_never"), @"Never");
+
+        /// <summary>
+        /// "When HUD is visible"
+        /// </summary>
+        public static LocalisableString FlyingHitEnableHUD => new TranslatableString(getKey(@"hit_flying_enable_hud"), @"When HUD is visible");
+
+        /// <summary>
+        /// "Always"
+        /// </summary>
+        public static LocalisableString FlyingHitEnableAlways => new TranslatableString(getKey(@"hit_flying_enable_always"), @"Always");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
