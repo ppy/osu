@@ -12,6 +12,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 {
     public static class FlowAimEvaluator
     {
+        // The reason why this exist in evaluator instead of FlowAim skill - it's because it's very important to keep flowaim in the same scaling as snapaim on evaluator level
         private static double flowMultiplier => 1.12;
 
         public static double EvaluateDifficultyOf(DifficultyHitObject current, bool withSliderTravelDistance)
@@ -38,19 +39,25 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             double flowDifficulty = velocity;
 
-            // Square the distance to turn into d/t
+            // Rescale the distance to make it closer d/t
             if (osuCurrObj.LazyJumpDistance > diameter)
             {
                 // Decrease spacing if patterns are comfy
                 double comfyness = IdentifyComfyFlow(current);
+
+                // Change those 2 power coeficients to control amount of buff high spaced flow aim has for comfy/uncomfy patterns
                 flowDifficulty *= Math.Pow(osuCurrObj.LazyJumpDistance / diameter, 0.65 - 0.45 * comfyness);
             }
             else
             {
+                // Decrease power here if you want to buff low-spaced flow aim
                 flowDifficulty *= Math.Pow(osuCurrObj.LazyJumpDistance / diameter, 0.8);
             }
 
             // Flow aim is harder on High BPM
+            // Increase multiplier in the beginning to buff all the scaling
+            // Increase power to increase buff for spaced speedflow
+            // Increase number in the divisor to make steeper scaling with bpm
             flowDifficulty += 2.2 * (Math.Pow(osuCurrObj.LazyJumpDistance, 0.7) / osuCurrObj.StrainTime) * (osuCurrObj.StrainTime / (osuCurrObj.StrainTime - 13) - 1);
 
             double angleBonus = 0;
@@ -83,6 +90,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                 //angleBonus = double.Lerp(summedBonus, largerBonus, angleChangeConsistency) * overlappedNotesWeight;
 
+                // IMPORTANT INFORMATION: summing those bonuses (as commented code above) instead of taking max singificantly buffs many alt maps
+                // BUT it also buffs ReLief. So it's should be explored how to keep this buff for actually hard patterns but not for ReLief
                 angleBonus = Math.Max(angleChangeBonus, acuteAngleBonus) * overlappedNotesWeight;
             }
 
@@ -142,6 +151,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             result *= Math.Min(osuCurrObj.LazyJumpDistance, osuLastObj.LazyJumpDistance) / Math.Max(osuCurrObj.StrainTime, osuLastObj.StrainTime);
 
             // Nerf acute angle if previous notes were slower
+            // IMPORTANT INFORMATION: removing this limitation buffs many alt maps
+            // BUT it also  buffs ReLief. So it's should be explored how to keep this buff for actually hard patterns but not for ReLief
             result *= DifficultyCalculationUtils.ReverseLerp(osuCurrObj.StrainTime, osuLastObj.StrainTime * 0.55, osuLastObj.StrainTime * 0.75);
 
             // Decrease angle change buff if angle changes are slower than 1 in 4 notes
@@ -177,7 +188,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double minVelocity = Math.Min(currVelocity, prevVelocity);
             double angleChangeBonus = Math.Pow(Math.Sin((currAngle - lastAngle) / 2), 2) * minVelocity;
 
-            // Nerf angle change if previous notes were slower
+            // Remove angle change if previous notes were slower
+            // IMPORTANT INFORMATION: removing this limitation significantly buffs almost all tech, alt, underweight maps in general
+            // BUT it also very significantly buffs ReLief. So it's should be explored how to keep this buff for actually hard patterns but not for ReLief
             angleChangeBonus *= DifficultyCalculationUtils.ReverseLerp(osuCurrObj.StrainTime, osuLastObj.StrainTime * 0.55, osuLastObj.StrainTime * 0.75);
             angleChangeBonus *= DifficultyCalculationUtils.ReverseLerp(osuCurrObj.StrainTime, osuLast1Obj.StrainTime * 0.55, osuLast1Obj.StrainTime * 0.75);
 

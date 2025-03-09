@@ -29,8 +29,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
         }
 
-        public static double AimVersatilityAdditionPortion = 0.08;
+        // Increasing this multiplier buffs versatile aim+flow maps
+        public static double AimVersatilityBonus = 0.08;
+
+        // Increasing this multiplier nerfs mixed aim+speed map (but not snapaim + flowaim!)
         public static double MechanicsAdditionPortion => 0.13;
+
+        // This increases multiplier on both aim and speed. Exist for easier adjust of both skills after changing the MechanicsAdditionPortion
         public static double MechanicsMultiplier => 0.935;
 
         protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
@@ -58,8 +63,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double flashlightRating = flashlight == null ? 0.0 : Math.Sqrt(flashlight.DifficultyValue()) * difficulty_multiplier;
 
             // Adjust aim to reward more versatile maps
-            aimRating = aimRating * (1 - AimVersatilityAdditionPortion) + (snapAimRating + flowAimRating) * AimVersatilityAdditionPortion;
-            aimRatingNoSliders = aimRatingNoSliders * (1 - AimVersatilityAdditionPortion) + (snapAimRating + flowAimRating) * AimVersatilityAdditionPortion;
+            aimRating = aimRating * (1 - AimVersatilityBonus) + (snapAimRating + flowAimRating) * AimVersatilityBonus;
+            aimRatingNoSliders = aimRatingNoSliders * (1 - AimVersatilityBonus) + (snapAimRating + flowAimRating) * AimVersatilityBonus;
             double sliderFactor = aimRating > 0 ? aimRatingNoSliders / aimRating : 1;
 
             if (mods.Any(m => m is OsuModTouchDevice))

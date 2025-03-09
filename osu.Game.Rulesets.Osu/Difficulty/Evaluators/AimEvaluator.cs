@@ -40,24 +40,25 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             const int diameter = OsuDifficultyHitObject.NORMALISED_DIAMETER;
 
             // Additional reward for wide angles being hard to snap on high BPM
-            double hardSnapBonus = 0;
+            double angleSnapDifficultyBonus = 0;
             double strainTimeThreshold = DifficultyCalculationUtils.BPMToMilliseconds(180, 2);
 
             if (osuCurrObj.StrainTime < strainTimeThreshold)
             {
                 double bpmFactor = Math.Pow((strainTimeThreshold - osuCurrObj.StrainTime) * 0.015, 2.5);
 
-                hardSnapBonus = OsuDifficultyHitObject.NORMALISED_DIAMETER * bpmFactor;
+                angleSnapDifficultyBonus = OsuDifficultyHitObject.NORMALISED_DIAMETER * bpmFactor;
 
                 // Shift starting point of "uncomfy" from square to wide-angle patterns if spacing is too big
                 double highSpacingAdjust = Math.PI / 6;
                 highSpacingAdjust *= DifficultyCalculationUtils.ReverseLerp(osuCurrObj.LazyJumpDistance, diameter * 2, diameter * 4);
 
-                hardSnapBonus *= DifficultyCalculationUtils.Smoothstep(osuCurrObj.Angle ?? 0, Math.PI / 3 + highSpacingAdjust, Math.PI / 2 + highSpacingAdjust);
+                angleSnapDifficultyBonus *= DifficultyCalculationUtils.Smoothstep(osuCurrObj.Angle ?? 0, Math.PI / 3 + highSpacingAdjust, Math.PI / 2 + highSpacingAdjust);
 
             }
 
-            double getSnapDistance(double currDistance)
+            // Adjusting minimal distance of snap evaluator to account for fact that the snapping difficulty itself have it's own difficulty
+            double adjustSnapDistance(double currDistance)
             {
                 double bpm = DifficultyCalculationUtils.BPMToMilliseconds(osuCurrObj.StrainTime, 2);
                 double snapThreshold = diameter * (1 + 1.3 * DifficultyCalculationUtils.ReverseLerp(bpm, 200, 250));
@@ -75,19 +76,19 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 // Don't increase snap distance when previous jump is very big, as it leads to cheese being overrewarded
                 double bigDistanceDifferenceFactor = 1 - DifficultyCalculationUtils.ReverseLerp(osuLastObj.LazyJumpDistance, notOverlappingAdjust + diameter, notOverlappingAdjust + diameter * 2);
 
-                double totalBonus = result + hardSnapBonus - currDistance;
+                double totalBonus = result + angleSnapDifficultyBonus - currDistance;
                 return currDistance + totalBonus * bigDistanceDifferenceFactor;
             }
 
             // Calculate the velocity to the current hitobject, which starts with a base distance / time assuming the last object is a hitcircle.
-            double currDistance = getSnapDistance(osuCurrObj.LazyJumpDistance);
+            double currDistance = adjustSnapDistance(osuCurrObj.LazyJumpDistance);
             double currVelocity = currDistance / osuCurrObj.StrainTime;
 
             // But if the last object is a slider, then we extend the travel velocity through the slider into the current object.
             if (osuLastObj.BaseObject is Slider && withSliderTravelDistance)
             {
                 double travelVelocity = osuLastObj.TravelDistance / osuLastObj.TravelTime; // calculate the slider velocity from slider head to slider end.
-                double movementVelocity = getSnapDistance(osuCurrObj.MinimumJumpDistance) / osuCurrObj.MinimumJumpTime; // calculate the movement velocity from slider end to current object
+                double movementVelocity = adjustSnapDistance(osuCurrObj.MinimumJumpDistance) / osuCurrObj.MinimumJumpTime; // calculate the movement velocity from slider end to current object
 
                 currVelocity = Math.Max(currVelocity, movementVelocity + travelVelocity); // take the larger total combined velocity.
             }
