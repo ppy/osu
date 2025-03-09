@@ -243,7 +243,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             // Add radius to account for distance potenitally being very small
             double distanceSimilarityFactor = DifficultyCalculationUtils.ReverseLerpTwoDirectional(prev1Distance + radius, prev2Distance + radius, 0.8, 0.95);
             double distanceFactor = 0.5 + 0.5 * DifficultyCalculationUtils.ReverseLerp(Math.Max(prev1Distance, prev2Distance), diameter * 1.5, diameter * 0.75);
-            deltaVelocity *= 1 - 0.5 * distanceSimilarityFactor * distanceFactor;
+            deltaVelocity *= 1 - 0.65 * distanceSimilarityFactor * distanceFactor;
 
             // Decrease buff on doubles that go back and forth, because in this case angle change bonuses account for all added difficulty
             // Add radius to account for distance potenitally being very small
