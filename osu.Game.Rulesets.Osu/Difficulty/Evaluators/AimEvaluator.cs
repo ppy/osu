@@ -76,8 +76,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 // Don't increase snap distance when previous jump is very big, as it leads to cheese being overrewarded
                 double bigDistanceDifferenceFactor = 1 - DifficultyCalculationUtils.ReverseLerp(osuLastObj.LazyJumpDistance, notOverlappingAdjust + diameter, notOverlappingAdjust + diameter * 2);
 
+                // Reduce bonus on different rhythm that can be cheesed
+                double rhythmDifferenceFactor = Math.Pow(Math.Min(osuCurrObj.StrainTime, osuLastObj.StrainTime) / Math.Max(osuCurrObj.StrainTime, osuLastObj.StrainTime), 2.5);
+
+                // Ignore very small rhythm difference
+                rhythmDifferenceFactor = Math.Min(1, rhythmDifferenceFactor * 1.1);
+
+                // When distance is high - angle is still relevant. We wan't to nerf very slow stuff before snap so angle becomes irrelevant
+                rhythmDifferenceFactor = 1 - (1 - rhythmDifferenceFactor) * DifficultyCalculationUtils.Smoothstep(osuLastObj.LazyJumpDistance * osuCurrObj.StrainTime / osuLastObj.StrainTime, diameter * 2, diameter);
+
                 double totalBonus = result + angleSnapDifficultyBonus - currDistance;
-                return currDistance + totalBonus * bigDistanceDifferenceFactor;
+                return currDistance + totalBonus * bigDistanceDifferenceFactor * rhythmDifferenceFactor;
             }
 
             // Calculate the velocity to the current hitobject, which starts with a base distance / time assuming the last object is a hitcircle.
