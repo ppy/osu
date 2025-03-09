@@ -3,7 +3,6 @@
 
 using System;
 using osu.Framework.Allocation;
-using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Platform;
 using osu.Framework.Utils;
@@ -21,18 +20,14 @@ namespace osu.Game.Screens.Menu
         [Resolved]
         private GameHost host { get; set; } = null!;
 
-        [Resolved]
-        private ISkinSource skin { get; set; } = null!;
-
-        private ISample? sample;
-        private SampleChannel? sampleChannel;
+        private SkinnableSound? sample;
 
         [BackgroundDependencyLoader]
         private void load()
         {
             RelativeSizeAxes = Axes.Both;
 
-            Children = new[]
+            Children = new Drawable[]
             {
                 leftFountain = new StarFountain
                 {
@@ -46,9 +41,8 @@ namespace osu.Game.Screens.Menu
                     Origin = Anchor.BottomRight,
                     X = -250,
                 },
+                sample = new SkinnableSound(new SampleInfo("Gameplay/fountain-shoot"))
             };
-
-            sample = skin.GetSample(new SampleInfo(@"Gameplay/fountain-shoot"));
         }
 
         private bool isTriggered;
@@ -89,13 +83,9 @@ namespace osu.Game.Screens.Menu
                     break;
             }
 
-            // Don't play SFX when game is in background
-            if (!host.IsActive.Value) return;
-
-            // Track sample channel to avoid overlapping playback
-            sampleChannel?.Stop();
-            sampleChannel = sample?.GetChannel();
-            sampleChannel?.Play();
+            // Don't play SFX when game is in background as it can be a bit noisy.
+            if (host.IsActive.Value)
+                sample?.Play();
         }
     }
 }
