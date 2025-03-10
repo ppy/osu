@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mods;
@@ -58,6 +59,21 @@ namespace osu.Game.Overlays.Mods
 
             modState.ValidForSelection.BindValueChanged(_ => updateFilterState());
             modState.MatchingTextFilter.BindValueChanged(_ => updateFilterState(), true);
+            modState.Preselected.BindValueChanged(b =>
+            {
+                if (b.NewValue)
+                {
+                    Content.EdgeEffect = new EdgeEffectParameters
+                    {
+                        Type = EdgeEffectType.Glow,
+                        Colour = AccentColour,
+                        Hollow = true,
+                        Radius = 2,
+                    };
+                }
+                else
+                    Content.EdgeEffect = default;
+            }, true);
         }
 
         protected override void Select()

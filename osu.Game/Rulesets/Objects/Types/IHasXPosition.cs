@@ -11,6 +11,6 @@ namespace osu.Game.Rulesets.Objects.Types
         /// <summary>
         /// The starting X-position of this HitObject.
         /// </summary>
-        float X { get; }
+        float X { get; set; }
     }
 }

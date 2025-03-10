@@ -49,6 +49,51 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString RevertToDefaultDescription => new TranslatableString(getKey(@"revert_to_default_description"), @"All layout elements for layers in the current screen will be reset to defaults.");
 
+        /// <summary>
+        /// "Closest"
+        /// </summary>
+        public static LocalisableString Closest => new TranslatableString(getKey(@"closest"), @"Closest");
+
+        /// <summary>
+        /// "Anchor"
+        /// </summary>
+        public static LocalisableString Anchor => new TranslatableString(getKey(@"anchor"), @"Anchor");
+
+        /// <summary>
+        /// "Origin"
+        /// </summary>
+        public static LocalisableString Origin => new TranslatableString(getKey(@"origin"), @"Origin");
+
+        /// <summary>
+        /// "Reset position"
+        /// </summary>
+        public static LocalisableString ResetPosition => new TranslatableString(getKey(@"reset_position"), @"Reset position");
+
+        /// <summary>
+        /// "Reset rotation"
+        /// </summary>
+        public static LocalisableString ResetRotation => new TranslatableString(getKey(@"reset_rotation"), @"Reset rotation");
+
+        /// <summary>
+        /// "Reset scale"
+        /// </summary>
+        public static LocalisableString ResetScale => new TranslatableString(getKey(@"reset_scale"), @"Reset scale");
+
+        /// <summary>
+        /// "Bring to front"
+        /// </summary>
+        public static LocalisableString BringToFront => new TranslatableString(getKey(@"bring_to_front"), @"Bring to front");
+
+        /// <summary>
+        /// "Send to back"
+        /// </summary>
+        public static LocalisableString SendToBack => new TranslatableString(getKey(@"send_to_back"), @"Send to back");
+
+        /// <summary>
+        /// "Current working layer"
+        /// </summary>
+        public static LocalisableString CurrentWorkingLayer => new TranslatableString(getKey(@"current_working_layer"), @"Current working layer");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

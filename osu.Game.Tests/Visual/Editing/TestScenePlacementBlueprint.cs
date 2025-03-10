@@ -74,7 +74,6 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
-        [Solo]
         public void TestCommitPlacementViaRightClick()
         {
             Playfield playfield = null!;
@@ -165,7 +164,9 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("enable automatic bank assignment", () =>
             {
                 InputManager.PressKey(Key.LShift);
+                InputManager.PressKey(Key.LAlt);
                 InputManager.Key(Key.Q);
+                InputManager.ReleaseKey(Key.LAlt);
                 InputManager.ReleaseKey(Key.LShift);
             });
             AddStep("select circle placement tool", () => InputManager.Key(Key.Number2));
@@ -228,7 +229,9 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("select drum bank", () =>
             {
                 InputManager.PressKey(Key.LShift);
+                InputManager.PressKey(Key.LAlt);
                 InputManager.Key(Key.R);
+                InputManager.ReleaseKey(Key.LAlt);
                 InputManager.ReleaseKey(Key.LShift);
             });
             AddStep("enable clap addition", () => InputManager.Key(Key.R));

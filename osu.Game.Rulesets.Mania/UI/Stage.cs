@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
@@ -102,12 +103,13 @@ namespace osu.Game.Rulesets.Mania.UI
                             Width = 1366, // Bar lines should only be masked on the vertical axis
                             BypassAutoSizeAxes = Axes.Both,
                             Masking = true,
-                            Child = barLineContainer = new HitObjectArea(HitObjectContainer)
+                            Child = barLineContainer = new HitPositionPaddedContainer
                             {
                                 Name = "Bar lines",
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
                                 RelativeSizeAxes = Axes.Y,
+                                Child = HitObjectContainer,
                             }
                         },
                         columnFlow = new ColumnFlow<Column>(definition)
@@ -118,12 +120,13 @@ namespace osu.Game.Rulesets.Mania.UI
                         {
                             RelativeSizeAxes = Axes.Both
                         },
-                        judgements = new JudgementContainer<DrawableManiaJudgement>
+                        new HitPositionPaddedContainer
                         {
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.Centre,
                             RelativeSizeAxes = Axes.Both,
-                            Y = HIT_TARGET_POSITION + 150
+                            Child = judgements = new JudgementContainer<DrawableManiaJudgement>
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                            },
                         },
                         topLevelContainer = new Container { RelativeSizeAxes = Axes.Both }
                     }
@@ -134,12 +137,14 @@ namespace osu.Game.Rulesets.Mania.UI
             {
                 bool isSpecial = definition.IsSpecialColumn(i);
 
-                var column = new Column(firstColumnIndex + i, isSpecial)
+                var action = columnStartAction;
+                columnStartAction++;
+                var column = CreateColumn(firstColumnIndex + i, isSpecial).With(c =>
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Width = 1,
-                    Action = { Value = columnStartAction++ }
-                };
+                    c.RelativeSizeAxes = Axes.Both;
+                    c.Width = 1;
+                    c.Action.Value = action;
+                });
 
                 topLevelContainer.Add(column.TopLevelContainer.CreateProxy());
                 columnBackgrounds.Add(column.BackgroundContainer.CreateProxy());
@@ -153,6 +158,9 @@ namespace osu.Game.Rulesets.Mania.UI
 
             RegisterPool<BarLine, DrawableBarLine>(50, 200);
         }
+
+        [Pure]
+        protected virtual Column CreateColumn(int index, bool isSpecial) => new Column(index, isSpecial);
 
         [BackgroundDependencyLoader]
         private void load(ISkinSource skin)
@@ -208,13 +216,7 @@ namespace osu.Game.Rulesets.Mania.UI
                 return;
 
             judgements.Clear(false);
-            judgements.Add(judgementPooler.Get(result.Type, j =>
-            {
-                j.Apply(result, judgedObject);
-
-                j.Anchor = Anchor.Centre;
-                j.Origin = Anchor.Centre;
-            })!);
+            judgements.Add(judgementPooler.Get(result.Type, j => j.Apply(result, judgedObject))!);
         }
 
         protected override void Update()

@@ -31,6 +31,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
+using osu.Game.Overlays.Volume;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Backgrounds;
@@ -81,6 +82,11 @@ namespace osu.Game.Screens.Select
         /// Helps keep them located beneath the footer itself.
         /// </summary>
         protected Container FooterPanels { get; private set; } = null!;
+
+        /// <summary>
+        /// The <see cref="FooterButton"/> that opens the mod select dialog.
+        /// </summary>
+        protected FooterButton ModsFooterButton { get; private set; } = null!;
 
         /// <summary>
         /// Whether entering editor mode should be allowed.
@@ -169,10 +175,12 @@ namespace osu.Game.Screens.Select
 
             AddRangeInternal(new Drawable[]
             {
+                new GlobalScrollAdjustsVolume(),
                 new VerticalMaskingContainer
                 {
                     Children = new Drawable[]
                     {
+                        new GlobalScrollAdjustsVolume(),
                         new GridContainer // used for max width implementation
                         {
                             RelativeSizeAxes = Axes.Both,
@@ -211,11 +219,11 @@ namespace osu.Game.Screens.Select
                                 },
                             }
                         },
-                        FilterControl = new FilterControl
+                        FilterControl = CreateFilterControl().With(d =>
                         {
-                            RelativeSizeAxes = Axes.X,
-                            Height = FilterControl.HEIGHT,
-                        },
+                            d.RelativeSizeAxes = Axes.X;
+                            d.Height = FilterControl.HEIGHT;
+                        }),
                         new GridContainer // used for max width implementation
                         {
                             RelativeSizeAxes = Axes.Both,
@@ -375,7 +383,7 @@ namespace osu.Game.Screens.Select
 
                 BeatmapOptions.AddButton(@"Manage", @"collections", FontAwesome.Solid.Book, colours.Green, () => manageCollectionsDialog?.Show());
                 BeatmapOptions.AddButton(@"Delete", @"all difficulties", FontAwesome.Solid.Trash, colours.Pink, () => DeleteBeatmap(Beatmap.Value.BeatmapSetInfo));
-                BeatmapOptions.AddButton(@"Remove", @"from unplayed", FontAwesome.Regular.TimesCircle, colours.Purple, null);
+                BeatmapOptions.AddButton(@"Mark", @"as played", FontAwesome.Regular.TimesCircle, colours.Purple, () => beatmaps.MarkPlayed(Beatmap.Value.BeatmapInfo));
                 BeatmapOptions.AddButton(@"Clear", @"local scores", FontAwesome.Solid.Eraser, colours.Purple, () => ClearScores(Beatmap.Value.BeatmapInfo));
             }
 
@@ -383,6 +391,8 @@ namespace osu.Game.Screens.Select
             sampleChangeBeatmap = audio.Samples.Get(@"SongSelect/select-expand");
             SampleConfirm = audio.Samples.Get(@"SongSelect/confirm-selection");
         }
+
+        protected virtual FilterControl CreateFilterControl() => new FilterControl();
 
         protected override void LoadComplete()
         {
@@ -405,9 +415,9 @@ namespace osu.Game.Screens.Select
         /// Creates the buttons to be displayed in the footer.
         /// </summary>
         /// <returns>A set of <see cref="FooterButton"/> and an optional <see cref="OverlayContainer"/> which the button opens when pressed.</returns>
-        protected virtual IEnumerable<(FooterButton, OverlayContainer?)> CreateSongSelectFooterButtons() => new (FooterButton, OverlayContainer?)[]
+        protected virtual IEnumerable<(FooterButton button, OverlayContainer? overlay)> CreateSongSelectFooterButtons() => new (FooterButton, OverlayContainer?)[]
         {
-            (new FooterButtonMods { Current = Mods }, ModSelect),
+            (ModsFooterButton = new FooterButtonMods { Current = Mods }, ModSelect),
             (new FooterButtonRandom
             {
                 NextRandom = () => Carousel.SelectNextRandom(),
@@ -610,11 +620,6 @@ namespace osu.Game.Screens.Select
                 beatmapInfoPrevious = beatmap;
             }
 
-            // we can't run this in the debounced run due to the selected mods bindable not being debounced,
-            // since mods could be updated to the new ruleset instances while the decoupled bindable is held behind,
-            // therefore resulting in performing difficulty calculation with invalid states.
-            advancedStats.Ruleset.Value = ruleset;
-
             void run()
             {
                 // clear pending task immediately to track any potential nested debounce operation.
@@ -716,12 +721,6 @@ namespace osu.Game.Screens.Select
 
             Carousel.AllowSelection = true;
 
-            if (pendingFilterApplication)
-            {
-                Carousel.Filter(FilterControl.CreateCriteria());
-                pendingFilterApplication = false;
-            }
-
             BeatmapDetails.Refresh();
 
             beginLooping();
@@ -752,6 +751,17 @@ namespace osu.Game.Screens.Select
             wedgeBackground.ScaleTo(1, 500, Easing.OutQuint);
 
             FilterControl.Activate();
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (Carousel.AllowSelection && pendingFilterApplication)
+            {
+                Carousel.Filter(FilterControl.CreateCriteria());
+                pendingFilterApplication = false;
+            }
         }
 
         public override void OnSuspending(ScreenTransitionEvent e)
@@ -878,6 +888,8 @@ namespace osu.Game.Screens.Select
             ModSelect.Beatmap.Value = beatmap;
 
             advancedStats.BeatmapInfo = beatmap.BeatmapInfo;
+            advancedStats.Mods.Value = selectedMods.Value;
+            advancedStats.Ruleset.Value = Ruleset.Value;
 
             bool beatmapSelected = beatmap is not DummyWorkingBeatmap;
 
@@ -989,6 +1001,12 @@ namespace osu.Game.Screens.Select
             decoupledRuleset.DisabledChanged += r => Ruleset.Disabled = r;
 
             Beatmap.BindValueChanged(updateCarouselSelection);
+
+            selectedMods.BindValueChanged(_ =>
+            {
+                if (decoupledRuleset.Value.Equals(rulesetNoDebounce))
+                    advancedStats.Mods.Value = selectedMods.Value;
+            }, true);
 
             boundLocalBindables = true;
         }

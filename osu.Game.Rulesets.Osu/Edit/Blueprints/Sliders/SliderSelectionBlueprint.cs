@@ -140,8 +140,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             if (hoveredControlPoint == null)
                 return false;
 
-            hoveredControlPoint.IsSelected.Value = true;
-            ControlPointVisualiser?.DeleteSelected();
+            if (hoveredControlPoint.IsSelected.Value)
+                ControlPointVisualiser?.DeleteSelected();
+            else
+                ControlPointVisualiser?.Delete([hoveredControlPoint.ControlPoint]);
+
             return true;
         }
 
@@ -177,6 +180,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         protected override void OnDeselected()
         {
             base.OnDeselected();
+
+            if (placementControlPoint != null)
+                endControlPointPlacement();
 
             updateVisualDefinition();
             BodyPiece.RecyclePath();
@@ -268,9 +274,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             }
             else
             {
-                double minDistance = distanceSnapProvider?.GetBeatSnapDistanceAt(HitObject, false) * oldVelocityMultiplier ?? 1;
+                double minDistance = distanceSnapProvider?.GetBeatSnapDistance() * oldVelocityMultiplier ?? 1;
                 // Add a small amount to the proposed distance to make it easier to snap to the full length of the slider.
-                proposedDistance = distanceSnapProvider?.FindSnappedDistance(HitObject, (float)proposedDistance + 1, DistanceSnapTarget.Start) ?? proposedDistance;
+                proposedDistance = distanceSnapProvider?.FindSnappedDistance((float)proposedDistance + 1, HitObject.StartTime, HitObject) ?? proposedDistance;
                 proposedDistance = MathHelper.Clamp(proposedDistance, minDistance, HitObject.Path.CalculatedDistance);
             }
 
@@ -377,13 +383,16 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         protected override void OnMouseUp(MouseUpEvent e)
         {
             if (placementControlPoint != null)
-            {
-                if (IsDragged)
-                    ControlPointVisualiser?.DragEnded();
+                endControlPointPlacement();
+        }
 
-                placementControlPoint = null;
-                changeHandler?.EndChange();
-            }
+        private void endControlPointPlacement()
+        {
+            if (IsDragged)
+                ControlPointVisualiser?.DragEnded();
+
+            placementControlPoint = null;
+            changeHandler?.EndChange();
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)
@@ -545,6 +554,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             HitObject.Position += first;
         }
 
+        // duplicated in `JuiceStreamSelectionBlueprint.convertToStream()`
+        // consider extracting common helper when applying changes here
         private void convertToStream()
         {
             if (editorBeatmap == null || beatDivisor == null)
@@ -615,7 +626,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
         {
-            if (BodyPiece.ReceivePositionalInputAt(screenSpacePos))
+            if (BodyPiece.ReceivePositionalInputAt(screenSpacePos) && (IsSelected || DrawableObject.Body.Alpha > 0))
                 return true;
 
             if (ControlPointVisualiser == null)

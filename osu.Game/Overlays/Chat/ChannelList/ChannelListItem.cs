@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -9,6 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -19,9 +21,11 @@ using osuTK;
 
 namespace osu.Game.Overlays.Chat.ChannelList
 {
-    public partial class ChannelListItem : OsuClickableContainer
+    public partial class ChannelListItem : OsuClickableContainer, IFilterable
     {
         public event Action<Channel>? OnRequestSelect;
+
+        public bool CanLeave { get; init; } = true;
         public event Action<Channel>? OnRequestLeave;
 
         public readonly Channel Channel;
@@ -158,7 +162,7 @@ namespace osu.Game.Overlays.Chat.ChannelList
 
         private ChannelListItemCloseButton? createCloseButton()
         {
-            if (isSelector)
+            if (isSelector || !CanLeave)
                 return null;
 
             return new ChannelListItemCloseButton
@@ -186,5 +190,28 @@ namespace osu.Game.Overlays.Chat.ChannelList
         }
 
         private bool isSelector => Channel is ChannelListing.ChannelListingChannel;
+
+        #region Filtering support
+
+        public IEnumerable<LocalisableString> FilterTerms => isSelector ? Enumerable.Empty<LocalisableString>() : [Channel.Name];
+
+        private bool matchingFilter = true;
+
+        public bool MatchingFilter
+        {
+            get => matchingFilter;
+            set
+            {
+                if (matchingFilter == value)
+                    return;
+
+                matchingFilter = value;
+                Alpha = matchingFilter ? 1 : 0;
+            }
+        }
+
+        public bool FilteringActive { get; set; }
+
+        #endregion
     }
 }

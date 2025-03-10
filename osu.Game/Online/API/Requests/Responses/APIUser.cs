@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
-using osu.Framework.Bindables;
 using osu.Game.Extensions;
 using osu.Game.Users;
 
@@ -56,9 +55,9 @@ namespace osu.Game.Online.API.Requests.Responses
             set => countryCodeString = value.ToString();
         }
 
-        public readonly Bindable<UserStatus?> Status = new Bindable<UserStatus?>();
-
-        public readonly Bindable<UserActivity> Activity = new Bindable<UserActivity>();
+        [JsonProperty(@"team")]
+        [CanBeNull]
+        public APITeam Team { get; set; }
 
         [JsonProperty(@"profile_colour")]
         public string Colour;
@@ -223,8 +222,10 @@ namespace osu.Game.Online.API.Requests.Responses
 
         /// <summary>
         /// User statistics for the requested ruleset (in the case of a <see cref="GetUserRequest"/> or <see cref="GetFriendsRequest"/> response).
-        /// Otherwise empty.
         /// </summary>
+        /// <remarks>
+        /// This returns null when accessed from <see cref="IAPIProvider.LocalUser"/>. Use <see cref="LocalUserStatisticsProvider"/> instead.
+        /// </remarks>
         [JsonProperty(@"statistics")]
         public UserStatistics Statistics
         {
@@ -261,7 +262,7 @@ namespace osu.Game.Online.API.Requests.Responses
         public APIUserHistoryCount[] ReplaysWatchedCounts;
 
         /// <summary>
-        /// All user statistics per ruleset's short name (in the case of a <see cref="GetUsersRequest"/> response).
+        /// All user statistics per ruleset's short name (in the case of a <see cref="GetUsersRequest"/> or <see cref="GetMeRequest"/> response).
         /// Otherwise empty. Can be altered for testing purposes.
         /// </summary>
         // todo: this should likely be moved to a separate UserCompact class at some point.

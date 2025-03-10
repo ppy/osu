@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
@@ -10,6 +11,7 @@ using osu.Framework.Graphics.Pooling;
 using osu.Game.Rulesets.Catch.Skinning;
 using osu.Game.Rulesets.Objects.Pooling;
 using osu.Game.Skinning;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.UI
@@ -53,6 +55,25 @@ namespace osu.Game.Rulesets.Catch.UI
                 hyperDashTrails = new Container<CatcherTrail> { RelativeSizeAxes = Axes.Both, Colour = Catcher.DEFAULT_HYPER_DASH_COLOUR },
                 hyperDashAfterImages = new Container<CatcherTrail> { RelativeSizeAxes = Axes.Both, Colour = Catcher.DEFAULT_HYPER_DASH_COLOUR },
             };
+        }
+
+        /// <summary>
+        /// Update the scale of all trails.
+        /// </summary>
+        /// <param name="scale">The new body scale of the Catcher</param>
+        public void UpdateCatcherTrailsScale(Vector2 scale)
+        {
+            var oldEntries = Entries.ToList();
+
+            Clear();
+
+            foreach (var oldEntry in oldEntries)
+            {
+                // use magnitude of the new scale while preserving the sign of the old one in the X direction.
+                // the end effect is preserving the direction in which the trail sprites face, which is important.
+                var targetScale = new Vector2(Math.Abs(scale.X) * Math.Sign(oldEntry.Scale.X), Math.Abs(scale.Y));
+                Add(new CatcherTrailEntry(oldEntry.LifetimeStart, oldEntry.CatcherState, oldEntry.Position, targetScale, oldEntry.Animation));
+            }
         }
 
         protected override void LoadComplete()

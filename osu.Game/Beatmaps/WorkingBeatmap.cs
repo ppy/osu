@@ -62,7 +62,12 @@ namespace osu.Game.Beatmaps
         #region Resource getters
 
         protected virtual Waveform GetWaveform() => new Waveform(null);
-        protected virtual Storyboard GetStoryboard() => new Storyboard { BeatmapInfo = BeatmapInfo };
+
+        protected virtual Storyboard GetStoryboard() => new Storyboard
+        {
+            BeatmapInfo = BeatmapInfo,
+            Beatmap = Beatmap,
+        };
 
         protected abstract IBeatmap GetBeatmap();
         public abstract Texture GetBackground();
@@ -198,6 +203,8 @@ namespace osu.Game.Beatmaps
             {
                 try
                 {
+                    // TODO: This is a touch expensive and can become an issue if being accessed every Update call.
+                    // Optimally we would not involve the async flow if things are already loaded.
                     return loadBeatmapAsync().GetResultSafely();
                 }
                 catch (AggregateException ae)

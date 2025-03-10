@@ -214,9 +214,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
             roomId = clone(roomId);
             password = clone(password);
 
-            ServerAPIRoom = roomManager.ServerSideRooms.Single(r => r.RoomID.Value == roomId);
+            ServerAPIRoom = roomManager.ServerSideRooms.Single(r => r.RoomID == roomId);
 
-            if (password != ServerAPIRoom.Password.Value)
+            if (password != ServerAPIRoom.Password)
                 throw new InvalidOperationException("Invalid password.");
 
             lastPlaylistItemId = ServerAPIRoom.Playlist.Max(item => item.ID);
@@ -230,11 +230,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 Settings =
                 {
-                    Name = ServerAPIRoom.Name.Value,
-                    MatchType = ServerAPIRoom.Type.Value,
-                    Password = password,
-                    QueueMode = ServerAPIRoom.QueueMode.Value,
-                    AutoStartDuration = ServerAPIRoom.AutoStartDuration.Value
+                    Name = ServerAPIRoom.Name,
+                    MatchType = ServerAPIRoom.Type,
+                    Password = password ?? string.Empty,
+                    QueueMode = ServerAPIRoom.QueueMode,
+                    AutoStartDuration = ServerAPIRoom.AutoStartDuration
                 },
                 Playlist = ServerAPIRoom.Playlist.Select(CreateMultiplayerPlaylistItem).ToList(),
                 Users = { localUser },
@@ -333,6 +333,23 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             ChangeUserBeatmapAvailability(api.LocalUser.Value.Id, clone(newBeatmapAvailability));
             return Task.CompletedTask;
+        }
+
+        public override Task ChangeUserStyle(int? beatmapId, int? rulesetId)
+        {
+            ChangeUserStyle(api.LocalUser.Value.Id, beatmapId, rulesetId);
+            return Task.CompletedTask;
+        }
+
+        public void ChangeUserStyle(int userId, int? beatmapId, int? rulesetId)
+        {
+            Debug.Assert(ServerRoom != null);
+
+            var user = ServerRoom.Users.Single(u => u.UserID == userId);
+            user.BeatmapId = beatmapId;
+            user.RulesetId = rulesetId;
+
+            ((IMultiplayerClient)this).UserStyleChanged(userId, beatmapId, rulesetId);
         }
 
         public void ChangeUserMods(int userId, IEnumerable<Mod> newMods)
@@ -447,7 +464,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             item.PlaylistOrder = existingItem.PlaylistOrder;
 
             ServerRoom.Playlist[ServerRoom.Playlist.IndexOf(existingItem)] = item;
-            ServerAPIRoom.Playlist[ServerAPIRoom.Playlist.IndexOf(ServerAPIRoom.Playlist.Single(i => i.ID == item.ID))] = new PlaylistItem(item);
+            ServerAPIRoom.Playlist = ServerAPIRoom.Playlist.Select((pi, i) => pi.ID == item.ID ? new PlaylistItem(item) : ServerAPIRoom.Playlist[i]).ToArray();
 
             await ((IMultiplayerClient)this).PlaylistItemChanged(clone(item)).ConfigureAwait(false);
         }
@@ -474,7 +491,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 throw new InvalidOperationException("Attempted to remove an item which has already been played.");
 
             ServerRoom.Playlist.Remove(item);
-            ServerAPIRoom.Playlist.RemoveAll(i => i.ID == item.ID);
+            ServerAPIRoom.Playlist = ServerAPIRoom.Playlist.Where(i => i.ID != item.ID).ToArray();
             await ((IMultiplayerClient)this).PlaylistItemRemoved(clone(playlistItemId)).ConfigureAwait(false);
 
             await updateCurrentItem(ServerRoom).ConfigureAwait(false);
@@ -569,7 +586,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             item.ID = ++lastPlaylistItemId;
 
             ServerRoom.Playlist.Add(item);
-            ServerAPIRoom.Playlist.Add(new PlaylistItem(item));
+            ServerAPIRoom.Playlist = ServerAPIRoom.Playlist.Append(new PlaylistItem(item)).ToArray();
             await ((IMultiplayerClient)this).PlaylistItemAdded(clone(item)).ConfigureAwait(false);
 
             await updatePlaylistOrder(ServerRoom).ConfigureAwait(false);

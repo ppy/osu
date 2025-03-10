@@ -12,6 +12,7 @@ using osu.Framework.Extensions.ObjectExtensions;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Metadata;
 using osu.Game.Online.Spectator;
 using osu.Game.Replays;
 using osu.Game.Rulesets;
@@ -39,6 +40,9 @@ namespace osu.Game.Screens.Spectate
         private SpectatorClient spectatorClient { get; set; } = null!;
 
         [Resolved]
+        private MetadataClient metadataClient { get; set; } = null!;
+
+        [Resolved]
         private UserLookupCache userLookupCache { get; set; } = null!;
 
         [Resolved]
@@ -50,6 +54,7 @@ namespace osu.Game.Screens.Spectate
         private readonly Dictionary<int, SpectatorGameplayState> gameplayStates = new Dictionary<int, SpectatorGameplayState>();
 
         private IDisposable? realmSubscription;
+        private IDisposable? userWatchToken;
 
         /// <summary>
         /// Creates a new <see cref="SpectatorScreen"/>.
@@ -63,6 +68,8 @@ namespace osu.Game.Screens.Spectate
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            userWatchToken = metadataClient.BeginWatchingUserPresence();
 
             userLookupCache.GetUsersAsync(users.ToArray()).ContinueWith(task => Schedule(() =>
             {
@@ -282,6 +289,7 @@ namespace osu.Game.Screens.Spectate
             }
 
             realmSubscription?.Dispose();
+            userWatchToken?.Dispose();
         }
     }
 }
