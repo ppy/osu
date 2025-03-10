@@ -179,32 +179,34 @@ namespace osu.Game.Database
 
                 sleepIfRequired();
 
-                realmAccess.Write(r =>
+                var beatmap = realmAccess.Run(r => r.Find<BeatmapInfo>(id)?.Detach());
+
+                if (beatmap == null)
+                    return;
+
+                try
                 {
-                    var beatmap = r.Find<BeatmapInfo>(id);
+                    var working = beatmapManager.GetWorkingBeatmap(beatmap);
+                    var ruleset = getRuleset(working.BeatmapInfo.Ruleset);
 
-                    if (beatmap == null)
-                        return;
+                    Debug.Assert(ruleset != null);
 
-                    try
+                    var calculator = ruleset.CreateDifficultyCalculator(working);
+
+                    double starRating = calculator.Calculate().StarRating;
+                    realmAccess.Write(r =>
                     {
-                        var working = beatmapManager.GetWorkingBeatmap(beatmap);
-                        var ruleset = getRuleset(working.BeatmapInfo.Ruleset);
-
-                        Debug.Assert(ruleset != null);
-
-                        var calculator = ruleset.CreateDifficultyCalculator(working);
-
-                        beatmap.StarRating = calculator.Calculate().StarRating;
-                        ((IWorkingBeatmapCache)beatmapManager).Invalidate(beatmap);
-                        ++processedCount;
-                    }
-                    catch (Exception e)
-                    {
-                        Logger.Log($"Background processing failed on {beatmap}: {e}");
-                        ++failedCount;
-                    }
-                });
+                        if (r.Find<BeatmapInfo>(id) is BeatmapInfo liveBeatmapInfo)
+                            liveBeatmapInfo.StarRating = starRating;
+                    });
+                    ((IWorkingBeatmapCache)beatmapManager).Invalidate(beatmap);
+                    ++processedCount;
+                }
+                catch (Exception e)
+                {
+                    Logger.Log($"Background processing failed on {beatmap}: {e}");
+                    ++failedCount;
+                }
             }
 
             completeNotification(notification, processedCount, beatmapIds.Count, failedCount);
