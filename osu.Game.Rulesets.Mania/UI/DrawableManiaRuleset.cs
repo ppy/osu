@@ -112,6 +112,8 @@ namespace osu.Game.Rulesets.Mania.UI
             configScrollSpeed.BindValueChanged(speed => TargetTimeRange = ComputeScrollTime(speed.NewValue));
 
             TimeRange.Value = TargetTimeRange = currentTimeRange = ComputeScrollTime(configScrollSpeed.Value);
+
+            KeyBindingInputManager.Add(new ManiaTouchInputArea(this));
         }
 
         protected override void AdjustScrollSpeed(int amount) => configScrollSpeed.Value += amount;
