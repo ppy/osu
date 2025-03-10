@@ -160,7 +160,17 @@ namespace osu.Game.Database
             int processedCount = 0;
             int failedCount = 0;
 
-            foreach (var id in beatmapIds)
+            Dictionary<string, Ruleset> rulesetCache = new Dictionary<string, Ruleset>();
+
+            Ruleset getRuleset(RulesetInfo rulesetInfo)
+            {
+                if (!rulesetCache.TryGetValue(rulesetInfo.ShortName, out var ruleset))
+                    ruleset = rulesetCache[rulesetInfo.ShortName] = rulesetInfo.CreateInstance();
+
+                return ruleset;
+            }
+
+            foreach (Guid id in beatmapIds)
             {
                 if (notification?.State == ProgressNotificationState.Cancelled)
                     break;
@@ -179,7 +189,7 @@ namespace osu.Game.Database
                     try
                     {
                         var working = beatmapManager.GetWorkingBeatmap(beatmap);
-                        var ruleset = working.BeatmapInfo.Ruleset.CreateInstance();
+                        var ruleset = getRuleset(working.BeatmapInfo.Ruleset);
 
                         Debug.Assert(ruleset != null);
 
