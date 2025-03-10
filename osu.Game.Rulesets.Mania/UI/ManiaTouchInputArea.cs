@@ -97,7 +97,7 @@ namespace osu.Game.Rulesets.Mania.UI
             };
         }
 
-        private IBindable<ManiaMobilePlayStyle> mobilePlayStyle;
+        private IBindable<ManiaMobilePlayStyle> mobilePlayStyle = null!;
 
         protected override void LoadComplete()
         {
