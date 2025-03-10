@@ -46,15 +46,18 @@ namespace osu.Game.Rulesets.Osu.Statistics
 
         private const float line_thickness = 2;
 
+        private readonly bool showsLabel;
+
         /// <summary>
         /// The highest count of any point currently being displayed.
         /// </summary>
         protected float PeakValue { get; private set; }
 
-        public AccuracyHeatmap(ScoreInfo score, IBeatmap playableBeatmap)
+        public AccuracyHeatmap(ScoreInfo score, IBeatmap playableBeatmap, bool showsLabel = true)
         {
             this.score = score;
             this.playableBeatmap = playableBeatmap;
+            this.showsLabel = showsLabel;
         }
 
         [BackgroundDependencyLoader]
@@ -123,6 +126,7 @@ namespace osu.Game.Rulesets.Osu.Statistics
                                         new OsuSpriteText
                                         {
                                             Text = "Overshoot",
+                                            Alpha = showsLabel ? 1 : 0,
                                             Font = OsuFont.GetFont(size: 12),
                                             Anchor = Anchor.Centre,
                                             Origin = Anchor.BottomLeft,
@@ -134,6 +138,7 @@ namespace osu.Game.Rulesets.Osu.Statistics
                                         new OsuSpriteText
                                         {
                                             Text = "Undershoot",
+                                            Alpha = showsLabel ? 1 : 0,
                                             Font = OsuFont.GetFont(size: 12),
                                             Anchor = Anchor.Centre,
                                             Origin = Anchor.TopRight,
@@ -227,7 +232,7 @@ namespace osu.Game.Rulesets.Osu.Statistics
             }
         }
 
-        protected void AddPoint(Vector2 start, Vector2 end, Vector2 hitPoint, float radius)
+        public void AddPoint(Vector2 start, Vector2 end, Vector2 hitPoint, float radius)
         {
             if (pointGrid.Content.Count == 0)
                 return;
