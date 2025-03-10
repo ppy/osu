@@ -172,7 +172,7 @@ namespace osu.Game.Screens.Ranking
                         var tag = (UserTag)e.NewItems[i]!;
                         var drawableTag = new DrawableUserTag(tag);
                         tagFlow.Insert(tagFlow.Count, drawableTag);
-                        tag.VoteCount.BindValueChanged(sortTags, true);
+                        tag.VoteCount.BindValueChanged(voteCountChanged, true);
                         layout.Invalidate();
                     }
 
@@ -184,7 +184,7 @@ namespace osu.Game.Screens.Ranking
                     for (int i = 0; i < e.OldItems!.Count; i++)
                     {
                         var tag = (UserTag)e.OldItems[i]!;
-                        tag.VoteCount.ValueChanged -= sortTags;
+                        tag.VoteCount.ValueChanged -= voteCountChanged;
                         tagFlow.Remove(oldItems[e.OldStartingIndex + i], true);
                     }
 
@@ -199,7 +199,18 @@ namespace osu.Game.Screens.Ranking
             }
         }
 
-        private void sortTags(ValueChangedEvent<int> _) => layout.Invalidate();
+        private void voteCountChanged(ValueChangedEvent<int> _)
+        {
+            var tagsWithNoVotes = displayedTags.Where(t => t.VoteCount.Value == 0).ToArray();
+
+            foreach (var tag in tagsWithNoVotes)
+            {
+                displayedTags.Remove(tag);
+                extraTags.Add(tag);
+            }
+
+            layout.Invalidate();
+        }
 
         protected override void Update()
         {
