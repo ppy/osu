@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         public BindableFloat Spacing { get; } = new BindableFloat(4f)
         {
             MinValue = 4f,
-            MaxValue = 128f,
+            MaxValue = 256f,
             Precision = 0.01f,
         };
 
