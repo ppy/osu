@@ -438,7 +438,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("Enter song select", () =>
             {
                 var currentSubScreen = ((Screens.OnlinePlay.Multiplayer.Multiplayer)multiplayerComponents.CurrentScreen).CurrentSubScreen;
-                ((MultiplayerMatchSubScreen)currentSubScreen).OpenSongSelection(item);
+                ((MultiplayerMatchSubScreen)currentSubScreen).ShowSongSelect(item);
             });
 
             AddUntilStep("wait for song select", () => this.ChildrenOfType<MultiplayerMatchSongSelect>().FirstOrDefault()?.BeatmapSetsLoaded == true);
@@ -479,7 +479,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("Enter song select", () =>
             {
                 var currentSubScreen = ((Screens.OnlinePlay.Multiplayer.Multiplayer)multiplayerComponents.CurrentScreen).CurrentSubScreen;
-                ((MultiplayerMatchSubScreen)currentSubScreen).OpenSongSelection(item);
+                ((MultiplayerMatchSubScreen)currentSubScreen).ShowSongSelect(item);
             });
 
             AddUntilStep("wait for song select", () => this.ChildrenOfType<MultiplayerMatchSongSelect>().FirstOrDefault()?.BeatmapSetsLoaded == true);
@@ -520,7 +520,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("Enter song select", () =>
             {
                 var currentSubScreen = ((Screens.OnlinePlay.Multiplayer.Multiplayer)multiplayerComponents.CurrentScreen).CurrentSubScreen;
-                ((MultiplayerMatchSubScreen)currentSubScreen).OpenSongSelection(item);
+                ((MultiplayerMatchSubScreen)currentSubScreen).ShowSongSelect(item);
             });
 
             AddUntilStep("wait for song select", () => this.ChildrenOfType<MultiplayerMatchSongSelect>().FirstOrDefault()?.BeatmapSetsLoaded == true);
@@ -652,7 +652,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("invoke on back button", () => multiplayerComponents.OnBackButton());
 
-            AddAssert("mod overlay is hidden", () => this.ChildrenOfType<RoomSubScreen>().Single().UserModsSelectOverlay.State.Value == Visibility.Hidden);
+            AddAssert("mod overlay is hidden", () => this.ChildrenOfType<MultiplayerUserModSelectOverlay>().Single().State.Value == Visibility.Hidden);
 
             AddAssert("dialog overlay is hidden", () => DialogOverlay.State.Value == Visibility.Hidden);
 
@@ -825,7 +825,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddAssert("local room has correct settings", () =>
             {
-                var localRoom = this.ChildrenOfType<MultiplayerMatchSubScreen>().Single().Room;
+                var localRoom = this.ChildrenOfType<IMultiplayerMatchScreen>().Single().Room;
                 return localRoom.Name == multiplayerClient.ServerSideRooms[0].Name && localRoom.Playlist.Single().ID == 2;
             });
         }
