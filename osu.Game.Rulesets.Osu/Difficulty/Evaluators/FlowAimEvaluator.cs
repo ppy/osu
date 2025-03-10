@@ -295,19 +295,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             OsuDifficultyHitObject osuLast1Obj = (OsuDifficultyHitObject)current.Previous(starting_index - 1);
             OsuDifficultyHitObject osuLast2Obj = (OsuDifficultyHitObject)current.Previous(starting_index);
             OsuDifficultyHitObject osuLast3Obj = (OsuDifficultyHitObject)current.Previous(starting_index + 1);
-            OsuDifficultyHitObject osuLast4Obj = (OsuDifficultyHitObject)current.Previous(starting_index + 2);
 
             double prevAngle = osuLast1Obj.AngleSigned ?? 0;
             double prevAngleChange = 0;
 
-            double prev3Velocity = osuLast4Obj != null ? osuLast4Obj.LazyJumpDistance / osuLast4Obj.StrainTime : double.NaN;
             double prev2Velocity = osuLast3Obj != null ? osuLast3Obj.LazyJumpDistance / osuLast3Obj.StrainTime : double.NaN;
             double prev1Velocity = osuLast2Obj != null ? osuLast2Obj.LazyJumpDistance / osuLast2Obj.StrainTime : double.NaN;
             double prevVelocity = osuLast1Obj != null ? osuLast1Obj.LazyJumpDistance / osuLast1Obj.StrainTime : double.NaN;
 
             double prevVelocityChange = prevVelocity / prev1Velocity;
             double prev1VelocityChange = prev1Velocity / prev2Velocity;
-            double prev2VelocityChange = prev2Velocity / prev3Velocity;
+            double prev2VelocityChange = double.NaN;
 
             // It's allowed to get two angle change without triggering comfyness penalty
 
@@ -362,11 +360,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double velocityChangeFactor = DifficultyCalculationUtils.Smoothstep(normalizedVelocityChange, 1.25 + normalVelocityChangeAdjust, 1.1 + normalVelocityChangeAdjust);
                 double accelerationChangeFactor = double.IsNaN(accelerationChange) ? 1.0 : DifficultyCalculationUtils.Smoothstep(accelerationChange, 0.25 + normalVelocityChangeAdjust, 0.15 + normalVelocityChangeAdjust);
 
-                double instantComfyness = angleFactor * angleChangeFactor * velocityChangeFactor * accelerationChangeFactor;
+                // Don't look on accelerationChangeFactor on first iteration because it looks for one object behind than other bonuses, and we don't want it
+                double instantComfyness = angleFactor * angleChangeFactor * velocityChangeFactor * (i == starting_index - 2 ? 1.0 : accelerationChangeFactor);
                 totalComfyness *= instantComfyness;
 
                 prevVelocity = currVelocity;
 
+                prev2VelocityChange = prev1VelocityChange;
                 prev1VelocityChange = prevVelocityChange;
                 prevVelocityChange = currVelocityChange;
 
