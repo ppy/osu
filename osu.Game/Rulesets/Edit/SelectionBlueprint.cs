@@ -36,6 +36,11 @@ namespace osu.Game.Rulesets.Edit
         public override bool HandlePositionalInput => IsSelectable;
         public override bool RemoveWhenNotAlive => false;
 
+        /// <summary>
+        /// Whether this <see cref="SelectionBlueprint{T}"/> will be used as a preview or not.
+        /// </summary>
+        public bool IsPreview { protected get; set; } = false;
+
         protected SelectionBlueprint(T item)
         {
             Item = item;

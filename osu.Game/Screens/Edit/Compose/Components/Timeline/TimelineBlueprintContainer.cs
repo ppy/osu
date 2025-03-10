@@ -90,7 +90,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             {
                 placementBlueprint = CreateBlueprintFor(obj.NewValue).AsNonNull();
 
-                placementBlueprint.Colour = OsuColour.Gray(0.9f);
+                placementBlueprint.IsPreview = true;
 
                 // TODO: this is out of order, causing incorrect stacking height.
                 SelectionBlueprints.Add(placementBlueprint);

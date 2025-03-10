@@ -196,7 +196,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     break;
             }
 
-            if (IsSelected)
+            if (IsSelected || IsPreview)
                 border.Show();
             else
                 border.Hide();
