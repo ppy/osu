@@ -235,11 +235,18 @@ namespace osu.Game.Beatmaps
                     // Todo: Handle cancellation during beatmap parsing
                     var b = GetBeatmap() ?? new Beatmap();
 
-                    // The original beatmap version needs to be preserved as the database doesn't contain it
-                    BeatmapInfo.BeatmapVersion = b.BeatmapInfo.BeatmapVersion;
-
-                    // Use the database-backed info for more up-to-date values (beatmap id, ranked status, etc)
-                    b.BeatmapInfo = BeatmapInfo;
+                    // Copy across values of key properties for which the database-backed model has data that the decoded beatmap isn't going to.
+                    b.BeatmapInfo.ID = BeatmapInfo.ID;
+                    b.BeatmapInfo.UserSettings = BeatmapInfo.UserSettings;
+                    b.BeatmapInfo.BeatmapSet = BeatmapInfo.BeatmapSet;
+                    b.BeatmapInfo.Status = BeatmapInfo.Status;
+                    b.BeatmapInfo.OnlineID = BeatmapInfo.OnlineID;
+                    b.BeatmapInfo.OnlineMD5Hash = BeatmapInfo.OnlineMD5Hash;
+                    b.BeatmapInfo.LastLocalUpdate = BeatmapInfo.LastLocalUpdate;
+                    b.BeatmapInfo.LastOnlineUpdate = BeatmapInfo.LastOnlineUpdate;
+                    b.BeatmapInfo.LastPlayed = BeatmapInfo.LastPlayed;
+                    b.BeatmapInfo.EditorTimestamp = BeatmapInfo.EditorTimestamp;
+                    b.BeatmapInfo.StarRating = BeatmapInfo.StarRating; // this could be recomputed in the decoding process but it's a bit annoying to do.
 
                     return b;
                 }, loadCancellationSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
