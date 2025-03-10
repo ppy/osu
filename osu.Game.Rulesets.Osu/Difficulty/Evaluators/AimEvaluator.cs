@@ -132,7 +132,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     double acuteVelocityBase = Math.Min(currVelocity, prevVelocity);
                     double wideVelocityBase = Math.Min(currDistance / osuCurrObj.StrainTime, prevVelocity); // Don't reward wide angle bonus to sliders
 
-                    double velocityThreshold = diameter * 2.5 / osuCurrObj.StrainTime;
+                    double velocityThreshold = diameter * 2.3 / osuCurrObj.StrainTime;
                     if (wideVelocityBase > velocityThreshold) // Nerf high spaced squares to compensate buff on lower spaced squares
                     {
                         wideVelocityBase = velocityThreshold + 0.4 * (wideVelocityBase - velocityThreshold);
@@ -141,8 +141,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     wideAngleBonus = CalcWideAngleBonus(currAngle);
                     acuteAngleBonus = CalcAcuteAngleBonus(currAngle);
 
-                    // Penalize angle repetition.
-                    double wideAngleRepetitionNerf = Math.Min(wideAngleBonus, Math.Pow(CalcWideAngleBonus(lastAngle), 3));
+                    // Penalize angle repetition. Ideally this thing should be removed, but it breaks balance so I've just make it weaker by taking min between angles
+                    double wideAngleRepetitionNerf = Math.Min(wideAngleBonus, Math.Pow(CalcWideAngleBonus(Math.Min(lastAngle, lastLastAngle)), 3));
                     wideAngleBonus *= 1 - wideAngleRepetitionNerf;
 
                     double acuteAngleRepetitionNerf = Math.Pow(CalcAcuteAngleBonus(lastAngle), 3);
