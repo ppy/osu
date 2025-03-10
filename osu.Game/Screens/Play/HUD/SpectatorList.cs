@@ -145,16 +145,12 @@ namespace osu.Game.Screens.Play.HUD
 
         private void removePlayersFromMultiplayerRoom()
         {
-            if (multiplayerClient.Room == null)
-                return;
-
             // the multiplayer gameplay leaderboard relies on calling `SpectatorClient.WatchUser()` to get updates on users' total scores.
             // this has an unfortunate side effect of other players showing up in `SpectatorClient.WatchingUsers`.
             //
             // we do not generally wish to display other players in the room as spectators due to that implementation detail,
             // therefore this code is intended to filter out those players on the client side.
-            var excludedUserIds = multiplayerClient.Room.Users.Where(u => u.State != MultiplayerUserState.Spectating).Select(u => u.UserID).ToHashSet();
-            actualSpectators.RemoveAll(s => excludedUserIds.Contains(s.OnlineID));
+            actualSpectators.RemoveAll(s => multiplayerPlayers.Contains(s.OnlineID));
         }
 
         private void onSpectatorsChanged(object? sender, NotifyCollectionChangedEventArgs e)
