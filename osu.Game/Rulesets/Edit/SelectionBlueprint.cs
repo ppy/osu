@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Edit
         /// <summary>
         /// Whether this <see cref="SelectionBlueprint{T}"/> will be used as a preview or not.
         /// </summary>
-        public bool IsPreview { protected get; set; } = false;
+        public bool IsPreview { protected get; set; }
 
         protected SelectionBlueprint(T item)
         {
