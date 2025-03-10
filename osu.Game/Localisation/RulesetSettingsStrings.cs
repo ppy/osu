@@ -89,6 +89,21 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString TouchControlScheme => new TranslatableString(getKey(@"touch_control_scheme"), @"Touch control scheme");
 
+        /// <summary>
+        /// "Prefer portrait mode on mobile phones"
+        /// </summary>
+        public static LocalisableString PreferPortraitOnPhone => new TranslatableString(getKey(@"prefer_portrait_on_phone"), @"Prefer portrait mode on mobile phones");
+
+        /// <summary>
+        /// "Extend columns on mobile in landscape mode"
+        /// </summary>
+        public static LocalisableString ExtendColumnsOnLandscape => new TranslatableString(getKey(@"extend_columns_on_landscape"), @"Extend columns on mobile in landscape mode");
+
+        /// <summary>
+        /// "Enable touch controls instead of touchable columns"
+        /// </summary>
+        public static LocalisableString ManiaTouchControls => new TranslatableString(getKey(@"mania_touch_controls"), @"Enable touch controls instead of touchable columns");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
