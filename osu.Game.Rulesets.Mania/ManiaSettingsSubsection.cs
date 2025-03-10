@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
@@ -46,29 +45,12 @@ namespace osu.Game.Rulesets.Mania
                     LabelText = RulesetSettingsStrings.TimingBasedColouring,
                     Current = config.GetBindable<bool>(ManiaRulesetSetting.TimingBasedNoteColouring),
                 },
-                new SettingsCheckbox
+                new SettingsEnumDropdown<ManiaMobilePlayStyle>
                 {
-                    LabelText = RulesetSettingsStrings.ManiaTouchControls,
-                    Current = config.GetBindable<bool>(ManiaRulesetSetting.TouchControls),
+                    LabelText = RulesetSettingsStrings.MobilePlayStyle,
+                    Current = config.GetBindable<ManiaMobilePlayStyle>(ManiaRulesetSetting.MobilePlayStyle),
                 },
             };
-
-            if (RuntimeInfo.IsMobile)
-            {
-                AddRange(new[]
-                {
-                    new SettingsCheckbox
-                    {
-                        LabelText = RulesetSettingsStrings.ExtendColumnsOnLandscape,
-                        Current = config.GetBindable<bool>(ManiaRulesetSetting.MobileExtendedColumns),
-                    },
-                    new SettingsCheckbox
-                    {
-                        LabelText = RulesetSettingsStrings.PreferPortraitOnPhone,
-                        Current = config.GetBindable<bool>(ManiaRulesetSetting.PreferPortraitOnPhone),
-                    }
-                });
-            }
         }
 
         private partial class ManiaScrollSlider : RoundedSliderBar<double>
