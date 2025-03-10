@@ -90,19 +90,24 @@ namespace osu.Game.Localisation
         public static LocalisableString TouchControlScheme => new TranslatableString(getKey(@"touch_control_scheme"), @"Touch control scheme");
 
         /// <summary>
-        /// "Prefer portrait mode on mobile phones"
+        /// "Mobile play style"
         /// </summary>
-        public static LocalisableString PreferPortraitOnPhone => new TranslatableString(getKey(@"prefer_portrait_on_phone"), @"Prefer portrait mode on mobile phones");
+        public static LocalisableString MobilePlayStyle => new TranslatableString(getKey(@"mobile_play_style"), @"Mobile play style");
 
         /// <summary>
-        /// "Extend columns on mobile in landscape mode"
+        /// "Touchable columns"
         /// </summary>
-        public static LocalisableString ExtendColumnsOnLandscape => new TranslatableString(getKey(@"extend_columns_on_landscape"), @"Extend columns on mobile in landscape mode");
+        public static LocalisableString TouchableColumns => new TranslatableString(getKey(@"touchable_columns"), @"Touchable columns");
 
         /// <summary>
-        /// "Enable touch controls instead of touchable columns"
+        /// "Touch controls"
         /// </summary>
-        public static LocalisableString ManiaTouchControls => new TranslatableString(getKey(@"mania_touch_controls"), @"Enable touch controls instead of touchable columns");
+        public static LocalisableString TouchControls => new TranslatableString(getKey(@"touch_controls"), @"Touch controls");
+
+        /// <summary>
+        /// "Extended columns"
+        /// </summary>
+        public static LocalisableString ExtendedColumns => new TranslatableString(getKey(@"extended_columns"), @"Extended columns");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

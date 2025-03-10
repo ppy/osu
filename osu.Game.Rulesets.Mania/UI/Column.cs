@@ -58,7 +58,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public readonly Bindable<Color4> AccentColour = new Bindable<Color4>(Color4.Black);
 
-        private IBindable<bool> touchControls = null!;
+        private IBindable<ManiaMobilePlayStyle> mobilePlayStyle = null!;
 
         public Column(int index, bool isSpecial)
         {
@@ -120,7 +120,7 @@ namespace osu.Game.Rulesets.Mania.UI
             RegisterPool<HoldNoteBody, DrawableHoldNoteBody>(10, 50);
 
             if (rulesetConfig != null)
-                touchControls = rulesetConfig.GetBindable<bool>(ManiaRulesetSetting.TouchControls);
+                mobilePlayStyle = rulesetConfig.GetBindable<ManiaMobilePlayStyle>(ManiaRulesetSetting.MobilePlayStyle);
         }
 
         private void onSourceChanged()
@@ -199,8 +199,8 @@ namespace osu.Game.Rulesets.Mania.UI
 
         protected override bool OnTouchDown(TouchDownEvent e)
         {
-            // if touch controls are enabled, disallow columns from handling touch directly.
-            if (touchControls.Value)
+            // if touch controls are selected, disallow columns from handling touch directly.
+            if (mobilePlayStyle.Value == ManiaMobilePlayStyle.TouchControls)
                 return false;
 
             maniaInputManager?.KeyBindingContainer.TriggerPressed(Action.Value);

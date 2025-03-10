@@ -50,8 +50,9 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public IEnumerable<BarLine> BarLines;
 
-        public override bool RequiresPortraitOrientation
-            => Beatmap.Stages.Count == 1 && Config.Get<bool>(ManiaRulesetSetting.PreferPortraitOnPhone);
+        private bool playsWithTouchableColumns => Config.Get<ManiaMobilePlayStyle>(ManiaRulesetSetting.MobilePlayStyle) == ManiaMobilePlayStyle.TouchableColumns;
+
+        public override bool RequiresPortraitOrientation => Beatmap.Stages.Count == 1 && playsWithTouchableColumns;
 
         protected override bool RelativeScaleBeatLengths => true;
 

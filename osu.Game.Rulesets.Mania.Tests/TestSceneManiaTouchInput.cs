@@ -137,7 +137,7 @@ namespace osu.Game.Rulesets.Mania.Tests
         private void toggleTouchControls(bool enabled)
         {
             var maniaConfig = (ManiaRulesetConfigManager)RulesetConfigs.GetConfigFor(CreatePlayerRuleset())!;
-            maniaConfig.SetValue(ManiaRulesetSetting.TouchControls, enabled);
+            maniaConfig.SetValue(ManiaRulesetSetting.MobilePlayStyle, enabled ? ManiaMobilePlayStyle.TouchControls : ManiaMobilePlayStyle.TouchableColumns);
         }
 
         private ManiaTouchInputArea? getTouchOverlay() => this.ChildrenOfType<ManiaTouchInputArea>().SingleOrDefault();

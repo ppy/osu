@@ -97,11 +97,15 @@ namespace osu.Game.Rulesets.Mania.UI
             };
         }
 
+        private IBindable<ManiaMobilePlayStyle> mobilePlayStyle;
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            rulesetConfig.BindWith(ManiaRulesetSetting.TouchControls, touchControls);
+            mobilePlayStyle = rulesetConfig.GetBindable<ManiaMobilePlayStyle>(ManiaRulesetSetting.MobilePlayStyle);
+            mobilePlayStyle.BindValueChanged(p => touchControls.Value = p.NewValue == ManiaMobilePlayStyle.TouchControls, true);
+
             Opacity.BindValueChanged(o => Alpha = o.NewValue, true);
         }
 

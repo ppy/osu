@@ -61,15 +61,15 @@ namespace osu.Game.Rulesets.Mania.UI
 
         private ISkinSource currentSkin;
 
-        private IBindable<bool> mobileExtendedColumns = null!;
+        private IBindable<ManiaMobilePlayStyle> mobilePlayStyle = null!;
 
         [BackgroundDependencyLoader]
         private void load(ISkinSource skin, ManiaRulesetConfigManager rulesetConfig)
         {
             currentSkin = skin;
 
-            mobileExtendedColumns = rulesetConfig.GetBindable<bool>(ManiaRulesetSetting.MobileExtendedColumns);
-            mobileExtendedColumns.BindValueChanged(_ => updateMobileSizing());
+            mobilePlayStyle = rulesetConfig.GetBindable<ManiaMobilePlayStyle>(ManiaRulesetSetting.MobilePlayStyle);
+            mobilePlayStyle.BindValueChanged(_ => updateMobileSizing());
 
             skin.SourceChanged += onSkinChanged;
             onSkinChanged();
@@ -121,7 +121,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         private void updateMobileSizing()
         {
-            if (!IsLoaded || !RuntimeInfo.IsMobile || !mobileExtendedColumns.Value)
+            if (!IsLoaded || !RuntimeInfo.IsMobile || mobilePlayStyle.Value != ManiaMobilePlayStyle.ExtendedColumns)
                 return;
 
             // GridContainer+CellContainer containing this stage (gets split up for dual stages).
