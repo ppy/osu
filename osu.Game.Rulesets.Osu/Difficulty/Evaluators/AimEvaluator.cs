@@ -143,7 +143,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                     // Penalize angle repetition.
                     double wideAngleRepetitionNerf = Math.Min(wideAngleBonus, Math.Pow(CalcWideAngleBonus(lastAngle), 3));
-                    wideAngleRepetitionNerf *= DifficultyCalculationUtils.Smoothstep(Math.Max(currAngle, Math.Min(lastAngle, lastLastAngle)), 2 * Math.PI / 3, Math.PI / 2);
                     wideAngleBonus *= 1 - wideAngleRepetitionNerf;
 
                     double acuteAngleRepetitionNerf = Math.Pow(CalcAcuteAngleBonus(lastAngle), 3);
