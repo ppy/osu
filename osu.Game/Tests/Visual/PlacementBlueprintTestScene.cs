@@ -51,7 +51,9 @@ namespace osu.Game.Tests.Visual
 
         protected virtual IBeatmap GetPlayableBeatmap()
         {
-            var playable = Beatmap.Value.GetPlayableBeatmap(Beatmap.Value.BeatmapInfo.Ruleset);
+            var rulesetInfo = CreateRuleset()!.RulesetInfo;
+            var playable = Beatmap.Value.GetPlayableBeatmap(rulesetInfo);
+            playable.BeatmapInfo.Ruleset = rulesetInfo;
             playable.Difficulty.CircleSize = 2;
             return playable;
         }
