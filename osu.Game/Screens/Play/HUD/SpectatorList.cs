@@ -13,12 +13,10 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Pooling;
-using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Online.Chat;
 using osu.Game.Localisation.HUD;
-using osu.Game.Localisation.SkinComponents;
+using osu.Game.Online.Chat;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Spectator;
 using osu.Game.Skinning;
@@ -31,10 +29,7 @@ namespace osu.Game.Screens.Play.HUD
     {
         private const int max_spectators_displayed = 10;
 
-        [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.Font), nameof(SkinnableComponentStrings.FontDescription))]
-        public Bindable<Typeface> Font { get; } = new Bindable<Typeface>(Typeface.Torus);
-
-        [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.TextColour), nameof(SkinnableComponentStrings.TextColourDescription))]
+        public Bindable<Typeface> HeaderFont { get; } = new Bindable<Typeface>(Typeface.Torus);
         public BindableColour4 HeaderColour { get; } = new BindableColour4(Colour4.White);
 
         private BindableList<SpectatorUser> watchingUsers { get; } = new BindableList<SpectatorUser>();
@@ -97,7 +92,7 @@ namespace osu.Game.Screens.Play.HUD
             watchingUsers.BindCollectionChanged(onSpectatorsChanged, true);
             userPlayingState.BindValueChanged(_ => updateVisibility());
 
-            Font.BindValueChanged(_ => updateAppearance());
+            HeaderFont.BindValueChanged(_ => updateAppearance());
             HeaderColour.BindValueChanged(_ => updateAppearance(), true);
             FinishTransforms(true);
 
@@ -198,7 +193,7 @@ namespace osu.Game.Screens.Play.HUD
 
         private void updateAppearance()
         {
-            header.Font = OsuFont.GetFont(Font.Value, 12, FontWeight.Bold);
+            header.Font = OsuFont.GetFont(HeaderFont.Value, 12, FontWeight.Bold);
             header.Colour = HeaderColour.Value;
 
             Width = header.DrawWidth;
