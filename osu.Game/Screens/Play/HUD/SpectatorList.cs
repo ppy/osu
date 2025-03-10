@@ -8,7 +8,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.LocalisationExtensions;
-using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -37,7 +36,8 @@ namespace osu.Game.Screens.Play.HUD
         [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.TextColour), nameof(SkinnableComponentStrings.TextColourDescription))]
         public BindableColour4 HeaderColour { get; } = new BindableColour4(Colour4.White);
 
-        private BindableList<SpectatorUser> watchingUsers { get; } = new BindableList<SpectatorUser>();
+        private IBindableList<SpectatorUser> watchingUsers { get; } = new BindableList<SpectatorUser>();
+        private IBindableList<int> multiplayerPlayers { get; } = new BindableList<int>();
         private BindableList<SpectatorUser> actualSpectators { get; } = new BindableList<SpectatorUser>();
 
         private Bindable<LocalUserPlayingState> userPlayingState { get; } = new Bindable<LocalUserPlayingState>();
@@ -92,11 +92,14 @@ namespace osu.Game.Screens.Play.HUD
         {
             base.LoadComplete();
 
-            ((IBindableList<SpectatorUser>)watchingUsers).BindTo(client.WatchingUsers);
             ((IBindable<LocalUserPlayingState>)userPlayingState).BindTo(gameplayState.PlayingState);
 
+            multiplayerPlayers.BindTo(multiplayerClient.CurrentMatchPlayingUserIds);
+            multiplayerPlayers.BindCollectionChanged((_, _) => removePlayersFromMultiplayerRoom());
+
+            watchingUsers.BindTo(client.WatchingUsers);
             watchingUsers.BindCollectionChanged(onWatchingUsersChanged, true);
-            multiplayerClient.RoomUpdated += removePlayersFromMultiplayerRoom;
+
             actualSpectators.BindCollectionChanged(onSpectatorsChanged, true);
             userPlayingState.BindValueChanged(_ => updateVisibility());
 
@@ -234,14 +237,6 @@ namespace osu.Game.Screens.Play.HUD
             header.Colour = HeaderColour.Value;
 
             Width = header.DrawWidth;
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-
-            if (multiplayerClient.IsNotNull())
-                multiplayerClient.RoomUpdated -= removePlayersFromMultiplayerRoom;
         }
 
         private partial class SpectatorListEntry : PoolableDrawable
