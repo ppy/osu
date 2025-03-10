@@ -18,11 +18,13 @@ namespace osu.Game.Rulesets.Taiko.Configuration
             base.InitialiseDefaults();
 
             SetDefault(TaikoRulesetSetting.TouchControlScheme, TaikoTouchControlScheme.KDDK);
+            SetDefault(TaikoRulesetSetting.HitFlyingEnable, TaikoHitFlyingEnable.Always);
         }
     }
 
     public enum TaikoRulesetSetting
     {
-        TouchControlScheme
+        TouchControlScheme,
+        HitFlyingEnable
     }
 }
