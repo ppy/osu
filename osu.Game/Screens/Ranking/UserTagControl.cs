@@ -17,6 +17,7 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Extensions;
@@ -447,6 +448,9 @@ namespace osu.Game.Screens.Ranking
 
         private partial class ExtraTagsPopover : OsuPopover
         {
+            private SearchTextBox searchBox = null!;
+            private SearchContainer searchContainer = null!;
+
             public BindableList<UserTag> ExtraTags { get; } = new BindableList<UserTag>();
 
             public Action<UserTag>? OnSelected { get; set; }
@@ -457,28 +461,43 @@ namespace osu.Game.Screens.Ranking
                 Child = new OsuScrollContainer
                 {
                     Width = 250,
-                    Height = 200,
+                    Height = 250,
                     ScrollbarOverlapsContent = false,
-                    Child = new FillFlowContainer
+                    Children = new Drawable[]
                     {
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        Padding = new MarginPadding { Right = 5 },
-                        Spacing = new Vector2(10),
-                        ChildrenEnumerable = ExtraTags.Select(tag => new DrawableExtraTag(tag)
+                        searchBox = new SearchTextBox
                         {
-                            Action = () =>
+                            RelativeSizeAxes = Axes.X,
+                        },
+                        searchContainer = new SearchContainer
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Direction = FillDirection.Vertical,
+                            Padding = new MarginPadding { Right = 5, Top = 50, },
+                            Spacing = new Vector2(10),
+                            ChildrenEnumerable = ExtraTags.Select(tag => new DrawableExtraTag(tag)
                             {
-                                OnSelected?.Invoke(tag);
-                                this.HidePopover();
-                            }
-                        })
-                    }
+                                Action = () =>
+                                {
+                                    OnSelected?.Invoke(tag);
+                                    this.HidePopover();
+                                }
+                            })
+                        }
+                    },
                 };
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                searchBox.Current.BindValueChanged(_ => searchContainer.SearchTerm = searchBox.Current.Value, true);
             }
         }
 
-        private partial class DrawableExtraTag : OsuAnimatedButton
+        private partial class DrawableExtraTag : OsuAnimatedButton, IFilterable
         {
             private readonly UserTag tag;
 
@@ -527,6 +546,15 @@ namespace osu.Game.Screens.Ranking
                     }
                 });
             }
+
+            public IEnumerable<LocalisableString> FilterTerms => [tag.Name, tag.Description];
+
+            public bool MatchingFilter
+            {
+                set => Alpha = value ? 1 : 0;
+            }
+
+            public bool FilteringActive { set { } }
         }
     }
 
