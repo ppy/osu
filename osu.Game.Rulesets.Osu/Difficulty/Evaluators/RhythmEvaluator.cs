@@ -132,7 +132,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                         }
 
                         // scale down the difficulty if the object is doubletappable
-                        double doubletapness = prevObj.GetDoubletapness(currObj);
+                        double doubletapness = getDoubletapness(prevObj, currObj);
                         effectiveRatio *= 1 - doubletapness * 0.75;
 
                         rhythmComplexitySum += Math.Sqrt(effectiveRatio * startRatio) * currHistoricalDecay;
@@ -171,6 +171,23 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             }
 
             return Math.Sqrt(4 + rhythmComplexitySum * rhythm_overall_multiplier) / 2.0; // produces multiplier that can be applied to strain. range [1, infinity) (not really though)
+        }
+
+        /// <summary>
+        /// Returns how possible is it to doubletap this object together with the next one and get perfect judgement in range from 0 to 1
+        /// </summary>
+        private static double getDoubletapness(OsuDifficultyHitObject osuCurrObj, OsuDifficultyHitObject? osuNextObj)
+        {
+            if (osuNextObj == null)
+                return 0;
+
+            double currDeltaTime = Math.Max(1, osuCurrObj.DeltaTime);
+            double nextDeltaTime = Math.Max(1, osuNextObj.DeltaTime);
+            double deltaDifference = Math.Abs(nextDeltaTime - currDeltaTime);
+            double speedRatio = currDeltaTime / Math.Max(currDeltaTime, deltaDifference);
+            double windowRatio = Math.Pow(Math.Min(1, currDeltaTime / osuCurrObj.HitWindowGreat), 2);
+
+            return 1.0 - Math.Pow(speedRatio, 1 - windowRatio);
         }
 
         private class Island : IEquatable<Island>
