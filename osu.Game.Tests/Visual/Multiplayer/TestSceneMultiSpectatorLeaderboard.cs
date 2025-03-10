@@ -24,6 +24,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             base.SetUpSteps();
 
+            AddStep("join room", () => JoinRoom(CreateDefaultRoom()));
+            WaitForJoined();
+
             AddStep("reset", () =>
             {
                 leaderboard?.RemoveAndDisposeImmediately();

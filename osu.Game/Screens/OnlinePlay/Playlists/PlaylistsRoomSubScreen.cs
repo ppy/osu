@@ -44,7 +44,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         private IdleTracker? idleTracker { get; set; }
 
         private MatchLeaderboard leaderboard = null!;
-        private SelectionPollingComponent selectionPollingComponent = null!;
+        private PlaylistsRoomUpdater roomUpdater = null!;
         private FillFlowContainer progressSection = null!;
         private DrawableRoomPlaylist drawablePlaylist = null!;
 
@@ -64,7 +64,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             if (idleTracker != null)
                 isIdle.BindTo(idleTracker.IsIdle);
 
-            AddInternal(selectionPollingComponent = new SelectionPollingComponent(Room));
+            AddInternal(roomUpdater = new PlaylistsRoomUpdater(Room));
         }
 
         protected override void LoadComplete()
@@ -330,8 +330,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
         private void updatePollingRate()
         {
-            selectionPollingComponent.TimeBetweenPolls.Value = isIdle.Value ? 30000 : 5000;
-            Logger.Log($"Polling adjusted (selection: {selectionPollingComponent.TimeBetweenPolls.Value})");
+            roomUpdater.TimeBetweenPolls.Value = isIdle.Value ? 30000 : 5000;
+            Logger.Log($"Polling adjusted (selection: {roomUpdater.TimeBetweenPolls.Value})");
         }
 
         private void closePlaylist()
@@ -343,6 +343,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                 API.Queue(request);
             }));
         }
+
+        protected override void PartRoom() => api.Queue(new PartRoomRequest(Room));
 
         protected override Screen CreateGameplayScreen(PlaylistItem selectedItem)
         {

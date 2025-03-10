@@ -29,12 +29,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 {
     public partial class MultiplayerMatchSettingsOverlay : RoomSettingsOverlay
     {
-        public required Bindable<PlaylistItem?> SelectedItem
-        {
-            get => selectedItem;
-            set => selectedItem.Current = value;
-        }
-
         protected override OsuButton SubmitButton => settings.ApplyButton;
         protected override bool IsLoading => ongoingOperationTracker.InProgress.Value;
 
@@ -56,7 +50,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             RelativeSizeAxes = Axes.Both,
             RelativePositionAxes = Axes.Y,
             SettingsApplied = Hide,
-            SelectedItem = { BindTarget = SelectedItem }
         };
 
         protected partial class MatchSettings : CompositeDrawable
@@ -65,7 +58,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
             public override bool IsPresent => base.IsPresent || Scheduler.HasPendingTasks;
 
-            public readonly Bindable<PlaylistItem?> SelectedItem = new Bindable<PlaylistItem?>();
             public Action? SettingsApplied;
 
             public OsuTextBox NameField = null!;
@@ -85,9 +77,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
             [Resolved]
             private MultiplayerMatchSubScreen matchSubScreen { get; set; } = null!;
-
-            [Resolved]
-            private IRoomManager manager { get; set; } = null!;
 
             [Resolved]
             private MultiplayerClient client { get; set; } = null!;
@@ -279,7 +268,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                                         {
                                                             RelativeSizeAxes = Axes.X,
                                                             Height = DrawableRoomPlaylistItem.HEIGHT,
-                                                            SelectedItem = { BindTarget = SelectedItem }
                                                         },
                                                         selectBeatmapButton = new RoundedButton
                                                         {
@@ -377,8 +365,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 updateRoomMaxParticipants();
                 updateRoomAutoStartDuration();
                 updateRoomPlaylist();
-
-                drawablePlaylist.Items.BindCollectionChanged((_, __) => room.Playlist = drawablePlaylist.Items.ToArray());
             }
 
             private void onRoomPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -456,7 +442,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 if (!ApplyButton.Enabled.Value)
                     return;
 
-                hideError();
+                ErrorText.FadeOut(50);
 
                 Debug.Assert(applyingSettingsOperation == null);
                 applyingSettingsOperation = ongoingOperationTracker.BeginOperation();
@@ -475,32 +461,32 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                           .ContinueWith(t => Schedule(() =>
                           {
                               if (t.IsCompletedSuccessfully)
-                                  onSuccess(room);
+                                  onSuccess();
                               else
-                                  onError(t.Exception?.AsSingular().Message ?? "Error changing settings.");
+                                  onError(t.Exception, "Error changing settings");
                           }));
                 }
                 else
                 {
                     room.Name = NameField.Text;
+                    room.Password = PasswordTextBox.Text;
                     room.Type = TypePicker.Current.Value;
-                    room.Password = PasswordTextBox.Current.Value;
                     room.QueueMode = QueueModeDropdown.Current.Value;
                     room.AutoStartDuration = TimeSpan.FromSeconds((int)startModeDropdown.Current.Value);
                     room.AutoSkip = AutoSkipCheckbox.Current.Value;
+                    room.Playlist = drawablePlaylist.Items.ToArray();
 
-                    if (int.TryParse(MaxParticipantsField.Text, out int max))
-                        room.MaxParticipants = max;
-                    else
-                        room.MaxParticipants = null;
-
-                    manager.CreateRoom(room, onSuccess, onError);
+                    client.CreateRoom(room).ContinueWith(t => Schedule(() =>
+                    {
+                        if (t.IsCompletedSuccessfully)
+                            onSuccess();
+                        else
+                            onError(t.Exception, "Error creating room");
+                    }));
                 }
             }
 
-            private void hideError() => ErrorText.FadeOut(50);
-
-            private void onSuccess(Room room) => Schedule(() =>
+            private void onSuccess() => Schedule(() =>
             {
                 Debug.Assert(applyingSettingsOperation != null);
 
@@ -510,28 +496,31 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 applyingSettingsOperation = null;
             });
 
-            private void onError(string text) => Schedule(() =>
+            private void onError(Exception? exception, string description)
             {
-                Debug.Assert(applyingSettingsOperation != null);
+                if (exception is AggregateException aggregateException)
+                    exception = aggregateException.AsSingular();
 
-                // see https://github.com/ppy/osu-web/blob/2c97aaeb64fb4ed97c747d8383a35b30f57428c7/app/Models/Multiplayer/PlaylistItem.php#L48.
-                const string not_found_prefix = "beatmaps not found:";
+                string message = exception?.GetHubExceptionMessage() ?? $"{description} ({exception?.Message})";
 
-                if (text.StartsWith(not_found_prefix, StringComparison.Ordinal))
+                Schedule(() =>
                 {
-                    ErrorText.Text = "The selected beatmap is not available online.";
-                    SelectedItem.Value?.MarkInvalid();
-                }
-                else
-                {
-                    ErrorText.Text = text;
-                }
+                    Debug.Assert(applyingSettingsOperation != null);
 
-                ErrorText.FadeIn(50);
+                    // see https://github.com/ppy/osu-web/blob/2c97aaeb64fb4ed97c747d8383a35b30f57428c7/app/Models/Multiplayer/PlaylistItem.php#L48.
+                    const string not_found_prefix = "beatmaps not found:";
 
-                applyingSettingsOperation.Dispose();
-                applyingSettingsOperation = null;
-            });
+                    if (message.StartsWith(not_found_prefix, StringComparison.Ordinal))
+                        ErrorText.Text = "The selected beatmap is not available online.";
+                    else
+                        ErrorText.Text = message;
+
+                    ErrorText.FadeIn(50);
+
+                    applyingSettingsOperation.Dispose();
+                    applyingSettingsOperation = null;
+                });
+            }
 
             protected override void Dispose(bool isDisposing)
             {
