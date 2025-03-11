@@ -79,12 +79,12 @@ namespace osu.Game.Screens.Ranking
                             LayoutEasing = Easing.OutQuint,
                             Spacing = new Vector2(4),
                         },
-                        new ExtraTagsButton
+                        new AddTagsButton
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
                             OnTagSelected = onExtraTagSelected,
-                            ExtraTags = { BindTarget = extraTags },
+                            AvailableTags = { BindTarget = extraTags },
                         },
                     },
                 },
@@ -420,13 +420,13 @@ namespace osu.Game.Screens.Ranking
             }
         }
 
-        private partial class ExtraTagsButton : GrayButton, IHasPopover
+        private partial class AddTagsButton : GrayButton, IHasPopover
         {
-            public BindableList<UserTag> ExtraTags { get; } = new BindableList<UserTag>();
+            public BindableList<UserTag> AvailableTags { get; } = new BindableList<UserTag>();
 
             public Action<UserTag>? OnTagSelected { get; set; }
 
-            public ExtraTagsButton()
+            public AddTagsButton()
                 : base(FontAwesome.Solid.Plus)
             {
                 Size = new Vector2(30);
@@ -438,22 +438,22 @@ namespace osu.Game.Screens.Ranking
             {
                 base.LoadComplete();
 
-                ExtraTags.BindCollectionChanged((_, _) => Enabled.Value = ExtraTags.Count > 0, true);
+                AvailableTags.BindCollectionChanged((_, _) => Enabled.Value = AvailableTags.Count > 0, true);
             }
 
-            public Popover GetPopover() => new ExtraTagsPopover
+            public Popover GetPopover() => new AddTagsPopover
             {
-                ExtraTags = { BindTarget = ExtraTags },
+                AvailableTags = { BindTarget = AvailableTags },
                 OnSelected = OnTagSelected,
             };
         }
 
-        private partial class ExtraTagsPopover : OsuPopover
+        private partial class AddTagsPopover : OsuPopover
         {
             private SearchTextBox searchBox = null!;
             private SearchContainer searchContainer = null!;
 
-            public BindableList<UserTag> ExtraTags { get; } = new BindableList<UserTag>();
+            public BindableList<UserTag> AvailableTags { get; } = new BindableList<UserTag>();
 
             public Action<UserTag>? OnSelected { get; set; }
 
@@ -479,19 +479,13 @@ namespace osu.Game.Screens.Ranking
                             Direction = FillDirection.Vertical,
                             Padding = new MarginPadding { Right = 5, Top = 50, },
                             Spacing = new Vector2(10),
-                            ChildrenEnumerable = ExtraTags.Select(tag => new DrawableExtraTag(tag)
+                            ChildrenEnumerable = AvailableTags.Select(tag => new DrawableAddableTag(tag)
                             {
                                 Action = () => select(tag)
                             })
                         }
                     },
                 };
-            }
-
-            private void select(UserTag tag)
-            {
-                OnSelected?.Invoke(tag);
-                this.HidePopover();
             }
 
             protected override void LoadComplete()
@@ -503,7 +497,7 @@ namespace osu.Game.Screens.Ranking
 
             protected override bool OnKeyDown(KeyDownEvent e)
             {
-                var visibleItems = searchContainer.OfType<DrawableExtraTag>().Where(d => d.IsPresent).ToArray();
+                var visibleItems = searchContainer.OfType<DrawableAddableTag>().Where(d => d.IsPresent).ToArray();
 
                 if (e.Key == Key.Enter)
                 {
@@ -515,82 +509,68 @@ namespace osu.Game.Screens.Ranking
 
                 return base.OnKeyDown(e);
             }
-        }
 
-        private partial class DrawableExtraTag : OsuAnimatedButton, IFilterable
-        {
-            public readonly UserTag Tag;
-
-            public DrawableExtraTag(UserTag tag)
+            private void select(UserTag tag)
             {
-                Tag = tag;
-
-                RelativeSizeAxes = Axes.X;
-                AutoSizeAxes = Axes.Y;
-                Anchor = Origin = Anchor.Centre;
+                OnSelected?.Invoke(tag);
+                this.HidePopover();
             }
 
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            private partial class DrawableAddableTag : OsuAnimatedButton, IFilterable
             {
-                Content.AddRange(new Drawable[]
+                public readonly UserTag Tag;
+
+                public DrawableAddableTag(UserTag tag)
                 {
-                    new Box
+                    Tag = tag;
+
+                    RelativeSizeAxes = Axes.X;
+                    AutoSizeAxes = Axes.Y;
+                    Anchor = Origin = Anchor.Centre;
+                }
+
+                [BackgroundDependencyLoader]
+                private void load(OsuColour colours)
+                {
+                    Content.AddRange(new Drawable[]
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = colours.GreySeaFoamDark,
-                        Depth = float.MaxValue,
-                    },
-                    new FillFlowContainer
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        Direction = FillDirection.Vertical,
-                        Spacing = new Vector2(2),
-                        Padding = new MarginPadding(5),
-                        Children = new Drawable[]
+                        new Box
                         {
-                            new OsuTextFlowContainer(t => t.Font = OsuFont.Default.With(weight: FontWeight.Bold))
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = colours.GreySeaFoamDark,
+                            Depth = float.MaxValue,
+                        },
+                        new FillFlowContainer
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Direction = FillDirection.Vertical,
+                            Spacing = new Vector2(2),
+                            Padding = new MarginPadding(5),
+                            Children = new Drawable[]
                             {
-                                RelativeSizeAxes = Axes.X,
-                                AutoSizeAxes = Axes.Y,
-                                Text = Tag.Name,
-                            },
-                            new OsuTextFlowContainer(t => t.Font = OsuFont.Default.With(size: 14))
-                            {
-                                RelativeSizeAxes = Axes.X,
-                                AutoSizeAxes = Axes.Y,
-                                Text = Tag.Description,
+                                new OsuTextFlowContainer(t => t.Font = OsuFont.Default.With(weight: FontWeight.Bold))
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Text = Tag.Name,
+                                },
+                                new OsuTextFlowContainer(t => t.Font = OsuFont.Default.With(size: 14))
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Text = Tag.Description,
+                                }
                             }
                         }
-                    }
-                });
+                    });
+                }
+
+                public IEnumerable<LocalisableString> FilterTerms => [Tag.Name, Tag.Description];
+
+                public bool MatchingFilter { set => Alpha = value ? 1 : 0; }
+                public bool FilteringActive { set { } }
             }
-
-            public IEnumerable<LocalisableString> FilterTerms => [Tag.Name, Tag.Description];
-
-            public bool MatchingFilter
-            {
-                set => Alpha = value ? 1 : 0;
-            }
-
-            public bool FilteringActive { set { } }
-        }
-    }
-
-    public record UserTag
-    {
-        public long Id { get; }
-        public string Name { get; }
-        public string Description { get; set; }
-        public BindableInt VoteCount { get; } = new BindableInt();
-        public BindableBool Voted { get; } = new BindableBool();
-
-        public UserTag(APITag tag)
-        {
-            Id = tag.Id;
-            Name = tag.Name;
-            Description = tag.Description;
         }
     }
 }
