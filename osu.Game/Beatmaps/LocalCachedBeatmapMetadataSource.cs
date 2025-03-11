@@ -104,11 +104,6 @@ namespace osu.Game.Beatmaps
 
                     switch (getCacheVersion(db))
                     {
-                        case 1:
-                            // will eventually become irrelevant due to the monthly recycling of local caches
-                            // can be removed 20250221
-                            return queryCacheVersion1(db, beatmapInfo, out onlineMetadata);
-
                         case 2:
                             return queryCacheVersion2(db, beatmapInfo, out onlineMetadata);
                     }
@@ -268,42 +263,6 @@ namespace osu.Game.Beatmaps
 
                 return reader.GetInt32(0);
             }
-        }
-
-        private bool queryCacheVersion1(SqliteConnection db, BeatmapInfo beatmapInfo, out OnlineBeatmapMetadata? onlineMetadata)
-        {
-            Debug.Assert(beatmapInfo.BeatmapSet != null);
-
-            using var cmd = db.CreateCommand();
-
-            cmd.CommandText =
-                @"SELECT beatmapset_id, beatmap_id, approved, user_id, checksum, last_update FROM osu_beatmaps WHERE checksum = @MD5Hash OR filename = @Path";
-
-            cmd.Parameters.Add(new SqliteParameter(@"@MD5Hash", beatmapInfo.MD5Hash));
-            cmd.Parameters.Add(new SqliteParameter(@"@Path", beatmapInfo.Path));
-
-            using var reader = cmd.ExecuteReader();
-
-            if (reader.Read())
-            {
-                logForModel(beatmapInfo.BeatmapSet, $@"Cached local retrieval for {beatmapInfo} (cache version 1).");
-
-                onlineMetadata = new OnlineBeatmapMetadata
-                {
-                    BeatmapSetID = reader.GetInt32(0),
-                    BeatmapID = reader.GetInt32(1),
-                    BeatmapStatus = (BeatmapOnlineStatus)reader.GetByte(2),
-                    BeatmapSetStatus = (BeatmapOnlineStatus)reader.GetByte(2),
-                    AuthorID = reader.GetInt32(3),
-                    MD5Hash = reader.GetString(4),
-                    LastUpdated = reader.GetDateTimeOffset(5),
-                    // TODO: DateSubmitted and DateRanked are not provided by local cache in this version.
-                };
-                return true;
-            }
-
-            onlineMetadata = null;
-            return false;
         }
 
         private bool queryCacheVersion2(SqliteConnection db, BeatmapInfo beatmapInfo, out OnlineBeatmapMetadata? onlineMetadata)
