@@ -206,6 +206,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
                     break;
             }
 
+            updatePanelVisibilities();
             updateStatusCounts();
         }
 
