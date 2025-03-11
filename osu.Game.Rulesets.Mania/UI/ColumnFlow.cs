@@ -66,14 +66,14 @@ namespace osu.Game.Rulesets.Mania.UI
         [Resolved]
         private ISkinSource skin { get; set; } = null!;
 
-        private readonly Bindable<ManiaMobilePlayStyle> mobilePlayStyle = new Bindable<ManiaMobilePlayStyle>();
+        private readonly Bindable<ManiaMobileLayout> mobileLayout = new Bindable<ManiaMobileLayout>();
 
         [BackgroundDependencyLoader]
         private void load(ManiaRulesetConfigManager? rulesetConfig)
         {
-            rulesetConfig?.BindWith(ManiaRulesetSetting.MobilePlayStyle, mobilePlayStyle);
+            rulesetConfig?.BindWith(ManiaRulesetSetting.MobileLayout, mobileLayout);
 
-            mobilePlayStyle.BindValueChanged(_ => updateColumnSize());
+            mobileLayout.BindValueChanged(_ => updateColumnSize());
             skin.SourceChanged += updateColumnSize;
         }
 
@@ -102,7 +102,7 @@ namespace osu.Game.Rulesets.Mania.UI
         {
             float mobileAdjust = 1f;
 
-            if (mobilePlayStyle.Value == ManiaMobilePlayStyle.ExtendedColumns)
+            if (RuntimeInfo.IsMobile && mobileLayout.Value == ManiaMobileLayout.Landscape)
             {
                 // GridContainer+CellContainer containing this stage (gets split up for dual stages).
                 Vector2? containingCell = this.FindClosestParent<Stage>()?.Parent?.DrawSize;

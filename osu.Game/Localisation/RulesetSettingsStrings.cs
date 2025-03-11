@@ -90,24 +90,24 @@ namespace osu.Game.Localisation
         public static LocalisableString TouchControlScheme => new TranslatableString(getKey(@"touch_control_scheme"), @"Touch control scheme");
 
         /// <summary>
-        /// "Mobile play style"
+        /// "Mobile layout"
         /// </summary>
-        public static LocalisableString MobilePlayStyle => new TranslatableString(getKey(@"mobile_play_style"), @"Mobile play style");
+        public static LocalisableString MobileLayout => new TranslatableString(getKey(@"mobile_layout"), @"Mobile layout");
 
         /// <summary>
-        /// "Touchable columns"
+        /// "Portrait (expanded columns)"
         /// </summary>
-        public static LocalisableString TouchableColumns => new TranslatableString(getKey(@"touchable_columns"), @"Touchable columns");
+        public static LocalisableString PortraitExpandedColumns => new TranslatableString(getKey(@"portrait_expanded_columns"), @"Portrait (expanded columns)");
 
         /// <summary>
-        /// "Touch controls"
+        /// "Landscape (expanded columns)"
         /// </summary>
-        public static LocalisableString TouchControls => new TranslatableString(getKey(@"touch_controls"), @"Touch controls");
+        public static LocalisableString LandscapeExpandedColumns => new TranslatableString(getKey(@"landscape_expanded_columns"), @"Landscape (expanded columns)");
 
         /// <summary>
-        /// "Extended columns"
+        /// "Landscape (touch overlay)"
         /// </summary>
-        public static LocalisableString ExtendedColumns => new TranslatableString(getKey(@"extended_columns"), @"Extended columns");
+        public static LocalisableString LandscapeTouchOverlay => new TranslatableString(getKey(@"landscape_touch_overlay"), @"Landscape (touch overlay)");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
