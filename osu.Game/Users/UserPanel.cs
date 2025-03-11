@@ -22,6 +22,7 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Localisation;
+using osu.Game.Online.Metadata;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Screens;
 using osu.Game.Screens.Play;
@@ -75,6 +76,9 @@ namespace osu.Game.Users
 
         [Resolved]
         private MultiplayerClient? multiplayerClient { get; set; }
+
+        [Resolved]
+        private MetadataClient? metadataClient { get; set; }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -153,7 +157,7 @@ namespace osu.Game.Users
                     chatOverlay?.Show();
                 }));
 
-                if (User.IsOnline)
+                if (metadataClient?.GetPresence(User.OnlineID) != null)
                 {
                     items.Add(new OsuMenuItem(ContextMenuStrings.SpectatePlayer, MenuItemType.Standard, () =>
                     {
