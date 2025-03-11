@@ -50,9 +50,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public IEnumerable<BarLine> BarLines;
 
-        private bool playsWithTouchableColumns => Config.Get<ManiaMobileLayout>(ManiaRulesetSetting.MobileLayout) == ManiaMobileLayout.Portrait;
-
-        public override bool RequiresPortraitOrientation => Beatmap.Stages.Count == 1 && playsWithTouchableColumns;
+        public override bool RequiresPortraitOrientation => Beatmap.Stages.Count == 1 && mobileLayout.Value == ManiaMobileLayout.Portrait;
 
         protected override bool RelativeScaleBeatLengths => true;
 
@@ -60,6 +58,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         private readonly Bindable<ManiaScrollingDirection> configDirection = new Bindable<ManiaScrollingDirection>();
         private readonly BindableDouble configScrollSpeed = new BindableDouble();
+        private readonly Bindable<ManiaMobileLayout> mobileLayout = new Bindable<ManiaMobileLayout>();
 
         private double currentTimeRange;
         protected double TargetTimeRange;
@@ -114,7 +113,27 @@ namespace osu.Game.Rulesets.Mania.UI
 
             TimeRange.Value = TargetTimeRange = currentTimeRange = ComputeScrollTime(configScrollSpeed.Value);
 
-            KeyBindingInputManager.Add(new ManiaTouchInputArea(this));
+            Config.BindWith(ManiaRulesetSetting.MobileLayout, mobileLayout);
+            mobileLayout.BindValueChanged(_ => updateMobileLayout(), true);
+        }
+
+        private ManiaTouchInputArea? touchInputArea;
+
+        private void updateMobileLayout()
+        {
+            switch (mobileLayout.Value)
+            {
+                case ManiaMobileLayout.LandscapeWithOverlay:
+                    KeyBindingInputManager.Add(touchInputArea = new ManiaTouchInputArea(this));
+                    break;
+
+                default:
+                    if (touchInputArea != null)
+                        KeyBindingInputManager.Remove(touchInputArea, true);
+
+                    touchInputArea = null;
+                    break;
+            }
         }
 
         protected override void AdjustScrollSpeed(int amount) => configScrollSpeed.Value += amount;
