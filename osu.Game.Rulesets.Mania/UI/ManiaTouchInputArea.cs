@@ -46,8 +46,6 @@ namespace osu.Game.Rulesets.Mania.UI
 
         private GridContainer gridContainer = null!;
 
-        private readonly BindableBool touchControls = new BindableBool();
-
         public ManiaTouchInputArea(DrawableManiaRuleset drawableRuleset)
         {
             this.drawableRuleset = drawableRuleset;
@@ -80,7 +78,6 @@ namespace osu.Game.Rulesets.Mania.UI
                     receptorGridContent.Add(new ColumnInputReceptor
                     {
                         Action = { BindTarget = column.Action },
-                        Enabled = { BindTarget = touchControls },
                     });
                     receptorGridDimensions.Add(new Dimension());
 
@@ -97,15 +94,9 @@ namespace osu.Game.Rulesets.Mania.UI
             };
         }
 
-        private IBindable<ManiaMobileLayout> mobilePlayStyle = null!;
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
-            mobilePlayStyle = rulesetConfig.GetBindable<ManiaMobileLayout>(ManiaRulesetSetting.MobileLayout);
-            mobilePlayStyle.BindValueChanged(p => touchControls.Value = p.NewValue == ManiaMobileLayout.LandscapeWithOverlay, true);
-
             Opacity.BindValueChanged(o => Alpha = o.NewValue, true);
         }
 
@@ -118,13 +109,8 @@ namespace osu.Game.Rulesets.Mania.UI
 
         protected override bool OnTouchDown(TouchDownEvent e)
         {
-            if (touchControls.Value)
-            {
-                Show();
-                return true;
-            }
-
-            return false;
+            Show();
+            return true;
         }
 
         protected override void PopIn()
@@ -140,7 +126,6 @@ namespace osu.Game.Rulesets.Mania.UI
         public partial class ColumnInputReceptor : CompositeDrawable
         {
             public readonly IBindable<ManiaAction> Action = new Bindable<ManiaAction>();
-            public readonly IBindable<bool> Enabled = new BindableBool();
 
             private readonly Box highlightOverlay;
 
@@ -180,13 +165,8 @@ namespace osu.Game.Rulesets.Mania.UI
 
             protected override bool OnTouchDown(TouchDownEvent e)
             {
-                if (Enabled.Value)
-                {
-                    updateButton(true);
-                    return false; // handled by parent container to show overlay.
-                }
-
-                return false;
+                updateButton(true);
+                return false; // handled by parent container to show overlay.
             }
 
             protected override void OnTouchUp(TouchUpEvent e)
