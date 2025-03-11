@@ -97,14 +97,14 @@ namespace osu.Game.Rulesets.Mania.UI
             };
         }
 
-        private IBindable<ManiaMobilePlayStyle> mobilePlayStyle = null!;
+        private IBindable<ManiaMobileLayout> mobilePlayStyle = null!;
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            mobilePlayStyle = rulesetConfig.GetBindable<ManiaMobilePlayStyle>(ManiaRulesetSetting.MobilePlayStyle);
-            mobilePlayStyle.BindValueChanged(p => touchControls.Value = p.NewValue == ManiaMobilePlayStyle.TouchControls, true);
+            mobilePlayStyle = rulesetConfig.GetBindable<ManiaMobileLayout>(ManiaRulesetSetting.MobileLayout);
+            mobilePlayStyle.BindValueChanged(p => touchControls.Value = p.NewValue == ManiaMobileLayout.LandscapeWithOverlay, true);
 
             Opacity.BindValueChanged(o => Alpha = o.NewValue, true);
         }
