@@ -1,9 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
+using JetBrains.Annotations;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -59,16 +58,16 @@ namespace osu.Game.Rulesets.Mania.UI
                 columns.Add(new Container<TContent> { RelativeSizeAxes = Axes.Y });
         }
 
-        private ISkinSource currentSkin;
+        private ISkinSource currentSkin = null!;
 
-        private IBindable<ManiaMobilePlayStyle> mobilePlayStyle = null!;
+        private readonly Bindable<ManiaMobilePlayStyle> mobilePlayStyle = new Bindable<ManiaMobilePlayStyle>();
 
         [BackgroundDependencyLoader]
-        private void load(ISkinSource skin, ManiaRulesetConfigManager rulesetConfig)
+        private void load(ISkinSource skin, ManiaRulesetConfigManager? rulesetConfig)
         {
             currentSkin = skin;
 
-            mobilePlayStyle = rulesetConfig.GetBindable<ManiaMobilePlayStyle>(ManiaRulesetSetting.MobilePlayStyle);
+            rulesetConfig?.BindWith(ManiaRulesetSetting.MobilePlayStyle, mobilePlayStyle);
             mobilePlayStyle.BindValueChanged(_ => updateMobileSizing());
 
             skin.SourceChanged += onSkinChanged;
