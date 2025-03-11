@@ -16,9 +16,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     public class Speed : OsuStrainSkill
     {
         private double totalMultiplier => 1.0;
-        private double burstMultiplier => 1.8;
-        private double streamMultiplier => 0.164;
-        private double staminaMultiplier => 0.021;
+        private double burstMultiplier => 1.82;
+        private double streamMultiplier => 0.15;
+        private double staminaMultiplier => 0.03;
+        private double meanFactor => 1.2;
 
         private double currentBurstStrain;
         private double currentStreamStrain;
@@ -39,9 +40,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         protected override double CalculateInitialStrain(double time, DifficultyHitObject current)
         {
-            return currentBurstStrain * currentRhythm * strainDecayBurst(time - current.Previous(0).StartTime) +
-                   currentStreamStrain * strainDecayStream(time - current.Previous(0).StartTime) +
-                   currentStaminaStrain * strainDecayStamina(time - current.Previous(0).StartTime);
+            if (WithoutStamina)
+                return currentBurstStrain * currentRhythm * strainDecayBurst(time - current.Previous(0).StartTime);
+
+            return Math.Pow(
+                Math.Pow(currentBurstStrain * currentRhythm * strainDecayBurst(time - current.Previous(0).StartTime), meanFactor) +
+                Math.Pow(currentStreamStrain * strainDecayStream(time - current.Previous(0).StartTime), meanFactor) +
+                Math.Pow(currentStaminaStrain * strainDecayStamina(time - current.Previous(0).StartTime), meanFactor), 1.0 / meanFactor
+            );
         }
 
         protected override double StrainValueAt(DifficultyHitObject current)
@@ -50,18 +56,23 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             currentRhythm = RhythmEvaluator.EvaluateDifficultyOf(current);
             currentBurstStrain += SpeedEvaluator.EvaluateDifficultyOf(current, Mods) * burstMultiplier;
 
-            if (!WithoutStamina)
-            {
-                currentStreamStrain *= strainDecayStream(((OsuDifficultyHitObject)current).StrainTime);
-                currentStreamStrain += StaminaEvaluator.EvaluateDifficultyOf(current) * streamMultiplier;
+            if (WithoutStamina)
+                return currentBurstStrain * currentRhythm;
 
-                currentStaminaStrain *= strainDecayStamina(((OsuDifficultyHitObject)current).StrainTime);
-                currentStaminaStrain += StaminaEvaluator.EvaluateDifficultyOf(current) * staminaMultiplier;
-            }
+            currentStreamStrain *= strainDecayStream(((OsuDifficultyHitObject)current).StrainTime);
+            currentStreamStrain += StaminaEvaluator.EvaluateDifficultyOf(current) * streamMultiplier;
 
-            double combinedStrain = currentBurstStrain * currentRhythm + Math.Max(currentStreamStrain, currentStaminaStrain);
+            currentStaminaStrain *= strainDecayStamina(((OsuDifficultyHitObject)current).StrainTime);
+            currentStaminaStrain += StaminaEvaluator.EvaluateDifficultyOf(current) * staminaMultiplier;
 
-            return combinedStrain * totalMultiplier;
+            double totalValue =
+                Math.Pow(
+                    Math.Pow(currentBurstStrain * currentRhythm, meanFactor) +
+                    Math.Pow(currentStreamStrain, meanFactor) +
+                    Math.Pow(currentStaminaStrain, meanFactor), 1.0 / meanFactor
+                );
+
+            return totalValue * totalMultiplier;
         }
 
         public double RelevantNoteCount()
