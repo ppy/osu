@@ -26,7 +26,7 @@ namespace osu.Game.Screens.OnlinePlay
         {
             // Bindables are leased by the OnlinePlayScreen, but pulled locally in order to not rely on screen load timings.
             // They will all be initially enabled while there is no screen in this stack.
-            dependencies = new OsuScreenDependencies(true, parent)
+            dependencies = new OsuScreenDependencies(true, base.CreateChildDependencies(parent))
             {
                 Beatmap = { Disabled = false },
                 Ruleset = { Disabled = false },
