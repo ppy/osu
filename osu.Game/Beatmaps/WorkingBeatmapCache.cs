@@ -21,7 +21,6 @@ using osu.Framework.Statistics;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Database;
 using osu.Game.IO;
-using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Skinning;
 using osu.Game.Storyboards;
 
@@ -168,10 +167,7 @@ namespace osu.Game.Beatmaps
 
                         beatmap.BeatmapInfo.MD5Hash = streamMD5;
                         beatmap.BeatmapInfo.Hash = streamSHA2;
-                        beatmap.BeatmapInfo.Length = beatmap.CalculatePlayableLength();
-                        beatmap.BeatmapInfo.BPM = 60000 / beatmap.GetMostCommonBeatLength();
-                        beatmap.BeatmapInfo.EndTimeObjectCount = beatmap.HitObjects.Count(h => h is IHasDuration);
-                        beatmap.BeatmapInfo.TotalObjectCount = beatmap.HitObjects.Count;
+                        beatmap.BeatmapInfo.UpdateStatisticsFromBeatmap(beatmap);
 
                         return beatmap;
                     }
