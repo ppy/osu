@@ -260,7 +260,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
 
             foreach (var user in apiFriends)
             {
-                if (friendPresences.TryGetValue(user.TargetID, out _))
+                if (friendPresences.ContainsKey(user.TargetID))
                     countOnline++;
                 else
                     countOffline++;
