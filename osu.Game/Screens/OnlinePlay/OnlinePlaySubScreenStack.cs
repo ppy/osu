@@ -17,14 +17,14 @@ namespace osu.Game.Screens.OnlinePlay
     {
         private OsuScreenDependencies dependencies = null!;
 
-        // Note - these are required to be unbound on disposal.
+        // Note - these bindables must be stored to fields of this component to be correctly unbound on disposal.
         private Bindable<WorkingBeatmap> beatmap = null!;
         private Bindable<RulesetInfo> ruleset = null!;
         private Bindable<IReadOnlyList<Mod>> mods = null!;
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
-            // Bindables are leased by the OnlinePlayScreen, but pulled locally in order ot not rely on screen load timings.
+            // Bindables are leased by the OnlinePlayScreen, but pulled locally in order to not rely on screen load timings.
             // They will all be initially enabled while there is no screen in this stack.
             dependencies = new OsuScreenDependencies(true, parent)
             {
