@@ -476,7 +476,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             HitObject.SnapTo(distanceSnapProvider);
 
             // If there are 0 or 1 remaining control points, or the slider has an invalid length, it is in a degenerate form and should be deleted
-            if (controlPoints.Count <= 1 || !HitObject.Path.HasValidLength)
+            if (controlPoints.Count <= 1 || !HitObject.Path.HasValidLengthForPlacement)
             {
                 placementHandler?.Delete(HitObject);
                 return;
