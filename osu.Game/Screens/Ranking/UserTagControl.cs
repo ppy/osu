@@ -467,6 +467,7 @@ namespace osu.Game.Screens.Ranking
                     {
                         searchBox = new SearchTextBox
                         {
+                            HoldFocus = true,
                             RelativeSizeAxes = Axes.X,
                         },
                         searchContainer = new SearchContainer
