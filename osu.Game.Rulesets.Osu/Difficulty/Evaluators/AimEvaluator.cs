@@ -185,17 +185,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 velocityChangeBonus *= Math.Pow(Math.Min(osuCurrObj.StrainTime, osuLastObj.StrainTime) / Math.Max(osuCurrObj.StrainTime, osuLastObj.StrainTime), 2);
 
                 var osuLast2Obj = (OsuDifficultyHitObject)current.Previous(2);
+                double prev1Distance = osuLast1Obj.LazyJumpDistance;
+                double prev2Distance = (osuLast2Obj?.LazyJumpDistance ?? 0);
 
-                // Decrease buff on cutstreams for the same reason as in flow aim
-                // Add radius to account for distance being very small
-                double prev1Distance = osuLast1Obj.LazyJumpDistance + radius;
-                double prev2Distance = (osuLast2Obj?.LazyJumpDistance ?? 0) + radius;
+                // If previously there was slow flow pattern - sudden velocity change is much easier because you could flow faster to give yourself more time
+                // Add radius to account for distance potenitally being very small
+                double distanceSimilarityFactor = DifficultyCalculationUtils.ReverseLerp(prev1Distance + radius, (prev2Distance + radius) * 0.8, (prev2Distance + radius) * 0.95);
+                double distanceFactor = 0.5 + 0.5 * DifficultyCalculationUtils.ReverseLerp(Math.Max(prev1Distance, prev2Distance), diameter * 1.5, diameter * 0.75);
 
-                double velocitySimilarityFactor = DifficultyCalculationUtils.SmoothstepTwoDirectional(prev1Distance, prev2Distance, 0.8, 0.95);
-
+                // We don't nerf more snappy patterns with this as
                 double angleFactor = DifficultyCalculationUtils.Smoothstep(Math.Max(osuLast1Obj?.Angle ?? 0, osuLast2Obj?.Angle ?? 0), Math.PI * 0.55, Math.PI * 0.75);
 
-                velocityChangeBonus *= 1 - velocitySimilarityFactor * angleFactor;
+                velocityChangeBonus *= 1 - distanceSimilarityFactor * distanceFactor * angleFactor;
 
                 // Decrease buff large jumps leading into very small jumps to compensate the fact that smaller jumps are buffed by minimal jump distance
                 double doublesNerf = DifficultyCalculationUtils.ReverseLerp(osuCurrObj.LazyJumpDistance, diameter, diameter * 3) * DifficultyCalculationUtils.ReverseLerp(osuLastObj.LazyJumpDistance, diameter, radius);

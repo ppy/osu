@@ -239,10 +239,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double prev1Distance = osuLast1Obj.LazyJumpDistance;
             double prev2Distance = osuLast2Obj?.LazyJumpDistance ?? 0;
 
-            // Decrease buff if distance is small and angle is not changing previously, as it's easier to follow angle change in this way
+            // If previously there was slow flow pattern - sudden velocity change is much easier because you could flow faster to give yourself more time
             // Add radius to account for distance potenitally being very small
-            double distanceSimilarityFactor = DifficultyCalculationUtils.ReverseLerpTwoDirectional(prev1Distance + radius, prev2Distance + radius, 0.8, 0.95);
+            double distanceSimilarityFactor = DifficultyCalculationUtils.ReverseLerp(prev1Distance + radius, (prev2Distance + radius) * 0.8, (prev2Distance + radius) * 0.95);
             double distanceFactor = 0.5 + 0.5 * DifficultyCalculationUtils.ReverseLerp(Math.Max(prev1Distance, prev2Distance), diameter * 1.5, diameter * 0.75);
+            // There also should be smth like angleFactor, because if it has aim-control difficulty - you can't really speed-up flow aim that easily
+
             deltaVelocity *= 1 - 0.65 * distanceSimilarityFactor * distanceFactor;
 
             // Decrease buff on doubles that go back and forth, because in this case angle change bonuses account for all added difficulty
