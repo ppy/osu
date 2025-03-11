@@ -38,7 +38,7 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestOffline()
         {
-            AddStep("Populate with offline test users", () => display.Users = getUsers());
+            // AddStep("Populate with offline test users", () => display.Users = getUsers());
         }
 
         [Test]

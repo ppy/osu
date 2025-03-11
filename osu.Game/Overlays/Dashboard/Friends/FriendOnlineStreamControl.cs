@@ -1,30 +1,43 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
-using System.Collections.Generic;
-using System.Linq;
-using osu.Game.Online.API.Requests.Responses;
+using System;
+using osu.Framework.Bindables;
 
 namespace osu.Game.Overlays.Dashboard.Friends
 {
-    public partial class FriendOnlineStreamControl : OverlayStreamControl<FriendStream>
+    public partial class FriendOnlineStreamControl : OverlayStreamControl<OnlineStatus>
     {
-        protected override OverlayStreamItem<FriendStream> CreateStreamItem(FriendStream value) => new FriendsOnlineStatusItem(value);
+        public readonly BindableInt CountAll = new BindableInt();
+        public readonly BindableInt CountOnline = new BindableInt();
+        public readonly BindableInt CountOffline = new BindableInt();
 
-        public void Populate(List<APIUser> users)
+        public FriendOnlineStreamControl()
         {
-            Clear();
+            Items =
+            [
+                OnlineStatus.All,
+                OnlineStatus.Online,
+                OnlineStatus.Offline
+            ];
+        }
 
-            int userCount = users.Count;
-            int onlineUsersCount = users.Count(user => user.IsOnline);
+        protected override OverlayStreamItem<OnlineStatus> CreateStreamItem(OnlineStatus value)
+        {
+            switch (value)
+            {
+                case OnlineStatus.All:
+                    return new FriendsOnlineStatusItem(value) { UserCount = { BindTarget = CountAll } };
 
-            AddItem(new FriendStream(OnlineStatus.All, userCount));
-            AddItem(new FriendStream(OnlineStatus.Online, onlineUsersCount));
-            AddItem(new FriendStream(OnlineStatus.Offline, userCount - onlineUsersCount));
+                case OnlineStatus.Online:
+                    return new FriendsOnlineStatusItem(value) { UserCount = { BindTarget = CountOnline } };
 
-            Current.Value = Items.FirstOrDefault();
+                case OnlineStatus.Offline:
+                    return new FriendsOnlineStatusItem(value) { UserCount = { BindTarget = CountOffline } };
+
+                default:
+                    throw new ArgumentException(nameof(value));
+            }
         }
     }
 }
