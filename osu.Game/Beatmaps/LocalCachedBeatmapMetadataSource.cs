@@ -276,7 +276,7 @@ namespace osu.Game.Beatmaps
                 SELECT `b`.`beatmapset_id`, `b`.`beatmap_id`, `b`.`approved`, `b`.`user_id`, `b`.`checksum`, `b`.`last_update`, `s`.`submit_date`, `s`.`approved_date`
                 FROM `osu_beatmaps` AS `b`
                 JOIN `osu_beatmapsets` AS `s` ON `s`.`beatmapset_id` = `b`.`beatmapset_id`
-                WHERE `b`.`checksum` = @MD5Hash OR `b`.`filename` = @Path
+                WHERE (`b`.`checksum` = @MD5Hash OR `b`.`filename` = @Path)
                 AND `b`.`approved` in (1, 2, 4)
                 """;
             // approved conditional can theoretically be removed as it was fixed in
