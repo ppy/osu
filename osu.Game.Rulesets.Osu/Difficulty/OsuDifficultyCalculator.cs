@@ -154,6 +154,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 skills.Add(new Flashlight(mods));
 
             skills.Add(new Stamina(mods));
+            skills.Add(new StreamStamina(mods));
 
             return skills.ToArray();
         }

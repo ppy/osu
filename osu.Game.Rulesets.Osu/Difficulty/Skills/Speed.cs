@@ -16,10 +16,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     public class Speed : OsuStrainSkill
     {
         private double totalMultiplier => 1.0;
-        private double burstMultiplier => 1.925;
-        private double staminaMultiplier => 0.025;
+        private double burstMultiplier => 1.8;
+        private double streamMultiplier => 0.164;
+        private double staminaMultiplier => 0.021;
 
         private double currentBurstStrain;
+        private double currentStreamStrain;
         private double currentStaminaStrain;
         private double currentRhythm;
 
@@ -32,11 +34,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         }
 
         private double strainDecayBurst(double ms) => Math.Pow(0.15, ms / 1000);
+        private double strainDecayStream(double ms) => Math.Pow(0.4, ms / 1000);
         private double strainDecayStamina(double ms) => Math.Pow(0.1, Math.Pow(ms / 1000, 2.6));
 
         protected override double CalculateInitialStrain(double time, DifficultyHitObject current)
         {
             return currentBurstStrain * currentRhythm * strainDecayBurst(time - current.Previous(0).StartTime) +
+                   currentStreamStrain * strainDecayStream(time - current.Previous(0).StartTime) +
                    currentStaminaStrain * strainDecayStamina(time - current.Previous(0).StartTime);
         }
 
@@ -48,11 +52,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             if (!WithoutStamina)
             {
+                currentStreamStrain *= strainDecayStream(((OsuDifficultyHitObject)current).StrainTime);
+                currentStreamStrain += StaminaEvaluator.EvaluateDifficultyOf(current) * streamMultiplier;
+
                 currentStaminaStrain *= strainDecayStamina(((OsuDifficultyHitObject)current).StrainTime);
                 currentStaminaStrain += StaminaEvaluator.EvaluateDifficultyOf(current) * staminaMultiplier;
             }
 
-            double combinedStrain = currentBurstStrain * currentRhythm + currentStaminaStrain;
+            double combinedStrain = currentBurstStrain * currentRhythm + Math.Max(currentStreamStrain, currentStaminaStrain);
 
             return combinedStrain * totalMultiplier;
         }
