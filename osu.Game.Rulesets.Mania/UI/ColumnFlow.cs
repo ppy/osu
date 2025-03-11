@@ -2,10 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using JetBrains.Annotations;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Mania.Beatmaps;
@@ -58,15 +58,14 @@ namespace osu.Game.Rulesets.Mania.UI
                 columns.Add(new Container<TContent> { RelativeSizeAxes = Axes.Y });
         }
 
-        private ISkinSource currentSkin = null!;
+        [Resolved]
+        private ISkinSource skin { get; set; } = null!;
 
         private readonly Bindable<ManiaMobilePlayStyle> mobilePlayStyle = new Bindable<ManiaMobilePlayStyle>();
 
         [BackgroundDependencyLoader]
-        private void load(ISkinSource skin, ManiaRulesetConfigManager? rulesetConfig)
+        private void load(ManiaRulesetConfigManager? rulesetConfig)
         {
-            currentSkin = skin;
-
             rulesetConfig?.BindWith(ManiaRulesetSetting.MobilePlayStyle, mobilePlayStyle);
             mobilePlayStyle.BindValueChanged(_ => updateMobileSizing());
 
@@ -86,16 +85,16 @@ namespace osu.Game.Rulesets.Mania.UI
             {
                 if (i > 0)
                 {
-                    float spacing = currentSkin.GetConfig<ManiaSkinConfigurationLookup, float>(
-                                                   new ManiaSkinConfigurationLookup(LegacyManiaSkinConfigurationLookups.ColumnSpacing, i - 1))
-                                               ?.Value ?? Stage.COLUMN_SPACING;
+                    float spacing = skin.GetConfig<ManiaSkinConfigurationLookup, float>(
+                                            new ManiaSkinConfigurationLookup(LegacyManiaSkinConfigurationLookups.ColumnSpacing, i - 1))
+                                        ?.Value ?? Stage.COLUMN_SPACING;
 
                     columns[i].Margin = new MarginPadding { Left = spacing };
                 }
 
-                float? width = currentSkin.GetConfig<ManiaSkinConfigurationLookup, float>(
-                                              new ManiaSkinConfigurationLookup(LegacyManiaSkinConfigurationLookups.ColumnWidth, i))
-                                          ?.Value;
+                float? width = skin.GetConfig<ManiaSkinConfigurationLookup, float>(
+                                       new ManiaSkinConfigurationLookup(LegacyManiaSkinConfigurationLookups.ColumnWidth, i))
+                                   ?.Value;
 
                 bool isSpecialColumn = stageDefinition.IsSpecialColumn(i);
 
@@ -146,8 +145,8 @@ namespace osu.Game.Rulesets.Mania.UI
         {
             base.Dispose(isDisposing);
 
-            if (currentSkin != null)
-                currentSkin.SourceChanged -= onSkinChanged;
+            if (skin.IsNotNull())
+                skin.SourceChanged -= onSkinChanged;
         }
     }
 }
