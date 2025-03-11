@@ -8,6 +8,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Layout;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Configuration;
 using osu.Game.Rulesets.Mania.Skinning;
@@ -38,6 +39,8 @@ namespace osu.Game.Rulesets.Mania.UI
             set => base.Masking = value;
         }
 
+        private readonly LayoutValue columnSizeLayout = new LayoutValue(Invalidation.DrawSize);
+
         public ColumnFlow(StageDefinition stageDefinition)
         {
             this.stageDefinition = stageDefinition;
@@ -56,6 +59,8 @@ namespace osu.Game.Rulesets.Mania.UI
 
             for (int i = 0; i < stageDefinition.Columns; i++)
                 columns.Add(new Container<TContent> { RelativeSizeAxes = Axes.Y });
+
+            AddLayout(columnSizeLayout);
         }
 
         [Resolved]
@@ -67,20 +72,54 @@ namespace osu.Game.Rulesets.Mania.UI
         private void load(ManiaRulesetConfigManager? rulesetConfig)
         {
             rulesetConfig?.BindWith(ManiaRulesetSetting.MobilePlayStyle, mobilePlayStyle);
-            mobilePlayStyle.BindValueChanged(_ => updateMobileSizing());
 
-            skin.SourceChanged += onSkinChanged;
-            onSkinChanged();
+            mobilePlayStyle.BindValueChanged(_ => updateColumnSize());
+            skin.SourceChanged += updateColumnSize;
         }
 
-        protected override void LoadComplete()
+        protected override void Update()
         {
-            base.LoadComplete();
-            updateMobileSizing();
+            base.Update();
+
+            if (!columnSizeLayout.IsValid)
+            {
+                updateColumnSize();
+                columnSizeLayout.Validate();
+            }
         }
 
-        private void onSkinChanged()
+        /// <summary>
+        /// Sets the content of one of the columns of this <see cref="ColumnFlow{TContent}"/>.
+        /// </summary>
+        /// <param name="column">The index of the column to set the content of.</param>
+        /// <param name="content">The content.</param>
+        public void SetContentForColumn(int column, TContent content)
         {
+            Content[column] = columns[column].Child = content;
+        }
+
+        private void updateColumnSize()
+        {
+            float mobileAdjust = 1f;
+
+            if (mobilePlayStyle.Value == ManiaMobilePlayStyle.ExtendedColumns)
+            {
+                // GridContainer+CellContainer containing this stage (gets split up for dual stages).
+                Vector2? containingCell = this.FindClosestParent<Stage>()?.Parent?.DrawSize;
+
+                // Will be null in tests.
+                if (containingCell != null && containingCell.Value.X >= containingCell.Value.Y)
+                {
+                    float aspectRatio = containingCell.Value.X / containingCell.Value.Y;
+
+                    // 2.83 is a mostly arbitrary scale-up (170 / 60, based on original implementation for argon)
+                    mobileAdjust = 2.83f * Math.Min(1, 7f / stageDefinition.Columns);
+                    // 1.92 is a "reference" mobile screen aspect ratio for phones.
+                    // We should scale it back for cases like tablets which aren't so extreme.
+                    mobileAdjust *= aspectRatio / 1.92f;
+                }
+            }
+
             for (int i = 0; i < stageDefinition.Columns; i++)
             {
                 if (i > 0)
@@ -101,44 +140,8 @@ namespace osu.Game.Rulesets.Mania.UI
                 // only used by default skin (legacy skins get defaults set in LegacyManiaSkinConfiguration)
                 width ??= isSpecialColumn ? Column.SPECIAL_COLUMN_WIDTH : Column.COLUMN_WIDTH;
 
-                columns[i].Width = width.Value;
+                columns[i].Width = width.Value * mobileAdjust;
             }
-
-            updateMobileSizing();
-        }
-
-        /// <summary>
-        /// Sets the content of one of the columns of this <see cref="ColumnFlow{TContent}"/>.
-        /// </summary>
-        /// <param name="column">The index of the column to set the content of.</param>
-        /// <param name="content">The content.</param>
-        public void SetContentForColumn(int column, TContent content)
-        {
-            Content[column] = columns[column].Child = content;
-        }
-
-        private void updateMobileSizing()
-        {
-            if (!IsLoaded || !RuntimeInfo.IsMobile || mobilePlayStyle.Value != ManiaMobilePlayStyle.ExtendedColumns)
-                return;
-
-            // GridContainer+CellContainer containing this stage (gets split up for dual stages).
-            Vector2? containingCell = this.FindClosestParent<Stage>()?.Parent?.DrawSize;
-
-            // Will be null in tests.
-            if (containingCell == null || containingCell.Value.X < containingCell.Value.Y)
-                return;
-
-            float aspectRatio = containingCell.Value.X / containingCell.Value.Y;
-
-            // 2.83 is a mostly arbitrary scale-up (170 / 60, based on original implementation for argon)
-            float mobileAdjust = 2.83f * Math.Min(1, 7f / stageDefinition.Columns);
-            // 1.92 is a "reference" mobile screen aspect ratio for phones.
-            // We should scale it back for cases like tablets which aren't so extreme.
-            mobileAdjust *= aspectRatio / 1.92f;
-
-            for (int i = 0; i < stageDefinition.Columns; i++)
-                columns[i].Width *= mobileAdjust;
         }
 
         protected override void Dispose(bool isDisposing)
@@ -146,7 +149,7 @@ namespace osu.Game.Rulesets.Mania.UI
             base.Dispose(isDisposing);
 
             if (skin.IsNotNull())
-                skin.SourceChanged -= onSkinChanged;
+                skin.SourceChanged -= updateColumnSize;
         }
     }
 }
