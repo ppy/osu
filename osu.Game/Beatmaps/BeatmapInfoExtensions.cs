@@ -1,15 +1,28 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using osu.Framework.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Screens.Select;
 
 namespace osu.Game.Beatmaps
 {
     public static class BeatmapInfoExtensions
     {
+        /// <summary>
+        /// Given an <see cref="IBeatmap"/>, update length, BPM and object counts.
+        /// </summary>
+        public static void UpdateStatisticsFromBeatmap(this BeatmapInfo beatmapInfo, IBeatmap beatmap)
+        {
+            beatmapInfo.Length = beatmap.CalculatePlayableLength();
+            beatmapInfo.BPM = 60000 / beatmap.GetMostCommonBeatLength();
+            beatmapInfo.EndTimeObjectCount = beatmap.HitObjects.Count(h => h is IHasDuration);
+            beatmapInfo.TotalObjectCount = beatmap.HitObjects.Count;
+        }
+
         /// <summary>
         /// A user-presentable display title representing this beatmap.
         /// </summary>
