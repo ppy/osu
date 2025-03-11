@@ -215,10 +215,10 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                             Current = sizeY,
                             CanBeShown = { BindTarget = enabled }
                         },
-                        new SettingsSlider<float>
+                        new SettingsPercentageSlider<float>
                         {
                             TransferValueOnCommit = true,
-                            LabelText = "Tip Threshold",
+                            LabelText = TabletSettingsStrings.TipPressureForClick,
                             Current = pressureThreshold,
                             CanBeShown = { BindTarget = enabled }
                         },
