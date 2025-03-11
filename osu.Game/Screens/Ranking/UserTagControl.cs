@@ -17,6 +17,7 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
@@ -30,6 +31,7 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Screens.Ranking
 {
@@ -479,15 +481,17 @@ namespace osu.Game.Screens.Ranking
                             Spacing = new Vector2(10),
                             ChildrenEnumerable = ExtraTags.Select(tag => new DrawableExtraTag(tag)
                             {
-                                Action = () =>
-                                {
-                                    OnSelected?.Invoke(tag);
-                                    this.HidePopover();
-                                }
+                                Action = () => select(tag)
                             })
                         }
                     },
                 };
+            }
+
+            private void select(UserTag tag)
+            {
+                OnSelected?.Invoke(tag);
+                this.HidePopover();
             }
 
             protected override void LoadComplete()
@@ -496,15 +500,30 @@ namespace osu.Game.Screens.Ranking
 
                 searchBox.Current.BindValueChanged(_ => searchContainer.SearchTerm = searchBox.Current.Value, true);
             }
+
+            protected override bool OnKeyDown(KeyDownEvent e)
+            {
+                var visibleItems = searchContainer.OfType<DrawableExtraTag>().Where(d => d.IsPresent).ToArray();
+
+                if (e.Key == Key.Enter)
+                {
+                    if (visibleItems.Length == 1)
+                        select(visibleItems.Single().Tag);
+
+                    return true;
+                }
+
+                return base.OnKeyDown(e);
+            }
         }
 
         private partial class DrawableExtraTag : OsuAnimatedButton, IFilterable
         {
-            private readonly UserTag tag;
+            public readonly UserTag Tag;
 
             public DrawableExtraTag(UserTag tag)
             {
-                this.tag = tag;
+                Tag = tag;
 
                 RelativeSizeAxes = Axes.X;
                 AutoSizeAxes = Axes.Y;
@@ -535,20 +554,20 @@ namespace osu.Game.Screens.Ranking
                             {
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
-                                Text = tag.Name,
+                                Text = Tag.Name,
                             },
                             new OsuTextFlowContainer(t => t.Font = OsuFont.Default.With(size: 14))
                             {
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
-                                Text = tag.Description,
+                                Text = Tag.Description,
                             }
                         }
                     }
                 });
             }
 
-            public IEnumerable<LocalisableString> FilterTerms => [tag.Name, tag.Description];
+            public IEnumerable<LocalisableString> FilterTerms => [Tag.Name, Tag.Description];
 
             public bool MatchingFilter
             {
