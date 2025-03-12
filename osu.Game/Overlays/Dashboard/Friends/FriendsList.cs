@@ -47,7 +47,6 @@ namespace osu.Game.Overlays.Dashboard.Friends
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
-                Padding = new MarginPadding { Horizontal = WaveOverlayContainer.HORIZONTAL_PADDING },
                 Spacing = new Vector2(style == OverlayPanelDisplayStyle.Card ? 10 : 2),
                 SortCriteria = { BindTarget = SortCriteria },
                 ChildrenEnumerable = friends.Select(createUserPanel)
