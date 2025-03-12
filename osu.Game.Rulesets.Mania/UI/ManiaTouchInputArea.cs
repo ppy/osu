@@ -9,7 +9,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Configuration;
-using osu.Game.Rulesets.Mania.Configuration;
 using osuTK;
 
 namespace osu.Game.Rulesets.Mania.UI
@@ -40,9 +39,6 @@ namespace osu.Game.Rulesets.Mania.UI
             MinValue = 0,
             MaxValue = 1
         };
-
-        [Resolved]
-        private ManiaRulesetConfigManager rulesetConfig { get; set; } = null!;
 
         private GridContainer gridContainer = null!;
 
