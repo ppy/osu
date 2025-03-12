@@ -32,7 +32,7 @@ namespace osu.Game.Screens.Ranking.Statistics
 
         /// <summary>
         /// The score which was achieved by the local user.
-        /// If this is set to a non-null score, an <see cref="OverallRanking"/> component will be displayed showing changes to the local user's ranking & statistics
+        /// If this is set to a non-null score, an <see cref="OverallRanking"/> component will be displayed showing changes to the local user's ranking and statistics
         /// when a statistics update related to this score is received from spectator server.
         /// </summary>
         public ScoreInfo? AchievedScore { get; init; }
