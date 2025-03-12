@@ -165,7 +165,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
             apiFriends.BindTo(api.Friends);
             apiFriends.BindCollectionChanged((_, _) => reloadList());
 
-            userListToolbar.DisplayStyle.BindValueChanged(_ => reloadList());
+            userListToolbar.DisplayStyle.BindValueChanged(_ => reloadList(), true);
         }
 
         private void reloadList()

@@ -180,6 +180,46 @@ namespace osu.Game.Tests.Visual.Online
             }
         }
 
+        [Test]
+        public void TestLoadFriendsBeforeDisplay()
+        {
+            AddStep("set friends", () =>
+            {
+                DummyAPIAccess api = (DummyAPIAccess)API;
+                api.Friends.Clear();
+                api.Friends.AddRange(getUsers().Select(u => new APIRelation
+                {
+                    RelationType = RelationType.Friend,
+                    TargetID = u.OnlineID,
+                    TargetUser = u
+                }));
+            });
+
+            AddStep("load new display", () =>
+            {
+                Child = new DependencyProvidingContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    CachedDependencies =
+                    [
+                        (typeof(MetadataClient), metadataClient = new TestMetadataClient())
+                    ],
+                    Children = new Drawable[]
+                    {
+                        metadataClient,
+                        new BasicScrollContainer
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Child = new FriendDisplay()
+                        }
+                    }
+                };
+            });
+
+            AddUntilStep("wait for friends to load", () => this.ChildrenOfType<FriendsList>().LastOrDefault()?.IsLoaded == true);
+            AddAssert("3 panels in list", () => this.ChildrenOfType<FriendsList>().Last().ChildrenOfType<UserPanel>().Count(), () => Is.EqualTo(3));
+        }
+
         private List<APIUser> getUsers() => new List<APIUser>
         {
             new APIUser

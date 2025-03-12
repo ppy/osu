@@ -59,7 +59,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
             base.LoadComplete();
 
             friendPresences.BindTo(metadataClient.FriendPresences);
-            friendPresences.BindCollectionChanged(onFriendPresencesChanged, true);
+            friendPresences.BindCollectionChanged(onFriendPresencesChanged);
 
             SearchText.BindValueChanged(onSearchTextChanged, true);
             OnlineStream.BindValueChanged(onFriendsStreamChanged, true);
