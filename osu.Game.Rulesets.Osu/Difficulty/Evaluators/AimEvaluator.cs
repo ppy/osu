@@ -67,26 +67,29 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double result = currDistance < snapThreshold ? snapThreshold * 0.65 + currDistance * 0.35 : currDistance;
 
                 // Don't buff doubles jumps as you don't snap in this case (except very close to itself doubles, that need to have some distance bonus to be calculated as flow)
-                double doublesFactor = DifficultyCalculationUtils.ReverseLerp(currDistance, radius * 2, radius);
+                double lowSpacingFactor = DifficultyCalculationUtils.ReverseLerp(currDistance, radius * 2, radius);
                 double timeFactor = DifficultyCalculationUtils.ReverseLerpTwoDirectional(osuCurrObj.StrainTime, osuLastObj.StrainTime, 0.75, 0.95);
 
                 // Make nerf much smaller if it's not doubles and time is different
-                double notOverlappingAdjust = diameter * 2 * (1 - doublesFactor) * (2 - timeFactor);
+                double notOverlappingAdjust = diameter * 2 * (1 - lowSpacingFactor) * (2 - timeFactor);
 
                 // Don't increase snap distance when previous jump is very big, as it leads to cheese being overrewarded
-                double bigDistanceDifferenceFactor = 1 - DifficultyCalculationUtils.ReverseLerp(osuLastObj.LazyJumpDistance, notOverlappingAdjust + diameter, notOverlappingAdjust + diameter * 2);
+                double bigDistanceDifferenceFactor = DifficultyCalculationUtils.ReverseLerp(osuLastObj.LazyJumpDistance, notOverlappingAdjust + diameter, notOverlappingAdjust + diameter * 2);
 
-                // Reduce bonus on different rhythm that can be cheesed
-                double rhythmDifferenceFactor = Math.Pow(Math.Min(osuCurrObj.StrainTime, osuLastObj.StrainTime) / Math.Max(osuCurrObj.StrainTime, osuLastObj.StrainTime), 2.5);
+                // And don't nerf spaced bursts, we want them to be buffed to be assumed to be flow-aimed
+                bigDistanceDifferenceFactor *= 1 - (1 - lowSpacingFactor) * (1 - DifficultyCalculationUtils.ReverseLerpTwoDirectional(osuCurrObj.StrainTime, osuLastObj.StrainTime, 1.95, 1.5));
 
-                // Ignore very small rhythm difference
-                rhythmDifferenceFactor = Math.Min(1, rhythmDifferenceFactor * 1.1);
+                //// Reduce bonus on different rhythm that can be cheesed
+                //double rhythmDifferenceFactor = Math.Pow(Math.Min(osuCurrObj.StrainTime, osuLastObj.StrainTime) / Math.Max(osuCurrObj.StrainTime, osuLastObj.StrainTime), 2.5);
 
-                // When distance is high - angle is still relevant. We wan't to nerf very slow stuff before snap so angle becomes irrelevant
-                rhythmDifferenceFactor = 1 - (1 - rhythmDifferenceFactor) * DifficultyCalculationUtils.Smoothstep(osuLastObj.LazyJumpDistance * osuCurrObj.StrainTime / osuLastObj.StrainTime, diameter * 2, diameter);
+                //// Ignore very small rhythm difference
+                //rhythmDifferenceFactor = Math.Min(1, rhythmDifferenceFactor * 1.1);
+
+                //// When distance is high - angle is still relevant. We wan't to nerf very slow stuff before snap so angle becomes irrelevant
+                //rhythmDifferenceFactor = 1 - (1 - rhythmDifferenceFactor) * DifficultyCalculationUtils.Smoothstep(osuLastObj.LazyJumpDistance * osuCurrObj.StrainTime / osuLastObj.StrainTime, diameter * 2, diameter);
 
                 double totalBonus = result + angleSnapDifficultyBonus - currDistance;
-                return currDistance + totalBonus * bigDistanceDifferenceFactor;
+                return currDistance + totalBonus * (1 - bigDistanceDifferenceFactor);
             }
 
             // Calculate the velocity to the current hitobject, which starts with a base distance / time assuming the last object is a hitcircle.
