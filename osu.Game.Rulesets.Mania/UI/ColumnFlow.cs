@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Mania.UI
             set => base.Masking = value;
         }
 
-        private readonly LayoutValue columnSizeLayout = new LayoutValue(Invalidation.DrawSize);
+        private readonly LayoutValue layout = new LayoutValue(Invalidation.DrawSize);
 
         public ColumnFlow(StageDefinition stageDefinition)
         {
@@ -60,7 +60,7 @@ namespace osu.Game.Rulesets.Mania.UI
             for (int i = 0; i < stageDefinition.Columns; i++)
                 columns.Add(new Container<TContent> { RelativeSizeAxes = Axes.Y });
 
-            AddLayout(columnSizeLayout);
+            AddLayout(layout);
         }
 
         [Resolved]
@@ -73,18 +73,18 @@ namespace osu.Game.Rulesets.Mania.UI
         {
             rulesetConfig?.BindWith(ManiaRulesetSetting.MobileLayout, mobileLayout);
 
-            mobileLayout.BindValueChanged(_ => updateColumnSize());
-            skin.SourceChanged += updateColumnSize;
+            mobileLayout.BindValueChanged(_ => invalidateLayout());
+            skin.SourceChanged += invalidateLayout;
         }
 
         protected override void Update()
         {
             base.Update();
 
-            if (!columnSizeLayout.IsValid)
+            if (!layout.IsValid)
             {
                 updateColumnSize();
-                columnSizeLayout.Validate();
+                layout.Validate();
             }
         }
 
@@ -97,6 +97,8 @@ namespace osu.Game.Rulesets.Mania.UI
         {
             Content[column] = columns[column].Child = content;
         }
+
+        private void invalidateLayout() => layout.Invalidate();
 
         private void updateColumnSize()
         {
@@ -149,7 +151,7 @@ namespace osu.Game.Rulesets.Mania.UI
             base.Dispose(isDisposing);
 
             if (skin.IsNotNull())
-                skin.SourceChanged -= updateColumnSize;
+                skin.SourceChanged -= invalidateLayout;
         }
     }
 }
