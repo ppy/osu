@@ -26,7 +26,9 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
 
         private float? lastPlayerPosition;
         private float lastDistanceMoved;
+        private float lastExactDistanceMoved;
         private double lastStrainTime;
+        private bool isInBuzzSection;
 
         /// <summary>
         /// The speed multiplier applied to the player's catcher.
@@ -58,6 +60,9 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
             );
 
             float distanceMoved = playerPosition - lastPlayerPosition.Value;
+
+            // For the exact position we consider that the catcher is in the correct position for both objects
+            float exactDistanceMoved = catchCurrent.NormalizedPosition - lastPlayerPosition.Value;
 
             double weightedStrainTime = catchCurrent.StrainTime + 13 + (3 / catcherSpeedMultiplier);
 
@@ -92,12 +97,30 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
                     playerPosition = catchCurrent.NormalizedPosition;
                 }
 
-                distanceAddition *= 1.0 + edgeDashBonus * ((20 - catchCurrent.LastObject.DistanceToHyperDash) / 20) * Math.Pow((Math.Min(catchCurrent.StrainTime * catcherSpeedMultiplier, 265) / 265), 1.5); // Edge Dashes are easier at lower ms values
+                distanceAddition *= 1.0 + edgeDashBonus * ((20 - catchCurrent.LastObject.DistanceToHyperDash) / 20)
+                                                        * Math.Pow((Math.Min(catchCurrent.StrainTime * catcherSpeedMultiplier, 265) / 265), 1.5); // Edge Dashes are easier at lower ms values
+            }
+
+            // There is an edge case where horizontal back and forth sliders create "buzz" patterns which are repeated "movements" with a distance lower than
+            // the platter's width but high enough to be considered a movement due to the absolute_player_positioning_error and normalized_hitobject_radius offsets
+            // We are detecting this exact scenario. The first back and forth is counted but all subsequent ones are nullified.
+            // To achieve that, we need to store the exact distances (distance ignoring absolute_player_positioning_error and normalized_hitobject_radius)
+            if (Math.Abs(exactDistanceMoved) <= HalfCatcherWidth * 2 && exactDistanceMoved == -lastExactDistanceMoved && catchCurrent.StrainTime == lastStrainTime)
+            {
+                if (isInBuzzSection)
+                    distanceAddition = 0;
+                else
+                    isInBuzzSection = true;
+            }
+            else
+            {
+                isInBuzzSection = false;
             }
 
             lastPlayerPosition = playerPosition;
             lastDistanceMoved = distanceMoved;
             lastStrainTime = catchCurrent.StrainTime;
+            lastExactDistanceMoved = exactDistanceMoved;
 
             return distanceAddition / weightedStrainTime;
         }

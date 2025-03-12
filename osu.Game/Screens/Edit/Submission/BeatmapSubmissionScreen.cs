@@ -285,7 +285,7 @@ namespace osu.Game.Screens.Edit.Submission
                     continue;
                 }
 
-                if (localHash != onlineHash)
+                if (!localHash.Equals(onlineHash, StringComparison.OrdinalIgnoreCase))
                     filesToUpdate.Add(filename);
             }
 
@@ -304,7 +304,7 @@ namespace osu.Game.Screens.Edit.Submission
                 Logger.Log($"Beatmap submission failed on upload: {ex}");
                 allowExit();
             };
-            patchRequest.Progressed += (current, total) => uploadStep.SetInProgress((float)current / total);
+            patchRequest.Progressed += (current, total) => uploadStep.SetInProgress(total > 0 ? (float)current / total : null);
 
             api.Queue(patchRequest);
             uploadStep.SetInProgress();

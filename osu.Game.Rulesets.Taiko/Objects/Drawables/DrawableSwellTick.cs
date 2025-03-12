@@ -4,9 +4,7 @@
 #nullable disable
 
 using JetBrains.Annotations;
-using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
-using osu.Game.Rulesets.Taiko.Skinning.Default;
 using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
@@ -25,8 +23,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         {
         }
 
-        protected override void UpdateInitialTransforms() => this.FadeOut();
-
         public void TriggerResult(bool hit)
         {
             HitObject.StartTime = Time.Current;
@@ -43,7 +39,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         public override bool OnPressed(KeyBindingPressEvent<TaikoAction> e) => false;
 
-        protected override SkinnableDrawable CreateMainPiece() => new SkinnableDrawable(new TaikoSkinComponentLookup(TaikoSkinComponents.DrumRollTick),
-            _ => new TickPiece());
+        protected override SkinnableDrawable CreateMainPiece() => null;
     }
 }

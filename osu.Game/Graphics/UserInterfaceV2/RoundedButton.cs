@@ -8,6 +8,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.Backgrounds;
@@ -17,7 +18,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
-    public partial class RoundedButton : OsuButton, IFilterable
+    public partial class RoundedButton : OsuButton, IFilterable, IHasTooltip
     {
         protected TrianglesV2? Triangles { get; private set; }
 
@@ -107,5 +108,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
         }
 
         public bool FilteringActive { get; set; }
+
+        public virtual LocalisableString TooltipText { get; set; }
     }
 }

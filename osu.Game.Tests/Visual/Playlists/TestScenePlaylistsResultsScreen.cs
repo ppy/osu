@@ -7,9 +7,12 @@ using System.Linq;
 using System.Net;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
+using osu.Framework.Utils;
+using osu.Game.Database;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
@@ -32,6 +35,9 @@ namespace osu.Game.Tests.Visual.Playlists
         private const int scores_per_result = 10;
         private const int real_user_position = 200;
 
+        [Cached]
+        private readonly BeatmapLookupCache beatmapLookupCache = new BeatmapLookupCache();
+
         private ResultsScreen resultsScreen = null!;
 
         private int lowestScoreId; // Score ID of the lowest score in the list.
@@ -40,6 +46,11 @@ namespace osu.Game.Tests.Visual.Playlists
         private bool requestComplete;
         private int totalCount;
         private ScoreInfo userScore = null!;
+
+        public TestScenePlaylistsResultsScreen()
+        {
+            Add(beatmapLookupCache);
+        }
 
         [SetUpSteps]
         public override void SetUpSteps()
@@ -58,9 +69,11 @@ namespace osu.Game.Tests.Visual.Playlists
                 totalCount = 0;
 
                 userScore = TestResources.CreateTestScoreInfo();
+                userScore.OnlineID = 1;
                 userScore.TotalScore = 0;
                 userScore.Statistics = new Dictionary<HitResult, int>();
                 userScore.MaximumStatistics = new Dictionary<HitResult, int>();
+                userScore.Position = real_user_position;
 
                 // Beatmap is required to be an actual beatmap so the scores can get their scores correctly
                 // calculated for standardised scoring, else the tests that rely on ordering will fall over.
@@ -143,13 +156,13 @@ namespace osu.Game.Tests.Visual.Playlists
                 AddStep("get panel count", () => beforePanelCount = this.ChildrenOfType<ScorePanel>().Count());
                 AddStep("scroll to right", () => resultsScreen.ChildrenOfType<ScorePanelList>().Single().ChildrenOfType<OsuScrollContainer>().Single().ScrollToEnd(false));
 
-                AddAssert("right loading spinner shown", () =>
+                AddUntilStep("right loading spinner shown", () =>
                     resultsScreen.ChildrenOfType<LoadingSpinner>().Single(l => l.Anchor == Anchor.CentreRight).State.Value == Visibility.Visible);
 
                 waitForDisplay();
 
                 AddAssert($"count increased by {scores_per_result}", () => this.ChildrenOfType<ScorePanel>().Count() == beforePanelCount + scores_per_result);
-                AddAssert("right loading spinner hidden", () =>
+                AddUntilStep("right loading spinner hidden", () =>
                     resultsScreen.ChildrenOfType<LoadingSpinner>().Single(l => l.Anchor == Anchor.CentreRight).State.Value == Visibility.Hidden);
             }
         }
@@ -167,26 +180,26 @@ namespace osu.Game.Tests.Visual.Playlists
             AddStep("get panel count", () => beforePanelCount = this.ChildrenOfType<ScorePanel>().Count());
             AddStep("scroll to right", () => resultsScreen.ChildrenOfType<ScorePanelList>().Single().ChildrenOfType<OsuScrollContainer>().Single().ScrollToEnd(false));
 
-            AddAssert("right loading spinner shown", () =>
+            AddUntilStep("right loading spinner shown", () =>
                 resultsScreen.ChildrenOfType<LoadingSpinner>().Single(l => l.Anchor == Anchor.CentreRight).State.Value == Visibility.Visible);
 
             waitForDisplay();
 
             AddAssert($"count increased by {scores_per_result}", () => this.ChildrenOfType<ScorePanel>().Count() == beforePanelCount + scores_per_result);
-            AddAssert("right loading spinner hidden", () =>
+            AddUntilStep("right loading spinner hidden", () =>
                 resultsScreen.ChildrenOfType<LoadingSpinner>().Single(l => l.Anchor == Anchor.CentreRight).State.Value == Visibility.Hidden);
 
             AddStep("get panel count", () => beforePanelCount = this.ChildrenOfType<ScorePanel>().Count());
             AddStep("bind delayed handler with no scores", () => bindHandler(delayed: true, noScores: true));
             AddStep("scroll to right", () => resultsScreen.ChildrenOfType<ScorePanelList>().Single().ChildrenOfType<OsuScrollContainer>().Single().ScrollToEnd(false));
 
-            AddAssert("right loading spinner shown", () =>
+            AddUntilStep("right loading spinner shown", () =>
                 resultsScreen.ChildrenOfType<LoadingSpinner>().Single(l => l.Anchor == Anchor.CentreRight).State.Value == Visibility.Visible);
 
             waitForDisplay();
 
             AddAssert("count not increased", () => this.ChildrenOfType<ScorePanel>().Count() == beforePanelCount);
-            AddAssert("right loading spinner hidden", () =>
+            AddUntilStep("right loading spinner hidden", () =>
                 resultsScreen.ChildrenOfType<LoadingSpinner>().Single(l => l.Anchor == Anchor.CentreRight).State.Value == Visibility.Hidden);
 
             AddAssert("no placeholders shown", () => this.ChildrenOfType<MessagePlaceholder>().Count(), () => Is.Zero);
@@ -209,13 +222,13 @@ namespace osu.Game.Tests.Visual.Playlists
                 AddStep("get panel count", () => beforePanelCount = this.ChildrenOfType<ScorePanel>().Count());
                 AddStep("scroll to left", () => resultsScreen.ChildrenOfType<ScorePanelList>().Single().ChildrenOfType<OsuScrollContainer>().Single().ScrollToStart(false));
 
-                AddAssert("left loading spinner shown", () =>
+                AddUntilStep("left loading spinner shown", () =>
                     resultsScreen.ChildrenOfType<LoadingSpinner>().Single(l => l.Anchor == Anchor.CentreLeft).State.Value == Visibility.Visible);
 
                 waitForDisplay();
 
                 AddAssert($"count increased by {scores_per_result}", () => this.ChildrenOfType<ScorePanel>().Count() == beforePanelCount + scores_per_result);
-                AddAssert("left loading spinner hidden", () =>
+                AddUntilStep("left loading spinner hidden", () =>
                     resultsScreen.ChildrenOfType<LoadingSpinner>().Single(l => l.Anchor == Anchor.CentreLeft).State.Value == Visibility.Hidden);
             }
         }
@@ -229,7 +242,36 @@ namespace osu.Game.Tests.Visual.Playlists
             AddStep("bind user score info handler", () => bindHandler(noScores: true));
             createUserBestResults();
             AddAssert("no scores visible", () => !resultsScreen.ChildrenOfType<ScorePanelList>().Single().GetScorePanels().Any());
-            AddAssert("placeholder shown", () => this.ChildrenOfType<MessagePlaceholder>().Count(), () => Is.EqualTo(1));
+            AddUntilStep("placeholder shown", () => this.ChildrenOfType<MessagePlaceholder>().Count(), () => Is.EqualTo(1));
+        }
+
+        [Test]
+        public void TestFetchingAllTheWayToFirstNeverDisplaysNegativePosition()
+        {
+            AddStep("set user position", () => userScore.Position = 20);
+            AddStep("bind user score info handler", () => bindHandler(userScore: userScore));
+
+            createResultsWithScore(() => userScore);
+            waitForDisplay();
+
+            AddStep("bind delayed handler", () => bindHandler(true));
+
+            for (int i = 0; i < 2; i++)
+            {
+                AddStep("simulate user falling down ranking", () => userScore.Position += 2);
+                AddStep("scroll to left", () => resultsScreen.ChildrenOfType<ScorePanelList>().Single().ChildrenOfType<OsuScrollContainer>().Single().ScrollToStart(false));
+
+                AddUntilStep("left loading spinner shown", () =>
+                    resultsScreen.ChildrenOfType<LoadingSpinner>().Single(l => l.Anchor == Anchor.CentreLeft).State.Value == Visibility.Visible);
+
+                waitForDisplay();
+
+                AddUntilStep("left loading spinner hidden", () =>
+                    resultsScreen.ChildrenOfType<LoadingSpinner>().Single(l => l.Anchor == Anchor.CentreLeft).State.Value == Visibility.Hidden);
+            }
+
+            AddAssert("total count is 34", () => this.ChildrenOfType<ScorePanel>().Count(), () => Is.EqualTo(34));
+            AddUntilStep("all panels have non-negative position", () => this.ChildrenOfType<ScorePanel>().All(p => p.ScorePosition.Value > 0));
         }
 
         private void createResultsWithScore(Func<ScoreInfo> getScore)
@@ -279,6 +321,25 @@ namespace osu.Game.Tests.Visual.Playlists
                 case IndexPlaylistScoresRequest:
                     break;
 
+                case GetBeatmapsRequest getBeatmaps:
+                    getBeatmaps.TriggerSuccess(new GetBeatmapsResponse
+                    {
+                        Beatmaps = getBeatmaps.BeatmapIds.Select(id => new APIBeatmap
+                        {
+                            OnlineID = id,
+                            StarRating = id,
+                            DifficultyName = $"Beatmap {id}",
+                            BeatmapSet = new APIBeatmapSet
+                            {
+                                Title = $"Title {id}",
+                                Artist = $"Artist {id}",
+                                AuthorString = $"Author {id}"
+                            }
+                        }).ToList()
+                    });
+
+                    return true;
+
                 default:
                     return false;
             }
@@ -301,7 +362,7 @@ namespace osu.Game.Tests.Visual.Playlists
                         if (userScore == null)
                             triggerFail(s);
                         else
-                            triggerSuccess(s, createUserResponse(userScore));
+                            triggerSuccess(s, () => createUserResponse(userScore));
 
                         break;
 
@@ -309,12 +370,12 @@ namespace osu.Game.Tests.Visual.Playlists
                         if (userScore == null)
                             triggerFail(u);
                         else
-                            triggerSuccess(u, createUserResponse(userScore));
+                            triggerSuccess(u, () => createUserResponse(userScore));
 
                         break;
 
                     case IndexPlaylistScoresRequest i:
-                        triggerSuccess(i, createIndexResponse(i, noScores));
+                        triggerSuccess(i, () => createIndexResponse(i, noScores));
                         break;
                 }
             }, delay);
@@ -322,11 +383,11 @@ namespace osu.Game.Tests.Visual.Playlists
             return true;
         };
 
-        private void triggerSuccess<T>(APIRequest<T> req, T result)
+        private void triggerSuccess<T>(APIRequest<T> req, Func<T> result)
             where T : class
         {
             requestComplete = true;
-            req.TriggerSuccess(result);
+            req.TriggerSuccess(result.Invoke());
         }
 
         private void triggerFail(APIRequest req)
@@ -337,33 +398,20 @@ namespace osu.Game.Tests.Visual.Playlists
 
         private MultiplayerScore createUserResponse(ScoreInfo userScore)
         {
-            var multiplayerUserScore = new MultiplayerScore
-            {
-                ID = highestScoreId,
-                Accuracy = userScore.Accuracy,
-                Passed = userScore.Passed,
-                Rank = userScore.Rank,
-                Position = real_user_position,
-                MaxCombo = userScore.MaxCombo,
-                User = userScore.User,
-                ScoresAround = new MultiplayerScoresAround
-                {
-                    Higher = new MultiplayerScores(),
-                    Lower = new MultiplayerScores()
-                }
-            };
+            var multiplayerUserScore = createMultiplayerUserScore(userScore);
 
             totalCount++;
 
             for (int i = 1; i <= scores_per_result; i++)
             {
-                multiplayerUserScore.ScoresAround.Lower.Scores.Add(new MultiplayerScore
+                multiplayerUserScore.ScoresAround!.Lower!.Scores.Add(new MultiplayerScore
                 {
                     ID = getNextLowestScoreId(),
                     Accuracy = userScore.Accuracy,
                     Passed = true,
                     Rank = userScore.Rank,
                     MaxCombo = userScore.MaxCombo,
+                    BeatmapId = RNG.Next(0, 7),
                     User = new APIUser
                     {
                         Id = 2 + i,
@@ -372,13 +420,14 @@ namespace osu.Game.Tests.Visual.Playlists
                     },
                 });
 
-                multiplayerUserScore.ScoresAround.Higher.Scores.Add(new MultiplayerScore
+                multiplayerUserScore.ScoresAround!.Higher!.Scores.Add(new MultiplayerScore
                 {
                     ID = getNextHighestScoreId(),
                     Accuracy = userScore.Accuracy,
                     Passed = true,
                     Rank = userScore.Rank,
                     MaxCombo = userScore.MaxCombo,
+                    BeatmapId = RNG.Next(0, 7),
                     User = new APIUser
                     {
                         Id = 2 + i,
@@ -390,13 +439,33 @@ namespace osu.Game.Tests.Visual.Playlists
                 totalCount += 2;
             }
 
-            addCursor(multiplayerUserScore.ScoresAround.Lower);
-            addCursor(multiplayerUserScore.ScoresAround.Higher);
+            addCursor(multiplayerUserScore.ScoresAround!.Lower!);
+            addCursor(multiplayerUserScore.ScoresAround!.Higher!);
 
             return multiplayerUserScore;
         }
 
-        private IndexedMultiplayerScores createIndexResponse(IndexPlaylistScoresRequest req, bool noScores = false)
+        private MultiplayerScore createMultiplayerUserScore(ScoreInfo userScore)
+        {
+            return new MultiplayerScore
+            {
+                ID = highestScoreId,
+                Accuracy = userScore.Accuracy,
+                Passed = userScore.Passed,
+                Rank = userScore.Rank,
+                Position = userScore.Position,
+                MaxCombo = userScore.MaxCombo,
+                User = userScore.User,
+                BeatmapId = RNG.Next(0, 7),
+                ScoresAround = new MultiplayerScoresAround
+                {
+                    Higher = new MultiplayerScores(),
+                    Lower = new MultiplayerScores()
+                }
+            };
+        }
+
+        private IndexedMultiplayerScores createIndexResponse(IndexPlaylistScoresRequest req, bool noScores)
         {
             var result = new IndexedMultiplayerScores();
 
@@ -404,15 +473,26 @@ namespace osu.Game.Tests.Visual.Playlists
 
             string sort = req.IndexParams?.Properties["sort"].ToObject<string>() ?? "score_desc";
 
+            bool reachedEnd = false;
+
             for (int i = 1; i <= scores_per_result; i++)
             {
+                int nextId = sort == "score_asc" ? getNextHighestScoreId() : getNextLowestScoreId();
+
+                if (userScore.OnlineID - nextId >= userScore.Position)
+                {
+                    reachedEnd = true;
+                    break;
+                }
+
                 result.Scores.Add(new MultiplayerScore
                 {
-                    ID = sort == "score_asc" ? getNextHighestScoreId() : getNextLowestScoreId(),
+                    ID = nextId,
                     Accuracy = 1,
                     Passed = true,
                     Rank = ScoreRank.X,
                     MaxCombo = 1000,
+                    BeatmapId = RNG.Next(0, 7),
                     User = new APIUser
                     {
                         Id = 2 + i,
@@ -424,7 +504,10 @@ namespace osu.Game.Tests.Visual.Playlists
                 totalCount++;
             }
 
-            addCursor(result);
+            if (!reachedEnd)
+                addCursor(result);
+
+            result.UserScore = createMultiplayerUserScore(userScore);
 
             return result;
         }

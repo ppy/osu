@@ -3,7 +3,6 @@
 
 using System.Linq;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -63,13 +62,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private partial class ApproachRateSettingsControl : DifficultyAdjustSettingsControl
         {
-            protected override RoundedSliderBar<float> CreateSlider(BindableNumber<float> current) =>
-                new ApproachRateSlider
-                {
-                    RelativeSizeAxes = Axes.X,
-                    Current = current,
-                    KeyboardStep = 0.1f,
-                };
+            protected override RoundedSliderBar<float> CreateSlider(BindableNumber<float> current) => new ApproachRateSlider();
 
             /// <summary>
             /// A slider bar with more detailed approach rate info for its given value

@@ -4,8 +4,11 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Platform;
 using osu.Framework.Utils;
+using osu.Game.Audio;
 using osu.Game.Graphics.Containers;
+using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Menu
 {
@@ -14,12 +17,17 @@ namespace osu.Game.Screens.Menu
         private StarFountain leftFountain = null!;
         private StarFountain rightFountain = null!;
 
+        [Resolved]
+        private GameHost host { get; set; } = null!;
+
+        private SkinnableSound? sample;
+
         [BackgroundDependencyLoader]
         private void load()
         {
             RelativeSizeAxes = Axes.Both;
 
-            Children = new[]
+            Children = new Drawable[]
             {
                 leftFountain = new StarFountain
                 {
@@ -33,6 +41,7 @@ namespace osu.Game.Screens.Menu
                     Origin = Anchor.BottomRight,
                     X = -250,
                 },
+                sample = new SkinnableSound(new SampleInfo("Gameplay/fountain-shoot"))
             };
         }
 
@@ -73,6 +82,10 @@ namespace osu.Game.Screens.Menu
                     rightFountain.Shoot(1);
                     break;
             }
+
+            // Don't play SFX when game is in background as it can be a bit noisy.
+            if (host.IsActive.Value)
+                sample?.Play();
         }
     }
 }

@@ -317,6 +317,17 @@ namespace osu.Game.Database
 
             try
             {
+                // Some platforms' realm implementation (including windows) don't update modified time on open.
+                // Let's do this explicitly as some users may depend on it roughly aligning to usage expectations.
+                string fullPath = storage.GetFullPath(Filename);
+                var fi = new FileInfo(fullPath);
+                if (fi.Exists)
+                    fi.LastWriteTime = DateTime.Now;
+            }
+            catch { }
+
+            try
+            {
                 return getRealmInstance();
             }
             catch (Exception e)
