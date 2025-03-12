@@ -157,20 +157,28 @@ namespace osu.Game.Users
                     chatOverlay?.Show();
                 }));
 
-                if (metadataClient?.GetPresence(User.OnlineID) != null)
+                if (isUserOnline())
                 {
                     items.Add(new OsuMenuItem(ContextMenuStrings.SpectatePlayer, MenuItemType.Standard, () =>
                     {
-                        performer?.PerformFromScreen(s => s.Push(new SoloSpectatorScreen(User)));
+                        if (isUserOnline())
+                            performer?.PerformFromScreen(s => s.Push(new SoloSpectatorScreen(User)));
                     }));
 
-                    if (multiplayerClient?.Room?.Users.All(u => u.UserID != User.Id) == true)
+                    if (canInviteUser())
                     {
-                        items.Add(new OsuMenuItem(ContextMenuStrings.InvitePlayer, MenuItemType.Standard, () => multiplayerClient.InvitePlayer(User.Id)));
+                        items.Add(new OsuMenuItem(ContextMenuStrings.InvitePlayer, MenuItemType.Standard, () =>
+                        {
+                            if (canInviteUser())
+                                multiplayerClient!.InvitePlayer(User.Id);
+                        }));
                     }
                 }
 
                 return items.ToArray();
+
+                bool isUserOnline() => metadataClient?.GetPresence(User.OnlineID) != null;
+                bool canInviteUser() => isUserOnline() && multiplayerClient?.Room?.Users.All(u => u.UserID != User.Id) == true;
             }
         }
 
