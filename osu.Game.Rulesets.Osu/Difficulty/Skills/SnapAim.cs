@@ -10,7 +10,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
     public class SnapAim : Aim
     {
-        public SnapAim(Mod[] mods) : base(mods, false)
+        public SnapAim(Mod[] mods)
+            : base(mods, false)
         {
         }
 

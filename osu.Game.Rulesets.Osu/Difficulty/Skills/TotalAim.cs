@@ -10,7 +10,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
     public class TotalAim : Aim
     {
-        public TotalAim(Mod[] mods, bool includeSliders) : base(mods, includeSliders)
+        public TotalAim(Mod[] mods, bool includeSliders)
+            : base(mods, includeSliders)
         {
         }
 

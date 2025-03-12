@@ -64,7 +64,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             if (osuCurrObj.AngleSigned != null && osuLast0Obj.AngleSigned != null && osuLast1Obj.AngleSigned != null)
             {
-
                 double angleChangeBonus = CalculateFlowAngleChangeBonus(current);
                 double acuteAngleBonus = CalculateFlowAcuteAngleBonus(current);
 
@@ -108,7 +107,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             return Math.Clamp(1 - Math.Pow((distance - radius) / radius, 2), 0, 1);
         }
 
-        // This bonus accounts for the fact that flow is circular movement, therefore flowing on sharp angles is harder
+        // This bonus accounts for the fact that flow is circular movement, therefore flowing on sharp angles is harder.
         public static double CalculateFlowAcuteAngleBonus(DifficultyHitObject current)
         {
             if (current.BaseObject is Spinner || current.Index <= 1 || current.Previous(0).BaseObject is Spinner)
@@ -151,7 +150,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             return result;
         }
 
-        // This bonus 
+        // This bonus accounts for flow aim being harder when angle is changing. There's extra bonus for changes occuring more often than once in 4 notes.
         public static double CalculateFlowAngleChangeBonus(DifficultyHitObject current)
         {
             if (current.BaseObject is Spinner || current.Index <= 1 || current.Previous(0).BaseObject is Spinner)
@@ -195,6 +194,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             return angleChangeBonus;
         }
 
+        // This bonus accounts for the fact that changing velocity makes flow aim harder.
         public static double CalculateFlowVelocityChangeBonus(DifficultyHitObject current)
         {
             if (current.BaseObject is Spinner || current.Index <= 2 || current.Previous(0).BaseObject is Spinner)
@@ -247,6 +247,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             // Check the direction of doubles
             double directionFactor = 1.0;
+
             if (osuLast3Obj != null)
             {
                 Vector2 p1 = ((OsuHitObject)osuCurrObj.BaseObject).StackedPosition;
@@ -276,27 +277,28 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             return deltaVelocity;
         }
 
+        // This function is used to reward high spacing on uncomfy flow outside of direct bonuses.
         public static double IdentifyComfyFlow(DifficultyHitObject current)
         {
-            if (current.BaseObject is Spinner || current.Index <= 3 || current.Previous(0).BaseObject is Spinner)
-                return 0;
-
             // Check starts from this note before current and ends with current notes
             // Previous 3 notes before are still checked for some adjustments but not relevenat to main check
             const int starting_index = 4;
 
+            if (current.BaseObject is Spinner || current.Index < starting_index || current.Previous(0).BaseObject is Spinner)
+                return 0;
+
             double totalComfyness = 1.0;
 
             OsuDifficultyHitObject osuLast1Obj = (OsuDifficultyHitObject)current.Previous(starting_index - 1);
-            OsuDifficultyHitObject osuLast2Obj = (OsuDifficultyHitObject)current.Previous(starting_index);
-            OsuDifficultyHitObject osuLast3Obj = (OsuDifficultyHitObject)current.Previous(starting_index + 1);
+            OsuDifficultyHitObject? osuLast2Obj = (OsuDifficultyHitObject)current.Previous(starting_index);
+            OsuDifficultyHitObject? osuLast3Obj = (OsuDifficultyHitObject)current.Previous(starting_index + 1);
 
             double prevAngle = osuLast1Obj.AngleSigned ?? 0;
             double prevAngleChange = 0;
 
             double prev2Velocity = osuLast3Obj != null ? osuLast3Obj.LazyJumpDistance / osuLast3Obj.StrainTime : double.NaN;
             double prev1Velocity = osuLast2Obj != null ? osuLast2Obj.LazyJumpDistance / osuLast2Obj.StrainTime : double.NaN;
-            double prevVelocity = osuLast1Obj != null ? osuLast1Obj.LazyJumpDistance / osuLast1Obj.StrainTime : double.NaN;
+            double prevVelocity = osuLast1Obj.LazyJumpDistance / osuLast1Obj.StrainTime;
 
             double prevVelocityChange = prevVelocity / prev1Velocity;
             double prev1VelocityChange = prev1Velocity / prev2Velocity;

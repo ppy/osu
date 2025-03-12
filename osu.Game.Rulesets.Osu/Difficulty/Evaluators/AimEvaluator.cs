@@ -54,7 +54,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 highSpacingAdjust *= DifficultyCalculationUtils.ReverseLerp(osuCurrObj.LazyJumpDistance, diameter * 2, diameter * 4);
 
                 angleSnapDifficultyBonus *= DifficultyCalculationUtils.Smoothstep(osuCurrObj.Angle ?? 0, Math.PI / 3 + highSpacingAdjust, Math.PI / 2 + highSpacingAdjust);
-
             }
 
             // Adjusting minimal distance of snap evaluator to account for fact that the snapping difficulty itself have it's own difficulty
@@ -78,7 +77,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                 // And don't nerf spaced bursts, we want them to be buffed to be assumed to be flow-aimed
                 bigDistanceDifferenceFactor *= 1 - (1 - lowSpacingFactor) * (1 - DifficultyCalculationUtils.ReverseLerpTwoDirectional(osuCurrObj.StrainTime, osuLastObj.StrainTime, 1.95, 1.5));
-
 
                 double totalBonus = result + angleSnapDifficultyBonus - currDistance;
                 return currDistance + totalBonus * (1 - bigDistanceDifferenceFactor);
@@ -128,6 +126,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     double wideVelocityBase = Math.Min(currDistance / osuCurrObj.StrainTime, prevVelocity); // Don't reward wide angle bonus to sliders
 
                     double velocityThreshold = diameter * 2.3 / osuCurrObj.StrainTime;
+
                     if (wideVelocityBase > velocityThreshold) // Nerf high spaced squares to compensate total square buff
                     {
                         wideVelocityBase = velocityThreshold + 0.4 * (wideVelocityBase - velocityThreshold);
@@ -181,7 +180,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                 var osuLast2Obj = (OsuDifficultyHitObject)current.Previous(2);
                 double prev1Distance = osuLast1Obj.LazyJumpDistance;
-                double prev2Distance = (osuLast2Obj?.LazyJumpDistance ?? 0);
+                double prev2Distance = osuLast2Obj?.LazyJumpDistance ?? 0;
 
                 // If previously there was slow flow pattern - sudden velocity change is much easier because you could flow faster to give yourself more time
                 // Add radius to account for distance potenitally being very small
@@ -189,7 +188,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double distanceFactor = 0.5 + 0.5 * DifficultyCalculationUtils.ReverseLerp(Math.Max(prev1Distance, prev2Distance), diameter * 1.5, diameter * 0.75);
 
                 // We don't nerf more snappy patterns with this as it's much more difficult to snap faster compared to flow faster
-                double angleFactor = DifficultyCalculationUtils.Smoothstep(Math.Max(osuLast1Obj?.Angle ?? 0, osuLast2Obj?.Angle ?? 0), Math.PI * 0.55, Math.PI * 0.75);
+                double angleFactor = DifficultyCalculationUtils.Smoothstep(Math.Max(osuLast1Obj.Angle ?? 0, osuLast2Obj?.Angle ?? 0), Math.PI * 0.55, Math.PI * 0.75);
 
                 velocityChangeBonus *= 1 - distanceSimilarityFactor * distanceFactor * angleFactor;
 
