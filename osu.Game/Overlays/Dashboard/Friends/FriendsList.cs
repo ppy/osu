@@ -16,7 +16,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Dashboard.Friends
 {
-    public class FriendsList : CompositeDrawable
+    public partial class FriendsList : CompositeDrawable
     {
         public readonly IBindable<OnlineStatus> OnlineStream = new Bindable<OnlineStatus>();
         public readonly IBindable<UserSortCriteria> SortCriteria = new Bindable<UserSortCriteria>();
@@ -133,7 +133,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
             return new FilterableUserPanel(panel);
         }
 
-        private class FriendsSearchContainer : SearchContainer<FilterableUserPanel>
+        private partial class FriendsSearchContainer : SearchContainer<FilterableUserPanel>
         {
             public readonly IBindable<UserSortCriteria> SortCriteria = new Bindable<UserSortCriteria>();
 
@@ -165,7 +165,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
             }
         }
 
-        public class FilterableUserPanel : CompositeDrawable, IConditionalFilterable
+        public partial class FilterableUserPanel : CompositeDrawable, IConditionalFilterable
         {
             public readonly Bindable<bool> CanBeShown = new Bindable<bool>();
 
