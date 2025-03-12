@@ -30,6 +30,7 @@ using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Overlays;
 using osuTK;
 using osuTK.Input;
 
@@ -534,14 +535,14 @@ namespace osu.Game.Screens.Ranking
                 }
 
                 [BackgroundDependencyLoader]
-                private void load(OsuColour colours)
+                private void load(OsuColour colours, OverlayColourProvider? colourProvider)
                 {
                     Content.AddRange(new Drawable[]
                     {
                         new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = colours.GreySeaFoamDark,
+                            Colour = colourProvider?.Background3 ?? colours.GreySeaFoamDark,
                             Depth = float.MaxValue,
                         },
                         new FillFlowContainer
