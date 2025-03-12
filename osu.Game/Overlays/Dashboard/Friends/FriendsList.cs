@@ -165,7 +165,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
             }
         }
 
-        private class FilterableUserPanel : CompositeDrawable, IConditionalFilterable
+        public class FilterableUserPanel : CompositeDrawable, IConditionalFilterable
         {
             public readonly Bindable<bool> CanBeShown = new Bindable<bool>();
 
