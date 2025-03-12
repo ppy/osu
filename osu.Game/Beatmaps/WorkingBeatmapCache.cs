@@ -89,7 +89,7 @@ namespace osu.Game.Beatmaps
 
         public virtual WorkingBeatmap GetWorkingBeatmap([CanBeNull] BeatmapInfo beatmapInfo)
         {
-            if (beatmapInfo?.BeatmapSet == null)
+            if (beatmapInfo == null || ReferenceEquals(beatmapInfo, DefaultBeatmap.BeatmapInfo))
                 return DefaultBeatmap;
 
             lock (workingCache)

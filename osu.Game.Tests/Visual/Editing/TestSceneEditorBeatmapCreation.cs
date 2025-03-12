@@ -94,6 +94,8 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("release", () => InputManager.ReleaseButton(MouseButton.Left));
 
             AddAssert("new beatmap not persisted", () => beatmapManager.QueryBeatmapSet(s => s.ID == editorBeatmap.BeatmapInfo.BeatmapSet.AsNonNull().ID)?.Value.DeletePending == true);
+
+            AddUntilStep("wait for default beatmap", () => Editor.Beatmap.Value is DummyWorkingBeatmap);
         }
 
         [Test]
