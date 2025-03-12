@@ -152,13 +152,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double accuracyValue = computeAccuracyValue(score, osuAttributes);
             double flashlightValue = computeFlashlightValue(score, osuAttributes);
 
+            // Adjust aim and speed summation to nerf mixed maps
             if (aimValue > speedValue)
                 speedValue += (aimValue - speedValue) * OsuDifficultyCalculator.MechanicsAdditionPortion;
             else
                 aimValue += (speedValue - aimValue) * OsuDifficultyCalculator.MechanicsAdditionPortion;
-
-            // Debug stuff to see snap and flow pp
-            double aimScale = aimValue / OsuStrainSkill.DifficultyToPerformance(osuAttributes.AimDifficulty);
 
             double totalValue =
                 Math.Pow(
@@ -176,8 +174,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 Flashlight = flashlightValue,
                 EffectiveMissCount = effectiveMissCount,
                 SpeedDeviation = speedDeviation,
-                SnapAim = OsuStrainSkill.DifficultyToPerformance(osuAttributes.SnapAimDifficulty) * aimScale,
-                FlowAim = OsuStrainSkill.DifficultyToPerformance(osuAttributes.FlowAimDifficulty) * aimScale,
                 Total = totalValue
             };
         }

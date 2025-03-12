@@ -35,9 +35,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         // Increasing this multiplier nerfs mixed aim+speed map (but not snapaim + flowaim!)
         public static double MechanicsAdditionPortion => 0.13;
 
-        // This increases multiplier on both aim and speed. Exist for easier adjust of both skills after changing the MechanicsAdditionPortion
-        public static double MechanicsMultiplier => 0.935;
-
         protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
         {
             if (beatmap.HitObjects.Count == 0)
@@ -96,6 +93,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (mods.Any(h => h is OsuModFlashlight))
                 baseFlashlightPerformance = Flashlight.DifficultyToPerformance(flashlightRating);
 
+            // Adjust aim and speed summation to nerf mixed maps
             if (baseAimPerformance > baseSpeedPerformance)
                 baseSpeedPerformance += (baseAimPerformance - baseSpeedPerformance) * MechanicsAdditionPortion;
             else
