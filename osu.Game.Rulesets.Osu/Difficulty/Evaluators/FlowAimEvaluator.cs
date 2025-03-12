@@ -372,6 +372,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             return totalComfyness;
         }
 
-        private static double normalizeVelocityChange(double velocityChange) => double.IsNaN(velocityChange) ? 1.0 :  velocityChange >= 1 ? velocityChange : 1.0 / velocityChange;
+        private static double normalizeVelocityChange(double velocityChange) => double.IsNaN(velocityChange) ? 1.0 : velocityChange >= 1 ? velocityChange : 1.0 / velocityChange;
     }
 }
