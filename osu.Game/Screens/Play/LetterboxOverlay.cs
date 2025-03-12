@@ -3,7 +3,6 @@
 
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Utils;
@@ -23,9 +22,8 @@ namespace osu.Game.Screens.Play
 
         public LetterboxOverlay()
         {
-            const int letterbox_height = 150;
-
             RelativeSizeAxes = Axes.Both;
+            const float letterbox_height = 0.125f;
 
             InternalChild = fadeContainer = new Container
             {
@@ -37,17 +35,17 @@ namespace osu.Game.Screens.Play
                     {
                         Anchor = Anchor.TopLeft,
                         Origin = Anchor.TopLeft,
-                        RelativeSizeAxes = Axes.X,
+                        RelativeSizeAxes = Axes.Both,
                         Height = letterbox_height,
-                        Colour = ColourInfo.GradientVertical(Color4.Black, transparent_black),
+                        Colour = Color4.Black,
                     },
                     new Box
                     {
                         Anchor = Anchor.BottomLeft,
                         Origin = Anchor.BottomLeft,
-                        RelativeSizeAxes = Axes.X,
+                        RelativeSizeAxes = Axes.Both,
                         Height = letterbox_height,
-                        Colour = ColourInfo.GradientVertical(transparent_black, Color4.Black),
+                        Colour = Color4.Black,
                     }
                 }
             };
