@@ -34,7 +34,6 @@ using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Scoring;
 using osu.Game.Scoring.Legacy;
-using osu.Game.Screens.Play.Break;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Ranking;
 using osu.Game.Skinning;
@@ -453,9 +452,10 @@ namespace osu.Game.Screens.Play
                     DimmableStoryboard.OverlayLayerContainer.CreateProxy(),
                     new LetterboxOverlay
                     {
+                        Clock = DrawableRuleset.FrameStableClock,
+                        ProcessCustomClock = false,
+                        BreakTracker = breakTracker,
                         Alpha = working.Beatmap.LetterboxInBreaks ? 1 : 0,
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
                     },
                     HUDOverlay = new HUDOverlay(DrawableRuleset, GameplayState.Mods, Configuration.AlwaysShowLeaderboard)
                     {

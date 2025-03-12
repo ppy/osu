@@ -44,7 +44,12 @@ namespace osu.Game.Tests.Visual.Gameplay
                 {
                     ProcessCustomClock = false,
                     BreakTracker = breakTracker,
-                }
+                },
+                new LetterboxOverlay
+                {
+                    ProcessCustomClock = false,
+                    BreakTracker = breakTracker,
+                },
             };
         }
 
