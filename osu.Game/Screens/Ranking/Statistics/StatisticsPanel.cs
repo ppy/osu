@@ -16,6 +16,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API;
 using osu.Game.Online.Placeholders;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking.Statistics.User;
@@ -36,10 +37,18 @@ namespace osu.Game.Screens.Ranking.Statistics
         /// </summary>
         public ScoreInfo? AchievedScore { get; init; }
 
+        /// <summary>
+        /// Whether to show a control that allows to assign user tags to the played beatmap.
+        /// </summary>
+        public bool ShowUserTagControl { get; init; }
+
         protected override bool StartHidden => true;
 
         [Resolved]
         private BeatmapManager beatmapManager { get; set; } = null!;
+
+        [Resolved]
+        private IAPIProvider api { get; set; } = null!;
 
         private readonly Container content;
         private readonly LoadingSpinner spinner;
@@ -219,6 +228,18 @@ namespace osu.Game.Screens.Ranking.Statistics
                 && newScore.OnlineID == AchievedScore.OnlineID)
             {
                 yield return new StatisticItem("Overall Ranking", () => new OverallRanking(newScore)
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                });
+            }
+
+            if (ShowUserTagControl
+                && newScore.BeatmapInfo!.OnlineID > 0
+                && api.IsLoggedIn)
+            {
+                yield return new StatisticItem("Tag the beatmap!", () => new UserTagControl(newScore.BeatmapInfo)
                 {
                     RelativeSizeAxes = Axes.X,
                     Anchor = Anchor.Centre,

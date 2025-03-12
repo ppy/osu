@@ -85,6 +85,8 @@ namespace osu.Game.Screens.Ranking
         /// </summary>
         public bool ShowUserStatistics { get; init; }
 
+        public bool ShowUserTagControl { get; init; }
+
         private Sample? popInSample;
 
         protected ResultsScreen(ScoreInfo? score)
@@ -123,12 +125,11 @@ namespace osu.Game.Screens.Ranking
                                         new GlobalScrollAdjustsVolume(),
                                         StatisticsPanel = new StatisticsPanel
                                         {
-                                            AchievedScore = ShowUserStatistics && Score != null ? Score : null
-                                        }.With(panel =>
-                                        {
-                                            panel.RelativeSizeAxes = Axes.Both;
-                                            panel.Score.BindTarget = SelectedScore;
-                                        }),
+                                            RelativeSizeAxes = Axes.Both,
+                                            Score = { BindTarget = SelectedScore },
+                                            AchievedScore = ShowUserStatistics && Score != null ? Score : null,
+                                            ShowUserTagControl = ShowUserTagControl,
+                                        },
                                         ScorePanelList = new ScorePanelList
                                         {
                                             RelativeSizeAxes = Axes.Both,
