@@ -115,14 +115,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
-            var selectionBefore = SelectionHandler.SelectedItems.ToArray();
             bool handled = performMouseDownActions(e);
-            bool selectionChanged = !SelectionHandler.SelectedItems.SequenceEqual(selectionBefore);
             bool movementPossible = prepareSelectionMovement(e);
 
-            if (selectionChanged)
+            if (SelectedItems.Any())
             {
-                // if the selection changed and there are no modifiers pressed, don't block so the context menu still shows.
+                // if there is a selection and there are no modifiers pressed, don't block so the context menu still shows.
                 bool shouldShowContextMenu = e.Button == MouseButton.Right && !e.ShiftPressed && !e.AltPressed && !e.SuperPressed;
                 return !shouldShowContextMenu;
             }
