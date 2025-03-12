@@ -22,6 +22,8 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
 {
     public abstract partial class ManiaPlacementBlueprintTestScene : PlacementBlueprintTestScene
     {
+        protected sealed override Ruleset CreateRuleset() => new ManiaRuleset();
+
         private readonly Column column;
 
         [Cached(typeof(IReadOnlyList<Mod>))]
