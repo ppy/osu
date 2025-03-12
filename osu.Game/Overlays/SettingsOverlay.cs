@@ -68,6 +68,9 @@ namespace osu.Game.Overlays
         public void ShowAtControl<T>()
             where T : Drawable
         {
+            // if search isn't cleared then the target control won't be visible if it doesn't match the query
+            SearchTextBox.Current.SetDefault();
+
             Show();
 
             // wait for load of sections

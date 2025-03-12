@@ -63,7 +63,6 @@ namespace osu.Game.Overlays.Music
                 {
                     sprite.Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold);
                     sprite.Colour = colours.Gray9;
-                    sprite.Padding = new MarginPadding { Top = 1 };
                 });
 
                 SelectedSet.BindValueChanged(set => updateSelectionState(set.NewValue));

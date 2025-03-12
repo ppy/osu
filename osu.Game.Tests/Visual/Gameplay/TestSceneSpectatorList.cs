@@ -32,7 +32,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             Bindable<LocalUserPlayingState> playingState = new Bindable<LocalUserPlayingState>();
             GameplayState gameplayState = new GameplayState(new Beatmap(), new OsuRuleset(), healthProcessor: new OsuHealthProcessor(0), localUserPlayingState: playingState);
             TestSpectatorClient spectatorClient = new TestSpectatorClient();
-            TestMultiplayerClient multiplayerClient = new TestMultiplayerClient(new TestMultiplayerRoomManager(new TestRoomRequestsHandler()));
+            TestMultiplayerClient multiplayerClient = new TestMultiplayerClient(new TestRoomRequestsHandler());
 
             AddStep("create spectator list", () =>
             {
@@ -75,8 +75,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddRepeatStep("remove random user", () => ((ISpectatorClient)spectatorClient).UserEndedWatching(
                 spectatorClient.WatchingUsers[RNG.Next(spectatorClient.WatchingUsers.Count)].OnlineID), 5);
 
-            AddStep("change font to venera", () => list.Font.Value = Typeface.Venera);
-            AddStep("change font to torus", () => list.Font.Value = Typeface.Torus);
+            AddStep("change font to venera", () => list.HeaderFont.Value = Typeface.Venera);
+            AddStep("change font to torus", () => list.HeaderFont.Value = Typeface.Torus);
             AddStep("change header colour", () => list.HeaderColour.Value = new Colour4(RNG.NextSingle(), RNG.NextSingle(), RNG.NextSingle(), 1));
 
             AddStep("enter break", () => playingState.Value = LocalUserPlayingState.Break);

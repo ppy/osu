@@ -277,18 +277,18 @@ namespace osu.Game.Screens.Play
             if (rulesetComponents != null)
                 processDrawables(rulesetComponents);
 
-            if (lowestTopScreenSpaceRight.HasValue)
-                TopRightElements.Y = MathHelper.Clamp(ToLocalSpace(new Vector2(0, lowestTopScreenSpaceRight.Value)).Y, 0, DrawHeight - TopRightElements.DrawHeight);
+            if (lowestTopScreenSpaceRight.HasValue && DrawHeight - TopRightElements.DrawHeight > 0)
+                TopRightElements.Y = Math.Clamp(ToLocalSpace(new Vector2(0, lowestTopScreenSpaceRight.Value)).Y, 0, DrawHeight - TopRightElements.DrawHeight);
             else
                 TopRightElements.Y = 0;
 
-            if (lowestTopScreenSpaceLeft.HasValue)
-                LeaderboardFlow.Y = MathHelper.Clamp(ToLocalSpace(new Vector2(0, lowestTopScreenSpaceLeft.Value)).Y, 0, DrawHeight - LeaderboardFlow.DrawHeight);
+            if (lowestTopScreenSpaceLeft.HasValue && DrawHeight - LeaderboardFlow.DrawHeight > 0)
+                LeaderboardFlow.Y = Math.Clamp(ToLocalSpace(new Vector2(0, lowestTopScreenSpaceLeft.Value)).Y, 0, DrawHeight - LeaderboardFlow.DrawHeight);
             else
                 LeaderboardFlow.Y = 0;
 
-            if (highestBottomScreenSpace.HasValue)
-                bottomRightElements.Y = BottomScoringElementsHeight = -MathHelper.Clamp(DrawHeight - ToLocalSpace(highestBottomScreenSpace.Value).Y, 0, DrawHeight - bottomRightElements.DrawHeight);
+            if (highestBottomScreenSpace.HasValue && DrawHeight - bottomRightElements.DrawHeight > 0)
+                bottomRightElements.Y = BottomScoringElementsHeight = -Math.Clamp(DrawHeight - ToLocalSpace(highestBottomScreenSpace.Value).Y, 0, DrawHeight - bottomRightElements.DrawHeight);
             else
                 bottomRightElements.Y = 0;
 
