@@ -198,5 +198,13 @@ namespace osu.Game.Overlays.Dashboard.Friends
                 newList.FadeIn(200, Easing.OutQuint);
             }
         }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            listLoadCancellation?.Cancel();
+            listLoadCancellation?.Dispose();
+        }
     }
 }
