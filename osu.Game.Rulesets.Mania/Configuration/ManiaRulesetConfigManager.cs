@@ -24,6 +24,7 @@ namespace osu.Game.Rulesets.Mania.Configuration
             SetDefault(ManiaRulesetSetting.ScrollSpeed, 8.0, 1.0, 40.0, 0.1);
             SetDefault(ManiaRulesetSetting.ScrollDirection, ManiaScrollingDirection.Down);
             SetDefault(ManiaRulesetSetting.TimingBasedNoteColouring, false);
+            SetDefault(ManiaRulesetSetting.MobileLayout, ManiaMobileLayout.Portrait);
 
 #pragma warning disable CS0618
             // Although obsolete, this is still required to populate the bindable from the database in case migration is required.
@@ -55,6 +56,7 @@ namespace osu.Game.Rulesets.Mania.Configuration
         ScrollTime,
         ScrollSpeed,
         ScrollDirection,
-        TimingBasedNoteColouring
+        TimingBasedNoteColouring,
+        MobileLayout,
     }
 }
