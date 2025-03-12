@@ -53,7 +53,6 @@ namespace osu.Game.Screens.Select
         private readonly OsuTabControl<BeatmapDetailAreaTabItem> tabs;
         private readonly SlimEnumDropdown<ScoreSortMode> sortModeDropdown;
         private readonly Container tabsContainer;
-        private readonly Container dropdownContainer;
 
         public BeatmapDetailAreaTabControl()
         {
@@ -88,7 +87,7 @@ namespace osu.Game.Screens.Select
                     AutoSizeAxes = Axes.X,
                     ColumnDimensions = new[]
                     {
-                        new Dimension(),
+                        new Dimension(GridSizeMode.AutoSize),
                         new Dimension(GridSizeMode.AutoSize),
                     },
                     RowDimensions = new[] { new Dimension() },
@@ -98,22 +97,13 @@ namespace osu.Game.Screens.Select
                         {
                             modsCheckbox = new OsuTabControlCheckbox
                             {
-                                Anchor = Anchor.BottomRight,
-                                Origin = Anchor.BottomRight,
                                 Text = @"Selected Mods",
                                 Alpha = 0,
                             },
-                            dropdownContainer = new Container
+                            sortModeDropdown = new SlimEnumDropdown<ScoreSortMode>
                             {
-                                Anchor = Anchor.CentreRight,
-                                Origin = Anchor.CentreRight,
-                                RelativeSizeAxes = Axes.Y,
                                 Width = 110,
-                                Child = sortModeDropdown = new SlimEnumDropdown<ScoreSortMode>
-                                {
-                                    RelativeSizeAxes = Axes.X,
-                                    BypassAutoSizeAxes = Axes.Y,
-                                }
+                                BypassAutoSizeAxes = Axes.Y,
                             }
                         }
                     }
@@ -135,28 +125,29 @@ namespace osu.Game.Screens.Select
         {
             OnFilter?.Invoke(tabs.Current.Value, modsCheckbox.Current.Value, sortModeDropdown.Current.Value);
 
-            if (tabs.Current.Value is BeatmapDetailAreaLeaderboardTabItem<BeatmapLeaderboardScope> leaderboard && leaderboard.Scope == BeatmapLeaderboardScope.Local)
-            {
-                dropdownContainer.ResizeWidthTo(110, 200, Easing.OutQuint);
-                dropdownContainer.FadeTo(1, 200, Easing.OutQuint);
-                modsCheckbox.Padding = new MarginPadding { Right = 5 };
-            }
-            else
-            {
-                dropdownContainer.ResizeWidthTo(0, 200, Easing.OutQuint);
-                dropdownContainer.FadeTo(0, 200, Easing.OutQuint);
-                modsCheckbox.Padding = new MarginPadding();
-            }
-
             if (tabs.Current.Value.FilterableByMods)
             {
                 modsCheckbox.FadeTo(1, 200, Easing.OutQuint);
-                tabsContainer.Padding = new MarginPadding { Right = 215 };
+                tabsContainer.Padding = new MarginPadding { Right = 100 };
             }
             else
             {
                 modsCheckbox.FadeTo(0, 200, Easing.OutQuint);
                 tabsContainer.Padding = new MarginPadding();
+            }
+
+            if (tabs.Current.Value is BeatmapDetailAreaLeaderboardTabItem<BeatmapLeaderboardScope> leaderboard && leaderboard.Scope == BeatmapLeaderboardScope.Local)
+            {
+                sortModeDropdown.ResizeWidthTo(110, 200, Easing.OutQuint);
+                sortModeDropdown.FadeTo(1, 200, Easing.OutQuint);
+                modsCheckbox.Padding = new MarginPadding { Right = 5 };
+                tabsContainer.Padding = new MarginPadding { Right = 215 };
+            }
+            else
+            {
+                sortModeDropdown.ResizeWidthTo(0, 200, Easing.OutQuint);
+                sortModeDropdown.FadeTo(0, 200, Easing.OutQuint);
+                modsCheckbox.Padding = new MarginPadding();
             }
         }
     }
