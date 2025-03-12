@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Specialized;
 using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
@@ -12,22 +11,16 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Online.Metadata;
 using osu.Game.Resources.Localisation.Web;
-using osu.Game.Users;
 
 namespace osu.Game.Overlays.Dashboard.Friends
 {
     public partial class FriendDisplay : CompositeDrawable
     {
         private readonly IBindableList<APIRelation> apiFriends = new BindableList<APIRelation>();
-        private readonly IBindableDictionary<int, UserPresence> friendPresences = new BindableDictionary<int, UserPresence>();
 
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
-
-        [Resolved]
-        private MetadataClient metadataClient { get; set; } = null!;
 
         private FriendOnlineStreamControl streamControl = null!;
         private Box background = null!;
@@ -170,29 +163,9 @@ namespace osu.Game.Overlays.Dashboard.Friends
             base.LoadComplete();
 
             apiFriends.BindTo(api.Friends);
-            apiFriends.BindCollectionChanged(onFriendsChanged, true);
-
-            friendPresences.BindTo(metadataClient.FriendPresences);
-            friendPresences.BindCollectionChanged(onFriendPresencesChanged, true);
+            apiFriends.BindCollectionChanged((_, _) => reloadList());
 
             userListToolbar.DisplayStyle.BindValueChanged(_ => reloadList());
-        }
-
-        private void onFriendsChanged(object? sender, NotifyCollectionChangedEventArgs e)
-        {
-            reloadList();
-            updateStatusCounts();
-        }
-
-        private void onFriendPresencesChanged(object? sender, NotifyDictionaryChangedEventArgs<int, UserPresence> e)
-        {
-            switch (e.Action)
-            {
-                case NotifyDictionaryChangedAction.Add:
-                case NotifyDictionaryChangedAction.Remove:
-                    updateStatusCounts();
-                    break;
-            }
         }
 
         private void reloadList()
@@ -224,24 +197,6 @@ namespace osu.Game.Overlays.Dashboard.Friends
                 listContainer.Add(newList);
                 newList.FadeIn(200, Easing.OutQuint);
             }
-        }
-
-        private void updateStatusCounts()
-        {
-            int countOnline = 0;
-            int countOffline = 0;
-
-            foreach (var user in apiFriends)
-            {
-                if (friendPresences.ContainsKey(user.TargetID))
-                    countOnline++;
-                else
-                    countOffline++;
-            }
-
-            streamControl.CountAll.Value = apiFriends.Count;
-            streamControl.CountOnline.Value = countOnline;
-            streamControl.CountOffline.Value = countOffline;
         }
     }
 }
