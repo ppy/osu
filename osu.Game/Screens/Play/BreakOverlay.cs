@@ -35,7 +35,7 @@ namespace osu.Game.Screens.Play
 
         public override bool RemoveCompletedTransforms => false;
 
-        public BreakTracker BreakTracker { get; init; } = null!;
+        public required BreakTracker BreakTracker { get; init; }
 
         private readonly Container remainingTimeAdjustmentBox;
         private readonly Container remainingTimeBox;
@@ -159,7 +159,7 @@ namespace osu.Game.Screens.Play
             if (currentPeriod.Value == null)
                 return;
 
-            float timeBoxTargetWidth = (float)Math.Max(0, (remainingTimeForCurrentPeriod - timingPoint.BeatLength / currentPeriod.Value.Value.Duration));
+            float timeBoxTargetWidth = (float)Math.Max(0, remainingTimeForCurrentPeriod - timingPoint.BeatLength / currentPeriod.Value.Value.Duration);
             remainingTimeBox.ResizeWidthTo(timeBoxTargetWidth, timingPoint.BeatLength * 3.5, Easing.OutQuint);
         }
 
