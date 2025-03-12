@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                 angleSnapDifficultyBonus = OsuDifficultyHitObject.NORMALISED_DIAMETER * bpmFactor;
 
-                // Shift starting point of "uncomfy" from square to wide-angle patterns if spacing is too big
+                // Shift starting point of "uncomfy" from square to wide-angle patterns if spacing is too big, becvause big spacing is already buffed enough by wide angle bonus
                 double highSpacingAdjust = Math.PI / 6;
                 highSpacingAdjust *= DifficultyCalculationUtils.ReverseLerp(osuCurrObj.LazyJumpDistance, diameter * 2, diameter * 4);
 
@@ -136,7 +136,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     double wideVelocityBase = Math.Min(currDistance / osuCurrObj.StrainTime, prevVelocity); // Don't reward wide angle bonus to sliders
 
                     double velocityThreshold = diameter * 2.3 / osuCurrObj.StrainTime;
-                    if (wideVelocityBase > velocityThreshold) // Nerf high spaced squares to compensate buff on lower spaced squares
+                    if (wideVelocityBase > velocityThreshold) // Nerf high spaced squares to compensate total square buff
                     {
                         wideVelocityBase = velocityThreshold + 0.4 * (wideVelocityBase - velocityThreshold);
                     }
@@ -149,7 +149,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     wideAngleBonus *= 1 - wideAngleRepetitionNerf;
 
                     double acuteAngleRepetitionNerf = Math.Pow(CalcAcuteAngleBonus(lastAngle), 3);
-                    acuteAngleBonus *= 0.08 + 0.65 * (1 - Math.Min(acuteAngleBonus, acuteAngleRepetitionNerf)); // Need to somehow nerf anoneanone here
+                    acuteAngleBonus *= 0.08 + 0.65 * (1 - Math.Min(acuteAngleBonus, acuteAngleRepetitionNerf));
 
                     // Apply full wide angle bonus for distance more than one diameter
                     wideAngleBonus *= wideVelocityBase * DifficultyCalculationUtils.Smootherstep(osuCurrObj.LazyJumpDistance, 0, diameter);
@@ -196,12 +196,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double distanceSimilarityFactor = DifficultyCalculationUtils.ReverseLerp(prev1Distance + radius, (prev2Distance + radius) * 0.8, (prev2Distance + radius) * 0.95);
                 double distanceFactor = 0.5 + 0.5 * DifficultyCalculationUtils.ReverseLerp(Math.Max(prev1Distance, prev2Distance), diameter * 1.5, diameter * 0.75);
 
-                // We don't nerf more snappy patterns with this as
+                // We don't nerf more snappy patterns with this as it's much more difficult to snap faster compared to flow faster
                 double angleFactor = DifficultyCalculationUtils.Smoothstep(Math.Max(osuLast1Obj?.Angle ?? 0, osuLast2Obj?.Angle ?? 0), Math.PI * 0.55, Math.PI * 0.75);
 
                 velocityChangeBonus *= 1 - distanceSimilarityFactor * distanceFactor * angleFactor;
 
-                // Decrease buff large jumps leading into very small jumps to compensate the fact that smaller jumps are buffed by minimal jump distance
+                // Decrease buff large jumps leading into very small jumps to compensate the fact that smaller jumps are buffed by minimal snap distance
                 double doublesNerf = DifficultyCalculationUtils.ReverseLerp(osuCurrObj.LazyJumpDistance, diameter, diameter * 3) * DifficultyCalculationUtils.ReverseLerp(osuLastObj.LazyJumpDistance, diameter, radius);
                 double cheesableJumpsNerf = DifficultyCalculationUtils.ReverseLerp(osuCurrObj.LazyJumpDistance, diameter * 2, diameter * 4) * DifficultyCalculationUtils.ReverseLerp(osuLastObj.LazyJumpDistance, diameter * 1.5, diameter);
                 velocityChangeBonus *= 1 - 0.8 * Math.Max(doublesNerf, cheesableJumpsNerf);

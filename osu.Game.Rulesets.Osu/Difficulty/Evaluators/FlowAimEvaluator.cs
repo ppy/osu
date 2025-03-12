@@ -119,6 +119,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             return Math.Clamp(1 - Math.Pow((distance - radius) / radius, 2), 0, 1);
         }
 
+        // This bonus accounts for the fact that flow is circular movement, therefore flowing on sharp angles is harder
         public static double CalculateFlowAcuteAngleBonus(DifficultyHitObject current)
         {
             if (current.BaseObject is Spinner || current.Index <= 1 || current.Previous(0).BaseObject is Spinner)
@@ -148,17 +149,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             // BUT it also  buffs ReLief. So it's should be explored how to keep this buff for actually hard patterns but not for ReLief
             result *= DifficultyCalculationUtils.ReverseLerp(osuCurrObj.StrainTime, osuLastObj.StrainTime * 0.55, osuLastObj.StrainTime * 0.75);
 
-            // Decrease angle change buff if angle changes are slower than 1 in 4 notes
+            // Decrease angle bonus if angle changes are slower than 1 in 4 notes
             double deltaAngle = Math.Abs(last1Angle - last2Angle);
             double isSameAngle = DifficultyCalculationUtils.Smoothstep(deltaAngle, 0.25, 0.15); // =1 if there's no angle change
 
             double angleBonusDifference = currAngleBonus > 0 ? Math.Clamp(prevAngleBonus / currAngleBonus, 0, 1) : 1;
 
+            // Decrease buffs from angle bonus if it's not repeating too often
+            // Multiply nerf by difference in bonus to not nerf repeating high angle bonuse
             result *= 1 - 0.5 * isSameAngle * (1 - angleBonusDifference);
 
             return result;
         }
 
+        // This bonus 
         public static double CalculateFlowAngleChangeBonus(DifficultyHitObject current)
         {
             if (current.BaseObject is Spinner || current.Index <= 1 || current.Previous(0).BaseObject is Spinner)
@@ -195,8 +199,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             double prevAngleBonus = AimEvaluator.CalcAcuteAngleBonus(last2Angle);
 
-            // Decrease buffs from angle bonuses if it's not repeating too often
-            // Multiply nerf by difference in bonus to not nerf repeating high angle bonuses
+            // Decrease buffs from angle bonus if it's not repeating too often
+            // Multiply nerf by difference in bonus to not nerf repeating high angle bonuse
             angleChangeBonus *= 1 - 0.5 * isSameAngle * (1 - prevAngleBonus);
 
             return angleChangeBonus;
@@ -309,9 +313,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double prev1VelocityChange = prev1Velocity / prev2Velocity;
             double prev2VelocityChange = double.NaN;
 
-            // It's allowed to get two angle change without triggering comfyness penalty
+            // It's allowed to get two angle change without stream to be considered comfy
 
-            // First one is normal direction change
+            // First one is normal Y type direction change
             double angleLeniency = 1.0;
 
             // Second one is the S type of movement where clockwise is changing to counterclockwise
