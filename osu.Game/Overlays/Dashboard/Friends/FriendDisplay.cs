@@ -1,22 +1,20 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Metadata;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Users;
-using osuTK;
 
 namespace osu.Game.Overlays.Dashboard.Friends
 {
@@ -35,9 +33,11 @@ namespace osu.Game.Overlays.Dashboard.Friends
         private Box background = null!;
         private Box controlBackground = null!;
         private UserListToolbar userListToolbar = null!;
+        private Container<FriendsList> listContainer = null!;
         private LoadingLayer loading = null!;
         private BasicSearchTextBox searchTextBox = null!;
-        private FriendsSearchContainer panelsContainer = null!;
+
+        private CancellationTokenSource? listLoadCancellation;
 
         public FriendDisplay()
         {
@@ -145,14 +145,11 @@ namespace osu.Game.Overlays.Dashboard.Friends
                                         AutoSizeAxes = Axes.Y,
                                         Children = new Drawable[]
                                         {
-                                            panelsContainer = new FriendsSearchContainer
+                                            listContainer = new Container<FriendsList>
                                             {
                                                 RelativeSizeAxes = Axes.X,
                                                 AutoSizeAxes = Axes.Y,
-                                                Padding = new MarginPadding { Horizontal = WaveOverlayContainer.HORIZONTAL_PADDING },
-                                                // Todo: Spacing = new Vector2(style == OverlayPanelDisplayStyle.Card ? 10 : 2),
-                                                Spacing = new Vector2(10),
-                                                SortCriteria = { BindTarget = userListToolbar.SortCriteria }
+                                                Padding = new MarginPadding { Horizontal = WaveOverlayContainer.HORIZONTAL_PADDING }
                                             },
                                             loading = new LoadingLayer(true)
                                         }
@@ -178,35 +175,12 @@ namespace osu.Game.Overlays.Dashboard.Friends
             friendPresences.BindTo(metadataClient.FriendPresences);
             friendPresences.BindCollectionChanged(onFriendPresencesChanged, true);
 
-            searchTextBox.Current.BindValueChanged(onSearchChanged);
-            streamControl.Current.BindValueChanged(onFriendsStreamChanged);
+            userListToolbar.DisplayStyle.BindValueChanged(_ => reloadList());
         }
 
         private void onFriendsChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
-            switch (e.Action)
-            {
-                case NotifyCollectionChangedAction.Add:
-                    foreach (APIRelation relation in e.NewItems!.OfType<APIRelation>())
-                    {
-                        panelsContainer.Add(new FilterableUserPanel(new UserGridPanel(relation.TargetUser!).With(panel =>
-                        {
-                            panel.Anchor = Anchor.TopCentre;
-                            panel.Origin = Anchor.TopCentre;
-                            panel.Width = 290;
-                        })));
-                    }
-
-                    break;
-
-                case NotifyCollectionChangedAction.Remove:
-                    foreach (APIRelation relation in e.OldItems!.OfType<APIRelation>())
-                        panelsContainer.RemoveAll(panel => panel.User.Equals(relation.TargetUser), true);
-
-                    break;
-            }
-
-            updatePanelVisibilities();
+            reloadList();
             updateStatusCounts();
         }
 
@@ -216,40 +190,39 @@ namespace osu.Game.Overlays.Dashboard.Friends
             {
                 case NotifyDictionaryChangedAction.Add:
                 case NotifyDictionaryChangedAction.Remove:
-                    updatePanelVisibilities();
                     updateStatusCounts();
                     break;
             }
         }
 
-        private void onFriendsStreamChanged(ValueChangedEvent<OnlineStatus> stream)
+        private void reloadList()
         {
-            updatePanelVisibilities();
-        }
+            listLoadCancellation?.Cancel();
+            var cancellationSource = listLoadCancellation = new CancellationTokenSource();
 
-        private void onSearchChanged(ValueChangedEvent<string> search)
-        {
-            panelsContainer.SearchTerm = search.NewValue;
-        }
-
-        private void updatePanelVisibilities()
-        {
-            foreach (var panel in panelsContainer)
+            FriendsList? currentList = listContainer.SingleOrDefault();
+            FriendsList newList = new FriendsList(userListToolbar.DisplayStyle.Value, apiFriends.Select(f => f.TargetUser!).ToArray())
             {
-                switch (streamControl.Current.Value)
+                OnlineStream = { BindTarget = streamControl.Current },
+                SortCriteria = { BindTarget = userListToolbar.SortCriteria },
+                SearchText = { BindTarget = searchTextBox.Current }
+            };
+
+            loading.Show();
+            LoadComponentAsync(newList, finishLoad, cancellationSource.Token);
+
+            void finishLoad(FriendsList list)
+            {
+                loading.Hide();
+
+                if (currentList != null)
                 {
-                    case OnlineStatus.All:
-                        panel.CanBeShown.Value = true;
-                        break;
-
-                    case OnlineStatus.Online:
-                        panel.CanBeShown.Value = friendPresences.ContainsKey(panel.User.OnlineID);
-                        break;
-
-                    case OnlineStatus.Offline:
-                        panel.CanBeShown.Value = !friendPresences.ContainsKey(panel.User.OnlineID);
-                        break;
+                    currentList.FadeOut(100, Easing.OutQuint).Expire();
+                    currentList.Delay(25).Schedule(() => currentList.BypassAutoSizeAxes = Axes.Y);
                 }
+
+                listContainer.Add(newList);
+                newList.FadeIn(200, Easing.OutQuint);
             }
         }
 
@@ -269,78 +242,6 @@ namespace osu.Game.Overlays.Dashboard.Friends
             streamControl.CountAll.Value = apiFriends.Count;
             streamControl.CountOnline.Value = countOnline;
             streamControl.CountOffline.Value = countOffline;
-        }
-
-        private class FriendsSearchContainer : SearchContainer<FilterableUserPanel>
-        {
-            public readonly IBindable<UserSortCriteria> SortCriteria = new Bindable<UserSortCriteria>();
-
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-                SortCriteria.BindValueChanged(_ => InvalidateLayout(), true);
-            }
-
-            public override IEnumerable<Drawable> FlowingChildren
-            {
-                get
-                {
-                    IEnumerable<FilterableUserPanel> panels = base.FlowingChildren.OfType<FilterableUserPanel>();
-
-                    switch (SortCriteria.Value)
-                    {
-                        default:
-                        case UserSortCriteria.LastVisit:
-                            return panels.OrderByDescending(panel => panel.User.LastVisit);
-
-                        case UserSortCriteria.Rank:
-                            return panels.OrderByDescending(panel => panel.User.Statistics.GlobalRank.HasValue).ThenBy(panel => panel.User.Statistics.GlobalRank ?? 0);
-
-                        case UserSortCriteria.Username:
-                            return panels.OrderBy(panel => panel.User.Username);
-                    }
-                }
-            }
-        }
-
-        private class FilterableUserPanel : CompositeDrawable, IConditionalFilterable
-        {
-            public readonly Bindable<bool> CanBeShown = new Bindable<bool>();
-
-            public APIUser User => panel.User;
-
-            private readonly UserPanel panel;
-
-            public FilterableUserPanel(UserPanel panel)
-            {
-                this.panel = panel;
-
-                Anchor = panel.Anchor;
-                Origin = panel.Origin;
-                RelativeSizeAxes = panel.RelativeSizeAxes;
-                AutoSizeAxes = panel.AutoSizeAxes;
-                Width = panel.Width;
-                Height = panel.Height;
-
-                InternalChild = panel;
-            }
-
-            IBindable<bool> IConditionalFilterable.CanBeShown => CanBeShown;
-
-            IEnumerable<LocalisableString> IHasFilterTerms.FilterTerms => panel.FilterTerms;
-
-            bool IFilterable.MatchingFilter
-            {
-                set
-                {
-                    if (value)
-                        Show();
-                    else
-                        Hide();
-                }
-            }
-
-            bool IFilterable.FilteringActive { set { } }
         }
     }
 }
