@@ -46,7 +46,7 @@ namespace osu.Game.Screens.Play
 
         private readonly IBindable<Period?> currentPeriod = new Bindable<Period?>();
 
-        public BreakOverlay(bool letterboxing, ScoreProcessor scoreProcessor)
+        public BreakOverlay(ScoreProcessor scoreProcessor)
         {
             this.scoreProcessor = scoreProcessor;
             RelativeSizeAxes = Axes.Both;
@@ -63,12 +63,6 @@ namespace osu.Game.Screens.Play
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
-                    new LetterboxOverlay
-                    {
-                        Alpha = letterboxing ? 1 : 0,
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                    },
                     new CircularContainer
                     {
                         Anchor = Anchor.Centre,
