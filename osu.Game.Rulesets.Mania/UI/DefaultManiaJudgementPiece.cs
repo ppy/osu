@@ -29,7 +29,11 @@ namespace osu.Game.Rulesets.Mania.UI
             direction.BindValueChanged(_ => onDirectionChanged(), true);
         }
 
-        private void onDirectionChanged() => Y = direction.Value == ScrollingDirection.Up ? -judgement_y_position : judgement_y_position;
+        private void onDirectionChanged()
+        {
+            Anchor = direction.Value == ScrollingDirection.Up ? Anchor.TopCentre : Anchor.BottomCentre;
+            Y = direction.Value == ScrollingDirection.Up ? -judgement_y_position : judgement_y_position;
+        }
 
         protected override void LoadComplete()
         {
