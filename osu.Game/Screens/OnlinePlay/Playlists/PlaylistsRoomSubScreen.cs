@@ -458,12 +458,14 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             beatmapAvailabilityTracker.Availability.BindValueChanged(_ => updateGameplayState());
 
             UserBeatmap.BindValueChanged(_ => updateGameplayState());
+            UserMods.BindValueChanged(_ => updateGameplayState());
             UserRuleset.BindValueChanged(_ =>
             {
+                // The user mod selection overlay is separate from the beatmap/ruleset style selection screen,
+                // and so the validity of mods has to be confirmed separately after the ruleset is changed.
                 validateUserMods();
                 updateGameplayState();
             });
-            UserMods.BindValueChanged(_ => updateGameplayState());
 
             updateSetupState();
             updateGameplayState();
@@ -545,7 +547,6 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                 UserRuleset.Value = null;
 
             validateUserMods();
-
             updateGameplayState();
         }
 
