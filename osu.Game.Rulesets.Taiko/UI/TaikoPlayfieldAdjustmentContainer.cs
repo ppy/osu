@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Taiko.Beatmaps;
@@ -19,9 +18,6 @@ namespace osu.Game.Rulesets.Taiko.UI
         private const float stable_gamefield_height = 480f;
 
         public readonly IBindable<bool> LockPlayfieldAspectRange = new BindableBool(true);
-
-        [Resolved]
-        private OsuGame? osuGame { get; set; }
 
         public TaikoPlayfieldAdjustmentContainer()
         {
