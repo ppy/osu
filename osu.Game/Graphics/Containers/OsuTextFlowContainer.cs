@@ -21,8 +21,18 @@ namespace osu.Game.Graphics.Containers
 
         protected override SpriteText CreateSpriteText() => new OsuSpriteText();
 
-        public ITextPart AddArbitraryDrawable(Drawable drawable) => AddPart(new TextPartManual(drawable.Yield()));
+        public ITextPart AddArbitraryDrawable(Drawable drawable) => AddPart(new TextPartManual(new ArbitraryDrawableWrapper { Child = drawable }.Yield()));
 
         public ITextPart AddIcon(IconUsage icon, Action<SpriteText> creationParameters = null) => AddText(icon.Icon.ToString(), creationParameters);
+
+        private partial class ArbitraryDrawableWrapper : Container, IHasLineBaseHeight
+        {
+            public float LineBaseHeight => DrawHeight;
+
+            public ArbitraryDrawableWrapper()
+            {
+                AutoSizeAxes = Axes.Both;
+            }
+        }
     }
 }
