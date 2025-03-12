@@ -21,6 +21,7 @@ using osu.Game.Online.Rooms;
 using osu.Game.Online.Spectator;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
+using osu.Game.Screens.Ranking;
 
 namespace osu.Game.Screens.Play
 {
@@ -323,5 +324,12 @@ namespace osu.Game.Screens.Play
             api.Queue(request);
             return scoreSubmissionSource.Task;
         }
+
+        protected override ResultsScreen CreateResults(ScoreInfo score) => new SoloResultsScreen(score)
+        {
+            AllowRetry = true,
+            ShowUserStatistics = true,
+            ShowUserTagControl = true,
+        };
     }
 }

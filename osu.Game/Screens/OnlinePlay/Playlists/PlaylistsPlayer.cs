@@ -60,6 +60,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             {
                 AllowRetry = true,
                 ShowUserStatistics = true,
+                ShowUserTagControl = true,
             };
         }
 
