@@ -37,6 +37,8 @@ namespace osu.Game.Screens.Ranking
 {
     public partial class UserTagControl : CompositeDrawable
     {
+        private readonly BeatmapInfo beatmapInfo;
+
         public override bool HandlePositionalInput => true;
 
         private readonly Cached layout = new Cached();
@@ -53,8 +55,10 @@ namespace osu.Game.Screens.Ranking
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
 
-        [Resolved]
-        private Bindable<WorkingBeatmap> beatmap { get; set; } = null!;
+        public UserTagControl(BeatmapInfo beatmapInfo)
+        {
+            this.beatmapInfo = beatmapInfo;
+        }
 
         [BackgroundDependencyLoader]
         private void load(SessionStatics sessionStatics)
@@ -104,8 +108,8 @@ namespace osu.Game.Screens.Ranking
                 api.Queue(listTagsRequest);
             }
 
-            var getBeatmapSetRequest = new GetBeatmapSetRequest(beatmap.Value.BeatmapInfo.BeatmapSet!.OnlineID);
-            getBeatmapSetRequest.Success += set => apiBeatmap.Value = set.Beatmaps.SingleOrDefault(b => b.MatchesOnlineID(beatmap.Value.BeatmapInfo));
+            var getBeatmapSetRequest = new GetBeatmapSetRequest(beatmapInfo.BeatmapSet!.OnlineID);
+            getBeatmapSetRequest.Success += set => apiBeatmap.Value = set.Beatmaps.SingleOrDefault(b => b.MatchesOnlineID(beatmapInfo));
             api.Queue(getBeatmapSetRequest);
         }
 
@@ -114,7 +118,7 @@ namespace osu.Game.Screens.Ranking
             loadingLayer.Show();
             extraTags.Remove(tag);
 
-            var req = new AddBeatmapTagRequest(beatmap.Value.BeatmapInfo.OnlineID, tag.Id);
+            var req = new AddBeatmapTagRequest(beatmapInfo.OnlineID, tag.Id);
             req.Success += () =>
             {
                 tag.Voted.Value = true;
