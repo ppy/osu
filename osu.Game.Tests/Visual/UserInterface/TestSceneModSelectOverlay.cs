@@ -1030,7 +1030,10 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private partial class TestModSelectOverlay : UserModSelectOverlay
         {
-            protected override bool ShowPresets => true;
+            public TestModSelectOverlay()
+            {
+                ShowPresets = true;
+            }
         }
 
         private class TestUnimplementedMod : Mod
