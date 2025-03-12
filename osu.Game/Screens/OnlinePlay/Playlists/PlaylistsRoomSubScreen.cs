@@ -526,19 +526,19 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         /// <summary>
         /// Responds to changes in <see cref="SelectedItem"/> to validate the user style and update the global gameplay state.
         /// </summary>
-        private void onSelectedItemChanged(ValueChangedEvent<PlaylistItem?> e)
+        private void onSelectedItemChanged(ValueChangedEvent<PlaylistItem?> item)
         {
-            if (e.NewValue is not PlaylistItem item)
+            if (item.NewValue == null)
                 return;
 
             // Always resetting the user beatmap style when a new item is selected is most intuitive.
             UserBeatmap.Value = null;
 
-            if (item.Freestyle)
+            if (item.NewValue.Freestyle)
             {
                 // If freestyle is active, attempt to preserve the user ruleset style but only if the online item is from the osu! ruleset
                 // (i.e. the beatmap is generally always convertible to the current ruleset, excluding custom rulesets).
-                if (item.RulesetID > 0)
+                if (item.NewValue.RulesetID > 0)
                     UserRuleset.Value = null;
             }
             else
@@ -554,8 +554,10 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         /// </summary>
         private Mod[] listAllowedMods()
         {
-            if (SelectedItem.Value is not PlaylistItem item)
+            if (SelectedItem.Value == null)
                 return [];
+
+            PlaylistItem item = SelectedItem.Value;
 
             RulesetInfo gameplayRuleset = UserRuleset.Value ?? rulesets.GetRuleset(item.RulesetID)!;
             Ruleset rulesetInstance = gameplayRuleset.CreateInstance();
@@ -580,8 +582,10 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         /// </summary>
         private void updateGameplayState()
         {
-            if (!this.IsCurrentScreen() || SelectedItem.Value is not PlaylistItem item)
+            if (!this.IsCurrentScreen() || SelectedItem.Value == null)
                 return;
+
+            PlaylistItem item = SelectedItem.Value;
 
             IBeatmapInfo gameplayBeatmap = UserBeatmap.Value ?? item.Beatmap;
             RulesetInfo gameplayRuleset = UserRuleset.Value ?? rulesets.GetRuleset(item.RulesetID)!;
@@ -638,8 +642,10 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         /// </summary>
         private void startPlay()
         {
-            if (!this.IsCurrentScreen() || SelectedItem.Value is not PlaylistItem item)
+            if (!this.IsCurrentScreen() || SelectedItem.Value == null)
                 return;
+
+            PlaylistItem item = SelectedItem.Value;
 
             // Required for validation inside the player.
             RulesetInfo gameplayRuleset = UserRuleset.Value ?? rulesets.GetRuleset(item.RulesetID)!;
@@ -661,7 +667,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         /// </summary>
         private void showUserModSelect()
         {
-            if (!this.IsCurrentScreen() || SelectedItem.Value is not PlaylistItem)
+            if (!this.IsCurrentScreen() || SelectedItem.Value == null)
                 return;
 
             userModsSelectOverlay.Show();
@@ -672,10 +678,10 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         /// </summary>
         private void showUserStyleSelect()
         {
-            if (!this.IsCurrentScreen() || SelectedItem.Value is not PlaylistItem item)
+            if (!this.IsCurrentScreen() || SelectedItem.Value == null)
                 return;
 
-            this.Push(new PlaylistsRoomFreestyleSelect(room, item)
+            this.Push(new PlaylistsRoomFreestyleSelect(room, SelectedItem.Value)
             {
                 Beatmap = { BindTarget = UserBeatmap },
                 Ruleset = { BindTarget = UserRuleset }
