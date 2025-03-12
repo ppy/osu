@@ -121,7 +121,10 @@ namespace osu.Game.Screens.Ranking
                                     Children = new Drawable[]
                                     {
                                         new GlobalScrollAdjustsVolume(),
-                                        StatisticsPanel = createStatisticsPanel().With(panel =>
+                                        StatisticsPanel = new StatisticsPanel
+                                        {
+                                            AchievedScore = ShowUserStatistics && Score != null ? Score : null
+                                        }.With(panel =>
                                         {
                                             panel.RelativeSizeAxes = Axes.Both;
                                             panel.Score.BindTarget = SelectedScore;
@@ -352,16 +355,6 @@ namespace osu.Game.Screens.Ranking
         /// </summary>
         /// <param name="direction">The fetch direction. -1 to fetch scores greater than the current start of the list, and 1 to fetch scores lower than the current end of the list.</param>
         protected virtual Task<ScoreInfo[]> FetchNextPage(int direction) => Task.FromResult<ScoreInfo[]>([]);
-
-        /// <summary>
-        /// Creates the <see cref="Statistics.StatisticsPanel"/> to be used to display extended information about scores.
-        /// </summary>
-        private StatisticsPanel createStatisticsPanel()
-        {
-            return ShowUserStatistics && Score != null
-                ? new UserStatisticsPanel(Score)
-                : new StatisticsPanel();
-        }
 
         private Task addScores(ScoreInfo[] scores)
         {

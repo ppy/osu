@@ -137,11 +137,12 @@ namespace osu.Game.Tests.Visual.Ranking
             {
                 CachedDependencies = [(typeof(UserStatisticsWatcher), userStatisticsWatcher)],
                 RelativeSizeAxes = Axes.Both,
-                Child = new UserStatisticsPanel(score)
+                Child = new StatisticsPanel
                 {
                     RelativeSizeAxes = Axes.Both,
                     State = { Value = Visibility.Visible },
-                    Score = { Value = score, }
+                    Score = { Value = score, },
+                    AchievedScore = score,
                 }
             });
             AddUntilStep("overall ranking present", () => this.ChildrenOfType<OverallRanking>().Any());
@@ -150,11 +151,12 @@ namespace osu.Game.Tests.Visual.Ranking
 
         private void loadPanel(ScoreInfo score) => AddStep("load panel", () =>
         {
-            Child = new UserStatisticsPanel(score)
+            Child = new StatisticsPanel
             {
                 RelativeSizeAxes = Axes.Both,
                 State = { Value = Visibility.Visible },
                 Score = { Value = score },
+                AchievedScore = score,
             };
         });
 
