@@ -358,8 +358,12 @@ namespace osu.Game.Rulesets.Osu.Edit
             {
                 var osuSelectionHandler = (OsuSelectionHandler)BlueprintContainer.SelectionHandler;
 
-                osuSelectionHandler.SelectionNewComboState.Value =
-                    osuSelectionHandler.SelectionNewComboState.Value == TernaryState.False ? TernaryState.True : TernaryState.False;
+                if (!osuSelectionHandler.SelectedItems.Any())
+                {
+                    osuSelectionHandler.SelectionNewComboState.Value =
+                        osuSelectionHandler.SelectionNewComboState.Value == TernaryState.False ? TernaryState.True : TernaryState.False;
+                    return true;
+                }
             }
 
             return base.OnMouseDown(e);
