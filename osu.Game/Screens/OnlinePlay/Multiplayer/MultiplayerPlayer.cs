@@ -199,10 +199,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 ? new MultiplayerTeamResultsScreen(score, Room.RoomID.Value, PlaylistItem, multiplayerLeaderboard.TeamScores)
                 {
                     ShowUserStatistics = true,
+                    ShowUserTagControl = true,
                 }
                 : new MultiplayerResultsScreen(score, Room.RoomID.Value, PlaylistItem)
                 {
-                    ShowUserStatistics = true
+                    ShowUserStatistics = true,
+                    ShowUserTagControl = true,
                 };
         }
 
