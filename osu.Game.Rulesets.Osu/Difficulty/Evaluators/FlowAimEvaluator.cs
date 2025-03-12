@@ -79,17 +79,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     overlappedNotesWeight = 1 - o1 * o2 * o3;
                 }
 
-                //// Don't apply both angle change and acute angle bonus at the same time if change is consistent
-                //double angleChangeCurrent = Math.Abs((double)(osuCurrObj.AngleSigned - osuLast0Obj.AngleSigned));
-                //double angleChangePrevious = Math.Abs((double)(osuLast0Obj.AngleSigned - osuLast1Obj.AngleSigned));
-                //double angleChangeBonusDifference = Math.Abs(angleChangePrevious - angleChangeCurrent);
-                //double angleChangeConsistency = DifficultyCalculationUtils.Smoothstep(angleChangeBonusDifference, 0.2, 0.1);
-
-                //double largerBonus = Math.Max(angleChangeBonus, acuteAngleBonus);
-                //double summedBonus = angleChangeBonus + acuteAngleBonus;
-
-                //angleBonus = double.Lerp(summedBonus, largerBonus, angleChangeConsistency) * overlappedNotesWeight;
-
                 // IMPORTANT INFORMATION: summing those bonuses (as commented code above) instead of taking max singificantly buffs many alt maps
                 // BUT it also buffs ReLief. So it's should be explored how to keep this buff for actually hard patterns but not for ReLief
                 angleBonus = Math.Max(angleChangeBonus, acuteAngleBonus) * overlappedNotesWeight;
