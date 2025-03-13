@@ -49,10 +49,15 @@ namespace osu.Game.Scoring
             get => beatmapInfo;
             set
             {
-                beatmapInfo = value;
-
-                if (value != null)
+                if (value == null)
                 {
+                    beatmapInfo = null;
+                    return;
+                }
+
+                if (string.IsNullOrEmpty(BeatmapHash) || value.Hash == BeatmapHash)
+                {
+                    beatmapInfo = value;
                     BeatmapHash = value.Hash;
                 }
             }
