@@ -328,8 +328,7 @@ namespace osu.Game.Screens.Play
         protected override ResultsScreen CreateResults(ScoreInfo score) => new SoloResultsScreen(score)
         {
             AllowRetry = true,
-            ShowUserStatistics = true,
-            ShowUserTagControl = true,
+            IsLocalPlay = true,
         };
     }
 }

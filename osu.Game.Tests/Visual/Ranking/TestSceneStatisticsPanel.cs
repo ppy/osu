@@ -214,7 +214,6 @@ namespace osu.Game.Tests.Visual.Ranking
                         State = { Value = Visibility.Visible },
                         Score = { Value = score },
                         AchievedScore = score,
-                        ShowUserTagControl = true,
                     }
                 };
             });
