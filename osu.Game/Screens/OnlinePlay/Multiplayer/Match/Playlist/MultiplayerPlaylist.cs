@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Online.Multiplayer;
@@ -19,12 +20,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
     {
         public readonly Bindable<MultiplayerPlaylistDisplayMode> DisplayMode = new Bindable<MultiplayerPlaylistDisplayMode>();
 
-        public required Bindable<PlaylistItem?> SelectedItem
-        {
-            get => selectedItem;
-            set => selectedItem.Current = value;
-        }
-
         /// <summary>
         /// Invoked when an item requests to be edited.
         /// </summary>
@@ -33,12 +28,17 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
         [Resolved]
         private MultiplayerClient client { get; set; } = null!;
 
+        // Todo: This bindable shouldn't exist - consider moving this class' logic into each component.
+        private readonly Bindable<PlaylistItem?> selectedItem = new Bindable<PlaylistItem?>();
+
         private readonly Room room;
-        private readonly BindableWithCurrent<PlaylistItem?> selectedItem = new BindableWithCurrent<PlaylistItem?>();
+
         private MultiplayerPlaylistTabControl playlistTabControl = null!;
         private MultiplayerQueueList queueList = null!;
         private MultiplayerHistoryList historyList = null!;
+
         private bool firstPopulation = true;
+        private long lastPlaylistItemId;
 
         public MultiplayerPlaylist(Room room)
         {
@@ -89,11 +89,20 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
             base.LoadComplete();
 
             DisplayMode.BindValueChanged(onDisplayModeChanged, true);
-            client.ItemAdded += playlistItemAdded;
-            client.ItemRemoved += playlistItemRemoved;
-            client.ItemChanged += playlistItemChanged;
+
             client.RoomUpdated += onRoomUpdated;
+            client.SettingsChanged += onSettingsChanged;
+            client.ItemAdded += onItemAdded;
+            client.ItemRemoved += onItemRemoved;
+            client.ItemChanged += onItemChanged;
+
             updateState();
+        }
+
+        private void onPlaylistItemChanged(MultiplayerPlaylistItem item)
+        {
+            if (item.ID == client.Room?.Settings.PlaylistItemId)
+                updateSelectedItem();
         }
 
         private void onDisplayModeChanged(ValueChangedEvent<MultiplayerPlaylistDisplayMode> mode)
@@ -104,30 +113,20 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
 
         private void onRoomUpdated() => Scheduler.AddOnce(updateState);
 
-        private void updateState()
+        private void onSettingsChanged(MultiplayerRoomSettings settings)
         {
-            if (client.Room == null)
+            if (settings.PlaylistItemId != lastPlaylistItemId)
             {
-                historyList.Items.Clear();
-                queueList.Items.Clear();
-                firstPopulation = true;
-                return;
-            }
-
-            if (firstPopulation)
-            {
-                foreach (var item in client.Room.Playlist)
-                    addItemToLists(item);
-
-                firstPopulation = false;
+                updateSelectedItem();
+                lastPlaylistItemId = settings.PlaylistItemId;
             }
         }
 
-        private void playlistItemAdded(MultiplayerPlaylistItem item) => Schedule(() => addItemToLists(item));
+        private void onItemAdded(MultiplayerPlaylistItem item) => Schedule(() => addItemToLists(item));
 
-        private void playlistItemRemoved(long item) => Schedule(() => removeItemFromLists(item));
+        private void onItemRemoved(long item) => Schedule(() => removeItemFromLists(item));
 
-        private void playlistItemChanged(MultiplayerPlaylistItem item) => Schedule(() =>
+        private void onItemChanged(MultiplayerPlaylistItem item) => Schedule(() =>
         {
             if (client.Room == null)
                 return;
@@ -150,7 +149,37 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
                 removeItemFromLists(item.ID);
                 addItemToLists(item);
             }
+
+            if (item.ID == client.Room.Settings.PlaylistItemId)
+                updateSelectedItem();
         });
+
+        private void updateState()
+        {
+            if (client.Room == null)
+            {
+                historyList.Items.Clear();
+                queueList.Items.Clear();
+                firstPopulation = true;
+                return;
+            }
+
+            if (firstPopulation)
+            {
+                foreach (var item in client.Room.Playlist)
+                    addItemToLists(item);
+
+                firstPopulation = false;
+            }
+        }
+
+        private void updateSelectedItem()
+        {
+            if (client.Room == null)
+                return;
+
+            selectedItem.Value = new PlaylistItem(client.Room.Playlist.Single(i => i.ID == client.Room.Settings.PlaylistItemId));
+        }
 
         private void addItemToLists(MultiplayerPlaylistItem item)
         {
@@ -170,6 +199,20 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
         {
             queueList.Items.RemoveAll(i => i.ID == item);
             historyList.Items.RemoveAll(i => i.ID == item);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (client.IsNotNull())
+            {
+                client.RoomUpdated -= onRoomUpdated;
+                client.SettingsChanged -= onSettingsChanged;
+                client.ItemAdded -= onItemAdded;
+                client.ItemRemoved -= onItemRemoved;
+                client.ItemChanged -= onItemChanged;
+            }
         }
     }
 }

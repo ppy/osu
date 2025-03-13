@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -19,7 +20,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Online;
 using osu.Game.Online.API;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
@@ -34,7 +34,6 @@ using osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Participants;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Spectate;
 using osu.Game.Users;
-using osu.Game.Utils;
 using osuTK;
 using Container = osu.Framework.Graphics.Containers.Container;
 using ParticipantsList = osu.Game.Screens.OnlinePlay.Multiplayer.Participants.ParticipantsList;
@@ -116,22 +115,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         private OsuGame? game { get; set; }
 
         [Cached]
-        private readonly OnlinePlayBeatmapAvailabilityTracker beatmapAvailabilityTracker = new OnlinePlayBeatmapAvailabilityTracker();
-
-        /// <summary>
-        /// Describes the playlist item to be used for the next gameplay session.
-        /// </summary>
-        public PlaylistItem? CurrentItem => currentItem.Value;
-
-        /// <summary>
-        /// Describes the playlist item to be used for the next gameplay session.
-        /// </summary>
-        private readonly Bindable<PlaylistItem?> currentItem = new Bindable<PlaylistItem?>();
-
-        /// <summary>
-        /// Whether the multiplayer room has been joined.
-        /// </summary>
-        private readonly Bindable<bool> hasJoinedRoom = new Bindable<bool>();
+        private readonly OnlinePlayBeatmapAvailabilityTracker beatmapAvailabilityTracker = new MultiplayerBeatmapAvailabilityTracker();
 
         private readonly Room room;
 
@@ -146,6 +130,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         private Sample? sampleStart;
         private IDisposable? userModsSelectOverlayRegistration;
+
+        private long lastPlaylistItemId;
+        private bool isRoomJoined;
 
         public MultiplayerMatchSubScreen(Room room)
         {
@@ -191,10 +178,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                 {
                                     new Drawable[]
                                     {
-                                        new DrawableMatchRoom(room, true)
+                                        new DrawableMultiplayerRoom(room)
                                         {
-                                            OnEdit = () => settingsOverlay.Show(),
-                                            SelectedItem = currentItem
+                                            OnEdit = () => settingsOverlay.Show()
                                         }
                                     },
                                     null,
@@ -285,8 +271,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                                                         new MultiplayerPlaylist(room)
                                                                         {
                                                                             RelativeSizeAxes = Axes.Both,
-                                                                            RequestEdit = ShowSongSelect,
-                                                                            SelectedItem = currentItem
+                                                                            RequestEdit = ShowSongSelect
                                                                         }
                                                                     },
                                                                     new Drawable[]
@@ -399,10 +384,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 Padding = new MarginPadding(5),
-                                Child = new MultiplayerMatchFooter
-                                {
-                                    SelectedItem = currentItem
-                                }
+                                Child = new MultiplayerMatchFooter()
                             }
                         }
                     }
@@ -419,38 +401,97 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             userModsSelectOverlayRegistration = overlayManager?.RegisterBlockingOverlay(userModsSelectOverlay);
 
             client.RoomUpdated += onRoomUpdated;
+            client.SettingsChanged += onSettingsChanged;
+            client.ItemChanged += onItemChanged;
+            client.UserStyleChanged += onUserStyleChanged;
+            client.UserModsChanged += onUserModsChanged;
             client.LoadRequested += onLoadRequested;
 
-            hasJoinedRoom.BindValueChanged(onHasJoinedRoomChanged, true);
-            currentItem.BindValueChanged(onCurrentItemChanged, true);
-
-            beatmapAvailabilityTracker.SelectedItem.BindTo(currentItem);
             beatmapAvailabilityTracker.Availability.BindValueChanged(onBeatmapAvailabilityChanged, true);
 
             onRoomUpdated();
+            updateGameplayState();
+            updateUserActivity();
         }
 
         /// <summary>
-        /// Updates the current playlist item and local user's activity to reflect the room's current state.
+        /// Responds to changes in the active room to adjust the visibility of the settings and main content.
+        /// Only the settings overlay is visible while the room isn't created, and only the main content is visible after creation.
         /// </summary>
         private void onRoomUpdated()
         {
-            hasJoinedRoom.Value = client.Room != null;
+            bool newIsRoomJoined = client.Room != null;
 
-            if (client.Room == null || client.LocalUser == null)
-                return;
+            if (newIsRoomJoined)
+            {
+                roomContent.Show();
+                settingsOverlay.Hide();
+            }
+            else if (isRoomJoined)
+            {
+                Logger.Log($"{this} exiting due to loss of room or connection");
 
-            if (Activity.Value is not UserActivity.InLobby existing || existing.RoomName != client.Room.Settings.Name)
-                Activity.Value = new UserActivity.InLobby(client.Room);
+                if (this.IsCurrentScreen())
+                    this.Exit();
+                else
+                    ValidForResume = false;
+            }
+            else
+            {
+                Debug.Assert(!isRoomJoined && !newIsRoomJoined);
 
-            PlaylistItem roomItem = room.Playlist.Single(i => i.ID == client.Room.Settings.PlaylistItemId);
-            currentItem.Value = roomItem.With(
-                beatmap: new Optional<IBeatmapInfo>(new APIBeatmap { OnlineID = client.LocalUser.BeatmapId ?? roomItem.Beatmap.OnlineID }),
-                ruleset: client.LocalUser.RulesetId ?? roomItem.RulesetID);
+                // A new room is being created.
+                // The main content should be hidden until the settings overlay is hidden, signaling the room is ready to be displayed.
+                roomContent.Hide();
+                settingsOverlay.Show();
+            }
+
+            isRoomJoined = newIsRoomJoined;
         }
 
         /// <summary>
-        /// Responds to notifications from the server that a gameplay session has started and the local user should proceed to a gameplay screen.
+        /// Responds to changes in the room's settings to update the gameplay state and local user's activity.
+        /// </summary>
+        private void onSettingsChanged(MultiplayerRoomSettings settings)
+        {
+            if (settings.PlaylistItemId != lastPlaylistItemId)
+            {
+                updateGameplayState();
+                lastPlaylistItemId = settings.PlaylistItemId;
+            }
+
+            updateUserActivity();
+        }
+
+        /// <summary>
+        /// Responds to changes in the active playlist item to update the gameplay state.
+        /// </summary>
+        private void onItemChanged(MultiplayerPlaylistItem item)
+        {
+            if (item.ID == client.Room?.Settings.PlaylistItemId)
+                updateGameplayState();
+        }
+
+        /// <summary>
+        /// Responds to changes in the local user's style to update the gameplay state.
+        /// </summary>
+        private void onUserStyleChanged(MultiplayerRoomUser user)
+        {
+            if (user.Equals(client.LocalUser))
+                updateGameplayState();
+        }
+
+        /// <summary>
+        /// Responds to changes in the local user's mods style to update the gameplay state.
+        /// </summary>
+        private void onUserModsChanged(MultiplayerRoomUser user)
+        {
+            if (user.Equals(client.LocalUser))
+                updateGameplayState();
+        }
+
+        /// <summary>
+        /// Responds to notifications from the server that a gameplay session is ready to attempt to start the gameplay session.
         /// </summary>
         private void onLoadRequested()
         {
@@ -477,82 +518,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             // This is an issue with MultiSpectatorScreen which is effectively in an always "ready" state and receives LoadRequested() callbacks
             // even when it is not truly ready (i.e. the beatmap hasn't been selected by the client yet). For the time being, a simple fix to this is to ignore the callback.
             // Note that spectator will be entered automatically when the client is capable of doing so via beatmap availability callbacks (see: updateBeatmapAvailability()).
-            if (client.LocalUser.State == MultiplayerUserState.Spectating && (CurrentItem == null || Beatmap.IsDefault))
+            if (client.LocalUser.State == MultiplayerUserState.Spectating || Beatmap.IsDefault)
                 return;
 
             if (beatmapAvailabilityTracker.Availability.Value.State != DownloadState.LocallyAvailable)
                 return;
 
             startPlay();
-        }
-
-        /// <summary>
-        /// Adjusts visibility of UI controls while the room is being created and updates the user's activity on any relevant changes.
-        /// Only the settings overlay is visible while the room isn't created, and only the main content is visible after creation.
-        /// </summary>
-        private void onHasJoinedRoomChanged(ValueChangedEvent<bool> joined)
-        {
-            if (joined.NewValue)
-            {
-                roomContent.Show();
-                settingsOverlay.Hide();
-            }
-            else if (joined.OldValue)
-            {
-                Logger.Log($"{this} exiting due to loss of room or connection");
-
-                if (this.IsCurrentScreen())
-                    this.Exit();
-                else
-                    ValidForResume = false;
-            }
-            else
-            {
-                // A new room is being created.
-                // The main content should be hidden until the settings overlay is hidden, signaling the room is ready to be displayed.
-                roomContent.Hide();
-                settingsOverlay.Show();
-            }
-        }
-
-        /// <summary>
-        /// Responds to changes in the playlist item in preparation for a new gameplay session.
-        /// </summary>
-        private void onCurrentItemChanged(ValueChangedEvent<PlaylistItem?> e)
-        {
-            if (client.Room == null || client.LocalUser == null || e.NewValue == null)
-                return;
-
-            updateGameplayState();
-
-            PlaylistItem item = e.NewValue;
-            bool freemods = item.Freestyle || item.AllowedMods.Length > 0;
-            bool freestyle = item.Freestyle;
-
-            if (freemods)
-                userModsSection.Show();
-            else
-            {
-                userModsSection.Hide();
-                userModsSelectOverlay.Hide();
-            }
-
-            if (freestyle)
-            {
-                userStyleSection.Show();
-
-                if (!item.Equals(userStyleDisplayContainer.SingleOrDefault()?.Item))
-                {
-                    userStyleDisplayContainer.Child = new DrawableRoomPlaylistItem(item, true)
-                    {
-                        AllowReordering = false,
-                        AllowEditing = true,
-                        RequestEdit = _ => showUserStyleSelect()
-                    };
-                }
-            }
-            else
-                userStyleSection.Hide();
         }
 
         /// <summary>
@@ -585,24 +557,68 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         }
 
         /// <summary>
+        /// Updates the local user's activity to publish their presence in the room.
+        /// </summary>
+        private void updateUserActivity()
+        {
+            if (client.Room == null)
+                return;
+
+            if (Activity.Value is not UserActivity.InLobby existing || existing.RoomName != client.Room.Settings.Name)
+                Activity.Value = new UserActivity.InLobby(client.Room);
+        }
+
+        /// <summary>
         /// Updates the global beatmap/ruleset/mods in preparation for a new gameplay session.
         /// </summary>
         private void updateGameplayState()
         {
-            if (client.Room == null || client.LocalUser == null || CurrentItem == null)
+            if (client.Room == null || client.LocalUser == null)
                 return;
 
-            PlaylistItem item = CurrentItem;
-            RulesetInfo ruleset = rulesets.GetRuleset(item.RulesetID)!;
+            MultiplayerPlaylistItem item = client.Room.Playlist.Single(i => i.ID == client.Room.Settings.PlaylistItemId);
+            int beatmapId = client.LocalUser.BeatmapId ?? item.BeatmapID;
+            int rulesetId = client.LocalUser.RulesetId ?? item.RulesetID;
+
+            RulesetInfo ruleset = rulesets.GetRuleset(rulesetId)!;
             Ruleset rulesetInstance = ruleset.CreateInstance();
 
             // Update global gameplay state to correspond to the new selection.
             // Retrieve the corresponding local beatmap, since we can't directly use the playlist's beatmap info
-            int beatmapId = item.Beatmap.OnlineID;
             var localBeatmap = beatmapManager.QueryBeatmap(b => b.OnlineID == beatmapId);
             Beatmap.Value = beatmapManager.GetWorkingBeatmap(localBeatmap);
             Ruleset.Value = ruleset;
             Mods.Value = client.LocalUser.Mods.Concat(item.RequiredMods).Select(m => m.ToMod(rulesetInstance)).ToArray();
+
+            bool freemods = item.Freestyle || item.AllowedMods.Count() > 0;
+            bool freestyle = item.Freestyle;
+
+            if (freemods)
+                userModsSection.Show();
+            else
+            {
+                userModsSection.Hide();
+                userModsSelectOverlay.Hide();
+            }
+
+            if (freestyle)
+            {
+                userStyleSection.Show();
+
+                PlaylistItem apiItem = new PlaylistItem(item);
+
+                if (!apiItem.Equals(userStyleDisplayContainer.SingleOrDefault()?.Item))
+                {
+                    userStyleDisplayContainer.Child = new DrawableRoomPlaylistItem(apiItem, true)
+                    {
+                        AllowReordering = false,
+                        AllowEditing = true,
+                        RequestEdit = _ => showUserStyleSelect()
+                    };
+                }
+            }
+            else
+                userStyleSection.Hide();
         }
 
         /// <summary>
@@ -610,7 +626,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         /// </summary>
         private void startPlay()
         {
-            if (client.Room == null || client.LocalUser == null || !this.IsCurrentScreen() || CurrentItem == null)
+            if (client.Room == null || client.LocalUser == null || !this.IsCurrentScreen())
+                return;
+
+            // Ensure we're in a valid state to be able to start gameplay.
+            MultiplayerPlaylistItem item = client.Room.Playlist.Single(i => i.ID == client.Room.Settings.PlaylistItemId);
+            int beatmapId = client.LocalUser.BeatmapId ?? item.BeatmapID;
+            int rulesetId = client.LocalUser.RulesetId ?? item.RulesetID;
+            if (Beatmap.Value.BeatmapInfo.OnlineID != beatmapId || Ruleset.Value.OnlineID != rulesetId)
                 return;
 
             sampleStart?.Play();
@@ -628,7 +651,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                     break;
 
                 default:
-                    targetScreen.Push(new MultiplayerPlayerLoader(() => new MultiplayerPlayer(room, CurrentItem, users)));
+                    // Required for validation inside the player.
+                    PlaylistItem apiItem = new PlaylistItem(item).With(beatmap: Beatmap.Value.BeatmapInfo, ruleset: Ruleset.Value.OnlineID);
+                    targetScreen.Push(new MultiplayerPlayerLoader(() => new MultiplayerPlayer(room, apiItem, users)));
                     break;
             }
         }
@@ -650,7 +675,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         /// </summary>
         private void showUserModSelect()
         {
-            if (!this.IsCurrentScreen() || CurrentItem == null)
+            if (!this.IsCurrentScreen())
                 return;
 
             userModsSelectOverlay.Show();
@@ -661,10 +686,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         /// </summary>
         private void showUserStyleSelect()
         {
-            if (!this.IsCurrentScreen() || CurrentItem == null)
+            if (!this.IsCurrentScreen() || client.Room == null || client.LocalUser == null)
                 return;
 
-            this.Push(new MultiplayerMatchFreestyleSelect(room, CurrentItem));
+            MultiplayerPlaylistItem item = client.Room.Playlist.Single(i => i.ID == client.Room.Settings.PlaylistItemId);
+            this.Push(new MultiplayerMatchFreestyleSelect(room, new PlaylistItem(item)));
         }
 
         public override void OnEntering(ScreenTransitionEvent e)
@@ -685,7 +711,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             beginHandlingTrack();
 
             // Required to update beatmap/ruleset when resuming from style selection.
-            currentItem.TriggerChange();
+            updateGameplayState();
         }
 
         public override bool OnExiting(ScreenExitEvent e)
@@ -848,10 +874,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         // Normally this would be handled by ScreenStack, but we are in a child ScreenStack.
         public override bool PropagateNonPositionalInputSubTree => base.PropagateNonPositionalInputSubTree && (parentScreen?.IsCurrentScreen() ?? this.IsCurrentScreen());
 
-        protected override BackgroundScreen CreateBackground() => new RoomBackgroundScreen(room.Playlist.FirstOrDefault())
-        {
-            SelectedItem = { BindTarget = currentItem }
-        };
+        protected override BackgroundScreen CreateBackground() => new MultiplayerRoomBackgroundScreen();
 
         Room IMultiplayerMatchScreen.Room => room;
 
@@ -868,6 +891,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             if (client.IsNotNull())
             {
                 client.RoomUpdated -= onRoomUpdated;
+                client.SettingsChanged -= onSettingsChanged;
+                client.ItemChanged -= onItemChanged;
+                client.UserStyleChanged -= onUserStyleChanged;
+                client.UserModsChanged -= onUserModsChanged;
                 client.LoadRequested -= onLoadRequested;
             }
         }
