@@ -929,8 +929,10 @@ namespace osu.Game.Database
                     // Add ScoreInfo.BeatmapHash property to ensure scores correspond to the correct version of beatmap.
                     var scores = migration.NewRealm.All<ScoreInfo>();
 
+                    // While this looks meaningless, behind the scene it synchronises BeatmapHash property with BeatmapInfo.Hash
+                    // since BeatmapInfo property now has an underlying field beatmapInfo
                     foreach (var score in scores)
-                        score.BeatmapInfo = score.BeatmapInfo; //While this looks meaningless, behind the scene it syncs BeatmapHash property with BeatmapInfo.Hash
+                        score.BeatmapInfo = score.BeatmapInfo;
 
                     break;
                 }

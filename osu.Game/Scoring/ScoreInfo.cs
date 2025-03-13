@@ -43,9 +43,6 @@ namespace osu.Game.Scoring
         /// e.g. due to online updates, or local modifications to the beatmap.
         /// The property will only link to a <see cref="BeatmapInfo"/> if its <see cref="Beatmaps.BeatmapInfo.Hash"/> matches <see cref="BeatmapHash"/>.
         /// </para>
-        /// <para>
-        /// Due to the above, whenever setting this, make sure to also set <see cref="BeatmapHash"/> to allow relational consistency when a beatmap is potentially changed.
-        /// </para>
         /// </remarks>
         public BeatmapInfo? BeatmapInfo
         {
