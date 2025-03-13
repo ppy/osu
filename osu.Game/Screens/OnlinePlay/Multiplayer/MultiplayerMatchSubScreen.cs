@@ -20,6 +20,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Online;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
@@ -34,6 +35,7 @@ using osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Participants;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Spectate;
 using osu.Game.Users;
+using osu.Game.Utils;
 using osuTK;
 using Container = osu.Framework.Graphics.Containers.Container;
 using ParticipantsList = osu.Game.Screens.OnlinePlay.Multiplayer.Participants.ParticipantsList;
@@ -586,16 +588,16 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             if (client.Room == null || client.LocalUser == null)
                 return;
 
-            MultiplayerPlaylistItem item = client.Room.Playlist.Single(i => i.ID == client.Room.Settings.PlaylistItemId);
-            int beatmapId = client.LocalUser.BeatmapId ?? item.BeatmapID;
-            int rulesetId = client.LocalUser.RulesetId ?? item.RulesetID;
+            MultiplayerPlaylistItem item = client.Room.CurrentPlaylistItem;
+            int gameplayBeatmapId = client.LocalUser.BeatmapId ?? item.BeatmapID;
+            int gameplayRulesetId = client.LocalUser.RulesetId ?? item.RulesetID;
 
-            RulesetInfo ruleset = rulesets.GetRuleset(rulesetId)!;
+            RulesetInfo ruleset = rulesets.GetRuleset(gameplayRulesetId)!;
             Ruleset rulesetInstance = ruleset.CreateInstance();
 
             // Update global gameplay state to correspond to the new selection.
             // Retrieve the corresponding local beatmap, since we can't directly use the playlist's beatmap info
-            var localBeatmap = beatmapManager.QueryBeatmap(b => b.OnlineID == beatmapId);
+            var localBeatmap = beatmapManager.QueryBeatmap(b => b.OnlineID == gameplayBeatmapId);
             Beatmap.Value = beatmapManager.GetWorkingBeatmap(localBeatmap);
             Ruleset.Value = ruleset;
             Mods.Value = client.LocalUser.Mods.Concat(item.RequiredMods).Select(m => m.ToMod(rulesetInstance)).ToArray();
@@ -615,7 +617,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             {
                 userStyleSection.Show();
 
-                PlaylistItem apiItem = new PlaylistItem(item);
+                PlaylistItem apiItem = new PlaylistItem(item).With(beatmap: new Optional<IBeatmapInfo>(new APIBeatmap { OnlineID = gameplayBeatmapId }), ruleset: gameplayRulesetId);
 
                 if (!apiItem.Equals(userStyleDisplayContainer.SingleOrDefault()?.Item))
                 {
@@ -662,7 +664,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             if (!this.IsCurrentScreen() || client.Room == null || client.LocalUser == null)
                 return;
 
-            MultiplayerPlaylistItem item = client.Room.Playlist.Single(i => i.ID == client.Room.Settings.PlaylistItemId);
+            MultiplayerPlaylistItem item = client.Room.CurrentPlaylistItem;
             this.Push(new MultiplayerMatchFreestyleSelect(room, new PlaylistItem(item)));
         }
 
