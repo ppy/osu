@@ -1183,8 +1183,7 @@ namespace osu.Game.Tests.Database
                 realm.Add(new ScoreInfo
                 {
                     OnlineID = 2,
-                    BeatmapInfo = beatmap,
-                    BeatmapHash = beatmap.Hash
+                    BeatmapInfo = beatmap
                 });
             });
 

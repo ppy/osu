@@ -181,7 +181,6 @@ namespace osu.Game.Tests.Resources
                 CoverUrl = "https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
             },
             BeatmapInfo = beatmap,
-            BeatmapHash = beatmap.Hash,
             Ruleset = beatmap.Ruleset,
             Mods = new Mod[] { new TestModHardRock(), new TestModDoubleTime() },
             TotalScore = 284537,
