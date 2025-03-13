@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
@@ -10,9 +11,13 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Input;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
 using osu.Game.Online.Rooms;
+using osu.Game.Rulesets;
 using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Match;
 using osu.Game.Screens.OnlinePlay.Match.Components;
@@ -32,13 +37,19 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
         private readonly IBindable<bool> isIdle = new BindableBool();
 
+        [Resolved]
+        private IAPIProvider api { get; set; } = null!;
+
         [Resolved(CanBeNull = true)]
         private IdleTracker? idleTracker { get; set; }
 
         private MatchLeaderboard leaderboard = null!;
-        private SelectionPollingComponent selectionPollingComponent = null!;
+        private PlaylistsRoomUpdater roomUpdater = null!;
         private FillFlowContainer progressSection = null!;
         private DrawableRoomPlaylist drawablePlaylist = null!;
+
+        private readonly Bindable<BeatmapInfo?> userBeatmap = new Bindable<BeatmapInfo?>();
+        private readonly Bindable<RulesetInfo?> userRuleset = new Bindable<RulesetInfo?>();
 
         public PlaylistsRoomSubScreen(Room room)
             : base(room, false) // Editing is temporarily not allowed.
@@ -53,13 +64,14 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             if (idleTracker != null)
                 isIdle.BindTo(idleTracker.IsIdle);
 
-            AddInternal(selectionPollingComponent = new SelectionPollingComponent(Room));
+            AddInternal(roomUpdater = new PlaylistsRoomUpdater(Room));
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
+            SelectedItem.BindValueChanged(onSelectedItemChanged, true);
             isIdle.BindValueChanged(_ => updatePollingRate(), true);
 
             Room.PropertyChanged += onRoomPropertyChanged;
@@ -67,6 +79,16 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             updateRoomMaxAttempts();
             updateRoomPlaylist();
         }
+
+        private void onSelectedItemChanged(ValueChangedEvent<PlaylistItem?> item)
+        {
+            // Simplest for now.
+            userBeatmap.Value = null;
+            userRuleset.Value = null;
+        }
+
+        protected override IBeatmapInfo GetGameplayBeatmap() => userBeatmap.Value ?? base.GetGameplayBeatmap();
+        protected override RulesetInfo GetGameplayRuleset() => userRuleset.Value ?? base.GetGameplayRuleset();
 
         private void onRoomPropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
@@ -124,7 +146,6 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                     {
                         new Drawable?[]
                         {
-                            // Playlist items column
                             new GridContainer
                             {
                                 RelativeSizeAxes = Axes.Both,
@@ -143,20 +164,28 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                             RequestResults = item =>
                                             {
                                                 Debug.Assert(Room.RoomID != null);
-                                                ParentScreen?.Push(new PlaylistItemUserResultsScreen(null, Room.RoomID.Value, item));
+                                                ParentScreen?.Push(new PlaylistItemUserBestResultsScreen(Room.RoomID.Value, item, api.LocalUser.Value.Id));
                                             }
                                         }
                                     },
+                                    new Drawable[]
+                                    {
+                                        new AddPlaylistToCollectionButton(Room)
+                                        {
+                                            Margin = new MarginPadding { Top = 5 },
+                                            RelativeSizeAxes = Axes.X,
+                                            Size = new Vector2(1, 40)
+                                        }
+                                    }
                                 },
                                 RowDimensions = new[]
                                 {
                                     new Dimension(GridSizeMode.AutoSize),
                                     new Dimension(),
+                                    new Dimension(GridSizeMode.AutoSize),
                                 }
                             },
-                            // Spacer
                             null,
-                            // Middle column (mods and leaderboard)
                             new GridContainer
                             {
                                 RelativeSizeAxes = Axes.Both,
@@ -168,8 +197,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                         {
                                             RelativeSizeAxes = Axes.X,
                                             AutoSizeAxes = Axes.Y,
-                                            Alpha = 0,
                                             Margin = new MarginPadding { Bottom = 10 },
+                                            Alpha = 0,
                                             Children = new Drawable[]
                                             {
                                                 new OverlinedHeader("Extra mods"),
@@ -185,6 +214,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                             Anchor = Anchor.CentreLeft,
                                                             Origin = Anchor.CentreLeft,
                                                             Width = 90,
+                                                            Height = 30,
                                                             Text = "Select",
                                                             Action = ShowUserModSelect,
                                                         },
@@ -196,6 +226,25 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                             Scale = new Vector2(0.8f),
                                                         },
                                                     }
+                                                }
+                                            }
+                                        },
+                                    },
+                                    new[]
+                                    {
+                                        UserStyleSection = new FillFlowContainer
+                                        {
+                                            RelativeSizeAxes = Axes.X,
+                                            AutoSizeAxes = Axes.Y,
+                                            Margin = new MarginPadding { Bottom = 10 },
+                                            Alpha = 0,
+                                            Children = new Drawable[]
+                                            {
+                                                new OverlinedHeader("Difficulty"),
+                                                UserStyleDisplayContainer = new Container<DrawableRoomPlaylistItem>
+                                                {
+                                                    RelativeSizeAxes = Axes.X,
+                                                    AutoSizeAxes = Axes.Y
                                                 }
                                             }
                                         },
@@ -227,12 +276,11 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                     new Dimension(GridSizeMode.AutoSize),
                                     new Dimension(GridSizeMode.AutoSize),
                                     new Dimension(GridSizeMode.AutoSize),
+                                    new Dimension(GridSizeMode.AutoSize),
                                     new Dimension(),
                                 }
                             },
-                            // Spacer
                             null,
-                            // Main right column
                             new GridContainer
                             {
                                 RelativeSizeAxes = Axes.Both,
@@ -255,7 +303,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
         protected override Drawable CreateFooter() => new PlaylistsRoomFooter(Room)
         {
-            OnStart = StartPlay
+            OnStart = StartPlay,
+            OnClose = closePlaylist,
         };
 
         protected override RoomSettingsOverlay CreateRoomSettingsOverlay(Room room) => new PlaylistsRoomSettingsOverlay(room)
@@ -267,11 +316,35 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             },
         };
 
+        protected override void OpenStyleSelection()
+        {
+            if (!this.IsCurrentScreen() || SelectedItem.Value is not PlaylistItem item)
+                return;
+
+            this.Push(new PlaylistsRoomFreestyleSelect(Room, item)
+            {
+                Beatmap = { BindTarget = userBeatmap },
+                Ruleset = { BindTarget = userRuleset }
+            });
+        }
+
         private void updatePollingRate()
         {
-            selectionPollingComponent.TimeBetweenPolls.Value = isIdle.Value ? 30000 : 5000;
-            Logger.Log($"Polling adjusted (selection: {selectionPollingComponent.TimeBetweenPolls.Value})");
+            roomUpdater.TimeBetweenPolls.Value = isIdle.Value ? 30000 : 5000;
+            Logger.Log($"Polling adjusted (selection: {roomUpdater.TimeBetweenPolls.Value})");
         }
+
+        private void closePlaylist()
+        {
+            DialogOverlay?.Push(new ClosePlaylistDialog(Room, () =>
+            {
+                var request = new ClosePlaylistRequest(Room.RoomID!.Value);
+                request.Success += () => Room.EndDate = DateTimeOffset.UtcNow;
+                API.Queue(request);
+            }));
+        }
+
+        protected override void PartRoom() => api.Queue(new PartRoomRequest(Room));
 
         protected override Screen CreateGameplayScreen(PlaylistItem selectedItem)
         {

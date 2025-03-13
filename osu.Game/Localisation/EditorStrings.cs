@@ -70,6 +70,16 @@ namespace osu.Game.Localisation
         public static LocalisableString DeleteDifficulty => new TranslatableString(getKey(@"delete_difficulty"), @"Delete difficulty");
 
         /// <summary>
+        /// "Edit externally"
+        /// </summary>
+        public static LocalisableString EditExternally => new TranslatableString(getKey(@"edit_externally"), @"Edit externally");
+
+        /// <summary>
+        /// "Submit beatmap"
+        /// </summary>
+        public static LocalisableString SubmitBeatmap => new TranslatableString(getKey(@"submit_beatmap"), @"Submit beatmap");
+
+        /// <summary>
         /// "setup"
         /// </summary>
         public static LocalisableString SetupScreen => new TranslatableString(getKey(@"setup_screen"), @"setup");
@@ -153,6 +163,46 @@ namespace osu.Game.Localisation
         /// "Show ticks"
         /// </summary>
         public static LocalisableString TimelineShowTicks => new TranslatableString(getKey(@"timeline_show_ticks"), @"Show ticks");
+
+        /// <summary>
+        /// "Bookmarks"
+        /// </summary>
+        public static LocalisableString Bookmarks => new TranslatableString(getKey(@"bookmarks"), @"Bookmarks");
+
+        /// <summary>
+        /// "Add bookmark"
+        /// </summary>
+        public static LocalisableString AddBookmark => new TranslatableString(getKey(@"add_bookmark"), @"Add bookmark");
+
+        /// <summary>
+        /// "Remove closest bookmark"
+        /// </summary>
+        public static LocalisableString RemoveClosestBookmark => new TranslatableString(getKey(@"remove_closest_bookmark"), @"Remove closest bookmark");
+
+        /// <summary>
+        /// "Seek to previous bookmark"
+        /// </summary>
+        public static LocalisableString SeekToPreviousBookmark => new TranslatableString(getKey(@"seek_to_previous_bookmark"), @"Seek to previous bookmark");
+
+        /// <summary>
+        /// "Seek to next bookmark"
+        /// </summary>
+        public static LocalisableString SeekToNextBookmark => new TranslatableString(getKey(@"seek_to_next_bookmark"), @"Seek to next bookmark");
+
+        /// <summary>
+        /// "Reset bookmarks"
+        /// </summary>
+        public static LocalisableString ResetBookmarks => new TranslatableString(getKey(@"reset_bookmarks"), @"Reset bookmarks");
+
+        /// <summary>
+        /// "Open beatmap info page"
+        /// </summary>
+        public static LocalisableString OpenInfoPage => new TranslatableString(getKey(@"open_info_page"), @"Open beatmap info page");
+
+        /// <summary>
+        /// "Open beatmap discussion page"
+        /// </summary>
+        public static LocalisableString OpenDiscussionPage => new TranslatableString(getKey(@"open_discussion_page"), @"Open beatmap discussion page");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

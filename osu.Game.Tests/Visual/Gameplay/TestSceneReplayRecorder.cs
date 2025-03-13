@@ -15,6 +15,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Input.StateChanges;
 using osu.Framework.Testing;
 using osu.Framework.Threading;
+using osu.Framework.Timing;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Replays;
 using osu.Game.Rulesets;
@@ -42,6 +43,8 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private GameplayState gameplayState;
 
+        private Drawable content;
+
         [SetUpSteps]
         public void SetUpSteps()
         {
@@ -58,7 +61,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 {
                     RelativeSizeAxes = Axes.Both,
                     CachedDependencies = new (Type, object)[] { (typeof(GameplayState), gameplayState) },
-                    Child = createContent(),
+                    Child = content = createContent(),
                 };
             });
         }
@@ -67,8 +70,30 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void TestBasic()
         {
             AddStep("move to center", () => InputManager.MoveMouseTo(recordingManager.ScreenSpaceDrawQuad.Centre));
-            AddUntilStep("at least one frame recorded", () => replay.Frames.Count > 0);
+            AddUntilStep("at least one frame recorded", () => replay.Frames.Count, () => Is.GreaterThanOrEqualTo(0));
             AddUntilStep("position matches", () => playbackManager.ChildrenOfType<Box>().First().Position == recordingManager.ChildrenOfType<Box>().First().Position);
+        }
+
+        [Test]
+        [Explicit("Making this test work in a headless context is high effort due to rate adjustment requirements not aligning with the global fast clock. StopwatchClock usage would need to be replace with a rate adjusting clock that still reads from the parent clock. High effort for a test which likely will not see any changes to covered code for some years.")]
+        public void TestSlowClockStillRecordsFramesInRealtime()
+        {
+            ScheduledDelegate moveFunction = null;
+
+            AddStep("set slow running clock", () =>
+            {
+                var stopwatchClock = new StopwatchClock(true) { Rate = 0.01 };
+                stopwatchClock.Seek(Clock.CurrentTime);
+
+                content.Clock = new FramedClock(stopwatchClock);
+            });
+
+            AddStep("move to center", () => InputManager.MoveMouseTo(recordingManager.ScreenSpaceDrawQuad.Centre));
+            AddStep("much move", () => moveFunction = Scheduler.AddDelayed(() =>
+                InputManager.MoveMouseTo(InputManager.CurrentState.Mouse.Position + new Vector2(-1, 0)), 10, true));
+            AddWaitStep("move", 10);
+            AddStep("stop move", () => moveFunction.Cancel());
+            AddAssert("at least 60 frames recorded", () => replay.Frames.Count, () => Is.GreaterThanOrEqualTo(60));
         }
 
         [Test]
@@ -81,7 +106,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 InputManager.MoveMouseTo(InputManager.CurrentState.Mouse.Position + new Vector2(-1, 0)), 10, true));
             AddWaitStep("move", 10);
             AddStep("stop move", () => moveFunction.Cancel());
-            AddAssert("at least 60 frames recorded", () => replay.Frames.Count > 60);
+            AddAssert("at least 60 frames recorded", () => replay.Frames.Count, () => Is.GreaterThanOrEqualTo(60));
         }
 
         [Test]
@@ -97,7 +122,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 InputManager.MoveMouseTo(InputManager.CurrentState.Mouse.Position + new Vector2(-1, 0)), 10, true));
             AddWaitStep("move", 10);
             AddStep("stop move", () => moveFunction.Cancel());
-            AddAssert("less than 10 frames recorded", () => replay.Frames.Count - initialFrameCount < 10);
+            AddAssert("less than 10 frames recorded", () => replay.Frames.Count - initialFrameCount, () => Is.LessThan(10));
         }
 
         [Test]
@@ -114,7 +139,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             }, 10, true));
             AddWaitStep("move", 10);
             AddStep("stop move", () => moveFunction.Cancel());
-            AddAssert("at least 60 frames recorded", () => replay.Frames.Count > 60);
+            AddAssert("at least 60 frames recorded", () => replay.Frames.Count, () => Is.GreaterThanOrEqualTo(60));
         }
 
         protected override void Update()

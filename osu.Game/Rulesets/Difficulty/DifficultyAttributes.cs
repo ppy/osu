@@ -17,19 +17,15 @@ namespace osu.Game.Rulesets.Difficulty
     {
         protected const int ATTRIB_ID_AIM = 1;
         protected const int ATTRIB_ID_SPEED = 3;
-        protected const int ATTRIB_ID_OVERALL_DIFFICULTY = 5;
-        protected const int ATTRIB_ID_APPROACH_RATE = 7;
         protected const int ATTRIB_ID_MAX_COMBO = 9;
         protected const int ATTRIB_ID_DIFFICULTY = 11;
-        protected const int ATTRIB_ID_GREAT_HIT_WINDOW = 13;
-        protected const int ATTRIB_ID_SCORE_MULTIPLIER = 15;
         protected const int ATTRIB_ID_FLASHLIGHT = 17;
         protected const int ATTRIB_ID_SLIDER_FACTOR = 19;
         protected const int ATTRIB_ID_SPEED_NOTE_COUNT = 21;
         protected const int ATTRIB_ID_SPEED_DIFFICULT_STRAIN_COUNT = 23;
         protected const int ATTRIB_ID_AIM_DIFFICULT_STRAIN_COUNT = 25;
-        protected const int ATTRIB_ID_OK_HIT_WINDOW = 27;
         protected const int ATTRIB_ID_MONO_STAMINA_FACTOR = 29;
+        protected const int ATTRIB_ID_AIM_DIFFICULT_SLIDER_COUNT = 31;
 
         /// <summary>
         /// The mods which were applied to the beatmap.
