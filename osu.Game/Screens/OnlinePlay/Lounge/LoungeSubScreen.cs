@@ -27,7 +27,6 @@ using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
-using osu.Game.Screens.OnlinePlay.Match;
 using osu.Game.Users;
 using osuTK;
 using osuTK.Graphics;
@@ -218,10 +217,10 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             filter.BindValueChanged(_ =>
             {
                 roomListing.Rooms.Clear();
-                hasListingResults.Value = false;
-                listingPoller.PollImmediately();
+                RefreshRooms();
             });
 
+            updateLoadingLayer();
             updateFilter();
         }
 
@@ -411,7 +410,11 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
         protected virtual void OpenNewRoom(Room room) => this.Push(CreateRoomSubScreen(room));
 
-        public void RefreshRooms() => listingPoller.PollImmediately();
+        public void RefreshRooms()
+        {
+            hasListingResults.Value = false;
+            listingPoller.PollImmediately();
+        }
 
         private void updateLoadingLayer()
         {
@@ -439,6 +442,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         /// <returns>The created <see cref="Room"/>.</returns>
         protected abstract Room CreateNewRoom();
 
-        protected abstract RoomSubScreen CreateRoomSubScreen(Room room);
+        protected abstract OnlinePlaySubScreen CreateRoomSubScreen(Room room);
     }
 }
