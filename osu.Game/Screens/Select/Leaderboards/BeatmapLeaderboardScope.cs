@@ -21,8 +21,7 @@ namespace osu.Game.Screens.Select.Leaderboards
         [LocalisableDescription(typeof(BeatmapsetsStrings), nameof(BeatmapsetsStrings.ShowScoreboardFriend))]
         Friend,
 
-        // TODO: localise once localisations are updated
-        [Description("Team Ranking")]
+        [LocalisableDescription(typeof(BeatmapsetsStrings), nameof(BeatmapsetsStrings.ShowScoreboardTeam))]
         Team,
     }
 }
