@@ -3,19 +3,15 @@
 
 using System;
 using System.Diagnostics;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
-using osu.Framework.Testing;
 using osu.Framework.Timing;
-using osu.Game.Beatmaps;
 using osu.Game.Input.Handlers;
 using osu.Game.Screens.Play;
-using osu.Game.Utils;
 
 namespace osu.Game.Rulesets.UI
 {
@@ -46,7 +42,7 @@ namespace osu.Game.Rulesets.UI
 
         private readonly Bindable<bool> waitingOnFrames = new Bindable<bool>();
 
-        private readonly double gameplayStartTime;
+        public double GameplayStartTime { get; }
 
         private IGameplayClock? parentGameplayClock;
 
@@ -89,7 +85,7 @@ namespace osu.Game.Rulesets.UI
 
             framedClock = new FramedClock(manualClock = new ManualClock());
 
-            this.gameplayStartTime = gameplayStartTime;
+            GameplayStartTime = gameplayStartTime;
         }
 
         [BackgroundDependencyLoader(true)]
@@ -168,13 +164,7 @@ namespace osu.Game.Rulesets.UI
                 if (lastBackwardsSeekLogTime == null || Math.Abs(Clock.CurrentTime - lastBackwardsSeekLogTime.Value) > 1000)
                 {
                     lastBackwardsSeekLogTime = Clock.CurrentTime;
-
-                    string loggableContent = $"Denying backwards seek during gameplay (reference: {referenceClock.CurrentTime:N2} stable: {proposedTime:N2})";
-
-                    if (parentGameplayClock is GameplayClockContainer gcc)
-                        loggableContent += $"\n{gcc.ChildrenOfType<FramedBeatmapClock>().Single().GetSnapshot()}";
-
-                    Logger.Error(new SentryOnlyDiagnosticsException("backwards seek"), loggableContent);
+                    Logger.Log($"Denying backwards seek during gameplay (reference: {referenceClock.CurrentTime:N2} stable: {proposedTime:N2})");
                 }
 
                 state = PlaybackState.NotValid;
@@ -267,8 +257,8 @@ namespace osu.Game.Rulesets.UI
                 return;
             }
 
-            if (manualClock.CurrentTime < gameplayStartTime)
-                manualClock.CurrentTime = proposedTime = Math.Min(gameplayStartTime, proposedTime);
+            if (manualClock.CurrentTime < GameplayStartTime)
+                manualClock.CurrentTime = proposedTime = Math.Min(GameplayStartTime, proposedTime);
             else if (Math.Abs(manualClock.CurrentTime - proposedTime) > sixty_frame_time * 1.2f)
             {
                 proposedTime = proposedTime > manualClock.CurrentTime

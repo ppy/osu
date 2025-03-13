@@ -21,6 +21,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
+using osu.Game.Utils;
 using osuTK;
 
 namespace osu.Game.Overlays.BeatmapSet
@@ -185,7 +186,7 @@ namespace osu.Game.Overlays.BeatmapSet
                                                                 OnHovered = beatmap =>
                                                                 {
                                                                     showBeatmap(beatmap);
-                                                                    starRating.Text = beatmap.StarRating.ToLocalisableString(@"0.00");
+                                                                    starRating.Text = beatmap.StarRating.FormatStarRating();
                                                                     starRatingContainer.FadeIn(100);
                                                                 },
                                                                 OnClicked = beatmap => { Beatmap.Value = beatmap; },

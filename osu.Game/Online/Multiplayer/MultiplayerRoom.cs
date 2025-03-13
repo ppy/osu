@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using MessagePack;
 using Newtonsoft.Json;
 using osu.Game.Online.Rooms;
@@ -58,11 +59,26 @@ namespace osu.Game.Online.Multiplayer
         [Key(7)]
         public IList<MultiplayerCountdown> ActiveCountdowns { get; set; } = new List<MultiplayerCountdown>();
 
+        /// <summary>
+        /// The ID of the chat channel for the room.
+        /// </summary>
+        [Key(8)]
+        public int ChannelID { get; set; }
+
         [JsonConstructor]
         [SerializationConstructor]
         public MultiplayerRoom(long roomId)
         {
             RoomID = roomId;
+        }
+
+        public MultiplayerRoom(Room room)
+        {
+            RoomID = room.RoomID ?? 0;
+            ChannelID = room.ChannelId;
+            Settings = new MultiplayerRoomSettings(room);
+            Host = room.Host != null ? new MultiplayerRoomUser(room.Host.OnlineID) : null;
+            Playlist = room.Playlist.Select(p => new MultiplayerPlaylistItem(p)).ToArray();
         }
 
         public override string ToString() => $"RoomID:{RoomID} Host:{Host?.UserID} Users:{Users.Count} State:{State} Settings: [{Settings}]";

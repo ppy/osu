@@ -45,6 +45,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         private readonly BindableNumber<float> rotation = new BindableNumber<float> { MinValue = 0, MaxValue = 360 };
 
+        private readonly BindableNumber<float> pressureThreshold = new BindableNumber<float> { MinValue = 0.0f, MaxValue = 1.0f, Precision = 0.005f };
+
         [Resolved]
         private GameHost host { get; set; }
 
@@ -114,10 +116,10 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                             if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows || RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
                             {
                                 t.NewLine();
-                                var formattedSource = MessageFormatter.FormatText(localisation.GetLocalisedBindableString(TabletSettingsStrings.NoTabletDetectedDescription(
+                                var formattedSource = MessageFormatter.FormatText(localisation.GetLocalisedString(TabletSettingsStrings.NoTabletDetectedDescription(
                                     RuntimeInfo.OS == RuntimeInfo.Platform.Windows
                                         ? @"https://opentabletdriver.net/Wiki/FAQ/Windows"
-                                        : @"https://opentabletdriver.net/Wiki/FAQ/Linux")).Value);
+                                        : @"https://opentabletdriver.net/Wiki/FAQ/Linux")));
                                 t.AddLinks(formattedSource.Text, formattedSource.Links);
                             }
                         }),
@@ -213,6 +215,13 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                             Current = sizeY,
                             CanBeShown = { BindTarget = enabled }
                         },
+                        new SettingsPercentageSlider<float>
+                        {
+                            TransferValueOnCommit = true,
+                            LabelText = TabletSettingsStrings.TipPressureForClick,
+                            Current = pressureThreshold,
+                            CanBeShown = { BindTarget = enabled }
+                        },
                     }
                 },
             };
@@ -266,6 +275,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 aspectRatioApplication?.Cancel();
                 aspectRatioApplication = Schedule(() => forceAspectRatio(aspect.NewValue));
             });
+
+            pressureThreshold.BindTo(tabletHandler.PressureThreshold);
 
             tablet.BindTo(tabletHandler.Tablet);
             tablet.BindValueChanged(val => Schedule(() =>

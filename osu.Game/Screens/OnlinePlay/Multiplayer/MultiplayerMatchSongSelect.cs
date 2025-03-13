@@ -11,7 +11,6 @@ using osu.Framework.Screens;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Select;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer
@@ -86,7 +85,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                     BeatmapChecksum = item.Beatmap.MD5Hash,
                     RulesetID = item.RulesetID,
                     RequiredMods = item.RequiredMods.ToArray(),
-                    AllowedMods = item.AllowedMods.ToArray()
+                    AllowedMods = item.AllowedMods.ToArray(),
+                    Freestyle = item.Freestyle
                 };
 
                 Task task = itemToEdit != null ? client.EditPlaylistItem(multiplayerItem) : client.AddPlaylistItem(multiplayerItem);
@@ -121,9 +121,5 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         }
 
         protected override BeatmapDetailArea CreateBeatmapDetailArea() => new PlayBeatmapDetailArea();
-
-        protected override bool IsValidMod(Mod mod) => base.IsValidMod(mod) && mod.ValidForMultiplayer;
-
-        protected override bool IsValidFreeMod(Mod mod) => base.IsValidFreeMod(mod) && mod.ValidForMultiplayerAsFreeMod;
     }
 }

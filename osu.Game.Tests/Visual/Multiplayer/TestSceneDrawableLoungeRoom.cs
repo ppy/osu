@@ -38,7 +38,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [BackgroundDependencyLoader]
         private void load()
         {
-            var mockLounge = new Mock<LoungeSubScreen>();
+            var mockLounge = new Mock<IOnlinePlayLounge>();
             mockLounge
                 .Setup(l => l.Join(It.IsAny<Room>(), It.IsAny<string>(), It.IsAny<Action<Room>>(), It.IsAny<Action<string>>()))
                 .Callback<Room, string, Action<Room>, Action<string>>((_, _, _, d) =>

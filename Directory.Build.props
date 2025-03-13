@@ -18,9 +18,21 @@
   <ItemGroup Label="Code Analysis">
     <PackageReference Include="Microsoft.CodeAnalysis.BannedApiAnalyzers" Version="3.3.4" PrivateAssets="All" />
     <AdditionalFiles Include="$(MSBuildThisFileDirectory)CodeAnalysis\BannedSymbols.txt" />
+    <!-- Rider compatibility: .globalconfig needs to be explicitly referenced instead of using the global file name. -->
+    <GlobalAnalyzerConfigFiles Include="$(MSBuildThisFileDirectory)CodeAnalysis\osu.globalconfig" />
   </ItemGroup>
   <PropertyGroup Label="Code Analysis">
-    <CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)CodeAnalysis\osu.ruleset</CodeAnalysisRuleSet>
+    <AnalysisMode>Default</AnalysisMode>
+    <AnalysisModeDesign>Default</AnalysisModeDesign>
+    <AnalysisModeDocumentation>Recommended</AnalysisModeDocumentation>
+    <AnalysisModeGlobalization>Recommended</AnalysisModeGlobalization>
+    <AnalysisModeInteroperability>Recommended</AnalysisModeInteroperability>
+    <AnalysisModeMaintainability>Recommended</AnalysisModeMaintainability>
+    <AnalysisModeNaming>Default</AnalysisModeNaming>
+    <AnalysisModePerformance>Minimum</AnalysisModePerformance>
+    <AnalysisModeReliability>Recommended</AnalysisModeReliability>
+    <AnalysisModeSecurity>Default</AnalysisModeSecurity>
+    <AnalysisModeUsage>Default</AnalysisModeUsage>
   </PropertyGroup>
   <PropertyGroup Label="Documentation">
     <GenerateDocumentationFile>true</GenerateDocumentationFile>

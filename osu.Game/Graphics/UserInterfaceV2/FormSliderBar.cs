@@ -119,7 +119,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                             Caption = Caption,
                             TooltipText = HintText,
                         },
-                        textBox = new FormNumberBox.InnerNumberBox
+                        textBox = new FormNumberBox.InnerNumberBox(allowDecimals: true)
                         {
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
@@ -127,7 +127,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
                             Width = 0.5f,
                             CommitOnFocusLost = true,
                             SelectAllOnFocus = true,
-                            AllowDecimals = true,
                             OnInputError = () =>
                             {
                                 flashLayer.Colour = ColourInfo.GradientVertical(colours.Red3.Opacity(0), colours.Red3);

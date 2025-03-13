@@ -15,6 +15,7 @@ using osu.Game.Graphics;
 using osu.Game.Models;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Menu;
+using osu.Game.Utils;
 using osuTK;
 using osuTK.Graphics;
 
@@ -207,7 +208,7 @@ namespace osu.Game.Tournament.Components
                                         Children = new Drawable[]
                                         {
                                             new DiffPiece(stats),
-                                            new DiffPiece(("Star Rating", $"{beatmap.StarRating:0.00}{srExtra}"))
+                                            new DiffPiece(("Star Rating", $"{beatmap.StarRating.FormatStarRating()}{srExtra}"))
                                         }
                                     },
                                     new FillFlowContainer

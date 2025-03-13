@@ -14,11 +14,10 @@ M:Realms.CollectionExtensions.SubscribeForNotifications`1(System.Collections.Gen
 M:System.Threading.Tasks.Task.Wait();Don't use Task.Wait. Use Task.WaitSafely() to ensure we avoid deadlocks.
 P:System.Threading.Tasks.Task`1.Result;Don't use Task.Result. Use Task.GetResultSafely() to ensure we avoid deadlocks.
 M:System.Threading.ManualResetEventSlim.Wait();Specify a timeout to avoid waiting forever.
-M:System.Char.ToLower(System.Char);char.ToLower() changes behaviour depending on CultureInfo.CurrentCulture. Use char.ToLowerInvariant() instead. If wanting culture-sensitive behaviour, explicitly provide CultureInfo.CurrentCulture.
-M:System.Char.ToUpper(System.Char);char.ToUpper() changes behaviour depending on CultureInfo.CurrentCulture. Use char.ToUpperInvariant() instead. If wanting culture-sensitive behaviour, explicitly provide CultureInfo.CurrentCulture.
-M:System.String.ToLower();string.ToLower() changes behaviour depending on CultureInfo.CurrentCulture. Use string.ToLowerInvariant() instead. If wanting culture-sensitive behaviour, explicitly provide CultureInfo.CurrentCulture or use LocalisableString.
-M:System.String.ToUpper();string.ToUpper() changes behaviour depending on CultureInfo.CurrentCulture. Use string.ToUpperInvariant() instead. If wanting culture-sensitive behaviour, explicitly provide CultureInfo.CurrentCulture or use LocalisableString.
 M:Humanizer.InflectorExtensions.Pascalize(System.String);Humanizer's .Pascalize() extension method changes behaviour depending on CultureInfo.CurrentCulture. Use StringDehumanizeExtensions.ToPascalCase() instead.
 M:Humanizer.InflectorExtensions.Camelize(System.String);Humanizer's .Camelize() extension method changes behaviour depending on CultureInfo.CurrentCulture. Use StringDehumanizeExtensions.ToCamelCase() instead.
 M:Humanizer.InflectorExtensions.Underscore(System.String);Humanizer's .Underscore() extension method changes behaviour depending on CultureInfo.CurrentCulture. Use StringDehumanizeExtensions.ToSnakeCase() instead.
 M:Humanizer.InflectorExtensions.Kebaberize(System.String);Humanizer's .Kebaberize() extension method changes behaviour depending on CultureInfo.CurrentCulture. Use StringDehumanizeExtensions.ToKebabCase() instead.
+M:osuTK.MathHelper.Clamp(System.Int32,System.Int32,System.Int32)~System.Int32;Use Math.Clamp() instead.
+M:osuTK.MathHelper.Clamp(System.Single,System.Single,System.Single)~System.Single;This osuTK helper has unsafe semantics when one of the bounds provided is NaN. Use Math.Clamp() instead.
+M:osuTK.MathHelper.Clamp(System.Double,System.Double,System.Double)~System.Double;This osuTK helper has unsafe semantics when one of the bounds provided is NaN. Use Math.Clamp() instead.

@@ -3,8 +3,8 @@
 
 using System;
 using osu.Framework.Allocation;
-using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osuTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -26,7 +26,8 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
         [Resolved]
         protected EditorBeatmap EditorBeatmap { get; private set; } = null!;
 
-        protected readonly IBindable<Track> Track = new Bindable<Track>();
+        [Resolved]
+        private EditorClock editorClock { get; set; } = null!;
 
         private readonly Container<T> content;
 
@@ -35,22 +36,17 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
         public TimelinePart(Container<T>? content = null)
         {
             AddInternal(this.content = content ?? new Container<T> { RelativeSizeAxes = Axes.Both });
-
-            beatmap.ValueChanged += _ =>
-            {
-                updateRelativeChildSize();
-            };
-
-            Track.ValueChanged += _ => updateRelativeChildSize();
         }
 
         [BackgroundDependencyLoader]
-        private void load(IBindable<WorkingBeatmap> beatmap, EditorClock clock)
+        private void load(IBindable<WorkingBeatmap> beatmap)
         {
             this.beatmap.BindTo(beatmap);
             LoadBeatmap(EditorBeatmap);
 
-            Track.BindTo(clock.Track);
+            this.beatmap.ValueChanged += _ => updateRelativeChildSize();
+            editorClock.TrackChanged += updateRelativeChildSize;
+            updateRelativeChildSize();
         }
 
         private void updateRelativeChildSize()
@@ -67,6 +63,14 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
         protected virtual void LoadBeatmap(EditorBeatmap beatmap)
         {
             content.Clear();
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (editorClock.IsNotNull())
+                editorClock.TrackChanged -= updateRelativeChildSize;
         }
     }
 }

@@ -18,6 +18,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         [Resolved]
         private MultiplayerClient multiplayerClient { get; set; } = null!;
 
+        [Resolved]
+        private OsuGame? game { get; set; }
+
         private Player? player;
 
         public MultiplayerPlayerLoader(Func<Player> createPlayer)
@@ -38,6 +41,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         protected override void OnPlayerLoaded()
         {
             base.OnPlayerLoaded();
+
+            game?.Window?.Flash();
 
             multiplayerClient.ChangeState(MultiplayerUserState.Loaded)
                              .ContinueWith(task => failAndBail(task.Exception?.Message ?? "Server error"), TaskContinuationOptions.NotOnRanToCompletion);

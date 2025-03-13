@@ -429,6 +429,41 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString EditorSeekToNextSamplePoint => new TranslatableString(getKey(@"editor_seek_to_next_sample_point"), @"Seek to next sample point");
 
+        /// <summary>
+        /// "Add bookmark"
+        /// </summary>
+        public static LocalisableString EditorAddBookmark => new TranslatableString(getKey(@"editor_add_bookmark"), @"Add bookmark");
+
+        /// <summary>
+        /// "Remove closest bookmark"
+        /// </summary>
+        public static LocalisableString EditorRemoveClosestBookmark => new TranslatableString(getKey(@"editor_remove_closest_bookmark"), @"Remove closest bookmark");
+
+        /// <summary>
+        /// "Seek to previous bookmark"
+        /// </summary>
+        public static LocalisableString EditorSeekToPreviousBookmark => new TranslatableString(getKey(@"editor_seek_to_previous_bookmark"), @"Seek to previous bookmark");
+
+        /// <summary>
+        /// "Seek to next bookmark"
+        /// </summary>
+        public static LocalisableString EditorSeekToNextBookmark => new TranslatableString(getKey(@"editor_seek_to_next_bookmark"), @"Seek to next bookmark");
+
+        /// <summary>
+        /// "Absolute scroll song list"
+        /// </summary>
+        public static LocalisableString AbsoluteScrollSongList => new TranslatableString(getKey(@"absolute_scroll_song_list"), @"Absolute scroll song list");
+
+        /// <summary>
+        /// "Toggle movement control"
+        /// </summary>
+        public static LocalisableString EditorToggleMoveControl => new TranslatableString(getKey(@"editor_toggle_move_control"), @"Toggle movement control");
+
+        /// <summary>
+        /// "Discard unsaved changes"
+        /// </summary>
+        public static LocalisableString EditorDiscardUnsavedChanges => new TranslatableString(getKey(@"editor_discard_unsaved_changes"), @"Discard unsaved changes");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

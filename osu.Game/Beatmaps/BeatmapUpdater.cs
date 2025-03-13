@@ -51,7 +51,7 @@ namespace osu.Game.Beatmaps
                 if (lookupScope != MetadataLookupScope.None)
                     metadataLookup.Update(beatmapSet, lookupScope == MetadataLookupScope.OnlineFirst);
 
-                foreach (var beatmap in beatmapSet.Beatmaps)
+                foreach (BeatmapInfo beatmap in beatmapSet.Beatmaps)
                 {
                     difficultyCache.Invalidate(beatmap);
 
@@ -63,10 +63,7 @@ namespace osu.Game.Beatmaps
                     var calculator = ruleset.CreateDifficultyCalculator(working);
 
                     beatmap.StarRating = calculator.Calculate().StarRating;
-                    beatmap.Length = working.Beatmap.CalculatePlayableLength();
-                    beatmap.BPM = 60000 / working.Beatmap.GetMostCommonBeatLength();
-                    beatmap.EndTimeObjectCount = working.Beatmap.HitObjects.Count(h => h is IHasDuration);
-                    beatmap.TotalObjectCount = working.Beatmap.HitObjects.Count;
+                    beatmap.UpdateStatisticsFromBeatmap(working.Beatmap);
                 }
 
                 // And invalidate again afterwards as re-fetching the most up-to-date database metadata will be required.

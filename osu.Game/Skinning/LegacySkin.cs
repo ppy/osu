@@ -198,8 +198,14 @@ namespace osu.Game.Skinning
                 case LegacyManiaSkinConfigurationLookups.ComboBreakColour:
                     return SkinUtils.As<TValue>(getCustomColour(existing, "ColourBreak"));
 
+                case LegacyManiaSkinConfigurationLookups.BarLineColour:
+                    return SkinUtils.As<TValue>(getCustomColour(existing, "ColourBarline"));
+
                 case LegacyManiaSkinConfigurationLookups.MinimumColumnWidth:
                     return SkinUtils.As<TValue>(new Bindable<float>(existing.MinimumColumnWidth));
+
+                case LegacyManiaSkinConfigurationLookups.BarLineHeight:
+                    return SkinUtils.As<TValue>(new Bindable<float>(existing.BarLineHeight));
 
                 case LegacyManiaSkinConfigurationLookups.NoteBodyStyle:
 
@@ -367,16 +373,29 @@ namespace osu.Game.Skinning
                                 return new DefaultSkinComponentsContainer(container =>
                                 {
                                     var combo = container.OfType<LegacyDefaultComboCounter>().FirstOrDefault();
+                                    var spectatorList = container.OfType<SpectatorList>().FirstOrDefault();
+
+                                    Vector2 pos = new Vector2();
 
                                     if (combo != null)
                                     {
                                         combo.Anchor = Anchor.BottomLeft;
                                         combo.Origin = Anchor.BottomLeft;
                                         combo.Scale = new Vector2(1.28f);
+
+                                        pos += new Vector2(10, -(combo.DrawHeight * 1.56f + 20) * combo.Scale.X);
+                                    }
+
+                                    if (spectatorList != null)
+                                    {
+                                        spectatorList.Anchor = Anchor.BottomLeft;
+                                        spectatorList.Origin = Anchor.BottomLeft;
+                                        spectatorList.Position = pos;
                                     }
                                 })
                                 {
-                                    new LegacyDefaultComboCounter()
+                                    new LegacyDefaultComboCounter(),
+                                    new SpectatorList(),
                                 };
                             }
 

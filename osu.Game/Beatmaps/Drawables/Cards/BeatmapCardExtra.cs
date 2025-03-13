@@ -22,7 +22,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
         protected override Drawable IdleContent => idleBottomContent;
         protected override Drawable DownloadInProgressContent => downloadProgressBar;
 
-        private const float height = 140;
+        private const float height = 112;
 
         [Cached]
         private readonly BeatmapCardContent content;
@@ -68,7 +68,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                             Padding = new MarginPadding { Right = CORNER_RADIUS },
                             Child = leftIconArea = new FillFlowContainer
                             {
-                                Margin = new MarginPadding(5),
+                                Margin = new MarginPadding(4),
                                 AutoSizeAxes = Axes.Both,
                                 Direction = FillDirection.Horizontal,
                                 Spacing = new Vector2(1)
@@ -80,7 +80,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                             Width = WIDTH - height + CORNER_RADIUS,
                             FavouriteState = { BindTarget = FavouriteState },
                             ButtonsCollapsedWidth = CORNER_RADIUS,
-                            ButtonsExpandedWidth = 30,
+                            ButtonsExpandedWidth = 24,
                             Children = new Drawable[]
                             {
                                 new FillFlowContainer
@@ -109,7 +109,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                                                     new TruncatingSpriteText
                                                     {
                                                         Text = new RomanisableString(BeatmapSet.TitleUnicode, BeatmapSet.Title),
-                                                        Font = OsuFont.Default.With(size: 22.5f, weight: FontWeight.SemiBold),
+                                                        Font = OsuFont.Default.With(size: 18f, weight: FontWeight.SemiBold),
                                                         RelativeSizeAxes = Axes.X,
                                                     },
                                                     titleBadgeArea = new FillFlowContainer
@@ -142,7 +142,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                                                     new TruncatingSpriteText
                                                     {
                                                         Text = createArtistText(),
-                                                        Font = OsuFont.Default.With(size: 17.5f, weight: FontWeight.SemiBold),
+                                                        Font = OsuFont.Default.With(size: 14f, weight: FontWeight.SemiBold),
                                                         RelativeSizeAxes = Axes.X,
                                                     },
                                                     Empty()
@@ -154,7 +154,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                                             RelativeSizeAxes = Axes.X,
                                             Text = BeatmapSet.Source,
                                             Shadow = false,
-                                            Font = OsuFont.GetFont(size: 14, weight: FontWeight.SemiBold),
+                                            Font = OsuFont.GetFont(size: 11f, weight: FontWeight.SemiBold),
                                             Colour = colourProvider.Content2
                                         },
                                     }
@@ -173,18 +173,18 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                                             RelativeSizeAxes = Axes.X,
                                             AutoSizeAxes = Axes.Y,
                                             Direction = FillDirection.Vertical,
-                                            Spacing = new Vector2(0, 3),
+                                            Spacing = new Vector2(0, 2),
                                             AlwaysPresent = true,
                                             Children = new Drawable[]
                                             {
                                                 new LinkFlowContainer(s =>
                                                 {
                                                     s.Shadow = false;
-                                                    s.Font = OsuFont.GetFont(size: 14, weight: FontWeight.SemiBold);
+                                                    s.Font = OsuFont.GetFont(size: 11f, weight: FontWeight.SemiBold);
                                                 }).With(d =>
                                                 {
                                                     d.AutoSizeAxes = Axes.Both;
-                                                    d.Margin = new MarginPadding { Top = 2 };
+                                                    d.Margin = new MarginPadding { Top = 1 };
                                                     d.AddText("mapped by ", t => t.Colour = colourProvider.Content2);
                                                     d.AddUserLink(BeatmapSet.Author);
                                                 }),
@@ -215,7 +215,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                                         downloadProgressBar = new BeatmapCardDownloadProgressBar
                                         {
                                             RelativeSizeAxes = Axes.X,
-                                            Height = 6,
+                                            Height = 5,
                                             Anchor = Anchor.Centre,
                                             Origin = Anchor.Centre,
                                             State = { BindTarget = DownloadTracker.State },
@@ -231,17 +231,17 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Padding = new MarginPadding { Horizontal = 10, Vertical = 13 },
+                    Padding = new MarginPadding { Horizontal = 8, Vertical = 10 },
                     Child = new BeatmapCardDifficultyList(BeatmapSet)
                 };
                 c.Expanded.BindTarget = Expanded;
             });
 
             if (BeatmapSet.HasVideo)
-                leftIconArea.Add(new VideoIconPill { IconSize = new Vector2(20) });
+                leftIconArea.Add(new VideoIconPill { IconSize = new Vector2(16) });
 
             if (BeatmapSet.HasStoryboard)
-                leftIconArea.Add(new StoryboardIconPill { IconSize = new Vector2(20) });
+                leftIconArea.Add(new StoryboardIconPill { IconSize = new Vector2(16) });
 
             if (BeatmapSet.FeaturedInSpotlight)
             {
@@ -249,7 +249,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                 {
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight,
-                    Margin = new MarginPadding { Left = 5 }
+                    Margin = new MarginPadding { Left = 4 }
                 });
             }
 
@@ -259,7 +259,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                 {
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight,
-                    Margin = new MarginPadding { Left = 5 }
+                    Margin = new MarginPadding { Left = 4 }
                 });
             }
 
@@ -269,7 +269,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                 {
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight,
-                    Margin = new MarginPadding { Left = 5 }
+                    Margin = new MarginPadding { Left = 4 }
                 };
             }
 
@@ -288,7 +288,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
         {
             BeatmapCardStatistic withMargin(BeatmapCardStatistic original)
             {
-                original.Margin = new MarginPadding { Right = 10 };
+                original.Margin = new MarginPadding { Right = 8 };
                 return original;
             }
 

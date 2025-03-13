@@ -1,13 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
+using osu.Framework.Extensions.ExceptionExtensions;
 using osu.Framework.Logging;
-using osu.Framework.Screens;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Configuration;
@@ -15,7 +13,6 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
-using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Lounge;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Screens.OnlinePlay.Match;
@@ -31,23 +28,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         private MultiplayerClient client { get; set; } = null!;
 
         private Dropdown<RoomPermissionsFilter> roomAccessTypeDropdown = null!;
-
-        public override void OnResuming(ScreenTransitionEvent e)
-        {
-            base.OnResuming(e);
-
-            // Upon having left a room, we don't know whether we were the only participant, and whether the room is now closed as a result of leaving it.
-            // To work around this, temporarily remove the room and trigger an immediate listing poll.
-            if (e.Last is MultiplayerMatchSubScreen match)
-            {
-                RoomManager?.RemoveRoom(match.Room);
-                ListingPollingComponent.PollImmediately();
-            }
-        }
+        private OsuCheckbox showInProgress = null!;
 
         protected override IEnumerable<Drawable> CreateFilterControls()
         {
-            roomAccessTypeDropdown = new SlimEnumDropdown<RoomPermissionsFilter>
+            foreach (var control in base.CreateFilterControls())
+                yield return control;
+
+            yield return roomAccessTypeDropdown = new SlimEnumDropdown<RoomPermissionsFilter>
             {
                 RelativeSizeAxes = Axes.None,
                 Current = Config.GetBindable<RoomPermissionsFilter>(OsuSetting.MultiplayerRoomFilter),
@@ -56,7 +44,17 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             roomAccessTypeDropdown.Current.BindValueChanged(_ => UpdateFilter());
 
-            return base.CreateFilterControls().Append(roomAccessTypeDropdown);
+            yield return showInProgress = new OsuCheckbox
+            {
+                LabelText = "Show in-progress rooms",
+                RelativeSizeAxes = Axes.None,
+                Width = 220,
+                Padding = new MarginPadding { Vertical = 5, },
+                Current = Config.GetBindable<bool>(OsuSetting.MultiplayerShowInProgressFilter),
+            };
+
+            showInProgress.Current.BindValueChanged(_ => UpdateFilter());
+            StatusDropdown.Current.BindValueChanged(_ => showInProgress.Alpha = StatusDropdown.Current.Value == RoomModeFilter.Open ? 1 : 0, true);
         }
 
         protected override FilterCriteria CreateFilterCriteria()
@@ -64,6 +62,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             var criteria = base.CreateFilterCriteria();
             criteria.Category = @"realtime";
             criteria.Permissions = roomAccessTypeDropdown.Current.Value;
+            criteria.Status = showInProgress.Current.Value && criteria.Mode == RoomModeFilter.Open ? null : RoomStatusFilter.Idle;
             return criteria;
         }
 
@@ -77,7 +76,31 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         protected override RoomSubScreen CreateRoomSubScreen(Room room) => new MultiplayerMatchSubScreen(room);
 
-        protected override ListingPollingComponent CreatePollingComponent() => new MultiplayerListingPollingComponent();
+        protected override void JoinInternal(Room room, string? password, Action<Room> onSuccess, Action<string> onFailure)
+        {
+            client.JoinRoom(room, password).ContinueWith(result =>
+            {
+                if (result.IsCompletedSuccessfully)
+                    onSuccess(room);
+                else
+                {
+                    Exception? exception = result.Exception?.AsSingular();
+
+                    if (exception?.GetHubExceptionMessage() is string message)
+                        onFailure(message);
+                    else
+                    {
+                        const string generic_failure_message = "Failed to join multiplayer room.";
+                        if (result.Exception != null)
+                            Logger.Error(result.Exception, generic_failure_message);
+                        onFailure(generic_failure_message);
+                    }
+                }
+            });
+        }
+
+        public override void Close(Room room)
+            => throw new NotSupportedException("Cannot close multiplayer rooms.");
 
         protected override void OpenNewRoom(Room room)
         {
@@ -88,38 +111,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             }
 
             base.OpenNewRoom(room);
-        }
-
-        private partial class MultiplayerListingPollingComponent : ListingPollingComponent
-        {
-            [Resolved]
-            private MultiplayerClient client { get; set; } = null!;
-
-            private readonly IBindable<bool> isConnected = new Bindable<bool>();
-
-            [BackgroundDependencyLoader]
-            private void load()
-            {
-                isConnected.BindTo(client.IsConnected);
-                isConnected.BindValueChanged(_ => Scheduler.AddOnce(poll), true);
-            }
-
-            private void poll()
-            {
-                if (isConnected.Value && IsLoaded)
-                    PollImmediately();
-            }
-
-            protected override Task Poll()
-            {
-                if (!isConnected.Value)
-                    return Task.CompletedTask;
-
-                if (client.Room != null)
-                    return Task.CompletedTask;
-
-                return base.Poll();
-            }
         }
     }
 }

@@ -152,7 +152,7 @@ namespace osu.Game.Screens.Play
                                 Logger.Log($"Please ensure that you are using the latest version of the official game releases.\n\n{whatWillHappen}", level: LogLevel.Important);
                                 break;
 
-                            case @"invalid beatmap_hash":
+                            case @"invalid or missing beatmap_hash":
                                 Logger.Log($"This beatmap does not match the online version. Please update or redownload it.\n\n{whatWillHappen}", level: LogLevel.Important);
                                 break;
 
@@ -281,6 +281,13 @@ namespace osu.Game.Screens.Play
             if (!score.ScoreInfo.Statistics.Any(s => s.Key.IsHit() && s.Value > 0))
             {
                 Logger.Log("No hits registered, skipping score submission");
+                return Task.CompletedTask;
+            }
+
+            // zero scores should also never be submitted.
+            if (score.ScoreInfo.TotalScore == 0)
+            {
+                Logger.Log("Zero score, skipping score submission");
                 return Task.CompletedTask;
             }
 
