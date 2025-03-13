@@ -219,6 +219,28 @@ namespace osu.Game.Tests.Visual.Ranking
             });
         }
 
+        [Test]
+        public void TestTaggingWhenRankTooLow()
+        {
+            var score = TestResources.CreateTestScoreInfo();
+            score.Rank = ScoreRank.D;
+
+            AddStep("load panel", () =>
+            {
+                Child = new PopoverContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Child = new StatisticsPanel
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        State = { Value = Visibility.Visible },
+                        Score = { Value = score },
+                        AchievedScore = score,
+                    }
+                };
+            });
+        }
+
         private void loadPanel(ScoreInfo score) => AddStep("load panel", () =>
         {
             Child = new StatisticsPanel
