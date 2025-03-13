@@ -1,13 +1,18 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Development;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Logging;
+using osu.Framework.Platform;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets;
@@ -47,10 +52,21 @@ namespace osu.Game.Overlays.Settings
                     Text = game.Name,
                     Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold),
                 },
-                new BuildDisplay(game.Version)
+                new OsuContextMenuContainer()
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+
+                    Children = new Drawable[]
+                    {
+                        new BuildDisplay(game.Version)
+                        {
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                        }
+                    }
                 }
             };
 
@@ -76,9 +92,12 @@ namespace osu.Game.Overlays.Settings
             }
         }
 
-        private partial class BuildDisplay : OsuAnimatedButton
+        private partial class BuildDisplay : OsuAnimatedButton, IHasContextMenu
         {
             private readonly string version;
+
+            [Resolved]
+            private Clipboard clipboard { get; set; } = null!;
 
             [Resolved]
             private OsuColour colours { get; set; } = null!;
@@ -107,6 +126,19 @@ namespace osu.Game.Overlays.Settings
                     Padding = new MarginPadding(5),
                     Colour = DebugUtils.IsDebugBuild ? colours.Red : Color4.White,
                 });
+            }
+
+            public MenuItem[] ContextMenuItems
+            {
+                get
+                {
+                    List<MenuItem> menuItems = new List<MenuItem>()
+                    {
+                        new OsuMenuItem("Copy Version", MenuItemType.Standard, () => clipboard.SetText(version))
+                    };
+
+                    return menuItems.ToArray();
+                }
             }
         }
     }
