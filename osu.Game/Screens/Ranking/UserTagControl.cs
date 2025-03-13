@@ -27,6 +27,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Input.Bindings;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
@@ -500,19 +501,43 @@ namespace osu.Game.Screens.Ranking
                 searchBox.Current.BindValueChanged(_ => searchContainer.SearchTerm = searchBox.Current.Value, true);
             }
 
+            public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+            {
+                if (base.OnPressed(e))
+                    return true;
+
+                if (e.Repeat)
+                    return false;
+
+                if (State.Value == Visibility.Hidden)
+                    return false;
+
+                if (e.Action == GlobalAction.Select)
+                {
+                    attemptSelect();
+                    return true;
+                }
+
+                return false;
+            }
+
             protected override bool OnKeyDown(KeyDownEvent e)
             {
-                var visibleItems = searchContainer.OfType<DrawableAddableTag>().Where(d => d.IsPresent).ToArray();
-
                 if (e.Key == Key.Enter)
                 {
-                    if (visibleItems.Length == 1)
-                        select(visibleItems.Single().Tag);
-
+                    attemptSelect();
                     return true;
                 }
 
                 return base.OnKeyDown(e);
+            }
+
+            private void attemptSelect()
+            {
+                var visibleItems = searchContainer.OfType<DrawableAddableTag>().Where(d => d.IsPresent).ToArray();
+
+                if (visibleItems.Length == 1)
+                    select(visibleItems.Single().Tag);
             }
 
             private void select(UserTag tag)
