@@ -514,17 +514,29 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 return;
             }
 
-            // The beatmap is queried asynchronously when the selected item changes.
-            // This is an issue with MultiSpectatorScreen which is effectively in an always "ready" state and receives LoadRequested() callbacks
-            // even when it is not truly ready (i.e. the beatmap hasn't been selected by the client yet). For the time being, a simple fix to this is to ignore the callback.
-            // Note that spectator will be entered automatically when the client is capable of doing so via beatmap availability callbacks (see: updateBeatmapAvailability()).
-            if (client.LocalUser.State == MultiplayerUserState.Spectating || Beatmap.IsDefault)
-                return;
-
             if (beatmapAvailabilityTracker.Availability.Value.State != DownloadState.LocallyAvailable)
                 return;
 
-            startPlay();
+            sampleStart?.Play();
+
+            int[] userIds = client.CurrentMatchPlayingUserIds.ToArray();
+            MultiplayerRoomUser[] users = userIds.Select(id => client.Room.Users.First(u => u.UserID == id)).ToArray();
+
+            // fallback is to allow this class to operate when there is no parent OnlineScreen (testing purposes).
+            var targetScreen = (Screen?)parentScreen ?? this;
+
+            switch (client.LocalUser.State)
+            {
+                case MultiplayerUserState.Spectating:
+                    targetScreen.Push(new MultiSpectatorScreen(room, users.Take(PlayerGrid.MAX_PLAYERS).ToArray()));
+                    break;
+
+                default:
+                    // Required for validation inside the player.
+                    PlaylistItem apiItem = new PlaylistItem(client.Room.CurrentPlaylistItem).With(beatmap: Beatmap.Value.BeatmapInfo, ruleset: Ruleset.Value.OnlineID);
+                    targetScreen.Push(new MultiplayerPlayerLoader(() => new MultiplayerPlayer(room, apiItem, users)));
+                    break;
+            }
         }
 
         /// <summary>
@@ -619,43 +631,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             }
             else
                 userStyleSection.Hide();
-        }
-
-        /// <summary>
-        /// Pushes a gameplay or spectate screen to start gameplay for the current selection.
-        /// </summary>
-        private void startPlay()
-        {
-            if (client.Room == null || client.LocalUser == null || !this.IsCurrentScreen())
-                return;
-
-            // Ensure we're in a valid state to be able to start gameplay.
-            MultiplayerPlaylistItem item = client.Room.Playlist.Single(i => i.ID == client.Room.Settings.PlaylistItemId);
-            int beatmapId = client.LocalUser.BeatmapId ?? item.BeatmapID;
-            int rulesetId = client.LocalUser.RulesetId ?? item.RulesetID;
-            if (Beatmap.Value.BeatmapInfo.OnlineID != beatmapId || Ruleset.Value.OnlineID != rulesetId)
-                return;
-
-            sampleStart?.Play();
-
-            int[] userIds = client.CurrentMatchPlayingUserIds.ToArray();
-            MultiplayerRoomUser[] users = userIds.Select(id => client.Room.Users.First(u => u.UserID == id)).ToArray();
-
-            // fallback is to allow this class to operate when there is no parent OnlineScreen (testing purposes).
-            var targetScreen = (Screen?)parentScreen ?? this;
-
-            switch (client.LocalUser.State)
-            {
-                case MultiplayerUserState.Spectating:
-                    targetScreen.Push(new MultiSpectatorScreen(room, users.Take(PlayerGrid.MAX_PLAYERS).ToArray()));
-                    break;
-
-                default:
-                    // Required for validation inside the player.
-                    PlaylistItem apiItem = new PlaylistItem(item).With(beatmap: Beatmap.Value.BeatmapInfo, ruleset: Ruleset.Value.OnlineID);
-                    targetScreen.Push(new MultiplayerPlayerLoader(() => new MultiplayerPlayer(room, apiItem, users)));
-                    break;
-            }
         }
 
         /// <summary>
