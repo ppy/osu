@@ -5,7 +5,6 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Testing;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Metadata;
@@ -73,7 +72,6 @@ namespace osu.Game.Tests.Visual.UserInterface
             });
         }
 
-        [Solo]
         [Test]
         public void TestChangeOnlineStates()
         {
