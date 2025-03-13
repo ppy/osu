@@ -138,7 +138,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                 return null;
             }
 
-            if (!api.LocalUser.Value.IsSupporter && (Scope != BeatmapLeaderboardScope.Global || filterMods))
+            if (Scope.RequiresSupporter(filterMods) && !api.LocalUser.Value.IsSupporter)
             {
                 SetErrorState(LeaderboardState.NotSupporter);
                 return null;

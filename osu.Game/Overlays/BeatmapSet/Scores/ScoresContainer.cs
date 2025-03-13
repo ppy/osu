@@ -12,6 +12,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
+using osu.Game.Extensions;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
@@ -248,7 +249,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 return;
             }
 
-            if ((scope.Value != BeatmapLeaderboardScope.Global || modSelector.SelectedMods.Count > 0) && !userIsSupporter)
+            if (scope.Value.RequiresSupporter(modSelector.SelectedMods.Count > 0) && !userIsSupporter)
             {
                 Scores = null;
                 notSupporterPlaceholder.Show();
