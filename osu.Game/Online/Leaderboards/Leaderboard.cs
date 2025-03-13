@@ -356,6 +356,9 @@ namespace osu.Game.Online.Leaderboards
                 case LeaderboardState.NotSupporter:
                     return new MessagePlaceholder(LeaderboardStrings.PleaseInvestInAnOsuSupporterTagToViewThisLeaderboard);
 
+                case LeaderboardState.NoTeam:
+                    return new MessagePlaceholder(LeaderboardStrings.NoTeam);
+
                 case LeaderboardState.Retrieving:
                     return null;
 
