@@ -81,6 +81,12 @@ namespace osu.Game.Online.Multiplayer
             Playlist = room.Playlist.Select(p => new MultiplayerPlaylistItem(p)).ToArray();
         }
 
+        /// <summary>
+        /// Retrieves the active <see cref="MultiplayerPlaylistItem"/> as determined by the room's current settings.
+        /// </summary>
+        [IgnoreMember]
+        public MultiplayerPlaylistItem CurrentPlaylistItem => Playlist.Single(item => item.ID == Settings.PlaylistItemId);
+
         public override string ToString() => $"RoomID:{RoomID} Host:{Host?.UserID} Users:{Users.Count} State:{State} Settings: [{Settings}]";
     }
 }

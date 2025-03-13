@@ -175,7 +175,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             if (isClientAuthoritative)
                 return;
 
-            MultiplayerPlaylistItem currentItem = client.Room.Playlist.Single(item => item.ID == client.Room.Settings.PlaylistItemId);
+            MultiplayerPlaylistItem currentItem = client.Room.CurrentPlaylistItem;
             Ruleset ruleset = rulesets.GetRuleset(client.LocalUser.RulesetId ?? currentItem.RulesetID)!.CreateInstance();
 
             // Suppose the host changed the room in some way such that some mods are no longer valid...
@@ -205,7 +205,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             if (client.Room == null || client.LocalUser == null)
                 return [];
 
-            MultiplayerPlaylistItem currentItem = client.Room.Playlist.Single(item => item.ID == client.Room.Settings.PlaylistItemId);
+            MultiplayerPlaylistItem currentItem = client.Room.CurrentPlaylistItem;
             Ruleset ruleset = rulesets.GetRuleset(currentItem.RulesetID)!.CreateInstance();
 
             return currentItem.RequiredMods.Select(m => m.ToMod(ruleset)).Concat(base.ComputeActiveMods()).ToArray();

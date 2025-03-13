@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
@@ -15,7 +14,7 @@ using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
-    public class DrawableMultiplayerRoom : DrawableRoom
+    public partial class DrawableMultiplayerRoom : DrawableRoom
     {
         public Action? OnEdit;
 
@@ -23,8 +22,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         [Resolved]
         private MultiplayerClient client { get; set; } = null!;
-
-        private long lastPlaylistItemId;
 
         public DrawableMultiplayerRoom(Room room)
             : base(room)
@@ -49,45 +46,18 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         {
             base.LoadComplete();
 
-            client.HostChanged += onHostChanged;
-            client.SettingsChanged += onSettingsChanged;
-            client.ItemChanged += onItemChanged;
+            client.RoomUpdated += onRoomUpdated;
 
-            updateHost();
-            updateSelectedItem();
+            onRoomUpdated();
         }
 
-        private void onHostChanged(MultiplayerRoomUser? host)
+        private void onRoomUpdated()
         {
-            updateHost();
-        }
-
-        private void onSettingsChanged(MultiplayerRoomSettings settings)
-        {
-            if (settings.PlaylistItemId != lastPlaylistItemId)
-            {
-                updateSelectedItem();
-                lastPlaylistItemId = settings.PlaylistItemId;
-            }
-        }
-
-        private void onItemChanged(MultiplayerPlaylistItem item)
-        {
-            if (item.ID == client.Room?.Settings.PlaylistItemId)
-                updateSelectedItem();
-        }
-
-        private void updateHost()
-        {
-            ChangeSettingsButton.Alpha = client.Room?.Host?.Equals(client.LocalUser) == true ? 1 : 0;
-        }
-
-        private void updateSelectedItem()
-        {
-            if (client.Room == null)
+            if (client.Room == null || client.LocalUser == null)
                 return;
 
-            SelectedItem.Value = new PlaylistItem(client.Room.Playlist.Single(i => i.ID == client.Room.Settings.PlaylistItemId));
+            ChangeSettingsButton.Alpha = client.Room.Host?.Equals(client.LocalUser) == true ? 1 : 0;
+            SelectedItem.Value = new PlaylistItem(client.Room.CurrentPlaylistItem);
         }
 
         protected override UpdateableBeatmapBackgroundSprite CreateBackground() => base.CreateBackground().With(d =>
@@ -100,11 +70,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             base.Dispose(isDisposing);
 
             if (client.IsNotNull())
-            {
-                client.HostChanged -= onHostChanged;
-                client.SettingsChanged -= onSettingsChanged;
-                client.ItemChanged -= onItemChanged;
-            }
+                client.RoomUpdated -= onRoomUpdated;
         }
     }
 }

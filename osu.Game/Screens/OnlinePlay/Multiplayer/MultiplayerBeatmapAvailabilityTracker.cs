@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
@@ -11,46 +10,28 @@ using osu.Game.Online.Rooms;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
-    public class MultiplayerBeatmapAvailabilityTracker : OnlinePlayBeatmapAvailabilityTracker
+    public partial class MultiplayerBeatmapAvailabilityTracker : OnlinePlayBeatmapAvailabilityTracker
     {
         public new Bindable<PlaylistItem> SelectedItem => throw new NotSupportedException();
 
         [Resolved]
         private MultiplayerClient client { get; set; } = null!;
 
-        private long lastPlaylistItemId;
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            client.SettingsChanged += onSettingsChanged;
-            client.ItemChanged += onPlaylistItemChanged;
+            client.RoomUpdated += onRoomUpdated;
 
-            updateSelectedItem();
+            onRoomUpdated();
         }
 
-        private void onPlaylistItemChanged(MultiplayerPlaylistItem item)
-        {
-            if (item.ID == client.Room?.Settings.PlaylistItemId)
-                updateSelectedItem();
-        }
-
-        private void onSettingsChanged(MultiplayerRoomSettings settings)
-        {
-            if (settings.PlaylistItemId != lastPlaylistItemId)
-            {
-                updateSelectedItem();
-                lastPlaylistItemId = settings.PlaylistItemId;
-            }
-        }
-
-        private void updateSelectedItem()
+        private void onRoomUpdated()
         {
             if (client.Room == null)
                 return;
 
-            base.SelectedItem.Value = new PlaylistItem(client.Room.Playlist.Single(i => i.ID == client.Room.Settings.PlaylistItemId));
+            base.SelectedItem.Value = new PlaylistItem(client.Room.CurrentPlaylistItem);
         }
 
         protected override void Dispose(bool isDisposing)
@@ -58,10 +39,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             base.Dispose(isDisposing);
 
             if (client.IsNotNull())
-            {
-                client.SettingsChanged -= onSettingsChanged;
-                client.ItemChanged -= onPlaylistItemChanged;
-            }
+                client.RoomUpdated -= onRoomUpdated;
         }
     }
 }

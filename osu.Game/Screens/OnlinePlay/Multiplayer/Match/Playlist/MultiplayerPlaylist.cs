@@ -38,7 +38,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
         private MultiplayerHistoryList historyList = null!;
 
         private bool firstPopulation = true;
-        private long lastPlaylistItemId;
 
         public MultiplayerPlaylist(Room room)
         {
@@ -91,18 +90,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
             DisplayMode.BindValueChanged(onDisplayModeChanged, true);
 
             client.RoomUpdated += onRoomUpdated;
-            client.SettingsChanged += onSettingsChanged;
             client.ItemAdded += onItemAdded;
             client.ItemRemoved += onItemRemoved;
             client.ItemChanged += onItemChanged;
 
             updateState();
-        }
-
-        private void onPlaylistItemChanged(MultiplayerPlaylistItem item)
-        {
-            if (item.ID == client.Room?.Settings.PlaylistItemId)
-                updateSelectedItem();
         }
 
         private void onDisplayModeChanged(ValueChangedEvent<MultiplayerPlaylistDisplayMode> mode)
@@ -112,15 +104,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
         }
 
         private void onRoomUpdated() => Scheduler.AddOnce(updateState);
-
-        private void onSettingsChanged(MultiplayerRoomSettings settings)
-        {
-            if (settings.PlaylistItemId != lastPlaylistItemId)
-            {
-                updateSelectedItem();
-                lastPlaylistItemId = settings.PlaylistItemId;
-            }
-        }
 
         private void onItemAdded(MultiplayerPlaylistItem item) => Schedule(() => addItemToLists(item));
 
@@ -149,9 +132,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
                 removeItemFromLists(item.ID);
                 addItemToLists(item);
             }
-
-            if (item.ID == client.Room.Settings.PlaylistItemId)
-                updateSelectedItem();
         });
 
         private void updateState()
@@ -171,14 +151,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
 
                 firstPopulation = false;
             }
-        }
 
-        private void updateSelectedItem()
-        {
-            if (client.Room == null)
-                return;
-
-            selectedItem.Value = new PlaylistItem(client.Room.Playlist.Single(i => i.ID == client.Room.Settings.PlaylistItemId));
+            selectedItem.Value = new PlaylistItem(client.Room.CurrentPlaylistItem);
         }
 
         private void addItemToLists(MultiplayerPlaylistItem item)
@@ -208,7 +182,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
             if (client.IsNotNull())
             {
                 client.RoomUpdated -= onRoomUpdated;
-                client.SettingsChanged -= onSettingsChanged;
                 client.ItemAdded -= onItemAdded;
                 client.ItemRemoved -= onItemRemoved;
                 client.ItemChanged -= onItemChanged;
