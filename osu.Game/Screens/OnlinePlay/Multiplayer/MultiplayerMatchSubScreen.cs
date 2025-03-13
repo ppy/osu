@@ -114,7 +114,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         [Resolved]
         private OsuGame? game { get; set; }
 
-        [Cached]
+        [Cached(typeof(OnlinePlayBeatmapAvailabilityTracker))]
         private readonly OnlinePlayBeatmapAvailabilityTracker beatmapAvailabilityTracker = new MultiplayerBeatmapAvailabilityTracker();
 
         private readonly Room room;
