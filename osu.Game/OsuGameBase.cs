@@ -108,6 +108,8 @@ namespace osu.Game
         public virtual EndpointConfiguration CreateEndpoints() =>
             UseDevelopmentServer ? new DevelopmentEndpointConfiguration() : new ProductionEndpointConfiguration();
 
+        protected override OnlineStore CreateOnlineStore() => new OsuOnlineStore(CreateEndpoints().APIUrl);
+
         public virtual Version AssemblyVersion => Assembly.GetEntryAssembly()?.GetName().Version ?? new Version();
 
         /// <summary>
