@@ -119,7 +119,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 {
                     double currAngle = osuCurrObj.Angle.Value;
                     double lastAngle = osuLastObj.Angle.Value;
-                    double lastLastAngle = osuLast1Obj.Angle ?? Math.PI;
+                    double last1Angle = osuLast1Obj.Angle ?? Math.PI;
 
                     // Rewarding angles, take the smaller velocity as base.
                     double acuteVelocityBase = Math.Min(currVelocity, prevVelocity);
@@ -136,7 +136,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     acuteAngleBonus = CalcAcuteAngleBonus(currAngle);
 
                     // Penalize angle repetition. Ideally this thing should be removed, but it breaks balance so I've just make it weaker by taking min between angles
-                    double wideAngleRepetitionNerf = Math.Min(wideAngleBonus, Math.Pow(CalcWideAngleBonus(Math.Min(lastAngle, lastLastAngle)), 3));
+                    double wideAngleRepetitionNerf = Math.Min(wideAngleBonus, Math.Pow(CalcWideAngleBonus(Math.Min(lastAngle, last1Angle)), 3));
                     wideAngleBonus *= 1 - wideAngleRepetitionNerf;
 
                     double acuteAngleRepetitionNerf = Math.Pow(CalcAcuteAngleBonus(lastAngle), 3);
