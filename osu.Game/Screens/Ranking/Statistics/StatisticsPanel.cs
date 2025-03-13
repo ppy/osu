@@ -37,11 +37,6 @@ namespace osu.Game.Screens.Ranking.Statistics
         /// </summary>
         public ScoreInfo? AchievedScore { get; init; }
 
-        /// <summary>
-        /// Whether to show a control that allows to assign user tags to the played beatmap.
-        /// </summary>
-        public bool ShowUserTagControl { get; init; }
-
         protected override bool StartHidden => true;
 
         [Resolved]
@@ -235,7 +230,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                 });
             }
 
-            if (ShowUserTagControl
+            if (AchievedScore != null
                 && newScore.BeatmapInfo!.OnlineID > 0
                 && api.IsLoggedIn)
             {

@@ -404,7 +404,7 @@ namespace osu.Game.Tests.Visual.Ranking
                 : base(score)
             {
                 AllowRetry = true;
-                ShowUserStatistics = true;
+                IsLocalPlay = true;
             }
 
             protected override void LoadComplete()

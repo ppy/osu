@@ -79,13 +79,10 @@ namespace osu.Game.Screens.Ranking
         public bool AllowWatchingReplay { get; init; } = true;
 
         /// <summary>
-        /// Whether the user's personal statistics should be shown on the extended statistics panel
-        /// after clicking the score panel associated with the <see cref="Score"/> being presented.
-        /// Requires <see cref="Score"/> to be present.
+        /// Whether the provided score is for a local user's play.
+        /// This will trigger elements like the user's ranking to display.
         /// </summary>
-        public bool ShowUserStatistics { get; init; }
-
-        public bool ShowUserTagControl { get; init; }
+        public bool IsLocalPlay { get; init; }
 
         private Sample? popInSample;
 
@@ -127,8 +124,7 @@ namespace osu.Game.Screens.Ranking
                                         {
                                             RelativeSizeAxes = Axes.Both,
                                             Score = { BindTarget = SelectedScore },
-                                            AchievedScore = ShowUserStatistics && Score != null ? Score : null,
-                                            ShowUserTagControl = ShowUserTagControl,
+                                            AchievedScore = IsLocalPlay && Score != null ? Score : null,
                                         },
                                         ScorePanelList = new ScorePanelList
                                         {
