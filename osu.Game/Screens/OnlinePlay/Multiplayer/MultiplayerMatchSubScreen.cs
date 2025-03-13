@@ -42,7 +42,7 @@ using ParticipantsList = osu.Game.Screens.OnlinePlay.Multiplayer.Participants.Pa
 namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
     [Cached(typeof(IMultiplayerMatchScreen))]
-    public class MultiplayerMatchSubScreen : OnlinePlaySubScreen, IPreviewTrackOwner, IMultiplayerMatchScreen, IHandlePresentBeatmap
+    public partial class MultiplayerMatchSubScreen : OnlinePlaySubScreen, IPreviewTrackOwner, IMultiplayerMatchScreen, IHandlePresentBeatmap
     {
         /// <summary>
         /// Footer height.
@@ -118,10 +118,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         [Cached]
         private readonly OnlinePlayBeatmapAvailabilityTracker beatmapAvailabilityTracker = new OnlinePlayBeatmapAvailabilityTracker();
 
+        /// <summary>
+        /// Describes the playlist item to be used for the next gameplay session.
+        /// </summary>
         public PlaylistItem? CurrentItem => currentItem.Value;
 
         /// <summary>
-        /// Describes the current playlist item to be used for the next gameplay session.
+        /// Describes the playlist item to be used for the next gameplay session.
         /// </summary>
         private readonly Bindable<PlaylistItem?> currentItem = new Bindable<PlaylistItem?>();
 
@@ -474,7 +477,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             // This is an issue with MultiSpectatorScreen which is effectively in an always "ready" state and receives LoadRequested() callbacks
             // even when it is not truly ready (i.e. the beatmap hasn't been selected by the client yet). For the time being, a simple fix to this is to ignore the callback.
             // Note that spectator will be entered automatically when the client is capable of doing so via beatmap availability callbacks (see: updateBeatmapAvailability()).
-            if (client.LocalUser.State == MultiplayerUserState.Spectating && (currentItem.Value == null || Beatmap.IsDefault))
+            if (client.LocalUser.State == MultiplayerUserState.Spectating && (CurrentItem == null || Beatmap.IsDefault))
                 return;
 
             if (beatmapAvailabilityTracker.Availability.Value.State != DownloadState.LocallyAvailable)
@@ -517,14 +520,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         /// </summary>
         private void onCurrentItemChanged(ValueChangedEvent<PlaylistItem?> e)
         {
-            if (client.Room == null || client.LocalUser == null)
-                return;
-
-            if (e.NewValue is not PlaylistItem item)
+            if (client.Room == null || client.LocalUser == null || e.NewValue == null)
                 return;
 
             updateGameplayState();
 
+            PlaylistItem item = e.NewValue;
             bool freemods = item.Freestyle || item.AllowedMods.Length > 0;
             bool freestyle = item.Freestyle;
 
@@ -588,12 +589,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         /// </summary>
         private void updateGameplayState()
         {
-            if (client.Room == null || client.LocalUser == null)
+            if (client.Room == null || client.LocalUser == null || CurrentItem == null)
                 return;
 
-            if (currentItem.Value is not PlaylistItem item)
-                return;
-
+            PlaylistItem item = CurrentItem;
             RulesetInfo ruleset = rulesets.GetRuleset(item.RulesetID)!;
             Ruleset rulesetInstance = ruleset.CreateInstance();
 
@@ -611,10 +610,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         /// </summary>
         private void startPlay()
         {
-            if (client.Room == null || client.LocalUser == null)
-                return;
-
-            if (!this.IsCurrentScreen() || currentItem.Value is not PlaylistItem item)
+            if (client.Room == null || client.LocalUser == null || !this.IsCurrentScreen() || CurrentItem == null)
                 return;
 
             sampleStart?.Play();
@@ -632,7 +628,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                     break;
 
                 default:
-                    targetScreen.Push(new MultiplayerPlayerLoader(() => new MultiplayerPlayer(room, item, users)));
+                    targetScreen.Push(new MultiplayerPlayerLoader(() => new MultiplayerPlayer(room, CurrentItem, users)));
                     break;
             }
         }
@@ -654,7 +650,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         /// </summary>
         private void showUserModSelect()
         {
-            if (!this.IsCurrentScreen() || currentItem.Value is not PlaylistItem)
+            if (!this.IsCurrentScreen() || CurrentItem == null)
                 return;
 
             userModsSelectOverlay.Show();
@@ -665,10 +661,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         /// </summary>
         private void showUserStyleSelect()
         {
-            if (!this.IsCurrentScreen() || currentItem.Value is not PlaylistItem item)
+            if (!this.IsCurrentScreen() || CurrentItem == null)
                 return;
 
-            this.Push(new MultiplayerMatchFreestyleSelect(room, item));
+            this.Push(new MultiplayerMatchFreestyleSelect(room, CurrentItem));
         }
 
         public override void OnEntering(ScreenTransitionEvent e)
@@ -891,11 +887,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             private void onRoomUpdated()
             {
-                if (client.Room is not MultiplayerRoom room
-                    || client.LocalUser is not MultiplayerRoomUser user)
+                if (client.Room == null || client.LocalUser == null)
                     return;
 
-                Alpha = user.CanAddPlaylistItems(room) ? 1 : 0;
+                Alpha = client.LocalUser.CanAddPlaylistItems(client.Room) ? 1 : 0;
             }
 
             protected override void Dispose(bool isDisposing)
