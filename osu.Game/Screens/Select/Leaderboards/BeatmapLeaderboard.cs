@@ -9,6 +9,7 @@ using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.Online.API;
@@ -141,6 +142,12 @@ namespace osu.Game.Screens.Select.Leaderboards
             if (Scope.RequiresSupporter(filterMods) && !api.LocalUser.Value.IsSupporter)
             {
                 SetErrorState(LeaderboardState.NotSupporter);
+                return null;
+            }
+
+            if (Scope == BeatmapLeaderboardScope.Team && api.LocalUser.Value.Team == null)
+            {
+                SetErrorState(LeaderboardState.NoTeam);
                 return null;
             }
 

@@ -41,6 +41,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private readonly LeaderboardModSelector modSelector;
         private readonly NoScoresPlaceholder noScoresPlaceholder;
         private readonly NotSupporterPlaceholder notSupporterPlaceholder;
+        private readonly NoTeamPlaceholder noTeamPlaceholder;
 
         [Resolved]
         private IAPIProvider api { get; set; }
@@ -155,6 +156,13 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                                     AlwaysPresent = true,
                                     Margin = new MarginPadding { Vertical = 10 }
                                 },
+                                noTeamPlaceholder = new NoTeamPlaceholder
+                                {
+                                    Anchor = Anchor.TopCentre,
+                                    Origin = Anchor.TopCentre,
+                                    Margin = new MarginPadding { Vertical = 10 },
+                                    Alpha = 0,
+                                },
                                 notSupporterPlaceholder = new NotSupporterPlaceholder
                                 {
                                     Anchor = Anchor.TopCentre,
@@ -249,6 +257,13 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 return;
             }
 
+            if ((scope.Value == BeatmapLeaderboardScope.Team) && user.Value.Team == null)
+            {
+                Scores = null;
+                noTeamPlaceholder.Show();
+                return;
+            }
+
             if (scope.Value.RequiresSupporter(modSelector.SelectedMods.Count > 0) && !userIsSupporter)
             {
                 Scores = null;
@@ -256,6 +271,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 return;
             }
 
+            noTeamPlaceholder.Hide();
             notSupporterPlaceholder.Hide();
 
             Show();
