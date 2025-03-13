@@ -152,9 +152,11 @@ namespace osu.Game.Overlays.Dashboard.Friends
                     {
                         default:
                         case UserSortCriteria.LastVisit:
+                            // Todo: Last visit time is not currently updated according to realtime user presence.
                             return panels.OrderByDescending(panel => panel.User.LastVisit);
 
                         case UserSortCriteria.Rank:
+                            // Todo: Statistics are not currently updated according to realtime user statistics, but it's also not currently displayed in the panels.
                             return panels.OrderByDescending(panel => panel.User.Statistics.GlobalRank.HasValue).ThenBy(panel => panel.User.Statistics.GlobalRank ?? 0);
 
                         case UserSortCriteria.Username:
