@@ -68,7 +68,7 @@ namespace osu.Game.Tests.Visual.Online
             });
 
             waitForLoad();
-            assertPanels<UserPanel>(3);
+            assertVisiblePanelCount<UserPanel>(3);
 
             AddStep("remove one friend", () =>
             {
@@ -77,7 +77,7 @@ namespace osu.Game.Tests.Visual.Online
             });
 
             waitForLoad();
-            assertPanels<UserPanel>(2);
+            assertVisiblePanelCount<UserPanel>(2);
 
             AddStep("add one friend", () =>
             {
@@ -91,7 +91,7 @@ namespace osu.Game.Tests.Visual.Online
             });
 
             waitForLoad();
-            assertPanels<UserPanel>(3);
+            assertVisiblePanelCount<UserPanel>(3);
         }
 
         [Test]
@@ -110,17 +110,17 @@ namespace osu.Game.Tests.Visual.Online
             });
 
             waitForLoad();
-            assertPanels<UserGridPanel>(3);
+            assertVisiblePanelCount<UserGridPanel>(3);
 
             AddStep("set list style", () => this.ChildrenOfType<UserListToolbar>().Single().DisplayStyle.Value = OverlayPanelDisplayStyle.List);
 
             waitForLoad();
-            assertPanels<UserListPanel>(3);
+            assertVisiblePanelCount<UserListPanel>(3);
 
             AddStep("set brick style", () => this.ChildrenOfType<UserListToolbar>().Single().DisplayStyle.Value = OverlayPanelDisplayStyle.Brick);
 
             waitForLoad();
-            assertPanels<UserBrickPanel>(3);
+            assertVisiblePanelCount<UserBrickPanel>(3);
         }
 
         [Test]
@@ -139,10 +139,10 @@ namespace osu.Game.Tests.Visual.Online
             });
 
             waitForLoad();
-            assertPanels<UserPanel>(3);
+            assertVisiblePanelCount<UserPanel>(3);
 
             AddStep("change to online stream", () => this.ChildrenOfType<FriendOnlineStreamControl>().Single().Current.Value = OnlineStatus.Online);
-            assertPanels<UserPanel>(0);
+            assertVisiblePanelCount<UserPanel>(0);
 
             AddStep("bring a friend online", () =>
             {
@@ -150,10 +150,10 @@ namespace osu.Game.Tests.Visual.Online
                 metadataClient.FriendPresenceUpdated(api.Friends[0].TargetID, new UserPresence { Status = UserStatus.Online });
             });
 
-            assertPanels<UserPanel>(1);
+            assertVisiblePanelCount<UserPanel>(1);
 
             AddStep("change to offline stream", () => this.ChildrenOfType<FriendOnlineStreamControl>().Single().Current.Value = OnlineStatus.Offline);
-            assertPanels<UserPanel>(2);
+            assertVisiblePanelCount<UserPanel>(2);
 
             AddStep("bring a friend online", () =>
             {
@@ -161,13 +161,20 @@ namespace osu.Game.Tests.Visual.Online
                 metadataClient.FriendPresenceUpdated(api.Friends[1].TargetID, new UserPresence { Status = UserStatus.Online });
             });
 
-            assertPanels<UserPanel>(1);
+            assertVisiblePanelCount<UserPanel>(1);
 
             AddStep("change to online stream", () => this.ChildrenOfType<FriendOnlineStreamControl>().Single().Current.Value = OnlineStatus.Online);
-            assertPanels<UserPanel>(2);
+            assertVisiblePanelCount<UserPanel>(2);
+
+            AddStep("take friend offline", () =>
+            {
+                DummyAPIAccess api = (DummyAPIAccess)API;
+                metadataClient.FriendPresenceUpdated(api.Friends[1].TargetID, null);
+            });
+            assertVisiblePanelCount<UserPanel>(1);
 
             AddStep("change to all stream", () => this.ChildrenOfType<FriendOnlineStreamControl>().Single().Current.Value = OnlineStatus.All);
-            assertPanels<UserPanel>(3);
+            assertVisiblePanelCount<UserPanel>(3);
         }
 
         [Test]
@@ -207,13 +214,13 @@ namespace osu.Game.Tests.Visual.Online
             });
 
             waitForLoad();
-            assertPanels<UserPanel>(3);
+            assertVisiblePanelCount<UserPanel>(3);
         }
 
         private void waitForLoad()
             => AddUntilStep("wait for panels to load", () => this.ChildrenOfType<LoadingSpinner>().Single().State.Value, () => Is.EqualTo(Visibility.Hidden));
 
-        private void assertPanels<T>(int expectedVisible)
+        private void assertVisiblePanelCount<T>(int expectedVisible)
             where T : UserPanel
         {
             AddAssert($"{typeof(T).ReadableName()}s in list", () => this.ChildrenOfType<FriendsList>().Last().ChildrenOfType<UserPanel>().All(p => p is T));
