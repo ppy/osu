@@ -27,6 +27,8 @@ namespace osu.Game.Rulesets.Osu.UI
 
         private readonly Replay replay;
 
+        private int replayFrameIndex;
+
         public ReplayAnalysisOverlay(Replay replay)
         {
             RelativeSizeAxes = Axes.Both;
@@ -52,20 +54,39 @@ namespace osu.Game.Rulesets.Osu.UI
             displayLength.BindValueChanged(_ =>
             {
                 // Need to fully reload to make this work.
-                loaded.Invalidate();
+                invalidateLoaded();
             }, true);
         }
 
-        private readonly Cached loaded = new Cached();
+        /// <summary>
+        /// Invalidated when containers are not loaded nor loading, false if loading, and true if loaded
+        /// </summary>
+        /// <remarks>
+        /// Knowing the loading/loaded state is for avoiding an enumeration error when adding
+        /// new entries and not starting a new load while loading
+        /// </remarks>
+        private readonly Cached<bool> loadState = new Cached<bool>();
 
         private CancellationTokenSource? generationCancellationSource;
+
+        private void invalidateLoaded()
+        {
+            loadState.Invalidate();
+            replayFrameIndex = 0;
+        }
 
         protected override void Update()
         {
             base.Update();
 
             if (requireDisplay)
+            {
                 initialise();
+                // adding entries while the component is asynchronously loading
+                // can collide with enumeration operations and cause an error
+                if (loadState.IsValid && loadState.Value)
+                    addEntries();
+            }
 
             if (ClickMarkers != null) ClickMarkers.Alpha = showClickMarkers.Value ? 1 : 0;
             if (FrameMarkers != null) FrameMarkers.Alpha = showFrameMarkers.Value ? 1 : 0;
@@ -74,10 +95,10 @@ namespace osu.Game.Rulesets.Osu.UI
 
         private void initialise()
         {
-            if (loaded.IsValid)
+            if (loadState.IsValid)
                 return;
 
-            loaded.Validate();
+            loadState.Value = false;
 
             generationCancellationSource?.Cancel();
             generationCancellationSource = new CancellationTokenSource();
@@ -90,14 +111,23 @@ namespace osu.Game.Rulesets.Osu.UI
                 FrameMarkers = new FrameMarkerContainer(),
             };
 
+            LoadComponentsAsync(newDrawables, drawables =>
+            {
+                InternalChildrenEnumerable = drawables;
+                loadState.Value = true;
+            }, generationCancellationSource.Token);
+        }
+
+        private void addEntries()
+        {
             bool leftHeld = false;
             bool rightHeld = false;
 
             // This should probably be async as well, but it's a bit of a pain to debounce and everything.
             // Let's address concerns when they are raised.
-            foreach (var frame in replay.Frames)
+            while (replayFrameIndex < replay.Frames.Count)
             {
-                var osuFrame = (OsuReplayFrame)frame;
+                var osuFrame = (OsuReplayFrame)replay.Frames[replayFrameIndex];
 
                 bool leftButton = osuFrame.Actions.Contains(OsuAction.LeftButton);
                 bool rightButton = osuFrame.Actions.Contains(OsuAction.RightButton);
@@ -107,7 +137,7 @@ namespace osu.Game.Rulesets.Osu.UI
                 else if (!leftHeld && leftButton)
                 {
                     leftHeld = true;
-                    ClickMarkers.Add(new AnalysisFrameEntry(osuFrame.Time, displayLength.Value, osuFrame.Position, OsuAction.LeftButton));
+                    ClickMarkers!.Add(new AnalysisFrameEntry(osuFrame.Time, displayLength.Value, osuFrame.Position, OsuAction.LeftButton));
                 }
 
                 if (rightHeld && !rightButton)
@@ -115,14 +145,14 @@ namespace osu.Game.Rulesets.Osu.UI
                 else if (!rightHeld && rightButton)
                 {
                     rightHeld = true;
-                    ClickMarkers.Add(new AnalysisFrameEntry(osuFrame.Time, displayLength.Value, osuFrame.Position, OsuAction.RightButton));
+                    ClickMarkers!.Add(new AnalysisFrameEntry(osuFrame.Time, displayLength.Value, osuFrame.Position, OsuAction.RightButton));
                 }
 
-                FrameMarkers.Add(new AnalysisFrameEntry(osuFrame.Time, displayLength.Value, osuFrame.Position, osuFrame.Actions.ToArray()));
-                CursorPath.Add(new AnalysisFrameEntry(osuFrame.Time, displayLength.Value, osuFrame.Position));
-            }
+                FrameMarkers!.Add(new AnalysisFrameEntry(osuFrame.Time, displayLength.Value, osuFrame.Position, osuFrame.Actions.ToArray()));
+                CursorPath!.Add(new AnalysisFrameEntry(osuFrame.Time, displayLength.Value, osuFrame.Position));
 
-            LoadComponentsAsync(newDrawables, drawables => InternalChildrenEnumerable = drawables, generationCancellationSource.Token);
+                replayFrameIndex++;
+            }
         }
     }
 }
