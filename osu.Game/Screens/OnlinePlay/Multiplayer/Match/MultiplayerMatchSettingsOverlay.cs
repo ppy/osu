@@ -363,8 +363,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 updateRoomMaxParticipants();
                 updateRoomAutoStartDuration();
                 updateRoomPlaylist();
-
-                drawablePlaylist.Items.BindCollectionChanged((_, __) => room.Playlist = drawablePlaylist.Items.ToArray());
             }
 
             private void onRoomPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -468,6 +466,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 }
                 else
                 {
+                    room.Name = NameField.Text;
+                    room.Password = PasswordTextBox.Text;
+                    room.Type = TypePicker.Current.Value;
+                    room.QueueMode = QueueModeDropdown.Current.Value;
+                    room.AutoStartDuration = TimeSpan.FromSeconds((int)startModeDropdown.Current.Value);
+                    room.AutoSkip = AutoSkipCheckbox.Current.Value;
+                    room.Playlist = drawablePlaylist.Items.ToArray();
+
                     client.CreateRoom(room).ContinueWith(t => Schedule(() =>
                     {
                         if (t.IsCompletedSuccessfully)
@@ -503,10 +509,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                     const string not_found_prefix = "beatmaps not found:";
 
                     if (message.StartsWith(not_found_prefix, StringComparison.Ordinal))
-                    {
                         ErrorText.Text = "The selected beatmap is not available online.";
-                        room.Playlist.SingleOrDefault()?.MarkInvalid();
-                    }
                     else
                         ErrorText.Text = message;
 

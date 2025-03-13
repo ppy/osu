@@ -450,6 +450,13 @@ namespace osu.Game.Screens.Play
                 Children = new[]
                 {
                     DimmableStoryboard.OverlayLayerContainer.CreateProxy(),
+                    new LetterboxOverlay
+                    {
+                        Clock = DrawableRuleset.FrameStableClock,
+                        ProcessCustomClock = false,
+                        BreakTracker = breakTracker,
+                        Alpha = working.Beatmap.LetterboxInBreaks ? 1 : 0,
+                    },
                     HUDOverlay = new HUDOverlay(DrawableRuleset, GameplayState.Mods, Configuration.AlwaysShowLeaderboard)
                     {
                         HoldToQuit =
@@ -468,7 +475,7 @@ namespace osu.Game.Screens.Play
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre
                     },
-                    BreakOverlay = new BreakOverlay(working.Beatmap.LetterboxInBreaks, ScoreProcessor)
+                    BreakOverlay = new BreakOverlay(ScoreProcessor)
                     {
                         Clock = DrawableRuleset.FrameStableClock,
                         ProcessCustomClock = false,

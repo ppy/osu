@@ -36,7 +36,7 @@ namespace osu.Game.Tests.OnlinePlay
             AddStep("push screen that disables bindables", () => stack.Push(new ScreenWithExternalBindableDisablement(true)));
             AddAssert("bindables disabled", () => Beatmap.Disabled && Ruleset.Disabled && SelectedMods.Disabled, () => Is.True);
 
-            AddStep("push screen that does not disables bindables", () => stack.Push(new ScreenWithExternalBindableDisablement(false)));
+            AddStep("push screen that does not disable bindables", () => stack.Push(new ScreenWithExternalBindableDisablement(false)));
             AddAssert("bindables not disabled", () => Beatmap.Disabled || Ruleset.Disabled || SelectedMods.Disabled, () => Is.False);
 
             AddStep("exit one screen", () => stack.Exit());
