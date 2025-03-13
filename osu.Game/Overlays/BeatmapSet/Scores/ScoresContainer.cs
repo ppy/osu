@@ -158,6 +158,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                                 {
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
+                                    Margin = new MarginPadding { Vertical = 10 },
                                     Alpha = 0,
                                 },
                                 new FillFlowContainer
