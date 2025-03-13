@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
 using System.Linq;
@@ -36,7 +37,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             // These sections will not contribute to the difficulty.
             var peaks = GetCurrentStrainPeaks().Where(p => p > 0);
 
-            var strains = peaks.OrderDescending().ToList();
+            List<double> strains = peaks.OrderDescending().ToList();
 
             // We are reducing the highest strains first to account for extreme difficulty spikes
             for (int i = 0; i < Math.Min(strains.Count, ReducedSectionCount); i++)
