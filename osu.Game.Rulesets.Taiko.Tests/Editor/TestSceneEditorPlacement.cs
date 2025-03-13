@@ -3,9 +3,7 @@
 
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Testing;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.Objects.Drawables;
 using osu.Game.Tests.Visual;
@@ -31,7 +29,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Editor
             AddStep("hover over first hit", () => InputManager.MoveMouseTo(Editor.ChildrenOfType<DrawableHit>().ElementAt(1)));
             AddStep("hover over second hit", () => InputManager.MoveMouseTo(Editor.ChildrenOfType<DrawableHit>().ElementAt(0)));
             AddStep("right click", () => InputManager.Click(MouseButton.Right));
-            AddUntilStep("context menu open", () => Editor.ChildrenOfType<OsuContextMenu>().Any(menu => menu.State == MenuState.Open));
+            AddUntilStep("second hit deleted", () => Editor.ChildrenOfType<DrawableHit>().Count(), () => Is.EqualTo(1));
         }
     }
 }

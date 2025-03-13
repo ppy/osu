@@ -7,6 +7,7 @@ using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Edit;
@@ -14,8 +15,10 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.UI;
+using osu.Game.Screens.Edit.Components.TernaryButtons;
 using osu.Game.Screens.Edit.Compose.Components;
 using osu.Game.Tests.Beatmaps;
+using osuTK;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Editing
@@ -58,19 +61,63 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
-        public void TestContextMenu()
+        public void TestRightClickDuringEmptyPlacementTogglesNewCombo()
+        {
+            AddStep("select circle placement tool", () => InputManager.Key(Key.Number2));
+            AddStep("move mouse to center of playfield", () => InputManager.MoveMouseTo(this.ChildrenOfType<Playfield>().Single()));
+            AddStep("place circle", () => InputManager.Click(MouseButton.Left));
+            AddAssert("one circle added", () => EditorBeatmap.HitObjects, () => Has.One.Items);
+
+            AddStep("move mouse away from placed circle", () => InputManager.MoveMouseTo(this.ChildrenOfType<Playfield>().Single().ScreenSpaceDrawQuad.TopLeft + Vector2.One));
+
+            AddAssert("new combo false", () => this.ChildrenOfType<NewComboTernaryButton>().Single().Current.Value, () => Is.EqualTo(TernaryState.False));
+            AddStep("click right mouse", () => InputManager.Click(MouseButton.Right));
+            AddAssert("new combo true", () => this.ChildrenOfType<NewComboTernaryButton>().Single().Current.Value, () => Is.EqualTo(TernaryState.True));
+            AddAssert("context menu not visible", () => !Editor.ChildrenOfType<OsuContextMenu>().Any(c => c.IsPresent));
+
+            AddStep("click right mouse", () => InputManager.Click(MouseButton.Right));
+            AddAssert("new combo false", () => this.ChildrenOfType<NewComboTernaryButton>().Single().Current.Value, () => Is.EqualTo(TernaryState.False));
+            AddAssert("context menu not visible", () => !Editor.ChildrenOfType<OsuContextMenu>().Any(c => c.IsPresent));
+        }
+
+        [Test]
+        public void TestRightClickDuringPlacementDeletes()
+        {
+            AddStep("select circle placement tool", () => InputManager.Key(Key.Number2));
+            AddStep("move mouse to center of playfield", () => InputManager.MoveMouseTo(this.ChildrenOfType<Playfield>().Single()));
+            AddStep("place circle", () => InputManager.Click(MouseButton.Left));
+            AddAssert("one circle added", () => EditorBeatmap.HitObjects, () => Has.One.Items);
+
+            AddStep("click right mouse", () => InputManager.Click(MouseButton.Right));
+
+            AddAssert("circle removed", () => EditorBeatmap.HitObjects, () => Has.Exactly(0).Items);
+            AddAssert("circle not selected", () => EditorBeatmap.SelectedHitObjects, () => Has.Exactly(0).Items);
+            AddAssert("context menu not visible", () => !Editor.ChildrenOfType<OsuContextMenu>().Any(c => c.IsPresent));
+            AddAssert("new combo false", () => this.ChildrenOfType<NewComboTernaryButton>().Single().Current.Value, () => Is.EqualTo(TernaryState.False));
+        }
+
+        [Test]
+        public void TestRightClickDuringSelectionShowsContextMenu()
         {
             AddStep("select circle placement tool", () => InputManager.Key(Key.Number2));
             AddStep("move mouse to center of playfield", () => InputManager.MoveMouseTo(this.ChildrenOfType<Playfield>().Single()));
             AddStep("place circle", () => InputManager.Click(MouseButton.Left));
 
-            AddAssert("one circle added", () => EditorBeatmap.HitObjects, () => Has.One.Items);
-            AddStep("delete with right mouse", () =>
-            {
-                InputManager.Click(MouseButton.Right);
-            });
-            AddAssert("circle not removed", () => EditorBeatmap.HitObjects, () => Has.One.Items);
+            // ensure the circle we're selecting is not a new combo so we can assert
+            // new combo doesn't happen to get toggled by right click.
+            AddStep("seek forward", () => EditorClock.Seek(1000));
+            AddStep("place second circle", () => InputManager.Click(MouseButton.Left));
+
+            AddAssert("two circles added", () => EditorBeatmap.HitObjects, () => Has.Exactly(2).Items);
+            AddAssert("context menu not visible", () => !Editor.ChildrenOfType<OsuContextMenu>().Any(c => c.IsPresent));
+
+            AddStep("select selection tool", () => InputManager.Key(Key.Number1));
+            AddStep("click right mouse", () => InputManager.Click(MouseButton.Right));
+
+            AddAssert("circle not removed", () => EditorBeatmap.HitObjects, () => Has.Exactly(2).Items);
             AddAssert("circle selected", () => EditorBeatmap.SelectedHitObjects, () => Has.One.Items);
+            AddAssert("context menu visible", () => Editor.ChildrenOfType<OsuContextMenu>().Any(c => c.IsPresent));
+            AddAssert("new combo false", () => this.ChildrenOfType<NewComboTernaryButton>().Single().Current.Value, () => Is.EqualTo(TernaryState.False));
         }
 
         [Test]
