@@ -532,9 +532,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                     break;
 
                 default:
-                    // Required for validation inside the player.
-                    PlaylistItem apiItem = new PlaylistItem(client.Room.CurrentPlaylistItem).With(beatmap: Beatmap.Value.BeatmapInfo, ruleset: Ruleset.Value.OnlineID);
-                    targetScreen.Push(new MultiplayerPlayerLoader(() => new MultiplayerPlayer(room, apiItem, users)));
+                    targetScreen.Push(new MultiplayerPlayerLoader(() => new MultiplayerPlayer(room, new PlaylistItem(client.Room.CurrentPlaylistItem), users)));
                     break;
             }
         }
