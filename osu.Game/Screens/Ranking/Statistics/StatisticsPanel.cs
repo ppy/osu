@@ -14,6 +14,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
@@ -234,12 +235,28 @@ namespace osu.Game.Screens.Ranking.Statistics
                 && newScore.BeatmapInfo!.OnlineID > 0
                 && api.IsLoggedIn)
             {
-                yield return new StatisticItem("Tag the beatmap!", () => new UserTagControl(newScore.BeatmapInfo)
+                if (
+                    // We may want to iterate on this condition
+                    AchievedScore.Rank >= ScoreRank.C
+                )
                 {
-                    RelativeSizeAxes = Axes.X,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                });
+                    yield return new StatisticItem("Tag the beatmap!", () => new UserTagControl(newScore.BeatmapInfo)
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                    });
+                }
+                else
+                {
+                    yield return new StatisticItem("Tag the beatmap!", () => new OsuTextFlowContainer(cp => cp.Font = OsuFont.GetFont(size: StatisticItem.FONT_SIZE, weight: FontWeight.SemiBold))
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        TextAnchor = Anchor.Centre,
+                        Text = "Set a better score to contribute to beatmap tags!",
+                    });
+                }
             }
         }
 
