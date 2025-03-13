@@ -12,6 +12,7 @@ using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Metadata;
@@ -66,7 +67,8 @@ namespace osu.Game.Tests.Visual.Online
                 }));
             });
 
-            waitForLoad(3);
+            waitForLoad();
+            assertPanels<UserPanel>(3);
 
             AddStep("remove one friend", () =>
             {
@@ -74,7 +76,8 @@ namespace osu.Game.Tests.Visual.Online
                 api.Friends.RemoveAt(0);
             });
 
-            waitForLoad(2);
+            waitForLoad();
+            assertPanels<UserPanel>(2);
 
             AddStep("add one friend", () =>
             {
@@ -87,13 +90,8 @@ namespace osu.Game.Tests.Visual.Online
                 }));
             });
 
-            waitForLoad(3);
-
-            void waitForLoad(int expectedPanels)
-            {
-                AddUntilStep("wait for friends to load", () => this.ChildrenOfType<FriendsList>().LastOrDefault()?.IsLoaded == true);
-                AddAssert($"{expectedPanels} panels in list", () => this.ChildrenOfType<FriendsList>().Last().ChildrenOfType<UserPanel>().Count(), () => Is.EqualTo(expectedPanels));
-            }
+            waitForLoad();
+            assertPanels<UserPanel>(3);
         }
 
         [Test]
@@ -111,19 +109,18 @@ namespace osu.Game.Tests.Visual.Online
                 }));
             });
 
-            waitForLoad<UserGridPanel>();
+            waitForLoad();
+            assertPanels<UserGridPanel>(3);
 
             AddStep("set list style", () => this.ChildrenOfType<UserListToolbar>().Single().DisplayStyle.Value = OverlayPanelDisplayStyle.List);
-            waitForLoad<UserListPanel>();
+
+            waitForLoad();
+            assertPanels<UserListPanel>(3);
 
             AddStep("set brick style", () => this.ChildrenOfType<UserListToolbar>().Single().DisplayStyle.Value = OverlayPanelDisplayStyle.Brick);
-            waitForLoad<UserBrickPanel>();
 
-            void waitForLoad<T>()
-            {
-                AddUntilStep("wait for friends to load", () => this.ChildrenOfType<FriendsList>().LastOrDefault()?.IsLoaded == true);
-                AddAssert($"3 {typeof(T).ReadableName()} in list", () => this.ChildrenOfType<FriendsList>().Last().ChildrenOfType<T>().Count(), () => Is.EqualTo(3));
-            }
+            waitForLoad();
+            assertPanels<UserBrickPanel>(3);
         }
 
         [Test]
@@ -141,11 +138,11 @@ namespace osu.Game.Tests.Visual.Online
                 }));
             });
 
-            AddUntilStep("wait for friends to load", () => this.ChildrenOfType<FriendsList>().LastOrDefault()?.IsLoaded == true);
-            assertVisible(3);
+            waitForLoad();
+            assertPanels<UserPanel>(3);
 
             AddStep("change to online stream", () => this.ChildrenOfType<FriendOnlineStreamControl>().Single().Current.Value = OnlineStatus.Online);
-            assertVisible(0);
+            assertPanels<UserPanel>(0);
 
             AddStep("bring a friend online", () =>
             {
@@ -153,10 +150,10 @@ namespace osu.Game.Tests.Visual.Online
                 metadataClient.FriendPresenceUpdated(api.Friends[0].TargetID, new UserPresence { Status = UserStatus.Online });
             });
 
-            assertVisible(1);
+            assertPanels<UserPanel>(1);
 
             AddStep("change to offline stream", () => this.ChildrenOfType<FriendOnlineStreamControl>().Single().Current.Value = OnlineStatus.Offline);
-            assertVisible(2);
+            assertPanels<UserPanel>(2);
 
             AddStep("bring a friend online", () =>
             {
@@ -164,20 +161,13 @@ namespace osu.Game.Tests.Visual.Online
                 metadataClient.FriendPresenceUpdated(api.Friends[1].TargetID, new UserPresence { Status = UserStatus.Online });
             });
 
-            assertVisible(1);
+            assertPanels<UserPanel>(1);
 
             AddStep("change to online stream", () => this.ChildrenOfType<FriendOnlineStreamControl>().Single().Current.Value = OnlineStatus.Online);
-            assertVisible(2);
+            assertPanels<UserPanel>(2);
 
             AddStep("change to all stream", () => this.ChildrenOfType<FriendOnlineStreamControl>().Single().Current.Value = OnlineStatus.All);
-            assertVisible(3);
-
-            void assertVisible(int expectedPanels)
-            {
-                AddAssert($"{expectedPanels} panels visible",
-                    () => this.ChildrenOfType<FriendsList.FilterableUserPanel>().Count(p => p.Alpha > 0),
-                    () => Is.EqualTo(expectedPanels));
-            }
+            assertPanels<UserPanel>(3);
         }
 
         [Test]
@@ -216,8 +206,19 @@ namespace osu.Game.Tests.Visual.Online
                 };
             });
 
-            AddUntilStep("wait for friends to load", () => this.ChildrenOfType<FriendsList>().LastOrDefault()?.IsLoaded == true);
-            AddAssert("3 panels in list", () => this.ChildrenOfType<FriendsList>().Last().ChildrenOfType<UserPanel>().Count(), () => Is.EqualTo(3));
+            waitForLoad();
+            assertPanels<UserPanel>(3);
+        }
+
+        private void waitForLoad()
+            => AddUntilStep("wait for panels to load", () => this.ChildrenOfType<LoadingSpinner>().Single().State.Value, () => Is.EqualTo(Visibility.Hidden));
+
+        private void assertPanels<T>(int expectedVisible)
+            where T : UserPanel
+        {
+            AddAssert($"{typeof(T).ReadableName()}s in list", () => this.ChildrenOfType<FriendsList>().Last().ChildrenOfType<UserPanel>().All(p => p is T));
+            AddAssert($"{expectedVisible} panels visible", () => this.ChildrenOfType<FriendsList>().Last().ChildrenOfType<FriendsList.FilterableUserPanel>().Count(p => p.IsPresent),
+                () => Is.EqualTo(expectedVisible));
         }
 
         private List<APIUser> getUsers() => new List<APIUser>
