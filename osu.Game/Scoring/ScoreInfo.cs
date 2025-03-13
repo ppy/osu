@@ -31,6 +31,9 @@ namespace osu.Game.Scoring
         [PrimaryKey]
         public Guid ID { get; set; }
 
+        [MapTo(nameof(BeatmapInfo))]
+        private BeatmapInfo? beatmapInfo { get; set; }
+
         /// <summary>
         /// The <see cref="BeatmapInfo"/> this score was made against.
         /// </summary>
@@ -44,7 +47,19 @@ namespace osu.Game.Scoring
         /// Due to the above, whenever setting this, make sure to also set <see cref="BeatmapHash"/> to allow relational consistency when a beatmap is potentially changed.
         /// </para>
         /// </remarks>
-        public BeatmapInfo? BeatmapInfo { get; set; }
+        public BeatmapInfo? BeatmapInfo
+        {
+            get => beatmapInfo;
+            set
+            {
+                beatmapInfo = value;
+
+                if (value != null)
+                {
+                    BeatmapHash = value.Hash;
+                }
+            }
+        }
 
         /// <summary>
         /// The version of the client this score was set using.
@@ -55,7 +70,7 @@ namespace osu.Game.Scoring
         /// <summary>
         /// The <see cref="osu.Game.Beatmaps.BeatmapInfo.Hash"/> at the point in time when the score was set.
         /// </summary>
-        public string BeatmapHash { get; set; } = string.Empty;
+        public string BeatmapHash { get; private set; } = string.Empty;
 
         public RulesetInfo Ruleset { get; set; } = null!;
 

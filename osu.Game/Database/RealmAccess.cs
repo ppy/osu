@@ -930,7 +930,7 @@ namespace osu.Game.Database
                     var scores = migration.NewRealm.All<ScoreInfo>();
 
                     foreach (var score in scores)
-                        score.BeatmapHash = score.BeatmapInfo?.Hash ?? string.Empty;
+                        score.BeatmapInfo = score.BeatmapInfo; //While this looks meaningless, behind the scene it syncs BeatmapHash property with BeatmapInfo.Hash
 
                     break;
                 }
