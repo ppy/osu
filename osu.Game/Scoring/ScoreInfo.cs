@@ -49,12 +49,15 @@ namespace osu.Game.Scoring
             get => beatmapInfo;
             set
             {
+                // Detach beatmapInfo from score if it's not avaliable locally
                 if (value == null)
                 {
                     beatmapInfo = null;
                     return;
                 }
 
+                // Empty BeatmapHash indicates that this score was set before realm v26 and needs to be populated.
+                // BeatmapInfo.Hash and BeatmapHash must be the same for beatmap to re-attach.
                 if (string.IsNullOrEmpty(BeatmapHash) || value.Hash == BeatmapHash)
                 {
                     beatmapInfo = value;
