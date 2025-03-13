@@ -52,7 +52,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("create list", () =>
             {
-                Child = list = new MultiplayerPlaylist(room)
+                Child = list = new MultiplayerPlaylist
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,

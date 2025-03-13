@@ -49,17 +49,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("create playlist", () =>
             {
-                Child = playlist = new MultiplayerQueueList(room)
+                Child = playlist = new MultiplayerQueueList
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Size = new Vector2(500, 300),
-                };
-
-                MultiplayerClient.ClientAPIRoom!.PropertyChanged += (_, e) =>
-                {
-                    if (e.PropertyName == nameof(Room.Playlist))
-                        playlist.Items.ReplaceRange(0, playlist.Items.Count, MultiplayerClient.ClientAPIRoom.Playlist);
                 };
             });
 
@@ -126,10 +120,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("finish current item", () => MultiplayerClient.FinishCurrentItem().WaitSafely());
             AddUntilStep("wait for next item to be selected", () => MultiplayerClient.ClientRoom?.Settings.PlaylistItemId == 2);
-            AddUntilStep("wait for two items in playlist", () => playlist.ChildrenOfType<DrawableRoomPlaylistItem>().Count() == 2);
+            AddAssert("one item in playlist", () => playlist.ChildrenOfType<DrawableRoomPlaylistItem>().Count() == 1);
 
             assertDeleteButtonVisibility(0, false);
-            assertDeleteButtonVisibility(1, false);
         }
 
         private void addPlaylistItem(Func<int> userId)
