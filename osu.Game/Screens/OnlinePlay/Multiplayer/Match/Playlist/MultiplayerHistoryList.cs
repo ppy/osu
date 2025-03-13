@@ -74,7 +74,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
 
         private void onItemChanged(MultiplayerPlaylistItem item)
         {
-            if (item.Expired)
+            if (item.Expired && Items.All(i => i.ID != item.ID))
                 Items.Add(new PlaylistItem(item));
         }
 
