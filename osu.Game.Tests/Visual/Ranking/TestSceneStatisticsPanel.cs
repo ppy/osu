@@ -152,7 +152,9 @@ namespace osu.Game.Tests.Visual.Ranking
                 }
             });
             AddUntilStep("overall ranking present", () => this.ChildrenOfType<OverallRanking>().Any());
-            AddUntilStep("loading spinner not visible", () => this.ChildrenOfType<LoadingLayer>().All(l => l.State.Value == Visibility.Hidden));
+            AddUntilStep("loading spinner not visible",
+                () => this.ChildrenOfType<OverallRanking>().Single()
+                          .ChildrenOfType<LoadingLayer>().All(l => l.State.Value == Visibility.Hidden));
         }
 
         [Test]
