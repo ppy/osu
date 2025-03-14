@@ -86,7 +86,7 @@ namespace osu.Game.Overlays.Settings
             private OsuColour colours { get; set; } = null!;
 
             [Resolved]
-            private OsuGame game { get; set; } = null!;
+            private OsuGame? game { get; set; }
 
             public BuildDisplay(string version)
             {
