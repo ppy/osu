@@ -125,6 +125,18 @@ namespace osu.Game.Tests.Visual.Multiplayer
             assertDeleteButtonVisibility(0, false);
         }
 
+        [Test]
+        public void TestChangeExistingItem()
+        {
+            AddStep("change beatmap", () => MultiplayerClient.EditPlaylistItem(new MultiplayerPlaylistItem
+            {
+                ID = playlist.Items[0].ID,
+                BeatmapID = 1337
+            }).WaitSafely());
+
+            AddUntilStep("first playlist item has new beatmap", () => playlist.Items[0].Beatmap.OnlineID, () => Is.EqualTo(1337));
+        }
+
         private void addPlaylistItem(Func<int> userId)
         {
             long itemId = -1;
