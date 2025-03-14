@@ -3,10 +3,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 using osu.Framework.Localisation;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Models;
@@ -44,23 +46,17 @@ namespace osu.Game.Scoring
         /// The property will only link to a <see cref="BeatmapInfo"/> if its <see cref="Beatmaps.BeatmapInfo.Hash"/> matches <see cref="BeatmapHash"/>.
         /// </para>
         /// </remarks>
+        [Ignored]
         public BeatmapInfo? BeatmapInfo
         {
             get => beatmapInfo;
             set
             {
-                // Detach beatmapInfo from score if it's not avaliable locally
-                if (value == null)
-                {
-                    beatmapInfo = null;
-                    return;
-                }
+                beatmapInfo = value;
 
-                // Empty BeatmapHash indicates that this score was set before realm v26 and needs to be populated.
-                // BeatmapInfo.Hash and BeatmapHash must be the same for beatmap to re-attach.
-                if (string.IsNullOrEmpty(BeatmapHash) || value.Hash == BeatmapHash)
+                // Safe first beatmap hash for score validation
+                if (value != null && string.IsNullOrEmpty(BeatmapHash))
                 {
-                    beatmapInfo = value;
                     BeatmapHash = value.Hash;
                 }
             }
