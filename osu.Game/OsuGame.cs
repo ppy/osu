@@ -519,9 +519,9 @@ namespace osu.Game
             }
         });
 
-        public void CopyStringToClipboard(string url) => waitForReady(() => onScreenDisplay, _ =>
+        public void CopyStringToClipboard(string value) => waitForReady(() => onScreenDisplay, _ =>
         {
-            dependencies.Get<Clipboard>().SetText(url);
+            dependencies.Get<Clipboard>().SetText(value);
             onScreenDisplay.Display(new CopyStringToast());
         });
 
