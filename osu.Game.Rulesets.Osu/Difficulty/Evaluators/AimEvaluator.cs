@@ -176,7 +176,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 velocityChangeBonus = overlapVelocityBuff * distRatio;
 
                 // Penalize for rhythm changes.
-                velocityChangeBonus *= Math.Pow(Math.Min(osuCurrObj.StrainTime, osuLastObj.StrainTime) / Math.Max(osuCurrObj.StrainTime, osuLastObj.StrainTime), 2);
+                double rhythmPenalty = Math.Pow(Math.Min(osuCurrObj.StrainTime, osuLastObj.StrainTime) / Math.Max(osuCurrObj.StrainTime, osuLastObj.StrainTime), 2);
+                velocityChangeBonus *= rhythmPenalty;
 
                 var osuLast2Obj = (OsuDifficultyHitObject)current.Previous(2);
                 double prev1Distance = osuLast1Obj.LazyJumpDistance;
@@ -195,7 +196,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 // Decrease buff large jumps leading into very small jumps to compensate the fact that smaller jumps are buffed by minimal snap distance
                 double doublesNerf = DifficultyCalculationUtils.ReverseLerp(osuCurrObj.LazyJumpDistance, diameter, diameter * 3) * DifficultyCalculationUtils.ReverseLerp(osuLastObj.LazyJumpDistance, diameter, radius);
                 double cheesableJumpsNerf = DifficultyCalculationUtils.ReverseLerp(osuCurrObj.LazyJumpDistance, diameter * 2, diameter * 4) * DifficultyCalculationUtils.ReverseLerp(osuLastObj.LazyJumpDistance, diameter * 1.5, diameter);
-                velocityChangeBonus *= 1 - 0.8 * Math.Max(doublesNerf, cheesableJumpsNerf);
+                velocityChangeBonus *= 1 - 0.8 * Math.Max(doublesNerf, cheesableJumpsNerf) * rhythmPenalty;
             }
 
             if (osuLastObj.BaseObject is Slider)
