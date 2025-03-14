@@ -26,6 +26,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
         [Resolved]
         private MultiplayerClient client { get; set; } = null!;
 
+        private QueueFillFlowContainer flow = null!;
         private bool firstPopulation = true;
 
         public MultiplayerQueueList()
@@ -79,15 +80,30 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
                 Items.RemoveAll(i => i.ID == item.ID);
             else
             {
+                PlaylistItem apiItem = new PlaylistItem(item);
+
                 for (int i = 0; i < Items.Count; i++)
                 {
-                    if (Items[i].ID == item.ID)
+                    if (Items[i].ID != item.ID)
+                        continue;
+
+                    // Test if the only change to this item is the playlist order to avoid recreating it.
+                    PlaylistItem testItem = Items[i].With(playlistOrder: apiItem.PlaylistOrder);
+
+                    if (testItem.Equals(apiItem))
+                    {
+                        Items[i].PlaylistOrder = apiItem.PlaylistOrder;
+                        flow.InvalidateLayout();
+                    }
+                    else
                         Items[i] = new PlaylistItem(item);
+
+                    break;
                 }
             }
         });
 
-        protected override FillFlowContainer<RearrangeableListItem<PlaylistItem>> CreateListFillFlowContainer() => new QueueFillFlowContainer
+        protected override FillFlowContainer<RearrangeableListItem<PlaylistItem>> CreateListFillFlowContainer() => flow = new QueueFillFlowContainer
         {
             Spacing = new Vector2(0, 2)
         };
