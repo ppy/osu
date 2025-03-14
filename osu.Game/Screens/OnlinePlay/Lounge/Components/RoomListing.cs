@@ -99,7 +99,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 {
                     bool matchingFilter = true;
 
-                    matchingFilter &= criteria.Ruleset == null || r.Room.PlaylistItemStats?.RulesetIDs.Any(id => id == criteria.Ruleset.OnlineID) != false;
+                    matchingFilter &= criteria.Ruleset == null || r.Room.CurrentPlaylistItem?.Freestyle == true || r.Room.PlaylistItemStats?.RulesetIDs.Any(id => id == criteria.Ruleset.OnlineID) != false;
                     matchingFilter &= matchPermissions(r, criteria.Permissions);
 
                     // Room name isn't translatable, so ToString() is used here for simplicity.
