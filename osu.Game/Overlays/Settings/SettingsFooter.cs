@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Development;
 using osu.Framework.Graphics;
@@ -9,7 +8,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Logging;
-using osu.Framework.Platform;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -85,9 +83,6 @@ namespace osu.Game.Overlays.Settings
             private readonly string version;
 
             [Resolved]
-            private Clipboard clipboard { get; set; } = null!;
-
-            [Resolved]
             private OsuColour colours { get; set; } = null!;
 
             [Resolved]
@@ -119,18 +114,10 @@ namespace osu.Game.Overlays.Settings
                 });
             }
 
-            public MenuItem[] ContextMenuItems
+            public MenuItem[] ContextMenuItems => new MenuItem[]
             {
-                get
-                {
-                    List<MenuItem> menuItems = new List<MenuItem>()
-                    {
-                        new OsuMenuItem("Copy version", MenuItemType.Standard, () => game?.CopyStringToClipboard(version))
-                    };
-
-                    return menuItems.ToArray();
-                }
-            }
+                new OsuMenuItem("Copy version", MenuItemType.Standard, () => game?.CopyStringToClipboard(version))
+            };
         }
     }
 }
