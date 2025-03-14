@@ -420,7 +420,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         /// Responds to changes in the active room to adjust the visibility of the settings and main content.
         /// Only the settings overlay is visible while the room isn't created, and only the main content is visible after creation.
         /// </summary>
-        private void onRoomUpdated()
+        private void onRoomUpdated() => Scheduler.AddOnce(() =>
         {
             bool newIsRoomJoined = client.Room != null;
 
@@ -449,7 +449,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             }
 
             isRoomJoined = newIsRoomJoined;
-        }
+        });
 
         /// <summary>
         /// Responds to changes in the room's settings to update the gameplay state and local user's activity.

@@ -44,7 +44,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
             onRoomUpdated();
         }
 
-        private void onRoomUpdated()
+        private void onRoomUpdated() => Scheduler.AddOnce(() =>
         {
             if (client.Room == null)
             {
@@ -59,24 +59,24 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
             }
 
             base.SelectedItem.Value = client.Room?.CurrentPlaylistItem == null ? null : new PlaylistItem(client.Room.CurrentPlaylistItem);
-        }
+        });
 
-        private void onItemAdded(MultiplayerPlaylistItem item)
+        private void onItemAdded(MultiplayerPlaylistItem item) => Scheduler.Add(() =>
         {
             if (item.Expired)
                 Items.Add(new PlaylistItem(item));
-        }
+        });
 
-        private void onItemRemoved(long item)
+        private void onItemRemoved(long item) => Scheduler.Add(() =>
         {
             Items.RemoveAll(i => i.ID == item);
-        }
+        });
 
-        private void onItemChanged(MultiplayerPlaylistItem item)
+        private void onItemChanged(MultiplayerPlaylistItem item) => Scheduler.Add(() =>
         {
             if (item.Expired && Items.All(i => i.ID != item.ID))
                 Items.Add(new PlaylistItem(item));
-        }
+        });
 
         protected override FillFlowContainer<RearrangeableListItem<PlaylistItem>> CreateListFillFlowContainer() => new HistoryFillFlowContainer
         {

@@ -37,7 +37,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             onRoomUpdated();
         }
 
-        private void onRoomUpdated()
+        private void onRoomUpdated() => Scheduler.AddOnce(() =>
         {
             if (client.Room == null || client.LocalUser == null)
                 return;
@@ -48,7 +48,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             if (!userMods.SequenceEqual(base.Current.Value))
                 base.Current.Value = userMods;
-        }
+        });
 
         protected override void Dispose(bool isDisposing)
         {

@@ -22,13 +22,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             onRoomUpdated();
         }
 
-        private void onRoomUpdated()
+        private void onRoomUpdated() => Scheduler.AddOnce(() =>
         {
             if (client.Room == null)
                 return;
 
             PlaylistItem = new PlaylistItem(client.Room.CurrentPlaylistItem);
-        }
+        });
 
         protected override void Dispose(bool isDisposing)
         {
