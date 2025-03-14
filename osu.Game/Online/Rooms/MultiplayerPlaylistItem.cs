@@ -62,11 +62,17 @@ namespace osu.Game.Online.Rooms
         [Key(11)]
         public bool Freestyle { get; set; }
 
+        /// <summary>
+        /// Creates a new <see cref="MultiplayerPlaylistItem"/>.
+        /// </summary>
         [SerializationConstructor]
         public MultiplayerPlaylistItem()
         {
         }
 
+        /// <summary>
+        /// Creates a new <see cref="MultiplayerPlaylistItem"/> from an API <see cref="PlaylistItem"/>.
+        /// </summary>
         public MultiplayerPlaylistItem(PlaylistItem item)
         {
             ID = item.ID;
@@ -82,5 +88,24 @@ namespace osu.Game.Online.Rooms
             StarRating = item.Beatmap.StarRating;
             Freestyle = item.Freestyle;
         }
+
+        /// <summary>
+        /// Creates a copy of this <see cref="MultiplayerPlaylistItem"/>.
+        /// </summary>
+        public MultiplayerPlaylistItem Clone() => new MultiplayerPlaylistItem
+        {
+            ID = ID,
+            OwnerID = OwnerID,
+            BeatmapID = BeatmapID,
+            BeatmapChecksum = BeatmapChecksum,
+            RulesetID = RulesetID,
+            RequiredMods = RequiredMods.ToArray(),
+            AllowedMods = AllowedMods.ToArray(),
+            Expired = Expired,
+            PlaylistOrder = PlaylistOrder,
+            PlayedAt = PlayedAt,
+            StarRating = StarRating,
+            Freestyle = Freestyle,
+        };
     }
 }
