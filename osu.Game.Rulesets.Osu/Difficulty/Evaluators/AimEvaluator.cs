@@ -191,7 +191,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 // We don't nerf more snappy patterns with this as it's much more difficult to snap faster compared to flow faster
                 double angleFactor = DifficultyCalculationUtils.Smoothstep(Math.Max(osuLast1Obj.Angle ?? 0, osuLast2Obj?.Angle ?? 0), Math.PI * 0.55, Math.PI * 0.75);
 
-                velocityChangeBonus *= 1 - distanceSimilarityFactor * distanceFactor * angleFactor;
+                velocityChangeBonus *= 1 - distanceSimilarityFactor * distanceFactor * angleFactor * rhythmPenalty;
 
                 // Decrease buff large jumps leading into very small jumps to compensate the fact that smaller jumps are buffed by minimal snap distance
                 double doublesNerf = DifficultyCalculationUtils.ReverseLerp(osuCurrObj.LazyJumpDistance, diameter, diameter * 3) * DifficultyCalculationUtils.ReverseLerp(osuLastObj.LazyJumpDistance, diameter, radius);
