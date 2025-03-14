@@ -104,7 +104,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double distance = Vector2.Distance(o1.StackedPosition, o2.StackedPosition);
             double radius = o1.Radius;
 
-            return Math.Clamp(1 - Math.Pow((distance - radius) / radius, 2), 0, 1);
+            return Math.Clamp(1 - Math.Pow(Math.Max(distance - radius, 0) / radius, 2), 0, 1);
         }
 
         // This bonus accounts for the fact that flow is circular movement, therefore flowing on sharp angles is harder.
