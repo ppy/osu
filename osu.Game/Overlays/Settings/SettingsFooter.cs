@@ -90,6 +90,9 @@ namespace osu.Game.Overlays.Settings
             [Resolved]
             private OsuColour colours { get; set; } = null!;
 
+            [Resolved]
+            private OsuGame game { get; set; } = null!;
+
             public BuildDisplay(string version)
             {
                 this.version = version;
@@ -122,7 +125,7 @@ namespace osu.Game.Overlays.Settings
                 {
                     List<MenuItem> menuItems = new List<MenuItem>()
                     {
-                        new OsuMenuItem("Copy Version", MenuItemType.Standard, () => clipboard.SetText(version))
+                        new OsuMenuItem("Copy version", MenuItemType.Standard, () => game?.CopyStringToClipboard(version))
                     };
 
                     return menuItems.ToArray();
