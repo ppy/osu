@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
     {
         private const double wide_angle_multiplier = 1.5;
         private const double acute_angle_multiplier = 2.25;
-        private const double velocity_change_multiplier = 0.75;
+        private const double velocity_change_multiplier = 0.74;
         private const double wiggle_multiplier = 1.02;
 
         public const double SLIDER_MULTIPLIER = 1.27;
