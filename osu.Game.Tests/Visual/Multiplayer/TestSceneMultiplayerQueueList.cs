@@ -49,17 +49,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("create playlist", () =>
             {
-                Child = playlist = new MultiplayerQueueList(room)
+                Child = playlist = new MultiplayerQueueList
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Size = new Vector2(500, 300),
-                };
-
-                MultiplayerClient.ClientAPIRoom!.PropertyChanged += (_, e) =>
-                {
-                    if (e.PropertyName == nameof(Room.Playlist))
-                        playlist.Items.ReplaceRange(0, playlist.Items.Count, MultiplayerClient.ClientAPIRoom.Playlist);
                 };
             });
 
@@ -126,10 +120,21 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("finish current item", () => MultiplayerClient.FinishCurrentItem().WaitSafely());
             AddUntilStep("wait for next item to be selected", () => MultiplayerClient.ClientRoom?.Settings.PlaylistItemId == 2);
-            AddUntilStep("wait for two items in playlist", () => playlist.ChildrenOfType<DrawableRoomPlaylistItem>().Count() == 2);
+            AddAssert("one item in playlist", () => playlist.ChildrenOfType<DrawableRoomPlaylistItem>().Count() == 1);
 
             assertDeleteButtonVisibility(0, false);
-            assertDeleteButtonVisibility(1, false);
+        }
+
+        [Test]
+        public void TestChangeExistingItem()
+        {
+            AddStep("change beatmap", () => MultiplayerClient.EditPlaylistItem(new MultiplayerPlaylistItem
+            {
+                ID = playlist.Items[0].ID,
+                BeatmapID = 1337
+            }).WaitSafely());
+
+            AddUntilStep("first playlist item has new beatmap", () => playlist.Items[0].Beatmap.OnlineID, () => Is.EqualTo(1337));
         }
 
         private void addPlaylistItem(Func<int> userId)
@@ -138,7 +143,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("add playlist item", () =>
             {
-                MultiplayerPlaylistItem item = TestMultiplayerClient.CreateMultiplayerPlaylistItem(new PlaylistItem(importedBeatmap));
+                MultiplayerPlaylistItem item = new MultiplayerPlaylistItem(new PlaylistItem(importedBeatmap));
 
                 MultiplayerClient.AddUserPlaylistItem(userId(), item).WaitSafely();
 

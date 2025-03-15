@@ -6,7 +6,6 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
-using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Platform;
@@ -53,13 +52,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("create list", () =>
             {
-                Child = list = new MultiplayerPlaylist(room)
+                Child = list = new MultiplayerPlaylist
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.Both,
-                    Size = new Vector2(0.4f, 0.8f),
-                    SelectedItem = new Bindable<PlaylistItem?>()
+                    Size = new Vector2(0.4f, 0.8f)
                 };
             });
 
@@ -220,7 +218,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         /// </summary>
         private void addItemStep(bool expired = false, int? userId = null) => AddStep("add item", () =>
         {
-            MultiplayerClient.AddUserPlaylistItem(userId ?? API.LocalUser.Value.OnlineID, TestMultiplayerClient.CreateMultiplayerPlaylistItem(new PlaylistItem(importedBeatmap)
+            MultiplayerClient.AddUserPlaylistItem(userId ?? API.LocalUser.Value.OnlineID, new MultiplayerPlaylistItem(new PlaylistItem(importedBeatmap)
             {
                 Expired = expired,
                 PlayedAt = DateTimeOffset.Now

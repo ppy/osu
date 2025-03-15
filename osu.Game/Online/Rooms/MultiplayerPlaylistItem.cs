@@ -11,7 +11,7 @@ namespace osu.Game.Online.Rooms
 {
     [Serializable]
     [MessagePackObject]
-    public class MultiplayerPlaylistItem
+    public class MultiplayerPlaylistItem : IEquatable<MultiplayerPlaylistItem>
     {
         [Key(0)]
         public long ID { get; set; }
@@ -81,6 +81,25 @@ namespace osu.Game.Online.Rooms
             PlayedAt = item.PlayedAt;
             StarRating = item.Beatmap.StarRating;
             Freestyle = item.Freestyle;
+        }
+
+        public bool Equals(MultiplayerPlaylistItem? other)
+        {
+            if (other is null) return false;
+            if (ReferenceEquals(this, other)) return true;
+
+            return ID == other.ID
+                   && OwnerID == other.OwnerID
+                   && BeatmapID == other.BeatmapID
+                   && BeatmapChecksum.Equals(other.BeatmapChecksum, StringComparison.Ordinal)
+                   && RulesetID == other.RulesetID
+                   && RequiredMods.SequenceEqual(other.RequiredMods)
+                   && AllowedMods.SequenceEqual(other.AllowedMods)
+                   && Expired == other.Expired
+                   && PlaylistOrder == other.PlaylistOrder
+                   && Nullable.Equals(PlayedAt, other.PlayedAt)
+                   && StarRating == other.StarRating
+                   && Freestyle == other.Freestyle;
         }
     }
 }

@@ -1,10 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -20,13 +21,16 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
     /// </summary>
     public partial class MultiplayerQueueList : DrawableRoomPlaylist
     {
-        private readonly Room room;
+        public new Bindable<PlaylistItem?> SelectedItem => throw new NotSupportedException();
+
+        [Resolved]
+        private MultiplayerClient client { get; set; } = null!;
 
         private QueueFillFlowContainer flow = null!;
+        private bool firstPopulation = true;
 
-        public MultiplayerQueueList(Room room)
+        public MultiplayerQueueList()
         {
-            this.room = room;
             ShowItemOwners = true;
         }
 
@@ -34,18 +38,70 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
         {
             base.LoadComplete();
 
-            room.PropertyChanged += onRoomPropertyChanged;
-            updateRoomPlaylist();
+            client.RoomUpdated += onRoomUpdated;
+            client.ItemAdded += onItemAdded;
+            client.ItemRemoved += onItemRemoved;
+            client.ItemChanged += onItemChanged;
+
+            onRoomUpdated();
         }
 
-        private void onRoomPropertyChanged(object? sender, PropertyChangedEventArgs e)
+        private void onRoomUpdated() => Scheduler.AddOnce(() =>
         {
-            if (e.PropertyName == nameof(Room.Playlist))
-                updateRoomPlaylist();
-        }
+            if (client.Room == null)
+            {
+                Items.Clear();
+                firstPopulation = true;
+            }
+            else if (firstPopulation)
+            {
+                foreach (var item in client.Room.Playlist)
+                    onItemAdded(item);
+                firstPopulation = false;
+            }
 
-        private void updateRoomPlaylist()
-            => flow.InvalidateLayout();
+            base.SelectedItem.Value = client.Room?.CurrentPlaylistItem == null ? null : new PlaylistItem(client.Room.CurrentPlaylistItem);
+        });
+
+        private void onItemAdded(MultiplayerPlaylistItem item) => Scheduler.Add(() =>
+        {
+            if (!item.Expired)
+                Items.Add(new PlaylistItem(item));
+        });
+
+        private void onItemRemoved(long item) => Scheduler.Add(() =>
+        {
+            Items.RemoveAll(i => i.ID == item);
+        });
+
+        private void onItemChanged(MultiplayerPlaylistItem item) => Scheduler.Add(() =>
+        {
+            if (item.Expired)
+                Items.RemoveAll(i => i.ID == item.ID);
+            else
+            {
+                PlaylistItem apiItem = new PlaylistItem(item);
+
+                for (int i = 0; i < Items.Count; i++)
+                {
+                    if (Items[i].ID != item.ID)
+                        continue;
+
+                    // Test if the only change to this item is the playlist order to avoid recreating it.
+                    PlaylistItem testItem = Items[i].With(playlistOrder: apiItem.PlaylistOrder);
+
+                    if (testItem.Equals(apiItem))
+                    {
+                        Items[i].PlaylistOrder = apiItem.PlaylistOrder;
+                        flow.InvalidateLayout();
+                    }
+                    else
+                        Items[i] = new PlaylistItem(item);
+
+                    break;
+                }
+            }
+        });
 
         protected override FillFlowContainer<RearrangeableListItem<PlaylistItem>> CreateListFillFlowContainer() => flow = new QueueFillFlowContainer
         {
@@ -57,7 +113,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            room.PropertyChanged -= onRoomPropertyChanged;
+
+            if (client.IsNotNull())
+            {
+                client.RoomUpdated -= onRoomUpdated;
+                client.ItemAdded -= onItemAdded;
+                client.ItemRemoved -= onItemRemoved;
+                client.ItemChanged -= onItemChanged;
+            }
         }
 
         private partial class QueueFillFlowContainer : FillFlowContainer<RearrangeableListItem<PlaylistItem>>

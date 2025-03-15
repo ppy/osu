@@ -91,5 +91,15 @@ namespace osu.Game.Online.Multiplayer
                     return false;
             }
         }
+
+        /// <summary>
+        /// Whether this user can add playlist items to the given room.
+        /// </summary>
+        /// <param name="room">The target multiplayer room.</param>
+        public bool CanAddPlaylistItems(MultiplayerRoom room)
+        {
+            return Equals(room.Host)
+                   || room.Settings.QueueMode != QueueMode.HostOnly;
+        }
     }
 }

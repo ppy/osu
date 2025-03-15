@@ -18,7 +18,7 @@ using osu.Game.Overlays;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.OnlinePlay.Lounge;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
-using osu.Game.Screens.OnlinePlay.Match;
+using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Tests.Beatmaps;
 using osuTK;
 
@@ -160,33 +160,24 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 Spacing = new Vector2(5),
                 Children = new[]
                 {
-                    new DrawableMatchRoom(new Room
+                    new DrawableMultiplayerRoom(new Room
                     {
                         Name = "A host-only room",
                         QueueMode = QueueMode.HostOnly,
                         Type = MatchType.HeadToHead,
-                    })
-                    {
-                        SelectedItem = new Bindable<PlaylistItem?>()
-                    },
-                    new DrawableMatchRoom(new Room
+                    }),
+                    new DrawableMultiplayerRoom(new Room
                     {
                         Name = "An all-players, team-versus room",
                         QueueMode = QueueMode.AllPlayers,
                         Type = MatchType.TeamVersus
-                    })
-                    {
-                        SelectedItem = new Bindable<PlaylistItem?>()
-                    },
-                    new DrawableMatchRoom(new Room
+                    }),
+                    new DrawableMultiplayerRoom(new Room
                     {
                         Name = "A round-robin room",
                         QueueMode = QueueMode.AllPlayersRoundRobin,
                         Type = MatchType.HeadToHead
-                    })
-                    {
-                        SelectedItem = new Bindable<PlaylistItem?>()
-                    },
+                    }),
                 }
             });
         }
