@@ -11,7 +11,6 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
 {
     public class Movement : StrainDecaySkill
     {
-        private const float absolute_player_positioning_error = 16f;
         private const double direction_change_bonus = 21.0;
 
         protected override double SkillMultiplier => 1;
@@ -23,10 +22,6 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
 
         protected readonly float HalfCatcherWidth;
 
-        private float? lastPlayerPosition;
-        private float lastDistanceMoved;
-        private float lastExactDistanceMoved;
-        private double lastStrainTime;
         private bool isInBuzzSection;
 
         /// <summary>
@@ -49,41 +44,29 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
         protected override double StrainValueOf(DifficultyHitObject current)
         {
             var catchCurrent = (CatchDifficultyHitObject)current;
-
-            lastPlayerPosition ??= catchCurrent.LastNormalizedPosition;
-
-            float playerPosition = Math.Clamp(
-                lastPlayerPosition.Value,
-                catchCurrent.NormalizedPosition - (CatchDifficultyHitObject.NORMALIZED_HALF_CATCHER_WIDTH - absolute_player_positioning_error),
-                catchCurrent.NormalizedPosition + (CatchDifficultyHitObject.NORMALIZED_HALF_CATCHER_WIDTH - absolute_player_positioning_error)
-            );
-
-            float distanceMoved = playerPosition - lastPlayerPosition.Value;
-
-            // For the exact position we consider that the catcher is in the correct position for both objects
-            float exactDistanceMoved = catchCurrent.NormalizedPosition - lastPlayerPosition.Value;
+            var catchLast = (CatchDifficultyHitObject)current.Previous(0);
 
             double weightedStrainTime = catchCurrent.StrainTime + 13 + (3 / catcherSpeedMultiplier);
 
-            double distanceAddition = (Math.Pow(Math.Abs(distanceMoved), 1.3) / 510);
+            double distanceAddition = (Math.Pow(Math.Abs(catchCurrent.DistanceMoved), 1.3) / 510);
             double sqrtStrain = Math.Sqrt(weightedStrainTime);
 
             double edgeDashBonus = 0;
 
             // Direction change bonus.
-            if (Math.Abs(distanceMoved) > 0.1)
+            if (Math.Abs(catchCurrent.DistanceMoved) > 0.1)
             {
-                if (Math.Abs(lastDistanceMoved) > 0.1 && Math.Sign(distanceMoved) != Math.Sign(lastDistanceMoved))
+                if (current.Index >= 1 && Math.Abs(catchLast.DistanceMoved) > 0.1 && Math.Sign(catchCurrent.DistanceMoved) != Math.Sign(catchLast.DistanceMoved))
                 {
-                    double bonusFactor = Math.Min(50, Math.Abs(distanceMoved)) / 50;
-                    double antiflowFactor = Math.Max(Math.Min(70, Math.Abs(lastDistanceMoved)) / 70, 0.38);
+                    double bonusFactor = Math.Min(50, Math.Abs(catchCurrent.DistanceMoved)) / 50;
+                    double antiflowFactor = Math.Max(Math.Min(70, Math.Abs(catchLast.DistanceMoved)) / 70, 0.38);
 
-                    distanceAddition += direction_change_bonus / Math.Sqrt(lastStrainTime + 16) * bonusFactor * antiflowFactor * Math.Max(1 - Math.Pow(weightedStrainTime / 1000, 3), 0);
+                    distanceAddition += direction_change_bonus / Math.Sqrt(catchLast.StrainTime + 16) * bonusFactor * antiflowFactor * Math.Max(1 - Math.Pow(weightedStrainTime / 1000, 3), 0);
                 }
 
                 // Base bonus for every movement, giving some weight to streams.
-                distanceAddition += 12.5 * Math.Min(Math.Abs(distanceMoved), CatchDifficultyHitObject.NORMALIZED_HALF_CATCHER_WIDTH * 2) / (CatchDifficultyHitObject.NORMALIZED_HALF_CATCHER_WIDTH * 6)
-                    / sqrtStrain;
+                distanceAddition += 12.5 * Math.Min(Math.Abs(catchCurrent.DistanceMoved), CatchDifficultyHitObject.NORMALIZED_HALF_CATCHER_WIDTH * 2)
+                                    / (CatchDifficultyHitObject.NORMALIZED_HALF_CATCHER_WIDTH * 6) / sqrtStrain;
             }
 
             // Bonus for edge dashes.
@@ -91,11 +74,6 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
             {
                 if (!catchCurrent.LastObject.HyperDash)
                     edgeDashBonus += 5.7;
-                else
-                {
-                    // After a hyperdash we ARE in the correct position. Always!
-                    playerPosition = catchCurrent.NormalizedPosition;
-                }
 
                 distanceAddition *= 1.0 + edgeDashBonus * ((20 - catchCurrent.LastObject.DistanceToHyperDash) / 20)
                                                         * Math.Pow((Math.Min(catchCurrent.StrainTime * catcherSpeedMultiplier, 265) / 265), 1.5); // Edge Dashes are easier at lower ms values
@@ -105,8 +83,8 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
             // the platter's width but high enough to be considered a movement due to the absolute_player_positioning_error and NORMALIZED_HALF_CATCHER_WIDTH offsets
             // We are detecting this exact scenario. The first back and forth is counted but all subsequent ones are nullified.
             // To achieve that, we need to store the exact distances (distance ignoring absolute_player_positioning_error and NORMALIZED_HALF_CATCHER_WIDTH)
-            if (Math.Abs(exactDistanceMoved) <= CatchDifficultyHitObject.NORMALIZED_HALF_CATCHER_WIDTH * 2 && exactDistanceMoved == -lastExactDistanceMoved
-                                                                                                           && catchCurrent.StrainTime == lastStrainTime)
+            if (current.Index >= 1 && Math.Abs(catchCurrent.ExactDistanceMoved) <= CatchDifficultyHitObject.NORMALIZED_HALF_CATCHER_WIDTH * 2
+                                   && catchCurrent.ExactDistanceMoved == -catchLast.ExactDistanceMoved && catchCurrent.StrainTime == catchLast.StrainTime)
             {
                 if (isInBuzzSection)
                     distanceAddition = 0;
@@ -117,11 +95,6 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
             {
                 isInBuzzSection = false;
             }
-
-            lastPlayerPosition = playerPosition;
-            lastDistanceMoved = distanceMoved;
-            lastStrainTime = catchCurrent.StrainTime;
-            lastExactDistanceMoved = exactDistanceMoved;
 
             return distanceAddition / weightedStrainTime;
         }
