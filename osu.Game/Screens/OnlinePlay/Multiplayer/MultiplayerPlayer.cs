@@ -198,11 +198,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             return multiplayerLeaderboard.TeamScores.Count == 2
                 ? new MultiplayerTeamResultsScreen(score, Room.RoomID.Value, PlaylistItem, multiplayerLeaderboard.TeamScores)
                 {
-                    ShowUserStatistics = true,
+                    IsLocalPlay = true,
                 }
                 : new MultiplayerResultsScreen(score, Room.RoomID.Value, PlaylistItem)
                 {
-                    ShowUserStatistics = true
+                    IsLocalPlay = true,
                 };
         }
 
