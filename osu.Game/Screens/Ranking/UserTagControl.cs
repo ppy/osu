@@ -27,9 +27,11 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Input.Bindings;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Overlays;
 using osuTK;
 using osuTK.Input;
 
@@ -37,6 +39,8 @@ namespace osu.Game.Screens.Ranking
 {
     public partial class UserTagControl : CompositeDrawable
     {
+        private readonly BeatmapInfo beatmapInfo;
+
         public override bool HandlePositionalInput => true;
 
         private readonly Cached layout = new Cached();
@@ -53,8 +57,10 @@ namespace osu.Game.Screens.Ranking
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
 
-        [Resolved]
-        private Bindable<WorkingBeatmap> beatmap { get; set; } = null!;
+        public UserTagControl(BeatmapInfo beatmapInfo)
+        {
+            this.beatmapInfo = beatmapInfo;
+        }
 
         [BackgroundDependencyLoader]
         private void load(SessionStatics sessionStatics)
@@ -104,8 +110,8 @@ namespace osu.Game.Screens.Ranking
                 api.Queue(listTagsRequest);
             }
 
-            var getBeatmapSetRequest = new GetBeatmapSetRequest(beatmap.Value.BeatmapInfo.BeatmapSet!.OnlineID);
-            getBeatmapSetRequest.Success += set => apiBeatmap.Value = set.Beatmaps.SingleOrDefault(b => b.MatchesOnlineID(beatmap.Value.BeatmapInfo));
+            var getBeatmapSetRequest = new GetBeatmapSetRequest(beatmapInfo.BeatmapSet!.OnlineID);
+            getBeatmapSetRequest.Success += set => apiBeatmap.Value = set.Beatmaps.SingleOrDefault(b => b.MatchesOnlineID(beatmapInfo));
             api.Queue(getBeatmapSetRequest);
         }
 
@@ -114,7 +120,7 @@ namespace osu.Game.Screens.Ranking
             loadingLayer.Show();
             extraTags.Remove(tag);
 
-            var req = new AddBeatmapTagRequest(beatmap.Value.BeatmapInfo.OnlineID, tag.Id);
+            var req = new AddBeatmapTagRequest(beatmapInfo.OnlineID, tag.Id);
             req.Success += () =>
             {
                 tag.Voted.Value = true;
@@ -495,19 +501,43 @@ namespace osu.Game.Screens.Ranking
                 searchBox.Current.BindValueChanged(_ => searchContainer.SearchTerm = searchBox.Current.Value, true);
             }
 
+            public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+            {
+                if (base.OnPressed(e))
+                    return true;
+
+                if (e.Repeat)
+                    return false;
+
+                if (State.Value == Visibility.Hidden)
+                    return false;
+
+                if (e.Action == GlobalAction.Select)
+                {
+                    attemptSelect();
+                    return true;
+                }
+
+                return false;
+            }
+
             protected override bool OnKeyDown(KeyDownEvent e)
             {
-                var visibleItems = searchContainer.OfType<DrawableAddableTag>().Where(d => d.IsPresent).ToArray();
-
                 if (e.Key == Key.Enter)
                 {
-                    if (visibleItems.Length == 1)
-                        select(visibleItems.Single().Tag);
-
+                    attemptSelect();
                     return true;
                 }
 
                 return base.OnKeyDown(e);
+            }
+
+            private void attemptSelect()
+            {
+                var visibleItems = searchContainer.OfType<DrawableAddableTag>().Where(d => d.IsPresent).ToArray();
+
+                if (visibleItems.Length == 1)
+                    select(visibleItems.Single().Tag);
             }
 
             private void select(UserTag tag)
@@ -530,14 +560,14 @@ namespace osu.Game.Screens.Ranking
                 }
 
                 [BackgroundDependencyLoader]
-                private void load(OsuColour colours)
+                private void load(OsuColour colours, OverlayColourProvider? colourProvider)
                 {
                     Content.AddRange(new Drawable[]
                     {
                         new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = colours.GreySeaFoamDark,
+                            Colour = colourProvider?.Background3 ?? colours.GreySeaFoamDark,
                             Depth = float.MaxValue,
                         },
                         new FillFlowContainer

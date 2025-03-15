@@ -11,6 +11,7 @@ using NUnit.Framework;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
@@ -18,6 +19,9 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
@@ -36,6 +40,8 @@ namespace osu.Game.Tests.Visual.Ranking
 {
     public partial class TestSceneStatisticsPanel : OsuTestScene
     {
+        private DummyAPIAccess dummyAPI => (DummyAPIAccess)API;
+
         [Test]
         public void TestScoreWithPositionStatistics()
         {
@@ -137,62 +143,114 @@ namespace osu.Game.Tests.Visual.Ranking
             {
                 CachedDependencies = [(typeof(UserStatisticsWatcher), userStatisticsWatcher)],
                 RelativeSizeAxes = Axes.Both,
-                Child = new UserStatisticsPanel(score)
+                Child = new StatisticsPanel
                 {
                     RelativeSizeAxes = Axes.Both,
                     State = { Value = Visibility.Visible },
-                    Score = { Value = score, }
+                    Score = { Value = score, },
+                    AchievedScore = score,
                 }
             });
             AddUntilStep("overall ranking present", () => this.ChildrenOfType<OverallRanking>().Any());
-            AddUntilStep("loading spinner not visible", () => this.ChildrenOfType<LoadingLayer>().All(l => l.State.Value == Visibility.Hidden));
+            AddUntilStep("loading spinner not visible",
+                () => this.ChildrenOfType<OverallRanking>().Single()
+                          .ChildrenOfType<LoadingLayer>().All(l => l.State.Value == Visibility.Hidden));
+        }
+
+        [Test]
+        public void TestTagging()
+        {
+            var score = TestResources.CreateTestScoreInfo();
+
+            AddStep("set up network requests", () =>
+            {
+                dummyAPI.HandleRequest = request =>
+                {
+                    switch (request)
+                    {
+                        case ListTagsRequest listTagsRequest:
+                        {
+                            Scheduler.AddDelayed(() => listTagsRequest.TriggerSuccess(new APITagCollection
+                            {
+                                Tags =
+                                [
+                                    new APITag { Id = 1, Name = "tech", Description = "Tests uncommon skills.", },
+                                    new APITag { Id = 2, Name = "alt", Description = "Colloquial term for maps which use rhythms that encourage the player to alternate notes. Typically distinct from burst or stream maps.", },
+                                    new APITag { Id = 3, Name = "aim", Description = "Category for difficulty relating to cursor movement.", },
+                                    new APITag { Id = 4, Name = "tap", Description = "Category for difficulty relating to tapping input.", },
+                                ]
+                            }), 500);
+                            return true;
+                        }
+
+                        case GetBeatmapSetRequest getBeatmapSetRequest:
+                        {
+                            var beatmapSet = CreateAPIBeatmapSet(score.BeatmapInfo);
+                            beatmapSet.Beatmaps.Single().TopTags =
+                            [
+                                new APIBeatmapTag { TagId = 3, VoteCount = 9 },
+                            ];
+                            Scheduler.AddDelayed(() => getBeatmapSetRequest.TriggerSuccess(beatmapSet), 500);
+                            return true;
+                        }
+
+                        case AddBeatmapTagRequest:
+                        case RemoveBeatmapTagRequest:
+                        {
+                            Scheduler.AddDelayed(request.TriggerSuccess, 500);
+                            return true;
+                        }
+                    }
+
+                    return false;
+                };
+            });
+            AddStep("load panel", () =>
+            {
+                Child = new PopoverContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Child = new StatisticsPanel
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        State = { Value = Visibility.Visible },
+                        Score = { Value = score },
+                        AchievedScore = score,
+                    }
+                };
+            });
+        }
+
+        [Test]
+        public void TestTaggingWhenRankTooLow()
+        {
+            var score = TestResources.CreateTestScoreInfo();
+            score.Rank = ScoreRank.D;
+
+            AddStep("load panel", () =>
+            {
+                Child = new PopoverContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Child = new StatisticsPanel
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        State = { Value = Visibility.Visible },
+                        Score = { Value = score },
+                        AchievedScore = score,
+                    }
+                };
+            });
         }
 
         private void loadPanel(ScoreInfo score) => AddStep("load panel", () =>
         {
-            Child = new UserStatisticsPanel(score)
+            Child = new StatisticsPanel
             {
                 RelativeSizeAxes = Axes.Both,
                 State = { Value = Visibility.Visible },
                 Score = { Value = score },
-                DisplayedUserStatisticsUpdate =
-                {
-                    Value = new ScoreBasedUserStatisticsUpdate(score, new UserStatistics
-                    {
-                        Level = new UserStatistics.LevelInfo
-                        {
-                            Current = 5,
-                            Progress = 20,
-                        },
-                        GlobalRank = 38000,
-                        CountryRank = 12006,
-                        PP = 2134,
-                        RankedScore = 21123849,
-                        Accuracy = 0.985,
-                        PlayCount = 13375,
-                        PlayTime = 354490,
-                        TotalScore = 128749597,
-                        TotalHits = 0,
-                        MaxCombo = 1233,
-                    }, new UserStatistics
-                    {
-                        Level = new UserStatistics.LevelInfo
-                        {
-                            Current = 5,
-                            Progress = 30,
-                        },
-                        GlobalRank = 36000,
-                        CountryRank = 12000,
-                        PP = (decimal)2134.5,
-                        RankedScore = 23897015,
-                        Accuracy = 0.984,
-                        PlayCount = 13376,
-                        PlayTime = 35789,
-                        TotalScore = 132218497,
-                        TotalHits = 0,
-                        MaxCombo = 1233,
-                    })
-                }
+                AchievedScore = score,
             };
         });
 
