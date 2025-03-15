@@ -11,8 +11,8 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
 {
     public class Movement : StrainDecaySkill
     {
+        private const float normalized_half_catcher_width = CatchDifficultyHitObject.NORMALIZED_HALF_CATCHER_WIDTH;
         private const float absolute_player_positioning_error = 16f;
-        private const float normalized_half_catcher_width = 41.0f;
         private const double direction_change_bonus = 21.0;
 
         protected override double SkillMultiplier => 1;
