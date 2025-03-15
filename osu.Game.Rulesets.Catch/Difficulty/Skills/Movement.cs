@@ -105,7 +105,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
             // the platter's width but high enough to be considered a movement due to the absolute_player_positioning_error and normalized_hitobject_radius offsets
             // We are detecting this exact scenario. The first back and forth is counted but all subsequent ones are nullified.
             // To achieve that, we need to store the exact distances (distance ignoring absolute_player_positioning_error and normalized_hitobject_radius)
-            if (Math.Abs(exactDistanceMoved) <= HalfCatcherWidth * 2 && exactDistanceMoved == -lastExactDistanceMoved && catchCurrent.StrainTime == lastStrainTime)
+            if (Math.Abs(exactDistanceMoved) <= normalized_hitobject_radius * 2 && exactDistanceMoved == -lastExactDistanceMoved && catchCurrent.StrainTime == lastStrainTime)
             {
                 if (isInBuzzSection)
                     distanceAddition = 0;
