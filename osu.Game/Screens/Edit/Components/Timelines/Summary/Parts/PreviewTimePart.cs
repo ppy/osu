@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Localisation;
 using osu.Game.Extensions;
@@ -36,6 +37,10 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
                 : base(time)
             {
                 Alpha = 0.8f;
+
+                // Display as a small circle on the middle line as to not clash with other displays.
+                RelativeSizeAxes = Axes.None;
+                Height = Width = 5;
             }
 
             [BackgroundDependencyLoader]

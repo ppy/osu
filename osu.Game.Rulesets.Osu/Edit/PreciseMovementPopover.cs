@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -127,8 +128,11 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             if (relativeCheckbox.Current.Value)
             {
-                (xBindable.MinValue, xBindable.MaxValue) = (0 - initialSurroundingQuad.TopLeft.X, OsuPlayfield.BASE_SIZE.X - initialSurroundingQuad.BottomRight.X);
-                (yBindable.MinValue, yBindable.MaxValue) = (0 - initialSurroundingQuad.TopLeft.Y, OsuPlayfield.BASE_SIZE.Y - initialSurroundingQuad.BottomRight.Y);
+                xBindable.MinValue = 0 - Math.Max(initialSurroundingQuad.TopLeft.X, 0);
+                xBindable.MaxValue = OsuPlayfield.BASE_SIZE.X - Math.Min(initialSurroundingQuad.BottomRight.X, OsuPlayfield.BASE_SIZE.X);
+
+                yBindable.MinValue = 0 - Math.Max(initialSurroundingQuad.TopLeft.Y, 0);
+                yBindable.MaxValue = OsuPlayfield.BASE_SIZE.Y - Math.Min(initialSurroundingQuad.BottomRight.Y, OsuPlayfield.BASE_SIZE.Y);
 
                 xBindable.Default = yBindable.Default = 0;
 
@@ -146,8 +150,21 @@ namespace osu.Game.Rulesets.Osu.Edit
 
                 var quadRelativeToPosition = new RectangleF(initialSurroundingQuad.Location - initialPosition, initialSurroundingQuad.Size);
 
-                (xBindable.MinValue, xBindable.MaxValue) = (0 - quadRelativeToPosition.TopLeft.X, OsuPlayfield.BASE_SIZE.X - quadRelativeToPosition.BottomRight.X);
-                (yBindable.MinValue, yBindable.MaxValue) = (0 - quadRelativeToPosition.TopLeft.Y, OsuPlayfield.BASE_SIZE.Y - quadRelativeToPosition.BottomRight.Y);
+                if (initialSurroundingQuad.Width < OsuPlayfield.BASE_SIZE.X)
+                {
+                    xBindable.MinValue = 0 - quadRelativeToPosition.TopLeft.X;
+                    xBindable.MaxValue = OsuPlayfield.BASE_SIZE.X - quadRelativeToPosition.BottomRight.X;
+                }
+                else
+                    xBindable.MinValue = xBindable.MaxValue = initialPosition.X;
+
+                if (initialSurroundingQuad.Height < OsuPlayfield.BASE_SIZE.Y)
+                {
+                    yBindable.MinValue = 0 - quadRelativeToPosition.TopLeft.Y;
+                    yBindable.MaxValue = OsuPlayfield.BASE_SIZE.Y - quadRelativeToPosition.BottomRight.Y;
+                }
+                else
+                    yBindable.MinValue = yBindable.MaxValue = initialPosition.Y;
 
                 xBindable.Default = initialPosition.X;
                 yBindable.Default = initialPosition.Y;

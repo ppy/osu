@@ -405,6 +405,35 @@ namespace osu.Game.Tests.Beatmaps.Formats
         }
 
         [Test]
+        public void TestComboColourCountIsLimitedToEight()
+        {
+            var decoder = new LegacySkinDecoder();
+
+            using (var resStream = TestResources.OpenResource("too-many-combo-colours.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var comboColors = decoder.Decode(stream).ComboColours;
+
+                Debug.Assert(comboColors != null);
+
+                Color4[] expectedColors =
+                {
+                    new Color4(142, 199, 255, 255),
+                    new Color4(255, 128, 128, 255),
+                    new Color4(128, 255, 255, 255),
+                    new Color4(128, 255, 128, 255),
+                    new Color4(255, 187, 255, 255),
+                    new Color4(255, 177, 140, 255),
+                    new Color4(100, 100, 100, 255),
+                    new Color4(142, 199, 255, 255),
+                };
+                Assert.AreEqual(expectedColors.Length, comboColors.Count);
+                for (int i = 0; i < expectedColors.Length; i++)
+                    Assert.AreEqual(expectedColors[i], comboColors[i]);
+            }
+        }
+
+        [Test]
         public void TestGetLastObjectTime()
         {
             var decoder = new LegacyBeatmapDecoder();

@@ -19,6 +19,11 @@ namespace osu.Game.Screens.Play
         double StartTime { get; }
 
         /// <summary>
+        /// The time from which actual gameplay should start. When intro time is skipped, this will be the seeked location.
+        /// </summary>
+        double GameplayStartTime { get; }
+
+        /// <summary>
         /// All adjustments applied to this clock which come from mods.
         /// </summary>
         IAdjustableAudioComponent AdjustmentsFromMods { get; }

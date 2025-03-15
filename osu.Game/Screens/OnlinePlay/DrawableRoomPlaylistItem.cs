@@ -74,7 +74,7 @@ namespace osu.Game.Screens.OnlinePlay
 
         public bool IsSelectedItem => SelectedItem.Value?.ID == Item.ID;
 
-        private readonly DelayedLoadWrapper onScreenLoader = new DelayedLoadWrapper(Empty) { RelativeSizeAxes = Axes.Both };
+        private readonly DelayedLoadWrapper onScreenLoader;
         private readonly IBindable<bool> valid = new Bindable<bool>();
 
         private IBeatmapInfo? beatmap;
@@ -120,9 +120,11 @@ namespace osu.Game.Screens.OnlinePlay
         [Resolved(CanBeNull = true)]
         private ManageCollectionsDialog? manageCollectionsDialog { get; set; }
 
-        public DrawableRoomPlaylistItem(PlaylistItem item)
+        public DrawableRoomPlaylistItem(PlaylistItem item, bool loadImmediately = false)
             : base(item)
         {
+            onScreenLoader = new DelayedLoadWrapper(Empty, timeBeforeLoad: loadImmediately ? 0 : 500) { RelativeSizeAxes = Axes.Both };
+
             Item = item;
 
             valid.BindTo(item.Valid);

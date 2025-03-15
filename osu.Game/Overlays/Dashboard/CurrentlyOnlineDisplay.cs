@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
@@ -40,17 +38,20 @@ namespace osu.Game.Overlays.Dashboard
         private readonly IBindableDictionary<int, UserPresence> onlineUserPresences = new BindableDictionary<int, UserPresence>();
         private readonly Dictionary<int, OnlineUserPanel> userPanels = new Dictionary<int, OnlineUserPanel>();
 
-        private SearchContainer<OnlineUserPanel> userFlow;
-        private BasicSearchTextBox searchTextBox;
+        private SearchContainer<OnlineUserPanel> userFlow = null!;
+        private BasicSearchTextBox searchTextBox = null!;
 
         [Resolved]
-        private IAPIProvider api { get; set; }
+        private IAPIProvider api { get; set; } = null!;
 
         [Resolved]
-        private SpectatorClient spectatorClient { get; set; }
+        private SpectatorClient spectatorClient { get; set; } = null!;
 
         [Resolved]
-        private MetadataClient metadataClient { get; set; }
+        private MetadataClient metadataClient { get; set; } = null!;
+
+        [Resolved]
+        private UserLookupCache users { get; set; } = null!;
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
@@ -99,9 +100,6 @@ namespace osu.Game.Overlays.Dashboard
             searchTextBox.Current.ValueChanged += text => userFlow.SearchTerm = text.NewValue;
         }
 
-        [Resolved]
-        private UserLookupCache users { get; set; }
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -120,7 +118,7 @@ namespace osu.Game.Overlays.Dashboard
             searchTextBox.TakeFocus();
         }
 
-        private void onUserPresenceUpdated(object sender, NotifyDictionaryChangedEventArgs<int, UserPresence> e) => Schedule(() =>
+        private void onUserPresenceUpdated(object? sender, NotifyDictionaryChangedEventArgs<int, UserPresence> e) => Schedule(() =>
         {
             switch (e.Action)
             {
@@ -133,36 +131,9 @@ namespace osu.Game.Overlays.Dashboard
 
                         users.GetUserAsync(userId).ContinueWith(task =>
                         {
-                            APIUser user = task.GetResultSafely();
-
-                            if (user == null)
-                                return;
-
-                            Schedule(() =>
-                            {
-                                userFlow.Add(userPanels[userId] = createUserPanel(user).With(p =>
-                                {
-                                    var presence = onlineUserPresences.GetValueOrDefault(userId);
-
-                                    p.Status.Value = presence.Status;
-                                    p.Activity.Value = presence.Activity;
-                                }));
-                            });
+                            if (task.GetResultSafely() is APIUser user)
+                                Schedule(() => userFlow.Add(userPanels[userId] = createUserPanel(user)));
                         });
-                    }
-
-                    break;
-
-                case NotifyDictionaryChangedAction.Replace:
-                    Debug.Assert(e.NewItems != null);
-
-                    foreach (var kvp in e.NewItems)
-                    {
-                        if (userPanels.TryGetValue(kvp.Key, out var panel))
-                        {
-                            panel.Activity.Value = kvp.Value.Activity;
-                            panel.Status.Value = kvp.Value.Status;
-                        }
                     }
 
                     break;
@@ -181,7 +152,7 @@ namespace osu.Game.Overlays.Dashboard
             }
         });
 
-        private void onPlayingUsersChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void onPlayingUsersChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             switch (e.Action)
             {
@@ -221,15 +192,12 @@ namespace osu.Game.Overlays.Dashboard
         {
             public readonly APIUser User;
 
-            public readonly Bindable<UserStatus?> Status = new Bindable<UserStatus?>();
-            public readonly Bindable<UserActivity> Activity = new Bindable<UserActivity>();
-
             public BindableBool CanSpectate { get; } = new BindableBool();
 
             public IEnumerable<LocalisableString> FilterTerms { get; }
 
-            [Resolved(canBeNull: true)]
-            private IPerformFromScreenRunner performer { get; set; }
+            [Resolved]
+            private IPerformFromScreenRunner? performer { get; set; }
 
             public bool FilteringActive { set; get; }
 
@@ -270,10 +238,7 @@ namespace osu.Game.Overlays.Dashboard
                             {
                                 RelativeSizeAxes = Axes.X,
                                 Anchor = Anchor.TopCentre,
-                                Origin = Anchor.TopCentre,
-                                // this is SHOCKING
-                                Activity = { BindTarget = Activity },
-                                Status = { BindTarget = Status },
+                                Origin = Anchor.TopCentre
                             },
                             new PurpleRoundedButton
                             {

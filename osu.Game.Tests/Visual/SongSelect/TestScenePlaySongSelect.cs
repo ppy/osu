@@ -1239,7 +1239,6 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
-        [Solo]
         public void TestHardDeleteHandledCorrectly()
         {
             createSongSelect();

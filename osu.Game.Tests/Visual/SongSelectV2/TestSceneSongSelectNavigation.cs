@@ -16,7 +16,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             base.SetUpSteps();
             AddStep("press enter", () => InputManager.Key(Key.Enter));
             AddWaitStep("wait", 5);
-            PushAndConfirm(() => new Screens.SelectV2.SongSelectV2());
+            PushAndConfirm(() => new Screens.SelectV2.SoloSongSelect());
         }
 
         [Test]

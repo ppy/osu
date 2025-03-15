@@ -32,7 +32,7 @@ using osuTK;
 namespace osu.Game.Overlays.FirstRunSetup
 {
     [LocalisableDescription(typeof(GraphicsSettingsStrings), nameof(GraphicsSettingsStrings.UIScaling))]
-    public partial class ScreenUIScale : FirstRunSetupScreen
+    public partial class ScreenUIScale : WizardScreen
     {
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)

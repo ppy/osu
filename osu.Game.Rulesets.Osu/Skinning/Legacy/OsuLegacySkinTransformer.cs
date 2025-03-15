@@ -6,6 +6,7 @@ using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Screens.Play.HUD;
 using osu.Game.Skinning;
 using osuTK;
 
@@ -70,12 +71,24 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                                 }
 
                                 var combo = container.OfType<LegacyDefaultComboCounter>().FirstOrDefault();
+                                var spectatorList = container.OfType<SpectatorList>().FirstOrDefault();
+
+                                Vector2 pos = new Vector2();
 
                                 if (combo != null)
                                 {
                                     combo.Anchor = Anchor.BottomLeft;
                                     combo.Origin = Anchor.BottomLeft;
                                     combo.Scale = new Vector2(1.28f);
+
+                                    pos += new Vector2(10, -(combo.DrawHeight * 1.56f + 20) * combo.Scale.X);
+                                }
+
+                                if (spectatorList != null)
+                                {
+                                    spectatorList.Anchor = Anchor.BottomLeft;
+                                    spectatorList.Origin = Anchor.BottomLeft;
+                                    spectatorList.Position = pos;
                                 }
                             })
                             {
@@ -83,6 +96,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                                 {
                                     new LegacyDefaultComboCounter(),
                                     new LegacyKeyCounterDisplay(),
+                                    new SpectatorList(),
                                 }
                             };
                     }

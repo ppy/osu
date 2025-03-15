@@ -28,11 +28,12 @@ namespace osu.Game.Rulesets.Scoring
             result ??= new UnstableRateCalculationResult();
 
             // Handle rewinding in the simplest way possible.
-            if (hitEvents.Count < result.EventCount + 1)
+            if (hitEvents.Count < result.LastProcessedIndex + 1)
                 result = new UnstableRateCalculationResult();
 
-            for (int i = result.EventCount; i < hitEvents.Count; i++)
+            for (int i = result.LastProcessedIndex + 1; i < hitEvents.Count; i++)
             {
+                result.LastProcessedIndex = i;
                 HitEvent e = hitEvents[i];
 
                 if (!AffectsUnstableRate(e))
@@ -84,6 +85,11 @@ namespace osu.Game.Rulesets.Scoring
         /// </remarks>
         public class UnstableRateCalculationResult
         {
+            /// <summary>
+            /// The last result index processed. For internal incremental calculation use.
+            /// </summary>
+            public int LastProcessedIndex = -1;
+
             /// <summary>
             /// Total events processed. For internal incremental calculation use.
             /// </summary>

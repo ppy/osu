@@ -42,8 +42,7 @@ namespace osu.Game.Rulesets.Mania.Mods
                 var locations = column.OfType<Note>().Select(n => (startTime: n.StartTime, samples: n.Samples))
                                       .Concat(column.OfType<HoldNote>().SelectMany(h => new[]
                                       {
-                                          (startTime: h.StartTime, samples: h.GetNodeSamples(0)),
-                                          (startTime: h.EndTime, samples: h.GetNodeSamples(1))
+                                          (startTime: h.StartTime, samples: h.GetNodeSamples(0))
                                       }))
                                       .OrderBy(h => h.startTime).ToList();
 

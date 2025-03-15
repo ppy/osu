@@ -24,6 +24,21 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString StartMatchWithCountdown(string humanReadableTime) => new TranslatableString(getKey(@"start_match_width_countdown"), @"Start match in {0}", humanReadableTime);
 
+        /// <summary>
+        /// "Choose the mods which all players should play with."
+        /// </summary>
+        public static LocalisableString RequiredModsButtonTooltip => new TranslatableString(getKey(@"required_mods_button_tooltip"), @"Choose the mods which all players should play with.");
+
+        /// <summary>
+        /// "Each player can choose their preferred mods from a selected list."
+        /// </summary>
+        public static LocalisableString FreeModsButtonTooltip => new TranslatableString(getKey(@"free_mods_button_tooltip"), @"Each player can choose their preferred mods from a selected list.");
+
+        /// <summary>
+        /// "Each player can choose their preferred difficulty, ruleset and mods."
+        /// </summary>
+        public static LocalisableString FreestyleButtonTooltip => new TranslatableString(getKey(@"freestyle_button_tooltip"), @"Each player can choose their preferred difficulty, ruleset and mods.");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

@@ -12,15 +12,19 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.UserInterface;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API;
 using osu.Game.Online.Chat;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
@@ -31,10 +35,16 @@ using Container = osu.Framework.Graphics.Containers.Container;
 
 namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 {
-    public abstract partial class DrawableRoom : CompositeDrawable
+    public abstract partial class DrawableRoom : CompositeDrawable, IHasContextMenu
     {
         protected const float CORNER_RADIUS = 10;
         private const float height = 100;
+
+        [Resolved]
+        private IAPIProvider api { get; set; } = null!;
+
+        [Resolved]
+        private OsuGame? game { get; set; }
 
         public readonly Room Room;
 
@@ -165,6 +175,11 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                                                         Origin = Anchor.CentreLeft
                                                                     },
                                                                     specialCategoryPill = new RoomSpecialCategoryPill(Room)
+                                                                    {
+                                                                        Anchor = Anchor.CentreLeft,
+                                                                        Origin = Anchor.CentreLeft
+                                                                    },
+                                                                    new FreestyleStatusPill(Room)
                                                                     {
                                                                         Anchor = Anchor.CentreLeft,
                                                                         Origin = Anchor.CentreLeft
@@ -327,6 +342,26 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
                 if (drawableRoomParticipantsList != null)
                     drawableRoomParticipantsList.NumberOfCircles = value;
+            }
+        }
+
+        public virtual MenuItem[] ContextMenuItems
+        {
+            get
+            {
+                var items = new List<MenuItem>();
+
+                if (Room.RoomID.HasValue)
+                {
+                    items.AddRange([
+                        new OsuMenuItem("View in browser", MenuItemType.Standard, () => game?.OpenUrlExternally(formatRoomUrl(Room.RoomID.Value))),
+                        new OsuMenuItem("Copy link", MenuItemType.Standard, () => game?.CopyUrlToClipboard(formatRoomUrl(Room.RoomID.Value)))
+                    ]);
+                }
+
+                return items.ToArray();
+
+                string formatRoomUrl(long id) => $@"{api.Endpoints.WebsiteUrl}/multiplayer/rooms/{id}";
             }
         }
 

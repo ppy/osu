@@ -21,7 +21,7 @@ using Realms;
 namespace osu.Game.Overlays.FirstRunSetup
 {
     [LocalisableDescription(typeof(FirstRunSetupBeatmapScreenStrings), nameof(FirstRunSetupBeatmapScreenStrings.Header))]
-    public partial class ScreenBeatmaps : FirstRunSetupScreen
+    public partial class ScreenBeatmaps : WizardScreen
     {
         private ProgressRoundedButton downloadBundledButton = null!;
         private ProgressRoundedButton downloadTutorialButton = null!;

@@ -398,6 +398,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             private readonly BindableBeatDivisor beatDivisor;
 
+            public override bool AcceptsFocus => false;
+
             public TickSliderBar(BindableBeatDivisor beatDivisor)
             {
                 CurrentNumber.BindTo(this.beatDivisor = beatDivisor);

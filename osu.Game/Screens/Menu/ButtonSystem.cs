@@ -245,6 +245,15 @@ namespace osu.Game.Screens.Menu
             if (e.Repeat || e.ControlPressed || e.ShiftPressed || e.AltPressed || e.SuperPressed)
                 return false;
 
+            if (e.Key >= Key.F1 && e.Key <= Key.F35)
+                return false;
+
+            switch (e.Key)
+            {
+                case Key.Escape:
+                    return false;
+            }
+
             if (triggerInitialOsuLogo())
                 return true;
 

@@ -20,6 +20,8 @@ namespace osu.Game.Screens.Edit.Timing
 {
     public partial class ControlPointList : CompositeDrawable
     {
+        public Action? SelectClosestTimingPoint { get; init; }
+
         private ControlPointTable table = null!;
         private Container controls = null!;
         private OsuButton deleteButton = null!;
@@ -75,7 +77,7 @@ namespace osu.Game.Screens.Edit.Timing
                                 new RoundedButton
                                 {
                                     Text = "Select closest to current time",
-                                    Action = goToCurrentGroup,
+                                    Action = SelectClosestTimingPoint,
                                     Size = new Vector2(220, 30),
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
@@ -144,17 +146,6 @@ namespace osu.Game.Screens.Edit.Timing
 
             addButton.Enabled.Value = clock.CurrentTimeAccurate != selectedGroup.Value?.Time;
             table.Padding = new MarginPadding { Bottom = controls.DrawHeight };
-        }
-
-        private void goToCurrentGroup()
-        {
-            double accurateTime = clock.CurrentTimeAccurate;
-
-            var activeTimingPoint = Beatmap.ControlPointInfo.TimingPointAt(accurateTime);
-            var activeEffectPoint = Beatmap.ControlPointInfo.EffectPointAt(accurateTime);
-
-            double latestActiveTime = Math.Max(activeTimingPoint.Time, activeEffectPoint.Time);
-            selectedGroup.Value = Beatmap.ControlPointInfo.GroupAt(latestActiveTime);
         }
 
         private void delete()

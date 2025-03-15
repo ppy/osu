@@ -56,9 +56,31 @@ namespace osu.Game.Online.Rooms
         [Key(10)]
         public double StarRating { get; set; }
 
+        /// <summary>
+        /// Indicates whether participants in the room are able to pick their own choice of beatmap difficulty and ruleset.
+        /// </summary>
+        [Key(11)]
+        public bool Freestyle { get; set; }
+
         [SerializationConstructor]
         public MultiplayerPlaylistItem()
         {
+        }
+
+        public MultiplayerPlaylistItem(PlaylistItem item)
+        {
+            ID = item.ID;
+            OwnerID = item.OwnerID;
+            BeatmapID = item.Beatmap.OnlineID;
+            BeatmapChecksum = item.Beatmap.MD5Hash;
+            RulesetID = item.RulesetID;
+            RequiredMods = item.RequiredMods.ToArray();
+            AllowedMods = item.AllowedMods.ToArray();
+            Expired = item.Expired;
+            PlaylistOrder = item.PlaylistOrder ?? 0;
+            PlayedAt = item.PlayedAt;
+            StarRating = item.Beatmap.StarRating;
+            Freestyle = item.Freestyle;
         }
     }
 }

@@ -7,6 +7,7 @@ using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Objects;
+using osuTK;
 using osuTK.Input;
 
 namespace osu.Game.Rulesets.Edit
@@ -75,18 +76,7 @@ namespace osu.Game.Rulesets.Edit
             PlacementActive = PlacementState.Finished;
         }
 
-        /// <summary>
-        /// Determines which objects to snap to for the snap result in <see cref="UpdateTimeAndPosition"/>.
-        /// </summary>
-        public virtual SnapType SnapType => SnapType.All;
-
-        /// <summary>
-        /// Updates the time and position of this <see cref="PlacementBlueprint"/> based on the provided snap information.
-        /// </summary>
-        /// <param name="result">The snap result information.</param>
-        public virtual void UpdateTimeAndPosition(SnapResult result)
-        {
-        }
+        public abstract SnapResult UpdateTimeAndPosition(Vector2 screenSpacePosition, double fallbackTime);
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {

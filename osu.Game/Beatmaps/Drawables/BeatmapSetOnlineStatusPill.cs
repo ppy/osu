@@ -101,7 +101,7 @@ namespace osu.Game.Beatmaps.Drawables
         {
             if (Status == BeatmapOnlineStatus.None)
             {
-                this.FadeOut(animation_duration, Easing.OutQuint);
+                Hide();
                 return;
             }
 

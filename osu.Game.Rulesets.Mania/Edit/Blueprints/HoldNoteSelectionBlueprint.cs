@@ -5,7 +5,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
-using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.Edit.Blueprints.Components;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
@@ -24,7 +23,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
         private EditorBeatmap? editorBeatmap { get; set; }
 
         [Resolved]
-        private IPositionSnapProvider? positionSnapProvider { get; set; }
+        private ManiaHitObjectComposer? positionSnapProvider { get; set; }
 
         private EditBodyPiece body = null!;
         private EditHoldNoteEndPiece head = null!;

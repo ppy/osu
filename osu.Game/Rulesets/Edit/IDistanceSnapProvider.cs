@@ -4,7 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Rulesets.Edit
 {
@@ -22,53 +22,63 @@ namespace osu.Game.Rulesets.Edit
         Bindable<double> DistanceSpacingMultiplier { get; }
 
         /// <summary>
-        /// Retrieves the distance between two points within a timing point that are one beat length apart.
+        /// Returns the spatial distance between objects which are temporally one beat apart.
+        /// Depends on:
+        /// <list type="bullet">
+        /// <item>the slider velocity taken from <paramref name="withVelocity"/>,</item>
+        /// <item>the beatmap's <see cref="IBeatmapDifficultyInfo.SliderMultiplier"/>,</item>,
+        /// <item>the current beat divisor.</item>
+        /// </list>
+        /// Note that the returned value does <b>NOT</b> depend on <see cref="DistanceSpacingMultiplier"/>;
+        /// consumers are expected to include that multiplier as they see fit.
         /// </summary>
-        /// <param name="referenceObject">An object to be used as a reference point for this operation.</param>
-        /// <param name="useReferenceSliderVelocity">Whether the <paramref name="referenceObject"/>'s slider velocity should be factored into the returned distance.</param>
-        /// <returns>The distance between two points residing in the timing point that are one beat length apart.</returns>
-        float GetBeatSnapDistanceAt(HitObject referenceObject, bool useReferenceSliderVelocity = true);
+        float GetBeatSnapDistance(IHasSliderVelocity? withVelocity = null);
 
         /// <summary>
-        /// Converts a duration to a distance without applying any snapping.
+        /// Converts a temporal duration into a spatial distance.
+        /// Does not perform any snapping.
+        /// Depends on:
+        /// <list type="bullet">
+        /// <item>the <paramref name="duration"/> provided,</item>
+        /// <item>a <paramref name="timingReference"/> used to retrieve the beat length of the beatmap at that time,</item>
+        /// <item>the slider velocity taken from <paramref name="withVelocity"/>,</item>
+        /// <item>the beatmap's <see cref="IBeatmapDifficultyInfo.SliderMultiplier"/>,</item>,
+        /// <item>the current beat divisor.</item>
+        /// </list>
+        /// Note that the returned value does <b>NOT</b> depend on <see cref="DistanceSpacingMultiplier"/>;
+        /// consumers are expected to include that multiplier as they see fit.
         /// </summary>
-        /// <param name="referenceObject">An object to be used as a reference point for this operation.</param>
-        /// <param name="duration">The duration to convert.</param>
-        /// <returns>A value that represents <paramref name="duration"/> as a distance in the timing point.</returns>
-        float DurationToDistance(HitObject referenceObject, double duration);
+        float DurationToDistance(double duration, double timingReference, IHasSliderVelocity? withVelocity = null);
 
         /// <summary>
-        /// Converts a distance to a duration without applying any snapping.
+        /// Converts a spatial distance into a temporal duration.
+        /// Does not perform any snapping.
+        /// Depends on:
+        /// <list type="bullet">
+        /// <item>the <paramref name="distance"/> provided,</item>
+        /// <item>a <paramref name="timingReference"/> used to retrieve the beat length of the beatmap at that time,</item>
+        /// <item>the slider velocity taken from <paramref name="withVelocity"/>,</item>
+        /// <item>the beatmap's <see cref="IBeatmapDifficultyInfo.SliderMultiplier"/>,</item>,
+        /// <item>the current beat divisor.</item>
+        /// </list>
+        /// Note that the returned value does <b>NOT</b> depend on <see cref="DistanceSpacingMultiplier"/>;
+        /// consumers are expected to include that multiplier as they see fit.
         /// </summary>
-        /// <param name="referenceObject">An object to be used as a reference point for this operation.</param>
-        /// <param name="distance">The distance to convert.</param>
-        /// <returns>A value that represents <paramref name="distance"/> as a duration in the timing point.</returns>
-        double DistanceToDuration(HitObject referenceObject, float distance);
+        double DistanceToDuration(float distance, double timingReference, IHasSliderVelocity? withVelocity = null);
 
         /// <summary>
-        /// Given a distance from the provided hit object, find the valid snapped duration.
+        /// Snaps a spatial distance to the beat, relative to <paramref name="snapReferenceTime"/>.
+        /// Depends on:
+        /// <list type="bullet">
+        /// <item>the <paramref name="distance"/> provided,</item>
+        /// <item>a <paramref name="snapReferenceTime"/> used to retrieve the beat length of the beatmap at that time,</item>
+        /// <item>the slider velocity taken from <paramref name="withVelocity"/>,</item>
+        /// <item>the beatmap's <see cref="IBeatmapDifficultyInfo.SliderMultiplier"/>,</item>,
+        /// <item>the current beat divisor.</item>
+        /// </list>
+        /// Note that the returned value does <b>NOT</b> depend on <see cref="DistanceSpacingMultiplier"/>;
+        /// consumers are expected to include that multiplier as they see fit.
         /// </summary>
-        /// <param name="referenceObject">An object to be used as a reference point for this operation.</param>
-        /// <param name="distance">The distance to convert.</param>
-        /// <returns>A value that represents <paramref name="distance"/> as a duration snapped to the closest beat of the timing point.</returns>
-        double FindSnappedDuration(HitObject referenceObject, float distance);
-
-        /// <summary>
-        /// Given a distance from the provided hit object, find the valid snapped distance.
-        /// </summary>
-        /// <param name="referenceObject">An object to be used as a reference point for this operation.</param>
-        /// <param name="distance">The distance to convert.</param>
-        /// <param name="target">Whether the distance measured should be from the start or the end of <paramref name="referenceObject"/>.</param>
-        /// <returns>
-        /// A value that represents <paramref name="distance"/> snapped to the closest beat of the timing point.
-        /// The distance will always be less than or equal to the provided <paramref name="distance"/>.
-        /// </returns>
-        float FindSnappedDistance(HitObject referenceObject, float distance, DistanceSnapTarget target);
-    }
-
-    public enum DistanceSnapTarget
-    {
-        Start,
-        End,
+        float FindSnappedDistance(float distance, double snapReferenceTime, IHasSliderVelocity? withVelocity = null);
     }
 }

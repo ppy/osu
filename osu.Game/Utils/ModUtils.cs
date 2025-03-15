@@ -8,6 +8,7 @@ using System.Linq;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Localisation;
 using osu.Game.Online.API;
+using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 
@@ -291,6 +292,46 @@ namespace osu.Game.Utils
                 rate = mod.ApplyToRate(0, rate);
 
             return rate;
+        }
+
+        /// <summary>
+        /// Determines whether a mod can be applied to playlist items in the given match type.
+        /// </summary>
+        /// <param name="mod">The mod to test.</param>
+        /// <param name="type">The match type.</param>
+        public static bool IsValidModForMatchType(Mod mod, MatchType type)
+        {
+            if (mod.Type == ModType.System || !mod.UserPlayable || !mod.HasImplementation)
+                return false;
+
+            switch (type)
+            {
+                case MatchType.Playlists:
+                    return true;
+
+                default:
+                    return mod.ValidForMultiplayer;
+            }
+        }
+
+        /// <summary>
+        /// Determines whether a mod can be applied as a free mod to playlist items in the given match type.
+        /// </summary>
+        /// <param name="mod">The mod to test.</param>
+        /// <param name="type">The match type.</param>
+        public static bool IsValidFreeModForMatchType(Mod mod, MatchType type)
+        {
+            if (mod.Type == ModType.System || !mod.UserPlayable || !mod.HasImplementation)
+                return false;
+
+            switch (type)
+            {
+                case MatchType.Playlists:
+                    return true;
+
+                default:
+                    return mod.ValidForMultiplayerAsFreeMod;
+            }
         }
     }
 }
