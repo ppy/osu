@@ -221,18 +221,18 @@ namespace osu.Game.Online.Leaderboards
 
                 string description = mod.SettingDescription;
 
-                if (!string.IsNullOrEmpty(description))
+                if (string.IsNullOrEmpty(description))
+                    description = mod.Name;
+
+                container.Add(new OsuSpriteText
                 {
-                    container.Add(new OsuSpriteText
-                    {
-                        RelativeSizeAxes = Axes.Y,
-                        Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
-                        Text = mod.SettingDescription,
-                        Origin = Anchor.CentreLeft,
-                        Anchor = Anchor.CentreLeft,
-                        Margin = new MarginPadding { Top = 1 },
-                    });
-                }
+                    RelativeSizeAxes = Axes.Y,
+                    Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
+                    Text = description,
+                    Origin = Anchor.CentreLeft,
+                    Anchor = Anchor.CentreLeft,
+                    Margin = new MarginPadding { Top = 1 },
+                });
             }
         }
     }
