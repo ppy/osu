@@ -5,7 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using osu.Framework.Bindables;
 using osu.Framework.Localisation;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
@@ -20,13 +22,15 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModRelax : ModRelax, IUpdatableByPlayfield, IApplicableToDrawableRuleset<OsuHitObject>, IApplicableToPlayer, IHasNoTimedInputs
     {
+        [SettingSource("Strict Timing", "Removes timing leniency.")]
+        public Bindable<bool> Strict { get; } = new BindableBool();
         public override LocalisableString Description => @"You don't need to click. Give your clicking/tapping fingers a break from the heat of things.";
 
         public override Type[] IncompatibleMods =>
             base.IncompatibleMods.Concat(new[] { typeof(OsuModAutopilot), typeof(OsuModMagnetised), typeof(OsuModAlternate), typeof(OsuModSingleTap) }).ToArray();
 
         /// <summary>
-        /// How early before a hitobject's start time to trigger a hit.
+        /// How early before a hitobject's start time to trigger a hit, in non-strict mode.
         /// </summary>
         public const float RELAX_LENIENCY = 12;
 
@@ -79,16 +83,26 @@ namespace osu.Game.Rulesets.Osu.Mods
             bool requiresHit = false;
 
             double time = playfield.Clock.CurrentTime;
+            double lastFrameTime = time - playfield.Clock.ElapsedFrameTime;
+
+            double relaxLeniency = Strict.Value ? 0 : RELAX_LENIENCY;
 
             foreach (var h in playfield.HitObjectContainer.AliveObjects.OfType<DrawableOsuHitObject>())
             {
                 // we are not yet close enough to the object.
-                if (time < h.HitObject.StartTime - RELAX_LENIENCY)
+                if (time < h.HitObject.StartTime - relaxLeniency)
                     break;
 
                 // already hit or beyond the hittable end time.
                 if (h.IsHit || (h.HitObject is IHasDuration hasEnd && time > hasEnd.EndTime))
                     continue;
+
+                // if in strict mode, hitting a circle slightly late is an automatic miss. gives 1 frame of leniency so it's physically possible to hit the circle
+                if (Strict.Value && !h.Judged && h.HitObject is HitCircle && lastFrameTime > h.HitObject.StartTime)
+                {
+                    h.MissForcefully();
+                    continue;
+                }
 
                 switch (h)
                 {
@@ -127,7 +141,9 @@ namespace osu.Game.Rulesets.Osu.Mods
                     return;
 
                 Debug.Assert(circle.HitObject.HitWindows != null);
-                requiresHit |= circle.HitObject.HitWindows.CanBeHit(time - circle.HitObject.StartTime);
+
+                // Judged check is so you can't attempt to click on a circle which has already been forcefully missed
+                requiresHit |= !circle.Judged && circle.HitObject.HitWindows.CanBeHit(time - circle.HitObject.StartTime);
             }
 
             void changeState(bool down)
