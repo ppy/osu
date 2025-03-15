@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
     public class Movement : StrainDecaySkill
     {
         private const float absolute_player_positioning_error = 16f;
-        private const float normalized_hitobject_radius = 41.0f;
+        private const float normalized_half_catcher_width = 41.0f;
         private const double direction_change_bonus = 21.0;
 
         protected override double SkillMultiplier => 1;
@@ -55,8 +55,8 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
 
             float playerPosition = Math.Clamp(
                 lastPlayerPosition.Value,
-                catchCurrent.NormalizedPosition - (normalized_hitobject_radius - absolute_player_positioning_error),
-                catchCurrent.NormalizedPosition + (normalized_hitobject_radius - absolute_player_positioning_error)
+                catchCurrent.NormalizedPosition - (normalized_half_catcher_width - absolute_player_positioning_error),
+                catchCurrent.NormalizedPosition + (normalized_half_catcher_width - absolute_player_positioning_error)
             );
 
             float distanceMoved = playerPosition - lastPlayerPosition.Value;
@@ -83,7 +83,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
                 }
 
                 // Base bonus for every movement, giving some weight to streams.
-                distanceAddition += 12.5 * Math.Min(Math.Abs(distanceMoved), normalized_hitobject_radius * 2) / (normalized_hitobject_radius * 6) / sqrtStrain;
+                distanceAddition += 12.5 * Math.Min(Math.Abs(distanceMoved), normalized_half_catcher_width * 2) / (normalized_half_catcher_width * 6) / sqrtStrain;
             }
 
             // Bonus for edge dashes.
@@ -102,10 +102,10 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
             }
 
             // There is an edge case where horizontal back and forth sliders create "buzz" patterns which are repeated "movements" with a distance lower than
-            // the platter's width but high enough to be considered a movement due to the absolute_player_positioning_error and normalized_hitobject_radius offsets
+            // the platter's width but high enough to be considered a movement due to the absolute_player_positioning_error and normalized_half_catcher_width offsets
             // We are detecting this exact scenario. The first back and forth is counted but all subsequent ones are nullified.
-            // To achieve that, we need to store the exact distances (distance ignoring absolute_player_positioning_error and normalized_hitobject_radius)
-            if (Math.Abs(exactDistanceMoved) <= normalized_hitobject_radius * 2 && exactDistanceMoved == -lastExactDistanceMoved && catchCurrent.StrainTime == lastStrainTime)
+            // To achieve that, we need to store the exact distances (distance ignoring absolute_player_positioning_error and normalized_half_catcher_width)
+            if (Math.Abs(exactDistanceMoved) <= normalized_half_catcher_width * 2 && exactDistanceMoved == -lastExactDistanceMoved && catchCurrent.StrainTime == lastStrainTime)
             {
                 if (isInBuzzSection)
                     distanceAddition = 0;

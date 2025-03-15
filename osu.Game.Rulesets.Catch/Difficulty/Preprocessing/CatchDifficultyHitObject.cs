@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing
 {
     public class CatchDifficultyHitObject : DifficultyHitObject
     {
-        private const float normalized_hitobject_radius = 41.0f;
+        private const float normalized_half_catcher_width = 41.0f;
 
         public new PalpableCatchHitObject BaseObject => (PalpableCatchHitObject)base.BaseObject;
 
@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing
             : base(hitObject, lastObject, clockRate, objects, index)
         {
             // We will scale everything by this factor, so we can assume a uniform CircleSize among beatmaps.
-            float scalingFactor = normalized_hitobject_radius / halfCatcherWidth;
+            float scalingFactor = normalized_half_catcher_width / halfCatcherWidth;
 
             NormalizedPosition = BaseObject.EffectiveX * scalingFactor;
             LastNormalizedPosition = LastObject.EffectiveX * scalingFactor;
