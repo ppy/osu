@@ -519,10 +519,10 @@ namespace osu.Game
             }
         });
 
-        public void CopyUrlToClipboard(string url) => waitForReady(() => onScreenDisplay, _ =>
+        public void CopyStringToClipboard(string value) => waitForReady(() => onScreenDisplay, _ =>
         {
-            dependencies.Get<Clipboard>().SetText(url);
-            onScreenDisplay.Display(new CopyUrlToast());
+            dependencies.Get<Clipboard>().SetText(value);
+            onScreenDisplay.Display(new CopyStringToast());
         });
 
         public void OpenUrlExternally(string url, LinkWarnMode warnMode = LinkWarnMode.Default) => waitForReady(() => externalLinkOpener, _ => externalLinkOpener.OpenUrlExternally(url, warnMode));
