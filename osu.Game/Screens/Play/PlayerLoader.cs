@@ -53,6 +53,9 @@ namespace osu.Game.Screens.Play
 
         public override bool? AllowGlobalTrackControl => false;
 
+        // this makes the game stay in portrait mode when restarting gameplay rather than switching back to landscape.
+        public override bool RequiresPortraitOrientation => CurrentPlayer?.RequiresPortraitOrientation == true;
+
         public override float BackgroundParallaxAmount => quickRestart ? 0 : 1;
 
         // Here because IsHovered will not update unless we do so.
@@ -663,8 +666,6 @@ namespace osu.Game.Screens.Play
 
         private partial class MutedNotification : SimpleNotification
         {
-            public override bool IsImportant => true;
-
             public MutedNotification()
             {
                 Text = NotificationsStrings.GameVolumeTooLow;
@@ -716,8 +717,6 @@ namespace osu.Game.Screens.Play
 
         private partial class BatteryWarningNotification : SimpleNotification
         {
-            public override bool IsImportant => true;
-
             public BatteryWarningNotification()
             {
                 Text = NotificationsStrings.BatteryLow;

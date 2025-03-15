@@ -26,39 +26,34 @@ namespace osu.Game.Screens.SelectV2
         {
             var criteria = getCriteria();
 
-            return items.OrderDescending(Comparer<CarouselItem>.Create((a, b) =>
+            return items.Order(Comparer<CarouselItem>.Create((a, b) =>
             {
-                int comparison = 0;
+                int comparison;
 
-                if (a.Model is BeatmapInfo ab && b.Model is BeatmapInfo bb)
+                var ab = (BeatmapInfo)a.Model;
+                var bb = (BeatmapInfo)b.Model;
+
+                switch (criteria.Sort)
                 {
-                    switch (criteria.Sort)
-                    {
-                        case SortMode.Artist:
-                            comparison = OrdinalSortByCaseStringComparer.DEFAULT.Compare(ab.BeatmapSet!.Metadata.Artist, bb.BeatmapSet!.Metadata.Artist);
-                            if (comparison == 0)
-                                goto case SortMode.Title;
-                            break;
+                    case SortMode.Artist:
+                        comparison = OrdinalSortByCaseStringComparer.DEFAULT.Compare(ab.Metadata.Artist, bb.Metadata.Artist);
+                        if (comparison == 0)
+                            goto case SortMode.Title;
+                        break;
 
-                        case SortMode.Difficulty:
-                            comparison = ab.StarRating.CompareTo(bb.StarRating);
-                            break;
+                    case SortMode.Difficulty:
+                        comparison = ab.StarRating.CompareTo(bb.StarRating);
+                        break;
 
-                        case SortMode.Title:
-                            comparison = OrdinalSortByCaseStringComparer.DEFAULT.Compare(ab.BeatmapSet!.Metadata.Title, bb.BeatmapSet!.Metadata.Title);
-                            break;
+                    case SortMode.Title:
+                        comparison = OrdinalSortByCaseStringComparer.DEFAULT.Compare(ab.Metadata.Title, bb.Metadata.Title);
+                        break;
 
-                        default:
-                            throw new ArgumentOutOfRangeException();
-                    }
+                    default:
+                        throw new ArgumentOutOfRangeException();
                 }
 
-                if (comparison != 0) return comparison;
-
-                if (a is BeatmapCarouselItem aItem && b is BeatmapCarouselItem bItem)
-                    return aItem.ID.CompareTo(bItem.ID);
-
-                return 0;
+                return comparison;
             }));
         }, cancellationToken).ConfigureAwait(false);
     }

@@ -68,6 +68,17 @@ namespace osu.Game.Screens.Play
 
         public override bool HideMenuCursorOnNonMouseInput => true;
 
+        public override bool RequiresPortraitOrientation
+        {
+            get
+            {
+                if (!LoadedBeatmapSuccessfully)
+                    return false;
+
+                return DrawableRuleset!.RequiresPortraitOrientation;
+            }
+        }
+
         protected override OverlayActivation InitialOverlayActivationMode => OverlayActivation.UserTriggered;
 
         // We are managing our own adjustments (see OnEntering/OnExiting).
@@ -261,7 +272,7 @@ namespace osu.Game.Screens.Play
             Score.ScoreInfo.Ruleset = ruleset.RulesetInfo;
             Score.ScoreInfo.Mods = gameplayMods;
 
-            dependencies.CacheAs(GameplayState = new GameplayState(playableBeatmap, ruleset, gameplayMods, Score, ScoreProcessor, HealthProcessor, Beatmap.Value.Storyboard));
+            dependencies.CacheAs(GameplayState = new GameplayState(playableBeatmap, ruleset, gameplayMods, Score, ScoreProcessor, HealthProcessor, Beatmap.Value.Storyboard, PlayingState));
 
             var rulesetSkinProvider = new RulesetSkinProvidingContainer(ruleset, playableBeatmap, Beatmap.Value.Skin);
             GameplayClockContainer.Add(new GameplayScrollWheelHandling());
@@ -439,6 +450,13 @@ namespace osu.Game.Screens.Play
                 Children = new[]
                 {
                     DimmableStoryboard.OverlayLayerContainer.CreateProxy(),
+                    new LetterboxOverlay
+                    {
+                        Clock = DrawableRuleset.FrameStableClock,
+                        ProcessCustomClock = false,
+                        BreakTracker = breakTracker,
+                        Alpha = working.Beatmap.LetterboxInBreaks ? 1 : 0,
+                    },
                     HUDOverlay = new HUDOverlay(DrawableRuleset, GameplayState.Mods, Configuration.AlwaysShowLeaderboard)
                     {
                         HoldToQuit =
@@ -457,7 +475,7 @@ namespace osu.Game.Screens.Play
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre
                     },
-                    BreakOverlay = new BreakOverlay(working.Beatmap.LetterboxInBreaks, ScoreProcessor)
+                    BreakOverlay = new BreakOverlay(ScoreProcessor)
                     {
                         Clock = DrawableRuleset.FrameStableClock,
                         ProcessCustomClock = false,
@@ -1258,11 +1276,7 @@ namespace osu.Game.Screens.Play
         /// </summary>
         /// <param name="score">The <see cref="ScoreInfo"/> to be displayed in the results screen.</param>
         /// <returns>The <see cref="ResultsScreen"/>.</returns>
-        protected virtual ResultsScreen CreateResults(ScoreInfo score) => new SoloResultsScreen(score)
-        {
-            AllowRetry = true,
-            ShowUserStatistics = true,
-        };
+        protected abstract ResultsScreen CreateResults(ScoreInfo score);
 
         private void fadeOut()
         {
