@@ -125,11 +125,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 HitWindowGreat = 2 * BaseObject.HitWindows.WindowFor(HitResult.Great) / clockRate;
             }
 
-            if (BaseObject is Slider)
-            {
-                computeSliderCursorPosition();
-            }
-
+            computeSliderCursorPosition();
             setDistances(clockRate);
         }
 
