@@ -88,14 +88,16 @@ namespace osu.Game.Rulesets.Osu.Mods
             if (hasReplay && !legacyReplay && Strict.Value)
             {
                 List<ReplayFrame> frames = ruleset.ReplayScore.Replay.Frames;
-                //use the last frame in the replay before the current time to avoid replays playing back differently on different framerates
+                //use the last frame in the replay before the current time to avoid replays playing back differently on different framerates (NOT WORKING PERFECTLY)
                 while (lastReplayFrameIndex + 1 < frames.Count && frames[lastReplayFrameIndex + 1].Time < time)
                     lastReplayFrameIndex++;
+                while (lastReplayFrameIndex >= 0 && frames[lastReplayFrameIndex].Time >= time)
+                    lastReplayFrameIndex--;
 
                 foreach (var h in playfield.HitObjectContainer.AliveObjects.OfType<DrawableOsuHitObject>())
                 {
                     // if in strict mode, hitting a circle slightly late is an automatic miss. gives 1 frame of leniency so it's physically possible to hit the circle
-                    // THIS IS CURRENTLY BUSTED!! REPLAYS PLAY BACK DIFFERENT ON DIFFERENT FRAMERATES!! NOT SURE HOW TO FIX!!!
+                    // THIS IS CURRENTLY BUSTED!! REPLAYS CAN OCCASIONALLY PLAY BACK DIFFERENTLY IF YOU SKIP FORWARDS!!! HELP
                     if (Strict.Value && !h.Judged && h.HitObject is HitCircle && frames[lastReplayFrameIndex].Time > h.HitObject.StartTime)
                     {
                         h.MissForcefully();
