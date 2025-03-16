@@ -187,7 +187,19 @@ namespace osu.Game.Overlays.Dashboard
 
                 // TODO: we probably don't want to do this every frame.
                 var activity = metadataClient?.GetPresence(User.Id)?.Activity;
-                spectateButton.Enabled.Value = activity is UserActivity.InSoloGame or UserActivity.InMultiplayerGame or UserActivity.InPlaylistGame;
+
+                switch (activity)
+                {
+                    default:
+                        spectateButton.Enabled.Value = false;
+                        break;
+
+                    case UserActivity.InSoloGame:
+                    case UserActivity.InMultiplayerGame:
+                    case UserActivity.InPlaylistGame:
+                        spectateButton.Enabled.Value = true;
+                        break;
+                }
             }
 
             [BackgroundDependencyLoader]
