@@ -48,6 +48,8 @@ namespace osu.Game.Rulesets.Osu.Mods
         private bool hasReplay;
         private bool legacyReplay;
 
+        private int lastReplayFrameIndex = -1;
+
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
             ruleset = (DrawableOsuRuleset)drawableRuleset;
@@ -76,14 +78,36 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void Update(Playfield playfield)
         {
-            if (hasReplay && !legacyReplay)
+            // update only necessary for legacy or strict replays
+            if (hasReplay && !legacyReplay && !Strict.Value)
                 return;
+
+            double time = playfield.Clock.CurrentTime;
+
+            // only update necessary in a strict replay is forcing misses
+            if (hasReplay && !legacyReplay && Strict.Value)
+            {
+                List<ReplayFrame> frames = ruleset.ReplayScore.Replay.Frames;
+                //use the last frame in the replay before the current time to avoid replays playing back differently on different framerates
+                while (lastReplayFrameIndex + 1 < frames.Count && frames[lastReplayFrameIndex + 1].Time < time)
+                    lastReplayFrameIndex++;
+
+                foreach (var h in playfield.HitObjectContainer.AliveObjects.OfType<DrawableOsuHitObject>())
+                {
+                    // if in strict mode, hitting a circle slightly late is an automatic miss. gives 1 frame of leniency so it's physically possible to hit the circle
+                    // THIS IS CURRENTLY BUSTED!! REPLAYS PLAY BACK DIFFERENT ON DIFFERENT FRAMERATES!! NOT SURE HOW TO FIX!!!
+                    if (Strict.Value && !h.Judged && h.HitObject is HitCircle && frames[lastReplayFrameIndex].Time > h.HitObject.StartTime)
+                    {
+                        h.MissForcefully();
+                    }
+                }
+                return;
+            }
+
+            double lastFrameTime = time - playfield.Clock.ElapsedFrameTime;
 
             bool requiresHold = false;
             bool requiresHit = false;
-
-            double time = playfield.Clock.CurrentTime;
-            double lastFrameTime = time - playfield.Clock.ElapsedFrameTime;
 
             double relaxLeniency = Strict.Value ? 0 : RELAX_LENIENCY;
 
@@ -98,10 +122,18 @@ namespace osu.Game.Rulesets.Osu.Mods
                     continue;
 
                 // if in strict mode, hitting a circle slightly late is an automatic miss. gives 1 frame of leniency so it's physically possible to hit the circle
-                if (Strict.Value && !h.Judged && h.HitObject is HitCircle && lastFrameTime > h.HitObject.StartTime)
+                if (Strict.Value)
                 {
-                    h.MissForcefully();
-                    continue;
+                    if (h is DrawableHitCircle && !h.Judged && lastFrameTime > h.HitObject.StartTime)
+                    {
+                        h.MissForcefully();
+                        continue;
+                    }
+                    if (h is DrawableSlider s && !s.HeadCircle.Judged && lastFrameTime > s.HeadCircle.HitObject.StartTime)
+                    {
+                        s.HeadCircle.MissForcefully();
+                        continue;
+                    }
                 }
 
                 switch (h)
