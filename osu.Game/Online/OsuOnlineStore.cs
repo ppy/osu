@@ -9,13 +9,6 @@ namespace osu.Game.Online
 {
     public class OsuOnlineStore : OnlineStore
     {
-        private readonly string apiEndpointUrl;
-
-        public OsuOnlineStore(string apiEndpointUrl)
-        {
-            this.apiEndpointUrl = apiEndpointUrl;
-        }
-
         protected override string GetLookupUrl(string url)
         {
             if (!Uri.TryCreate(url, UriKind.Absolute, out Uri? uri) || !uri.Host.EndsWith(@".ppy.sh", StringComparison.OrdinalIgnoreCase))
