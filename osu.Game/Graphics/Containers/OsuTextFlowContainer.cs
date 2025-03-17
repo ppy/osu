@@ -27,7 +27,7 @@ namespace osu.Game.Graphics.Containers
 
         private partial class ArbitraryDrawableWrapper : Container, IHasLineBaseHeight
         {
-            public float LineBaseHeight => DrawHeight;
+            public float LineBaseHeight => (Child as IHasLineBaseHeight)?.LineBaseHeight ?? DrawHeight;
 
             public ArbitraryDrawableWrapper()
             {
