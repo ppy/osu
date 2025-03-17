@@ -231,8 +231,6 @@ namespace osu.Game.Beatmaps
         [Obsolete("Use ScoreManager.GetMaximumAchievableComboAsync instead.")]
         public int? MaxCombo { get; set; }
 
-        public int BeatmapVersion;
-
         public BeatmapInfo Clone() => (BeatmapInfo)this.Detach().MemberwiseClone();
 
         public override string ToString() => this.GetDisplayTitle();

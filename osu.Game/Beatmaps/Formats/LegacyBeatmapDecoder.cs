@@ -79,7 +79,7 @@ namespace osu.Game.Beatmaps.Formats
         protected override void ParseStreamInto(LineBufferedReader stream, Beatmap beatmap)
         {
             this.beatmap = beatmap;
-            this.beatmap.BeatmapInfo.BeatmapVersion = FormatVersion;
+            this.beatmap.BeatmapVersion = FormatVersion;
             parser = new ConvertHitObjectParser(getOffsetTime(), FormatVersion);
 
             ApplyLegacyDefaults(this.beatmap);

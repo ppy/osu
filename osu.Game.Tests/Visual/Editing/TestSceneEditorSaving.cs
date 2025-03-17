@@ -212,7 +212,7 @@ namespace osu.Game.Tests.Visual.Editing
         [Test]
         public void TestBeatmapVersionPopulatedCorrectly()
         {
-            AddAssert("beatmap version is populated", () => EditorBeatmap.BeatmapInfo.BeatmapVersion > 0);
+            AddAssert("beatmap version is populated", () => EditorBeatmap.BeatmapVersion > 0);
         }
     }
 }
