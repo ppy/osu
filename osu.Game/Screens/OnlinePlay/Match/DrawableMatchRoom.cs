@@ -25,12 +25,13 @@ namespace osu.Game.Screens.OnlinePlay.Match
             set => selectedItem.Current = value;
         }
 
+        public Drawable? ChangeSettingsButton { get; private set; }
+
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
 
         private readonly BindableWithCurrent<PlaylistItem?> selectedItem = new BindableWithCurrent<PlaylistItem?>();
         private readonly bool allowEdit;
-        private Drawable? editButton;
 
         public DrawableMatchRoom(Room room, bool allowEdit = true)
             : base(room)
@@ -45,7 +46,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
         {
             if (allowEdit)
             {
-                ButtonsContainer.Add(editButton = new PurpleRoundedButton
+                ButtonsContainer.Add(ChangeSettingsButton = new PurpleRoundedButton
                 {
                     RelativeSizeAxes = Axes.Y,
                     Anchor = Anchor.Centre,
@@ -73,8 +74,8 @@ namespace osu.Game.Screens.OnlinePlay.Match
 
         private void updateRoomHost()
         {
-            if (editButton != null)
-                editButton.Alpha = Room.Host?.Equals(api.LocalUser.Value) == true ? 1 : 0;
+            if (ChangeSettingsButton != null)
+                ChangeSettingsButton.Alpha = Room.Host?.Equals(api.LocalUser.Value) == true ? 1 : 0;
         }
 
         protected override UpdateableBeatmapBackgroundSprite CreateBackground() => base.CreateBackground().With(d =>

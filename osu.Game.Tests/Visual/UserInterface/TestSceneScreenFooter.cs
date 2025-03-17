@@ -23,7 +23,7 @@ namespace osu.Game.Tests.Visual.UserInterface
     {
         private DependencyProvidingContainer contentContainer = null!;
         private ScreenFooter screenFooter = null!;
-        private TestModSelectOverlay modOverlay = null!;
+        private UserModSelectOverlay modOverlay = null!;
 
         [SetUp]
         public void SetUp() => Schedule(() =>
@@ -39,7 +39,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 },
                 Children = new Drawable[]
                 {
-                    modOverlay = new TestModSelectOverlay(),
+                    modOverlay = new UserModSelectOverlay { ShowPresets = true },
                     new PopoverContainer
                     {
                         RelativeSizeAxes = Axes.Both,
@@ -194,11 +194,6 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("hide mod overlay", () => modOverlay.Hide());
             AddUntilStep("mod footer content hidden", () => this.ChildrenOfType<ModSelectFooterContent>().SingleOrDefault()?.IsPresent, () => Is.Not.True);
             AddAssert("external overlay content still not shown", () => this.ChildrenOfType<TestShearedOverlayContainer.TestFooterContent>().SingleOrDefault()?.IsPresent, () => Is.Not.True);
-        }
-
-        private partial class TestModSelectOverlay : UserModSelectOverlay
-        {
-            protected override bool ShowPresets => true;
         }
 
         private partial class TestShearedOverlayContainer : ShearedOverlayContainer

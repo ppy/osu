@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input;
@@ -27,11 +25,12 @@ namespace osu.Game.Configuration
             SetDefault(Static.FeaturedArtistDisclaimerShownOnce, false);
             SetDefault(Static.LastHoverSoundPlaybackTime, (double?)null);
             SetDefault(Static.LastModSelectPanelSamplePlaybackTime, (double?)null);
-            SetDefault<APISeasonalBackgrounds>(Static.SeasonalBackgrounds, null);
+            SetDefault<APISeasonalBackgrounds?>(Static.SeasonalBackgrounds, null);
             SetDefault(Static.TouchInputActive, RuntimeInfo.IsMobile);
-            SetDefault<ScoreInfo>(Static.LastLocalUserScore, null);
-            SetDefault<ScoreInfo>(Static.LastAppliedOffsetScore, null);
-            SetDefault<UserActivity>(Static.UserOnlineActivity, null);
+            SetDefault<ScoreInfo?>(Static.LastLocalUserScore, null);
+            SetDefault<ScoreInfo?>(Static.LastAppliedOffsetScore, null);
+            SetDefault<UserActivity?>(Static.UserOnlineActivity, null);
+            SetDefault<APITag[]?>(Static.AllBeatmapTags, null);
         }
 
         /// <summary>
@@ -99,5 +98,7 @@ namespace osu.Game.Configuration
         /// The activity for the current user to broadcast to other players.
         /// </summary>
         UserOnlineActivity,
+
+        AllBeatmapTags,
     }
 }

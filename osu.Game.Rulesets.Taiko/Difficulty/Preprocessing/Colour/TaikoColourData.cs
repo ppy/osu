@@ -8,7 +8,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour
     /// <summary>
     /// Stores colour compression information for a <see cref="TaikoDifficultyHitObject"/>.
     /// </summary>
-    public class TaikoDifficultyHitObjectColour
+    public class TaikoColourData
     {
         /// <summary>
         /// The <see cref="MonoStreak"/> that encodes this note.

@@ -16,7 +16,7 @@ namespace osu.Game.Screens.SelectV2
 {
     public partial class BeatmapSetPanelBackground : ModelBackedDrawable<WorkingBeatmap>
     {
-        protected override bool TransformImmediately => true;
+        protected override double TransformDuration => 400;
 
         public WorkingBeatmap? Beatmap
         {

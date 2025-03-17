@@ -178,7 +178,7 @@ namespace osu.Game.Overlays.Chat
                 }
 
                 if (!user.Equals(api.LocalUser.Value))
-                    items.Add(new OsuMenuItem("Report", MenuItemType.Destructive, ReportRequested));
+                    items.Add(new OsuMenuItem(UsersStrings.ReportButtonText, MenuItemType.Destructive, ReportRequested));
 
                 return items.ToArray();
             }

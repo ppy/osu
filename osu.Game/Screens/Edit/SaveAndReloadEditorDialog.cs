@@ -8,9 +8,9 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Edit
 {
-    public partial class ReloadEditorDialog : PopupDialog
+    public partial class SaveAndReloadEditorDialog : PopupDialog
     {
-        public ReloadEditorDialog(Action reload, Action cancel)
+        public SaveAndReloadEditorDialog(Action reload, Action cancel)
         {
             HeaderText = EditorDialogsStrings.EditorReloadDialogHeader;
 

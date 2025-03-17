@@ -22,6 +22,8 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
 {
     public abstract partial class CatchPlacementBlueprintTestScene : PlacementBlueprintTestScene
     {
+        protected sealed override Ruleset CreateRuleset() => new CatchRuleset();
+
         protected const double TIME_SNAP = 100;
 
         protected DrawableCatchHitObject LastObject;

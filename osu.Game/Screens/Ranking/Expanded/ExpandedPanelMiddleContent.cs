@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +14,7 @@ using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Configuration;
+using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -41,10 +40,10 @@ namespace osu.Game.Screens.Ranking.Expanded
 
         private readonly List<StatisticDisplay> statisticDisplays = new List<StatisticDisplay>();
 
-        private RollingCounter<long> scoreCounter;
+        private RollingCounter<long> scoreCounter = null!;
 
         [Resolved]
-        private ScoreManager scoreManager { get; set; }
+        private ScoreManager scoreManager { get; set; } = null!;
 
         /// <summary>
         /// Creates a new <see cref="ExpandedPanelMiddleContent"/>.
@@ -63,11 +62,18 @@ namespace osu.Game.Screens.Ranking.Expanded
         }
 
         [BackgroundDependencyLoader]
-        private void load(BeatmapDifficultyCache beatmapDifficultyCache)
+        private void load(RealmAccess realmAccess, BeatmapDifficultyCache beatmapDifficultyCache)
         {
             var beatmap = score.BeatmapInfo!;
             var metadata = beatmap.BeatmapSet?.Metadata ?? beatmap.Metadata;
             string creator = metadata.Author.Username;
+
+            StarDifficulty starDifficulty = new StarDifficulty(beatmap.StarRating, 0);
+
+            // In some cases, the beatmap ferried through ScoreInfo actually represents an online beatmap.
+            // If it isn't, we may be able to compute a more accurate difficulty from the ruleset and mods.
+            if (realmAccess.Run(r => r.Find<BeatmapInfo>(score.BeatmapInfo!.ID)) != null)
+                starDifficulty = beatmapDifficultyCache.GetDifficultyAsync(score.BeatmapInfo!, score.Ruleset, score.Mods).GetResultSafely() ?? starDifficulty;
 
             var topStatistics = new List<StatisticDisplay>
             {
@@ -146,7 +152,7 @@ namespace osu.Game.Screens.Ranking.Expanded
                                 Spacing = new Vector2(5, 0),
                                 Children = new Drawable[]
                                 {
-                                    new StarRatingDisplay(beatmapDifficultyCache.GetDifficultyAsync(beatmap, score.Ruleset, score.Mods).GetResultSafely() ?? default)
+                                    new StarRatingDisplay(starDifficulty)
                                     {
                                         Anchor = Anchor.CentreLeft,
                                         Origin = Anchor.CentreLeft
