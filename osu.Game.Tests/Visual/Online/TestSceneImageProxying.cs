@@ -1,10 +1,14 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers.Markdown;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Platform;
+using osu.Framework.Testing;
 using osu.Game.Graphics.Containers.Markdown;
 
 namespace osu.Game.Tests.Visual.Online
@@ -17,31 +21,23 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestExternalImageLink()
         {
-            AddStep("load image", () => Child = new OsuMarkdownContainer
+            MarkdownContainer markdown = null!;
+
+            // use base MarkdownContainer as a method of directly attempting to load an image without proxying logic.
+            AddStep("load external without proxying", () => Child = markdown = new MarkdownContainer
             {
                 RelativeSizeAxes = Axes.Both,
                 Text = "![](https://github.com/ppy/osu-wiki/blob/master/wiki/Announcement_messages/img/notification.png?raw=true)",
             });
-        }
+            AddWaitStep("wait", 5);
+            AddAssert("image not loaded", () => markdown.ChildrenOfType<Sprite>().Single().Texture == null);
 
-        [Test]
-        public void TestLocalImageLink()
-        {
-            AddStep("load image", () => Child = new OsuMarkdownContainer
+            AddStep("load external with proxying", () => Child = markdown = new OsuMarkdownContainer
             {
                 RelativeSizeAxes = Axes.Both,
-                Text = "![](https://osu.ppy.sh/help/wiki/shared/news/banners/monthly-beatmapping-contest.png)",
+                Text = "![](https://github.com/ppy/osu-wiki/blob/master/wiki/Announcement_messages/img/notification.png?raw=true)",
             });
-        }
-
-        [Test]
-        public void TestInvalidImageLink()
-        {
-            AddStep("load image", () => Child = new OsuMarkdownContainer
-            {
-                RelativeSizeAxes = Axes.Both,
-                Text = "![](https://this-site-does-not-exist.com/img.png)",
-            });
+            AddUntilStep("image loaded", () => markdown.ChildrenOfType<Sprite>().SingleOrDefault()?.Texture != null);
         }
     }
 }
