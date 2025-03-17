@@ -20,7 +20,7 @@ namespace osu.Game.Online.API.Requests
         protected override WebRequest CreateWebRequest()
         {
             var req = base.CreateWebRequest();
-            req.Method = HttpMethod.Post;
+            req.Method = HttpMethod.Put;
             return req;
         }
 
