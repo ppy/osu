@@ -9,7 +9,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Online;
-using osu.Game.Online.API;
 
 namespace osu.Game.Audio
 {
@@ -29,9 +28,9 @@ namespace osu.Game.Audio
         }
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audioManager, IAPIProvider api)
+        private void load(AudioManager audioManager)
         {
-            trackStore = audioManager.GetTrackStore(new OsuOnlineStore(api.Endpoints.APIUrl));
+            trackStore = audioManager.GetTrackStore(new OsuOnlineStore());
         }
 
         /// <summary>

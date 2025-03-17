@@ -3,11 +3,9 @@
 
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers.Markdown;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Graphics.Containers.Markdown;
 
@@ -15,9 +13,6 @@ namespace osu.Game.Tests.Visual.Online
 {
     public partial class TestSceneImageProxying : OsuTestScene
     {
-        [Resolved]
-        private GameHost host { get; set; } = null!;
-
         [Test]
         public void TestExternalImageLink()
         {
