@@ -30,7 +30,7 @@ namespace osu.Game.Tests.Visual.Online
                 Text = "![](https://github.com/ppy/osu-wiki/blob/master/wiki/Announcement_messages/img/notification.png?raw=true)",
             });
             AddWaitStep("wait", 5);
-            AddAssert("image not loaded", () => markdown.ChildrenOfType<Sprite>().Single().Texture == null);
+            AddAssert("image not loaded", () => markdown.ChildrenOfType<Sprite>().SingleOrDefault()?.Texture == null);
 
             AddStep("load external with proxying", () => Child = markdown = new OsuMarkdownContainer
             {
