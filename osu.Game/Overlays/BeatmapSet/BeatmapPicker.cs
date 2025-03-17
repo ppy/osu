@@ -212,47 +212,49 @@ namespace osu.Game.Overlays.BeatmapSet
         {
             guestMapperContainer.Clear();
             var beatmapOwners = beatmapInfo?.BeatmapOwners;
+            bool isHostDifficulty = beatmapOwners?.Length == 1 && beatmapOwners.First().Id == beatmapSet?.AuthorID;
 
-            if (beatmapOwners != null && (beatmapOwners.Length != 1 || beatmapOwners.First().Id != beatmapSet?.AuthorID))
+            if (beatmapOwners != null && !isHostDifficulty)
             {
-                APIUser[]? users = BeatmapSet?.RelatedUsers?.Where(u => beatmapOwners.Any(o => o.Id == u.OnlineID)).ToArray();
+                APIUser[] users = BeatmapSet?.RelatedUsers?.Where(u => beatmapOwners.Any(o => o.Id == u.OnlineID)).ToArray() ?? [];
+                int count = users.Length;
 
-                if (users != null)
+                switch (count)
                 {
-                    int count = users.Length;
+                    case 0:
+                        break;
 
-                    guestMapperContainer.AddText(BeatmapsetsStrings.ShowDetailsMappedBy(string.Empty)); // set string.Empty here because we need user link.
+                    case 1:
+                        guestMapperContainer.AddText(BeatmapsetsStrings.ShowDetailsMappedBy(string.Empty));
+                        guestMapperContainer.AddUserLink(users[0]);
+                        break;
 
-                    switch (count)
+                    case 2:
+                        guestMapperContainer.AddText(BeatmapsetsStrings.ShowDetailsMappedBy(string.Empty));
+                        guestMapperContainer.AddUserLink(users[0]);
+                        guestMapperContainer.AddText(CommonStrings.ArrayAndTwoWordsConnector);
+                        guestMapperContainer.AddUserLink(users[1]);
+                        break;
+
+                    default:
                     {
-                        case 1:
-                            guestMapperContainer.AddUserLink(users[0]);
-                            break;
+                        guestMapperContainer.AddText(BeatmapsetsStrings.ShowDetailsMappedBy(string.Empty));
 
-                        case 2:
-                            guestMapperContainer.AddUserLink(users[0]);
-                            guestMapperContainer.AddText(CommonStrings.ArrayAndTwoWordsConnector);
-                            guestMapperContainer.AddUserLink(users[1]);
-                            break;
-
-                        default:
+                        for (int i = 0; i < count; i++)
                         {
-                            for (int i = 0; i < count; i++)
+                            guestMapperContainer.AddUserLink(users[i]);
+
+                            if (i < count - 2)
                             {
-                                guestMapperContainer.AddUserLink(users[i]);
-
-                                if (i < count - 2)
-                                {
-                                    guestMapperContainer.AddText(CommonStrings.ArrayAndWordsConnector);
-                                }
-                                else if (i == count - 2)
-                                {
-                                    guestMapperContainer.AddText(CommonStrings.ArrayAndLastWordConnector);
-                                }
+                                guestMapperContainer.AddText(CommonStrings.ArrayAndWordsConnector);
                             }
-
-                            break;
+                            else if (i == count - 2)
+                            {
+                                guestMapperContainer.AddText(CommonStrings.ArrayAndLastWordConnector);
+                            }
                         }
+
+                        break;
                     }
                 }
             }
