@@ -116,7 +116,7 @@ namespace osu.Game.Overlays.Settings
 
             public MenuItem[] ContextMenuItems => new MenuItem[]
             {
-                new OsuMenuItem("Copy version", MenuItemType.Standard, () => game?.CopyStringToClipboard(version))
+                new OsuMenuItem("Copy version", MenuItemType.Standard, () => game?.CopyToClipboard(version))
             };
         }
     }
