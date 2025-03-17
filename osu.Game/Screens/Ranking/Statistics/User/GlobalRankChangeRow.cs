@@ -18,7 +18,7 @@ namespace osu.Game.Screens.Ranking.Statistics.User
         protected override LocalisableString Label => UsersStrings.ShowRankGlobalSimple;
 
         protected override LocalisableString FormatCurrentValue(int? current)
-            => current == null ? string.Empty : current.Value.FormatRank();
+            => current == null ? string.Empty : current.Value.ToString();
 
         protected override int CalculateDifference(int? previous, int? current, out LocalisableString formattedDifference)
         {
@@ -30,13 +30,13 @@ namespace osu.Game.Screens.Ranking.Statistics.User
 
             if (previous == null && current != null)
             {
-                formattedDifference = LocalisableString.Interpolate($"+{current.Value.FormatRank()}");
+                formattedDifference = LocalisableString.Interpolate($"+{current.Value.ToString()}");
                 return 1;
             }
 
             if (previous != null && current == null)
             {
-                formattedDifference = LocalisableString.Interpolate($"-{previous.Value.FormatRank()}");
+                formattedDifference = LocalisableString.Interpolate($"-{previous.Value.ToString()}");
                 return -1;
             }
 
@@ -46,9 +46,9 @@ namespace osu.Game.Screens.Ranking.Statistics.User
             int difference = previous.Value - current.Value;
 
             if (difference < 0)
-                formattedDifference = difference.FormatRank();
+                formattedDifference = difference.ToString();
             else if (difference > 0)
-                formattedDifference = LocalisableString.Interpolate($"+{difference.FormatRank()}");
+                formattedDifference = LocalisableString.Interpolate($"+{difference.ToString()}");
             else
                 formattedDifference = string.Empty;
 
