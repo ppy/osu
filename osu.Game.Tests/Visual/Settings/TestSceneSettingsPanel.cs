@@ -161,9 +161,6 @@ namespace osu.Game.Tests.Visual.Settings
             });
 
             Dependencies.CacheAs<IDialogOverlay>(dialogOverlay);
-
-            var osuGame = new OsuGame();
-            Dependencies.CacheAs(osuGame);
         }
     }
 }
