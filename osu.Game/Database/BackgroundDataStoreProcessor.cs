@@ -76,8 +76,9 @@ namespace osu.Game.Database
             {
                 Logger.Log("Beginning background data store processing..");
 
-                checkForOutdatedStarRatings();
-                processBeatmapSetsWithMissingMetrics();
+                clearOutdatedStarRatings();
+                populateMissingStarRatings();
+                processOnlineBeatmapSetsWithNoUpdate();
                 // Note that the previous method will also update these on a fresh run.
                 processBeatmapsWithMissingObjectCounts();
                 processScoresWithMissingStatistics();
@@ -100,7 +101,7 @@ namespace osu.Game.Database
         /// Check whether the databased difficulty calculation version matches the latest ruleset provided version.
         /// If it doesn't, clear out any existing difficulties so they can be incrementally recalculated.
         /// </summary>
-        private void checkForOutdatedStarRatings()
+        private void clearOutdatedStarRatings()
         {
             foreach (var ruleset in rulesetStore.AvailableRulesets)
             {
@@ -132,7 +133,86 @@ namespace osu.Game.Database
             }
         }
 
-        private void processBeatmapSetsWithMissingMetrics()
+        /// <remarks>
+        /// This is split out from <see cref="processOnlineBeatmapSetsWithNoUpdate"/> as a separate process to prevent high server-side load
+        /// from the <see cref="beatmapUpdater"/> firing online requests as part of the update.
+        /// Star rating recalculations can be ran strictly locally.
+        /// </remarks>
+        private void populateMissingStarRatings()
+        {
+            HashSet<Guid> beatmapIds = new HashSet<Guid>();
+
+            Logger.Log("Querying for beatmaps with missing star ratings...");
+
+            realmAccess.Run(r =>
+            {
+                foreach (var b in r.All<BeatmapInfo>().Where(b => b.StarRating < 0 && b.BeatmapSet != null))
+                    beatmapIds.Add(b.ID);
+            });
+
+            if (beatmapIds.Count == 0)
+                return;
+
+            Logger.Log($"Found {beatmapIds.Count} beatmaps which require star rating reprocessing.");
+
+            var notification = showProgressNotification(beatmapIds.Count, "Reprocessing star rating for beatmaps", "beatmaps' star ratings have been updated");
+
+            int processedCount = 0;
+            int failedCount = 0;
+
+            Dictionary<string, Ruleset> rulesetCache = new Dictionary<string, Ruleset>();
+
+            Ruleset getRuleset(RulesetInfo rulesetInfo)
+            {
+                if (!rulesetCache.TryGetValue(rulesetInfo.ShortName, out var ruleset))
+                    ruleset = rulesetCache[rulesetInfo.ShortName] = rulesetInfo.CreateInstance();
+
+                return ruleset;
+            }
+
+            foreach (Guid id in beatmapIds)
+            {
+                if (notification?.State == ProgressNotificationState.Cancelled)
+                    break;
+
+                updateNotificationProgress(notification, processedCount, beatmapIds.Count);
+
+                sleepIfRequired();
+
+                var beatmap = realmAccess.Run(r => r.Find<BeatmapInfo>(id)?.Detach());
+
+                if (beatmap == null)
+                    return;
+
+                try
+                {
+                    var working = beatmapManager.GetWorkingBeatmap(beatmap);
+                    var ruleset = getRuleset(working.BeatmapInfo.Ruleset);
+
+                    Debug.Assert(ruleset != null);
+
+                    var calculator = ruleset.CreateDifficultyCalculator(working);
+
+                    double starRating = calculator.Calculate().StarRating;
+                    realmAccess.Write(r =>
+                    {
+                        if (r.Find<BeatmapInfo>(id) is BeatmapInfo liveBeatmapInfo)
+                            liveBeatmapInfo.StarRating = starRating;
+                    });
+                    ((IWorkingBeatmapCache)beatmapManager).Invalidate(beatmap);
+                    ++processedCount;
+                }
+                catch (Exception e)
+                {
+                    Logger.Log($"Background processing failed on {beatmap}: {e}");
+                    ++failedCount;
+                }
+            }
+
+            completeNotification(notification, processedCount, beatmapIds.Count, failedCount);
+        }
+
+        private void processOnlineBeatmapSetsWithNoUpdate()
         {
             HashSet<Guid> beatmapSetIds = new HashSet<Guid>();
 
@@ -148,12 +228,7 @@ namespace osu.Game.Database
                 // of other possible ways), but for now avoid queueing if the user isn't logged in at startup.
                 if (api.IsLoggedIn)
                 {
-                    foreach (var b in r.All<BeatmapInfo>().Where(b => (b.StarRating < 0 || (b.OnlineID > 0 && b.LastOnlineUpdate == null)) && b.BeatmapSet != null))
-                        beatmapSetIds.Add(b.BeatmapSet!.ID);
-                }
-                else
-                {
-                    foreach (var b in r.All<BeatmapInfo>().Where(b => b.StarRating < 0 && b.BeatmapSet != null))
+                    foreach (var b in r.All<BeatmapInfo>().Where(b => b.OnlineID > 0 && b.LastOnlineUpdate == null && b.BeatmapSet != null))
                         beatmapSetIds.Add(b.BeatmapSet!.ID);
                 }
             });
@@ -161,10 +236,9 @@ namespace osu.Game.Database
             if (beatmapSetIds.Count == 0)
                 return;
 
-            Logger.Log($"Found {beatmapSetIds.Count} beatmap sets which require reprocessing.");
+            Logger.Log($"Found {beatmapSetIds.Count} beatmap sets which require online updates.");
 
-            // Technically this is doing more than just star ratings, but easier for the end user to understand.
-            var notification = showProgressNotification(beatmapSetIds.Count, "Reprocessing star rating for beatmaps", "beatmaps' star ratings have been updated");
+            var notification = showProgressNotification(beatmapSetIds.Count, "Updating online data for beatmaps", "beatmaps' online data have been updated");
 
             int processedCount = 0;
             int failedCount = 0;

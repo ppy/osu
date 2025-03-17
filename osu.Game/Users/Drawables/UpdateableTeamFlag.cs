@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Localisation;
@@ -75,10 +76,18 @@ namespace osu.Game.Users.Drawables
                 InternalChildren = new Drawable[]
                 {
                     new HoverClickSounds(),
+                    new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = Colour4.FromHex("333"),
+                    },
                     new Sprite
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Texture = textures.Get(team.FlagUrl)
+                        Texture = textures.Get(team.FlagUrl),
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        FillMode = FillMode.Fit,
                     }
                 };
             }

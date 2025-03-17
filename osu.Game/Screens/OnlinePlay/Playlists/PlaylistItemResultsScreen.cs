@@ -5,11 +5,17 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Logging;
+using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Models;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
@@ -37,6 +43,12 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
         [Resolved]
         protected RulesetStore Rulesets { get; private set; } = null!;
+
+        [Resolved]
+        private BeatmapLookupCache beatmapLookupCache { get; set; } = null!;
+
+        [Resolved]
+        private BeatmapManager beatmapManager { get; set; } = null!;
 
         protected PlaylistItemResultsScreen(ScoreInfo? score, long roomId, PlaylistItem playlistItem)
             : base(score)
@@ -76,16 +88,21 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
         protected abstract APIRequest<MultiplayerScore> CreateScoreRequest();
 
-        protected sealed override APIRequest FetchScores(Action<IEnumerable<ScoreInfo>> scoresCallback)
+        protected override async Task<ScoreInfo[]> FetchScores()
         {
             // This performs two requests:
             // 1. A request to show the relevant score (and scores around).
             // 2. If that fails, a request to index the room starting from the highest score.
 
+            var requestTaskSource = new TaskCompletionSource<MultiplayerScore>();
             var userScoreReq = CreateScoreRequest();
+            userScoreReq.Success += requestTaskSource.SetResult;
+            userScoreReq.Failure += requestTaskSource.SetException;
+            API.Queue(userScoreReq);
 
-            userScoreReq.Success += userScore =>
+            try
             {
+                var userScore = await requestTaskSource.Task.ConfigureAwait(false);
                 var allScores = new List<MultiplayerScore> { userScore };
 
                 // Other scores could have arrived between score submission and entering the results screen. Ensure the local player score position is up to date.
@@ -113,98 +130,157 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                     setPositions(lowerScores, userScore.Position.Value, 1);
                 }
 
-                Schedule(() =>
-                {
-                    PerformSuccessCallback(scoresCallback, allScores);
-                    hideLoadingSpinners();
-                });
-            };
-
-            // On failure, fallback to a normal index.
-            userScoreReq.Failure += _ => API.Queue(createIndexRequest(scoresCallback));
-
-            return userScoreReq;
+                return await transformScores(allScores).ConfigureAwait(false);
+            }
+            catch
+            {
+                return await fetchScoresAround().ConfigureAwait(false);
+            }
         }
 
-        protected override APIRequest? FetchNextPage(int direction, Action<IEnumerable<ScoreInfo>> scoresCallback)
+        protected override async Task<ScoreInfo[]> FetchNextPage(int direction)
         {
             Debug.Assert(direction == 1 || direction == -1);
 
             MultiplayerScores? pivot = direction == -1 ? higherScores : lowerScores;
-
             if (pivot?.Cursor == null)
-                return null;
+                return [];
 
-            if (pivot == higherScores)
-                LeftSpinner.Show();
-            else
-                RightSpinner.Show();
+            Schedule(() =>
+            {
+                if (pivot == higherScores)
+                    LeftSpinner.Show();
+                else
+                    RightSpinner.Show();
+            });
 
-            return createIndexRequest(scoresCallback, pivot);
+            return await fetchScoresAround(pivot).ConfigureAwait(false);
         }
 
         /// <summary>
         /// Creates a <see cref="IndexPlaylistScoresRequest"/> with an optional score pivot.
         /// </summary>
         /// <remarks>Does not queue the request.</remarks>
-        /// <param name="scoresCallback">The callback to perform with the resulting scores.</param>
         /// <param name="pivot">An optional score pivot to retrieve scores around. Can be null to retrieve scores from the highest score.</param>
-        /// <returns>The indexing <see cref="APIRequest"/>.</returns>
-        private APIRequest createIndexRequest(Action<IEnumerable<ScoreInfo>> scoresCallback, MultiplayerScores? pivot = null)
+        private async Task<ScoreInfo[]> fetchScoresAround(MultiplayerScores? pivot = null)
         {
+            var requestTaskSource = new TaskCompletionSource<IndexedMultiplayerScores>();
             var indexReq = pivot != null
                 ? new IndexPlaylistScoresRequest(RoomId, PlaylistItem.ID, pivot.Cursor, pivot.Params)
                 : new IndexPlaylistScoresRequest(RoomId, PlaylistItem.ID);
+            indexReq.Success += requestTaskSource.SetResult;
+            indexReq.Failure += requestTaskSource.SetException;
+            API.Queue(indexReq);
 
-            indexReq.Success += r =>
+            try
             {
+                var index = await requestTaskSource.Task.ConfigureAwait(false);
+
                 if (pivot == lowerScores)
                 {
-                    lowerScores = r;
-                    setPositions(r, pivot, 1);
+                    lowerScores = index;
+                    setPositions(index, pivot, 1);
                 }
                 else
                 {
-                    higherScores = r;
-                    setPositions(r, pivot, -1);
+                    higherScores = index;
+                    setPositions(index, pivot, -1);
+
+                    // when paginating the results, it's possible for the user's score to naturally fall down the rankings.
+                    // unmitigated, this can cause scores at the very top of the rankings to have zero or negative positions
+                    // because the positions are counted backwards from the user's score, which has increased in this case during pagination.
+                    // if this happens, just give the top score the first position.
+                    // note that this isn't 100% correct, but it *is* however the most reliable way to mask the problem.
+                    int smallestPosition = index.Scores.Min(s => s.Position ?? 1);
+
+                    if (smallestPosition < 1)
+                    {
+                        int offset = 1 - smallestPosition;
+
+                        foreach (var scorePanel in ScorePanelList.GetScorePanels())
+                            scorePanel.ScorePosition.Value += offset;
+
+                        foreach (var score in index.Scores)
+                            score.Position += offset;
+                    }
                 }
 
-                Schedule(() =>
-                {
-                    PerformSuccessCallback(scoresCallback, r.Scores, r);
-                    hideLoadingSpinners(r);
-                });
-            };
-
-            indexReq.Failure += _ => hideLoadingSpinners(pivot);
-
-            return indexReq;
+                return await transformScores(index.Scores).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                Logger.Log($"Failed to fetch scores (room: {RoomId}, item: {PlaylistItem.ID}): {ex}");
+                return [];
+            }
         }
 
         /// <summary>
-        /// Transforms returned <see cref="MultiplayerScores"/> into <see cref="ScoreInfo"/>s, ensure the <see cref="ScorePanelList"/> is put into a sane state, and invokes a given success callback.
+        /// Transforms returned <see cref="MultiplayerScores"/> into <see cref="ScoreInfo"/>s.
         /// </summary>
-        /// <param name="callback">The callback to invoke with the final <see cref="ScoreInfo"/>s.</param>
         /// <param name="scores">The <see cref="MultiplayerScore"/>s that were retrieved from <see cref="APIRequest"/>s.</param>
-        /// <param name="pivot">An optional pivot around which the scores were retrieved.</param>
-        protected virtual ScoreInfo[] PerformSuccessCallback(Action<IEnumerable<ScoreInfo>> callback, List<MultiplayerScore> scores, MultiplayerScores? pivot = null)
+        private async Task<ScoreInfo[]> transformScores(List<MultiplayerScore> scores)
         {
-            var scoreInfos = scores.Select(s => s.CreateScoreInfo(ScoreManager, Rulesets, Beatmap.Value.BeatmapInfo)).OrderByTotalScore().ToArray();
+            int[] allBeatmapIds = scores.Select(s => s.BeatmapId).Distinct().ToArray();
+            BeatmapInfo[] localBeatmaps = allBeatmapIds.Select(id => beatmapManager.QueryBeatmap(b => b.OnlineID == id))
+                                                       .Where(b => b != null)
+                                                       .ToArray()!;
 
-            // Invoke callback to add the scores. Exclude the score provided to this screen since it's added already.
-            callback.Invoke(scoreInfos.Where(s => s.OnlineID != Score?.OnlineID));
+            int[] missingBeatmapIds = allBeatmapIds.Except(localBeatmaps.Select(b => b.OnlineID)).ToArray();
+            APIBeatmap[] onlineBeatmaps = (await beatmapLookupCache.GetBeatmapsAsync(missingBeatmapIds).ConfigureAwait(false)).Where(b => b != null).ToArray()!;
 
-            return scoreInfos;
+            Dictionary<int, BeatmapInfo> beatmapsById = new Dictionary<int, BeatmapInfo>();
+
+            foreach (var beatmap in localBeatmaps)
+                beatmapsById[beatmap.OnlineID] = beatmap;
+
+            foreach (var beatmap in onlineBeatmaps)
+            {
+                // Minimal data required to get various components in this screen to display correctly.
+                beatmapsById[beatmap.OnlineID] = new BeatmapInfo
+                {
+                    Difficulty = new BeatmapDifficulty(beatmap.Difficulty),
+                    Metadata =
+                    {
+                        Artist = beatmap.Metadata.Artist,
+                        Title = beatmap.Metadata.Title,
+                        Author = new RealmUser
+                        {
+                            Username = beatmap.Metadata.Author.Username,
+                            OnlineID = beatmap.Metadata.Author.OnlineID,
+                        }
+                    },
+                    DifficultyName = beatmap.DifficultyName,
+                    StarRating = beatmap.StarRating,
+                    Length = beatmap.Length,
+                    BPM = beatmap.BPM
+                };
+            }
+
+            // Validate that we have all beatmaps we need.
+            foreach (int id in allBeatmapIds)
+            {
+                if (!beatmapsById.ContainsKey(id))
+                {
+                    Logger.Log($"Failed to fetch beatmap {id} to display scores for playlist item {PlaylistItem.ID}");
+                    beatmapsById[id] = Beatmap.Value.BeatmapInfo;
+                }
+            }
+
+            // Exclude the score provided to this screen since it's added already.
+            return scores
+                   .Where(s => s.ID != Score?.OnlineID)
+                   .Select(s => s.CreateScoreInfo(ScoreManager, Rulesets, beatmapsById[s.BeatmapId]))
+                   .OrderByTotalScore()
+                   .ToArray();
         }
 
-        private void hideLoadingSpinners(MultiplayerScores? pivot = null)
+        protected override void OnScoresAdded(ScoreInfo[] scores)
         {
-            CentreSpinner.Hide();
+            base.OnScoresAdded(scores);
 
-            if (pivot == lowerScores)
-                RightSpinner.Hide();
-            else if (pivot == higherScores)
-                LeftSpinner.Hide();
+            CentreSpinner.Hide();
+            RightSpinner.Hide();
+            LeftSpinner.Hide();
         }
 
         /// <summary>
@@ -213,7 +289,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         /// <param name="scores">The <see cref="MultiplayerScores"/> to set positions on.</param>
         /// <param name="pivot">The pivot.</param>
         /// <param name="increment">The amount to increment the pivot position by for each <see cref="MultiplayerScore"/> in <paramref name="scores"/>.</param>
-        private void setPositions(MultiplayerScores scores, MultiplayerScores? pivot, int increment)
+        private static void setPositions(MultiplayerScores scores, MultiplayerScores? pivot, int increment)
             => setPositions(scores, pivot?.Scores[^1].Position ?? 0, increment);
 
         /// <summary>
@@ -222,7 +298,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         /// <param name="scores">The <see cref="MultiplayerScores"/> to set positions on.</param>
         /// <param name="pivotPosition">The pivot position.</param>
         /// <param name="increment">The amount to increment the pivot position by for each <see cref="MultiplayerScore"/> in <paramref name="scores"/>.</param>
-        private void setPositions(MultiplayerScores scores, int pivotPosition, int increment)
+        private static void setPositions(MultiplayerScores scores, int pivotPosition, int increment)
         {
             foreach (var s in scores.Scores)
             {
