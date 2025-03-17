@@ -42,9 +42,8 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 var decoder = Decoder.GetDecoder<Beatmap>(stream);
                 var working = new TestWorkingBeatmap(decoder.Decode(stream));
 
-                Assert.AreEqual(6, working.BeatmapInfo.BeatmapVersion);
-                Assert.AreEqual(6, working.Beatmap.BeatmapInfo.BeatmapVersion);
-                Assert.AreEqual(6, working.GetPlayableBeatmap(new OsuRuleset().RulesetInfo, Array.Empty<Mod>()).BeatmapInfo.BeatmapVersion);
+                Assert.AreEqual(6, working.Beatmap.BeatmapVersion);
+                Assert.AreEqual(6, working.GetPlayableBeatmap(new OsuRuleset().RulesetInfo, Array.Empty<Mod>()).BeatmapVersion);
             }
         }
 
@@ -59,9 +58,8 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 ((LegacyBeatmapDecoder)decoder).ApplyOffsets = applyOffsets;
                 var working = new TestWorkingBeatmap(decoder.Decode(stream));
 
-                Assert.AreEqual(4, working.BeatmapInfo.BeatmapVersion);
-                Assert.AreEqual(4, working.Beatmap.BeatmapInfo.BeatmapVersion);
-                Assert.AreEqual(4, working.GetPlayableBeatmap(new OsuRuleset().RulesetInfo, Array.Empty<Mod>()).BeatmapInfo.BeatmapVersion);
+                Assert.AreEqual(4, working.Beatmap.BeatmapVersion);
+                Assert.AreEqual(4, working.GetPlayableBeatmap(new OsuRuleset().RulesetInfo, Array.Empty<Mod>()).BeatmapVersion);
 
                 Assert.AreEqual(-1, working.BeatmapInfo.Metadata.PreviewTime);
             }
