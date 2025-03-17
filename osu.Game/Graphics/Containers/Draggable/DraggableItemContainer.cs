@@ -181,7 +181,6 @@ namespace osu.Game.Graphics.Containers.Draggable
 
         private void collectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
-            // todo : imporve efficiency be reducing number of calls to sortItems.
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
@@ -217,7 +216,7 @@ namespace osu.Game.Graphics.Containers.Draggable
                     break;
 
                 case NotifyCollectionChangedAction.Move:
-                    sortItems();
+                    syncItems();
                     OnItemsChanged();
                     break;
             }
@@ -239,8 +238,7 @@ namespace osu.Game.Graphics.Containers.Draggable
                 itemMap.Remove(item);
             }
 
-            // if items are already sorted there is no need to sort on removal.
-            sortItems();
+            syncItems();
             OnItemsChanged();
         }
 
@@ -281,7 +279,7 @@ namespace osu.Game.Graphics.Containers.Draggable
                         ListContainer.Add(d);
                 }
 
-                sortItems();
+                syncItems();
                 OnItemsChanged();
             }
         }
@@ -327,9 +325,9 @@ namespace osu.Game.Graphics.Containers.Draggable
             }
         }
 
-        private void sortItems()
+        private void syncItems()
         {
-            Logger.Log("sortItems called!");
+            Logger.Log("syncItems called!");
             for (int i = 0; i < Items.Count; i++)
             {
                 // A drawable for the item may not exist yet, for example in a replace-range operation where the removal happens first.
