@@ -355,7 +355,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 {
                     items.AddRange([
                         new OsuMenuItem("View in browser", MenuItemType.Standard, () => game?.OpenUrlExternally(formatRoomUrl(Room.RoomID.Value))),
-                        new OsuMenuItem("Copy link", MenuItemType.Standard, () => game?.CopyStringToClipboard(formatRoomUrl(Room.RoomID.Value)))
+                        new OsuMenuItem("Copy link", MenuItemType.Standard, () => game?.CopyToClipboard(formatRoomUrl(Room.RoomID.Value)))
                     ]);
                 }
 

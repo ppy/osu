@@ -47,7 +47,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Copied to clipboard"
         /// </summary>
-        public static LocalisableString StringCopied => new TranslatableString(getKey(@"string_copied"), @"Copied to clipboard");
+        public static LocalisableString CopiedToClipboard => new TranslatableString(getKey(@"copied_to_clipboard"), @"Copied to clipboard");
 
         /// <summary>
         /// "Speed changed to {0:N2}x"

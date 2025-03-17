@@ -5,10 +5,10 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.OSD
 {
-    public partial class CopyStringToast : Toast
+    public partial class CopiedToClipboardToast : Toast
     {
-        public CopyStringToast()
-            : base(CommonStrings.General, ToastStrings.StringCopied, "")
+        public CopiedToClipboardToast()
+            : base(CommonStrings.General, ToastStrings.CopiedToClipboard, "")
         {
         }
     }
