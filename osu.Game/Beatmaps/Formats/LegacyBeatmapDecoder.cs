@@ -193,7 +193,10 @@ namespace osu.Game.Beatmaps.Formats
         internal static void ApplyLegacyDefaults(Beatmap beatmap)
         {
             beatmap.WidescreenStoryboard = false;
-            beatmap.BeatmapInfo.Ruleset = RulesetStore?.GetRuleset(0) ?? throw new ArgumentException("osu! ruleset is not available locally.");
+            // in a perfect world this would throw if osu! ruleset couldn't be found,
+            // but unfortunately there are "legitimate" cases where it's not there (i.e. ruleset test projects),
+            // so attempt to trudge on with whatever it is that's in `BeatmapInfo` if the lookup fails.
+            beatmap.BeatmapInfo.Ruleset = RulesetStore?.GetRuleset(0) ?? beatmap.BeatmapInfo.Ruleset;
         }
 
         protected override void ParseLine(Beatmap beatmap, Section section, string line)
