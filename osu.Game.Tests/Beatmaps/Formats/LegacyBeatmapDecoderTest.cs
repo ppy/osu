@@ -43,6 +43,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 var working = new TestWorkingBeatmap(decoder.Decode(stream));
 
                 Assert.AreEqual(6, working.Beatmap.BeatmapVersion);
+                Assert.That(working.Beatmap.BeatmapInfo.Ruleset.Name, Is.Not.EqualTo("null placeholder ruleset"));
                 Assert.AreEqual(6, working.GetPlayableBeatmap(new OsuRuleset().RulesetInfo, Array.Empty<Mod>()).BeatmapVersion);
             }
         }
