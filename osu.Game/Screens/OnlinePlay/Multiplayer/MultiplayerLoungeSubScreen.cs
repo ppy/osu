@@ -88,12 +88,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                     if (exception?.GetHubExceptionMessage() is string message)
                         onFailure(message);
                     else
-                    {
-                        const string generic_failure_message = "Failed to join multiplayer room.";
-                        if (result.Exception != null)
-                            Logger.Error(result.Exception, generic_failure_message);
-                        onFailure(generic_failure_message);
-                    }
+                        onFailure($"Failed to join multiplayer room: {exception?.Message}");
                 }
             });
         }

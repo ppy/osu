@@ -351,7 +351,11 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             {
                 joiningRoomOperation?.Dispose();
                 joiningRoomOperation = null;
-                onFailure?.Invoke(error);
+
+                if (onFailure != null)
+                    onFailure(error);
+                else
+                    Logger.Log(error, level: LogLevel.Error);
             });
         });
 
