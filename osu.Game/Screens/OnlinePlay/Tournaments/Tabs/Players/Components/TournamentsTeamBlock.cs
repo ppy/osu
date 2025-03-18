@@ -52,5 +52,10 @@ namespace osu.Game.Screens.OnlinePlay.Tournaments.Tabs.Players.Components
                 ]
             };
         }
+
+        protected override TournamentUser CreateDefaultItem()
+        {
+            return new TournamentUser();
+        }
     }
 }

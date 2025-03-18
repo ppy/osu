@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -77,12 +78,19 @@ namespace osu.Game.Graphics.Containers.Draggable
             CurrentlySharedDraggedItem.Value?.MoveToCursor(CursorPosition.Value);
         }
 
+        public bool IsDragging => CurrentlySharedDraggedItem != null;
+
         /// <summary>
         /// Called by the <see cref="DraggableItemContainer{TModel}"/> that started the drag. Will end the drag for all tree.descendant <see cref="DraggableItemContainer{TModel}"/>s.
         /// </summary>
         internal void DragEnd()
         {
-            WasShared = draggableItemContainers.Any(d => d.ScrollContainerHasCursor());
+            Debug.Assert(CurrentlySharedDraggedItem.Value != null, "Cannot end drag when no DraggableItem is selected.");
+            // 1 will count dragging a duplicate item to a container as not shared, since we don't allow duplicates.
+            // 2 will count those same items as shared. It is useful for dropping unwanted items into a big pool to remove it, no matter if its already there.
+            // idk which one is preferred or if there should be a toggle.
+            // WasShared = draggableItemContainers.Any(d => d.ScrollContainerHasCursor() && !d.StartedDrag && !d.Items.Contains(CurrentlySharedDraggedItem.Value.Model)); // 1
+            WasShared = draggableItemContainers.Any(d => d.ScrollContainerHasCursor() && !d.StartedDrag); // 2
             DragEnded.Invoke();
             DragEnded = () => { };
             CurrentlySharedDraggedItem.Value = null;

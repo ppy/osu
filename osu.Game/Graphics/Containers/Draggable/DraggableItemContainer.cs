@@ -32,6 +32,8 @@ namespace osu.Game.Graphics.Containers.Draggable
     public abstract partial class DraggableItemContainer<TModel> : CompositeDrawable
         where TModel : notnull
     {
+        // todo : rename variables from IsX to X.
+
         /// <summary>
         /// If this container should retain a <see cref="DraggableItem{TModel}"/> when it is dropped outside a of the ScrollContainer.
         /// This container will still lose the item if it is dragged into another <see cref="DraggableItemContainer{TModel}"/> and IsSharedItemRetained is false.
@@ -51,13 +53,11 @@ namespace osu.Game.Graphics.Containers.Draggable
         /// </summary>
         public bool IsStrictlySorted = false;
 
+        /// todo : need help on the phrasing.
         /// <summary>
         /// When dragging a <see cref="DraggableItem{TModel}"/> inside a list, how far do you need to move before the empty item switches with the next item.
         /// Measured in relative size of a <see cref="DraggableItem{TModel}"/> from the start of the next item.
         /// </summary>
-        /// <remarks>
-        /// Currently not implemented.
-        /// </remarks>
         public float DraggedItemMoveThreshold = 0.5f;
 
         /// <summary>
@@ -100,11 +100,17 @@ namespace osu.Game.Graphics.Containers.Draggable
         /// </summary>
         protected IReadOnlyDictionary<TModel, DraggableItem<TModel>> ItemMap => itemMap;
 
+        public bool IsDragging => currentlySharedDraggedItem != null;
+
         private readonly Dictionary<TModel, DraggableItem<TModel>> itemMap = new Dictionary<TModel, DraggableItem<TModel>>();
 
+        // todo : try to minimize use of currentlyDraggedItem, prefer currentlySharedDraggedItem.
+        // The prior should only be used to still receive mouse updates.
+        // todo : if we can let DraggableItemContainer receive mouse updates after drag start, we wouldn't need this variable at all.
         private DraggableItem<TModel>? currentlyDraggedItem;
-        private int revertIndex = -1;
-        private bool isCurrentlyDraggedItemTemporary = true;
+        private DraggableItem<TModel> draggedShadow;
+        private int draggedShadowIndex = -2;
+        internal bool StartedDrag = false;
 
         // Is a different instance to currentlyDraggedItem. Possibly different subtype aswell.
         private Bindable<DraggableItem<TModel>?> currentlySharedDraggedItem = new();
@@ -114,9 +120,9 @@ namespace osu.Game.Graphics.Containers.Draggable
         {
             // ugly but should work.
             return (
-                (DraggableSharingContainer != null && DraggableSharingContainer.WasShared && isCurrentlyDraggedItemTemporary && ScrollContainerHasCursor()) ||
-                (DraggableSharingContainer != null && DraggableSharingContainer.WasShared && !isCurrentlyDraggedItemTemporary && IsSharedItemRetained) ||
-                (DraggableSharingContainer != null && !DraggableSharingContainer.WasShared && !isCurrentlyDraggedItemTemporary && IsDroppedItemRetained) ||
+                (DraggableSharingContainer != null && DraggableSharingContainer.WasShared && !StartedDrag && ScrollContainerHasCursor()) ||
+                (DraggableSharingContainer != null && DraggableSharingContainer.WasShared && StartedDrag && IsSharedItemRetained) ||
+                (DraggableSharingContainer != null && !DraggableSharingContainer.WasShared && StartedDrag && (IsDroppedItemRetained || ScrollContainerHasCursor())) ||
                 (DraggableSharingContainer == null && ScrollContainerHasCursor())
             );
         }
@@ -142,6 +148,9 @@ namespace osu.Game.Graphics.Containers.Draggable
             });
 
             Items.CollectionChanged += collectionChanged;
+
+            draggedShadow = CreateDrawable(CreateDefaultItem()).With(d => { d.Alpha = 0.0f; d.AlwaysPresent = false; });
+            ListContainer.Add(draggedShadow);
         }
 
         [BackgroundDependencyLoader]
@@ -321,6 +330,7 @@ namespace osu.Game.Graphics.Containers.Draggable
                         ListContainer.Insert(index, d);
                 }
 
+                syncItems();
                 OnItemsChanged();
             }
         }
@@ -328,6 +338,7 @@ namespace osu.Game.Graphics.Containers.Draggable
         private void syncItems()
         {
             Logger.Log("syncItems called!");
+            int skip = 0;
             for (int i = 0; i < Items.Count; i++)
             {
                 // A drawable for the item may not exist yet, for example in a replace-range operation where the removal happens first.
@@ -338,7 +349,11 @@ namespace osu.Game.Graphics.Containers.Draggable
                 if (drawable.Parent != ListContainer)
                     continue;
 
-                ListContainer.SetLayoutPosition(drawable, i);
+                // Skip the invisible DraggedItem when dragging
+                if (drawable == currentlyDraggedItem)
+                    skip++;
+
+                ListContainer.SetLayoutPosition(drawable, i - skip);
             }
         }
 
@@ -353,9 +368,9 @@ namespace osu.Game.Graphics.Containers.Draggable
             Debug.Assert(currentlySharedDraggedItem.Value == null,
                 "Tried to start an arrangement while the previous one is not finished. Only one arrangement per sharing group is allowed.");
 
-            currentlyDraggedItem = item.With(d => { d.Alpha = 0.0f; });
-            revertIndex = Items.IndexOf(currentlyDraggedItem.Model);
-            isCurrentlyDraggedItemTemporary = false;
+            currentlyDraggedItem = item.With(d => { d.Alpha = 0.0f; d.AlwaysPresent = false; });
+            draggedShadowIndex = -3; // special signal for updateArrangement to not do plusone.
+            StartedDrag = true;
 
             CreateDrawableOnTop();
 
@@ -385,18 +400,15 @@ namespace osu.Game.Graphics.Containers.Draggable
             Logger.Log("Dropped Item!");
         }
 
+        // todo : if we move the action assignment elsewhere, we can remove this function.
         private void createTemporaryDraggableItem()
         {
             Debug.Assert(DraggableSharingContainer != null);
             Debug.Assert(currentlySharedDraggedItem.Value != null);
 
-            Items.Add(currentlySharedDraggedItem.Value.Model);
-            itemMap.TryGetValue(currentlySharedDraggedItem.Value.Model, out var draggable);
-            Debug.Assert(draggable != null);
-            currentlyDraggedItem = draggable.With(d => { d.Alpha = 0.0f; });
+            currentlyDraggedItem = CreateDrawable(currentlySharedDraggedItem.Value.Model);
 
-            revertIndex = Items.IndexOf(currentlyDraggedItem.Model); // Only required for when IsStrictlySorted is true
-            isCurrentlyDraggedItemTemporary = true; // strictly speaking not neccessary
+            StartedDrag = false; // strictly speaking not neccessary
 
             DraggableSharingContainer.DragEnded += FinalizeArrangement;
         }
@@ -408,8 +420,11 @@ namespace osu.Game.Graphics.Containers.Draggable
 
         internal void CreateDrawableOnTop()
         {
+            Debug.Assert(currentlyDraggedItem != null || currentlySharedDraggedItem.Value != null);
             if (currentlyDraggedItem != null)
                 currentlySharedDraggedItem.Value = CreateDrawable(currentlyDraggedItem.Model).With(d => { d.Origin = Anchor.Centre; });
+            else
+                currentlySharedDraggedItem.Value = CreateDrawable(currentlySharedDraggedItem.Value!.Model).With(d => { d.Origin = Anchor.Centre; });
         }
 
         /// <summary>
@@ -419,20 +434,32 @@ namespace osu.Game.Graphics.Containers.Draggable
         {
             if (currentlyDraggedItem != null)
             {
-                // currentlyDraggedItem might become invalid, change parameters beforehand.
                 currentlyDraggedItem.Alpha = 1.0f;
-
-                if (!ScrollContainerHasCursor())
-                    if (shouldRetainCurrentlyDraggedItem())
-                        Items.Move(Items.IndexOf(currentlyDraggedItem.Model), revertIndex);
-                    else
-                        Items.Remove(currentlyDraggedItem.Model);
-                else if (IsStrictlySorted)
-                    Items.Move(Items.IndexOf(currentlyDraggedItem.Model), revertIndex);
-
+                var model = currentlyDraggedItem.Model;
                 currentlyDraggedItem = null;
-                isCurrentlyDraggedItemTemporary = true;
-                revertIndex = -1;
+
+                if (StartedDrag)
+                {
+                    if (!shouldRetainCurrentlyDraggedItem())
+                        Items.Remove(model);
+                    else if (ScrollContainerHasCursor() && !IsStrictlySorted)
+                        // Only move if strict sorting is not enabled.
+                        Items.Move(Items.IndexOf(model), draggedShadowIndex);
+                }
+                else if (!itemMap.ContainsKey(model) && (ScrollContainerHasCursor() || shouldRetainCurrentlyDraggedItem()))
+                {
+                    if (IsStrictlySorted)
+                        // todo : Insert item into its sorted position
+                        throw new NotImplementedException("Strict sorting has not been implemented.");
+                    else if (0 <= draggedShadowIndex && draggedShadowIndex < Items.Count)
+                        Items.Insert(draggedShadowIndex, model);
+                    else
+                        Items.Add(model);
+                }
+
+                StartedDrag = false;
+                draggedShadow.AlwaysPresent = false;
+                draggedShadowIndex = -2;
             }
         }
 
@@ -487,53 +514,51 @@ namespace osu.Game.Graphics.Containers.Draggable
             Debug.Assert(currentlyDraggedItem != null);
 
             var localPos = ListContainer.ToLocalSpace(cursorPosition.Value);
-            int srcIndex = Items.IndexOf(currentlyDraggedItem.Model);
 
             // todo : move to on drag update, slightly more efficient.
-            currentlyDraggedItem.AlwaysPresent = ScrollContainerHasCursor();
-            if (!currentlyDraggedItem.AlwaysPresent)
-                return;
-
-            // Find the last item with position < mouse position. Note we can't directly use
-            // the item positions as they are being transformed
-            float heightAccumulator = 0;
-            int dstIndex = 0;
-
-            for (; dstIndex < Items.Count; dstIndex++)
+            draggedShadow.AlwaysPresent = ScrollContainerHasCursor();
+            if (!draggedShadow.AlwaysPresent)
             {
-                var drawable = itemMap[Items[dstIndex]];
-
-                if (!drawable.IsLoaded || !drawable.IsPresent)
-                    continue;
-
-                // Using BoundingBox here takes care of scale, paddings, etc...
-                float height = drawable.BoundingBox.Height;
-
-                // Rearrangement should occur only after the mid-point of items is crossed
-                heightAccumulator += height / 2;
-
-                // Check if the midpoint has been crossed (i.e. cursor is located above the midpoint)
-                if (heightAccumulator > localPos.Y)
-                {
-                    if (dstIndex > srcIndex)
-                        // Suppose an item is dragged just slightly below its own midpoint. The rearrangement condition (accumulator > pos) will be satisfied for the next immediate item
-                        // but not the currently-dragged item, which will invoke a rearrangement. This is an off-by-one condition.
-                        // Rearrangement should not occur until the midpoint of the next item is crossed, and so to fix this the next item's index is discarded.
-                        dstIndex--;
-
-                    break;
-                }
-
-                // Add the remainder of the height of the current item
-                heightAccumulator += height / 2 + ListContainer.Spacing.Y;
+                draggedShadowIndex = -2; // reset to be unbiased when cursor re-enters
+                return;
             }
 
-            dstIndex = Math.Clamp(dstIndex, 0, Items.Count - 1);
+            // Remove half of the last spacing so that items are split in the middle of spacings.
+            float halfSpacingOffset = ListContainer.Spacing.Y / 2;
 
-            if (srcIndex == dstIndex)
+            // Here we assume all items have the same static height.
+            float itemHeight = draggedShadow.BoundingBox.Height;
+
+            float division = (localPos.Y + halfSpacingOffset) / (itemHeight + ListContainer.Spacing.Y);
+            float currentItemNum = (float)Math.Floor(division);
+            float fractional = division - currentItemNum;
+
+            // Clamp stops syncItems being called when cursor is above fill container but still inside scroll container.
+            int currentItemIndex = Math.Clamp((int)currentItemNum, 0, Items.Count);
+
+            if (currentItemIndex - draggedShadowIndex == 1 && fractional < DraggedItemMoveThreshold)
                 return;
 
-            Items.Move(srcIndex, dstIndex);
+            if (currentItemIndex - draggedShadowIndex == -1 && fractional > 1.0f - DraggedItemMoveThreshold)
+                return;
+
+            if (currentItemIndex == draggedShadowIndex)
+                return;
+
+            // When entering a DraggbleItemContainer and if cursor is on the highest part of the DraggableItem,
+            // move the shadow an extra index.
+            // This made sense from a user perspective, but actually using this feature was more weird.
+            bool shouldAddOne = draggedShadowIndex == -2 && fractional > 0.5f;
+
+            // Clamp does nothing more than put the mind at ease...
+            draggedShadowIndex = Math.Clamp(currentItemIndex + (shouldAddOne ? 1 : 0), 0, Items.Count);
+            ListContainer.SetLayoutPosition(draggedShadow, draggedShadowIndex - 0.5f);
+
+            // todo : add callback for items moving.
+
+            // todo : idk why updating every single item is neccessary, but without it they don't update positions
+            // Maybe we could get away with only changing one and causing a cascading effect.
+            syncItems();
         }
 
         #endregion
@@ -554,5 +579,11 @@ namespace osu.Game.Graphics.Containers.Draggable
         /// <param name="item">The item to create the <see cref="Drawable"/> representation of.</param>
         /// <returns>The <see cref="DraggableItem{TModel}"/>.</returns>
         protected abstract DraggableItem<TModel> CreateDrawable(TModel item);
+
+        /// <summary>
+        /// Creates the default item value.
+        /// </summary>
+        /// <returns>The defualt item.</returns>
+        protected abstract TModel CreateDefaultItem();
     }
 }

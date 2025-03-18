@@ -38,6 +38,9 @@ namespace osu.Game.Graphics.Containers.Draggable
 
         private void playSwapSample()
         {
+            if (!IsDragging)
+                return;
+
             if (Time.Current - sampleLastPlaybackTime <= 35)
                 return;
 
