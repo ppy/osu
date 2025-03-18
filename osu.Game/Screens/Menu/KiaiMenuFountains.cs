@@ -18,7 +18,7 @@ namespace osu.Game.Screens.Menu
         [Resolved]
         private GameHost host { get; set; } = null!;
 
-        private StarFountainSfx sfx = null!;
+        private StarFountainSounds sounds = null!;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -39,7 +39,7 @@ namespace osu.Game.Screens.Menu
                     Origin = Anchor.BottomRight,
                     X = -250,
                 },
-                sfx = new StarFountainSfx()
+                sounds = new StarFountainSounds()
             };
         }
 
@@ -83,7 +83,7 @@ namespace osu.Game.Screens.Menu
 
             // Don't play SFX when game is in background, as it can be a bit noisy.
             if (host.IsActive.Value)
-                sfx.Trigger();
+                sounds.Play();
         }
     }
 }

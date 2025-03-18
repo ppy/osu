@@ -19,7 +19,7 @@ namespace osu.Game.Screens.Play
 
         private Bindable<bool> kiaiStarFountains = null!;
 
-        private StarFountainSfx sfx = null!;
+        private StarFountainSounds sounds = null!;
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
@@ -42,7 +42,7 @@ namespace osu.Game.Screens.Play
                     Origin = Anchor.BottomRight,
                     X = -75,
                 },
-                sfx = new StarFountainSfx(),
+                sounds = new StarFountainSounds(),
             };
         }
 
@@ -70,7 +70,7 @@ namespace osu.Game.Screens.Play
             leftFountain.Shoot(1);
             rightFountain.Shoot(-1);
 
-            sfx.Trigger();
+            sounds.Play();
         }
 
         public partial class GameplayStarFountain : StarFountain
