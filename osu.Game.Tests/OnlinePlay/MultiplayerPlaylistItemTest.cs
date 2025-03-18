@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using Bogus;
 using MessagePack;
 using NUnit.Framework;
@@ -12,6 +13,12 @@ namespace osu.Game.Tests.OnlinePlay
     [TestFixture]
     public class MultiplayerPlaylistItemTest
     {
+        [SetUp]
+        public void Setup()
+        {
+            Randomizer.Seed = new Random(1337);
+        }
+
         [Test]
         public void TestCloneMultiplayerPlaylistItem()
         {
