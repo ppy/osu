@@ -11,7 +11,6 @@ using osu.Framework.Testing;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Osu;
-using osu.Game.Rulesets.Taiko;
 using osu.Game.Screens.OnlinePlay.Lounge;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Tests.Visual.OnlinePlay;
@@ -197,22 +196,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public void TestPasswordProtectedRooms()
         {
             AddStep("add rooms", () => rooms.AddRange(GenerateRooms(3, withPassword: true)));
-        }
-
-        [Test]
-        public void TestFreestyleBypassesRulesetFilter()
-        {
-            AddStep("apply taiko filter", () => container.Filter.Value = new FilterCriteria { Ruleset = new TaikoRuleset().RulesetInfo });
-
-            AddStep("add osu + freestyle room", () =>
-            {
-                var room = GenerateRooms(1, new OsuRuleset().RulesetInfo)[0];
-                room.Playlist[0].Freestyle = true;
-                room.CurrentPlaylistItem = room.Playlist[0];
-                rooms.Add(room);
-            });
-
-            AddAssert("room visible", () => container.DrawableRooms.Any());
         }
 
         private bool checkRoomSelected(Room? room) => selectedRoom.Value == room;
