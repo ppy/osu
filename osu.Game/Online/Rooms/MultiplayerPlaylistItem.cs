@@ -73,6 +73,9 @@ namespace osu.Game.Online.Rooms
         /// <summary>
         /// Creates a new <see cref="MultiplayerPlaylistItem"/> from an API <see cref="PlaylistItem"/>.
         /// </summary>
+        /// <remarks>
+        /// This will create unique instances of the <see cref="RequiredMods"/> and <see cref="AllowedMods"/> arrays but NOT unique instances of the contained <see cref="APIMod"/>s.
+        /// </remarks>
         public MultiplayerPlaylistItem(PlaylistItem item)
         {
             ID = item.ID;
@@ -92,6 +95,9 @@ namespace osu.Game.Online.Rooms
         /// <summary>
         /// Creates a copy of this <see cref="MultiplayerPlaylistItem"/>.
         /// </summary>
+        /// <remarks>
+        /// This will create unique instances of the <see cref="RequiredMods"/> and <see cref="AllowedMods"/> arrays but NOT unique instances of the contained <see cref="APIMod"/>s.
+        /// </remarks>
         public MultiplayerPlaylistItem Clone() => new MultiplayerPlaylistItem
         {
             ID = ID,
