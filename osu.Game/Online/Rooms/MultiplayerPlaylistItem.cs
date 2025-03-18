@@ -98,20 +98,12 @@ namespace osu.Game.Online.Rooms
         /// <remarks>
         /// This will create unique instances of the <see cref="RequiredMods"/> and <see cref="AllowedMods"/> arrays but NOT unique instances of the contained <see cref="APIMod"/>s.
         /// </remarks>
-        public MultiplayerPlaylistItem Clone() => new MultiplayerPlaylistItem
+        public MultiplayerPlaylistItem Clone()
         {
-            ID = ID,
-            OwnerID = OwnerID,
-            BeatmapID = BeatmapID,
-            BeatmapChecksum = BeatmapChecksum,
-            RulesetID = RulesetID,
-            RequiredMods = RequiredMods.ToArray(),
-            AllowedMods = AllowedMods.ToArray(),
-            Expired = Expired,
-            PlaylistOrder = PlaylistOrder,
-            PlayedAt = PlayedAt,
-            StarRating = StarRating,
-            Freestyle = Freestyle,
-        };
+            MultiplayerPlaylistItem clone = (MultiplayerPlaylistItem)MemberwiseClone();
+            clone.RequiredMods = RequiredMods.ToArray();
+            clone.AllowedMods = AllowedMods.ToArray();
+            return clone;
+        }
     }
 }
