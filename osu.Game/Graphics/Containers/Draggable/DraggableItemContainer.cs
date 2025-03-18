@@ -100,7 +100,7 @@ namespace osu.Game.Graphics.Containers.Draggable
         /// </summary>
         protected IReadOnlyDictionary<TModel, DraggableItem<TModel>> ItemMap => itemMap;
 
-        public bool IsDragging => currentlySharedDraggedItem != null;
+        public bool IsDragging => currentlySharedDraggedItem.Value != null;
 
         private readonly Dictionary<TModel, DraggableItem<TModel>> itemMap = new Dictionary<TModel, DraggableItem<TModel>>();
 
@@ -108,13 +108,13 @@ namespace osu.Game.Graphics.Containers.Draggable
         // The prior should only be used to still receive mouse updates.
         // todo : if we can let DraggableItemContainer receive mouse updates after drag start, we wouldn't need this variable at all.
         private DraggableItem<TModel>? currentlyDraggedItem;
-        private DraggableItem<TModel> draggedShadow;
+        private readonly DraggableItem<TModel> draggedShadow;
         private int draggedShadowIndex = -2;
-        internal bool StartedDrag = false;
+        internal bool StartedDrag;
 
         // Is a different instance to currentlyDraggedItem. Possibly different subtype aswell.
-        private Bindable<DraggableItem<TModel>?> currentlySharedDraggedItem = new();
-        private Bindable<Vector2> cursorPosition = new();
+        private readonly Bindable<DraggableItem<TModel>?> currentlySharedDraggedItem = new Bindable<DraggableItem<TModel>?>();
+        private readonly Bindable<Vector2> cursorPosition = new Bindable<Vector2>();
 
         private bool shouldRetainCurrentlyDraggedItem()
         {
@@ -149,7 +149,11 @@ namespace osu.Game.Graphics.Containers.Draggable
 
             Items.CollectionChanged += collectionChanged;
 
-            draggedShadow = CreateDrawable(CreateDefaultItem()).With(d => { d.Alpha = 0.0f; d.AlwaysPresent = false; });
+            draggedShadow = CreateDrawable(CreateDefaultItem()).With(d =>
+            {
+                d.Alpha = 0.0f;
+                d.AlwaysPresent = false;
+            });
             ListContainer.Add(draggedShadow);
         }
 
@@ -339,6 +343,7 @@ namespace osu.Game.Graphics.Containers.Draggable
         {
             Logger.Log("syncItems called!");
             int skip = 0;
+
             for (int i = 0; i < Items.Count; i++)
             {
                 // A drawable for the item may not exist yet, for example in a replace-range operation where the removal happens first.
@@ -368,7 +373,11 @@ namespace osu.Game.Graphics.Containers.Draggable
             Debug.Assert(currentlySharedDraggedItem.Value == null,
                 "Tried to start an arrangement while the previous one is not finished. Only one arrangement per sharing group is allowed.");
 
-            currentlyDraggedItem = item.With(d => { d.Alpha = 0.0f; d.AlwaysPresent = false; });
+            currentlyDraggedItem = item.With(d =>
+            {
+                d.Alpha = 0.0f;
+                d.AlwaysPresent = false;
+            });
             draggedShadowIndex = -3; // special signal for updateArrangement to not do plusone.
             StartedDrag = true;
 
@@ -517,6 +526,7 @@ namespace osu.Game.Graphics.Containers.Draggable
 
             // todo : move to on drag update, slightly more efficient.
             draggedShadow.AlwaysPresent = ScrollContainerHasCursor();
+
             if (!draggedShadow.AlwaysPresent)
             {
                 draggedShadowIndex = -2; // reset to be unbiased when cursor re-enters

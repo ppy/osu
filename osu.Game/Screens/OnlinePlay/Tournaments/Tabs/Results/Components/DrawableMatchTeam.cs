@@ -80,7 +80,6 @@ namespace osu.Game.Screens.OnlinePlay.Tournaments.Tabs.Results.Components
         [BackgroundDependencyLoader(true)]
         private void load()
         {
-
             colourWinner = losers
                 ? Color4Extensions.FromHex("#8E7F48")
                 : Color4Extensions.FromHex("#1462AA");
@@ -174,10 +173,9 @@ namespace osu.Game.Screens.OnlinePlay.Tournaments.Tabs.Results.Components
             if (e.Button == MouseButton.Left)
             {
                 Console.WriteLine("Pressed Team");
+
                 if (score.Value == null)
-                {
                     match.StartMatch();
-                }
                 else if (!match.Completed.Value)
                     score.Value++;
             }
@@ -207,7 +205,7 @@ namespace osu.Game.Screens.OnlinePlay.Tournaments.Tabs.Results.Components
         private void updateWinStyle()
         {
             // todo : This is where i add checks for being eliminated, protected, winning, losing and not played.
-            bool winner = false;
+            bool winner = completed.Value;
             // bool winner = completed.Value && isWinner?.Invoke() == true;
 
             background.FadeColour(winner ? Color4.White : Color4Extensions.FromHex("#444"), winner ? 500 : 0, Easing.OutQuint);

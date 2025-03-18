@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-
 using System.Collections.Specialized;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -44,9 +43,9 @@ namespace osu.Game.Graphics.Containers.Draggable
             if (Time.Current - sampleLastPlaybackTime <= 35)
                 return;
 
-            var channel = sampleSwap?.GetChannel();
-            if (channel == null)
-                return;
+            var channel = sampleSwap.GetChannel();
+            // if (channel == null)
+            //     return;
 
             channel.Frequency.Value = 0.96 + RNG.NextDouble(0.08);
             channel.Play();
@@ -59,6 +58,5 @@ namespace osu.Game.Graphics.Containers.Draggable
             sampleSwap = audio.Samples.Get(@"UI/item-swap");
             sampleLastPlaybackTime = Time.Current;
         }
-
     }
 }

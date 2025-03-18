@@ -16,7 +16,8 @@ namespace osu.Game.Screens.OnlinePlay.Tournaments.Tabs.Players.Components
     /// </summary>
     public partial class TournamentsDraggablePlayerCopy : OsuDraggableItem<TournamentUser>
     {
-        public TournamentsDraggablePlayerCopy(TournamentUser item) : base(item)
+        public TournamentsDraggablePlayerCopy(TournamentUser item)
+            : base(item)
         {
         }
 
@@ -25,8 +26,8 @@ namespace osu.Game.Screens.OnlinePlay.Tournaments.Tabs.Players.Components
         {
             RelativeSizeAxes = Axes.None;
             Size = new Vector2(80, 50);
-            AddInternal(new Box() { RelativeSizeAxes = Axes.Both, Colour = new Colour4(0, 255, 255, 255) });
-            AddInternal(new OsuSpriteText() { RelativeSizeAxes = Axes.Both, Text = Model.OnlineID.ToString(), Colour = new Colour4(34, 34, 34, 255) });
+            AddInternal(new Box { RelativeSizeAxes = Axes.Both, Colour = new Colour4(0, 255, 255, 255) });
+            AddInternal(new OsuSpriteText { RelativeSizeAxes = Axes.Both, Text = Model.OnlineID.ToString(), Colour = new Colour4(34, 34, 34, 255) });
         }
     }
 }

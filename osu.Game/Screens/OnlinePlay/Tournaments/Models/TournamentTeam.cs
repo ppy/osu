@@ -15,7 +15,6 @@ namespace osu.Game.Screens.OnlinePlay.Tournaments.Models
     [Serializable]
     public class TournamentTeam
     {
-
         /// <summary>
         /// Unique ID for this team. If a team is removed and then added, the ID will not be reused.
         /// </summary>

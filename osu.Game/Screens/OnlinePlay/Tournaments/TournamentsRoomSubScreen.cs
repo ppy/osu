@@ -32,7 +32,6 @@ namespace osu.Game.Screens.OnlinePlay.Tournaments
 {
     public partial class TournamentsRoomSubScreen : RoomSubScreen
     {
-
         // Colours taken from TournamentGame
         public static ColourInfo GetTeamColour(TeamColour teamColour) => teamColour == TeamColour.Red ? COLOUR_RED : COLOUR_BLUE;
 
@@ -45,15 +44,17 @@ namespace osu.Game.Screens.OnlinePlay.Tournaments
         public static readonly Color4 TEXT_COLOUR = Color4Extensions.FromHex("#fff");
 
         [Cached]
-        private TournamentInfo tournamentInfo { get; set; } = new();
+        private TournamentInfo tournamentInfo { get; set; } = new TournamentInfo();
+
         public TournamentInfo TournamentInfo { get => tournamentInfo; set => tournamentInfo = value; }
 
-        private readonly Bindable<TournamentsTab> currentTabType = new();
+        private readonly Bindable<TournamentsTab> currentTabType = new Bindable<TournamentsTab>();
         private TournamentsBaseTab? currentTab;
 
         public override string ShortTitle => "Name of Tornament. Testing long names.";
 
-        public TournamentsRoomSubScreen(Room room, bool allowEdit = true) : base(room, allowEdit)
+        public TournamentsRoomSubScreen(Room room, bool allowEdit = true)
+            : base(room, allowEdit)
         {
         }
 
@@ -62,7 +63,7 @@ namespace osu.Game.Screens.OnlinePlay.Tournaments
         protected override void LoadComplete()
         {
             currentTabType.BindTo(tournamentInfo.CurrentTabType);
-            currentTabType.BindValueChanged((tab) => ChangeTab(tab.NewValue), true);
+            currentTabType.BindValueChanged(tab => ChangeTab(tab.NewValue), true);
 
             foreach (var team in tournamentInfo.Teams)
             {
@@ -82,12 +83,13 @@ namespace osu.Game.Screens.OnlinePlay.Tournaments
                 RelativeSizeAxes = Axes.Both,
                 Origin = Anchor.Centre,
                 Anchor = Anchor.Centre,
-                Child = MainContent = new()
+                Child = MainContent = new Container<TournamentsBaseTab>
                 {
                     RelativeSizeAxes = Axes.Both,
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
-                    Children = [
+                    Children =
+                    [
                         new TournamentsInfoTab(),
                         new TournamentsPlayersTab(),
                         new TournamentsResultsTab(),
@@ -122,9 +124,12 @@ namespace osu.Game.Screens.OnlinePlay.Tournaments
                 return;
 
             currentTab?.Hide();
+
             foreach (TournamentsBaseTab tabScreen in MainContent)
+            {
                 if (tabScreen.TabType == tab)
                     currentTab = tabScreen;
+            }
 
             currentTab?.Show();
             currentTabType.Value = tab;

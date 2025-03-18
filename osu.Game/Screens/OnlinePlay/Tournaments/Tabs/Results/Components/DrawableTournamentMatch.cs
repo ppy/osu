@@ -133,7 +133,7 @@ namespace osu.Game.Screens.OnlinePlay.Tournaments.Tabs.Results.Components
         private readonly List<IUnbindable> scoreBindables = new List<IUnbindable>();
 
         private T boundScore<T>(T obj)
-                where T : IBindable
+            where T : IBindable
         {
             obj = (T)obj.GetBoundCopy();
             scoreBindables.Add(obj);
@@ -249,7 +249,8 @@ namespace osu.Game.Screens.OnlinePlay.Tournaments.Tabs.Results.Components
 
         private void updateWinConditions()
         {
-            if (Match.Round.Value == null) return;
+            // if (Match.Round.Value == null)
+            //     return;
 
             // todo : Create function for determining who won a match. Also figure out how to display a winner/winners.
 

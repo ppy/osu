@@ -48,7 +48,7 @@ namespace osu.Game.Screens.OnlinePlay.Tournaments
             return (
                 from TournamentsTab tab in Enum.GetValues(typeof(TournamentsTab))
                 select createFooterButton(tab)
-                ).ToArray();
+            ).ToArray();
         }
     }
 
@@ -62,9 +62,10 @@ namespace osu.Game.Screens.OnlinePlay.Tournaments
         /// <summary>
         /// The currentTabType that is opened. Dictated by TournamentInfo.
         /// </summary>
-        private Bindable<TournamentsTab> currentTabType = new();
+        private readonly Bindable<TournamentsTab> currentTabType = new Bindable<TournamentsTab>();
 
         private bool isVisible = true;
+
         public bool IsVisible
         {
             get => isVisible;
@@ -83,6 +84,7 @@ namespace osu.Game.Screens.OnlinePlay.Tournaments
         public bool IsForced;
 
         private bool isCurrent;
+
         public bool IsCurrent
         {
             get => isCurrent;
@@ -111,14 +113,14 @@ namespace osu.Game.Screens.OnlinePlay.Tournaments
             // Setting Enabled is to trigger updateDisplay in FooterButton
             // This was done to avoid the possibility of tabButton not reverting color after currentTabType changed.
             currentTabType.BindTo(tournamentInfo.CurrentTabType);
-            currentTabType.BindValueChanged((e) =>
+            currentTabType.BindValueChanged(e =>
             {
                 IsCurrent = e.NewValue == TabType;
                 Enabled.Value = !Enabled.Value;
                 Enabled.Value = !Enabled.Value;
             }, true);
 
-            tournamentInfo.VisibleTabs.BindValueChanged((tab) => IsVisible = tab.NewValue.HasFlag(TabType.AsFlag()));
+            tournamentInfo.VisibleTabs.BindValueChanged(tab => IsVisible = tab.NewValue.HasFlag(TabType.AsFlag()));
             IsVisible = tournamentInfo.VisibleTabs.Value.HasFlag(TabType.AsFlag());
             Action = () => currentTabType.Value = TabType;
         }

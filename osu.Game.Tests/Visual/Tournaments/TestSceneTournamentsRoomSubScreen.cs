@@ -26,6 +26,7 @@ namespace osu.Game.Tests.Visual.Tournaments
     public partial class TestSceneTournamentsRoomSubScreen : OnlinePlayTestScene
     {
         private TournamentsRoomSubScreen screen = null!;
+
         private TournamentInfo tournamentInfo = null!;
         // private BeatmapManager beatmaps = null!;
         // private BeatmapSetInfo importedSet = null!;
@@ -62,7 +63,7 @@ namespace osu.Game.Tests.Visual.Tournaments
 
             AddStep("Select players tab", () =>
             {
-                var temp = ((FillFlowContainer)screen.ChildrenOfType<TournamentsRoomFooter>().First().Child).Children.Last((d) =>
+                var temp = ((FillFlowContainer)screen.ChildrenOfType<TournamentsRoomFooter>().First().Child).Children.Last(d =>
                     ((TournamentsRoomFooterButton)d).TabType == TournamentsTab.Players);
                 InputManager.MoveMouseTo(temp);
                 InputManager.Click(MouseButton.Left);
@@ -79,15 +80,16 @@ namespace osu.Game.Tests.Visual.Tournaments
 
         private TournamentInfo createTournamentInfo1()
         {
-
             List<TournamentUser> players = [];
+
             foreach (int id in Enumerable.Range(1, 8))
             {
-                players.Add(new TournamentUser() { OnlineID = id });
+                players.Add(new TournamentUser { OnlineID = id });
                 // PopulatePlayer(players.Last(), success: () => Console.WriteLine("Successfully populated player."), immediate: true);
             }
 
             BindableList<TournamentTeam> teams = [];
+
             foreach (int i in Enumerable.Range(0, 4))
             {
                 teams.Add(new TournamentTeam(players.GetRange(i, 2))
@@ -100,13 +102,14 @@ namespace osu.Game.Tests.Visual.Tournaments
             }
 
             BindableList<TournamentMatch> matches = [];
+
             foreach (int i in Enumerable.Range(0, 3))
             {
                 matches.Add(new TournamentMatch([teams[i], teams[i + 1]]));
                 matches.Last().Position.Value = new Point(i * 240, 0);
             }
 
-            return new TournamentInfo()
+            return new TournamentInfo
             {
                 IsEditing = { Value = true },
                 VisibleTabs = { Value = TournamentsTabs.Info | TournamentsTabs.Players | TournamentsTabs.Results },
@@ -115,7 +118,6 @@ namespace osu.Game.Tests.Visual.Tournaments
                 Teams = teams,
             };
         }
-
 
         private partial class TestTournamentsRoomSubScreen : TournamentsRoomSubScreen
         {

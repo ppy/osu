@@ -22,9 +22,9 @@ namespace osu.Game.Screens.OnlinePlay.Tournaments
         public string TournamentName { get; set; } = string.Empty;
 
         [JsonIgnore]
-        public readonly Bindable<TournamentsTab> CurrentTabType = new(TournamentsTab.Info);
+        public readonly Bindable<TournamentsTab> CurrentTabType = new Bindable<TournamentsTab>(TournamentsTab.Info);
 
-        public readonly Bindable<TournamentsTabs> VisibleTabs = new(TournamentsTabs.None);
+        public readonly Bindable<TournamentsTabs> VisibleTabs = new Bindable<TournamentsTabs>(TournamentsTabs.None);
 
         [JsonIgnore]
         public readonly BindableBool IsEditing = new BindableBool(false);
@@ -86,7 +86,7 @@ namespace osu.Game.Screens.OnlinePlay.Tournaments
 
         public TournamentInfo()
         {
-            VisibleTabs.BindValueChanged((tab) =>
+            VisibleTabs.BindValueChanged(tab =>
             {
                 // Don't know if hiding all tabs should be allowed. Just assert for now.
                 Debug.Assert(VisibleTabs.Value != TournamentsTabs.None);
@@ -114,7 +114,3 @@ namespace osu.Game.Screens.OnlinePlay.Tournaments
         }
     }
 }
-
-
-
-

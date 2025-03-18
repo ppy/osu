@@ -26,18 +26,18 @@ namespace osu.Game.Screens.OnlinePlay.Tournaments.Tabs
         {
             RelativeSizeAxes = Axes.Both;
             Alpha = 0.0f;
-            InternalChild = (new Container()
+            InternalChild = new Container
             {
                 RelativeSizeAxes = Axes.Both,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Child = new OsuSpriteText()
+                Child = new OsuSpriteText
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Text = TabType.ToString()
                 }
-            });
+            };
         }
     }
 }

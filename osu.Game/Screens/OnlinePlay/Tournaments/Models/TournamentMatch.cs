@@ -10,7 +10,6 @@ using Newtonsoft.Json;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 
-
 namespace osu.Game.Screens.OnlinePlay.Tournaments.Models
 {
     /// <summary>
@@ -26,10 +25,12 @@ namespace osu.Game.Screens.OnlinePlay.Tournaments.Models
             get
             {
                 List<string> acronyms = new List<string>();
+
                 foreach (var team in Teams)
                 {
                     if (team?.Acronym != null) acronyms.Add(team.Acronym.Value);
                 }
+
                 return acronyms;
             }
         }
@@ -82,6 +83,7 @@ namespace osu.Game.Screens.OnlinePlay.Tournaments.Models
         {
             Teams.BindCollectionChanged((temp1, temp2) => createTeamScores(), true);
         }
+
         public TournamentMatch(ICollection<TournamentTeam> teams)
         {
             Teams.Clear();
@@ -101,28 +103,34 @@ namespace osu.Game.Screens.OnlinePlay.Tournaments.Models
         public List<TournamentTeam> GetWinners()
         {
             List<TournamentTeam> winners = [];
-            TournamentTeam? element; // Variable used to get around possible null warning
+
             for (int i = 0; i < (LoserTeams.Value ?? 0); i++)
             {
+                TournamentTeam? element; // Variable used to get around possible null warning
+
                 if ((element = Teams.ElementAt(i)) != null)
                 {
                     winners.Add(element);
                 }
             }
+
             return winners;
         }
 
         public List<TournamentTeam> GetLosers()
         {
             List<TournamentTeam> losers = [];
-            TournamentTeam? element; // Variable used to get around possible null warning
+
             for (int i = LoserTeams.Value ?? Teams.Count; i < Teams.Count; i++)
             {
+                TournamentTeam? element; // Variable used to get around possible null warning
+
                 if ((element = Teams.ElementAt(i)) != null)
                 {
                     losers.Add(element);
                 }
             }
+
             return losers;
         }
 
@@ -148,10 +156,10 @@ namespace osu.Game.Screens.OnlinePlay.Tournaments.Models
         /// </summary>
         public void StartMatch()
         {
-            if (!Teams.All(team => team != null))
+            if (Teams.Any(team => team != null))
                 return;
 
-            if (!TeamScores.All(score => score != null))
+            if (TeamScores.Any(score => score.Value != null))
                 return;
 
             foreach (var score in TeamScores)

@@ -17,7 +17,6 @@ using osu.Framework.Input.States;
 using osu.Game.Screens.OnlinePlay.Tournaments.Models;
 using osu.Game.Screens.OnlinePlay.Tournaments.Tabs.Results.Components;
 using osuTK;
-
 using System;
 using System.Drawing;
 using osu.Framework.Graphics.UserInterface;
@@ -240,7 +239,10 @@ namespace osu.Game.Screens.OnlinePlay.Tournaments.Tabs.Results
             ScrollContent.Add(new JoinVisualiser(MatchesContainer, match, losers, UpdateLayout));
         }
 
-        public MenuItem[] ContextMenuItems => !tournamentInfo.IsEditing.Value ? Array.Empty<MenuItem>() : new MenuItem[]
+        public MenuItem[] ContextMenuItems =>
+            !tournamentInfo.IsEditing.Value
+                ? Array.Empty<MenuItem>()
+                : new MenuItem[]
                 {
                     new OsuMenuItem("Create new match", MenuItemType.Highlighted, () =>
                     {

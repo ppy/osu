@@ -2,9 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics.Containers;
-
-
-
 using System;
 using osu.Framework.Input.Events;
 using osuTK;
@@ -71,15 +68,15 @@ namespace osu.Game.Graphics.Containers.Draggable
         {
             if (IsDraggableAt(e.ScreenSpaceMouseDownPosition))
             {
-                StartArrangement?.Invoke(this, e);
+                StartArrangement.Invoke(this, e);
                 return true;
             }
 
             return false;
         }
 
-        protected override void OnDrag(DragEvent e) => Arrange?.Invoke(this, e);
+        protected override void OnDrag(DragEvent e) => Arrange.Invoke(this, e);
 
-        protected override void OnDragEnd(DragEndEvent e) => EndArrangement?.Invoke(this, e);
+        protected override void OnDragEnd(DragEndEvent e) => EndArrangement.Invoke(this, e);
     }
 }

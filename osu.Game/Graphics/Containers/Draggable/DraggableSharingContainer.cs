@@ -21,28 +21,27 @@ namespace osu.Game.Graphics.Containers.Draggable
     public abstract partial class DraggableSharingContainer<TModel> : Container
         where TModel : notnull
     {
-
         /// <summary>
         /// Only updates when the user is dragging a <see cref="DraggableItem{TModel}"/>
         /// </summary>
-        public readonly Bindable<Vector2> CursorPosition = new();
+        public readonly Bindable<Vector2> CursorPosition = new Bindable<Vector2>();
 
         /// <summary>
         /// True if the previous CurrentlySharedDraggedItem was shared with at least one other <see cref="DraggableItemContainer{TModel}"/>.
         /// </summary>
-        internal bool WasShared = false;
+        internal bool WasShared;
 
         /// <summary>
         /// The <see cref="DraggableItem{TModel}"/> that is currently shared between the tree-descendant <see cref="DraggableItemContainer{TModel}"/>s of this container.
         /// </summary>
-        public readonly Bindable<DraggableItem<TModel>?> CurrentlySharedDraggedItem = new();
+        public readonly Bindable<DraggableItem<TModel>?> CurrentlySharedDraggedItem = new Bindable<DraggableItem<TModel>?>();
 
         /// <summary>
         /// Hooked onto by <see cref="DraggableItemContainer{TModel}"/>. Invoked when the drag has ended.
         /// </summary>
         public Action DragEnded = () => { };
 
-        private List<DraggableItemContainer<TModel>> draggableItemContainers = [];
+        private readonly List<DraggableItemContainer<TModel>> draggableItemContainers = [];
 
         protected DraggableSharingContainer()
         {
@@ -60,12 +59,12 @@ namespace osu.Game.Graphics.Containers.Draggable
 
             CursorPosition.BindValueChanged(d =>
             {
-                var draggable = draggableItemContainers.FirstOrDefault(d => d?.ScrollContainerHasCursor() ?? false, null);
+                var draggable = draggableItemContainers.FirstOrDefault(c => c?.ScrollContainerHasCursor() ?? false, null);
 
                 if (draggable != null && draggable.DraggableItemType != CurrentlySharedDraggedItem.Value?.GetType())
                 {
-                    Logger.Log("Draggable type: " + draggable.DraggableItemType.ToString());
-                    Logger.Log("Shared type: " + CurrentlySharedDraggedItem.Value?.GetType().ToString());
+                    Logger.Log("Draggable type: " + draggable.DraggableItemType);
+                    Logger.Log("Shared type: " + CurrentlySharedDraggedItem.Value?.GetType());
 
                     draggable.CreateDrawableOnTop();
                 }
@@ -78,7 +77,7 @@ namespace osu.Game.Graphics.Containers.Draggable
             CurrentlySharedDraggedItem.Value?.MoveToCursor(CursorPosition.Value);
         }
 
-        public bool IsDragging => CurrentlySharedDraggedItem != null;
+        public bool IsDragging => CurrentlySharedDraggedItem.Value != null;
 
         /// <summary>
         /// Called by the <see cref="DraggableItemContainer{TModel}"/> that started the drag. Will end the drag for all tree.descendant <see cref="DraggableItemContainer{TModel}"/>s.

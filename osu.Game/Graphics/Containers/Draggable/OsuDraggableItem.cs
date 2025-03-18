@@ -8,7 +8,8 @@ namespace osu.Game.Graphics.Containers.Draggable
     /// </summary>
     public partial class OsuDraggableItem<TModel> : DraggableItem<TModel>
     {
-        protected OsuDraggableItem(TModel item) : base(item)
+        protected OsuDraggableItem(TModel item)
+            : base(item)
         {
         }
     }

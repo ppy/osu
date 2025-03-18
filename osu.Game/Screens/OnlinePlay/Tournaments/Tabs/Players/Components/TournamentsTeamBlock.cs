@@ -14,10 +14,9 @@ namespace osu.Game.Screens.OnlinePlay.Tournaments.Tabs.Players.Components
 {
     public partial class TournamentsTeamBlock : OsuDraggableItemContainer<TournamentUser>
     {
-
-        public TournamentsTeamBlock() : base()
-        {
-        }
+        // public TournamentsTeamBlock() : base()
+        // {
+        // }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -26,12 +25,12 @@ namespace osu.Game.Screens.OnlinePlay.Tournaments.Tabs.Players.Components
             IsDroppedItemRetained = true;
 
             Size = new Vector2(250, 250);
-            var temp = new Box() { RelativeSizeAxes = Axes.Both, Colour = new Colour4(56, 126, 35, 255) };
+            var temp = new Box { RelativeSizeAxes = Axes.Both, Colour = new Colour4(56, 126, 35, 255) };
             AddInternal(temp);
             ChangeInternalChildDepth(temp, 10.0f);
         }
 
-        protected override FillFlowContainer<DraggableItem<TournamentUser>> CreateListFillFlowContainer() => new FillFlowContainer<DraggableItem<TournamentUser>>()
+        protected override FillFlowContainer<DraggableItem<TournamentUser>> CreateListFillFlowContainer() => new FillFlowContainer<DraggableItem<TournamentUser>>
         {
             RelativeSizeAxes = Axes.Both,
             Spacing = new Vector2(5),
@@ -44,11 +43,11 @@ namespace osu.Game.Screens.OnlinePlay.Tournaments.Tabs.Players.Components
 
         protected override ScrollContainer<Drawable> CreateScrollContainer()
         {
-            return new OsuScrollContainer()
+            return new OsuScrollContainer
             {
                 Children =
                 [
-                    new Box() { RelativeSizeAxes = Axes.Both, Colour = new Colour4(255, 255, 255, 128) },
+                    new Box { RelativeSizeAxes = Axes.Both, Colour = new Colour4(255, 255, 255, 128) },
                 ]
             };
         }

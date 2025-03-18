@@ -25,7 +25,7 @@ namespace osu.Game.Screens.OnlinePlay.Tournaments.Tabs.Players
             Anchor = Anchor.Centre;
             Masking = true;
             MaskingSmoothness = 0.5f;
-            InternalChild = new OsuDraggableSharingContainer<TournamentUser>()
+            InternalChild = new OsuDraggableSharingContainer<TournamentUser>
             {
                 RelativeSizeAxes = Axes.Both,
                 Origin = Anchor.Centre,
@@ -47,15 +47,16 @@ namespace osu.Game.Screens.OnlinePlay.Tournaments.Tabs.Players
                                     RelativeSizeAxes = Axes.Both,
                                     Origin = Anchor.Centre,
                                     Anchor = Anchor.Centre,
-                                    Colour = new Colour4(34,34,34,255)
+                                    Colour = new Colour4(34, 34, 34, 255)
                                 },
-                                new TournamentsTeamBlockCopy()
+                                new TournamentsTeamBlockCopy
                                 {
-                                    Items = {
-                                        new TournamentUser() { OnlineID = 21 },
-                                        new TournamentUser() { OnlineID = 22 },
-                                        new TournamentUser() { OnlineID = 23 },
-                                        new TournamentUser() { OnlineID = 24 },
+                                    Items =
+                                    {
+                                        new TournamentUser { OnlineID = 21 },
+                                        new TournamentUser { OnlineID = 22 },
+                                        new TournamentUser { OnlineID = 23 },
+                                        new TournamentUser { OnlineID = 24 },
                                     }
                                 },
                             }
@@ -71,7 +72,7 @@ namespace osu.Game.Screens.OnlinePlay.Tournaments.Tabs.Players
                                     RelativeSizeAxes = Axes.Both,
                                     Origin = Anchor.Centre,
                                     Anchor = Anchor.Centre,
-                                    Colour = new Colour4(255,34,34,128)
+                                    Colour = new Colour4(255, 34, 34, 128)
                                 },
 
                                 // todo : on some resolutions the children of this container will stick out on the top or bottom.
@@ -80,7 +81,7 @@ namespace osu.Game.Screens.OnlinePlay.Tournaments.Tabs.Players
                                     RelativeSizeAxes = Axes.Both,
                                     Origin = Anchor.Centre,
                                     Anchor = Anchor.Centre,
-                                    Child = new FillFlowContainer()
+                                    Child = new FillFlowContainer
                                     {
                                         RelativeSizeAxes = Axes.X,
                                         AutoSizeAxes = Axes.Y,
@@ -91,37 +92,40 @@ namespace osu.Game.Screens.OnlinePlay.Tournaments.Tabs.Players
                                         Padding = new MarginPadding(10),
                                         Children = new Drawable[]
                                         {
-                                            new TournamentsTeamBlock()
+                                            new TournamentsTeamBlock
                                             {
-                                                Items = {
-                                                    new TournamentUser() { OnlineID = 1 },
-                                                    new TournamentUser() { OnlineID = 2 },
-                                                    new TournamentUser() { OnlineID = 3 },
-                                                    new TournamentUser() { OnlineID = 4 },
+                                                Items =
+                                                {
+                                                    new TournamentUser { OnlineID = 1 },
+                                                    new TournamentUser { OnlineID = 2 },
+                                                    new TournamentUser { OnlineID = 3 },
+                                                    new TournamentUser { OnlineID = 4 },
                                                 }
                                             },
-                                            new TournamentsTeamBlock()
+                                            new TournamentsTeamBlock
                                             {
-                                                Items = {
-                                                    new TournamentUser() { OnlineID = 10 },
-                                                    new TournamentUser() { OnlineID = 20 },
-                                                    new TournamentUser() { OnlineID = 30 },
-                                                    new TournamentUser() { OnlineID = 40 },
-                                                    new TournamentUser() { OnlineID = 50 },
-                                                    new TournamentUser() { OnlineID = 60 },
+                                                Items =
+                                                {
+                                                    new TournamentUser { OnlineID = 10 },
+                                                    new TournamentUser { OnlineID = 20 },
+                                                    new TournamentUser { OnlineID = 30 },
+                                                    new TournamentUser { OnlineID = 40 },
+                                                    new TournamentUser { OnlineID = 50 },
+                                                    new TournamentUser { OnlineID = 60 },
                                                 }
                                             },
                                             new TournamentsTeamBlock(),
                                             new TournamentsTeamBlock(),
                                             new TournamentsTeamBlock(),
-                                            new TournamentsTeamBlock()
+                                            new TournamentsTeamBlock
                                             {
-                                                Items = {
-                                                    new TournamentUser() { OnlineID = 100 },
-                                                    new TournamentUser() { OnlineID = 200 },
-                                                    new TournamentUser() { OnlineID = 300 },
-                                                    new TournamentUser() { OnlineID = 400 },
-                                                    new TournamentUser() { OnlineID = 500 },
+                                                Items =
+                                                {
+                                                    new TournamentUser { OnlineID = 100 },
+                                                    new TournamentUser { OnlineID = 200 },
+                                                    new TournamentUser { OnlineID = 300 },
+                                                    new TournamentUser { OnlineID = 400 },
+                                                    new TournamentUser { OnlineID = 500 },
                                                 }
                                             },
                                             new TournamentsTeamBlock(),

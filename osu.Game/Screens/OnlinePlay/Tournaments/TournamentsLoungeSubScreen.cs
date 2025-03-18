@@ -59,7 +59,7 @@ namespace osu.Game.Screens.OnlinePlay.Tournaments
             return criteria;
         }
 
-        protected override OsuButton CreateNewRoomButton() => new CreateRoomButton()
+        protected override OsuButton CreateNewRoomButton() => new CreateRoomButton
         {
             Text = "Create tournament!"
         };
