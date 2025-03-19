@@ -18,13 +18,12 @@ using osu.Game.Overlays;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.OnlinePlay.Lounge;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
-using osu.Game.Screens.OnlinePlay.Match;
 using osu.Game.Tests.Beatmaps;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public partial class TestSceneDrawableRoom : OsuTestScene
+    public partial class TestSceneRoomPanel : OsuTestScene
     {
         [Cached]
         protected readonly OverlayColourProvider ColourProvider = new OverlayColourProvider(OverlayColourScheme.Plum);
@@ -129,24 +128,24 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestEnableAndDisablePassword()
         {
-            DrawableRoom drawableRoom = null!;
+            RoomPanel panel = null!;
             Room room = null!;
 
-            AddStep("create room", () => Child = drawableRoom = createLoungeRoom(room = new Room
+            AddStep("create room", () => Child = panel = createLoungeRoom(room = new Room
             {
                 Name = "Room with password",
                 Type = MatchType.HeadToHead,
             }));
 
-            AddUntilStep("wait for panel load", () => drawableRoom.ChildrenOfType<DrawableRoomParticipantsList>().Any());
+            AddUntilStep("wait for panel load", () => panel.ChildrenOfType<DrawableRoomParticipantsList>().Any());
 
-            AddAssert("password icon hidden", () => Precision.AlmostEquals(0, drawableRoom.ChildrenOfType<DrawableRoom.PasswordProtectedIcon>().Single().Alpha));
+            AddAssert("password icon hidden", () => Precision.AlmostEquals(0, panel.ChildrenOfType<RoomPanel.PasswordProtectedIcon>().Single().Alpha));
 
             AddStep("set password", () => room.Password = "password");
-            AddAssert("password icon visible", () => Precision.AlmostEquals(1, drawableRoom.ChildrenOfType<DrawableRoom.PasswordProtectedIcon>().Single().Alpha));
+            AddAssert("password icon visible", () => Precision.AlmostEquals(1, panel.ChildrenOfType<RoomPanel.PasswordProtectedIcon>().Single().Alpha));
 
             AddStep("unset password", () => room.Password = string.Empty);
-            AddAssert("password icon hidden", () => Precision.AlmostEquals(0, drawableRoom.ChildrenOfType<DrawableRoom.PasswordProtectedIcon>().Single().Alpha));
+            AddAssert("password icon hidden", () => Precision.AlmostEquals(0, panel.ChildrenOfType<RoomPanel.PasswordProtectedIcon>().Single().Alpha));
         }
 
         [Test]
@@ -160,7 +159,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 Spacing = new Vector2(5),
                 Children = new[]
                 {
-                    new DrawableMatchRoom(new Room
+                    new MatchRoomPanel(new Room
                     {
                         Name = "A host-only room",
                         QueueMode = QueueMode.HostOnly,
@@ -169,7 +168,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     {
                         SelectedItem = new Bindable<PlaylistItem?>()
                     },
-                    new DrawableMatchRoom(new Room
+                    new MatchRoomPanel(new Room
                     {
                         Name = "An all-players, team-versus room",
                         QueueMode = QueueMode.AllPlayers,
@@ -178,7 +177,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     {
                         SelectedItem = new Bindable<PlaylistItem?>()
                     },
-                    new DrawableMatchRoom(new Room
+                    new MatchRoomPanel(new Room
                     {
                         Name = "A round-robin room",
                         QueueMode = QueueMode.AllPlayersRoundRobin,
@@ -191,7 +190,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
         }
 
-        private DrawableRoom createLoungeRoom(Room room)
+        private RoomPanel createLoungeRoom(Room room)
         {
             room.Host ??= new APIUser { Username = "peppy", Id = 2 };
 
@@ -204,7 +203,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 }).ToArray();
             }
 
-            return new DrawableLoungeRoom(room)
+            return new LoungeRoomPanel(room)
             {
                 MatchingFilter = true,
                 SelectedRoom = selectedRoom
