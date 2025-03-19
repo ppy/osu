@@ -41,7 +41,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                         new MatchStartControl
                         {
                             RelativeSizeAxes = Axes.Both,
-                            SelectedItem = selectedItem
                         },
                         null
                     }
