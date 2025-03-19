@@ -36,7 +36,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                         new MultiplayerSpectateButton
                         {
                             RelativeSizeAxes = Axes.Both,
-                            SelectedItem = selectedItem
                         },
                         null,
                         new MatchStartControl
