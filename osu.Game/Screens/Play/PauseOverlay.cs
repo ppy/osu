@@ -34,9 +34,9 @@ namespace osu.Game.Screens.Play
                 OnResume?.Invoke();
         };
 
-        private IBindable<bool>? windowActive;
+        private readonly IBindable<bool> windowActive = new Bindable<bool>(true);
 
-        private float targetVolume => windowActive?.Value != false && State.Value == Visibility.Visible ? 1.0f : 0;
+        private float targetVolume => windowActive.Value && State.Value == Visibility.Visible ? 1.0f : 0;
 
         [BackgroundDependencyLoader]
         private void load(GameHost? host)
@@ -48,10 +48,15 @@ namespace osu.Game.Screens.Play
             });
 
             if (host != null)
-            {
-                windowActive = host.IsActive.GetBoundCopy();
-                windowActive.BindValueChanged(_ => Schedule(() => pauseLoop.VolumeTo(targetVolume, 1000, Easing.Out)));
-            }
+                windowActive.BindTo(host.IsActive);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            // Schedule required because host.IsActive doesn't seem to always run on the update thread.
+            windowActive.BindValueChanged(_ => Schedule(() => pauseLoop.VolumeTo(targetVolume, 1000, Easing.Out)));
         }
 
         public void StopAllSamples()
