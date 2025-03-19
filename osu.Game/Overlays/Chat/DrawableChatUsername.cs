@@ -189,10 +189,9 @@ namespace osu.Game.Overlays.Chat
 
                 items.Add(new OsuMenuItem(UsersStrings.CardSendMessage, MenuItemType.Standard, openUserChannel));
 
-                // Best effort checking against the recently online flag here.
-                // We can't use MetadataClient.GetPresence because we may not be requesting/receiving presences.
+                // We should probably be checking against an online state here.
+                // But we can't use MetadataClient.GetPresence because we may not be requesting/receiving presences.
                 // This isn't really too bad – worst case scenario the client will open spectator view and show the user as "offline".
-                if (user.WasRecentlyOnline)
                 {
                     items.Add(new OsuMenuItemSpacer());
 
