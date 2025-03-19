@@ -15,8 +15,6 @@ namespace osu.Game.Tests.Visual.Beatmaps
 {
     public partial class TestSceneDifficultySpectrumDisplay : OsuTestScene
     {
-        private DifficultySpectrumDisplay display;
-
         private static APIBeatmapSet createBeatmapSetWith(params (int rulesetId, double stars)[] difficulties) => new APIBeatmapSet
         {
             Beatmaps = difficulties.Select(difficulty => new APIBeatmap
@@ -78,32 +76,9 @@ namespace osu.Game.Tests.Visual.Beatmaps
             createDisplay(beatmapSet);
         }
 
-        [Test]
-        public void TestAdjustableDotSize()
+        private void createDisplay(IBeatmapSetInfo beatmapSetInfo) => AddStep("create spectrum display", () => Child = new DifficultySpectrumDisplay
         {
-            var beatmapSet = createBeatmapSetWith(
-                (rulesetId: 0, stars: 2.0),
-                (rulesetId: 3, stars: 2.3),
-                (rulesetId: 0, stars: 3.2),
-                (rulesetId: 1, stars: 4.3),
-                (rulesetId: 0, stars: 5.6));
-
-            createDisplay(beatmapSet);
-
-            AddStep("change dot dimensions", () =>
-            {
-                display.DotSize = new Vector2(8, 12);
-                display.DotSpacing = 2;
-            });
-            AddStep("change dot dimensions back", () =>
-            {
-                display.DotSize = new Vector2(4, 8);
-                display.DotSpacing = 1;
-            });
-        }
-
-        private void createDisplay(IBeatmapSetInfo beatmapSetInfo) => AddStep("create spectrum display", () => Child = display = new DifficultySpectrumDisplay(beatmapSetInfo)
-        {
+            BeatmapSet = beatmapSetInfo,
             Anchor = Anchor.Centre,
             Origin = Anchor.Centre,
             Scale = new Vector2(3)
