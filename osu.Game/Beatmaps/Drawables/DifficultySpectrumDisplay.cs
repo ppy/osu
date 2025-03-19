@@ -18,34 +18,6 @@ namespace osu.Game.Beatmaps.Drawables
 {
     public partial class DifficultySpectrumDisplay : CompositeDrawable
     {
-        private Vector2 dotSize = new Vector2(4, 8);
-
-        public Vector2 DotSize
-        {
-            get => dotSize;
-            set
-            {
-                dotSize = value;
-
-                if (IsLoaded)
-                    updateDisplay();
-            }
-        }
-
-        private float dotSpacing = 1;
-
-        public float DotSpacing
-        {
-            get => dotSpacing;
-            set
-            {
-                dotSpacing = value;
-
-                if (IsLoaded)
-                    updateDisplay();
-            }
-        }
-
         private IBeatmapSetInfo? beatmapSet;
 
         public IBeatmapSetInfo? BeatmapSet
@@ -60,9 +32,10 @@ namespace osu.Game.Beatmaps.Drawables
             }
         }
 
-        private readonly FillFlowContainer<RulesetDifficultyGroup> flow;
+        private FillFlowContainer<RulesetDifficultyGroup> flow = null!;
 
-        public DifficultySpectrumDisplay(IBeatmapSetInfo? beatmapSet = null)
+        [BackgroundDependencyLoader]
+        private void load()
         {
             AutoSizeAxes = Axes.Both;
 
@@ -72,8 +45,6 @@ namespace osu.Game.Beatmaps.Drawables
                 Spacing = new Vector2(10, 0),
                 Direction = FillDirection.Horizontal,
             };
-
-            BeatmapSet = beatmapSet;
         }
 
         protected override void LoadComplete()
@@ -94,10 +65,7 @@ namespace osu.Game.Beatmaps.Drawables
 
             foreach (var rulesetGrouping in beatmapSet.Beatmaps.GroupBy(beatmap => beatmap.Ruleset).OrderBy(group => group.Key))
             {
-                flow.Add(new RulesetDifficultyGroup(rulesetGrouping.Key.OnlineID, rulesetGrouping, collapsed, dotSize)
-                {
-                    Spacing = new Vector2(DotSpacing, 0f),
-                });
+                flow.Add(new RulesetDifficultyGroup(rulesetGrouping.Key.OnlineID, rulesetGrouping, collapsed));
             }
         }
 
@@ -106,14 +74,12 @@ namespace osu.Game.Beatmaps.Drawables
             private readonly int rulesetId;
             private readonly IEnumerable<IBeatmapInfo> beatmapInfos;
             private readonly bool collapsed;
-            private readonly Vector2 dotSize;
 
-            public RulesetDifficultyGroup(int rulesetId, IEnumerable<IBeatmapInfo> beatmapInfos, bool collapsed, Vector2 dotSize)
+            public RulesetDifficultyGroup(int rulesetId, IEnumerable<IBeatmapInfo> beatmapInfos, bool collapsed)
             {
                 this.rulesetId = rulesetId;
                 this.beatmapInfos = beatmapInfos;
                 this.collapsed = collapsed;
-                this.dotSize = dotSize;
             }
 
             [BackgroundDependencyLoader]
@@ -133,7 +99,7 @@ namespace osu.Game.Beatmaps.Drawables
                 if (!collapsed)
                 {
                     foreach (var beatmapInfo in beatmapInfos.OrderBy(bi => bi.StarRating))
-                        Add(new DifficultyDot(beatmapInfo.StarRating, dotSize));
+                        Add(new DifficultyDot(beatmapInfo.StarRating));
                 }
                 else
                 {
@@ -153,10 +119,10 @@ namespace osu.Game.Beatmaps.Drawables
         {
             private readonly double starDifficulty;
 
-            public DifficultyDot(double starDifficulty, Vector2 dotSize)
+            public DifficultyDot(double starDifficulty)
             {
                 this.starDifficulty = starDifficulty;
-                Size = dotSize;
+                Size = new Vector2(5, 10);
             }
 
             [BackgroundDependencyLoader]

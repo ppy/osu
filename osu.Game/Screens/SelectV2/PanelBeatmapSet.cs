@@ -106,8 +106,6 @@ namespace osu.Game.Screens.SelectV2
                                 },
                                 difficultiesDisplay = new DifficultySpectrumDisplay
                                 {
-                                    DotSize = new Vector2(5, 10),
-                                    DotSpacing = 2,
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
                                 },
