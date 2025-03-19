@@ -186,9 +186,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                 {
                                     new Drawable[]
                                     {
-                                        new MatchRoomPanel(room, false)
+                                        new PlaylistsRoomPanel(room)
                                         {
-                                            OnEdit = () => settingsOverlay.Show(),
                                             SelectedItem = SelectedItem
                                         }
                                     },
