@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.LocalisationExtensions;
@@ -84,7 +83,7 @@ namespace osu.Game.Beatmaps.Drawables
                 }
 
                 group.Alpha = 1;
-                group.Beatmaps = rulesetGrouping;
+                group.Beatmaps = rulesetGrouping.ToArray();
                 group.Collapsed = collapsed;
             }
         }
@@ -93,14 +92,13 @@ namespace osu.Game.Beatmaps.Drawables
         {
             public readonly int RulesetId;
 
-            private IEnumerable<IBeatmapInfo> beatmaps = [];
+            private IBeatmapInfo[] beatmaps = [];
 
-            public IEnumerable<IBeatmapInfo> Beatmaps
+            public IBeatmapInfo[] Beatmaps
             {
-                get => beatmaps;
                 set
                 {
-                    beatmaps = value;
+                    beatmaps = value.OrderBy(bi => bi.StarRating).ToArray();
                     updateDisplay();
                 }
             }
@@ -159,23 +157,22 @@ namespace osu.Game.Beatmaps.Drawables
             private void updateDisplay()
             {
                 countText.Alpha = collapsed ? 1 : 0;
-                countText.Text = beatmaps.Count().ToLocalisableString(@"N0");
+                countText.Text = beatmaps.Length.ToLocalisableString(@"N0");
 
-                var orderedBeatmaps = beatmaps.OrderBy(bi => bi.StarRating).ToArray();
                 var dots = this.OfType<DifficultyDot>().ToArray();
 
                 for (int i = 0; i < max_difficulties_before_collapsing; i++)
                 {
                     var dot = dots[i];
 
-                    if (collapsed || i >= orderedBeatmaps.Length)
+                    if (collapsed || i >= beatmaps.Length)
                     {
                         dot.Alpha = 0;
                         continue;
                     }
 
                     dot.Alpha = 1;
-                    dot.StarDifficulty = orderedBeatmaps[i].StarRating;
+                    dot.StarDifficulty = beatmaps[i].StarRating;
                 }
             }
         }
