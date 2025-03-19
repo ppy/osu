@@ -172,29 +172,10 @@ namespace osu.Game.Overlays.Chat
                 if (user.Equals(APIUser.SYSTEM_USER))
                     return Array.Empty<MenuItem>();
 
-                List<MenuItem> items = new List<MenuItem>
-                {
-                    new OsuMenuItem(ContextMenuStrings.ViewProfile, MenuItemType.Highlighted, openUserProfile)
-                };
+                if (user.Equals(api.LocalUser.Value))
+                    return Array.Empty<MenuItem>();
 
-                if (!user.Equals(api.LocalUser.Value))
-                    items.Add(new OsuMenuItem(UsersStrings.CardSendMessage, MenuItemType.Standard, openUserChannel));
-
-                if (!user.Equals(api.LocalUser.Value))
-                {
-                    if (user.IsOnline)
-                    {
-                        items.Add(new OsuMenuItem(ContextMenuStrings.SpectatePlayer, MenuItemType.Standard, () =>
-                        {
-                            performer?.PerformFromScreen(s => s.Push(new SoloSpectatorScreen(user)));
-                        }));
-
-                        if (multiplayerClient?.Room?.Users.All(u => u.UserID != user.Id) == true)
-                        {
-                            items.Add(new OsuMenuItem(ContextMenuStrings.InvitePlayer, MenuItemType.Standard, () => multiplayerClient.InvitePlayer(user.Id)));
-                        }
-                    }
-                }
+                List<MenuItem> items = new List<MenuItem>();
 
                 if (currentChannel?.Value != null)
                 {
@@ -204,8 +185,27 @@ namespace osu.Game.Overlays.Chat
                     }));
                 }
 
-                if (!user.Equals(api.LocalUser.Value))
-                    items.Add(new OsuMenuItem(UsersStrings.ReportButtonText, MenuItemType.Destructive, ReportRequested));
+                items.Add(new OsuMenuItem(ContextMenuStrings.ViewProfile, MenuItemType.Highlighted, openUserProfile));
+
+                items.Add(new OsuMenuItem(UsersStrings.CardSendMessage, MenuItemType.Standard, openUserChannel));
+
+                if (user.IsOnline)
+                {
+                    items.Add(new OsuMenuItemSpacer());
+
+                    items.Add(new OsuMenuItem(ContextMenuStrings.SpectatePlayer, MenuItemType.Standard, () =>
+                    {
+                        performer?.PerformFromScreen(s => s.Push(new SoloSpectatorScreen(user)));
+                    }));
+
+                    if (multiplayerClient?.Room?.Users.All(u => u.UserID != user.Id) == true)
+                    {
+                        items.Add(new OsuMenuItem(ContextMenuStrings.InvitePlayer, MenuItemType.Standard, () => multiplayerClient.InvitePlayer(user.Id)));
+                    }
+                }
+
+                items.Add(new OsuMenuItemSpacer());
+                items.Add(new OsuMenuItem(UsersStrings.ReportButtonText, MenuItemType.Destructive, ReportRequested));
 
                 return items.ToArray();
             }
