@@ -30,6 +30,9 @@ namespace osu.Game.Screens.Play.HUD
         [SettingSource(typeof(SkinnableModDisplayStrings), nameof(SkinnableModDisplayStrings.ExpansionMode), nameof(SkinnableModDisplayStrings.ExpansionModeDescription))]
         public Bindable<ExpansionMode> ExpansionModeSetting { get; } = new Bindable<ExpansionMode>();
 
+        [SettingSource(typeof(SkinnableModDisplayStrings), nameof(SkinnableModDisplayStrings.DisplayDirection))]
+        public Bindable<Direction> Direction { get; } = new Bindable<Direction>();
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -50,6 +53,7 @@ namespace osu.Game.Screens.Play.HUD
 
             ShowExtendedInformation.BindValueChanged(_ => modDisplay.ShowExtendedInformation = ShowExtendedInformation.Value, true);
             ExpansionModeSetting.BindValueChanged(_ => modDisplay.ExpansionMode = ExpansionModeSetting.Value, true);
+            Direction.BindValueChanged(_ => modDisplay.FillDirection = Direction.Value == Framework.Graphics.Direction.Horizontal ? FillDirection.Horizontal : FillDirection.Vertical, true);
 
             FinishTransforms(true);
         }
