@@ -128,7 +128,7 @@ namespace osu.Game.Screens.Play.HUD
         private void expand(double duration = 500)
         {
             if (ExpansionMode != ExpansionMode.AlwaysContracted)
-                iconsContainer.TransformSpacingTo(new Vector2(5), duration, Easing.OutQuint);
+                iconsContainer.TransformSpacingTo(new Vector2(5, -10), duration, Easing.OutQuint);
         }
 
         private void contract(double duration = 500)
