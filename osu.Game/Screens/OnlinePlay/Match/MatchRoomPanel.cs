@@ -15,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Match
 {
-    public partial class DrawableMatchRoom : DrawableRoom
+    public partial class MatchRoomPanel : RoomPanel
     {
         public Action? OnEdit;
 
@@ -33,7 +33,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
         private readonly BindableWithCurrent<PlaylistItem?> selectedItem = new BindableWithCurrent<PlaylistItem?>();
         private readonly bool allowEdit;
 
-        public DrawableMatchRoom(Room room, bool allowEdit = true)
+        public MatchRoomPanel(Room room, bool allowEdit = true)
             : base(room)
         {
             this.allowEdit = allowEdit;

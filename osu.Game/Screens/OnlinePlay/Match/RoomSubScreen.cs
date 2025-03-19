@@ -172,7 +172,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
                                                     {
                                                         RelativeSizeAxes = Axes.X,
                                                         AutoSizeAxes = Axes.Y,
-                                                        Child = new DrawableMatchRoom(Room, allowEdit)
+                                                        Child = new MatchRoomPanel(Room, allowEdit)
                                                         {
                                                             OnEdit = () => settingsOverlay.Show(),
                                                             SelectedItem = SelectedItem

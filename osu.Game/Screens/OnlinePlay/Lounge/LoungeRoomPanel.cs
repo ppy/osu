@@ -36,9 +36,9 @@ using Container = osu.Framework.Graphics.Containers.Container;
 namespace osu.Game.Screens.OnlinePlay.Lounge
 {
     /// <summary>
-    /// A <see cref="DrawableRoom"/> with lounge-specific interactions such as selection and hover sounds.
+    /// A <see cref="RoomPanel"/> with lounge-specific interactions such as selection and hover sounds.
     /// </summary>
-    public partial class DrawableLoungeRoom : DrawableRoom, IFilterable, IHasPopover, IKeyBindingHandler<GlobalAction>
+    public partial class LoungeRoomPanel : RoomPanel, IFilterable, IHasPopover, IKeyBindingHandler<GlobalAction>
     {
         private const float transition_duration = 60;
         private const float selection_border_width = 4;
@@ -63,7 +63,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         private Sample? sampleJoin;
         private Drawable selectionBox = null!;
 
-        public DrawableLoungeRoom(Room room)
+        public LoungeRoomPanel(Room room)
             : base(room)
         {
         }

@@ -35,7 +35,7 @@ using Container = osu.Framework.Graphics.Containers.Container;
 
 namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 {
-    public abstract partial class DrawableRoom : CompositeDrawable, IHasContextMenu
+    public abstract partial class RoomPanel : CompositeDrawable, IHasContextMenu
     {
         protected const float CORNER_RADIUS = 10;
         private const float height = 100;
@@ -63,7 +63,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         private UpdateableBeatmapBackgroundSprite background = null!;
         private DelayedLoadWrapper wrapper = null!;
 
-        protected DrawableRoom(Room room)
+        protected RoomPanel(Room room)
         {
             Room = room;
 
