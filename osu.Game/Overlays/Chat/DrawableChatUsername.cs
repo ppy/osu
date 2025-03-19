@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -14,6 +15,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -22,7 +24,10 @@ using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
+using osu.Game.Online.Multiplayer;
 using osu.Game.Resources.Localisation.Web;
+using osu.Game.Screens;
+using osu.Game.Screens.Play;
 using osuTK;
 using osuTK.Graphics;
 using ChatStrings = osu.Game.Localisation.ChatStrings;
@@ -68,6 +73,12 @@ namespace osu.Game.Overlays.Chat
 
         [Resolved]
         private OsuColour colours { get; set; } = null!;
+
+        [Resolved]
+        private MultiplayerClient? multiplayerClient { get; set; }
+
+        [Resolved]
+        private IPerformFromScreenRunner? performer { get; set; }
 
         [Resolved(canBeNull: true)]
         private ChannelManager? chatManager { get; set; }
@@ -168,6 +179,22 @@ namespace osu.Game.Overlays.Chat
 
                 if (!user.Equals(api.LocalUser.Value))
                     items.Add(new OsuMenuItem(UsersStrings.CardSendMessage, MenuItemType.Standard, openUserChannel));
+
+                if (!user.Equals(api.LocalUser.Value))
+                {
+                    if (user.IsOnline)
+                    {
+                        items.Add(new OsuMenuItem(ContextMenuStrings.SpectatePlayer, MenuItemType.Standard, () =>
+                        {
+                            performer?.PerformFromScreen(s => s.Push(new SoloSpectatorScreen(user)));
+                        }));
+
+                        if (multiplayerClient?.Room?.Users.All(u => u.UserID != user.Id) == true)
+                        {
+                            items.Add(new OsuMenuItem(ContextMenuStrings.InvitePlayer, MenuItemType.Standard, () => multiplayerClient.InvitePlayer(user.Id)));
+                        }
+                    }
+                }
 
                 if (currentChannel?.Value != null)
                 {
