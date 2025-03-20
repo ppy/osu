@@ -33,7 +33,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         private readonly RoundedButton button;
 
         private IBindable<bool> operationInProgress = null!;
-        private long? lastPlaylistItemId;
 
         public MultiplayerSpectateButton()
         {
@@ -114,6 +113,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
         private void checkForAutomaticDownload()
         {
+            downloadCheckCancellation?.Cancel();
+
             if (client.Room == null)
                 return;
 
@@ -131,11 +132,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
             MultiplayerPlaylistItem item = client.Room.CurrentPlaylistItem;
 
-            if (item.ID == lastPlaylistItemId)
-                return;
-
-            downloadCheckCancellation?.Cancel();
-
             // In a perfect world we'd use BeatmapAvailability, but there's no event-driven flow for when a selection changes.
             // ie. if selection changes from "not downloaded" to another "not downloaded" we wouldn't get a value changed raised.
             beatmapLookupCache
@@ -152,8 +148,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
                     beatmapDownloader.Download(beatmapSet);
                 }));
-
-            lastPlaylistItemId = item.ID;
         }
 
         #endregion
