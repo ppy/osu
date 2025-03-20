@@ -238,6 +238,8 @@ namespace osu.Game.Screens.Ranking.Statistics
                 if (
                     // We may want to iterate on this condition
                     AchievedScore.Rank >= ScoreRank.C
+                    // Tags are only relevant to the original ruleset of the map, so disallow tagging when playing as a convert.
+                    && AchievedScore.Ruleset.OnlineID == AchievedScore.BeatmapInfo!.Ruleset.OnlineID
                 )
                 {
                     yield return new StatisticItem("Tag the beatmap!", () => new UserTagControl(newScore.BeatmapInfo)
