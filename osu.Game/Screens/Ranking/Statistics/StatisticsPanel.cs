@@ -14,10 +14,13 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API;
 using osu.Game.Online.Placeholders;
 using osu.Game.Scoring;
+using osu.Game.Screens.Ranking.Statistics.User;
 using osuTK;
 
 namespace osu.Game.Screens.Ranking.Statistics
@@ -28,10 +31,20 @@ namespace osu.Game.Screens.Ranking.Statistics
 
         public readonly Bindable<ScoreInfo?> Score = new Bindable<ScoreInfo?>();
 
+        /// <summary>
+        /// The score which was achieved by the local user.
+        /// If this is set to a non-null score, an <see cref="OverallRanking"/> component will be displayed showing changes to the local user's ranking and statistics
+        /// when a statistics update related to this score is received from spectator server.
+        /// </summary>
+        public ScoreInfo? AchievedScore { get; init; }
+
         protected override bool StartHidden => true;
 
         [Resolved]
         private BeatmapManager beatmapManager { get; set; } = null!;
+
+        [Resolved]
+        private IAPIProvider api { get; set; } = null!;
 
         private readonly Container content;
         private readonly LoadingSpinner spinner;
@@ -97,7 +110,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                 bool hitEventsAvailable = newScore.HitEvents.Count != 0;
                 Container<Drawable> container;
 
-                var statisticItems = CreateStatisticItems(newScore, task.GetResultSafely());
+                var statisticItems = CreateStatisticItems(newScore, task.GetResultSafely()).ToArray();
 
                 if (!hitEventsAvailable && statisticItems.All(c => c.RequiresHitEvents))
                 {
@@ -199,8 +212,53 @@ namespace osu.Game.Screens.Ranking.Statistics
         /// </summary>
         /// <param name="newScore">The score to create the rows for.</param>
         /// <param name="playableBeatmap">The beatmap on which the score was set.</param>
-        protected virtual ICollection<StatisticItem> CreateStatisticItems(ScoreInfo newScore, IBeatmap playableBeatmap)
-            => newScore.Ruleset.CreateInstance().CreateStatisticsForScore(newScore, playableBeatmap);
+        protected virtual IEnumerable<StatisticItem> CreateStatisticItems(ScoreInfo newScore, IBeatmap playableBeatmap)
+        {
+            foreach (var statistic in newScore.Ruleset.CreateInstance().CreateStatisticsForScore(newScore, playableBeatmap))
+                yield return statistic;
+
+            if (AchievedScore != null
+                && newScore.UserID > 1
+                && newScore.UserID == AchievedScore.UserID
+                && newScore.OnlineID > 0
+                && newScore.OnlineID == AchievedScore.OnlineID)
+            {
+                yield return new StatisticItem("Overall Ranking", () => new OverallRanking(newScore)
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                });
+            }
+
+            if (AchievedScore != null
+                && newScore.BeatmapInfo!.OnlineID > 0
+                && api.IsLoggedIn)
+            {
+                if (
+                    // We may want to iterate on this condition
+                    AchievedScore.Rank >= ScoreRank.C
+                )
+                {
+                    yield return new StatisticItem("Tag the beatmap!", () => new UserTagControl(newScore.BeatmapInfo)
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                    });
+                }
+                else
+                {
+                    yield return new StatisticItem("Tag the beatmap!", () => new OsuTextFlowContainer(cp => cp.Font = OsuFont.GetFont(size: StatisticItem.FONT_SIZE, weight: FontWeight.SemiBold))
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        TextAnchor = Anchor.Centre,
+                        Text = "Set a better score to contribute to beatmap tags!",
+                    });
+                }
+            }
+        }
 
         protected override bool OnClick(ClickEvent e)
         {

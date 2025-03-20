@@ -127,7 +127,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                 multiplayerRoom = new MultiplayerRoom(0)
                 {
-                    Playlist = { TestMultiplayerClient.CreateMultiplayerPlaylistItem(item) },
+                    Playlist = { new MultiplayerPlaylistItem(item) },
                     Users = { localUser },
                     Host = localUser,
                 };

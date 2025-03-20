@@ -147,6 +147,9 @@ namespace osu.Game.Screens.Play
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
+                        // This display is potentially a duplicate of users with a local ModDisplay in their skins.
+                        // It would be very nice to remove this, but the version here has special logic with regards to replays
+                        // and initial states, so needs a bit of thought before doing so.
                         ModDisplay = CreateModsContainer(),
                     }
                 },
