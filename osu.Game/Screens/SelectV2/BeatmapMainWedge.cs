@@ -250,7 +250,7 @@ namespace osu.Game.Screens.SelectV2
 
             if (beatmapSetInfo.OnlineID >= 1)
             {
-                // todo: replace with BeatmapSetLookupCache
+                // todo: consider introducing a BeatmapSetLookupCache for caching benefits.
                 currentRequest = new GetBeatmapSetRequest(beatmapSetInfo.OnlineID);
                 currentRequest.Failure += _ => updateOnlineDisplay();
                 currentRequest.Success += s =>

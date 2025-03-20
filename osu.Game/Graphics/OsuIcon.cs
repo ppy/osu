@@ -110,7 +110,6 @@ namespace osu.Game.Graphics
 
         public static IconUsage Audio => get(OsuIconMapping.Audio);
         public static IconUsage Beatmap => get(OsuIconMapping.Beatmap);
-        public static IconUsage Metronome => get(OsuIconMapping.Metronome);
         public static IconUsage Calendar => get(OsuIconMapping.Calendar);
         public static IconUsage ChangelogA => get(OsuIconMapping.ChangelogA);
         public static IconUsage ChangelogB => get(OsuIconMapping.ChangelogB);
@@ -143,6 +142,7 @@ namespace osu.Game.Graphics
         public static IconUsage Input => get(OsuIconMapping.Input);
         public static IconUsage Maintenance => get(OsuIconMapping.Maintenance);
         public static IconUsage Megaphone => get(OsuIconMapping.Megaphone);
+        public static IconUsage Metronome => get(OsuIconMapping.Metronome);
         public static IconUsage Music => get(OsuIconMapping.Music);
         public static IconUsage News => get(OsuIconMapping.News);
         public static IconUsage Next => get(OsuIconMapping.Next);

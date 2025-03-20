@@ -137,7 +137,8 @@ namespace osu.Game.Screens.SelectV2
                                         {
                                             Anchor = Anchor.BottomLeft,
                                             Origin = Anchor.BottomLeft,
-                                            Text = " mapped by ",
+                                            Text = BeatmapsetsStrings.ShowDetailsMappedBy(string.Empty),
+                                            Margin = new MarginPadding { Left = 4f },
                                             Font = OsuFont.Torus.With(size: 16.8f, weight: FontWeight.Regular),
                                         },
                                         mapperLink = new MapperLinkContainer
@@ -217,7 +218,7 @@ namespace osu.Game.Screens.SelectV2
                                                     {
                                                         AutoSizeAxes = Axes.Both,
                                                         Spacing = new Vector2(12f, 0f),
-                                                        Padding = new MarginPadding { Left = 10f },
+                                                        Padding = new MarginPadding { Left = 20f },
                                                         Children = new[]
                                                         {
                                                             firstDifficultyStatistic = new BeatmapDifficultyWedgeStatistic(BeatmapsetsStrings.ShowStatsCs),
