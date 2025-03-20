@@ -11,6 +11,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
@@ -21,6 +22,7 @@ using osu.Game.Localisation;
 using osu.Game.Online;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Mods;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
@@ -60,7 +62,7 @@ namespace osu.Game.Screens.SelectV2
 
         private FillFlowContainer ratingAndNameFlow = null!;
         private FillFlowContainer<BeatmapDifficultyWedgeStatistic> beatmapStatisticsFlow = null!;
-        private FillFlowContainer<BeatmapDifficultyWedgeStatistic> difficultyStatisticsFlow = null!;
+        private DifficultyStatisticsFlow difficultyStatisticsFlow = null!;
 
         private BeatmapDifficultyWedgeStatistic firstDifficultyStatistic = null!;
         private BeatmapDifficultyWedgeStatistic accuracyStatistic = null!;
@@ -211,7 +213,7 @@ namespace osu.Game.Screens.SelectV2
                                                         Colour = colourProvider.Background5,
                                                         RelativeSizeAxes = Axes.Both,
                                                     },
-                                                    difficultyStatisticsFlow = new FillFlowContainer<BeatmapDifficultyWedgeStatistic>
+                                                    difficultyStatisticsFlow = new DifficultyStatisticsFlow
                                                     {
                                                         AutoSizeAxes = Axes.Both,
                                                         Spacing = new Vector2(12f, 0f),
@@ -285,52 +287,47 @@ namespace osu.Game.Screens.SelectV2
             else
                 beatmapStatisticsFlow.Children = newStatistics;
 
-            BeatmapDifficulty? baseDifficulty = beatmap.Value.BeatmapInfo.Difficulty;
+            BeatmapDifficulty baseDifficulty = beatmap.Value.BeatmapInfo.Difficulty;
+            BeatmapDifficulty originalDifficulty = new BeatmapDifficulty(baseDifficulty);
 
-            if (baseDifficulty != null)
+            foreach (var mod in mods.Value.OfType<IApplicableToDifficulty>())
+                mod.ApplyToDifficulty(originalDifficulty);
+
+            var rateAdjustedDifficulty = originalDifficulty;
+
+            if (ruleset.Value != null)
             {
-                BeatmapDifficulty originalDifficulty = new BeatmapDifficulty(baseDifficulty);
+                double rate = ModUtils.CalculateRateWithMods(mods.Value);
 
-                foreach (var mod in mods.Value.OfType<IApplicableToDifficulty>())
-                    mod.ApplyToDifficulty(originalDifficulty);
-
-                var rateAdjustedDifficulty = originalDifficulty;
-
-                if (ruleset.Value != null)
-                {
-                    double rate = ModUtils.CalculateRateWithMods(mods.Value);
-
-                    rateAdjustedDifficulty = ruleset.Value.CreateInstance().GetRateAdjustedDisplayDifficulty(originalDifficulty, rate);
-
-                    // TooltipContent = new AdjustedAttributesTooltip.Data(originalDifficulty, adjustedDifficulty);
-                }
-
-                switch (ruleset.Value?.OnlineID)
-                {
-                    case 3:
-                        // Account for mania differences locally for now.
-                        // Eventually this should be handled in a more modular way, allowing rulesets to return arbitrary difficulty attributes.
-                        ILegacyRuleset legacyRuleset = (ILegacyRuleset)ruleset.Value.CreateInstance();
-
-                        // For the time being, the key count is static no matter what, because:
-                        // a) The method doesn't have knowledge of the active keymods. Doing so may require considerations for filtering.
-                        // b) Using the difficulty adjustment mod to adjust OD doesn't have an effect on conversion.
-                        int keyCount = legacyRuleset.GetKeyCount(beatmap.Value.BeatmapInfo, mods.Value);
-
-                        firstDifficultyStatistic.Label = BeatmapsetsStrings.ShowStatsCsMania;
-                        firstDifficultyStatistic.Value = (keyCount, 10);
-                        break;
-
-                    default:
-                        firstDifficultyStatistic.Label = BeatmapsetsStrings.ShowStatsCs;
-                        firstDifficultyStatistic.Value = (rateAdjustedDifficulty.CircleSize, 10f);
-                        break;
-                }
-
-                accuracyStatistic.Value = (rateAdjustedDifficulty.OverallDifficulty, 10f);
-                hpDrainStatistic.Value = (rateAdjustedDifficulty.DrainRate, 10f);
-                approachRateStatistic.Value = (rateAdjustedDifficulty.ApproachRate, 10f);
+                rateAdjustedDifficulty = ruleset.Value.CreateInstance().GetRateAdjustedDisplayDifficulty(originalDifficulty, rate);
+                difficultyStatisticsFlow.TooltipContent = new AdjustedAttributesTooltip.Data(originalDifficulty, rateAdjustedDifficulty);
             }
+
+            switch (ruleset.Value?.OnlineID)
+            {
+                case 3:
+                    // Account for mania differences locally for now.
+                    // Eventually this should be handled in a more modular way, allowing rulesets to return arbitrary difficulty attributes.
+                    ILegacyRuleset legacyRuleset = (ILegacyRuleset)ruleset.Value.CreateInstance();
+
+                    // For the time being, the key count is static no matter what, because:
+                    // a) The method doesn't have knowledge of the active keymods. Doing so may require considerations for filtering.
+                    // b) Using the difficulty adjustment mod to adjust OD doesn't have an effect on conversion.
+                    int keyCount = legacyRuleset.GetKeyCount(beatmap.Value.BeatmapInfo, mods.Value);
+
+                    firstDifficultyStatistic.Label = BeatmapsetsStrings.ShowStatsCsMania;
+                    firstDifficultyStatistic.Value = (keyCount, 10);
+                    break;
+
+                default:
+                    firstDifficultyStatistic.Label = BeatmapsetsStrings.ShowStatsCs;
+                    firstDifficultyStatistic.Value = (rateAdjustedDifficulty.CircleSize, 10f);
+                    break;
+            }
+
+            accuracyStatistic.Value = (rateAdjustedDifficulty.OverallDifficulty, 10f);
+            hpDrainStatistic.Value = (rateAdjustedDifficulty.DrainRate, 10f);
+            approachRateStatistic.Value = (rateAdjustedDifficulty.ApproachRate, 10f);
         }
 
         private void updateStars()
@@ -369,6 +366,16 @@ namespace osu.Game.Screens.SelectV2
                 TooltipText = ContextMenuStrings.ViewProfile;
                 IdleColour = overlayColourProvider?.Light2 ?? colours.Blue;
             }
+        }
+
+        private partial class DifficultyStatisticsFlow : FillFlowContainer<BeatmapDifficultyWedgeStatistic>, IHasCustomTooltip<AdjustedAttributesTooltip.Data>
+        {
+            [Resolved]
+            private OverlayColourProvider colourProvider { get; set; } = null!;
+
+            public ITooltip<AdjustedAttributesTooltip.Data> GetCustomTooltip() => new AdjustedAttributesTooltip(colourProvider);
+
+            public AdjustedAttributesTooltip.Data? TooltipContent { get; set; }
         }
     }
 }
