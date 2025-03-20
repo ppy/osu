@@ -235,12 +235,16 @@ namespace osu.Game.Screens.Ranking.Statistics
                 && newScore.BeatmapInfo!.OnlineID > 0
                 && api.IsLoggedIn)
             {
-                if (
-                    // We may want to iterate on this condition
-                    AchievedScore.Rank >= ScoreRank.C
-                    // Tags are only relevant to the original ruleset of the map, so disallow tagging when playing as a convert.
-                    && AchievedScore.Ruleset.OnlineID == AchievedScore.BeatmapInfo!.Ruleset.OnlineID
-                )
+                string? preventTaggingReason = null;
+
+                // We may want to iterate on the following conditions further in the future
+
+                if (AchievedScore.Ruleset.OnlineID != AchievedScore.BeatmapInfo!.Ruleset.OnlineID)
+                    preventTaggingReason = "Play the beatmap in its original ruleset to contribute to beatmap tags!";
+                else if (AchievedScore.Rank < ScoreRank.C)
+                    preventTaggingReason = "Set a better score to contribute to beatmap tags!";
+
+                if (preventTaggingReason == null)
                 {
                     yield return new StatisticItem("Tag the beatmap!", () => new UserTagControl(newScore.BeatmapInfo)
                     {
@@ -256,7 +260,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
                         TextAnchor = Anchor.Centre,
-                        Text = "Set a better score to contribute to beatmap tags!",
+                        Text = preventTaggingReason,
                     });
                 }
             }
