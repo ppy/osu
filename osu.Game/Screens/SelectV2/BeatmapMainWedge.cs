@@ -267,10 +267,7 @@ namespace osu.Game.Screens.SelectV2
         {
             if (currentRequest?.CompletionState == APIRequestCompletionState.Waiting)
             {
-                playsStatistic.FadeIn(300, Easing.OutQuint);
                 playsStatistic.Value = null;
-
-                favouritesStatistic.FadeIn(300, Easing.OutQuint);
                 favouritesStatistic.Value = null;
             }
             else if (currentOnlineBeatmapSet == null)
