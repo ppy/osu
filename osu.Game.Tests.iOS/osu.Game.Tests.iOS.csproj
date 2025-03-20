@@ -1,4 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\osu.iOS.props" />
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net8.0-ios</TargetFramework>
@@ -6,11 +7,19 @@
     <RootNamespace>osu.Game.Tests</RootNamespace>
     <AssemblyName>osu.Game.Tests.iOS</AssemblyName>
   </PropertyGroup>
-  <Import Project="..\osu.iOS.props" />
+  <PropertyGroup>
+    <NoWarn>$(NoWarn);CA2007</NoWarn>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\osu.Game.Tests\**\*.cs" Exclude="**\obj\**">
       <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
     </Compile>
+    <!-- TargetPath is relative to RootNamespace,
+         and DllResourceStore is relative to AssemblyName. -->
+    <EmbeddedResource Include="..\osu.Game.Tests\**\Resources\**\*">
+      <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <TargetPath>iOS\%(RecursiveDir)%(Filename)%(Extension)</TargetPath>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup Label="Project References">
     <ProjectReference Include="..\osu.Game\osu.Game.csproj" />
