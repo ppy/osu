@@ -24,6 +24,7 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Difficulty;
+using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Scoring;
@@ -226,6 +227,28 @@ namespace osu.Game.Tests.Visual.Ranking
         {
             var score = TestResources.CreateTestScoreInfo();
             score.Rank = ScoreRank.D;
+
+            AddStep("load panel", () =>
+            {
+                Child = new PopoverContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Child = new StatisticsPanel
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        State = { Value = Visibility.Visible },
+                        Score = { Value = score },
+                        AchievedScore = score,
+                    }
+                };
+            });
+        }
+
+        [Test]
+        public void TestTaggingConvert()
+        {
+            var score = TestResources.CreateTestScoreInfo();
+            score.Ruleset = new ManiaRuleset().RulesetInfo;
 
             AddStep("load panel", () =>
             {
