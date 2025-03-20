@@ -17,7 +17,13 @@ namespace osu.Game.Localisation.SkinComponents
         /// <summary>
         /// "Whether to show extended information for each mod."
         /// </summary>
-        public static LocalisableString ShowExtendedInformationDescription => new TranslatableString(getKey(@"whether_to_show_extended_information"), @"Whether to show extended information for each mod.");
+        public static LocalisableString ShowExtendedInformationDescription =>
+            new TranslatableString(getKey(@"whether_to_show_extended_information"), @"Whether to show extended information for each mod.");
+
+        /// <summary>
+        /// "Display direction"
+        /// </summary>
+        public static LocalisableString DisplayDirection => new TranslatableString(getKey(@"display_direction"), "Display direction");
 
         /// <summary>
         /// "Expansion mode"

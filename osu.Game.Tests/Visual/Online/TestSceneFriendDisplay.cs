@@ -234,7 +234,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 Username = "flyte",
                 Id = 3103765,
-                IsOnline = true,
+                WasRecentlyOnline = true,
                 Statistics = new UserStatistics { GlobalRank = 1111 },
                 CountryCode = CountryCode.JP,
                 CoverUrl = "https://osu.ppy.sh/images/headers/profile-covers/c6.jpg"
@@ -243,7 +243,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 Username = "peppy",
                 Id = 2,
-                IsOnline = false,
+                WasRecentlyOnline = false,
                 Statistics = new UserStatistics { GlobalRank = 2222 },
                 CountryCode = CountryCode.AU,
                 CoverUrl = "https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
@@ -256,7 +256,7 @@ namespace osu.Game.Tests.Visual.Online
                 Id = 8195163,
                 CountryCode = CountryCode.BY,
                 CoverUrl = "https://assets.ppy.sh/user-profile-covers/8195163/4a8e2ad5a02a2642b631438cfa6c6bd7e2f9db289be881cb27df18331f64144c.jpeg",
-                IsOnline = false,
+                WasRecentlyOnline = false,
                 LastVisit = DateTimeOffset.Now
             }
         };

@@ -138,7 +138,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("add playlist item", () =>
             {
-                MultiplayerPlaylistItem item = TestMultiplayerClient.CreateMultiplayerPlaylistItem(new PlaylistItem(importedBeatmap));
+                MultiplayerPlaylistItem item = new MultiplayerPlaylistItem(new PlaylistItem(importedBeatmap));
 
                 MultiplayerClient.AddUserPlaylistItem(userId(), item).WaitSafely();
 

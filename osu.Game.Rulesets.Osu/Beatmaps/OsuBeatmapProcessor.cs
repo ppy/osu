@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                 foreach (var h in hitObjects)
                     h.StackHeight = 0;
 
-                if (beatmap.BeatmapInfo.BeatmapVersion >= 6)
+                if (beatmap.BeatmapVersion >= 6)
                     applyStacking(beatmap, hitObjects, 0, hitObjects.Count - 1);
                 else
                     applyStackingOld(beatmap, hitObjects);
