@@ -7,7 +7,7 @@ using osu.Framework.Logging;
 
 namespace osu.Game.Online
 {
-    public class OsuOnlineStore : OnlineStore
+    public sealed class TrustedDomainOnlineStore : OnlineStore
     {
         protected override string GetLookupUrl(string url)
         {
