@@ -23,6 +23,7 @@ namespace osu.Game.Graphics
         /// <summary>
         /// Retrieves the colour for a given point in the star range.
         /// </summary>
+        // todo: fix stupid array
         public Color4 ForStarDifficulty(double starDifficulty) => ColourUtils.SampleFromLinearGradient(new[]
         {
             (0.1f, Color4Extensions.FromHex("aaaaaa")),
@@ -402,6 +403,12 @@ namespace osu.Game.Graphics
         public readonly Color4 Orange2 = Color4Extensions.FromHex(@"ebc247");
         public readonly Color4 Orange3 = Color4Extensions.FromHex(@"cca633");
         public readonly Color4 Orange4 = Color4Extensions.FromHex(@"6b5c2e");
+
+        public readonly Color4 DarkOrange0 = Color4Extensions.FromHex(@"ffbb99");
+        public readonly Color4 DarkOrange1 = Color4Extensions.FromHex(@"ff9966");
+        public readonly Color4 DarkOrange2 = Color4Extensions.FromHex(@"eb7e47");
+        public readonly Color4 DarkOrange3 = Color4Extensions.FromHex(@"cc6633");
+        public readonly Color4 DarkOrange4 = Color4Extensions.FromHex(@"6b422e");
 
         public readonly Color4 Red0 = Color4Extensions.FromHex(@"ff9b9b");
         public readonly Color4 Red1 = Color4Extensions.FromHex(@"ff6666");
