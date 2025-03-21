@@ -6,11 +6,9 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Utils;
-using osu.Game.Audio;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osu.Game.Screens.Menu;
-using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Play
 {
@@ -21,7 +19,7 @@ namespace osu.Game.Screens.Play
 
         private Bindable<bool> kiaiStarFountains = null!;
 
-        private SkinnableSound? sample;
+        private StarFountainSounds sounds = null!;
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
@@ -44,7 +42,7 @@ namespace osu.Game.Screens.Play
                     Origin = Anchor.BottomRight,
                     X = -75,
                 },
-                sample = new SkinnableSound(new SampleInfo("Gameplay/fountain-shoot"))
+                sounds = new StarFountainSounds(),
             };
         }
 
@@ -72,7 +70,7 @@ namespace osu.Game.Screens.Play
             leftFountain.Shoot(1);
             rightFountain.Shoot(-1);
 
-            sample?.Play();
+            sounds.Play();
         }
 
         public partial class GameplayStarFountain : StarFountain

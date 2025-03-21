@@ -14,5 +14,6 @@ namespace osu.Game.Online.Leaderboards
         NoScores,
         NotLoggedIn,
         NotSupporter,
+        NoTeam
     }
 }

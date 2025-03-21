@@ -17,5 +17,8 @@ namespace osu.Game.Graphics.Containers.Markdown
         {
             TooltipText = linkInline.Title;
         }
+
+        protected override ImageContainer CreateImageContainer(string url)
+            => base.CreateImageContainer($@"https://osu.ppy.sh/media-url?url={url}");
     }
 }

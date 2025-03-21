@@ -90,6 +90,7 @@ namespace osu.Game.Users
 
         private void updatePresence()
         {
+            // TODO: we probably don't want to do this every frame.
             UserPresence? presence = metadata?.GetPresence(User.OnlineID);
             UserStatus status = presence?.Status ?? UserStatus.Offline;
             UserActivity? activity = presence?.Activity;

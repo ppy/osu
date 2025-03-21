@@ -201,6 +201,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("ensure no scores displayed", () => leaderboard.SetScores(null));
 
             AddStep(@"Network failure", () => leaderboard.SetErrorState(LeaderboardState.NetworkFailure));
+            AddStep(@"No team", () => leaderboard.SetErrorState(LeaderboardState.NoTeam));
             AddStep(@"No supporter", () => leaderboard.SetErrorState(LeaderboardState.NotSupporter));
             AddStep(@"Not logged in", () => leaderboard.SetErrorState(LeaderboardState.NotLoggedIn));
             AddStep(@"Ruleset unavailable", () => leaderboard.SetErrorState(LeaderboardState.RulesetUnavailable));

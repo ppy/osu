@@ -13,6 +13,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Lists;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Beatmaps.Formats;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Edit;
@@ -133,6 +134,8 @@ namespace osu.Game.Screens.Edit
                 BeatmapInfo.Metadata.PreviewTime = s.NewValue;
                 EndChange();
             });
+
+            BeatmapVersion = PlayableBeatmap.BeatmapVersion;
         }
 
         /// <summary>
@@ -285,6 +288,8 @@ namespace osu.Game.Screens.Edit
             get => PlayableBeatmap.Bookmarks;
             set => PlayableBeatmap.Bookmarks = value;
         }
+
+        public int BeatmapVersion { get; set; }
 
         public IBeatmap Clone() => (EditorBeatmap)MemberwiseClone();
 
@@ -456,6 +461,10 @@ namespace osu.Game.Screens.Edit
             if (batchPendingUpdates.Count == 0 && batchPendingDeletes.Count == 0 && batchPendingInserts.Count == 0)
                 return;
 
+            // if the user is doing edits to this beatmaps via this flow, we better bump the beatmap version
+            // because the beatmap encoder can only output this specific beatmap version anyway,
+            // so *not* bumping it could lead to results that look misleading at best.
+            BeatmapVersion = LegacyBeatmapEncoder.FIRST_LAZER_VERSION;
             beatmapProcessor.PreProcess();
 
             foreach (var h in batchPendingDeletes) processHitObject(h);

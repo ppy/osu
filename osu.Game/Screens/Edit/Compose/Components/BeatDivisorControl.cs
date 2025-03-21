@@ -146,22 +146,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
                                 }
                             }
                         },
-                        new Drawable[]
-                        {
-                            new TextFlowContainer(s => s.Font = s.Font.With(size: 14))
-                            {
-                                Padding = new MarginPadding { Horizontal = 15, Vertical = 2 },
-                                Text = "beat snap",
-                                RelativeSizeAxes = Axes.X,
-                                TextAnchor = Anchor.TopCentre,
-                            },
-                        },
                     },
                     RowDimensions = new[]
                     {
                         new Dimension(GridSizeMode.Absolute, 40),
                         new Dimension(GridSizeMode.Absolute, 20),
-                        new Dimension(GridSizeMode.Absolute, 15)
                     }
                 }
             };

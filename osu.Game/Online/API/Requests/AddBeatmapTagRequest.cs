@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Globalization;
 using System.Net.Http;
 using osu.Framework.IO.Network;
 
@@ -21,11 +20,10 @@ namespace osu.Game.Online.API.Requests
         protected override WebRequest CreateWebRequest()
         {
             var req = base.CreateWebRequest();
-            req.Method = HttpMethod.Post;
-            req.AddParameter(@"tag_id", TagID.ToString(CultureInfo.InvariantCulture), RequestParameterType.Query);
+            req.Method = HttpMethod.Put;
             return req;
         }
 
-        protected override string Target => $@"beatmaps/{BeatmapID}/tags";
+        protected override string Target => $@"beatmaps/{BeatmapID}/tags/{TagID}";
     }
 }
