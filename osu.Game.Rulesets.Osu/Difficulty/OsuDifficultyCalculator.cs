@@ -62,11 +62,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // Warning - this is very debatable but I think it's reasonable to assume that if map has 10 star flowaim difficulty - player who plays it must have at least 6 star snapaim skill
             snapAimRating = Math.Max(snapAimRating, flowAimRating * 0.6);
 
-            // Adjust aim to reward more versatile maps
-            aimRating = aimRating * (1 - AimVersatilityBonus) + (snapAimRating + flowAimRating) * AimVersatilityBonus;
-            aimRatingNoSliders = aimRatingNoSliders * (1 - AimVersatilityBonus) + (snapAimRating + flowAimRating) * AimVersatilityBonus;
-            double sliderFactor = aimRating > 0 ? aimRatingNoSliders / aimRating : 1;
-
             if (mods.Any(m => m is OsuModTouchDevice))
             {
                 aimRating = Math.Pow(aimRating, 0.8);
@@ -75,16 +70,32 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             if (mods.Any(h => h is OsuModRelax))
             {
-                aimRating *= 0.9;
+                // Don't punish slideraim as much
+                double slideraim = aimRating - aimRatingNoSliders;
+                aimRatingNoSliders *= 0.88;
+                aimRating = aimRatingNoSliders + slideraim;
+
+                // Additional flow bonus should be 0
+                flowAimRating = 0.0;
+
                 speedRating = 0.0;
                 flashlightRating *= 0.7;
             }
             else if (mods.Any(h => h is OsuModAutopilot))
             {
-                speedRating *= 0.5;
                 aimRating = 0.0;
+                aimRatingNoSliders = 0.0;
+                snapAimRating = 0.0;
+                flowAimRating = 0.0;
+
+                speedRating *= 0.5;
                 flashlightRating *= 0.4;
             }
+
+            // Adjust aim to reward more versatile maps
+            aimRating = aimRating * (1 - AimVersatilityBonus) + (snapAimRating + flowAimRating) * AimVersatilityBonus;
+            aimRatingNoSliders = aimRatingNoSliders * (1 - AimVersatilityBonus) + (snapAimRating + flowAimRating) * AimVersatilityBonus;
+            double sliderFactor = aimRating > 0 ? aimRatingNoSliders / aimRating : 1;
 
             double baseAimPerformance = OsuStrainSkill.DifficultyToPerformance(aimRating);
             double baseSpeedPerformance = OsuStrainSkill.DifficultyToPerformance(speedRating);
