@@ -33,8 +33,8 @@ namespace osu.Game.Screens.SelectV2.Wedges
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
-        public BeatmapPlayCountStatistic(bool background = false, float leftPadding = 10)
-            : base(OsuIcon.Play, background, leftPadding)
+        public BeatmapPlayCountStatistic(bool background = false, float leftPadding = 10, float? minSize = null)
+            : base(OsuIcon.Play, background, leftPadding, minSize)
         {
         }
 

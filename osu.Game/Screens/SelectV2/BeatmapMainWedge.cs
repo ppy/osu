@@ -147,11 +147,11 @@ namespace osu.Game.Screens.SelectV2
                             AutoSizeEasing = Easing.OutQuint,
                             Children = new Drawable[]
                             {
-                                playsStatistic = new BeatmapPlayCountStatistic(background: true, leftPadding: SongSelect.WEDGE_CONTENT_MARGIN)
+                                playsStatistic = new BeatmapPlayCountStatistic(background: true, leftPadding: SongSelect.WEDGE_CONTENT_MARGIN, minSize: 60f)
                                 {
                                     Margin = new MarginPadding { Left = -SongSelect.WEDGE_CONTENT_MARGIN },
                                 },
-                                favouritesStatistic = new BeatmapMainWedgeStatistic(OsuIcon.Heart, background: true)
+                                favouritesStatistic = new BeatmapMainWedgeStatistic(OsuIcon.Heart, background: true, minSize: 30f)
                                 {
                                     TooltipText = BeatmapsStrings.StatusFavourites,
                                 },
