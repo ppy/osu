@@ -97,6 +97,11 @@ namespace osu.Game.Rulesets.Osu.Mods
                         h.MissForcefully();
                         continue;
                     }
+                    if (h is DrawableSlider s && !s.HeadCircle.Judged && lastFrameTime > s.HeadCircle.HitObject.StartTime)
+                    {
+                        s.HeadCircle.MissForcefully();
+                        continue;
+                    }
                 }
                 return;
             }
