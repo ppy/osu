@@ -93,7 +93,7 @@ namespace osu.Game.Overlays.Profile.Header
 
             addSpacer(topLinkContainer);
 
-            if (user.IsOnline)
+            if (user.WasRecentlyOnline)
             {
                 topLinkContainer.AddText(UsersStrings.ShowLastvisitOnline);
                 addSpacer(topLinkContainer);

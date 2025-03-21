@@ -14,6 +14,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Framework.Testing;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Cursor;
 using osu.Game.Localisation;
 using osu.Game.Overlays.Settings;
 using osu.Game.Overlays.Settings.Sections;
@@ -56,7 +57,13 @@ namespace osu.Game.Overlays
         private SettingsSubPanel lastOpenedSubPanel;
 
         protected override Drawable CreateHeader() => new SettingsHeader(Title, Description);
-        protected override Drawable CreateFooter() => new SettingsFooter();
+
+        protected override Drawable CreateFooter() => new OsuContextMenuContainer
+        {
+            RelativeSizeAxes = Axes.X,
+            AutoSizeAxes = Axes.Y,
+            Child = new SettingsFooter()
+        };
 
         public SettingsOverlay()
             : base(false)

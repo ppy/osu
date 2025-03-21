@@ -109,6 +109,8 @@ namespace osu.Game.Beatmaps
 
         int[] Bookmarks { get; internal set; }
 
+        int BeatmapVersion { get; }
+
         /// <summary>
         /// Creates a shallow-clone of this beatmap and returns it.
         /// </summary>
