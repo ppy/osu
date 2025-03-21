@@ -309,16 +309,14 @@ namespace osu.Game.Screens.Ranking.Expanded
 
             public ClickableMetadata(int beatmapId, IBeatmapMetadataInfo metadata)
             {
-                RelativeSizeAxes = Axes.X;
-                AutoSizeAxes = Axes.Y;
+                AutoSizeAxes = Axes.Both;
 
                 Anchor = Anchor.TopCentre;
                 Origin = Anchor.TopCentre;
 
                 Child = new FillFlowContainer
                 {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
+                    AutoSizeAxes = Axes.Both,
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
