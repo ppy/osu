@@ -302,7 +302,7 @@ namespace osu.Game.Screens.Ranking.Expanded
             }
         }
 
-        internal class ClickableMetadata : OsuHoverContainer
+        internal partial class ClickableMetadata : OsuHoverContainer
         {
             [Resolved]
             private OsuGame? game { get; set; }

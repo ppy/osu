@@ -12,7 +12,7 @@ using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Users.Drawables
 {
-    internal class ClickableUsername : OsuHoverContainer, IHasCustomTooltip<APIUser>
+    internal partial class ClickableUsername : OsuHoverContainer, IHasCustomTooltip<APIUser>
     {
         public ITooltip<APIUser?> GetCustomTooltip() => new ClickableAvatar.NoCardTooltip();
 
