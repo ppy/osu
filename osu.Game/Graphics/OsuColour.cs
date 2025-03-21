@@ -20,7 +20,7 @@ namespace osu.Game.Graphics
         public static Color4 Gray(float amt) => new Color4(amt, amt, amt, 1f);
         public static Color4 Gray(byte amt) => new Color4(amt, amt, amt, 255);
 
-        private static readonly (float, Color4)[] star_difficulty_spectrum = new[]
+        private static readonly (float, Color4)[] star_difficulty_spectrum =
         {
             (0.1f, Color4Extensions.FromHex("aaaaaa")),
             (0.1f, Color4Extensions.FromHex("4290fb")),
