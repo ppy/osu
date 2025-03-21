@@ -83,30 +83,23 @@ namespace osu.Game.Rulesets.Osu.Mods
                 return;
 
             double time = playfield.Clock.CurrentTime;
+            double lastFrameTime = time - playfield.Clock.ElapsedFrameTime;
 
             // only update necessary in a strict replay is forcing misses
             if (hasReplay && !legacyReplay && Strict.Value)
             {
-                List<ReplayFrame> frames = ruleset.ReplayScore.Replay.Frames;
-                //use the last frame in the replay before the current time to avoid replays playing back differently on different framerates (NOT WORKING PERFECTLY)
-                while (lastReplayFrameIndex + 1 < frames.Count && frames[lastReplayFrameIndex + 1].Time < time)
-                    lastReplayFrameIndex++;
-                while (lastReplayFrameIndex >= 0 && frames[lastReplayFrameIndex].Time >= time)
-                    lastReplayFrameIndex--;
-
+                //DOES NOT WORK, because frames with judgements are not currently stored as important in the replay recorder.
+                //Whenever replays are watched back with a different framerate than they were played at, things break.
                 foreach (var h in playfield.HitObjectContainer.AliveObjects.OfType<DrawableOsuHitObject>())
                 {
-                    // if in strict mode, hitting a circle slightly late is an automatic miss. gives 1 frame of leniency so it's physically possible to hit the circle
-                    // THIS IS CURRENTLY BUSTED!! REPLAYS CAN OCCASIONALLY PLAY BACK DIFFERENTLY IF YOU SKIP FORWARDS!!! HELP
-                    if (Strict.Value && !h.Judged && h.HitObject is HitCircle && frames[lastReplayFrameIndex].Time > h.HitObject.StartTime)
+                    if (h is DrawableHitCircle && !h.Judged && lastFrameTime > h.HitObject.StartTime)
                     {
                         h.MissForcefully();
+                        continue;
                     }
                 }
                 return;
             }
-
-            double lastFrameTime = time - playfield.Clock.ElapsedFrameTime;
 
             bool requiresHold = false;
             bool requiresHit = false;
