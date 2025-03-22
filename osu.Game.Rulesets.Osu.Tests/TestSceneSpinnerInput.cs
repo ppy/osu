@@ -201,15 +201,15 @@ namespace osu.Game.Rulesets.Osu.Tests
                 new SpinFramesGenerator(time_spinner_start)
                     // 1500ms start
                     .Spin(360, 500)
-                    // 2000ms -> 1 full CW spin
+                    // 2000ms -> 0 current    + 1 spin recorded  = 360
                     .Spin(-180, 500)
-                    // 2500ms -> 1 full CW spin + 0.5 CCW spins
+                    // 2500ms -> -180 current + 1 spin recorded  = 540
                     .Spin(90, 500)
-                    // 3000ms -> 1 full CW spin + 0.25 CCW spins
+                    // 3000ms -> -90 current  + 1 spin recorded  = 540
                     .Spin(450, 500)
-                    // 3500ms -> 2 full CW spins
+                    // 3500ms -> 0 current    + 2 spins recorded = 720
                     .Spin(180, 500)
-                    // 4000ms -> 2 full CW spins + 0.5 CW spins
+                    // 4000ms -> 180 current  + 2 spins recorded = 900
                     .Build();
 
             loadPlayer(frames);
@@ -222,12 +222,21 @@ namespace osu.Game.Rulesets.Osu.Tests
                 drawableRuleset = currentPlayer.ChildrenOfType<DrawableRuleset>().Single();
             });
 
-            addSeekStep(frames.Last().Time);
+            addSeekStep(1500);
 
             DrawableSpinner drawableSpinner = null!;
             AddUntilStep("get spinner", () => (drawableSpinner = currentPlayer.ChildrenOfType<DrawableSpinner>().Single()) != null);
 
+            // Check in forwards direction just to make sure the generation matches expectations.
+            assertTotalRotation(1500, 0);
+            assertTotalRotation(2000, 360);
+            assertTotalRotation(2500, 540);
+            assertTotalRotation(3000, 540);
+            assertTotalRotation(3500, 720);
+            assertTotalRotation(4000, 900);
+
             assertFinalRotationCorrect();
+
             assertTotalRotation(3750, 810);
             assertTotalRotation(3500, 720);
             assertTotalRotation(3250, 530);
@@ -268,7 +277,6 @@ namespace osu.Game.Rulesets.Osu.Tests
             void addSeekStep(double time)
             {
                 AddStep($"seek to {time}", () => clock.Seek(time));
-                // Lenience is required due to interpolation running slightly ahead on a stalled clock.
                 AddUntilStep("wait for seek to finish", () => drawableRuleset.FrameStableClock.CurrentTime, () => Is.EqualTo(time));
             }
 
