@@ -2,10 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
@@ -28,6 +31,14 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public override ModType Type => ModType.Fun;
 
+        [SettingSource("Connecting length", "Length to connect the combo.", 0)]
+        public BindableFloat StackCount { get; } = new BindableFloat(1)
+        {
+            Precision = 1,
+            MinValue = 1,
+            MaxValue = 10
+        };
+
         //mod breaks normal approach circle preempt
         private double originalPreempt;
 
@@ -37,20 +48,27 @@ namespace osu.Game.Rulesets.Osu.Mods
             if (firstHitObject == null)
                 return;
 
-            double lastNewComboTime = 0;
+            double applicableStartTime = 0;
+            Queue<double> startTimes = new Queue<double>();
+            for (int i = 0; i < StackCount.Value; i++)
+                startTimes.Enqueue(0);
 
             originalPreempt = firstHitObject.TimePreempt;
 
             foreach (var obj in beatmap.HitObjects.OfType<OsuHitObject>())
             {
-                if (obj.NewCombo) { lastNewComboTime = obj.StartTime; }
+                if (obj.NewCombo)
+                {
+                    startTimes.Enqueue(obj.StartTime);
+                    applicableStartTime = startTimes.Dequeue();
+                }
 
                 applyFadeInAdjustment(obj);
             }
 
             void applyFadeInAdjustment(OsuHitObject osuObject)
             {
-                osuObject.TimePreempt += osuObject.StartTime - lastNewComboTime;
+                osuObject.TimePreempt += osuObject.StartTime - applicableStartTime;
 
                 foreach (var nested in osuObject.NestedHitObjects.OfType<OsuHitObject>())
                 {
