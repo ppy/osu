@@ -54,6 +54,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 weight *= DecayWeight;
             }
 
+            double consistentTopStrain = difficulty / 10; // What would the top strain be if all strain values were identical
+
+            TopWeightedStrains = ObjectStrains.Sum(s => 1.1 / (1 + Math.Exp(-10 * (s / consistentTopStrain - 0.88))));
+
             return difficulty;
         }
 
