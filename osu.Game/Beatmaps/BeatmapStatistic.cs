@@ -18,5 +18,8 @@ namespace osu.Game.Beatmaps
 
         public string Content;
         public LocalisableString Name;
+
+        public int Count;
+        public int Maximum;
     }
 }
