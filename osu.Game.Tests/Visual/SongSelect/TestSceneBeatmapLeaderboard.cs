@@ -42,6 +42,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         private RulesetStore rulesetStore = null!;
         private BeatmapManager beatmapManager = null!;
         private PlaySongSelect songSelect = null!;
+        private LeaderboardManager leaderboardManager = null!;
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
@@ -52,6 +53,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             dependencies.Cache(scoreManager = new ScoreManager(rulesetStore, () => beatmapManager, LocalStorage, Realm, API));
             dependencies.CacheAs<Screens.Select.SongSelect>(songSelect = new PlaySongSelect());
             Dependencies.Cache(Realm);
+            dependencies.Cache(leaderboardManager = new LeaderboardManager());
 
             return dependencies;
         }
@@ -60,6 +62,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         private void load()
         {
             LoadComponent(songSelect);
+            LoadComponent(leaderboardManager);
         }
 
         public TestSceneBeatmapLeaderboard()
