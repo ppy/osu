@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Screens.Select.Filter;
 
 namespace osu.Game.Scoring
 {
@@ -25,6 +26,35 @@ namespace osu.Game.Scoring
                      .ThenBy(s => s.OnlineID)
                      // Local scores may not have an online ID. Fall back to date in these cases.
                      .ThenBy(s => s.Date);
+
+        /// <summary>
+        /// Orders an array of <see cref="ScoreInfo"/>s by the selected <see cref="ScoreSortMode"/>.
+        /// </summary>
+        /// <param name="scores">The array of <see cref="ScoreInfo"/>s to reorder.</param>
+        /// <param name="scoreSortMode">The attribute to sort the scores by.</param>
+        /// <returns>The given <paramref name="scores"/> ordered by the selected mode.</returns>
+        public static IEnumerable<ScoreInfo> OrderByCriteria(this IEnumerable<ScoreInfo> scores, ScoreSortMode scoreSortMode)
+        {
+            switch (scoreSortMode)
+            {
+                case ScoreSortMode.TotalScore:
+                    return scores.OrderByDescending(s => s.TotalScore);
+
+                case ScoreSortMode.Accuracy:
+                    return scores.OrderByDescending(s => s.Accuracy).ThenByDescending(s => s.TotalScore);
+
+                case ScoreSortMode.Combo:
+                    return scores.OrderByDescending(s => s.MaxCombo).ThenByDescending(s => s.TotalScore);
+
+                case ScoreSortMode.MissCount:
+                    return scores.OrderBy(s => s.Statistics.GetValueOrDefault(HitResult.Miss, 0)).ThenByDescending(s => s.TotalScore);
+
+                case ScoreSortMode.Date:
+                    return scores.OrderByDescending(s => s.Date);
+
+                default: return scores;
+            }
+        }
 
         /// <summary>
         /// Retrieves the maximum achievable combo for the provided score.
