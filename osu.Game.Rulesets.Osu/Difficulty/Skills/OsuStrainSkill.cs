@@ -30,6 +30,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         public override double DifficultyValue()
         {
+
+            //Check if the difficulty was already calculated and if not calculate it.
+            if (difficulty != 0)
+                difficulty = 0;
+
             double difficulty = 0;
             double weight = 1;
 
@@ -53,10 +58,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 difficulty += strain * weight;
                 weight *= DecayWeight;
             }
-
-            double consistentTopStrain = difficulty / 10; // What would the top strain be if all strain values were identical
-
-            TopWeightedStrains = ObjectStrains.Sum(s => 1.1 / (1 + Math.Exp(-10 * (s / consistentTopStrain - 0.88))));
 
             return difficulty;
         }

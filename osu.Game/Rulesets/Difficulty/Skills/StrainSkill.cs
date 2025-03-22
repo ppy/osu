@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         private double currentSectionPeak; // We also keep track of the peak strain level in the current section.
         private double currentSectionEnd;
 
-        protected double TopWeightedStrains = 0;
+        protected double difficulty = 0;
 
         private readonly List<double> strainPeaks = new List<double>();
         protected readonly List<double> ObjectStrains = new List<double>(); // Store individual strains
@@ -72,9 +72,20 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// </summary>
         public virtual double CountTopWeightedStrains()
         {
-            if (TopWeightedStrains == 0)
-                DifficultyValue();
-            return TopWeightedStrains;
+            if (ObjectStrains.Count == 0)
+                return 0.0;
+
+            //Check if the difficulty was already calculated and if not calculate it.
+            if (difficulty == 0)
+                difficulty = DifficultyValue();
+
+            double consistentTopStrain = difficulty / 10; // What would the top strain be if all strain values were identical
+
+            if (consistentTopStrain == 0)
+                return ObjectStrains.Count;
+
+            // Use a weighted sum of all strains. Constants are arbitrary and give nice values
+            return ObjectStrains.Sum(s => 1.1 / (1 + Math.Exp(-10 * (s / consistentTopStrain - 0.88))));
         }
 
         /// <summary>
@@ -116,7 +127,10 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// </summary>
         public override double DifficultyValue()
         {
-            double difficulty = 0;
+            //Check if the difficulty was already calculated and if not calculate it.
+            if (difficulty != 0)
+                difficulty = 0;
+
             double weight = 1;
 
             // Sections with 0 strain are excluded to avoid worst-case time complexity of the following sort (e.g. /b/2351871).
@@ -130,10 +144,6 @@ namespace osu.Game.Rulesets.Difficulty.Skills
                 difficulty += strain * weight;
                 weight *= DecayWeight;
             }
-
-            double consistentTopStrain = difficulty / 10; // What would the top strain be if all strain values were identical
-
-            TopWeightedStrains = ObjectStrains.Sum(s => 1.1 / (1 + Math.Exp(-10 * (s / consistentTopStrain - 0.88))));
 
             return difficulty;
         }
