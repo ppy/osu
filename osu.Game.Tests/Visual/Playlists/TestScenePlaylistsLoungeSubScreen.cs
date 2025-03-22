@@ -61,9 +61,9 @@ namespace osu.Game.Tests.Visual.Playlists
             AddUntilStep("last room is not masked", () => checkRoomVisible(roomListing.DrawableRooms[^1]));
         }
 
-        private bool checkRoomVisible(DrawableRoom room) =>
+        private bool checkRoomVisible(RoomPanel panel) =>
             loungeScreen.ChildrenOfType<OsuScrollContainer>().First().ScreenSpaceDrawQuad
-                        .Contains(room.ScreenSpaceDrawQuad.Centre);
+                        .Contains(panel.ScreenSpaceDrawQuad.Centre);
 
         private void createRooms(params Room[] rooms)
         {
