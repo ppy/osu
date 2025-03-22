@@ -17,14 +17,28 @@ namespace osu.Game.Rulesets.Osu.Scoring
         }
 
         public override ScoreRank RankFromScore(double accuracy, IReadOnlyDictionary<HitResult, int> results)
-        {
-            ScoreRank rank = base.RankFromScore(accuracy, results);
+            => adjustRankFromMisses(base.RankFromScore(accuracy, results), results.GetValueOrDefault(HitResult.Miss));
 
+        protected override ScoreRank MinimumRankFromScore(double accuracy, IReadOnlyDictionary<HitResult, int> results)
+        {
+            // when computing minimum rank in osu!, always assume the player has missed...
+            int misses = int.MaxValue;
+
+            // ...unless the player reached the end, at which point show the minimum rank with the player's misses count.
+            // this gives the effect where minimum rank becomes equal to actual rank when the player finishes the beatmap.
+            if (JudgedHits == MaxHits)
+                misses = results.GetValueOrDefault(HitResult.Miss);
+
+            return adjustRankFromMisses(base.RankFromScore(accuracy, results), misses);
+        }
+
+        private ScoreRank adjustRankFromMisses(ScoreRank rank, int misses)
+        {
             switch (rank)
             {
                 case ScoreRank.S:
                 case ScoreRank.X:
-                    if (results.GetValueOrDefault(HitResult.Miss) > 0)
+                    if (misses > 0)
                         rank = ScoreRank.A;
                     break;
             }
