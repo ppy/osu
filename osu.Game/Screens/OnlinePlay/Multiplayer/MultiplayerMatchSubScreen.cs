@@ -254,10 +254,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             this.Push(new MultiplayerMatchFreestyleSelect(Room, item));
         }
 
-        protected override Drawable CreateFooter() => new MultiplayerMatchFooter
-        {
-            SelectedItem = SelectedItem
-        };
+        protected override Drawable CreateFooter() => new MultiplayerMatchFooter();
 
         protected override RoomSettingsOverlay CreateRoomSettingsOverlay(Room room) => new MultiplayerMatchSettingsOverlay(room);
 
