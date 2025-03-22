@@ -30,11 +30,6 @@ namespace osu.Game.Skinning
 
         protected ISkinSource? ParentSource { get; private set; }
 
-        /// <summary>
-        /// Whether falling back to parent <see cref="ISkinSource"/>s is allowed in this container.
-        /// </summary>
-        protected virtual bool AllowFallingBackToParent => true;
-
         protected virtual bool AllowDrawableLookup(ISkinComponentLookup lookup) => true;
 
         protected virtual bool AllowTextureLookup(string componentName) => true;
@@ -93,9 +88,6 @@ namespace osu.Game.Skinning
                     return skin;
             }
 
-            if (!AllowFallingBackToParent)
-                return null;
-
             return ParentSource?.FindProvider(lookupFunction);
         }
 
@@ -106,11 +98,8 @@ namespace osu.Game.Skinning
                 foreach (var i in skinSources)
                     yield return i.skin;
 
-                if (AllowFallingBackToParent && ParentSource != null)
-                {
-                    foreach (var skin in ParentSource.AllSources)
-                        yield return skin;
-                }
+                if (ParentSource != null)
+                    yield return ParentSource;
             }
         }
 
@@ -122,9 +111,6 @@ namespace osu.Game.Skinning
                 if ((sourceDrawable = lookupWrapper.GetDrawableComponent(lookup)) != null)
                     return sourceDrawable;
             }
-
-            if (!AllowFallingBackToParent)
-                return null;
 
             return ParentSource?.GetDrawableComponent(lookup);
         }
@@ -138,9 +124,6 @@ namespace osu.Game.Skinning
                     return sourceTexture;
             }
 
-            if (!AllowFallingBackToParent)
-                return null;
-
             return ParentSource?.GetTexture(componentName, wrapModeS, wrapModeT);
         }
 
@@ -152,9 +135,6 @@ namespace osu.Game.Skinning
                 if ((sourceSample = lookupWrapper.GetSample(sampleInfo)) != null)
                     return sourceSample;
             }
-
-            if (!AllowFallingBackToParent)
-                return null;
 
             return ParentSource?.GetSample(sampleInfo);
         }
@@ -173,9 +153,6 @@ namespace osu.Game.Skinning
                     if ((bindable = lookupWrapper.GetConfig<TLookup, TValue>(lookup)) != null)
                         return bindable;
                 }
-
-                if (!AllowFallingBackToParent)
-                    return null;
 
                 return ParentSource?.GetConfig<TLookup, TValue>(lookup);
             }
