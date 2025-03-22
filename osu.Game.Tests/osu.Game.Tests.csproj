@@ -10,7 +10,7 @@
   </ItemGroup>
   <PropertyGroup Label="Project">
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup Label="Code Analysis">
     <GlobalAnalyzerConfigFiles Include="CodeAnalysis.tests.globalconfig" />
