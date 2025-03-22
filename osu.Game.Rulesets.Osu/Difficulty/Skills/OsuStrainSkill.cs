@@ -32,10 +32,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         {
 
             //Check if the difficulty was already calculated and if not calculate it.
-            if (difficulty != 0)
-                difficulty = 0;
+            if (Difficulty != 0)
+                return Difficulty;
 
-            double difficulty = 0;
             double weight = 1;
 
             // Sections with 0 strain are excluded to avoid worst-case time complexity of the following sort (e.g. /b/2351871).
@@ -55,11 +54,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             // We're sorting from highest to lowest strain.
             foreach (double strain in strains.OrderDescending())
             {
-                difficulty += strain * weight;
+                Difficulty += strain * weight;
                 weight *= DecayWeight;
             }
 
-            return difficulty;
+            return Difficulty;
         }
 
         public static double DifficultyToPerformance(double difficulty) => Math.Pow(5.0 * Math.Max(1.0, difficulty / 0.0675) - 4.0, 3.0) / 100000.0;

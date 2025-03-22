@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         private double currentSectionPeak; // We also keep track of the peak strain level in the current section.
         private double currentSectionEnd;
 
-        protected double difficulty = 0;
+        protected double Difficulty = 0;
 
         private readonly List<double> strainPeaks = new List<double>();
         protected readonly List<double> ObjectStrains = new List<double>(); // Store individual strains
@@ -76,10 +76,10 @@ namespace osu.Game.Rulesets.Difficulty.Skills
                 return 0.0;
 
             //Check if the difficulty was already calculated and if not calculate it.
-            if (difficulty == 0)
-                difficulty = DifficultyValue();
+            if (Difficulty == 0)
+                Difficulty = DifficultyValue();
 
-            double consistentTopStrain = difficulty / 10; // What would the top strain be if all strain values were identical
+            double consistentTopStrain = Difficulty / 10; // What would the top strain be if all strain values were identical
 
             if (consistentTopStrain == 0)
                 return ObjectStrains.Count;
@@ -128,8 +128,8 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         public override double DifficultyValue()
         {
             //Check if the difficulty was already calculated and if not calculate it.
-            if (difficulty != 0)
-                difficulty = 0;
+            if (Difficulty != 0)
+                Difficulty = 0;
 
             double weight = 1;
 
@@ -141,11 +141,11 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             // We're sorting from highest to lowest strain.
             foreach (double strain in peaks.OrderDescending())
             {
-                difficulty += strain * weight;
+                Difficulty += strain * weight;
                 weight *= DecayWeight;
             }
 
-            return difficulty;
+            return Difficulty;
         }
     }
 }
