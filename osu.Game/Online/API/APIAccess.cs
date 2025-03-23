@@ -40,9 +40,7 @@ namespace osu.Game.Online.API
 
         private readonly Queue<APIRequest> queue = new Queue<APIRequest>();
 
-        public string APIEndpointUrl { get; }
-
-        public string WebsiteRootUrl { get; }
+        public EndpointConfiguration Endpoints { get; }
 
         /// <summary>
         /// The API response version.
@@ -75,7 +73,7 @@ namespace osu.Game.Online.API
         private readonly CancellationTokenSource cancellationToken = new CancellationTokenSource();
         private readonly Logger log;
 
-        public APIAccess(OsuGameBase game, OsuConfigManager config, EndpointConfiguration endpointConfiguration, string versionHash)
+        public APIAccess(OsuGameBase game, OsuConfigManager config, EndpointConfiguration endpoints, string versionHash)
         {
             this.game = game;
             this.config = config;
@@ -89,14 +87,13 @@ namespace osu.Game.Online.API
                 APIVersion = now.Year * 10000 + now.Month * 100 + now.Day;
             }
 
-            APIEndpointUrl = endpointConfiguration.APIEndpointUrl;
-            WebsiteRootUrl = endpointConfiguration.WebsiteRootUrl;
+            Endpoints = endpoints;
             NotificationsClient = setUpNotificationsClient();
 
-            authentication = new OAuth(endpointConfiguration.APIClientID, endpointConfiguration.APIClientSecret, APIEndpointUrl);
+            authentication = new OAuth(endpoints.APIClientID, endpoints.APIClientSecret, Endpoints.APIUrl);
 
             log = Logger.GetLogger(LoggingTarget.Network);
-            log.Add($@"API endpoint root: {APIEndpointUrl}");
+            log.Add($@"API endpoint root: {Endpoints.APIUrl}");
             log.Add($@"API request version: {APIVersion}");
 
             ProvidedUsername = config.Get<string>(OsuSetting.Username);
@@ -193,7 +190,10 @@ namespace osu.Game.Online.API
                     attemptConnect();
 
                     if (state.Value != APIState.Online)
+                    {
+                        Thread.Sleep(50);
                         continue;
+                    }
                 }
 
                 // hard bail if we can't get a valid access token.
@@ -241,12 +241,13 @@ namespace osu.Game.Online.API
         /// <returns>Whether the connection attempt was successful.</returns>
         private void attemptConnect()
         {
-            Scheduler.Add(setPlaceholderLocalUser, false);
+            if (localUser.IsDefault)
+                Scheduler.Add(setPlaceholderLocalUser, false);
 
             // save the username at this point, if the user requested for it to be.
             config.SetValue(OsuSetting.Username, config.Get<bool>(OsuSetting.SaveUsername) ? ProvidedUsername : string.Empty);
 
-            if (!authentication.HasValidAccessToken)
+            if (!authentication.HasValidAccessToken && HasLogin)
             {
                 state.Value = APIState.Connecting;
                 LastLoginError = null;
@@ -254,6 +255,10 @@ namespace osu.Game.Online.API
                 try
                 {
                     authentication.AuthenticateWithLogin(ProvidedUsername, password);
+                }
+                catch (WebRequestFlushedException)
+                {
+                    return;
                 }
                 catch (Exception e)
                 {
@@ -315,7 +320,7 @@ namespace osu.Game.Online.API
                             log.Add(@"Login no longer valid");
                             Logout();
                         }
-                        else
+                        else if (ex is not WebRequestFlushedException)
                         {
                             state.Value = APIState.Failing;
                         }
@@ -408,7 +413,7 @@ namespace osu.Game.Online.API
 
             var req = new RegistrationRequest
             {
-                Url = $@"{APIEndpointUrl}/users",
+                Url = $@"{Endpoints.APIUrl}/users",
                 Method = HttpMethod.Post,
                 Username = username,
                 Email = email,
@@ -496,6 +501,11 @@ namespace osu.Game.Online.API
                 handleWebException(we);
                 return false;
             }
+            catch (WebRequestFlushedException wrf)
+            {
+                log.Add(wrf.Message);
+                return false;
+            }
             catch (Exception ex)
             {
                 Logger.Error(ex, "Error occurred while handling an API request.");
@@ -577,7 +587,7 @@ namespace osu.Game.Online.API
                 if (failOldRequests)
                 {
                     foreach (var req in oldQueueRequests)
-                        req.Fail(new WebException($@"Request failed from flush operation (state {state.Value})"));
+                        req.Fail(new WebRequestFlushedException(state.Value));
                 }
             }
         }
@@ -608,7 +618,11 @@ namespace osu.Game.Online.API
                 return;
 
             var friendsReq = new GetFriendsRequest();
-            friendsReq.Failure += _ => state.Value = APIState.Failing;
+            friendsReq.Failure += ex =>
+            {
+                if (ex is not WebRequestFlushedException)
+                    state.Value = APIState.Failing;
+            };
             friendsReq.Success += res =>
             {
                 var existingFriends = friends.Select(f => f.TargetID).ToHashSet();
@@ -632,6 +646,14 @@ namespace osu.Game.Online.API
 
             flushQueue();
             cancellationToken.Cancel();
+        }
+
+        private class WebRequestFlushedException : Exception
+        {
+            public WebRequestFlushedException(APIState state)
+                : base($@"Request failed from flush operation (state {state})")
+            {
+            }
         }
     }
 

@@ -220,6 +220,9 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.AlwaysShowHoldForMenuButton, false);
             SetDefault(OsuSetting.AlwaysRequireHoldingForPause, false);
             SetDefault(OsuSetting.EditorShowStoryboard, true);
+
+            SetDefault(OsuSetting.EditorSubmissionNotifyOnDiscussionReplies, true);
+            SetDefault(OsuSetting.EditorSubmissionLoadInBrowserAfterSubmission, true);
         }
 
         protected override bool CheckLookupContainsPrivateInformation(OsuSetting lookup)
@@ -235,7 +238,7 @@ namespace osu.Game.Configuration
 
         public void Migrate()
         {
-            // arrives as 2020.123.0
+            // arrives as 2020.123.0-lazer
             string rawVersion = Get<string>(OsuSetting.Version);
 
             if (rawVersion.Length < 6)
@@ -248,11 +251,14 @@ namespace osu.Game.Configuration
             if (!int.TryParse(pieces[0], out int year)) return;
             if (!int.TryParse(pieces[1], out int monthDay)) return;
 
-            // ReSharper disable once UnusedVariable
-            int combined = (year * 10000) + monthDay;
+            int combined = year * 10000 + monthDay;
 
-            // migrations can be added here using a condition like:
-            // if (combined < 20220103) { performMigration() }
+            if (combined < 20250214)
+            {
+                // UI scaling on mobile platforms has been internally adjusted such that 1x UI scale looks correctly zoomed in than before.
+                if (RuntimeInfo.IsMobile)
+                    GetBindable<float>(OsuSetting.UIScale).SetDefault();
+            }
         }
 
         public override TrackedSettings CreateTrackedSettings()
@@ -461,5 +467,7 @@ namespace osu.Game.Configuration
         BeatmapListingFeaturedArtistFilter,
         ShowMobileDisclaimer,
         EditorShowStoryboard,
+        EditorSubmissionNotifyOnDiscussionReplies,
+        EditorSubmissionLoadInBrowserAfterSubmission,
     }
 }

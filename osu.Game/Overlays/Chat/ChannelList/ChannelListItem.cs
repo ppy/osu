@@ -24,6 +24,8 @@ namespace osu.Game.Overlays.Chat.ChannelList
     public partial class ChannelListItem : OsuClickableContainer, IFilterable
     {
         public event Action<Channel>? OnRequestSelect;
+
+        public bool CanLeave { get; init; } = true;
         public event Action<Channel>? OnRequestLeave;
 
         public readonly Channel Channel;
@@ -160,7 +162,7 @@ namespace osu.Game.Overlays.Chat.ChannelList
 
         private ChannelListItemCloseButton? createCloseButton()
         {
-            if (isSelector)
+            if (isSelector || !CanLeave)
                 return null;
 
             return new ChannelListItemCloseButton

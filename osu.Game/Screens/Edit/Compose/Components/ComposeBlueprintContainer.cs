@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Humanizer;
@@ -26,14 +27,13 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Edit.Components.TernaryButtons;
 using osuTK;
-using osuTK.Input;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
     /// <summary>
     /// A blueprint container generally displayed as an overlay to a ruleset's playfield.
     /// </summary>
-    public partial class ComposeBlueprintContainer : EditorBlueprintContainer
+    public abstract partial class ComposeBlueprintContainer : EditorBlueprintContainer
     {
         private readonly Container<PlacementBlueprint> placementBlueprintContainer;
 
@@ -52,7 +52,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// </remarks>
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => editorScreen?.MainContent.ReceivePositionalInputAt(screenSpacePos) ?? base.ReceivePositionalInputAt(screenSpacePos);
 
-        public ComposeBlueprintContainer(HitObjectComposer composer)
+        protected override IEnumerable<SelectionBlueprint<HitObject>> ApplySelectionOrder(IEnumerable<SelectionBlueprint<HitObject>> blueprints) =>
+            base.ApplySelectionOrder(blueprints)
+                .OrderBy(b => Math.Min(Math.Abs(EditorClock.CurrentTime - b.Item.GetEndTime()), Math.Abs(EditorClock.CurrentTime - b.Item.StartTime)));
+
+        protected ComposeBlueprintContainer(HitObjectComposer composer)
             : base(composer)
         {
             placementBlueprintContainer = new Container<PlacementBlueprint>
@@ -105,69 +109,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             var blueprint = (HitObjectSelectionBlueprint)GetBlueprintFor(hitObject);
             blueprint.DrawableObject = drawableObject;
-        }
-
-        private bool nudgeMovementActive;
-
-        protected override bool OnKeyDown(KeyDownEvent e)
-        {
-            if (e.ControlPressed)
-            {
-                switch (e.Key)
-                {
-                    case Key.Left:
-                        nudgeSelection(new Vector2(-1, 0));
-                        return true;
-
-                    case Key.Right:
-                        nudgeSelection(new Vector2(1, 0));
-                        return true;
-
-                    case Key.Up:
-                        nudgeSelection(new Vector2(0, -1));
-                        return true;
-
-                    case Key.Down:
-                        nudgeSelection(new Vector2(0, 1));
-                        return true;
-                }
-            }
-
-            return false;
-        }
-
-        protected override void OnKeyUp(KeyUpEvent e)
-        {
-            base.OnKeyUp(e);
-
-            if (nudgeMovementActive && !e.ControlPressed)
-            {
-                Beatmap.EndChange();
-                nudgeMovementActive = false;
-            }
-        }
-
-        /// <summary>
-        /// Move the current selection spatially by the specified delta, in gamefield coordinates (ie. the same coordinates as the blueprints).
-        /// </summary>
-        /// <param name="delta"></param>
-        private void nudgeSelection(Vector2 delta)
-        {
-            if (!nudgeMovementActive)
-            {
-                nudgeMovementActive = true;
-                Beatmap.BeginChange();
-            }
-
-            var firstBlueprint = SelectionHandler.SelectedBlueprints.FirstOrDefault();
-
-            if (firstBlueprint == null)
-                return;
-
-            // convert to game space coordinates
-            delta = firstBlueprint.ToScreenSpace(delta) - firstBlueprint.ToScreenSpace(Vector2.Zero);
-
-            SelectionHandler.HandleMovement(new MoveSelectionEvent<HitObject>(firstBlueprint, delta));
         }
 
         private void updatePlacementNewCombo()
@@ -338,12 +279,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void updatePlacementTimeAndPosition()
         {
-            var snapResult = Composer.FindSnappedPositionAndTime(InputManager.CurrentState.Mouse.Position, CurrentPlacement.SnapType);
-
-            // if no time was found from positional snapping, we should still quantize to the beat.
-            snapResult.Time ??= Beatmap.SnapTime(EditorClock.CurrentTime, null);
-
-            CurrentPlacement.UpdateTimeAndPosition(snapResult);
+            CurrentPlacement.UpdateTimeAndPosition(InputManager.CurrentState.Mouse.Position, Beatmap.SnapTime(EditorClock.CurrentTime, null));
         }
 
         #endregion

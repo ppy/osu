@@ -71,6 +71,10 @@ namespace osu.Game.Tests.Skins
             "Archives/modified-classic-20240724.osk",
             // Covers skinnable mod display
             "Archives/modified-default-20241207.osk",
+            // Covers skinnable spectator list
+            "Archives/modified-argon-20250116.osk",
+            // Covers player team flag
+            "Archives/modified-argon-20250214.osk",
         };
 
         /// <summary>

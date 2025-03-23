@@ -72,6 +72,7 @@ using osu.Game.Skinning;
 using osu.Game.Updater;
 using osu.Game.Users;
 using osu.Game.Utils;
+using osuTK;
 using osuTK.Graphics;
 using Sentry;
 
@@ -178,9 +179,9 @@ namespace osu.Game
         /// </summary>
         private readonly IBindable<bool> backButtonVisibility = new Bindable<bool>();
 
-        IBindable<LocalUserPlayingState> ILocalUserPlayInfo.PlayingState => playingState;
+        IBindable<LocalUserPlayingState> ILocalUserPlayInfo.PlayingState => UserPlayingState;
 
-        private readonly Bindable<LocalUserPlayingState> playingState = new Bindable<LocalUserPlayingState>();
+        protected readonly Bindable<LocalUserPlayingState> UserPlayingState = new Bindable<LocalUserPlayingState>();
 
         protected OsuScreenStack ScreenStack;
 
@@ -233,8 +234,6 @@ namespace osu.Game
 
             forwardGeneralLogsToNotifications();
             forwardTabletLogsToNotifications();
-
-            SentryLogger = new SentryLogger(this);
         }
 
         #region IOverlayManager
@@ -308,7 +307,7 @@ namespace osu.Game
         protected override UserInputManager CreateUserInputManager()
         {
             var userInputManager = base.CreateUserInputManager();
-            (userInputManager as OsuUserInputManager)?.PlayingState.BindTo(playingState);
+            (userInputManager as OsuUserInputManager)?.PlayingState.BindTo(UserPlayingState);
             return userInputManager;
         }
 
@@ -319,6 +318,12 @@ namespace osu.Game
 
         private readonly List<string> dragDropFiles = new List<string>();
         private ScheduledDelegate dragDropImportSchedule;
+
+        public override void SetupLogging(Storage gameStorage, Storage cacheStorage)
+        {
+            base.SetupLogging(gameStorage, cacheStorage);
+            SentryLogger = new SentryLogger(this, cacheStorage);
+        }
 
         public override void SetHost(GameHost host)
         {
@@ -403,7 +408,7 @@ namespace osu.Game
             // Transfer any runtime changes back to configuration file.
             SkinManager.CurrentSkinInfo.ValueChanged += skin => configSkin.Value = skin.NewValue.ID.ToString();
 
-            playingState.BindValueChanged(p =>
+            UserPlayingState.BindValueChanged(p =>
             {
                 BeatmapManager.PauseImports = p.NewValue != LocalUserPlayingState.NotPlaying;
                 SkinManager.PauseImports = p.NewValue != LocalUserPlayingState.NotPlaying;
@@ -808,6 +813,12 @@ namespace osu.Game
         protected virtual Loader CreateLoader() => new Loader();
 
         protected virtual UpdateManager CreateUpdateManager() => new UpdateManager();
+
+        /// <summary>
+        /// Adjust the globally applied <see cref="DrawSizePreservingFillContainer.TargetDrawSize"/> in every <see cref="ScalingContainer"/>.
+        /// Useful for changing how the game handles different aspect ratios.
+        /// </summary>
+        public virtual Vector2 ScalingContainerTargetDrawSize { get; } = new Vector2(1024, 768);
 
         protected override Container CreateScalingContainer() => new ScalingContainer(ScalingMode.Everything);
 
@@ -1544,7 +1555,7 @@ namespace osu.Game
             GlobalCursorDisplay.ShowCursor = (ScreenStack.CurrentScreen as IOsuScreen)?.CursorVisible ?? false;
         }
 
-        private void screenChanged(IScreen current, IScreen newScreen)
+        protected virtual void ScreenChanged([CanBeNull] IOsuScreen current, [CanBeNull] IOsuScreen newScreen)
         {
             SentrySdk.ConfigureScope(scope =>
             {
@@ -1560,10 +1571,10 @@ namespace osu.Game
             switch (current)
             {
                 case Player player:
-                    player.PlayingState.UnbindFrom(playingState);
+                    player.PlayingState.UnbindFrom(UserPlayingState);
 
                     // reset for sanity.
-                    playingState.Value = LocalUserPlayingState.NotPlaying;
+                    UserPlayingState.Value = LocalUserPlayingState.NotPlaying;
                     break;
             }
 
@@ -1580,7 +1591,7 @@ namespace osu.Game
                     break;
 
                 case Player player:
-                    player.PlayingState.BindTo(playingState);
+                    player.PlayingState.BindTo(UserPlayingState);
                     break;
 
                 default:
@@ -1588,30 +1599,32 @@ namespace osu.Game
                     break;
             }
 
-            if (current is IOsuScreen currentOsuScreen)
+            if (current != null)
             {
-                backButtonVisibility.UnbindFrom(currentOsuScreen.BackButtonVisibility);
-                OverlayActivationMode.UnbindFrom(currentOsuScreen.OverlayActivationMode);
-                configUserActivity.UnbindFrom(currentOsuScreen.Activity);
+                backButtonVisibility.UnbindFrom(current.BackButtonVisibility);
+                OverlayActivationMode.UnbindFrom(current.OverlayActivationMode);
+                configUserActivity.UnbindFrom(current.Activity);
             }
 
-            if (newScreen is IOsuScreen newOsuScreen)
+            // Bind to new screen.
+            if (newScreen != null)
             {
-                backButtonVisibility.BindTo(newOsuScreen.BackButtonVisibility);
-                OverlayActivationMode.BindTo(newOsuScreen.OverlayActivationMode);
-                configUserActivity.BindTo(newOsuScreen.Activity);
+                backButtonVisibility.BindTo(newScreen.BackButtonVisibility);
+                OverlayActivationMode.BindTo(newScreen.OverlayActivationMode);
+                configUserActivity.BindTo(newScreen.Activity);
 
-                GlobalCursorDisplay.MenuCursor.HideCursorOnNonMouseInput = newOsuScreen.HideMenuCursorOnNonMouseInput;
+                // Handle various configuration updates based on new screen settings.
+                GlobalCursorDisplay.MenuCursor.HideCursorOnNonMouseInput = newScreen.HideMenuCursorOnNonMouseInput;
 
-                if (newOsuScreen.HideOverlaysOnEnter)
+                if (newScreen.HideOverlaysOnEnter)
                     CloseAllOverlays();
                 else
                     Toolbar.Show();
 
-                if (newOsuScreen.ShowFooter)
+                if (newScreen.ShowFooter)
                 {
                     BackButton.Hide();
-                    ScreenFooter.SetButtons(newOsuScreen.CreateFooterButtons());
+                    ScreenFooter.SetButtons(newScreen.CreateFooterButtons());
                     ScreenFooter.Show();
                 }
                 else
@@ -1619,16 +1632,16 @@ namespace osu.Game
                     ScreenFooter.SetButtons(Array.Empty<ScreenFooterButton>());
                     ScreenFooter.Hide();
                 }
-            }
 
-            skinEditor.SetTarget((OsuScreen)newScreen);
+                skinEditor.SetTarget((OsuScreen)newScreen);
+            }
         }
 
-        private void screenPushed(IScreen lastScreen, IScreen newScreen) => screenChanged(lastScreen, newScreen);
+        private void screenPushed(IScreen lastScreen, IScreen newScreen) => ScreenChanged((OsuScreen)lastScreen, (OsuScreen)newScreen);
 
         private void screenExited(IScreen lastScreen, IScreen newScreen)
         {
-            screenChanged(lastScreen, newScreen);
+            ScreenChanged((OsuScreen)lastScreen, (OsuScreen)newScreen);
 
             if (newScreen == null)
                 Exit();
