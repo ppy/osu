@@ -64,6 +64,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 readingRating = Math.Pow(readingRating, 0.8);
             }
 
+            if (mods.Any(m => m is OsuModFlashlight))
+            {
+                readingRating *= 0.5;
+            }
+
             if (mods.Any(h => h is OsuModRelax))
             {
                 aimRating *= 0.9;
@@ -76,7 +81,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 speedRating *= 0.5;
                 aimRating = 0.0;
                 flashlightRating *= 0.4;
-                readingRating *= 0.7;
+                readingRating *= 0.4;
             }
 
             double baseAimPerformance = OsuStrainSkill.DifficultyToPerformance(aimRating);
