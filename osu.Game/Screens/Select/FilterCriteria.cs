@@ -118,6 +118,12 @@ namespace osu.Game.Screens.Select
 
         public IRulesetFilterCriteria? RulesetCriteria { get; set; }
 
+        /// <summary>
+        /// If set, overrides which maps can be played and should be shown, instead of only showing maps from our own
+        /// ruleset and std with map conversion enabled.
+        /// </summary>
+        public IRulesetConvertSupport? RulesetConvertSupport { get; set; }
+
         public readonly struct OptionalSet<T> : IEquatable<OptionalSet<T>>
             where T : struct, Enum
         {
