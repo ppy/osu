@@ -30,7 +30,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         public override double DifficultyValue()
         {
-
             //Check if the difficulty was already calculated and if not calculate it.
             if (Difficulty != 0)
                 return Difficulty;
