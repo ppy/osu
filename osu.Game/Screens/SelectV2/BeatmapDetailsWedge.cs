@@ -20,7 +20,7 @@ using osuTK;
 
 namespace osu.Game.Screens.SelectV2
 {
-    public partial class BeatmapDetailsWedge : CompositeDrawable
+    public partial class BeatmapDetailsWedge : VisibilityContainer
     {
         private static readonly Vector2 shear = new Vector2(OsuGame.SHEAR, 0);
 
@@ -164,6 +164,7 @@ namespace osu.Game.Screens.SelectV2
                     }),
                     new ShearAlignedDrawable(shear, ratingsWedge = new Container
                     {
+                        Alpha = 0f,
                         CornerRadius = 10,
                         Masking = true,
                         RelativeSizeAxes = Axes.X,
@@ -207,6 +208,7 @@ namespace osu.Game.Screens.SelectV2
                     }),
                     new ShearAlignedDrawable(shear, failRetryWedge = new Container
                     {
+                        Alpha = 0f,
                         CornerRadius = 10,
                         Masking = true,
                         RelativeSizeAxes = Axes.X,
@@ -240,6 +242,18 @@ namespace osu.Game.Screens.SelectV2
 
             apiState = api.State.GetBoundCopy();
             apiState.BindValueChanged(_ => Scheduler.AddOnce(updateDisplay), true);
+        }
+
+        protected override void PopIn()
+        {
+            this.FadeIn(300, Easing.OutQuint)
+                .MoveToX(0, 300, Easing.OutQuint);
+        }
+
+        protected override void PopOut()
+        {
+            this.FadeOut(300, Easing.OutQuint)
+                .MoveToX(-100, 300, Easing.OutQuint);
         }
 
         private void updateDisplay()
