@@ -32,13 +32,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             {
                 double loopDifficulty = currObj.OpacityAt(loopObj.BaseObject.StartTime, false);
 
-                // Small distances means objects may be cheesed, so it doesn't matter whether they are arranged confusingly.
-                loopDifficulty *= DifficultyCalculationUtils.Logistic(-(loopObj.MinimumJumpDistance - 80) / 15);
+                if (currObj.BaseObject is Slider slider)
+                    // Longer sliders are inherently denser objects
+                    loopDifficulty += Math.Log10(Math.Max(1, slider.Velocity * slider.SpanDuration / slider.Radius));
 
-                if (loopObj.BaseObject is Slider)
-                    // Sliders have a small inherent difficulty regardless of size
-                    // This is temporary until proper overlap check is implemented
-                    loopDifficulty += 0.2 + Math.Sqrt(loopObj.TravelDistance / OsuDifficultyHitObject.NORMALISED_DIAMETER);
+                // Small distances means objects may be cheesed, so it doesn't matter whether they are arranged confusingly.
+                loopDifficulty *= loopObj.LazyJumpDistance == 0 ? rhythm : DifficultyCalculationUtils.Logistic(-(loopObj.MinimumJumpDistance - 80) / 15);
+
+                if (loopObj.BaseObject is Slider pastSlider)
+                    // Buff current object if it's obstructed by a previous slider
+                    loopDifficulty += 0; // To be implemented
 
                 double timeBetweenCurrAndLoopObj = (currObj.BaseObject.StartTime - loopObj.BaseObject.StartTime) / current.ClockRate;
                 loopDifficulty *= getTimeNerfFactor(timeBetweenCurrAndLoopObj);
@@ -52,7 +55,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             if (currApproachRate < 500)
             {
-                preemptDifficulty += Math.Pow(500 - currApproachRate, 2.1) / 18000;
+                preemptDifficulty += Math.Pow(500 - currApproachRate, 2.1) / 16500;
 
                 // Buff spacing.
                 preemptDifficulty *= currVelocity;
@@ -71,13 +74,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             {
                 double timeSpentInvisible = getDurationSpentInvisible(currObj) / current.ClockRate;
                 // Nerf hidden difficulty less the more density difficulty you have
-                double timeDifficultyFactor = 12000 / pastObjectDifficultyInfluence;
+                double timeDifficultyFactor = 13000 / pastObjectDifficultyInfluence;
 
                 // Clamp objects because after a certain point hidden density is mainly memory
-                double visibleObjectFactor = Math.Min(retrieveCurrentVisibleObjects(currObj).Count, 10);
+                double visibleObjectFactor = Math.Min(retrieveCurrentVisibleObjects(currObj).Count, 8);
+
+                // double perfectStackFactor = currObj.LazyJumpDistance == 0 && currObj.BaseObject? 2 * rhythm : 0;
+
+                // hiddenDifficulty += perfectStackFactor;
 
                 // The longer an object is hidden, the more velocity should matter
-                hiddenDifficulty += visibleObjectFactor * timeSpentInvisible * currVelocity / timeDifficultyFactor;
+                hiddenDifficulty += visibleObjectFactor * timeSpentInvisible * Math.Max(1, currVelocity) / timeDifficultyFactor;
 
                 // Buff rhythm
                 hiddenDifficulty *= rhythm;
