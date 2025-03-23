@@ -57,6 +57,7 @@ namespace osu.Game.Overlays.Mods
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
+                            Margin = new MarginPadding { Bottom = 5f },
                         }
                     }
                 }
