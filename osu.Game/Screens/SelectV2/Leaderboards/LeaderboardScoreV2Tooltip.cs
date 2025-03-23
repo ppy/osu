@@ -19,6 +19,7 @@ using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
 using osu.Game.Utils;
 using osuTK;
@@ -254,11 +255,12 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
                     {
                         Show();
 
-                        modsFlow.ChildrenEnumerable = mods.AsOrdered().Select(m => new LeaderboardScoreV2.ColouredModSwitchTiny(m)
+                        modsFlow.ChildrenEnumerable = mods.AsOrdered().Select(m => new ModSwitchTiny(m)
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Scale = new Vector2(0.375f),
+                            Active = { Value = true },
                         });
                     }
                 }
