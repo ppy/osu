@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 {
     public class OsuPerformanceCalculator : PerformanceCalculator
     {
-        public const double PERFORMANCE_BASE_MULTIPLIER = 1.145; // This is being adjusted to keep the final pp value scaled around what it used to be when changing things.
+        public const double PERFORMANCE_BASE_MULTIPLIER = 1.125; // This is being adjusted to keep the final pp value scaled around what it used to be when changing things.
 
         private bool usingClassicSliderAccuracy;
 
