@@ -329,7 +329,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // Scale the reading value with accuracy _harshly_.
             readingValue *= accuracy * accuracy;
             // It is important to also consider accuracy difficulty when doing that.
-            readingValue *= 0.98 + Math.Pow(attributes.OverallDifficulty, 2) / 2500;
+            readingValue *= 0.98 + Math.Pow(overallDifficulty, 2) / 2500;
 
             return readingValue;
         }
