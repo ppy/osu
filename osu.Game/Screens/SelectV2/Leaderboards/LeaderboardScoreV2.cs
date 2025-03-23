@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
@@ -24,6 +25,7 @@ using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Leaderboards;
@@ -67,13 +69,18 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
         private readonly ScoreInfo score;
         private readonly bool sheared;
 
-        private const int height = 60;
+        public const int HEIGHT = 60;
+
         private const int corner_radius = 10;
         private const int transition_duration = 200;
 
         private Colour4 foregroundColour;
         private Colour4 backgroundColour;
         private ColourInfo totalScoreBackgroundGradient;
+
+        private static readonly Color4 personal_best_gradient_left = Color4Extensions.FromHex("#66FFCC");
+        private static readonly Color4 personal_best_gradient_right = Color4Extensions.FromHex("#51A388");
+        private ColourInfo personalBestGradient;
 
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
@@ -111,7 +118,8 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
         private Box totalScoreBackground = null!;
 
         private FillFlowContainer statisticsContainer = null!;
-        private RankLabel rankLabel = null!;
+        private Container personalBestIndicator = null!;
+        private Container rankLabelStandalone = null!;
         private Container rankLabelOverlay = null!;
 
         public ITooltip<ScoreInfo> GetCustomTooltip() => new LeaderboardScoreV2Tooltip(colourProvider);
@@ -124,7 +132,7 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
 
             Shear = new Vector2(sheared ? OsuGame.SHEAR : 0, 0);
             RelativeSizeAxes = Axes.X;
-            Height = height;
+            Height = HEIGHT;
         }
 
         [BackgroundDependencyLoader]
@@ -132,9 +140,10 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
         {
             var user = score.User;
 
-            foregroundColour = IsPersonalBest ? colourProvider.Background1 : colourProvider.Background5;
-            backgroundColour = IsPersonalBest ? colourProvider.Background2 : colourProvider.Background4;
+            foregroundColour = colourProvider.Background5;
+            backgroundColour = colourProvider.Background3;
             totalScoreBackgroundGradient = ColourInfo.GradientHorizontal(backgroundColour.Opacity(0), backgroundColour);
+            personalBestGradient = ColourInfo.GradientHorizontal(personal_best_gradient_left, personal_best_gradient_right);
 
             statisticsLabels = GetStatistics(score).Select(s => new ScoreComponentLabel(s, score)
             {
@@ -167,14 +176,24 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
                         {
                             new Drawable[]
                             {
-                                new Container
+                                rankLabelStandalone = new Container
                                 {
-                                    AutoSizeAxes = Axes.X,
+                                    Width = rank_label_width,
                                     RelativeSizeAxes = Axes.Y,
-                                    Child = rankLabel = new RankLabel(Rank, sheared)
+                                    Children = new Drawable[]
                                     {
-                                        Width = rank_label_width,
-                                        RelativeSizeAxes = Axes.Y,
+                                        personalBestIndicator = new Container
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                            Padding = new MarginPadding { Right = -10f },
+                                            Alpha = IsPersonalBest ? 1 : 0,
+                                            Colour = ColourInfo.GradientHorizontal(Color4Extensions.FromHex("#66FFCC"), Color4Extensions.FromHex("#51A388")),
+                                            Child = new Box { RelativeSizeAxes = Axes.Both },
+                                        },
+                                        new RankLabel(Rank, sheared, darkText: IsPersonalBest)
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                        }
                                     },
                                 },
                                 createCentreContent(user),
@@ -230,7 +249,7 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
                 if (score.Mods.Length > maxMods)
                 {
                     modsContainer.Remove(modsContainer[^1], true);
-                    modsContainer.Add(new MoreModSwitchTiny(score.Mods.Length - maxMods + 1)
+                    modsContainer.Add(new MoreModSwitchTiny(score.Mods)
                     {
                         Scale = new Vector2(0.375f),
                     });
@@ -291,7 +310,7 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
                                         })
                                     {
                                         RelativeSizeAxes = Axes.None,
-                                        Size = new Vector2(height)
+                                        Size = new Vector2(HEIGHT)
                                     },
                                     rankLabelOverlay = new Container
                                     {
@@ -304,7 +323,7 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
                                                 RelativeSizeAxes = Axes.Both,
                                                 Colour = Colour4.Black.Opacity(0.5f),
                                             },
-                                            new RankLabel(Rank, sheared)
+                                            new RankLabel(Rank, sheared, false)
                                             {
                                                 AutoSizeAxes = Axes.Both,
                                                 Anchor = Anchor.Centre,
@@ -492,14 +511,18 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
                                             Current = scoreManager.GetBindableTotalScoreString(score),
                                             Font = OsuFont.GetFont(size: 30, weight: FontWeight.Light),
                                         },
-                                        modsContainer = new FillFlowContainer
+                                        new InputBlockingContainer
                                         {
                                             Anchor = Anchor.TopRight,
                                             Origin = Anchor.TopRight,
-                                            Shear = new Vector2(sheared ? -OsuGame.SHEAR : 0, 0),
                                             AutoSizeAxes = Axes.Both,
-                                            Direction = FillDirection.Horizontal,
-                                            Spacing = new Vector2(2f, 0f),
+                                            Child = modsContainer = new FillFlowContainer
+                                            {
+                                                Shear = new Vector2(sheared ? -OsuGame.SHEAR : 0, 0),
+                                                AutoSizeAxes = Axes.Both,
+                                                Direction = FillDirection.Horizontal,
+                                                Spacing = new Vector2(2f, 0f),
+                                            },
                                         },
                                     }
                                 }
@@ -568,10 +591,12 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
         private void updateState()
         {
             var lightenedGradient = ColourInfo.GradientHorizontal(backgroundColour.Opacity(0).Lighten(0.2f), backgroundColour.Lighten(0.2f));
+            var personalBestLightenedGradient = ColourInfo.GradientHorizontal(personal_best_gradient_left.Lighten(0.2f), personal_best_gradient_right.Lighten(0.2f));
 
             foreground.FadeColour(IsHovered ? foregroundColour.Lighten(0.2f) : foregroundColour, transition_duration, Easing.OutQuint);
             background.FadeColour(IsHovered ? backgroundColour.Lighten(0.2f) : backgroundColour, transition_duration, Easing.OutQuint);
             totalScoreBackground.FadeColour(IsHovered ? lightenedGradient : totalScoreBackgroundGradient, transition_duration, Easing.OutQuint);
+            personalBestIndicator.FadeColour(IsHovered ? personalBestLightenedGradient : personalBestGradient, transition_duration, Easing.OutQuint);
 
             if (IsHovered && currentMode != DisplayMode.Full)
                 rankLabelOverlay.FadeIn(transition_duration, Easing.OutQuint);
@@ -590,9 +615,9 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
             if (currentMode != mode)
             {
                 if (mode >= DisplayMode.Full)
-                    rankLabel.FadeIn(transition_duration, Easing.OutQuint).MoveToX(0, transition_duration, Easing.OutQuint);
+                    rankLabelStandalone.FadeIn(transition_duration, Easing.OutQuint).ResizeWidthTo(rank_label_width, transition_duration, Easing.OutQuint);
                 else
-                    rankLabel.FadeOut(transition_duration, Easing.OutQuint).MoveToX(-rankLabel.DrawWidth, transition_duration, Easing.OutQuint);
+                    rankLabelStandalone.FadeOut(transition_duration, Easing.OutQuint).ResizeWidthTo(0, transition_duration, Easing.OutQuint);
 
                 if (mode >= DisplayMode.Regular)
                 {
@@ -615,13 +640,13 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
 
         private DisplayMode getCurrentDisplayMode()
         {
-            if (DrawWidth >= height + username_min_width + statistics_regular_min_width + expanded_right_content_width + rank_label_width)
+            if (DrawWidth >= HEIGHT + username_min_width + statistics_regular_min_width + expanded_right_content_width + rank_label_width)
                 return DisplayMode.Full;
 
-            if (DrawWidth >= height + username_min_width + statistics_regular_min_width + expanded_right_content_width)
+            if (DrawWidth >= HEIGHT + username_min_width + statistics_regular_min_width + expanded_right_content_width)
                 return DisplayMode.Regular;
 
-            if (DrawWidth >= height + username_min_width + statistics_compact_min_width + expanded_right_content_width)
+            if (DrawWidth >= HEIGHT + username_min_width + statistics_compact_min_width + expanded_right_content_width)
                 return DisplayMode.Compact;
 
             return DisplayMode.Minimal;
@@ -697,49 +722,63 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
 
         private partial class RankLabel : Container, IHasTooltip
         {
-            public RankLabel(int? rank, bool sheared)
+            private readonly bool darkText;
+            private readonly OsuSpriteText text;
+
+            public RankLabel(int? rank, bool sheared, bool darkText)
             {
+                this.darkText = darkText;
                 if (rank >= 1000)
                     TooltipText = $"#{rank:N0}";
 
-                Child = new OsuSpriteText
+                Child = text = new OsuSpriteText
                 {
                     Shear = new Vector2(sheared ? -OsuGame.SHEAR : 0, 0),
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Font = OsuFont.GetFont(size: 20, weight: FontWeight.SemiBold, italics: true),
-                    Text = rank == null ? "-" : rank.Value.FormatRank().Insert(0, "#")
+                    Text = rank == null ? "-" : rank.Value.FormatRank().Insert(0, "#"),
+                    Shadow = !darkText,
                 };
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OverlayColourProvider colourProvider)
+            {
+                text.Colour = darkText ? colourProvider.Background3 : colourProvider.Content1;
             }
 
             public LocalisableString TooltipText { get; }
         }
 
-        private sealed partial class ColouredModSwitchTiny : ModSwitchTiny, IHasTooltip
+        public sealed partial class ColouredModSwitchTiny : ModSwitchTiny, IHasCustomTooltip<Mod>
         {
-            private readonly IMod mod;
+            public Mod? TooltipContent { get; }
 
-            public ColouredModSwitchTiny(IMod mod)
+            [Resolved]
+            private OverlayColourProvider colourProvider { get; set; } = null!;
+
+            public ColouredModSwitchTiny(Mod mod)
                 : base(mod)
             {
-                this.mod = mod;
+                TooltipContent = mod;
                 Active.Value = true;
             }
 
-            public LocalisableString TooltipText => (mod as Mod)?.IconTooltip ?? mod.Name;
+            public ITooltip<Mod> GetCustomTooltip() => new ModTooltip(colourProvider);
         }
 
-        private sealed partial class MoreModSwitchTiny : CompositeDrawable
+        private sealed partial class MoreModSwitchTiny : CompositeDrawable, IHasPopover
         {
-            private readonly int count;
+            private readonly IReadOnlyList<Mod> mods;
 
-            public MoreModSwitchTiny(int count)
+            public MoreModSwitchTiny(IReadOnlyList<Mod> mods)
             {
-                this.count = count;
+                this.mods = mods;
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            private void load(OsuColour colours, OverlayColourProvider colourProvider)
             {
                 Size = new Vector2(ModSwitchTiny.WIDTH, ModSwitchTiny.DEFAULT_HEIGHT);
 
@@ -752,22 +791,54 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
                         new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = OsuColour.Gray(0.2f),
+                            Colour = colourProvider.Background6,
                         },
                         new OsuSpriteText
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Shadow = false,
-                            Font = OsuFont.Numeric.With(size: 24, weight: FontWeight.Black),
-                            Text = $"+{count}",
-                            Colour = colours.Yellow,
+                            Font = OsuFont.Torus.With(size: 32, weight: FontWeight.Bold),
+                            Text = ". . .",
+                            Colour = Color4.White,
+                            UseFullGlyphHeight = false,
                             Margin = new MarginPadding
                             {
                                 Top = 4
                             }
                         }
                     }
+                };
+            }
+
+            protected override bool OnClick(ClickEvent e)
+            {
+                this.ShowPopover();
+                return true;
+            }
+
+            protected override bool OnHover(HoverEvent e) => true;
+
+            public Popover GetPopover() => new MoreModsPopover(mods);
+        }
+
+        public partial class MoreModsPopover : OsuPopover
+        {
+            public MoreModsPopover(IReadOnlyList<Mod> mods)
+            {
+                AutoSizeAxes = Axes.Both;
+                AllowableAnchors = new[] { Anchor.CentreLeft, Anchor.CentreRight };
+
+                Child = new FillFlowContainer
+                {
+                    Width = 150f,
+                    AutoSizeAxes = Axes.Y,
+                    Direction = FillDirection.Full,
+                    Spacing = new Vector2(3f),
+                    ChildrenEnumerable = mods.AsOrdered().Select(m => new ColouredModSwitchTiny(m)
+                    {
+                        Scale = new Vector2(0.375f),
+                    })
                 };
             }
         }
