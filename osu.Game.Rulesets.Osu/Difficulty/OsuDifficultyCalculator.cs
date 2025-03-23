@@ -66,7 +66,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             if (mods.Any(m => m is OsuModFlashlight))
             {
-                readingRating *= 0.5;
+                bool hasHidden = mods.Any(m => m is OsuModHidden);
+                readingRating *= hasHidden ? 0.8 : 0.5;
             }
 
             if (mods.Any(h => h is OsuModRelax))
