@@ -114,7 +114,7 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
         private RankLabel rankLabel = null!;
         private Container rankLabelOverlay = null!;
 
-        public ITooltip<ScoreInfo> GetCustomTooltip() => new LeaderboardScoreTooltip();
+        public ITooltip<ScoreInfo> GetCustomTooltip() => new LeaderboardScoreV2Tooltip(colourProvider);
         public virtual ScoreInfo TooltipContent => score;
 
         public LeaderboardScoreV2(ScoreInfo score, bool sheared = true)
