@@ -30,6 +30,8 @@ namespace osu.Game.Rulesets.Difficulty.Skills
 
         protected double Difficulty = 0;
 
+        private double summedObjectStrains = 0;
+
         private readonly List<double> strainPeaks = new List<double>();
         protected readonly List<double> ObjectStrains = new List<double>(); // Store individual strains
 
@@ -72,20 +74,22 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// </summary>
         public virtual double CountTopWeightedStrains()
         {
+            //Check if the TopWeightedStrains was already calculated and if not calculate it.
+            if (summedObjectStrains != 0)
+                return summedObjectStrains;
+
             if (ObjectStrains.Count == 0)
                 return 0.0;
 
-            //Check if the difficulty was already calculated and if not calculate it.
-            if (Difficulty == 0)
-                Difficulty = DifficultyValue();
-
-            double consistentTopStrain = Difficulty / 10; // What would the top strain be if all strain values were identical
+            double consistentTopStrain = DifficultyValue() / 10; // What would the top strain be if all strain values were identical
 
             if (consistentTopStrain == 0)
                 return ObjectStrains.Count;
 
+            summedObjectStrains = ObjectStrains.Sum(s => 1.1 / (1 + Math.Exp(-10 * (s / consistentTopStrain - 0.88))));
+
             // Use a weighted sum of all strains. Constants are arbitrary and give nice values
-            return ObjectStrains.Sum(s => 1.1 / (1 + Math.Exp(-10 * (s / consistentTopStrain - 0.88))));
+            return summedObjectStrains;
         }
 
         /// <summary>

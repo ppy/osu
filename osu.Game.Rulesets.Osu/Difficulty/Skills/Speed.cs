@@ -21,6 +21,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private double currentStrain;
         private double currentRhythm;
 
+        private double summedRelevantNoteCount;
+
         protected override int ReducedSectionCount => 5;
 
         public Speed(Mod[] mods)
@@ -46,6 +48,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         public double RelevantNoteCount()
         {
+            //Check if the RelevantNote was already calculated and if not calculate it.
+            if (summedRelevantNoteCount != 0)
+                return summedRelevantNoteCount;
+
             if (ObjectStrains.Count == 0)
                 return 0;
 
@@ -53,7 +59,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             if (maxStrain == 0)
                 return 0;
 
-            return ObjectStrains.Sum(strain => 1.0 / (1.0 + Math.Exp(-(strain / maxStrain * 12.0 - 6.0))));
+            summedRelevantNoteCount = ObjectStrains.Sum(strain => 1.0 / (1.0 + Math.Exp(-(strain / maxStrain * 12.0 - 6.0))));
+
+            return summedRelevantNoteCount;
         }
     }
 }
