@@ -28,10 +28,9 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         private double currentSectionPeak; // We also keep track of the peak strain level in the current section.
         private double currentSectionEnd;
 
-        protected double Difficulty = 0;
+        protected double Difficulty;
 
-        private double summedObjectStrains = 0;
-
+        private double summedObjectStrains;
         private readonly List<double> strainPeaks = new List<double>();
         protected readonly List<double> ObjectStrains = new List<double>(); // Store individual strains
 
@@ -133,7 +132,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         {
             //Check if the difficulty was already calculated and if not calculate it.
             if (Difficulty != 0)
-                Difficulty = 0;
+                return Difficulty;
 
             double weight = 1;
 
