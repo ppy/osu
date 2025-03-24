@@ -52,13 +52,6 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary
                         },
                     }
                 },
-                new PreviewTimePart
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.TopCentre,
-                    RelativeSizeAxes = Axes.Both,
-                    Height = 0.4f,
-                },
                 new BreakPart
                 {
                     Anchor = Anchor.Centre,
@@ -84,6 +77,12 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary
                     Origin = Anchor.TopCentre,
                     RelativeSizeAxes = Axes.Both,
                     Height = 0.4f
+                },
+                new PreviewTimePart
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Both,
                 },
                 new MarkerPart { RelativeSizeAxes = Axes.Both },
             };

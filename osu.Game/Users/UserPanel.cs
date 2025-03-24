@@ -22,6 +22,7 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Localisation;
+using osu.Game.Online.Metadata;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Screens;
 using osu.Game.Screens.Play;
@@ -75,6 +76,9 @@ namespace osu.Game.Users
 
         [Resolved]
         private MultiplayerClient? multiplayerClient { get; set; }
+
+        [Resolved]
+        private MetadataClient? metadataClient { get; set; }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -153,20 +157,28 @@ namespace osu.Game.Users
                     chatOverlay?.Show();
                 }));
 
-                if (User.IsOnline)
+                if (isUserOnline())
                 {
                     items.Add(new OsuMenuItem(ContextMenuStrings.SpectatePlayer, MenuItemType.Standard, () =>
                     {
-                        performer?.PerformFromScreen(s => s.Push(new SoloSpectatorScreen(User)));
+                        if (isUserOnline())
+                            performer?.PerformFromScreen(s => s.Push(new SoloSpectatorScreen(User)));
                     }));
 
-                    if (multiplayerClient?.Room?.Users.All(u => u.UserID != User.Id) == true)
+                    if (canInviteUser())
                     {
-                        items.Add(new OsuMenuItem(ContextMenuStrings.InvitePlayer, MenuItemType.Standard, () => multiplayerClient.InvitePlayer(User.Id)));
+                        items.Add(new OsuMenuItem(ContextMenuStrings.InvitePlayer, MenuItemType.Standard, () =>
+                        {
+                            if (canInviteUser())
+                                multiplayerClient!.InvitePlayer(User.Id);
+                        }));
                     }
                 }
 
                 return items.ToArray();
+
+                bool isUserOnline() => metadataClient?.GetPresence(User.OnlineID) != null;
+                bool canInviteUser() => isUserOnline() && multiplayerClient?.Room?.Users.All(u => u.UserID != User.Id) == true;
             }
         }
 

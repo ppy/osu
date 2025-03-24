@@ -23,23 +23,22 @@ namespace osu.Game.Screens.SelectV2
     {
         private const float corner_radius = 10;
 
-        private const float left_edge_x_offset = 20f;
-        private const float keyboard_active_x_offset = 25f;
         private const float active_x_offset = 50f;
 
-        private const float duration = 500;
+        protected const float DURATION = 400;
 
         protected float PanelXOffset { get; init; }
 
         private Box backgroundBorder = null!;
         private Box backgroundGradient = null!;
         private Box backgroundAccentGradient = null!;
-        private Container backgroundLayer = null!;
         private Container backgroundLayerHorizontalPadding = null!;
         private Container backgroundContainer = null!;
         private Container iconContainer = null!;
         private Box activationFlash = null!;
         private Box hoverLayer = null!;
+        private Box keyboardSelectionLayer = null!;
+        private Box selectionLayer = null!;
 
         public Container TopLevelContent { get; private set; } = null!;
 
@@ -60,6 +59,14 @@ namespace osu.Game.Screens.SelectV2
                 updateDisplay();
             }
         }
+
+        // content is offset by PanelXOffset, make sure we only handle input at the actual visible
+        // offset region.
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
+            TopLevelContent.ReceivePositionalInputAt(screenSpacePos);
+
+        [Resolved]
+        private BeatmapCarousel? carousel { get; set; }
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider, OsuColour colours)
@@ -97,30 +104,26 @@ namespace osu.Game.Screens.SelectV2
                             backgroundLayerHorizontalPadding = new Container
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Child = backgroundLayer = new Container
+                                Child = new Container
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Child = new Container
+                                    Masking = true,
+                                    CornerRadius = corner_radius,
+                                    Children = new Drawable[]
                                     {
-                                        Masking = true,
-                                        CornerRadius = corner_radius,
-                                        RelativeSizeAxes = Axes.Both,
-                                        Children = new Drawable[]
+                                        backgroundGradient = new Box
                                         {
-                                            backgroundGradient = new Box
-                                            {
-                                                RelativeSizeAxes = Axes.Both,
-                                            },
-                                            backgroundAccentGradient = new Box
-                                            {
-                                                RelativeSizeAxes = Axes.Both,
-                                            },
-                                            backgroundContainer = new Container
-                                            {
-                                                RelativeSizeAxes = Axes.Both,
-                                            },
-                                        }
-                                    },
+                                            RelativeSizeAxes = Axes.Both,
+                                        },
+                                        backgroundAccentGradient = new Box
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                        },
+                                        backgroundContainer = new Container
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                        },
+                                    }
                                 },
                             }
                         },
@@ -139,6 +142,24 @@ namespace osu.Game.Screens.SelectV2
                     hoverLayer = new Box
                     {
                         Alpha = 0,
+                        Colour = colours.Blue.Opacity(0.1f),
+                        Blending = BlendingParameters.Additive,
+                        RelativeSizeAxes = Axes.Both,
+                    },
+                    selectionLayer = new Box
+                    {
+                        Alpha = 0,
+                        Colour = ColourInfo.GradientHorizontal(colours.Yellow.Opacity(0), colours.Yellow.Opacity(0.5f)),
+                        Blending = BlendingParameters.Additive,
+                        RelativeSizeAxes = Axes.Both,
+                        Width = 0.7f,
+                        Anchor = Anchor.TopRight,
+                        Origin = Anchor.TopRight,
+                    },
+                    keyboardSelectionLayer = new Box
+                    {
+                        Alpha = 0,
+                        Colour = colours.Yellow.Opacity(0.1f),
                         Blending = BlendingParameters.Additive,
                         RelativeSizeAxes = Axes.Both,
                     },
@@ -153,7 +174,6 @@ namespace osu.Game.Screens.SelectV2
                 }
             };
 
-            hoverLayer.Colour = colours.Blue.Opacity(0.1f);
             backgroundGradient.Colour = ColourInfo.GradientHorizontal(colourProvider.Background3, colourProvider.Background4);
         }
 
@@ -161,37 +181,50 @@ namespace osu.Game.Screens.SelectV2
         {
             base.LoadComplete();
 
-            Expanded.BindValueChanged(_ => updateDisplay());
-            KeyboardSelected.BindValueChanged(_ => updateDisplay(), true);
+            Expanded.BindValueChanged(_ => updateDisplay(), true);
+
+            Selected.BindValueChanged(selected =>
+            {
+                if (selected.NewValue)
+                    selectionLayer.FadeIn(100, Easing.OutQuint);
+                else
+                    selectionLayer.FadeOut(200, Easing.OutQuint);
+
+                updateXOffset();
+            }, true);
+
+            KeyboardSelected.BindValueChanged(selected =>
+            {
+                if (selected.NewValue)
+                    keyboardSelectionLayer.FadeIn(100, Easing.OutQuint);
+                else
+                    keyboardSelectionLayer.FadeOut(1000, Easing.OutQuint);
+
+                updateXOffset();
+            }, true);
         }
 
         protected override void PrepareForUse()
         {
             base.PrepareForUse();
-            this.FadeInFromZero(duration, Easing.OutQuint);
+            this.FadeInFromZero(DURATION, Easing.OutQuint);
         }
-
-        [Resolved]
-        private BeatmapCarousel? carousel { get; set; }
 
         protected override bool OnClick(ClickEvent e)
         {
-            activationFlash.FadeOutFromOne(500, Easing.OutQuint);
             carousel?.Activate(Item!);
             return true;
         }
 
         private void updateDisplay()
         {
-            backgroundLayer.TransformTo(nameof(Padding), backgroundLayer.Padding with { Vertical = Expanded.Value ? 2f : 0f }, duration, Easing.OutQuint);
-
             var backgroundColour = accentColour ?? Color4.White;
             var edgeEffectColour = accentColour ?? Color4Extensions.FromHex(@"4EBFFF");
 
-            backgroundAccentGradient.FadeColour(ColourInfo.GradientHorizontal(backgroundColour.Opacity(0.25f), backgroundColour.Opacity(0f)), duration, Easing.OutQuint);
-            backgroundBorder.FadeColour(backgroundColour, duration, Easing.OutQuint);
+            backgroundAccentGradient.FadeColour(ColourInfo.GradientHorizontal(backgroundColour.Opacity(0.25f), backgroundColour.Opacity(0f)), DURATION, Easing.OutQuint);
+            backgroundBorder.FadeColour(backgroundColour, DURATION, Easing.OutQuint);
 
-            TopLevelContent.FadeEdgeEffectTo(Expanded.Value ? edgeEffectColour.Opacity(0.5f) : Color4.Black.Opacity(0.4f), duration, Easing.OutQuint);
+            TopLevelContent.FadeEdgeEffectTo(Expanded.Value ? edgeEffectColour.Opacity(0.5f) : Color4.Black.Opacity(0.4f), DURATION, Easing.OutQuint);
 
             updateXOffset();
             updateHover();
@@ -199,22 +232,20 @@ namespace osu.Game.Screens.SelectV2
 
         private void updateXOffset()
         {
-            float x = PanelXOffset + active_x_offset + keyboard_active_x_offset + left_edge_x_offset;
+            float x = PanelXOffset + corner_radius;
 
-            if (Expanded.Value)
-                x -= active_x_offset;
+            if (!Expanded.Value && !Selected.Value)
+                x += active_x_offset;
 
-            if (KeyboardSelected.Value)
-                x -= keyboard_active_x_offset;
+            if (!KeyboardSelected.Value)
+                x += active_x_offset * 0.5f;
 
-            this.TransformTo(nameof(Padding), new MarginPadding { Left = x }, duration, Easing.OutQuint);
+            TopLevelContent.MoveToX(x, DURATION, Easing.OutQuint);
         }
 
         private void updateHover()
         {
-            bool hovered = IsHovered || KeyboardSelected.Value;
-
-            if (hovered)
+            if (IsHovered)
                 hoverLayer.FadeIn(100, Easing.OutQuint);
             else
                 hoverLayer.FadeOut(1000, Easing.OutQuint);
@@ -222,13 +253,13 @@ namespace osu.Game.Screens.SelectV2
 
         protected override bool OnHover(HoverEvent e)
         {
-            updateDisplay();
+            updateHover();
             return true;
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            updateDisplay();
+            updateHover();
             base.OnHoverLost(e);
         }
 
@@ -250,7 +281,7 @@ namespace osu.Game.Screens.SelectV2
 
         public virtual void Activated()
         {
-            activationFlash.FadeOutFromOne(500, Easing.OutQuint);
+            activationFlash.FadeOutFromOne(1000, Easing.OutQuint);
         }
 
         #endregion

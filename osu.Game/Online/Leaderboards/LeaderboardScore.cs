@@ -190,7 +190,7 @@ namespace osu.Game.Online.Leaderboards
                                                     RelativeSizeAxes = Axes.Y,
                                                     Direction = FillDirection.Horizontal,
                                                     Spacing = new Vector2(5f, 0f),
-                                                    Width = 114f,
+                                                    Width = 130f,
                                                     Masking = true,
                                                     Children = new Drawable[]
                                                     {
@@ -452,8 +452,11 @@ namespace osu.Game.Online.Leaderboards
             {
                 List<MenuItem> items = new List<MenuItem>();
 
-                if (Score.Mods.Length > 0 && songSelect != null)
-                    items.Add(new OsuMenuItem("Use these mods", MenuItemType.Highlighted, () => songSelect.Mods.Value = Score.Mods));
+                // system mods should never be copied across regardless of anything.
+                var copyableMods = Score.Mods.Where(m => m.Type != ModType.System).ToArray();
+
+                if (copyableMods.Length > 0 && songSelect != null)
+                    items.Add(new OsuMenuItem("Use these mods", MenuItemType.Highlighted, () => songSelect.Mods.Value = copyableMods));
 
                 if (Score.OnlineID > 0)
                     items.Add(new OsuMenuItem(CommonStrings.CopyLink, MenuItemType.Standard, () => clipboard?.SetText($@"{api.Endpoints.WebsiteUrl}/scores/{Score.OnlineID}")));

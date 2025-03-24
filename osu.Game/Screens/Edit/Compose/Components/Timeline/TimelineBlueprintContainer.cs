@@ -18,6 +18,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Utils;
 using osu.Game.Audio;
 using osu.Game.Graphics;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
@@ -90,7 +91,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             {
                 placementBlueprint = CreateBlueprintFor(obj.NewValue).AsNonNull();
 
-                placementBlueprint.Colour = OsuColour.Gray(0.9f);
+                // just to show the border. using the selection state doesn't seem to backfire.
+                // if it does then we'll probably want to just make `new` object above rather than rely on `CreateBlueprintFor`.
+                placementBlueprint.State = SelectionState.Selected;
 
                 // TODO: this is out of order, causing incorrect stacking height.
                 SelectionBlueprints.Add(placementBlueprint);

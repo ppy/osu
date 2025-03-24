@@ -46,7 +46,7 @@ namespace osu.Game.Overlays.Chat
             }
         }
 
-        public IReadOnlyCollection<Drawable> DrawableContentFlow => drawableContentFlow;
+        public IEnumerable<Drawable> DrawableContentFlow => drawableContentFlow.Children;
 
         private const float font_size = 13;
 

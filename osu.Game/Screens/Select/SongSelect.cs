@@ -426,7 +426,10 @@ namespace osu.Game.Screens.Select
             (beatmapOptionsButton = new FooterButtonOptions(), BeatmapOptions)
         };
 
-        protected virtual ModSelectOverlay CreateModSelectOverlay() => new SoloModSelectOverlay();
+        protected virtual ModSelectOverlay CreateModSelectOverlay() => new UserModSelectOverlay
+        {
+            ShowPresets = true,
+        };
 
         private DependencyContainer dependencies = null!;
 
@@ -1151,11 +1154,6 @@ namespace osu.Game.Screens.Select
                 resetCarouselPosition?.Invoke();
                 return base.OnHover(e);
             }
-        }
-
-        internal partial class SoloModSelectOverlay : UserModSelectOverlay
-        {
-            protected override bool ShowPresets => true;
         }
     }
 }

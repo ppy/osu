@@ -30,6 +30,7 @@ using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Edit.Components.TernaryButtons;
 using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Rulesets.Osu.Edit
 {
@@ -349,6 +350,35 @@ namespace osu.Game.Rulesets.Osu.Edit
                 distanceSnapGridContainer.Add(distanceSnapGrid);
                 distanceSnapGridCache.Validate();
             }
+        }
+
+        protected override bool OnMouseDown(MouseDownEvent e)
+        {
+            // Why is this logic here and not in `OsuSelectionHandler`?
+            // Because we only want to handle this toggle after all other right-click handling completes.
+            //
+            // Consider that input is handled from the most nested child first:
+            //
+            // ComposeScreen
+            //  |- OsuContextMenuContainer                 // right click for context
+            //     |- TimelineBlueprintContainer
+            //        |- TimelineSelectionHandler
+            //     |- (Osu)HitObjectComposer               // right click for toggle new combo
+            //        |- (Osu)EditorBlueprintContainer     // right click for select
+            //           |- (Osu)EditorSelectionHandler    // right click for delete
+            if (e.Button == MouseButton.Right)
+            {
+                var osuSelectionHandler = (OsuSelectionHandler)BlueprintContainer.SelectionHandler;
+
+                if (!osuSelectionHandler.SelectedItems.Any())
+                {
+                    osuSelectionHandler.SelectionNewComboState.Value =
+                        osuSelectionHandler.SelectionNewComboState.Value == TernaryState.False ? TernaryState.True : TernaryState.False;
+                    return true;
+                }
+            }
+
+            return base.OnMouseDown(e);
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)

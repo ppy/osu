@@ -109,6 +109,8 @@ namespace osu.Game.Beatmaps
 
         int[] Bookmarks { get; internal set; }
 
+        int BeatmapVersion { get; }
+
         /// <summary>
         /// Creates a shallow-clone of this beatmap and returns it.
         /// </summary>
@@ -161,7 +163,7 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Find the total milliseconds between the first and last hittable objects, excluding any break time.
         /// </summary>
-        public static double CalculateDrainLength(this IBeatmap beatmap) => CalculatePlayableLength(beatmap.HitObjects) - beatmap.TotalBreakTime;
+        public static double CalculateDrainLength(this IBeatmap beatmap) => Math.Max(CalculatePlayableLength(beatmap.HitObjects) - beatmap.TotalBreakTime, 0);
 
         /// <summary>
         /// Find the timestamps in milliseconds of the start and end of the playable region.

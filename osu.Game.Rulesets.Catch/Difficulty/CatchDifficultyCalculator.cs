@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
         private float halfCatcherWidth;
 
-        public override int Version => 20220701;
+        public override int Version => 20250306;
 
         public CatchDifficultyCalculator(IRulesetInfo ruleset, IWorkingBeatmap beatmap)
             : base(ruleset, beatmap)

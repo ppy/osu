@@ -164,6 +164,7 @@ namespace osu.Game.Screens.Edit
         private bool switchingDifficulty;
 
         private string lastSavedHash;
+        private EditorMenuItem discardChangesMenuItem;
 
         private ScreenContainer screenContainer;
 
@@ -607,6 +608,8 @@ namespace osu.Game.Screens.Edit
         {
             base.Update();
             clock.ProcessFrame();
+
+            discardChangesMenuItem.Action.Disabled = !HasUnsavedChanges;
         }
 
         public bool OnPressed(KeyBindingPressEvent<PlatformAction> e)
@@ -821,6 +824,10 @@ namespace osu.Game.Screens.Edit
                 case GlobalAction.EditorTestGameplay:
                     bottomBar.TestGameplayButton.TriggerClick();
                     return true;
+
+                case GlobalAction.EditorDiscardUnsavedChanges:
+                    DiscardUnsavedChanges();
+                    return true;
             }
 
             return false;
@@ -1007,6 +1014,20 @@ namespace osu.Game.Screens.Edit
         protected void Undo() => changeHandler?.RestoreState(-1);
 
         protected void Redo() => changeHandler?.RestoreState(1);
+
+        protected void DiscardUnsavedChanges()
+        {
+            if (!HasUnsavedChanges)
+                return;
+
+            // we're not doing this via `changeHandler` because `changeHandler` has limited number of undo actions
+            // and therefore there's no guarantee that it even *has* the beatmap's last saved state in its history still.
+            dialogOverlay.Push(new DiscardUnsavedChangesDialog(() =>
+            {
+                updateLastSavedHash(); // without this a second dialog will show (the standard "save unsaved changes" one that shows on exit).
+                SwitchToDifficulty(editorBeatmap.BeatmapInfo);
+            }));
+        }
 
         protected void SetPreviewPointToCurrentTime()
         {
@@ -1247,6 +1268,11 @@ namespace osu.Game.Screens.Edit
             var save = new EditorMenuItem(WebCommonStrings.ButtonsSave, MenuItemType.Standard, () => attemptMutationOperation(Save)) { Hotkey = new Hotkey(PlatformAction.Save) };
             saveRelatedMenuItems.Add(save);
             yield return save;
+
+            yield return discardChangesMenuItem = new EditorMenuItem(GlobalActionKeyBindingStrings.EditorDiscardUnsavedChanges, MenuItemType.Destructive, DiscardUnsavedChanges)
+            {
+                Hotkey = new Hotkey(GlobalAction.EditorDiscardUnsavedChanges)
+            };
 
             if (RuntimeInfo.OS != RuntimeInfo.Platform.Android)
             {
@@ -1510,11 +1536,11 @@ namespace osu.Game.Screens.Edit
             loader?.CancelPendingDifficultySwitch();
         }
 
-        public Task<bool> Reload()
+        public Task<bool> SaveAndReload()
         {
             var tcs = new TaskCompletionSource<bool>();
 
-            dialogOverlay.Push(new ReloadEditorDialog(
+            dialogOverlay.Push(new SaveAndReloadEditorDialog(
                 reload: () =>
                 {
                     bool reloadedSuccessfully = attemptMutationOperation(() =>

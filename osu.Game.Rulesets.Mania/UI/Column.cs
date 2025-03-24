@@ -12,6 +12,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Platform;
 using osu.Game.Extensions;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Mania.Configuration;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Skinning;
@@ -57,6 +58,8 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public readonly Bindable<Color4> AccentColour = new Bindable<Color4>(Color4.Black);
 
+        private IBindable<ManiaMobileLayout> mobilePlayStyle = null!;
+
         public Column(int index, bool isSpecial)
         {
             Index = index;
@@ -77,7 +80,7 @@ namespace osu.Game.Rulesets.Mania.UI
         private ISkinSource skin { get; set; } = null!;
 
         [BackgroundDependencyLoader]
-        private void load(GameHost host)
+        private void load(GameHost host, ManiaRulesetConfigManager? rulesetConfig)
         {
             SkinnableDrawable keyArea;
 
@@ -115,6 +118,9 @@ namespace osu.Game.Rulesets.Mania.UI
             RegisterPool<HeadNote, DrawableHoldNoteHead>(10, 50);
             RegisterPool<TailNote, DrawableHoldNoteTail>(10, 50);
             RegisterPool<HoldNoteBody, DrawableHoldNoteBody>(10, 50);
+
+            if (rulesetConfig != null)
+                mobilePlayStyle = rulesetConfig.GetBindable<ManiaMobileLayout>(ManiaRulesetSetting.MobileLayout);
         }
 
         private void onSourceChanged()
@@ -193,6 +199,10 @@ namespace osu.Game.Rulesets.Mania.UI
 
         protected override bool OnTouchDown(TouchDownEvent e)
         {
+            // if touch overlay is visible, disallow columns from handling touch directly.
+            if (mobilePlayStyle.Value == ManiaMobileLayout.LandscapeWithOverlay)
+                return false;
+
             maniaInputManager?.KeyBindingContainer.TriggerPressed(Action.Value);
             touchActivationCount++;
             return true;
