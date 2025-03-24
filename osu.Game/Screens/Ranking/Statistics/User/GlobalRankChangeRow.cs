@@ -5,7 +5,6 @@ using System.Diagnostics;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Localisation;
 using osu.Game.Resources.Localisation.Web;
-using osu.Game.Utils;
 
 namespace osu.Game.Screens.Ranking.Statistics.User
 {
@@ -19,7 +18,7 @@ namespace osu.Game.Screens.Ranking.Statistics.User
         protected override LocalisableString Label => UsersStrings.ShowRankGlobalSimple;
 
         protected override LocalisableString FormatCurrentValue(int? current)
-            => current == null ? string.Empty : current.Value.ToLocalisableString(@"N0");
+            => current?.ToLocalisableString(@"N0") ?? string.Empty;
 
         protected override int CalculateDifference(int? previous, int? current, out LocalisableString formattedDifference)
         {
