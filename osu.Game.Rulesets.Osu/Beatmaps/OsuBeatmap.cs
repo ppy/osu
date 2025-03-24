@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
-using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Beatmaps
@@ -23,7 +22,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
             {
                 new BeatmapStatistic
                 {
-                    Name = BeatmapsetsStrings.ShowStatsCountCircles,
+                    Name = "Circles",
                     Content = circles.ToString(),
                     Count = circles,
                     Maximum = maximum,
@@ -31,7 +30,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                 },
                 new BeatmapStatistic
                 {
-                    Name = BeatmapsetsStrings.ShowStatsCountSliders,
+                    Name = "Sliders",
                     Content = sliders.ToString(),
                     Count = sliders,
                     Maximum = maximum,
@@ -39,7 +38,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                 },
                 new BeatmapStatistic
                 {
-                    Name = @"Spinner Count",
+                    Name = @"Spinners",
                     Content = spinners.ToString(),
                     Count = spinners,
                     Maximum = Math.Max(spinners, 10),
