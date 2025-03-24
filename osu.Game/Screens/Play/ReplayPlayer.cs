@@ -32,12 +32,16 @@ namespace osu.Game.Screens.Play
 
         private readonly bool replayIsFailedScore;
 
+        private PlaybackSettings playbackSettings;
+
         protected override UserActivity InitialActivity => new UserActivity.WatchingReplay(Score.ScoreInfo);
+
+        private bool isAutoplayPlayback => GameplayState.Mods.OfType<ModAutoplay>().Any();
 
         // Disallow replays from failing. (see https://github.com/ppy/osu/issues/6108)
         protected override bool CheckModsAllowFailure()
         {
-            if (!replayIsFailedScore && !GameplayState.Mods.OfType<ModAutoplay>().Any())
+            if (!replayIsFailedScore && !isAutoplayPlayback)
                 return false;
 
             return base.CheckModsAllowFailure();
@@ -71,7 +75,7 @@ namespace osu.Game.Screens.Play
             if (!LoadedBeatmapSuccessfully)
                 return;
 
-            var playbackSettings = new PlaybackSettings
+            playbackSettings = new PlaybackSettings
             {
                 Depth = float.MaxValue,
                 Expanded = { BindTarget = config.GetBindable<bool>(OsuSetting.ReplayPlaybackControlsExpanded) }
@@ -102,7 +106,12 @@ namespace osu.Game.Screens.Play
                 Scores = { BindTarget = LeaderboardScores }
             };
 
-        protected override ResultsScreen CreateResults(ScoreInfo score) => new SoloResultsScreen(score);
+        protected override ResultsScreen CreateResults(ScoreInfo score) => new SoloResultsScreen(score)
+        {
+            // Only show the relevant button otherwise things look silly.
+            AllowWatchingReplay = !isAutoplayPlayback,
+            AllowRetry = isAutoplayPlayback,
+        };
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
@@ -117,11 +126,11 @@ namespace osu.Game.Screens.Play
                     return true;
 
                 case GlobalAction.SeekReplayBackward:
-                    SeekInDirection(-5);
+                    SeekInDirection(-5 * (float)playbackSettings.UserPlaybackRate.Value);
                     return true;
 
                 case GlobalAction.SeekReplayForward:
-                    SeekInDirection(5);
+                    SeekInDirection(5 * (float)playbackSettings.UserPlaybackRate.Value);
                     return true;
 
                 case GlobalAction.TogglePauseReplay:

@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -10,7 +11,9 @@ using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Online.Rooms;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.OnlinePlay.Components;
+using osu.Game.Utils;
 
 namespace osu.Game.Screens.OnlinePlay.Playlists
 {
@@ -18,6 +21,9 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
     {
         [Resolved]
         private IBindable<WorkingBeatmap> gameBeatmap { get; set; } = null!;
+
+        [Resolved]
+        private IBindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
 
         private readonly Room room;
 
@@ -63,14 +69,14 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         {
             base.Update();
 
-            Enabled.Value = hasRemainingAttempts && enoughTimeLeft;
+            Enabled.Value = hasRemainingAttempts && enoughTimeLeft();
         }
 
         public override LocalisableString TooltipText
         {
             get
             {
-                if (!enoughTimeLeft)
+                if (!enoughTimeLeft())
                     return "No time left!";
 
                 if (!hasRemainingAttempts)
@@ -80,9 +86,17 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             }
         }
 
-        private bool enoughTimeLeft =>
-            // This should probably consider the length of the currently selected item, rather than a constant 30 seconds.
-            room.EndDate != null && DateTimeOffset.UtcNow.AddSeconds(30).AddMilliseconds(gameBeatmap.Value.Track.Length) < room.EndDate;
+        private bool enoughTimeLeft()
+        {
+            double rate = ModUtils.CalculateRateWithMods(mods.Value);
+
+            // We want to avoid users not being able to submit scores if they chose to not skip,
+            // so track length is chosen over playable length.
+            double trackLength = Math.Round(gameBeatmap.Value.Track.Length / rate);
+
+            // Additional 30 second delay added to account for load and/or submit time.
+            return room.EndDate != null && DateTimeOffset.UtcNow.AddSeconds(30).AddMilliseconds(trackLength) < room.EndDate;
+        }
 
         protected override void Dispose(bool isDisposing)
         {

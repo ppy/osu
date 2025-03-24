@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Online;
 using osu.Game.Scoring;
@@ -12,7 +13,7 @@ namespace osu.Game.Tests.Visual.Ranking
 {
     public partial class TestSceneOverallRanking : OsuTestScene
     {
-        private OverallRanking overallRanking = null!;
+        private readonly Bindable<ScoreBasedUserStatisticsUpdate?> statisticsUpdate = new Bindable<ScoreBasedUserStatisticsUpdate?>();
 
         [Test]
         public void TestUpdatePending()
@@ -138,14 +139,19 @@ namespace osu.Game.Tests.Visual.Ranking
                 new UserStatistics());
         }
 
-        private void createDisplay() => AddStep("create display", () => Child = overallRanking = new OverallRanking
+        private void createDisplay() => AddStep("create display", () =>
         {
-            Width = 400,
-            Anchor = Anchor.Centre,
-            Origin = Anchor.Centre
+            statisticsUpdate.Value = null;
+            Child = new OverallRanking(new ScoreInfo())
+            {
+                Width = 400,
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                DisplayedUpdate = { BindTarget = statisticsUpdate }
+            };
         });
 
         private void displayUpdate(UserStatistics before, UserStatistics after) =>
-            AddStep("display update", () => overallRanking.StatisticsUpdate.Value = new ScoreBasedUserStatisticsUpdate(new ScoreInfo(), before, after));
+            AddStep("display update", () => statisticsUpdate.Value = new ScoreBasedUserStatisticsUpdate(new ScoreInfo(), before, after));
     }
 }

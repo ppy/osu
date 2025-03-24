@@ -9,7 +9,6 @@ using osu.Framework.Graphics;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
-using osu.Game.Resources.Localisation.Web;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Screens.OnlinePlay.Match.Components;
 using osuTK;
@@ -26,12 +25,13 @@ namespace osu.Game.Screens.OnlinePlay.Match
             set => selectedItem.Current = value;
         }
 
+        public Drawable? ChangeSettingsButton { get; private set; }
+
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
 
         private readonly BindableWithCurrent<PlaylistItem?> selectedItem = new BindableWithCurrent<PlaylistItem?>();
         private readonly bool allowEdit;
-        private Drawable? editButton;
 
         public DrawableMatchRoom(Room room, bool allowEdit = true)
             : base(room)
@@ -46,11 +46,13 @@ namespace osu.Game.Screens.OnlinePlay.Match
         {
             if (allowEdit)
             {
-                ButtonsContainer.Add(editButton = new PurpleRoundedButton
+                ButtonsContainer.Add(ChangeSettingsButton = new PurpleRoundedButton
                 {
                     RelativeSizeAxes = Axes.Y,
-                    Size = new Vector2(100, 1),
-                    Text = CommonStrings.ButtonsEdit,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Size = new Vector2(120, 0.7f),
+                    Text = "Change settings",
                     Action = () => OnEdit?.Invoke()
                 });
             }
@@ -72,8 +74,8 @@ namespace osu.Game.Screens.OnlinePlay.Match
 
         private void updateRoomHost()
         {
-            if (editButton != null)
-                editButton.Alpha = Room.Host?.Equals(api.LocalUser.Value) == true ? 1 : 0;
+            if (ChangeSettingsButton != null)
+                ChangeSettingsButton.Alpha = Room.Host?.Equals(api.LocalUser.Value) == true ? 1 : 0;
         }
 
         protected override UpdateableBeatmapBackgroundSprite CreateBackground() => base.CreateBackground().With(d =>

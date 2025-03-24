@@ -14,8 +14,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour
     public static class TaikoColourDifficultyPreprocessor
     {
         /// <summary>
-        /// Processes and encodes a list of <see cref="TaikoDifficultyHitObject"/>s into a list of <see cref="TaikoDifficultyHitObjectColour"/>s,
-        /// assigning the appropriate <see cref="TaikoDifficultyHitObjectColour"/>s to each <see cref="TaikoDifficultyHitObject"/>.
+        /// Processes and encodes a list of <see cref="TaikoDifficultyHitObject"/>s into a list of <see cref="TaikoColourData"/>s,
+        /// assigning the appropriate <see cref="TaikoColourData"/>s to each <see cref="TaikoDifficultyHitObject"/>.
         /// </summary>
         public static void ProcessAndAssign(List<DifficultyHitObject> hitObjects)
         {
@@ -41,9 +41,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour
 
                         foreach (var hitObject in monoStreak.HitObjects)
                         {
-                            hitObject.Colour.RepeatingHitPattern = repeatingHitPattern;
-                            hitObject.Colour.AlternatingMonoPattern = monoPattern;
-                            hitObject.Colour.MonoStreak = monoStreak;
+                            hitObject.ColourData.RepeatingHitPattern = repeatingHitPattern;
+                            hitObject.ColourData.AlternatingMonoPattern = monoPattern;
+                            hitObject.ColourData.MonoStreak = monoStreak;
                         }
                     }
                 }

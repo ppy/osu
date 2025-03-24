@@ -15,6 +15,7 @@ using osu.Framework.Audio.Track;
 using osu.Framework.Extensions;
 using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Database;
 using osu.Game.Extensions;
@@ -154,8 +155,19 @@ namespace osu.Game.Beatmaps
                 DifficultyName = NamingUtils.GetNextBestName(targetBeatmapSet.Beatmaps.Select(b => b.DifficultyName), "New Difficulty")
             };
             var newBeatmap = new Beatmap { BeatmapInfo = newBeatmapInfo };
+
             foreach (var timingPoint in referenceWorkingBeatmap.Beatmap.ControlPointInfo.TimingPoints)
                 newBeatmap.ControlPointInfo.Add(timingPoint.Time, timingPoint.DeepClone());
+
+            foreach (var effectPoint in referenceWorkingBeatmap.Beatmap.ControlPointInfo.EffectPoints)
+            {
+                var clonedEffectPoint = (EffectControlPoint)effectPoint.DeepClone();
+
+                if (!rulesetInfo.Equals(referenceWorkingBeatmap.BeatmapInfo.Ruleset))
+                    clonedEffectPoint.ScrollSpeedBindable.SetDefault();
+
+                newBeatmap.ControlPointInfo.Add(clonedEffectPoint.Time, clonedEffectPoint);
+            }
 
             return addDifficultyToSet(targetBeatmapSet, newBeatmap, referenceWorkingBeatmap.Skin);
         }
@@ -408,7 +420,7 @@ namespace osu.Game.Beatmaps
                     // user requested abort
                     return;
 
-                var video = b.Files.FirstOrDefault(f => OsuGameBase.VIDEO_EXTENSIONS.Any(ex => f.Filename.EndsWith(ex, StringComparison.OrdinalIgnoreCase)));
+                var video = b.Files.FirstOrDefault(f => SupportedExtensions.VIDEO_EXTENSIONS.Any(ex => f.Filename.EndsWith(ex, StringComparison.OrdinalIgnoreCase)));
 
                 if (video != null)
                 {
@@ -463,11 +475,8 @@ namespace osu.Game.Beatmaps
             beatmapContent.BeatmapInfo = beatmapInfo;
 
             // Since now this is a locally-modified beatmap, we also set all relevant flags to indicate this.
-            // Importantly, the `ResetOnlineInfo()` call must happen before encoding, as online ID is encoded into the `.osu` file,
-            // which influences the beatmap checksums.
             beatmapInfo.LastLocalUpdate = DateTimeOffset.Now;
             beatmapInfo.Status = BeatmapOnlineStatus.LocallyModified;
-            beatmapInfo.ResetOnlineInfo();
 
             Realm.Write(r =>
             {
@@ -520,6 +529,16 @@ namespace osu.Game.Beatmaps
                 return $"{metadata.Artist} - {metadata.Title} ({metadata.Author.Username}) [{beatmapInfo.DifficultyName}].osu".GetValidFilename();
             }
         }
+
+        public void MarkPlayed(BeatmapInfo beatmapSetInfo) => Realm.Run(r =>
+        {
+            using var transaction = r.BeginWrite();
+
+            var beatmap = r.Find<BeatmapInfo>(beatmapSetInfo.ID)!;
+            beatmap.LastPlayed = DateTimeOffset.Now;
+
+            transaction.Commit();
+        });
 
         #region Implementation of ICanAcceptFiles
 

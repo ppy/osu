@@ -27,7 +27,7 @@ namespace osu.Game.Tests
                                         [CallerMemberName] string callingMethodName = @"")
             : base($"{callingMethodName}-{Guid.NewGuid()}", new HostOptions
             {
-                IPCPort = bindIPC ? OsuGame.IPC_PORT : null,
+                IPCPipeName = bindIPC ? OsuGame.IPC_PIPE_NAME : null,
             }, bypassCleanup: bypassCleanupOnDispose, realtime: realtime)
         {
             this.bypassCleanupOnSetup = bypassCleanupOnSetup;

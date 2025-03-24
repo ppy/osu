@@ -56,7 +56,7 @@ namespace osu.Game.Online.Chat
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            IdleColour = overlayColourProvider?.Light2 ?? colours.Blue;
+            IdleColour ??= overlayColourProvider?.Light2 ?? colours.Blue;
         }
 
         protected override IEnumerable<Drawable> EffectTargets => Parts;

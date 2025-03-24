@@ -226,7 +226,7 @@ namespace osu.Game.Skinning.Components
                     return computeDifficulty().ApproachRate.ToLocalisableString(@"0.##");
 
                 case BeatmapAttribute.StarRating:
-                    return (starDifficulty?.Stars ?? 0).ToLocalisableString(@"F2");
+                    return (starDifficulty?.Stars ?? 0).FormatStarRating();
 
                 case BeatmapAttribute.MaxPP:
                     return Math.Round(starDifficulty?.PerformanceAttributes?.Total ?? 0, MidpointRounding.AwayFromZero).ToLocalisableString();

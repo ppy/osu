@@ -196,6 +196,27 @@ namespace osu.Game.Graphics
         }
 
         /// <summary>
+        /// Retrieves the accent colour representing a <see cref="Room"/>'s current status.
+        /// </summary>
+        public Color4 ForRoomStatus(Room room)
+        {
+            if (room.HasEnded)
+                return YellowDarker;
+
+            switch (room.Status)
+            {
+                case RoomStatus.Playing:
+                    return Purple;
+
+                default:
+                    if (room.HasPassword)
+                        return GreenDark;
+
+                    return GreenLight;
+            }
+        }
+
+        /// <summary>
         /// Retrieves colour for a <see cref="RankingTier"/>.
         /// See https://www.figma.com/file/YHWhp9wZ089YXgB7pe6L1k/Tier-Colours
         /// </summary>

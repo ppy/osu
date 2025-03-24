@@ -17,6 +17,7 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Screens.Edit;
+using osu.Game.Utils;
 
 namespace osu.Game.Beatmaps.Formats
 {
@@ -50,7 +51,7 @@ namespace osu.Game.Beatmaps.Formats
         }
 
         /// <summary>
-        /// Whether or not beatmap or runtime offsets should be applied. Defaults on; only disable for testing purposes.
+        /// Whether beatmap or runtime offsets should be applied. Defaults on; only disable for testing purposes.
         /// </summary>
         public bool ApplyOffsets = true;
 
@@ -78,10 +79,10 @@ namespace osu.Game.Beatmaps.Formats
         protected override void ParseStreamInto(LineBufferedReader stream, Beatmap beatmap)
         {
             this.beatmap = beatmap;
-            this.beatmap.BeatmapInfo.BeatmapVersion = FormatVersion;
+            this.beatmap.BeatmapVersion = FormatVersion;
             parser = new ConvertHitObjectParser(getOffsetTime(), FormatVersion);
 
-            applyLegacyDefaults(this.beatmap.BeatmapInfo);
+            ApplyLegacyDefaults(this.beatmap);
 
             base.ParseStreamInto(stream, beatmap);
 
@@ -189,9 +190,13 @@ namespace osu.Game.Beatmaps.Formats
         /// This method's intention is to restore those legacy defaults.
         /// See also: https://osu.ppy.sh/wiki/en/Client/File_formats/Osu_%28file_format%29
         /// </summary>
-        private static void applyLegacyDefaults(BeatmapInfo beatmapInfo)
+        internal static void ApplyLegacyDefaults(Beatmap beatmap)
         {
-            beatmapInfo.WidescreenStoryboard = false;
+            beatmap.WidescreenStoryboard = false;
+            // in a perfect world this would throw if osu! ruleset couldn't be found,
+            // but unfortunately there are "legitimate" cases where it's not there (i.e. ruleset test projects),
+            // so attempt to trudge on with whatever it is that's in `BeatmapInfo` if the lookup fails.
+            beatmap.BeatmapInfo.Ruleset = RulesetStore?.GetRuleset(0) ?? beatmap.BeatmapInfo.Ruleset;
         }
 
         protected override void ParseLine(Beatmap beatmap, Section section, string line)
@@ -243,7 +248,7 @@ namespace osu.Game.Beatmaps.Formats
                     break;
 
                 case @"AudioLeadIn":
-                    beatmap.BeatmapInfo.AudioLeadIn = Parsing.ParseInt(pair.Value);
+                    beatmap.AudioLeadIn = Parsing.ParseInt(pair.Value);
                     break;
 
                 case @"PreviewTime":
@@ -260,7 +265,7 @@ namespace osu.Game.Beatmaps.Formats
                     break;
 
                 case @"StackLeniency":
-                    beatmap.BeatmapInfo.StackLeniency = Parsing.ParseFloat(pair.Value);
+                    beatmap.StackLeniency = Parsing.ParseFloat(pair.Value);
                     break;
 
                 case @"Mode":
@@ -268,31 +273,31 @@ namespace osu.Game.Beatmaps.Formats
                     break;
 
                 case @"LetterboxInBreaks":
-                    beatmap.BeatmapInfo.LetterboxInBreaks = Parsing.ParseInt(pair.Value) == 1;
+                    beatmap.LetterboxInBreaks = Parsing.ParseInt(pair.Value) == 1;
                     break;
 
                 case @"SpecialStyle":
-                    beatmap.BeatmapInfo.SpecialStyle = Parsing.ParseInt(pair.Value) == 1;
+                    beatmap.SpecialStyle = Parsing.ParseInt(pair.Value) == 1;
                     break;
 
                 case @"WidescreenStoryboard":
-                    beatmap.BeatmapInfo.WidescreenStoryboard = Parsing.ParseInt(pair.Value) == 1;
+                    beatmap.WidescreenStoryboard = Parsing.ParseInt(pair.Value) == 1;
                     break;
 
                 case @"EpilepsyWarning":
-                    beatmap.BeatmapInfo.EpilepsyWarning = Parsing.ParseInt(pair.Value) == 1;
+                    beatmap.EpilepsyWarning = Parsing.ParseInt(pair.Value) == 1;
                     break;
 
                 case @"SamplesMatchPlaybackRate":
-                    beatmap.BeatmapInfo.SamplesMatchPlaybackRate = Parsing.ParseInt(pair.Value) == 1;
+                    beatmap.SamplesMatchPlaybackRate = Parsing.ParseInt(pair.Value) == 1;
                     break;
 
                 case @"Countdown":
-                    beatmap.BeatmapInfo.Countdown = Enum.Parse<CountdownType>(pair.Value);
+                    beatmap.Countdown = Enum.Parse<CountdownType>(pair.Value);
                     break;
 
                 case @"CountdownOffset":
-                    beatmap.BeatmapInfo.CountdownOffset = Parsing.ParseInt(pair.Value);
+                    beatmap.CountdownOffset = Parsing.ParseInt(pair.Value);
                     break;
             }
         }
@@ -304,7 +309,7 @@ namespace osu.Game.Beatmaps.Formats
             switch (pair.Key)
             {
                 case @"Bookmarks":
-                    beatmap.BeatmapInfo.Bookmarks = pair.Value.Split(',').Select(v =>
+                    beatmap.Bookmarks = pair.Value.Split(',').Select(v =>
                     {
                         bool result = int.TryParse(v, out int val);
                         return new { result, val };
@@ -312,7 +317,7 @@ namespace osu.Game.Beatmaps.Formats
                     break;
 
                 case @"DistanceSpacing":
-                    beatmap.BeatmapInfo.DistanceSpacing = Math.Max(0, Parsing.ParseDouble(pair.Value));
+                    beatmap.DistanceSpacing = Math.Max(0, Parsing.ParseDouble(pair.Value));
                     break;
 
                 case @"BeatDivisor":
@@ -320,11 +325,11 @@ namespace osu.Game.Beatmaps.Formats
                     break;
 
                 case @"GridSize":
-                    beatmap.BeatmapInfo.GridSize = Parsing.ParseInt(pair.Value);
+                    beatmap.GridSize = Parsing.ParseInt(pair.Value);
                     break;
 
                 case @"TimelineZoom":
-                    beatmap.BeatmapInfo.TimelineZoom = Math.Max(0, Parsing.ParseDouble(pair.Value));
+                    beatmap.TimelineZoom = Math.Max(0, Parsing.ParseDouble(pair.Value));
                     break;
             }
         }
@@ -446,7 +451,7 @@ namespace osu.Game.Beatmaps.Formats
                         // Some very old beatmaps had incorrect type specifications for their backgrounds (ie. using 1 for VIDEO
                         // instead of 0 for BACKGROUND). To handle this gracefully, check the file extension against known supported
                         // video extensions and handle similar to a background if it doesn't match.
-                        if (!OsuGameBase.VIDEO_EXTENSIONS.Contains(Path.GetExtension(filename).ToLowerInvariant()))
+                        if (!SupportedExtensions.VIDEO_EXTENSIONS.Contains(Path.GetExtension(filename).ToLowerInvariant()))
                         {
                             beatmap.BeatmapInfo.Metadata.BackgroundFile = filename;
                             lineSupportedByEncoder = true;

@@ -5,7 +5,6 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
-using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -28,6 +27,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
     {
         private MultiplayerSpectateButton spectateButton = null!;
         private MatchStartControl startControl = null!;
+        private Room room = null!;
 
         private BeatmapSetInfo importedSet = null!;
         private BeatmapManager beatmaps = null!;
@@ -46,11 +46,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             base.SetUpSteps();
 
+            AddStep("create room", () => room = CreateDefaultRoom());
+            AddStep("join room", () => JoinRoom(room));
+            WaitForJoined();
+
             AddStep("create button", () =>
             {
-                PlaylistItem item = SelectedRoom.Value!.Playlist.First();
-
-                AvailabilityTracker.SelectedItem.Value = item;
+                AvailabilityTracker.SelectedItem.Value = room.Playlist.First();
 
                 importedSet = beatmaps.GetAllUsableBeatmapSets().First();
                 Beatmap.Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First());
@@ -68,15 +70,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
-                                Size = new Vector2(200, 50),
-                                SelectedItem = new Bindable<PlaylistItem?>(item)
+                                Size = new Vector2(200, 50)
                             },
                             startControl = new MatchStartControl
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
-                                Size = new Vector2(200, 50),
-                                SelectedItem = new Bindable<PlaylistItem?>(item)
+                                Size = new Vector2(200, 50)
                             }
                         }
                     }
