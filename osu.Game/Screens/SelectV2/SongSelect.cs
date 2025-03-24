@@ -96,7 +96,7 @@ namespace osu.Game.Screens.SelectV2
                                 },
                                 Content = new[]
                                 {
-                                    new Drawable[]
+                                    new[]
                                     {
                                         new FillFlowContainer
                                         {
