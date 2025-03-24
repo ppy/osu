@@ -411,7 +411,7 @@ namespace osu.Game.Online.Chat
         }
 
         /// <summary>
-        /// Find an existing channel instance for the provided channel. Lookup is performed basd on ID.
+        /// Find an existing channel instance for the provided channel. Lookup is performed based on ID.
         /// The provided channel may be used if an existing instance is not found.
         /// </summary>
         /// <param name="lookup">A candidate channel to be used for lookup or permanently on lookup failure.</param>

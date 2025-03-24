@@ -120,6 +120,11 @@ namespace osu.Game.Localisation
         public static LocalisableString AutoplayBeatmapShortcut => new TranslatableString(getKey(@"autoplay_beatmap_shortcut"), @"Ctrl-Enter at song select will start a beatmap in autoplay mode!");
 
         /// <summary>
+        /// "&quot;Lazer&quot; is not an English word. The correct spelling for the bright light is &quot;laser&quot;."
+        /// </summary>
+        public static LocalisableString LazerIsNotAWord => new TranslatableString(getKey(@"lazer_is_not_a_word"), @"""Lazer"" is not an English word. The correct spelling for the bright light is ""laser"".");
+
+        /// <summary>
         /// "Multithreading support means that even with low &quot;FPS&quot; your input and judgements will be accurate!"
         /// </summary>
         public static LocalisableString MultithreadingSupport => new TranslatableString(getKey(@"multithreading_support"), @"Multithreading support means that even with low ""FPS"" your input and judgements will be accurate!");

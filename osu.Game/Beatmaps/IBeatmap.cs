@@ -7,6 +7,7 @@ using System.Linq;
 using osu.Framework.Lists;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Timing;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
 
@@ -69,6 +70,47 @@ namespace osu.Game.Beatmaps
         /// </summary>
         double GetMostCommonBeatLength();
 
+        double AudioLeadIn { get; internal set; }
+
+        float StackLeniency { get; internal set; }
+
+        bool SpecialStyle { get; internal set; }
+
+        bool LetterboxInBreaks { get; internal set; }
+
+        bool WidescreenStoryboard { get; internal set; }
+
+        bool EpilepsyWarning { get; internal set; }
+
+        bool SamplesMatchPlaybackRate { get; internal set; }
+
+        /// <summary>
+        /// The ratio of distance travelled per time unit.
+        /// Generally used to decouple the spacing between hit objects from the enforced "velocity" of the beatmap (see <see cref="DifficultyControlPoint.SliderVelocity"/>).
+        /// </summary>
+        /// <remarks>
+        /// The most common method of understanding is that at a default value of 1.0, the time-to-distance ratio will match the slider velocity of the beatmap
+        /// at the current point in time. Increasing this value will make hit objects more spaced apart when compared to the cursor movement required to track a slider.
+        ///
+        /// This is only a hint property, used by the editor in <see cref="IDistanceSnapProvider"/> implementations. It does not directly affect the beatmap or gameplay.
+        /// </remarks>
+        double DistanceSpacing { get; internal set; }
+
+        int GridSize { get; internal set; }
+
+        double TimelineZoom { get; internal set; }
+
+        CountdownType Countdown { get; internal set; }
+
+        /// <summary>
+        /// The number of beats to move the countdown backwards (compared to its default location).
+        /// </summary>
+        int CountdownOffset { get; internal set; }
+
+        int[] Bookmarks { get; internal set; }
+
+        int BeatmapVersion { get; }
+
         /// <summary>
         /// Creates a shallow-clone of this beatmap and returns it.
         /// </summary>
@@ -121,7 +163,7 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Find the total milliseconds between the first and last hittable objects, excluding any break time.
         /// </summary>
-        public static double CalculateDrainLength(this IBeatmap beatmap) => CalculatePlayableLength(beatmap.HitObjects) - beatmap.TotalBreakTime;
+        public static double CalculateDrainLength(this IBeatmap beatmap) => Math.Max(CalculatePlayableLength(beatmap.HitObjects) - beatmap.TotalBreakTime, 0);
 
         /// <summary>
         /// Find the timestamps in milliseconds of the start and end of the playable region.

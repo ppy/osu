@@ -88,6 +88,9 @@ namespace osu.Game.Screens.Select.Carousel
         [Resolved]
         private OsuGame? game { get; set; }
 
+        [Resolved]
+        private BeatmapManager? manager { get; set; }
+
         private IBindable<StarDifficulty?> starDifficultyBindable = null!;
         private CancellationTokenSource? starDifficultyCancellationSource;
 
@@ -98,7 +101,7 @@ namespace osu.Game.Screens.Select.Carousel
         }
 
         [BackgroundDependencyLoader]
-        private void load(BeatmapManager? manager, SongSelect? songSelect)
+        private void load(SongSelect? songSelect)
         {
             Header.Height = height;
 
@@ -298,7 +301,10 @@ namespace osu.Game.Screens.Select.Carousel
                 items.Add(new OsuMenuItem("Collections") { Items = collectionItems });
 
                 if (beatmapInfo.GetOnlineURL(api, ruleset.Value) is string url)
-                    items.Add(new OsuMenuItem(CommonStrings.CopyLink, MenuItemType.Standard, () => game?.CopyUrlToClipboard(url)));
+                    items.Add(new OsuMenuItem(CommonStrings.CopyLink, MenuItemType.Standard, () => game?.CopyToClipboard(url)));
+
+                if (manager != null)
+                    items.Add(new OsuMenuItem("Mark as played", MenuItemType.Standard, () => manager.MarkPlayed(beatmapInfo)));
 
                 if (hideRequested != null)
                     items.Add(new OsuMenuItem(WebCommonStrings.ButtonsHide.ToSentence(), MenuItemType.Destructive, () => hideRequested(beatmapInfo)));
