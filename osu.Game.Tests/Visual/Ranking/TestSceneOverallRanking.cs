@@ -104,6 +104,40 @@ namespace osu.Game.Tests.Visual.Ranking
             displayUpdate(statistics, statistics);
         }
 
+        [Test]
+        public void TestFromNothing()
+        {
+            createDisplay();
+            displayUpdate(
+                new UserStatistics(),
+                new UserStatistics
+                {
+                    GlobalRank = 12_345,
+                    Accuracy = 98.99,
+                    MaxCombo = 2_322,
+                    RankedScore = 23_123_543_456,
+                    TotalScore = 123_123_543_456,
+                    PP = 5_072
+                });
+        }
+
+        [Test]
+        public void TestToNothing()
+        {
+            createDisplay();
+            displayUpdate(
+                new UserStatistics
+                {
+                    GlobalRank = 12_345,
+                    Accuracy = 98.99,
+                    MaxCombo = 2_322,
+                    RankedScore = 23_123_543_456,
+                    TotalScore = 123_123_543_456,
+                    PP = 5_072
+                },
+                new UserStatistics());
+        }
+
         private void createDisplay() => AddStep("create display", () => Child = overallRanking = new OverallRanking
         {
             Width = 400,
