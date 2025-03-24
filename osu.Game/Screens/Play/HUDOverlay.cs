@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Logging;
 using osu.Game.Configuration;
 using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
@@ -195,7 +196,7 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuConfigManager config, INotificationOverlay notificationOverlay)
+        private void load(OsuConfigManager config, INotificationOverlay notificationOverlay, ISkinSource skinSource)
         {
             if (drawableRuleset != null)
             {
@@ -220,6 +221,27 @@ namespace osu.Game.Screens.Play
 
             // start all elements hidden
             hideTargets.ForEach(d => d.Hide());
+
+            logSkinLookupHierarchy(skinSource);
+        }
+
+        private void logSkinLookupHierarchy(ISkinSource skinSource)
+        {
+            Logger.Log("Skin lookup hierarchy for HUD:");
+            Logger.Log(string.Empty);
+
+            log(skinSource);
+
+            void log(ISkin s, int depth = 0)
+            {
+                Logger.Log(new string('-', depth) + $"| {s}");
+
+                if (s is ISkinSource ss)
+                {
+                    foreach (var nestedSource in ss.AllSources)
+                        log(nestedSource, depth + 1);
+                }
+            }
         }
 
         public override void Hide() =>
