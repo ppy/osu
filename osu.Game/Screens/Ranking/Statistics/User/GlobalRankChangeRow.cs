@@ -30,13 +30,13 @@ namespace osu.Game.Screens.Ranking.Statistics.User
 
             if (previous == null && current != null)
             {
-                formattedDifference = LocalisableString.Interpolate($"+{current.Value.ToString()}");
+                formattedDifference = LocalisableString.Interpolate($"+{current.Value:N0}");
                 return 1;
             }
 
             if (previous != null && current == null)
             {
-                formattedDifference = LocalisableString.Interpolate($"-{previous.Value.ToString()}");
+                formattedDifference = LocalisableString.Interpolate($"-{previous.Value:N0}");
                 return -1;
             }
 
@@ -48,7 +48,7 @@ namespace osu.Game.Screens.Ranking.Statistics.User
             if (difference < 0)
                 formattedDifference = difference.ToLocalisableString(@"N0");
             else if (difference > 0)
-                formattedDifference = LocalisableString.Interpolate($"+{difference.ToLocalisableString(@"N0")}");
+                formattedDifference = LocalisableString.Interpolate($"+{difference:N0}");
             else
                 formattedDifference = string.Empty;
 
