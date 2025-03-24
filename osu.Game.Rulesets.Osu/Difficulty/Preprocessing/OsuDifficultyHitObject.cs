@@ -139,24 +139,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             return Math.Clamp((time - fadeInStartTime) / fadeInDuration, 0.0, 1.0);
         }
 
-        /// <summary>
-        /// Returns how possible is it to doubletap this object together with the next one and get perfect judgement in range from 0 to 1
-        /// </summary>
-        public double GetDoubletapness(OsuDifficultyHitObject? osuNextObj)
-        {
-            if (osuNextObj != null)
-            {
-                double currDeltaTime = Math.Max(1, DeltaTime);
-                double nextDeltaTime = Math.Max(1, osuNextObj.DeltaTime);
-                double deltaDifference = Math.Abs(nextDeltaTime - currDeltaTime);
-                double speedRatio = currDeltaTime / Math.Max(currDeltaTime, deltaDifference);
-                double windowRatio = Math.Pow(Math.Min(1, currDeltaTime / HitWindowGreat), 2);
-                return 1.0 - Math.Pow(speedRatio, 1 - windowRatio);
-            }
-
-            return 0;
-        }
-
         private void setDistances(double clockRate)
         {
             if (BaseObject is Slider currentSlider)
