@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -11,7 +10,7 @@ using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
 using osu.Game.Screens.Footer;
 using osu.Game.Screens.Menu;
-using osu.Game.Screens.Play;
+using osu.Game.Screens.Select;
 using osu.Game.Screens.SelectV2.Footer;
 
 namespace osu.Game.Screens.SelectV2
@@ -20,14 +19,19 @@ namespace osu.Game.Screens.SelectV2
     /// This screen is intended to house all components introduced in the new song select design to add transitions and examine the overall look.
     /// This will be gradually built upon and ultimately replace <see cref="Select.SongSelect"/> once everything is in place.
     /// </summary>
-    public partial class SongSelectV2 : OsuScreen
+    public abstract partial class SongSelect : OsuScreen
     {
         private const float logo_scale = 0.4f;
 
-        private readonly ModSelectOverlay modSelectOverlay = new SoloModSelectOverlay();
+        private readonly ModSelectOverlay modSelectOverlay = new ModSelectOverlay
+        {
+            ShowPresets = true,
+        };
 
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
+
+        private BeatmapCarousel carousel = null!;
 
         public override bool ShowFooter => true;
 
@@ -39,17 +43,33 @@ namespace osu.Game.Screens.SelectV2
         {
             AddRangeInternal(new Drawable[]
             {
-                new Container
+                new GridContainer // used for max width implementation
                 {
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight,
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Bottom = ScreenFooter.HEIGHT },
-                    Child = new BeatmapCarousel
+                    ColumnDimensions = new[]
                     {
-                        Anchor = Anchor.TopRight,
-                        Origin = Anchor.TopRight,
-                        RelativeSizeAxes = Axes.Both,
-                        Width = 0.6f,
+                        new Dimension(),
+                        new Dimension(GridSizeMode.Relative, 0.5f, maxSize: 750),
                     },
+                    Content = new[]
+                    {
+                        new[]
+                        {
+                            Empty(),
+                            new Container
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Padding = new MarginPadding { Bottom = ScreenFooter.HEIGHT },
+                                Child = carousel = new BeatmapCarousel
+                                {
+                                    RequestPresentBeatmap = _ => OnStart(),
+                                    RelativeSizeAxes = Axes.Both
+                                },
+                            },
+                        }
+                    }
                 },
                 modSelectOverlay,
             });
@@ -82,9 +102,13 @@ namespace osu.Game.Screens.SelectV2
             base.OnEntering(e);
         }
 
+        private const double fade_duration = 300;
+
         public override void OnResuming(ScreenTransitionEvent e)
         {
-            this.FadeIn();
+            this.FadeIn(fade_duration, Easing.OutQuint);
+
+            carousel.VisuallyFocusSelected = false;
 
             // required due to https://github.com/ppy/osu-framework/issues/3218
             modSelectOverlay.SelectedMods.Disabled = false;
@@ -95,16 +119,18 @@ namespace osu.Game.Screens.SelectV2
 
         public override void OnSuspending(ScreenTransitionEvent e)
         {
-            this.Delay(400).FadeOut();
+            this.Delay(100).FadeOut(fade_duration, Easing.OutQuint);
 
             modSelectOverlay.SelectedMods.UnbindFrom(Mods);
+
+            carousel.VisuallyFocusSelected = true;
 
             base.OnSuspending(e);
         }
 
         public override bool OnExiting(ScreenExitEvent e)
         {
-            this.Delay(400).FadeOut();
+            this.FadeOut(fade_duration, Easing.OutQuint);
             return base.OnExiting(e);
         }
 
@@ -126,10 +152,16 @@ namespace osu.Game.Screens.SelectV2
 
             logo.Action = () =>
             {
-                this.Push(new PlayerLoaderV2(() => new SoloPlayer()));
+                OnStart();
                 return false;
             };
         }
+
+        /// <summary>
+        /// Called when a selection is made.
+        /// </summary>
+        /// <returns>If a resultant action occurred that takes the user away from SongSelect.</returns>
+        protected abstract bool OnStart();
 
         protected override void LogoSuspending(OsuLogo logo)
         {
@@ -145,19 +177,17 @@ namespace osu.Game.Screens.SelectV2
             logo.FadeOut(120, Easing.Out);
         }
 
-        private partial class SoloModSelectOverlay : UserModSelectOverlay
+        /// <summary>
+        /// Set the query to the search text box.
+        /// </summary>
+        /// <param name="query">The string to search.</param>
+        public void Search(string query)
         {
-            protected override bool ShowPresets => true;
-        }
-
-        private partial class PlayerLoaderV2 : PlayerLoader
-        {
-            public override bool ShowFooter => true;
-
-            public PlayerLoaderV2(Func<Player> createPlayer)
-                : base(createPlayer)
+            carousel.Filter(new FilterCriteria
             {
-            }
+                // TODO: this should only set the text of the current criteria, not use a completely new criteria.
+                SearchText = query,
+            });
         }
     }
 }

@@ -31,7 +31,10 @@ namespace osu.Game.Rulesets.Objects
         /// </summary>
         public readonly Bindable<double?> ExpectedDistance = new Bindable<double?>();
 
-        public bool HasValidLength => Precision.DefinitelyBigger(Distance, 0);
+        /// <summary>
+        /// Should be used to check whether placement can continue after a user editor operation.
+        /// </summary>
+        public bool HasValidLengthForPlacement => Precision.DefinitelyBigger(Distance, 0, 1);
 
         /// <summary>
         /// The control points of the path.
