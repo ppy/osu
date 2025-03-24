@@ -76,6 +76,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         public partial class ShearedDropdownHeader : DropdownHeader
         {
+            private const float corner_radius = 5f;
+
             private LocalisableString label;
 
             protected override LocalisableString Label
@@ -111,7 +113,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             public ShearedDropdownHeader()
             {
                 Shear = shear;
-                CornerRadius = 5f;
+                CornerRadius = corner_radius;
                 Masking = true;
 
                 Foreground.Children = new Drawable[]
@@ -132,24 +134,14 @@ namespace osu.Game.Graphics.UserInterfaceV2
                             {
                                 LabelContainer = new Container
                                 {
+                                    CornerRadius = corner_radius,
+                                    Masking = true,
                                     AutoSizeAxes = Axes.Both,
                                     Children = new Drawable[]
                                     {
-                                        new Container
+                                        labelBox = new Box
                                         {
-                                            RelativeSizeAxes = Axes.Both,
-                                            // required to fix colour bleeding around the edges of the dropdown on hover
-                                            Padding = new MarginPadding { Vertical = -1f, Left = -1f },
-                                            Child = new Container
-                                            {
-                                                RelativeSizeAxes = Axes.Both,
-                                                CornerRadius = 5f,
-                                                Masking = true,
-                                                Child = labelBox = new Box
-                                                {
-                                                    RelativeSizeAxes = Axes.Both,
-                                                }
-                                            },
+                                            RelativeSizeAxes = Axes.Both
                                         },
                                         labelText = new OsuSpriteText
                                         {
@@ -215,6 +207,9 @@ namespace osu.Game.Graphics.UserInterfaceV2
             {
                 base.Update();
                 searchBar.Padding = new MarginPadding { Left = LabelContainer.DrawWidth };
+
+                // By limiting the width we avoid this box showing up as an outline around the drawables that are on top of it.
+                Background.Padding = new MarginPadding { Left = LabelContainer.DrawWidth - corner_radius };
             }
 
             protected override bool OnHover(HoverEvent e)
