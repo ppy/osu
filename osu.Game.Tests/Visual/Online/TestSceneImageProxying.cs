@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Containers.Markdown;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Testing;
 using osu.Game.Graphics.Containers.Markdown;
+using osu.Game.Overlays.Comments;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -28,6 +29,19 @@ namespace osu.Game.Tests.Visual.Online
             AddAssert("image not loaded", () => markdown.ChildrenOfType<Sprite>().SingleOrDefault()?.Texture == null);
 
             AddStep("load external with proxying", () => Child = markdown = new OsuMarkdownContainer
+            {
+                RelativeSizeAxes = Axes.Both,
+                Text = "![](https://github.com/ppy/osu-wiki/blob/master/wiki/Announcement_messages/img/notification.png?raw=true)",
+            });
+            AddUntilStep("image loaded", () => markdown.ChildrenOfType<Sprite>().SingleOrDefault()?.Texture != null);
+        }
+
+        [Test]
+        public void TestExternalImageLinkInComments()
+        {
+            MarkdownContainer markdown = null!;
+
+            AddStep("load external with proxying", () => Child = markdown = new CommentMarkdownContainer
             {
                 RelativeSizeAxes = Axes.Both,
                 Text = "![](https://github.com/ppy/osu-wiki/blob/master/wiki/Announcement_messages/img/notification.png?raw=true)",
