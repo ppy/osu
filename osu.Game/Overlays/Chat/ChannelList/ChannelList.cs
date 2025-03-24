@@ -85,7 +85,7 @@ namespace osu.Game.Overlays.Chat.ChannelList
                             AnnounceChannelGroup = new ChannelGroup(ChatStrings.ChannelsListTitleANNOUNCE.ToUpper(), FontAwesome.Solid.Bullhorn, false),
                             PublicChannelGroup = new ChannelGroup(ChatStrings.ChannelsListTitlePUBLIC.ToUpper(), FontAwesome.Solid.Comments, false),
                             selector = new ChannelListItem(ChannelListingChannel),
-                            TeamChannelGroup = new ChannelGroup("TEAM", FontAwesome.Solid.Users, false), // TODO: replace with osu-web localisable string once available
+                            TeamChannelGroup = new ChannelGroup(ChatStrings.ChannelsListTitleTEAM.ToUpper(), FontAwesome.Solid.Users, false),
                             PrivateChannelGroup = new ChannelGroup(ChatStrings.ChannelsListTitlePM.ToUpper(), FontAwesome.Solid.Envelope, true),
                         },
                     },
