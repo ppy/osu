@@ -61,9 +61,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("create leaderboard", () =>
             {
-                SelectedRoom.Value = new Room { RoomID = 3 };
-
-                Child = new MatchLeaderboard(SelectedRoom.Value)
+                Child = new MatchLeaderboard(new Room { RoomID = 3 })
                 {
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,

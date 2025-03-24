@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
         private bool isConvert;
 
-        public override int Version => 20241007;
+        public override int Version => 20250306;
 
         public TaikoDifficultyCalculator(IRulesetInfo ruleset, IWorkingBeatmap beatmap)
             : base(ruleset, beatmap)

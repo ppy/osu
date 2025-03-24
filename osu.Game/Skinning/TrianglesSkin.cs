@@ -158,7 +158,7 @@ namespace osu.Game.Skinning
 
                                 if (spectatorList != null)
                                 {
-                                    spectatorList.Font.Value = Typeface.Venera;
+                                    spectatorList.HeaderFont.Value = Typeface.Venera;
                                     spectatorList.HeaderColour.Value = new OsuColour().BlueLighter;
                                     spectatorList.Anchor = Anchor.BottomLeft;
                                     spectatorList.Origin = Anchor.BottomLeft;

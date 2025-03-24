@@ -5,6 +5,8 @@ using osu.Framework.Allocation;
 using osu.Framework.Development;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Logging;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -76,12 +78,15 @@ namespace osu.Game.Overlays.Settings
             }
         }
 
-        private partial class BuildDisplay : OsuAnimatedButton
+        private partial class BuildDisplay : OsuAnimatedButton, IHasContextMenu
         {
             private readonly string version;
 
             [Resolved]
             private OsuColour colours { get; set; } = null!;
+
+            [Resolved]
+            private OsuGame? game { get; set; }
 
             public BuildDisplay(string version)
             {
@@ -108,6 +113,11 @@ namespace osu.Game.Overlays.Settings
                     Colour = DebugUtils.IsDebugBuild ? colours.Red : Color4.White,
                 });
             }
+
+            public MenuItem[] ContextMenuItems => new MenuItem[]
+            {
+                new OsuMenuItem("Copy version", MenuItemType.Standard, () => game?.CopyToClipboard(version))
+            };
         }
     }
 }
