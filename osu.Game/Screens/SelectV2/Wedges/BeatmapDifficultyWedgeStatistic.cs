@@ -48,11 +48,12 @@ namespace osu.Game.Screens.SelectV2.Wedges
 
         public BeatmapDifficultyWedgeStatistic(LocalisableString label)
         {
-            AutoSizeAxes = Axes.Both;
+            AutoSizeAxes = Axes.Y;
 
             InternalChild = new FillFlowContainer
             {
-                AutoSizeAxes = Axes.Both,
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
                 Direction = FillDirection.Vertical,
                 Children = new Drawable[]
                 {

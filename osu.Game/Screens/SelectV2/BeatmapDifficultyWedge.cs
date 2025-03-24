@@ -191,7 +191,7 @@ namespace osu.Game.Screens.SelectV2
                                                     beatmapStatisticsFlow = new FillFlowContainer<BeatmapDifficultyWedgeStatistic>
                                                     {
                                                         AutoSizeAxes = Axes.Both,
-                                                        Spacing = new Vector2(12f, 0f),
+                                                        Spacing = new Vector2(8f, 0f),
                                                     },
                                                 }
                                             },
@@ -205,7 +205,7 @@ namespace osu.Game.Screens.SelectV2
                                                     new Box
                                                     {
                                                         Colour = ColourInfo.GradientHorizontal(colourProvider.Background5.Opacity(0), colourProvider.Background5),
-                                                        Width = 50,
+                                                        Width = 30,
                                                         RelativeSizeAxes = Axes.Y,
                                                         Origin = Anchor.TopRight,
                                                     },
@@ -217,14 +217,14 @@ namespace osu.Game.Screens.SelectV2
                                                     difficultyStatisticsFlow = new DifficultyStatisticsFlow
                                                     {
                                                         AutoSizeAxes = Axes.Both,
-                                                        Spacing = new Vector2(12f, 0f),
-                                                        Padding = new MarginPadding { Left = 20f },
+                                                        Spacing = new Vector2(8f, 0f),
+                                                        Padding = new MarginPadding { Left = 10f },
                                                         Children = new[]
                                                         {
-                                                            firstDifficultyStatistic = new BeatmapDifficultyWedgeStatistic(BeatmapsetsStrings.ShowStatsCs),
-                                                            accuracyStatistic = new BeatmapDifficultyWedgeStatistic(BeatmapsetsStrings.ShowStatsAccuracy),
-                                                            hpDrainStatistic = new BeatmapDifficultyWedgeStatistic(BeatmapsetsStrings.ShowStatsDrain),
-                                                            approachRateStatistic = new BeatmapDifficultyWedgeStatistic(BeatmapsetsStrings.ShowStatsAr),
+                                                            firstDifficultyStatistic = new BeatmapDifficultyWedgeStatistic(BeatmapsetsStrings.ShowStatsCs) { Width = 80 },
+                                                            accuracyStatistic = new BeatmapDifficultyWedgeStatistic(BeatmapsetsStrings.ShowStatsAccuracy) { Width = 80 },
+                                                            hpDrainStatistic = new BeatmapDifficultyWedgeStatistic(BeatmapsetsStrings.ShowStatsDrain) { Width = 80 },
+                                                            approachRateStatistic = new BeatmapDifficultyWedgeStatistic(BeatmapsetsStrings.ShowStatsAr) { Width = 80 },
                                                         },
                                                     }
                                                 }
@@ -275,6 +275,7 @@ namespace osu.Game.Screens.SelectV2
             var playableBeatmap = beatmap.Value.GetPlayableBeatmap(ruleset.Value);
             var newStatistics = playableBeatmap.GetStatistics().Select(s => new BeatmapDifficultyWedgeStatistic(s.Name)
             {
+                Width = 90,
                 Value = (s.Count, s.Maximum),
             }).ToArray();
 
