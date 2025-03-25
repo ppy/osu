@@ -715,18 +715,21 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
             public LocalisableString TooltipText { get; }
         }
 
-        private sealed partial class ColouredModSwitchTiny : ModSwitchTiny, IHasTooltip
+        private sealed partial class ColouredModSwitchTiny : ModSwitchTiny, IHasCustomTooltip<Mod>
         {
-            private readonly IMod mod;
+            public Mod? TooltipContent { get; }
 
-            public ColouredModSwitchTiny(IMod mod)
+            [Resolved]
+            private OverlayColourProvider colourProvider { get; set; } = null!;
+
+            public ColouredModSwitchTiny(Mod mod)
                 : base(mod)
             {
-                this.mod = mod;
+                TooltipContent = mod;
                 Active.Value = true;
             }
 
-            public LocalisableString TooltipText => (mod as Mod)?.IconTooltip ?? mod.Name;
+            public ITooltip<Mod> GetCustomTooltip() => new ModTooltip(colourProvider);
         }
 
         private sealed partial class MoreModSwitchTiny : CompositeDrawable
