@@ -89,17 +89,6 @@ namespace osu.Game.Overlays.Mods
                     }
                 }
             };
-
-            // if (!string.IsNullOrEmpty(mod.SettingDescription))
-            // {
-            //     AddInternal(new OsuTextFlowContainer
-            //     {
-            //         RelativeSizeAxes = Axes.X,
-            //         AutoSizeAxes = Axes.Y,
-            //         Padding = new MarginPadding { Left = 14 },
-            //         // Text = mod.SettingDescription
-            //     });
-            // }
         }
     }
 }
