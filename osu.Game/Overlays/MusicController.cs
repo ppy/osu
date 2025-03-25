@@ -20,6 +20,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Seasonal;
 
 namespace osu.Game.Overlays
 {
@@ -256,8 +257,10 @@ namespace osu.Game.Overlays
                 playableSet = getNextRandom(-1, allowProtectedTracks);
             else
             {
-                playableSet = getBeatmapSets().TakeWhile(i => !i.Value.Equals(current?.BeatmapSetInfo)).LastOrDefault(s => !s.Value.Protected || allowProtectedTracks)
-                              ?? getBeatmapSets().LastOrDefault(s => !s.Value.Protected || allowProtectedTracks);
+                var beatmapSets = getBeatmapSets(allowProtectedTracks);
+
+                playableSet = beatmapSets.TakeWhile(i => !i.Value.Equals(current?.BeatmapSetInfo)).LastOrDefault(s => !s.Value.Protected || allowProtectedTracks)
+                              ?? beatmapSets.LastOrDefault(s => !s.Value.Protected || allowProtectedTracks);
             }
 
             if (playableSet != null)
@@ -352,10 +355,9 @@ namespace osu.Game.Overlays
                 playableSet = getNextRandom(1, allowProtectedTracks);
             else
             {
-                playableSet = getBeatmapSets().SkipWhile(i => !i.Value.Equals(current?.BeatmapSetInfo))
-                                              .Where(i => !i.Value.Protected || allowProtectedTracks)
-                                              .ElementAtOrDefault(1)
-                              ?? getBeatmapSets().FirstOrDefault(i => !i.Value.Protected || allowProtectedTracks);
+                var beatmapSets = getBeatmapSets(allowProtectedTracks);
+
+                playableSet = beatmapSets.SkipWhile(i => !i.Value.Equals(current?.BeatmapSetInfo)).ElementAtOrDefault(1) ?? beatmapSets.FirstOrDefault();
             }
 
             var playableBeatmap = playableSet?.Value.Beatmaps.FirstOrDefault();
@@ -376,12 +378,13 @@ namespace osu.Game.Overlays
             {
                 Live<BeatmapSetInfo> result;
 
-                var possibleSets = getBeatmapSets().Where(s => !s.Value.Protected || allowProtectedTracks).ToList();
+                var possibleSets = getBeatmapSets(allowProtectedTracks).ToList();
 
                 if (possibleSets.Count == 0)
                     return null;
 
-                // if there is only one possible set left, play it, even if it is the same as the current track.
+                // if there is only
+                // one possible set left, play it, even if it is the same as the current track.
                 // looping is preferable over playing nothing.
                 if (possibleSets.Count == 1)
                     return possibleSets.Single();
@@ -459,9 +462,12 @@ namespace osu.Game.Overlays
 
         private TrackChangeDirection? queuedDirection;
 
-        private IEnumerable<Live<BeatmapSetInfo>> getBeatmapSets() => realm.Realm.All<BeatmapSetInfo>().Where(s => !s.DeletePending)
-                                                                           .AsEnumerable()
-                                                                           .Select(s => new RealmLive<BeatmapSetInfo>(s, realm));
+        private IEnumerable<Live<BeatmapSetInfo>> getBeatmapSets(bool allowProtectedTracks) =>
+            realm.Realm.All<BeatmapSetInfo>().Where(s => !s.DeletePending)
+                 .AsEnumerable()
+                 .Select(s => new RealmLive<BeatmapSetInfo>(s, realm))
+                 .Where(i => (allowProtectedTracks || !i.Value.Protected)
+                             && (SeasonalUIConfig.ENABLED || i.Value.Hash != IntroChristmas.CHRISTMAS_BEATMAP_SET_HASH));
 
         private void changeBeatmap(WorkingBeatmap newWorking)
         {
@@ -488,8 +494,8 @@ namespace osu.Game.Overlays
                 else
                 {
                     // figure out the best direction based on order in playlist.
-                    int last = getBeatmapSets().TakeWhile(b => !b.Value.Equals(current.BeatmapSetInfo)).Count();
-                    int next = getBeatmapSets().TakeWhile(b => !b.Value.Equals(newWorking.BeatmapSetInfo)).Count();
+                    int last = getBeatmapSets(allowProtectedTracks: false).TakeWhile(b => !b.Value.Equals(current.BeatmapSetInfo)).Count();
+                    int next = getBeatmapSets(allowProtectedTracks: false).TakeWhile(b => !b.Value.Equals(newWorking.BeatmapSetInfo)).Count();
 
                     direction = last > next ? TrackChangeDirection.Prev : TrackChangeDirection.Next;
                 }
