@@ -257,10 +257,8 @@ namespace osu.Game.Overlays
                 playableSet = getNextRandom(-1, allowProtectedTracks);
             else
             {
-                var beatmapSets = getBeatmapSets(allowProtectedTracks);
-
-                playableSet = beatmapSets.TakeWhile(i => !i.Value.Equals(current?.BeatmapSetInfo)).LastOrDefault()
-                              ?? beatmapSets.LastOrDefault();
+                playableSet = getBeatmapSets(allowProtectedTracks).TakeWhile(i => !i.Value.Equals(current?.BeatmapSetInfo)).LastOrDefault()
+                              ?? getBeatmapSets(allowProtectedTracks).LastOrDefault();
             }
 
             if (playableSet != null)
@@ -355,9 +353,8 @@ namespace osu.Game.Overlays
                 playableSet = getNextRandom(1, allowProtectedTracks);
             else
             {
-                var beatmapSets = getBeatmapSets(allowProtectedTracks);
-
-                playableSet = beatmapSets.SkipWhile(i => !i.Value.Equals(current?.BeatmapSetInfo)).ElementAtOrDefault(1) ?? beatmapSets.FirstOrDefault();
+                playableSet = getBeatmapSets(allowProtectedTracks).SkipWhile(i => !i.Value.Equals(current?.BeatmapSetInfo)).ElementAtOrDefault(1)
+                              ?? getBeatmapSets(allowProtectedTracks).FirstOrDefault();
             }
 
             var playableBeatmap = playableSet?.Value.Beatmaps.FirstOrDefault();
