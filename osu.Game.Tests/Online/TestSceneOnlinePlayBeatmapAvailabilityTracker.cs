@@ -28,6 +28,7 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
+using osu.Game.Screens.OnlinePlay;
 using osu.Game.Tests.Resources;
 using osu.Game.Tests.Visual;
 
@@ -110,7 +111,7 @@ namespace osu.Game.Tests.Online
                     beatmapLookupCache,
                     availabilityTracker = new OnlinePlayBeatmapAvailabilityTracker
                     {
-                        SelectedItem = { BindTarget = selectedItem, }
+                        PlaylistItem = { BindTarget = selectedItem, }
                     }
                 }
             };

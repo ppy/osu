@@ -268,7 +268,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
             SelectedItem.BindValueChanged(_ => updateSpecifics());
             UserMods.BindValueChanged(_ => updateSpecifics());
 
-            beatmapAvailabilityTracker.SelectedItem.BindTo(SelectedItem);
+            beatmapAvailabilityTracker.PlaylistItem.BindTo(SelectedItem);
             beatmapAvailabilityTracker.Availability.BindValueChanged(_ => updateSpecifics());
 
             userModsSelectOverlayRegistration = overlayManager?.RegisterBlockingOverlay(UserModsSelectOverlay);

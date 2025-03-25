@@ -454,7 +454,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
             SelectedItem.BindValueChanged(onSelectedItemChanged);
 
-            beatmapAvailabilityTracker.SelectedItem.BindTo(SelectedItem);
+            beatmapAvailabilityTracker.PlaylistItem.BindTo(SelectedItem);
             beatmapAvailabilityTracker.Availability.BindValueChanged(_ => updateGameplayState());
 
             UserBeatmap.BindValueChanged(_ => updateGameplayState());

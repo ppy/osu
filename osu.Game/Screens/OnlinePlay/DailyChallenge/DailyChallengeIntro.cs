@@ -352,7 +352,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
         {
             base.OnEntering(e);
 
-            beatmapAvailabilityTracker.SelectedItem.Value = item;
+            beatmapAvailabilityTracker.PlaylistItem.Value = item;
             beatmapAvailabilityTracker.Availability.BindValueChanged(availability =>
             {
                 if (shouldBePlayingMusic && availability.NewValue.State == DownloadState.LocallyAvailable)
