@@ -15,7 +15,6 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
-using osu.Game.Rulesets;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Tests.Resources;
 using osu.Game.Tests.Visual.Multiplayer;
@@ -34,7 +33,6 @@ namespace osu.Game.Tests.Online
         [BackgroundDependencyLoader]
         private void load(GameHost host)
         {
-            Dependencies.Cache(new RealmRulesetStore(Realm));
             Dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, Realm, null, Audio, Resources, host, Beatmap.Default));
             Dependencies.Cache(Realm);
 
