@@ -606,44 +606,15 @@ namespace osu.Game.Tests.Visual.Background
             // if Colour == Colour4.White, that could mean either that
             // DimLevel == 0.0, or
             // DimLevel == 1.0 and DimColour == Colour4.White.
-            public Colour4 CurrentColour
-            {
-                get
-                {
-                    Colour4 drawColour = DrawColourInfo.Colour;
-                    float dimLevel = ColouredDimmable.DimLevel;
+            public Colour4 CurrentColour => ColouredDimmable.DrawColourInfo.Colour;
 
-                    return new Colour4(
-                        drawColour.R * (1 - dimLevel),
-                        drawColour.G * (1 - dimLevel),
-                        drawColour.B * (1 - dimLevel),
-                        drawColour.A
-                    );
-                }
-            }
-
-            public Colour4 CurrentColourOffset
-            {
-                get
-                {
-                    Colour4 drawColour = DrawColourInfo.Colour;
-                    Colour4 dimColour = ColouredDimmable.DimColour;
-                    float dimLevel = ColouredDimmable.DimLevel;
-
-                    return new Colour4(
-                        drawColour.R * dimColour.R * dimLevel,
-                        drawColour.G * dimColour.G * dimLevel,
-                        drawColour.B * dimColour.B * dimLevel,
-                        drawColour.A
-                    );
-                }
-            }
+            public Colour4 CurrentColourOffset => ColouredDimmable.DrawColourOffset;
 
             public Colour4 ContentDrawColour => ColouredDimmable.DrawColourInfo.Colour;
 
-            public bool IsSpriteDimmed => ColouredDimmableSprite.DimLevel != 0.0f;
+            public bool IsSpriteDimmed => ColouredDimmableSprite.DrawColourInfo.Colour != Colour4.White;
 
-            public bool IsBufferedContainerDimmed => ColouredDimmableBufferedContainer != null && ColouredDimmableBufferedContainer.DimLevel != 0.0f;
+            public bool IsBufferedContainerDimmed => ColouredDimmableBufferedContainer != null && ColouredDimmableBufferedContainer.DrawColourInfo.Colour != Colour4.White;
 
             public bool IsBufferedContainerNull => ColouredDimmableBufferedContainer == null;
 
@@ -670,16 +641,11 @@ namespace osu.Game.Tests.Visual.Background
 
             protected override BufferedContainer CreateBufferedContainer()
             {
-                ColouredDimmableSprite.DimColour = Colour4.Black;
-                ColouredDimmableSprite.DimLevel = 0.0f;
-
                 return ColouredDimmableBufferedContainer = dimmableBufferedContainer = new TestDimmableBufferedContainer(cachedFrameBuffer: true)
                 {
                     RelativeSizeAxes = Axes.Both,
                     RedrawOnScale = false,
                     Child = Sprite,
-                    DimColour = DimColour,
-                    DimLevel = DimLevel
                 };
             }
         }
