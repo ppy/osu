@@ -15,7 +15,7 @@ using osu.Game.Overlays;
 using osu.Game.Resources.Localisation.Web;
 using osuTK;
 
-namespace osu.Game.Screens.SelectV2.Wedges
+namespace osu.Game.Screens.SelectV2
 {
     public partial class BeatmapDetailsSuccessRate : CompositeDrawable, IHasTooltip
     {
@@ -60,7 +60,7 @@ namespace osu.Game.Screens.SelectV2.Wedges
                         new OsuSpriteText
                         {
                             Text = BeatmapsetsStrings.ShowInfoSuccessRate,
-                            Font = OsuFont.Torus.With(size: 14.4f, weight: FontWeight.SemiBold),
+                            Font = OsuFont.Torus.With(size: 12f, weight: FontWeight.SemiBold),
                         },
                         new Container
                         {
@@ -71,8 +71,7 @@ namespace osu.Game.Screens.SelectV2.Wedges
                             {
                                 Origin = Anchor.TopCentre,
                                 RelativePositionAxes = Axes.X,
-                                Font = OsuFont.Torus.With(size: 14.4f, weight: FontWeight.Regular),
-                                Text = "0.00%",
+                                Font = OsuFont.Torus.With(size: 12f, weight: FontWeight.Regular),
                             }
                         },
                         new Container

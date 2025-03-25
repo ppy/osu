@@ -14,7 +14,7 @@ using osu.Game.Overlays;
 using osu.Game.Screens.Select.Leaderboards;
 using osuTK;
 
-namespace osu.Game.Screens.SelectV2.Wedges
+namespace osu.Game.Screens.SelectV2
 {
     public partial class BeatmapWedgesHeader : CompositeDrawable
     {
@@ -57,12 +57,12 @@ namespace osu.Game.Screens.SelectV2.Wedges
                     Padding = new MarginPadding { Left = SongSelect.WEDGE_CONTENT_MARGIN, Right = 20f },
                     Children = new Drawable[]
                     {
-                        tabControl = new BeatmapWedgesTabControl<Selection>(24f)
+                        tabControl = new BeatmapWedgesTabControl<Selection>(20f)
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                             Width = 200,
-                            Height = 25,
+                            Height = 22,
                             Margin = new MarginPadding { Top = 2f },
                         },
                         leaderboardControls = new FillFlowContainer

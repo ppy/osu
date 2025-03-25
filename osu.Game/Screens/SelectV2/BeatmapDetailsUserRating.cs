@@ -13,7 +13,7 @@ using osu.Game.Overlays;
 using osu.Game.Resources.Localisation.Web;
 using osuTK;
 
-namespace osu.Game.Screens.SelectV2.Wedges
+namespace osu.Game.Screens.SelectV2
 {
     public partial class BeatmapDetailsUserRating : CompositeDrawable
     {
@@ -66,7 +66,7 @@ namespace osu.Game.Screens.SelectV2.Wedges
                         new OsuSpriteText
                         {
                             Text = BeatmapsetsStrings.ShowStatsUserRating,
-                            Font = OsuFont.Torus.With(size: 14.4f, weight: FontWeight.SemiBold),
+                            Font = OsuFont.Torus.With(size: 12f, weight: FontWeight.SemiBold),
                         },
                         new Container
                         {
@@ -79,13 +79,13 @@ namespace osu.Game.Screens.SelectV2.Wedges
                                 {
                                     Anchor = Anchor.TopLeft,
                                     Origin = Anchor.TopLeft,
-                                    Font = OsuFont.Torus.With(size: 14.4f, weight: FontWeight.Regular),
+                                    Font = OsuFont.Torus.With(size: 12f, weight: FontWeight.Regular),
                                 },
                                 positiveText = new OsuSpriteText
                                 {
                                     Anchor = Anchor.TopRight,
                                     Origin = Anchor.TopRight,
-                                    Font = OsuFont.Torus.With(size: 14.4f, weight: FontWeight.Regular),
+                                    Font = OsuFont.Torus.With(size: 12f, weight: FontWeight.Regular),
                                 },
                             },
                         },

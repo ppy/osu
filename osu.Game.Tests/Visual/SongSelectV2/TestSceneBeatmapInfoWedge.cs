@@ -17,10 +17,10 @@ using osu.Game.Screens.SelectV2;
 
 namespace osu.Game.Tests.Visual.SongSelectV2
 {
-    public partial class TestSceneBeatmapMainWedge : SongSelectComponentsTestScene
+    public partial class TestSceneBeatmapInfoWedge : SongSelectComponentsTestScene
     {
         private RulesetStore rulesets = null!;
-        private BeatmapMainWedge mainWedge = null!;
+        private BeatmapInfoWedge infoWedge = null!;
 
         [BackgroundDependencyLoader]
         private void load(RulesetStore rulesets)
@@ -47,7 +47,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                     Padding = new MarginPadding { Top = 20 },
                     Children = new Drawable[]
                     {
-                        mainWedge = new BeatmapMainWedge
+                        infoWedge = new BeatmapInfoWedge
                         {
                             State = { Value = Visibility.Visible },
                         },
@@ -57,7 +57,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             AddSliderStep("change star difficulty", 0, 11.9, 4.18, v =>
             {
-                ((BindableDouble)mainWedge.ChildrenOfType<BeatmapDifficultyWedge>().Single().DisplayedStars).Value = v;
+                ((BindableDouble)infoWedge.ChildrenOfType<WedgetDifficultyDisplay>().Single().DisplayedStars).Value = v;
             });
         }
 
@@ -80,12 +80,12 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         [Test]
         public void TestWedgeVisibility()
         {
-            AddStep("hide", () => { mainWedge.Hide(); });
+            AddStep("hide", () => { infoWedge.Hide(); });
             AddWaitStep("wait for hide", 3);
-            AddAssert("check visibility", () => mainWedge.Alpha == 0);
-            AddStep("show", () => { mainWedge.Show(); });
+            AddAssert("check visibility", () => infoWedge.Alpha == 0);
+            AddStep("show", () => { infoWedge.Show(); });
             AddWaitStep("wait for show", 1);
-            AddAssert("check visibility", () => mainWedge.Alpha > 0);
+            AddAssert("check visibility", () => infoWedge.Alpha > 0);
         }
 
         [Test]

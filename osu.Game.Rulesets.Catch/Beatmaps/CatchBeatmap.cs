@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
             {
                 new BeatmapStatistic
                 {
-                    Name = @"Fruit Count",
+                    Name = @"Fruits",
                     Content = fruits.ToString(),
                     Count = fruits,
                     Maximum = maximum,
@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                 },
                 new BeatmapStatistic
                 {
-                    Name = @"Juice Stream Count",
+                    Name = @"Juice Streams",
                     Content = juiceStreams.ToString(),
                     Count = juiceStreams,
                     Maximum = maximum,
@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                 },
                 new BeatmapStatistic
                 {
-                    Name = @"Banana Shower Count",
+                    Name = @"Banana Showers",
                     Content = bananaShowers.ToString(),
                     Count = bananaShowers,
                     Maximum = Math.Max(bananaShowers, 10),

@@ -15,9 +15,9 @@ using osu.Game.Overlays;
 using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Game.Screens.SelectV2.Wedges
+namespace osu.Game.Screens.SelectV2
 {
-    public partial class BeatmapPlayCountStatistic : BeatmapMainWedgeStatistic, IHasCustomTooltip<BeatmapPlayCountStatistic.Data>
+    public partial class WedgeStatisticPlayCount : WedgeStatistic, IHasCustomTooltip<WedgeStatisticPlayCount.Data>
     {
         public new Data? Value
         {
@@ -33,8 +33,8 @@ namespace osu.Game.Screens.SelectV2.Wedges
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
-        public BeatmapPlayCountStatistic(bool background = false, float leftPadding = 10)
-            : base(OsuIcon.Play, background, leftPadding)
+        public WedgeStatisticPlayCount(bool background = false, float leftPadding = 10, float? minSize = null)
+            : base(OsuIcon.Play, background, leftPadding, minSize)
         {
         }
 
@@ -92,13 +92,13 @@ namespace osu.Game.Screens.SelectV2.Wedges
                                     new OsuSpriteText
                                     {
                                         Colour = colourProvider.Content2,
-                                        Font = OsuFont.Torus.With(size: 14.4f, weight: FontWeight.SemiBold),
+                                        Font = OsuFont.Torus.With(size: 12f, weight: FontWeight.SemiBold),
                                         Text = "Total Plays",
                                     },
                                     totalPlaysText = new OsuSpriteText
                                     {
                                         Colour = colourProvider.Content1,
-                                        Font = OsuFont.Torus.With(size: 24f, weight: FontWeight.Regular),
+                                        Font = OsuFont.Torus.With(size: 20f, weight: FontWeight.Regular),
                                     },
                                 }
                             },
@@ -111,13 +111,13 @@ namespace osu.Game.Screens.SelectV2.Wedges
                                     new OsuSpriteText
                                     {
                                         Colour = colourProvider.Content2,
-                                        Font = OsuFont.Torus.With(size: 14.4f, weight: FontWeight.SemiBold),
+                                        Font = OsuFont.Torus.With(size: 12f, weight: FontWeight.SemiBold),
                                         Text = "Personal Plays",
                                     },
                                     personalPlaysText = new OsuSpriteText
                                     {
                                         Colour = colourProvider.Content1,
-                                        Font = OsuFont.Torus.With(size: 24f, weight: FontWeight.Regular),
+                                        Font = OsuFont.Torus.With(size: 20f, weight: FontWeight.Regular),
                                     },
                                 }
                             },

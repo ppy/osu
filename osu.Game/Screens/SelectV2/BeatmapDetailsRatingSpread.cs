@@ -13,7 +13,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Resources.Localisation.Web;
 using osuTK;
 
-namespace osu.Game.Screens.SelectV2.Wedges
+namespace osu.Game.Screens.SelectV2
 {
     public partial class BeatmapDetailsRatingSpread : CompositeDrawable
     {
@@ -64,7 +64,7 @@ namespace osu.Game.Screens.SelectV2.Wedges
                         new OsuSpriteText
                         {
                             Text = BeatmapsetsStrings.ShowStatsRatingSpread,
-                            Font = OsuFont.Torus.With(size: 14.4f, weight: FontWeight.SemiBold),
+                            Font = OsuFont.Torus.With(size: 12f, weight: FontWeight.SemiBold),
                         },
                         new GridContainer
                         {

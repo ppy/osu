@@ -48,7 +48,7 @@ namespace osu.Game.Screens.SelectV2
 
         private BeatmapCarousel carousel = null!;
 
-        private BeatmapMainWedge mainWedge = null!;
+        private BeatmapInfoWedge infoWedge = null!;
         private BeatmapWedgesArea wedgesArea = null!;
         private FillFlowContainer wedgesContainer = null!;
 
@@ -92,12 +92,13 @@ namespace osu.Game.Screens.SelectV2
                                 RelativeSizeAxes = Axes.Both,
                                 ColumnDimensions = new[]
                                 {
+                                    new Dimension(GridSizeMode.Relative, 0.5f),
                                     new Dimension(),
                                     new Dimension(GridSizeMode.Relative, 0.5f, maxSize: 750),
                                 },
                                 Content = new[]
                                 {
-                                    new Drawable[]
+                                    new[]
                                     {
                                         wedgesContainer = new FillFlowContainer
                                         {
@@ -107,10 +108,11 @@ namespace osu.Game.Screens.SelectV2
                                             Direction = FillDirection.Vertical,
                                             Children = new Drawable[]
                                             {
-                                                new ShearAlignedDrawable(shear, mainWedge = new BeatmapMainWedge()),
+                                                new ShearAlignedDrawable(shear, infoWedge = new BeatmapInfoWedge()),
                                                 new ShearAlignedDrawable(shear, wedgesArea = new BeatmapWedgesArea()),
                                             },
                                         },
+                                        Empty(),
                                         new Container
                                         {
                                             RelativeSizeAxes = Axes.Both,
@@ -158,7 +160,7 @@ namespace osu.Game.Screens.SelectV2
 
             Beatmap.BindValueChanged(onBeatmapChanged, true);
 
-            mainWedge.Show();
+            infoWedge.Show();
             wedgesArea.Show();
 
             modSelectOverlay.State.BindValueChanged(onModSelectStateChanged, true);
@@ -175,7 +177,7 @@ namespace osu.Game.Screens.SelectV2
 
             carousel.VisuallyFocusSelected = false;
 
-            mainWedge.Show();
+            infoWedge.Show();
             wedgesArea.Show();
 
             // required due to https://github.com/ppy/osu-framework/issues/3218
@@ -191,7 +193,7 @@ namespace osu.Game.Screens.SelectV2
 
             modSelectOverlay.SelectedMods.UnbindFrom(Mods);
 
-            mainWedge.Hide();
+            infoWedge.Hide();
             wedgesArea.Hide();
 
             carousel.VisuallyFocusSelected = true;
@@ -203,7 +205,7 @@ namespace osu.Game.Screens.SelectV2
         {
             this.FadeOut(fade_duration, Easing.OutQuint);
 
-            mainWedge.Hide();
+            infoWedge.Hide();
             wedgesArea.Hide();
 
             return base.OnExiting(e);
@@ -274,7 +276,7 @@ namespace osu.Game.Screens.SelectV2
         protected override void Update()
         {
             base.Update();
-            wedgesArea.Height = wedgesContainer.DrawHeight - mainWedge.LayoutSize.Y - 4;
+            wedgesArea.Height = wedgesContainer.DrawHeight - infoWedge.LayoutSize.Y - 4;
         }
     }
 }

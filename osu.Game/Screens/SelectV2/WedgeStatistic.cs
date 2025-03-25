@@ -15,15 +15,16 @@ using osu.Game.Overlays;
 using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Game.Screens.SelectV2.Wedges
+namespace osu.Game.Screens.SelectV2
 {
-    public partial class BeatmapMainWedgeStatistic : CompositeDrawable, IHasTooltip
+    public partial class WedgeStatistic : CompositeDrawable, IHasTooltip
     {
         private static readonly Vector2 shear = new Vector2(OsuGame.SHEAR, 0);
 
         private readonly IconUsage icon;
         private readonly bool background;
         private readonly float leftPadding;
+        private readonly float? minSize;
 
         private OsuSpriteText valueText = null!;
         private LoadingSpinner loading = null!;
@@ -54,14 +55,15 @@ namespace osu.Game.Screens.SelectV2.Wedges
 
         public LocalisableString TooltipText { get; set; }
 
-        public BeatmapMainWedgeStatistic(IconUsage icon, bool background = false, float leftPadding = 10f)
+        public WedgeStatistic(IconUsage icon, bool background = false, float leftPadding = 10f, float? minSize = null)
         {
             this.icon = icon;
             this.background = background;
             this.leftPadding = leftPadding;
+            this.minSize = minSize;
 
             AutoSizeAxes = Axes.X;
-            Height = 30f;
+            Height = 25f;
         }
 
         [BackgroundDependencyLoader]
@@ -95,7 +97,7 @@ namespace osu.Game.Screens.SelectV2.Wedges
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                             Icon = icon,
-                            Size = new Vector2(20f),
+                            Size = new Vector2(16f),
                             Colour = colourProvider.Content2,
                         },
                         new Container
@@ -112,14 +114,31 @@ namespace osu.Game.Screens.SelectV2.Wedges
                                     Size = new Vector2(16f),
                                     State = { Value = Visibility.Visible },
                                 },
-                                valueText = new OsuSpriteText
+                                new GridContainer
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
-                                    Font = OsuFont.Torus.With(size: 19.2f, weight: FontWeight.SemiBold),
-                                    Colour = colourProvider.Content2,
-                                    Margin = new MarginPadding { Bottom = 2f },
-                                    AlwaysPresent = true,
+                                    AutoSizeAxes = Axes.Both,
+                                    RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
+                                    ColumnDimensions = new[]
+                                    {
+                                        new Dimension(GridSizeMode.AutoSize, minSize: minSize ?? 0),
+                                    },
+                                    Content = new[]
+                                    {
+                                        new[]
+                                        {
+                                            valueText = new OsuSpriteText
+                                            {
+                                                Anchor = Anchor.Centre,
+                                                Origin = Anchor.Centre,
+                                                Font = OsuFont.Torus.With(size: 16f, weight: FontWeight.SemiBold),
+                                                Colour = colourProvider.Content2,
+                                                Margin = new MarginPadding { Bottom = 2f },
+                                                AlwaysPresent = true,
+                                            },
+                                        }
+                                    }
                                 },
                             },
                         },
