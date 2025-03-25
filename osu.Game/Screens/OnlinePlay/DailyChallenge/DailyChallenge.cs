@@ -378,7 +378,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
         {
             base.LoadComplete();
 
-            beatmapAvailabilityTracker.SelectedItem.Value = playlistItem;
+            beatmapAvailabilityTracker.PlaylistItem.Value = playlistItem;
             beatmapAvailabilityTracker.Availability.BindValueChanged(_ => TrySetDailyChallengeBeatmap(this, beatmapManager, rulesets, musicController, playlistItem), true);
 
             userModsSelectOverlayRegistration = overlayManager?.RegisterBlockingOverlay(userModsSelectOverlay);

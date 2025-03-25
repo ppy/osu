@@ -52,7 +52,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("create button", () =>
             {
-                AvailabilityTracker.SelectedItem.Value = room.Playlist.First();
+                AvailabilityTracker.PlaylistItem.Value = room.Playlist.First();
 
                 importedSet = beatmaps.GetAllUsableBeatmapSets().First();
                 Beatmap.Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First());
