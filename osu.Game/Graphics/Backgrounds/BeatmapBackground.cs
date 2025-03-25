@@ -53,8 +53,6 @@ namespace osu.Game.Graphics.Backgrounds
 
         protected DimmableBufferedContainer ColouredDimmableBufferedContainer;
 
-        protected IColouredDimmable ColouredDimmable => (IColouredDimmable)ColouredDimmableBufferedContainer ?? ColouredDimmableSprite;
-
         public BeatmapBackground(WorkingBeatmap beatmap, string fallbackTextureName = @"Backgrounds/bg1")
         {
             Beatmap = beatmap;

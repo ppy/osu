@@ -400,32 +400,19 @@ namespace osu.Game.Tests.Visual.Background
 
             public bool IsBackgroundDimmed()
             {
-                Colour4 parentDrawColour = background.ParentDrawColour;
-                Colour4 targetColour = new Colour4(
-                    parentDrawColour.R * (1f - background.CurrentDim),
-                    parentDrawColour.G * (1f - background.CurrentDim),
-                    parentDrawColour.B * (1f - background.CurrentDim),
-                    parentDrawColour.A
+                Colour4 targetDrawColour = new Colour4(
+                    1f - background.CurrentDim,
+                    1f - background.CurrentDim,
+                    1f - background.CurrentDim,
+                    1f
                 );
 
-                return background.CurrentColour == targetColour;
+                return background.CurrentColour == targetDrawColour;
             }
 
             public bool IsBackgroundUndimmed() => background.CurrentColour == background.ParentDrawColour && background.CurrentColourOffset == Colour4.Black;
 
-            public bool IsBackgroundColourOffset()
-            {
-                Colour4 currentDimColour = background.CurrentDimColour;
-                Colour4 parentDrawColour = background.ParentDrawColour;
-                Colour4 targetColourOffset = new Colour4(
-                    parentDrawColour.R * currentDimColour.R * background.CurrentDim,
-                    parentDrawColour.G * currentDimColour.G * background.CurrentDim,
-                    parentDrawColour.B * currentDimColour.B * background.CurrentDim,
-                    1
-                );
-
-                return background.CurrentColourOffset == targetColourOffset;
-            }
+            public bool IsBackgroundColourOffset() => background.CurrentColourOffset == background.ParentDrawColour * background.CurrentDimColour;
 
             public bool IsUserBlurApplied() => Precision.AlmostEquals(background.CurrentBlur, new Vector2((float)BlurLevel.Value * BackgroundScreenBeatmap.USER_BLUR_FACTOR), 0.1f);
 
@@ -540,8 +527,6 @@ namespace osu.Game.Tests.Visual.Background
 
             public Colour4 CurrentColourOffset => beatmapBackground.CurrentColourOffset;
 
-            public Colour4 ContentDrawColour => beatmapBackground.ContentDrawColour;
-
             public bool IsSpriteDimmed => beatmapBackground.IsSpriteDimmed;
 
             public bool IsBufferedContainerDimmed => beatmapBackground.IsBufferedContainerDimmed;
@@ -606,11 +591,9 @@ namespace osu.Game.Tests.Visual.Background
             // if Colour == Colour4.White, that could mean either that
             // DimLevel == 0.0, or
             // DimLevel == 1.0 and DimColour == Colour4.White.
-            public Colour4 CurrentColour => ColouredDimmable.DrawColourInfo.Colour;
+            public Colour4 CurrentColour => ColouredDimmableBufferedContainer?.FrameBufferDrawColour?.Colour ?? ColouredDimmableSprite.DrawColourInfo.Colour;
 
-            public Colour4 CurrentColourOffset => ColouredDimmable.DrawColourOffset;
-
-            public Colour4 ContentDrawColour => ColouredDimmable.DrawColourInfo.Colour;
+            public Colour4 CurrentColourOffset => ColouredDimmableBufferedContainer?.FrameBufferDrawColourOffset ?? (ColouredDimmableSprite as IColouredDimmable).DrawColourOffset;
 
             public bool IsSpriteDimmed => ColouredDimmableSprite.DrawColourInfo.Colour != Colour4.White;
 
