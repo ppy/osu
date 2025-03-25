@@ -9,7 +9,7 @@ using osu.Game.Screens.OnlinePlay.Components;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
-    public class MultiplayerRoomBackgroundScreen : OnlinePlayBackgroundScreen
+    public partial class MultiplayerRoomBackgroundScreen : OnlinePlayBackgroundScreen
     {
         [Resolved]
         private MultiplayerClient client { get; set; } = null!;
