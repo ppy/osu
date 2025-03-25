@@ -25,13 +25,12 @@ using osu.Game.Overlays;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Screens.SelectV2.Wedges;
 using osu.Game.Utils;
 using osuTK;
 
 namespace osu.Game.Screens.SelectV2
 {
-    public partial class BeatmapMainWedge : VisibilityContainer
+    public partial class BeatmapInfoWedge : VisibilityContainer
     {
         private const float corner_radius = 10;
 
@@ -52,10 +51,10 @@ namespace osu.Game.Screens.SelectV2
         private OsuHoverContainer artistLink = null!;
         private OsuSpriteText artistLabel = null!;
 
-        private BeatmapPlayCountStatistic playsStatistic = null!;
-        private BeatmapMainWedgeStatistic favouritesStatistic = null!;
-        private BeatmapMainWedgeStatistic lengthStatistic = null!;
-        private BeatmapMainWedgeStatistic bpmStatistic = null!;
+        private WedgeStatisticPlayCount playCount = null!;
+        private WedgeStatistic favouritesStatistic = null!;
+        private WedgeStatistic lengthStatistic = null!;
+        private WedgeStatistic bpmStatistic = null!;
 
         [Resolved]
         private SongSelect? songSelect { get; set; }
@@ -69,7 +68,7 @@ namespace osu.Game.Screens.SelectV2
         private APIBeatmapSet? currentOnlineBeatmapSet;
         private GetBeatmapSetRequest? currentRequest;
 
-        public BeatmapMainWedge()
+        public BeatmapInfoWedge()
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -103,7 +102,7 @@ namespace osu.Game.Screens.SelectV2
                         new ShearAlignedDrawable(shear, new Container
                         {
                             RelativeSizeAxes = Axes.X,
-                            Height = 30,
+                            Height = 35,
                             Child = statusPill = new BeatmapSetOnlineStatusPill
                             {
                                 AutoSizeAxes = Axes.Both,
@@ -115,12 +114,12 @@ namespace osu.Game.Screens.SelectV2
                         new ShearAlignedDrawable(shear, titleLink = new OsuHoverContainer
                         {
                             RelativeSizeAxes = Axes.X,
-                            Height = 43.2f,
+                            Height = 36f,
                             Margin = new MarginPadding { Bottom = -5f },
                             Child = titleLabel = new TruncatingSpriteText
                             {
                                 Shadow = true,
-                                Font = OsuFont.TorusAlternate.With(size: 43.2f, weight: FontWeight.SemiBold),
+                                Font = OsuFont.TorusAlternate.With(size: 36f, weight: FontWeight.SemiBold),
                                 RelativeSizeAxes = Axes.X,
                                 Padding = new MarginPadding { Right = 20f },
                             },
@@ -128,12 +127,12 @@ namespace osu.Game.Screens.SelectV2
                         new ShearAlignedDrawable(shear, artistLink = new OsuHoverContainer
                         {
                             RelativeSizeAxes = Axes.X,
-                            Height = 28.8f,
+                            Height = 24f,
                             Margin = new MarginPadding { Left = 1f },
                             Child = artistLabel = new TruncatingSpriteText
                             {
                                 Shadow = true,
-                                Font = OsuFont.Torus.With(size: 28.8f, weight: FontWeight.SemiBold),
+                                Font = OsuFont.Torus.With(size: 24f, weight: FontWeight.SemiBold),
                                 RelativeSizeAxes = Axes.X,
                                 Padding = new MarginPadding { Right = 20f },
                             },
@@ -147,19 +146,19 @@ namespace osu.Game.Screens.SelectV2
                             AutoSizeEasing = Easing.OutQuint,
                             Children = new Drawable[]
                             {
-                                playsStatistic = new BeatmapPlayCountStatistic(background: true, leftPadding: SongSelect.WEDGE_CONTENT_MARGIN)
+                                playCount = new WedgeStatisticPlayCount(background: true, leftPadding: SongSelect.WEDGE_CONTENT_MARGIN, minSize: 50f)
                                 {
                                     Margin = new MarginPadding { Left = -SongSelect.WEDGE_CONTENT_MARGIN },
                                 },
-                                favouritesStatistic = new BeatmapMainWedgeStatistic(OsuIcon.Heart, background: true)
+                                favouritesStatistic = new WedgeStatistic(OsuIcon.Heart, background: true, minSize: 25f)
                                 {
                                     TooltipText = BeatmapsStrings.StatusFavourites,
                                 },
-                                lengthStatistic = new BeatmapMainWedgeStatistic(OsuIcon.Clock),
-                                bpmStatistic = new BeatmapMainWedgeStatistic(OsuIcon.Metronome)
+                                lengthStatistic = new WedgeStatistic(OsuIcon.Clock),
+                                bpmStatistic = new WedgeStatistic(OsuIcon.Metronome)
                                 {
                                     TooltipText = BeatmapsetsStrings.ShowStatsBpm,
-                                    Margin = new MarginPadding { Left = 4f },
+                                    Margin = new MarginPadding { Left = 5f },
                                 },
                             },
                         }),
@@ -171,7 +170,7 @@ namespace osu.Game.Screens.SelectV2
                             Origin = Anchor.BottomLeft,
                             Margin = new MarginPadding { Left = -SongSelect.WEDGE_CONTENT_MARGIN },
                             Padding = new MarginPadding { Right = -SongSelect.WEDGE_CONTENT_MARGIN },
-                            Child = new BeatmapDifficultyWedge(),
+                            Child = new WedgetDifficultyDisplay(),
                         }),
                     },
                 }
@@ -267,12 +266,12 @@ namespace osu.Game.Screens.SelectV2
         {
             if (currentRequest?.CompletionState == APIRequestCompletionState.Waiting)
             {
-                playsStatistic.Value = null;
+                playCount.Value = null;
                 favouritesStatistic.Value = null;
             }
             else if (currentOnlineBeatmapSet == null)
             {
-                playsStatistic.FadeOut(300, Easing.OutQuint);
+                playCount.FadeOut(300, Easing.OutQuint);
                 favouritesStatistic.FadeOut(300, Easing.OutQuint);
             }
             else
@@ -282,13 +281,13 @@ namespace osu.Game.Screens.SelectV2
 
                 if (onlineBeatmap != null)
                 {
-                    playsStatistic.FadeIn(300, Easing.OutQuint);
-                    playsStatistic.Value = new BeatmapPlayCountStatistic.Data(onlineBeatmap.PlayCount, onlineBeatmap.UserPlayCount);
+                    playCount.FadeIn(300, Easing.OutQuint);
+                    playCount.Value = new WedgeStatisticPlayCount.Data(onlineBeatmap.PlayCount, onlineBeatmap.UserPlayCount);
                 }
                 else
                 {
-                    playsStatistic.FadeOut(300, Easing.OutQuint);
-                    playsStatistic.Value = null;
+                    playCount.FadeOut(300, Easing.OutQuint);
+                    playCount.Value = null;
                 }
 
                 favouritesStatistic.FadeIn(300, Easing.OutQuint);

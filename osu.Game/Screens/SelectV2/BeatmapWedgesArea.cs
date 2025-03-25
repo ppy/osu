@@ -5,7 +5,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Containers;
-using osu.Game.Screens.SelectV2.Wedges;
 using osuTK;
 
 namespace osu.Game.Screens.SelectV2

@@ -13,7 +13,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Resources.Localisation.Web;
 using osuTK;
 
-namespace osu.Game.Screens.SelectV2.Wedges
+namespace osu.Game.Screens.SelectV2
 {
     public partial class BeatmapDetailsRatingSpread : CompositeDrawable
     {

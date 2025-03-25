@@ -15,7 +15,7 @@ using osu.Game.Overlays;
 using osu.Game.Resources.Localisation.Web;
 using osuTK;
 
-namespace osu.Game.Screens.SelectV2.Wedges
+namespace osu.Game.Screens.SelectV2
 {
     public partial class BeatmapDetailsSuccessRate : CompositeDrawable, IHasTooltip
     {
