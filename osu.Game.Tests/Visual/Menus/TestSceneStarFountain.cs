@@ -50,30 +50,17 @@ namespace osu.Game.Tests.Visual.Menus
         [Test]
         public void TestGameplay()
         {
+            KiaiGameplayFountains fountains = null!;
+
             AddStep("make fountains", () =>
             {
                 Children = new[]
                 {
-                    new KiaiGameplayFountains.GameplayStarFountain
-                    {
-                        Anchor = Anchor.BottomLeft,
-                        Origin = Anchor.BottomLeft,
-                        X = 75,
-                    },
-                    new KiaiGameplayFountains.GameplayStarFountain
-                    {
-                        Anchor = Anchor.BottomRight,
-                        Origin = Anchor.BottomRight,
-                        X = -75,
-                    },
+                    fountains = new KiaiGameplayFountains(),
                 };
             });
 
-            AddStep("activate fountains", () =>
-            {
-                ((StarFountain)Children[0]).Shoot(1);
-                ((StarFountain)Children[1]).Shoot(-1);
-            });
+            AddStep("activate fountains", () => fountains.Shoot());
         }
 
         [Test]

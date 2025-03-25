@@ -143,7 +143,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
         {
             base.UpdateHitObjectFromPath(hitObject);
 
-            if (hitObject.Path.ControlPoints.Count <= 1 || !hitObject.Path.HasValidLength)
+            if (hitObject.Path.ControlPoints.Count <= 1 || !hitObject.Path.HasValidLengthForPlacement)
                 EditorBeatmap?.Remove(hitObject);
         }
     }

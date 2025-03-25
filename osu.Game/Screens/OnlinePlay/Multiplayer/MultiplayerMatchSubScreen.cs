@@ -259,10 +259,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             SelectedItem = SelectedItem
         };
 
-        protected override RoomSettingsOverlay CreateRoomSettingsOverlay(Room room) => new MultiplayerMatchSettingsOverlay(room)
-        {
-            SelectedItem = SelectedItem
-        };
+        protected override RoomSettingsOverlay CreateRoomSettingsOverlay(Room room) => new MultiplayerMatchSettingsOverlay(room);
 
         protected override APIMod[] GetGameplayMods()
         {
@@ -312,6 +309,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             return base.OnExiting(e);
         }
+
+        protected override void PartRoom() => client.LeaveRoom();
 
         private ModSettingChangeTracker? modSettingChangeTracker;
         private ScheduledDelegate? debouncedModSettingsUpdate;

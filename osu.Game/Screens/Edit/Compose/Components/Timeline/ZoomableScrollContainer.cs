@@ -141,7 +141,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             if (e.AltPressed)
             {
                 // zoom when holding alt.
-                AdjustZoomRelatively(e.ScrollDelta.Y, zoomedContent.ToLocalSpace(e.ScreenSpaceMousePosition).X);
+                AdjustZoomRelatively(e.ScrollDelta.Y);
                 return true;
             }
 

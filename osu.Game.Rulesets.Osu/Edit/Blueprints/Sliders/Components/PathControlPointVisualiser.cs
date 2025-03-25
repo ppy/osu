@@ -484,7 +484,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             // Snap the path to the current beat divisor before checking length validity.
             hitObject.SnapTo(distanceSnapProvider);
 
-            if (!hitObject.Path.HasValidLength)
+            if (!hitObject.Path.HasValidLengthForPlacement)
             {
                 for (int i = 0; i < hitObject.Path.ControlPoints.Count; i++)
                     hitObject.Path.ControlPoints[i].Position = oldControlPoints[i];
