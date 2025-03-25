@@ -4,6 +4,8 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
+using osu.Game.Screens.OnlinePlay;
+using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Match;
 
 namespace osu.Game.Tests.Visual.Multiplayer
@@ -16,18 +18,26 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("create footer", () =>
             {
-                Child = new PopoverContainer
+                Child = new DependencyProvidingContainer
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.Both,
-                    Child = new Container
+                    CachedDependencies =
+                    [
+                        (typeof(OnlinePlayBeatmapAvailabilityTracker), new MultiplayerBeatmapAvailabilityTracker())
+                    ],
+                    Child = new PopoverContainer
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        RelativeSizeAxes = Axes.X,
-                        Height = 50,
-                        Child = new MultiplayerMatchFooter()
+                        RelativeSizeAxes = Axes.Both,
+                        Child = new Container
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            RelativeSizeAxes = Axes.X,
+                            Height = 50,
+                            Child = new MultiplayerMatchFooter()
+                        }
                     }
                 };
             });

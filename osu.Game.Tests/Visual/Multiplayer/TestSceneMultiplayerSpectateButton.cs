@@ -17,6 +17,8 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
+using osu.Game.Screens.OnlinePlay;
+using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Match;
 using osu.Game.Tests.Resources;
 using osuTK;
@@ -52,31 +54,37 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("create button", () =>
             {
-                AvailabilityTracker.PlaylistItem.Value = room.Playlist.First();
-
                 importedSet = beatmaps.GetAllUsableBeatmapSets().First();
                 Beatmap.Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First());
 
-                Child = new PopoverContainer
+                Child = new DependencyProvidingContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Child = new FillFlowContainer
+                    CachedDependencies =
+                    [
+                        (typeof(OnlinePlayBeatmapAvailabilityTracker), new MultiplayerBeatmapAvailabilityTracker())
+                    ],
+                    Child = new PopoverContainer
                     {
-                        AutoSizeAxes = Axes.Both,
-                        Direction = FillDirection.Vertical,
-                        Children = new Drawable[]
+                        RelativeSizeAxes = Axes.Both,
+                        Child = new FillFlowContainer
                         {
-                            spectateButton = new MultiplayerSpectateButton
+                            AutoSizeAxes = Axes.Both,
+                            Direction = FillDirection.Vertical,
+                            Children = new Drawable[]
                             {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                Size = new Vector2(200, 50)
-                            },
-                            startControl = new MatchStartControl
-                            {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                Size = new Vector2(200, 50)
+                                spectateButton = new MultiplayerSpectateButton
+                                {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    Size = new Vector2(200, 50)
+                                },
+                                startControl = new MatchStartControl
+                                {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    Size = new Vector2(200, 50)
+                                }
                             }
                         }
                     }

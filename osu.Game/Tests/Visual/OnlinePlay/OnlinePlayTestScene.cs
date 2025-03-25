@@ -22,7 +22,6 @@ namespace osu.Game.Tests.Visual.OnlinePlay
     public abstract partial class OnlinePlayTestScene : ScreenTestScene, IOnlinePlayTestSceneDependencies
     {
         public OngoingOperationTracker OngoingOperationTracker => OnlinePlayDependencies.OngoingOperationTracker;
-        public OnlinePlayBeatmapAvailabilityTracker AvailabilityTracker => OnlinePlayDependencies.AvailabilityTracker;
         public TestUserLookupCache UserLookupCache => OnlinePlayDependencies.UserLookupCache;
         public BeatmapLookupCache BeatmapLookupCache => OnlinePlayDependencies.BeatmapLookupCache;
 
