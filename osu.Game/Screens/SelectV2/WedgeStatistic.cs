@@ -63,7 +63,7 @@ namespace osu.Game.Screens.SelectV2
             this.minSize = minSize;
 
             AutoSizeAxes = Axes.X;
-            Height = 30f;
+            Height = 25f;
         }
 
         [BackgroundDependencyLoader]
@@ -97,7 +97,7 @@ namespace osu.Game.Screens.SelectV2
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                             Icon = icon,
-                            Size = new Vector2(20f),
+                            Size = new Vector2(16f),
                             Colour = colourProvider.Content2,
                         },
                         new Container
@@ -132,7 +132,7 @@ namespace osu.Game.Screens.SelectV2
                                             {
                                                 Anchor = Anchor.Centre,
                                                 Origin = Anchor.Centre,
-                                                Font = OsuFont.Torus.With(size: 19.2f, weight: FontWeight.SemiBold),
+                                                Font = OsuFont.Torus.With(size: 16f, weight: FontWeight.SemiBold),
                                                 Colour = colourProvider.Content2,
                                                 Margin = new MarginPadding { Bottom = 2f },
                                                 AlwaysPresent = true,

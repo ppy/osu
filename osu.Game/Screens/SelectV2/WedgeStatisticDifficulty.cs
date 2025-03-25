@@ -85,12 +85,12 @@ namespace osu.Game.Screens.SelectV2
                     {
                         Margin = new MarginPadding { Top = 2f },
                         Text = label,
-                        Font = OsuFont.Torus.With(size: 14.4f, weight: FontWeight.SemiBold),
+                        Font = OsuFont.Torus.With(size: 12f, weight: FontWeight.SemiBold),
                     },
                     valueText = new OsuSpriteText
                     {
                         Margin = new MarginPadding { Top = 0f },
-                        Font = OsuFont.Torus.With(size: 24f, weight: FontWeight.Regular),
+                        Font = OsuFont.Torus.With(size: 20f, weight: FontWeight.Regular),
                     },
                 },
             };

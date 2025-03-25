@@ -109,13 +109,14 @@ namespace osu.Game.Screens.SelectV2
                             Height = 28f,
                             Direction = FillDirection.Horizontal,
                             Padding = new MarginPadding { Left = SongSelect.WEDGE_CONTENT_MARGIN },
-                            Spacing = new Vector2(8f, 0f),
+                            Spacing = new Vector2(6f, 0f),
                             Children = new Drawable[]
                             {
                                 starRatingDisplay = new StarRatingDisplay(default, animated: true)
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
+                                    Scale = new Vector2(1f),
                                 },
                                 new FillFlowContainer
                                 {
@@ -130,7 +131,7 @@ namespace osu.Game.Screens.SelectV2
                                         {
                                             Anchor = Anchor.BottomLeft,
                                             Origin = Anchor.BottomLeft,
-                                            Font = OsuFont.Torus.With(size: 19.2f, weight: FontWeight.SemiBold),
+                                            Font = OsuFont.Torus.With(size: 16f, weight: FontWeight.SemiBold),
                                         },
                                         mappedByText = new OsuSpriteText
                                         {
@@ -138,7 +139,7 @@ namespace osu.Game.Screens.SelectV2
                                             Origin = Anchor.BottomLeft,
                                             Text = BeatmapsetsStrings.ShowDetailsMappedBy(string.Empty),
                                             Margin = new MarginPadding { Left = 4f },
-                                            Font = OsuFont.Torus.With(size: 16.8f, weight: FontWeight.Regular),
+                                            Font = OsuFont.Torus.With(size: 14f, weight: FontWeight.Regular),
                                         },
                                         mapperLink = new MapperLinkContainer
                                         {
@@ -148,7 +149,7 @@ namespace osu.Game.Screens.SelectV2
                                             Child = mapperText = new TruncatingSpriteText
                                             {
                                                 Shadow = true,
-                                                Font = OsuFont.Torus.With(size: 16.8f, weight: FontWeight.SemiBold),
+                                                Font = OsuFont.Torus.With(size: 14f, weight: FontWeight.SemiBold),
                                             },
                                         },
                                     },
@@ -220,10 +221,10 @@ namespace osu.Game.Screens.SelectV2
                                                         Padding = new MarginPadding { Left = 10f },
                                                         Children = new[]
                                                         {
-                                                            firstStatisticDifficulty = new WedgeStatisticDifficulty(BeatmapsetsStrings.ShowStatsCs) { Width = 80 },
-                                                            accuracy = new WedgeStatisticDifficulty(BeatmapsetsStrings.ShowStatsAccuracy) { Width = 80 },
-                                                            hpDrain = new WedgeStatisticDifficulty(BeatmapsetsStrings.ShowStatsDrain) { Width = 80 },
-                                                            approachRate = new WedgeStatisticDifficulty(BeatmapsetsStrings.ShowStatsAr) { Width = 80 },
+                                                            firstStatisticDifficulty = new WedgeStatisticDifficulty(BeatmapsetsStrings.ShowStatsCs) { Width = 65 },
+                                                            accuracy = new WedgeStatisticDifficulty(BeatmapsetsStrings.ShowStatsAccuracy) { Width = 65 },
+                                                            hpDrain = new WedgeStatisticDifficulty(BeatmapsetsStrings.ShowStatsDrain) { Width = 65 },
+                                                            approachRate = new WedgeStatisticDifficulty(BeatmapsetsStrings.ShowStatsAr) { Width = 65 },
                                                         },
                                                     }
                                                 }
@@ -274,7 +275,7 @@ namespace osu.Game.Screens.SelectV2
             var playableBeatmap = beatmap.Value.GetPlayableBeatmap(ruleset.Value);
             var newStatistics = playableBeatmap.GetStatistics().Select(s => new WedgeStatisticDifficulty(s.Name)
             {
-                Width = 90,
+                Width = 75,
                 Value = (s.Count, s.Maximum),
             }).ToArray();
 

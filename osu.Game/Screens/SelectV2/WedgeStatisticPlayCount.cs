@@ -92,13 +92,13 @@ namespace osu.Game.Screens.SelectV2
                                     new OsuSpriteText
                                     {
                                         Colour = colourProvider.Content2,
-                                        Font = OsuFont.Torus.With(size: 14.4f, weight: FontWeight.SemiBold),
+                                        Font = OsuFont.Torus.With(size: 12f, weight: FontWeight.SemiBold),
                                         Text = "Total Plays",
                                     },
                                     totalPlaysText = new OsuSpriteText
                                     {
                                         Colour = colourProvider.Content1,
-                                        Font = OsuFont.Torus.With(size: 24f, weight: FontWeight.Regular),
+                                        Font = OsuFont.Torus.With(size: 20f, weight: FontWeight.Regular),
                                     },
                                 }
                             },
@@ -111,13 +111,13 @@ namespace osu.Game.Screens.SelectV2
                                     new OsuSpriteText
                                     {
                                         Colour = colourProvider.Content2,
-                                        Font = OsuFont.Torus.With(size: 14.4f, weight: FontWeight.SemiBold),
+                                        Font = OsuFont.Torus.With(size: 12f, weight: FontWeight.SemiBold),
                                         Text = "Personal Plays",
                                     },
                                     personalPlaysText = new OsuSpriteText
                                     {
                                         Colour = colourProvider.Content1,
-                                        Font = OsuFont.Torus.With(size: 24f, weight: FontWeight.Regular),
+                                        Font = OsuFont.Torus.With(size: 20f, weight: FontWeight.Regular),
                                     },
                                 }
                             },

@@ -102,7 +102,7 @@ namespace osu.Game.Screens.SelectV2
                         new ShearAlignedDrawable(shear, new Container
                         {
                             RelativeSizeAxes = Axes.X,
-                            Height = 30,
+                            Height = 35,
                             Child = statusPill = new BeatmapSetOnlineStatusPill
                             {
                                 AutoSizeAxes = Axes.Both,
@@ -114,12 +114,12 @@ namespace osu.Game.Screens.SelectV2
                         new ShearAlignedDrawable(shear, titleLink = new OsuHoverContainer
                         {
                             RelativeSizeAxes = Axes.X,
-                            Height = 43.2f,
+                            Height = 36f,
                             Margin = new MarginPadding { Bottom = -5f },
                             Child = titleLabel = new TruncatingSpriteText
                             {
                                 Shadow = true,
-                                Font = OsuFont.TorusAlternate.With(size: 43.2f, weight: FontWeight.SemiBold),
+                                Font = OsuFont.TorusAlternate.With(size: 36f, weight: FontWeight.SemiBold),
                                 RelativeSizeAxes = Axes.X,
                                 Padding = new MarginPadding { Right = 20f },
                             },
@@ -127,12 +127,12 @@ namespace osu.Game.Screens.SelectV2
                         new ShearAlignedDrawable(shear, artistLink = new OsuHoverContainer
                         {
                             RelativeSizeAxes = Axes.X,
-                            Height = 28.8f,
+                            Height = 24f,
                             Margin = new MarginPadding { Left = 1f },
                             Child = artistLabel = new TruncatingSpriteText
                             {
                                 Shadow = true,
-                                Font = OsuFont.Torus.With(size: 28.8f, weight: FontWeight.SemiBold),
+                                Font = OsuFont.Torus.With(size: 24f, weight: FontWeight.SemiBold),
                                 RelativeSizeAxes = Axes.X,
                                 Padding = new MarginPadding { Right = 20f },
                             },
@@ -146,11 +146,11 @@ namespace osu.Game.Screens.SelectV2
                             AutoSizeEasing = Easing.OutQuint,
                             Children = new Drawable[]
                             {
-                                playCount = new WedgeStatisticPlayCount(background: true, leftPadding: SongSelect.WEDGE_CONTENT_MARGIN, minSize: 60f)
+                                playCount = new WedgeStatisticPlayCount(background: true, leftPadding: SongSelect.WEDGE_CONTENT_MARGIN, minSize: 50f)
                                 {
                                     Margin = new MarginPadding { Left = -SongSelect.WEDGE_CONTENT_MARGIN },
                                 },
-                                favouritesStatistic = new WedgeStatistic(OsuIcon.Heart, background: true, minSize: 30f)
+                                favouritesStatistic = new WedgeStatistic(OsuIcon.Heart, background: true, minSize: 25f)
                                 {
                                     TooltipText = BeatmapsStrings.StatusFavourites,
                                 },
@@ -158,7 +158,7 @@ namespace osu.Game.Screens.SelectV2
                                 bpmStatistic = new WedgeStatistic(OsuIcon.Metronome)
                                 {
                                     TooltipText = BeatmapsetsStrings.ShowStatsBpm,
-                                    Margin = new MarginPadding { Left = 4f },
+                                    Margin = new MarginPadding { Left = 5f },
                                 },
                             },
                         }),
