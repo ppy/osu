@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Platform;
 using osu.Framework.Threading;
 using osu.Game.Audio;
 using osu.Game.Skinning;
@@ -22,6 +23,9 @@ namespace osu.Game.Screens.Menu
 
         private ScheduledDelegate? loopFadeDelegate;
         private ScheduledDelegate? loopStopDelegate;
+
+        [Resolved]
+        private GameHost host { get; set; } = null!;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -56,10 +60,11 @@ namespace osu.Game.Screens.Menu
                 }
 
                 // Schedule a volume fadeout, followed by a `Stop()`.
-                loopFadeDelegate = Scheduler.AddDelayed(() =>
+                // Required to be on global scheduler to handle cases like main menu being suspended (resulting in this drawable's schedule not being updated).
+                loopFadeDelegate = host.UpdateThread.Scheduler.AddDelayed(() =>
                 {
                     this.TransformBindableTo(loopSample.Volume, 0, loop_fade_duration);
-                    loopStopDelegate = Scheduler.AddDelayed(() => loopSample.Stop(), loop_fade_duration);
+                    loopStopDelegate = host.UpdateThread.Scheduler.AddDelayed(() => loopSample.Stop(), loop_fade_duration);
                 }, shoot_retrigger_delay);
             }
             finally
