@@ -60,7 +60,7 @@ namespace osu.Game.Screens.SelectV2
                         new OsuSpriteText
                         {
                             Text = BeatmapsetsStrings.ShowInfoSuccessRate,
-                            Font = OsuFont.Torus.With(size: 14.4f, weight: FontWeight.SemiBold),
+                            Font = OsuFont.Torus.With(size: 12f, weight: FontWeight.SemiBold),
                         },
                         new Container
                         {
@@ -71,8 +71,7 @@ namespace osu.Game.Screens.SelectV2
                             {
                                 Origin = Anchor.TopCentre,
                                 RelativePositionAxes = Axes.X,
-                                Font = OsuFont.Torus.With(size: 14.4f, weight: FontWeight.Regular),
-                                Text = "0.00%",
+                                Font = OsuFont.Torus.With(size: 12f, weight: FontWeight.Regular),
                             }
                         },
                         new Container

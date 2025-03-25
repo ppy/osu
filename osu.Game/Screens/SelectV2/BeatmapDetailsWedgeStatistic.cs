@@ -32,18 +32,19 @@ namespace osu.Game.Screens.SelectV2
                 if (value.HasValue)
                 {
                     string valueString = value.Value.value.ToString();
-
                     // todo: this logic is not perfect but we don't have a way to truncate text in TextFlowContainer yet.
+                    string truncatedValueString = valueString.Truncate(28);
+
                     if (value.Value.linkAction != null)
-                        valueText.AddLink(valueString.Truncate(24), value.Value.linkAction);
+                        valueText.AddLink(truncatedValueString, value.Value.linkAction, valueString != truncatedValueString ? valueString : null);
                     else
-                        valueText.AddText(valueString.Truncate(24));
+                        valueText.AddText(truncatedValueString);
                 }
                 else
                 {
                     valueText.AddArbitraryDrawable(new LoadingSpinner
                     {
-                        Size = new Vector2(16),
+                        Size = new Vector2(12),
                         State = { Value = Visibility.Visible },
                         Margin = new MarginPadding { Top = 4f },
                     });
@@ -58,7 +59,7 @@ namespace osu.Game.Screens.SelectV2
                 valueText.Clear();
 
                 if (value != null)
-                    valueText.AddArbitraryDrawable(new DrawableDate(value.Value, textSize: 14.4f, italic: false));
+                    valueText.AddArbitraryDrawable(new DrawableDate(value.Value, textSize: 12f, italic: false));
                 else
                     valueText.AddText("-");
             }
@@ -76,7 +77,7 @@ namespace osu.Game.Screens.SelectV2
                     total += tag.Length + 1;
 
                     // todo: this logic is not perfect but we don't have a way to truncate text in TextFlowContainer yet.
-                    if (total > 80)
+                    if (total > 90)
                     {
                         valueText.AddArbitraryDrawable(new TagsOverflowButton(value.tags));
                         break;
@@ -101,12 +102,12 @@ namespace osu.Game.Screens.SelectV2
                 labelText = new OsuSpriteText
                 {
                     Text = label,
-                    Font = OsuFont.Torus.With(size: 14.4f, weight: FontWeight.SemiBold),
+                    Font = OsuFont.Torus.With(size: 12f, weight: FontWeight.SemiBold),
                 },
-                valueText = new LinkFlowContainer(t => t.Font = t.Font.With(size: 14.4f, weight: FontWeight.Regular))
+                valueText = new LinkFlowContainer(t => t.Font = t.Font.With(size: 12f, weight: FontWeight.Regular))
                 {
                     RelativeSizeAxes = Axes.X,
-                    Height = 14.4f,
+                    Height = 12f,
                 }
             };
         }
