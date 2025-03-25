@@ -6,7 +6,7 @@ using osu.Game.Online.Rooms;
 
 namespace osu.Game.Screens.OnlinePlay.Playlists
 {
-    public class PlaylistsBeatmapAvailabilityTracker : OnlinePlayBeatmapAvailabilityTracker
+    public partial class PlaylistsBeatmapAvailabilityTracker : OnlinePlayBeatmapAvailabilityTracker
     {
         public new Bindable<PlaylistItem?> PlaylistItem => base.PlaylistItem;
     }
