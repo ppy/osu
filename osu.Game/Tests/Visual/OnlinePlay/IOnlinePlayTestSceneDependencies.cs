@@ -17,11 +17,6 @@ namespace osu.Game.Tests.Visual.OnlinePlay
         OngoingOperationTracker OngoingOperationTracker { get; }
 
         /// <summary>
-        /// The cached <see cref="OnlinePlayBeatmapAvailabilityTracker"/>.
-        /// </summary>
-        OnlinePlayBeatmapAvailabilityTracker AvailabilityTracker { get; }
-
-        /// <summary>
         /// The cached <see cref="UserLookupCache"/>.
         /// </summary>
         TestUserLookupCache UserLookupCache { get; }

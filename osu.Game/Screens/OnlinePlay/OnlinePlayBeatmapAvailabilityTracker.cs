@@ -27,17 +27,17 @@ namespace osu.Game.Screens.OnlinePlay
     /// This differs from a regular download tracking composite as this accounts for the
     /// databased beatmap set's checksum, to disallow from playing with an altered version of the beatmap.
     /// </summary>
-    public partial class OnlinePlayBeatmapAvailabilityTracker : CompositeComponent
+    public abstract partial class OnlinePlayBeatmapAvailabilityTracker : CompositeComponent
     {
         /// <summary>
         /// The current availability of <see cref="PlaylistItem"/>'s beatmap.
         /// </summary>
-        public IBindable<BeatmapAvailability> Availability => availability;
+        public virtual IBindable<BeatmapAvailability> Availability => availability; // Virtual for mocking in some tests.
 
         /// <summary>
         /// The playlist item to track the availability of.
         /// </summary>
-        public readonly Bindable<PlaylistItem?> PlaylistItem = new Bindable<PlaylistItem?>();
+        protected readonly Bindable<PlaylistItem?> PlaylistItem = new Bindable<PlaylistItem?>();
 
         [Resolved]
         private RealmAccess realm { get; set; } = null!;

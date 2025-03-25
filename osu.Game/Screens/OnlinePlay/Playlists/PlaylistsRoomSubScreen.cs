@@ -110,8 +110,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         [Resolved]
         private IDialogOverlay? dialogOverlay { get; set; }
 
-        [Cached]
-        private readonly OnlinePlayBeatmapAvailabilityTracker beatmapAvailabilityTracker = new OnlinePlayBeatmapAvailabilityTracker();
+        [Cached(typeof(OnlinePlayBeatmapAvailabilityTracker))]
+        private readonly PlaylistsBeatmapAvailabilityTracker beatmapAvailabilityTracker;
 
         protected readonly Bindable<PlaylistItem?> SelectedItem = new Bindable<PlaylistItem?>();
         protected readonly Bindable<BeatmapInfo?> UserBeatmap = new Bindable<BeatmapInfo?>();
@@ -146,6 +146,11 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             Activity.Value = new UserActivity.InLobby(room);
 
             Padding = new MarginPadding { Top = Header.HEIGHT };
+
+            beatmapAvailabilityTracker = new PlaylistsBeatmapAvailabilityTracker
+            {
+                PlaylistItem = { BindTarget = SelectedItem }
+            };
         }
 
         [BackgroundDependencyLoader]
@@ -451,12 +456,9 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             room.PropertyChanged += onRoomPropertyChanged;
 
             isIdle.BindValueChanged(_ => updatePollingRate(), true);
-
-            SelectedItem.BindValueChanged(onSelectedItemChanged);
-
-            beatmapAvailabilityTracker.PlaylistItem.BindTo(SelectedItem);
             beatmapAvailabilityTracker.Availability.BindValueChanged(_ => updateGameplayState());
 
+            SelectedItem.BindValueChanged(onSelectedItemChanged);
             UserBeatmap.BindValueChanged(_ => updateGameplayState());
             UserMods.BindValueChanged(_ => updateGameplayState());
             UserRuleset.BindValueChanged(_ =>

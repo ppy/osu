@@ -17,7 +17,6 @@ namespace osu.Game.Tests.Visual.OnlinePlay
     public class OnlinePlayTestSceneDependencies : IReadOnlyDependencyContainer, IOnlinePlayTestSceneDependencies
     {
         public OngoingOperationTracker OngoingOperationTracker { get; }
-        public OnlinePlayBeatmapAvailabilityTracker AvailabilityTracker { get; }
         public TestRoomRequestsHandler RequestsHandler { get; }
         public TestUserLookupCache UserLookupCache { get; }
         public BeatmapLookupCache BeatmapLookupCache { get; }
@@ -34,7 +33,6 @@ namespace osu.Game.Tests.Visual.OnlinePlay
         {
             RequestsHandler = new TestRoomRequestsHandler();
             OngoingOperationTracker = new OngoingOperationTracker();
-            AvailabilityTracker = new OnlinePlayBeatmapAvailabilityTracker();
             UserLookupCache = new TestUserLookupCache();
             BeatmapLookupCache = new BeatmapLookupCache();
 
@@ -42,7 +40,6 @@ namespace osu.Game.Tests.Visual.OnlinePlay
 
             CacheAs(RequestsHandler);
             CacheAs(OngoingOperationTracker);
-            CacheAs(AvailabilityTracker);
             CacheAs(new OverlayColourProvider(OverlayColourScheme.Plum));
             CacheAs<UserLookupCache>(UserLookupCache);
             CacheAs(BeatmapLookupCache);
