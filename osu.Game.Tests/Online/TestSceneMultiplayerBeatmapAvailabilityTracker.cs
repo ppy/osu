@@ -23,7 +23,7 @@ using osu.Game.Utils;
 
 namespace osu.Game.Tests.Online
 {
-    public class TestSceneMultiplayerBeatmapAvailabilityTracker : MultiplayerTestScene
+    public partial class TestSceneMultiplayerBeatmapAvailabilityTracker : MultiplayerTestScene
     {
         private BeatmapManager beatmapManager = null!;
         private BeatmapInfo availableBeatmap = null!;

@@ -8,7 +8,7 @@ using osu.Game.Online.Rooms;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
-    public class MultiplayerBeatmapAvailabilityTracker : OnlinePlayBeatmapAvailabilityTracker
+    public partial class MultiplayerBeatmapAvailabilityTracker : OnlinePlayBeatmapAvailabilityTracker
     {
         [Resolved]
         private MultiplayerClient client { get; set; } = null!;

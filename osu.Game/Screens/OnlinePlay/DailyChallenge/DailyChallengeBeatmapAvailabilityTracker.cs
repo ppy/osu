@@ -5,7 +5,7 @@ using osu.Game.Online.Rooms;
 
 namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 {
-    public class DailyChallengeBeatmapAvailabilityTracker : OnlinePlayBeatmapAvailabilityTracker
+    public partial class DailyChallengeBeatmapAvailabilityTracker : OnlinePlayBeatmapAvailabilityTracker
     {
         public DailyChallengeBeatmapAvailabilityTracker(PlaylistItem item)
         {
