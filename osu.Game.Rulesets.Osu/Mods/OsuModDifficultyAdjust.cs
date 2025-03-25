@@ -1,7 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Linq;
+using System.Collections.Generic;
 using osu.Framework.Bindables;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
@@ -36,19 +36,18 @@ namespace osu.Game.Rulesets.Osu.Mods
             ReadCurrentFromDifficulty = diff => diff.ApproachRate,
         };
 
-        public override string SettingDescription
+        public override IEnumerable<(LocalisableString setting, LocalisableString value)> SettingDescription
         {
             get
             {
-                string circleSize = CircleSize.IsDefault ? string.Empty : $"CS {CircleSize.Value:N1}";
-                string approachRate = ApproachRate.IsDefault ? string.Empty : $"AR {ApproachRate.Value:N1}";
+                if (!CircleSize.IsDefault)
+                    yield return ("Circle size", $"{CircleSize.Value:N1}");
 
-                return string.Join(", ", new[]
-                {
-                    circleSize,
-                    base.SettingDescription,
-                    approachRate
-                }.Where(s => !string.IsNullOrEmpty(s)));
+                foreach (var setting in base.SettingDescription)
+                    yield return setting;
+
+                if (!ApproachRate.IsDefault)
+                    yield return ("Approach rate", $"{ApproachRate.Value:N1}");
             }
         }
 
