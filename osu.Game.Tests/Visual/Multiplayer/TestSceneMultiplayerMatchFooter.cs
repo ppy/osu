@@ -18,27 +18,33 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("create footer", () =>
             {
+                MultiplayerBeatmapAvailabilityTracker tracker = new MultiplayerBeatmapAvailabilityTracker();
+
                 Child = new DependencyProvidingContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     CachedDependencies =
                     [
-                        (typeof(OnlinePlayBeatmapAvailabilityTracker), new MultiplayerBeatmapAvailabilityTracker())
+                        (typeof(OnlinePlayBeatmapAvailabilityTracker), tracker)
                     ],
-                    Child = new PopoverContainer
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        RelativeSizeAxes = Axes.Both,
-                        Child = new Container
+                    Children =
+                    [
+                        tracker,
+                        new PopoverContainer
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            RelativeSizeAxes = Axes.X,
-                            Height = 50,
-                            Child = new MultiplayerMatchFooter()
+                            RelativeSizeAxes = Axes.Both,
+                            Child = new Container
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                RelativeSizeAxes = Axes.X,
+                                Height = 50,
+                                Child = new MultiplayerMatchFooter()
+                            }
                         }
-                    }
+                    ]
                 };
             });
         }
