@@ -8,6 +8,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Platform;
+using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Online;
 using osu.Game.Online.API;
@@ -22,6 +23,7 @@ using osu.Game.Utils;
 
 namespace osu.Game.Tests.Online
 {
+    [HeadlessTest]
     public partial class TestSceneMultiplayerBeatmapAvailabilityTracker : MultiplayerTestScene
     {
         private BeatmapManager beatmapManager = null!;
