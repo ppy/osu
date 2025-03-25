@@ -259,8 +259,8 @@ namespace osu.Game.Overlays
             {
                 var beatmapSets = getBeatmapSets(allowProtectedTracks);
 
-                playableSet = beatmapSets.TakeWhile(i => !i.Value.Equals(current?.BeatmapSetInfo)).LastOrDefault(s => !s.Value.Protected || allowProtectedTracks)
-                              ?? beatmapSets.LastOrDefault(s => !s.Value.Protected || allowProtectedTracks);
+                playableSet = beatmapSets.TakeWhile(i => !i.Value.Equals(current?.BeatmapSetInfo)).LastOrDefault()
+                              ?? beatmapSets.LastOrDefault();
             }
 
             if (playableSet != null)
