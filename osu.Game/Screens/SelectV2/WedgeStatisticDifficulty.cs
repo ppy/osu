@@ -12,9 +12,9 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
 using osuTK.Graphics;
 
-namespace osu.Game.Screens.SelectV2.Wedges
+namespace osu.Game.Screens.SelectV2
 {
-    public partial class BeatmapDifficultyWedgeStatistic : CompositeDrawable, IHasAccentColour
+    public partial class WedgeStatisticDifficulty : CompositeDrawable, IHasAccentColour
     {
         public LocalisableString Label
         {
@@ -46,7 +46,7 @@ namespace osu.Game.Screens.SelectV2.Wedges
             set => bar.Colour = value;
         }
 
-        public BeatmapDifficultyWedgeStatistic(LocalisableString label)
+        public WedgeStatisticDifficulty(LocalisableString label)
         {
             AutoSizeAxes = Axes.Y;
 

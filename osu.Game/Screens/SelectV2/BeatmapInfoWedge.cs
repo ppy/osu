@@ -25,13 +25,12 @@ using osu.Game.Overlays;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Screens.SelectV2.Wedges;
 using osu.Game.Utils;
 using osuTK;
 
 namespace osu.Game.Screens.SelectV2
 {
-    public partial class BeatmapMainWedge : VisibilityContainer
+    public partial class BeatmapInfoWedge : VisibilityContainer
     {
         private const float corner_radius = 10;
 
@@ -52,10 +51,10 @@ namespace osu.Game.Screens.SelectV2
         private OsuHoverContainer artistLink = null!;
         private OsuSpriteText artistLabel = null!;
 
-        private BeatmapPlayCountStatistic playsStatistic = null!;
-        private BeatmapMainWedgeStatistic favouritesStatistic = null!;
-        private BeatmapMainWedgeStatistic lengthStatistic = null!;
-        private BeatmapMainWedgeStatistic bpmStatistic = null!;
+        private WedgeStatisticPlayCount playCount = null!;
+        private WedgeStatistic favouritesStatistic = null!;
+        private WedgeStatistic lengthStatistic = null!;
+        private WedgeStatistic bpmStatistic = null!;
 
         [Resolved]
         private SongSelect? songSelect { get; set; }
@@ -69,7 +68,7 @@ namespace osu.Game.Screens.SelectV2
         private APIBeatmapSet? currentOnlineBeatmapSet;
         private GetBeatmapSetRequest? currentRequest;
 
-        public BeatmapMainWedge()
+        public BeatmapInfoWedge()
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -147,16 +146,16 @@ namespace osu.Game.Screens.SelectV2
                             AutoSizeEasing = Easing.OutQuint,
                             Children = new Drawable[]
                             {
-                                playsStatistic = new BeatmapPlayCountStatistic(background: true, leftPadding: SongSelect.WEDGE_CONTENT_MARGIN, minSize: 60f)
+                                playCount = new WedgeStatisticPlayCount(background: true, leftPadding: SongSelect.WEDGE_CONTENT_MARGIN, minSize: 60f)
                                 {
                                     Margin = new MarginPadding { Left = -SongSelect.WEDGE_CONTENT_MARGIN },
                                 },
-                                favouritesStatistic = new BeatmapMainWedgeStatistic(OsuIcon.Heart, background: true, minSize: 30f)
+                                favouritesStatistic = new WedgeStatistic(OsuIcon.Heart, background: true, minSize: 30f)
                                 {
                                     TooltipText = BeatmapsStrings.StatusFavourites,
                                 },
-                                lengthStatistic = new BeatmapMainWedgeStatistic(OsuIcon.Clock),
-                                bpmStatistic = new BeatmapMainWedgeStatistic(OsuIcon.Metronome)
+                                lengthStatistic = new WedgeStatistic(OsuIcon.Clock),
+                                bpmStatistic = new WedgeStatistic(OsuIcon.Metronome)
                                 {
                                     TooltipText = BeatmapsetsStrings.ShowStatsBpm,
                                     Margin = new MarginPadding { Left = 4f },
@@ -171,7 +170,7 @@ namespace osu.Game.Screens.SelectV2
                             Origin = Anchor.BottomLeft,
                             Margin = new MarginPadding { Left = -SongSelect.WEDGE_CONTENT_MARGIN },
                             Padding = new MarginPadding { Right = -SongSelect.WEDGE_CONTENT_MARGIN },
-                            Child = new BeatmapDifficultyWedge(),
+                            Child = new WedgetDifficultyDisplay(),
                         }),
                     },
                 }
@@ -267,12 +266,12 @@ namespace osu.Game.Screens.SelectV2
         {
             if (currentRequest?.CompletionState == APIRequestCompletionState.Waiting)
             {
-                playsStatistic.Value = null;
+                playCount.Value = null;
                 favouritesStatistic.Value = null;
             }
             else if (currentOnlineBeatmapSet == null)
             {
-                playsStatistic.FadeOut(300, Easing.OutQuint);
+                playCount.FadeOut(300, Easing.OutQuint);
                 favouritesStatistic.FadeOut(300, Easing.OutQuint);
             }
             else
@@ -282,13 +281,13 @@ namespace osu.Game.Screens.SelectV2
 
                 if (onlineBeatmap != null)
                 {
-                    playsStatistic.FadeIn(300, Easing.OutQuint);
-                    playsStatistic.Value = new BeatmapPlayCountStatistic.Data(onlineBeatmap.PlayCount, onlineBeatmap.UserPlayCount);
+                    playCount.FadeIn(300, Easing.OutQuint);
+                    playCount.Value = new WedgeStatisticPlayCount.Data(onlineBeatmap.PlayCount, onlineBeatmap.UserPlayCount);
                 }
                 else
                 {
-                    playsStatistic.FadeOut(300, Easing.OutQuint);
-                    playsStatistic.Value = null;
+                    playCount.FadeOut(300, Easing.OutQuint);
+                    playCount.Value = null;
                 }
 
                 favouritesStatistic.FadeIn(300, Easing.OutQuint);

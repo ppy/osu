@@ -48,7 +48,7 @@ namespace osu.Game.Screens.SelectV2
 
         private BeatmapCarousel carousel = null!;
 
-        private BeatmapMainWedge mainWedge = null!;
+        private BeatmapInfoWedge infoWedge = null!;
 
         public override bool ShowFooter => true;
 
@@ -106,7 +106,7 @@ namespace osu.Game.Screens.SelectV2
                                             Direction = FillDirection.Vertical,
                                             Children = new Drawable[]
                                             {
-                                                new ShearAlignedDrawable(shear, mainWedge = new BeatmapMainWedge()),
+                                                new ShearAlignedDrawable(shear, infoWedge = new BeatmapInfoWedge()),
                                             },
                                         },
                                         Empty(),
@@ -157,7 +157,7 @@ namespace osu.Game.Screens.SelectV2
 
             Beatmap.BindValueChanged(onBeatmapChanged, true);
 
-            mainWedge.Show();
+            infoWedge.Show();
 
             modSelectOverlay.State.BindValueChanged(onModSelectStateChanged, true);
             modSelectOverlay.SelectedMods.BindTo(Mods);
@@ -173,7 +173,7 @@ namespace osu.Game.Screens.SelectV2
 
             carousel.VisuallyFocusSelected = false;
 
-            mainWedge.Show();
+            infoWedge.Show();
 
             // required due to https://github.com/ppy/osu-framework/issues/3218
             modSelectOverlay.SelectedMods.Disabled = false;
@@ -188,7 +188,7 @@ namespace osu.Game.Screens.SelectV2
 
             modSelectOverlay.SelectedMods.UnbindFrom(Mods);
 
-            mainWedge.Hide();
+            infoWedge.Hide();
 
             carousel.VisuallyFocusSelected = true;
 
@@ -199,7 +199,7 @@ namespace osu.Game.Screens.SelectV2
         {
             this.FadeOut(fade_duration, Easing.OutQuint);
 
-            mainWedge.Hide();
+            infoWedge.Hide();
 
             return base.OnExiting(e);
         }

@@ -15,9 +15,9 @@ using osu.Game.Overlays;
 using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Game.Screens.SelectV2.Wedges
+namespace osu.Game.Screens.SelectV2
 {
-    public partial class BeatmapPlayCountStatistic : BeatmapMainWedgeStatistic, IHasCustomTooltip<BeatmapPlayCountStatistic.Data>
+    public partial class WedgeStatisticPlayCount : WedgeStatistic, IHasCustomTooltip<WedgeStatisticPlayCount.Data>
     {
         public new Data? Value
         {
@@ -33,7 +33,7 @@ namespace osu.Game.Screens.SelectV2.Wedges
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
-        public BeatmapPlayCountStatistic(bool background = false, float leftPadding = 10, float? minSize = null)
+        public WedgeStatisticPlayCount(bool background = false, float leftPadding = 10, float? minSize = null)
             : base(OsuIcon.Play, background, leftPadding, minSize)
         {
         }

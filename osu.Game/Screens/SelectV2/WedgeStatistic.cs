@@ -15,9 +15,9 @@ using osu.Game.Overlays;
 using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Game.Screens.SelectV2.Wedges
+namespace osu.Game.Screens.SelectV2
 {
-    public partial class BeatmapMainWedgeStatistic : CompositeDrawable, IHasTooltip
+    public partial class WedgeStatistic : CompositeDrawable, IHasTooltip
     {
         private static readonly Vector2 shear = new Vector2(OsuGame.SHEAR, 0);
 
@@ -55,7 +55,7 @@ namespace osu.Game.Screens.SelectV2.Wedges
 
         public LocalisableString TooltipText { get; set; }
 
-        public BeatmapMainWedgeStatistic(IconUsage icon, bool background = false, float leftPadding = 10f, float? minSize = null)
+        public WedgeStatistic(IconUsage icon, bool background = false, float leftPadding = 10f, float? minSize = null)
         {
             this.icon = icon;
             this.background = background;

@@ -26,14 +26,13 @@ using osu.Game.Overlays.Mods;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Screens.SelectV2.Wedges;
 using osu.Game.Utils;
 using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.SelectV2
 {
-    public partial class BeatmapDifficultyWedge : CompositeDrawable
+    public partial class WedgetDifficultyDisplay : CompositeDrawable
     {
         private const float border_weight = 2;
 
@@ -61,13 +60,13 @@ namespace osu.Game.Screens.SelectV2
         private OsuSpriteText mapperText = null!;
 
         private FillFlowContainer ratingAndNameFlow = null!;
-        private FillFlowContainer<BeatmapDifficultyWedgeStatistic> beatmapStatisticsFlow = null!;
+        private FillFlowContainer<WedgeStatisticDifficulty> beatmapStatisticsFlow = null!;
         private DifficultyStatisticsFlow difficultyStatisticsFlow = null!;
 
-        private BeatmapDifficultyWedgeStatistic firstDifficultyStatistic = null!;
-        private BeatmapDifficultyWedgeStatistic accuracyStatistic = null!;
-        private BeatmapDifficultyWedgeStatistic hpDrainStatistic = null!;
-        private BeatmapDifficultyWedgeStatistic approachRateStatistic = null!;
+        private WedgeStatisticDifficulty firstStatisticDifficulty = null!;
+        private WedgeStatisticDifficulty accuracy = null!;
+        private WedgeStatisticDifficulty hpDrain = null!;
+        private WedgeStatisticDifficulty approachRate = null!;
 
         private CancellationTokenSource? cancellationSource;
 
@@ -75,7 +74,7 @@ namespace osu.Game.Screens.SelectV2
 
         private readonly Bindable<double> displayedStars = new BindableDouble();
 
-        public BeatmapDifficultyWedge()
+        public WedgetDifficultyDisplay()
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -188,7 +187,7 @@ namespace osu.Game.Screens.SelectV2
                                                 AutoSizeAxes = Axes.Both,
                                                 Children = new Drawable[]
                                                 {
-                                                    beatmapStatisticsFlow = new FillFlowContainer<BeatmapDifficultyWedgeStatistic>
+                                                    beatmapStatisticsFlow = new FillFlowContainer<WedgeStatisticDifficulty>
                                                     {
                                                         AutoSizeAxes = Axes.Both,
                                                         Spacing = new Vector2(8f, 0f),
@@ -221,10 +220,10 @@ namespace osu.Game.Screens.SelectV2
                                                         Padding = new MarginPadding { Left = 10f },
                                                         Children = new[]
                                                         {
-                                                            firstDifficultyStatistic = new BeatmapDifficultyWedgeStatistic(BeatmapsetsStrings.ShowStatsCs) { Width = 80 },
-                                                            accuracyStatistic = new BeatmapDifficultyWedgeStatistic(BeatmapsetsStrings.ShowStatsAccuracy) { Width = 80 },
-                                                            hpDrainStatistic = new BeatmapDifficultyWedgeStatistic(BeatmapsetsStrings.ShowStatsDrain) { Width = 80 },
-                                                            approachRateStatistic = new BeatmapDifficultyWedgeStatistic(BeatmapsetsStrings.ShowStatsAr) { Width = 80 },
+                                                            firstStatisticDifficulty = new WedgeStatisticDifficulty(BeatmapsetsStrings.ShowStatsCs) { Width = 80 },
+                                                            accuracy = new WedgeStatisticDifficulty(BeatmapsetsStrings.ShowStatsAccuracy) { Width = 80 },
+                                                            hpDrain = new WedgeStatisticDifficulty(BeatmapsetsStrings.ShowStatsDrain) { Width = 80 },
+                                                            approachRate = new WedgeStatisticDifficulty(BeatmapsetsStrings.ShowStatsAr) { Width = 80 },
                                                         },
                                                     }
                                                 }
@@ -273,7 +272,7 @@ namespace osu.Game.Screens.SelectV2
             }
 
             var playableBeatmap = beatmap.Value.GetPlayableBeatmap(ruleset.Value);
-            var newStatistics = playableBeatmap.GetStatistics().Select(s => new BeatmapDifficultyWedgeStatistic(s.Name)
+            var newStatistics = playableBeatmap.GetStatistics().Select(s => new WedgeStatisticDifficulty(s.Name)
             {
                 Width = 90,
                 Value = (s.Count, s.Maximum),
@@ -317,19 +316,19 @@ namespace osu.Game.Screens.SelectV2
                     // b) Using the difficulty adjustment mod to adjust OD doesn't have an effect on conversion.
                     int keyCount = legacyRuleset.GetKeyCount(beatmap.Value.BeatmapInfo, mods.Value);
 
-                    firstDifficultyStatistic.Label = BeatmapsetsStrings.ShowStatsCsMania;
-                    firstDifficultyStatistic.Value = (keyCount, 10);
+                    firstStatisticDifficulty.Label = BeatmapsetsStrings.ShowStatsCsMania;
+                    firstStatisticDifficulty.Value = (keyCount, 10);
                     break;
 
                 default:
-                    firstDifficultyStatistic.Label = BeatmapsetsStrings.ShowStatsCs;
-                    firstDifficultyStatistic.Value = (rateAdjustedDifficulty.CircleSize, 10f);
+                    firstStatisticDifficulty.Label = BeatmapsetsStrings.ShowStatsCs;
+                    firstStatisticDifficulty.Value = (rateAdjustedDifficulty.CircleSize, 10f);
                     break;
             }
 
-            accuracyStatistic.Value = (rateAdjustedDifficulty.OverallDifficulty, 10f);
-            hpDrainStatistic.Value = (rateAdjustedDifficulty.DrainRate, 10f);
-            approachRateStatistic.Value = (rateAdjustedDifficulty.ApproachRate, 10f);
+            accuracy.Value = (rateAdjustedDifficulty.OverallDifficulty, 10f);
+            hpDrain.Value = (rateAdjustedDifficulty.DrainRate, 10f);
+            approachRate.Value = (rateAdjustedDifficulty.ApproachRate, 10f);
         }
 
         private void updateStars()
@@ -370,7 +369,7 @@ namespace osu.Game.Screens.SelectV2
             }
         }
 
-        private partial class DifficultyStatisticsFlow : FillFlowContainer<BeatmapDifficultyWedgeStatistic>, IHasCustomTooltip<AdjustedAttributesTooltip.Data>
+        private partial class DifficultyStatisticsFlow : FillFlowContainer<WedgeStatisticDifficulty>, IHasCustomTooltip<AdjustedAttributesTooltip.Data>
         {
             [Resolved]
             private OverlayColourProvider colourProvider { get; set; } = null!;
