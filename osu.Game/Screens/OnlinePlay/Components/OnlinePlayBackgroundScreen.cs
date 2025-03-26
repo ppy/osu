@@ -114,7 +114,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
             }
         }
 
-        private class DefaultBackground : Background
+        private partial class DefaultBackground : Background
         {
             [Resolved]
             private BeatmapManager beatmapManager { get; set; } = null!;
