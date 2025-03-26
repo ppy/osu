@@ -80,7 +80,7 @@ namespace osu.Game.Screens.SelectV2
             Shear = shear;
             Masking = true;
             CornerRadius = corner_radius;
-            Margin = new MarginPadding { Top = -10f };
+            Margin = new MarginPadding { Top = -corner_radius };
 
             InternalChildren = new Drawable[]
             {

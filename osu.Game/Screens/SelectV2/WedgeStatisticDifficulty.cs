@@ -89,7 +89,6 @@ namespace osu.Game.Screens.SelectV2
                     },
                     valueText = new OsuSpriteText
                     {
-                        Margin = new MarginPadding { Top = 0f },
                         Font = OsuFont.Torus.With(size: 20f, weight: FontWeight.Regular),
                     },
                 },
