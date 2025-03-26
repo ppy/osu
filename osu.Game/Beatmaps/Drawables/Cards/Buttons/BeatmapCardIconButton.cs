@@ -9,7 +9,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osuTK;
 using osuTK.Graphics;
@@ -48,7 +47,6 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
 
         private Container content = null!;
         private Container hover = null!;
-        private LoadingSpinner spinner = null!;
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
@@ -77,10 +75,6 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
                     {
                         Origin = Anchor.Centre,
                         Anchor = Anchor.Centre,
-                        Size = new Vector2(14),
-                    },
-                    spinner = new LoadingSpinner
-                    {
                         Size = new Vector2(14),
                     },
                 }
@@ -117,13 +111,11 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
             hover.FadeTo(isHovered ? 1f : 0f, 500, Easing.OutQuint);
             content.ScaleTo(isHovered ? 0.9f : 0.8f, 500, Easing.OutQuint);
             Icon.FadeColour(isHovered ? HoverColour : IdleColour, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
-            spinner.FadeColour(isHovered ? HoverColour : IdleColour, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
         }
 
         protected void SetLoading(bool isLoading)
         {
-            Icon.Alpha = isLoading ? 0 : 1;
-            spinner.Alpha = isLoading ? 1 : 0;
+            Icon.FadeTo(isLoading ? 0.2f : 1, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
             Enabled.Value = !isLoading;
         }
     }
