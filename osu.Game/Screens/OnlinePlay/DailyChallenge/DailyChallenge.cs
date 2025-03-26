@@ -490,7 +490,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             if (!screen.IsCurrentScreen())
                 return;
 
-            var beatmap = beatmaps.QueryBeatmap(b => b.OnlineID == item.Beatmap.OnlineID);
+            var beatmap = beatmaps.QueryBeatmap(b => b.OnlineID == item.Beatmap.OnlineID && b.MD5Hash == item.Beatmap.MD5Hash);
 
             screen.Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap); // this will gracefully fall back to dummy beatmap if missing locally.
             screen.Ruleset.Value = rulesets.GetRuleset(item.RulesetID);
