@@ -196,7 +196,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
 
             var hitEvents = score.NewValue.HitEvents;
 
-            if (!(hitEvents.CalculateAverageHitError() is double average))
+            if (!(hitEvents.CalculateMedianHitError() is double median))
                 return;
 
             referenceScoreContainer.Children = new Drawable[]
@@ -226,7 +226,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 return;
             }
 
-            lastPlayAverage = average;
+            lastPlayAverage = median;
             lastPlayBeatmapOffset = Current.Value;
 
             LinkFlowContainer globalOffsetText;
