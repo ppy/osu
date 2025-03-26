@@ -71,8 +71,8 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Plum);
 
-        [Cached]
-        private readonly OnlinePlayBeatmapAvailabilityTracker beatmapAvailabilityTracker = new OnlinePlayBeatmapAvailabilityTracker();
+        [Cached(typeof(OnlinePlayBeatmapAvailabilityTracker))]
+        private readonly DailyChallengeBeatmapAvailabilityTracker beatmapAvailabilityTracker;
 
         [Resolved]
         private OsuGame? game { get; set; }
@@ -113,8 +113,11 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
         public DailyChallenge(Room room)
         {
             this.room = room;
+
             playlistItem = room.Playlist.Single();
             Padding = new MarginPadding { Horizontal = -HORIZONTAL_OVERFLOW_PADDING };
+
+            beatmapAvailabilityTracker = new DailyChallengeBeatmapAvailabilityTracker(playlistItem);
         }
 
         [BackgroundDependencyLoader]
@@ -378,7 +381,6 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
         {
             base.LoadComplete();
 
-            beatmapAvailabilityTracker.SelectedItem.Value = playlistItem;
             beatmapAvailabilityTracker.Availability.BindValueChanged(_ => TrySetDailyChallengeBeatmap(this, beatmapManager, rulesets, musicController, playlistItem), true);
 
             userModsSelectOverlayRegistration = overlayManager?.RegisterBlockingOverlay(userModsSelectOverlay);
