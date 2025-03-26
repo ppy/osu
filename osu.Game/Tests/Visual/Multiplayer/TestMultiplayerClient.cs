@@ -238,7 +238,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     QueueMode = ServerAPIRoom.QueueMode,
                     AutoStartDuration = ServerAPIRoom.AutoStartDuration
                 },
-                Playlist = ServerAPIRoom.Playlist.Select(CreateMultiplayerPlaylistItem).ToList(),
+                Playlist = ServerAPIRoom.Playlist.Select(item => new MultiplayerPlaylistItem(item)).ToList(),
                 Users = { localUser },
                 Host = localUser
             };
@@ -686,21 +686,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
             byte[] serialized = MessagePackSerializer.Serialize(typeof(T), incoming, SignalRUnionWorkaroundResolver.OPTIONS);
             return MessagePackSerializer.Deserialize<T>(serialized, SignalRUnionWorkaroundResolver.OPTIONS);
         }
-
-        public static MultiplayerPlaylistItem CreateMultiplayerPlaylistItem(PlaylistItem item) => new MultiplayerPlaylistItem
-        {
-            ID = item.ID,
-            OwnerID = item.OwnerID,
-            BeatmapID = item.Beatmap.OnlineID,
-            BeatmapChecksum = item.Beatmap.MD5Hash,
-            RulesetID = item.RulesetID,
-            RequiredMods = item.RequiredMods.ToArray(),
-            AllowedMods = item.AllowedMods.ToArray(),
-            Expired = item.Expired,
-            PlaylistOrder = item.PlaylistOrder ?? 0,
-            PlayedAt = item.PlayedAt,
-            StarRating = item.Beatmap.StarRating,
-        };
 
         public override Task DisconnectInternal()
         {

@@ -21,15 +21,12 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
         protected override bool OnStart()
         {
-            // Beatmaps without a valid online ID are filtered away; this is just a final safety.
-            if (base.Beatmap.Value.BeatmapInfo.OnlineID < 0)
-                return false;
-
-            if (base.Ruleset.Value.OnlineID < 0)
+            if (!base.OnStart())
                 return false;
 
             Beatmap.Value = base.Beatmap.Value.BeatmapInfo;
             Ruleset.Value = base.Ruleset.Value;
+
             this.Exit();
             return true;
         }

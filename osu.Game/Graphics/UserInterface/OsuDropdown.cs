@@ -53,7 +53,7 @@ namespace osu.Game.Graphics.UserInterface
 
         #region OsuDropdownMenu
 
-        protected partial class OsuDropdownMenu : DropdownMenu
+        public partial class OsuDropdownMenu : DropdownMenu
         {
             public override bool HandleNonPositionalInput => State == MenuState.Open;
 

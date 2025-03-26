@@ -14,14 +14,18 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
+using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Models;
 using osu.Game.Online.API;
 using osu.Game.Online.Placeholders;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking.Statistics.User;
 using osuTK;
+using Realms;
 
 namespace osu.Game.Screens.Ranking.Statistics
 {
@@ -42,6 +46,9 @@ namespace osu.Game.Screens.Ranking.Statistics
 
         [Resolved]
         private BeatmapManager beatmapManager { get; set; } = null!;
+
+        [Resolved]
+        private RealmAccess realm { get; set; } = null!;
 
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
@@ -231,14 +238,32 @@ namespace osu.Game.Screens.Ranking.Statistics
                 });
             }
 
-            if (AchievedScore != null
-                && newScore.BeatmapInfo!.OnlineID > 0
+            if (newScore.BeatmapInfo!.OnlineID > 0
                 && api.IsLoggedIn)
             {
-                if (
-                    // We may want to iterate on this condition
-                    AchievedScore.Rank >= ScoreRank.C
-                )
+                string? preventTaggingReason = null;
+
+                // We may want to iterate on the following conditions further in the future
+
+                var localUserScore = AchievedScore ?? realm.Run(r =>
+                    r.All<ScoreInfo>()
+                     .Filter($@"{nameof(ScoreInfo.User)}.{nameof(RealmUser.OnlineID)} == $0"
+                             + $@" && {nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.ID)} == $1"
+                             + $@" && {nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.Hash)} == {nameof(ScoreInfo.BeatmapHash)}"
+                             + $@" && {nameof(ScoreInfo.DeletePending)} == false", api.LocalUser.Value.Id, newScore.BeatmapInfo.ID, newScore.BeatmapInfo.Ruleset.ShortName)
+                     .AsEnumerable()
+                     .OrderByDescending(score => score.Ruleset.MatchesOnlineID(newScore.BeatmapInfo.Ruleset))
+                     .ThenByDescending(score => score.Rank)
+                     .FirstOrDefault());
+
+                if (localUserScore == null)
+                    preventTaggingReason = "Play the beatmap to contribute to beatmap tags!";
+                else if (localUserScore.Ruleset.OnlineID != newScore.BeatmapInfo!.Ruleset.OnlineID)
+                    preventTaggingReason = "Play the beatmap in its original ruleset to contribute to beatmap tags!";
+                else if (localUserScore.Rank < ScoreRank.C)
+                    preventTaggingReason = "Set a better score to contribute to beatmap tags!";
+
+                if (preventTaggingReason == null)
                 {
                     yield return new StatisticItem("Tag the beatmap!", () => new UserTagControl(newScore.BeatmapInfo)
                     {
@@ -254,7 +279,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
                         TextAnchor = Anchor.Centre,
-                        Text = "Set a better score to contribute to beatmap tags!",
+                        Text = preventTaggingReason,
                     });
                 }
             }

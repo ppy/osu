@@ -34,6 +34,8 @@ namespace osu.Game.Users
     [Union(41, typeof(EditingBeatmap))]
     [Union(42, typeof(ModdingBeatmap))]
     [Union(43, typeof(TestingBeatmap))]
+    [Union(51, typeof(InDailyChallengeLobby))]
+    [Union(52, typeof(PlayingDailyChallenge))]
     public abstract class UserActivity
     {
         public abstract string GetStatus(bool hideIdentifiableInformation = false);
@@ -58,6 +60,7 @@ namespace osu.Game.Users
         [Union(23, typeof(InMultiplayerGame))]
         [Union(24, typeof(SpectatingMultiplayerGame))]
         [Union(31, typeof(InPlaylistGame))]
+        [Union(52, typeof(PlayingDailyChallenge))]
         public abstract class InGame : UserActivity
         {
             [Key(0)]
@@ -244,7 +247,7 @@ namespace osu.Game.Users
             [SerializationConstructor]
             public SpectatingMultiplayerGame() { }
 
-            public override string GetStatus(bool hideIdentifiableInformation = false) => $"Watching others {base.GetStatus(hideIdentifiableInformation).ToLowerInvariant()}";
+            public override string GetStatus(bool hideIdentifiableInformation = false) => @"Spectating a multiplayer game";
         }
 
         [MessagePackObject]
@@ -276,6 +279,31 @@ namespace osu.Game.Users
             public override string? GetDetails(bool hideIdentifiableInformation = false) => hideIdentifiableInformation
                 ? null
                 : RoomName;
+        }
+
+        [MessagePackObject]
+        public class InDailyChallengeLobby : UserActivity
+        {
+            [SerializationConstructor]
+            public InDailyChallengeLobby() { }
+
+            public override string GetStatus(bool hideIdentifiableInformation = false) => @"In daily challenge lobby";
+        }
+
+        [MessagePackObject]
+        public class PlayingDailyChallenge : InGame
+        {
+            public PlayingDailyChallenge(IBeatmapInfo beatmapInfo, IRulesetInfo ruleset)
+                : base(beatmapInfo, ruleset)
+            {
+            }
+
+            [SerializationConstructor]
+            public PlayingDailyChallenge()
+            {
+            }
+
+            public override string GetStatus(bool hideIdentifiableInformation = false) => @$"{RulesetPlayingVerb} in daily challenge";
         }
     }
 }
