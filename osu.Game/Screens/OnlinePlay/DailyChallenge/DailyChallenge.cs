@@ -39,6 +39,7 @@ using osu.Game.Screens.OnlinePlay.Match;
 using osu.Game.Screens.OnlinePlay.Match.Components;
 using osu.Game.Screens.OnlinePlay.Playlists;
 using osu.Game.Screens.Play;
+using osu.Game.Users;
 using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.DailyChallenge
@@ -106,6 +107,8 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
         public override bool DisallowExternalBeatmapRulesetChanges => true;
 
         public override bool? ApplyModTrackAdjustments => true;
+
+        protected override UserActivity InitialActivity => new UserActivity.InDailyChallengeLobby();
 
         public DailyChallenge(Room room)
         {
@@ -526,7 +529,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
         private void startPlay()
         {
             sampleStart?.Play();
-            this.Push(new PlayerLoader(() => new PlaylistsPlayer(room, playlistItem)
+            this.Push(new PlayerLoader(() => new DailyChallengePlayer(room, playlistItem)
             {
                 Exited = () => Scheduler.AddOnce(() => leaderboard.RefetchScores())
             }));

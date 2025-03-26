@@ -125,9 +125,10 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Reset any fetched online linking information (and history).
         /// </summary>
-        public void ResetOnlineInfo()
+        public void ResetOnlineInfo(bool resetOnlineId = true)
         {
-            OnlineID = -1;
+            if (resetOnlineId)
+                OnlineID = -1;
             LastOnlineUpdate = null;
             OnlineMD5Hash = string.Empty;
             if (Status != BeatmapOnlineStatus.LocallyModified)

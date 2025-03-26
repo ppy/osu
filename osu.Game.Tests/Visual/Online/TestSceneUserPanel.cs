@@ -77,7 +77,7 @@ namespace osu.Game.Tests.Visual.Online
                                 Id = 3103765,
                                 CountryCode = CountryCode.JP,
                                 CoverUrl = @"https://assets.ppy.sh/user-cover-presets/1/df28696b58541a9e67f6755918951d542d93bdf1da41720fcca2fd2c1ea8cf51.jpeg",
-                                IsOnline = true
+                                WasRecentlyOnline = true
                             }) { Width = 300 },
                             new UserGridPanel(new APIUser
                             {

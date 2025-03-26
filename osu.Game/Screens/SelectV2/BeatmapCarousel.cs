@@ -23,7 +23,7 @@ namespace osu.Game.Screens.SelectV2
     {
         public Action<BeatmapInfo>? RequestPresentBeatmap { private get; init; }
 
-        public const float SPACING = 5f;
+        public const float SPACING = 3f;
 
         private IBindableList<BeatmapSetInfo> detachedBeatmaps = null!;
 

@@ -196,6 +196,37 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("external overlay content still not shown", () => this.ChildrenOfType<TestShearedOverlayContainer.TestFooterContent>().SingleOrDefault()?.IsPresent, () => Is.Not.True);
         }
 
+        [Test]
+        public void TestButtonResizedAfterFooterIsDisplayed()
+        {
+            TestShearedOverlayContainer externalOverlay = null!;
+
+            AddStep("add overlay", () => contentContainer.Add(externalOverlay = new TestShearedOverlayContainer()));
+            AddStep("set buttons", () => screenFooter.SetButtons(new[]
+            {
+                new ScreenFooterButton(externalOverlay)
+                {
+                    AccentColour = Dependencies.Get<OsuColour>().Orange1,
+                    Icon = FontAwesome.Solid.Toolbox,
+                    Text = "One",
+                },
+                new ScreenFooterButton { Text = "Two", Action = () => { } },
+                new ScreenFooterButton { Text = "Three", Action = () => { } },
+            }));
+            AddWaitStep("wait for transition", 3);
+
+            AddStep("show overlay", () => externalOverlay.Show());
+            AddAssert("content displayed in footer", () => screenFooter.ChildrenOfType<TestShearedOverlayContainer.TestFooterContent>().Single().IsPresent);
+            AddUntilStep("other buttons hidden", () => screenFooter.ChildrenOfType<ScreenFooterButton>().Skip(1).All(b => b.Child.Parent!.Y > 0));
+
+            AddStep("resize active button", () => this.ChildrenOfType<ScreenFooterButton>().First().ResizeWidthTo(240, 300, Easing.OutQuint));
+            AddStep("resize active button back", () => this.ChildrenOfType<ScreenFooterButton>().First().ResizeWidthTo(116, 300, Easing.OutQuint));
+
+            AddStep("hide overlay", () => externalOverlay.Hide());
+            AddUntilStep("content hidden from footer", () => screenFooter.ChildrenOfType<TestShearedOverlayContainer.TestFooterContent>().SingleOrDefault()?.IsPresent != true);
+            AddUntilStep("other buttons returned", () => screenFooter.ChildrenOfType<ScreenFooterButton>().Skip(1).All(b => b.ChildrenOfType<Container>().First().Y == 0));
+        }
+
         private partial class TestShearedOverlayContainer : ShearedOverlayContainer
         {
             public TestShearedOverlayContainer()
