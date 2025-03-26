@@ -87,6 +87,7 @@ namespace osu.Game.Rulesets.Scoring
 
             int center = timeOffsets.Length / 2;
 
+            // Use average of the 2 central values if length is even
             return timeOffsets.Length % 2 == 0 ? (timeOffsets[center - 1] + timeOffsets[center]) / 2 : timeOffsets[center];
         }
 
