@@ -170,7 +170,7 @@ namespace osu.Game.Screens.SelectV2
                             Origin = Anchor.BottomLeft,
                             Margin = new MarginPadding { Left = -SongSelect.WEDGE_CONTENT_MARGIN },
                             Padding = new MarginPadding { Right = -SongSelect.WEDGE_CONTENT_MARGIN },
-                            Child = new WedgetDifficultyDisplay(),
+                            Child = new WedgeDifficultyDisplay(),
                         }),
                     },
                 }

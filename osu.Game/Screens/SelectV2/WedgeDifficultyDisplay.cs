@@ -33,7 +33,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.SelectV2
 {
-    public partial class WedgetDifficultyDisplay : CompositeDrawable
+    public partial class WedgeDifficultyDisplay : CompositeDrawable
     {
         private const float border_weight = 2;
 
@@ -76,7 +76,7 @@ namespace osu.Game.Screens.SelectV2
 
         private readonly Bindable<double> displayedStars = new BindableDouble();
 
-        public WedgetDifficultyDisplay()
+        public WedgeDifficultyDisplay()
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
