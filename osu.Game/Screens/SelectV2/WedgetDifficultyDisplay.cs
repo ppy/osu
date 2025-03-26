@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -54,12 +55,13 @@ namespace osu.Game.Screens.SelectV2
         private OsuColour colours { get; set; } = null!;
 
         private StarRatingDisplay starRatingDisplay = null!;
+        private FillFlowContainer nameLine = null!;
         private OsuSpriteText difficultyText = null!;
         private OsuSpriteText mappedByText = null!;
         private OsuHoverContainer mapperLink = null!;
         private OsuSpriteText mapperText = null!;
 
-        private FillFlowContainer ratingAndNameFlow = null!;
+        private GridContainer ratingAndNameContainer = null!;
         private FillFlowContainer<WedgeStatisticDifficulty> beatmapStatisticsFlow = null!;
         private DifficultyStatisticsFlow difficultyStatisticsFlow = null!;
 
@@ -102,58 +104,67 @@ namespace osu.Game.Screens.SelectV2
                     Shear = -shear,
                     Children = new Drawable[]
                     {
-                        new ShearAlignedDrawable(shear, ratingAndNameFlow = new FillFlowContainer
+                        new ShearAlignedDrawable(shear, ratingAndNameContainer = new GridContainer
                         {
                             AlwaysPresent = true,
-                            AutoSizeAxes = Axes.X,
+                            RelativeSizeAxes = Axes.X,
                             Height = 28f,
-                            Direction = FillDirection.Horizontal,
                             Padding = new MarginPadding { Left = SongSelect.WEDGE_CONTENT_MARGIN },
-                            Spacing = new Vector2(6f, 0f),
-                            Children = new Drawable[]
+                            ColumnDimensions = new[]
                             {
-                                starRatingDisplay = new StarRatingDisplay(default, animated: true)
+                                new Dimension(GridSizeMode.AutoSize),
+                                new Dimension(GridSizeMode.Absolute, 6),
+                                new Dimension(),
+                            },
+                            Content = new[]
+                            {
+                                new[]
                                 {
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.CentreLeft,
-                                    Scale = new Vector2(1f),
-                                },
-                                new FillFlowContainer
-                                {
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.CentreLeft,
-                                    AutoSizeAxes = Axes.Both,
-                                    Direction = FillDirection.Horizontal,
-                                    Margin = new MarginPadding { Bottom = 2f },
-                                    Children = new Drawable[]
+                                    starRatingDisplay = new StarRatingDisplay(default, animated: true)
                                     {
-                                        difficultyText = new OsuSpriteText
+                                        Anchor = Anchor.CentreLeft,
+                                        Origin = Anchor.CentreLeft,
+                                        Scale = new Vector2(1f),
+                                    },
+                                    Empty(),
+                                    nameLine = new FillFlowContainer
+                                    {
+                                        Anchor = Anchor.CentreLeft,
+                                        Origin = Anchor.CentreLeft,
+                                        RelativeSizeAxes = Axes.X,
+                                        AutoSizeAxes = Axes.Y,
+                                        Direction = FillDirection.Horizontal,
+                                        Margin = new MarginPadding { Bottom = 2f },
+                                        Children = new Drawable[]
                                         {
-                                            Anchor = Anchor.BottomLeft,
-                                            Origin = Anchor.BottomLeft,
-                                            Font = OsuFont.Torus.With(size: 16f, weight: FontWeight.SemiBold),
-                                        },
-                                        mappedByText = new OsuSpriteText
-                                        {
-                                            Anchor = Anchor.BottomLeft,
-                                            Origin = Anchor.BottomLeft,
-                                            Text = BeatmapsetsStrings.ShowDetailsMappedBy(string.Empty),
-                                            Margin = new MarginPadding { Left = 4f },
-                                            Font = OsuFont.Torus.With(size: 14f, weight: FontWeight.Regular),
-                                        },
-                                        mapperLink = new MapperLinkContainer
-                                        {
-                                            AutoSizeAxes = Axes.Both,
-                                            Anchor = Anchor.BottomLeft,
-                                            Origin = Anchor.BottomLeft,
-                                            Child = mapperText = new TruncatingSpriteText
+                                            difficultyText = new TruncatingSpriteText
                                             {
-                                                Shadow = true,
-                                                Font = OsuFont.Torus.With(size: 14f, weight: FontWeight.SemiBold),
+                                                Anchor = Anchor.BottomLeft,
+                                                Origin = Anchor.BottomLeft,
+                                                Font = OsuFont.Torus.With(size: 16f, weight: FontWeight.SemiBold),
+                                            },
+                                            mappedByText = new OsuSpriteText
+                                            {
+                                                Anchor = Anchor.BottomLeft,
+                                                Origin = Anchor.BottomLeft,
+                                                Text = BeatmapsetsStrings.ShowDetailsMappedBy(string.Empty),
+                                                Margin = new MarginPadding { Left = 4f },
+                                                Font = OsuFont.Torus.With(size: 14f, weight: FontWeight.Regular),
+                                            },
+                                            mapperLink = new MapperLinkContainer
+                                            {
+                                                AutoSizeAxes = Axes.Both,
+                                                Anchor = Anchor.BottomLeft,
+                                                Origin = Anchor.BottomLeft,
+                                                Child = mapperText = new TruncatingSpriteText
+                                                {
+                                                    Shadow = true,
+                                                    Font = OsuFont.Torus.With(size: 14f, weight: FontWeight.SemiBold),
+                                                },
                                             },
                                         },
                                     },
-                                },
+                                }
                             },
                         }),
                         new ShearAlignedDrawable(shear, new Container
@@ -263,10 +274,10 @@ namespace osu.Game.Screens.SelectV2
             computeStarDifficulty(cancellationSource.Token);
 
             if (beatmap.IsDefault)
-                ratingAndNameFlow.FadeOut(300, Easing.OutQuint);
+                ratingAndNameContainer.FadeOut(300, Easing.OutQuint);
             else
             {
-                ratingAndNameFlow.FadeIn(300, Easing.OutQuint);
+                ratingAndNameContainer.FadeIn(300, Easing.OutQuint);
                 difficultyText.Text = beatmap.Value.BeatmapInfo.DifficultyName;
                 mapperLink.Action = () => linkHandler?.HandleLink(new LinkDetails(LinkAction.OpenUserProfile, beatmap.Value.Metadata.Author));
                 mapperText.Text = beatmap.Value.Metadata.Author.Username;
@@ -358,6 +369,12 @@ namespace osu.Game.Screens.SelectV2
                                    displayedStars.Value = result.Stars;
                                });
                            }, cancellationToken);
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+            difficultyText.MaxWidth = Math.Max(nameLine.DrawWidth - mappedByText.DrawWidth - mapperText.DrawWidth - 20, 0);
         }
 
         private partial class MapperLinkContainer : OsuHoverContainer
