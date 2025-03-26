@@ -298,7 +298,6 @@ namespace osu.Game.Tests.Visual.Ranking
         public void TestTaggingInteractionWithLocalScores()
         {
             BeatmapInfo beatmapInfo = null!;
-            string originalHash = string.Empty;
 
             AddStep(@"Import beatmap", () =>
             {
