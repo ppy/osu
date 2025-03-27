@@ -13,6 +13,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Testing;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Screens.OnlinePlay.Lounge;
@@ -41,13 +42,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
             var mockLounge = new Mock<IOnlinePlayLounge>();
             mockLounge
                 .Setup(l => l.Join(It.IsAny<Room>(), It.IsAny<string>(), It.IsAny<Action<Room>>(), It.IsAny<Action<string, Exception?>>()))
-                .Callback<Room, string, Action<Room>, Action<string>>((_, _, _, d) =>
+                .Callback<Room, string, Action<Room>, Action<string, Exception?>>((_, _, _, d) =>
                 {
                     Task.Run(() =>
                     {
                         allowResponseCallback.Wait(10000);
                         allowResponseCallback.Reset();
-                        Schedule(() => d?.Invoke("Incorrect password"));
+                        Schedule(() => d?.Invoke("Incorrect password", new InvalidPasswordException()));
                     });
                 });
 
