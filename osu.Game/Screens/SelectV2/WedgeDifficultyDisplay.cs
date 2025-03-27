@@ -8,9 +8,7 @@ using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
@@ -62,7 +60,7 @@ namespace osu.Game.Screens.SelectV2
         private OsuSpriteText mapperText = null!;
 
         private GridContainer ratingAndNameContainer = null!;
-        private FillFlowContainer<WedgeStatisticDifficulty> beatmapStatisticsFlow = null!;
+        private WedgeHitStatisticsDisplay hitStatisticsDisplay = null!;
         private DifficultyStatisticsFlow difficultyStatisticsFlow = null!;
 
         private WedgeStatisticDifficulty firstStatisticDifficulty = null!;
@@ -186,62 +184,42 @@ namespace osu.Game.Screens.SelectV2
                                         RelativeSizeAxes = Axes.Both,
                                         Colour = colourProvider.Background5,
                                     },
-                                    new Container
+                                    new GridContainer
                                     {
                                         RelativeSizeAxes = Axes.X,
                                         AutoSizeAxes = Axes.Y,
                                         Padding = new MarginPadding { Left = SongSelect.WEDGE_CONTENT_MARGIN, Right = 20f, Top = 7.5f, Bottom = 5f },
                                         Shear = -shear,
-                                        Children = new Drawable[]
+                                        RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
+                                        ColumnDimensions = new[]
                                         {
-                                            new Container
+                                            new Dimension(),
+                                            new Dimension(GridSizeMode.AutoSize),
+                                        },
+                                        Content = new[]
+                                        {
+                                            new Drawable[]
                                             {
-                                                AutoSizeAxes = Axes.Both,
-                                                Children = new Drawable[]
+                                                hitStatisticsDisplay = new WedgeHitStatisticsDisplay
                                                 {
-                                                    beatmapStatisticsFlow = new FillFlowContainer<WedgeStatisticDifficulty>
+                                                    RelativeSizeAxes = Axes.X,
+                                                },
+                                                difficultyStatisticsFlow = new DifficultyStatisticsFlow
+                                                {
+                                                    AutoSizeAxes = Axes.Both,
+                                                    Spacing = new Vector2(8f, 0f),
+                                                    Padding = new MarginPadding { Left = 10f },
+                                                    Children = new[]
                                                     {
-                                                        AutoSizeAxes = Axes.Both,
-                                                        Spacing = new Vector2(8f, 0f),
+                                                        firstStatisticDifficulty = new WedgeStatisticDifficulty(BeatmapsetsStrings.ShowStatsCs) { Width = 65 },
+                                                        accuracy = new WedgeStatisticDifficulty(BeatmapsetsStrings.ShowStatsAccuracy) { Width = 65 },
+                                                        hpDrain = new WedgeStatisticDifficulty(BeatmapsetsStrings.ShowStatsDrain) { Width = 65 },
+                                                        approachRate = new WedgeStatisticDifficulty(BeatmapsetsStrings.ShowStatsAr) { Width = 65 },
                                                     },
                                                 }
-                                            },
-                                            new Container
-                                            {
-                                                Anchor = Anchor.TopRight,
-                                                Origin = Anchor.TopRight,
-                                                AutoSizeAxes = Axes.Both,
-                                                Children = new Drawable[]
-                                                {
-                                                    new Box
-                                                    {
-                                                        Colour = ColourInfo.GradientHorizontal(colourProvider.Background5.Opacity(0), colourProvider.Background5),
-                                                        Width = 30,
-                                                        RelativeSizeAxes = Axes.Y,
-                                                        Origin = Anchor.TopRight,
-                                                    },
-                                                    new Box
-                                                    {
-                                                        Colour = colourProvider.Background5,
-                                                        RelativeSizeAxes = Axes.Both,
-                                                    },
-                                                    difficultyStatisticsFlow = new DifficultyStatisticsFlow
-                                                    {
-                                                        AutoSizeAxes = Axes.Both,
-                                                        Spacing = new Vector2(8f, 0f),
-                                                        Padding = new MarginPadding { Left = 10f },
-                                                        Children = new[]
-                                                        {
-                                                            firstStatisticDifficulty = new WedgeStatisticDifficulty(BeatmapsetsStrings.ShowStatsCs) { Width = 65 },
-                                                            accuracy = new WedgeStatisticDifficulty(BeatmapsetsStrings.ShowStatsAccuracy) { Width = 65 },
-                                                            hpDrain = new WedgeStatisticDifficulty(BeatmapsetsStrings.ShowStatsDrain) { Width = 65 },
-                                                            approachRate = new WedgeStatisticDifficulty(BeatmapsetsStrings.ShowStatsAr) { Width = 65 },
-                                                        },
-                                                    }
-                                                }
-                                            },
-                                        }
-                                    },
+                                            }
+                                        },
+                                    }
                                 },
                             }
                         }),
@@ -284,21 +262,7 @@ namespace osu.Game.Screens.SelectV2
             }
 
             var playableBeatmap = beatmap.Value.GetPlayableBeatmap(ruleset.Value);
-            var newStatistics = playableBeatmap.GetStatistics().Select(s => new WedgeStatisticDifficulty(s.Name)
-            {
-                Width = 75,
-                Value = (s.Count, s.Maximum),
-            }).ToArray();
-
-            var currentStatistics = beatmapStatisticsFlow.Children;
-
-            if (currentStatistics.Select(s => s.Label).SequenceEqual(newStatistics.Select(s => s.Label)))
-            {
-                for (int i = 0; i < newStatistics.Length; i++)
-                    currentStatistics[i].Value = newStatistics[i].Value;
-            }
-            else
-                beatmapStatisticsFlow.Children = newStatistics;
+            hitStatisticsDisplay.Statistics = playableBeatmap.GetStatistics().ToList();
 
             BeatmapDifficulty baseDifficulty = beatmap.Value.BeatmapInfo.Difficulty;
             BeatmapDifficulty originalDifficulty = new BeatmapDifficulty(baseDifficulty);
@@ -350,8 +314,9 @@ namespace osu.Game.Screens.SelectV2
             Color4 colour = displayedStars.Value >= 6.5f ? colours.Orange1 : colours.ForStarDifficulty(displayedStars.Value);
             difficultyText.FadeColour(colour, 300, Easing.OutQuint);
             mappedByText.FadeColour(colour, 300, Easing.OutQuint);
+            hitStatisticsDisplay.TransformTo(nameof(hitStatisticsDisplay.AccentColour), colour, 300, Easing.OutQuint);
 
-            foreach (var statistic in beatmapStatisticsFlow.Concat(difficultyStatisticsFlow))
+            foreach (var statistic in difficultyStatisticsFlow)
                 statistic.TransformTo(nameof(statistic.AccentColour), colour, 300, Easing.OutQuint);
         }
 
