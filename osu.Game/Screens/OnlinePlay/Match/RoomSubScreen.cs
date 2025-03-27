@@ -456,7 +456,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
 
             // Retrieve the corresponding local beatmap, since we can't directly use the playlist's beatmap info
             int beatmapId = GetGameplayBeatmap().OnlineID;
-            var localBeatmap = beatmapManager.QueryBeatmap(b => b.OnlineID == beatmapId);
+            var localBeatmap = beatmapManager.QueryBeatmap($@"{nameof(BeatmapInfo.OnlineID)} = $0 AND {nameof(BeatmapInfo.MD5Hash)} = {nameof(BeatmapInfo.OnlineMD5Hash)}", beatmapId);
             Beatmap.Value = beatmapManager.GetWorkingBeatmap(localBeatmap);
             UserModsSelectOverlay.Beatmap.Value = Beatmap.Value;
 
