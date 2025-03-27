@@ -327,9 +327,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 readingValue *= calculateMissPenalty(effectiveMissCount, attributes.ReadingDifficultStrainCount);
 
             // Scale the reading value with accuracy _harshly_.
-            readingValue *= accuracy * accuracy;
+            readingValue *= Math.Pow(accuracy, 3);
             // It is important to also consider accuracy difficulty when doing that.
-            readingValue *= 0.98 + Math.Pow(overallDifficulty, 2) / 2500;
+            readingValue *= 0.9 + Math.Pow(overallDifficulty, 2) / 800;
 
             return readingValue;
         }
