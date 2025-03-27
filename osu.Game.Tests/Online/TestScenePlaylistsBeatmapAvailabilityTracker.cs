@@ -1,18 +1,14 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
-using JetBrains.Annotations;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
-using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.IO.Stores;
@@ -27,31 +23,29 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
-using osu.Game.Rulesets;
+using osu.Game.Screens.OnlinePlay;
+using osu.Game.Screens.OnlinePlay.Playlists;
 using osu.Game.Tests.Resources;
 using osu.Game.Tests.Visual;
 
 namespace osu.Game.Tests.Online
 {
     [HeadlessTest]
-    public partial class TestSceneOnlinePlayBeatmapAvailabilityTracker : OsuTestScene
+    public partial class TestScenePlaylistsBeatmapAvailabilityTracker : OsuTestScene
     {
-        private RulesetStore rulesets;
-        private TestBeatmapManager beatmaps;
-        private TestBeatmapModelDownloader beatmapDownloader;
+        private TestBeatmapManager beatmaps = null!;
+        private TestBeatmapModelDownloader beatmapDownloader = null!;
 
-        private string testBeatmapFile;
-        private BeatmapInfo testBeatmapInfo;
-        private BeatmapSetInfo testBeatmapSet;
+        private string testBeatmapFile = null!;
+        private BeatmapInfo testBeatmapInfo = null!;
+        private BeatmapSetInfo testBeatmapSet = null!;
 
-        private readonly Bindable<PlaylistItem> selectedItem = new Bindable<PlaylistItem>();
-        private OnlinePlayBeatmapAvailabilityTracker availabilityTracker;
+        private OnlinePlayBeatmapAvailabilityTracker availabilityTracker = null!;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, GameHost host)
         {
-            Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
-            Dependencies.CacheAs<BeatmapManager>(beatmaps = new TestBeatmapManager(LocalStorage, Realm, rulesets, API, audio, Resources, host, Beatmap.Default));
+            Dependencies.CacheAs<BeatmapManager>(beatmaps = new TestBeatmapManager(LocalStorage, Realm, API, audio, Resources, host, Beatmap.Default));
             Dependencies.CacheAs<BeatmapModelDownloader>(beatmapDownloader = new TestBeatmapModelDownloader(beatmaps, API));
         }
 
@@ -82,15 +76,10 @@ namespace osu.Game.Tests.Online
             testBeatmapFile = TestResources.GetQuickTestBeatmapForImport();
 
             testBeatmapInfo = getTestBeatmapInfo(testBeatmapFile);
-            testBeatmapSet = testBeatmapInfo.BeatmapSet;
+            testBeatmapSet = testBeatmapInfo.BeatmapSet!;
 
             Realm.Write(r => r.RemoveAll<BeatmapSetInfo>());
             Realm.Write(r => r.RemoveAll<BeatmapInfo>());
-
-            selectedItem.Value = new PlaylistItem(testBeatmapInfo)
-            {
-                RulesetID = testBeatmapInfo.Ruleset.OnlineID,
-            };
 
             recreateChildren();
         });
@@ -108,9 +97,15 @@ namespace osu.Game.Tests.Online
                 Children = new Drawable[]
                 {
                     beatmapLookupCache,
-                    availabilityTracker = new OnlinePlayBeatmapAvailabilityTracker
+                    availabilityTracker = new PlaylistsBeatmapAvailabilityTracker
                     {
-                        SelectedItem = { BindTarget = selectedItem, }
+                        PlaylistItem =
+                        {
+                            Value = new PlaylistItem(testBeatmapInfo)
+                            {
+                                RulesetID = testBeatmapInfo.Ruleset.OnlineID,
+                            },
+                        }
                     }
                 }
             };
@@ -125,10 +120,10 @@ namespace osu.Game.Tests.Online
             AddStep("start downloading", () => beatmapDownloader.Download(testBeatmapSet));
             addAvailabilityCheckStep("state downloading 0%", () => BeatmapAvailability.Downloading(0.0f));
 
-            AddStep("set progress 40%", () => ((TestDownloadRequest)beatmapDownloader.GetExistingDownload(testBeatmapSet))!.SetProgress(0.4f));
+            AddStep("set progress 40%", () => ((TestDownloadRequest)beatmapDownloader.GetExistingDownload(testBeatmapSet)!).SetProgress(0.4f));
             addAvailabilityCheckStep("state downloading 40%", () => BeatmapAvailability.Downloading(0.4f));
 
-            AddStep("finish download", () => ((TestDownloadRequest)beatmapDownloader.GetExistingDownload(testBeatmapSet))!.TriggerSuccess(testBeatmapFile));
+            AddStep("finish download", () => ((TestDownloadRequest)beatmapDownloader.GetExistingDownload(testBeatmapSet)!).TriggerSuccess(testBeatmapFile));
             addAvailabilityCheckStep("state importing", BeatmapAvailability.Importing);
 
             AddStep("allow importing", () => beatmaps.AllowImport.Set());
@@ -203,10 +198,10 @@ namespace osu.Game.Tests.Online
         {
             public readonly ManualResetEventSlim AllowImport = new ManualResetEventSlim();
 
-            public Live<BeatmapSetInfo> CurrentImport { get; private set; }
+            public Live<BeatmapSetInfo>? CurrentImport { get; private set; }
 
-            public TestBeatmapManager(Storage storage, RealmAccess realm, RulesetStore rulesets, IAPIProvider api, [NotNull] AudioManager audioManager, IResourceStore<byte[]> resources,
-                                      GameHost host = null, WorkingBeatmap defaultBeatmap = null)
+            public TestBeatmapManager(Storage storage, RealmAccess realm, IAPIProvider api, AudioManager audioManager, IResourceStore<byte[]> resources,
+                                      GameHost? host = null, WorkingBeatmap? defaultBeatmap = null)
                 : base(storage, realm, api, audioManager, resources, host, defaultBeatmap)
             {
             }
@@ -226,12 +221,13 @@ namespace osu.Game.Tests.Online
                     this.testBeatmapManager = testBeatmapManager;
                 }
 
-                public override Live<BeatmapSetInfo> ImportModel(BeatmapSetInfo item, ArchiveReader archive = null, ImportParameters parameters = default, CancellationToken cancellationToken = default)
+                public override Live<BeatmapSetInfo>? ImportModel(BeatmapSetInfo item, ArchiveReader? archive = null, ImportParameters parameters = default,
+                                                                  CancellationToken cancellationToken = default)
                 {
                     if (!testBeatmapManager.AllowImport.Wait(TimeSpan.FromSeconds(10), cancellationToken))
                         throw new TimeoutException("Timeout waiting for import to be allowed.");
 
-                    return (testBeatmapManager.CurrentImport = base.ImportModel(item, archive, parameters, cancellationToken));
+                    return testBeatmapManager.CurrentImport = base.ImportModel(item, archive, parameters, cancellationToken);
                 }
             }
         }

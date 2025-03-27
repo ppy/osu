@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Diagnostics;
 using System.Linq;
@@ -16,10 +14,12 @@ using osu.Framework.Logging;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
+using osu.Game.Online;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Rooms;
 using Realms;
 
-namespace osu.Game.Online.Rooms
+namespace osu.Game.Screens.OnlinePlay
 {
     /// <summary>
     /// Represent a checksum-verifying beatmap availability tracker usable for online play screens.
@@ -27,9 +27,17 @@ namespace osu.Game.Online.Rooms
     /// This differs from a regular download tracking composite as this accounts for the
     /// databased beatmap set's checksum, to disallow from playing with an altered version of the beatmap.
     /// </summary>
-    public partial class OnlinePlayBeatmapAvailabilityTracker : CompositeComponent
+    public abstract partial class OnlinePlayBeatmapAvailabilityTracker : CompositeComponent
     {
-        public readonly Bindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();
+        /// <summary>
+        /// The current availability of <see cref="PlaylistItem"/>'s beatmap.
+        /// </summary>
+        public virtual IBindable<BeatmapAvailability> Availability => availability; // Virtual for mocking in some tests.
+
+        /// <summary>
+        /// The playlist item to track the availability of.
+        /// </summary>
+        protected readonly Bindable<PlaylistItem?> PlaylistItem = new Bindable<PlaylistItem?>();
 
         [Resolved]
         private RealmAccess realm { get; set; } = null!;
@@ -37,23 +45,17 @@ namespace osu.Game.Online.Rooms
         [Resolved]
         private BeatmapLookupCache beatmapLookupCache { get; set; } = null!;
 
-        /// <summary>
-        /// The availability state of the currently selected playlist item.
-        /// </summary>
-        public virtual IBindable<BeatmapAvailability> Availability => availability;
-
         private readonly Bindable<BeatmapAvailability> availability = new Bindable<BeatmapAvailability>(BeatmapAvailability.NotDownloaded());
 
-        private ScheduledDelegate progressUpdate;
-        private BeatmapDownloadTracker downloadTracker;
-        private IDisposable realmSubscription;
-        private APIBeatmap selectedBeatmap;
+        private ScheduledDelegate? progressUpdate;
+        private BeatmapDownloadTracker? downloadTracker;
+        private IDisposable? realmSubscription;
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            SelectedItem.BindValueChanged(item =>
+            PlaylistItem.BindValueChanged(item =>
             {
                 // the underlying playlist is regularly cleared for maintenance purposes (things which probably need to be fixed eventually).
                 // to avoid exposing a state change when there may actually be none, ignore all nulls for now.
@@ -69,30 +71,29 @@ namespace osu.Game.Online.Rooms
                 // This is just for safety.
                 availability.Value = BeatmapAvailability.Unknown();
 
-                downloadTracker?.RemoveAndDisposeImmediately();
-                selectedBeatmap = null;
+                cancelTracking();
 
                 beatmapLookupCache.GetBeatmapAsync(item.NewValue.Beatmap.OnlineID).ContinueWith(task => Schedule(() =>
                 {
                     var beatmap = task.GetResultSafely();
 
-                    if (beatmap != null && SelectedItem.Value?.Beatmap.OnlineID == beatmap.OnlineID)
-                    {
-                        selectedBeatmap = beatmap;
-                        beginTracking();
-                    }
+                    if (beatmap != null && PlaylistItem.Value?.Beatmap.OnlineID == beatmap.OnlineID)
+                        startTracking(beatmap);
                 }), TaskContinuationOptions.OnlyOnRanToCompletion);
             }, true);
         }
 
-        private void beginTracking()
+        private void cancelTracking()
         {
-            Debug.Assert(selectedBeatmap.BeatmapSet != null);
+            downloadTracker?.RemoveAndDisposeImmediately();
+            realmSubscription?.Dispose();
+        }
 
-            downloadTracker = new BeatmapDownloadTracker(selectedBeatmap.BeatmapSet);
+        private void startTracking(APIBeatmap beatmap)
+        {
+            Debug.Assert(beatmap.BeatmapSet != null);
 
-            AddInternal(downloadTracker);
-
+            downloadTracker = new BeatmapDownloadTracker(beatmap.BeatmapSet);
             downloadTracker.State.BindValueChanged(_ => Scheduler.AddOnce(updateAvailability), true);
             downloadTracker.Progress.BindValueChanged(_ =>
             {
@@ -105,64 +106,55 @@ namespace osu.Game.Online.Rooms
                     progressUpdate = Scheduler.AddDelayed(updateAvailability, progressUpdate == null ? 0 : 500);
             }, true);
 
+            AddInternal(downloadTracker);
+
             // handles changes to hash that didn't occur from the import process (ie. a user editing the beatmap in the editor, somehow).
-            realmSubscription?.Dispose();
-            realmSubscription = realm.RegisterForNotifications(_ => filteredBeatmaps(), (_, changes) =>
+            realmSubscription = realm.RegisterForNotifications(_ => queryBeatmap(), (_, changes) =>
             {
                 if (changes == null)
                     return;
 
                 Scheduler.AddOnce(updateAvailability);
             });
-        }
 
-        private void updateAvailability()
-        {
-            if (downloadTracker == null || selectedBeatmap == null)
-                return;
-
-            switch (downloadTracker.State.Value)
+            void updateAvailability()
             {
-                case DownloadState.Unknown:
-                    availability.Value = BeatmapAvailability.Unknown();
-                    break;
+                switch (downloadTracker.State.Value)
+                {
+                    case DownloadState.Unknown:
+                        availability.Value = BeatmapAvailability.Unknown();
+                        break;
 
-                case DownloadState.NotDownloaded:
-                    availability.Value = BeatmapAvailability.NotDownloaded();
-                    break;
+                    case DownloadState.NotDownloaded:
+                        availability.Value = BeatmapAvailability.NotDownloaded();
+                        break;
 
-                case DownloadState.Downloading:
-                    availability.Value = BeatmapAvailability.Downloading((float)downloadTracker.Progress.Value);
-                    break;
+                    case DownloadState.Downloading:
+                        availability.Value = BeatmapAvailability.Downloading((float)downloadTracker.Progress.Value);
+                        break;
 
-                case DownloadState.Importing:
-                    availability.Value = BeatmapAvailability.Importing();
-                    break;
+                    case DownloadState.Importing:
+                        availability.Value = BeatmapAvailability.Importing();
+                        break;
 
-                case DownloadState.LocallyAvailable:
-                    bool available = filteredBeatmaps().Any();
+                    case DownloadState.LocallyAvailable:
+                        bool available = queryBeatmap().Any();
 
-                    availability.Value = available ? BeatmapAvailability.LocallyAvailable() : BeatmapAvailability.NotDownloaded();
+                        availability.Value = available ? BeatmapAvailability.LocallyAvailable() : BeatmapAvailability.NotDownloaded();
 
-                    // only display a message to the user if a download seems to have just completed.
-                    if (!available && downloadTracker.Progress.Value == 1)
-                        Logger.Log("The imported beatmap set does not match the online version.", LoggingTarget.Runtime, LogLevel.Important);
+                        // only display a message to the user if a download seems to have just completed.
+                        if (!available && downloadTracker.Progress.Value == 1)
+                            Logger.Log("The imported beatmap set does not match the online version.", LoggingTarget.Runtime, LogLevel.Important);
 
-                    break;
+                        break;
 
-                default:
-                    throw new ArgumentOutOfRangeException();
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
             }
-        }
 
-        private IQueryable<BeatmapInfo> filteredBeatmaps()
-        {
-            int onlineId = selectedBeatmap.OnlineID;
-            string checksum = selectedBeatmap.MD5Hash;
-
-            return realm.Realm
-                        .All<BeatmapInfo>()
-                        .Filter("OnlineID == $0 && MD5Hash == $1 && BeatmapSet.DeletePending == false", onlineId, checksum);
+            IQueryable<BeatmapInfo> queryBeatmap() =>
+                realm.Realm.All<BeatmapInfo>().Filter("OnlineID == $0 && MD5Hash == $1 && BeatmapSet.DeletePending == false", beatmap.OnlineID, beatmap.MD5Hash);
         }
 
         protected override void Dispose(bool isDisposing)

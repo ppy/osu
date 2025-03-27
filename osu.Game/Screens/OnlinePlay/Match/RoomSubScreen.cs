@@ -94,8 +94,8 @@ namespace osu.Game.Screens.OnlinePlay.Match
         [Resolved(canBeNull: true)]
         protected IDialogOverlay? DialogOverlay { get; private set; }
 
-        [Cached]
-        private readonly OnlinePlayBeatmapAvailabilityTracker beatmapAvailabilityTracker = new OnlinePlayBeatmapAvailabilityTracker();
+        [Cached(typeof(OnlinePlayBeatmapAvailabilityTracker))]
+        private readonly MultiplayerBeatmapAvailabilityTracker beatmapAvailabilityTracker = new MultiplayerBeatmapAvailabilityTracker();
 
         protected IBindable<BeatmapAvailability> BeatmapAvailability => beatmapAvailabilityTracker.Availability;
 
@@ -263,7 +263,6 @@ namespace osu.Game.Screens.OnlinePlay.Match
             SelectedItem.BindValueChanged(_ => updateSpecifics());
             UserMods.BindValueChanged(_ => updateSpecifics());
 
-            beatmapAvailabilityTracker.SelectedItem.BindTo(SelectedItem);
             beatmapAvailabilityTracker.Availability.BindValueChanged(_ => updateSpecifics());
 
             userModsSelectOverlayRegistration = overlayManager?.RegisterBlockingOverlay(UserModsSelectOverlay);
