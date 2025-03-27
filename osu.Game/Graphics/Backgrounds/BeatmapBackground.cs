@@ -98,7 +98,7 @@ namespace osu.Game.Graphics.Backgrounds
             {
                 bool result = base.OnInvalidate(invalidation, source);
 
-                if ((invalidation & (Invalidation.Colour | Invalidation.DrawInfo | Invalidation.RequiredParentSizeToFit | Invalidation.Presence)) > 0)
+                if ((invalidation & Invalidation.Colour) > 0)
                 {
                     result |= Invalidate(Invalidation.DrawNode);
                 }
@@ -194,7 +194,7 @@ namespace osu.Game.Graphics.Backgrounds
             {
                 bool result = base.OnInvalidate(invalidation, source);
 
-                if ((invalidation & (Invalidation.Colour | Invalidation.DrawInfo | Invalidation.RequiredParentSizeToFit | Invalidation.Presence)) > 0)
+                if ((invalidation & Invalidation.Colour) > 0)
                 {
                     result |= Invalidate(Invalidation.DrawNode);
                 }
