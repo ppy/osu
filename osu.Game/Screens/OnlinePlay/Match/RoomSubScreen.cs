@@ -39,10 +39,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
 
         public override bool? ApplyModTrackAdjustments => true;
 
-        protected override BackgroundScreen CreateBackground() => new RoomBackgroundScreen(Room.Playlist.FirstOrDefault())
-        {
-            SelectedItem = { BindTarget = SelectedItem }
-        };
+        protected override BackgroundScreen CreateBackground() => new MultiplayerRoomBackgroundScreen();
 
         public override bool DisallowExternalBeatmapRulesetChanges => true;
 
