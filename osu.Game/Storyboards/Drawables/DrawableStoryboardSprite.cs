@@ -2,16 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Runtime.InteropServices;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Rendering;
-using osu.Framework.Graphics.Shaders;
-using osu.Framework.Graphics.Shaders.Types;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Layout;
 using osu.Framework.Utils;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Skinning;
@@ -19,7 +13,7 @@ using osuTK;
 
 namespace osu.Game.Storyboards.Drawables
 {
-    public partial class DrawableStoryboardSprite : Sprite, IFlippable, IVectorScalable, IColouredDimmable
+    public partial class DrawableStoryboardSprite : BeatmapBackground.DimmableSprite, IFlippable, IVectorScalable
     {
         public StoryboardSprite Sprite { get; }
 
@@ -86,18 +80,6 @@ namespace osu.Game.Storyboards.Drawables
         [Resolved]
         private TextureStore textureStore { get; set; } = null!;
 
-        protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
-        {
-            bool result = base.OnInvalidate(invalidation, source);
-
-            if ((invalidation & Invalidation.Colour) > 0)
-            {
-                result |= Invalidate(Invalidation.DrawNode);
-            }
-
-            return result;
-        }
-
         public DrawableStoryboardSprite(StoryboardSprite sprite)
         {
             Sprite = sprite;
@@ -110,7 +92,7 @@ namespace osu.Game.Storyboards.Drawables
         }
 
         [BackgroundDependencyLoader]
-        private void load(Storyboard storyboard, ShaderManager shaders)
+        private void load(Storyboard storyboard)
         {
             if (storyboard.UseSkinSprites)
             {
@@ -121,8 +103,6 @@ namespace osu.Game.Storyboards.Drawables
                 Texture = textureStore.Get(Sprite.Path, WrapMode.ClampToEdge, WrapMode.ClampToEdge);
 
             Sprite.ApplyTransforms(this);
-
-            TextureShader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, "ColouredDimmableTexture");
         }
 
         private void skinSourceChanged()
@@ -141,59 +121,6 @@ namespace osu.Game.Storyboards.Drawables
 
             if (skin.IsNotNull())
                 skin.SourceChanged -= skinSourceChanged;
-        }
-
-        protected override DrawNode CreateDrawNode() => new DrawableStoryboardSpriteDrawNode(this);
-
-        public class DrawableStoryboardSpriteDrawNode : SpriteDrawNode
-        {
-            public new DrawableStoryboardSprite Source => (DrawableStoryboardSprite)base.Source;
-
-            public DrawableStoryboardSpriteDrawNode(DrawableStoryboardSprite source)
-                : base(source)
-            {
-            }
-
-            private Colour4 drawColourOffset;
-
-            public override void ApplyState()
-            {
-                base.ApplyState();
-
-                drawColourOffset = (Source as IColouredDimmable).DrawColourOffset;
-            }
-
-            private IUniformBuffer<DimParameters> dimParametersBuffer = null!;
-
-            protected override void BindUniformResources(IShader shader, IRenderer renderer)
-            {
-                dimParametersBuffer ??= renderer.CreateUniformBuffer<DimParameters>();
-
-                dimParametersBuffer.Data = dimParametersBuffer.Data with
-                {
-                    DimColour = new UniformVector4
-                    {
-                        X = drawColourOffset.R,
-                        Y = drawColourOffset.G,
-                        Z = drawColourOffset.B,
-                        W = drawColourOffset.A
-                    },
-                };
-
-                shader.BindUniformBlock("m_DimParameters", dimParametersBuffer);
-            }
-
-            protected override void Dispose(bool isDisposing)
-            {
-                base.Dispose(isDisposing);
-                dimParametersBuffer?.Dispose();
-            }
-
-            [StructLayout(LayoutKind.Sequential, Pack = 1)]
-            private record struct DimParameters
-            {
-                public UniformVector4 DimColour;
-            }
         }
     }
 }

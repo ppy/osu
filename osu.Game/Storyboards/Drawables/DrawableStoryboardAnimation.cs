@@ -5,16 +5,11 @@
 
 using System;
 using System.IO;
-using System.Runtime.InteropServices;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
-using osu.Framework.Graphics.Rendering;
-using osu.Framework.Graphics.Shaders;
-using osu.Framework.Graphics.Shaders.Types;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Layout;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Backgrounds;
@@ -74,7 +69,7 @@ namespace osu.Game.Storyboards.Drawables
             }
         }
 
-        protected override Sprite CreateSprite() => new DrawableStoryboardAnimationSprite
+        protected override Sprite CreateSprite() => new BeatmapBackground.DimmableSprite
         {
             RelativeSizeAxes = Axes.Both,
             Anchor = Anchor.Centre,
@@ -173,84 +168,6 @@ namespace osu.Game.Storyboards.Drawables
 
             if (skin != null)
                 skin.SourceChanged -= skinSourceChanged;
-        }
-
-        public partial class DrawableStoryboardAnimationSprite : Sprite, IColouredDimmable
-        {
-            protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
-            {
-                bool result = base.OnInvalidate(invalidation, source);
-
-                if ((invalidation & Invalidation.Colour) > 0)
-                {
-                    result |= Invalidate(Invalidation.DrawNode);
-                }
-
-                return result;
-            }
-
-            public DrawableStoryboardAnimationSprite()
-            {
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(ShaderManager shaders)
-            {
-                TextureShader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, "ColouredDimmableTexture");
-            }
-
-            protected override DrawNode CreateDrawNode() => new BeatmapBackgroundSpriteDrawNode(this);
-
-            public class BeatmapBackgroundSpriteDrawNode : SpriteDrawNode
-            {
-                public new DrawableStoryboardAnimationSprite Source => (DrawableStoryboardAnimationSprite)base.Source;
-
-                public BeatmapBackgroundSpriteDrawNode(DrawableStoryboardAnimationSprite source)
-                    : base(source)
-                {
-                }
-
-                private Colour4 drawColourOffset;
-
-                public override void ApplyState()
-                {
-                    base.ApplyState();
-
-                    drawColourOffset = (Source as IColouredDimmable).DrawColourOffset;
-                }
-
-                private IUniformBuffer<DimParameters> dimParametersBuffer;
-
-                protected override void BindUniformResources(IShader shader, IRenderer renderer)
-                {
-                    dimParametersBuffer ??= renderer.CreateUniformBuffer<DimParameters>();
-
-                    dimParametersBuffer.Data = dimParametersBuffer.Data with
-                    {
-                        DimColour = new UniformVector4
-                        {
-                            X = drawColourOffset.R,
-                            Y = drawColourOffset.G,
-                            Z = drawColourOffset.B,
-                            W = drawColourOffset.A
-                        },
-                    };
-
-                    shader.BindUniformBlock("m_DimParameters", dimParametersBuffer);
-                }
-
-                protected override void Dispose(bool isDisposing)
-                {
-                    base.Dispose(isDisposing);
-                    dimParametersBuffer?.Dispose();
-                }
-
-                [StructLayout(LayoutKind.Sequential, Pack = 1)]
-                private record struct DimParameters
-                {
-                    public UniformVector4 DimColour;
-                }
-            }
         }
     }
 }
