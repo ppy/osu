@@ -9,6 +9,7 @@ using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Game.Database;
+using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Metadata;
 using osu.Game.Online.Spectator;
@@ -96,6 +97,87 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("User finished playing", () => metadataClient.UserPresenceUpdated(streamingUser.Id, new UserPresence { Status = UserStatus.Online, Activity = new UserActivity.ChoosingBeatmap() }));
             AddAssert("Spectate button disabled", () => currentlyOnline.ChildrenOfType<PurpleRoundedButton>().First().Enabled.Value, () => Is.False);
             AddStep("Remove playing user", () => metadataClient.UserPresenceUpdated(streamingUser.Id, null));
+            AddStep("End watching user presence", () => token.Dispose());
+        }
+
+        [Test]
+        public void TestBlockedUsersHidden()
+        {
+            IDisposable token = null!;
+
+            AddStep("Clear blocks", () =>
+            {
+                DummyAPIAccess api = (DummyAPIAccess)API;
+                api.Blocks.Clear();
+            });
+
+            AddStep("Begin watching user presence", () => token = metadataClient.BeginWatchingUserPresence());
+            AddStep("Add online user", () => metadataClient.UserPresenceUpdated(streamingUser.Id, new UserPresence { Status = UserStatus.Online, Activity = new UserActivity.InSoloGame() }));
+            AddUntilStep("Panel loaded", () => currentlyOnline.ChildrenOfType<UserGridPanel>().FirstOrDefault()?.User.Id == streamingUser.Id);
+
+            AddStep("Block online user", () =>
+            {
+                DummyAPIAccess api = (DummyAPIAccess)API;
+                api.Blocks.Add(new APIRelation()
+                {
+                    RelationType = RelationType.Block,
+                    TargetUser = streamingUser,
+                    TargetID = streamingUser.Id
+                });
+            });
+
+            AddAssert("Blocked user not shown", () => currentlyOnline.ChildrenOfType<UserGridPanel>().All(p => p.User.Id != streamingUser.Id));
+
+            AddStep("Unblock online user", () =>
+            {
+                DummyAPIAccess api = (DummyAPIAccess)API;
+                api.Blocks.RemoveAll(b => b.TargetID == streamingUser.Id);
+            });
+
+            AddAssert("Unblocked user shown again", () => currentlyOnline.ChildrenOfType<UserGridPanel>().Any(p => p.User.Id == streamingUser.Id));
+
+            AddStep("Remove playing user", () => metadataClient.UserPresenceUpdated(streamingUser.Id, null));
+            AddStep("End watching user presence", () => token.Dispose());
+        }
+
+        [Test]
+        public void TestUnblockedOfflineUsersHidden()
+        {
+            IDisposable token = null!;
+
+            AddStep("Clear blocks", () =>
+            {
+                DummyAPIAccess api = (DummyAPIAccess)API;
+                api.Blocks.Clear();
+            });
+
+            AddStep("Begin watching user presence", () => token = metadataClient.BeginWatchingUserPresence());
+            AddStep("Add online user", () => metadataClient.UserPresenceUpdated(streamingUser.Id, new UserPresence { Status = UserStatus.Online, Activity = new UserActivity.InSoloGame() }));
+            AddUntilStep("Panel loaded", () => currentlyOnline.ChildrenOfType<UserGridPanel>().FirstOrDefault()?.User.Id == streamingUser.Id);
+
+            AddStep("Block online user", () =>
+            {
+                DummyAPIAccess api = (DummyAPIAccess)API;
+                api.Blocks.Add(new APIRelation()
+                {
+                    RelationType = RelationType.Block,
+                    TargetUser = streamingUser,
+                    TargetID = streamingUser.Id
+                });
+            });
+
+            AddAssert("Blocked user not shown", () => currentlyOnline.ChildrenOfType<UserGridPanel>().All(p => p.User.Id != streamingUser.Id));
+
+            AddStep("Remove playing user", () => metadataClient.UserPresenceUpdated(streamingUser.Id, null));
+
+            AddStep("Unblock offline user", () =>
+            {
+                DummyAPIAccess api = (DummyAPIAccess)API;
+                api.Blocks.RemoveAll(b => b.TargetID == streamingUser.Id);
+            });
+
+            AddAssert("Unblocked offline user not shown", () => currentlyOnline.ChildrenOfType<UserGridPanel>().All(p => p.User.Id != streamingUser.Id));
+
             AddStep("End watching user presence", () => token.Dispose());
         }
 
