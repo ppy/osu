@@ -597,7 +597,7 @@ namespace osu.Game.Tests.Visual.Background
 
             public bool IsSpriteDimmed => ColouredDimmableSprite.DrawColourInfo.Colour != Colour4.White;
 
-            public bool IsBufferedContainerDimmed => ColouredDimmableBufferedContainer != null && ColouredDimmableBufferedContainer.DrawColourInfo.Colour != Colour4.White;
+            public bool IsBufferedContainerDimmed => ColouredDimmableBufferedContainer != null && ColouredDimmableBufferedContainer.FrameBufferDrawColour?.Colour != Colour4.White;
 
             public bool IsBufferedContainerNull => ColouredDimmableBufferedContainer == null;
 
