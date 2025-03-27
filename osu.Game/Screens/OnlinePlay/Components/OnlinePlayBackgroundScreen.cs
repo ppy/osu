@@ -1,12 +1,14 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
@@ -108,8 +110,12 @@ namespace osu.Game.Screens.OnlinePlay.Components
                     if (coverImage != null)
                         Sprite.Texture = textures.Get(coverImage);
                 }
-                catch
+                catch (OperationCanceledException)
                 {
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex, $"Failed to retrieve cover image for beatmap {beatmapId}.");
                 }
             }
         }
@@ -124,9 +130,6 @@ namespace osu.Game.Screens.OnlinePlay.Components
             {
                 Sprite.Texture = beatmapManager.DefaultBeatmap.GetBackground();
             }
-
-            public override bool Equals(Background? other)
-                => other is DefaultBackground;
         }
     }
 }
