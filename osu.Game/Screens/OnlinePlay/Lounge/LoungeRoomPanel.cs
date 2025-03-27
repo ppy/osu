@@ -17,6 +17,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using osu.Framework.Logging;
 using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -306,13 +307,14 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                 GetContainingFocusManager()?.TriggerFocusContention(passwordTextBox);
             }
 
-            private void joinFailed(string error) => Schedule(() =>
+            private void joinFailed(string message, Exception? exception) => Schedule(() =>
             {
                 passwordTextBox.Text = string.Empty;
 
                 GetContainingFocusManager()!.ChangeFocus(passwordTextBox);
 
-                errorText.Text = error;
+                Logger.Log($"Failed to join room with password. {exception}");
+                errorText.Text = message;
                 errorText
                     .FadeIn()
                     .FlashColour(Color4.White, 200)
