@@ -46,8 +46,10 @@ namespace osu.Game.Screens.SelectV2
         private IBindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
 
         private BeatmapSetOnlineStatusPill statusPill = null!;
+        private Container titleContainer = null!;
         private OsuHoverContainer titleLink = null!;
         private OsuSpriteText titleLabel = null!;
+        private Container artistContainer = null!;
         private OsuHoverContainer artistLink = null!;
         private OsuSpriteText artistLabel = null!;
 
@@ -111,31 +113,35 @@ namespace osu.Game.Screens.SelectV2
                                 TextPadding = new MarginPadding { Horizontal = 8, Vertical = 2 },
                             }
                         }),
-                        new ShearAlignedDrawable(shear, titleLink = new OsuHoverContainer
+                        new ShearAlignedDrawable(shear, titleContainer = new Container
                         {
                             RelativeSizeAxes = Axes.X,
                             Height = 36f,
                             Margin = new MarginPadding { Bottom = -5f },
-                            Child = titleLabel = new TruncatingSpriteText
+                            Child = titleLink = new OsuHoverContainer
                             {
-                                Shadow = true,
-                                Font = OsuFont.TorusAlternate.With(size: 36f, weight: FontWeight.SemiBold),
-                                RelativeSizeAxes = Axes.X,
-                                Padding = new MarginPadding { Right = 20f },
-                            },
+                                AutoSizeAxes = Axes.Both,
+                                Child = titleLabel = new TruncatingSpriteText
+                                {
+                                    Shadow = true,
+                                    Font = OsuFont.TorusAlternate.With(size: 36f, weight: FontWeight.SemiBold),
+                                },
+                            }
                         }),
-                        new ShearAlignedDrawable(shear, artistLink = new OsuHoverContainer
+                        new ShearAlignedDrawable(shear, artistContainer = new Container
                         {
                             RelativeSizeAxes = Axes.X,
                             Height = 24f,
                             Margin = new MarginPadding { Left = 1f },
-                            Child = artistLabel = new TruncatingSpriteText
+                            Child = artistLink = new OsuHoverContainer
                             {
-                                Shadow = true,
-                                Font = OsuFont.Torus.With(size: 24f, weight: FontWeight.SemiBold),
-                                RelativeSizeAxes = Axes.X,
-                                Padding = new MarginPadding { Right = 20f },
-                            },
+                                AutoSizeAxes = Axes.Both,
+                                Child = artistLabel = new TruncatingSpriteText
+                                {
+                                    Shadow = true,
+                                    Font = OsuFont.Torus.With(size: 24f, weight: FontWeight.SemiBold),
+                                },
+                            }
                         }),
                         new ShearAlignedDrawable(shear, new FillFlowContainer
                         {
@@ -199,6 +205,13 @@ namespace osu.Game.Screens.SelectV2
         {
             this.MoveToX(-150, SongSelect.ENTER_DURATION, Easing.OutQuint)
                 .FadeOut(SongSelect.ENTER_DURATION / 3, Easing.In);
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+            titleLabel.MaxWidth = titleContainer.DrawWidth - 20;
+            artistLabel.MaxWidth = artistContainer.DrawWidth - 20;
         }
 
         private void updateDisplay()
