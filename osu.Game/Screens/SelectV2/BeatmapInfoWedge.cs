@@ -14,6 +14,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
+using osu.Game.Configuration;
 using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -44,6 +45,8 @@ namespace osu.Game.Screens.SelectV2
 
         [Resolved]
         private IBindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
+
+        private ModSettingChangeTracker? settingChangeTracker;
 
         private BeatmapSetOnlineStatusPill statusPill = null!;
         private Container titleContainer = null!;
@@ -189,7 +192,17 @@ namespace osu.Game.Screens.SelectV2
 
             beatmap.BindValueChanged(_ => updateDisplay());
             ruleset.BindValueChanged(_ => updateDisplay());
-            mods.BindValueChanged(_ => updateDisplay());
+
+            mods.BindValueChanged(m =>
+            {
+                settingChangeTracker?.Dispose();
+
+                updateLengthAndBpmStatistics();
+
+                settingChangeTracker = new ModSettingChangeTracker(m.NewValue);
+                settingChangeTracker.SettingChanged += _ => updateLengthAndBpmStatistics();
+            });
+
             updateDisplay();
 
             FinishTransforms(true);
@@ -230,6 +243,18 @@ namespace osu.Game.Screens.SelectV2
             artistLabel.Text = artistText;
             artistLink.Action = () => songSelect?.Search(artistText.GetPreferred(localisation.CurrentParameters.Value.PreferOriginalScript));
 
+            updateLengthAndBpmStatistics();
+
+            if (currentOnlineBeatmapSet == null || currentOnlineBeatmapSet.OnlineID != beatmapSetInfo.OnlineID)
+                refetchBeatmapSet();
+
+            updateOnlineDisplay();
+        }
+
+        private void updateLengthAndBpmStatistics()
+        {
+            var beatmapInfo = beatmap.Value.BeatmapInfo;
+
             double rate = ModUtils.CalculateRateWithMods(mods.Value);
 
             int bpmMax = FormatUtils.RoundBPM(beatmap.Value.Beatmap.ControlPointInfo.BPMMaximum, rate);
@@ -245,11 +270,6 @@ namespace osu.Game.Screens.SelectV2
             bpmStatistic.Value = bpmMin == bpmMax
                 ? $"{bpmMin}"
                 : $"{bpmMin}-{bpmMax} (mostly {mostCommonBPM})";
-
-            if (currentOnlineBeatmapSet == null || currentOnlineBeatmapSet.OnlineID != beatmapSetInfo.OnlineID)
-                refetchBeatmapSet();
-
-            updateOnlineDisplay();
         }
 
         private void refetchBeatmapSet()

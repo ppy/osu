@@ -14,6 +14,7 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -45,6 +46,8 @@ namespace osu.Game.Screens.SelectV2
 
         [Resolved]
         private IBindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
+
+        private ModSettingChangeTracker? settingChangeTracker;
 
         [Resolved]
         private BeatmapDifficultyCache difficultyCache { get; set; } = null!;
@@ -216,7 +219,17 @@ namespace osu.Game.Screens.SelectV2
 
             beatmap.BindValueChanged(_ => updateDisplay());
             ruleset.BindValueChanged(_ => updateDisplay());
-            mods.BindValueChanged(_ => updateDisplay());
+
+            mods.BindValueChanged(m =>
+            {
+                settingChangeTracker?.Dispose();
+
+                updateDifficultyStatistics();
+
+                settingChangeTracker = new ModSettingChangeTracker(m.NewValue);
+                settingChangeTracker.SettingChanged += _ => updateDifficultyStatistics();
+            });
+
             updateDisplay();
 
             displayedStars.BindValueChanged(_ => updateStars(), true);
@@ -246,6 +259,11 @@ namespace osu.Game.Screens.SelectV2
             var playableBeatmap = beatmap.Value.GetPlayableBeatmap(ruleset.Value);
             countStatisticsDisplay.Statistics = playableBeatmap.GetStatistics().ToList();
 
+            updateDifficultyStatistics();
+        }
+
+        private void updateDifficultyStatistics() => Scheduler.AddOnce(() =>
+        {
             BeatmapDifficulty baseDifficulty = beatmap.Value.BeatmapInfo.Difficulty;
             BeatmapDifficulty originalDifficulty = new BeatmapDifficulty(baseDifficulty);
 
@@ -295,7 +313,7 @@ namespace osu.Game.Screens.SelectV2
                 new BeatmapStatistic { Name = BeatmapsetsStrings.ShowStatsDrain, Value = rateAdjustedDifficulty.DrainRate, Maximum = 10 },
                 new BeatmapStatistic { Name = BeatmapsetsStrings.ShowStatsAr, Value = rateAdjustedDifficulty.ApproachRate, Maximum = 10 },
             };
-        }
+        });
 
         private void updateStars()
         {
