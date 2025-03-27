@@ -51,10 +51,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         protected readonly Bindable<PlaylistItem?> SelectedItem = new Bindable<PlaylistItem?>();
         protected Container ButtonsContainer { get; private set; } = null!;
 
-        private readonly Bindable<MatchType> roomType = new Bindable<MatchType>();
-        private readonly Bindable<RoomCategory> roomCategory = new Bindable<RoomCategory>();
-        private readonly Bindable<bool> hasPassword = new Bindable<bool>();
-
         private DrawableRoomParticipantsList? drawableRoomParticipantsList;
         private RoomSpecialCategoryPill? specialCategoryPill;
         private PasswordProtectedIcon? passwordIcon;
