@@ -31,7 +31,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Cached]
         protected readonly OverlayColourProvider ColourProvider = new OverlayColourProvider(OverlayColourScheme.Pink);
 
-        private DrawableLoungeRoom drawableRoom = null!;
+        private LoungeRoomPanel panel = null!;
         private SearchTextBox searchTextBox = null!;
 
         private readonly ManualResetEventSlim allowResponseCallback = new ManualResetEventSlim();
@@ -74,7 +74,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                             Width = 500,
                             Depth = float.MaxValue
                         },
-                        drawableRoom = new DrawableLoungeRoom(room)
+                        panel = new LoungeRoomPanel(room)
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
@@ -88,16 +88,16 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestFocusViaKeyboardCommit()
         {
-            DrawableLoungeRoom.PasswordEntryPopover? popover = null;
+            LoungeRoomPanel.PasswordEntryPopover? popover = null;
 
             AddAssert("search textbox has focus", () => checkFocus(searchTextBox));
             AddStep("click room twice", () =>
             {
-                InputManager.MoveMouseTo(drawableRoom);
+                InputManager.MoveMouseTo(panel);
                 InputManager.Click(MouseButton.Left);
                 InputManager.Click(MouseButton.Left);
             });
-            AddUntilStep("wait for popover", () => (popover = InputManager.ChildrenOfType<DrawableLoungeRoom.PasswordEntryPopover>().SingleOrDefault()) != null);
+            AddUntilStep("wait for popover", () => (popover = InputManager.ChildrenOfType<LoungeRoomPanel.PasswordEntryPopover>().SingleOrDefault()) != null);
 
             AddAssert("textbox has focus", () => checkFocus(popover.ChildrenOfType<OsuPasswordTextBox>().Single()));
 
@@ -123,16 +123,16 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestFocusViaMouseCommit()
         {
-            DrawableLoungeRoom.PasswordEntryPopover? popover = null;
+            LoungeRoomPanel.PasswordEntryPopover? popover = null;
 
             AddAssert("search textbox has focus", () => checkFocus(searchTextBox));
             AddStep("click room twice", () =>
             {
-                InputManager.MoveMouseTo(drawableRoom);
+                InputManager.MoveMouseTo(panel);
                 InputManager.Click(MouseButton.Left);
                 InputManager.Click(MouseButton.Left);
             });
-            AddUntilStep("wait for popover", () => (popover = InputManager.ChildrenOfType<DrawableLoungeRoom.PasswordEntryPopover>().SingleOrDefault()) != null);
+            AddUntilStep("wait for popover", () => (popover = InputManager.ChildrenOfType<LoungeRoomPanel.PasswordEntryPopover>().SingleOrDefault()) != null);
 
             AddAssert("textbox has focus", () => checkFocus(popover.ChildrenOfType<OsuPasswordTextBox>().Single()));
 
