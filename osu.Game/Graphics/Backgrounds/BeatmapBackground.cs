@@ -96,6 +96,10 @@ namespace osu.Game.Graphics.Backgrounds
         {
             protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
             {
+                // Colour is handled by BufferedContainer, no need to propagate it to children
+                // Perhaps this needs to be moved into base class
+                invalidation &= ~Invalidation.Colour;
+
                 bool result = base.OnInvalidate(invalidation, source);
 
                 if ((invalidation & Invalidation.Colour) > 0)
