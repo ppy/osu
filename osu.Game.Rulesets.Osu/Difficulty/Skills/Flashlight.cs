@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         public Flashlight(Mod[] mods)
             : base(mods)
         {
-            hasHiddenMod = mods.Any(m => m is OsuModHidden);
+            hasHiddenMod = mods.OfType<OsuModHidden>().All(m => !m.OnlyFadeApproachCircles.Value);
         }
 
         private double skillMultiplier => 0.05512;
