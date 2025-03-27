@@ -353,7 +353,10 @@ namespace osu.Game.Overlays.Mods
                                     .ToArray();
 
                 foreach (var modState in modStates)
+                {
+                    modState.Active.Value = SelectedMods.Value.Any(selected => selected.GetType() == modState.Mod.GetType());
                     modState.Active.BindValueChanged(_ => updateFromInternalSelection());
+                }
 
                 newLocalAvailableMods[modType] = modStates;
             }
