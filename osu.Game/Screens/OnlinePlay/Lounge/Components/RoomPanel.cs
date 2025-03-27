@@ -46,6 +46,9 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         [Resolved]
         private OsuGame? game { get; set; }
 
+        [Resolved]
+        private BeatmapLookupCache beatmapLookupCache { get; set; } = null!;
+
         public readonly Room Room;
 
         protected readonly Bindable<PlaylistItem?> SelectedItem = new Bindable<PlaylistItem?>();
@@ -56,8 +59,13 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         private PasswordProtectedIcon? passwordIcon;
         private EndDateInfo? endDateInfo;
         private SpriteText? roomName;
-        private UpdateableBeatmapBackgroundSprite background = null!;
         private DelayedLoadWrapper wrapper = null!;
+        private CancellationTokenSource? beatmapLookupCancellation;
+
+        /// <summary>
+        /// A fully-populated representation of the selected item's current beatmap.
+        /// </summary>
+        private readonly Bindable<IBeatmapInfo?> currentBeatmap = new Bindable<IBeatmapInfo?>();
 
         protected RoomPanel(Room room)
         {
@@ -95,9 +103,10 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                     RelativeSizeAxes = Axes.Both,
                     Colour = colours.Background5,
                 },
-                background = CreateBackground().With(d =>
+                CreateBackground().With(d =>
                 {
                     d.RelativeSizeAxes = Axes.Both;
+                    d.Beatmap.BindTarget = currentBeatmap;
                 }),
                 wrapper = new DelayedLoadWrapper(() =>
                     new Container
@@ -202,7 +211,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                                                     },
                                                                     new RoomStatusText(Room)
                                                                     {
-                                                                        SelectedItem = { BindTarget = SelectedItem }
+                                                                        Beatmap = { BindTarget = currentBeatmap }
                                                                     }
                                                                 }
                                                             }
@@ -276,7 +285,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 updateRoomHasPassword();
             };
 
-            SelectedItem.BindValueChanged(item => background.Beatmap.Value = item.NewValue?.Beatmap, true);
+            SelectedItem.BindValueChanged(onSelectedItemChanged, true);
         }
 
         private void onRoomPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -299,6 +308,30 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                     updateRoomHasPassword();
                     break;
             }
+        }
+
+        private void onSelectedItemChanged(ValueChangedEvent<PlaylistItem?> item)
+        {
+            if (item.NewValue?.Beatmap.OnlineID == item.OldValue?.Beatmap.OnlineID)
+                return;
+
+            beatmapLookupCancellation?.Cancel();
+            beatmapLookupCancellation?.Dispose();
+
+            if (item.NewValue?.Beatmap == null)
+            {
+                currentBeatmap.Value = null;
+                return;
+            }
+
+            var cancellationSource = beatmapLookupCancellation = new CancellationTokenSource();
+
+            beatmapLookupCache.GetBeatmapAsync(item.NewValue.Beatmap.OnlineID, cancellationSource.Token)
+                              .ContinueWith(task => Schedule(() =>
+                              {
+                                  if (!cancellationSource.IsCancellationRequested)
+                                      currentBeatmap.Value = task.GetResultSafely();
+                              }), cancellationSource.Token);
         }
 
         private void updateRoomName()
@@ -402,13 +435,10 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
         private partial class RoomStatusText : CompositeDrawable
         {
-            public readonly IBindable<PlaylistItem?> SelectedItem = new Bindable<PlaylistItem?>();
+            public readonly Bindable<IBeatmapInfo?> Beatmap = new Bindable<IBeatmapInfo?>();
 
             [Resolved]
             private OsuColour colours { get; set; } = null!;
-
-            [Resolved]
-            private BeatmapLookupCache beatmapLookupCache { get; set; } = null!;
 
             private readonly Room room;
             private SpriteText statusText = null!;
@@ -465,14 +495,12 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                SelectedItem.BindValueChanged(onSelectedItemChanged, true);
+
+                Beatmap.BindValueChanged(onBeatmapChanged, true);
             }
 
-            private CancellationTokenSource? beatmapLookupCancellation;
-
-            private void onSelectedItemChanged(ValueChangedEvent<PlaylistItem?> item)
+            private void onBeatmapChanged(ValueChangedEvent<IBeatmapInfo?> beatmap)
             {
-                beatmapLookupCancellation?.Cancel();
                 beatmapText.Clear();
 
                 if (room.Type == MatchType.Playlists)
@@ -481,31 +509,17 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                     return;
                 }
 
-                var beatmap = item.NewValue?.Beatmap;
-                if (beatmap == null)
-                    return;
+                statusText.Text = "Currently playing ";
 
-                var cancellationSource = beatmapLookupCancellation = new CancellationTokenSource();
-                beatmapLookupCache.GetBeatmapAsync(beatmap.OnlineID, cancellationSource.Token)
-                                  .ContinueWith(task => Schedule(() =>
-                                  {
-                                      if (cancellationSource.IsCancellationRequested)
-                                          return;
-
-                                      var retrievedBeatmap = task.GetResultSafely();
-
-                                      statusText.Text = "Currently playing ";
-
-                                      if (retrievedBeatmap != null)
-                                      {
-                                          beatmapText.AddLink(retrievedBeatmap.GetDisplayTitleRomanisable(),
-                                              LinkAction.OpenBeatmap,
-                                              retrievedBeatmap.OnlineID.ToString(),
-                                              creationParameters: s => s.Truncate = true);
-                                      }
-                                      else
-                                          beatmapText.AddText("unknown beatmap");
-                                  }), cancellationSource.Token);
+                if (beatmap.NewValue != null)
+                {
+                    beatmapText.AddLink(beatmap.NewValue.GetDisplayTitleRomanisable(),
+                        LinkAction.OpenBeatmap,
+                        beatmap.NewValue.OnlineID.ToString(),
+                        creationParameters: s => s.Truncate = true);
+                }
+                else
+                    beatmapText.AddText("unknown beatmap");
             }
         }
 
