@@ -65,7 +65,8 @@ namespace osu.Game.Tests.Visual.Playlists
                         OnlineID = 1,
                         DifficultyName = "Osu 1",
                         Hash = Guid.NewGuid().ToString().ComputeMD5Hash(),
-                        MD5Hash = Guid.NewGuid().ToString().ComputeMD5Hash(),
+                        MD5Hash = "11111111",
+                        OnlineMD5Hash = "11111111",
                         Ruleset = new OsuRuleset().RulesetInfo,
                         Metadata =
                         {
@@ -79,7 +80,8 @@ namespace osu.Game.Tests.Visual.Playlists
                         OnlineID = 2,
                         DifficultyName = "Osu 2",
                         Hash = Guid.NewGuid().ToString().ComputeMD5Hash(),
-                        MD5Hash = Guid.NewGuid().ToString().ComputeMD5Hash(),
+                        MD5Hash = "22222222",
+                        OnlineMD5Hash = "22222222",
                         Ruleset = new OsuRuleset().RulesetInfo,
                         Metadata =
                         {
@@ -93,7 +95,8 @@ namespace osu.Game.Tests.Visual.Playlists
                         OnlineID = 3,
                         DifficultyName = "Taiko 1",
                         Hash = Guid.NewGuid().ToString().ComputeMD5Hash(),
-                        MD5Hash = Guid.NewGuid().ToString().ComputeMD5Hash(),
+                        MD5Hash = "33333333",
+                        OnlineMD5Hash = "33333333",
                         Ruleset = new TaikoRuleset().RulesetInfo,
                         Metadata =
                         {
@@ -107,7 +110,8 @@ namespace osu.Game.Tests.Visual.Playlists
                         OnlineID = 4,
                         DifficultyName = "Taiko 2",
                         Hash = Guid.NewGuid().ToString().ComputeMD5Hash(),
-                        MD5Hash = Guid.NewGuid().ToString().ComputeMD5Hash(),
+                        MD5Hash = "44444444",
+                        OnlineMD5Hash = "44444444",
                         Ruleset = new TaikoRuleset().RulesetInfo,
                         Metadata =
                         {
