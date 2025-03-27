@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     // Buff current object if it's obstructed by a previous slider
                     loopDifficulty += 0; // To be implemented
 
-                double timeBetweenCurrAndLoopObj = (currObj.BaseObject.StartTime - loopObj.BaseObject.StartTime) / current.ClockRate;
+                double timeBetweenCurrAndLoopObj = (currObj.BaseObject.StartTime - loopObj.BaseObject.StartTime) / currObj.ClockRate;
                 double timeNerfFactor = getTimeNerfFactor(timeBetweenCurrAndLoopObj);
                 loopDifficulty *= timeNerfFactor;
 
@@ -81,7 +81,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 // Hidden has some inherent difficulty even at its easiest situations
                 hiddenDifficulty += 0.2;
 
-                double timeSpentInvisible = getDurationSpentInvisible(currObj) / current.ClockRate;
+                double timeSpentInvisible = getDurationSpentInvisible(currObj) / currObj.ClockRate;
                 // Nerf hidden difficulty less the more past object difficulty you have
                 // Cap said difficulty because after a certain point hidden becomes memory
                 double timeDifficultyFactor = 12000 / Math.Min(pastObjectDifficultyInfluence, 7);
