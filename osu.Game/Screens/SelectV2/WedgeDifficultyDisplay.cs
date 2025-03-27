@@ -140,8 +140,7 @@ namespace osu.Game.Screens.SelectV2
                                             {
                                                 Anchor = Anchor.BottomLeft,
                                                 Origin = Anchor.BottomLeft,
-                                                Text = BeatmapsetsStrings.ShowDetailsMappedBy(string.Empty),
-                                                Margin = new MarginPadding { Left = 4f },
+                                                Text = " mapped by ",
                                                 Font = OsuFont.Torus.With(size: 14f, weight: FontWeight.Regular),
                                             },
                                             mapperLink = new MapperLinkContainer
