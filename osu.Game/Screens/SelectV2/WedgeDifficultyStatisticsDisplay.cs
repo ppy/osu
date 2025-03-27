@@ -5,10 +5,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Layout;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
@@ -23,9 +23,9 @@ namespace osu.Game.Screens.SelectV2
         private readonly FillFlowContainer<WedgeStatisticDifficulty> statisticsFlow;
         private readonly GridContainer tinyStatisticsGrid;
 
-        private IReadOnlyList<BeatmapStatistic>? statistics;
+        private IReadOnlyList<WedgeStatisticDifficulty.Data>? statistics;
 
-        public IReadOnlyList<BeatmapStatistic>? Statistics
+        public IReadOnlyList<WedgeStatisticDifficulty.Data>? Statistics
         {
             get => statistics;
             set
@@ -148,14 +148,14 @@ namespace osu.Game.Screens.SelectV2
             if (statistics == null)
                 return;
 
-            var newStatistics = statistics.Select(s => new WedgeStatisticDifficulty(s.Name)
+            var newStatistics = statistics.Select(data => new WedgeStatisticDifficulty
             {
-                Value = (s.Value, s.Maximum),
+                Value = data,
             }).ToArray();
 
             var currentStatistics = statisticsFlow.Children;
 
-            if (currentStatistics.Select(s => s.Label).SequenceEqual(newStatistics.Select(s => s.Label)))
+            if (currentStatistics.Select(s => s.Value.Label).SequenceEqual(newStatistics.Select(s => s.Value.Label)))
             {
                 for (int i = 0; i < newStatistics.Length; i++)
                     currentStatistics[i].Value = newStatistics[i].Value;
@@ -177,7 +177,7 @@ namespace osu.Game.Screens.SelectV2
             {
                 new OsuSpriteText
                 {
-                    Text = s.Name,
+                    Text = s.Label,
                     Font = OsuFont.Torus.With(size: 12f, weight: FontWeight.SemiBold),
                     Colour = colourProvider.Content2,
                 },
@@ -185,7 +185,7 @@ namespace osu.Game.Screens.SelectV2
                 new OsuSpriteText
                 {
                     Font = OsuFont.Torus.With(size: 12f, weight: FontWeight.SemiBold),
-                    Text = s.Content,
+                    Text = s.Value.ToLocalisableString("0.##"),
                     Colour = colourProvider.Content1,
                 },
             }).ToArray();

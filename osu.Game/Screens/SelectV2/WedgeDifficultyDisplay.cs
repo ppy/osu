@@ -257,7 +257,10 @@ namespace osu.Game.Screens.SelectV2
             }
 
             var playableBeatmap = beatmap.Value.GetPlayableBeatmap(ruleset.Value);
-            countStatisticsDisplay.Statistics = playableBeatmap.GetStatistics().ToList();
+
+            countStatisticsDisplay.Statistics = playableBeatmap.GetStatistics()
+                                                               .Select(s => new WedgeStatisticDifficulty.Data(s.Name, s.Value, s.Value, s.Maximum))
+                                                               .ToList();
 
             updateDifficultyStatistics();
         }
@@ -280,7 +283,7 @@ namespace osu.Game.Screens.SelectV2
                 difficultyStatisticsDisplay.TooltipContent = new AdjustedAttributesTooltip.Data(originalDifficulty, rateAdjustedDifficulty);
             }
 
-            var firstStatistic = new BeatmapStatistic();
+            WedgeStatisticDifficulty.Data firstStatistic;
 
             switch (ruleset.Value?.OnlineID)
             {
@@ -294,24 +297,20 @@ namespace osu.Game.Screens.SelectV2
                     // b) Using the difficulty adjustment mod to adjust OD doesn't have an effect on conversion.
                     int keyCount = legacyRuleset.GetKeyCount(beatmap.Value.BeatmapInfo, mods.Value);
 
-                    firstStatistic.Name = BeatmapsetsStrings.ShowStatsCsMania;
-                    firstStatistic.Value = keyCount;
-                    firstStatistic.Maximum = 10;
+                    firstStatistic = new WedgeStatisticDifficulty.Data(BeatmapsetsStrings.ShowStatsCsMania, keyCount, keyCount, 10);
                     break;
 
                 default:
-                    firstStatistic.Name = BeatmapsetsStrings.ShowStatsCs;
-                    firstStatistic.Value = (int)rateAdjustedDifficulty.CircleSize;
-                    firstStatistic.Maximum = 10;
+                    firstStatistic = new WedgeStatisticDifficulty.Data(BeatmapsetsStrings.ShowStatsCs, originalDifficulty.CircleSize, rateAdjustedDifficulty.CircleSize, 10);
                     break;
             }
 
             difficultyStatisticsDisplay.Statistics = new[]
             {
                 firstStatistic,
-                new BeatmapStatistic { Name = BeatmapsetsStrings.ShowStatsAccuracy, Value = rateAdjustedDifficulty.OverallDifficulty, Maximum = 10 },
-                new BeatmapStatistic { Name = BeatmapsetsStrings.ShowStatsDrain, Value = rateAdjustedDifficulty.DrainRate, Maximum = 10 },
-                new BeatmapStatistic { Name = BeatmapsetsStrings.ShowStatsAr, Value = rateAdjustedDifficulty.ApproachRate, Maximum = 10 },
+                new WedgeStatisticDifficulty.Data(BeatmapsetsStrings.ShowStatsAccuracy, originalDifficulty.OverallDifficulty, rateAdjustedDifficulty.OverallDifficulty, 10),
+                new WedgeStatisticDifficulty.Data(BeatmapsetsStrings.ShowStatsDrain, originalDifficulty.DrainRate, rateAdjustedDifficulty.DrainRate, 10),
+                new WedgeStatisticDifficulty.Data(BeatmapsetsStrings.ShowStatsAr, originalDifficulty.ApproachRate, rateAdjustedDifficulty.ApproachRate, 10),
             };
         });
 
