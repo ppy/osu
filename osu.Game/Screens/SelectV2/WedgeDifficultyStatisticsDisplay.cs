@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -16,10 +17,9 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.SelectV2
 {
-    public partial class WedgeHitStatisticsDisplay : CompositeDrawable, IHasAccentColour
+    public partial class WedgeDifficultyStatisticsDisplay : CompositeDrawable, IHasAccentColour
     {
-        private const float statistic_width = 75;
-
+        private readonly bool autosize;
         private readonly FillFlowContainer<WedgeStatisticDifficulty> statisticsFlow;
         private readonly GridContainer tinyStatisticsGrid;
 
@@ -51,13 +51,19 @@ namespace osu.Game.Screens.SelectV2
         }
 
         private readonly LayoutValue drawSizeLayout = new LayoutValue(Invalidation.DrawSize);
+        private readonly LayoutValue labelSizeLayout = new LayoutValue(Invalidation.DrawSize, InvalidationSource.Child);
 
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
-        public WedgeHitStatisticsDisplay()
+        public WedgeDifficultyStatisticsDisplay(bool autosize = false)
         {
-            AutoSizeAxes = Axes.Y;
+            this.autosize = autosize;
+
+            if (autosize)
+                AutoSizeAxes = Axes.Both;
+            else
+                AutoSizeAxes = Axes.Y;
 
             InternalChildren = new Drawable[]
             {
@@ -66,6 +72,7 @@ namespace osu.Game.Screens.SelectV2
                     AutoSizeAxes = Axes.Both,
                     Spacing = new Vector2(8f, 0f),
                     Direction = FillDirection.Horizontal,
+                    AlwaysPresent = true,
                 },
                 tinyStatisticsGrid = new GridContainer
                 {
@@ -81,11 +88,18 @@ namespace osu.Game.Screens.SelectV2
             };
 
             AddLayout(drawSizeLayout);
+            AddLayout(labelSizeLayout);
         }
 
         protected override void Update()
         {
             base.Update();
+
+            if (!labelSizeLayout.IsValid)
+            {
+                updateLabelLayout();
+                labelSizeLayout.Validate();
+            }
 
             if (!drawSizeLayout.IsValid)
             {
@@ -94,15 +108,39 @@ namespace osu.Game.Screens.SelectV2
             }
         }
 
+        private bool displayedTinyStatistics;
+
+        private void updateLabelLayout()
+        {
+            float statisticWidth = Math.Max(65, statisticsFlow.Max(s => s.LabelWidth));
+
+            foreach (var statistic in statisticsFlow)
+                statistic.Width = statisticWidth;
+        }
+
         private void updateLayout()
         {
-            if (statistics == null)
+            if (statistics?.Count < 1)
                 return;
 
-            float statisticsFlowWidth = statistic_width * statistics.Count + 8 * (statistics.Count - 1);
-            bool displayTinyStatistics = DrawWidth < statisticsFlowWidth;
-            statisticsFlow.Alpha = displayTinyStatistics ? 0 : 1;
-            tinyStatisticsGrid.Alpha = displayTinyStatistics ? 1 : 0;
+            float flowWidth = statisticsFlow[0].Width * statisticsFlow.Count + statisticsFlow.Spacing.X * (statisticsFlow.Count - 1);
+            bool tiny = !autosize && DrawWidth < flowWidth;
+
+            if (displayedTinyStatistics != tiny)
+            {
+                if (tiny)
+                {
+                    statisticsFlow.Hide();
+                    tinyStatisticsGrid.FadeIn(200, Easing.InQuint);
+                }
+                else
+                {
+                    tinyStatisticsGrid.Hide();
+                    statisticsFlow.FadeIn(200, Easing.InQuint);
+                }
+
+                displayedTinyStatistics = tiny;
+            }
         }
 
         private void updateStatistics()
@@ -112,8 +150,7 @@ namespace osu.Game.Screens.SelectV2
 
             var newStatistics = statistics.Select(s => new WedgeStatisticDifficulty(s.Name)
             {
-                Value = (s.Count, s.Maximum),
-                Width = statistic_width,
+                Value = (s.Value, s.Maximum),
             }).ToArray();
 
             var currentStatistics = statisticsFlow.Children;
@@ -124,10 +161,10 @@ namespace osu.Game.Screens.SelectV2
                     currentStatistics[i].Value = newStatistics[i].Value;
             }
             else
-            {
                 statisticsFlow.Children = newStatistics;
-                drawSizeLayout.Invalidate();
-            }
+
+            labelSizeLayout.Invalidate();
+            drawSizeLayout.Invalidate();
         }
 
         private void updateTinyStatistics()

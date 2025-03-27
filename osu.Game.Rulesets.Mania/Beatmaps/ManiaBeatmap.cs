@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                     Name = @"Notes",
                     CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Circles),
                     Content = notes.ToString(),
-                    Count = notes,
+                    Value = notes,
                     Maximum = maximum,
                 },
                 new BeatmapStatistic
@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                     Name = @"Hold Notes",
                     CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Sliders),
                     Content = holdNotes.ToString(),
-                    Count = holdNotes,
+                    Value = holdNotes,
                     Maximum = maximum,
                 },
             };

@@ -22,6 +22,8 @@ namespace osu.Game.Screens.SelectV2
             set => labelText.Text = value;
         }
 
+        public float LabelWidth => labelText.DrawWidth;
+
         private (float value, float maximum) value;
 
         public (float value, float maximum) Value

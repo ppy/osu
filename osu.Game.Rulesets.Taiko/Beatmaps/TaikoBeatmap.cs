@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
                     Name = @"Hits",
                     CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Circles),
                     Content = hits.ToString(),
-                    Count = hits,
+                    Value = hits,
                     Maximum = maximum,
                 },
                 new BeatmapStatistic
@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
                     Name = @"Drumrolls",
                     CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Sliders),
                     Content = drumRolls.ToString(),
-                    Count = drumRolls,
+                    Value = drumRolls,
                     Maximum = maximum,
                 },
                 new BeatmapStatistic
@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
                     Name = @"Swells",
                     CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Spinners),
                     Content = swells.ToString(),
-                    Count = swells,
+                    Value = swells,
                     Maximum = Math.Max(swells, 10),
                 }
             };
