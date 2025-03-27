@@ -176,6 +176,7 @@ namespace osu.Game.Tests.Visual.Playlists
                         RulesetID = new OsuRuleset().RulesetInfo.OnlineID
                     }
                 ];
+                room.EndDate = DateTimeOffset.Now.AddHours(1);
             });
 
             AddAssert("match has default beatmap", () => match.Beatmap.IsDefault);
@@ -212,6 +213,11 @@ namespace osu.Game.Tests.Visual.Playlists
 
             Debug.Assert(beatmap.BeatmapInfo.BeatmapSet != null);
             importedBeatmap = manager.Import(beatmap.BeatmapInfo.BeatmapSet)!.Value.Detach();
+            Realm.Write(r =>
+            {
+                foreach (var beatmapInfo in r.All<BeatmapInfo>())
+                    beatmapInfo.OnlineMD5Hash = beatmapInfo.MD5Hash;
+            });
         });
 
         private partial class TestPlaylistsRoomSubScreen : PlaylistsRoomSubScreen
