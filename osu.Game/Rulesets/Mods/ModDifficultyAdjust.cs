@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Linq;
+using System.Collections.Generic;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
@@ -65,18 +65,15 @@ namespace osu.Game.Rulesets.Mods
             }
         }
 
-        public override string SettingDescription
+        public override IEnumerable<(LocalisableString setting, LocalisableString value)> SettingDescription
         {
             get
             {
-                string drainRate = DrainRate.IsDefault ? string.Empty : $"HP {DrainRate.Value:N1}";
-                string overallDifficulty = OverallDifficulty.IsDefault ? string.Empty : $"OD {OverallDifficulty.Value:N1}";
+                if (!DrainRate.IsDefault)
+                    yield return ("HP drain", $"{DrainRate.Value:N1}");
 
-                return string.Join(", ", new[]
-                {
-                    drainRate,
-                    overallDifficulty
-                }.Where(s => !string.IsNullOrEmpty(s)));
+                if (!OverallDifficulty.IsDefault)
+                    yield return ("Accuracy", $"{OverallDifficulty.Value:N1}");
             }
         }
 

@@ -298,14 +298,24 @@ namespace osu.Game.Tests.Visual.Multiplayer
             return ((IMultiplayerClient)this).UserKicked(clone(user));
         }
 
+        /// <summary>
+        /// Simulates a change to the server-side room's settings without any other change.
+        /// </summary>
+        public async Task ChangeServerRoomSettings(MultiplayerRoomSettings settings)
+        {
+            Debug.Assert(ServerRoom != null);
+
+            ServerRoom.Settings = settings;
+
+            await ((IMultiplayerClient)this).SettingsChanged(clone(settings)).ConfigureAwait(false);
+        }
+
         public override async Task ChangeSettings(MultiplayerRoomSettings settings)
         {
-            settings = clone(settings);
-
             Debug.Assert(ServerRoom != null);
-            Debug.Assert(currentItem != null);
 
             // Server is authoritative for the time being.
+            settings = clone(settings);
             settings.PlaylistItemId = ServerRoom.Settings.PlaylistItemId;
             ServerRoom.Settings = settings;
 
