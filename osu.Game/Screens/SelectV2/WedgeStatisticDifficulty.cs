@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
@@ -33,7 +34,7 @@ namespace osu.Game.Screens.SelectV2
             {
                 this.value = value;
 
-                bar.ResizeWidthTo(value.maximum == 0 ? 0 : value.value / value.maximum, 300, Easing.OutQuint);
+                bar.ResizeWidthTo(value.maximum == 0 ? 0 : Math.Min(1, value.value / value.maximum), 300, Easing.OutQuint);
                 valueText.Text = value.value.ToLocalisableString("0.##");
             }
         }
