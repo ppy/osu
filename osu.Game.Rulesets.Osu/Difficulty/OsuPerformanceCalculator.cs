@@ -151,7 +151,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double speedValue = computeSpeedValue(score, osuAttributes);
             double accuracyValue = computeAccuracyValue(score, osuAttributes);
             double flashlightValue = computeFlashlightValue(score, osuAttributes);
-            double readingValue = computeReadingValue(score, osuAttributes);
+            double readingValue = computeReadingValue(osuAttributes);
             double totalValue =
                 Math.Pow(
                     Math.Pow(aimValue, 1.1) +
@@ -319,7 +319,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return flashlightValue;
         }
 
-        private double computeReadingValue(ScoreInfo score, OsuDifficultyAttributes attributes)
+        private double computeReadingValue(OsuDifficultyAttributes attributes)
         {
             double readingValue = Reading.DifficultyToPerformance(attributes.ReadingDifficulty);
 
