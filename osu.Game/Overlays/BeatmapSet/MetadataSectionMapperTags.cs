@@ -7,10 +7,10 @@ using osu.Game.Online.Chat;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
-    public partial class MetadataSectionTags : MetadataSection
+    public partial class MetadataSectionMapperTags : MetadataSection
     {
-        public MetadataSectionTags(Action<string>? searchAction = null)
-            : base(MetadataType.Tags, searchAction)
+        public MetadataSectionMapperTags(Action<string>? searchAction = null)
+            : base(MetadataType.MapperTags, searchAction)
         {
         }
 

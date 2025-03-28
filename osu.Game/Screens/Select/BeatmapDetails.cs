@@ -133,7 +133,7 @@ namespace osu.Game.Screens.Select
                                             {
                                                 description = new MetadataSectionDescription(query => songSelect?.Search(query)),
                                                 source = new MetadataSectionSource(query => songSelect?.Search(query)),
-                                                tags = new MetadataSectionTags(query => songSelect?.Search(query)),
+                                                tags = new MetadataSectionMapperTags(query => songSelect?.Search(query)),
                                             },
                                         },
                                     },
