@@ -77,13 +77,14 @@ namespace osu.Game.Screens.SelectV2
                                 {
                                     Anchor = Anchor.CentreRight,
                                     Origin = Anchor.CentreRight,
-                                    Size = new Vector2(128f, 33f),
+                                    Size = new Vector2(128f, 32f),
+                                    Scale = new Vector2(0.875f),
                                     Child = selectedModsToggle = new ShearedToggleButton
                                     {
                                         Anchor = Anchor.Centre,
                                         Origin = Anchor.Centre,
                                         Text = @"Selected Mods",
-                                        Height = 33f,
+                                        Height = 32,
                                     },
                                 },
                                 // new Container
@@ -102,6 +103,7 @@ namespace osu.Game.Screens.SelectV2
                                     Anchor = Anchor.CentreRight,
                                     Origin = Anchor.CentreRight,
                                     Size = new Vector2(160f, 32f),
+                                    Scale = new Vector2(0.875f),
                                     Child = scopeDropdown = new ScopeDropdown
                                     {
                                         Width = 160f,

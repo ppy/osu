@@ -144,9 +144,15 @@ namespace osu.Game.Screens.SelectV2
                     },
                     placeholderContainer = new Container<Placeholder>
                     {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
                         RelativeSizeAxes = Axes.Both,
+                        Scale = new Vector2(0.875f),
                     },
-                    loading = new LoadingLayer(),
+                    loading = new LoadingLayer
+                    {
+                        Scale = new Vector2(0.875f),
+                    },
                 }
             };
         }
