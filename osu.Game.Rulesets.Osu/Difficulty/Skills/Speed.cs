@@ -16,9 +16,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     public class Speed : OsuStrainSkill
     {
         private double totalMultiplier => 1.0;
-        private double burstMultiplier => 2.0;
-        private double streamMultiplier => 0.1;
-        private double staminaMultiplier => 0.027;
+        private double burstMultiplier => 1.91;
+        private double streamMultiplier => 0.15;
+        private double staminaMultiplier => 0.052;
         private double meanFactor => 1.25;
 
         private double currentBurstStrain;
@@ -36,7 +36,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double strainDecayBurst(double ms) => Math.Pow(0.14, ms / 1000);
         private double strainDecayStream(double ms) => Math.Pow(0.01, Math.Pow(ms / 1000, 1.6));
-        private double strainDecayStamina(double ms) => Math.Pow(0.1, Math.Pow(ms / 1000, 2.6));
+
+        private double strainDecayStamina(double ms, double staminaValue)
+        {
+            double changeFactor = currentStaminaStrain > 0 ? 1 + Math.Pow(currentStaminaStrain / (staminaValue + currentStaminaStrain), 25) : 1;
+            return Math.Pow(0.01, Math.Pow(ms * changeFactor / 1000, 3.5));
+
+            //double changeFactor = currentStaminaStrain > 0 ? 0.25 + 0.75 * (1 - Math.Pow(1 / (((staminaValue + currentStaminaStrain) / currentStaminaStrain) + 1), 50)) : 1;
+            //return Math.Pow(0.1, Math.Pow(ms / 1000, 2.6)) * changeFactor;
+        }
 
         protected override double CalculateInitialStrain(double time, DifficultyHitObject current)
         {
@@ -46,7 +54,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return Math.Pow(
                 Math.Pow(currentBurstStrain * currentRhythm * strainDecayBurst(time - current.Previous(0).StartTime), meanFactor) +
                 Math.Pow(currentStreamStrain * strainDecayStream(time - current.Previous(0).StartTime), meanFactor) +
-                Math.Pow(currentStaminaStrain * strainDecayStamina(time - current.Previous(0).StartTime), meanFactor), 1.0 / meanFactor
+                Math.Pow(currentStaminaStrain * strainDecayStamina(time - current.Previous(0).StartTime, currentStaminaStrain), meanFactor), 1.0 / meanFactor
             );
         }
 
@@ -59,11 +67,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             if (WithoutStamina)
                 return currentBurstStrain * currentRhythm;
 
-            currentStreamStrain *= strainDecayStream(((OsuDifficultyHitObject)current).StrainTime);
-            currentStreamStrain += StaminaEvaluator.EvaluateDifficultyOf(current) * streamMultiplier;
+            double staminaValue = StaminaEvaluator.EvaluateDifficultyOf(current);
 
-            currentStaminaStrain *= strainDecayStamina(((OsuDifficultyHitObject)current).StrainTime);
-            currentStaminaStrain += StaminaEvaluator.EvaluateDifficultyOf(current) * staminaMultiplier;
+            currentStreamStrain *= strainDecayStream(((OsuDifficultyHitObject)current).StrainTime);
+            currentStreamStrain += staminaValue * streamMultiplier;
+
+            currentStaminaStrain *= strainDecayStamina(((OsuDifficultyHitObject)current).StrainTime, staminaValue * staminaMultiplier);
+            currentStaminaStrain += staminaValue * staminaMultiplier;
 
             double totalValue =
                 Math.Pow(
