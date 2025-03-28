@@ -131,7 +131,12 @@ namespace osu.Game.Tournament.Screens.Setup
                     ButtonText = "Set height",
                     Action = height =>
                     {
-                        windowSize.Value = new Size((int)(height * aspect_ratio / TournamentSceneManager.STREAM_AREA_WIDTH * TournamentSceneManager.REQUIRED_WIDTH), height);
+                        Size previousSize = windowSize.Value;
+                        Size newSize = new Size((int)(height * aspect_ratio / TournamentSceneManager.STREAM_AREA_WIDTH * TournamentSceneManager.REQUIRED_WIDTH), height);
+                        if (previousSize == newSize) return;
+
+                        windowSize.Value = newSize;
+                        AddInternal(new ResolutionConfirmationPopup(revertAction: () => windowSize.Value = previousSize));
                     }
                 },
                 new LabelledSwitchButton
