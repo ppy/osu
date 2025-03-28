@@ -1159,6 +1159,14 @@ namespace osu.Game.Screens.Select
 
         public partial class CarouselScrollContainer : UserTrackingScrollContainer<DrawableCarouselItem>, IKeyBindingHandler<GlobalAction>
         {
+
+            private bool isMouseOnLeftSide(MouseEvent e)
+            {
+                var mousePos = e.CurrentState.Mouse.Position;
+                var localPos = ToLocalSpace(mousePos);
+                return localPos.X < DrawWidth * 0.2f;
+            }
+
             public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
             public CarouselScrollContainer()
@@ -1203,7 +1211,7 @@ namespace osu.Game.Screens.Select
                 if (e.Button == MouseButton.Right)
                 {
                     // To avoid conflicts with context menus, disallow absolute scroll if it looks like things will fall over.
-                    if (GetContainingInputManager()!.HoveredDrawables.OfType<IHasContextMenu>().Any())
+                    if (!isMouseOnLeftSide(e) || GetContainingInputManager()!.HoveredDrawables.OfType<IHasContextMenu>().Any())
                         return false;
 
                     beginAbsoluteScrolling(e);
@@ -1214,8 +1222,9 @@ namespace osu.Game.Screens.Select
 
             protected override void OnMouseUp(MouseUpEvent e)
             {
-                if (e.Button == MouseButton.Right)
+                if (e.Button == MouseButton.Right && absoluteScrolling)
                     endAbsoluteScrolling();
+
                 base.OnMouseUp(e);
             }
 
