@@ -62,11 +62,20 @@ namespace osu.Game.Online.Rooms
         [Key(11)]
         public bool Freestyle { get; set; }
 
+        /// <summary>
+        /// Creates a new <see cref="MultiplayerPlaylistItem"/>.
+        /// </summary>
         [SerializationConstructor]
         public MultiplayerPlaylistItem()
         {
         }
 
+        /// <summary>
+        /// Creates a new <see cref="MultiplayerPlaylistItem"/> from an API <see cref="PlaylistItem"/>.
+        /// </summary>
+        /// <remarks>
+        /// This will create unique instances of the <see cref="RequiredMods"/> and <see cref="AllowedMods"/> arrays but NOT unique instances of the contained <see cref="APIMod"/>s.
+        /// </remarks>
         public MultiplayerPlaylistItem(PlaylistItem item)
         {
             ID = item.ID;
@@ -81,6 +90,20 @@ namespace osu.Game.Online.Rooms
             PlayedAt = item.PlayedAt;
             StarRating = item.Beatmap.StarRating;
             Freestyle = item.Freestyle;
+        }
+
+        /// <summary>
+        /// Creates a copy of this <see cref="MultiplayerPlaylistItem"/>.
+        /// </summary>
+        /// <remarks>
+        /// This will create unique instances of the <see cref="RequiredMods"/> and <see cref="AllowedMods"/> arrays but NOT unique instances of the contained <see cref="APIMod"/>s.
+        /// </remarks>
+        public MultiplayerPlaylistItem Clone()
+        {
+            MultiplayerPlaylistItem clone = (MultiplayerPlaylistItem)MemberwiseClone();
+            clone.RequiredMods = RequiredMods.ToArray();
+            clone.AllowedMods = AllowedMods.ToArray();
+            return clone;
         }
     }
 }
