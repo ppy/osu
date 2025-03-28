@@ -249,6 +249,7 @@ namespace osu.Game.Screens.Ranking
 
             private Box mainBackground = null!;
             private Box voteBackground = null!;
+            private OsuSpriteText tagCategoryText = null!;
             private OsuSpriteText tagNameText = null!;
             private OsuSpriteText voteCountText = null!;
             private LoadingSpinner spinner = null!;
@@ -276,6 +277,8 @@ namespace osu.Game.Screens.Ranking
             [BackgroundDependencyLoader]
             private void load()
             {
+                string[] tagParts = UserTag.Name.Split('/');
+
                 Anchor = Anchor.Centre;
                 Origin = Anchor.Centre;
                 CornerRadius = 8;
@@ -297,21 +300,42 @@ namespace osu.Game.Screens.Ranking
                     {
                         AutoSizeAxes = Axes.Both,
                         Direction = FillDirection.Horizontal,
-                        Padding = new MarginPadding { Left = 6, Right = 3, Vertical = 3, },
-                        Spacing = new Vector2(5),
                         Children = new Drawable[]
                         {
-                            tagNameText = new OsuSpriteText
+                            tagCategoryText = new OsuSpriteText
                             {
-                                Text = UserTag.Name,
+                                Alpha = tagParts.Length > 1 ? 0.6f : 0,
+                                Text = tagParts[0],
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
+                                Margin = new MarginPadding { Horizontal = 6 }
+                            },
+                            new Container
+                            {
+                                RelativeSizeAxes = Axes.Y,
+                                AutoSizeAxes = Axes.X,
+                                Anchor = Anchor.CentreLeft,
+                                Origin = Anchor.CentreLeft,
+                                Children = new Drawable[]
+                                {
+                                    new Box
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        Alpha = 0.1f,
+                                        Blending = BlendingParameters.Additive,
+                                    },
+                                    tagNameText = new OsuSpriteText
+                                    {
+                                        Text = tagParts[^1],
+                                        Anchor = Anchor.CentreLeft,
+                                        Origin = Anchor.CentreLeft,
+                                        Margin = new MarginPadding { Horizontal = 6 }
+                                    },
+                                }
                             },
                             new Container
                             {
                                 AutoSizeAxes = Axes.Both,
-                                CornerRadius = 5,
-                                Masking = true,
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
                                 Children = new Drawable[]
@@ -353,7 +377,7 @@ namespace osu.Game.Screens.Ranking
                 {
                     if (v.NewValue)
                     {
-                        voteBackground.FadeColour(colours.Lime3, transition_duration, Easing.OutQuint);
+                        voteBackground.FadeColour(colours.Lime2, transition_duration, Easing.OutQuint);
                         voteCountText.FadeColour(Colour4.Black, transition_duration, Easing.OutQuint);
                     }
                     else
@@ -366,13 +390,15 @@ namespace osu.Game.Screens.Ranking
                 {
                     if (c.NewValue)
                     {
-                        mainBackground.FadeColour(colours.Lime1, transition_duration, Easing.OutQuint);
+                        mainBackground.FadeColour(colours.Lime2, transition_duration, Easing.OutQuint);
+                        tagCategoryText.FadeColour(Colour4.Black, transition_duration, Easing.OutQuint);
                         tagNameText.FadeColour(Colour4.Black, transition_duration, Easing.OutQuint);
                         FadeEdgeEffectTo(0.5f, transition_duration, Easing.OutQuint);
                     }
                     else
                     {
                         mainBackground.FadeColour(colours.Gray4, transition_duration, Easing.OutQuint);
+                        tagCategoryText.FadeColour(Colour4.White, transition_duration, Easing.OutQuint);
                         tagNameText.FadeColour(Colour4.White, transition_duration, Easing.OutQuint);
                         FadeEdgeEffectTo(0f, transition_duration, Easing.OutQuint);
                     }
