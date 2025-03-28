@@ -301,16 +301,16 @@ namespace osu.Game.Screens.SelectV2
                     break;
 
                 default:
-                    firstStatistic = new WedgeStatisticDifficulty.Data(BeatmapsetsStrings.ShowStatsCs, originalDifficulty.CircleSize, rateAdjustedDifficulty.CircleSize, 10);
+                    firstStatistic = new WedgeStatisticDifficulty.Data(BeatmapsetsStrings.ShowStatsCs, baseDifficulty.CircleSize, rateAdjustedDifficulty.CircleSize, 10);
                     break;
             }
 
             difficultyStatisticsDisplay.Statistics = new[]
             {
                 firstStatistic,
-                new WedgeStatisticDifficulty.Data(BeatmapsetsStrings.ShowStatsAccuracy, originalDifficulty.OverallDifficulty, rateAdjustedDifficulty.OverallDifficulty, 10),
-                new WedgeStatisticDifficulty.Data(BeatmapsetsStrings.ShowStatsDrain, originalDifficulty.DrainRate, rateAdjustedDifficulty.DrainRate, 10),
-                new WedgeStatisticDifficulty.Data(BeatmapsetsStrings.ShowStatsAr, originalDifficulty.ApproachRate, rateAdjustedDifficulty.ApproachRate, 10),
+                new WedgeStatisticDifficulty.Data(BeatmapsetsStrings.ShowStatsAccuracy, baseDifficulty.OverallDifficulty, rateAdjustedDifficulty.OverallDifficulty, 10),
+                new WedgeStatisticDifficulty.Data(BeatmapsetsStrings.ShowStatsDrain, baseDifficulty.DrainRate, rateAdjustedDifficulty.DrainRate, 10),
+                new WedgeStatisticDifficulty.Data(BeatmapsetsStrings.ShowStatsAr, baseDifficulty.ApproachRate, rateAdjustedDifficulty.ApproachRate, 10),
             };
         });
 
