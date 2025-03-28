@@ -136,6 +136,24 @@ namespace osu.Game.Tests.Beatmaps.Formats
         }
 
         [Test]
+        public void TestNoopFadeTransformIsIgnoredForLifetime()
+        {
+            var decoder = new LegacyStoryboardDecoder();
+
+            using (var resStream = TestResources.OpenResource("noop-fade-transform-is-ignored-for-lifetime.osb"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var storyboard = decoder.Decode(stream);
+
+                StoryboardLayer background = storyboard.Layers.Single(l => l.Depth == 3);
+                Assert.AreEqual(2, background.Elements.Count);
+
+                Assert.AreEqual(1500, background.Elements[0].StartTime);
+                Assert.AreEqual(1500, background.Elements[1].StartTime);
+            }
+        }
+
+        [Test]
         public void TestOutOfOrderStartTimes()
         {
             var decoder = new LegacyStoryboardDecoder();
