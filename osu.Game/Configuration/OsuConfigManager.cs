@@ -99,7 +99,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.NotifyOnFriendPresenceChange, true);
 
             // Audio
-            SetDefault(OsuSetting.VolumeInactive, 0.25, 0, 1, 0.01);
+            SetDefault(OsuSetting.VolumeInactive, 0.25, 0, 1);
 
             SetDefault(OsuSetting.MenuVoice, true);
             SetDefault(OsuSetting.MenuMusic, true);
