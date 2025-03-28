@@ -43,7 +43,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             var header = (ShearedDropdownHeader)Header;
             var menu = (ShearedDropdownMenu)Menu;
 
-            menu.Padding = new MarginPadding { Left = header.LabelContainer.DrawWidth - 15f };
+            menu.Padding = new MarginPadding { Left = header.LabelContainer.DrawWidth - 10f, Right = 6f };
         }
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
@@ -62,6 +62,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         protected partial class ShearedDropdownMenu : OsuDropdown<T>.OsuDropdownMenu
         {
+            private readonly Vector2 shear = new Vector2(OsuGame.SHEAR, 0);
+
             public new MarginPadding Padding
             {
                 get => base.Padding;
@@ -70,12 +72,32 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
             public ShearedDropdownMenu()
             {
+                Shear = shear;
                 Margin = new MarginPadding { Top = 5f };
+            }
+
+            protected override DrawableDropdownMenuItem CreateDrawableDropdownMenuItem(MenuItem item) => new ShearedMenuItem(item)
+            {
+                BackgroundColourHover = HoverColour,
+                BackgroundColourSelected = SelectionColour
+            };
+
+            public partial class ShearedMenuItem : DrawableOsuDropdownMenuItem
+            {
+                private readonly Vector2 shear = new Vector2(OsuGame.SHEAR, 0);
+
+                public ShearedMenuItem(MenuItem item)
+                    : base(item)
+                {
+                    Foreground.Shear = -shear;
+                }
             }
         }
 
         public partial class ShearedDropdownHeader : DropdownHeader
         {
+            private const float corner_radius = 5f;
+
             private LocalisableString label;
 
             protected override LocalisableString Label
@@ -111,7 +133,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             public ShearedDropdownHeader()
             {
                 Shear = shear;
-                CornerRadius = 5f;
+                CornerRadius = corner_radius;
                 Masking = true;
 
                 Foreground.Children = new Drawable[]
@@ -132,24 +154,14 @@ namespace osu.Game.Graphics.UserInterfaceV2
                             {
                                 LabelContainer = new Container
                                 {
+                                    CornerRadius = corner_radius,
+                                    Masking = true,
                                     AutoSizeAxes = Axes.Both,
                                     Children = new Drawable[]
                                     {
-                                        new Container
+                                        labelBox = new Box
                                         {
-                                            RelativeSizeAxes = Axes.Both,
-                                            // required to fix colour bleeding around the edges of the dropdown on hover
-                                            Padding = new MarginPadding { Vertical = -1f, Left = -1f },
-                                            Child = new Container
-                                            {
-                                                RelativeSizeAxes = Axes.Both,
-                                                CornerRadius = 5f,
-                                                Masking = true,
-                                                Child = labelBox = new Box
-                                                {
-                                                    RelativeSizeAxes = Axes.Both,
-                                                }
-                                            },
+                                            RelativeSizeAxes = Axes.Both
                                         },
                                         labelText = new OsuSpriteText
                                         {
@@ -215,6 +227,9 @@ namespace osu.Game.Graphics.UserInterfaceV2
             {
                 base.Update();
                 searchBar.Padding = new MarginPadding { Left = LabelContainer.DrawWidth };
+
+                // By limiting the width we avoid this box showing up as an outline around the drawables that are on top of it.
+                Background.Padding = new MarginPadding { Left = LabelContainer.DrawWidth - corner_radius };
             }
 
             protected override bool OnHover(HoverEvent e)

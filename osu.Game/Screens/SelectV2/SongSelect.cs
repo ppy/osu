@@ -41,7 +41,10 @@ namespace osu.Game.Screens.SelectV2
 
         private static readonly Vector2 shear = new Vector2(OsuGame.SHEAR, 0);
 
-        private readonly ModSelectOverlay modSelectOverlay = new UserModSelectOverlay();
+        private readonly ModSelectOverlay modSelectOverlay = new UserModSelectOverlay(OverlayColourScheme.Aquamarine)
+        {
+            ShowPresets = true,
+        };
 
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);

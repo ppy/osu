@@ -57,7 +57,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             AddSliderStep("change star difficulty", 0, 11.9, 4.18, v =>
             {
-                ((BindableDouble)infoWedge.ChildrenOfType<WedgetDifficultyDisplay>().Single().DisplayedStars).Value = v;
+                ((BindableDouble)infoWedge.ChildrenOfType<WedgeDifficultyDisplay>().Single().DisplayedStars).Value = v;
             });
         }
 
