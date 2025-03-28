@@ -2,9 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Diagnostics;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
@@ -16,7 +14,6 @@ using osu.Framework.Localisation;
 using osu.Framework.Screens;
 using osu.Game.Database;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Metadata;
 using osu.Game.Resources.Localisation.Web;
@@ -34,7 +31,6 @@ namespace osu.Game.Overlays.Dashboard
         private const float padding = 10;
 
         private readonly IBindableDictionary<int, UserPresence> onlineUserPresences = new BindableDictionary<int, UserPresence>();
-        private readonly IBindableList<APIRelation> blockedUsers = new BindableList<APIRelation>();
         private readonly Dictionary<int, OnlineUserPanel> userPanels = new Dictionary<int, OnlineUserPanel>();
 
         private SearchContainer<OnlineUserPanel> userFlow = null!;
@@ -45,9 +41,6 @@ namespace osu.Game.Overlays.Dashboard
 
         [Resolved]
         private UserLookupCache users { get; set; } = null!;
-
-        [Resolved]
-        private IAPIProvider api { get; set; } = null!;
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
@@ -102,8 +95,6 @@ namespace osu.Game.Overlays.Dashboard
 
             onlineUserPresences.BindTo(metadataClient.UserPresences);
             onlineUserPresences.BindCollectionChanged(onUserPresenceUpdated, true);
-            blockedUsers.BindTo(api.Blocks);
-            blockedUsers.BindCollectionChanged(onBlocksUpdated);
         }
 
         protected override void OnFocus(FocusEvent e)
@@ -111,36 +102,6 @@ namespace osu.Game.Overlays.Dashboard
             base.OnFocus(e);
 
             searchTextBox.TakeFocus();
-        }
-
-        private void onBlocksUpdated(object? sender, NotifyCollectionChangedEventArgs e)
-        {
-            switch (e.Action)
-            {
-                case NotifyCollectionChangedAction.Add:
-                    Debug.Assert(e.NewItems != null);
-
-                    foreach (APIRelation block in e.NewItems.Cast<APIRelation>())
-                    {
-                        int userId = block.TargetID;
-                        removeUserPanel(userId);
-                    }
-
-                    break;
-
-                case NotifyCollectionChangedAction.Remove:
-                    Debug.Assert(e.OldItems != null);
-
-                    foreach (APIRelation block in e.OldItems)
-                    {
-                        int userId = block.TargetID;
-                        if (!onlineUserPresences.ContainsKey(userId)) continue;
-
-                        addUserPanel(userId);
-                    }
-
-                    break;
-            }
         }
 
         private void onUserPresenceUpdated(object? sender, NotifyDictionaryChangedEventArgs<int, UserPresence> e) => Schedule(() =>
@@ -153,9 +114,12 @@ namespace osu.Game.Overlays.Dashboard
                     foreach (var kvp in e.NewItems)
                     {
                         int userId = kvp.Key;
-                        if (blockedUsers.Any(b => b.TargetID == userId)) continue;
 
-                        addUserPanel(userId);
+                        users.GetUserAsync(userId).ContinueWith(task =>
+                        {
+                            if (task.GetResultSafely() is APIUser user)
+                                Schedule(() => userFlow.Add(userPanels[userId] = createUserPanel(user)));
+                        });
                     }
 
                     break;
@@ -166,27 +130,13 @@ namespace osu.Game.Overlays.Dashboard
                     foreach (var kvp in e.OldItems)
                     {
                         int userId = kvp.Key;
-                        removeUserPanel(userId);
+                        if (userPanels.Remove(userId, out var userPanel))
+                            userPanel.Expire();
                     }
 
                     break;
             }
         });
-
-        private void addUserPanel(int userId)
-        {
-            users.GetUserAsync(userId).ContinueWith(task =>
-            {
-                if (task.GetResultSafely() is APIUser user)
-                    Schedule(() => userFlow.Add(userPanels[userId] = createUserPanel(user)));
-            });
-        }
-
-        private void removeUserPanel(int userId)
-        {
-            if (userPanels.Remove(userId, out var userPanel))
-                userPanel.Expire();
-        }
 
         private OnlineUserPanel createUserPanel(APIUser user) =>
             new OnlineUserPanel(user).With(panel =>
