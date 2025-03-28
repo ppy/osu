@@ -5,10 +5,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Layout;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
@@ -51,7 +53,6 @@ namespace osu.Game.Screens.SelectV2
         }
 
         private readonly LayoutValue drawSizeLayout = new LayoutValue(Invalidation.DrawSize);
-        private readonly LayoutValue labelSizeLayout = new LayoutValue(Invalidation.DrawSize, InvalidationSource.Child);
 
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
@@ -88,18 +89,24 @@ namespace osu.Game.Screens.SelectV2
             };
 
             AddLayout(drawSizeLayout);
-            AddLayout(labelSizeLayout);
+        }
+
+        [Resolved]
+        private LocalisationManager localisations { get; set; } = null!;
+
+        private IBindable<LocalisationParameters>? localisationParameters;
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            localisationParameters = localisations.CurrentParameters.GetBoundCopy();
+            localisationParameters.BindValueChanged(_ => updateStatisticsSizing());
         }
 
         protected override void Update()
         {
             base.Update();
-
-            if (!labelSizeLayout.IsValid)
-            {
-                updateLabelLayout();
-                labelSizeLayout.Validate();
-            }
 
             if (!drawSizeLayout.IsValid)
             {
@@ -109,14 +116,6 @@ namespace osu.Game.Screens.SelectV2
         }
 
         private bool displayedTinyStatistics;
-
-        private void updateLabelLayout()
-        {
-            float statisticWidth = Math.Max(65, statisticsFlow.Max(s => s.LabelWidth));
-
-            foreach (var statistic in statisticsFlow)
-                statistic.Width = statisticWidth;
-        }
 
         private void updateLayout()
         {
@@ -143,6 +142,19 @@ namespace osu.Game.Screens.SelectV2
             }
         }
 
+        private void updateStatisticsSizing() => SchedulerAfterChildren.AddOnce(() =>
+        {
+            if (statisticsFlow.Count == 0)
+                return;
+
+            float statisticWidth = Math.Max(65, statisticsFlow.Max(s => s.LabelWidth));
+
+            foreach (var statistic in statisticsFlow)
+                statistic.Width = statisticWidth;
+
+            drawSizeLayout.Invalidate();
+        });
+
         private void updateStatistics()
         {
             if (statistics == null)
@@ -161,10 +173,10 @@ namespace osu.Game.Screens.SelectV2
                     currentStatistics[i].Value = newStatistics[i].Value;
             }
             else
+            {
                 statisticsFlow.Children = newStatistics;
-
-            labelSizeLayout.Invalidate();
-            drawSizeLayout.Invalidate();
+                updateStatisticsSizing();
+            }
         }
 
         private void updateTinyStatistics()
@@ -189,8 +201,6 @@ namespace osu.Game.Screens.SelectV2
                     Colour = colourProvider.Content1,
                 },
             }).ToArray();
-
-            drawSizeLayout.Invalidate();
         }
     }
 }
