@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                 {
                     Name = @"Fruits",
                     Content = fruits.ToString(),
-                    Count = fruits,
+                    Value = fruits,
                     Maximum = maximum,
                     CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Circles),
                 },
@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                 {
                     Name = @"Juice Streams",
                     Content = juiceStreams.ToString(),
-                    Count = juiceStreams,
+                    Value = juiceStreams,
                     Maximum = maximum,
                     CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Sliders),
                 },
@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                 {
                     Name = @"Banana Showers",
                     Content = bananaShowers.ToString(),
-                    Count = bananaShowers,
+                    Value = bananaShowers,
                     Maximum = Math.Max(bananaShowers, 10),
                     CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Spinners),
                 }

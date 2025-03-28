@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                 {
                     Name = "Circles",
                     Content = circles.ToString(),
-                    Count = circles,
+                    Value = circles,
                     Maximum = maximum,
                     CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Circles),
                 },
@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                 {
                     Name = "Sliders",
                     Content = sliders.ToString(),
-                    Count = sliders,
+                    Value = sliders,
                     Maximum = maximum,
                     CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Sliders),
                 },
@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                 {
                     Name = @"Spinners",
                     Content = spinners.ToString(),
-                    Count = spinners,
+                    Value = spinners,
                     Maximum = Math.Max(spinners, 10),
                     CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Spinners),
                 }
