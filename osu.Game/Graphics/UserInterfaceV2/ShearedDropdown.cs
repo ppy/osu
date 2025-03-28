@@ -166,7 +166,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                                         labelText = new OsuSpriteText
                                         {
                                             Margin = new MarginPadding { Horizontal = 10f, Vertical = 8f },
-                                            Font = OsuFont.Torus.With(size: 16.8f, weight: FontWeight.SemiBold),
+                                            Font = OsuFont.Torus.With(size: 16f, weight: FontWeight.SemiBold),
                                             Shear = -shear,
                                         },
                                     },
@@ -186,7 +186,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                                             Anchor = Anchor.CentreLeft,
                                             Origin = Anchor.CentreLeft,
                                             Padding = new MarginPadding { Right = 15f },
-                                            Font = OsuFont.Torus.With(size: 16.8f, weight: FontWeight.SemiBold),
+                                            Font = OsuFont.Torus.With(size: 16f, weight: FontWeight.SemiBold),
                                             RelativeSizeAxes = Axes.X,
                                         },
                                         chevron = new SpriteIcon
