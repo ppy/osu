@@ -59,17 +59,17 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
         public int? Rank { get; init; }
         public bool IsPersonalBest { get; init; }
 
-        private const float expanded_right_content_width = 210;
-        private const float grade_width = 40;
-        private const float username_min_width = 125;
-        private const float statistics_regular_min_width = 175;
-        private const float statistics_compact_min_width = 100;
-        private const float rank_label_width = 65;
+        private const float expanded_right_content_width = 175;
+        private const float grade_width = 30;
+        private const float username_min_width = 105;
+        private const float statistics_regular_min_width = 145;
+        private const float statistics_compact_min_width = 80;
+        private const float rank_label_width = 55;
 
         private readonly ScoreInfo score;
         private readonly bool sheared;
 
-        public const int HEIGHT = 60;
+        public const int HEIGHT = 50;
 
         private const int corner_radius = 10;
         private const int transition_duration = 200;
@@ -187,7 +187,7 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
                                             RelativeSizeAxes = Axes.Both,
                                             Padding = new MarginPadding { Right = -10f },
                                             Alpha = IsPersonalBest ? 1 : 0,
-                                            Colour = ColourInfo.GradientHorizontal(Color4Extensions.FromHex("#66FFCC"), Color4Extensions.FromHex("#51A388")),
+                                            Colour = personalBestGradient,
                                             Child = new Box { RelativeSizeAxes = Axes.Both },
                                         },
                                         new RankLabel(Rank, sheared, darkText: IsPersonalBest)
@@ -222,7 +222,7 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
                 switch (s.NewValue)
                 {
                     case ScoringMode.Standardised:
-                        rightContent.Width = 180f;
+                        rightContent.Width = 150;
                         break;
 
                     case ScoringMode.Classic:
@@ -243,7 +243,7 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
                 modsContainer.Padding = new MarginPadding { Top = 4f };
                 modsContainer.ChildrenEnumerable = score.Mods.AsOrdered().Take(Math.Min(maxMods, score.Mods.Length)).Select(mod => new ColouredModSwitchTiny(mod)
                 {
-                    Scale = new Vector2(0.375f)
+                    Scale = new Vector2(0.3125f)
                 });
 
                 if (score.Mods.Length > maxMods)
@@ -251,7 +251,7 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
                     modsContainer.Remove(modsContainer[^1], true);
                     modsContainer.Add(new MoreModSwitchTiny(score.Mods)
                     {
-                        Scale = new Vector2(0.375f),
+                        Scale = new Vector2(0.3125f),
                     });
                 }
             }
@@ -356,13 +356,13 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
                                             {
                                                 Anchor = Anchor.CentreLeft,
                                                 Origin = Anchor.CentreLeft,
-                                                Size = new Vector2(24, 16),
+                                                Size = new Vector2(20, 14),
                                             },
                                             new UpdateableTeamFlag(user.Team)
                                             {
                                                 Anchor = Anchor.CentreLeft,
                                                 Origin = Anchor.CentreLeft,
-                                                Size = new Vector2(40, 20),
+                                                Size = new Vector2(30, 15),
                                             },
                                             new DateLabel(score.Date)
                                             {
@@ -377,7 +377,7 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
                                         RelativeSizeAxes = Axes.X,
                                         Shear = new Vector2(sheared ? -OsuGame.SHEAR : 0, 0),
                                         Text = user.Username,
-                                        Font = OsuFont.GetFont(size: 20, weight: FontWeight.SemiBold)
+                                        Font = OsuFont.GetFont(size: 16f, weight: FontWeight.SemiBold)
                                     }
                                 }
                             },
@@ -460,7 +460,7 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
                             Origin = Anchor.Centre,
                             Spacing = new Vector2(-2),
                             Colour = DrawableRank.GetRankNameColour(score.Rank),
-                            Font = OsuFont.Numeric.With(size: 16),
+                            Font = OsuFont.Numeric.With(size: 14),
                             Text = DrawableRank.GetRankName(score.Rank),
                             ShadowColour = Color4.Black.Opacity(0.3f),
                             ShadowOffset = new Vector2(0, 0.08f),
@@ -509,7 +509,7 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
                                             UseFullGlyphHeight = false,
                                             Shear = new Vector2(sheared ? -OsuGame.SHEAR : 0, 0),
                                             Current = scoreManager.GetBindableTotalScoreString(score),
-                                            Font = OsuFont.GetFont(size: 30, weight: FontWeight.Light),
+                                            Font = OsuFont.GetFont(size: 25, weight: FontWeight.Light),
                                         },
                                         new InputBlockingContainer
                                         {
@@ -546,9 +546,9 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
 
             Alpha = 0;
 
-            content.MoveToY(75);
-            avatar.MoveToX(75);
-            nameLabel.MoveToX(150);
+            content.MoveToY(60);
+            avatar.MoveToX(60);
+            nameLabel.MoveToX(125);
 
             this.FadeIn(200);
             content.MoveToY(0, 800, Easing.OutQuint);
@@ -702,7 +702,7 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
                         {
                             Colour = colourProvider.Content2,
                             Text = statisticInfo.Name,
-                            Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
+                            Font = OsuFont.GetFont(size: 10, weight: FontWeight.Bold),
                         },
                         value = new OsuSpriteText
                         {
@@ -710,7 +710,7 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
                             // since the accuracy is sometimes longer than its name.
                             BypassAutoSizeAxes = Axes.X,
                             Text = statisticInfo.Value,
-                            Font = OsuFont.GetFont(size: 19, weight: FontWeight.Medium),
+                            Font = OsuFont.GetFont(size: 15, weight: FontWeight.Medium),
                         }
                     }
                 };
@@ -736,7 +736,7 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
                     Shear = new Vector2(sheared ? -OsuGame.SHEAR : 0, 0),
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Font = OsuFont.GetFont(size: 20, weight: FontWeight.SemiBold, italics: true),
+                    Font = OsuFont.GetFont(size: 16, weight: FontWeight.SemiBold, italics: true),
                     Text = rank == null ? "-" : rank.Value.FormatRank().Insert(0, "#"),
                     Shadow = !darkText,
                 };
@@ -778,7 +778,7 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours, OverlayColourProvider colourProvider)
+            private void load(OverlayColourProvider colourProvider)
             {
                 Size = new Vector2(ModSwitchTiny.WIDTH, ModSwitchTiny.DEFAULT_HEIGHT);
 
@@ -798,7 +798,7 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Shadow = false,
-                            Font = OsuFont.Torus.With(size: 32, weight: FontWeight.Bold),
+                            Font = OsuFont.Torus.With(size: 26, weight: FontWeight.Bold),
                             Text = ". . .",
                             Colour = Color4.White,
                             UseFullGlyphHeight = false,
@@ -831,13 +831,13 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
 
                 Child = new FillFlowContainer
                 {
-                    Width = 150f,
+                    Width = 125f,
                     AutoSizeAxes = Axes.Y,
                     Direction = FillDirection.Full,
-                    Spacing = new Vector2(3f),
+                    Spacing = new Vector2(2.5f),
                     ChildrenEnumerable = mods.AsOrdered().Select(m => new ColouredModSwitchTiny(m)
                     {
-                        Scale = new Vector2(0.375f),
+                        Scale = new Vector2(0.3125f),
                     })
                 };
             }
