@@ -191,16 +191,18 @@ namespace osu.Game.Screens.SelectV2
                                         ColumnDimensions = new[]
                                         {
                                             new Dimension(),
+                                            new Dimension(GridSizeMode.Absolute, 30),
                                             new Dimension(GridSizeMode.AutoSize),
                                         },
                                         Content = new[]
                                         {
-                                            new Drawable[]
+                                            new[]
                                             {
                                                 countStatisticsDisplay = new WedgeDifficultyStatisticsDisplay
                                                 {
                                                     RelativeSizeAxes = Axes.X,
                                                 },
+                                                Empty(),
                                                 difficultyStatisticsDisplay = new AdjustableDifficultyStatisticsDisplay(autosize: true),
                                             }
                                         },
