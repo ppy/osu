@@ -107,11 +107,26 @@ namespace osu.Game.Overlays.SkinEditor
                 State = { Value = GetStateFromSelection(selection, c => !c.Item.UsesFixedAnchor) }
             };
 
+            var anchorItems = createAnchorItems((d, a) => d.UsesFixedAnchor && ((Drawable)d).Anchor == a, applyFixedAnchors).Prepend(closestItem).ToArray();
+
+            // Make sure when any anchor item is checked, it unchecks previously selected item
+            foreach (var item in anchorItems)
+            {
+                item.State.ValueChanged += state =>
+                {
+                    if (state.NewValue == TernaryState.True)
+                    {
+                        var previouslyCheckedItem = anchorItems.FirstOrDefault(i => i != item && i.State.Value == TernaryState.True);
+                        if (previouslyCheckedItem != null)
+                            previouslyCheckedItem.State.Value = TernaryState.False;
+                    }
+                };
+            }
+
+
             yield return new OsuMenuItem(SkinEditorStrings.Anchor)
             {
-                Items = createAnchorItems((d, a) => d.UsesFixedAnchor && ((Drawable)d).Anchor == a, applyFixedAnchors)
-                        .Prepend(closestItem)
-                        .ToArray()
+                Items = anchorItems
             };
 
             yield return originMenu = new OsuMenuItem(SkinEditorStrings.Origin);
@@ -177,13 +192,29 @@ namespace osu.Game.Overlays.SkinEditor
                     Anchor.BottomCentre,
                     Anchor.BottomRight,
                 };
-                return displayableAnchors.Select(a =>
+                var items = displayableAnchors.Select(a =>
                 {
                     return new TernaryStateRadioMenuItem(a.ToString(), MenuItemType.Standard, _ => applyFunction(a))
                     {
                         State = { Value = GetStateFromSelection(selection, c => checkFunction(c.Item, a)) }
                     };
-                });
+                }).ToList();
+
+                // for each item, add a state change handler that unchecks previously selected item when the current item is checked
+                foreach (var item in items)
+                {
+                    item.State.ValueChanged += state =>
+                    {
+                        if (state.NewValue == TernaryState.True)
+                        {
+                            var previouslyCheckedItem = items.FirstOrDefault(i => i != item && i.State.Value == TernaryState.True);
+                            if (previouslyCheckedItem != null)
+                                previouslyCheckedItem.State.Value = TernaryState.False;
+                        }
+                    };
+                }
+
+                return items;
             }
         }
 

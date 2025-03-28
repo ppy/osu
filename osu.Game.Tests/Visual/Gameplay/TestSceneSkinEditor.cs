@@ -15,6 +15,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 using osu.Framework.Testing;
 using osu.Game.Database;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Settings;
 using osu.Game.Overlays.SkinEditor;
@@ -456,6 +457,92 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("wait for load", () => globalHUDTarget.ComponentsLoaded && rulesetHUDTarget.ComponentsLoaded);
             AddAssert("combo placed in global target", () => globalHUDTarget.Components.OfType<LegacyDefaultComboCounter>().Count() == 1);
             AddAssert("combo placed in ruleset target", () => rulesetHUDTarget.Components.OfType<LegacyDefaultComboCounter>().Count() == 1);
+        }
+
+        [Test]
+        public void TestAnchorRadioButtonBehavior()
+        {
+            ISerialisableDrawable? selectedComponent = null;
+
+            AddStep("Select first component", () =>
+            {
+                var blueprint = skinEditor.ChildrenOfType<SkinBlueprint>().First();
+                skinEditor.SelectedComponents.Clear();
+                skinEditor.SelectedComponents.Add(blueprint.Item);
+                selectedComponent = blueprint.Item;
+            });
+
+            AddStep("Right-click to open context menu", () =>
+            {
+                if (selectedComponent != null)
+                    InputManager.MoveMouseTo(((Drawable)selectedComponent).ScreenSpaceDrawQuad.Centre);
+                InputManager.Click(MouseButton.Right);
+            });
+
+            AddStep("Click on Anchor menu", () =>
+            {
+                var anchorMenuItem = this.ChildrenOfType<Menu.DrawableMenuItem>()
+                                        .First(m => m.Item.Text.ToString().Contains("Anchor"));
+                InputManager.MoveMouseTo(anchorMenuItem);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddStep("Right-click TopLeft anchor", () =>
+            {
+                var topLeftItem = this.ChildrenOfType<Menu.DrawableMenuItem>()
+                                    .First(m => m.Item.Text.ToString() == "TopLeft");
+                InputManager.MoveMouseTo(topLeftItem);
+                InputManager.Click(MouseButton.Right);
+            });
+
+            AddAssert("TopLeft item checked", () =>
+            {
+                var topLeftItem = this.ChildrenOfType<Menu.DrawableMenuItem>()
+                                    .First(m => m.Item.Text.ToString() == "TopLeft");
+                return ((TernaryStateRadioMenuItem)topLeftItem.Item).State.Value == TernaryState.True;
+            });
+
+            AddStep("Right-click Centre anchor", () =>
+            {
+                var centreItem = this.ChildrenOfType<Menu.DrawableMenuItem>()
+                                    .First(m => m.Item.Text.ToString() == "Centre");
+                InputManager.MoveMouseTo(centreItem);
+                InputManager.Click(MouseButton.Right);
+            });
+
+            AddAssert("Centre item checked", () =>
+            {
+                var centreItem = this.ChildrenOfType<Menu.DrawableMenuItem>()
+                                    .First(m => m.Item.Text.ToString() == "Centre");
+                return ((TernaryStateRadioMenuItem)centreItem.Item).State.Value == TernaryState.True;
+            });
+            AddAssert("TopLeft item unchecked", () =>
+            {
+                var topLeftItem = this.ChildrenOfType<Menu.DrawableMenuItem>()
+                                    .First(m => m.Item.Text.ToString() == "TopLeft");
+                return ((TernaryStateRadioMenuItem)topLeftItem.Item).State.Value == TernaryState.False;
+            });
+
+            AddStep("Right-click Closest anchor", () =>
+            {
+                var closestItem = this.ChildrenOfType<Menu.DrawableMenuItem>()
+                                    .First(m => m.Item.Text.ToString() == "Closest");
+                InputManager.MoveMouseTo(closestItem);
+                InputManager.Click(MouseButton.Right);
+            });
+
+            AddAssert("Closest item checked", () =>
+            {
+                var closestItem = this.ChildrenOfType<Menu.DrawableMenuItem>()
+                                    .First(m => m.Item.Text.ToString() == "Closest");
+                return ((TernaryStateRadioMenuItem)closestItem.Item).State.Value == TernaryState.True;
+            });
+            AddAssert("Centre item unchecked", () =>
+            {
+                var centreItem = this.ChildrenOfType<Menu.DrawableMenuItem>()
+                                    .First(m => m.Item.Text.ToString() == "Centre");
+                return ((TernaryStateRadioMenuItem)centreItem.Item).State.Value == TernaryState.False;
+            });
         }
 
         private Skin importSkinFromArchives(string filename)
