@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Online.API.Requests.Responses;
@@ -159,6 +160,19 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
 
             queueList.Items.RemoveAll(i => i.ID == itemId);
             historyList.Items.RemoveAll(i => i.ID == itemId);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (client.IsNotNull())
+            {
+                client.ItemAdded -= playlistItemAdded;
+                client.ItemRemoved -= playlistItemRemoved;
+                client.ItemChanged -= playlistItemChanged;
+                client.RoomUpdated -= onRoomUpdated;
+            }
         }
     }
 }
