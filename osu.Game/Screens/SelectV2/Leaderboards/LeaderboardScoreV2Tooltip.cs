@@ -30,6 +30,7 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
     public partial class LeaderboardScoreV2Tooltip : VisibilityContainer, ITooltip<ScoreInfo>
     {
         private const float spacing = 20f;
+        private const float corner_radius = 10f;
 
         private DateAndStatisticsPanel dateAndStatistics = null!;
         private ModsPanel modsPanel = null!;
@@ -46,7 +47,7 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
         [BackgroundDependencyLoader]
         private void load()
         {
-            Width = 180;
+            Width = 150;
             AutoSizeAxes = Axes.Y;
 
             InternalChild = new ReverseChildIDFillFlowContainer<Drawable>
@@ -129,7 +130,7 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
                     }
 
                     statistics.ChildrenEnumerable = judgementsStatistics
-                                                    .Append(Empty().With(d => d.Height = 25))
+                                                    .Append(Empty().With(d => d.Height = 20))
                                                     .Concat(generalStatistics);
                 }
             }
@@ -139,7 +140,7 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
             {
                 RelativeSizeAxes = Axes.X;
                 AutoSizeAxes = Axes.Y;
-                CornerRadius = 10;
+                CornerRadius = corner_radius;
                 Masking = true;
 
                 EdgeEffect = new EdgeEffectParameters
@@ -163,18 +164,18 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
                         Direction = FillDirection.Vertical,
-                        Spacing = new Vector2(0f, 5f),
-                        Margin = new MarginPadding { Top = 10f },
+                        Spacing = new Vector2(0f, 4f),
+                        Margin = new MarginPadding { Top = 8f },
                         Children = new Drawable[]
                         {
                             absoluteDate = new OsuSpriteText
                             {
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
-                                Font = OsuFont.Torus.With(size: 14.4f, weight: FontWeight.SemiBold),
+                                Font = OsuFont.Torus.With(size: 10f, weight: FontWeight.SemiBold),
                                 UseFullGlyphHeight = false,
                             },
-                            relativeDate = new DrawableDate(default, 14.4f)
+                            relativeDate = new DrawableDate(default, 10f)
                             {
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
@@ -187,9 +188,9 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
                                 Origin = Anchor.TopCentre,
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
-                                CornerRadius = 10,
+                                CornerRadius = corner_radius,
                                 Masking = true,
-                                Margin = new MarginPadding { Top = 5f },
+                                Margin = new MarginPadding { Top = 4f },
                                 Children = new Drawable[]
                                 {
                                     new Box
@@ -201,8 +202,8 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
                                     {
                                         RelativeSizeAxes = Axes.X,
                                         AutoSizeAxes = Axes.Y,
-                                        Spacing = new Vector2(0f, 5f),
-                                        Padding = new MarginPadding { Horizontal = 10f, Vertical = 10f },
+                                        Spacing = new Vector2(0f, 4f),
+                                        Padding = new MarginPadding(8f),
                                     },
                                 },
                             },
@@ -225,7 +226,7 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
                     {
                         Text = label,
                         Colour = labelColour,
-                        Font = OsuFont.Torus.With(size: 12, weight: FontWeight.SemiBold),
+                        Font = OsuFont.Torus.With(size: 10, weight: FontWeight.SemiBold),
                     },
                     new OsuSpriteText
                     {
@@ -233,7 +234,7 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
                         Origin = Anchor.TopRight,
                         Text = value,
                         Colour = Color4.White,
-                        Font = OsuFont.Torus.With(size: 12, weight: FontWeight.Bold),
+                        Font = OsuFont.Torus.With(size: 10, weight: FontWeight.Bold),
                     },
                 };
             }
@@ -259,7 +260,7 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Scale = new Vector2(0.375f),
+                            Scale = new Vector2(0.3125f),
                             Active = { Value = true },
                         });
                     }
@@ -271,7 +272,7 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
             {
                 RelativeSizeAxes = Axes.X;
                 AutoSizeAxes = Axes.Y;
-                CornerRadius = 10;
+                CornerRadius = corner_radius;
                 Masking = true;
 
                 EdgeEffect = new EdgeEffectParameters
@@ -297,9 +298,9 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                        Margin = new MarginPadding { Bottom = 8f, Top = 8f + spacing },
-                        Padding = new MarginPadding { Horizontal = 20f },
-                        Spacing = new Vector2(3f),
+                        Margin = new MarginPadding { Bottom = 6f, Top = 6f + spacing },
+                        Padding = new MarginPadding { Horizontal = 16f },
+                        Spacing = new Vector2(2.5f),
                     },
                 };
             }
@@ -328,7 +329,7 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
             {
                 RelativeSizeAxes = Axes.X;
                 AutoSizeAxes = Axes.Y;
-                CornerRadius = 10;
+                CornerRadius = corner_radius;
                 Masking = true;
 
                 EdgeEffect = new EdgeEffectParameters
@@ -353,15 +354,15 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
                     {
                         Anchor = Anchor.BottomCentre,
                         Origin = Anchor.BottomCentre,
-                        Size = new Vector2(32f, 16f),
-                        Margin = new MarginPadding { Bottom = 8f },
+                        Size = new Vector2(25f, 14f),
+                        Margin = new MarginPadding { Bottom = 5f },
                     },
                     totalScore = new OsuSpriteText
                     {
                         Anchor = Anchor.BottomCentre,
                         Origin = Anchor.BottomCentre,
-                        Margin = new MarginPadding { Bottom = 24f + 8f, Top = 8f + spacing },
-                        Font = OsuFont.Torus.With(size: 38.4f, weight: FontWeight.Light),
+                        Margin = new MarginPadding { Bottom = 25f, Top = 10f + spacing },
+                        Font = OsuFont.Torus.With(size: 32f, weight: FontWeight.Light),
                         UseFullGlyphHeight = false,
                     },
                 };
