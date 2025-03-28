@@ -252,6 +252,7 @@ namespace osu.Game.Graphics.UserInterface
                                 Size = new Vector2(8),
                                 Alpha = 0,
                                 X = chevron_offset,
+                                Y = 1,
                                 Margin = new MarginPadding { Left = 3, Right = 3 },
                                 Origin = Anchor.CentreLeft,
                                 Anchor = Anchor.CentreLeft,
