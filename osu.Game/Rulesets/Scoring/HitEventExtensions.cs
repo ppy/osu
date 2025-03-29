@@ -55,20 +55,23 @@ namespace osu.Game.Rulesets.Scoring
         }
 
         /// <summary>
-        /// Calculates the average hit offset/error for a sequence of <see cref="HitEvent"/>s, where negative numbers mean the user hit too early on average.
+        /// Calculates the median hit offset/error for a sequence of <see cref="HitEvent"/>s, where negative numbers mean the user hit too early on average.
         /// </summary>
         /// <returns>
         /// A non-null <see langword="double"/> value if unstable rate could be calculated,
         /// and <see langword="null"/> if unstable rate cannot be calculated due to <paramref name="hitEvents"/> being empty.
         /// </returns>
-        public static double? CalculateAverageHitError(this IEnumerable<HitEvent> hitEvents)
+        public static double? CalculateMedianHitError(this IEnumerable<HitEvent> hitEvents)
         {
-            double[] timeOffsets = hitEvents.Where(AffectsUnstableRate).Select(ev => ev.TimeOffset).ToArray();
+            double[] timeOffsets = hitEvents.Where(AffectsUnstableRate).Select(ev => ev.TimeOffset).OrderBy(x => x).ToArray();
 
             if (timeOffsets.Length == 0)
                 return null;
 
-            return timeOffsets.Average();
+            int center = timeOffsets.Length / 2;
+
+            // Use average of the 2 central values if length is even
+            return timeOffsets.Length % 2 == 0 ? (timeOffsets[center - 1] + timeOffsets[center]) / 2 : timeOffsets[center];
         }
 
         public static bool AffectsUnstableRate(HitEvent e) => AffectsUnstableRate(e.HitObject, e.Result);
