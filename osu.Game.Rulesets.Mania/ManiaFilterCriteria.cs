@@ -1,10 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Filter;
@@ -14,7 +12,6 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring.Legacy;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
-using Remotion.Linq.Utilities;
 
 namespace osu.Game.Rulesets.Mania
 {
