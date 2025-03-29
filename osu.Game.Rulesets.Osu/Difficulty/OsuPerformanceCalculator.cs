@@ -23,6 +23,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         public const double PERFORMANCE_BASE_MULTIPLIER = 1.15; // This is being adjusted to keep the final pp value scaled around what it used to be when changing things.
 
         private bool usingClassicSliderAccuracy;
+        private bool usingHidden;
+        private bool usingHalfHidden;
 
         private double accuracy;
         private int scoreMaxCombo;
@@ -65,6 +67,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             var osuAttributes = (OsuDifficultyAttributes)attributes;
 
             usingClassicSliderAccuracy = score.Mods.OfType<OsuModClassic>().Any(m => m.NoSliderHeadAccuracy.Value);
+            usingHalfHidden = score.Mods.OfType<OsuModHidden>().All(m => m.OnlyFadeApproachCircles.Value);
+            usingHidden = !usingHalfHidden && score.Mods.Any(m => m is OsuModHidden or OsuModTraceable);
 
             accuracy = score.Accuracy;
             scoreMaxCombo = score.MaxCombo;
@@ -222,10 +226,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             if (score.Mods.Any(m => m is OsuModBlinds))
                 aimValue *= 1.3 + (totalHits * (0.0016 / (1 + 2 * effectiveMissCount)) * Math.Pow(accuracy, 16)) * (1 - 0.003 * attributes.DrainRate * attributes.DrainRate);
-            else if (score.Mods.Any(m => m is OsuModHidden || m is OsuModTraceable))
+            else if (usingHidden)
             {
                 // We want to give more reward for lower AR when it comes to aim and HD. This nerfs high AR and buffs lower AR.
                 aimValue *= 1.0 + 0.04 * (12.0 - approachRate);
+            }
+            else if (usingHalfHidden)
+            {
+                // Slight buff since approach circles can assist reading when determining the position of the next circle
+                aimValue *= 1.02;
             }
 
             aimValue *= accuracy;
@@ -263,10 +272,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 // Increasing the speed value by object count for Blinds isn't ideal, so the minimum buff is given.
                 speedValue *= 1.12;
             }
-            else if (score.Mods.Any(m => m is OsuModHidden || m is OsuModTraceable))
+            else if (usingHidden)
             {
                 // We want to give more reward for lower AR when it comes to aim and HD. This nerfs high AR and buffs lower AR.
                 speedValue *= 1.0 + 0.04 * (12.0 - approachRate);
+            }
+            else if (usingHalfHidden)
+            {
+                // Very slight buff since approach circles can offer assistance in determining which circle is the correct
+                // one to click in a stream
+                speedValue *= 1.01;
             }
 
             double speedHighDeviationMultiplier = calculateSpeedHighDeviationNerf(attributes);
@@ -315,7 +330,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // Increasing the accuracy value by object count for Blinds isn't ideal, so the minimum buff is given.
             if (score.Mods.Any(m => m is OsuModBlinds))
                 accuracyValue *= 1.14;
-            else if (score.Mods.Any(m => m is OsuModHidden || m is OsuModTraceable))
+            else if (usingHidden || usingHalfHidden)
                 accuracyValue *= 1.08;
 
             if (score.Mods.Any(m => m is OsuModFlashlight))
