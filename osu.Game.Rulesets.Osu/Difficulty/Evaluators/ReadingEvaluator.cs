@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
     {
         private const double reading_window_size = 3000;
 
-        public static double EvaluateDifficultyOf(DifficultyHitObject current, IReadOnlyList<Mod> mods, double rhythm)
+        public static double EvaluateDifficultyOf(DifficultyHitObject current, IReadOnlyList<Mod> mods)
         {
             if (current.BaseObject is Spinner || current.Index == 0)
                 return 0;
@@ -26,9 +26,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             var currObj = (OsuDifficultyHitObject)current;
             double currVelocity = currObj.LazyJumpDistance / currObj.StrainTime;
 
+            double rhythmFactor = 1;
+
             double pastObjectDifficultyInfluence = 1.0;
 
-            double overlapness = 0;
+            double overlapness = 1;
 
             foreach (var loopObj in retrievePastVisibleObjects(currObj))
             {
@@ -38,21 +40,32 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     // Longer sliders are inherently denser objects
                     loopDifficulty += Math.Log10(Math.Max(1, slider.Velocity * slider.SpanDuration / slider.Radius));
 
-                // Buff perfect stacks depending on rhythm changes
-                double loopOverlapness = loopObj.LazyJumpDistance == 0 ? rhythm : 0;
+                double timeBetweenCurrAndLoopObj = (currObj.BaseObject.StartTime - loopObj.BaseObject.StartTime) / currObj.ClockRate;
+                double timeNerfFactor = getTimeNerfFactor(timeBetweenCurrAndLoopObj);
+
+                var loopLastObj = (OsuDifficultyHitObject)loopObj.Previous(0);
+
+                if (loopLastObj is not null && loopObj.StrainTime > loopLastObj.StrainTime)
+                {
+                    double rhythmSimilarity = getRhythmDifference(loopObj.StrainTime, loopLastObj.StrainTime);
+                    rhythmSimilarity *= Math.Pow(Math.Sin(rhythmSimilarity * 2 * Math.PI), 2);
+                    rhythmFactor += rhythmSimilarity;
+                    rhythmFactor *= timeNerfFactor;
+                }
+
+                // Buff perfect stacks only if rhythms change
+                double loopOverlapness = loopObj.LazyJumpDistance == 0 ? rhythmFactor : 0;
+
                 // Small distances means objects may be cheesed, so it doesn't matter whether they are arranged confusingly.
-                loopDifficulty *= loopOverlapness + DifficultyCalculationUtils.Logistic(-(loopObj.MinimumJumpDistance * rhythm - 80) / 15);
+                loopDifficulty *= loopOverlapness + DifficultyCalculationUtils.Logistic(-(loopObj.MinimumJumpDistance * Math.Pow(rhythmFactor, 3) - 80) / 15);
 
                 if (loopObj.BaseObject is Slider pastSlider)
                     // Buff current object if it's obstructed by a previous slider
                     loopDifficulty += 0; // To be implemented
 
-                double timeBetweenCurrAndLoopObj = (currObj.BaseObject.StartTime - loopObj.BaseObject.StartTime) / currObj.ClockRate;
-                double timeNerfFactor = getTimeNerfFactor(timeBetweenCurrAndLoopObj);
                 loopDifficulty *= timeNerfFactor;
-
-                overlapness += loopOverlapness * timeNerfFactor;
                 pastObjectDifficultyInfluence += loopDifficulty;
+                overlapness += loopOverlapness;
             }
 
             double preemptDifficulty = 0.0;
@@ -61,7 +74,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             if (currApproachRate < 500)
             {
-                preemptDifficulty += Math.Pow(500 - currApproachRate, 2.1) / 15000;
+                preemptDifficulty += Math.Pow(500 - currApproachRate, 2.2) / 60000;
 
                 // Buff spacing.
                 preemptDifficulty *= currVelocity;
@@ -70,8 +83,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 // This is on the basis that in a high density environment you can rely more on patterns and muscle memory
                 preemptDifficulty /= Math.Max(1, retrieveCurrentVisibleObjects(currObj).Count);
 
-                // Nerf reading difficulty less the more rhythmically straining a note is
-                preemptDifficulty /= 1 + 2 * DifficultyCalculationUtils.Logistic(15 * rhythm - 17);
+                // Buff rhythm changes harshly
+                preemptDifficulty *= Math.Pow(rhythmFactor, 2.5);
             }
 
             double hiddenDifficulty = 0.0;
@@ -92,8 +105,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 // The longer an object is hidden, the more velocity should matter
                 hiddenDifficulty += visibleObjectFactor * timeSpentInvisible * Math.Max(1, currVelocity) / timeDifficultyFactor;
 
-                // Buff perfect stacks with rhythm a second time to emphasise their difficulty with hidden
-                hiddenDifficulty += overlapness * rhythm;
+                // Buff rhythm changes
+                hiddenDifficulty *= rhythmFactor;
+
+                // Buff perfect stacks and scale with rhythm
+                hiddenDifficulty += currObj.LazyJumpDistance == 0 ? 1 + 2 * overlapness : 0;
             }
 
             // Award only denser than average maps
@@ -189,5 +205,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         {
             return Math.Clamp(2 - deltaTime / (reading_window_size / 2), 0, 1);
         }
+
+        private static double getRhythmDifference(double t1, double t2) => 1 - Math.Min(t1, t2) / Math.Max(t1, t2);
     }
 }
