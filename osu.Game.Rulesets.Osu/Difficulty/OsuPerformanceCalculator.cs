@@ -23,6 +23,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         public const double PERFORMANCE_BASE_MULTIPLIER = 1.15; // This is being adjusted to keep the final pp value scaled around what it used to be when changing things.
 
         private bool usingClassicSliderAccuracy;
+        private bool usingScoreV2;
 
         private double accuracy;
         private int scoreMaxCombo;
@@ -65,6 +66,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             var osuAttributes = (OsuDifficultyAttributes)attributes;
 
             usingClassicSliderAccuracy = score.Mods.OfType<OsuModClassic>().Any(m => m.NoSliderHeadAccuracy.Value);
+            usingScoreV2 = score.Mods.Any(m => m is ModScoreV2);
 
             accuracy = score.Accuracy;
             scoreMaxCombo = score.MaxCombo;
@@ -293,7 +295,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // This percentage only considers HitCircles of any value - in this part of the calculation we focus on hitting the timing hit window.
             double betterAccuracyPercentage;
             int amountHitObjectsWithAccuracy = attributes.HitCircleCount;
-            if (!usingClassicSliderAccuracy)
+            if (!usingClassicSliderAccuracy || usingScoreV2)
                 amountHitObjectsWithAccuracy += attributes.SliderCount;
 
             if (amountHitObjectsWithAccuracy > 0)
