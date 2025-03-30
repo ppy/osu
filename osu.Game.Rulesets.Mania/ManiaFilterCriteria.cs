@@ -17,20 +17,50 @@ namespace osu.Game.Rulesets.Mania
 {
     public class ManiaFilterCriteria : IRulesetFilterCriteria
     {
-        private FilterCriteria.OptionalRange<float> keys;
-
+        private FilterCriteria.OptionalRange<float> included_key_range;
+        private HashSet<int> included_keys = new HashSet<int>();
+        private HashSet<int> excluded_keys = new HashSet<int>();
         public bool Matches(BeatmapInfo beatmapInfo, FilterCriteria criteria)
         {
-            return !keys.HasFilter || keys.IsInRange(ManiaBeatmapConverter.GetColumnCount(LegacyBeatmapConversionDifficultyInfo.FromBeatmapInfo(beatmapInfo), criteria.Mods));
+            bool result = (!included_key_range.HasFilter) && (included_keys.Count == 0);
+            int key_index = ManiaBeatmapConverter.GetColumnCount(LegacyBeatmapConversionDifficultyInfo.FromBeatmapInfo(beatmapInfo), criteria.Mods);
+
+            result |= (included_key_range.HasFilter && included_key_range.IsInRange(key_index)) || included_keys.Contains(key_index);
+            result &= !excluded_keys.Contains(key_index);
+
+            return result;
         }
 
-        public bool TryParseCustomKeywordCriteria(string key, Operator op, string value)
+        public bool TryParseCustomKeywordCriteria(string key, Operator op, string str_values)
         {
             switch (key)
             {
                 case "key":
                 case "keys":
-                    return FilterQueryParser.TryUpdateCriteriaRange(ref keys, op, value);
+                    if (op == Operator.Equal)
+                    {
+                        foreach (string str_value in str_values.Split(','))
+                        {
+                            if (int.TryParse(str_value, out int value))
+                            {
+                                if (value > 0)
+                                {
+                                    included_keys.Add(value);
+                                }
+                                else
+                                {
+                                    excluded_keys.Add(-value);
+                                }
+                            }
+                        }
+
+                        return true;
+                    }
+                    else
+                    {
+                        // In this case, the str_values is a string of a single value
+                        return FilterQueryParser.TryUpdateCriteriaRange(ref included_key_range, op, str_values);
+                    }
             }
 
             return false;
@@ -38,7 +68,7 @@ namespace osu.Game.Rulesets.Mania
 
         public bool FilterMayChangeFromMods(ValueChangedEvent<IReadOnlyList<Mod>> mods)
         {
-            if (keys.HasFilter)
+            if (included_key_range.HasFilter || included_keys.Count != 0 || excluded_keys.Count != 0)
             {
                 // Interpreting as the Mod type is required for equality comparison.
                 HashSet<Mod> oldSet = mods.OldValue.OfType<ManiaKeyMod>().AsEnumerable<Mod>().ToHashSet();
