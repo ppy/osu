@@ -145,11 +145,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                     null,
                                     new Drawable[]
                                     {
-                                        new MultiplayerPlaylist(Room)
+                                        new MultiplayerPlaylist
                                         {
                                             RelativeSizeAxes = Axes.Both,
-                                            RequestEdit = OpenSongSelection,
-                                            SelectedItem = SelectedItem
+                                            RequestEdit = OpenSongSelection
                                         }
                                     },
                                     new[]
