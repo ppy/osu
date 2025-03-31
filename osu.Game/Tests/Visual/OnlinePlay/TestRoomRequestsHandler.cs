@@ -267,7 +267,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
         /// <param name="host">The room host.</param>
         public void AddServerSideRoom(Room room, APIUser host)
         {
-            room.RoomID ??= currentRoomId++;
+            room.RoomID = currentRoomId++;
             room.Host = host;
 
             for (int i = 0; i < room.Playlist.Count; i++)
