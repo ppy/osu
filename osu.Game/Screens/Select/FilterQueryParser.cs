@@ -129,6 +129,9 @@ namespace osu.Game.Screens.Select
                 case ":":
                     return Operator.Equal;
 
+                case "!=":
+                    return Operator.NotEqual;
+
                 case "<":
                     return Operator.Less;
 
