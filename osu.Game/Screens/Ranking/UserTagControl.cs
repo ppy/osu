@@ -25,6 +25,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Screens.Ranking.Statistics;
 using osuTK;
 using osuTK.Input;
 
@@ -290,8 +291,6 @@ namespace osu.Game.Screens.Ranking
             [BackgroundDependencyLoader]
             private void load()
             {
-                string[] tagParts = UserTag.Name.Split('/');
-
                 Anchor = Anchor.CentreLeft;
                 Origin = Anchor.CentreLeft;
                 CornerRadius = 8;
@@ -317,8 +316,8 @@ namespace osu.Game.Screens.Ranking
                         {
                             tagCategoryText = new OsuSpriteText
                             {
-                                Alpha = tagParts.Length > 1 ? 0.6f : 0,
-                                Text = tagParts[0],
+                                Alpha = UserTag.GroupName != null ? 0.6f : 0,
+                                Text = UserTag.GroupName ?? default(LocalisableString),
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
                                 Margin = new MarginPadding { Horizontal = 6 }
@@ -339,7 +338,7 @@ namespace osu.Game.Screens.Ranking
                                     },
                                     tagNameText = new OsuSpriteText
                                     {
-                                        Text = tagParts[^1],
+                                        Text = UserTag.DisplayName,
                                         Anchor = Anchor.CentreLeft,
                                         Origin = Anchor.CentreLeft,
                                         Margin = new MarginPadding { Horizontal = 6 }
@@ -497,6 +496,7 @@ namespace osu.Game.Screens.Ranking
                                 HoldFocus = true,
                                 RelativeSizeAxes = Axes.X,
                                 Depth = float.MinValue,
+                                Y = -2, // hacky compensation for masking issues
                             },
                             new OsuScrollContainer
                             {
@@ -523,12 +523,24 @@ namespace osu.Game.Screens.Ranking
                 AvailableTags.BindCollectionChanged((_, _) =>
                 {
                     searchContainer.Clear();
-                    searchContainer.ChildrenEnumerable = AvailableTags.Select(tag => new DrawableAddableTag(tag)
-                    {
-                        Action = () => OnSelected?.Invoke(tag)
-                    });
+                    searchContainer.ChildrenEnumerable = createItems(AvailableTags);
                 }, true);
                 searchBox.Current.BindValueChanged(_ => searchContainer.SearchTerm = searchBox.Current.Value, true);
+            }
+
+            private IEnumerable<Drawable> createItems(IEnumerable<UserTag> tags)
+            {
+                var grouped = tags.GroupBy(tag => tag.GroupName).OrderBy(group => group.Key);
+
+                foreach (var group in grouped)
+                {
+                    var drawableGroup = new GroupFlow(group.Key);
+
+                    foreach (var tag in group.OrderBy(t => t.FullName))
+                        drawableGroup.Add(new DrawableAddableTag(tag) { Action = () => OnSelected?.Invoke(tag) });
+
+                    yield return drawableGroup;
+                }
             }
 
             protected override bool OnKeyDown(KeyDownEvent e)
@@ -550,6 +562,30 @@ namespace osu.Game.Screens.Ranking
                     OnSelected?.Invoke(visibleItems.Single().Tag);
             }
 
+            private partial class GroupFlow : FillFlowContainer, IFilterable
+            {
+                public IEnumerable<LocalisableString> FilterTerms { get; }
+
+                public bool MatchingFilter
+                {
+                    set => Alpha = value ? 1 : 0;
+                }
+
+                public bool FilteringActive { set { } }
+
+                public GroupFlow(string? name)
+                {
+                    RelativeSizeAxes = Axes.X;
+                    AutoSizeAxes = Axes.Y;
+                    Direction = FillDirection.Vertical;
+                    Spacing = new Vector2(5);
+
+                    Add(new StatisticItemHeader { Text = name ?? "uncategorised" });
+
+                    FilterTerms = name == null ? [] : [name];
+                }
+            }
+
             private partial class DrawableAddableTag : OsuAnimatedButton, IFilterable
             {
                 public readonly UserTag Tag;
@@ -560,7 +596,6 @@ namespace osu.Game.Screens.Ranking
 
                     RelativeSizeAxes = Axes.X;
                     AutoSizeAxes = Axes.Y;
-                    Anchor = Origin = Anchor.Centre;
                 }
 
                 [BackgroundDependencyLoader]
@@ -587,7 +622,7 @@ namespace osu.Game.Screens.Ranking
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
-                                    Text = Tag.Name,
+                                    Text = Tag.DisplayName,
                                 },
                                 new OsuTextFlowContainer(t => t.Font = OsuFont.Default.With(size: 14))
                                 {
@@ -600,7 +635,7 @@ namespace osu.Game.Screens.Ranking
                     });
                 }
 
-                public IEnumerable<LocalisableString> FilterTerms => [Tag.Name, Tag.Description];
+                public IEnumerable<LocalisableString> FilterTerms => [Tag.FullName, Tag.Description];
 
                 public bool MatchingFilter { set => Alpha = value ? 1 : 0; }
                 public bool FilteringActive { set { } }

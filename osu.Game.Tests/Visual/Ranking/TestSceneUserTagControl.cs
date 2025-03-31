@@ -3,7 +3,6 @@
 
 using System.Linq;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Cursor;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
@@ -36,6 +35,7 @@ namespace osu.Game.Tests.Visual.Ranking
                             {
                                 Tags =
                                 [
+                                    new APITag { Id = 0, Name = "uncategorised tag", Description = "This probably isn't real but could be and should be handled.", },
                                     new APITag { Id = 1, Name = "song representation/simple", Description = "Accessible and straightforward map design.", },
                                     new APITag { Id = 2, Name = "style/clean", Description = "Visually uncluttered and organised patterns, often involving few overlaps and equal visual spacing between objects.", },
                                     new APITag { Id = 3, Name = "aim/aim control", Description = "Patterns with velocity or direction changes which strongly go against a player's natural movement pattern.", },
@@ -69,15 +69,11 @@ namespace osu.Game.Tests.Visual.Ranking
             });
             AddStep("create control", () =>
             {
-                Child = new PopoverContainer
+                Child = new UserTagControl(Beatmap.Value.BeatmapInfo)
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Child = new UserTagControl(Beatmap.Value.BeatmapInfo)
-                    {
-                        Width = 500,
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                    }
+                    Width = 700,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
                 };
             });
         }
