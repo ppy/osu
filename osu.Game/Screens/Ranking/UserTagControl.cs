@@ -604,6 +604,15 @@ namespace osu.Game.Screens.Ranking
 
                 public bool MatchingFilter { set => Alpha = value ? 1 : 0; }
                 public bool FilteringActive { set { } }
+
+                protected override bool OnMouseDown(MouseDownEvent e)
+                {
+                    bool result = base.OnMouseDown(e);
+                    // slightly dodgy way of overriding the amount of scale-on-click (the default is way too much in this case)
+                    ClearTransforms(targetMember: nameof(Scale));
+                    Content.ScaleTo(0.95f, 2000, Easing.OutQuint);
+                    return result;
+                }
             }
         }
     }
