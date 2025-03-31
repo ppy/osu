@@ -348,7 +348,7 @@ namespace osu.Game.Online.Rooms
 
         public Room(MultiplayerRoom room)
         {
-            RoomID = room.RoomID > 0 ? room.RoomID : null;
+            RoomID = room.RoomID;
             Name = room.Settings.Name;
             Password = room.Settings.Password;
             Type = room.Settings.MatchType;
