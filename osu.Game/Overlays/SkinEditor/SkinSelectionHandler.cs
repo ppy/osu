@@ -147,8 +147,6 @@ namespace osu.Game.Overlays.SkinEditor
 
             yield return originMenu = new OsuMenuItem(SkinEditorStrings.Origin);
 
-            var usingClosestAnchor = GetStateFromSelection(SelectedBlueprints, c => !c.Item.UsesFixedAnchor);
-
             originMenu.Items = createAnchorItems(applyOrigins).ToArray();
 
             yield return new OsuMenuItemSpacer();
