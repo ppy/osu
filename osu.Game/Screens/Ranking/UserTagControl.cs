@@ -17,8 +17,10 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Extensions;
@@ -26,12 +28,12 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Input.Bindings;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Screens.Ranking.Statistics;
 using osuTK;
-using osuTK.Input;
 
 namespace osu.Game.Screens.Ranking
 {
@@ -288,6 +290,10 @@ namespace osu.Game.Screens.Ranking
 
         protected override bool OnClick(ClickEvent e) => true;
 
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
+        {
+        }
+
         private partial class DrawableUserTag : OsuAnimatedButton
         {
             public readonly UserTag UserTag;
@@ -444,7 +450,7 @@ namespace osu.Game.Screens.Ranking
             }
         }
 
-        private partial class TagList : CompositeDrawable
+        private partial class TagList : CompositeDrawable, IKeyBindingHandler<GlobalAction>
         {
             private SearchTextBox searchBox = null!;
             private SearchContainer searchContainer = null!;
@@ -532,20 +538,24 @@ namespace osu.Game.Screens.Ranking
                 }
             }
 
-            protected override bool OnKeyDown(KeyDownEvent e)
+            public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
             {
-                if (e.Key == Key.Enter)
+                if (e.Action == GlobalAction.Select && !e.Repeat)
                 {
                     attemptSelect();
                     return true;
                 }
 
-                return base.OnKeyDown(e);
+                return false;
+            }
+
+            public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
+            {
             }
 
             private void attemptSelect()
             {
-                var visibleItems = searchContainer.OfType<DrawableAddableTag>().Where(d => d.IsPresent).ToArray();
+                var visibleItems = searchContainer.ChildrenOfType<DrawableAddableTag>().Where(d => d.IsPresent).ToArray();
 
                 if (visibleItems.Length == 1)
                     OnSelected?.Invoke(visibleItems.Single().Tag);
