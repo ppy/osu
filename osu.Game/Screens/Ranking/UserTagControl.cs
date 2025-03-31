@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Caching;
@@ -452,6 +453,8 @@ namespace osu.Game.Screens.Ranking
 
             public Action<UserTag>? OnSelected { get; set; }
 
+            private CancellationTokenSource? loadCancellationTokenSource;
+
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
@@ -502,8 +505,14 @@ namespace osu.Game.Screens.Ranking
 
                 AvailableTags.BindCollectionChanged((_, _) =>
                 {
-                    searchContainer.Clear();
-                    searchContainer.ChildrenEnumerable = createItems(AvailableTags.Values);
+                    loadCancellationTokenSource?.Cancel();
+                    loadCancellationTokenSource = new CancellationTokenSource();
+
+                    LoadComponentsAsync(createItems(AvailableTags.Values), loaded =>
+                    {
+                        searchContainer.Clear();
+                        searchContainer.AddRange(loaded);
+                    }, loadCancellationTokenSource.Token);
                 }, true);
                 searchBox.Current.BindValueChanged(_ => searchContainer.SearchTerm = searchBox.Current.Value, true);
             }
