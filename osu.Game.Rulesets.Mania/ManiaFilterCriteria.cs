@@ -34,13 +34,14 @@ namespace osu.Game.Rulesets.Mania
                 case "keys":
                     if (op == Operator.Equal)
                     {
-                        includedKeyCounts.Clear();
-
-                        foreach (string strValue in strValues.Split(','))
+                        // If the filter is empty
+                        if (includedKeyCounts.Count == 20)
                         {
-                            if (int.TryParse(strValue, out int value))
+                            includedKeyCounts.Clear();
+
+                            foreach (string strValue in strValues.Split(','))
                             {
-                                if (value > 0)
+                                if (int.TryParse(strValue, out int value))
                                 {
                                     includedKeyCounts.Add(value);
                                 }
@@ -49,10 +50,24 @@ namespace osu.Game.Rulesets.Mania
                                     return false;
                                 }
                             }
-                            else
+                        }
+                        else
+                        {
+                            HashSet<int> tmp = new HashSet<int>();
+
+                            foreach (string strValue in strValues.Split(','))
                             {
-                                return false;
+                                if (int.TryParse(strValue, out int value))
+                                {
+                                    tmp.Add(value);
+                                }
+                                else
+                                {
+                                    return false;
+                                }
                             }
+
+                            includedKeyCounts.IntersectWith(tmp);
                         }
                     }
                     else if (op == Operator.NotEqual)
@@ -61,14 +76,7 @@ namespace osu.Game.Rulesets.Mania
                         {
                             if (int.TryParse(strValue, out int value))
                             {
-                                if (value > 0)
-                                {
-                                    includedKeyCounts.Remove(value);
-                                }
-                                else
-                                {
-                                    return false;
-                                }
+                                includedKeyCounts.Remove(value);
                             }
                             else
                             {
@@ -79,11 +87,6 @@ namespace osu.Game.Rulesets.Mania
                     else
                     {
                         if (!int.TryParse(strValues, out int value))
-                        {
-                            return false;
-                        }
-
-                        if (value <= 0)
                         {
                             return false;
                         }
@@ -108,6 +111,9 @@ namespace osu.Game.Rulesets.Mania
                     }
 
                     break;
+
+                default:
+                    return false;
             }
 
             return true;
