@@ -90,7 +90,7 @@ namespace osu.Game.Screens.Ranking
                                     {
                                         RelativeSizeAxes = Axes.X,
                                         AutoSizeAxes = Axes.Y,
-                                        Direction = FillDirection.Full,
+                                        Direction = FillDirection.Vertical,
                                         LayoutDuration = 300,
                                         LayoutEasing = Easing.OutQuint,
                                         Spacing = new Vector2(4),
