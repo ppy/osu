@@ -55,6 +55,27 @@ namespace osu.Game.Rulesets.Mania
                             }
                         }
                     }
+                    else if (op == Operator.NotEqual)
+                    {
+                        foreach (string strValue in strValues.Split(','))
+                        {
+                            if (int.TryParse(strValue, out int value))
+                            {
+                                if (value > 0)
+                                {
+                                    includedKeyCounts.Remove(value);
+                                }
+                                else
+                                {
+                                    return false;
+                                }
+                            }
+                            else
+                            {
+                                return false;
+                            }
+                        }
+                    }
                     else
                     {
                         if (!int.TryParse(strValues, out int value))
@@ -81,6 +102,8 @@ namespace osu.Game.Rulesets.Mania
                             case Operator.GreaterOrEqual:
                                 includedKeyCounts.RemoveWhere(k => k < value);
                                 break;
+                            default:
+                                return false;
                         }
                     }
 
