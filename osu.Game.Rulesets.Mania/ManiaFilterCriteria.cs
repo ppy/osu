@@ -17,19 +17,13 @@ namespace osu.Game.Rulesets.Mania
 {
     public class ManiaFilterCriteria : IRulesetFilterCriteria
     {
-        private FilterCriteria.OptionalRange<float> includedKeyCountRange;
-        private readonly HashSet<int> includedKeyCounts = new HashSet<int>();
-        private readonly HashSet<int> excludedKeyCounts = new HashSet<int>();
+        private readonly HashSet<int> includedKeyCounts = Enumerable.Range(1, 20).ToHashSet();
 
         public bool Matches(BeatmapInfo beatmapInfo, FilterCriteria criteria)
         {
-            bool result = !includedKeyCountRange.HasFilter && includedKeyCounts.Count == 0;
             int keyCount = ManiaBeatmapConverter.GetColumnCount(LegacyBeatmapConversionDifficultyInfo.FromBeatmapInfo(beatmapInfo), criteria.Mods);
 
-            result |= (includedKeyCountRange.HasFilter && includedKeyCountRange.IsInRange(keyCount)) || includedKeyCounts.Contains(keyCount);
-            result &= !excludedKeyCounts.Contains(keyCount);
-
-            return result;
+            return includedKeyCounts.Contains(keyCount);
         }
 
         public bool TryParseCustomKeywordCriteria(string key, Operator op, string strValues)
@@ -40,6 +34,8 @@ namespace osu.Game.Rulesets.Mania
                 case "keys":
                     if (op == Operator.Equal)
                     {
+                        includedKeyCounts.Clear();
+
                         foreach (string strValue in strValues.Split(','))
                         {
                             if (int.TryParse(strValue, out int value))
@@ -50,26 +46,53 @@ namespace osu.Game.Rulesets.Mania
                                 }
                                 else
                                 {
-                                    excludedKeyCounts.Add(-value);
+                                    return false;
                                 }
                             }
+                            else
+                            {
+                                return false;
+                            }
                         }
-
-                        return true;
                     }
                     else
                     {
-                        // In this case, the strValues is a string of a single value
-                        return FilterQueryParser.TryUpdateCriteriaRange(ref includedKeyCountRange, op, strValues);
+                        if (!int.TryParse(strValues, out int value))
+                        {
+                            return false;
+                        }
+
+                        if (value <= 0)
+                        {
+                            return false;
+                        }
+
+                        switch (op)
+                        {
+                            case Operator.Less:
+                                includedKeyCounts.RemoveWhere(k => k >= value);
+                                break;
+                            case Operator.LessOrEqual:
+                                includedKeyCounts.RemoveWhere(k => k > value);
+                                break;
+                            case Operator.Greater:
+                                includedKeyCounts.RemoveWhere(k => k <= value);
+                                break;
+                            case Operator.GreaterOrEqual:
+                                includedKeyCounts.RemoveWhere(k => k < value);
+                                break;
+                        }
                     }
+
+                    break;
             }
 
-            return false;
+            return true;
         }
 
         public bool FilterMayChangeFromMods(ValueChangedEvent<IReadOnlyList<Mod>> mods)
         {
-            if (includedKeyCountRange.HasFilter || includedKeyCounts.Count != 0 || excludedKeyCounts.Count != 0)
+            if (includedKeyCounts.Count > 0)
             {
                 // Interpreting as the Mod type is required for equality comparison.
                 HashSet<Mod> oldSet = mods.OldValue.OfType<ManiaKeyMod>().AsEnumerable<Mod>().ToHashSet();
