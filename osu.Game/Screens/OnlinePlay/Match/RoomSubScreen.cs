@@ -27,6 +27,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.OnlinePlay.Match.Components;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
+using osu.Game.Screens.OnlinePlay.Multiplayer.Match;
 using osu.Game.Utils;
 using Container = osu.Framework.Graphics.Containers.Container;
 
@@ -245,10 +246,8 @@ namespace osu.Game.Screens.OnlinePlay.Match
                 }
             };
 
-            LoadComponent(UserModsSelectOverlay = new RoomModSelectOverlay
+            LoadComponent(UserModsSelectOverlay = new MultiplayerUserModSelectOverlay
             {
-                SelectedItem = { BindTarget = SelectedItem },
-                SelectedMods = { BindTarget = UserMods },
                 IsValidMod = _ => false
             });
         }
