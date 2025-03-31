@@ -9,7 +9,9 @@ namespace osu.Game.Screens.Ranking
     public record UserTag
     {
         public long Id { get; }
-        public string Name { get; }
+        public string FullName { get; }
+        public string? GroupName { get; }
+        public string DisplayName { get; }
         public string Description { get; }
 
         public BindableInt VoteCount { get; } = new BindableInt();
@@ -18,8 +20,12 @@ namespace osu.Game.Screens.Ranking
         public UserTag(APITag tag)
         {
             Id = tag.Id;
-            Name = tag.Name;
+            FullName = tag.Name;
             Description = tag.Description;
+
+            string[] splitName = FullName.Split('/');
+            GroupName = splitName.Length > 1 ? splitName[0] : null;
+            DisplayName = splitName[^1];
         }
     }
 }
