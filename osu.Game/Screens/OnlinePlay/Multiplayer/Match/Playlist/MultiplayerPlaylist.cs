@@ -8,7 +8,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 
@@ -111,10 +110,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
                 firstPopulation = false;
             }
 
-            // As a small optimisation, only the ID is required to match the selected item.
-            PlaylistItem? selectedItem = client.Room == null ? null : new PlaylistItem(new APIBeatmap()) { ID = client.Room.Settings.PlaylistItemId };
-            queueList.SelectedItem.Value = selectedItem;
-            historyList.SelectedItem.Value = selectedItem;
+            PlaylistItem? currentItem = client.Room == null ? null : new PlaylistItem(client.Room.CurrentPlaylistItem);
+            queueList.SelectedItem.Value = currentItem;
+            historyList.SelectedItem.Value = currentItem;
         }
 
         private void playlistItemAdded(MultiplayerPlaylistItem item) => Scheduler.Add(() => addItemToLists(item));
