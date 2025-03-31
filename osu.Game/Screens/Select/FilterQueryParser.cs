@@ -130,6 +130,7 @@ namespace osu.Game.Screens.Select
                     return Operator.Equal;
 
                 case "!=":
+                case "!:":
                     return Operator.NotEqual;
 
                 case "<":
