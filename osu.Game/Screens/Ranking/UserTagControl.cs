@@ -76,7 +76,7 @@ namespace osu.Game.Screens.Ranking
                     Padding = new MarginPadding(10),
                     ColumnDimensions =
                     [
-                        new Dimension(GridSizeMode.Absolute, 300),
+                        new Dimension(GridSizeMode.Absolute, 350),
                         new Dimension()
                     ],
                     RowDimensions = [new Dimension(GridSizeMode.AutoSize, minSize: 250)],
@@ -614,7 +614,7 @@ namespace osu.Game.Screens.Ranking
                                     Colour = colours.Lime1,
                                     Anchor = Anchor.CentreRight,
                                     Origin = Anchor.CentreRight,
-                                    Margin = new MarginPadding { Right = 5 },
+                                    Margin = new MarginPadding { Right = 10 },
                                 }
                             }
                         },
