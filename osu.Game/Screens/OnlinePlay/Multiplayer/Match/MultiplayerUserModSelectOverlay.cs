@@ -146,7 +146,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         }
 
         /// <summary>
-        /// Updates the selected mods from the online state if the server is authoritative.
+        /// Updates the selected mods from the online state if there are no changes pending on the server to process.
         /// </summary>
         private void updateFromOnlineState()
         {
