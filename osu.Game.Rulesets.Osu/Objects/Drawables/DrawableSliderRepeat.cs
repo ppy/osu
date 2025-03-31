@@ -95,7 +95,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             this
                 .FadeOut()
                 .Delay(delayFadeIn ? (Slider?.TimePreempt ?? 0) / 3 : 0)
-                .FadeIn(HitObject.RepeatIndex == 0 ? HitObject.TimeFadeIn : animDuration);
+                .FadeIn(150);
         }
 
         protected override void UpdateHitStateTransforms(ArmedState state)
