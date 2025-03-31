@@ -8,11 +8,14 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Caching;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
@@ -43,10 +46,13 @@ namespace osu.Game.Screens.Ranking
         private LoadingLayer loadingLayer = null!;
 
         private BindableList<UserTag> displayedTags { get; } = new BindableList<UserTag>();
-        private BindableList<UserTag> extraTags { get; } = new BindableList<UserTag>();
 
-        private Bindable<APITag[]?> allTags = null!;
+        private Bindable<APITag[]?> apiTags = null!;
+        private BindableDictionary<long, UserTag> allTagsById { get; } = new BindableDictionary<long, UserTag>();
+
         private readonly Bindable<APIBeatmap?> apiBeatmap = new Bindable<APIBeatmap?>();
+
+        private APIRequest? requestInFlight;
 
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
@@ -100,8 +106,8 @@ namespace osu.Game.Screens.Ranking
                             new TagList
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                AvailableTags = { BindTarget = extraTags },
-                                OnSelected = onExtraTagSelected,
+                                AvailableTags = { BindTarget = allTagsById },
+                                OnSelected = toggleVote,
                             }
                         }
                     }
@@ -113,12 +119,12 @@ namespace osu.Game.Screens.Ranking
                 },
             };
 
-            allTags = sessionStatics.GetBindable<APITag[]?>(Static.AllBeatmapTags);
+            apiTags = sessionStatics.GetBindable<APITag[]?>(Static.AllBeatmapTags);
 
-            if (allTags.Value == null)
+            if (apiTags.Value == null)
             {
                 var listTagsRequest = new ListTagsRequest();
-                listTagsRequest.Success += tags => allTags.Value = tags.Tags.ToArray();
+                listTagsRequest.Success += tags => apiTags.Value = tags.Tags.ToArray();
                 api.Queue(listTagsRequest);
             }
 
@@ -127,28 +133,11 @@ namespace osu.Game.Screens.Ranking
             api.Queue(getBeatmapSetRequest);
         }
 
-        private void onExtraTagSelected(UserTag tag)
-        {
-            loadingLayer.Show();
-            extraTags.Remove(tag);
-
-            var req = new AddBeatmapTagRequest(beatmapInfo.OnlineID, tag.Id);
-            req.Success += () =>
-            {
-                tag.Voted.Value = true;
-                tag.VoteCount.Value += 1;
-                displayedTags.Add(tag);
-                loadingLayer.Hide();
-            };
-            req.Failure += _ => extraTags.Add(tag);
-            api.Queue(req);
-        }
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            allTags.BindValueChanged(_ => updateTags());
+            apiTags.BindValueChanged(_ => updateTags());
             apiBeatmap.BindValueChanged(_ => updateTags());
             updateTags();
 
@@ -157,25 +146,26 @@ namespace osu.Game.Screens.Ranking
 
         private void updateTags()
         {
-            if (allTags.Value == null || apiBeatmap.Value?.TopTags == null)
+            if (apiTags.Value == null || apiBeatmap.Value == null)
                 return;
 
-            var allTagsById = allTags.Value.ToDictionary(t => t.Id);
-            var ownTagIds = apiBeatmap.Value.OwnTagIds?.ToHashSet() ?? new HashSet<long>();
+            allTagsById.Clear();
+            allTagsById.AddRange(apiTags.Value.Select(t => new KeyValuePair<long, UserTag>(t.Id, new UserTag(t))));
 
-            foreach (var topTag in apiBeatmap.Value.TopTags)
+            foreach (var topTag in apiBeatmap.Value.TopTags ?? [])
             {
-                if (allTagsById.Remove(topTag.TagId, out var tag))
+                if (allTagsById.TryGetValue(topTag.TagId, out var tag))
                 {
-                    displayedTags.Add(new UserTag(tag)
-                    {
-                        VoteCount = { Value = topTag.VoteCount },
-                        Voted = { Value = ownTagIds.Contains(tag.Id) }
-                    });
+                    tag.VoteCount.Value = topTag.VoteCount;
+                    displayedTags.Add(tag);
                 }
             }
 
-            extraTags.AddRange(allTagsById.Select(t => new UserTag(t.Value)));
+            foreach (long ownTagId in apiBeatmap.Value.OwnTagIds ?? [])
+            {
+                if (allTagsById.TryGetValue(ownTagId, out var tag))
+                    tag.Voted.Value = true;
+            }
 
             loadingLayer.Hide();
         }
@@ -191,7 +181,7 @@ namespace osu.Game.Screens.Ranking
                     for (int i = 0; i < e.NewItems!.Count; i++)
                     {
                         var tag = (UserTag)e.NewItems[i]!;
-                        var drawableTag = new DrawableUserTag(tag);
+                        var drawableTag = new DrawableUserTag(tag) { OnSelected = toggleVote };
                         tagFlow.Insert(tagFlow.Count, drawableTag);
                         tag.VoteCount.BindValueChanged(voteCountChanged, true);
                         layout.Invalidate();
@@ -220,15 +210,59 @@ namespace osu.Game.Screens.Ranking
             }
         }
 
+        private void toggleVote(UserTag tag)
+        {
+            if (requestInFlight != null)
+                return;
+
+            loadingLayer.Show();
+
+            APIRequest request;
+
+            switch (tag.Voted.Value)
+            {
+                case true:
+                    var removeReq = new RemoveBeatmapTagRequest(beatmapInfo.OnlineID, tag.Id);
+                    removeReq.Success += () =>
+                    {
+                        tag.VoteCount.Value -= 1;
+                        tag.Voted.Value = false;
+                    };
+                    request = removeReq;
+                    break;
+
+                case false:
+                    var addReq = new AddBeatmapTagRequest(beatmapInfo.OnlineID, tag.Id);
+                    addReq.Success += () =>
+                    {
+                        tag.VoteCount.Value += 1;
+                        tag.Voted.Value = true;
+                        if (!displayedTags.Contains(tag))
+                            displayedTags.Add(tag);
+                    };
+                    request = addReq;
+                    break;
+            }
+
+            request.Success += () =>
+            {
+                loadingLayer.Hide();
+                requestInFlight = null;
+            };
+            request.Failure += _ =>
+            {
+                loadingLayer.Hide();
+                requestInFlight = null;
+            };
+            api.Queue(requestInFlight = request);
+        }
+
         private void voteCountChanged(ValueChangedEvent<int> _)
         {
             var tagsWithNoVotes = displayedTags.Where(t => t.VoteCount.Value == 0).ToArray();
 
             foreach (var tag in tagsWithNoVotes)
-            {
                 displayedTags.Remove(tag);
-                extraTags.Add(tag);
-            }
 
             layout.Invalidate();
         }
@@ -257,6 +291,8 @@ namespace osu.Game.Screens.Ranking
         {
             public readonly UserTag UserTag;
 
+            public Action<UserTag>? OnSelected { get; set; }
+
             private readonly Bindable<int> voteCount = new Bindable<int>();
             private readonly BindableBool voted = new BindableBool();
             private readonly Bindable<bool> confirmed = new BindableBool();
@@ -266,18 +302,9 @@ namespace osu.Game.Screens.Ranking
             private OsuSpriteText tagCategoryText = null!;
             private OsuSpriteText tagNameText = null!;
             private OsuSpriteText voteCountText = null!;
-            private LoadingSpinner spinner = null!;
 
             [Resolved]
             private OsuColour colours { get; set; } = null!;
-
-            [Resolved]
-            private Bindable<WorkingBeatmap> beatmap { get; set; } = null!;
-
-            [Resolved]
-            private IAPIProvider api { get; set; } = null!;
-
-            private APIRequest? requestInFlight;
 
             public DrawableUserTag(UserTag userTag)
             {
@@ -360,11 +387,6 @@ namespace osu.Game.Screens.Ranking
                                     {
                                         Margin = new MarginPadding { Horizontal = 6, Vertical = 3, },
                                     },
-                                    spinner = new LoadingSpinner(withBox: true)
-                                    {
-                                        Alpha = 0,
-                                        Size = new Vector2(18),
-                                    }
                                 }
                             }
                         }
@@ -417,50 +439,7 @@ namespace osu.Game.Screens.Ranking
                 }, true);
                 FinishTransforms(true);
 
-                Action = () =>
-                {
-                    if (requestInFlight != null)
-                        return;
-
-                    spinner.Show();
-
-                    APIRequest request;
-
-                    switch (voted.Value)
-                    {
-                        case true:
-                            var removeReq = new RemoveBeatmapTagRequest(beatmap.Value.BeatmapInfo.OnlineID, UserTag.Id);
-                            removeReq.Success += () =>
-                            {
-                                voteCount.Value -= 1;
-                                voted.Value = false;
-                            };
-                            request = removeReq;
-                            break;
-
-                        case false:
-                            var addReq = new AddBeatmapTagRequest(beatmap.Value.BeatmapInfo.OnlineID, UserTag.Id);
-                            addReq.Success += () =>
-                            {
-                                voteCount.Value += 1;
-                                voted.Value = true;
-                            };
-                            request = addReq;
-                            break;
-                    }
-
-                    request.Success += () =>
-                    {
-                        spinner.Hide();
-                        requestInFlight = null;
-                    };
-                    request.Failure += _ =>
-                    {
-                        spinner.Hide();
-                        requestInFlight = null;
-                    };
-                    api.Queue(requestInFlight = request);
-                };
+                Action = () => OnSelected?.Invoke(UserTag);
             }
         }
 
@@ -469,7 +448,7 @@ namespace osu.Game.Screens.Ranking
             private SearchTextBox searchBox = null!;
             private SearchContainer searchContainer = null!;
 
-            public BindableList<UserTag> AvailableTags { get; } = new BindableList<UserTag>();
+            public BindableDictionary<long, UserTag> AvailableTags { get; } = new BindableDictionary<long, UserTag>();
 
             public Action<UserTag>? OnSelected { get; set; }
 
@@ -501,12 +480,13 @@ namespace osu.Game.Screens.Ranking
                             new OsuScrollContainer
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Padding = new MarginPadding(10) { Top = 45, },
+                                Padding = new MarginPadding { Top = 40, },
                                 ScrollbarOverlapsContent = false,
                                 Child = searchContainer = new SearchContainer
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
+                                    Padding = new MarginPadding { Horizontal = 10, Bottom = 10 },
                                     Direction = FillDirection.Vertical,
                                     Spacing = new Vector2(10),
                                 }
@@ -523,7 +503,7 @@ namespace osu.Game.Screens.Ranking
                 AvailableTags.BindCollectionChanged((_, _) =>
                 {
                     searchContainer.Clear();
-                    searchContainer.ChildrenEnumerable = createItems(AvailableTags);
+                    searchContainer.ChildrenEnumerable = createItems(AvailableTags.Values);
                 }, true);
                 searchBox.Current.BindValueChanged(_ => searchContainer.SearchTerm = searchBox.Current.Value, true);
             }
@@ -590,6 +570,10 @@ namespace osu.Game.Screens.Ranking
             {
                 public readonly UserTag Tag;
 
+                private Container votedIndicator = null!;
+
+                private readonly Bindable<bool> voted = new Bindable<bool>();
+
                 public DrawableAddableTag(UserTag tag)
                 {
                     Tag = tag;
@@ -609,10 +593,36 @@ namespace osu.Game.Screens.Ranking
                             Colour = colours.Gray6,
                             Depth = float.MaxValue,
                         },
+                        votedIndicator = new Container
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Width = 0.1f,
+                            Anchor = Anchor.CentreRight,
+                            Origin = Anchor.CentreRight,
+                            Depth = float.MaxValue,
+                            Children = new Drawable[]
+                            {
+                                new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Colour = ColourInfo.GradientHorizontal(colours.Lime1.Opacity(0), colours.Lime1.Opacity(0.4f)),
+                                },
+                                new SpriteIcon
+                                {
+                                    Size = new Vector2(16),
+                                    Icon = FontAwesome.Solid.ThumbsUp,
+                                    Colour = colours.Lime1,
+                                    Anchor = Anchor.CentreRight,
+                                    Origin = Anchor.CentreRight,
+                                    Margin = new MarginPadding { Right = 5 },
+                                }
+                            }
+                        },
                         new FillFlowContainer
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
+                            Width = 0.9f,
                             Direction = FillDirection.Vertical,
                             Spacing = new Vector2(2),
                             Padding = new MarginPadding(5),
@@ -633,12 +643,25 @@ namespace osu.Game.Screens.Ranking
                             }
                         }
                     });
+
+                    voted.BindTo(Tag.Voted);
                 }
 
                 public IEnumerable<LocalisableString> FilterTerms => [Tag.FullName, Tag.Description];
 
                 public bool MatchingFilter { set => Alpha = value ? 1 : 0; }
                 public bool FilteringActive { set { } }
+
+                protected override void LoadComplete()
+                {
+                    base.LoadComplete();
+
+                    voted.BindValueChanged(_ =>
+                    {
+                        votedIndicator.FadeTo(voted.Value ? 1 : 0, 250, Easing.OutQuint);
+                    }, true);
+                    FinishTransforms(true);
+                }
 
                 protected override bool OnMouseDown(MouseDownEvent e)
                 {
