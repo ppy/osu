@@ -324,7 +324,7 @@ namespace osu.Game.Screens.Ranking
             {
                 Anchor = Anchor.CentreLeft;
                 Origin = Anchor.CentreLeft;
-                CornerRadius = 8;
+                CornerRadius = 5;
                 Masking = true;
                 EdgeEffect = new EdgeEffectParameters
                 {
