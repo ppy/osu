@@ -18,7 +18,7 @@ using osu.Game.Utils;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 {
-    public class MultiplayerUserModSelectOverlay : UserModSelectOverlay
+    public partial class MultiplayerUserModSelectOverlay : UserModSelectOverlay
     {
         [Resolved]
         private MultiplayerClient client { get; set; } = null!;
