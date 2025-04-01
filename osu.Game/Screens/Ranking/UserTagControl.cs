@@ -77,10 +77,10 @@ namespace osu.Game.Screens.Ranking
                     Padding = new MarginPadding(10),
                     ColumnDimensions =
                     [
-                        new Dimension(GridSizeMode.Absolute, 350),
-                        new Dimension()
+                        new Dimension(),
+                        new Dimension(GridSizeMode.AutoSize)
                     ],
-                    RowDimensions = [new Dimension(GridSizeMode.AutoSize, minSize: 250)],
+                    RowDimensions = [new Dimension(GridSizeMode.AutoSize, minSize: 40)],
                     Content = new[]
                     {
                         new Drawable[]
@@ -97,7 +97,7 @@ namespace osu.Game.Screens.Ranking
                                     {
                                         RelativeSizeAxes = Axes.X,
                                         AutoSizeAxes = Axes.Y,
-                                        Direction = FillDirection.Vertical,
+                                        Direction = FillDirection.Full,
                                         LayoutDuration = 300,
                                         LayoutEasing = Easing.OutQuint,
                                         Spacing = new Vector2(4),
@@ -106,7 +106,6 @@ namespace osu.Game.Screens.Ranking
                             },
                             new TagList
                             {
-                                RelativeSizeAxes = Axes.Both,
                                 AvailableTags = { BindTarget = allTagsById },
                                 OnSelected = toggleVote,
                             }
@@ -436,7 +435,7 @@ namespace osu.Game.Screens.Ranking
                     }
                     else
                     {
-                        mainBackground.FadeColour(colours.Gray4, transition_duration, Easing.OutQuint);
+                        mainBackground.FadeColour(colours.Gray6, transition_duration, Easing.OutQuint);
                         tagCategoryText.FadeColour(Colour4.White, transition_duration, Easing.OutQuint);
                         tagNameText.FadeColour(Colour4.White, transition_duration, Easing.OutQuint);
                         FadeEdgeEffectTo(0f, transition_duration, Easing.OutQuint);
@@ -452,6 +451,7 @@ namespace osu.Game.Screens.Ranking
         {
             private SearchTextBox searchBox = null!;
             private SearchContainer searchContainer = null!;
+            private Container content = null!;
 
             public BindableDictionary<long, UserTag> AvailableTags { get; } = new BindableDictionary<long, UserTag>();
 
@@ -459,47 +459,81 @@ namespace osu.Game.Screens.Ranking
 
             private CancellationTokenSource? loadCancellationTokenSource;
 
+            private readonly BindableBool expanded = new BindableBool();
+
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
-                Masking = true;
-                CornerRadius = 5;
-
+                Margin = new MarginPadding { Left = 30 };
                 InternalChildren = new Drawable[]
                 {
-                    new Box
+                    new OsuClickableContainer
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        Alpha = 0.1f,
+                        AutoSizeAxes = Axes.Both,
+                        Anchor = Anchor.TopLeft,
+                        Origin = Anchor.TopRight,
+                        X = 10,
+                        Masking = true,
+                        CornerRadius = 5,
+                        Children = new Drawable[]
+                        {
+                            new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Colour = colours.Gray5,
+                            },
+                            new SpriteIcon
+                            {
+                                Size = new Vector2(16),
+                                Icon = FontAwesome.Solid.Plus,
+                                Margin = new MarginPadding(10),
+                            }
+                        },
+                        Action = expanded.Toggle,
                     },
                     new Container
                     {
                         RelativeSizeAxes = Axes.Both,
+                        Masking = true,
+                        CornerRadius = 10,
                         Children = new Drawable[]
                         {
-                            searchBox = new SearchTextBox
-                            {
-                                HoldFocus = true,
-                                RelativeSizeAxes = Axes.X,
-                                Depth = float.MinValue,
-                                Y = -2, // hacky compensation for masking issues
-                            },
-                            new OsuScrollContainer
+                            new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Padding = new MarginPadding { Top = 40, },
-                                ScrollbarOverlapsContent = false,
-                                Child = searchContainer = new SearchContainer
+                                Colour = colours.Gray5,
+                            },
+                            content = new Container
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Padding = new MarginPadding(10) { Top = 12 },
+                                Children = new Drawable[]
                                 {
-                                    RelativeSizeAxes = Axes.X,
-                                    AutoSizeAxes = Axes.Y,
-                                    Padding = new MarginPadding { Horizontal = 10, Bottom = 10 },
-                                    Direction = FillDirection.Vertical,
-                                    Spacing = new Vector2(10),
-                                }
-                            }
+                                    searchBox = new SearchTextBox
+                                    {
+                                        HoldFocus = true,
+                                        RelativeSizeAxes = Axes.X,
+                                        Depth = float.MinValue,
+                                        Y = -2, // hacky compensation for masking issues
+                                    },
+                                    new OsuScrollContainer
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        Padding = new MarginPadding { Top = 42, },
+                                        ScrollbarOverlapsContent = false,
+                                        Child = searchContainer = new SearchContainer
+                                        {
+                                            RelativeSizeAxes = Axes.X,
+                                            AutoSizeAxes = Axes.Y,
+                                            Padding = new MarginPadding { Right = 5, Bottom = 10 },
+                                            Direction = FillDirection.Vertical,
+                                            Spacing = new Vector2(10),
+                                        }
+                                    }
+                                },
+                            },
                         },
-                    }
+                    },
                 };
             }
 
@@ -519,6 +553,25 @@ namespace osu.Game.Screens.Ranking
                     }, loadCancellationTokenSource.Token);
                 }, true);
                 searchBox.Current.BindValueChanged(_ => searchContainer.SearchTerm = searchBox.Current.Value, true);
+                expanded.BindValueChanged(_ =>
+                {
+                    const float transition_duration = 250;
+
+                    if (expanded.Value)
+                    {
+                        this.ResizeWidthTo(400, transition_duration, Easing.OutQuint);
+                        content.FadeIn(250, Easing.OutQuint);
+                        RelativeSizeAxes = Axes.None;
+                        this.ResizeHeightTo(300, transition_duration, Easing.OutQuint);
+                    }
+                    else
+                    {
+                        this.ResizeWidthTo(10, transition_duration, Easing.OutQuint);
+                        content.FadeOut(250, Easing.OutQuint);
+                        RelativeSizeAxes = Axes.Y;
+                        this.ResizeHeightTo(1, transition_duration, Easing.OutQuint);
+                    }
+                }, true);
             }
 
             private IEnumerable<Drawable> createItems(IEnumerable<UserTag> tags)
@@ -611,7 +664,7 @@ namespace osu.Game.Screens.Ranking
                         new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = colours.Gray6,
+                            Colour = colours.Gray7,
                             Depth = float.MaxValue,
                         },
                         new Container
