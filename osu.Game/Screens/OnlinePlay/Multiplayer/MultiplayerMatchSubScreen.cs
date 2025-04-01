@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -11,9 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
-using osu.Framework.Threading;
 using osu.Game.Beatmaps;
-using osu.Game.Configuration;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Online;
 using osu.Game.Online.API;
@@ -23,7 +20,6 @@ using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Dialog;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Match;
 using osu.Game.Screens.OnlinePlay.Match.Components;
@@ -64,7 +60,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             base.LoadComplete();
 
             BeatmapAvailability.BindValueChanged(updateBeatmapAvailability, true);
-            UserMods.BindValueChanged(onUserModsChanged);
 
             client.LoadRequested += onLoadRequested;
             client.RoomUpdated += onRoomUpdated;
@@ -306,35 +301,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         protected override void PartRoom() => client.LeaveRoom();
 
-        private ModSettingChangeTracker? modSettingChangeTracker;
-        private ScheduledDelegate? debouncedModSettingsUpdate;
-
-        private void onUserModsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)
-        {
-            modSettingChangeTracker?.Dispose();
-
-            if (client.Room == null)
-                return;
-
-            client.ChangeUserMods(mods.NewValue).FireAndForget();
-
-            modSettingChangeTracker = new ModSettingChangeTracker(mods.NewValue);
-            modSettingChangeTracker.SettingChanged += onModSettingsChanged;
-        }
-
-        private void onModSettingsChanged(Mod mod)
-        {
-            // Debounce changes to mod settings so as to not thrash the network.
-            debouncedModSettingsUpdate?.Cancel();
-            debouncedModSettingsUpdate = Scheduler.AddDelayed(() =>
-            {
-                if (client.Room == null)
-                    return;
-
-                client.ChangeUserMods(UserMods.Value).FireAndForget();
-            }, 500);
-        }
-
         private void updateBeatmapAvailability(ValueChangedEvent<BeatmapAvailability> availability)
         {
             if (client.Room == null)
@@ -462,8 +428,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 client.RoomUpdated -= onRoomUpdated;
                 client.LoadRequested -= onLoadRequested;
             }
-
-            modSettingChangeTracker?.Dispose();
         }
 
         public partial class AddItemButton : PurpleRoundedButton
