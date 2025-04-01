@@ -9,10 +9,8 @@ using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Caching;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
@@ -589,7 +587,8 @@ namespace osu.Game.Screens.Ranking
             {
                 public readonly UserTag Tag;
 
-                private Container votedIndicator = null!;
+                private Box votedBackground = null!;
+                private SpriteIcon votedIcon = null!;
 
                 private readonly Bindable<bool> voted = new Bindable<bool>();
 
@@ -601,8 +600,11 @@ namespace osu.Game.Screens.Ranking
                     AutoSizeAxes = Axes.Y;
                 }
 
+                [Resolved]
+                private OsuColour colours { get; set; } = null!;
+
                 [BackgroundDependencyLoader]
-                private void load(OsuColour colours)
+                private void load()
                 {
                     Content.AddRange(new Drawable[]
                     {
@@ -612,28 +614,25 @@ namespace osu.Game.Screens.Ranking
                             Colour = colours.Gray6,
                             Depth = float.MaxValue,
                         },
-                        votedIndicator = new Container
+                        new Container
                         {
-                            RelativeSizeAxes = Axes.Both,
-                            Width = 0.1f,
+                            RelativeSizeAxes = Axes.Y,
+                            Width = 30,
                             Anchor = Anchor.CentreRight,
                             Origin = Anchor.CentreRight,
                             Depth = float.MaxValue,
                             Children = new Drawable[]
                             {
-                                new Box
+                                votedBackground = new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Colour = ColourInfo.GradientHorizontal(colours.Lime1.Opacity(0), colours.Lime1.Opacity(0.4f)),
                                 },
-                                new SpriteIcon
+                                votedIcon = new SpriteIcon
                                 {
                                     Size = new Vector2(16),
                                     Icon = FontAwesome.Solid.ThumbsUp,
-                                    Colour = colours.Lime1,
-                                    Anchor = Anchor.CentreRight,
-                                    Origin = Anchor.CentreRight,
-                                    Margin = new MarginPadding { Right = 10 },
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
                                 }
                             }
                         },
@@ -641,10 +640,9 @@ namespace osu.Game.Screens.Ranking
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            Width = 0.9f,
                             Direction = FillDirection.Vertical,
                             Spacing = new Vector2(2),
-                            Padding = new MarginPadding(5),
+                            Padding = new MarginPadding(5) { Right = 35 },
                             Children = new Drawable[]
                             {
                                 new OsuTextFlowContainer(t => t.Font = OsuFont.Default.With(weight: FontWeight.Bold))
@@ -677,7 +675,8 @@ namespace osu.Game.Screens.Ranking
 
                     voted.BindValueChanged(_ =>
                     {
-                        votedIndicator.FadeTo(voted.Value ? 1 : 0, 250, Easing.OutQuint);
+                        votedBackground.FadeColour(voted.Value ? colours.Lime2 : colours.Gray2, 250, Easing.OutQuint);
+                        votedIcon.FadeColour(voted.Value ? Colour4.Black : Colour4.White, 250, Easing.OutQuint);
                     }, true);
                     FinishTransforms(true);
                 }
