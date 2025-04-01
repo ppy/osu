@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using JetBrains.Annotations;
+using System;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -12,6 +13,8 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osuTK;
 using osuTK.Graphics;
+using osu.Game.Localisation.SkinComponents;
+using osu.Game.Overlays.Settings;
 
 namespace osu.Game.Skinning.Components
 {
@@ -34,6 +37,20 @@ namespace osu.Game.Skinning.Components
             Precision = 0.01f,
         };
 
+        [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.CornerRadius), nameof(SkinnableComponentStrings.CornerRadiusDescription), SettingControlType = typeof(SettingsPercentageSlider<float>))]
+        public new BindableFloat CornerRadius { get; } = new BindableFloat(0.20f)
+        {
+            MinValue = 0,
+            MaxValue=0.5f,
+            Precision = 0.01f,
+        };
+
+        [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.Colour), nameof(SkinnableComponentStrings.ColourDescription))]
+        public BindableColour4 AccentColour { get; } = new BindableColour4(Colour4.White);
+
+        [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.TextElementText), nameof(SkinnableComponentStrings.TextElementTextDescription))]
+        public Bindable<string> Text { get; } = new Bindable<string>("Big Black Box");
+
         private readonly Box box;
         private readonly OsuSpriteText text;
         private readonly OsuTextFlowContainer disclaimer;
@@ -43,8 +60,6 @@ namespace osu.Game.Skinning.Components
             Size = new Vector2(250);
 
             Masking = true;
-            CornerRadius = 20;
-            CornerExponent = 5;
 
             InternalChildren = new Drawable[]
             {
@@ -55,7 +70,6 @@ namespace osu.Game.Skinning.Components
                 },
                 text = new OsuSpriteText
                 {
-                    Text = "Big Black Box",
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Font = OsuFont.Default.With(size: 40)
@@ -71,11 +85,14 @@ namespace osu.Game.Skinning.Components
                     TextAnchor = Anchor.TopCentre,
                 }
             };
+            text.Current.BindTo(Text);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            AccentColour.BindValueChanged(_ => Colour = AccentColour.Value, true);
 
             BoxAlpha.BindValueChanged(alpha => box.Alpha = alpha.NewValue, true);
             TextSpin.BindValueChanged(spin =>
@@ -87,6 +104,12 @@ namespace osu.Game.Skinning.Components
             }, true);
 
             disclaimer.FadeOutFromOne(5000, Easing.InQuint);
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+            base.CornerRadius = CornerRadius.Value * Math.Min(DrawWidth, DrawHeight);
         }
     }
 }
