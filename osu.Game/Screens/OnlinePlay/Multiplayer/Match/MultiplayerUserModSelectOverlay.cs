@@ -10,14 +10,15 @@ using osu.Framework.Threading;
 using osu.Game.Configuration;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
+using osu.Game.Overlays;
+using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Screens.OnlinePlay.Match;
 using osu.Game.Utils;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 {
-    public class MultiplayerUserModSelectOverlay : RoomModSelectOverlay
+    public class MultiplayerUserModSelectOverlay : UserModSelectOverlay
     {
         [Resolved]
         private MultiplayerClient client { get; set; } = null!;
@@ -28,26 +29,22 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         private ModSettingChangeTracker? modSettingChangeTracker;
         private ScheduledDelegate? debouncedModSettingsUpdate;
 
+        public MultiplayerUserModSelectOverlay()
+            : base(OverlayColourScheme.Plum)
+        {
+        }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            IsValidMod = _ => false;
-
             client.RoomUpdated += onRoomUpdated;
-
-            SelectedItem.BindValueChanged(_ => updateSpecifics());
-            SelectedMods.BindValueChanged(_ => updateSpecifics());
             SelectedMods.BindValueChanged(onSelectedModsChanged);
+
+            updateValidMods();
         }
 
-        private void onRoomUpdated()
-        {
-            if (client.Room == null)
-                return;
-
-            SelectedItem.Value = new PlaylistItem(client.Room.CurrentPlaylistItem);
-        }
+        private void onRoomUpdated() => Scheduler.AddOnce(updateValidMods);
 
         private void onSelectedModsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)
         {
@@ -73,7 +70,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             };
         }
 
-        private void updateSpecifics()
+        private void updateValidMods()
         {
             if (client.Room == null || client.LocalUser == null)
                 return;
@@ -93,6 +90,16 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             Mod[] newUserMods = SelectedMods.Value.Where(m => allowedMods.Any(a => m.GetType() == a.GetType())).ToArray();
             if (!newUserMods.SequenceEqual(SelectedMods.Value))
                 SelectedMods.Value = newUserMods;
+        }
+
+        protected override IReadOnlyList<Mod> ComputeActiveMods()
+        {
+            if (client.Room == null || client.LocalUser == null)
+                return [];
+
+            MultiplayerPlaylistItem currentItem = client.Room.CurrentPlaylistItem;
+            Ruleset ruleset = rulesets.GetRuleset(client.LocalUser.RulesetId ?? currentItem.RulesetID)!.CreateInstance();
+            return currentItem.RequiredMods.Select(m => m.ToMod(ruleset)).Concat(base.ComputeActiveMods()).ToArray();
         }
 
         protected override void Dispose(bool isDisposing)
