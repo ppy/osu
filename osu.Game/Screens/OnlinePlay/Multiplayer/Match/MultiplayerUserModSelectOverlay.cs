@@ -90,6 +90,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             Mod[] newUserMods = SelectedMods.Value.Where(m => allowedMods.Any(a => m.GetType() == a.GetType())).ToArray();
             if (!newUserMods.SequenceEqual(SelectedMods.Value))
                 SelectedMods.Value = newUserMods;
+
+            ActiveMods.Value = ComputeActiveMods();
         }
 
         protected override IReadOnlyList<Mod> ComputeActiveMods()
