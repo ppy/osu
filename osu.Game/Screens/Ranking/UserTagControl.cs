@@ -329,7 +329,7 @@ namespace osu.Game.Screens.Ranking
                 EdgeEffect = new EdgeEffectParameters
                 {
                     Colour = colours.Lime1,
-                    Radius = 5,
+                    Radius = 6,
                     Type = EdgeEffectType.Glow,
                 };
                 Content.AddRange(new Drawable[]
@@ -432,7 +432,7 @@ namespace osu.Game.Screens.Ranking
                         mainBackground.FadeColour(colours.Lime2, transition_duration, Easing.OutQuint);
                         tagCategoryText.FadeColour(Colour4.Black, transition_duration, Easing.OutQuint);
                         tagNameText.FadeColour(Colour4.Black, transition_duration, Easing.OutQuint);
-                        FadeEdgeEffectTo(0.5f, transition_duration, Easing.OutQuint);
+                        FadeEdgeEffectTo(0.3f, transition_duration, Easing.OutQuint);
                     }
                     else
                     {
