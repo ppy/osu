@@ -59,8 +59,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 // This is on the basis that in a high density environment you can rely more on patterns and muscle memory
                 // Scale by velocity and drop the nerf the higher the density difficulty
                 double futureObjectDifficulty = retrieveCurrentVisibleObjects(currObj).Count * currVelocity;
-                futureObjectDifficulty = 1 + DifficultyCalculationUtils.BellCurve(futureObjectDifficulty, 6, 5, 4);
-                preemptDifficulty /= futureObjectDifficulty;
+                // Console.Out.WriteLine(futureObjectDifficulty);
+                futureObjectDifficulty = 1 + DifficultyCalculationUtils.BellCurve(futureObjectDifficulty, 4.5, 2 + 0.5 * futureObjectDifficulty, 4) - 0.06 * futureObjectDifficulty;
+                preemptDifficulty /= Math.Max(0.25, futureObjectDifficulty);
                 preemptDifficulty *= angleNerfFactor;
             }
 
