@@ -91,7 +91,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             if (!newUserMods.SequenceEqual(SelectedMods.Value))
                 SelectedMods.Value = newUserMods;
 
-            ActiveMods.Value = ComputeActiveMods();
+            // The active mods include the playlist item's required mods which change separately from the selected mods.
+            IReadOnlyList<Mod> newActiveMods = ComputeActiveMods();
+            if (!newActiveMods.SequenceEqual(ActiveMods.Value))
+                ActiveMods.Value = ComputeActiveMods();
         }
 
         protected override IReadOnlyList<Mod> ComputeActiveMods()
