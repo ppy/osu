@@ -148,12 +148,14 @@ namespace osu.Game.Screens.Ranking
             if (allTags.Value == null || apiBeatmap.Value?.TopTags == null)
                 return;
 
-            var allTagsById = allTags.Value.ToDictionary(t => t.Id);
+            var relevantTagsById = allTags.Value
+                                          .Where(tag => tag.RulesetId == null || tag.RulesetId == beatmapInfo.Ruleset.OnlineID)
+                                          .ToDictionary(t => t.Id);
             var ownTagIds = apiBeatmap.Value.OwnTagIds?.ToHashSet() ?? new HashSet<long>();
 
             foreach (var topTag in apiBeatmap.Value.TopTags)
             {
-                if (allTagsById.Remove(topTag.TagId, out var tag))
+                if (relevantTagsById.Remove(topTag.TagId, out var tag))
                 {
                     displayedTags.Add(new UserTag(tag)
                     {
@@ -163,7 +165,7 @@ namespace osu.Game.Screens.Ranking
                 }
             }
 
-            extraTags.AddRange(allTagsById.Select(t => new UserTag(t.Value)));
+            extraTags.AddRange(relevantTagsById.Select(t => new UserTag(t.Value)));
 
             loadingLayer.Hide();
         }
