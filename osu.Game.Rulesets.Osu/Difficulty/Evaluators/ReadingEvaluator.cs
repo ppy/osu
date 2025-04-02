@@ -72,12 +72,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 hiddenDifficulty += 0.2;
 
                 double timeSpentInvisible = getDurationSpentInvisible(currObj) / currObj.ClockRate;
-                // Nerf hidden difficulty less the more past object difficulty you have
-                // Cap said difficulty because after a certain point hidden becomes memory
-                double timeDifficultyFactor = 9000 / Math.Min(pastObjectDifficultyInfluence, 7);
 
-                // Clamp objects because after a certain point hidden density is mainly memory
-                double visibleObjectFactor = Math.Min(retrieveCurrentVisibleObjects(currObj).Count, 7);
+                // Nerf hidden difficulty less the more past object difficulty you have
+                double timeDifficultyFactor = 9000 / pastObjectDifficultyInfluence;
+
+                // Cap objects because after a certain point hidden density is mainly memory
+                double visibleObjectFactor = Math.Min(retrieveCurrentVisibleObjects(currObj).Count, 8);
 
                 // The longer an object is hidden, the more velocity should matter
                 hiddenDifficulty += visibleObjectFactor * timeSpentInvisible * Math.Max(1, currVelocity) / timeDifficultyFactor;
