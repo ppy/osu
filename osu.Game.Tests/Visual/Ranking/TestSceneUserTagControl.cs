@@ -8,6 +8,8 @@ using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Taiko;
 using osu.Game.Screens.Ranking;
 
 namespace osu.Game.Tests.Visual.Ranking
@@ -19,10 +21,6 @@ namespace osu.Game.Tests.Visual.Ranking
         [SetUpSteps]
         public void SetUpSteps()
         {
-            AddStep("set up working beatmap", () =>
-            {
-                Beatmap.Value.BeatmapInfo.OnlineID = 42;
-            });
             AddStep("set up network requests", () =>
             {
                 dummyAPI.HandleRequest = request =>
@@ -40,6 +38,7 @@ namespace osu.Game.Tests.Visual.Ranking
                                     new APITag { Id = 2, Name = "style/clean", Description = "Visually uncluttered and organised patterns, often involving few overlaps and equal visual spacing between objects.", },
                                     new APITag { Id = 3, Name = "aim/aim control", Description = "Patterns with velocity or direction changes which strongly go against a player's natural movement pattern.", },
                                     new APITag { Id = 4, Name = "tap/bursts", Description = "Patterns requiring continuous movement and alternating, typically 9 notes or less.", },
+                                    new APITag { Id = 5, Name = "style/mono-heavy", Description = "Features monos used in large amounts.", RulesetId = 1, },
                                 ]
                             }), 500);
                             return true;
@@ -67,15 +66,30 @@ namespace osu.Game.Tests.Visual.Ranking
                     return false;
                 };
             });
-            AddStep("create control", () =>
+            AddStep("show for osu! beatmap", () =>
             {
-                Child = new UserTagControl(Beatmap.Value.BeatmapInfo)
-                {
-                    Width = 700,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                };
+                var working = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
+                working.BeatmapInfo.OnlineID = 42;
+                Beatmap.Value = working;
+                recreateControl();
             });
+            AddStep("show for taiko beatmap", () =>
+            {
+                var working = CreateWorkingBeatmap(new TaikoRuleset().RulesetInfo);
+                working.BeatmapInfo.OnlineID = 44;
+                Beatmap.Value = working;
+                recreateControl();
+            });
+        }
+
+        private void recreateControl()
+        {
+            Child = new UserTagControl(Beatmap.Value.BeatmapInfo)
+            {
+                Width = 700,
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+            };
         }
     }
 }

@@ -49,7 +49,7 @@ namespace osu.Game.Screens.Ranking
         private BindableList<UserTag> displayedTags { get; } = new BindableList<UserTag>();
 
         private Bindable<APITag[]?> apiTags = null!;
-        private BindableDictionary<long, UserTag> allTagsById { get; } = new BindableDictionary<long, UserTag>();
+        private BindableDictionary<long, UserTag> relevantTagsById { get; } = new BindableDictionary<long, UserTag>();
 
         private readonly Bindable<APIBeatmap?> apiBeatmap = new Bindable<APIBeatmap?>();
 
@@ -106,7 +106,7 @@ namespace osu.Game.Screens.Ranking
                             },
                             new TagList
                             {
-                                AvailableTags = { BindTarget = allTagsById },
+                                AvailableTags = { BindTarget = relevantTagsById },
                                 OnSelected = toggleVote,
                             }
                         }
@@ -149,12 +149,14 @@ namespace osu.Game.Screens.Ranking
             if (apiTags.Value == null || apiBeatmap.Value == null)
                 return;
 
-            allTagsById.Clear();
-            allTagsById.AddRange(apiTags.Value.Select(t => new KeyValuePair<long, UserTag>(t.Id, new UserTag(t))));
+            relevantTagsById.Clear();
+            relevantTagsById.AddRange(apiTags.Value
+                                             .Where(t => t.RulesetId == null || t.RulesetId == beatmapInfo.Ruleset.OnlineID)
+                                             .Select(t => new KeyValuePair<long, UserTag>(t.Id, new UserTag(t))));
 
             foreach (var topTag in apiBeatmap.Value.TopTags ?? [])
             {
-                if (allTagsById.TryGetValue(topTag.TagId, out var tag))
+                if (relevantTagsById.TryGetValue(topTag.TagId, out var tag))
                 {
                     tag.VoteCount.Value = topTag.VoteCount;
                     displayedTags.Add(tag);
@@ -163,7 +165,7 @@ namespace osu.Game.Screens.Ranking
 
             foreach (long ownTagId in apiBeatmap.Value.OwnTagIds ?? [])
             {
-                if (allTagsById.TryGetValue(ownTagId, out var tag))
+                if (relevantTagsById.TryGetValue(ownTagId, out var tag))
                     tag.Voted.Value = true;
             }
 
