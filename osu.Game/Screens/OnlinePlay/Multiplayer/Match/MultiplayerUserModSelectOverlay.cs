@@ -44,7 +44,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             updateValidMods();
         }
 
-        private void onRoomUpdated() => Scheduler.AddOnce(updateValidMods);
+        private void onRoomUpdated()
+        {
+            // Importantly, this is not scheduled because the client must not skip intermediate server states to validate the allowed mods.
+            updateValidMods();
+        }
 
         private void onSelectedModsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)
         {
