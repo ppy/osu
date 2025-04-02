@@ -37,6 +37,7 @@ namespace osu.Game.Skinning.Components
             Precision = 0.01f,
         };
 
+        //corner radius
         [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.CornerRadius), nameof(SkinnableComponentStrings.CornerRadiusDescription), SettingControlType = typeof(SettingsPercentageSlider<float>))]
         public new BindableFloat CornerRadius { get; } = new BindableFloat(0.20f)
         {
@@ -45,11 +46,17 @@ namespace osu.Game.Skinning.Components
             Precision = 0.01f,
         };
 
+        //box color
         [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.Colour), nameof(SkinnableComponentStrings.ColourDescription))]
-        public BindableColour4 AccentColour { get; } = new BindableColour4(Colour4.White);
+        public BindableColour4 AccentColour { get; } = new BindableColour4(Colour4.Black);
 
+        //text
         [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.TextElementText), nameof(SkinnableComponentStrings.TextElementTextDescription))]
         public Bindable<string> Text { get; } = new Bindable<string>("Big Black Box");
+
+        //text color
+        [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.TextColour), nameof(SkinnableComponentStrings.TextColourDescription))]
+        public BindableColour4 TextColour { get; } = new BindableColour4(Colour4.White);
 
         private readonly Box box;
         private readonly OsuSpriteText text;
@@ -76,7 +83,7 @@ namespace osu.Game.Skinning.Components
                 },
                 disclaimer = new OsuTextFlowContainer(st => st.Font = OsuFont.Default.With(size: 10))
                 {
-                    Text = "This is intended to be a test component and may disappear in the future!",
+                    Text = "Test component that you can do whatever with; have fun!",
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Margin = new MarginPadding(10),
@@ -92,7 +99,9 @@ namespace osu.Game.Skinning.Components
         {
             base.LoadComplete();
 
-            AccentColour.BindValueChanged(_ => Colour = AccentColour.Value, true);
+            AccentColour.BindValueChanged(_ => box.Colour = AccentColour.Value, true);
+
+            TextColour.BindValueChanged(_ => text.Colour = TextColour.Value, true);
 
             BoxAlpha.BindValueChanged(alpha => box.Alpha = alpha.NewValue, true);
             TextSpin.BindValueChanged(spin =>
