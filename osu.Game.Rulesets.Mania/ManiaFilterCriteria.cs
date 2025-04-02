@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.Formats;
 using osu.Game.Rulesets.Filter;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Mods;
@@ -17,7 +18,7 @@ namespace osu.Game.Rulesets.Mania
 {
     public class ManiaFilterCriteria : IRulesetFilterCriteria
     {
-        private readonly HashSet<int> includedKeyCounts = Enumerable.Range(1, 20).ToHashSet();
+        private readonly HashSet<int> includedKeyCounts = Enumerable.Range(1, LegacyBeatmapDecoder.MAX_MANIA_KEY_COUNT).ToHashSet();
 
         public bool Matches(BeatmapInfo beatmapInfo, FilterCriteria criteria)
         {
@@ -32,85 +33,57 @@ namespace osu.Game.Rulesets.Mania
             {
                 case "key":
                 case "keys":
-                    if (op == Operator.Equal)
-                    {
-                        // If the filter is empty
-                        if (includedKeyCounts.Count == 20)
-                        {
-                            includedKeyCounts.Clear();
+                {
+                    var keyCounts = new HashSet<int>();
 
-                            foreach (string strValue in strValues.Split(','))
-                            {
-                                if (int.TryParse(strValue, out int value))
-                                {
-                                    includedKeyCounts.Add(value);
-                                }
-                                else
-                                {
-                                    return false;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            HashSet<int> tmp = new HashSet<int>();
-
-                            foreach (string strValue in strValues.Split(','))
-                            {
-                                if (int.TryParse(strValue, out int value))
-                                {
-                                    tmp.Add(value);
-                                }
-                                else
-                                {
-                                    return false;
-                                }
-                            }
-
-                            includedKeyCounts.IntersectWith(tmp);
-                        }
-                    }
-                    else if (op == Operator.NotEqual)
+                    foreach (string strValue in strValues.Split(','))
                     {
-                        foreach (string strValue in strValues.Split(','))
-                        {
-                            if (int.TryParse(strValue, out int value))
-                            {
-                                includedKeyCounts.Remove(value);
-                            }
-                            else
-                            {
-                                return false;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        if (!int.TryParse(strValues, out int value))
-                        {
+                        if (!int.TryParse(strValue, out int keyCount))
                             return false;
-                        }
 
-                        switch (op)
-                        {
-                            case Operator.Less:
-                                includedKeyCounts.RemoveWhere(k => k >= value);
-                                break;
-                            case Operator.LessOrEqual:
-                                includedKeyCounts.RemoveWhere(k => k > value);
-                                break;
-                            case Operator.Greater:
-                                includedKeyCounts.RemoveWhere(k => k <= value);
-                                break;
-                            case Operator.GreaterOrEqual:
-                                includedKeyCounts.RemoveWhere(k => k < value);
-                                break;
-                            default:
-                                return false;
-                        }
+                        keyCounts.Add(keyCount);
                     }
 
-                    break;
+                    int? singleKeyCount = keyCounts.Count == 1 ? keyCounts.Single() : null;
+
+                    switch (op)
+                    {
+                        case Operator.Equal:
+                            includedKeyCounts.IntersectWith(keyCounts);
+                            return true;
+
+                        case Operator.NotEqual:
+                            includedKeyCounts.ExceptWith(keyCounts);
+                            return true;
+
+                        case Operator.Less:
+                            if (singleKeyCount == null) return false;
+
+                            includedKeyCounts.RemoveWhere(k => k >= singleKeyCount.Value);
+                            return true;
+
+                        case Operator.LessOrEqual:
+                            if (singleKeyCount == null) return false;
+
+                            includedKeyCounts.RemoveWhere(k => k > singleKeyCount.Value);
+                            return true;
+
+                        case Operator.Greater:
+                            if (singleKeyCount == null) return false;
+
+                            includedKeyCounts.RemoveWhere(k => k <= singleKeyCount.Value);
+                            return true;
+
+                        case Operator.GreaterOrEqual:
+                            if (singleKeyCount == null) return false;
+
+                            includedKeyCounts.RemoveWhere(k => k < singleKeyCount.Value);
+                            return true;
+
+                        default:
+                            return false;
+                    }
+                }
 
                 default:
                     return false;
@@ -121,7 +94,7 @@ namespace osu.Game.Rulesets.Mania
 
         public bool FilterMayChangeFromMods(ValueChangedEvent<IReadOnlyList<Mod>> mods)
         {
-            if (includedKeyCounts.Count != 20)
+            if (includedKeyCounts.Count != LegacyBeatmapDecoder.MAX_MANIA_KEY_COUNT)
             {
                 // Interpreting as the Mod type is required for equality comparison.
                 HashSet<Mod> oldSet = mods.OldValue.OfType<ManiaKeyMod>().AsEnumerable<Mod>().ToHashSet();
