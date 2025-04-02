@@ -53,14 +53,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             if (currApproachRate < 500)
             {
-                preemptDifficulty += Math.Pow(500 - currApproachRate, 2.1) / 35000;
-
-                // Buff spacing.
-                preemptDifficulty *= currVelocity;
+                preemptDifficulty += Math.Pow(500 - currApproachRate, 2.5) / 130000;
 
                 // Nerf preempt difficulty with density, lower density means more difficulty
                 // This is on the basis that in a high density environment you can rely more on patterns and muscle memory
-                preemptDifficulty /= Math.Max(1, retrieveCurrentVisibleObjects(currObj).Count);
+                // Scale by velocity and drop the nerf the higher the density difficulty
+                double futureObjectDifficulty = retrieveCurrentVisibleObjects(currObj).Count * currVelocity;
+                futureObjectDifficulty = 1 + DifficultyCalculationUtils.BellCurve(futureObjectDifficulty, 6, 5, 4);
+                preemptDifficulty /= futureObjectDifficulty;
                 preemptDifficulty *= angleNerfFactor;
             }
 
