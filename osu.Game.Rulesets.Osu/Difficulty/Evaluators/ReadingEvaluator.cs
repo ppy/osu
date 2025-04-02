@@ -25,6 +25,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             var currObj = (OsuDifficultyHitObject)current;
             double currVelocity = currObj.LazyJumpDistance / currObj.StrainTime;
+            double angleNerfFactor = getConstantAngleNerfFactor(currObj);
 
             double pastObjectDifficultyInfluence = 1.0;
 
@@ -60,6 +61,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 // Nerf preempt difficulty with density, lower density means more difficulty
                 // This is on the basis that in a high density environment you can rely more on patterns and muscle memory
                 preemptDifficulty /= Math.Max(1, retrieveCurrentVisibleObjects(currObj).Count);
+                preemptDifficulty *= angleNerfFactor;
             }
 
             double hiddenDifficulty = 0.0;
@@ -80,16 +82,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 // The longer an object is hidden, the more velocity should matter
                 hiddenDifficulty += visibleObjectFactor * timeSpentInvisible * Math.Max(1, currVelocity) / timeDifficultyFactor;
 
+                hiddenDifficulty *= angleNerfFactor;
+
                 // Buff perfect stacks
-                hiddenDifficulty += currObj.LazyJumpDistance == 0 ? 4 : 0;
+                hiddenDifficulty += currObj.LazyJumpDistance == 0 ? 2 : 0;
             }
 
             // Award only denser than average maps
             double noteDensityDifficulty = Math.Max(0, pastObjectDifficultyInfluence - 2.8);
+            noteDensityDifficulty *= angleNerfFactor;
 
             double difficulty = preemptDifficulty + hiddenDifficulty + noteDensityDifficulty;
-
-            difficulty *= getConstantAngleNerfFactor(currObj);
 
             return difficulty;
         }
