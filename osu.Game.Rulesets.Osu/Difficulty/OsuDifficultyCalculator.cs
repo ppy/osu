@@ -59,24 +59,21 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             var flashlight = skills.OfType<Flashlight>().SingleOrDefault();
             double flashlightRating = flashlight == null ? 0.0 : Math.Sqrt(flashlight.DifficultyValue()) * difficulty_multiplier;
 
-            // Warning - this is very debatable but I think it's reasonable to assume that if map has 10 star flowaim difficulty - player who plays it must have at least 6 star snapaim skill
-            snapAimRating = Math.Max(snapAimRating, flowAimRating * 0.6);
-
             if (mods.Any(m => m is OsuModTouchDevice))
             {
-                aimRating = Math.Pow(aimRating, 0.8);
+                aimRating = Math.Pow(aimRating, 0.83);
+                aimRatingNoSliders = Math.Pow(aimRatingNoSliders, 0.83);
+                snapAimRating = Math.Pow(snapAimRating, 0.83);
+
                 flashlightRating = Math.Pow(flashlightRating, 0.8);
             }
-
             if (mods.Any(h => h is OsuModRelax))
             {
                 // Don't punish slideraim as much
                 double slideraim = aimRating - aimRatingNoSliders;
                 aimRatingNoSliders *= 0.88;
                 aimRating = aimRatingNoSliders + slideraim;
-
-                // Additional flow bonus should be 0
-                flowAimRating = 0.0;
+                flowAimRating = 0.0; // Additional flow bonus should be 0
 
                 speedRating = 0.0;
                 flashlightRating *= 0.7;
