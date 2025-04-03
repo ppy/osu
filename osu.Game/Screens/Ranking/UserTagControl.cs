@@ -319,6 +319,8 @@ namespace osu.Game.Screens.Ranking
                 voted.BindTo(userTag.Voted);
 
                 AutoSizeAxes = Axes.Both;
+
+                ScaleOnMouseDown = 0.95f;
             }
 
             [BackgroundDependencyLoader]
@@ -654,6 +656,8 @@ namespace osu.Game.Screens.Ranking
 
                     RelativeSizeAxes = Axes.X;
                     AutoSizeAxes = Axes.Y;
+
+                    ScaleOnMouseDown = 0.95f;
                 }
 
                 [Resolved]
@@ -735,15 +739,6 @@ namespace osu.Game.Screens.Ranking
                         votedIcon.FadeColour(voted.Value ? Colour4.Black : Colour4.White, 250, Easing.OutQuint);
                     }, true);
                     FinishTransforms(true);
-                }
-
-                protected override bool OnMouseDown(MouseDownEvent e)
-                {
-                    bool result = base.OnMouseDown(e);
-                    // slightly dodgy way of overriding the amount of scale-on-click (the default is way too much in this case)
-                    ClearTransforms(targetMember: nameof(Scale));
-                    Content.ScaleTo(0.95f, 2000, Easing.OutQuint);
-                    return result;
                 }
             }
         }
