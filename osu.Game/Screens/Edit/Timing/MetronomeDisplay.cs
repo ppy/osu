@@ -7,7 +7,6 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -20,7 +19,6 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
-using osu.Game.Utils;
 using osuTK;
 
 namespace osu.Game.Screens.Edit.Timing
@@ -217,7 +215,7 @@ namespace osu.Game.Screens.Edit.Timing
                 bpmText = new OsuTextFlowContainer(st =>
                 {
                     st.Font = OsuFont.Default.With(fixedWidth: true);
-                    st.Spacing = new Vector2(-2.2f, 0);
+                    st.Spacing = new Vector2(-1.9f, 0);
                 })
                 {
                     Name = @"BPM display",
@@ -233,8 +231,7 @@ namespace osu.Game.Screens.Edit.Timing
         }
 
         private double effectiveBeatLength;
-
-        private double effectiveBpm => 60_000 / effectiveBeatLength;
+        private double effectiveBpm;
 
         private TimingControlPoint timingPoint = null!;
 
@@ -268,19 +265,25 @@ namespace osu.Game.Screens.Edit.Timing
 
         private void updateBpmText()
         {
-            int intPart = (int)interpolatedBpm.Value;
+            string text = interpolatedBpm.Value.ToString("N2");
+            int? breakPoint = null;
 
-            bpmText.Text = intPart.ToLocalisableString();
-
-            // While interpolating between two integer values, showing the decimal places would look a bit odd
-            // so rounding is applied until we're close to the final value.
-            int decimalPlaces = FormatUtils.FindPrecision((decimal)effectiveBpm);
-
-            if (decimalPlaces > 0)
+            for (int i = 0; i < text.Length; i++)
             {
-                bool reachedFinalNumber = intPart == (int)effectiveBpm;
+                if (!char.IsDigit(text[i]))
+                    breakPoint = i;
+            }
 
-                bpmText.AddText((effectiveBpm % 1).ToLocalisableString("." + new string('0', decimalPlaces)), cp => cp.Alpha = reachedFinalNumber ? 0.5f : 0.1f);
+            if (breakPoint != null)
+            {
+                bool reachedFinalNumber = (int)interpolatedBpm.Value == (int)effectiveBpm;
+
+                bpmText.Text = text.Substring(0, breakPoint.Value);
+                bpmText.AddText(text.Substring(breakPoint.Value), cp => cp.Alpha = reachedFinalNumber ? 0.5f : 0.2f);
+            }
+            else
+            {
+                bpmText.Text = text;
             }
         }
 
@@ -300,6 +303,7 @@ namespace osu.Game.Screens.Edit.Timing
             if (effectiveBeatLength != timingPoint.BeatLength / Divisor)
             {
                 effectiveBeatLength = timingPoint.BeatLength / Divisor;
+                effectiveBpm = TimingSection.BeatLengthToBpm(effectiveBeatLength);
 
                 EarlyActivationMilliseconds = timingPoint.BeatLength / 2;
 
