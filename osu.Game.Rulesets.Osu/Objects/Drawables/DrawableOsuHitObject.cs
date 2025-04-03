@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -153,9 +154,15 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         protected void ApplyRepeatFadeIn(Drawable target, double fadeTime)
         {
             DrawableSlider slider = (DrawableSlider)ParentHitObject;
+            int repeatIndex = ((SliderEndCircle)HitObject).RepeatIndex;
+
+            Debug.Assert(slider != null);
 
             // When snaking in is enabled, the first end circle needs to be delayed until the snaking completes.
-            bool delayFadeIn = slider!.SliderBody?.SnakingIn.Value == true && ((SliderEndCircle)HitObject).RepeatIndex == 0;
+            bool delayFadeIn = slider.SliderBody?.SnakingIn.Value == true && repeatIndex == 0;
+
+            if (repeatIndex > 0)
+                fadeTime = Math.Min(slider.HitObject.SpanDuration, fadeTime);
 
             target
                 .FadeOut()
