@@ -115,7 +115,7 @@ namespace osu.Game.Screens.Edit.Timing
                     try
                     {
                         if (double.TryParse(Current.Value, out double doubleVal) && doubleVal > 0)
-                            beatLengthBindable.Value = beatLengthToBpm(doubleVal);
+                            beatLengthBindable.Value = BeatLengthToBpm(doubleVal);
                     }
                     catch
                     {
@@ -130,7 +130,7 @@ namespace osu.Game.Screens.Edit.Timing
 
                 beatLengthBindable.BindValueChanged(val =>
                 {
-                    Current.Value = beatLengthToBpm(val.NewValue).ToString("N2");
+                    Current.Value = BeatLengthToBpm(val.NewValue).ToString("N2");
                 }, true);
             }
 
@@ -146,6 +146,6 @@ namespace osu.Game.Screens.Edit.Timing
             }
         }
 
-        private static double beatLengthToBpm(double beatLength) => 60000 / beatLength;
+        public static double BeatLengthToBpm(double beatLength) => 60000 / beatLength;
     }
 }
