@@ -85,7 +85,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override void UpdateInitialTransforms()
         {
-            ApplyRepeatFadeIn(this);
+            base.UpdateInitialTransforms();
+
+            ApplyRepeatFadeIn(CirclePiece, HitObject.TimeFadeIn);
+            ApplyRepeatFadeIn(Arrow, 150);
         }
 
         protected override void UpdateHitStateTransforms(ArmedState state)
