@@ -149,5 +149,18 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         protected float CalculateDrawableRelativePosition(Drawable drawable) => (drawable.ScreenSpaceDrawQuad.Centre.X - parentScreenSpaceRectangle.X) / parentScreenSpaceRectangle.Width;
 
         protected override JudgementResult CreateResult(Judgement judgement) => new OsuJudgementResult(HitObject, judgement);
+
+        protected void ApplyRepeatFadeIn(Drawable target)
+        {
+            DrawableSlider slider = (DrawableSlider)ParentHitObject;
+
+            // When snaking in is enabled, the first end circle needs to be delayed until the snaking completes.
+            bool delayFadeIn = slider!.SliderBody?.SnakingIn.Value == true && ((SliderEndCircle)HitObject).RepeatIndex == 0;
+
+            target
+                .FadeOut()
+                .Delay(delayFadeIn ? (slider.HitObject.TimePreempt) / 3 : 0)
+                .FadeIn(150);
+        }
     }
 }
