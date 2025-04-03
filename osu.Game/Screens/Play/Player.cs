@@ -135,6 +135,8 @@ namespace osu.Game.Screens.Play
 
         public BreakOverlay BreakOverlay;
 
+        private LetterboxOverlay letterboxOverlay;
+
         /// <summary>
         /// Whether the gameplay is currently in a break.
         /// </summary>
@@ -277,6 +279,12 @@ namespace osu.Game.Screens.Play
             var rulesetSkinProvider = new RulesetSkinProvidingContainer(ruleset, playableBeatmap, Beatmap.Value.Skin);
             GameplayClockContainer.Add(new GameplayScrollWheelHandling());
 
+            // needs to exist in frame stable content, but is used by underlay layers so make sure assigned early.
+            breakTracker = new BreakTracker(DrawableRuleset.GameplayStartTime, ScoreProcessor)
+            {
+                Breaks = Beatmap.Value.Beatmap.Breaks
+            };
+
             // load the skinning hierarchy first.
             // this is intentionally done in two stages to ensure things are in a loaded state before exposing the ruleset to skin sources.
             GameplayClockContainer.Add(rulesetSkinProvider);
@@ -292,7 +300,7 @@ namespace osu.Game.Screens.Play
                     Children = new[]
                     {
                         // underlay and gameplay should have access to the skinning sources.
-                        createUnderlayComponents(),
+                        createUnderlayComponents(Beatmap.Value),
                         createGameplayComponents(Beatmap.Value)
                     }
                 },
@@ -335,10 +343,13 @@ namespace osu.Game.Screens.Play
             dependencies.CacheAs(DrawableRuleset.FrameStableClock);
             dependencies.CacheAs<IGameplayClock>(DrawableRuleset.FrameStableClock);
 
+            letterboxOverlay.Clock = DrawableRuleset.FrameStableClock;
+            letterboxOverlay.ProcessCustomClock = false;
+
             // add the overlay components as a separate step as they proxy some elements from the above underlay/gameplay components.
             // also give the overlays the ruleset skin provider to allow rulesets to potentially override HUD elements (used to disable combo counters etc.)
             // we may want to limit this in the future to disallow rulesets from outright replacing elements the user expects to be there.
-            failAnimationContainer.Add(createOverlayComponents(Beatmap.Value));
+            failAnimationContainer.Add(createOverlayComponents());
 
             if (!DrawableRuleset.AllowGameplayOverlays)
             {
@@ -409,14 +420,22 @@ namespace osu.Game.Screens.Play
 
         protected virtual GameplayClockContainer CreateGameplayClockContainer(WorkingBeatmap beatmap, double gameplayStart) => new MasterGameplayClockContainer(beatmap, gameplayStart);
 
-        private Drawable createUnderlayComponents()
+        private Drawable createUnderlayComponents(WorkingBeatmap working)
         {
             var container = new Container
             {
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
-                    DimmableStoryboard = new DimmableStoryboard(GameplayState.Storyboard, GameplayState.Mods) { RelativeSizeAxes = Axes.Both },
+                    DimmableStoryboard = new DimmableStoryboard(GameplayState.Storyboard, GameplayState.Mods)
+                    {
+                        RelativeSizeAxes = Axes.Both
+                    },
+                    letterboxOverlay = new LetterboxOverlay
+                    {
+                        BreakTracker = breakTracker,
+                        Alpha = working.Beatmap.LetterboxInBreaks ? 1 : 0,
+                    },
                     new KiaiGameplayFountains(),
                 },
             };
@@ -434,15 +453,12 @@ namespace osu.Game.Screens.Play
                         ScoreProcessor,
                         HealthProcessor,
                         new ComboEffects(ScoreProcessor),
-                        breakTracker = new BreakTracker(DrawableRuleset.GameplayStartTime, ScoreProcessor)
-                        {
-                            Breaks = working.Beatmap.Breaks
-                        }
+                        breakTracker,
                     }),
             }
         };
 
-        private Drawable createOverlayComponents(IWorkingBeatmap working)
+        private Drawable createOverlayComponents()
         {
             var container = new Container
             {
@@ -450,13 +466,6 @@ namespace osu.Game.Screens.Play
                 Children = new[]
                 {
                     DimmableStoryboard.OverlayLayerContainer.CreateProxy(),
-                    new LetterboxOverlay
-                    {
-                        Clock = DrawableRuleset.FrameStableClock,
-                        ProcessCustomClock = false,
-                        BreakTracker = breakTracker,
-                        Alpha = working.Beatmap.LetterboxInBreaks ? 1 : 0,
-                    },
                     HUDOverlay = new HUDOverlay(DrawableRuleset, GameplayState.Mods, Configuration.AlwaysShowLeaderboard)
                     {
                         HoldToQuit =
