@@ -4,7 +4,6 @@
 #nullable disable
 
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -30,12 +29,6 @@ namespace osu.Game.Skinning
 
         [CanBeNull]
         private readonly ISkin beatmapSkin;
-
-        /// <remarks>
-        /// This container already re-exposes all parent <see cref="ISkinSource"/> sources in a ruleset-usable form.
-        /// Therefore disallow falling back to any parent <see cref="ISkinSource"/> any further.
-        /// </remarks>
-        protected override bool AllowFallingBackToParent => false;
 
         protected override Container<Drawable> Content { get; } = new Container
         {
@@ -73,32 +66,13 @@ namespace osu.Game.Skinning
             // Populate a local list first so we can adjust the returned order as we go.
             var sources = new List<ISkin>();
 
-            Debug.Assert(ParentSource != null);
-
-            foreach (var source in ParentSource.AllSources)
-            {
-                switch (source)
-                {
-                    case Skin skin:
-                        sources.Add(GetRulesetTransformedSkin(skin));
-                        break;
-
-                    default:
-                        sources.Add(source);
-                        break;
-                }
-            }
-
-            // TODO: check
-            int lastDefaultSkinIndex = sources.IndexOf(sources.OfType<TrianglesSkin>().LastOrDefault());
+            // We want to transform the current user's skin for the current ruleset.
+            // Assume it's the first skin provided by the parent source (generally the case for both SkinManager and tests).
+            if (ParentSource?.AllSources.FirstOrDefault() is ISkin skin)
+                sources.Add(GetRulesetTransformedSkin(skin));
 
             // Ruleset resources should be given the ability to override game-wide defaults
-            // This is achieved by placing them before the last instance of DefaultSkin.
-            // Note that DefaultSkin may not be present in some test scenes.
-            if (lastDefaultSkinIndex >= 0)
-                sources.Insert(lastDefaultSkinIndex, rulesetResourcesSkin);
-            else
-                sources.Add(rulesetResourcesSkin);
+            sources.Add(rulesetResourcesSkin);
 
             SetSources(sources);
         }
