@@ -36,6 +36,11 @@ namespace osu.Game.Beatmaps.Formats
         /// </remarks>
         public const double CONTROL_POINT_LENIENCY = 5;
 
+        /// <summary>
+        /// The maximum allowed number of keys in mania beatmaps.
+        /// </summary>
+        public const int MAX_MANIA_KEY_COUNT = 18;
+
         internal static RulesetStore? RulesetStore;
 
         private Beatmap beatmap = null!;
@@ -116,7 +121,7 @@ namespace osu.Game.Beatmaps.Formats
             // mania uses "circle size" for key count, thus different allowable range
             difficulty.CircleSize = beatmap.BeatmapInfo.Ruleset.OnlineID != 3
                 ? Math.Clamp(difficulty.CircleSize, 0, 10)
-                : Math.Clamp(difficulty.CircleSize, 1, 18);
+                : Math.Clamp(difficulty.CircleSize, 1, MAX_MANIA_KEY_COUNT);
 
             difficulty.OverallDifficulty = Math.Clamp(difficulty.OverallDifficulty, 0, 10);
             difficulty.ApproachRate = Math.Clamp(difficulty.ApproachRate, 0, 10);
