@@ -19,6 +19,7 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
+using osu.Game.Utils;
 using osuTK;
 
 namespace osu.Game.Screens.Edit.Timing
@@ -265,7 +266,10 @@ namespace osu.Game.Screens.Edit.Timing
 
         private void updateBpmText()
         {
-            string text = interpolatedBpm.Value.ToString("N2");
+            bool reachedFinalNumber = interpolatedBpm.Value == effectiveBpm;
+            int decimalPlaces = Math.Min(2, FormatUtils.FindPrecision((decimal)effectiveBpm));
+
+            string text = interpolatedBpm.Value.ToString($"N{decimalPlaces}");
             int? breakPoint = null;
 
             for (int i = 0; i < text.Length; i++)
@@ -276,8 +280,6 @@ namespace osu.Game.Screens.Edit.Timing
 
             if (breakPoint != null)
             {
-                bool reachedFinalNumber = (int)interpolatedBpm.Value == (int)effectiveBpm;
-
                 bpmText.Text = text.Substring(0, breakPoint.Value);
                 bpmText.AddText(text.Substring(breakPoint.Value), cp => cp.Alpha = reachedFinalNumber ? 0.5f : 0.2f);
             }
