@@ -98,8 +98,6 @@ namespace osu.Game.Screens.Ranking
                                         RelativeSizeAxes = Axes.X,
                                         AutoSizeAxes = Axes.Y,
                                         Direction = FillDirection.Full,
-                                        LayoutDuration = 300,
-                                        LayoutEasing = Easing.OutQuint,
                                         Spacing = new Vector2(4),
                                     },
                                 },
@@ -326,8 +324,6 @@ namespace osu.Game.Screens.Ranking
             [BackgroundDependencyLoader]
             private void load()
             {
-                Anchor = Anchor.CentreLeft;
-                Origin = Anchor.CentreLeft;
                 CornerRadius = 5;
                 Masking = true;
                 EdgeEffect = new EdgeEffectParameters
