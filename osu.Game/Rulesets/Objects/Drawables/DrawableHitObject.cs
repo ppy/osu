@@ -15,7 +15,6 @@ using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Lists;
-using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Audio;
 using osu.Game.Configuration;
@@ -666,14 +665,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             UpdateResult(false);
         }
-
-        /// <summary>
-        /// Schedules an <see cref="Action"/> to this <see cref="DrawableHitObject"/>.
-        /// </summary>
-        /// <remarks>
-        /// Only provided temporarily until hitobject pooling is implemented.
-        /// </remarks>
-        protected internal new ScheduledDelegate Schedule(Action action) => base.Schedule(action);
 
         /// <summary>
         /// An offset prior to the start time of <see cref="HitObject"/> at which this <see cref="DrawableHitObject"/> may begin displaying contents.
