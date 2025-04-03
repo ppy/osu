@@ -71,6 +71,11 @@ namespace osu.Game.Screens.Edit.Setup
                 // Apply immediately on any change to ensure that if the user hits Ctrl+S after making a change (without committing)
                 // it will still apply to the beatmap.
                 item.Current.BindValueChanged(_ => applyMetadata());
+                item.OnCommit += (_, newText) =>
+                {
+                    if (newText)
+                        Beatmap.SaveState();
+                };
             }
 
             updateReadOnlyState();
