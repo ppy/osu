@@ -96,8 +96,14 @@ namespace osu.Game.Online.Rooms
             Beatmap = beatmap;
         }
 
+        /// <summary>
+        /// Creates a new <see cref="PlaylistItem"/> from a <see cref="MultiplayerPlaylistItem"/>.
+        /// </summary>
+        /// <remarks>
+        /// This will create unique instances of the <see cref="RequiredMods"/> and <see cref="AllowedMods"/> arrays but NOT unique instances of the contained <see cref="APIMod"/>s.
+        /// </remarks>
         public PlaylistItem(MultiplayerPlaylistItem item)
-            : this(new APIBeatmap { OnlineID = item.BeatmapID, StarRating = item.StarRating })
+            : this(new APIBeatmap { OnlineID = item.BeatmapID, StarRating = item.StarRating, Checksum = item.BeatmapChecksum })
         {
             ID = item.ID;
             OwnerID = item.OwnerID;
