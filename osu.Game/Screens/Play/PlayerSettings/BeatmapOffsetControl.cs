@@ -63,11 +63,11 @@ namespace osu.Game.Screens.Play.PlayerSettings
         [Resolved]
         private IGameplayClock? gameplayClock { get; set; }
 
-        private double lastPlayAverage;
+        private double lastPlayMedian;
         private double lastPlayBeatmapOffset;
         private HitEventTimingDistributionGraph? lastPlayGraph;
 
-        private SettingsButton? useAverageButton;
+        private SettingsButton? calibrateFromLastPlayButton;
 
         private IDisposable? beatmapOffsetSubscription;
 
@@ -196,7 +196,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
 
             var hitEvents = score.NewValue.HitEvents;
 
-            if (!(hitEvents.CalculateAverageHitError() is double average))
+            if (!(hitEvents.CalculateMedianHitError() is double median))
                 return;
 
             referenceScoreContainer.Children = new Drawable[]
@@ -210,7 +210,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
             // affecting unstable rate here is used as a substitute of determining if a hit event represents a *timed* hit event,
             // i.e. an user input that the user had to *time to the track*,
             // i.e. one that it *makes sense to use* when doing anything with timing and offsets.
-            if (hitEvents.Count(HitEventExtensions.AffectsUnstableRate) < 10)
+            if (hitEvents.Count(HitEventExtensions.AffectsUnstableRate) < 50)
             {
                 referenceScoreContainer.AddRange(new Drawable[]
                 {
@@ -226,7 +226,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 return;
             }
 
-            lastPlayAverage = average;
+            lastPlayMedian = median;
             lastPlayBeatmapOffset = Current.Value;
 
             LinkFlowContainer globalOffsetText;
@@ -239,7 +239,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                     Height = 50,
                 },
                 new AverageHitError(hitEvents),
-                useAverageButton = new SettingsButton
+                calibrateFromLastPlayButton = new SettingsButton
                 {
                     Text = BeatmapOffsetControlStrings.CalibrateUsingLastPlay,
                     Action = () =>
@@ -247,7 +247,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                         if (Current.Disabled)
                             return;
 
-                        Current.Value = lastPlayBeatmapOffset - lastPlayAverage;
+                        Current.Value = lastPlayBeatmapOffset - lastPlayMedian;
                         lastAppliedScore.Value = ReferenceScore.Value;
                     },
                 },
@@ -281,8 +281,8 @@ namespace osu.Game.Screens.Play.PlayerSettings
 
             bool allow = allowOffsetAdjust;
 
-            if (useAverageButton != null)
-                useAverageButton.Enabled.Value = allow && !Precision.AlmostEquals(lastPlayAverage, adjustmentSinceLastPlay, Current.Precision / 2);
+            if (calibrateFromLastPlayButton != null)
+                calibrateFromLastPlayButton.Enabled.Value = allow && !Precision.AlmostEquals(lastPlayMedian, adjustmentSinceLastPlay, Current.Precision / 2);
 
             Current.Disabled = !allow;
         }
