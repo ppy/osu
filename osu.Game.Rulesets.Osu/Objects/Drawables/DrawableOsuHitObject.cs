@@ -150,7 +150,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override JudgementResult CreateResult(Judgement judgement) => new OsuJudgementResult(HitObject, judgement);
 
-        protected void ApplyRepeatFadeIn(Drawable target)
+        protected void ApplyRepeatFadeIn(Drawable target, double fadeTime)
         {
             DrawableSlider slider = (DrawableSlider)ParentHitObject;
 
@@ -160,7 +160,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             target
                 .FadeOut()
                 .Delay(delayFadeIn ? (slider.HitObject.TimePreempt) / 3 : 0)
-                .FadeIn(150);
+                .FadeIn(fadeTime);
         }
     }
 }
