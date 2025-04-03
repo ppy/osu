@@ -24,7 +24,7 @@ namespace osu.Game.Storyboards
 
         public readonly StoryboardCommandGroup Commands = new StoryboardCommandGroup();
 
-        public double StartTime
+        public virtual double StartTime
         {
             get
             {
