@@ -55,7 +55,7 @@ namespace osu.Game.Screens.SelectV2
 
         public UpdateBeatmapSetButton()
         {
-            Size = new Vector2(75f, 22f);
+            Size = new Vector2(72, 22f);
         }
 
         private Bindable<bool> preferNoVideo = null!;
@@ -63,13 +63,12 @@ namespace osu.Game.Screens.SelectV2
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            const float icon_size = 14;
+            const float icon_size = 12;
 
             preferNoVideo = config.GetBindable<bool>(OsuSetting.PreferNoVideo);
 
             Content.Anchor = Anchor.Centre;
             Content.Origin = Anchor.Centre;
-            Content.Shear = new Vector2(OsuGame.SHEAR, 0);
 
             Content.AddRange(new Drawable[]
             {
@@ -87,7 +86,6 @@ namespace osu.Game.Screens.SelectV2
                     AutoSizeAxes = Axes.Both,
                     Direction = FillDirection.Horizontal,
                     Spacing = new Vector2(4),
-                    Shear = new Vector2(-OsuGame.SHEAR, 0),
                     Children = new Drawable[]
                     {
                         new Container
@@ -110,7 +108,7 @@ namespace osu.Game.Screens.SelectV2
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
-                            Font = OsuFont.Default.With(weight: FontWeight.Bold),
+                            Font = OsuFont.Body.With(weight: FontWeight.SemiBold),
                             Text = "Update",
                         }
                     }
