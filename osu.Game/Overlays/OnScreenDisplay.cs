@@ -5,9 +5,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Configuration.Tracking;
+using osu.Framework.Development;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Transforms;
@@ -60,6 +62,8 @@ namespace osu.Game.Overlays
         /// <returns>An object representing the registration, that may be disposed to stop tracking the <see cref="ConfigManager{T}"/>.</returns>
         public IDisposable BeginTracking(object source, ITrackableConfigManager configManager)
         {
+            Debug.Assert(ThreadSafety.IsUpdateThread);
+
             ArgumentNullException.ThrowIfNull(configManager);
 
             if (trackedConfigManagers.ContainsKey((source, configManager)))
