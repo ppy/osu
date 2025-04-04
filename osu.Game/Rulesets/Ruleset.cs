@@ -426,5 +426,11 @@ namespace osu.Game.Rulesets
         /// Can be overridden to avoid showing scroll speed changes in the editor.
         /// </summary>
         public virtual bool EditorShowScrollSpeed => true;
+
+        /// <summary>
+        /// Creates a ruleset-specific replay analysis settings drawable
+        /// </summary>
+        /// <returns>The replay analysis settings drawable</returns>
+        public virtual ReplayAnalysisSettings? CreateReplayAnalysisSettings() => null;
     }
 }

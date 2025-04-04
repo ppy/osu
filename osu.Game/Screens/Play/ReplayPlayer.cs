@@ -28,6 +28,8 @@ namespace osu.Game.Screens.Play
     {
         public const double BASE_SEEK_AMOUNT = 1000;
 
+        public override bool UseAnalysisSettings => true;
+
         private readonly Func<IBeatmap, IReadOnlyList<Mod>, Score> createScore;
 
         private readonly bool replayIsFailedScore;
@@ -58,16 +60,6 @@ namespace osu.Game.Screens.Play
         {
             this.createScore = createScore;
         }
-
-        /// <summary>
-        /// Add a settings group to the HUD overlay. Intended to be used by rulesets to add replay-specific settings.
-        /// </summary>
-        /// <param name="settings">The settings group to be shown.</param>
-        public void AddSettings(PlayerSettingsGroup settings) => Schedule(() =>
-        {
-            settings.Expanded.Value = false;
-            HUDOverlay.PlayerSettingsOverlay.Add(settings);
-        });
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)

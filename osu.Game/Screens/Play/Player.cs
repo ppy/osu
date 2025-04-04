@@ -112,6 +112,13 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public IBindable<bool> ShowingOverlayComponents = new Bindable<bool>();
 
+        /// <summary>
+        /// Whether to add <see cref="ReplayAnalysisSettings"/> to <see cref="PlayerSettingsOverlay"/>
+        /// and an indicator for implementations of <see cref="DrawableRuleset"/> to put an analysis overlay
+        /// on the player.
+        /// </summary>
+        public virtual bool UseAnalysisSettings => false;
+
         // Should match PlayerLoader for consistency. Cached here for the rare case we push a Player
         // without the loading screen (one such usage is the skin editor's scene library).
         [Cached]
@@ -350,6 +357,9 @@ namespace osu.Game.Screens.Play
             // also give the overlays the ruleset skin provider to allow rulesets to potentially override HUD elements (used to disable combo counters etc.)
             // we may want to limit this in the future to disallow rulesets from outright replacing elements the user expects to be there.
             failAnimationContainer.Add(createOverlayComponents());
+
+            if (UseAnalysisSettings)
+                addReplayAnalysisSettings();
 
             if (!DrawableRuleset.AllowGameplayOverlays)
             {
@@ -1308,6 +1318,17 @@ namespace osu.Game.Screens.Play
 
                 storyboardReplacesBackground.Value = false;
             }
+        }
+
+        /// <summary>
+        /// Create and add <see cref="ReplayAnalysisSettings"/> to player settings overlay.
+        /// </summary>
+        private void addReplayAnalysisSettings()
+        {
+            var replayAnalysisSettings = DrawableRuleset.Ruleset.CreateReplayAnalysisSettings();
+
+            if (replayAnalysisSettings != null)
+                HUDOverlay.PlayerSettingsOverlay.Add(replayAnalysisSettings);
         }
 
         #endregion
