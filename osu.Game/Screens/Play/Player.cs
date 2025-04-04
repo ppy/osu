@@ -112,6 +112,12 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public IBindable<bool> ShowingOverlayComponents = new Bindable<bool>();
 
+        /// <summary>
+        /// A flag which can be checked to decide whether we are in a state where settings that affect
+        /// game balance should be allowed to be applied at the current point in time.
+        /// </summary>
+        public virtual bool AllowCriticalSettingsAdjustment { get; } = true;
+
         // Should match PlayerLoader for consistency. Cached here for the rare case we push a Player
         // without the loading screen (one such usage is the skin editor's scene library).
         [Cached]
