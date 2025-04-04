@@ -160,7 +160,8 @@ namespace osu.Game.Rulesets.UI
         {
             base.LoadComplete();
 
-            configTracker = onScreenDisplay?.BeginTracking(this, Config);
+            if (Config != null)
+                configTracker = onScreenDisplay?.BeginTracking(this, Config);
 
             IsPaused.ValueChanged += paused =>
             {
