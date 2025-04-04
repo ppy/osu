@@ -18,6 +18,7 @@ namespace osu.Game.Rulesets.Mods
         public override ModType Type => ModType.DifficultyReduction;
         public override LocalisableString Description => "Whoaaaaa...";
         public override bool Ranked => UsesDefaultConfiguration;
+        public override bool ValidForFreestyle => true;
 
         [SettingSource("Speed decrease", "The actual decrease to apply", SettingControlType = typeof(MultiplierSettingsSlider))]
         public override BindableNumber<double> SpeedChange { get; } = new BindableDouble(0.75)

@@ -128,6 +128,15 @@ namespace osu.Game.Utils
         }
 
         /// <summary>
+        /// Checks that all <see cref="Mod"/>s in a combination are valid as "required mods" in a freestyle room.
+        /// </summary>
+        /// <param name="mods">The mods to check.</param>
+        /// <param name="invalidMods">Invalid mods, if any were found. Will be null if all mods were valid.</param>
+        /// <returns>Whether the input mods were all valid. If false, <paramref name="invalidMods"/> will contain all invalid entries.</returns>
+        public static bool CheckValidModsForFreestyle(IEnumerable<Mod> mods, [NotNullWhen(false)] out List<Mod>? invalidMods)
+            => checkValid(mods, m => m.Type != ModType.System && m.HasImplementation && m.ValidForFreestyle, out invalidMods);
+
+        /// <summary>
         /// Checks that all <see cref="Mod"/>s in a combination are valid as "required mods" in a multiplayer match session.
         /// </summary>
         /// <param name="mods">The mods to check.</param>
@@ -332,6 +341,19 @@ namespace osu.Game.Utils
                 default:
                     return mod.ValidForMultiplayerAsFreeMod;
             }
+        }
+
+        /// <summary>
+        /// Determines whether a mod can be applied in the given freestyle mode.
+        /// </summary>
+        /// <param name="mod">The mod to test.</param>
+        /// <param name="freestyle">Whether freestyle is enabled.</param>
+        public static bool IsValidModForFreestyleMode(Mod mod, bool freestyle)
+        {
+            if (mod.Type == ModType.System || !mod.UserPlayable || !mod.HasImplementation)
+                return false;
+
+            return !freestyle || mod.ValidForFreestyle;
         }
     }
 }
