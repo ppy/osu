@@ -118,6 +118,13 @@ namespace osu.Game.Screens.OnlinePlay
             Ruleset.BindValueChanged(onRulesetChanged);
             Freestyle.BindValueChanged(onFreestyleChanged, true);
 
+            if (initialItem == null)
+            {
+                // Enable all free mods if we're creating a new playlist item.
+                // Todo: This needs to be scheduled because mods aren't available until the nested LoadComplete(). Can we do this any better?
+                SchedulerAfterChildren.Add(() => FreeMods.Value = freeModSelect.AllAvailableMods.Where(state => state.ValidForSelection.Value).Select(state => state.Mod).ToArray());
+            }
+
             freeModSelectOverlayRegistration = OverlayManager?.RegisterBlockingOverlay(freeModSelect);
         }
 
