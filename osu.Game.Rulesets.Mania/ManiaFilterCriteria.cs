@@ -84,12 +84,9 @@ namespace osu.Game.Rulesets.Mania
                             return false;
                     }
                 }
-
-                default:
-                    return false;
             }
 
-            return true;
+            return false;
         }
 
         public bool FilterMayChangeFromMods(ValueChangedEvent<IReadOnlyList<Mod>> mods)
