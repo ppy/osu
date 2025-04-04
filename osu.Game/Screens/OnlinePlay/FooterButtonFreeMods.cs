@@ -24,7 +24,6 @@ namespace osu.Game.Screens.OnlinePlay
     public partial class FooterButtonFreeMods : FooterButton
     {
         public readonly Bindable<IReadOnlyList<Mod>> FreeMods = new Bindable<IReadOnlyList<Mod>>();
-        public readonly IBindable<bool> Freestyle = new Bindable<bool>();
 
         protected override bool IsActive => FreeMods.Value.Count > 0;
 
@@ -94,8 +93,6 @@ namespace osu.Game.Screens.OnlinePlay
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
-            Freestyle.BindValueChanged(_ => updateModDisplay());
             FreeMods.BindValueChanged(_ => updateModDisplay(), true);
         }
 
@@ -115,7 +112,7 @@ namespace osu.Game.Screens.OnlinePlay
         {
             int currentCount = FreeMods.Value.Count;
 
-            if (currentCount == allAvailableAndValidMods.Count() || Freestyle.Value)
+            if (currentCount == allAvailableAndValidMods.Count())
             {
                 count.Text = "all";
                 count.FadeColour(colours.Gray2, 200, Easing.OutQuint);
