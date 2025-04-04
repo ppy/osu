@@ -560,12 +560,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                 return [];
 
             PlaylistItem item = SelectedItem.Value;
-
             RulesetInfo gameplayRuleset = UserRuleset.Value ?? rulesets.GetRuleset(item.RulesetID)!;
             Ruleset rulesetInstance = gameplayRuleset.CreateInstance();
-
-            if (item.Freestyle)
-                return rulesetInstance.AllMods.OfType<Mod>().Where(m => ModUtils.IsValidFreeModForMatchType(m, room.Type)).ToArray();
 
             return item.AllowedMods.Select(m => m.ToMod(rulesetInstance)).ToArray();
         }
