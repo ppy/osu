@@ -158,7 +158,7 @@ namespace osu.Game.Screens.SelectV2
                                     difficultyAuthor = new OsuSpriteText
                                     {
                                         Colour = colourProvider.Content2,
-                                        Font = OsuFont.Subheading,
+                                        Font = OsuFont.Caption.With(weight: FontWeight.SemiBold),
                                         Origin = Anchor.BottomLeft,
                                         Anchor = Anchor.BottomLeft,
                                         Margin = new MarginPadding { Right = 5f, Bottom = 2f },
