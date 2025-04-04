@@ -25,7 +25,7 @@ namespace osu.Game.Screens.SelectV2
 {
     public partial class PanelBeatmapStandalone : PanelBase
     {
-        public const float HEIGHT = CarouselItem.DEFAULT_HEIGHT * 1.6f;
+        public const float HEIGHT = CarouselItem.DEFAULT_HEIGHT * 1.7f;
 
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; } = null!;
@@ -75,7 +75,7 @@ namespace osu.Game.Screens.SelectV2
 
             Icon = difficultyIcon = new ConstrainedIconContainer
             {
-                Size = new Vector2(20),
+                Size = new Vector2(16),
                 Margin = new MarginPadding { Horizontal = 5f },
                 Colour = colourProvider.Background5,
             };
@@ -94,19 +94,16 @@ namespace osu.Game.Screens.SelectV2
                 {
                     titleText = new OsuSpriteText
                     {
-                        Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 22, italics: true),
-                        Shadow = true,
+                        Font = OsuFont.Heading.With(typeface: Typeface.TorusAlternate),
                     },
                     artistText = new OsuSpriteText
                     {
-                        Font = OsuFont.GetFont(weight: FontWeight.SemiBold, size: 17, italics: true),
-                        Shadow = true,
+                        Font = OsuFont.Body.With(weight: FontWeight.SemiBold),
                     },
                     new FillFlowContainer
                     {
                         Direction = FillDirection.Horizontal,
                         AutoSizeAxes = Axes.Both,
-                        Margin = new MarginPadding { Top = 5f },
                         Children = new Drawable[]
                         {
                             updateButton = new UpdateBeatmapSetButton
@@ -120,8 +117,7 @@ namespace osu.Game.Screens.SelectV2
                                 AutoSizeAxes = Axes.Both,
                                 Origin = Anchor.CentreLeft,
                                 Anchor = Anchor.CentreLeft,
-                                TextSize = 11,
-                                TextPadding = new MarginPadding { Horizontal = 8, Vertical = 2 },
+                                TextSize = OsuFont.Tiny.Size,
                                 Margin = new MarginPadding { Right = 5f },
                             },
                             difficultyLine = new FillFlowContainer
@@ -146,7 +142,7 @@ namespace osu.Game.Screens.SelectV2
                                     },
                                     difficultyKeyCountText = new OsuSpriteText
                                     {
-                                        Font = OsuFont.GetFont(size: 18, weight: FontWeight.SemiBold),
+                                        Font = OsuFont.Subheading,
                                         Anchor = Anchor.BottomLeft,
                                         Origin = Anchor.BottomLeft,
                                         Alpha = 0,
@@ -154,7 +150,7 @@ namespace osu.Game.Screens.SelectV2
                                     },
                                     difficultyName = new OsuSpriteText
                                     {
-                                        Font = OsuFont.GetFont(size: 18, weight: FontWeight.SemiBold),
+                                        Font = OsuFont.Subheading,
                                         Origin = Anchor.BottomLeft,
                                         Anchor = Anchor.BottomLeft,
                                         Margin = new MarginPadding { Right = 5f, Bottom = 2f },
@@ -162,7 +158,7 @@ namespace osu.Game.Screens.SelectV2
                                     difficultyAuthor = new OsuSpriteText
                                     {
                                         Colour = colourProvider.Content2,
-                                        Font = OsuFont.GetFont(weight: FontWeight.SemiBold),
+                                        Font = OsuFont.Caption.With(weight: FontWeight.SemiBold),
                                         Origin = Anchor.BottomLeft,
                                         Anchor = Anchor.BottomLeft,
                                         Margin = new MarginPadding { Right = 5f, Bottom = 2f },
