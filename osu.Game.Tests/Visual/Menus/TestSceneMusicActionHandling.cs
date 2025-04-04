@@ -185,8 +185,12 @@ namespace osu.Game.Tests.Visual.Menus
             AddUntilStep("track changed", () => trackChangeQueue.Count == 1);
 
             AddStep("press previous", () => globalActionContainer.TriggerPressed(GlobalAction.MusicPrev));
-            AddUntilStep("track changed", () =>
+            AddUntilStep("new track selected", () =>
                 trackChangeQueue.Count == 2 && !trackChangeQueue.First().working.BeatmapInfo.Equals(trackChangeQueue.Last().working.BeatmapInfo));
+
+            AddStep("press next", () => globalActionContainer.TriggerPressed(GlobalAction.MusicNext));
+            AddUntilStep("first track selected",
+                () => trackChangeQueue.Count == 3 && trackChangeQueue.First().working.BeatmapInfo.Equals(trackChangeQueue.Last().working.BeatmapInfo));
         }
     }
 }
