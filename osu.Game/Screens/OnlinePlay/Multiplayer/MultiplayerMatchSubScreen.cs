@@ -37,7 +37,6 @@ using osu.Game.Screens.OnlinePlay.Multiplayer.Spectate;
 using osu.Game.Users;
 using osu.Game.Utils;
 using osuTK;
-using Container = osu.Framework.Graphics.Containers.Container;
 using ParticipantsList = osu.Game.Screens.OnlinePlay.Multiplayer.Participants.ParticipantsList;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer
