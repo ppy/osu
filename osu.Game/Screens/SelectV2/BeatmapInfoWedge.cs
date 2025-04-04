@@ -107,13 +107,13 @@ namespace osu.Game.Screens.SelectV2
                         new ShearAlignedDrawable(shear, new Container
                         {
                             RelativeSizeAxes = Axes.X,
-                            Height = 32,
+                            Height = 35,
                             Child = statusPill = new BeatmapSetOnlineStatusPill
                             {
                                 AutoSizeAxes = Axes.Both,
                                 Margin = new MarginPadding { Right = 20f, Top = 20f },
                                 TextSize = OsuFont.Caption.Size,
-                                TextPadding = new MarginPadding { Horizontal = 8, Vertical = 2 },
+                                TextPadding = new MarginPadding { Horizontal = 6, Vertical = 1 },
                             }
                         }),
                         new ShearAlignedDrawable(shear, titleContainer = new Container
