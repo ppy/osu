@@ -128,9 +128,6 @@ namespace osu.Game.Screens.OnlinePlay
             Item = item;
 
             valid.BindTo(item.Valid);
-
-            if (item.Expired)
-                Colour = OsuColour.Gray(0.5f);
         }
 
         [BackgroundDependencyLoader]
