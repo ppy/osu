@@ -250,12 +250,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                                             SelectedItem = { BindTarget = SelectedItem },
                                                                             AllowSelection = true,
                                                                             AllowShowingResults = true,
-                                                                            RequestResults = item =>
-                                                                            {
-                                                                                Debug.Assert(room.RoomID != null);
-                                                                                parentScreen?.Push(new PlaylistItemUserBestResultsScreen(room.RoomID.Value, item,
-                                                                                    api.LocalUser.Value.Id));
-                                                                            }
+                                                                            RequestResults = showResults
                                                                         }
                                                                     },
                                                                     new Drawable[]
@@ -687,6 +682,21 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                 Beatmap = { BindTarget = UserBeatmap },
                 Ruleset = { BindTarget = UserRuleset }
             });
+        }
+
+        /// <summary>
+        /// Shows the results screen for a playlist item.
+        /// </summary>
+        private void showResults(PlaylistItem item)
+        {
+            if (!this.IsCurrentScreen())
+                return;
+
+            Debug.Assert(room.RoomID != null);
+
+            // fallback is to allow this class to operate when there is no parent OnlineScreen (testing purposes).
+            var targetScreen = (Screen?)parentScreen ?? this;
+            targetScreen.Push(new PlaylistItemUserBestResultsScreen(room.RoomID.Value, item, api.LocalUser.Value.OnlineID));
         }
 
         /// <summary>

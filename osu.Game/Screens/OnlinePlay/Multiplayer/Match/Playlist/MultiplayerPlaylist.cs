@@ -21,9 +21,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
         public readonly Bindable<MultiplayerPlaylistDisplayMode> DisplayMode = new Bindable<MultiplayerPlaylistDisplayMode>();
 
         /// <summary>
-        /// Invoked when an item requests to be edited.
+        /// Invoked when the user requests to edit an item.
         /// </summary>
         public Action<PlaylistItem>? RequestEdit;
+
+        /// <summary>
+        /// Invoked when the user requests to view the results for an item.
+        /// </summary>
+        public Action<PlaylistItem>? RequestResults;
 
         [Resolved]
         private MultiplayerClient client { get; set; } = null!;
@@ -62,6 +67,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
                         {
                             RelativeSizeAxes = Axes.Both,
                             Alpha = 0,
+                            RequestResults = item => RequestResults?.Invoke(item)
                         }
                     }
                 }
