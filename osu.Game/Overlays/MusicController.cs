@@ -73,9 +73,9 @@ namespace osu.Game.Overlays
         private AudioFilter audioDuckFilter = null!;
 
         private readonly Bindable<RandomSelectAlgorithm> randomSelectAlgorithm = new Bindable<RandomSelectAlgorithm>();
-        private readonly List<Live<BeatmapSetInfo>> previousRandomSets = new List<Live<BeatmapSetInfo>>();
-        private int randomHistoryDirection;
-        private int lastRandomTrackDirection;
+
+        private readonly LinkedList<Live<BeatmapSetInfo>> randomHistory = new LinkedList<Live<BeatmapSetInfo>>();
+        private LinkedListNode<Live<BeatmapSetInfo>>? currentRandomHistoryPosition;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, OsuConfigManager configManager)
@@ -371,81 +371,66 @@ namespace osu.Game.Overlays
 
         private Live<BeatmapSetInfo>? getNextRandom(int direction, bool allowProtectedTracks)
         {
-            try
+            Live<BeatmapSetInfo> result;
+
+            var possibleSets = getBeatmapSets(allowProtectedTracks).ToList();
+
+            if (possibleSets.Count == 0)
+                return null;
+
+            // if there is only one possible set left, play it, even if it is the same as the current track.
+            // looping is preferable over playing nothing.
+            if (possibleSets.Count == 1)
+                return possibleSets.Single();
+
+            // now that we actually know there is a choice, do not allow the current track to be played again.
+            possibleSets.RemoveAll(s => s.Value.Equals(current?.BeatmapSetInfo));
+
+            if (currentRandomHistoryPosition != null)
             {
-                Live<BeatmapSetInfo> result;
+                if (direction < 0 && currentRandomHistoryPosition.Previous != null)
+                    return (currentRandomHistoryPosition = currentRandomHistoryPosition.Previous).Value;
 
-                var possibleSets = getBeatmapSets(allowProtectedTracks).ToList();
+                if (direction > 0 && currentRandomHistoryPosition.Next != null)
+                    return (currentRandomHistoryPosition = currentRandomHistoryPosition.Next).Value;
+            }
 
-                if (possibleSets.Count == 0)
-                    return null;
+            // if the early-return above didn't cover it, it means that we have no history to fall back on
+            // and need to actually choose something random.
 
-                // if there is only
-                // one possible set left, play it, even if it is the same as the current track.
-                // looping is preferable over playing nothing.
-                if (possibleSets.Count == 1)
-                    return possibleSets.Single();
+            Debug.Assert(randomHistory.Count == 0
+                         || (currentRandomHistoryPosition == randomHistory.First && direction < 0)
+                         || (currentRandomHistoryPosition == randomHistory.Last && direction > 0));
 
-                // now that we actually know there is a choice, do not allow the current track to be played again.
-                possibleSets.RemoveAll(s => s.Value.Equals(current?.BeatmapSetInfo));
+            switch (randomSelectAlgorithm.Value)
+            {
+                case RandomSelectAlgorithm.Random:
+                    result = possibleSets[RNG.Next(possibleSets.Count)];
+                    break;
 
-                // condition below checks if the signs of `randomHistoryDirection` and `direction` are opposite and not zero.
-                // if that is the case, it means that the user had previously chosen next track `randomHistoryDirection` times and wants to go back,
-                // or that the user had previously chosen previous track `randomHistoryDirection` times and wants to go forward.
-                // in both cases, it means that we have a history of previous random selections that we can rewind.
-                if (randomHistoryDirection * direction < 0)
-                {
-                    Debug.Assert(Math.Abs(randomHistoryDirection) == previousRandomSets.Count);
+                case RandomSelectAlgorithm.RandomPermutation:
+                    var notYetPlayedSets = possibleSets.Except(randomHistory).ToList();
 
-                    // if the user has been shuffling backwards and now going forwards (or vice versa),
-                    // the topmost item from history needs to be discarded because it's the *current* track.
-                    if (direction * lastRandomTrackDirection < 0)
+                    if (notYetPlayedSets.Count == 0)
                     {
-                        previousRandomSets.RemoveAt(previousRandomSets.Count - 1);
-                        randomHistoryDirection += direction;
+                        possibleSets.RemoveAll(s => s.Value.Equals(current?.BeatmapSetInfo));
+                        notYetPlayedSets = possibleSets;
+                        randomHistory.Clear();
                     }
 
-                    if (previousRandomSets.Count > 0)
-                    {
-                        result = previousRandomSets[^1];
-                        previousRandomSets.RemoveAt(previousRandomSets.Count - 1);
-                        return result;
-                    }
-                }
+                    result = notYetPlayedSets[RNG.Next(notYetPlayedSets.Count)];
 
-                // if the early-return above didn't cover it, it means that we have no history to fall back on
-                // and need to actually choose something random.
-                switch (randomSelectAlgorithm.Value)
-                {
-                    case RandomSelectAlgorithm.Random:
-                        result = possibleSets[RNG.Next(possibleSets.Count)];
-                        break;
+                    if (randomHistory.Count == 0 || (currentRandomHistoryPosition == randomHistory.Last && direction > 0))
+                        currentRandomHistoryPosition = randomHistory.AddLast(result);
+                    else if (currentRandomHistoryPosition == randomHistory.First && direction < 0)
+                        currentRandomHistoryPosition = randomHistory.AddFirst(result);
+                    break;
 
-                    case RandomSelectAlgorithm.RandomPermutation:
-                        var notYetPlayedSets = possibleSets.Except(previousRandomSets).ToList();
-
-                        if (notYetPlayedSets.Count == 0)
-                        {
-                            notYetPlayedSets = possibleSets;
-                            previousRandomSets.Clear();
-                            randomHistoryDirection = 0;
-                        }
-
-                        result = notYetPlayedSets[RNG.Next(notYetPlayedSets.Count)];
-                        break;
-
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(randomSelectAlgorithm), randomSelectAlgorithm.Value, "Unsupported random select algorithm");
-                }
-
-                previousRandomSets.Add(result);
-                return result;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(randomSelectAlgorithm), randomSelectAlgorithm.Value, "Unsupported random select algorithm");
             }
-            finally
-            {
-                randomHistoryDirection += direction;
-                lastRandomTrackDirection = direction;
-            }
+
+            return result;
         }
 
         private void restartTrack()
