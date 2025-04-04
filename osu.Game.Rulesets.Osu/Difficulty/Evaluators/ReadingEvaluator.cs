@@ -55,13 +55,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             {
                 preemptDifficulty += Math.Pow(500 - currApproachRate, 2.5) / 130000;
 
-                // Nerf preempt difficulty with density, lower density means more difficulty
-                // This is on the basis that in a high density environment you can rely more on patterns and muscle memory
-                // Scale by velocity and drop the nerf the higher the density difficulty
-                double futureObjectDifficulty = retrieveCurrentVisibleObjects(currObj).Count * currVelocity;
-                // Console.Out.WriteLine(futureObjectDifficulty);
-                futureObjectDifficulty = 1 + DifficultyCalculationUtils.BellCurve(futureObjectDifficulty, 4.5, 2 + 0.5 * futureObjectDifficulty, 4) - 0.06 * futureObjectDifficulty;
-                preemptDifficulty /= Math.Max(0.25, futureObjectDifficulty);
+                // Nerf preempt on most comfortable densities which are around 2-3 notes on the screen
+                // https://www.desmos.com/calculator/ywwol9l8cl
+                double futureObjectDifficulty = retrieveCurrentVisibleObjects(currObj).Count;
+                futureObjectDifficulty = 1 + DifficultyCalculationUtils.BellCurve(futureObjectDifficulty, 2.3, 1.7, 5.5);
+                preemptDifficulty *= currVelocity / futureObjectDifficulty;
                 preemptDifficulty *= angleNerfFactor;
             }
 
@@ -69,9 +67,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             if (mods.OfType<OsuModHidden>().Any())
             {
-                // Hidden has some inherent difficulty even at its easiest situations
-                hiddenDifficulty += 0.2;
-
                 double timeSpentInvisible = getDurationSpentInvisible(currObj) / currObj.ClockRate;
 
                 // Nerf hidden difficulty less the more past object difficulty you have
