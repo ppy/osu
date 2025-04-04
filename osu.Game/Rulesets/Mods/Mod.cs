@@ -105,32 +105,47 @@ namespace osu.Game.Rulesets.Mods
         /// </summary>
         /// <example>
         /// <list type="bullet">
-        /// <item><see cref="ModHardRock"/> is valid for multiplayer.</item>
+        /// <item><see cref="ModHardRock"/> <b>is</b> valid for multiplayer.</item>
         /// <item>
-        /// <see cref="ModDoubleTime"/> is valid for multiplayer as long as it is a <b>required</b> mod,
+        /// <see cref="ModDoubleTime"/> <b>is</b> valid for multiplayer as long as it is a <b>required</b> mod,
         /// as that ensures the same duration of gameplay for all users in the room.
         /// </item>
         /// <item>
-        /// <see cref="ModAdaptiveSpeed"/> is not valid for multiplayer, as it leads to varying
+        /// <see cref="ModAdaptiveSpeed"/> <b>is not</b> valid for multiplayer, as it leads to varying
         /// gameplay duration depending on how the users in the room play.
         /// </item>
-        /// <item><see cref="ModAutoplay"/> is not valid for multiplayer.</item>
+        /// <item><see cref="ModAutoplay"/> <b>is not</b> valid for multiplayer.</item>
         /// </list>
         /// </example>
         [JsonIgnore]
         public virtual bool ValidForMultiplayer => true;
 
         /// <summary>
+        /// Whether this mod can be specified as a mod (either "required" or "allowed") on freestyle playlist items,
+        /// indicating that all rulesets contain an implementation of this mod.
+        /// </summary>
+        /// <example>
+        /// <list type="bullet">
+        /// <item><see cref="ModHardRock"/> <b>is</b> valid as a freestyle mod.</item>
+        /// <item>
+        /// <c>OsuModNoScope</c> <b>is not</b> valid as a freestyle mod,
+        /// as it is only implemented in the osu! ruleset.
+        /// </item>
+        /// </list>
+        /// </example>
+        public virtual bool ValidForFreestyle => false;
+
+        /// <summary>
         /// Whether this mod can be specified as a "free" or "allowed" mod in a multiplayer context.
         /// </summary>
         /// <example>
         /// <list type="bullet">
-        /// <item><see cref="ModHardRock"/> is valid for multiplayer as a free mod.</item>
+        /// <item><see cref="ModHardRock"/> <b>is</b> valid for multiplayer as a free mod.</item>
         /// <item>
-        /// <see cref="ModDoubleTime"/> is <b>not</b> valid for multiplayer as a free mod,
+        /// <see cref="ModDoubleTime"/> <b>is not</b> valid for multiplayer as a free mod,
         /// as it could to varying gameplay duration between users in the room depending on whether they picked it.
         /// </item>
-        /// <item><see cref="ModAutoplay"/> is not valid for multiplayer as a free mod.</item>
+        /// <item><see cref="ModAutoplay"/> <b>is not</b> valid for multiplayer as a free mod.</item>
         /// </list>
         /// </example>
         [JsonIgnore]
