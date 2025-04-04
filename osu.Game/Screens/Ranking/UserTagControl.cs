@@ -5,20 +5,20 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Caching;
-using osu.Framework.Extensions;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Extensions;
@@ -26,14 +26,12 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Input.Bindings;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Overlays;
+using osu.Game.Screens.Ranking.Statistics;
 using osuTK;
-using osuTK.Input;
 
 namespace osu.Game.Screens.Ranking
 {
@@ -49,10 +47,13 @@ namespace osu.Game.Screens.Ranking
         private LoadingLayer loadingLayer = null!;
 
         private BindableList<UserTag> displayedTags { get; } = new BindableList<UserTag>();
-        private BindableList<UserTag> extraTags { get; } = new BindableList<UserTag>();
 
-        private Bindable<APITag[]?> allTags = null!;
+        private Bindable<APITag[]?> apiTags = null!;
+        private BindableDictionary<long, UserTag> relevantTagsById { get; } = new BindableDictionary<long, UserTag>();
+
         private readonly Bindable<APIBeatmap?> apiBeatmap = new Bindable<APIBeatmap?>();
+
+        private APIRequest? requestInFlight;
 
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
@@ -66,47 +67,62 @@ namespace osu.Game.Screens.Ranking
         private void load(SessionStatics sessionStatics)
         {
             AutoSizeAxes = Axes.Y;
+
             InternalChildren = new Drawable[]
             {
-                new FillFlowContainer
+                new GridContainer
                 {
-                    Direction = FillDirection.Vertical,
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Spacing = new Vector2(8),
-                    Children = new Drawable[]
+                    Padding = new MarginPadding(10),
+                    ColumnDimensions =
+                    [
+                        new Dimension(),
+                        new Dimension(GridSizeMode.AutoSize)
+                    ],
+                    RowDimensions = [new Dimension(GridSizeMode.AutoSize, minSize: 40)],
+                    Content = new[]
                     {
-                        tagFlow = new FillFlowContainer<DrawableUserTag>
+                        new Drawable[]
                         {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Direction = FillDirection.Full,
-                            LayoutDuration = 300,
-                            LayoutEasing = Easing.OutQuint,
-                            Spacing = new Vector2(4),
-                        },
-                        new AddTagsButton
-                        {
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre,
-                            OnTagSelected = onExtraTagSelected,
-                            AvailableTags = { BindTarget = extraTags },
-                        },
-                    },
+                            new FillFlowContainer
+                            {
+                                Direction = FillDirection.Vertical,
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                Spacing = new Vector2(8),
+                                Children = new Drawable[]
+                                {
+                                    tagFlow = new FillFlowContainer<DrawableUserTag>
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        AutoSizeAxes = Axes.Y,
+                                        Direction = FillDirection.Full,
+                                        Spacing = new Vector2(4),
+                                    },
+                                },
+                            },
+                            new TagList
+                            {
+                                AvailableTags = { BindTarget = relevantTagsById },
+                                OnSelected = toggleVote,
+                            }
+                        }
+                    }
                 },
-                loadingLayer = new LoadingLayer
+                loadingLayer = new LoadingLayer(dimBackground: true)
                 {
                     RelativeSizeAxes = Axes.Both,
                     State = { Value = Visibility.Visible }
                 },
             };
 
-            allTags = sessionStatics.GetBindable<APITag[]?>(Static.AllBeatmapTags);
+            apiTags = sessionStatics.GetBindable<APITag[]?>(Static.AllBeatmapTags);
 
-            if (allTags.Value == null)
+            if (apiTags.Value == null)
             {
                 var listTagsRequest = new ListTagsRequest();
-                listTagsRequest.Success += tags => allTags.Value = tags.Tags.ToArray();
+                listTagsRequest.Success += tags => apiTags.Value = tags.Tags.ToArray();
                 api.Queue(listTagsRequest);
             }
 
@@ -115,28 +131,11 @@ namespace osu.Game.Screens.Ranking
             api.Queue(getBeatmapSetRequest);
         }
 
-        private void onExtraTagSelected(UserTag tag)
-        {
-            loadingLayer.Show();
-            extraTags.Remove(tag);
-
-            var req = new AddBeatmapTagRequest(beatmapInfo.OnlineID, tag.Id);
-            req.Success += () =>
-            {
-                tag.Voted.Value = true;
-                tag.VoteCount.Value += 1;
-                displayedTags.Add(tag);
-                loadingLayer.Hide();
-            };
-            req.Failure += _ => extraTags.Add(tag);
-            api.Queue(req);
-        }
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            allTags.BindValueChanged(_ => updateTags());
+            apiTags.BindValueChanged(_ => updateTags());
             apiBeatmap.BindValueChanged(_ => updateTags());
             updateTags();
 
@@ -145,27 +144,28 @@ namespace osu.Game.Screens.Ranking
 
         private void updateTags()
         {
-            if (allTags.Value == null || apiBeatmap.Value?.TopTags == null)
+            if (apiTags.Value == null || apiBeatmap.Value == null)
                 return;
 
-            var relevantTagsById = allTags.Value
-                                          .Where(tag => tag.RulesetId == null || tag.RulesetId == beatmapInfo.Ruleset.OnlineID)
-                                          .ToDictionary(t => t.Id);
-            var ownTagIds = apiBeatmap.Value.OwnTagIds?.ToHashSet() ?? new HashSet<long>();
+            relevantTagsById.Clear();
+            relevantTagsById.AddRange(apiTags.Value
+                                             .Where(t => t.RulesetId == null || t.RulesetId == beatmapInfo.Ruleset.OnlineID)
+                                             .Select(t => new KeyValuePair<long, UserTag>(t.Id, new UserTag(t))));
 
-            foreach (var topTag in apiBeatmap.Value.TopTags)
+            foreach (var topTag in apiBeatmap.Value.TopTags ?? [])
             {
-                if (relevantTagsById.Remove(topTag.TagId, out var tag))
+                if (relevantTagsById.TryGetValue(topTag.TagId, out var tag))
                 {
-                    displayedTags.Add(new UserTag(tag)
-                    {
-                        VoteCount = { Value = topTag.VoteCount },
-                        Voted = { Value = ownTagIds.Contains(tag.Id) }
-                    });
+                    tag.VoteCount.Value = topTag.VoteCount;
+                    displayedTags.Add(tag);
                 }
             }
 
-            extraTags.AddRange(relevantTagsById.Select(t => new UserTag(t.Value)));
+            foreach (long ownTagId in apiBeatmap.Value.OwnTagIds ?? [])
+            {
+                if (relevantTagsById.TryGetValue(ownTagId, out var tag))
+                    tag.Voted.Value = true;
+            }
 
             loadingLayer.Hide();
         }
@@ -181,7 +181,7 @@ namespace osu.Game.Screens.Ranking
                     for (int i = 0; i < e.NewItems!.Count; i++)
                     {
                         var tag = (UserTag)e.NewItems[i]!;
-                        var drawableTag = new DrawableUserTag(tag);
+                        var drawableTag = new DrawableUserTag(tag) { OnSelected = toggleVote };
                         tagFlow.Insert(tagFlow.Count, drawableTag);
                         tag.VoteCount.BindValueChanged(voteCountChanged, true);
                         layout.Invalidate();
@@ -210,15 +210,59 @@ namespace osu.Game.Screens.Ranking
             }
         }
 
+        private void toggleVote(UserTag tag)
+        {
+            if (requestInFlight != null)
+                return;
+
+            loadingLayer.Show();
+
+            APIRequest request;
+
+            switch (tag.Voted.Value)
+            {
+                case true:
+                    var removeReq = new RemoveBeatmapTagRequest(beatmapInfo.OnlineID, tag.Id);
+                    removeReq.Success += () =>
+                    {
+                        tag.VoteCount.Value -= 1;
+                        tag.Voted.Value = false;
+                    };
+                    request = removeReq;
+                    break;
+
+                case false:
+                    var addReq = new AddBeatmapTagRequest(beatmapInfo.OnlineID, tag.Id);
+                    addReq.Success += () =>
+                    {
+                        tag.VoteCount.Value += 1;
+                        tag.Voted.Value = true;
+                        if (!displayedTags.Contains(tag))
+                            displayedTags.Add(tag);
+                    };
+                    request = addReq;
+                    break;
+            }
+
+            request.Success += () =>
+            {
+                loadingLayer.Hide();
+                requestInFlight = null;
+            };
+            request.Failure += _ =>
+            {
+                loadingLayer.Hide();
+                requestInFlight = null;
+            };
+            api.Queue(requestInFlight = request);
+        }
+
         private void voteCountChanged(ValueChangedEvent<int> _)
         {
             var tagsWithNoVotes = displayedTags.Where(t => t.VoteCount.Value == 0).ToArray();
 
             foreach (var tag in tagsWithNoVotes)
-            {
                 displayedTags.Remove(tag);
-                extraTags.Add(tag);
-            }
 
             layout.Invalidate();
         }
@@ -241,9 +285,17 @@ namespace osu.Game.Screens.Ranking
             }
         }
 
+        protected override bool OnClick(ClickEvent e) => true;
+
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
+        {
+        }
+
         private partial class DrawableUserTag : OsuAnimatedButton
         {
             public readonly UserTag UserTag;
+
+            public Action<UserTag>? OnSelected { get; set; }
 
             private readonly Bindable<int> voteCount = new Bindable<int>();
             private readonly BindableBool voted = new BindableBool();
@@ -251,20 +303,12 @@ namespace osu.Game.Screens.Ranking
 
             private Box mainBackground = null!;
             private Box voteBackground = null!;
+            private OsuSpriteText tagCategoryText = null!;
             private OsuSpriteText tagNameText = null!;
             private OsuSpriteText voteCountText = null!;
-            private LoadingSpinner spinner = null!;
 
             [Resolved]
             private OsuColour colours { get; set; } = null!;
-
-            [Resolved]
-            private Bindable<WorkingBeatmap> beatmap { get; set; } = null!;
-
-            [Resolved]
-            private IAPIProvider api { get; set; } = null!;
-
-            private APIRequest? requestInFlight;
 
             public DrawableUserTag(UserTag userTag)
             {
@@ -273,19 +317,19 @@ namespace osu.Game.Screens.Ranking
                 voted.BindTo(userTag.Voted);
 
                 AutoSizeAxes = Axes.Both;
+
+                ScaleOnMouseDown = 0.95f;
             }
 
             [BackgroundDependencyLoader]
             private void load()
             {
-                Anchor = Anchor.Centre;
-                Origin = Anchor.Centre;
-                CornerRadius = 8;
+                CornerRadius = 5;
                 Masking = true;
                 EdgeEffect = new EdgeEffectParameters
                 {
                     Colour = colours.Lime1,
-                    Radius = 5,
+                    Radius = 6,
                     Type = EdgeEffectType.Glow,
                 };
                 Content.AddRange(new Drawable[]
@@ -299,21 +343,43 @@ namespace osu.Game.Screens.Ranking
                     {
                         AutoSizeAxes = Axes.Both,
                         Direction = FillDirection.Horizontal,
-                        Padding = new MarginPadding { Left = 6, Right = 3, Vertical = 3, },
-                        Spacing = new Vector2(5),
                         Children = new Drawable[]
                         {
-                            tagNameText = new OsuSpriteText
+                            tagCategoryText = new OsuSpriteText
                             {
-                                Text = UserTag.Name,
+                                Alpha = UserTag.GroupName != null ? 0.6f : 0,
+                                Text = UserTag.GroupName ?? default(LocalisableString),
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
+                                Margin = new MarginPadding { Horizontal = 6 }
+                            },
+                            new Container
+                            {
+                                RelativeSizeAxes = Axes.Y,
+                                AutoSizeAxes = Axes.X,
+                                Anchor = Anchor.CentreLeft,
+                                Origin = Anchor.CentreLeft,
+                                Children = new Drawable[]
+                                {
+                                    new Box
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        Alpha = 0.1f,
+                                        Blending = BlendingParameters.Additive,
+                                    },
+                                    tagNameText = new OsuSpriteText
+                                    {
+                                        Text = UserTag.DisplayName,
+                                        Font = OsuFont.Default.With(weight: FontWeight.SemiBold),
+                                        Anchor = Anchor.CentreLeft,
+                                        Origin = Anchor.CentreLeft,
+                                        Margin = new MarginPadding { Horizontal = 6 }
+                                    },
+                                }
                             },
                             new Container
                             {
                                 AutoSizeAxes = Axes.Both,
-                                CornerRadius = 5,
-                                Masking = true,
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
                                 Children = new Drawable[]
@@ -326,11 +392,6 @@ namespace osu.Game.Screens.Ranking
                                     {
                                         Margin = new MarginPadding { Horizontal = 6, Vertical = 3, },
                                     },
-                                    spinner = new LoadingSpinner(withBox: true)
-                                    {
-                                        Alpha = 0,
-                                        Size = new Vector2(18),
-                                    }
                                 }
                             }
                         }
@@ -355,7 +416,7 @@ namespace osu.Game.Screens.Ranking
                 {
                     if (v.NewValue)
                     {
-                        voteBackground.FadeColour(colours.Lime3, transition_duration, Easing.OutQuint);
+                        voteBackground.FadeColour(colours.Lime2, transition_duration, Easing.OutQuint);
                         voteCountText.FadeColour(Colour4.Black, transition_duration, Easing.OutQuint);
                     }
                     else
@@ -368,130 +429,111 @@ namespace osu.Game.Screens.Ranking
                 {
                     if (c.NewValue)
                     {
-                        mainBackground.FadeColour(colours.Lime1, transition_duration, Easing.OutQuint);
+                        mainBackground.FadeColour(colours.Lime2, transition_duration, Easing.OutQuint);
+                        tagCategoryText.FadeColour(Colour4.Black, transition_duration, Easing.OutQuint);
                         tagNameText.FadeColour(Colour4.Black, transition_duration, Easing.OutQuint);
-                        FadeEdgeEffectTo(0.5f, transition_duration, Easing.OutQuint);
+                        FadeEdgeEffectTo(0.3f, transition_duration, Easing.OutQuint);
                     }
                     else
                     {
-                        mainBackground.FadeColour(colours.Gray4, transition_duration, Easing.OutQuint);
+                        mainBackground.FadeColour(colours.Gray6, transition_duration, Easing.OutQuint);
+                        tagCategoryText.FadeColour(Colour4.White, transition_duration, Easing.OutQuint);
                         tagNameText.FadeColour(Colour4.White, transition_duration, Easing.OutQuint);
                         FadeEdgeEffectTo(0f, transition_duration, Easing.OutQuint);
                     }
                 }, true);
                 FinishTransforms(true);
 
-                Action = () =>
-                {
-                    if (requestInFlight != null)
-                        return;
-
-                    spinner.Show();
-
-                    APIRequest request;
-
-                    switch (voted.Value)
-                    {
-                        case true:
-                            var removeReq = new RemoveBeatmapTagRequest(beatmap.Value.BeatmapInfo.OnlineID, UserTag.Id);
-                            removeReq.Success += () =>
-                            {
-                                voteCount.Value -= 1;
-                                voted.Value = false;
-                            };
-                            request = removeReq;
-                            break;
-
-                        case false:
-                            var addReq = new AddBeatmapTagRequest(beatmap.Value.BeatmapInfo.OnlineID, UserTag.Id);
-                            addReq.Success += () =>
-                            {
-                                voteCount.Value += 1;
-                                voted.Value = true;
-                            };
-                            request = addReq;
-                            break;
-                    }
-
-                    request.Success += () =>
-                    {
-                        spinner.Hide();
-                        requestInFlight = null;
-                    };
-                    request.Failure += _ =>
-                    {
-                        spinner.Hide();
-                        requestInFlight = null;
-                    };
-                    api.Queue(requestInFlight = request);
-                };
+                Action = () => OnSelected?.Invoke(UserTag);
             }
         }
 
-        private partial class AddTagsButton : GrayButton, IHasPopover
-        {
-            public BindableList<UserTag> AvailableTags { get; } = new BindableList<UserTag>();
-
-            public Action<UserTag>? OnTagSelected { get; set; }
-
-            public AddTagsButton()
-                : base(FontAwesome.Solid.Plus)
-            {
-                Size = new Vector2(30);
-
-                Action = this.ShowPopover;
-            }
-
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-
-                AvailableTags.BindCollectionChanged((_, _) => Enabled.Value = AvailableTags.Count > 0, true);
-            }
-
-            public Popover GetPopover() => new AddTagsPopover
-            {
-                AvailableTags = { BindTarget = AvailableTags },
-                OnSelected = OnTagSelected,
-            };
-        }
-
-        private partial class AddTagsPopover : OsuPopover
+        private partial class TagList : CompositeDrawable, IKeyBindingHandler<GlobalAction>
         {
             private SearchTextBox searchBox = null!;
             private SearchContainer searchContainer = null!;
+            private Container content = null!;
 
-            public BindableList<UserTag> AvailableTags { get; } = new BindableList<UserTag>();
+            public BindableDictionary<long, UserTag> AvailableTags { get; } = new BindableDictionary<long, UserTag>();
 
             public Action<UserTag>? OnSelected { get; set; }
 
+            private CancellationTokenSource? loadCancellationTokenSource;
+
+            private readonly BindableBool expanded = new BindableBool();
+
             [BackgroundDependencyLoader]
-            private void load()
+            private void load(OsuColour colours)
             {
-                Child = new OsuScrollContainer
+                Margin = new MarginPadding { Left = 30 };
+                InternalChildren = new Drawable[]
                 {
-                    Width = 250,
-                    Height = 250,
-                    ScrollbarOverlapsContent = false,
-                    Children = new Drawable[]
+                    new OsuClickableContainer
                     {
-                        searchBox = new SearchTextBox
+                        AutoSizeAxes = Axes.Both,
+                        Anchor = Anchor.TopLeft,
+                        Origin = Anchor.TopRight,
+                        X = 10,
+                        Masking = true,
+                        CornerRadius = 5,
+                        Children = new Drawable[]
                         {
-                            HoldFocus = true,
-                            RelativeSizeAxes = Axes.X,
-                        },
-                        searchContainer = new SearchContainer
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Direction = FillDirection.Vertical,
-                            Padding = new MarginPadding { Right = 5, Top = 50, },
-                            Spacing = new Vector2(10),
-                            ChildrenEnumerable = AvailableTags.Select(tag => new DrawableAddableTag(tag)
+                            new Box
                             {
-                                Action = () => select(tag)
-                            })
-                        }
+                                RelativeSizeAxes = Axes.Both,
+                                Colour = colours.Gray5,
+                            },
+                            new SpriteIcon
+                            {
+                                Size = new Vector2(16),
+                                Icon = FontAwesome.Solid.Plus,
+                                Margin = new MarginPadding(10),
+                            }
+                        },
+                        Action = expanded.Toggle,
+                    },
+                    new Container
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Masking = true,
+                        CornerRadius = 10,
+                        Children = new Drawable[]
+                        {
+                            new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Colour = colours.Gray5,
+                            },
+                            content = new Container
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Padding = new MarginPadding(10) { Top = 12 },
+                                Children = new Drawable[]
+                                {
+                                    searchBox = new SearchTextBox
+                                    {
+                                        HoldFocus = true,
+                                        RelativeSizeAxes = Axes.X,
+                                        Depth = float.MinValue,
+                                        Y = -2, // hacky compensation for masking issues
+                                    },
+                                    new OsuScrollContainer
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        Padding = new MarginPadding { Top = 42, },
+                                        ScrollbarOverlapsContent = false,
+                                        Child = searchContainer = new SearchContainer
+                                        {
+                                            RelativeSizeAxes = Axes.X,
+                                            AutoSizeAxes = Axes.Y,
+                                            Padding = new MarginPadding { Right = 5, Bottom = 10 },
+                                            Direction = FillDirection.Vertical,
+                                            Spacing = new Vector2(10),
+                                        }
+                                    }
+                                },
+                            },
+                        },
                     },
                 };
             }
@@ -500,21 +542,57 @@ namespace osu.Game.Screens.Ranking
             {
                 base.LoadComplete();
 
+                AvailableTags.BindCollectionChanged((_, _) =>
+                {
+                    loadCancellationTokenSource?.Cancel();
+                    loadCancellationTokenSource = new CancellationTokenSource();
+
+                    LoadComponentsAsync(createItems(AvailableTags.Values), loaded =>
+                    {
+                        searchContainer.Clear();
+                        searchContainer.AddRange(loaded);
+                    }, loadCancellationTokenSource.Token);
+                }, true);
                 searchBox.Current.BindValueChanged(_ => searchContainer.SearchTerm = searchBox.Current.Value, true);
+                expanded.BindValueChanged(_ =>
+                {
+                    const float transition_duration = 250;
+
+                    if (expanded.Value)
+                    {
+                        this.ResizeWidthTo(400, transition_duration, Easing.OutQuint);
+                        content.FadeIn(250, Easing.OutQuint);
+                        RelativeSizeAxes = Axes.None;
+                        this.ResizeHeightTo(300, transition_duration, Easing.OutQuint);
+                    }
+                    else
+                    {
+                        this.ResizeWidthTo(10, transition_duration, Easing.OutQuint);
+                        content.FadeOut(250, Easing.OutQuint);
+                        RelativeSizeAxes = Axes.Y;
+                        this.ResizeHeightTo(1, transition_duration, Easing.OutQuint);
+                    }
+                }, true);
             }
 
-            public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+            private IEnumerable<Drawable> createItems(IEnumerable<UserTag> tags)
             {
-                if (base.OnPressed(e))
-                    return true;
+                var grouped = tags.GroupBy(tag => tag.GroupName).OrderBy(group => group.Key);
 
-                if (e.Repeat)
-                    return false;
+                foreach (var group in grouped)
+                {
+                    var drawableGroup = new GroupFlow(group.Key);
 
-                if (State.Value == Visibility.Hidden)
-                    return false;
+                    foreach (var tag in group.OrderBy(t => t.FullName))
+                        drawableGroup.Add(new DrawableAddableTag(tag) { Action = () => OnSelected?.Invoke(tag) });
 
-                if (e.Action == GlobalAction.Select)
+                    yield return drawableGroup;
+                }
+            }
+
+            public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+            {
+                if (e.Action == GlobalAction.Select && !e.Repeat)
                 {
                     attemptSelect();
                     return true;
@@ -523,34 +601,50 @@ namespace osu.Game.Screens.Ranking
                 return false;
             }
 
-            protected override bool OnKeyDown(KeyDownEvent e)
+            public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
             {
-                if (e.Key == Key.Enter)
-                {
-                    attemptSelect();
-                    return true;
-                }
-
-                return base.OnKeyDown(e);
             }
 
             private void attemptSelect()
             {
-                var visibleItems = searchContainer.OfType<DrawableAddableTag>().Where(d => d.IsPresent).ToArray();
+                var visibleItems = searchContainer.ChildrenOfType<DrawableAddableTag>().Where(d => d.IsPresent).ToArray();
 
                 if (visibleItems.Length == 1)
-                    select(visibleItems.Single().Tag);
+                    OnSelected?.Invoke(visibleItems.Single().Tag);
             }
 
-            private void select(UserTag tag)
+            private partial class GroupFlow : FillFlowContainer, IFilterable
             {
-                OnSelected?.Invoke(tag);
-                this.HidePopover();
+                public IEnumerable<LocalisableString> FilterTerms { get; }
+
+                public bool MatchingFilter
+                {
+                    set => Alpha = value ? 1 : 0;
+                }
+
+                public bool FilteringActive { set { } }
+
+                public GroupFlow(string? name)
+                {
+                    RelativeSizeAxes = Axes.X;
+                    AutoSizeAxes = Axes.Y;
+                    Direction = FillDirection.Vertical;
+                    Spacing = new Vector2(5);
+
+                    Add(new StatisticItemHeader { Text = name ?? "uncategorised" });
+
+                    FilterTerms = name == null ? [] : [name];
+                }
             }
 
             private partial class DrawableAddableTag : OsuAnimatedButton, IFilterable
             {
                 public readonly UserTag Tag;
+
+                private Box votedBackground = null!;
+                private SpriteIcon votedIcon = null!;
+
+                private readonly Bindable<bool> voted = new Bindable<bool>();
 
                 public DrawableAddableTag(UserTag tag)
                 {
@@ -558,19 +652,45 @@ namespace osu.Game.Screens.Ranking
 
                     RelativeSizeAxes = Axes.X;
                     AutoSizeAxes = Axes.Y;
-                    Anchor = Origin = Anchor.Centre;
+
+                    ScaleOnMouseDown = 0.95f;
                 }
 
+                [Resolved]
+                private OsuColour colours { get; set; } = null!;
+
                 [BackgroundDependencyLoader]
-                private void load(OsuColour colours, OverlayColourProvider? colourProvider)
+                private void load()
                 {
                     Content.AddRange(new Drawable[]
                     {
                         new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = colourProvider?.Background3 ?? colours.GreySeaFoamDark,
+                            Colour = colours.Gray7,
                             Depth = float.MaxValue,
+                        },
+                        new Container
+                        {
+                            RelativeSizeAxes = Axes.Y,
+                            Width = 30,
+                            Anchor = Anchor.CentreRight,
+                            Origin = Anchor.CentreRight,
+                            Depth = float.MaxValue,
+                            Children = new Drawable[]
+                            {
+                                votedBackground = new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                },
+                                votedIcon = new SpriteIcon
+                                {
+                                    Size = new Vector2(16),
+                                    Icon = FontAwesome.Solid.ThumbsUp,
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                }
+                            }
                         },
                         new FillFlowContainer
                         {
@@ -578,14 +698,14 @@ namespace osu.Game.Screens.Ranking
                             AutoSizeAxes = Axes.Y,
                             Direction = FillDirection.Vertical,
                             Spacing = new Vector2(2),
-                            Padding = new MarginPadding(5),
+                            Padding = new MarginPadding(5) { Right = 35 },
                             Children = new Drawable[]
                             {
-                                new OsuTextFlowContainer(t => t.Font = OsuFont.Default.With(weight: FontWeight.Bold))
+                                new OsuTextFlowContainer(t => t.Font = OsuFont.Default.With(weight: FontWeight.SemiBold))
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
-                                    Text = Tag.Name,
+                                    Text = Tag.DisplayName,
                                 },
                                 new OsuTextFlowContainer(t => t.Font = OsuFont.Default.With(size: 14))
                                 {
@@ -596,12 +716,26 @@ namespace osu.Game.Screens.Ranking
                             }
                         }
                     });
+
+                    voted.BindTo(Tag.Voted);
                 }
 
-                public IEnumerable<LocalisableString> FilterTerms => [Tag.Name, Tag.Description];
+                public IEnumerable<LocalisableString> FilterTerms => [Tag.FullName, Tag.Description];
 
                 public bool MatchingFilter { set => Alpha = value ? 1 : 0; }
                 public bool FilteringActive { set { } }
+
+                protected override void LoadComplete()
+                {
+                    base.LoadComplete();
+
+                    voted.BindValueChanged(_ =>
+                    {
+                        votedBackground.FadeColour(voted.Value ? colours.Lime2 : colours.Gray2, 250, Easing.OutQuint);
+                        votedIcon.FadeColour(voted.Value ? Colour4.Black : Colour4.White, 250, Easing.OutQuint);
+                    }, true);
+                    FinishTransforms(true);
+                }
             }
         }
     }

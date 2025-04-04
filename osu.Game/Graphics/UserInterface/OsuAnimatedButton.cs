@@ -25,6 +25,8 @@ namespace osu.Game.Graphics.UserInterface
 
         private Color4 hoverColour = Color4.White.Opacity(0.1f);
 
+        protected float ScaleOnMouseDown { get; init; } = 0.75f;
+
         /// <summary>
         /// The background colour of the <see cref="OsuAnimatedButton"/> while it is hovered.
         /// </summary>
@@ -119,7 +121,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
-            Content.ScaleTo(0.75f, 2000, Easing.OutQuint);
+            Content.ScaleTo(ScaleOnMouseDown, 2000, Easing.OutQuint);
             return base.OnMouseDown(e);
         }
 
