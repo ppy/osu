@@ -29,6 +29,9 @@ namespace osu.Game.Rulesets.Mania.Mods
 
         public override bool Ranked => false;
 
+        // Ideally we'd allow this, but it's not easy to handle due to the change in acronym from the base class.
+        public override bool ValidForFreestyle => false;
+
         [SettingSource("Coverage", "The proportion of playfield height that notes will be hidden for.")]
         public override BindableNumber<float> Coverage { get; } = new BindableFloat(0.5f)
         {
