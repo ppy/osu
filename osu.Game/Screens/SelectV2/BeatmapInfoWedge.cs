@@ -107,19 +107,19 @@ namespace osu.Game.Screens.SelectV2
                         new ShearAlignedDrawable(shear, new Container
                         {
                             RelativeSizeAxes = Axes.X,
-                            Height = 35,
+                            Height = 32,
                             Child = statusPill = new BeatmapSetOnlineStatusPill
                             {
                                 AutoSizeAxes = Axes.Both,
                                 Margin = new MarginPadding { Right = 20f, Top = 20f },
-                                TextSize = 11,
+                                TextSize = OsuFont.Caption.Size,
                                 TextPadding = new MarginPadding { Horizontal = 8, Vertical = 2 },
                             }
                         }),
                         new ShearAlignedDrawable(shear, titleContainer = new Container
                         {
                             RelativeSizeAxes = Axes.X,
-                            Height = 36f,
+                            Height = OsuFont.Display.Size + 2,
                             Margin = new MarginPadding { Bottom = -5f },
                             Child = titleLink = new OsuHoverContainer
                             {
@@ -127,14 +127,14 @@ namespace osu.Game.Screens.SelectV2
                                 Child = titleLabel = new TruncatingSpriteText
                                 {
                                     Shadow = true,
-                                    Font = OsuFont.TorusAlternate.With(size: 36f, weight: FontWeight.SemiBold),
+                                    Font = OsuFont.Display,
                                 },
                             }
                         }),
                         new ShearAlignedDrawable(shear, artistContainer = new Container
                         {
                             RelativeSizeAxes = Axes.X,
-                            Height = 24f,
+                            Height = OsuFont.Subheading.Size,
                             Margin = new MarginPadding { Left = 1f },
                             Child = artistLink = new OsuHoverContainer
                             {
@@ -142,7 +142,7 @@ namespace osu.Game.Screens.SelectV2
                                 Child = artistLabel = new TruncatingSpriteText
                                 {
                                     Shadow = true,
-                                    Font = OsuFont.Torus.With(size: 24f, weight: FontWeight.SemiBold),
+                                    Font = OsuFont.Subheading,
                                 },
                             }
                         }),

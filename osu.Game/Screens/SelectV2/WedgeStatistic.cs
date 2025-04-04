@@ -62,8 +62,7 @@ namespace osu.Game.Screens.SelectV2
             this.leftPadding = leftPadding;
             this.minSize = minSize;
 
-            AutoSizeAxes = Axes.X;
-            Height = 25f;
+            AutoSizeAxes = Axes.Both;
         }
 
         [BackgroundDependencyLoader]
@@ -87,7 +86,7 @@ namespace osu.Game.Screens.SelectV2
                     Origin = Anchor.CentreLeft,
                     AutoSizeAxes = Axes.Both,
                     Direction = FillDirection.Horizontal,
-                    Margin = new MarginPadding { Left = background ? leftPadding : 0, Right = background ? 10f : 0f },
+                    Margin = new MarginPadding { Left = background ? leftPadding : 0, Right = background ? 10f : 0f, Vertical = 5f },
                     Spacing = new Vector2(4f, 0f),
                     Shear = background ? -shear : Vector2.Zero,
                     Children = new Drawable[]
@@ -97,7 +96,7 @@ namespace osu.Game.Screens.SelectV2
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                             Icon = icon,
-                            Size = new Vector2(16f),
+                            Size = new Vector2(OsuFont.Subheading.Size),
                             Colour = colourProvider.Content2,
                         },
                         new Container
@@ -111,7 +110,7 @@ namespace osu.Game.Screens.SelectV2
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
-                                    Size = new Vector2(16f),
+                                    Size = new Vector2(14f),
                                     State = { Value = Visibility.Visible },
                                 },
                                 new GridContainer
@@ -132,7 +131,7 @@ namespace osu.Game.Screens.SelectV2
                                             {
                                                 Anchor = Anchor.Centre,
                                                 Origin = Anchor.Centre,
-                                                Font = OsuFont.Torus.With(size: 16f, weight: FontWeight.SemiBold),
+                                                Font = OsuFont.Subheading,
                                                 Colour = colourProvider.Content2,
                                                 Margin = new MarginPadding { Bottom = 2f },
                                                 AlwaysPresent = true,
