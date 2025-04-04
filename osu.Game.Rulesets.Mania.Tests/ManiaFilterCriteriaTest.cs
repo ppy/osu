@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                 new FilterCriteria()));
 
             Assert.True(criteria.Matches(
-                new BeatmapInfo(new RulesetInfo() { OnlineID = 0 }, new BeatmapDifficulty { CircleSize = 4 }),
+                new BeatmapInfo(new RulesetInfo { OnlineID = 0 }, new BeatmapDifficulty { CircleSize = 4 }),
                 new FilterCriteria
                 {
                     Mods = [new ManiaModKey1()]
@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                 new FilterCriteria()));
 
             Assert.True(criteria.Matches(
-                new BeatmapInfo(new RulesetInfo() { OnlineID = 0 }, new BeatmapDifficulty { CircleSize = 4 }),
+                new BeatmapInfo(new RulesetInfo { OnlineID = 0 }, new BeatmapDifficulty { CircleSize = 4 }),
                 new FilterCriteria
                 {
                     Mods = [new ManiaModKey1()]
@@ -83,7 +83,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                 new FilterCriteria()));
 
             Assert.False(criteria.Matches(
-                new BeatmapInfo(new RulesetInfo() { OnlineID = 0 }, new BeatmapDifficulty { CircleSize = 4 }),
+                new BeatmapInfo(new RulesetInfo { OnlineID = 0 }, new BeatmapDifficulty { CircleSize = 4 }),
                 new FilterCriteria
                 {
                     Mods = [new ManiaModKey1()]
@@ -109,7 +109,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                 new FilterCriteria()));
 
             Assert.False(criteria.Matches(
-                new BeatmapInfo(new RulesetInfo() { OnlineID = 0 }, new BeatmapDifficulty { CircleSize = 4 }),
+                new BeatmapInfo(new RulesetInfo { OnlineID = 0 }, new BeatmapDifficulty { CircleSize = 4 }),
                 new FilterCriteria
                 {
                     Mods = [new ManiaModKey1()]
@@ -139,7 +139,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                 new FilterCriteria()));
 
             Assert.True(criteria.Matches(
-                new BeatmapInfo(new RulesetInfo() { OnlineID = 0 }, new BeatmapDifficulty { CircleSize = 3 }),
+                new BeatmapInfo(new RulesetInfo { OnlineID = 0 }, new BeatmapDifficulty { CircleSize = 3 }),
                 new FilterCriteria
                 {
                     Mods = [new ManiaModKey7()]
