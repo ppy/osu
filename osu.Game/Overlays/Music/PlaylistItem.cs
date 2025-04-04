@@ -31,19 +31,10 @@ namespace osu.Game.Overlays.Music
         private readonly Bindable<Live<BeatmapSetInfo>?> selectedSet = new Bindable<Live<BeatmapSetInfo>?>();
         private Action<Live<BeatmapSetInfo>>? requestSelection;
 
-        private TextFlowContainer text = null!;
-        private ITextPart? titlePart;
+        private OverflowScrollingContainer text = null!;
 
         [Resolved]
         private OsuColour colours { get; set; } = null!;
-
-        [Resolved]
-        private PlaylistOverlay playlistOverlay { get; set; } = null!;
-
-        public PlaylistItem()
-        {
-            Padding = new MarginPadding { Horizontal = 10 };
-        }
 
         [BackgroundDependencyLoader]
         private void load(PlaylistOverlay playlistOverlay)
@@ -51,12 +42,11 @@ namespace osu.Game.Overlays.Music
             RelativeSizeAxes = Axes.X;
             Height = 20;
 
-            InternalChild = text = new OsuTextFlowContainer
+            InternalChild = text = new OverflowScrollingContainer
             {
                 Anchor = Anchor.CentreLeft,
                 Origin = Anchor.CentreLeft,
-                RelativeSizeAxes = Axes.Both,
-                Direction = FillDirection.Horizontal,
+                RelativeSizeAxes = Axes.X,
             };
 
             selectedSet.BindTo(playlistOverlay.SelectedSet);
@@ -77,21 +67,25 @@ namespace osu.Game.Overlays.Music
             var title = new RomanisableString(metadata.TitleUnicode, metadata.Title);
             var artist = new RomanisableString(metadata.ArtistUnicode, metadata.Artist);
 
-            text.Clear();
-
-            titlePart = text.AddText(title, sprite => sprite.Font = OsuFont.GetFont(weight: FontWeight.Regular));
-            titlePart.DrawablePartsRecreated += _ =>
+            text.CreateContent.Value = () =>
             {
-                selectedSet.TriggerChange();
-                FinishTransforms(true);
+                var flow = new OsuTextFlowContainer
+                {
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                    AutoSizeAxes = Axes.Both,
+                    Direction = FillDirection.Horizontal,
+                };
+
+                flow.AddText(title, sprite => sprite.Font = OsuFont.GetFont(weight: FontWeight.Regular));
+                flow.AddText(@"  "); // to separate the title from the artist.
+                flow.AddText(artist, sprite =>
+                {
+                    sprite.Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold);
+                    sprite.Colour = colours.Gray9;
+                });
+                return flow;
             };
-
-            text.AddText(@"  "); // to separate the title from the artist.
-            text.AddText(artist, sprite =>
-            {
-                sprite.Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold);
-                sprite.Colour = colours.Gray9;
-            });
 
             selectedSet.TriggerChange();
             FinishTransforms(true);
@@ -107,11 +101,7 @@ namespace osu.Game.Overlays.Music
             if (wasSelected == this.selected)
                 return;
 
-            if (titlePart != null)
-            {
-                foreach (Drawable s in titlePart.Drawables)
-                    s.FadeColour(this.selected == true ? colours.Yellow : Color4.White, 100);
-            }
+            text.FadeColour(this.selected == true ? colours.Yellow : Color4.White, 100);
         }
 
         protected override bool OnClick(ClickEvent e)
