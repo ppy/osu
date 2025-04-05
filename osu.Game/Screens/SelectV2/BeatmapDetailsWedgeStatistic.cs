@@ -33,7 +33,7 @@ namespace osu.Game.Screens.SelectV2
                 {
                     string valueString = value.Value.value.ToString();
                     // todo: this logic is not perfect but we don't have a way to truncate text in TextFlowContainer yet.
-                    string truncatedValueString = valueString.Truncate(28);
+                    string truncatedValueString = valueString.Truncate(24);
 
                     if (value.Value.linkAction != null)
                         valueText.AddLink(truncatedValueString, value.Value.linkAction, valueString != truncatedValueString ? valueString : null);
@@ -44,7 +44,7 @@ namespace osu.Game.Screens.SelectV2
                 {
                     valueText.AddArbitraryDrawable(new LoadingSpinner
                     {
-                        Size = new Vector2(12),
+                        Size = new Vector2(OsuFont.Caption.Size),
                         State = { Value = Visibility.Visible },
                         Margin = new MarginPadding { Top = 4f },
                     });
@@ -59,7 +59,7 @@ namespace osu.Game.Screens.SelectV2
                 valueText.Clear();
 
                 if (value != null)
-                    valueText.AddArbitraryDrawable(new DrawableDate(value.Value, textSize: 12f, italic: false));
+                    valueText.AddArbitraryDrawable(new DrawableDate(value.Value, textSize: OsuFont.Caption.Size, italic: false));
                 else
                     valueText.AddText("-");
             }
@@ -77,7 +77,7 @@ namespace osu.Game.Screens.SelectV2
                     total += tag.Length + 1;
 
                     // todo: this logic is not perfect but we don't have a way to truncate text in TextFlowContainer yet.
-                    if (total > 90)
+                    if (total > 80)
                     {
                         valueText.AddArbitraryDrawable(new TagsOverflowButton(value.tags));
                         break;
@@ -102,12 +102,12 @@ namespace osu.Game.Screens.SelectV2
                 labelText = new OsuSpriteText
                 {
                     Text = label,
-                    Font = OsuFont.Torus.With(size: 12f, weight: FontWeight.SemiBold),
+                    Font = OsuFont.Caption.With(weight: FontWeight.SemiBold),
                 },
-                valueText = new LinkFlowContainer(t => t.Font = t.Font.With(size: 12f, weight: FontWeight.Regular))
+                valueText = new LinkFlowContainer(t => t.Font = OsuFont.Caption)
                 {
                     RelativeSizeAxes = Axes.X,
-                    Height = 12f,
+                    Height = OsuFont.Caption.Size,
                 }
             };
         }

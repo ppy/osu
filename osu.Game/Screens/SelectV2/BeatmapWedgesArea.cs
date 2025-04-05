@@ -27,7 +27,7 @@ namespace osu.Game.Screens.SelectV2
             CornerRadius = 10;
             Masking = true;
 
-            const float header_height = 40f;
+            const float header_height = 45f;
 
             InternalChildren = new Drawable[]
             {

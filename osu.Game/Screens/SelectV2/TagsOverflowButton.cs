@@ -56,7 +56,7 @@ namespace osu.Game.Screens.SelectV2
                     Origin = Anchor.Centre,
                     Text = "...",
                     Colour = colourProvider.Background4,
-                    Font = OsuFont.Torus.With(size: 12f, weight: FontWeight.Bold),
+                    Font = OsuFont.Caption.With(weight: FontWeight.Bold),
                     Margin = new MarginPadding { Horizontal = 3f },
                 }
             };
