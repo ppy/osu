@@ -59,12 +59,12 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
         public int? Rank { get; init; }
         public bool IsPersonalBest { get; init; }
 
-        private const float expanded_right_content_width = 175;
-        private const float grade_width = 30;
-        private const float username_min_width = 105;
-        private const float statistics_regular_min_width = 145;
-        private const float statistics_compact_min_width = 80;
-        private const float rank_label_width = 55;
+        private const float expanded_right_content_width = 200;
+        private const float grade_width = 35;
+        private const float username_min_width = 120;
+        private const float statistics_regular_min_width = 165;
+        private const float statistics_compact_min_width = 90;
+        private const float rank_label_width = 60;
 
         private readonly ScoreInfo score;
         private readonly bool sheared;
@@ -222,7 +222,7 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
                 switch (s.NewValue)
                 {
                     case ScoringMode.Standardised:
-                        rightContent.Width = 150;
+                        rightContent.Width = 170;
                         break;
 
                     case ScoringMode.Classic:
@@ -378,7 +378,7 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
                                         RelativeSizeAxes = Axes.X,
                                         Shear = new Vector2(sheared ? -OsuGame.SHEAR : 0, 0),
                                         Text = user.Username,
-                                        Font = OsuFont.GetFont(size: 16f, weight: FontWeight.SemiBold)
+                                        Font = OsuFont.Subheading,
                                     }
                                 }
                             },
@@ -510,7 +510,8 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
                                             UseFullGlyphHeight = false,
                                             Shear = new Vector2(sheared ? -OsuGame.SHEAR : 0, 0),
                                             Current = scoreManager.GetBindableTotalScoreString(score),
-                                            Font = OsuFont.GetFont(size: 25, weight: FontWeight.Light),
+                                            Spacing = new Vector2(-1.5f),
+                                            Font = OsuFont.Subdisplay.With(weight: FontWeight.Light, fixedWidth: true),
                                         },
                                         new InputBlockingContainer
                                         {
@@ -668,7 +669,7 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
             public DateLabel(DateTimeOffset date)
                 : base(date)
             {
-                Font = OsuFont.GetFont(size: 14, weight: FontWeight.Medium, italics: true);
+                Font = OsuFont.Caption.With(weight: FontWeight.SemiBold);
             }
 
             protected override string Format() => Date.ToShortRelativeTime(TimeSpan.FromSeconds(30));
@@ -703,7 +704,7 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
                         {
                             Colour = colourProvider.Content2,
                             Text = statisticInfo.Name,
-                            Font = OsuFont.GetFont(size: 10, weight: FontWeight.Bold),
+                            Font = OsuFont.Tiny.With(weight: FontWeight.SemiBold),
                         },
                         value = new OsuSpriteText
                         {
@@ -711,7 +712,7 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
                             // since the accuracy is sometimes longer than its name.
                             BypassAutoSizeAxes = Axes.X,
                             Text = statisticInfo.Value,
-                            Font = OsuFont.GetFont(size: 15, weight: FontWeight.Medium),
+                            Font = OsuFont.Body,
                         }
                     }
                 };
@@ -737,7 +738,7 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
                     Shear = new Vector2(sheared ? -OsuGame.SHEAR : 0, 0),
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Font = OsuFont.GetFont(size: 16, weight: FontWeight.SemiBold, italics: true),
+                    Font = OsuFont.Subheading,
                     Text = rank == null ? "-" : rank.Value.FormatRank().Insert(0, "#"),
                     Shadow = !darkText,
                 };
@@ -799,7 +800,7 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Shadow = false,
-                            Font = OsuFont.Torus.With(size: 26, weight: FontWeight.Bold),
+                            Font = OsuFont.Torus.With(size: 24, weight: FontWeight.Bold),
                             Text = ". . .",
                             Colour = Color4.White,
                             UseFullGlyphHeight = false,
