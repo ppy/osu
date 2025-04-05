@@ -128,7 +128,7 @@ namespace osu.Game.Screens.SelectV2
                                     {
                                         Colour = colourProvider.Content2,
                                         Text = "Personal Best",
-                                        Font = OsuFont.Torus.With(size: 14.4f, weight: FontWeight.SemiBold),
+                                        Font = OsuFont.Caption.With(weight: FontWeight.SemiBold),
                                     },
                                     personalBestScoreContainer = new Container<LeaderboardScoreV2>
                                     {
