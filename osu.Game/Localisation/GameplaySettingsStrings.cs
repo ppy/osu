@@ -80,6 +80,11 @@ namespace osu.Game.Localisation
         public static LocalisableString StarFountains => new TranslatableString(getKey(@"star_fountains"), @"Star fountains");
 
         /// <summary>
+        /// "Kiai flashing"
+        /// </summary>
+        public static LocalisableString KiaiFlashing => new TranslatableString(getKey(@"kiai_flashing"), @"Kiai flashing");
+
+        /// <summary>
         /// "Always show key overlay"
         /// </summary>
         public static LocalisableString AlwaysShowKeyOverlay => new TranslatableString(getKey(@"key_overlay"), @"Always show key overlay");

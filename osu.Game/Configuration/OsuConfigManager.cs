@@ -125,6 +125,8 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.ShowStoryboard, true);
             SetDefault(OsuSetting.BeatmapSkins, true);
             SetDefault(OsuSetting.BeatmapColours, true);
+            SetDefault(OsuSetting.KiaiFlashing, true);
+            SetDefault(OsuSetting.KiaiFlashing, true);
             SetDefault(OsuSetting.BeatmapHitsounds, true);
 
             SetDefault(OsuSetting.CursorRotation, true);
@@ -407,6 +409,7 @@ namespace osu.Game.Configuration
         ScreenshotCaptureMenuCursor,
         BeatmapSkins,
         BeatmapColours,
+        KiaiFlashing,
         BeatmapHitsounds,
         IncreaseFirstObjectVisibility,
         ScoreDisplayMode,

@@ -2,9 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osuTK.Graphics;
 
@@ -21,6 +24,8 @@ namespace osu.Game.Skinning
         private readonly Drawable flashingDrawable;
 
         private const float flash_opacity = 0.3f;
+
+        private readonly BindableBool kiaiFlashing = new BindableBool();
 
         public LegacyKiaiFlashingDrawable(Func<Drawable?> creationFunc)
         {
@@ -43,9 +48,15 @@ namespace osu.Game.Skinning
             };
         }
 
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
+        {
+            config.BindWith(OsuSetting.KiaiFlashing, kiaiFlashing);
+        }
+
         protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
         {
-            if (!effectPoint.KiaiMode)
+            if (!effectPoint.KiaiMode || !kiaiFlashing.Value)
                 return;
 
             flashingDrawable

@@ -3,12 +3,14 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
@@ -79,6 +81,8 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
 
         private readonly Box flashBox;
 
+        private readonly BindableBool kiaiFlashing = new BindableBool();
+
         protected CirclePiece()
         {
             RelativeSizeAxes = Axes.Both;
@@ -145,6 +149,12 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
             });
         }
 
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
+        {
+            config.BindWith(OsuSetting.KiaiFlashing, kiaiFlashing);
+        }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -181,7 +191,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
 
         protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
         {
-            if (!effectPoint.KiaiMode)
+            if (!effectPoint.KiaiMode || !kiaiFlashing.Value)
                 return;
 
             if (drawableHitObject.State.Value == ArmedState.Idle)
