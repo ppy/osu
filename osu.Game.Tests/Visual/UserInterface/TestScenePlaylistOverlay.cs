@@ -21,8 +21,6 @@ namespace osu.Game.Tests.Visual.UserInterface
     {
         protected override bool UseFreshStoragePerRun => true;
 
-        private PlaylistOverlay playlistOverlay = null!;
-
         private BeatmapManager beatmapManager = null!;
 
         private const int item_count = 20;
@@ -45,7 +43,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Size = new Vector2(300, 500),
-                Child = playlistOverlay = new PlaylistOverlay
+                Child = new PlaylistOverlay
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
