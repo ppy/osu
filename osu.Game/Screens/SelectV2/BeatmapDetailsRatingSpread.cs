@@ -64,7 +64,7 @@ namespace osu.Game.Screens.SelectV2
                         new OsuSpriteText
                         {
                             Text = BeatmapsetsStrings.ShowStatsRatingSpread,
-                            Font = OsuFont.Torus.With(size: 12f, weight: FontWeight.SemiBold),
+                            Font = OsuFont.Caption.With(weight: FontWeight.SemiBold),
                         },
                         new GridContainer
                         {

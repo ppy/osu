@@ -70,7 +70,7 @@ namespace osu.Game.Screens.SelectV2
                             new Circle
                             {
                                 RelativeSizeAxes = Axes.X,
-                                Height = 2.5f,
+                                Height = 2f,
                                 Colour = Color4.Black,
                                 Masking = true,
                                 CornerRadius = 1f,
@@ -79,7 +79,7 @@ namespace osu.Game.Screens.SelectV2
                             {
                                 RelativeSizeAxes = Axes.X,
                                 Width = 0f,
-                                Height = 2.5f,
+                                Height = 2f,
                                 Masking = true,
                                 CornerRadius = 1f,
                             },
@@ -87,7 +87,7 @@ namespace osu.Game.Screens.SelectV2
                             {
                                 RelativeSizeAxes = Axes.X,
                                 Width = 0f,
-                                Height = 2.5f,
+                                Height = 2f,
                                 Masking = true,
                                 CornerRadius = 1f,
                                 Alpha = 0.5f,
@@ -97,7 +97,7 @@ namespace osu.Game.Screens.SelectV2
                     labelText = new OsuSpriteText
                     {
                         Margin = new MarginPadding { Top = 2f },
-                        Font = OsuFont.Torus.With(size: 12f, weight: FontWeight.SemiBold),
+                        Font = OsuFont.Caption.With(weight: FontWeight.SemiBold),
                     },
                     new FillFlowContainer
                     {
@@ -109,7 +109,7 @@ namespace osu.Game.Screens.SelectV2
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
-                                Font = OsuFont.Torus.With(size: 20f, weight: FontWeight.Regular),
+                                Font = OsuFont.Body,
                             },
                             valueIcon = new SpriteIcon
                             {

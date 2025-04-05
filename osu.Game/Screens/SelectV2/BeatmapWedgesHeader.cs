@@ -4,6 +4,7 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -44,7 +45,7 @@ namespace osu.Game.Screens.SelectV2
                     RelativeSizeAxes = Axes.Both,
                     CornerRadius = 10,
                     Masking = true,
-                    Colour = colourProvider.Background4,
+                    Colour = colourProvider.Background4.Opacity(0.6f),
                     Child = new Box
                     {
                         RelativeSizeAxes = Axes.Both,

@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Online.Multiplayer;
@@ -19,12 +20,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
     {
         public readonly Bindable<MultiplayerPlaylistDisplayMode> DisplayMode = new Bindable<MultiplayerPlaylistDisplayMode>();
 
-        public required Bindable<PlaylistItem?> SelectedItem
-        {
-            get => selectedItem;
-            set => selectedItem.Current = value;
-        }
-
         /// <summary>
         /// Invoked when an item requests to be edited.
         /// </summary>
@@ -33,17 +28,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
         [Resolved]
         private MultiplayerClient client { get; set; } = null!;
 
-        private readonly Room room;
-        private readonly BindableWithCurrent<PlaylistItem?> selectedItem = new BindableWithCurrent<PlaylistItem?>();
         private MultiplayerPlaylistTabControl playlistTabControl = null!;
         private MultiplayerQueueList queueList = null!;
         private MultiplayerHistoryList historyList = null!;
         private bool firstPopulation = true;
-
-        public MultiplayerPlaylist(Room room)
-        {
-            this.room = room;
-        }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -65,17 +53,15 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
                     Masking = true,
                     Children = new Drawable[]
                     {
-                        queueList = new MultiplayerQueueList(room)
+                        queueList = new MultiplayerQueueList
                         {
                             RelativeSizeAxes = Axes.Both,
-                            SelectedItem = { BindTarget = selectedItem },
                             RequestEdit = item => RequestEdit?.Invoke(item)
                         },
                         historyList = new MultiplayerHistoryList
                         {
                             RelativeSizeAxes = Axes.Both,
                             Alpha = 0,
-                            SelectedItem = { BindTarget = selectedItem }
                         }
                     }
                 }
@@ -89,10 +75,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
             base.LoadComplete();
 
             DisplayMode.BindValueChanged(onDisplayModeChanged, true);
+
             client.ItemAdded += playlistItemAdded;
             client.ItemRemoved += playlistItemRemoved;
             client.ItemChanged += playlistItemChanged;
             client.RoomUpdated += onRoomUpdated;
+
             updateState();
         }
 
@@ -121,28 +109,28 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
 
                 firstPopulation = false;
             }
+
+            PlaylistItem? currentItem = client.Room == null ? null : new PlaylistItem(client.Room.CurrentPlaylistItem);
+            queueList.SelectedItem.Value = currentItem;
+            historyList.SelectedItem.Value = currentItem;
         }
 
-        private void playlistItemAdded(MultiplayerPlaylistItem item) => Schedule(() => addItemToLists(item));
+        private void playlistItemAdded(MultiplayerPlaylistItem item) => Scheduler.Add(() => addItemToLists(item));
 
-        private void playlistItemRemoved(long item) => Schedule(() => removeItemFromLists(item));
+        private void playlistItemRemoved(long item) => Scheduler.Add(() => removeItemFromLists(item));
 
-        private void playlistItemChanged(MultiplayerPlaylistItem item) => Schedule(() =>
+        private void playlistItemChanged(MultiplayerPlaylistItem item) => Scheduler.Add(() =>
         {
             if (client.Room == null)
                 return;
 
-            var newApiItem = new PlaylistItem(item);
-            var existingApiItemInQueue = queueList.Items.SingleOrDefault(i => i.ID == item.ID);
+            var existingItem = queueList.Items.SingleOrDefault(i => i.ID == item.ID);
 
             // Test if the only change between the two playlist items is the order.
-            if (existingApiItemInQueue != null && existingApiItemInQueue.With(playlistOrder: newApiItem.PlaylistOrder).Equals(newApiItem))
+            if (existingItem != null && existingItem.With(playlistOrder: item.PlaylistOrder).Equals(new PlaylistItem(item)))
             {
-                // Set the new playlist order directly without refreshing the DrawablePlaylistItem.
-                existingApiItemInQueue.PlaylistOrder = newApiItem.PlaylistOrder;
-
-                // The following isn't really required, but is here for safety and explicitness.
-                // MultiplayerQueueList internally binds to changes in Playlist to invalidate its own layout, which is mutated on every playlist operation.
+                // Set the new order directly and refresh the flow layout as an optimisation to avoid refreshing the items' visual state.
+                existingItem.PlaylistOrder = item.PlaylistOrder;
                 queueList.Invalidate();
             }
             else
@@ -154,22 +142,35 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
 
         private void addItemToLists(MultiplayerPlaylistItem item)
         {
-            var apiItem = client.Room?.Playlist.SingleOrDefault(i => i.ID == item.ID);
-
-            // Item could have been removed from the playlist while the local player was in gameplay.
-            if (apiItem == null)
+            if (client.Room == null)
                 return;
 
             if (item.Expired)
-                historyList.Items.Add(new PlaylistItem(apiItem));
+                historyList.Items.Add(new PlaylistItem(item));
             else
-                queueList.Items.Add(new PlaylistItem(apiItem));
+                queueList.Items.Add(new PlaylistItem(item));
         }
 
-        private void removeItemFromLists(long item)
+        private void removeItemFromLists(long itemId)
         {
-            queueList.Items.RemoveAll(i => i.ID == item);
-            historyList.Items.RemoveAll(i => i.ID == item);
+            if (client.Room == null)
+                return;
+
+            queueList.Items.RemoveAll(i => i.ID == itemId);
+            historyList.Items.RemoveAll(i => i.ID == itemId);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (client.IsNotNull())
+            {
+                client.ItemAdded -= playlistItemAdded;
+                client.ItemRemoved -= playlistItemRemoved;
+                client.ItemChanged -= playlistItemChanged;
+                client.RoomUpdated -= onRoomUpdated;
+            }
         }
     }
 }

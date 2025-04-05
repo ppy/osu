@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -27,6 +26,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.OnlinePlay.Match.Components;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
+using osu.Game.Screens.OnlinePlay.Multiplayer.Match;
 using osu.Game.Utils;
 using Container = osu.Framework.Graphics.Containers.Container;
 
@@ -39,10 +39,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
 
         public override bool? ApplyModTrackAdjustments => true;
 
-        protected override BackgroundScreen CreateBackground() => new RoomBackgroundScreen(Room.Playlist.FirstOrDefault())
-        {
-            SelectedItem = { BindTarget = SelectedItem }
-        };
+        protected override BackgroundScreen CreateBackground() => new MultiplayerRoomBackgroundScreen();
 
         public override bool DisallowExternalBeatmapRulesetChanges => true;
 
@@ -64,11 +61,6 @@ namespace osu.Game.Screens.OnlinePlay.Match
         protected Container<DrawableRoomPlaylistItem> UserStyleDisplayContainer = null!;
 
         private Sample? sampleStart;
-
-        /// <summary>
-        /// Any mods applied by/to the local user.
-        /// </summary>
-        protected readonly Bindable<IReadOnlyList<Mod>> UserMods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
         [Resolved(CanBeNull = true)]
         private IOverlayManager? overlayManager { get; set; }
@@ -100,7 +92,6 @@ namespace osu.Game.Screens.OnlinePlay.Match
         protected IBindable<BeatmapAvailability> BeatmapAvailability => beatmapAvailabilityTracker.Availability;
 
         public readonly Room Room;
-        private readonly bool allowEdit;
 
         internal ModSelectOverlay UserModsSelectOverlay { get; private set; } = null!;
 
@@ -112,12 +103,9 @@ namespace osu.Game.Screens.OnlinePlay.Match
         /// Creates a new <see cref="RoomSubScreen"/>.
         /// </summary>
         /// <param name="room">The <see cref="Room"/>.</param>
-        /// <param name="allowEdit">Whether to allow editing room settings post-creation.</param>
-        protected RoomSubScreen(Room room, bool allowEdit = true)
+        protected RoomSubScreen(Room room)
         {
             Room = room;
-            this.allowEdit = allowEdit;
-
             Padding = new MarginPadding { Top = Header.HEIGHT };
         }
 
@@ -172,10 +160,9 @@ namespace osu.Game.Screens.OnlinePlay.Match
                                                     {
                                                         RelativeSizeAxes = Axes.X,
                                                         AutoSizeAxes = Axes.Y,
-                                                        Child = new DrawableMatchRoom(Room, allowEdit)
+                                                        Child = new MultiplayerRoomPanel(Room)
                                                         {
                                                             OnEdit = () => settingsOverlay.Show(),
-                                                            SelectedItem = SelectedItem
                                                         }
                                                     }
                                                 },
@@ -253,12 +240,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
                 }
             };
 
-            LoadComponent(UserModsSelectOverlay = new RoomModSelectOverlay
-            {
-                SelectedItem = { BindTarget = SelectedItem },
-                SelectedMods = { BindTarget = UserMods },
-                IsValidMod = _ => false
-            });
+            LoadComponent(UserModsSelectOverlay = new MultiplayerUserModSelectOverlay());
         }
 
         protected override void LoadComplete()
@@ -266,7 +248,6 @@ namespace osu.Game.Screens.OnlinePlay.Match
             base.LoadComplete();
 
             SelectedItem.BindValueChanged(_ => updateSpecifics());
-            UserMods.BindValueChanged(_ => updateSpecifics());
 
             beatmapAvailabilityTracker.Availability.BindValueChanged(_ => updateSpecifics());
 
@@ -449,14 +430,9 @@ namespace osu.Game.Screens.OnlinePlay.Match
                 ? rulesetInstance.AllMods.OfType<Mod>().Where(m => ModUtils.IsValidFreeModForMatchType(m, Room.Type)).ToArray()
                 : item.AllowedMods.Select(m => m.ToMod(rulesetInstance)).ToArray();
 
-            // Remove any user mods that are no longer allowed.
-            Mod[] newUserMods = UserMods.Value.Where(m => allowedMods.Any(a => m.GetType() == a.GetType())).ToArray();
-            if (!newUserMods.SequenceEqual(UserMods.Value))
-                UserMods.Value = newUserMods;
-
             // Retrieve the corresponding local beatmap, since we can't directly use the playlist's beatmap info
             int beatmapId = GetGameplayBeatmap().OnlineID;
-            var localBeatmap = beatmapManager.QueryBeatmap(b => b.OnlineID == beatmapId);
+            var localBeatmap = beatmapManager.QueryBeatmap($@"{nameof(BeatmapInfo.OnlineID)} == $0 AND {nameof(BeatmapInfo.MD5Hash)} == {nameof(BeatmapInfo.OnlineMD5Hash)}", beatmapId);
             Beatmap.Value = beatmapManager.GetWorkingBeatmap(localBeatmap);
             UserModsSelectOverlay.Beatmap.Value = Beatmap.Value;
 
@@ -464,15 +440,11 @@ namespace osu.Game.Screens.OnlinePlay.Match
             Ruleset.Value = GetGameplayRuleset();
 
             if (allowedMods.Length > 0)
-            {
                 UserModsSection.Show();
-                UserModsSelectOverlay.IsValidMod = m => allowedMods.Any(a => a.GetType() == m.GetType());
-            }
             else
             {
                 UserModsSection.Hide();
                 UserModsSelectOverlay.Hide();
-                UserModsSelectOverlay.IsValidMod = _ => false;
             }
 
             if (item.Freestyle)
@@ -496,7 +468,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
                 UserStyleSection.Hide();
         }
 
-        protected virtual APIMod[] GetGameplayMods() => UserMods.Value.Select(m => new APIMod(m)).Concat(SelectedItem.Value!.RequiredMods).ToArray();
+        protected virtual APIMod[] GetGameplayMods() => SelectedItem.Value!.RequiredMods;
 
         protected virtual RulesetInfo GetGameplayRuleset() => Rulesets.GetRuleset(SelectedItem.Value!.RulesetID)!;
 

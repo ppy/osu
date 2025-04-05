@@ -191,9 +191,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                 {
                                     new Drawable[]
                                     {
-                                        new DrawableMatchRoom(room, false)
+                                        new PlaylistsRoomPanel(room)
                                         {
-                                            OnEdit = () => settingsOverlay.Show(),
                                             SelectedItem = SelectedItem
                                         }
                                     },
@@ -597,8 +596,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
             // Update global gameplay state to correspond to the new selection.
             // Retrieve the corresponding local beatmap, since we can't directly use the playlist's beatmap info
-            int beatmapId = gameplayBeatmap.OnlineID;
-            var localBeatmap = beatmapManager.QueryBeatmap(b => b.OnlineID == beatmapId);
+            var localBeatmap = beatmapManager.QueryBeatmap($@"{nameof(BeatmapInfo.OnlineID)} == $0 AND {nameof(BeatmapInfo.MD5Hash)} == {nameof(BeatmapInfo.OnlineMD5Hash)}", gameplayBeatmap.OnlineID);
             Beatmap.Value = beatmapManager.GetWorkingBeatmap(localBeatmap);
             Ruleset.Value = gameplayRuleset;
             Mods.Value = UserMods.Value.Concat(item.RequiredMods.Select(m => m.ToMod(rulesetInstance))).ToArray();

@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -78,8 +77,8 @@ namespace osu.Game.Screens.SelectV2
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = ColourInfo.GradientVertical(Color4.Black, Color4.Black.Opacity(0f)),
-                    Height = (float)Math.Sqrt(0.5f),
+                    Width = 0.5f,
+                    Colour = ColourInfo.GradientHorizontal(Color4.Black.Opacity(0.5f), Color4.Black.Opacity(0f)),
                 },
                 new Container
                 {
@@ -263,6 +262,7 @@ namespace osu.Game.Screens.SelectV2
             {
                 backgroundModeBeatmap.Beatmap = Beatmap.Value;
                 backgroundModeBeatmap.DimWhenUserSettingsIgnored.Value = 0.25f;
+                backgroundModeBeatmap.BlurAmount.Value = 0f;
                 backgroundModeBeatmap.IgnoreUserSettings.Value = true;
                 backgroundModeBeatmap.FadeColour(Color4.White, 250);
             });
