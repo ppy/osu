@@ -10,7 +10,7 @@ using osuTK;
 
 namespace osu.Game.Overlays
 {
-    public partial class OverflowScrollingContainer : CompositeDrawable
+    public partial class MarqueeContainer : CompositeDrawable
     {
         public Anchor NonOverflowingContentAnchor { get; init; } = Anchor.TopLeft;
 
@@ -24,7 +24,7 @@ namespace osu.Game.Overlays
         private Drawable fillerContent = null!;
         private FillFlowContainer flow = null!;
 
-        public OverflowScrollingContainer()
+        public MarqueeContainer()
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
