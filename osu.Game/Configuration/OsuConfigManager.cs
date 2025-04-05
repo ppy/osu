@@ -126,7 +126,6 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.BeatmapSkins, true);
             SetDefault(OsuSetting.BeatmapColours, true);
             SetDefault(OsuSetting.KiaiFlashing, true);
-            SetDefault(OsuSetting.KiaiFlashing, true);
             SetDefault(OsuSetting.BeatmapHitsounds, true);
 
             SetDefault(OsuSetting.CursorRotation, true);
