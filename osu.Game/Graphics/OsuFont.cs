@@ -20,6 +20,41 @@ namespace osu.Game.Graphics
         /// </summary>
         public static FontUsage Default => GetFont();
 
+        /// <summary>
+        /// Equivalent to Torus with 32px size and semi-bold weight.
+        /// </summary>
+        public static FontUsage Display => GetFont(size: 32, weight: FontWeight.SemiBold);
+
+        /// <summary>
+        /// Equivalent to Torus with 28px size and semi-bold weight.
+        /// </summary>
+        public static FontUsage Subdisplay => GetFont(size: 28, weight: FontWeight.SemiBold);
+
+        /// <summary>
+        /// Equivalent to Torus with 22px size and semi-bold weight.
+        /// </summary>
+        public static FontUsage Heading => GetFont(size: 22, weight: FontWeight.SemiBold);
+
+        /// <summary>
+        /// Equivalent to Torus with 18px size and semi-bold weight.
+        /// </summary>
+        public static FontUsage Subheading => GetFont(size: 18, weight: FontWeight.SemiBold);
+
+        /// <summary>
+        /// Equivalent to Torus with 16px size and regular weight.
+        /// </summary>
+        public static FontUsage Body => GetFont(size: 16, weight: FontWeight.Regular);
+
+        /// <summary>
+        /// Equivalent to Torus with 14px size and regular weight.
+        /// </summary>
+        public static FontUsage Caption => GetFont(size: 14, weight: FontWeight.Regular);
+
+        /// <summary>
+        /// Equivalent to Torus with 12px size and regular weight.
+        /// </summary>
+        public static FontUsage Tiny => GetFont(size: 12, weight: FontWeight.Regular);
+
         public static FontUsage Numeric => GetFont(Typeface.Venera, weight: FontWeight.Bold);
 
         public static FontUsage Torus => GetFont(Typeface.Torus, weight: FontWeight.Regular);
