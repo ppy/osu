@@ -4,9 +4,12 @@
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
@@ -69,6 +72,12 @@ namespace osu.Game.Screens.SelectV2
         {
             AddRangeInternal(new Drawable[]
             {
+                new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Width = 0.5f,
+                    Colour = ColourInfo.GradientHorizontal(Color4.Black.Opacity(0.5f), Color4.Black.Opacity(0f)),
+                },
                 new Container
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -246,6 +255,7 @@ namespace osu.Game.Screens.SelectV2
             {
                 backgroundModeBeatmap.Beatmap = Beatmap.Value;
                 backgroundModeBeatmap.DimWhenUserSettingsIgnored.Value = 0.25f;
+                backgroundModeBeatmap.BlurAmount.Value = 0f;
                 backgroundModeBeatmap.IgnoreUserSettings.Value = true;
                 backgroundModeBeatmap.FadeColour(Color4.White, 250);
             });
