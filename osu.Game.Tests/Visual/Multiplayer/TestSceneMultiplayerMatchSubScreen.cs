@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -330,10 +331,65 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddUntilStep("wait for join", () => RoomJoined);
 
-            AddUntilStep("button visible", () => this.ChildrenOfType<DrawableMatchRoom>().Single().ChangeSettingsButton?.Alpha, () => Is.GreaterThan(0));
+            AddUntilStep("button visible", () => this.ChildrenOfType<MultiplayerRoomPanel>().Single().ChangeSettingsButton.Alpha, () => Is.GreaterThan(0));
             AddStep("join other user", void () => MultiplayerClient.AddUser(new APIUser { Id = PLAYER_1_ID }));
             AddStep("make other user host", () => MultiplayerClient.TransferHost(PLAYER_1_ID));
-            AddAssert("button hidden", () => this.ChildrenOfType<DrawableMatchRoom>().Single().ChangeSettingsButton?.Alpha, () => Is.EqualTo(0));
+            AddAssert("button hidden", () => this.ChildrenOfType<MultiplayerRoomPanel>().Single().ChangeSettingsButton.Alpha, () => Is.EqualTo(0));
+        }
+
+        [Test]
+        public void TestUserModSelectUpdatesWhenNotVisible()
+        {
+            AddStep("add playlist item", () =>
+            {
+                room.Playlist =
+                [
+                    new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo)
+                    {
+                        RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
+                        AllowedMods = [new APIMod(new OsuModFlashlight())]
+                    }
+                ];
+            });
+
+            ClickButtonWhenEnabled<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>();
+            AddUntilStep("wait for join", () => RoomJoined);
+
+            // 1. Open the mod select overlay and enable flashlight
+
+            ClickButtonWhenEnabled<UserModSelectButton>();
+            AddUntilStep("mod select contents loaded", () => this.ChildrenOfType<ModColumn>().Any() && this.ChildrenOfType<ModColumn>().All(col => col.IsLoaded && col.ItemsLoaded));
+            AddStep("click flashlight panel", () =>
+            {
+                ModPanel panel = this.ChildrenOfType<ModPanel>().Single(p => p.Mod is OsuModFlashlight);
+                InputManager.MoveMouseTo(panel);
+                InputManager.Click(MouseButton.Left);
+            });
+            AddUntilStep("flashlight mod enabled", () => MultiplayerClient.ClientRoom!.Users[0].Mods.Any());
+
+            // 2. Close the mod select overlay, edit the playlist to disable allowed mods, and then edit it again to re-enable allowed mods.
+
+            AddStep("close mod select overlay", () => this.ChildrenOfType<MultiplayerUserModSelectOverlay>().Single().Hide());
+            AddUntilStep("mod select overlay not present", () => !this.ChildrenOfType<MultiplayerUserModSelectOverlay>().Single().IsPresent);
+            AddStep("disable allowed mods", () => MultiplayerClient.EditPlaylistItem(new MultiplayerPlaylistItem(new PlaylistItem(MultiplayerClient.ServerRoom!.Playlist[0])
+            {
+                AllowedMods = []
+            })));
+            // This would normally be done as part of the above operation with an actual server.
+            AddStep("disable user mods", () => MultiplayerClient.ChangeUserMods(API.LocalUser.Value.OnlineID, Array.Empty<APIMod>()));
+            AddUntilStep("flashlight mod disabled", () => !MultiplayerClient.ClientRoom!.Users[0].Mods.Any());
+            AddStep("re-enable allowed mods", () => MultiplayerClient.EditPlaylistItem(new MultiplayerPlaylistItem(new PlaylistItem(MultiplayerClient.ServerRoom!.Playlist[0])
+            {
+                AllowedMods = [new APIMod(new OsuModFlashlight())]
+            })));
+            AddAssert("flashlight mod still disabled", () => !MultiplayerClient.ClientRoom!.Users[0].Mods.Any());
+
+            // 3. Open the mod select overlay, check that the flashlight mod panel is deactivated.
+
+            ClickButtonWhenEnabled<UserModSelectButton>();
+            AddUntilStep("mod select contents loaded", () => this.ChildrenOfType<ModColumn>().Any() && this.ChildrenOfType<ModColumn>().All(col => col.IsLoaded && col.ItemsLoaded));
+            AddAssert("flashlight mod still disabled", () => !MultiplayerClient.ClientRoom!.Users[0].Mods.Any());
+            AddAssert("flashlight mod panel not activated", () => !this.ChildrenOfType<ModPanel>().Single(p => p.Mod is OsuModFlashlight).Active.Value);
         }
 
         private partial class TestMultiplayerMatchSubScreen : MultiplayerMatchSubScreen

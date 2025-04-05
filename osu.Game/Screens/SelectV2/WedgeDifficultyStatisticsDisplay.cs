@@ -190,13 +190,13 @@ namespace osu.Game.Screens.SelectV2
                 new OsuSpriteText
                 {
                     Text = s.Label,
-                    Font = OsuFont.Torus.With(size: 12f, weight: FontWeight.SemiBold),
+                    Font = OsuFont.Tiny.With(weight: FontWeight.SemiBold),
                     Colour = colourProvider.Content2,
                 },
                 Empty(),
                 new OsuSpriteText
                 {
-                    Font = OsuFont.Torus.With(size: 12f, weight: FontWeight.SemiBold),
+                    Font = OsuFont.Tiny.With(weight: FontWeight.SemiBold),
                     Text = s.Value.ToLocalisableString("0.##"),
                     Colour = colourProvider.Content1,
                 },

@@ -99,8 +99,35 @@ namespace osu.Game.Tests.Visual.Online
                                 Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
                                 Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
                             },
+                            TopTags =
+                            [
+                                new APIBeatmapTag { TagId = 4, VoteCount = 1 },
+                                new APIBeatmapTag { TagId = 2, VoteCount = 1 },
+                                new APIBeatmapTag { TagId = 23, VoteCount = 5 },
+                            ],
                         },
                     },
+                    RelatedTags =
+                    [
+                        new APITag
+                        {
+                            Id = 2,
+                            Name = "song representation/simple",
+                            Description = "Accessible and straightforward map design."
+                        },
+                        new APITag
+                        {
+                            Id = 4,
+                            Name = "style/clean",
+                            Description = "Visually uncluttered and organised patterns, often involving few overlaps and equal visual spacing between objects."
+                        },
+                        new APITag
+                        {
+                            Id = 23,
+                            Name = "aim/aim control",
+                            Description = "Patterns with velocity or direction changes which strongly go against a player's natural movement pattern."
+                        }
+                    ]
                 });
             });
 
