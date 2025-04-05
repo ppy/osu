@@ -7,9 +7,7 @@ using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
@@ -286,18 +284,7 @@ namespace osu.Game.Screens.SelectV2
                         AutoSizeAxes = Axes.Y,
                         Alpha = 0f,
                         Padding = new MarginPadding { Left = 80f },
-                        Children = new Drawable[]
-                        {
-                            new Box
-                            {
-                                X = 10,
-                                Origin = Anchor.TopRight,
-                                Width = 80f,
-                                RelativeSizeAxes = Axes.Y,
-                                Colour = ColourInfo.GradientHorizontal(colourProvider.Background4.Opacity(0.25f), colourProvider.Background4.Opacity(0.5f)),
-                            },
-                            scoreDrawable,
-                        },
+                        Child = scoreDrawable,
                     });
 
                     scoreDrawableContainer.Delay(delay).FadeIn(300, Easing.OutQuint);
