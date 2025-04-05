@@ -31,7 +31,7 @@ namespace osu.Game.Overlays.Music
         private readonly Bindable<Live<BeatmapSetInfo>?> selectedSet = new Bindable<Live<BeatmapSetInfo>?>();
         private Action<Live<BeatmapSetInfo>>? requestSelection;
 
-        private OverflowScrollingContainer text = null!;
+        private MarqueeContainer text = null!;
 
         [Resolved]
         private OsuColour colours { get; set; } = null!;
@@ -42,7 +42,7 @@ namespace osu.Game.Overlays.Music
             RelativeSizeAxes = Axes.X;
             Height = 20;
 
-            InternalChild = text = new OverflowScrollingContainer
+            InternalChild = text = new MarqueeContainer
             {
                 Anchor = Anchor.CentreLeft,
                 Origin = Anchor.CentreLeft,

@@ -49,7 +49,7 @@ namespace osu.Game.Overlays
         private MusicIconButton shuffleButton = null!;
         private IconButton playlistButton = null!;
 
-        private OverflowScrollingContainer title = null!, artist = null!;
+        private MarqueeContainer title = null!, artist = null!;
 
         private PlaylistOverlay? playlist;
 
@@ -107,7 +107,7 @@ namespace osu.Game.Overlays
                             Children = new[]
                             {
                                 background = Empty(),
-                                title = new OverflowScrollingContainer
+                                title = new MarqueeContainer
                                 {
                                     Origin = Anchor.BottomCentre,
                                     Anchor = Anchor.TopCentre,
@@ -125,7 +125,7 @@ namespace osu.Game.Overlays
                                     },
                                     NonOverflowingContentAnchor = Anchor.Centre,
                                 },
-                                artist = new OverflowScrollingContainer
+                                artist = new MarqueeContainer
                                 {
                                     Origin = Anchor.TopCentre,
                                     Anchor = Anchor.TopCentre,
