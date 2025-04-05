@@ -2,13 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Testing;
+using osu.Framework.Graphics.Cursor;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects;
@@ -17,49 +15,38 @@ using osu.Game.Screens.SelectV2;
 
 namespace osu.Game.Tests.Visual.SongSelectV2
 {
-    public partial class TestSceneBeatmapInfoWedge : SongSelectComponentsTestScene
+    public partial class TestSceneBeatmapWedgesArea : SongSelectComponentsTestScene
     {
-        private RulesetStore rulesets = null!;
-        private BeatmapInfoWedge infoWedge = null!;
+        private BeatmapWedgesArea wedgesArea = null!;
 
-        [BackgroundDependencyLoader]
-        private void load(RulesetStore rulesets)
+        [Resolved]
+        private RulesetStore rulesets { get; set; } = null!;
+
+        [SetUp]
+        public void SetUp() => Schedule(() =>
         {
-            this.rulesets = rulesets;
-        }
-
-        public override void SetUpSteps()
-        {
-            base.SetUpSteps();
-
-            AddStep("reset mods", () => SelectedMods.SetDefault());
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            AddRange(new Drawable[]
+            Child = new PopoverContainer
             {
-                new Container
+                RelativeSizeAxes = Axes.X,
+                Height = 650,
+                Children = new Drawable[]
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Top = 20 },
-                    Children = new Drawable[]
+                    new Container
                     {
-                        infoWedge = new BeatmapInfoWedge
+                        RelativeSizeAxes = Axes.Both,
+                        Padding = new MarginPadding { Top = 20 },
+                        Children = new Drawable[]
                         {
-                            State = { Value = Visibility.Visible },
+                            wedgesArea = new BeatmapWedgesArea
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                State = { Value = Visibility.Visible },
+                            },
                         },
-                    },
+                    }
                 }
-            });
-
-            AddSliderStep("change star difficulty", 0, 11.9, 4.18, v =>
-            {
-                ((BindableDouble)infoWedge.ChildrenOfType<WedgeDifficultyDisplay>().Single().DisplayedStars).Value = v;
-            });
-        }
+            };
+        });
 
         [Test]
         public void TestRulesetChange()
@@ -80,12 +67,12 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         [Test]
         public void TestWedgeVisibility()
         {
-            AddStep("hide", () => { infoWedge.Hide(); });
+            AddStep("hide", () => wedgesArea.Hide());
             AddWaitStep("wait for hide", 3);
-            AddAssert("check visibility", () => infoWedge.Alpha == 0);
-            AddStep("show", () => { infoWedge.Show(); });
+            AddAssert("check visibility", () => wedgesArea.Alpha == 0);
+            AddStep("show", () => wedgesArea.Show());
             AddWaitStep("wait for show", 1);
-            AddAssert("check visibility", () => infoWedge.Alpha > 0);
+            AddAssert("check visibility", () => wedgesArea.Alpha > 0);
         }
 
         [Test]
