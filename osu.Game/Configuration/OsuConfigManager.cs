@@ -125,7 +125,6 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.ShowStoryboard, true);
             SetDefault(OsuSetting.BeatmapSkins, true);
             SetDefault(OsuSetting.BeatmapColours, true);
-            SetDefault(OsuSetting.KiaiFlashing, true);
             SetDefault(OsuSetting.BeatmapHitsounds, true);
 
             SetDefault(OsuSetting.CursorRotation, true);
@@ -143,6 +142,7 @@ namespace osu.Game.Configuration
 
             SetDefault(OsuSetting.HitLighting, true);
             SetDefault(OsuSetting.StarFountains, true);
+            SetDefault(OsuSetting.KiaiFlashing, true);
 
             SetDefault(OsuSetting.HUDVisibilityMode, HUDVisibilityMode.Always);
             SetDefault(OsuSetting.ShowHealthDisplayWhenCantFail, true);
@@ -408,7 +408,6 @@ namespace osu.Game.Configuration
         ScreenshotCaptureMenuCursor,
         BeatmapSkins,
         BeatmapColours,
-        KiaiFlashing,
         BeatmapHitsounds,
         IncreaseFirstObjectVisibility,
         ScoreDisplayMode,
@@ -428,6 +427,7 @@ namespace osu.Game.Configuration
         UIHoldActivationDelay,
         HitLighting,
         StarFountains,
+        KiaiFlashing,
         MenuBackgroundSource,
         GameplayDisableWinKey,
         SeasonalBackgroundMode,
