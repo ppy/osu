@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Audio.Track;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Difficulty.Utils;
@@ -409,7 +410,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double limitValue = okHitWindow / Math.Sqrt(3);
 
             // If precision is not enough to compute true deviation - use limit value
-            if (pLowerBound == 0 || randomValue >= 1 || deviation > limitValue)
+            if (Precision.AlmostEquals(pLowerBound, 0.0) || randomValue >= 1 || deviation > limitValue)
                 deviation = limitValue;
 
             // Then compute the variance for mehs.
