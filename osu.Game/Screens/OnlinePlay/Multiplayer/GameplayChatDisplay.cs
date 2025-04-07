@@ -6,6 +6,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Game.Configuration;
 using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
 using osu.Game.Online.Rooms;
@@ -37,14 +38,17 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             : base(room, leaveChannelOnDispose: false)
         {
             RelativeSizeAxes = Axes.X;
-
             Background.Alpha = 0.2f;
+        }
 
-            TextBox.PlaceholderText = ChatStrings.InGameInputPlaceholder;
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
+        {
+            TextBox.PlaceholderText = ChatStrings.InGameInputPlaceholder(config.LookupKeyBindings(GlobalAction.ToggleChatFocus));
             TextBox.Focus = () => TextBox.PlaceholderText = Resources.Localisation.Web.ChatStrings.InputPlaceholder;
             TextBox.FocusLost = () =>
             {
-                TextBox.PlaceholderText = ChatStrings.InGameInputPlaceholder;
+                TextBox.PlaceholderText = ChatStrings.InGameInputPlaceholder(config.LookupKeyBindings(GlobalAction.ToggleChatFocus));
                 expandedFromTextBoxFocus.Value = false;
             };
         }
