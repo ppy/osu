@@ -389,18 +389,20 @@ namespace osu.Game.Overlays
             if (currentRandomHistoryPosition != null)
             {
                 if (direction < 0 && currentRandomHistoryPosition.Previous != null)
-                    return (currentRandomHistoryPosition = currentRandomHistoryPosition.Previous).Value;
+                {
+                    currentRandomHistoryPosition = currentRandomHistoryPosition.Previous;
+                    return currentRandomHistoryPosition.Value;
+                }
 
                 if (direction > 0 && currentRandomHistoryPosition.Next != null)
-                    return (currentRandomHistoryPosition = currentRandomHistoryPosition.Next).Value;
+                {
+                    currentRandomHistoryPosition = currentRandomHistoryPosition.Next;
+                    return currentRandomHistoryPosition.Value;
+                }
             }
 
             // if the early-return above didn't cover it, it means that we have no history to fall back on
             // and need to actually choose something random.
-
-            Debug.Assert(randomHistory.Count == 0
-                         || (currentRandomHistoryPosition == randomHistory.First && direction < 0)
-                         || (currentRandomHistoryPosition == randomHistory.Last && direction > 0));
 
             switch (randomSelectAlgorithm.Value)
             {
@@ -420,9 +422,16 @@ namespace osu.Game.Overlays
 
                     result = notYetPlayedSets[RNG.Next(notYetPlayedSets.Count)];
 
-                    if (randomHistory.Count == 0 || (currentRandomHistoryPosition == randomHistory.Last && direction > 0))
+                    Debug.Assert(randomHistory.Count == 0
+                                 || (currentRandomHistoryPosition == randomHistory.First && direction < 0)
+                                 || (currentRandomHistoryPosition == randomHistory.Last && direction > 0));
+
+                    // notably, this depends solely on `direction` specifically, because when there are less than 2 items in `randomHistory`,
+                    // we have `randomHistory.First == randomHistory.Last` (either `null` if no items, or the single item).
+                    // the assert above should make that safe to depend on.
+                    if (direction > 0)
                         currentRandomHistoryPosition = randomHistory.AddLast(result);
-                    else if (currentRandomHistoryPosition == randomHistory.First && direction < 0)
+                    else if (direction < 0)
                         currentRandomHistoryPosition = randomHistory.AddFirst(result);
                     break;
 
