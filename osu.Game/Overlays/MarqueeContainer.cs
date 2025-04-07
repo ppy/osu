@@ -6,12 +6,23 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Transforms;
+using osu.Framework.Threading;
 using osuTK;
 
 namespace osu.Game.Overlays
 {
     public partial class MarqueeContainer : CompositeDrawable
     {
+        /// <summary>
+        /// Whether the marquee should be allowed to scroll the content if it overflows.
+        /// Note that upon changing the value of this, any existing scrolls will be allowed to complete their current loop if they're mid-scroll.
+        /// </summary>
+        public Bindable<bool> AllowScrolling { get; } = new BindableBool(true);
+
+        /// <summary>
+        /// The <see cref="Anchor"/> to anchor the content to if it does not overflow.
+        /// </summary>
         public Anchor NonOverflowingContentAnchor { get; init; } = Anchor.TopLeft;
 
         public Bindable<Func<Drawable>> CreateContent = new Bindable<Func<Drawable>>();
@@ -37,6 +48,8 @@ namespace osu.Game.Overlays
             {
                 AutoSizeAxes = Axes.Both,
                 Direction = FillDirection.Horizontal,
+                Anchor = NonOverflowingContentAnchor,
+                Origin = NonOverflowingContentAnchor,
                 Spacing = new Vector2(padding),
                 Padding = new MarginPadding { Horizontal = padding },
             };
@@ -46,41 +59,50 @@ namespace osu.Game.Overlays
         {
             base.LoadComplete();
 
+            AllowScrolling.BindValueChanged(_ => ScheduleAfterChildren(() => updateScrolling(instant: false)));
             CreateContent.BindValueChanged(_ =>
             {
                 flow.Clear();
                 flow.Add(mainContent = CreateContent.Value.Invoke());
                 flow.Add(fillerContent = CreateContent.Value.Invoke().With(d => d.Alpha = 0));
-                ScheduleAfterChildren(updateText);
+                ScheduleAfterChildren(() => updateScrolling(instant: true));
             }, true);
         }
 
-        private void updateText()
-        {
-            fillerContent.Alpha = 0;
+        private TransformSequence<FillFlowContainer>? scrollSequence;
+        private ScheduledDelegate? scheduledScrollCancel;
 
-            flow.ClearTransforms();
-            flow.X = 0;
+        private void updateScrolling(bool instant)
+        {
+            scheduledScrollCancel?.Cancel();
+            scheduledScrollCancel = null;
 
             float overflowWidth = mainContent.DrawWidth + padding - DrawWidth;
 
-            if (overflowWidth > 0)
+            if (overflowWidth > 0 && AllowScrolling.Value)
             {
                 fillerContent.Alpha = 1;
+                flow.Anchor = Anchor.TopLeft;
+                flow.Origin = Anchor.TopLeft;
 
                 float targetX = mainContent.DrawWidth + padding;
 
-                flow.MoveToX(0)
-                    .Delay(initial_move_delay)
-                    .MoveToX(-targetX, targetX * 1000 / pixels_per_second)
-                    .Loop();
-                flow.Anchor = Anchor.TopLeft;
-                flow.Origin = Anchor.TopLeft;
+                scrollSequence ??= flow.MoveToX(0)
+                                       .Delay(initial_move_delay)
+                                       .MoveToX(-targetX, targetX * 1000 / pixels_per_second)
+                                       .Loop();
             }
-            else
+            else if (scrollSequence != null)
             {
-                flow.Anchor = NonOverflowingContentAnchor;
-                flow.Origin = NonOverflowingContentAnchor;
+                scheduledScrollCancel = Scheduler.AddDelayed(() =>
+                {
+                    fillerContent.Alpha = 0;
+                    flow.ClearTransforms();
+                    flow.X = 0;
+                    flow.Anchor = NonOverflowingContentAnchor;
+                    flow.Origin = NonOverflowingContentAnchor;
+                    scrollSequence = null;
+                }, instant ? 0 : flow.LatestTransformEndTime - Time.Current);
             }
         }
     }
