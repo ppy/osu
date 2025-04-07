@@ -60,9 +60,6 @@ namespace osu.Game.Screens.Play.PlayerSettings
         [Resolved]
         private Player? player { get; set; }
 
-        [Resolved]
-        private IGameplayClock? gameplayClock { get; set; }
-
         private double lastPlayMedian;
         private double lastPlayBeatmapOffset;
         private HitEventTimingDistributionGraph? lastPlayGraph;
@@ -287,27 +284,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
             Current.Disabled = !allow;
         }
 
-        private bool allowOffsetAdjust
-        {
-            get
-            {
-                // General limitations to ensure players don't do anything too weird.
-                // These match stable for now.
-                if (player is SubmittingPlayer)
-                {
-                    Debug.Assert(gameplayClock != null);
-
-                    // TODO: the blocking conditions should probably display a message.
-                    if (!player.IsBreakTime.Value && gameplayClock.CurrentTime - gameplayClock.GameplayStartTime > 10000)
-                        return false;
-
-                    if (gameplayClock.IsPaused.Value)
-                        return false;
-                }
-
-                return true;
-            }
-        }
+        private bool allowOffsetAdjust => player?.AllowCriticalSettingsAdjustment != false;
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
