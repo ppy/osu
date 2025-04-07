@@ -26,6 +26,7 @@ using osu.Game.Online;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mania;
@@ -51,6 +52,9 @@ namespace osu.Game.Tests.Visual.Ranking
         private ScoreManager scoreManager = null!;
         private RulesetStore rulesetStore = null!;
         private BeatmapManager beatmapManager = null!;
+
+        [Cached]
+        private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
@@ -364,12 +368,16 @@ namespace osu.Game.Tests.Visual.Ranking
 
         private void loadPanel(ScoreInfo score) => AddStep("load panel", () =>
         {
-            Child = new StatisticsPanel
+            Child = new PopoverContainer
             {
                 RelativeSizeAxes = Axes.Both,
-                State = { Value = Visibility.Visible },
-                Score = { Value = score },
-                AchievedScore = score,
+                Child = new StatisticsPanel
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    State = { Value = Visibility.Visible },
+                    Score = { Value = score },
+                    AchievedScore = score,
+                },
             };
         });
 
