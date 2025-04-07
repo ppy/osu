@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double speedBonus = 0.0;
 
             if (DifficultyCalculationUtils.MillisecondsToBPM(strainTime) > 240)
-                speedBonus = Math.Pow((DifficultyCalculationUtils.BPMToMilliseconds(240) - strainTime) / 16.0, 1.3);
+                speedBonus = Math.Pow((DifficultyCalculationUtils.BPMToMilliseconds(240) - strainTime) / 16.5, 1.1);
 
             double finalValue = (1 + speedBonus) * 1000 / strainTime;
 
