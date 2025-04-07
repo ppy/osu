@@ -27,6 +27,10 @@ namespace osu.Game.Overlays
 
         private bool allowScrolling = true;
 
+        /// <summary>
+        /// Time in milliseconds before scrolling begins.
+        /// </summary>
+        public double InitialMoveDelay { get; set; } = 1000;
 
         /// <summary>
         /// The <see cref="Anchor"/> to anchor the content to if it does not overflow.
@@ -45,7 +49,6 @@ namespace osu.Game.Overlays
 
         private Func<Drawable>? createContent;
 
-        private const float initial_move_delay = 1000;
         private const float pixels_per_second = 50;
         private const float padding = 15;
 
@@ -105,7 +108,7 @@ namespace osu.Game.Overlays
                 float targetX = mainContent.DrawWidth + padding;
 
                 flow.MoveToX(0)
-                    .Delay(initial_move_delay)
+                    .Delay(InitialMoveDelay)
                     .MoveToX(-targetX, targetX * 1000 / pixels_per_second)
                     .Loop();
             }
