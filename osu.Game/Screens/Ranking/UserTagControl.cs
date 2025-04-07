@@ -48,7 +48,6 @@ namespace osu.Game.Screens.Ranking
         private readonly Cached layout = new Cached();
 
         private FillFlowContainer<DrawableUserTag> tagFlow = null!;
-        private LoadingLayer loadingLayer = null!;
 
         private BindableList<UserTag> displayedTags { get; } = new BindableList<UserTag>();
 
@@ -116,11 +115,6 @@ namespace osu.Game.Screens.Ranking
                         }
                     }
                 },
-                loadingLayer = new LoadingLayer(dimBackground: true)
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    State = { Value = Visibility.Visible }
-                },
             };
 
             apiTags = sessionStatics.GetBindable<APITag[]?>(Static.AllBeatmapTags);
@@ -163,6 +157,7 @@ namespace osu.Game.Screens.Ranking
                 if (relevantTagsById.TryGetValue(topTag.TagId, out var tag))
                 {
                     tag.VoteCount.Value = topTag.VoteCount;
+                    tag.Updating.Value = false;
                     displayedTags.Add(tag);
                 }
             }
@@ -170,10 +165,11 @@ namespace osu.Game.Screens.Ranking
             foreach (long ownTagId in apiBeatmap.Value.OwnTagIds ?? [])
             {
                 if (relevantTagsById.TryGetValue(ownTagId, out var tag))
+                {
                     tag.Voted.Value = true;
+                    tag.Updating.Value = false;
+                }
             }
-
-            loadingLayer.Hide();
         }
 
         private void displayTags(object? sender, NotifyCollectionChangedEventArgs e)
@@ -222,7 +218,7 @@ namespace osu.Game.Screens.Ranking
             if (requestInFlight != null)
                 return;
 
-            loadingLayer.Show();
+            tag.Updating.Value = true;
 
             APIRequest request;
 
@@ -253,12 +249,12 @@ namespace osu.Game.Screens.Ranking
 
             request.Success += () =>
             {
-                loadingLayer.Hide();
+                tag.Updating.Value = false;
                 requestInFlight = null;
             };
             request.Failure += _ =>
             {
-                loadingLayer.Hide();
+                tag.Updating.Value = false;
                 requestInFlight = null;
             };
             api.Queue(requestInFlight = request);
@@ -308,6 +304,7 @@ namespace osu.Game.Screens.Ranking
             private readonly Bindable<int> voteCount = new Bindable<int>();
             private readonly BindableBool voted = new BindableBool();
             private readonly Bindable<bool> confirmed = new BindableBool();
+            private readonly BindableBool updating = new BindableBool();
 
             protected Box MainBackground { get; private set; } = null!;
             private Box voteBackground = null!;
@@ -318,6 +315,8 @@ namespace osu.Game.Screens.Ranking
 
             private readonly bool showVoteCount;
 
+            private LoadingLayer loadingLayer = null!;
+
             [Resolved]
             private OsuColour colours { get; set; } = null!;
 
@@ -326,6 +325,7 @@ namespace osu.Game.Screens.Ranking
                 UserTag = userTag;
                 this.showVoteCount = showVoteCount;
                 voteCount.BindTo(userTag.VoteCount);
+                updating.BindTo(userTag.Updating);
                 voted.BindTo(userTag.Voted);
 
                 AutoSizeAxes = Axes.Both;
@@ -408,7 +408,8 @@ namespace osu.Game.Screens.Ranking
                                 }
                                 : Empty(),
                         }
-                    }
+                    },
+                    loadingLayer = new LoadingLayer(dimBackground: true),
                 });
 
                 TooltipText = UserTag.Description;
@@ -419,6 +420,8 @@ namespace osu.Game.Screens.Ranking
                 base.LoadComplete();
 
                 const double transition_duration = 300;
+
+                updating.BindValueChanged(u => loadingLayer.State.Value = u.NewValue ? Visibility.Visible : Visibility.Hidden);
 
                 if (showVoteCount)
                 {
@@ -636,6 +639,9 @@ namespace osu.Game.Screens.Ranking
                 private SpriteIcon votedIcon = null!;
 
                 private readonly Bindable<bool> voted = new Bindable<bool>();
+                private readonly BindableBool updating = new BindableBool();
+
+                private LoadingLayer loadingLayer = null!;
 
                 public DrawableAddableTag(UserTag tag)
                 {
@@ -645,6 +651,9 @@ namespace osu.Game.Screens.Ranking
                     AutoSizeAxes = Axes.Y;
 
                     ScaleOnMouseDown = 0.95f;
+
+                    voted.BindTo(Tag.Voted);
+                    updating.BindTo(Tag.Updating);
                 }
 
                 [Resolved]
@@ -705,10 +714,9 @@ namespace osu.Game.Screens.Ranking
                                     Text = Tag.Description,
                                 }
                             }
-                        }
+                        },
+                        loadingLayer = new LoadingLayer(dimBackground: true),
                     });
-
-                    voted.BindTo(Tag.Voted);
                 }
 
                 public IEnumerable<LocalisableString> FilterTerms => [Tag.FullName, Tag.Description];
@@ -726,6 +734,8 @@ namespace osu.Game.Screens.Ranking
                         votedIcon.FadeColour(voted.Value ? Colour4.Black : Colour4.White, 250, Easing.OutQuint);
                     }, true);
                     FinishTransforms(true);
+
+                    updating.BindValueChanged(u => loadingLayer.State.Value = u.NewValue ? Visibility.Visible : Visibility.Hidden);
                 }
             }
         }
