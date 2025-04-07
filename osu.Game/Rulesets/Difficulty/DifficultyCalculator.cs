@@ -68,6 +68,7 @@ namespace osu.Game.Rulesets.Difficulty
                 cancellationToken = timedCancellationSource.Token;
 
             cancellationToken.ThrowIfCancellationRequested();
+            // ReSharper disable once PossiblyMistakenUseOfCancellationToken
             preProcess(mods, cancellationToken);
 
             var skills = CreateSkills(Beatmap, playableMods, clockRate);
@@ -109,6 +110,7 @@ namespace osu.Game.Rulesets.Difficulty
                 cancellationToken = timedCancellationSource.Token;
 
             cancellationToken.ThrowIfCancellationRequested();
+            // ReSharper disable once PossiblyMistakenUseOfCancellationToken
             preProcess(mods, cancellationToken);
 
             var attribs = new List<TimedDifficultyAttributes>();
