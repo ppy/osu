@@ -511,6 +511,7 @@ namespace osu.Game.Screens.Ranking
                 AllowableAnchors = new[]
                 {
                     Anchor.TopCentre,
+                    Anchor.BottomCentre,
                 };
 
                 Children = new Drawable[]
