@@ -6,8 +6,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Transforms;
-using osu.Framework.Threading;
 using osuTK;
 
 namespace osu.Game.Overlays
@@ -16,7 +14,7 @@ namespace osu.Game.Overlays
     {
         /// <summary>
         /// Whether the marquee should be allowed to scroll the content if it overflows.
-        /// Note that upon changing the value of this, any existing scrolls will be allowed to complete their current loop if they're mid-scroll.
+        /// Note that upon changing the value of this, any existing scrolls will be terminated instantly.
         /// </summary>
         public Bindable<bool> AllowScrolling { get; } = new BindableBool(true);
 
@@ -59,24 +57,18 @@ namespace osu.Game.Overlays
         {
             base.LoadComplete();
 
-            AllowScrolling.BindValueChanged(_ => ScheduleAfterChildren(() => updateScrolling(instant: false)));
+            AllowScrolling.BindValueChanged(_ => ScheduleAfterChildren(updateScrolling));
             CreateContent.BindValueChanged(_ =>
             {
                 flow.Clear();
                 flow.Add(mainContent = CreateContent.Value.Invoke());
                 flow.Add(fillerContent = CreateContent.Value.Invoke().With(d => d.Alpha = 0));
-                ScheduleAfterChildren(() => updateScrolling(instant: true));
+                ScheduleAfterChildren(updateScrolling);
             }, true);
         }
 
-        private TransformSequence<FillFlowContainer>? scrollSequence;
-        private ScheduledDelegate? scheduledScrollCancel;
-
-        private void updateScrolling(bool instant)
+        private void updateScrolling()
         {
-            scheduledScrollCancel?.Cancel();
-            scheduledScrollCancel = null;
-
             float overflowWidth = mainContent.DrawWidth + padding - DrawWidth;
 
             if (overflowWidth > 0 && AllowScrolling.Value)
@@ -87,22 +79,18 @@ namespace osu.Game.Overlays
 
                 float targetX = mainContent.DrawWidth + padding;
 
-                scrollSequence ??= flow.MoveToX(0)
-                                       .Delay(initial_move_delay)
-                                       .MoveToX(-targetX, targetX * 1000 / pixels_per_second)
-                                       .Loop();
+                flow.MoveToX(0)
+                    .Delay(initial_move_delay)
+                    .MoveToX(-targetX, targetX * 1000 / pixels_per_second)
+                    .Loop();
             }
-            else if (scrollSequence != null)
+            else
             {
-                scheduledScrollCancel = Scheduler.AddDelayed(() =>
-                {
-                    fillerContent.Alpha = 0;
-                    flow.ClearTransforms();
-                    flow.X = 0;
-                    flow.Anchor = NonOverflowingContentAnchor;
-                    flow.Origin = NonOverflowingContentAnchor;
-                    scrollSequence = null;
-                }, instant ? 0 : flow.LatestTransformEndTime - Time.Current);
+                fillerContent.Alpha = 0;
+                flow.ClearTransforms();
+                flow.X = 0;
+                flow.Anchor = NonOverflowingContentAnchor;
+                flow.Origin = NonOverflowingContentAnchor;
             }
         }
     }
