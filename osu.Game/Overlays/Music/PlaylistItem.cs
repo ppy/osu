@@ -47,6 +47,7 @@ namespace osu.Game.Overlays.Music
                 Anchor = Anchor.CentreLeft,
                 Origin = Anchor.CentreLeft,
                 RelativeSizeAxes = Axes.X,
+                AllowScrolling = { Value = false }
             };
 
             selectedSet.BindTo(playlistOverlay.SelectedSet);
@@ -108,6 +109,18 @@ namespace osu.Game.Overlays.Music
         {
             requestSelection?.Invoke(Current.Value);
             return true;
+        }
+
+        protected override bool OnHover(HoverEvent e)
+        {
+            text.AllowScrolling.Value = true;
+            return true;
+        }
+
+        protected override void OnHoverLost(HoverLostEvent e)
+        {
+            text.AllowScrolling.Value = false;
+            base.OnHoverLost(e);
         }
     }
 }
