@@ -56,8 +56,6 @@ namespace osu.Game.Screens.Ranking
 
         private readonly Bindable<APIBeatmap?> apiBeatmap = new Bindable<APIBeatmap?>();
 
-        private APIRequest? requestInFlight;
-
         private AddNewTagUserTag addNewTagUserTag = null!;
 
         [Resolved]
@@ -215,7 +213,7 @@ namespace osu.Game.Screens.Ranking
 
         private void toggleVote(UserTag tag)
         {
-            if (requestInFlight != null)
+            if (tag.Updating.Value)
                 return;
 
             tag.Updating.Value = true;
@@ -247,17 +245,10 @@ namespace osu.Game.Screens.Ranking
                     break;
             }
 
-            request.Success += () =>
-            {
-                tag.Updating.Value = false;
-                requestInFlight = null;
-            };
-            request.Failure += _ =>
-            {
-                tag.Updating.Value = false;
-                requestInFlight = null;
-            };
-            api.Queue(requestInFlight = request);
+            request.Success += () => tag.Updating.Value = false;
+            request.Failure += _ => tag.Updating.Value = false;
+
+            api.Queue(request);
         }
 
         private void voteCountChanged(ValueChangedEvent<int> _)
