@@ -161,7 +161,7 @@ namespace osu.Game.Tests.Beatmaps
 
             public ISkin FindProvider(Func<ISkin, bool> lookupFunction) => lookupFunction(this) ? this : null;
 
-            public IEnumerable<ISkin> AllSources => new[] { this };
+            public IEnumerable<ISkin> AllSources => Array.Empty<ISkin>();
         }
     }
 }
