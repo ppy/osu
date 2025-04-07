@@ -30,7 +30,7 @@ namespace osu.Game.Screens.Edit.Setup
         public override LocalisableString Title => EditorSetupStrings.MetadataHeader;
 
         [Resolved]
-        private Editor editor { get; set; }
+        private Editor editor { get; set; } = null!;
 
         [BackgroundDependencyLoader]
         private void load(SetupScreen? setupScreen)
