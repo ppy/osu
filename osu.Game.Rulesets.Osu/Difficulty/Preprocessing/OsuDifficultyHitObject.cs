@@ -167,10 +167,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 TravelTime = Math.Max(currentSlider.LazyTravelTime / clockRate, MIN_DELTA_TIME);
             }
 
-            // We don't need to calculate either angle or distance when one of the last->curr objects is a spinner
-            if (BaseObject is Spinner || lastObject is Spinner)
-                return;
-
             // We will scale distances by this factor, so we can assume a uniform CircleSize among beatmaps.
             float scalingFactor = NORMALISED_RADIUS / (float)BaseObject.Radius;
 
@@ -217,7 +213,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 MinimumJumpDistance = Math.Max(0, Math.Min(LazyJumpDistance - (maximum_slider_radius - assumed_slider_radius), tailJumpDistance - maximum_slider_radius));
             }
 
-            if (lastLastObject != null && !(lastLastObject is Spinner))
+            if (lastLastObject != null)
             {
                 Vector2 lastLastCursorPosition = getEndCursorPosition(lastLastObject);
 
