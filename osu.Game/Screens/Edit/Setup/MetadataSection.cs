@@ -25,7 +25,12 @@ namespace osu.Game.Screens.Edit.Setup
         private FormTextBox sourceTextBox = null!;
         private FormTextBox tagsTextBox = null!;
 
+        private bool dirty = false;
+
         public override LocalisableString Title => EditorSetupStrings.MetadataHeader;
+
+        [Resolved]
+        private Editor editor { get; set; }
 
         [BackgroundDependencyLoader]
         private void load(SetupScreen? setupScreen)
@@ -73,10 +78,12 @@ namespace osu.Game.Screens.Edit.Setup
                 item.Current.BindValueChanged(_ => applyMetadata());
                 item.OnCommit += (_, newText) =>
                 {
-                    if (newText)
+                    if (newText && dirty)
                         Beatmap.SaveState();
                 };
             }
+
+            editor.Saved += () => dirty = false;
 
             updateReadOnlyState();
         }
@@ -124,6 +131,8 @@ namespace osu.Game.Screens.Edit.Setup
             Beatmap.BeatmapInfo.DifficultyName = difficultyTextBox.Current.Value;
             Beatmap.Metadata.Source = sourceTextBox.Current.Value;
             Beatmap.Metadata.Tags = tagsTextBox.Current.Value;
+
+            dirty = true;
         }
 
         private partial class FormRomanisedTextBox : FormTextBox
