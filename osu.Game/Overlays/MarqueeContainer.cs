@@ -116,7 +116,7 @@ namespace osu.Game.Overlays
             {
                 fillerContent.Alpha = 0;
                 flow.ClearTransforms();
-                flow.X = 0;
+                flow.MoveToX(0, 300, Easing.OutQuint);
                 flow.Anchor = NonOverflowingContentAnchor;
                 flow.Origin = NonOverflowingContentAnchor;
             }
