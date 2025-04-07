@@ -3,7 +3,6 @@
 
 using System;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osuTK;
@@ -16,14 +15,35 @@ namespace osu.Game.Overlays
         /// Whether the marquee should be allowed to scroll the content if it overflows.
         /// Note that upon changing the value of this, any existing scrolls will be terminated instantly.
         /// </summary>
-        public Bindable<bool> AllowScrolling { get; } = new BindableBool(true);
+        public bool AllowScrolling
+        {
+            get => allowScrolling;
+            set
+            {
+                allowScrolling = value;
+                ScheduleAfterChildren(updateScrolling);
+            }
+        }
+
+        private bool allowScrolling = true;
+
 
         /// <summary>
         /// The <see cref="Anchor"/> to anchor the content to if it does not overflow.
         /// </summary>
         public Anchor NonOverflowingContentAnchor { get; init; } = Anchor.TopLeft;
 
-        public Bindable<Func<Drawable>> CreateContent = new Bindable<Func<Drawable>>();
+        public Func<Drawable>? CreateContent
+        {
+            set
+            {
+                createContent = value;
+                if (IsLoaded)
+                    updateContent();
+            }
+        }
+
+        private Func<Drawable>? createContent;
 
         private const float initial_move_delay = 1000;
         private const float pixels_per_second = 50;
@@ -57,21 +77,26 @@ namespace osu.Game.Overlays
         {
             base.LoadComplete();
 
-            AllowScrolling.BindValueChanged(_ => ScheduleAfterChildren(updateScrolling));
-            CreateContent.BindValueChanged(_ =>
-            {
-                flow.Clear();
-                flow.Add(mainContent = CreateContent.Value.Invoke());
-                flow.Add(fillerContent = CreateContent.Value.Invoke().With(d => d.Alpha = 0));
-                ScheduleAfterChildren(updateScrolling);
-            }, true);
+            updateContent();
+        }
+
+        private void updateContent()
+        {
+            flow.Clear();
+
+            if (createContent == null)
+                return;
+
+            flow.Add(mainContent = createContent());
+            flow.Add(fillerContent = createContent().With(d => d.Alpha = 0));
+            ScheduleAfterChildren(updateScrolling);
         }
 
         private void updateScrolling()
         {
             float overflowWidth = mainContent.DrawWidth + padding - DrawWidth;
 
-            if (overflowWidth > 0 && AllowScrolling.Value)
+            if (overflowWidth > 0 && AllowScrolling)
             {
                 fillerContent.Alpha = 1;
                 flow.Anchor = Anchor.TopLeft;

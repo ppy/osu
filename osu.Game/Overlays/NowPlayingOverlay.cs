@@ -113,15 +113,12 @@ namespace osu.Game.Overlays
                                     Anchor = Anchor.TopCentre,
                                     Position = new Vector2(0, 40),
                                     Colour = Color4.White,
-                                    CreateContent =
+                                    CreateContent = () => new OsuSpriteText
                                     {
-                                        Value = () => new OsuSpriteText
-                                        {
-                                            Font = title_font,
-                                            Text = @"Nothing to play",
-                                            Anchor = Anchor.Centre,
-                                            Origin = Anchor.Centre,
-                                        }
+                                        Font = title_font,
+                                        Text = @"Nothing to play",
+                                        Anchor = Anchor.Centre,
+                                        Origin = Anchor.Centre,
                                     },
                                     NonOverflowingContentAnchor = Anchor.Centre,
                                 },
@@ -131,15 +128,12 @@ namespace osu.Game.Overlays
                                     Anchor = Anchor.TopCentre,
                                     Position = new Vector2(0, 45),
                                     Colour = Color4.White,
-                                    CreateContent =
+                                    CreateContent = () => new OsuSpriteText
                                     {
-                                        Value = () => new OsuSpriteText
-                                        {
-                                            Font = artist_font,
-                                            Text = @"Nothing to play",
-                                            Anchor = Anchor.Centre,
-                                            Origin = Anchor.Centre,
-                                        }
+                                        Font = artist_font,
+                                        Text = @"Nothing to play",
+                                        Anchor = Anchor.Centre,
+                                        Origin = Anchor.Centre,
                                     },
                                     NonOverflowingContentAnchor = Anchor.Centre,
                                 },
@@ -338,14 +332,14 @@ namespace osu.Game.Overlays
             {
                 BeatmapMetadata metadata = beatmap.Metadata;
 
-                title.CreateContent.Value = () => new OsuSpriteText
+                title.CreateContent = () => new OsuSpriteText
                 {
                     Text = new RomanisableString(metadata.TitleUnicode, metadata.Title),
                     Font = title_font,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                 };
-                artist.CreateContent.Value = () => new OsuSpriteText
+                artist.CreateContent = () => new OsuSpriteText
                 {
                     Text = new RomanisableString(metadata.ArtistUnicode, metadata.Artist),
                     Font = artist_font,
