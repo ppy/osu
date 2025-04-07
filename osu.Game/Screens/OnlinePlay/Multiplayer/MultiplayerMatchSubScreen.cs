@@ -518,9 +518,19 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 return;
             }
 
-            if (beatmapAvailabilityTracker.Availability.Value.State != DownloadState.LocallyAvailable)
-                return;
+            // Ensure all the gameplay states are up-to-date, forgoing any misordering/scheduling shenanigans.
+            updateGameplayState();
 
+            // ... And then check that the set gameplay state is valid.
+            // When spectating, we'll receive LoadRequested() from the server even though we may not yet have the beatmap.
+            // In that case, this method will be invoked again after availability changes in onBeatmapAvailabilityChanged().
+            if (Beatmap.IsDefault)
+            {
+                Logger.Log("Aborting gameplay start - beatmap not downloaded.");
+                return;
+            }
+
+            // Start the gameplay session.
             sampleStart?.Play();
 
             int[] userIds = client.CurrentMatchPlayingUserIds.ToArray();
