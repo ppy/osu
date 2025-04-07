@@ -25,7 +25,7 @@ namespace osu.Game.Screens.Edit.Setup
         private FormTextBox sourceTextBox = null!;
         private FormTextBox tagsTextBox = null!;
 
-        private bool dirty = false;
+        private bool dirty;
 
         public override LocalisableString Title => EditorSetupStrings.MetadataHeader;
 
