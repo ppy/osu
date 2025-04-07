@@ -1,0 +1,214 @@
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
+using System;
+using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
+using osu.Game.Collections;
+using osu.Game.Configuration;
+using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Localisation;
+using osu.Game.Overlays;
+using osu.Game.Resources.Localisation.Web;
+using osu.Game.Screens.Select.Filter;
+using osuTK;
+
+namespace osu.Game.Screens.SelectV2
+{
+    public partial class BeatmapFilterControl : OverlayContainer
+    {
+        private ShearedToggleButton showConvertedBeatmapsButton = null!;
+        private ShearedDifficultyRangeSlider difficultyRangeSlider = null!;
+
+        [Resolved]
+        private OsuConfigManager config { get; set; } = null!;
+
+        [BackgroundDependencyLoader]
+        private void load(OverlayColourProvider colourProvider)
+        {
+            AutoSizeAxes = Axes.Y;
+
+            InternalChildren = new Drawable[]
+            {
+                new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Padding = new MarginPadding { Top = -10f, Right = -40f, Left = -80f },
+                    Child = new Container
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Masking = true,
+                        Children = new[]
+                        {
+                            new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Width = 0.2f,
+                                Colour = ColourInfo.GradientHorizontal(colourProvider.Background4.Opacity(0f), colourProvider.Background4.Opacity(0.8f)),
+                            },
+                            new Box
+                            {
+                                RelativePositionAxes = Axes.X,
+                                X = 0.2f,
+                                RelativeSizeAxes = Axes.Both,
+                                Width = 0.8f,
+                                Colour = colourProvider.Background4.Opacity(0.8f),
+                            },
+                        },
+                    }
+                },
+                new ReverseChildIDFillFlowContainer<Drawable>
+                {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Direction = FillDirection.Vertical,
+                    Spacing = new Vector2(0f, 8f),
+                    Padding = new MarginPadding { Vertical = 15f, Right = 15f, Left = 20f },
+                    Shear = new Vector2(OsuGame.SHEAR, 0),
+                    Children = new Drawable[]
+                    {
+                        new Container
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Shear = -new Vector2(OsuGame.SHEAR, 0),
+                            Child = new SongSelectSearchTextBox
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                HoldFocus = true,
+                                // TODO: pending implementation
+                                FilterText = "12345 matches",
+                            },
+                        },
+                        new GridContainer
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Shear = -new Vector2(OsuGame.SHEAR, 0),
+                            RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
+                            ColumnDimensions = new[]
+                            {
+                                new Dimension(),
+                                new Dimension(GridSizeMode.Absolute, 10),
+                                new Dimension(GridSizeMode.AutoSize),
+                            },
+                            Content = new[]
+                            {
+                                new[]
+                                {
+                                    difficultyRangeSlider = new ShearedDifficultyRangeSlider
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        MinRange = 0.1f,
+                                    },
+                                    Empty(),
+                                    new Container
+                                    {
+                                        Size = new Vector2(210, 30),
+                                        Child = showConvertedBeatmapsButton = new ShearedToggleButton
+                                        {
+                                            Anchor = Anchor.Centre,
+                                            Origin = Anchor.Centre,
+                                            Text = UserInterfaceStrings.ShowConvertedBeatmaps,
+                                            Height = 30f,
+                                        },
+                                    },
+                                },
+                            }
+                        },
+                        new GridContainer
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Shear = -new Vector2(OsuGame.SHEAR, 0),
+                            RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
+                            ColumnDimensions = new[]
+                            {
+                                new Dimension(maxSize: 210),
+                                new Dimension(GridSizeMode.Absolute, 10),
+                                new Dimension(maxSize: 230),
+                                new Dimension(GridSizeMode.Absolute, 10),
+                                new Dimension(),
+                            },
+                            Content = new[]
+                            {
+                                new[]
+                                {
+                                    new Container
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        Height = 32f,
+                                        Child = new ShearedDropdown<SortMode>(SortStrings.Default)
+                                        {
+                                            RelativeSizeAxes = Axes.X,
+                                            Items = Enum.GetValues<SortMode>(),
+                                        },
+                                    },
+                                    Empty(),
+                                    new Container
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        Height = 32f,
+                                        // todo: pending localisation
+                                        Child = new ShearedDropdown<GroupMode>("Group by")
+                                        {
+                                            RelativeSizeAxes = Axes.X,
+                                            Items = Enum.GetValues<GroupMode>(),
+                                        },
+                                    },
+                                    Empty(),
+                                    new Container
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        Height = 32f,
+                                        Child = new ShearedCollectionDropdown
+                                        {
+                                            RelativeSizeAxes = Axes.X,
+                                        },
+                                    },
+                                }
+                            }
+                        },
+                    },
+                }
+            };
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            difficultyRangeSlider.LowerBound = config.GetBindable<double>(OsuSetting.DisplayStarsMinimum);
+            difficultyRangeSlider.UpperBound = config.GetBindable<double>(OsuSetting.DisplayStarsMaximum);
+            config.BindWith(OsuSetting.ShowConvertedBeatmaps, showConvertedBeatmapsButton.Active);
+        }
+
+        protected override void PopIn()
+        {
+            this.MoveToX(0, SongSelect.ENTER_DURATION, Easing.OutQuint)
+                .FadeIn(SongSelect.ENTER_DURATION / 3, Easing.In);
+        }
+
+        protected override void PopOut()
+        {
+            this.MoveToX(150, SongSelect.ENTER_DURATION, Easing.OutQuint)
+                .FadeOut(SongSelect.ENTER_DURATION / 3, Easing.In);
+        }
+
+        private partial class SongSelectSearchTextBox : ShearedFilterTextBox
+        {
+            protected override InnerSearchTextBox CreateInnerTextBox() => new InnerTextBox();
+
+            private partial class InnerTextBox : InnerFilterTextBox
+            {
+                public override bool HandleLeftRightArrows => false;
+            }
+        }
+    }
+}
