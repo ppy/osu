@@ -47,7 +47,7 @@ namespace osu.Game.Overlays.Music
                 Anchor = Anchor.CentreLeft,
                 Origin = Anchor.CentreLeft,
                 RelativeSizeAxes = Axes.X,
-                AllowScrolling = { Value = false }
+                AllowScrolling = false,
             };
 
             selectedSet.BindTo(playlistOverlay.SelectedSet);
@@ -68,7 +68,7 @@ namespace osu.Game.Overlays.Music
             var title = new RomanisableString(metadata.TitleUnicode, metadata.Title);
             var artist = new RomanisableString(metadata.ArtistUnicode, metadata.Artist);
 
-            text.CreateContent.Value = () =>
+            text.CreateContent = () =>
             {
                 var flow = new OsuTextFlowContainer
                 {
@@ -113,13 +113,13 @@ namespace osu.Game.Overlays.Music
 
         protected override bool OnHover(HoverEvent e)
         {
-            text.AllowScrolling.Value = true;
+            text.AllowScrolling = true;
             return true;
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            text.AllowScrolling.Value = false;
+            text.AllowScrolling = false;
             base.OnHoverLost(e);
         }
     }
