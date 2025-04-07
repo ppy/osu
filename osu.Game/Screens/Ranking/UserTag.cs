@@ -16,6 +16,7 @@ namespace osu.Game.Screens.Ranking
 
         public BindableInt VoteCount { get; } = new BindableInt();
         public BindableBool Voted { get; } = new BindableBool();
+        public BindableBool Updating { get; } = new BindableBool();
 
         public UserTag(APITag tag)
         {
