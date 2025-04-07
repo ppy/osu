@@ -302,7 +302,7 @@ namespace osu.Game.Screens.Ranking
 
             protected OsuSpriteText TagCategoryText { get; private set; } = null!;
             protected OsuSpriteText TagNameText { get; private set; } = null!;
-            protected OsuSpriteText VoteCountText { get; private set; } = null!;
+            protected VoteCountText VoteCountText { get; private set; } = null!;
 
             private readonly bool showVoteCount;
 
@@ -382,7 +382,8 @@ namespace osu.Game.Screens.Ranking
                             showVoteCount
                                 ? new Container
                                 {
-                                    AutoSizeAxes = Axes.Both,
+                                    RelativeSizeAxes = Axes.Y,
+                                    AutoSizeAxes = Axes.X,
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
                                     Children = new Drawable[]
@@ -391,9 +392,9 @@ namespace osu.Game.Screens.Ranking
                                         {
                                             RelativeSizeAxes = Axes.Both,
                                         },
-                                        VoteCountText = new OsuSpriteText
+                                        VoteCountText = new VoteCountText(voteCount)
                                         {
-                                            Margin = new MarginPadding { Horizontal = 6, Vertical = 3, },
+                                            Margin = new MarginPadding { Horizontal = 6 },
                                         },
                                     }
                                 }
@@ -418,7 +419,6 @@ namespace osu.Game.Screens.Ranking
                 {
                     voteCount.BindValueChanged(_ =>
                     {
-                        VoteCountText.Text = voteCount.Value.ToLocalisableString();
                         confirmed.Value = voteCount.Value >= 10;
                     }, true);
                     voted.BindValueChanged(v =>
@@ -730,6 +730,60 @@ namespace osu.Game.Screens.Ranking
                     updating.BindValueChanged(u => loadingLayer.State.Value = u.NewValue ? Visibility.Visible : Visibility.Hidden);
                 }
             }
+        }
+
+        private partial class VoteCountText : CompositeDrawable
+        {
+            private OsuSpriteText voteCountText;
+
+            private readonly Bindable<int> voteCount;
+
+            public VoteCountText(Bindable<int> voteCount)
+            {
+                RelativeSizeAxes = Axes.Y;
+                AutoSizeAxes = Axes.X;
+
+                this.voteCount = voteCount.GetBoundCopy();
+
+                AddInternal(voteCountText = createText());
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                voteCount.BindValueChanged(count =>
+                {
+                    var previousText = voteCountText;
+
+                    const double transition_duration = 500;
+
+                    bool isIncrease = count.NewValue > count.OldValue;
+
+                    AddInternal(voteCountText = createText());
+
+                    voteCountText.MoveToY(isIncrease ? 20 : -20)
+                                 .MoveToY(0, transition_duration, Easing.OutExpo);
+
+                    previousText.BypassAutoSizeAxes = Axes.Both;
+                    previousText.MoveToY(isIncrease ? -20 : 20, transition_duration, Easing.OutExpo).Expire();
+                });
+
+                Scheduler.AddDelayed(() =>
+                {
+                    AutoSizeDuration = 300;
+                    AutoSizeEasing = Easing.OutQuint;
+                }, 1);
+            }
+
+            private OsuSpriteText createText() =>
+                new OsuSpriteText
+                {
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                    Font = OsuFont.GetFont(weight: FontWeight.SemiBold),
+                    Text = voteCount.Value.ToLocalisableString(),
+                };
         }
     }
 }
