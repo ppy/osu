@@ -47,6 +47,7 @@ namespace osu.Game.Overlays.Music
                 Anchor = Anchor.CentreLeft,
                 Origin = Anchor.CentreLeft,
                 RelativeSizeAxes = Axes.X,
+                InitialMoveDelay = 0,
                 AllowScrolling = false,
             };
 
