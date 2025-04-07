@@ -98,6 +98,7 @@ namespace osu.Game.Graphics.UserInterface
             base.LoadComplete();
 
             Current.BindValueChanged(onCurrentValueChanged, true);
+            FinishTransforms(true);
         }
 
         private bool glowing;
