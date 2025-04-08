@@ -15,5 +15,8 @@ namespace osu.Game.Online.API.Requests.Responses
 
         [JsonProperty("description")]
         public string Description { get; set; } = string.Empty;
+
+        [JsonProperty("ruleset_id")]
+        public int? RulesetId { get; set; }
     }
 }

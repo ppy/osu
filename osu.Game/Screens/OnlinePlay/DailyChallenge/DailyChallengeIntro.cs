@@ -56,8 +56,8 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Plum);
 
-        [Cached]
-        private readonly OnlinePlayBeatmapAvailabilityTracker beatmapAvailabilityTracker = new OnlinePlayBeatmapAvailabilityTracker();
+        [Cached(typeof(OnlinePlayBeatmapAvailabilityTracker))]
+        private readonly DailyChallengeBeatmapAvailabilityTracker beatmapAvailabilityTracker;
 
         private bool shouldBePlayingMusic;
 
@@ -91,6 +91,8 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             item = room.Playlist.Single();
 
             ValidForResume = false;
+
+            beatmapAvailabilityTracker = new DailyChallengeBeatmapAvailabilityTracker(item);
         }
 
         protected override BackgroundScreen CreateBackground() => new DailyChallengeIntroBackgroundScreen(colourProvider);
@@ -352,7 +354,6 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
         {
             base.OnEntering(e);
 
-            beatmapAvailabilityTracker.SelectedItem.Value = item;
             beatmapAvailabilityTracker.Availability.BindValueChanged(availability =>
             {
                 if (shouldBePlayingMusic && availability.NewValue.State == DownloadState.LocallyAvailable)
