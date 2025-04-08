@@ -15,6 +15,7 @@ using osu.Game.Online;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Online.Multiplayer.Countdown;
 using osu.Game.Online.Multiplayer.MatchTypes.TeamVersus;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.Mods;
@@ -70,6 +71,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private MultiplayerPlaylistItem? currentItem => ServerRoom?.Playlist[currentIndex];
         private int currentIndex;
         private long lastPlaylistItemId;
+        private int lastCountdownId;
 
         private readonly TestRoomRequestsHandler apiRequestHandler;
 
@@ -393,7 +395,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
             switch (request)
             {
                 case ChangeTeamRequest changeTeam:
-
                     TeamVersusRoomState roomState = (TeamVersusRoomState)ServerRoom.MatchState!;
                     TeamVersusUserState userState = (TeamVersusUserState)LocalUser.MatchState!;
 
@@ -402,10 +403,24 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     if (targetTeam != null)
                     {
                         userState.TeamID = targetTeam.ID;
-
                         await ((IMultiplayerClient)this).MatchUserStateChanged(clone(LocalUser.UserID), clone(userState)).ConfigureAwait(false);
                     }
 
+                    break;
+
+                case StartMatchCountdownRequest startCountdown:
+                    ServerRoom.ActiveCountdowns.Add(new MatchStartCountdown
+                    {
+                        ID = ++lastCountdownId,
+                        TimeRemaining = startCountdown.Duration
+                    });
+
+                    await ((IMultiplayerClient)this).MatchEvent(clone(new CountdownStartedEvent(ServerRoom.ActiveCountdowns[^1]))).ConfigureAwait(false);
+                    break;
+
+                case StopCountdownRequest stopCountdown:
+                    ServerRoom.ActiveCountdowns.Remove(ServerRoom.ActiveCountdowns.First(c => c.ID == stopCountdown.ID));
+                    await ((IMultiplayerClient)this).MatchEvent(clone(new CountdownStoppedEvent(stopCountdown.ID))).ConfigureAwait(false);
                     break;
             }
         }
