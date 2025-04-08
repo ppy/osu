@@ -195,6 +195,8 @@ namespace osu.Game.Graphics.UserInterface
 
             protected OsuSpriteText NubText { get; private set; } = null!;
 
+            public override bool AcceptsFocus => false;
+
             public BoundSliderBar(bool isUpper)
             {
                 this.isUpper = isUpper;
