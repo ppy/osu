@@ -734,7 +734,7 @@ namespace osu.Game.Screens.Ranking
 
         private partial class VoteCountText : CompositeDrawable
         {
-            private OsuSpriteText voteCountText;
+            private OsuSpriteText? text;
 
             private readonly Bindable<int> voteCount;
 
@@ -744,8 +744,6 @@ namespace osu.Game.Screens.Ranking
                 AutoSizeAxes = Axes.X;
 
                 this.voteCount = voteCount.GetBoundCopy();
-
-                AddInternal(voteCountText = createText());
             }
 
             protected override void LoadComplete()
@@ -754,36 +752,33 @@ namespace osu.Game.Screens.Ranking
 
                 voteCount.BindValueChanged(count =>
                 {
-                    var previousText = voteCountText;
+                    OsuSpriteText? previousText = text;
 
-                    const double transition_duration = 500;
+                    AddInternal(text = new OsuSpriteText
+                    {
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreLeft,
+                        Font = OsuFont.GetFont(weight: FontWeight.SemiBold),
+                        Text = voteCount.Value.ToLocalisableString(),
+                    });
 
-                    bool isIncrease = count.NewValue > count.OldValue;
+                    if (previousText != null)
+                    {
+                        const double transition_duration = 500;
 
-                    AddInternal(voteCountText = createText());
+                        bool isIncrease = count.NewValue > count.OldValue;
 
-                    voteCountText.MoveToY(isIncrease ? 20 : -20)
-                                 .MoveToY(0, transition_duration, Easing.OutExpo);
+                        text.MoveToY(isIncrease ? 20 : -20)
+                            .MoveToY(0, transition_duration, Easing.OutExpo);
 
-                    previousText.BypassAutoSizeAxes = Axes.Both;
-                    previousText.MoveToY(isIncrease ? -20 : 20, transition_duration, Easing.OutExpo).Expire();
-                });
+                        previousText.BypassAutoSizeAxes = Axes.Both;
+                        previousText.MoveToY(isIncrease ? -20 : 20, transition_duration, Easing.OutExpo).Expire();
 
-                Scheduler.AddDelayed(() =>
-                {
-                    AutoSizeDuration = 300;
-                    AutoSizeEasing = Easing.OutQuint;
-                }, 1);
+                        AutoSizeDuration = 300;
+                        AutoSizeEasing = Easing.OutQuint;
+                    }
+                }, true);
             }
-
-            private OsuSpriteText createText() =>
-                new OsuSpriteText
-                {
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreLeft,
-                    Font = OsuFont.GetFont(weight: FontWeight.SemiBold),
-                    Text = voteCount.Value.ToLocalisableString(),
-                };
         }
     }
 }
