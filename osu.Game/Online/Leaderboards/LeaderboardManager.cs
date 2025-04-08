@@ -42,18 +42,6 @@ namespace osu.Game.Online.Leaderboards
         [Resolved]
         private RulesetStore rulesets { get; set; } = null!;
 
-        public LeaderboardManager()
-        {
-            scores.BindValueChanged(_ =>
-            {
-                if (localFetchCompletionSource != null && localFetchCompletionSource == lastFetchCompletionSource && scores.Value != null)
-                {
-                    localFetchCompletionSource.SetResult(scores.Value);
-                    localFetchCompletionSource = lastFetchCompletionSource = null;
-                }
-            });
-        }
-
         public Task<LeaderboardScores?> FetchWithCriteriaAsync(LeaderboardCriteria newCriteria)
         {
             if (criteria?.Equals(newCriteria) == true && lastFetchCompletionSource?.Task.IsFaulted == false)
@@ -69,6 +57,8 @@ namespace osu.Game.Online.Leaderboards
             {
                 case BeatmapLeaderboardScope.Local:
                 {
+                    // this task completion source will be marked completed in the `localScoresChanged()` below.
+                    // yes it's twisty, but such are the costs of trying to reconcile data-push / subscription and data-pull / explicit fetch flows.
                     lastFetchCompletionSource = localFetchCompletionSource = new TaskCompletionSource<LeaderboardScores?>();
                     localScoreSubscription = realm.RegisterForNotifications(r =>
                         r.All<ScoreInfo>().Filter($"{nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.ID)} == $0"
@@ -148,6 +138,12 @@ namespace osu.Game.Online.Leaderboards
             newScores = newScores.Detach().OrderByTotalScore();
 
             scores.Value = new LeaderboardScores(newScores, null);
+
+            if (localFetchCompletionSource != null && localFetchCompletionSource == lastFetchCompletionSource)
+            {
+                localFetchCompletionSource.SetResult(scores.Value);
+                localFetchCompletionSource = lastFetchCompletionSource = null;
+            }
         }
     }
 
