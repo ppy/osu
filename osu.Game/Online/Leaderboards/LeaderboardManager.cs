@@ -49,7 +49,7 @@ namespace osu.Game.Online.Leaderboards
                 if (localFetchCompletionSource != null && localFetchCompletionSource == lastFetchCompletionSource && scores.Value != null)
                 {
                     localFetchCompletionSource.SetResult(scores.Value);
-                    localFetchCompletionSource = null;
+                    localFetchCompletionSource = lastFetchCompletionSource = null;
                 }
             });
         }
