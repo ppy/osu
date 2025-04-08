@@ -415,12 +415,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         TimeRemaining = startCountdown.Duration
                     });
 
-                    await ((IMultiplayerClient)this).MatchEvent(new CountdownStartedEvent(ServerRoom.ActiveCountdowns[^1])).ConfigureAwait(false);
+                    await ((IMultiplayerClient)this).MatchEvent(clone(new CountdownStartedEvent(ServerRoom.ActiveCountdowns[^1]))).ConfigureAwait(false);
                     break;
 
                 case StopCountdownRequest stopCountdown:
                     ServerRoom.ActiveCountdowns.Remove(ServerRoom.ActiveCountdowns.First(c => c.ID == stopCountdown.ID));
-                    await ((IMultiplayerClient)this).MatchEvent(new CountdownStoppedEvent(stopCountdown.ID)).ConfigureAwait(false);
+                    await ((IMultiplayerClient)this).MatchEvent(clone(new CountdownStoppedEvent(stopCountdown.ID))).ConfigureAwait(false);
                     break;
             }
         }
