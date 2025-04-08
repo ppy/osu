@@ -573,6 +573,9 @@ namespace osu.Game.Screens.Edit
             return true;
         }
 
+        [CanBeNull]
+        internal event Action Saved;
+
         /// <summary>
         /// Saves the currently edited beatmap.
         /// </summary>
@@ -601,6 +604,7 @@ namespace osu.Game.Screens.Edit
             isNewBeatmap = false;
             updateLastSavedHash();
             onScreenDisplay?.Display(new BeatmapEditorToast(ToastStrings.BeatmapSaved, editorBeatmap.BeatmapInfo.GetDisplayTitle()));
+            Saved?.Invoke();
             return true;
         }
 
