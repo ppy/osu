@@ -28,7 +28,7 @@ namespace osu.Game.Tests.Visual.SongSelect
     {
         private BeatmapCarousel carousel = null!;
 
-        private TestSceneOnlinePlayBeatmapAvailabilityTracker.TestBeatmapModelDownloader beatmapDownloader = null!;
+        private TestScenePlaylistsBeatmapAvailabilityTracker.TestBeatmapModelDownloader beatmapDownloader = null!;
 
         private BeatmapSetInfo testBeatmapSetInfo = null!;
 
@@ -41,7 +41,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             var importer = parent.Get<BeatmapManager>();
 
-            dependencies.CacheAs<BeatmapModelDownloader>(beatmapDownloader = new TestSceneOnlinePlayBeatmapAvailabilityTracker.TestBeatmapModelDownloader(importer, API));
+            dependencies.CacheAs<BeatmapModelDownloader>(beatmapDownloader = new TestScenePlaylistsBeatmapAvailabilityTracker.TestBeatmapModelDownloader(importer, API));
             return dependencies;
         }
 
@@ -85,7 +85,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddUntilStep("progress download to completion", () =>
             {
-                if (downloadRequest is TestSceneOnlinePlayBeatmapAvailabilityTracker.TestDownloadRequest testRequest)
+                if (downloadRequest is TestScenePlaylistsBeatmapAvailabilityTracker.TestDownloadRequest testRequest)
                 {
                     testRequest.SetProgress(testRequest.Progress + 0.1f);
 
@@ -135,7 +135,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddUntilStep("progress download to failure", () =>
             {
-                if (downloadRequest is TestSceneOnlinePlayBeatmapAvailabilityTracker.TestDownloadRequest testRequest)
+                if (downloadRequest is TestScenePlaylistsBeatmapAvailabilityTracker.TestDownloadRequest testRequest)
                 {
                     testRequest.SetProgress(testRequest.Progress + 0.1f);
 
@@ -226,7 +226,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddUntilStep("progress download to completion", () =>
             {
-                if (downloadRequest is TestSceneOnlinePlayBeatmapAvailabilityTracker.TestDownloadRequest testRequest)
+                if (downloadRequest is TestScenePlaylistsBeatmapAvailabilityTracker.TestDownloadRequest testRequest)
                 {
                     testRequest.SetProgress(testRequest.Progress + 0.1f);
 

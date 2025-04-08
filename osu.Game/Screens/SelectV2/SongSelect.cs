@@ -23,7 +23,7 @@ namespace osu.Game.Screens.SelectV2
     {
         private const float logo_scale = 0.4f;
 
-        private readonly ModSelectOverlay modSelectOverlay = new ModSelectOverlay
+        private readonly ModSelectOverlay modSelectOverlay = new ModSelectOverlay(OverlayColourScheme.Aquamarine)
         {
             ShowPresets = true,
         };

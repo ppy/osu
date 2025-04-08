@@ -20,6 +20,7 @@ using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
@@ -45,7 +46,7 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Menu
 {
-    public partial class MainMenu : OsuScreen, IHandlePresentBeatmap, IKeyBindingHandler<GlobalAction>
+    public partial class MainMenu : OsuScreen, IHandlePresentBeatmap, IKeyBindingHandler<GlobalAction>, ISamplePlaybackDisabler
     {
         public const float FADE_IN_DURATION = 300;
 
@@ -84,6 +85,10 @@ namespace osu.Game.Screens.Menu
         [Resolved(canBeNull: true)]
         private IDialogOverlay dialogOverlay { get; set; }
 
+        // used to stop kiai fountain samples when navigating to other screens
+        IBindable<bool> ISamplePlaybackDisabler.SamplePlaybackDisabled => samplePlaybackDisabled;
+        private readonly Bindable<bool> samplePlaybackDisabled = new Bindable<bool>();
+
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenDefault();
 
         protected override bool PlayExitSound => false;
@@ -101,7 +106,7 @@ namespace osu.Game.Screens.Menu
         private SongTicker songTicker;
         private Container logoTarget;
         private OnlineMenuBanner onlineMenuBanner;
-        private MenuTip menuTip;
+        private MenuTipDisplay menuTipDisplay;
         private FillFlowContainer bottomElementsFlow;
         private SupporterDisplay supporterDisplay;
 
@@ -186,7 +191,7 @@ namespace osu.Game.Screens.Menu
                     Spacing = new Vector2(5),
                     Children = new Drawable[]
                     {
-                        menuTip = new MenuTip
+                        menuTipDisplay = new MenuTipDisplay
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
@@ -201,8 +206,8 @@ namespace osu.Game.Screens.Menu
                 supporterDisplay = new SupporterDisplay
                 {
                     Margin = new MarginPadding(5),
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
+                    Anchor = Anchor.TopLeft,
+                    Origin = Anchor.TopLeft,
                 },
                 holdToExitGameOverlay?.CreateProxy() ?? Empty()
             });
@@ -369,6 +374,8 @@ namespace osu.Game.Screens.Menu
 
             supporterDisplay
                 .FadeOut(500, Easing.OutQuint);
+
+            samplePlaybackDisabled.Value = true;
         }
 
         public override void OnResuming(ScreenTransitionEvent e)
@@ -384,11 +391,13 @@ namespace osu.Game.Screens.Menu
             musicController.EnsurePlayingSomething();
 
             // Cycle tip on resuming
-            menuTip.ShowNextTip();
+            menuTipDisplay.ShowNextTip();
 
             bottomElementsFlow
                 .ScaleTo(1, 1000, Easing.OutQuint)
                 .FadeIn(1000, Easing.OutQuint);
+
+            samplePlaybackDisabled.Value = false;
         }
 
         public override bool OnExiting(ScreenExitEvent e)

@@ -234,14 +234,14 @@ namespace osu.Game.Skinning
             {
                 Bulge();
                 explode.Blending = isEpic ? BlendingParameters.Additive : BlendingParameters.Inherit;
-                explode.ScaleTo(1).Then().ScaleTo(isEpic ? 2 : 1.6f, 120);
-                explode.FadeOutFromOne(120);
+                explode.ScaleTo(1).Then().ScaleTo(isEpic ? 2 : 1.6f, 120, Easing.Out);
+                explode.FadeOutFromOne(120, Easing.Out);
             }
 
             public override void Bulge()
             {
                 base.Bulge();
-                Main.ScaleTo(1.4f).Then().ScaleTo(1, 200, Easing.Out);
+                Main.ScaleTo(1.2f).Then().ScaleTo(0.8f, 150);
             }
         }
 
