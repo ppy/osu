@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
@@ -390,6 +391,39 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("mod select contents loaded", () => this.ChildrenOfType<ModColumn>().Any() && this.ChildrenOfType<ModColumn>().All(col => col.IsLoaded && col.ItemsLoaded));
             AddAssert("flashlight mod still disabled", () => !MultiplayerClient.ClientRoom!.Users[0].Mods.Any());
             AddAssert("flashlight mod panel not activated", () => !this.ChildrenOfType<ModPanel>().Single(p => p.Mod is OsuModFlashlight).Active.Value);
+        }
+
+        [Test]
+        public void TestStartCountdown()
+        {
+            AddStep("set playlist", () =>
+            {
+                room.Playlist =
+                [
+                    new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First()).BeatmapInfo)
+                    {
+                        RulesetID = new OsuRuleset().RulesetInfo.OnlineID
+                    }
+                ];
+            });
+
+            ClickButtonWhenEnabled<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>();
+
+            AddUntilStep("wait for room join", () => RoomJoined);
+
+            AddStep("click countdown button", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<MultiplayerCountdownButton>().Single());
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddStep("start a countdown", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<Popover>().Single().ChildrenOfType<Button>().First());
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddUntilStep("countdown started", () => MultiplayerClient.ServerRoom!.ActiveCountdowns.Any());
         }
 
         private partial class TestMultiplayerMatchSubScreen : MultiplayerMatchSubScreen
