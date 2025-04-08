@@ -10,6 +10,38 @@ using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
+    public class LongTermStamina : StrainSkill
+    {
+        private double skillMultiplier => 0.002 * 2;
+        private double strainDecayBase => 0.9992;
+        private double currentStrain;
+
+        public LongTermStamina(Mod[] mods)
+            : base(mods)
+        {
+        }
+
+        private double strainDecay(double ms) => Math.Pow(strainDecayBase, Math.Sqrt(ms / 1000));
+
+        private double strainDecayStamina(double ms, double staminaValue)
+        {
+            double changeFactor = currentStrain > 0 ? 1 + Math.Pow(currentStrain / (staminaValue + currentStrain), 20) : 1;
+            return Math.Pow(0.01, Math.Pow(ms * changeFactor / 1000, 3.5));
+        }
+
+        protected override double CalculateInitialStrain(double time, DifficultyHitObject current) => (currentStrain) * strainDecay(time - current.Previous(0).StartTime);
+
+        protected override double StrainValueAt(DifficultyHitObject current)
+        {
+            var value = StaminaEvaluator.EvaluateDifficultyOf(current) * skillMultiplier;
+            //currentStrain *= strainDecay(((OsuDifficultyHitObject)current).StrainTime);
+            currentStrain *= strainDecay(((OsuDifficultyHitObject)current).StrainTime);
+            currentStrain += value;
+
+            return currentStrain;
+        }
+    }
+
     public class Stamina : StrainSkill
     {
         private double skillMultiplier => 0.04 * 2;
@@ -21,15 +53,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         {
         }
 
-        private double strainDecay(double ms) => Math.Pow(strainDecayBase, Math.Pow(ms / 1000, 2.6));
+        //private double strainDecay(double ms) => Math.Pow(strainDecayBase, Math.Pow(ms / 1000, 2.6));
 
         private double strainDecayStamina(double ms, double staminaValue)
         {
             double changeFactor = currentStrain > 0 ? 1 + Math.Pow(currentStrain / (staminaValue + currentStrain), 20) : 1;
-            return Math.Pow(0.01, Math.Pow(ms * changeFactor / 1000, 3.5));
+            return Math.Pow(0.05, Math.Pow(ms * changeFactor / 1000, 3.5));
         }
 
-        protected override double CalculateInitialStrain(double time, DifficultyHitObject current) => (currentStrain) * strainDecay(time - current.Previous(0).StartTime);
+        protected override double CalculateInitialStrain(double time, DifficultyHitObject current) => (currentStrain) * strainDecayStamina(time - current.Previous(0).StartTime, StaminaEvaluator.EvaluateDifficultyOf(current));
 
         protected override double StrainValueAt(DifficultyHitObject current)
         {
