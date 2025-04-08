@@ -12,7 +12,6 @@ using osu.Framework.Extensions.ExceptionExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -35,7 +34,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         [Resolved]
         private OngoingOperationTracker ongoingOperationTracker { get; set; } = null!;
 
-        private readonly BindableWithCurrent<PlaylistItem?> selectedItem = new BindableWithCurrent<PlaylistItem?>();
         private MatchSettings settings = null!;
 
         public MultiplayerMatchSettingsOverlay(Room room)
@@ -274,11 +272,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                                             RelativeSizeAxes = Axes.X,
                                                             Height = 40,
                                                             Text = "Select beatmap",
-                                                            Action = () =>
-                                                            {
-                                                                if (matchSubScreen.IsCurrentScreen())
-                                                                    matchSubScreen.Push(new MultiplayerMatchSongSelect(matchSubScreen.Room));
-                                                            }
+                                                            Action = () => matchSubScreen.ShowSongSelect()
                                                         }
                                                     }
                                                 }
