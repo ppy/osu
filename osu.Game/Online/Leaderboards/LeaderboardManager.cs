@@ -11,6 +11,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
+using osu.Game.Extensions;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
@@ -154,5 +155,18 @@ namespace osu.Game.Online.Leaderboards
         Mod[]? ExactMods
     );
 
-    public record LeaderboardScores(IEnumerable<ScoreInfo> TopScores, ScoreInfo? UserScore);
+    public record LeaderboardScores(IEnumerable<ScoreInfo> TopScores, ScoreInfo? UserScore)
+    {
+        public IEnumerable<ScoreInfo> AllScores
+        {
+            get
+            {
+                foreach (var score in TopScores)
+                    yield return score;
+
+                if (UserScore != null && TopScores.All(topScore => !topScore.Equals(UserScore) && !topScore.MatchesOnlineID(UserScore)))
+                    yield return UserScore;
+            }
+        }
+    }
 }
