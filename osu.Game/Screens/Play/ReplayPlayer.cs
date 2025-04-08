@@ -14,6 +14,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Input.Bindings;
+using osu.Game.Online.Leaderboards;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play.HUD;
@@ -59,6 +60,12 @@ namespace osu.Game.Screens.Play
             this.createScore = createScore;
         }
 
+        [Resolved]
+        private LeaderboardManager leaderboardManager { get; set; } = null!;
+
+        private readonly IBindable<LeaderboardScores> globalScores = new Bindable<LeaderboardScores>();
+        private readonly BindableList<ScoreInfo> localScores = new BindableList<ScoreInfo>();
+
         /// <summary>
         /// Add a settings group to the HUD overlay. Intended to be used by rulesets to add replay-specific settings.
         /// </summary>
@@ -87,6 +94,20 @@ namespace osu.Game.Screens.Play
             HUDOverlay.PlayerSettingsOverlay.AddAtStart(playbackSettings);
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            globalScores.BindTo(leaderboardManager.Scores);
+            globalScores.BindValueChanged(_ =>
+            {
+                localScores.Clear();
+
+                if (globalScores.Value is LeaderboardScores g)
+                    localScores.AddRange(g.AllScores.OrderByTotalScore());
+            }, true);
+        }
+
         protected override void PrepareReplay()
         {
             DrawableRuleset?.SetReplayScore(Score);
@@ -97,13 +118,11 @@ namespace osu.Game.Screens.Play
         // Don't re-import replay scores as they're already present in the database.
         protected override Task ImportScore(Score score) => Task.CompletedTask;
 
-        public readonly BindableList<ScoreInfo> LeaderboardScores = new BindableList<ScoreInfo>();
-
         protected override GameplayLeaderboard CreateGameplayLeaderboard() =>
             new SoloGameplayLeaderboard(Score.ScoreInfo.User)
             {
                 AlwaysVisible = { Value = true },
-                Scores = { BindTarget = LeaderboardScores }
+                Scores = { BindTarget = localScores }
             };
 
         protected override ResultsScreen CreateResults(ScoreInfo score) => new SoloResultsScreen(score)

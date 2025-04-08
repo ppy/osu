@@ -6,10 +6,12 @@
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Extensions;
 using osu.Game.Online.API;
+using osu.Game.Online.Leaderboards;
 using osu.Game.Online.Rooms;
 using osu.Game.Online.Solo;
 using osu.Game.Scoring;
@@ -29,6 +31,26 @@ namespace osu.Game.Screens.Play
         {
         }
 
+        [Resolved]
+        private LeaderboardManager leaderboardManager { get; set; } = null!;
+
+        private readonly IBindable<LeaderboardScores> globalScores = new Bindable<LeaderboardScores>();
+        private readonly BindableList<ScoreInfo> localScores = new BindableList<ScoreInfo>();
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            globalScores.BindTo(leaderboardManager.Scores);
+            globalScores.BindValueChanged(_ =>
+            {
+                localScores.Clear();
+
+                if (globalScores.Value is LeaderboardScores g)
+                    localScores.AddRange(g.AllScores.OrderByTotalScore());
+            }, true);
+        }
+
         protected override APIRequest<APIScoreToken> CreateTokenRequest()
         {
             int beatmapId = Beatmap.Value.BeatmapInfo.OnlineID;
@@ -43,13 +65,11 @@ namespace osu.Game.Screens.Play
             return new CreateSoloScoreRequest(Beatmap.Value.BeatmapInfo, rulesetId, Game.VersionHash);
         }
 
-        public readonly BindableList<ScoreInfo> LeaderboardScores = new BindableList<ScoreInfo>();
-
         protected override GameplayLeaderboard CreateGameplayLeaderboard() =>
             new SoloGameplayLeaderboard(Score.ScoreInfo.User)
             {
                 AlwaysVisible = { Value = false },
-                Scores = { BindTarget = LeaderboardScores }
+                Scores = { BindTarget = localScores }
             };
 
         protected override bool ShouldExitOnTokenRetrievalFailure(Exception exception) => false;
@@ -59,7 +79,7 @@ namespace osu.Game.Screens.Play
             // Before importing a score, stop binding the leaderboard with its score source.
             // This avoids a case where the imported score may cause a leaderboard refresh
             // (if the leaderboard's source is local).
-            LeaderboardScores.UnbindBindings();
+            globalScores.UnbindBindings();
 
             return base.ImportScore(score);
         }
