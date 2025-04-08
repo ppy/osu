@@ -18,7 +18,7 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Menu
 {
-    public partial class MenuTip : CompositeDrawable
+    public partial class MenuTipDisplay : CompositeDrawable
     {
         [Resolved]
         private OsuConfigManager config { get; set; } = null!;
@@ -86,7 +86,12 @@ namespace osu.Game.Screens.Menu
             textFlow.AddParagraph(MenuTipStrings.MenuTipTitle, formatSemiBold);
             textFlow.AddParagraph(tip, formatRegular);
 
-            this.FadeInFromZero(200, Easing.OutQuint)
+            this
+                .FadeOut()
+                .ScaleTo(0.9f)
+                .Delay(600)
+                .FadeInFromZero(800, Easing.OutQuint)
+                .ScaleTo(1, 800, Easing.OutElasticHalf)
                 .Delay(1000 + 80 * tip.ToString().Length)
                 .Then()
                 .FadeOutFromOne(2000, Easing.OutQuint);

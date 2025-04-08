@@ -304,7 +304,10 @@ namespace osu.Game.Screens.Ranking.Statistics
             this.FadeOut(250, Easing.OutQuint);
 
             if (wasOpened)
+            {
                 popOutSample?.Play();
+                this.HidePopover(); // targeted at the user tag control
+            }
         }
 
         protected override void Dispose(bool isDisposing)
