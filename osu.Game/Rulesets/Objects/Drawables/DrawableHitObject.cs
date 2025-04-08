@@ -707,9 +707,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         protected void ApplyResult(HitResult type) => ApplyResult(static (result, state) => result.Type = state, type);
 
-        [Obsolete("Use overload with state, preferrably with static delegates to avoid allocation overhead.")] // Can be removed 2024-07-26
-        protected void ApplyResult(Action<JudgementResult> application) => ApplyResult((r, _) => application(r), this);
-
         protected void ApplyResult(Action<JudgementResult, DrawableHitObject> application) => ApplyResult(application, this);
 
         /// <summary>
