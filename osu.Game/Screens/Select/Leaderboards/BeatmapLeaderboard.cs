@@ -63,7 +63,7 @@ namespace osu.Game.Screens.Select.Leaderboards
             }
         }
 
-        private readonly IBindable<LeaderboardScores?> fetchedScores = new Bindable<LeaderboardScores?>();
+        private readonly Bindable<LeaderboardScores?> fetchedScores = new Bindable<LeaderboardScores?>();
 
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; } = null!;
@@ -86,17 +86,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                 if (filterMods)
                     RefetchScores();
             };
-            fetchedScores.BindTo(leaderboardManager.Scores);
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-            fetchedScores.BindValueChanged(_ =>
-            {
-                if (fetchedScores.Value != null)
-                    SetScores(fetchedScores.Value.TopScores, fetchedScores.Value.UserScore);
-            });
+            ((IBindable<LeaderboardScores?>)fetchedScores).BindTo(leaderboardManager.Scores);
         }
 
         protected override bool IsOnlineScope => Scope != BeatmapLeaderboardScope.Local;
@@ -147,7 +137,17 @@ namespace osu.Game.Screens.Select.Leaderboards
                               .ContinueWith(t =>
                               {
                                   if (t.Exception != null && !t.IsCanceled)
+                                  {
                                       Schedule(() => SetErrorState(LeaderboardState.NetworkFailure));
+                                      return;
+                                  }
+
+                                  fetchedScores.UnbindEvents();
+                                  fetchedScores.BindValueChanged(scores =>
+                                  {
+                                      if (scores.NewValue != null)
+                                          Schedule(() => SetScores(scores.NewValue.TopScores, scores.NewValue.UserScore));
+                                  }, true);
                               }, cancellationToken);
 
             return null;
