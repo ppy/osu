@@ -44,13 +44,15 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            TextBox.PlaceholderText = ChatStrings.InGameInputPlaceholder(config.LookupKeyBindings(GlobalAction.ToggleChatFocus));
+            resetPlaceholderText();
             TextBox.Focus = () => TextBox.PlaceholderText = Resources.Localisation.Web.ChatStrings.InputPlaceholder;
             TextBox.FocusLost = () =>
             {
-                TextBox.PlaceholderText = ChatStrings.InGameInputPlaceholder(config.LookupKeyBindings(GlobalAction.ToggleChatFocus));
+                resetPlaceholderText();
                 expandedFromTextBoxFocus.Value = false;
             };
+
+            void resetPlaceholderText() => TextBox.PlaceholderText = ChatStrings.InGameInputPlaceholder(config.LookupKeyBindings(GlobalAction.ToggleChatFocus));
         }
 
         protected override bool OnHover(HoverEvent e) => true; // use UI mouse cursor.
