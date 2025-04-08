@@ -46,9 +46,12 @@ namespace osu.Game.Rulesets.Catch.UI
 
         private readonly IBeatmapDifficultyInfo difficulty;
 
-        public CatchPlayfield(IBeatmapDifficultyInfo difficulty)
+        private readonly bool transferToCatcher;
+
+        public CatchPlayfield(IBeatmapDifficultyInfo difficulty, bool transferToCatcher = true)
         {
             this.difficulty = difficulty;
+            this.transferToCatcher = transferToCatcher;
         }
 
         protected override GameplayCursorContainer CreateCursor() => new CatchCursorContainer();
@@ -108,9 +111,15 @@ namespace osu.Game.Rulesets.Catch.UI
         private bool checkIfWeCanCatch(CatchHitObject obj) => Catcher.CanCatch(obj);
 
         private void onNewResult(DrawableHitObject judgedObject, JudgementResult result)
-            => CatcherArea.OnNewResult((DrawableCatchHitObject)judgedObject, result);
+        {
+            if (transferToCatcher)
+                CatcherArea.OnNewResult((DrawableCatchHitObject)judgedObject, result);
+        }
 
         private void onRevertResult(JudgementResult result)
-            => CatcherArea.OnRevertResult(result);
+        {
+            if (transferToCatcher)
+                CatcherArea.OnRevertResult(result);
+        }
     }
 }
