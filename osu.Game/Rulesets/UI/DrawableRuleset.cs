@@ -54,7 +54,12 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// The key conversion input manager for this DrawableRuleset.
         /// </summary>
-        protected PassThroughInputManager KeyBindingInputManager;
+        protected PassThroughInputManager KeyBindingInputManager { get; }
+
+        /// <summary>
+        /// This configuration for this DrawableRuleset.
+        /// </summary>
+        protected IRulesetConfigManager Config { get; private set; }
 
         public override double GameplayStartTime => Objects.FirstOrDefault()?.StartTime - 2000 ?? 0;
 
@@ -77,7 +82,25 @@ namespace osu.Game.Rulesets.UI
 
         public override IFrameStableClock FrameStableClock => frameStabilityContainer;
 
+        public override IEnumerable<HitObject> Objects => Beatmap.HitObjects;
+
+        /// <summary>
+        /// The beatmap.
+        /// </summary>
+        [Cached(typeof(IBeatmap))]
+        public readonly Beatmap<TObject> Beatmap;
+
+        [Cached(typeof(IReadOnlyList<Mod>))]
+        public sealed override IReadOnlyList<Mod> Mods { get; }
+
+        [Resolved(CanBeNull = true)]
+        private OnScreenDisplay onScreenDisplay { get; set; }
+
         private readonly PlayfieldAdjustmentContainer playfieldAdjustmentContainer;
+
+        private IDisposable configTracker;
+        private FrameStabilityContainer frameStabilityContainer;
+        private DrawableRulesetDependencies dependencies;
 
         private bool allowBackwardsSeeks;
 
@@ -104,25 +127,6 @@ namespace osu.Game.Rulesets.UI
                     frameStabilityContainer.FrameStablePlayback = value;
             }
         }
-
-        /// <summary>
-        /// The beatmap.
-        /// </summary>
-        [Cached(typeof(IBeatmap))]
-        public readonly Beatmap<TObject> Beatmap;
-
-        public override IEnumerable<HitObject> Objects => Beatmap.HitObjects;
-
-        protected IRulesetConfigManager Config { get; private set; }
-
-        [Cached(typeof(IReadOnlyList<Mod>))]
-        public sealed override IReadOnlyList<Mod> Mods { get; }
-
-        private FrameStabilityContainer frameStabilityContainer;
-
-        private OnScreenDisplay onScreenDisplay;
-
-        private DrawableRulesetDependencies dependencies;
 
         /// <summary>
         /// Creates a ruleset visualisation for the provided ruleset and beatmap.
@@ -156,6 +160,9 @@ namespace osu.Game.Rulesets.UI
         {
             base.LoadComplete();
 
+            if (Config != null)
+                configTracker = onScreenDisplay?.BeginTracking(this, Config);
+
             IsPaused.ValueChanged += paused =>
             {
                 if (HasReplayLoaded.Value)
@@ -168,13 +175,7 @@ namespace osu.Game.Rulesets.UI
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
             dependencies = new DrawableRulesetDependencies(Ruleset, base.CreateChildDependencies(parent));
-
             Config = dependencies.RulesetConfigManager;
-
-            onScreenDisplay = dependencies.Get<OnScreenDisplay>();
-            if (Config != null)
-                onScreenDisplay?.BeginTracking(this, Config);
-
             return dependencies;
         }
 
@@ -404,11 +405,7 @@ namespace osu.Game.Rulesets.UI
         {
             base.Dispose(isDisposing);
 
-            if (Config != null)
-            {
-                onScreenDisplay?.StopTracking(this, Config);
-                Config = null;
-            }
+            configTracker?.Dispose();
 
             // Dispose the components created by this dependency container.
             dependencies?.Dispose();
