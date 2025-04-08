@@ -136,6 +136,11 @@ namespace osu.Game.Skinning
                         currentConfig.LightFramePerSecond = lightFramePerSecond > 0 ? lightFramePerSecond : 24;
                         break;
 
+                    case "HoldNoteTailOrigin":
+                        if (Enum.TryParse<HoldNoteTailOrigin>(pair.Value, out var tailOrigin))
+                            currentConfig.HoldNoteTailOrigin = tailOrigin;
+                        break;
+
                     case string when pair.Key.StartsWith("Colour", StringComparison.Ordinal):
                         HandleColours(currentConfig, line, true);
                         break;
