@@ -470,7 +470,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 marker.Active = true;
                 handleMouseInput(e.ScreenSpaceMousePosition);
-                return base.OnMouseDown(e);
+                return true;
             }
 
             protected override void OnMouseUp(MouseUpEvent e)
