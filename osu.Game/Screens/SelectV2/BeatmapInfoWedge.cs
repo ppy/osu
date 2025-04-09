@@ -304,8 +304,8 @@ namespace osu.Game.Screens.SelectV2
             }
             else if (currentOnlineBeatmapSet == null)
             {
-                playCount.FadeOut(300, Easing.OutQuint);
-                favouritesStatistic.FadeOut(300, Easing.OutQuint);
+                playCount.Value = new WedgeStatisticPlayCount.Data(-1, -1);
+                favouritesStatistic.Value = "-";
             }
             else
             {
