@@ -34,11 +34,6 @@ namespace osu.Game.Configuration
             Migrate();
         }
 
-        /// <summary>
-        /// For a given <see cref="GlobalAction"/>, return a human-readable string representing the bindings bound to the action.
-        /// </summary>
-        public LocalisableString LookupKeyBindings(GlobalAction action) => LookupKeyBindingsFunc(action);
-
         protected override void InitialiseDefaults()
         {
             // UI/selection defaults
@@ -308,7 +303,7 @@ namespace osu.Game.Configuration
                     string skinName = string.Empty;
 
                     if (Guid.TryParse(skin, out var id))
-                        skinName = LookupSkinNameFunc(id);
+                        skinName = LookupSkinName(id);
 
                     return new SettingDescription(
                         rawValue: skinName,
@@ -329,8 +324,8 @@ namespace osu.Game.Configuration
             };
         }
 
-        public Func<Guid, string> LookupSkinNameFunc { private get; set; } = _ => @"unknown";
-        public Func<GlobalAction, LocalisableString> LookupKeyBindingsFunc { private get; set; } = _ => @"unknown";
+        public Func<Guid, string> LookupSkinName { private get; set; } = _ => @"unknown";
+        public Func<GlobalAction, LocalisableString> LookupKeyBindings { private get; set; } = _ => @"unknown";
 
         IBindable<float> IGameplaySettings.ComboColourNormalisationAmount => GetOriginalBindable<float>(OsuSetting.ComboColourNormalisationAmount);
         IBindable<float> IGameplaySettings.PositionalHitsoundsLevel => GetOriginalBindable<float>(OsuSetting.PositionalHitsoundsLevel);
