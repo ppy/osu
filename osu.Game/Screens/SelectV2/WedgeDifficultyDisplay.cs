@@ -88,11 +88,7 @@ namespace osu.Game.Screens.SelectV2
 
             InternalChildren = new Drawable[]
             {
-                new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider.Background4.Opacity(0.6f),
-                },
+                new WedgeBackground(),
                 new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.X,

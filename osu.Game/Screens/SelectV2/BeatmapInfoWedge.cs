@@ -6,11 +6,9 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
@@ -22,7 +20,6 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Overlays;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
@@ -80,7 +77,7 @@ namespace osu.Game.Screens.SelectV2
         }
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
+        private void load()
         {
             Shear = shear;
             Masking = true;
@@ -91,11 +88,7 @@ namespace osu.Game.Screens.SelectV2
 
             InternalChildren = new Drawable[]
             {
-                new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider.Background3.Opacity(0.6f),
-                },
+                new WedgeBackground(),
                 new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.X,
