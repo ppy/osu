@@ -4,7 +4,6 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Testing;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Overlays;
@@ -35,22 +34,23 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 Width = relativeWidth,
                 Children = new Drawable[]
                 {
-                    new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = ColourProvider.Background6,
-                    },
                     Content
                 }
             };
 
-            AddSliderStep("change relative width", 0, 1f, 0.6f, v =>
+            AddSliderStep("change relative width", 0, 1f, 1f, v =>
             {
                 if (resizeContainer != null)
                     resizeContainer.Width = v;
 
                 relativeWidth = v;
             });
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            ChangeBackgroundColour(ColourProvider.Background6);
         }
 
         [SetUpSteps]
