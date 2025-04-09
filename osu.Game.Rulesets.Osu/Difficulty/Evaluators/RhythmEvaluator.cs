@@ -23,9 +23,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         /// </summary>
         public static double EvaluateDifficultyOf(DifficultyHitObject current)
         {
-            if (current.BaseObject is Spinner)
-                return 0;
-
             double rhythmComplexitySum = 0;
 
             double deltaDifferenceEpsilon = ((OsuDifficultyHitObject)current).HitWindowGreat * 0.3;
