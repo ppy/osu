@@ -19,6 +19,8 @@ namespace osu.Game.Screens.Play
 
         private Bindable<bool> kiaiStarFountains = null!;
 
+        private StarFountainSounds sounds = null!;
+
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
@@ -26,7 +28,7 @@ namespace osu.Game.Screens.Play
 
             RelativeSizeAxes = Axes.Both;
 
-            Children = new[]
+            Children = new Drawable[]
             {
                 leftFountain = new GameplayStarFountain
                 {
@@ -40,6 +42,7 @@ namespace osu.Game.Screens.Play
                     Origin = Anchor.BottomRight,
                     X = -75,
                 },
+                sounds = new StarFountainSounds(),
             };
         }
 
@@ -66,6 +69,8 @@ namespace osu.Game.Screens.Play
         {
             leftFountain.Shoot(1);
             rightFountain.Shoot(-1);
+
+            sounds.Play();
         }
 
         public partial class GameplayStarFountain : StarFountain
