@@ -39,29 +39,24 @@ namespace osu.Game.Screens.SelectV2
                 new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Top = -10f, Right = -40f, Left = -80f },
-                    Child = new Container
+                    Masking = true,
+                    Children = new[]
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        Masking = true,
-                        Children = new[]
+                        new Box
                         {
-                            new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Width = 0.2f,
-                                Colour = ColourInfo.GradientHorizontal(colourProvider.Background4.Opacity(0f), colourProvider.Background4.Opacity(0.8f)),
-                            },
-                            new Box
-                            {
-                                RelativePositionAxes = Axes.X,
-                                X = 0.2f,
-                                RelativeSizeAxes = Axes.Both,
-                                Width = 0.8f,
-                                Colour = colourProvider.Background4.Opacity(0.8f),
-                            },
+                            RelativeSizeAxes = Axes.Both,
+                            Width = 0.2f,
+                            Colour = ColourInfo.GradientHorizontal(colourProvider.Background4.Opacity(0f), colourProvider.Background4.Opacity(0.8f)),
                         },
-                    }
+                        new Box
+                        {
+                            RelativePositionAxes = Axes.X,
+                            X = 0.2f,
+                            RelativeSizeAxes = Axes.Both,
+                            Width = 0.8f,
+                            Colour = colourProvider.Background4.Opacity(0.8f),
+                        },
+                    },
                 },
                 new ReverseChildIDFillFlowContainer<Drawable>
                 {

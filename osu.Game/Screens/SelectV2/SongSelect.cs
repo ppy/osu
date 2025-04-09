@@ -129,7 +129,6 @@ namespace osu.Game.Screens.SelectV2
                                                     Anchor = Anchor.TopRight,
                                                     Origin = Anchor.TopRight,
                                                     RelativeSizeAxes = Axes.X,
-                                                    Width = 1.1f,
                                                 },
                                             }
                                         },
