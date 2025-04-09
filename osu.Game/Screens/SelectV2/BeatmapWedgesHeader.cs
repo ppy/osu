@@ -4,14 +4,11 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
-using osu.Game.Overlays;
 using osu.Game.Screens.Select.Leaderboards;
 using osuTK;
 
@@ -34,27 +31,13 @@ namespace osu.Game.Screens.SelectV2
         public IBindable<bool> FilterBySelectedMods => selectedModsToggle.Active;
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
+        private void load()
         {
-            Shear = shear;
-
             InternalChildren = new Drawable[]
             {
                 new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    CornerRadius = 10,
-                    Masking = true,
-                    Colour = colourProvider.Background4.Opacity(0.6f),
-                    Child = new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                    },
-                },
-                new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Shear = -shear,
                     Padding = new MarginPadding { Left = SongSelect.WEDGE_CONTENT_MARGIN, Right = 20f },
                     Children = new Drawable[]
                     {
@@ -79,7 +62,6 @@ namespace osu.Game.Screens.SelectV2
                                     Anchor = Anchor.CentreRight,
                                     Origin = Anchor.CentreRight,
                                     Size = new Vector2(128f, 32f),
-                                    Scale = new Vector2(0.875f),
                                     Child = selectedModsToggle = new ShearedToggleButton
                                     {
                                         Anchor = Anchor.Centre,
@@ -104,7 +86,6 @@ namespace osu.Game.Screens.SelectV2
                                     Anchor = Anchor.CentreRight,
                                     Origin = Anchor.CentreRight,
                                     Size = new Vector2(160f, 32f),
-                                    Scale = new Vector2(0.875f),
                                     Child = scopeDropdown = new ScopeDropdown
                                     {
                                         Width = 160f,

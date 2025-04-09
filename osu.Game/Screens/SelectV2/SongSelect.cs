@@ -30,7 +30,10 @@ namespace osu.Game.Screens.SelectV2
     {
         private const float logo_scale = 0.4f;
 
-        public const float WEDGE_CONTENT_MARGIN = 60f;
+        public const float WEDGE_CONTENT_MARGIN = corner_radius_hide_offset + OsuGame.SCREEN_EDGE_MARGIN;
+
+        private const float corner_radius_hide_offset = 20f;
+
         public const double ENTER_DURATION = 600;
 
         private const double fade_duration = 300;
@@ -92,7 +95,7 @@ namespace osu.Game.Screens.SelectV2
                                 RelativeSizeAxes = Axes.Both,
                                 ColumnDimensions = new[]
                                 {
-                                    new Dimension(GridSizeMode.Relative, 0.5f),
+                                    new Dimension(GridSizeMode.Relative, 0.5f, maxSize: 850),
                                     new Dimension(),
                                     new Dimension(GridSizeMode.Relative, 0.5f, maxSize: 750),
                                 },
@@ -103,7 +106,7 @@ namespace osu.Game.Screens.SelectV2
                                         wedgesContainer = new FillFlowContainer
                                         {
                                             RelativeSizeAxes = Axes.Both,
-                                            Margin = new MarginPadding { Left = -20 },
+                                            Margin = new MarginPadding { Left = -corner_radius_hide_offset },
                                             Spacing = new Vector2(0f, 4f),
                                             Direction = FillDirection.Vertical,
                                             Children = new Drawable[]
@@ -123,15 +126,15 @@ namespace osu.Game.Screens.SelectV2
                                                     RelativeSizeAxes = Axes.Both,
                                                     Padding = new MarginPadding
                                                     {
-                                                        Top = BeatmapFilterControl.HEIGHT + 5,
+                                                        Top = BeatmapFilterControl.HEIGHT_FROM_SCREEN_TOP + 5,
                                                         Bottom = 5,
                                                     },
                                                     Children = new Drawable[]
                                                     {
                                                         carousel = new BeatmapCarousel
                                                         {
-                                                            BleedTop = BeatmapFilterControl.HEIGHT + 5,
-                                                            BleedBottom = 5,
+                                                            BleedTop = BeatmapFilterControl.HEIGHT_FROM_SCREEN_TOP + 5,
+                                                            BleedBottom = ScreenFooter.HEIGHT + 5,
                                                             RequestSelectBeatmap = b => Beatmap.Value = beatmaps.GetWorkingBeatmap(b),
                                                             RequestPresentBeatmap = _ => OnStart(),
                                                             RelativeSizeAxes = Axes.Both,

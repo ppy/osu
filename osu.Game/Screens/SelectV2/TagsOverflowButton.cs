@@ -13,6 +13,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
+using osuTK;
 
 namespace osu.Game.Screens.SelectV2
 {
@@ -39,7 +40,7 @@ namespace osu.Game.Screens.SelectV2
         [BackgroundDependencyLoader]
         private void load()
         {
-            AutoSizeAxes = Axes.Both;
+            Size = new Vector2(OsuFont.Caption.Size);
             CornerRadius = 1.5f;
             Masking = true;
 
@@ -52,12 +53,12 @@ namespace osu.Game.Screens.SelectV2
                 },
                 text = new OsuSpriteText
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
+                    Y = -2,
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
                     Text = "...",
                     Colour = colourProvider.Background4,
                     Font = OsuFont.Caption.With(weight: FontWeight.Bold),
-                    Margin = new MarginPadding { Horizontal = 3f },
                 }
             };
         }
