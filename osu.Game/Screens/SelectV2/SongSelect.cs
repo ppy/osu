@@ -118,11 +118,25 @@ namespace osu.Game.Screens.SelectV2
                                             RelativeSizeAxes = Axes.Both,
                                             Children = new CompositeDrawable[]
                                             {
-                                                carousel = new BeatmapCarousel
+                                                new Container
                                                 {
-                                                    RequestSelectBeatmap = b => Beatmap.Value = beatmaps.GetWorkingBeatmap(b),
-                                                    RequestPresentBeatmap = _ => OnStart(),
                                                     RelativeSizeAxes = Axes.Both,
+                                                    Padding = new MarginPadding
+                                                    {
+                                                        Top = BeatmapFilterControl.HEIGHT + 5,
+                                                        Bottom = 5,
+                                                    },
+                                                    Children = new Drawable[]
+                                                    {
+                                                        carousel = new BeatmapCarousel
+                                                        {
+                                                            BleedTop = BeatmapFilterControl.HEIGHT + 5,
+                                                            BleedBottom = 5,
+                                                            RequestSelectBeatmap = b => Beatmap.Value = beatmaps.GetWorkingBeatmap(b),
+                                                            RequestPresentBeatmap = _ => OnStart(),
+                                                            RelativeSizeAxes = Axes.Both,
+                                                        },
+                                                    }
                                                 },
                                                 filterControl = new BeatmapFilterControl
                                                 {

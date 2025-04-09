@@ -19,6 +19,8 @@ namespace osu.Game.Screens.SelectV2
 {
     public partial class BeatmapFilterControl : OverlayContainer
     {
+        public const float HEIGHT = 142;
+
         private ShearedToggleButton showConvertedBeatmapsButton = null!;
         private ShearedDifficultyRangeSlider difficultyRangeSlider = null!;
 
@@ -28,7 +30,8 @@ namespace osu.Game.Screens.SelectV2
         [BackgroundDependencyLoader]
         private void load()
         {
-            AutoSizeAxes = Axes.Y;
+            Height = HEIGHT;
+
             Shear = new Vector2(OsuGame.SHEAR, 0);
             Margin = new MarginPadding { Right = -30 };
 
