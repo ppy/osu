@@ -3,18 +3,14 @@
 
 using System;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Game.Collections;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
-using osu.Game.Overlays;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Screens.Select.Filter;
 using osuTK;
@@ -30,33 +26,19 @@ namespace osu.Game.Screens.SelectV2
         private OsuConfigManager config { get; set; } = null!;
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
+        private void load()
         {
             AutoSizeAxes = Axes.Y;
+            Shear = new Vector2(OsuGame.SHEAR, 0);
+            Margin = new MarginPadding { Right = -30 };
 
             InternalChildren = new Drawable[]
             {
-                new Container
+                new WedgeBackground
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Masking = true,
-                    Children = new[]
-                    {
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Width = 0.2f,
-                            Colour = ColourInfo.GradientHorizontal(colourProvider.Background4.Opacity(0f), colourProvider.Background4.Opacity(0.8f)),
-                        },
-                        new Box
-                        {
-                            RelativePositionAxes = Axes.X,
-                            X = 0.2f,
-                            RelativeSizeAxes = Axes.Both,
-                            Width = 0.8f,
-                            Colour = colourProvider.Background4.Opacity(0.8f),
-                        },
-                    },
+                    Anchor = Anchor.TopRight,
+                    Scale = new Vector2(-1, 1),
+                    FinalAlpha = 0,
                 },
                 new ReverseChildIDFillFlowContainer<Drawable>
                 {
@@ -64,8 +46,7 @@ namespace osu.Game.Screens.SelectV2
                     AutoSizeAxes = Axes.Y,
                     Direction = FillDirection.Vertical,
                     Spacing = new Vector2(0f, 8f),
-                    Padding = new MarginPadding { Vertical = 15f, Right = 15f, Left = 20f },
-                    Shear = new Vector2(OsuGame.SHEAR, 0),
+                    Padding = new MarginPadding { Vertical = 5f, Right = 30f },
                     Children = new Drawable[]
                     {
                         new Container
