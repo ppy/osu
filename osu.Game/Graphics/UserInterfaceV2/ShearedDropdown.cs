@@ -36,16 +36,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
             }
         }
 
-        protected override void Update()
-        {
-            base.Update();
-
-            var header = (ShearedDropdownHeader)Header;
-            var menu = (ShearedDropdownMenu)Menu;
-
-            menu.Padding = new MarginPadding { Left = header.LabelContainer.DrawWidth - 10f, Right = 6f };
-        }
-
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
             if (e.Repeat) return false;
@@ -62,16 +52,15 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         protected partial class ShearedDropdownMenu : OsuDropdown<T>.OsuDropdownMenu
         {
-            public new MarginPadding Padding
-            {
-                get => base.Padding;
-                set => base.Padding = value;
-            }
-
             public ShearedDropdownMenu()
             {
                 Shear = OsuGame.SHEAR;
                 Margin = new MarginPadding { Top = 5f };
+                Padding = new MarginPadding
+                {
+                    Left = -6f,
+                    Right = 6f
+                };
             }
 
             protected override DrawableDropdownMenuItem CreateDrawableDropdownMenuItem(MenuItem item) => new ShearedMenuItem(item)
@@ -180,7 +169,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                                             Anchor = Anchor.CentreLeft,
                                             Origin = Anchor.CentreLeft,
                                             Padding = new MarginPadding { Right = 15f },
-                                            Font = OsuFont.Body.With(weight: FontWeight.SemiBold),
+                                            Font = OsuFont.Body,
                                             RelativeSizeAxes = Axes.X,
                                         },
                                         chevron = new SpriteIcon
