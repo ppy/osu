@@ -10,9 +10,13 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Legacy;
+using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens.SelectV2;
 
 namespace osu.Game.Tests.Visual.SongSelectV2
@@ -44,7 +48,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Top = 20 },
                     Children = new Drawable[]
                     {
                         infoWedge = new BeatmapInfoWedge
@@ -59,6 +62,46 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             {
                 ((BindableDouble)infoWedge.ChildrenOfType<WedgeDifficultyDisplay>().Single().DisplayedStars).Value = v;
             });
+        }
+
+        [Test]
+        public void TestTruncation()
+        {
+            selectBeatmap(createLongMetadata());
+        }
+
+        [Test]
+        public void TestNullBeatmap()
+        {
+            selectBeatmap(null);
+            // TODO: add back assertions? need to make fields public again.
+            // AddAssert("check empty version", () => string.IsNullOrEmpty(infoWedge.Info.VersionLabel.Current.Value));
+            // AddAssert("check default title", () => infoWedge.Info.TitleLabel.Current.Value == Beatmap.Default.BeatmapInfo.Metadata.Title);
+            // AddAssert("check default artist", () => infoWedge.Info.ArtistLabel.Current.Value == Beatmap.Default.BeatmapInfo.Metadata.Artist);
+            // AddAssert("check empty author", () => !infoWedge.Info.MapperContainer.ChildrenOfType<OsuSpriteText>().Any());
+            // AddAssert("check no info labels", () => !infoWedge.Info.ChildrenOfType<BeatmapInfoWedge.WedgeInfoText.InfoLabel>().Any());
+        }
+
+        [Test]
+        public void TestBPMUpdates()
+        {
+            const double bpm = 120;
+            IBeatmap beatmap = createTestBeatmap(new OsuRuleset().RulesetInfo);
+            beatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = 60 * 1000 / bpm });
+
+            OsuModDoubleTime doubleTime = null!;
+
+            selectBeatmap(beatmap);
+            checkDisplayedBPM($"{bpm}");
+
+            AddStep("select DT", () => SelectedMods.Value = new[] { doubleTime = new OsuModDoubleTime() });
+            checkDisplayedBPM($"{bpm * 1.5f}");
+
+            AddStep("change DT rate", () => doubleTime.SpeedChange.Value = 2);
+            checkDisplayedBPM($"{bpm * 2}");
+
+            AddStep("select HT", () => SelectedMods.Value = new[] { new OsuModHalfTime() });
+            checkDisplayedBPM($"{bpm * 0.75f}");
         }
 
         [Test]
@@ -88,16 +131,23 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddAssert("check visibility", () => infoWedge.Alpha > 0);
         }
 
-        [Test]
-        public void TestTruncation()
+        [TestCase(120, 125, null, "120-125 (mostly 120)")]
+        [TestCase(120, 120.6, null, "120-121 (mostly 120)")]
+        [TestCase(120, 120.4, null, "120")]
+        [TestCase(120, 120.6, "DT", "180-182 (mostly 180)")]
+        [TestCase(120, 120.4, "DT", "180")]
+        public void TestVaryingBPM(double commonBpm, double otherBpm, string? mod, string expectedDisplay)
         {
-            selectBeatmap(createLongMetadata());
-        }
+            IBeatmap beatmap = createTestBeatmap(new OsuRuleset().RulesetInfo);
+            beatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = 60 * 1000 / commonBpm });
+            beatmap.ControlPointInfo.Add(100, new TimingControlPoint { BeatLength = 60 * 1000 / otherBpm });
+            beatmap.ControlPointInfo.Add(200, new TimingControlPoint { BeatLength = 60 * 1000 / commonBpm });
 
-        [Test]
-        public void TestNullBeatmapWithBackground()
-        {
-            selectBeatmap(null);
+            if (mod != null)
+                AddStep($"select {mod}", () => SelectedMods.Value = new[] { Ruleset.Value.CreateInstance().CreateModFromAcronym(mod) });
+
+            selectBeatmap(beatmap);
+            checkDisplayedBPM(expectedDisplay);
         }
 
         private void setRuleset(RulesetInfo rulesetInfo)
@@ -107,7 +157,19 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
         private void selectBeatmap(IBeatmap? b)
         {
-            AddStep($"select {b?.Metadata.Title ?? "null"} beatmap", () => Beatmap.Value = b == null ? Beatmap.Default : CreateWorkingBeatmap(b));
+            AddStep($"select {b?.Metadata.Title ?? "null"} beatmap", () =>
+            {
+                Beatmap.Value = b == null ? Beatmap.Default : CreateWorkingBeatmap(b);
+            });
+        }
+
+        private void checkDisplayedBPM(string target)
+        {
+            AddUntilStep($"displayed bpm is {target}", () =>
+            {
+                var label = infoWedge.ChildrenOfType<WedgeStatistic>().Single(l => l.TooltipText == BeatmapsetsStrings.ShowStatsBpm);
+                return label.Value == target;
+            });
         }
 
         private IBeatmap createTestBeatmap(RulesetInfo ruleset)
@@ -142,6 +204,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             {
                 BeatmapInfo = new BeatmapInfo
                 {
+                    StarRating = 6,
                     Metadata = new BeatmapMetadata
                     {
                         Author = { Username = "WWWWWWWWWWWWWWW" },

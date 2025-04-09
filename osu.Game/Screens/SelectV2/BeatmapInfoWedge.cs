@@ -85,6 +85,8 @@ namespace osu.Game.Screens.SelectV2
             Shear = shear;
             Masking = true;
             CornerRadius = corner_radius;
+
+            // Hide the top edge of the wedge off-screen (so we don't see the corner).
             Margin = new MarginPadding { Top = -corner_radius };
 
             InternalChildren = new Drawable[]
@@ -175,8 +177,6 @@ namespace osu.Game.Screens.SelectV2
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft,
                             Margin = new MarginPadding { Left = -SongSelect.WEDGE_CONTENT_MARGIN },
                             Padding = new MarginPadding { Right = -SongSelect.WEDGE_CONTENT_MARGIN },
                             Child = new WedgeDifficultyDisplay(),
