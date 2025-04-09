@@ -167,6 +167,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
             }, true);
         }
 
+        protected override bool OnMouseDown(MouseDownEvent e) => true;
+        protected override bool OnClick(ClickEvent e) => true;
+
         private void cycleDivisorType(int direction)
         {
             int totalTypes = Enum.GetValues<BeatDivisorType>().Length;
@@ -470,7 +473,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 marker.Active = true;
                 handleMouseInput(e.ScreenSpaceMousePosition);
-                return true;
+                return base.OnMouseDown(e);
             }
 
             protected override void OnMouseUp(MouseUpEvent e)

@@ -122,7 +122,7 @@ namespace osu.Game.Graphics.UserInterface
         protected override bool OnMouseDown(MouseDownEvent e)
         {
             Content.ScaleTo(ScaleOnMouseDown, 2000, Easing.OutQuint);
-            return true;
+            return base.OnMouseDown(e);
         }
 
         protected override void OnMouseUp(MouseUpEvent e)
