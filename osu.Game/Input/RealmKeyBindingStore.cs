@@ -5,8 +5,10 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Localisation;
 using osu.Game.Database;
 using osu.Game.Input.Bindings;
+using osu.Game.Localisation;
 using osu.Game.Rulesets;
 using Realms;
 
@@ -21,6 +23,19 @@ namespace osu.Game.Input
         {
             this.realm = realm;
             this.keyCombinationProvider = keyCombinationProvider;
+        }
+
+        /// <summary>
+        /// For a given <see cref="GlobalAction"/>, return a human-readable string representing the bindings bound to the action.
+        /// </summary>
+        public LocalisableString GetBindingsStringFor(GlobalAction globalAction)
+        {
+            var combinations = GetReadableKeyCombinationsFor(globalAction);
+
+            if (combinations.Count == 0)
+                return ToastStrings.NoKeyBound;
+
+            return string.Join(" / ", combinations);
         }
 
         /// <summary>

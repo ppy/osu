@@ -6,10 +6,10 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
-using osu.Game.Configuration;
+using osu.Game.Input;
 using osu.Game.Input.Bindings;
-using osu.Game.Localisation;
 using osu.Game.Online.Rooms;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Screens.OnlinePlay.Match.Components;
 using osu.Game.Screens.Play;
 
@@ -42,17 +42,17 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(RealmKeyBindingStore keyBindingStore)
         {
             resetPlaceholderText();
-            TextBox.Focus = () => TextBox.PlaceholderText = Resources.Localisation.Web.ChatStrings.InputPlaceholder;
+            TextBox.Focus = () => TextBox.PlaceholderText = ChatStrings.InputPlaceholder;
             TextBox.FocusLost = () =>
             {
                 resetPlaceholderText();
                 expandedFromTextBoxFocus.Value = false;
             };
 
-            void resetPlaceholderText() => TextBox.PlaceholderText = ChatStrings.InGameInputPlaceholder(config.LookupKeyBindings(GlobalAction.ToggleChatFocus));
+            void resetPlaceholderText() => TextBox.PlaceholderText = Localisation.ChatStrings.InGameInputPlaceholder(keyBindingStore.GetBindingsStringFor(GlobalAction.ToggleChatFocus));
         }
 
         protected override bool OnHover(HoverEvent e) => true; // use UI mouse cursor.
