@@ -19,7 +19,10 @@ namespace osu.Game.Screens.SelectV2
 {
     public partial class BeatmapFilterControl : OverlayContainer
     {
-        public const float HEIGHT = 160;
+        // taken from draw visualiser. used for carousel alignment purposes.
+        public const float HEIGHT_FROM_SCREEN_TOP = 141 - corner_radius;
+
+        private const float corner_radius = 8;
 
         private ShearedToggleButton showConvertedBeatmapsButton = null!;
         private ShearedDifficultyRangeSlider difficultyRangeSlider = null!;
@@ -30,9 +33,8 @@ namespace osu.Game.Screens.SelectV2
         [BackgroundDependencyLoader]
         private void load()
         {
-            const float corner_radius = 8;
-
-            Height = HEIGHT;
+            RelativeSizeAxes = Axes.X;
+            AutoSizeAxes = Axes.Y;
 
             Shear = new Vector2(OsuGame.SHEAR, 0);
             Margin = new MarginPadding { Top = -corner_radius, Right = -40 };
@@ -55,8 +57,8 @@ namespace osu.Game.Screens.SelectV2
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Direction = FillDirection.Vertical,
-                    Spacing = new Vector2(0f, 8f),
-                    Padding = new MarginPadding { Top = corner_radius + 10f, Bottom = 5f, Right = 40f, Left = 10f },
+                    Spacing = new Vector2(0f, 5f),
+                    Padding = new MarginPadding { Top = corner_radius + 5, Bottom = 2, Right = 40f, Left = 2f },
                     Children = new Drawable[]
                     {
                         new Container
@@ -111,7 +113,7 @@ namespace osu.Game.Screens.SelectV2
                         new GridContainer
                         {
                             RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
+                            Height = 32,
                             Shear = -new Vector2(OsuGame.SHEAR, 0),
                             RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
                             ColumnDimensions = new[]
@@ -126,37 +128,22 @@ namespace osu.Game.Screens.SelectV2
                             {
                                 new[]
                                 {
-                                    new Container
+                                    new ShearedDropdown<SortMode>(SortStrings.Default)
                                     {
                                         RelativeSizeAxes = Axes.X,
-                                        Height = 32f,
-                                        Child = new ShearedDropdown<SortMode>(SortStrings.Default)
-                                        {
-                                            RelativeSizeAxes = Axes.X,
-                                            Items = Enum.GetValues<SortMode>(),
-                                        },
+                                        Items = Enum.GetValues<SortMode>(),
                                     },
                                     Empty(),
-                                    new Container
+                                    // todo: pending localisation
+                                    new ShearedDropdown<GroupMode>("Group by")
                                     {
                                         RelativeSizeAxes = Axes.X,
-                                        Height = 32f,
-                                        // todo: pending localisation
-                                        Child = new ShearedDropdown<GroupMode>("Group by")
-                                        {
-                                            RelativeSizeAxes = Axes.X,
-                                            Items = Enum.GetValues<GroupMode>(),
-                                        },
+                                        Items = Enum.GetValues<GroupMode>(),
                                     },
                                     Empty(),
-                                    new Container
+                                    new ShearedCollectionDropdown
                                     {
                                         RelativeSizeAxes = Axes.X,
-                                        Height = 32f,
-                                        Child = new ShearedCollectionDropdown
-                                        {
-                                            RelativeSizeAxes = Axes.X,
-                                        },
                                     },
                                 }
                             }

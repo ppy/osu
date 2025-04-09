@@ -24,10 +24,7 @@ namespace osu.Game.Screens.SelectV2
         [BackgroundDependencyLoader]
         private void load()
         {
-            CornerRadius = 10;
-            Masking = true;
-
-            const float header_height = 45f;
+            const float header_height = 35f;
 
             InternalChildren = new Drawable[]
             {

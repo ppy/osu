@@ -44,9 +44,9 @@ namespace osu.Game.Screens.SelectV2
                 {
                     valueText.AddArbitraryDrawable(new LoadingSpinner
                     {
-                        Size = new Vector2(OsuFont.Caption.Size),
+                        Size = new Vector2(10),
+                        Margin = new MarginPadding { Top = 3f },
                         State = { Value = Visibility.Visible },
-                        Margin = new MarginPadding { Top = 4f },
                     });
                 }
             }
