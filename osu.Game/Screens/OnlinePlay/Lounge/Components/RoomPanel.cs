@@ -317,6 +317,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
             beatmapLookupCancellation?.Cancel();
             beatmapLookupCancellation?.Dispose();
+            beatmapLookupCancellation = null;
 
             if (item.NewValue?.Beatmap == null)
             {
