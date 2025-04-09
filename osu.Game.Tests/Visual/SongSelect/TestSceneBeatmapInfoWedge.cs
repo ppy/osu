@@ -125,6 +125,12 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
+        public void TestTruncation()
+        {
+            selectBeatmap(createLongMetadata());
+        }
+
+        [Test]
         public void TestNullBeatmap()
         {
             selectBeatmap(null);
@@ -133,12 +139,6 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddAssert("check default artist", () => infoWedge.Info.ArtistLabel.Current.Value == Beatmap.Default.BeatmapInfo.Metadata.Artist);
             AddAssert("check empty author", () => !infoWedge.Info.MapperContainer.ChildrenOfType<OsuSpriteText>().Any());
             AddAssert("check no info labels", () => !infoWedge.Info.ChildrenOfType<BeatmapInfoWedge.WedgeInfoText.InfoLabel>().Any());
-        }
-
-        [Test]
-        public void TestTruncation()
-        {
-            selectBeatmap(createLongMetadata());
         }
 
         [Test]

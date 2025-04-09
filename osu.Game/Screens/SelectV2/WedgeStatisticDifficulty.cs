@@ -115,8 +115,12 @@ namespace osu.Game.Screens.SelectV2
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
-                                Margin = new MarginPadding { Top = 2f },
-                                Size = new Vector2(12),
+                                Margin = new MarginPadding
+                                {
+                                    Top = -4f,
+                                    Left = 2,
+                                },
+                                Size = new Vector2(8),
                             }
                         },
                     },
@@ -160,7 +164,7 @@ namespace osu.Game.Screens.SelectV2
                     valueText.FadeColour(colours.Blue1, 300, Easing.OutQuint);
                     valueIcon.Show();
                     valueIcon.Colour = colours.Blue1;
-                    valueIcon.Icon = FontAwesome.Solid.ArrowDown;
+                    valueIcon.Icon = FontAwesome.Solid.SortDown;
                 }
                 else
                 {
@@ -168,7 +172,7 @@ namespace osu.Game.Screens.SelectV2
                     valueText.FadeColour(colours.Red1, 300, Easing.OutQuint);
                     valueIcon.Show();
                     valueIcon.Colour = colours.Red1;
-                    valueIcon.Icon = FontAwesome.Solid.ArrowUp;
+                    valueIcon.Icon = FontAwesome.Solid.SortUp;
                 }
             }
         }
