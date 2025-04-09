@@ -23,7 +23,7 @@ namespace osu.Game.Screens.SelectV2
         {
             set
             {
-                base.Value = value?.Total.ToLocalisableString("N0");
+                base.Value = value?.Total < 0 ? "-" : value?.Total.ToLocalisableString("N0");
                 TooltipContent = value;
             }
         }
@@ -128,8 +128,8 @@ namespace osu.Game.Screens.SelectV2
 
             public void SetContent(Data content)
             {
-                totalPlaysText.Text = content.Total.ToLocalisableString("N0");
-                personalPlaysText.Text = content.User.ToLocalisableString("N0");
+                totalPlaysText.Text = content.Total < 0 ? "-" : content.Total.ToLocalisableString("N0");
+                personalPlaysText.Text = content.User < 0 ? "-" : content.User.ToLocalisableString("N0");
             }
 
             public void Move(Vector2 pos) => Position = pos;
