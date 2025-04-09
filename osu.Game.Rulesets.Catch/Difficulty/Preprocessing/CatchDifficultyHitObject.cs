@@ -18,12 +18,40 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing
 
         public new PalpableCatchHitObject LastObject => (PalpableCatchHitObject)base.LastObject;
 
+        /// <summary>
+        /// Normalized position of <see cref="BaseObject"/>.
+        /// </summary>
         public readonly float NormalizedPosition;
+
+        /// <summary>
+        /// Normalized position of <see cref="LastObject"/>.
+        /// </summary>
         public readonly float LastNormalizedPosition;
 
+        /// <summary>
+        /// Normalized position of the player required to catch <see cref="BaseObject"/>, assuming the player moves as little as possible.
+        /// </summary>
         public float PlayerPosition { get; private set; }
+
+        /// <summary>
+        /// Normalized position of the player after catching <see cref="LastObject"/>.
+        /// </summary>
         public float LastPlayerPosition { get; private set; }
+
+        /// <summary>
+        /// Normalized distance between <see cref="LastPlayerPosition"/> and <see cref="PlayerPosition"/>.
+        /// </summary>
+        /// <remarks>
+        /// The sign of the value indicates the direction of the movement: negative is left and positive is right.
+        /// </remarks>
         public float DistanceMoved { get; private set; }
+
+        /// <summary>
+        /// Normalized distance the player has to move from <see cref="LastPlayerPosition"/> in order to catch <see cref="BaseObject"/> at its <see cref="NormalizedPosition"/>.
+        /// </summary>
+        /// <remarks>
+        /// The sign of the value indicates the direction of the movement: negative is left and positive is right.
+        /// </remarks>
         public float ExactDistanceMoved { get; private set; }
 
         /// <summary>
