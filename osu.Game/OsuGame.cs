@@ -977,20 +977,6 @@ namespace osu.Game
             MultiplayerClient.PostNotification = n => Notifications.Post(n);
             MultiplayerClient.PresentMatch = PresentMultiplayerMatch;
 
-            // make config aware of how to lookup skins for on-screen display purposes.
-            // if this becomes a more common thing, tracked settings should be reconsidered to allow local DI.
-            LocalConfig.LookupSkinName = id => SkinManager.Query(s => s.ID == id)?.ToString() ?? "Unknown";
-
-            LocalConfig.LookupKeyBindings = l =>
-            {
-                var combinations = KeyBindingStore.GetReadableKeyCombinationsFor(l);
-
-                if (combinations.Count == 0)
-                    return ToastStrings.NoKeyBound;
-
-                return string.Join(" / ", combinations);
-            };
-
             ScreenFooter.BackReceptor backReceptor;
 
             dependencies.CacheAs(idleTracker = new GameIdleTracker(6000));
