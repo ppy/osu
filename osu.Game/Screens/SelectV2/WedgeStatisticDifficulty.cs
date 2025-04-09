@@ -5,6 +5,7 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
@@ -40,6 +41,7 @@ namespace osu.Game.Screens.SelectV2
         private readonly OsuSpriteText labelText;
         private readonly OsuSpriteText valueText;
         private readonly SpriteIcon valueIcon;
+        private readonly Container bars;
 
         public Color4 AccentColour
         {
@@ -61,7 +63,7 @@ namespace osu.Game.Screens.SelectV2
                 Direction = FillDirection.Vertical,
                 Children = new Drawable[]
                 {
-                    new Container
+                    bars = new Container
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
@@ -74,6 +76,7 @@ namespace osu.Game.Screens.SelectV2
                                 Colour = Color4.Black,
                                 Masking = true,
                                 CornerRadius = 1f,
+                                Depth = float.MaxValue,
                             },
                             bar = new Circle
                             {
@@ -90,7 +93,6 @@ namespace osu.Game.Screens.SelectV2
                                 Height = 2f,
                                 Masking = true,
                                 CornerRadius = 1f,
-                                Alpha = 0.5f,
                             },
                         },
                     },
@@ -152,27 +154,36 @@ namespace osu.Game.Screens.SelectV2
             if (value.Value == value.AdjustedValue)
             {
                 adjustedBar.FadeColour(Color4.Transparent, 300, Easing.OutQuint);
+                bar.FadeIn(300, Easing.OutQuint);
 
                 valueText.FadeColour(Color4.White, 300, Easing.OutQuint);
                 valueIcon.Hide();
             }
             else
             {
-                if (value.Value > value.AdjustedValue)
+                bool difficultyIncrease = value.Value < value.AdjustedValue;
+
+                if (difficultyIncrease)
                 {
-                    adjustedBar.FadeColour(colours.Blue1, 300, Easing.OutQuint);
-                    valueText.FadeColour(colours.Blue1, 300, Easing.OutQuint);
-                    valueIcon.Show();
-                    valueIcon.Colour = colours.Blue1;
-                    valueIcon.Icon = FontAwesome.Solid.SortDown;
-                }
-                else
-                {
-                    adjustedBar.FadeColour(colours.Red1, 300, Easing.OutQuint);
+                    bars.ChangeChildDepth(adjustedBar, 1);
+                    bar.FadeIn(300, Easing.OutQuint);
+                    adjustedBar.FadeColour(ColourInfo.GradientHorizontal(Color4.Black, colours.Red1), 300, Easing.OutQuint);
+
                     valueText.FadeColour(colours.Red1, 300, Easing.OutQuint);
                     valueIcon.Show();
                     valueIcon.Colour = colours.Red1;
                     valueIcon.Icon = FontAwesome.Solid.SortUp;
+                }
+                else
+                {
+                    bar.FadeTo(0.5f, 300, Easing.OutQuint);
+                    bars.ChangeChildDepth(adjustedBar, -1);
+                    adjustedBar.FadeColour(colours.Lime1, 300, Easing.OutQuint);
+
+                    valueText.FadeColour(colours.Lime1, 300, Easing.OutQuint);
+                    valueIcon.Show();
+                    valueIcon.Colour = colours.Lime1;
+                    valueIcon.Icon = FontAwesome.Solid.SortDown;
                 }
             }
         }
