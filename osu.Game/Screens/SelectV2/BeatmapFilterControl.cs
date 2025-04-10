@@ -83,7 +83,7 @@ namespace osu.Game.Screens.SelectV2
                             ColumnDimensions = new[]
                             {
                                 new Dimension(),
-                                new Dimension(GridSizeMode.Absolute, 10),
+                                new Dimension(GridSizeMode.Absolute, 0),
                                 new Dimension(GridSizeMode.AutoSize),
                             },
                             Content = new[]
@@ -96,16 +96,12 @@ namespace osu.Game.Screens.SelectV2
                                         MinRange = 0.1f,
                                     },
                                     Empty(),
-                                    new Container
+                                    showConvertedBeatmapsButton = new ShearedToggleButton
                                     {
-                                        Size = new Vector2(210, 30),
-                                        Child = showConvertedBeatmapsButton = new ShearedToggleButton
-                                        {
-                                            Anchor = Anchor.Centre,
-                                            Origin = Anchor.Centre,
-                                            Text = UserInterfaceStrings.ShowConvertedBeatmaps,
-                                            Height = 30f,
-                                        },
+                                        Anchor = Anchor.Centre,
+                                        Origin = Anchor.Centre,
+                                        Text = UserInterfaceStrings.ShowConvertedBeatmaps,
+                                        Height = 30f,
                                     },
                                 },
                             }
@@ -113,15 +109,15 @@ namespace osu.Game.Screens.SelectV2
                         new GridContainer
                         {
                             RelativeSizeAxes = Axes.X,
-                            Height = 32,
+                            Height = 30,
                             Shear = -new Vector2(OsuGame.SHEAR, 0),
                             RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
                             ColumnDimensions = new[]
                             {
                                 new Dimension(maxSize: 210),
-                                new Dimension(GridSizeMode.Absolute, 10),
+                                new Dimension(GridSizeMode.Absolute, 5),
                                 new Dimension(maxSize: 230),
-                                new Dimension(GridSizeMode.Absolute, 10),
+                                new Dimension(GridSizeMode.Absolute, 5),
                                 new Dimension(),
                             },
                             Content = new[]

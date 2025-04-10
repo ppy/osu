@@ -91,11 +91,11 @@ namespace osu.Game.Graphics.UserInterface
         public ShearedButton(float? width = null, float height = DEFAULT_HEIGHT)
         {
             Height = height;
-            Padding = new MarginPadding { Horizontal = shear * height };
 
-            Content.CornerRadius = CORNER_RADIUS;
-            Content.Shear = new Vector2(shear, 0);
-            Content.Masking = true;
+            CornerRadius = CORNER_RADIUS;
+            Shear = new Vector2(shear, 0);
+            Masking = true;
+
             Content.Anchor = Content.Origin = Anchor.Centre;
 
             Children = new Drawable[]
