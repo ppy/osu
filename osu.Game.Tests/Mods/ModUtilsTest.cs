@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Moq;
 using NUnit.Framework;
+using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Localisation;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
@@ -441,35 +442,24 @@ namespace osu.Game.Tests.Mods
         [Test]
         public void TestFreestyleRulesetCompatibility()
         {
-            Mod[] osuMods = ModUtils.FlattenMods(new OsuRuleset().CreateAllMods()).Where(m => m.ValidForFreestyle).ToArray();
-            Ruleset[] otherRulesets = [new TaikoRuleset(), new CatchRuleset(), new ManiaRuleset()];
+            HashSet<string> commonAcronyms = new HashSet<string>();
 
-            EqualityComparer<Mod> validModComparer = EqualityComparer<Mod>.Create((a, b) =>
-            {
-                if (a == null || b == null)
-                    return false;
-
-                Type aType = a.GetType();
-
-                while (aType != typeof(Mod))
-                {
-                    if (aType.IsInstanceOfType(b))
-                        return string.Equals(a.Acronym, b.Acronym, StringComparison.Ordinal);
-
-                    aType = aType.BaseType!;
-                }
-
-                return false;
-            });
+            commonAcronyms.UnionWith(new OsuRuleset().CreateAllMods().Select(m => m.Acronym));
+            commonAcronyms.IntersectWith(new TaikoRuleset().CreateAllMods().Select(m => m.Acronym));
+            commonAcronyms.IntersectWith(new CatchRuleset().CreateAllMods().Select(m => m.Acronym));
+            commonAcronyms.IntersectWith(new ManiaRuleset().CreateAllMods().Select(m => m.Acronym));
 
             Assert.Multiple(() =>
             {
-                foreach (var ruleset in otherRulesets)
+                foreach (var ruleset in new Ruleset[] { new OsuRuleset(), new TaikoRuleset(), new CatchRuleset(), new ManiaRuleset() })
                 {
-                    Mod[] mods = ModUtils.FlattenMods(ruleset.CreateAllMods()).Where(m => m.ValidForFreestyle).ToArray();
-
-                    foreach (var mod in mods)
-                        Assert.That(osuMods, Contains.Item(mod).Using<Mod>(validModComparer));
+                    foreach (var mod in ruleset.CreateAllMods())
+                    {
+                        if (mod.ValidForFreestyle && mod.UserPlayable && !commonAcronyms.Contains(mod.Acronym))
+                            Assert.Fail($"{mod.GetType().ReadableName()} declares {nameof(Mod.ValidForFreestyle)} but does not exist in all four basic rulesets!");
+                        if (!mod.ValidForFreestyle && mod.UserPlayable && commonAcronyms.Contains(mod.Acronym))
+                            Assert.Fail($"{mod.GetType().ReadableName()} does not declare {nameof(Mod.ValidForFreestyle)} but exists in all four basic rulesets!");
+                    }
                 }
             });
         }
